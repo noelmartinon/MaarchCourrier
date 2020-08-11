@@ -5,6 +5,6 @@
     </div>
     <span class="divider-modal"></span>
     <div mat-dialog-actions *ngIf="!data.hidebutton">
-        <button id="alertComponentClose" class="actions" color="primary" mat-raised-button (click)="this.dialogRef.close();">{{lang.ok}}</button>
+        <button id="alertComponentClose" class="actions" color="primary" mat-raised-button (click)="this.dialogRef.close();">{{'lang.ok' | translate}}</button>
     </div>
 </div>

@@ -1,7 +1,7 @@
-<button mat-mini-fab (click)="openSummarySheet();" [disabled]="selectedRes.length == 0" title="{{lang.summarySheets}}">
+<button mat-mini-fab (click)="openSummarySheet();" [disabled]="selectedRes.length == 0" title="{{'lang.summarySheets' | translate}}">
     <mat-icon class="fa fa-link"></mat-icon>
 </button>
 
-<button mat-mini-fab (click)="openExport();" [disabled]="selectedRes.length == 0" title="{{lang.exportDatas}}">
+<button mat-mini-fab (click)="openExport();" [disabled]="selectedRes.length == 0" title="{{'lang.exportDatas' | translate}}">
     <mat-icon class="fa fa-file-download"></mat-icon>
 </button>

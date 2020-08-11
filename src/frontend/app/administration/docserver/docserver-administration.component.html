@@ -23,7 +23,7 @@
                             <div class="col-md-12">
                                 <mat-form-field>
                                     <mat-select required name="docserver_type" id="docserver_type"
-                                        title="{{lang.docserverType}}" placeholder="{{lang.docserverType}}"
+                                        title="{{'lang.docserverType' | translate}}" placeholder="{{'lang.docserverType' | translate}}"
                                         [(ngModel)]="docserver.docserver_type_id">
                                         <mat-option *ngFor="let docserverType of this.docserversTypes"
                                             [value]="docserverType.docserver_type_id">
@@ -32,18 +32,18 @@
                                     </mat-select>
                                 </mat-form-field>
                                 <mat-form-field>
-                                    <input matInput required name="identifier" id="identifier" title="{{lang.id}}"
-                                        type="text" placeholder="{{lang.id}}" [(ngModel)]="docserver.docserver_id"
+                                    <input matInput required name="identifier" id="identifier" title="{{'lang.id' | translate}}"
+                                        type="text" placeholder="{{'lang.id' | translate}}" [(ngModel)]="docserver.docserver_id"
                                         maxlength="32" pattern="^[\w.-]*$">
                                 </mat-form-field>
                                 <mat-form-field>
-                                    <input matInput required name="label" id="label" title="{{lang.label}}" type="text"
-                                        placeholder="{{lang.label}}" [(ngModel)]="docserver.device_label"
+                                    <input matInput required name="label" id="label" title="{{'lang.label' | translate}}" type="text"
+                                        placeholder="{{'lang.label' | translate}}" [(ngModel)]="docserver.device_label"
                                         maxlength="255">
                                 </mat-form-field>
                                 <mat-form-field>
-                                    <mat-select required name="collection" id="collection" title="{{lang.collection}}"
-                                        placeholder="{{lang.collection}}" [(ngModel)]="docserver.coll_id">
+                                    <mat-select required name="collection" id="collection" title="{{'lang.collection' | translate}}"
+                                        placeholder="{{'lang.collection' | translate}}" [(ngModel)]="docserver.coll_id">
                                         <mat-option value="letterbox_coll" selected>
                                             letterbox_coll
                                         </mat-option>
@@ -56,21 +56,21 @@
                                     </mat-select>
                                 </mat-form-field>
                                 <mat-form-field>
-                                    <input matInput required name="max_size" id="max_size" title="{{lang.maxSize}}"
-                                        type="number" placeholder="{{lang.maxSize}}"
+                                    <input matInput required name="max_size" id="max_size" title="{{'lang.maxSize' | translate}}"
+                                        type="number" placeholder="{{'lang.maxSize' | translate}}"
                                         [(ngModel)]="docserver.limitSizeFormatted" [disabled]="docserver.is_readonly"
                                         pattern="^\d+$">
                                     <span matSuffix> Go</span>
                                 </mat-form-field>
                                 <mat-form-field>
-                                    <input matInput required name="path" id="path" title="{{lang.path}}" type="text"
-                                        placeholder="{{lang.path}}" [(ngModel)]="docserver.path_template"
+                                    <input matInput required name="path" id="path" title="{{'lang.path' | translate}}" type="text"
+                                        placeholder="{{'lang.path' | translate}}" [(ngModel)]="docserver.path_template"
                                         [disabled]="docserver.is_readonly">
                                 </mat-form-field>
                             </div>
                             <div class="col-md-12 text-center" style="padding:10px;">
                                 <button mat-raised-button color="primary" type="submit"
-                                    [disabled]="!docserverForm.form.valid">{{lang.add}}</button>
+                                    [disabled]="!docserverForm.form.valid">{{'lang.add' | translate}}</button>
                             </div>
                         </div>
                     </form>

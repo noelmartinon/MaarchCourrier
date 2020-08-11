@@ -1,6 +1,7 @@
 import { Component, OnInit, NgZone, ViewChild, QueryList, ViewChildren, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from './translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../service/notification/notification.service';
 import { HeaderService } from '../service/header.service';
 import { debounceTime, switchMap, distinctUntilChanged, filter, tap } from 'rxjs/operators';
@@ -162,6 +163,7 @@ export class ProfileComponent implements OnInit {
 
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private zone: NgZone,
         private notify: NotificationService,
@@ -231,8 +233,8 @@ export class ProfileComponent implements OnInit {
         tinymce.init({
             selector: 'textarea#emailSignature',
             statusbar: false,
-            language: this.lang.langISO.replace('-', '_'),
-            language_url: `../node_modules/tinymce-i18n/langs/${this.lang.langISO.replace('-', '_')}.js`,
+            language: this.translate.instant('lang.langISO').replace('-', '_'),
+            language_url: `../node_modules/tinymce-i18n/langs/${this.translate.instant('lang.langISO').replace('-', '_')}.js`,
             height: '200',
             plugins: [
                 'textcolor'
@@ -284,7 +286,7 @@ export class ProfileComponent implements OnInit {
             .subscribe((data: any) => {
                 this.initGroupsContact();
                 // this.toggleAddGrp();
-                this.notify.success(this.lang.contactsGroupAdded);
+                this.notify.success(this.translate.instant('lang.contactsGroupAdded'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -293,7 +295,7 @@ export class ProfileComponent implements OnInit {
     updateGroupSubmit() {
         this.http.put('../rest/contactsGroups/' + this.contactsGroup.id, this.contactsGroup)
             .subscribe(() => {
-                this.notify.success(this.lang.contactsGroupUpdated);
+                this.notify.success(this.translate.instant('lang.contactsGroupUpdated'));
                 this.initGroupsContact();
             }, (err) => {
                 this.notify.error(err.error.errors);
@@ -302,7 +304,7 @@ export class ProfileComponent implements OnInit {
 
     deleteContactsGroup(row: any) {
         var contactsGroup = this.contactsGroups[row];
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + contactsGroup.label + ' »');
+        let r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + contactsGroup.label + ' »');
         if (r) {
             this.http.delete('../rest/contactsGroups/' + contactsGroup.id)
                 .subscribe(() => {
@@ -314,7 +316,7 @@ export class ProfileComponent implements OnInit {
 
                     this.dataSourceGroupsList = new MatTableDataSource(this.contactsGroups);
                     this.dataSourceGroupsList.paginator = this.paginatorGroupsList;
-                    this.notify.success(this.lang.contactsGroupDeleted);
+                    this.notify.success(this.translate.instant('lang.contactsGroupDeleted'));
 
                 }, (err) => {
                     this.notify.error(err.error.errors);
@@ -338,13 +340,13 @@ export class ProfileComponent implements OnInit {
     }
 
     saveContactsList(elem: any): void {
-        elem.textContent = this.lang.loading + '...';
+        elem.textContent = this.translate.instant('lang.loading') + '...';
         elem.disabled = true;
         this.http.post('../rest/contactsGroups/' + this.contactsGroup.id + '/contacts', { 'contacts': this.selection.selected })
             .subscribe((data: any) => {
-                this.notify.success(this.lang.contactAdded);
+                this.notify.success(this.translate.instant('lang.contactAdded'));
                 this.selection.clear();
-                elem.textContent = this.lang.add;
+                elem.textContent = this.translate.instant('lang.add');
                 this.contactsGroup = data.contactsGroup;
                 setTimeout(() => {
                     this.dataSourceContactsList = new MatTableDataSource(this.contactsGroup.contacts);
@@ -357,7 +359,7 @@ export class ProfileComponent implements OnInit {
     }
 
     preDelete(index: number) {
-        let r = confirm(this.lang.reallyWantToDeleteContactFromGroup);
+        let r = confirm(this.translate.instant('lang.reallyWantToDeleteContactFromGroup'));
 
         if (r) {
             this.removeContact(this.contactsGroup.contacts[index], index);
@@ -375,7 +377,7 @@ export class ProfileComponent implements OnInit {
                 this.dataSourceContactsList = new MatTableDataSource(this.contactsGroup.contacts);
                 this.dataSourceContactsList.paginator = this.paginatorContactsList;
                 this.dataSourceContactsList.sort = this.sortContactsList;
-                this.notify.success(this.lang.contactDeletedFromGroup);
+                this.notify.success(this.translate.instant('lang.contactDeletedFromGroup'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -405,7 +407,7 @@ export class ProfileComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.myProfile);
+        this.headerService.setHeader(this.translate.instant('lang.myProfile'));
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
@@ -528,7 +530,7 @@ export class ProfileComponent implements OnInit {
             )
         });
 
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.redirectBasket);
+        let r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.redirectBasket'));
 
         if (r) {
             this.http.post('../rest/users/' + this.user.id + '/redirectedBaskets', basketsRedirect)
@@ -536,7 +538,7 @@ export class ProfileComponent implements OnInit {
                     this.user.baskets = data['baskets'];
                     this.user.redirectedBaskets = data['redirectedBaskets'];
                     this.selectionBaskets.clear();
-                    this.notify.success(this.lang.basketUpdated);
+                    this.notify.success(this.translate.instant('lang.basketUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -544,14 +546,14 @@ export class ProfileComponent implements OnInit {
     }
 
     delBasketRedirection(basket: any, i: number) {
-        let r = confirm(this.lang.confirmAction);
+        let r = confirm(this.translate.instant('lang.confirmAction'));
 
         if (r) {
             this.http.delete('../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
                 .subscribe((data: any) => {
                     this.user.baskets = data['baskets'];
                     this.user.redirectedBaskets.splice(i, 1);
-                    this.notify.success(this.lang.basketUpdated);
+                    this.notify.success(this.translate.instant('lang.basketUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -559,14 +561,14 @@ export class ProfileComponent implements OnInit {
     }
 
     delBasketAssignRedirection(basket: any, i: number) {
-        let r = confirm(this.lang.confirmAction);
+        let r = confirm(this.translate.instant('lang.confirmAction'));
 
         if (r) {
             this.http.delete('../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
                 .subscribe((data: any) => {
                     this.user.baskets = data['baskets'];
                     this.user.assignedBaskets.splice(i, 1);
-                    this.notify.success(this.lang.basketUpdated);
+                    this.notify.success(this.translate.instant('lang.basketUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -574,7 +576,7 @@ export class ProfileComponent implements OnInit {
     }
 
     reassignBasketRedirection(newUser: any, basket: any, i: number) {
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.redirectBasket);
+        let r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.redirectBasket'));
 
         if (r) {
             this.http.post('../rest/users/' + this.user.id + '/redirectedBaskets', [
@@ -588,7 +590,7 @@ export class ProfileComponent implements OnInit {
                 .subscribe((data: any) => {
                     this.user.baskets = data['baskets'];
                     this.user.assignedBaskets.splice(i, 1);
-                    this.notify.success(this.lang.basketUpdated);
+                    this.notify.success(this.translate.instant('lang.basketUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -599,14 +601,14 @@ export class ProfileComponent implements OnInit {
         this.http.put('../rest/currentUser/groups/' + this.user.regroupedBaskets[i].groupSerialId + '/baskets/' + this.user.regroupedBaskets[i].baskets[y].basket_id, { 'color': this.user.regroupedBaskets[i].baskets[y].color })
             .subscribe((data: any) => {
                 this.user.regroupedBaskets = data.userBaskets;
-                this.notify.success(this.lang.modificationSaved);
+                this.notify.success(this.translate.instant('lang.modificationSaved'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
     }
 
     activateAbsence() {
-        let r = confirm(this.lang.confirmToBeAbsent);
+        let r = confirm(this.translate.instant('lang.confirmToBeAbsent'));
 
         if (r) {
             this.http.put('../rest/users/' + this.user.id + '/status', { 'status': 'ABS' })
@@ -621,7 +623,7 @@ export class ProfileComponent implements OnInit {
     askRedirectBasket() {
         this.myBasketExpansionPanel = false;
         this.viewPanels.forEach(p => p.close());
-        let r = confirm(this.lang.askRedirectBasketBeforeAbsence);
+        let r = confirm(this.translate.instant('lang.askRedirectBasketBeforeAbsence'));
         if (r) {
             this.selectedIndex = 1;
             setTimeout(() => {
@@ -644,7 +646,7 @@ export class ProfileComponent implements OnInit {
                     newPassword: '',
                     reNewPassword: '',
                 };
-                this.notify.success(this.lang.passwordUpdated);
+                this.notify.success(this.translate.instant('lang.passwordUpdated'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -665,7 +667,7 @@ export class ProfileComponent implements OnInit {
                         title: '',
                     };
                     tinymce.get('emailSignature').setContent('');
-                    this.notify.success(this.lang.emailSignatureAdded);
+                    this.notify.success(this.translate.instant('lang.emailSignatureAdded'));
                 }
             });
     }
@@ -681,13 +683,13 @@ export class ProfileComponent implements OnInit {
                 } else {
                     this.user.emailSignatures[this.mailSignatureModel.selected].title = data.emailSignature.title;
                     this.user.emailSignatures[this.mailSignatureModel.selected].html_body = data.emailSignature.html_body;
-                    this.notify.success(this.lang.emailSignatureUpdated);
+                    this.notify.success(this.translate.instant('lang.emailSignatureUpdated'));
                 }
             });
     }
 
     deleteEmailSignature() {
-        let r = confirm(this.lang.confirmDeleteMailSignature);
+        let r = confirm(this.translate.instant('lang.confirmDeleteMailSignature'));
 
         if (r) {
             var id = this.user.emailSignatures[this.mailSignatureModel.selected].id;
@@ -704,7 +706,7 @@ export class ProfileComponent implements OnInit {
                             title: '',
                         };
                         tinymce.get('emailSignature').setContent('');
-                        this.notify.success(this.lang.emailSignatureDeleted);
+                        this.notify.success(this.translate.instant('lang.emailSignatureDeleted'));
                     }
                 });
         }
@@ -722,7 +724,7 @@ export class ProfileComponent implements OnInit {
                     size: 0,
                     label: '',
                 };
-                this.notify.success(this.lang.signatureAdded);
+                this.notify.success(this.translate.instant('lang.signatureAdded'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -731,20 +733,20 @@ export class ProfileComponent implements OnInit {
     updateSignature(signature: any) {
         this.http.put('../rest/users/' + this.user.id + '/signatures/' + signature.id, { 'label': signature.signature_label })
             .subscribe((data: any) => {
-                this.notify.success(this.lang.signatureUpdated);
+                this.notify.success(this.translate.instant('lang.signatureUpdated'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
     }
 
     deleteSignature(id: number) {
-        let r = confirm(this.lang.confirmDeleteSignature);
+        let r = confirm(this.translate.instant('lang.confirmDeleteSignature'));
 
         if (r) {
             this.http.delete('../rest/users/' + this.user.id + '/signatures/' + id)
                 .subscribe((data: any) => {
                     this.user.signatures = data.signatures;
-                    this.notify.success(this.lang.signatureDeleted);
+                    this.notify.success(this.translate.instant('lang.signatureDeleted'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -754,7 +756,7 @@ export class ProfileComponent implements OnInit {
     onSubmit() {
         this.http.put('../rest/currentUser/profile', this.user)
             .subscribe(() => {
-                this.notify.success(this.lang.modificationSaved);
+                this.notify.success(this.translate.instant('lang.modificationSaved'));
                 this.headerService.user.firstname = this.user.firstname;
                 this.headerService.user.lastname = this.user.lastname;
             }, (err) => {
@@ -765,7 +767,7 @@ export class ProfileComponent implements OnInit {
     updateUserPreferences() {
         this.http.put('../rest/currentUser/profile/preferences', { documentEdition: this.user.preferences.documentEdition })
             .subscribe(() => {
-                this.notify.success(this.lang.modificationSaved);
+                this.notify.success(this.translate.instant('lang.modificationSaved'));
                 this.headerService.resfreshCurrentUser();
             }, (err) => {
                 this.notify.error(err.error.errors);
@@ -830,7 +832,7 @@ export class ProfileComponent implements OnInit {
                         this.passwordRules.renewal.enabled = rule.enabled;
                         this.passwordRules.renewal.value = rule.value;
                         if (rule.enabled) {
-                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.lang.days + '</b>. ' + this.lang['password2' + rule.label] + '.');
+                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.translate.instant('lang.days') + '</b>. ' + this.lang['password2' + rule.label] + '.');
                         }
                     } else if (rule.label == 'historyLastUse') {
                         this.passwordRules.historyLastUse.enabled = rule.enabled;
@@ -889,19 +891,19 @@ export class ProfileComponent implements OnInit {
             this.firstFormGroup.controls['retypePasswordCtrl'].setErrors(null);
         }
         if (this.firstFormGroup.controls['newPasswordCtrl'].hasError('required')) {
-            return this.lang.requiredField + ' !';
+            return this.translate.instant('lang.requiredField') + ' !';
 
         } else if (this.firstFormGroup.controls['newPasswordCtrl'].hasError('minlength') && this.passwordRules.minLength.enabled) {
-            return this.passwordRules.minLength.value + ' ' + this.lang.passwordminLength + ' !';
+            return this.passwordRules.minLength.value + ' ' + this.translate.instant('lang.passwordminLength') + ' !';
 
         } else if (this.firstFormGroup.controls['newPasswordCtrl'].errors != null && this.firstFormGroup.controls['newPasswordCtrl'].errors.complexityUpper !== undefined && this.passwordRules.complexityUpper.enabled) {
-            return this.lang.passwordcomplexityUpper + ' !';
+            return this.translate.instant('lang.passwordcomplexityUpper') + ' !';
 
         } else if (this.firstFormGroup.controls['newPasswordCtrl'].errors != null && this.firstFormGroup.controls['newPasswordCtrl'].errors.complexityNumber !== undefined && this.passwordRules.complexityNumber.enabled) {
-            return this.lang.passwordcomplexityNumber + ' !';
+            return this.translate.instant('lang.passwordcomplexityNumber') + ' !';
 
         } else if (this.firstFormGroup.controls['newPasswordCtrl'].errors != null && this.firstFormGroup.controls['newPasswordCtrl'].errors.complexitySpecial !== undefined && this.passwordRules.complexitySpecial.enabled) {
-            return this.lang.passwordcomplexitySpecial + ' !';
+            return this.translate.instant('lang.passwordcomplexitySpecial') + ' !';
 
         } else {
             this.firstFormGroup.controls['newPasswordCtrl'].setErrors(null);
@@ -941,7 +943,7 @@ export class ProfileComponent implements OnInit {
         this.http.put('../rest/users/' + this.user.id + '/externalSignatures', {})
             .subscribe((data: any) => {
                 this.loadingSign = false;
-                this.notify.success(this.lang.signsSynchronized);
+                this.notify.success(this.translate.instant('lang.signsSynchronized'));
             }, (err) => {
                 this.loadingSign = false;
                 this.notify.handleErrors(err);

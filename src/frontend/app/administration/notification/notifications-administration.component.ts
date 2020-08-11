@@ -1,10 +1,10 @@
 import { Component, ViewChild, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
@@ -13,6 +13,7 @@ import { tap } from 'rxjs/internal/operators/tap';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { of } from 'rxjs/internal/observable/of';
 import { finalize } from 'rxjs/operators';
+import { AdministrationService } from '../administration.service';
 
 @Component({
     templateUrl: 'notifications-administration.component.html'
@@ -48,29 +49,24 @@ export class NotificationsAdministrationComponent implements OnInit {
     crontab: any;
 
     displayedColumns = ['notification_id', 'description', 'is_enabled', 'notifications'];
-    dataSource = new MatTableDataSource(this.notifications);
+    filterColumns = ['notification_id', 'description'];
+
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
-    applyFilter(filterValue: string) {
-        filterValue = filterValue.trim(); // Remove whitespace
-        filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-        this.dataSource.filter = filterValue;
-        this.dataSource.filterPredicate = (template, filter: string) => {
-            return this.functions.filterUnSensitive(template, filter, ['notification_id', 'description']);
-        };
-    }
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
         public functions: FunctionsService,
+        public adminService: AdministrationService,
         private viewContainerRef: ViewContainerRef
     ) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.administration + ' ' + this.lang.notifications);
+        this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.notifications'));
 
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
@@ -81,12 +77,7 @@ export class NotificationsAdministrationComponent implements OnInit {
                 this.notifications = data.notifications;
                 this.loading = false;
                 setTimeout(() => {
-                    this.dataSource = new MatTableDataSource(this.notifications);
-                    this.dataSource.paginator = this.paginator;
-                    this.dataSource.sortingDataAccessor = this.functions.listSortingDataAccessor;
-                    this.sort.active = 'notification_id';
-                    this.sort.direction = 'asc';
-                    this.dataSource.sort = this.sort;
+                    this.adminService.setDataSource('admin_notif', this.notifications, this.sort, this.paginator, this.filterColumns);
                 }, 0);
             }, (err: any) => {
                 this.notify.error(err.error.errors);
@@ -94,19 +85,17 @@ export class NotificationsAdministrationComponent implements OnInit {
     }
 
     deleteNotification(notification: any) {
-        const r = confirm(this.lang.deleteMsg);
+        const r = confirm(this.translate.instant('lang.deleteMsg'));
 
         if (r) {
             this.http.delete('../rest/notifications/' + notification.notification_sid)
                 .subscribe((data: any) => {
                     this.notifications = data.notifications;
                     setTimeout(() => {
-                        this.dataSource = new MatTableDataSource(this.notifications);
-                        this.dataSource.paginator = this.paginator;
-                        this.dataSource.sort = this.sort;
+                        this.adminService.setDataSource('admin_notif', this.notifications, this.sort, this.paginator, this.filterColumns);
                     }, 0);
                     this.sidenavRight.close();
-                    this.notify.success(this.lang.notificationDeleted);
+                    this.notify.success(this.translate.instant('lang.notificationDeleted'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -115,36 +104,36 @@ export class NotificationsAdministrationComponent implements OnInit {
 
     loadCron() {
         return new Promise((resolve) => {
-            this.hours = [{ label: this.lang.eachHour, value: '*' }];
-            this.minutes = [{ label: this.lang.eachMinute, value: '*' }];
+            this.hours = [{ label: this.translate.instant('lang.eachHour'), value: '*' }];
+            this.minutes = [{ label: this.translate.instant('lang.eachMinute'), value: '*' }];
 
             this.months = [
-                { label: this.lang.eachMonth, value: '*' },
-                { label: this.lang.january, value: '1' },
-                { label: this.lang.february, value: '2' },
-                { label: this.lang.march, value: '3' },
-                { label: this.lang.april, value: '4' },
-                { label: this.lang.may, value: '5' },
-                { label: this.lang.june, value: '6' },
-                { label: this.lang.july, value: '7' },
-                { label: this.lang.august, value: '8' },
-                { label: this.lang.september, value: '9' },
-                { label: this.lang.october, value: '10' },
-                { label: this.lang.november, value: '11' },
-                { label: this.lang.december, value: '12' }
+                { label: this.translate.instant('lang.eachMonth'), value: '*' },
+                { label: this.translate.instant('lang.january'), value: '1' },
+                { label: this.translate.instant('lang.february'), value: '2' },
+                { label: this.translate.instant('lang.march'), value: '3' },
+                { label: this.translate.instant('lang.april'), value: '4' },
+                { label: this.translate.instant('lang.may'), value: '5' },
+                { label: this.translate.instant('lang.june'), value: '6' },
+                { label: this.translate.instant('lang.july'), value: '7' },
+                { label: this.translate.instant('lang.august'), value: '8' },
+                { label: this.translate.instant('lang.september'), value: '9' },
+                { label: this.translate.instant('lang.october'), value: '10' },
+                { label: this.translate.instant('lang.november'), value: '11' },
+                { label: this.translate.instant('lang.december'), value: '12' }
             ];
 
-            this.dom = [{ label: this.lang.notUsed, value: '*' }];
+            this.dom = [{ label: this.translate.instant('lang.notUsed'), value: '*' }];
 
             this.dow = [
-                { label: this.lang.eachDay, value: '*' },
-                { label: this.lang.monday, value: '1' },
-                { label: this.lang.tuesday, value: '2' },
-                { label: this.lang.wednesday, value: '3' },
-                { label: this.lang.thursday, value: '4' },
-                { label: this.lang.friday, value: '5' },
-                { label: this.lang.saturday, value: '6' },
-                { label: this.lang.sunday, value: '7' }
+                { label: this.translate.instant('lang.eachDay'), value: '*' },
+                { label: this.translate.instant('lang.monday'), value: '1' },
+                { label: this.translate.instant('lang.tuesday'), value: '2' },
+                { label: this.translate.instant('lang.wednesday'), value: '3' },
+                { label: this.translate.instant('lang.thursday'), value: '4' },
+                { label: this.translate.instant('lang.friday'), value: '5' },
+                { label: this.translate.instant('lang.saturday'), value: '6' },
+                { label: this.translate.instant('lang.sunday'), value: '7' }
             ];
 
             this.newCron = {
@@ -196,7 +185,7 @@ export class NotificationsAdministrationComponent implements OnInit {
                     'description': '',
                     'state': 'normal'
                 };
-                this.notify.success(this.lang.notificationScheduleUpdated);
+                this.notify.success(this.translate.instant('lang.notificationScheduleUpdated'));
             }, (err) => {
                 this.crontab.pop();
                 this.notify.error(err.error.errors);
@@ -208,7 +197,7 @@ export class NotificationsAdministrationComponent implements OnInit {
         this.http.post('../rest/notifications/schedule', this.crontab)
             .subscribe((data: any) => {
                 this.crontab.splice(i, 1);
-                this.notify.success(this.lang.notificationScheduleUpdated);
+                this.notify.success(this.translate.instant('lang.notificationScheduleUpdated'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });

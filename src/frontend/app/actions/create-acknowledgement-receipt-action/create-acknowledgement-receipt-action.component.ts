@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject, ViewChild, OnDestroy } from '@angular/core';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
@@ -47,6 +48,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
     loadingExport: boolean;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient, 
         private notify: NotificationService, 
         public dialogRef: MatDialogRef<CreateAcknowledgementReceiptActionComponent>, 
@@ -179,8 +181,8 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
             base_url: '../node_modules/tinymce/',
             readonly: false,
             suffix: '.min',
-            language: this.lang.langISO.replace('-', '_'),
-            language_url: `../node_modules/tinymce-i18n/langs/${this.lang.langISO.replace('-', '_')}.js`,
+            language: this.translate.instant('lang.langISO').replace('-', '_'),
+            language_url: `../node_modules/tinymce-i18n/langs/${this.translate.instant('lang.langISO').replace('-', '_')}.js`,
             menubar: false,
             statusbar: false,
             plugins: [

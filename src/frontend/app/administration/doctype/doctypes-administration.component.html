@@ -1,14 +1,14 @@
 <mat-sidenav-container autosize class="maarch-container">
     <ng-template #adminMenuTemplate>
         <mat-nav-list>
-            <h3 mat-subheader>{{lang.actions}}</h3>
+            <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
             <a mat-list-item (click)="prepareDoctypeAdd('firstLevel')">
                 <mat-icon color="primary" mat-list-icon class="fa-stack fa-fw" style="margin-left:-3px; font-size:18px">
                     <i class="fa fa-folder"></i>
                     <i class="fa fa-plus" style="position:absolute"></i>
                 </mat-icon>
                 <p mat-line>
-                    {{lang.addFirstLevel}}
+                    {{'lang.addFirstLevel' | translate}}
                 </p>
             </a>
             <a mat-list-item (click)="prepareDoctypeAdd('secondLevel')">
@@ -17,7 +17,7 @@
                     <i class="fa fa-plus" style="position:absolute"></i>
                 </mat-icon>
                 <p mat-line>
-                    {{lang.addSecondLevel}}
+                    {{'lang.addSecondLevel' | translate}}
                 </p>
             </a>
             <a mat-list-item (click)="prepareDoctypeAdd('doctype')">
@@ -26,7 +26,7 @@
                     <i class="fa fa-plus" style="position:absolute"></i>
                 </mat-icon>
                 <p mat-line>
-                    {{lang.addDoctype}}
+                    {{'lang.addDoctype' | translate}}
                 </p>
             </a>
         </mat-nav-list>
@@ -53,12 +53,12 @@
 
                     <mat-form-field>
                         <input matInput id="jstree_search" name="jstree_search" type="text"
-                            placeholder="{{lang.search}}">
+                            placeholder="{{'lang.search' | translate}}">
                     </mat-form-field>
                     <div id="jstree"></div>
                     <div class="mat-paginator"
                         style="min-height:48px;min-height: 48px;display: flex;justify-content: end;align-items: center;padding-right: 20px;">
-                        {{doctypes.length}} {{lang.documentTypesAlt}}</div>
+                        {{doctypes.length}} {{'lang.documentTypesAlt' | translate}}</div>
                 </mat-card>
             </div>
         </div>
@@ -68,14 +68,14 @@
 
         <mat-nav-list>
             <mat-tab-group>
-                <mat-tab label="{{lang.firstLevelDoctype}}" *ngIf="currentFirstLevel || creationMode=='firstLevel'">
+                <mat-tab label="{{'lang.firstLevelDoctype' | translate}}" *ngIf="currentFirstLevel || creationMode=='firstLevel'">
                     <form class="form-horizontal" #firstLevelForm="ngForm" style="overflow:hidden;">
                         <div class="form-group" *ngIf="!creationMode">
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentFirstLevel.doctypes_first_level_id" required
-                                        name="doctypes_first_level_id" id="doctypes_first_level_id" title="{{lang.id}}"
-                                        type="text" placeholder="{{lang.id}}" maxlength="255"
+                                        name="doctypes_first_level_id" id="doctypes_first_level_id" title="{{'lang.id' | translate}}"
+                                        type="text" placeholder="{{'lang.id' | translate}}" maxlength="255"
                                         [disabled]="!creationMode">
                                 </mat-form-field>
                             </div>
@@ -85,31 +85,31 @@
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentFirstLevel.doctypes_first_level_label" required
                                         name="doctypes_first_level_label" id="doctypes_first_level_label"
-                                        title="{{lang.label}}" type="text" placeholder="{{lang.label}}" maxlength="255">
+                                        title="{{'lang.label' | translate}}" type="text" placeholder="{{'lang.label' | translate}}" maxlength="255">
                                 </mat-form-field>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="col-md-12 text-center" style="padding:10px;">
                                 <button mat-raised-button [disabled]="!firstLevelForm.form.valid" color="primary"
-                                    (click)="saveFirstLevel()">{{lang.save}}</button>
+                                    (click)="saveFirstLevel()">{{'lang.save' | translate}}</button>
                                 <button type="button" mat-raised-button *ngIf="!creationMode"
                                     [disabled]="!firstLevelForm.form.valid || currentFirstLevel.hasChildren"
-                                    color="warn" (click)="removeFirstLevel()">{{lang.delete}}</button>
+                                    color="warn" (click)="removeFirstLevel()">{{'lang.delete' | translate}}</button>
                                 <button type="button" mat-raised-button *ngIf="creationMode" color="default"
-                                    (click)="readMode()">{{lang.cancel}}</button>
+                                    (click)="readMode()">{{'lang.cancel' | translate}}</button>
                             </div>
                         </div>
                     </form>
                 </mat-tab>
-                <mat-tab label="{{lang.secondLevelDoctype}}" *ngIf="currentSecondLevel || creationMode=='secondeLevel'">
+                <mat-tab label="{{'lang.secondLevelDoctype' | translate}}" *ngIf="currentSecondLevel || creationMode=='secondeLevel'">
                     <form class="form-horizontal" #secondLevelForm="ngForm" style="overflow:hidden;">
                         <div class="form-group" *ngIf="!creationMode">
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentSecondLevel.doctypes_second_level_id" required
                                         name="doctypes_second_level_id" id="doctypes_second_level_id"
-                                        title="{{lang.id}}" type="text" placeholder="{{lang.id}}" maxlength="255"
+                                        title="{{'lang.id' | translate}}" type="text" placeholder="{{'lang.id' | translate}}" maxlength="255"
                                         [disabled]="!creationMode">
                                 </mat-form-field>
                             </div>
@@ -119,12 +119,12 @@
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentSecondLevel.doctypes_second_level_label"
                                         required name="doctypes_second_level_label" id="doctypes_second_level_label"
-                                        title="{{lang.label}}" type="text" placeholder="{{lang.label}}" maxlength="255">
+                                        title="{{'lang.label' | translate}}" type="text" placeholder="{{'lang.label' | translate}}" maxlength="255">
                                 </mat-form-field>
                             </div>
                             <!-- <div class="col-sm-2">
                                 <mat-form-field>
-                                    <input matInput type="color" matTooltip="{{lang.chooseColor}}" name="css_style" id="css_style" [(ngModel)]="currentSecondLevel.css_style">
+                                    <input matInput type="color" matTooltip="{{'lang.chooseColor' | translate}}" name="css_style" id="css_style" [(ngModel)]="currentSecondLevel.css_style">
                                 </mat-form-field>
                             </div> -->
                         </div>
@@ -132,7 +132,7 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <mat-select id="doctypes_first_level_id" name="doctypes_first_level_id"
-                                        title="{{lang.firstLevelAttached}}" placeholder="{{lang.firstLevelAttached}}"
+                                        title="{{'lang.firstLevelAttached' | translate}}" placeholder="{{'lang.firstLevelAttached' | translate}}"
                                         [(ngModel)]="currentSecondLevel.doctypes_first_level_id" required>
                                         <mat-option *ngFor="let firstLevel of firstLevels"
                                             [value]="firstLevel.doctypes_first_level_id">
@@ -145,24 +145,24 @@
                         <div class="form-group">
                             <div class="col-md-12 text-center" style="padding:10px;">
                                 <button mat-raised-button [disabled]="!secondLevelForm.form.valid" color="primary"
-                                    (click)="saveSecondLevel()">{{lang.save}}</button>
+                                    (click)="saveSecondLevel()">{{'lang.save' | translate}}</button>
                                 <button mat-raised-button *ngIf="!creationMode"
                                     [disabled]="!secondLevelForm.form.valid || currentSecondLevel.hasChildren"
-                                    color="warn" (click)="removeSecondLevel()">{{lang.delete}}</button>
+                                    color="warn" (click)="removeSecondLevel()">{{'lang.delete' | translate}}</button>
                                 <button mat-raised-button *ngIf="creationMode" color="default"
-                                    (click)="readMode()">{{lang.cancel}}</button>
+                                    (click)="readMode()">{{'lang.cancel' | translate}}</button>
                             </div>
                         </div>
                     </form>
                 </mat-tab>
 
-                <mat-tab label="{{lang.doctype}}" *ngIf="currentType || creationMode=='doctype'">
+                <mat-tab label="{{'lang.doctype' | translate}}" *ngIf="currentType || creationMode=='doctype'">
                     <form class="form-horizontal" #typeForm="ngForm" style="overflow:hidden;">
                         <div class="form-group" *ngIf="!creationMode">
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentType.type_id" required name="type_id"
-                                        id="type_id" title="{{lang.id}}" type="text" placeholder="{{lang.id}}"
+                                        id="type_id" title="{{'lang.id' | translate}}" type="text" placeholder="{{'lang.id' | translate}}"
                                         maxlength="255" [disabled]="!creationMode">
                                 </mat-form-field>
                             </div>
@@ -171,7 +171,7 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentType.description" required name="description"
-                                        id="description" title="{{lang.label}}" type="text" placeholder="{{lang.label}}"
+                                        id="description" title="{{'lang.label' | translate}}" type="text" placeholder="{{'lang.label' | translate}}"
                                         maxlength="255">
                                 </mat-form-field>
                             </div>
@@ -180,7 +180,7 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <mat-select id="doctypes_second_level_id" name="doctypes_second_level_id"
-                                        title="{{lang.secondLevelAttached}}" placeholder="{{lang.secondLevelAttached}}"
+                                        title="{{'lang.secondLevelAttached' | translate}}" placeholder="{{'lang.secondLevelAttached' | translate}}"
                                         [(ngModel)]="currentType.doctypes_second_level_id" required>
                                         <mat-option *ngFor="let secondLevel of secondLevels"
                                             [value]="secondLevel.doctypes_second_level_id">
@@ -194,8 +194,8 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentType.process_delay" required
-                                        name="process_delay" id="process_delay" title="{{lang.processDelayDay}}"
-                                        type="number" placeholder="{{lang.processDelayDay}}" pattern="^[0-9]*$">
+                                        name="process_delay" id="process_delay" title="{{'lang.processDelayDay' | translate}}"
+                                        type="number" placeholder="{{'lang.processDelayDay' | translate}}" pattern="^[0-9]*$">
                                 </mat-form-field>
                             </div>
                         </div>
@@ -203,7 +203,7 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentType.delay1" required name="delay1" id="delay1"
-                                        title="{{lang.delay1}}" type="number" placeholder="{{lang.delay1}}"
+                                        title="{{'lang.delay1' | translate}}" type="number" placeholder="{{'lang.delay1' | translate}}"
                                         pattern="^[0-9]*$">
                                 </mat-form-field>
                             </div>
@@ -212,7 +212,7 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentType.delay2" required name="delay2" id="delay2"
-                                        title="{{lang.delay2}}" type="number" placeholder="{{lang.delay2}}"
+                                        title="{{'lang.delay2' | translate}}" type="number" placeholder="{{'lang.delay2' | translate}}"
                                         maxlength="255" pattern="^[0-9]*$">
                                 </mat-form-field>
                             </div>
@@ -220,8 +220,8 @@
                         <div class="form-group">
                             <div class="col-sm-12">
                                 <mat-form-field>
-                                    <mat-select id="process_mode" name="process_mode" title="{{lang.processMode}}"
-                                        placeholder="{{lang.processMode}}" [(ngModel)]="currentType.process_mode"
+                                    <mat-select id="process_mode" name="process_mode" title="{{'lang.processMode' | translate}}"
+                                        placeholder="{{'lang.processMode' | translate}}" [(ngModel)]="currentType.process_mode"
                                         required>
                                         <mat-option *ngFor="let process of processModes" [value]="process">
                                             {{process}}
@@ -234,7 +234,7 @@
                             <mat-expansion-panel>
                                 <mat-expansion-panel-header>
                                     <mat-panel-title>
-                                        {{lang.archival}}
+                                        {{'lang.archival' | translate}}
                                     </mat-panel-title>
                                 </mat-expansion-panel-header>
                                 <div class="form-group">
@@ -242,12 +242,12 @@
                                         <mat-form-field>
                                             <mat-select id="retention_final_disposition"
                                                 name="retention_final_disposition"
-                                                title="{{lang.retentionFinalDisposition}}"
-                                                placeholder="{{lang.retentionFinalDisposition}}"
+                                                title="{{'lang.retentionFinalDisposition' | translate}}"
+                                                placeholder="{{'lang.retentionFinalDisposition' | translate}}"
                                                 [(ngModel)]="currentType.retention_final_disposition">
                                                 <mat-option value=""></mat-option>
-                                                <mat-option value="destruction">{{lang.destruction}}</mat-option>
-                                                <mat-option value="conservation">{{lang.conservation}}</mat-option>
+                                                <mat-option value="destruction">{{'lang.destruction' | translate}}</mat-option>
+                                                <mat-option value="conservation">{{'lang.conservation' | translate}}</mat-option>
                                             </mat-select>
                                         </mat-form-field>
                                     </div>
@@ -256,16 +256,16 @@
                                     <div class="col-sm-6">
                                         <mat-form-field>
                                             <input matInput [(ngModel)]="currentType.retention_rule"
-                                                name="retention_rule" id="retention_rule" title="{{lang.retentionRule}}"
-                                                type="text" placeholder="{{lang.retentionRule}}" maxlength="15">
+                                                name="retention_rule" id="retention_rule" title="{{'lang.retentionRule' | translate}}"
+                                                type="text" placeholder="{{'lang.retentionRule' | translate}}" maxlength="15">
                                         </mat-form-field>
                                     </div>
                                     <div class="col-sm-6">
                                         <mat-form-field>
                                             <input matInput [(ngModel)]="currentType.duration_current_use"
                                                 name="duration_current_use" id="duration_current_use"
-                                                title="{{lang.durationCurrentUse}}" type="text"
-                                                placeholder="{{lang.durationCurrentUse}}" pattern="^[0-9]*$">
+                                                title="{{'lang.durationCurrentUse' | translate}}" type="text"
+                                                placeholder="{{'lang.durationCurrentUse' | translate}}" pattern="^[0-9]*$">
                                             <!-- pattern without required attribute must be type text -->
                                         </mat-form-field>
                                     </div>
@@ -276,12 +276,12 @@
                         <div class="form-group">
                             <div class="col-md-12 text-center" style="padding:10px;">
                                 <button mat-raised-button [disabled]="!typeForm.form.valid" color="primary"
-                                    (click)="saveType()">{{lang.save}}</button>
+                                    (click)="saveType()">{{'lang.save' | translate}}</button>
                                 <button mat-raised-button *ngIf="!creationMode" [disabled]="!typeForm.form.valid"
                                     color="warn" (click)="removeType()"
-                                    matTooltip="{{lang.toolTipDeleteDoctype}}">{{lang.delete}}</button>
+                                    matTooltip="{{'lang.toolTipDeleteDoctype' | translate}}">{{'lang.delete' | translate}}</button>
                                 <button mat-raised-button *ngIf="creationMode" color="default"
-                                    (click)="readMode()">{{lang.cancel}}</button>
+                                    (click)="readMode()">{{'lang.cancel' | translate}}</button>
                             </div>
                         </div>
                     </form>

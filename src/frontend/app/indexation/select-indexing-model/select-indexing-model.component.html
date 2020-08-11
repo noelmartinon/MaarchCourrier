@@ -13,11 +13,11 @@
         <mat-menu #IndexingModelsMenu="matMenu" [class]="'menuForm listModels-menu'">
             <div class="menuTitle">
                 <span>
-                    {{lang.indexingModel}}
+                    {{'lang.indexingModel' | translate}}
                 </span>
                 <mat-form-field floatLabel="never" appearance="outline" class="smallInput"
                     (click)="$event.stopPropagation();" style="width: 220px !important;">
-                    <input matInput id="searchTerm" placeholder="{{lang.filterBy}}" #listFilter autocomplete="off"
+                    <input matInput id="searchTerm" placeholder="{{'lang.filterBy' | translate}}" #listFilter autocomplete="off"
                         (click)="$event.stopPropagation();" (keydown)="$event.stopPropagation()">
                 </mat-form-field>
             </div>
@@ -32,11 +32,11 @@
                     </div>
                     <div *ngIf="indexingModel.private" style="flex:1;">
                         {{indexingModel.label | shorten: 45: '...'}}&nbsp;<span
-                            class="listModels-menu-badge">{{lang.private}}</span>
+                            class="listModels-menu-badge">{{'lang.private' | translate}}</span>
                     </div>
                     <button mat-icon-button class="listModels-menu-delete"
                         *ngIf="indexingModel.id !== currentIndexingModel.id && indexingModel.private"
-                        [title]="lang.delete"
+                        [title]="this.translate.instant('lang.delete')"
                         (click)="$event.stopPropagation();deletePrivateIndexingModel(indexingModel.id, i)">
                         <mat-icon class="fa fa-trash" color="warn">
                         </mat-icon>
@@ -45,7 +45,7 @@
             </ng-container>
         </mat-menu>
         <button mat-icon-button type="button" color="primary" (click)="savePrivateIndexingModel()"
-            [title]="lang.createPrivateIndexingModel">
+            [title]="this.translate.instant('lang.createPrivateIndexingModel')">
             <mat-icon class="far fa-copy"></mat-icon>
         </button>
     </ng-template>

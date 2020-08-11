@@ -1,6 +1,6 @@
-<div *ngIf="loading" style="display:block;padding: 10px;">{{lang.checkOnlyofficeServer}}...</div>
+<div *ngIf="loading" style="display:block;padding: 10px;">{{'lang.checkOnlyofficeServer' | translate}}...</div>
 <button *ngIf="!hideCloseEditor" class="onlyofficeButton_fullscreen" [class.buttonsHide]="hideButtons" [class.fullScreen]="fullscreenMode" mat-mini-fab color="warn"
-    [title]="lang.closeEditor" (click)="quit()">
+    [title]="this.translate.instant('lang.closeEditor')" (click)="quit()">
     <mat-icon class="fa fa-times" style="height:auto;"></mat-icon>
 </button>
 <button mat-mini-fab class="onlyofficeButton_close" [class.buttonsHide]="hideButtons" [class.fullScreen]="fullscreenMode" color="default"

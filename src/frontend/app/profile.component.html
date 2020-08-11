@@ -1,17 +1,17 @@
 <mat-sidenav-container autosize class="maarch-container">
     <ng-template #adminMenuTemplate>
         <mat-nav-list>
-            <h3 mat-subheader>{{lang.actions}}</h3>
+            <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
             <a mat-list-item (click)="askRedirectBasket()">
                 <mat-icon color="warn" mat-list-icon class="fa fa-plane"></mat-icon>
                 <p mat-line>
-                    {{lang.activateMyAbs}}
+                    {{'lang.activateMyAbs' | translate}}
                 </p>
             </a>
             <a *ngIf="user.canModifyPassword" mat-list-item (click)="changePasswd();">
                 <mat-icon color="primary" mat-list-icon class="fa fa-key"></mat-icon>
                 <p mat-line>
-                    {{lang.changeMyPassword}}
+                    {{'lang.changeMyPassword' | translate}}
                 </p>
             </a>
         </mat-nav-list>
@@ -36,19 +36,19 @@
                 </div>
                 <mat-card *ngIf="!loading" class="card-app-content">
                     <mat-tab-group [selectedIndex]="selectedIndex" (selectedTabChange)="initComponents($event)">
-                        <mat-tab label="{{lang.myInformations}}">
+                        <mat-tab label="{{'lang.myInformations' | translate}}">
                             <div *ngIf="showPassword" style="margin-bottom: 5%">
                                 <form [formGroup]="firstFormGroup">
                                     <div class="form-group">
                                         <mat-form-field style="padding:10px;">
-                                            <input matInput placeholder="{{lang.typeCurrentPassword}}"
+                                            <input matInput placeholder="{{'lang.typeCurrentPassword' | translate}}"
                                                    formControlName="currentPasswordCtrl" required
                                                    [type]="hidePassword ? 'password' : 'text'">
                                             <mat-icon matSuffix (click)="hidePassword = !hidePassword" class="fa fa-2x"
                                                       [ngClass]="[hidePassword ? 'fa-eye-slash' : 'fa-eye']"></mat-icon>
                                             <mat-error
                                                     *ngIf="firstFormGroup.controls['currentPasswordCtrl'].hasError('required')">
-                                                {{lang.requiredField}}</mat-error>
+                                                {{'lang.requiredField' | translate}}</mat-error>
                                         </mat-form-field>
                                     </div>
                                     <div class="form-group">
@@ -56,21 +56,21 @@
                                             {{this.ruleText}}</div>
                                         <div class="col-sm-6" style="padding-left:0px;padding-right: 0px;">
                                             <mat-form-field style="padding:10px;">
-                                                <input matInput #inputPasswd placeholder="{{lang.typeNewPassword}}"
+                                                <input matInput #inputPasswd placeholder="{{'lang.typeNewPassword' | translate}}"
                                                        formControlName="newPasswordCtrl" required
                                                        [type]="hidePassword ? 'password' : 'text'">
                                                 <mat-icon matSuffix (click)="hidePassword = !hidePassword" class="fa fa-2x"
                                                           [ngClass]="[hidePassword ? 'fa-eye-slash' : 'fa-eye']"></mat-icon>
                                                 <mat-hint *ngIf="validPassword">
                                                     <i color="accent" class="fa fa-check"></i>
-                                                    <span color="accent">{{lang.passwordValid}}</span>
+                                                    <span color="accent">{{'lang.passwordValid' | translate}}</span>
                                                 </mat-hint>
                                                 <mat-error>{{getErrorMessage()}}</mat-error>
                                             </mat-form-field>
                                         </div>
                                         <div class="col-sm-6" style="padding-left:0px;padding-right:0px;">
                                             <mat-form-field style="padding:10px;">
-                                                <input matInput #inputPasswd2 placeholder="{{lang.retypeNewPassword}}"
+                                                <input matInput #inputPasswd2 placeholder="{{'lang.retypeNewPassword' | translate}}"
                                                        required [type]="hidePassword ? 'password' : 'text'"
                                                        formControlName="retypePasswordCtrl">
                                                 <mat-icon matSuffix (click)="hidePassword = !hidePassword" class="fa fa-2x"
@@ -78,9 +78,9 @@
                                                 <mat-hint
                                                         *ngIf="!firstFormGroup.controls['retypePasswordCtrl'].hasError('mismatch') && firstFormGroup.controls['retypePasswordCtrl'].value != ''">
                                                     <i color="accent" class="fa fa-check"></i>
-                                                    <span color="accent">{{lang.passwordMatch}}</span>
+                                                    <span color="accent">{{'lang.passwordMatch' | translate}}</span>
                                                 </mat-hint>
-                                                <mat-error>{{lang.passwordNotMatch}} !</mat-error>
+                                                <mat-error>{{'lang.passwordNotMatch' | translate}} !</mat-error>
                                             </mat-form-field>
                                         </div>
                                     </div>
@@ -95,9 +95,9 @@
                                         <div style="text-align:center;">
                                             <button mat-raised-button color="primary" type="button"
                                                     (click)="updatePassword()"
-                                                    [disabled]="!firstFormGroup.valid">{{lang.update}}</button>
+                                                    [disabled]="!firstFormGroup.valid">{{'lang.update' | translate}}</button>
                                             <button mat-raised-button color="default" type="button"
-                                                    (click)="showPassword=false">{{lang.cancel}}</button>
+                                                    (click)="showPassword=false">{{'lang.cancel' | translate}}</button>
                                         </div>
                                     </div>
                                 </form>
@@ -113,8 +113,8 @@
                                         </div>
                                         <div class="input-group">
                                             <mat-form-field>
-                                                <input matInput type="text" title="{{lang.id}}" value="{{user.user_id}}"
-                                                       placeholder="{{lang.id}}" disabled>
+                                                <input matInput type="text" title="{{'lang.id' | translate}}" value="{{user.user_id}}"
+                                                       placeholder="{{'lang.id' | translate}}" disabled>
                                             </mat-form-field>
                                         </div>
                                     </div>
@@ -123,21 +123,21 @@
                                     <div class="col-sm-5" style="font-weight:bold;">
                                         <mat-form-field>
                                             <input matInput type="text" id="lastname" name="lastname"
-                                                   title="{{lang.lastname}}" placeholder="{{lang.lastname}}"
+                                                   title="{{'lang.lastname' | translate}}" placeholder="{{'lang.lastname' | translate}}"
                                                    [(ngModel)]="user.lastname" required>
                                         </mat-form-field>
                                     </div>
                                     <div class="col-sm-5" style="font-weight:bold;">
                                         <mat-form-field>
                                             <input matInput type="text" id="firstname" name="firstname"
-                                                   title="{{lang.firstname}}" placeholder="{{lang.firstname}}"
+                                                   title="{{'lang.firstname' | translate}}" placeholder="{{'lang.firstname' | translate}}"
                                                    [(ngModel)]="user.firstname" required>
                                         </mat-form-field>
                                     </div>
                                     <div class="col-sm-2" style="font-style:italic;">
                                         <mat-form-field>
                                             <input matInput type="text" id="initials" name="initials"
-                                                   title="{{lang.initials}}" placeholder="{{lang.initials}}"
+                                                   title="{{'lang.initials' | translate}}" placeholder="{{'lang.initials' | translate}}"
                                                    [(ngModel)]="user.initials">
                                         </mat-form-field>
                                     </div>
@@ -145,8 +145,8 @@
                                 <div class="form-group">
                                     <div class="col-sm-12">
                                         <mat-form-field>
-                                            <input matInput type="tel" id="phone" name="phone" title="{{lang.phoneNumber}}"
-                                                   placeholder="{{lang.phoneNumber}}" [(ngModel)]="user.phone"
+                                            <input matInput type="tel" id="phone" name="phone" title="{{'lang.phoneNumber' | translate}}"
+                                                   placeholder="{{'lang.phoneNumber' | translate}}" [(ngModel)]="user.phone"
                                                    pattern="\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$">
                                         </mat-form-field>
                                     </div>
@@ -154,8 +154,8 @@
                                 <div class="form-group">
                                     <div class="col-sm-12">
                                         <mat-form-field>
-                                            <input matInput type="email" id="mail" name="mail" title="{{lang.email}}"
-                                                   placeholder="{{lang.email}}" [(ngModel)]="user.mail"
+                                            <input matInput type="email" id="mail" name="mail" title="{{'lang.email' | translate}}"
+                                                   placeholder="{{'lang.email' | translate}}" [(ngModel)]="user.mail"
                                                    pattern="(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)" required>
                                         </mat-form-field>
                                     </div>
@@ -163,26 +163,26 @@
                                 <div class="form-group" style="margin-top: 10px;">
                                     <div style="text-align:center;">
                                         <button mat-raised-button color="primary" type="submit"
-                                                [disabled]="!profileForm.form.valid">{{lang.update}}</button>
+                                                [disabled]="!profileForm.form.valid">{{'lang.update' | translate}}</button>
                                     </div>
                                 </div>
                             </form>
                         </mat-tab>
-                        <mat-tab label="{{lang.myParameters}}">
+                        <mat-tab label="{{'lang.myParameters' | translate}}">
                             <mat-accordion>
                                 <mat-expansion-panel>
                                     <mat-expansion-panel-header>
                                         <mat-panel-title>
                                             <mat-icon color="primary" class="fa fa-file-word"
                                                       style="font-size:25px;width:50px;"></mat-icon>
-                                            <span>{{lang.editorOption}}</span>
+                                            <span>{{'lang.editorOption' | translate}}</span>
                                         </mat-panel-title>
                                         <mat-panel-description *ngIf="!appService.getViewMode()">
-                                            {{lang.editorOptionAdmin}}
+                                            {{'lang.editorOptionAdmin' | translate}}
                                         </mat-panel-description>
                                     </mat-expansion-panel-header>
 
-                                    <div class="col-sm-12 col-md-4" style="line-height: 50px;">{{lang.documentEditor}}</div>
+                                    <div class="col-sm-12 col-md-4" style="line-height: 50px;">{{'lang.documentEditor' | translate}}</div>
                                     <div class="col-sm-12 col-md-8">
                                         <mat-form-field>
                                             <mat-select name="documentEdition" [(ngModel)]="user.preferences.documentEdition"
@@ -200,10 +200,10 @@
                                                       style="font-size:25px;width:50px;"></mat-icon>
                                             <mat-icon color="primary" class="fa fa-magic"
                                                       style="position: absolute;margin-left: 30px;margin-top: -10px;"></mat-icon>
-                                            <span>{{lang.basketsColor}}</span>
+                                            <span>{{'lang.basketsColor' | translate}}</span>
                                         </mat-panel-title>
                                         <mat-panel-description *ngIf="!appService.getViewMode()">
-                                            {{lang.basketsColorAdmin}}
+                                            {{'lang.basketsColorAdmin' | translate}}
                                         </mat-panel-description>
                                     </mat-expansion-panel-header>
 
@@ -220,7 +220,7 @@
                                                        [(ngModel)]="user.regroupedBaskets[i].baskets[y].color"
                                                        (change)="updateBasketColor(i, y)" />
                                                 <a (click)="user.regroupedBaskets[i].baskets[y].color = ''; updateBasketColor(i, y)"
-                                                   title="{{lang.resetColor}}" style="cursor: pointer;color: #666666">
+                                                   title="{{'lang.resetColor' | translate}}" style="cursor: pointer;color: #666666">
                                                     <i class="fa fa-magic"></i>
                                                 </a>
                                             </mat-list-item>
@@ -234,10 +234,10 @@
                                                       style="font-size:25px;width:50px;"></mat-icon>
                                             <mat-icon color="primary" class="fa fa-reply"
                                                       style="position: absolute;margin-left: 30px;margin-top: -10px;"></mat-icon>
-                                            {{lang.myBaskets}}
+                                            {{'lang.myBaskets' | translate}}
                                         </mat-panel-title>
                                         <mat-panel-description *ngIf="!appService.getViewMode()">
-                                            {{lang.myBasketsDesc}}
+                                            {{'lang.myBasketsDesc' | translate}}
                                         </mat-panel-description>
                                     </mat-expansion-panel-header>
                                     <div class="col-sm-6" style="overflow:hidden;">
@@ -247,14 +247,14 @@
                                                     <mat-checkbox color="primary"
                                                                   (change)="$event ? masterToggleBaskets($event) : null"
                                                                   [checked]="selectionBaskets.hasValue()"
-                                                                  matTooltip="{{lang.selectAll}}"></mat-checkbox>
+                                                                  matTooltip="{{'lang.selectAll' | translate}}"></mat-checkbox>
                                                 </mat-icon>
                                                 <p mat-line>
                                                 <span *ngIf="!selectionBaskets.hasValue()"
                                                       style="opacity: 0.5;font-style: italic;font-size: 80%;">
-                                                    {{lang.selectAll}}
+                                                    {{'lang.selectAll' | translate}}
                                                 </span>
-                                                    <plugin-autocomplete *ngIf="selectionBaskets.hasValue()" [labelPlaceholder]="lang.redirectBaskets" [routeDatas]="['/rest/autocomplete/users']" [targetSearchKey]="'idToDisplay'" [subInfoKey]="'descriptionToDisplay'" (triggerEvent)="addBasketRedirection($event)" appearance="outline"></plugin-autocomplete>
+                                                    <plugin-autocomplete *ngIf="selectionBaskets.hasValue()" [labelPlaceholder]="this.translate.instant('lang.redirectBaskets')" [routeDatas]="['/rest/autocomplete/users']" [targetSearchKey]="'idToDisplay'" [subInfoKey]="'descriptionToDisplay'" (triggerEvent)="addBasketRedirection($event)" appearance="outline"></plugin-autocomplete>
                                                 </p>
                                             </mat-list-item>
                                             <mat-divider></mat-divider>
@@ -283,7 +283,7 @@
                                     </div>
                                     <div class="col-sm-6" style="overflow:hidden;">
                                         <mat-tab-group>
-                                            <mat-tab label="{{lang.basketsRedirected}}">
+                                            <mat-tab label="{{'lang.basketsRedirected' | translate}}">
                                                 <mat-list>
                                                     <ng-container
                                                             *ngFor="let basket of user.redirectedBaskets;let i = index">
@@ -298,11 +298,11 @@
                                                             <p mat-line>
                                                                 <mat-form-field>
                                                                     <input type="text" color="warn" matInput disabled
-                                                                           value="{{lang.redirectedTo}} {{basket.userToDisplay}}">
+                                                                           value="{{'lang.redirectedTo' | translate}} {{basket.userToDisplay}}">
                                                                     <button mat-button color="warn" matSuffix
                                                                             mat-icon-button aria-label="Clear"
                                                                             (click)="delBasketRedirection(basket,i)"
-                                                                            matTooltip="{{lang.deleteRedirection}}">
+                                                                            matTooltip="{{'lang.deleteRedirection' | translate}}">
                                                                         <mat-icon color="warn"
                                                                                   class="fa fa-times text-danger"></mat-icon>
                                                                     </button>
@@ -315,7 +315,7 @@
                                         </mat-tab-group>
 
                                         <mat-tab-group>
-                                            <mat-tab label="{{lang.basketsAssigned}}">
+                                            <mat-tab label="{{'lang.basketsAssigned' | translate}}">
                                                 <mat-list>
                                                     <ng-container *ngFor="let basket of user.assignedBaskets;let i = index">
                                                         <mat-list-item>
@@ -327,21 +327,21 @@
                                                                       style="font-weight:normal">{{basket.group_desc}}</span>
                                                             </h4>
                                                             <p mat-line>
-                                                                <plugin-autocomplete *ngIf="basket.userToDisplay == null" [labelPlaceholder]="lang.redirectBaskets" [routeDatas]="['/rest/autocomplete/users']" [targetSearchKey]="'idToDisplay'" [subInfoKey]="'descriptionToDisplay'" (triggerEvent)="reassignBasketRedirection($event,basket,i)" appearance="outline"></plugin-autocomplete>
+                                                                <plugin-autocomplete *ngIf="basket.userToDisplay == null" [labelPlaceholder]="this.translate.instant('lang.redirectBaskets')" [routeDatas]="['/rest/autocomplete/users']" [targetSearchKey]="'idToDisplay'" [subInfoKey]="'descriptionToDisplay'" (triggerEvent)="reassignBasketRedirection($event,basket,i)" appearance="outline"></plugin-autocomplete>
                                                                 <mat-form-field>
                                                                     <input type="text" color="warn" matInput disabled
-                                                                           value="{{lang.assignBy}} {{basket.userToDisplay}}">
+                                                                           value="{{'lang.assignBy' | translate}} {{basket.userToDisplay}}">
                                                                     <button mat-button color="warn" matSuffix
                                                                             mat-icon-button aria-label="Clear"
                                                                             (click)="basket.userToDisplay=null"
-                                                                            matTooltip="{{lang.reassign}}">
+                                                                            matTooltip="{{'lang.reassign' | translate}}">
                                                                         <mat-icon color="primary" class="fa fa-edit">
                                                                         </mat-icon>
                                                                     </button>
                                                                     <button mat-button color="warn" matSuffix
                                                                             mat-icon-button aria-label="Clear"
                                                                             (click)="delBasketAssignRedirection(basket,i)"
-                                                                            matTooltip="{{lang.deleteAssignation}}">
+                                                                            matTooltip="{{'lang.deleteAssignation' | translate}}">
                                                                         <mat-icon color="warn"
                                                                                   class="fa fa-times text-danger"></mat-icon>
                                                                     </button>
@@ -360,10 +360,10 @@
                                         <mat-panel-title>
                                             <mat-icon color="primary" class="fa fa-envelope"
                                                       style="font-size:25px;width:50px;"></mat-icon>
-                                            {{lang.mySignMail}}
+                                            {{'lang.mySignMail' | translate}}
                                         </mat-panel-title>
                                         <mat-panel-description *ngIf="!appService.getViewMode()">
-                                            {{lang.mySignMailDesc}}
+                                            {{'lang.mySignMailDesc' | translate}}
                                         </mat-panel-description>
                                     </mat-expansion-panel-header>
                                     <div class="col-sm-6" style="overflow:hidden;">
@@ -372,7 +372,7 @@
                                                 <div class="col-md-12">
                                                     <mat-form-field>
                                                         <input matInput type="text" [(ngModel)]="mailSignatureModel.title"
-                                                               name="title" placeholder="{{lang.label}}" required>
+                                                               name="title" placeholder="{{'lang.label' | translate}}" required>
                                                     </mat-form-field>
                                                 </div>
                                             </div>
@@ -388,17 +388,17 @@
                                                 <div style="text-align:center;">
                                                     <button mat-raised-button color="primary" type="submit"
                                                             *ngIf="mailSignatureModel.selected==-1"
-                                                            [disabled]="!emailSignatureForm.form.valid">{{lang.save}}</button>
+                                                            [disabled]="!emailSignatureForm.form.valid">{{'lang.save' | translate}}</button>
                                                     <button mat-raised-button color="primary" type="button"
                                                             *ngIf="mailSignatureModel.selected!=-1"
                                                             (click)="updateEmailSignature()"
-                                                            [disabled]="!emailSignatureForm.form.valid">{{lang.update}}</button>
+                                                            [disabled]="!emailSignatureForm.form.valid">{{'lang.update' | translate}}</button>
                                                     <button mat-raised-button color="warn" type="button"
                                                             *ngIf="mailSignatureModel.selected!=-1"
-                                                            (click)="deleteEmailSignature()">{{lang.delete}}</button>
+                                                            (click)="deleteEmailSignature()">{{'lang.delete' | translate}}</button>
                                                     <button mat-raised-button color="default" type="button"
                                                             *ngIf="mailSignatureModel.selected!=-1"
-                                                            (click)="resetEmailSignature()">{{lang.cancel}}</button>
+                                                            (click)="resetEmailSignature()">{{'lang.cancel' | translate}}</button>
                                                 </div>
                                             </div>
                                         </form>
@@ -410,11 +410,11 @@
                                                 <mat-card-content style="text-align:center;">
                                                     <mat-form-field floatLabel="never">
                                                         <input matInput type="text" [(ngModel)]="emailSignature.title"
-                                                               name="selectedEmailSignatureLabel" placeholder="{{lang.label}}"
+                                                               name="selectedEmailSignatureLabel" placeholder="{{'lang.label' | translate}}"
                                                                disabled>
                                                     </mat-form-field>
                                                     <button mat-icon-button color="primary"
-                                                            (click)="changeEmailSignature(i)" matTooltip="{{lang.update}}">
+                                                            (click)="changeEmailSignature(i)" matTooltip="{{'lang.update' | translate}}">
                                                         <mat-icon class="fa fa-edit fa-2x"></mat-icon>
                                                     </button>
                                                 </mat-card-content>
@@ -428,29 +428,29 @@
                                         <mat-panel-title>
                                             <mat-icon color="primary" class="fa fa-certificate"
                                                       style="font-size:25px;width:50px;"></mat-icon>
-                                            {{lang.mySignSignatureBook}}
+                                            {{'lang.mySignSignatureBook' | translate}}
                                         </mat-panel-title>
                                         <mat-panel-description *ngIf="!appService.getViewMode()">
-                                            {{lang.mySignSignatureBookDesc}}
+                                            {{'lang.mySignSignatureBookDesc' | translate}}
                                         </mat-panel-description>
                                     </mat-expansion-panel-header>
 
                                     <div style="overflow:hidden;">
-                                        <div dnd-droppable matTooltip="{{lang.uploadSignFileInfo}}"
+                                        <div dnd-droppable matTooltip="{{'lang.uploadSignFileInfo' | translate}}"
                                              (click)="clickOnUploader('uploadSignFile')"
                                              [class.dndFileHighlighted]="highlightMe" (dragover)="highlightMe=true"
                                              (dragleave)="highlightMe=false"
                                              (onDropSuccess)="dndUploadSignature($event);highlightMe=false;"
                                              class="dndFile">
-                                            {{lang.uploadSignFile}}
+                                            {{'lang.uploadSignFile' | translate}}
                                         </div>
                                         <form (ngSubmit)="submitSignature()" #signatureForm="ngForm"
                                               style="display:none;">
                                             <div class="col-md-12">
                                                 <mat-form-field>
                                                     <input matInput type="text" id="signature_label"
-                                                           name="signature_label" title="{{lang.label}}"
-                                                           placeholder="{{lang.label}}" [(ngModel)]="signatureModel.label"
+                                                           name="signature_label" title="{{'lang.label' | translate}}"
+                                                           placeholder="{{'lang.label' | translate}}" [(ngModel)]="signatureModel.label"
                                                            required>
                                                 </mat-form-field>
                                                 <div class="form-inline hide">
@@ -463,7 +463,7 @@
                                             <div [ngClass]="[signatureModel.size != '' ? 'col-md-10' : 'col-md-12']">
                                                 <div class="upload-drop-zone"
                                                      (click)="clickOnUploader('uploadSignFile')" style="cursor:pointer">
-                                                    {{lang.clickOn}}
+                                                    {{'lang.clickOn' | translate}}
                                                     <i class="fa fa-upload fa-2x"></i>
                                                     (
                                                     < 2MB) </div> </div> <div class="col-md-2"
@@ -474,7 +474,7 @@
                                             <div class="col-md-12 form-group" style="margin-top: 10px;">
                                                 <div style="text-align:center;">
                                                     <button mat-raised-button color="primary" type="submit"
-                                                            [disabled]="!signatureForm.form.valid || !signatureModel.size">{{lang.save}}</button>
+                                                            [disabled]="!signatureForm.form.valid || !signatureModel.size">{{'lang.save' | translate}}</button>
                                                 </div>
                                             </div>
                                         </form>
@@ -488,11 +488,11 @@
                                                     <mat-card-content style="text-align:center;">
                                                         <mat-form-field floatLabel="never">
                                                             <input matInput type="text" [(ngModel)]="signature.signature_label"
-                                                                   name="selectedSignatureLabel" placeholder="{{lang.label}}"
+                                                                   name="selectedSignatureLabel" placeholder="{{'lang.label' | translate}}"
                                                                    (change)="updateSignature(signature)">
                                                             <button mat-button matSuffix mat-icon-button
                                                                     (click)="deleteSignature(signature.id)" color="warn"
-                                                                    matTooltip="{{lang.delete}}">
+                                                                    matTooltip="{{'lang.delete' | translate}}">
                                                                 <mat-icon class="fa fa-times"></mat-icon>
                                                             </button>
                                                         </mat-form-field>
@@ -504,7 +504,7 @@
                                         </div>
                                         <div>
                                             <button *ngIf="user.signatures.length > 0" mat-icon-button color="primary" (click)="syncMP()"
-                                                    matTooltip="{{lang.syncSignsToMaarchParapheur}}" [disabled]="!user.external_id.maarchParapheur || loadingSign">
+                                                    matTooltip="{{'lang.syncSignsToMaarchParapheur' | translate}}" [disabled]="!user.external_id.maarchParapheur || loadingSign">
                                                 <mat-icon class="fa fa-sync-alt fa-2x" [class.fa-spin]="loadingSign" ></mat-icon>
                                             </button>
                                         </div>
@@ -516,21 +516,21 @@
                                         <mat-panel-title>
                                             <mat-icon color="primary" class="fa fa-users"
                                                       style="font-size:25px;width:50px;"></mat-icon>
-                                            {{lang.myContactsGroups}}
+                                            {{'lang.myContactsGroups' | translate}}
                                         </mat-panel-title>
                                         <mat-panel-description *ngIf="!appService.getViewMode()">
-                                            {{lang.myContactsGroupsDesc}}
+                                            {{'lang.myContactsGroupsDesc' | translate}}
                                         </mat-panel-description>
                                     </mat-expansion-panel-header>
                                     <mat-tab-group
                                             (selectedIndexChange)="changeTabContactGrp($event);createGrpContPan.close();"
                                             [selectedIndex]="selectedIndexContactsGrp">
-                                        <mat-tab label="{{lang.contactGroupList}}">
+                                        <mat-tab label="{{'lang.contactGroupList' | translate}}">
                                             <mat-accordion>
                                                 <mat-expansion-panel #createGrpContPan (opened)="initGroupsContact()">
                                                     <mat-expansion-panel-header>
                                                         <mat-panel-title color="primary">
-                                                            <span style="margin-top:5px;">{{lang.contactGroupCreate}}</span>
+                                                            <span style="margin-top:5px;">{{'lang.contactGroupCreate' | translate}}</span>
                                                         </mat-panel-title>
                                                     </mat-expansion-panel-header>
                                                     <form id="contactsGroupFormUp" class="form-horizontal"
@@ -541,8 +541,8 @@
                                                                 <mat-form-field>
                                                                     <input matInput [(ngModel)]="contactsGroup.label"
                                                                            required name="label" id="label"
-                                                                           title="{{lang.label}}" type="text"
-                                                                           placeholder="{{lang.label}}" maxlength="32">
+                                                                           title="{{'lang.label' | translate}}" type="text"
+                                                                           placeholder="{{'lang.label' | translate}}" maxlength="32">
                                                                 </mat-form-field>
                                                             </div>
                                                         </div>
@@ -551,23 +551,23 @@
                                                                 <mat-form-field>
                                                                     <input matInput [(ngModel)]="contactsGroup.description"
                                                                            required name="description" id="description"
-                                                                           title="{{lang.description}}" type="text"
-                                                                           placeholder="{{lang.description}}" maxlength="255">
+                                                                           title="{{'lang.description' | translate}}" type="text"
+                                                                           placeholder="{{'lang.description' | translate}}" maxlength="255">
                                                                 </mat-form-field>
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
                                                             <div class="col-sm-12">
                                                                 <mat-slide-toggle name="plubic"
-                                                                                  title="{{lang.contactsGroupDesc}}" id="plubic"
+                                                                                  title="{{'lang.contactsGroupDesc' | translate}}" id="plubic"
                                                                                   color="primary" [(ngModel)]="contactsGroup.public">
-                                                                    {{lang.public}}</mat-slide-toggle>
+                                                                    {{'lang.public' | translate}}</mat-slide-toggle>
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
                                                             <div class="col-sm-12" style="text-align:center;">
                                                                 <button mat-raised-button color="primary" type="submit"
-                                                                        [disabled]="!contactsGroupFormUp.form.valid">{{lang.save}}</button>
+                                                                        [disabled]="!contactsGroupFormUp.form.valid">{{'lang.save' | translate}}</button>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -579,7 +579,7 @@
                                                         <mat-form-field>
                                                             <input matInput
                                                                    (keyup)="applyFilterGroupsList($event.target.value)"
-                                                                   placeholder="{{lang.filterBy}}">
+                                                                   placeholder="{{'lang.filterBy' | translate}}">
                                                         </mat-form-field>
                                                     </div>
                                                     <div class="col-md-6 col-xs-6">
@@ -593,20 +593,20 @@
                                                     <ng-container matColumnDef="label">
                                                         <mat-header-cell *matHeaderCellDef mat-sort-header
                                                                          [class.hide-for-mobile]="appService.getViewMode()" style="flex:2;">
-                                                            {{lang.label}}</mat-header-cell>
+                                                            {{'lang.label' | translate}}</mat-header-cell>
                                                         <mat-cell *matCellDef="let element"
                                                                   [class.hide-for-mobile]="appService.getViewMode()" style="flex:2;">
                                                             {{element.label}} </mat-cell>
                                                     </ng-container>
                                                     <ng-container matColumnDef="description">
                                                         <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2;">
-                                                            {{lang.description}}</mat-header-cell>
+                                                            {{'lang.description' | translate}}</mat-header-cell>
                                                         <mat-cell *matCellDef="let element" style="flex:2;">
                                                             {{element.description}} </mat-cell>
                                                     </ng-container>
                                                     <ng-container matColumnDef="nbContacts">
                                                         <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:1;">
-                                                            {{lang.relatedContactNumber}}</mat-header-cell>
+                                                            {{'lang.relatedContactNumber' | translate}}</mat-header-cell>
                                                         <mat-cell *matCellDef="let element" style="flex:1;">
                                                         <span
                                                                 *ngIf="element.nbContacts == 0">{{element.nbContacts}}</span>
@@ -617,16 +617,16 @@
                                                     <ng-container matColumnDef="public">
                                                         <mat-header-cell *matHeaderCellDef mat-sort-header
                                                                          [class.hide-for-mobile]="appService.getViewMode()" style="flex:1;">
-                                                            {{lang.public}}</mat-header-cell>
+                                                            {{'lang.public' | translate}}</mat-header-cell>
                                                         <mat-cell *matCellDef="let element"
                                                                   [class.hide-for-mobile]="appService.getViewMode()" style="flex:1;">
-                                                            <span *ngIf="!element.public"> {{lang.no}} </span>
-                                                            <span *ngIf="element.public"> {{lang.yes}} </span>
+                                                            <span *ngIf="!element.public"> {{'lang.no' | translate}} </span>
+                                                            <span *ngIf="element.public"> {{'lang.yes' | translate}} </span>
                                                         </mat-cell>
                                                     </ng-container>
                                                     <ng-container matColumnDef="owner">
                                                         <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:1;">
-                                                            {{lang.createdBy}}</mat-header-cell>
+                                                            {{'lang.createdBy' | translate}}</mat-header-cell>
                                                         <mat-cell *matCellDef="let element" style="flex:1;">
                                                             {{element.labelledOwner}} </mat-cell>
                                                     </ng-container>
@@ -635,7 +635,7 @@
                                                         <mat-cell *matCellDef="let element"
                                                                   style="justify-content: flex-end;">
                                                             <button mat-icon-button color="warn"
-                                                                    matTooltip="{{lang.delete}}"
+                                                                    matTooltip="{{'lang.delete' | translate}}"
                                                                     (click)="$event.stopPropagation();deleteContactsGroup(element.position)">
                                                                 <mat-icon class="fa fa-trash-alt fa-2x" aria-hidden="true">
                                                                 </mat-icon>
@@ -646,17 +646,17 @@
                                                     </mat-header-row>
                                                     <mat-row *matRowDef="let row; columns: displayedColumnsGroupsList;"
                                                              (click)="loadContactsGroup(row)" style="cursor:pointer;"
-                                                             matTooltip="{{lang.view}}"></mat-row>
+                                                             matTooltip="{{'lang.view' | translate}}"></mat-row>
                                                 </mat-table>
                                             </div>
 
                                         </mat-tab>
-                                        <mat-tab label="{{lang.grouping}} : {{contactsGroup.label}}" *ngIf="contactsListMode">
+                                        <mat-tab label="{{'lang.grouping' | translate}} : {{contactsGroup.label}}" *ngIf="contactsListMode">
                                             <mat-accordion>
                                                 <mat-expansion-panel #linkContPan>
                                                     <mat-expansion-panel-header>
                                                         <mat-panel-title color="primary">
-                                                            <span style="margin-top:5px;">{{lang.linkContact}}</span>
+                                                            <span style="margin-top:5px;">{{'lang.linkContact' | translate}}</span>
                                                         </mat-panel-title>
                                                     </mat-expansion-panel-header>
                                                     <div id="contactsGroupFormAdd">
@@ -668,7 +668,7 @@
                                                                     </mat-icon>&nbsp;&nbsp;
                                                                 </span>
                                                                     <input class="autocompleteSearch" type="text"
-                                                                           placeholder="{{lang.linkContact}}" matInput
+                                                                           placeholder="{{'lang.linkContact' | translate}}" matInput
                                                                            [formControl]="searchTerm" autocomplete="off"
                                                                            (keyup)="launchLoading();" minlength="3">
                                                                 </mat-form-field>
@@ -676,7 +676,7 @@
                                                             <div class="col-md-6 col-xs-6">
                                                                 <div class="alert alert-danger"
                                                                      *ngIf="dataSourceContactsListAutocomplete && dataSourceContactsListAutocomplete.data.length == 1000"
-                                                                     [innerHTML]="lang.limitDataReached_1000"></div>
+                                                                     [innerHTML]="this.translate.instant('lang.limitDataReached_1000')"></div>
                                                             </div>
                                                             <div class="col-md-6 col-xs-6">
                                                                 <mat-paginator #paginatorGroupsListAutocomplete [length]="0"
@@ -708,13 +708,13 @@
                                                             </ng-container>
                                                             <ng-container matColumnDef="contact">
                                                                 <mat-header-cell *matHeaderCellDef style="flex:3;">
-                                                                    {{lang.contact}}</mat-header-cell>
+                                                                    {{'lang.contact' | translate}}</mat-header-cell>
                                                                 <mat-cell *matCellDef="let element" style="flex:3;">
                                                                     {{element.contact}} </mat-cell>
                                                             </ng-container>
                                                             <ng-container matColumnDef="address">
                                                                 <mat-header-cell *matHeaderCellDef style="flex:3;">
-                                                                    {{lang.address}}</mat-header-cell>
+                                                                    {{'lang.address' | translate}}</mat-header-cell>
                                                                 <mat-cell *matCellDef="let element" style="flex:3;">
                                                                     {{element.address}} </mat-cell>
                                                             </ng-container>
@@ -731,7 +731,7 @@
                                                             <div style="text-align:center;margin-top:30px">
                                                                 <button mat-raised-button color="primary" type="button"
                                                                         (click)="saveContactsList($event.target)"
-                                                                        [disabled]="this.selection.selected.length == 0">{{lang.add}}</button>
+                                                                        [disabled]="this.selection.selected.length == 0">{{'lang.add' | translate}}</button>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -746,8 +746,8 @@
                                                                 <mat-form-field>
                                                                     <input matInput [(ngModel)]="contactsGroup.label"
                                                                            required name="label" id="label"
-                                                                           title="{{lang.label}}" type="text"
-                                                                           placeholder="{{lang.label}}" maxlength="32">
+                                                                           title="{{'lang.label' | translate}}" type="text"
+                                                                           placeholder="{{'lang.label' | translate}}" maxlength="32">
                                                                 </mat-form-field>
                                                             </div>
                                                         </div>
@@ -756,25 +756,25 @@
                                                                 <mat-form-field>
                                                                     <input matInput [(ngModel)]="contactsGroup.description"
                                                                            required name="description" id="description"
-                                                                           title="{{lang.description}}" type="text"
-                                                                           placeholder="{{lang.description}}" maxlength="255">
+                                                                           title="{{'lang.description' | translate}}" type="text"
+                                                                           placeholder="{{'lang.description' | translate}}" maxlength="255">
                                                                 </mat-form-field>
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
                                                             <div class="col-sm-12">
-                                                                <mat-slide-toggle name="public" title="{{lang.public}}"
+                                                                <mat-slide-toggle name="public" title="{{'lang.public' | translate}}"
                                                                                   id="public" color="primary"
-                                                                                  [(ngModel)]="contactsGroup.public">{{lang.public}}
+                                                                                  [(ngModel)]="contactsGroup.public">{{'lang.public' | translate}}
                                                                 </mat-slide-toggle>
                                                             </div>
                                                         </div>
                                                         <div class="form-group">
                                                             <div class="col-sm-12" style="text-align:center;">
                                                                 <button mat-raised-button color="primary" type="submit"
-                                                                        [disabled]="!contactsGroupFormUp.form.valid">{{lang.update}}</button>
+                                                                        [disabled]="!contactsGroupFormUp.form.valid">{{'lang.update' | translate}}</button>
                                                                 <button mat-raised-button color="default" type="button"
-                                                                        (click)="initGroupsContact()">{{lang.close}}</button>
+                                                                        (click)="initGroupsContact()">{{'lang.close' | translate}}</button>
                                                             </div>
                                                         </div>
                                                     </form>
@@ -782,13 +782,13 @@
                                                 <div class="col-sm-6" *ngIf="contactsListMode">
                                                     <mat-tab-group>
                                                         <mat-tab
-                                                                label="{{contactsGroup.contacts.length}} {{lang.relatedContacts}}">
+                                                                label="{{contactsGroup.contacts.length}} {{'lang.relatedContacts' | translate}}">
                                                             <div class="row" style="margin:0px;">
                                                                 <div class="col-md-6 col-xs-6">
                                                                     <mat-form-field>
                                                                         <input matInput
                                                                                (keyup)="applyFilterContactsList($event.target.value)"
-                                                                               placeholder="{{lang.filterBy}}">
+                                                                               placeholder="{{'lang.filterBy' | translate}}">
                                                                     </mat-form-field>
                                                                 </div>
                                                                 <div class="col-md-6 col-xs-6">
@@ -803,13 +803,13 @@
                                                                        matSortActive="contact" matSortDirection="asc">
                                                                 <ng-container matColumnDef="contact">
                                                                     <mat-header-cell *matHeaderCellDef mat-sort-header
-                                                                                     style="flex:3;">{{lang.contact}}</mat-header-cell>
+                                                                                     style="flex:3;">{{'lang.contact' | translate}}</mat-header-cell>
                                                                     <mat-cell *matCellDef="let element" style="flex:3;">
                                                                         {{element.contact}} </mat-cell>
                                                                 </ng-container>
                                                                 <ng-container matColumnDef="address">
                                                                     <mat-header-cell *matHeaderCellDef mat-sort-header
-                                                                                     style="flex:3;">{{lang.address}}</mat-header-cell>
+                                                                                     style="flex:3;">{{'lang.address' | translate}}</mat-header-cell>
                                                                     <mat-cell *matCellDef="let element" style="flex:3;">
                                                                         {{element.address}} </mat-cell>
                                                                 </ng-container>
@@ -819,7 +819,7 @@
                                                                     <mat-cell *matCellDef="let element;let i = index"
                                                                               style="justify-content: flex-end;flex:1;">
                                                                         <button mat-icon-button color="warn"
-                                                                                matTooltip="{{lang.delete}}"
+                                                                                matTooltip="{{'lang.delete' | translate}}"
                                                                                 (click)="$event.stopPropagation();preDelete(i)">
                                                                             <mat-icon class="fa fa-trash-alt fa-2x"
                                                                                       aria-hidden="true"></mat-icon>
@@ -843,13 +843,13 @@
                                 </mat-expansion-panel>
                             </mat-accordion>
                         </mat-tab>
-                        <mat-tab label="{{lang.myHistoric}}">
+                        <mat-tab label="{{'lang.myHistoric' | translate}}">
                             <ng-template matTabContent>
                                 <div class="row">
                                     <div class="col-md-6 col-xs-6">
                                         <mat-form-field>
                                             <input matInput (keyup)="applyFilter($event.target.value)"
-                                                   placeholder="{{lang.filterBy}}">
+                                                   placeholder="{{'lang.filterBy' | translate}}">
                                         </mat-form-field>
                                     </div>
                                     <div class="col-md-6 col-xs-6">
@@ -860,16 +860,16 @@
                                 <mat-table #tableHistorySort="matSort" [dataSource]="dataSource" matSort
                                            matSortActive="event_date" matSortDirection="desc">
                                     <ng-container matColumnDef="event_date">
-                                        <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.date}}</mat-header-cell>
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.date' | translate}}</mat-header-cell>
                                         <mat-cell *matCellDef="let element">{{element.event_date | date : "dd/MM/y HH:mm"}}
                                         </mat-cell>
                                     </ng-container>
                                     <ng-container matColumnDef="record_id">
-                                        <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.technicalId}}</mat-header-cell>
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.technicalId' | translate}}</mat-header-cell>
                                         <mat-cell *matCellDef="let element">{{element.record_id}}</mat-cell>
                                     </ng-container>
                                     <ng-container matColumnDef="info">
-                                        <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.description}}
+                                        <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.description' | translate}}
                                         </mat-header-cell>
                                         <mat-cell *matCellDef="let element"> {{element.info}} </mat-cell>
                                     </ng-container>
@@ -889,20 +889,20 @@
                  style="overflow-x:hidden;max-width:500px;">
 
         <mat-list>
-            <h3 mat-subheader>{{lang.groups}}</h3>
+            <h3 mat-subheader>{{'lang.groups' | translate}}</h3>
             <mat-list-item *ngFor="let userGroup of user.groups">
                 <mat-icon color="primary" mat-list-icon class="fa fa-users"></mat-icon>
                 <h4 mat-line>{{userGroup.group_desc}}</h4>
                 <p mat-line>
                     <mat-form-field style="font-size:10px;">
-                        <input matInput type="text" id="role" name="role" title="{{lang.role}}"
-                               placeholder="{{lang.role}}" [(ngModel)]="userGroup.role" disabled>
-                        <mat-hint matTooltip="{{lang.perimeter}}">{{userGroup.maarch_comment}}</mat-hint>
+                        <input matInput type="text" id="role" name="role" title="{{'lang.role' | translate}}"
+                               placeholder="{{'lang.role' | translate}}" [(ngModel)]="userGroup.role" disabled>
+                        <mat-hint matTooltip="{{'lang.perimeter' | translate}}">{{userGroup.maarch_comment}}</mat-hint>
                     </mat-form-field>
                 </p>
             </mat-list-item>
             <mat-divider></mat-divider>
-            <h3 mat-subheader>{{lang.entities}}</h3>
+            <h3 mat-subheader>{{'lang.entities' | translate}}</h3>
             <mat-list-item *ngFor="let userEntity of user.entities">
                 <mat-icon color="primary" *ngIf="userEntity.primary_entity == 'Y'" mat-list-icon
                           class="fa fa-sitemap"></mat-icon>
@@ -910,7 +910,7 @@
                           class="fa fa-sitemap" style="position:relative;">
                     <!--<button mat-icon-button
                         style="cursor:pointer;position: absolute;right: -20px;top: -20px;font-size:10px;"
-                        (click)="updatePrimaryEntity(userEntity)" matTooltip="{{lang.entityTooglePrimary}}">
+                        (click)="updatePrimaryEntity(userEntity)" matTooltip="{{'lang.entityTooglePrimary' | translate}}">
                         <mat-icon class="fa fa-arrow-up"></mat-icon>
                     </button>-->
                 </mat-icon>
@@ -918,12 +918,12 @@
                     matTooltip="{{userEntity.entity_label}}">
                     {{userEntity.entity_label}}
                     <span *ngIf="userEntity.primary_entity == 'Y'" class="label label-primary"
-                          style="font-weight:normal">{{lang.primary}}</span>
+                          style="font-weight:normal">{{'lang.primary' | translate}}</span>
                 </h4>
                 <p mat-line>
                     <mat-form-field style="font-size:10px;">
-                        <input matInput type="text" id="role" name="role" title="{{lang.role}}"
-                               placeholder="{{lang.role}}" [(ngModel)]="userEntity.user_role" disabled>
+                        <input matInput type="text" id="role" name="role" title="{{'lang.role' | translate}}"
+                               placeholder="{{'lang.role' | translate}}" [(ngModel)]="userEntity.user_role" disabled>
                     </mat-form-field>
                 </p>
             </mat-list-item>

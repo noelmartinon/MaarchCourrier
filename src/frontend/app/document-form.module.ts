@@ -5,9 +5,13 @@ import { IndexingFormComponent } from './indexation/indexing-form/indexing-form.
 import { TagInputComponent } from './tag/indexing/tag-input.component';
 import { FolderInputComponent } from '../app/folder/indexing/folder-input.component';
 
+import { InternationalizationModule } from '../service/translate/internationalization.module';
+import { TranslateService } from '@ngx-translate/core';
+
 @NgModule({
     imports: [
-        SharedModule
+        SharedModule,
+        InternationalizationModule
     ],
     declarations: [
         IndexingFormComponent,
@@ -25,4 +29,8 @@ import { FolderInputComponent } from '../app/folder/indexing/folder-input.compon
 
     ],
 })
-export class DocumentFormModule { }
+export class DocumentFormModule {
+    constructor(translate: TranslateService) {
+        translate.setDefaultLang('fr');
+    }
+}

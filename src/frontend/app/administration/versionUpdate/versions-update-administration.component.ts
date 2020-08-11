@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { HeaderService } from '../../../service/header.service';
@@ -27,6 +28,7 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
     versions: any = {};
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private headerService: HeaderService,
         private notify: NotificationService,
@@ -35,7 +37,7 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.updateVersionControl);
+        this.headerService.setHeader(this.translate.instant('lang.updateVersionControl'));
 
         this.loading = true;
 
@@ -55,7 +57,7 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
 
     updateVersionAccess() {
 
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', data: { title: this.lang.confirm + ' ?', msg: this.lang.updateInfo } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', data: { title: this.translate.instant('lang.confirm') + ' ?', msg: this.translate.instant('lang.updateInfo') } });
         this.dialogRef.afterClosed().pipe(
             filter((data) => {
                 this.dialogRef = null;
@@ -70,7 +72,7 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
             }),
             exhaustMap(() => this.http.put('../rest/versionsUpdate', {})),
             tap(() => {
-                this.dialogRef = this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.updateOk, msg: this.lang.saveInDocserversInfo } });
+                this.dialogRef = this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.updateOk'), msg: this.translate.instant('lang.saveInDocserversInfo') } });
             }),
             exhaustMap(() => this.dialogRef.afterClosed()),
             tap(() => {
@@ -78,7 +80,7 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
                 window.location.reload(true);
             }),
             catchError(err => {
-                this.dialogRef = this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.updateKO, msg: this.lang.saveInDocserversInfo } });
+                this.dialogRef = this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.updateKO'), msg: this.translate.instant('lang.saveInDocserversInfo') } });
                 this.notify.handleErrors(err);
                 return of(false);
             }),

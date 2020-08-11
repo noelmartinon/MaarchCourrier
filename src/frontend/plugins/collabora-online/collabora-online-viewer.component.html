@@ -1,6 +1,6 @@
-<div *ngIf="loading" style="display:block;padding: 10px;">{{lang.checkCollaboraOnlineServer}}...</div>
+<div *ngIf="loading" style="display:block;padding: 10px;">{{'lang.checkCollaboraOnlineServer' | translate}}...</div>
 <button  class="collaboraOnlineButton_fullscreen" [class.buttonsHide]="hideButtons" [class.fullScreen]="fullscreenMode" mat-mini-fab color="warn"
-    [title]="lang.closeEditor" (click)="quit()">
+    [title]="this.translate.instant('lang.closeEditor')" (click)="quit()">
     <mat-icon class="fa fa-times" style="height:auto;"></mat-icon>
 </button>
 <button mat-mini-fab class="collaboraOnlineButton_close" [class.buttonsHide]="hideButtons" [class.fullScreen]="fullscreenMode" color="default"
@@ -8,7 +8,7 @@
     <mat-icon class="fas" [class.fa-expand]="!fullscreenMode" [class.fa-compress]="fullscreenMode" style="height:auto;"></mat-icon>
 </button>
 <button class="collaboraOnlineButton_hide" [class.buttonsHide]="hideButtons" [class.fullScreen]="fullscreenMode" mat-mini-fab color="default"
-        [title]="lang.closeEditor" (click)="hideButtons = !hideButtons">
+        [title]="!hideButtons ? lang.hideTool : lang.showTool" (click)="hideButtons = !hideButtons">
     <mat-icon class="fa fa-arrow-right" style="height:auto;"></mat-icon>
 </button>
 

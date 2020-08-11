@@ -28,9 +28,7 @@ use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\models\PasswordModel;
 use Template\models\TemplateAssociationModel;
-use User\controllers\UserController;
 use User\models\UserEntityModel;
 use User\models\UserModel;
 use \Template\models\TemplateModel;
@@ -522,5 +520,133 @@ class EntityController
     public function getTypes(Request $request, Response $response)
     {
         return $response->withJson(['types' => EntityModel::getTypes()]);
+    }
+
+    public function export(Request $request, Response $response)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'manage_entities', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $body = $request->getParsedBody();
+
+        $delimiter = ';';
+        if (!empty($body['delimiter'])) {
+            if (in_array($body['delimiter'], [',', ';', 'TAB'])) {
+                $delimiter = ($body['delimiter'] == 'TAB' ? "\t" : $body['delimiter']);
+            }
+        }
+
+        $fields = [
+            'id', 'entity_id', 'entity_label', 'short_label', 'entity_full_name', 'enabled', 'adrs_1', 'adrs_2', 'adrs_3', 'zipcode', 'city',
+            'country', 'email', 'parent_entity_id', 'entity_type', 'business_id', 'ldap_id', 'archival_agency', 'archival_agreement',
+            'folder_import', 'external_id',
+        ];
+
+        $csvHead = array_merge($fields, [ 'diffusionList', 'visaCircuit', 'opinionCircuit', 'users', 'templates']);
+
+        ini_set('memory_limit', -1);
+
+        $file = fopen('php://temp', 'w');
+        $delimiter = ($delimiter == 'TAB' ? "\t" : $delimiter);
+
+        $entities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]);
+        $entities = array_filter($entities, function ($entity) {
+            return $entity['allowed'] == true;
+        });
+        $entitiesIds = array_column($entities, 'serialId');
+        $entities = EntityModel::get([
+            'select'  => $fields,
+            'where'   => ['id in (?)'],
+            'data'    => [$entitiesIds],
+            'orderBy' => ['parent_entity_id', 'entity_label']
+        ]);
+
+        $templateType = ['diffusionList', 'visaCircuit', 'opinionCircuit'];
+
+        foreach ($entities as $key => $entity) {
+            // list templates
+            foreach ($templateType as $type) {
+                $template = ListTemplateModel::get([
+                    'select' => ['*'],
+                    'where'  => ['entity_id = ?', 'type = ?'],
+                    'data'   => [$entity['id'], $type]
+                ]);
+
+                $list = [];
+                if (!empty($template)) {
+                    $template = $template[0];
+                    $templateItems = ListTemplateItemModel::get([
+                        'select'  => ['*'],
+                        'where'   => ['list_template_id = ?'],
+                        'data'    => [$template['id']],
+                        'orderBy' => ['sequence']
+                    ]);
+                    foreach ($templateItems as $templateItem) {
+                        $item = [];
+                        if ($templateItem['item_mode'] == 'dest') {
+                            $item[] = _ASSIGNEE;
+                        } elseif ($templateItem['item_mode'] == 'cc') {
+                            $item[] = _TO_CC;
+                        } elseif ($templateItem['item_mode'] == 'avis') {
+                            $item[] = _AVIS_USER;
+                        } elseif ($templateItem['item_mode'] == 'avis_copy') {
+                            $item[] = _AVIS_USER_COPY;
+                        } elseif ($templateItem['item_mode'] == 'visa') {
+                            $item[] = _VISA_USER_MIN;
+                        } elseif ($templateItem['item_mode'] == 'sign') {
+                            $item[] = _SIGNATORY;
+                        }
+
+                        if ($templateItem['item_type'] == 'user') {
+                            $item[] = UserModel::getLabelledUserById(['id' => $templateItem['item_id']]);
+                        } elseif ($templateItem['item_type'] == 'entity') {
+                            $entityLabel = EntityModel::getById(['select' => ['entity_label'], 'id' => $templateItem['item_id']]);
+                            $item[] = $entityLabel['entity_label'];
+                        }
+
+                        $list[] = implode(' ', $item);
+                    }
+                }
+                $entities[$key][] = implode("\n", $list);
+            }
+
+            // Users in entity
+            $users = UserEntityModel::getWithUsers([
+                'select'    => ['DISTINCT users.id', 'firstname', 'lastname'],
+                'where'     => ['users_entities.entity_id = ?'],
+                'data'      => [$entity['entity_id']]
+            ]);
+            $users = array_map(function ($user) {
+                return $user['firstname'] . ' ' . $user['lastname'];
+            }, $users);
+            $entities[$key][] = implode("\n", $users);
+
+
+            // Document templates
+            $templates = TemplateModel::getByEntity([
+                'select'    => ['t.template_label', 't.template_target'],
+                'entities'  => [$entity['entity_id']]
+            ]);
+            $templates = array_map(function ($template) {
+                return $template['template_label'] . ' ' . $template['template_target'];
+            }, $templates);
+            $entities[$key][] = implode("\n", $templates);
+        }
+
+        fputcsv($file, $csvHead, $delimiter);
+
+        foreach ($entities as $entity) {
+            fputcsv($file, $entity, $delimiter);
+        }
+
+        rewind($file);
+
+        $response->write(stream_get_contents($file));
+        $response = $response->withAddedHeader('Content-Disposition', 'attachment; filename=export_maarch.csv');
+        $contentType = 'application/vnd.ms-excel';
+        fclose($file);
+
+        return $response->withHeader('Content-Type', $contentType);
     }
 }

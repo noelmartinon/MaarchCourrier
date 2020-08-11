@@ -4,6 +4,7 @@ import { NotificationService } from '../../../service/notification/notification.
 import { ContactService } from '../../../service/contact.service';
 import { tap, catchError, finalize } from 'rxjs/operators';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { FunctionsService } from '../../../service/functions.service';
 import { of } from 'rxjs/internal/observable/of';
 
@@ -34,6 +35,7 @@ export class ContactDetailComponent implements OnInit {
     customFields: any[] = [];
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private contactService: ContactService,

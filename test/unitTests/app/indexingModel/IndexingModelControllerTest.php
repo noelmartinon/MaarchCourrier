@@ -44,7 +44,7 @@ class IndexingModelControllerTest extends TestCase
                 [
                     'identifier'    => 'name',
                     'mandatory'     => true,
-                    ''       => true,
+                    'enabled'       => true,
                     'default_value' => 'massala',
                     'unit'          => 'contact'
                 ]
@@ -324,7 +324,7 @@ class IndexingModelControllerTest extends TestCase
 
                 $this->assertSame(true, $field->mandatory);
                 $this->assertSame(true, $field->enabled);
-                $this->assertSame('type_test', $field->default_value);
+                $this->assertSame('type_test2', $field->default_value);
                 $this->assertSame('mail', $field->unit);
             } elseif ($field->identifier == 'siret') {
                 $foundSiret = true;

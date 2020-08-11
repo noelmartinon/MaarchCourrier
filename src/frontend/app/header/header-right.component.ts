@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from '../../service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatInput } from '@angular/material/input';
@@ -29,6 +30,7 @@ export class HeaderRightComponent implements OnInit {
     @ViewChild('searchInput', { static: false }) searchInput: MatInput;
 
     constructor(
+        public translate: TranslateService,
         public http: HttpClient,
         private router: Router,
         public dialog: MatDialog,

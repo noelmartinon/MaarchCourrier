@@ -1,33 +1,33 @@
 <mat-sidenav-container autosize class="maarch-container">
     <ng-template #adminMenuTemplate>
         <mat-nav-list>
-            <h3 mat-subheader>{{lang.actions}}</h3>
+            <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
             <a mat-list-item routerLink="/administration/users/new">
                 <mat-icon color="primary" mat-list-icon class="fa fa-plus"></mat-icon>
                 <p mat-line>
-                    {{lang.add}}
+                    {{'lang.add' | translate}}
                 </p>
             </a>
             <a mat-list-item (click)="openUsersExportModal()">
                 <mat-icon color="primary" mat-list-icon class="fas fa-file-export"></mat-icon>
                 <p mat-line>
-                    Exporter les utilisateurs
+                    {{'lang.usersExport' | translate}}
                 </p>
             </a>
             <a mat-list-item (click)="openUsersImportModal()">
-                <mat-icon color="primary" mat-list-icon class="fas fa-file-download"></mat-icon>
+                <mat-icon color="primary" mat-list-icon class="fas fa-file-import"></mat-icon>
                 <p mat-line>
-                    Importer des utilisateurs
+                    {{'lang.usersImport' | translate}}
                 </p>
             </a>
         </mat-nav-list>
         <mat-divider></mat-divider>
         <mat-divider *ngIf="quota.userQuota"></mat-divider>
         <mat-nav-list *ngIf="quota.userQuota">
-            <h3 mat-subheader>{{lang.quota}}</h3>
-            <p mat-line style="margin-left:20px">{{lang.actives}} : {{quota.actives}}</p>
-            <p mat-line style="margin-left:20px">{{lang.inactives}} : {{quota.inactives}}</p>
-            <p mat-line style="margin-left:20px">{{lang.quota}} : {{quota.userQuota}}</p>
+            <h3 mat-subheader>{{'lang.quota' | translate}}</h3>
+            <p mat-line style="margin-left:20px">{{'lang.actives' | translate}} : {{quota.actives}}</p>
+            <p mat-line style="margin-left:20px">{{'lang.inactives' | translate}} : {{quota.inactives}}</p>
+            <p mat-line style="margin-left:20px">{{'lang.quota' | translate}} : {{quota.userQuota}}</p>
         </mat-nav-list>
     </ng-template>
     <mat-sidenav-content>
@@ -52,10 +52,10 @@
                     <div class="row">
                         <div class="col-md-6 col-xs-6">
                             <mat-form-field>
-                                <input matInput [formControl]="adminService.getFilterField()" placeholder="{{lang.filterBy}}">
+                                <input matInput [formControl]="adminService.getFilterField()" placeholder="{{'lang.filterBy' | translate}}">
                                 <mat-button-toggle class="webserviceAccount" matSuffix
                                     (click)="$event.stopPropagation();toggleWebserviceAccount()"
-                                    [checked]="this.withWebserviceAccount" title="{{lang.displayWebserviceAccount}}">
+                                    [checked]="this.withWebserviceAccount" title="{{'lang.displayWebserviceAccount' | translate}}">
                                     <mat-icon fontSet="fas" fontIcon="fa-user-shield fa-2x"
                                         style="margin-left: -2px; margin-top: -4px;"></mat-icon>
                                 </mat-button-toggle>
@@ -66,30 +66,30 @@
                             </mat-paginator>
                         </div>
                     </div>
-                    <mat-table #table [dataSource]="adminService.getDataSource()" [matSortActive]="adminService.getFilter('sort')" [matSortDirection]="adminService.getFilter('sortDirection')" matSort>
+                    <mat-table #table [dataSource]="adminService.getDataSource()" matSort matSortDisableClear>
                         <ng-container matColumnDef="id">
                             <mat-header-cell *matHeaderCellDef mat-sort-header
-                                [class.hide-for-mobile]="appService.getViewMode()">{{lang.technicalId}}
+                                [class.hide-for-mobile]="appService.getViewMode()">{{'lang.technicalId' | translate}}
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" [class.hide-for-mobile]="appService.getViewMode()">
                                 {{element.id}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="user_id">
                             <mat-header-cell *matHeaderCellDef mat-sort-header
-                                [class.hide-for-mobile]="appService.getViewMode()">{{lang.id}}</mat-header-cell>
+                                [class.hide-for-mobile]="appService.getViewMode()">{{'lang.id' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element" [class.hide-for-mobile]="appService.getViewMode()">
                                 {{element.user_id}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="lastname">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.lastname}}</mat-header-cell>
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.lastname' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element"> {{element.lastname}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="firstname">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.firstname}}</mat-header-cell>
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.firstname' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element"> {{element.firstname}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="status">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.status}}</mat-header-cell>
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.status' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element">
                                 <span
                                     [ngClass]="{'statusUserLabelWarn': ['SPD','ABS'].indexOf(element.status) > -1, 'statusUserLabelPrimary': ['SPD','ABS'].indexOf(element.status) == -1}"
@@ -98,7 +98,7 @@
                         </ng-container>
                         <ng-container matColumnDef="mail">
                             <mat-header-cell *matHeaderCellDef mat-sort-header
-                                [class.hide-for-mobile]="appService.getViewMode()">{{lang.email}}</mat-header-cell>
+                                [class.hide-for-mobile]="appService.getViewMode()">{{'lang.email' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element" [class.hide-for-mobile]="appService.getViewMode()">
                                 {{element.mail}} </mat-cell>
                         </ng-container>
@@ -107,17 +107,17 @@
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" style="justify-content: flex-end;">
                                 <button mat-icon-button color="primary" [disabled]="element.id===user.id || (['root_visible', 'root_invisible'].indexOf(element.mode) > -1 && headerService.user.mode === 'standard')"
-                                    *ngIf="element.status != 'SPD'" matTooltip="{{lang.suspend}}"
+                                    *ngIf="element.status != 'SPD'" matTooltip="{{'lang.suspend' | translate}}"
                                     (click)="$event.stopPropagation();deleteUser(element, 'suspend')">
                                     <mat-icon class="fa fa-pause fa-2x" aria-hidden="true"></mat-icon>
                                 </button>
                                 <button mat-icon-button color="accent" *ngIf="element.status == 'SPD'"
-                                    matTooltip="{{lang.authorize}}" [disabled]="['root_visible', 'root_invisible'].indexOf(element.mode) > -1 && headerService.user.mode === 'standard'"
+                                    matTooltip="{{'lang.authorize' | translate}}" [disabled]="['root_visible', 'root_invisible'].indexOf(element.mode) > -1 && headerService.user.mode === 'standard'"
                                     (click)="$event.stopPropagation();activateUser(element)">
                                     <mat-icon class="fa fa-check fa-2x" aria-hidden="true"></mat-icon>
                                 </button>
                                 <button mat-icon-button color="warn" [disabled]="element.id===user.id || ['root_visible', 'root_invisible'].indexOf(element.mode) > -1"
-                                    matTooltip="{{lang.delete}}" data-toggle="modal" data-target="#changeDiffListDest"
+                                    matTooltip="{{'lang.delete' | translate}}" data-toggle="modal" data-target="#changeDiffListDest"
                                     (click)="$event.stopPropagation();deleteUser(element, 'delete')">
                                     <mat-icon class="fa fa-trash-alt fa-2x"></mat-icon>
                                 </button>
@@ -126,11 +126,11 @@
                         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                         <mat-row *matRowDef="let row; columns: displayedColumns;"
                             routerLink="/administration/users/{{row.id}}" style="cursor:pointer;"
-                            matTooltip="{{lang.view}}" [class.admin]="['root_visible', 'root_invisible'].indexOf(row.mode) > -1"></mat-row>
+                            matTooltip="{{'lang.view' | translate}}" [class.admin]="['root_visible', 'root_invisible'].indexOf(row.mode) > -1"></mat-row>
                     </mat-table>
                     <div class="mat-paginator"
                         style="min-height:48px;min-height: 48px;display: flex;justify-content: end;align-items: center;padding-right: 20px;">
-                        {{data.length}} {{lang.usersAlt}}</div>
+                        {{data.length}} {{'lang.usersAlt' | translate}}</div>
                 </mat-card>
             </div>
         </div>

@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
@@ -17,6 +18,7 @@ export class FolderCreateModalComponent implements OnInit {
     folderName: string = '';
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient, 
         private notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any, 
@@ -31,7 +33,7 @@ export class FolderCreateModalComponent implements OnInit {
         this.loading = true;
         this.http.post("../rest/folders", { label: this.folderName }).pipe(
             tap((data : any) => {
-                this.notify.success(this.lang.folderAdded);
+                this.notify.success(this.translate.instant('lang.folderAdded'));
                 this.dialogRef.close(data.folder);
             }),
             finalize(() => this.loading = false),

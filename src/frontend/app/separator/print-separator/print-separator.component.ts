@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from '../../../service/header.service';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -34,6 +35,7 @@ export class PrintSeparatorComponent implements OnInit {
     @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -44,7 +46,7 @@ export class PrintSeparatorComponent implements OnInit {
 
     ngOnInit(): void {
 
-        this.headerService.setHeader(this.lang.printSeparators);
+        this.headerService.setHeader(this.translate.instant('lang.printSeparators'));
 
         this.http.get('../rest/entities')
             .subscribe((data: any) => {
@@ -166,7 +168,7 @@ export class PrintSeparatorComponent implements OnInit {
         }
         today = dd + '-' + mm + '-' + yyyy;
 
-        a.download = this.lang.separators + '_' + today + '.pdf';
+        a.download = this.translate.instant('lang.separators') + '_' + today + '.pdf';
         a.click();
         window.URL.revokeObjectURL(url);
     }

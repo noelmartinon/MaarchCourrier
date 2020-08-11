@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angula
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
@@ -38,6 +39,7 @@ export class AdministrationComponent implements OnInit, AfterViewInit {
     @ViewChild('searchServiceInput', { static: true }) searchServiceInput: ElementRef;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private router: Router,
         private headerService: HeaderService,
@@ -50,7 +52,7 @@ export class AdministrationComponent implements OnInit, AfterViewInit {
     ) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.administration);
+        this.headerService.setHeader(this.translate.instant('lang.administration'));
 
         // this.loading = true;
 

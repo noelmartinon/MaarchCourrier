@@ -7,6 +7,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
@@ -43,8 +44,8 @@ export class BasketAdministrationComponent implements OnInit {
     displayedColumns = ['label_action', 'actions'];
     orderColumns = ['alt_identifier', 'creation_date', 'process_limit_date', 'res_id', 'priority'];
     orderByColumns = ['asc', 'desc'];
-    langVarName = [this.lang.chrono, this.lang.creationDate, this.lang.processLimitDate, this.lang.id, this.lang.priority];
-    langOrderName = [this.lang.ascending, this.lang.descending];
+    langVarName = [this.translate.instant('lang.chrono'), this.translate.instant('lang.creationDate'), this.translate.instant('lang.processLimitDate'), this.translate.instant('lang.id'), this.translate.instant('lang.priority')];
+    langOrderName = [this.translate.instant('lang.ascending'), this.translate.instant('lang.descending')];
     orderColumnsSelected: any[] = [{ 'column': 'res_id', 'order': 'asc' }];
     dataSource: any;
 
@@ -58,6 +59,7 @@ export class BasketAdministrationComponent implements OnInit {
     }
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -74,7 +76,7 @@ export class BasketAdministrationComponent implements OnInit {
 
         this.route.params.subscribe((params: any) => {
             if (typeof params['id'] === 'undefined') {
-                this.headerService.setHeader(this.lang.basketCreation);
+                this.headerService.setHeader(this.translate.instant('lang.basketCreation'));
                 this.creationMode = true;
                 this.basketIdAvailable = false;
                 this.loading = false;
@@ -86,7 +88,7 @@ export class BasketAdministrationComponent implements OnInit {
                 this.id = params['id'];
                 this.http.get('../rest/baskets/' + this.id)
                     .subscribe((data: any) => {
-                        this.headerService.setHeader(this.lang.basketModification, data.basket.basket_name);
+                        this.headerService.setHeader(this.translate.instant('lang.basketModification'), data.basket.basket_name);
 
                         this.basket = data.basket;
                         this.basket.id = data.basket.basket_id;
@@ -151,7 +153,7 @@ export class BasketAdministrationComponent implements OnInit {
                 this.http.put('../rest/baskets/' + this.id + '/groups/' + result.group.group_id + '/actions', { 'groupActions': result.group.groupActions })
                     .subscribe(() => {
                         this.dialogRef = null;
-                        this.notify.success(this.lang.basketUpdated);
+                        this.notify.success(this.translate.instant('lang.basketUpdated'));
                     }, (err) => {
                         this.dialogRef = null;
                         this.openSettings(group, action);
@@ -168,7 +170,7 @@ export class BasketAdministrationComponent implements OnInit {
                     this.basketIdAvailable = false;
                 }, (err) => {
                     this.basketIdAvailable = false;
-                    if (err.error.errors === this.lang.basketNotFound) {
+                    if (err.error.errors === this.translate.instant('lang.basketNotFound')) {
                         this.basketIdAvailable = true;
                     }
                 });
@@ -190,7 +192,7 @@ export class BasketAdministrationComponent implements OnInit {
         if (this.creationMode) {
             this.http.post('../rest/baskets', this.basket)
                 .subscribe(() => {
-                    this.notify.success(this.lang.basketAdded);
+                    this.notify.success(this.translate.instant('lang.basketAdded'));
                     this.router.navigate(['/administration/baskets/' + this.basket.id]);
                 }, (err) => {
                     this.notify.error(err.error.errors);
@@ -198,7 +200,7 @@ export class BasketAdministrationComponent implements OnInit {
         } else {
             this.http.put('../rest/baskets/' + this.id, this.basket)
                 .subscribe(() => {
-                    this.notify.success(this.lang.basketUpdated);
+                    this.notify.success(this.translate.instant('lang.basketUpdated'));
                     this.router.navigate(['/administration/baskets']);
                 }, (err) => {
                     this.notify.error(err.error.errors);
@@ -227,7 +229,7 @@ export class BasketAdministrationComponent implements OnInit {
     }
 
     unlinkGroup(groupIndex: any) {
-        const r = confirm(this.lang.unlinkGroup + ' ?');
+        const r = confirm(this.translate.instant('lang.unlinkGroup') + ' ?');
 
         if (r) {
             this.http.delete('../rest/baskets/' + this.id + '/groups/' + this.basketGroups[groupIndex].group_id)
@@ -238,7 +240,7 @@ export class BasketAdministrationComponent implements OnInit {
                         }
                     });
                     this.basketGroups.splice(groupIndex, 1);
-                    this.notify.success(this.lang.basketUpdated);
+                    this.notify.success(this.translate.instant('lang.basketUpdated'));
                     this.selectedIndex = 0;
                 }, (err) => {
                     this.notify.error(err.error.errors);
@@ -264,7 +266,7 @@ export class BasketAdministrationComponent implements OnInit {
                                 tmpGroup.isUsed = true;
                             }
                         });
-                        this.notify.success(this.lang.basketUpdated);
+                        this.notify.success(this.translate.instant('lang.basketUpdated'));
                         this.selectedIndex = this.basketGroups.length;
                     }, (err) => {
                         this.notify.error(err.error.errors);
@@ -277,7 +279,7 @@ export class BasketAdministrationComponent implements OnInit {
     addAction(group: any) {
         this.http.put('../rest/baskets/' + this.id + '/groups/' + group.group_id + '/actions', { 'groupActions': group.groupActions })
             .subscribe(() => {
-                this.notify.success(this.lang.actionsGroupBasketUpdated);
+                this.notify.success(this.translate.instant('lang.actionsGroupBasketUpdated'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -289,7 +291,7 @@ export class BasketAdministrationComponent implements OnInit {
 
         this.http.put('../rest/baskets/' + this.id, this.basketClone)
             .subscribe(() => {
-                this.notify.success(this.lang.basketUpdated);
+                this.notify.success(this.translate.instant('lang.basketUpdated'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -301,20 +303,20 @@ export class BasketAdministrationComponent implements OnInit {
 
         this.http.put('../rest/baskets/' + this.id, this.basketClone)
             .subscribe(() => {
-                this.notify.success(this.lang.basketUpdated);
+                this.notify.success(this.translate.instant('lang.basketUpdated'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
     }
 
     unlinkAction(group: any, action: any) {
-        const r = confirm(this.lang.unlinkAction + ' ?');
+        const r = confirm(this.translate.instant('lang.unlinkAction') + ' ?');
 
         if (r) {
             action.checked = false;
             this.http.put('../rest/baskets/' + this.id + '/groups/' + group.group_id + '/actions', { 'groupActions': group.groupActions })
                 .subscribe(() => {
-                    this.notify.success(this.lang.actionsGroupBasketUpdated);
+                    this.notify.success(this.translate.instant('lang.actionsGroupBasketUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -336,6 +338,7 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
     allEntities: any[] = [];
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any,
@@ -353,56 +356,56 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
                     parent: '#',
                     icon: 'fa fa-hashtag',
                     allowed: true,
-                    text: this.lang.allEntities
+                    text: this.translate.instant('lang.allEntities')
                 }, {
                     id: 'ENTITIES_JUST_BELOW',
                     keyword: 'ENTITIES_JUST_BELOW',
                     parent: '#',
                     icon: 'fa fa-hashtag',
                     allowed: true,
-                    text: this.lang.immediatelyBelowMyPrimaryEntity
+                    text: this.translate.instant('lang.immediatelyBelowMyPrimaryEntity')
                 }, {
                     id: 'ENTITIES_BELOW',
                     keyword: 'ENTITIES_BELOW',
                     parent: '#',
                     icon: 'fa fa-hashtag',
                     allowed: true,
-                    text: this.lang.belowAllMyEntities
+                    text: this.translate.instant('lang.belowAllMyEntities')
                 }, {
                     id: 'ALL_ENTITIES_BELOW',
                     keyword: 'ALL_ENTITIES_BELOW',
                     parent: '#',
                     icon: 'fa fa-hashtag',
                     allowed: true,
-                    text: this.lang.belowMyPrimaryEntity
+                    text: this.translate.instant('lang.belowMyPrimaryEntity')
                 }, {
                     id: 'MY_ENTITIES',
                     keyword: 'MY_ENTITIES',
                     parent: '#',
                     icon: 'fa fa-hashtag',
                     allowed: true,
-                    text: this.lang.myEntities
+                    text: this.translate.instant('lang.myEntities')
                 }, {
                     id: 'MY_PRIMARY_ENTITY',
                     keyword: 'MY_PRIMARY_ENTITY',
                     parent: '#',
                     icon: 'fa fa-hashtag',
                     allowed: true,
-                    text: this.lang.myPrimaryEntity
+                    text: this.translate.instant('lang.myPrimaryEntity')
                 }, {
                     id: 'SAME_LEVEL_ENTITIES',
                     keyword: 'SAME_LEVEL_ENTITIES',
                     parent: '#',
                     icon: 'fa fa-hashtag',
                     allowed: true,
-                    text: this.lang.sameLevelMyPrimaryEntity
+                    text: this.translate.instant('lang.sameLevelMyPrimaryEntity')
                 }, {
                     id: 'ENTITIES_JUST_UP',
                     keyword: 'ENTITIES_JUST_UP',
                     parent: '#',
                     icon: 'fa fa-hashtag',
                     allowed: true,
-                    text: this.lang.immediatelySuperiorMyPrimaryEntity
+                    text: this.translate.instant('lang.immediatelySuperiorMyPrimaryEntity')
                 }];
 
                 keywordEntities.forEach((keyword: any) => {

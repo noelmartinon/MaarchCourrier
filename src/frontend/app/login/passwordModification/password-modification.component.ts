@@ -1,6 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { FormBuilder, FormGroup, Validators, ValidationErrors, AbstractControl, ValidatorFn } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
@@ -48,6 +49,7 @@ export class PasswordModificationComponent implements OnInit {
 
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private authService: AuthService,
         private headerService: HeaderService,
@@ -106,7 +108,7 @@ export class PasswordModificationComponent implements OnInit {
                         this.passwordRules.renewal.enabled = rule.enabled;
                         this.passwordRules.renewal.value = rule.value;
                         if (rule.enabled) {
-                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.lang.days + '</b>. ' + this.lang['password2' + rule.label] + '.');
+                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.translate.instant('lang.days') + '</b>. ' + this.lang['password2' + rule.label] + '.');
                         }
                     } else if (rule.label === 'historyLastUse') {
                         this.passwordRules.historyLastUse.enabled = rule.enabled;
@@ -166,15 +168,15 @@ export class PasswordModificationComponent implements OnInit {
             this.firstFormGroup.controls['retypePasswordCtrl'].setErrors(null);
         }
         if (this.firstFormGroup.controls['newPasswordCtrl'].hasError('required')) {
-            return this.lang.requiredField + ' !';
+            return this.translate.instant('lang.requiredField') + ' !';
         } else if (this.firstFormGroup.controls['newPasswordCtrl'].hasError('minlength') && this.passwordRules.minLength.enabled) {
-            return this.passwordRules.minLength.value + ' ' + this.lang.passwordminLength + ' !';
+            return this.passwordRules.minLength.value + ' ' + this.translate.instant('lang.passwordminLength') + ' !';
         } else if (this.firstFormGroup.controls['newPasswordCtrl'].errors != null && this.firstFormGroup.controls['newPasswordCtrl'].errors.complexityUpper !== undefined && this.passwordRules.complexityUpper.enabled) {
-            return this.lang.passwordcomplexityUpper + ' !';
+            return this.translate.instant('lang.passwordcomplexityUpper') + ' !';
         } else if (this.firstFormGroup.controls['newPasswordCtrl'].errors != null && this.firstFormGroup.controls['newPasswordCtrl'].errors.complexityNumber !== undefined && this.passwordRules.complexityNumber.enabled) {
-            return this.lang.passwordcomplexityNumber + ' !';
+            return this.translate.instant('lang.passwordcomplexityNumber') + ' !';
         } else if (this.firstFormGroup.controls['newPasswordCtrl'].errors != null && this.firstFormGroup.controls['newPasswordCtrl'].errors.complexitySpecial !== undefined && this.passwordRules.complexitySpecial.enabled) {
-            return this.lang.passwordcomplexitySpecial + ' !';
+            return this.translate.instant('lang.passwordcomplexitySpecial') + ' !';
         } else {
             this.firstFormGroup.controls['newPasswordCtrl'].setErrors(null);
             this.validPassword = true;

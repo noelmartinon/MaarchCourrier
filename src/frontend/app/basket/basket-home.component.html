@@ -1,23 +1,23 @@
 <mat-expansion-panel #basketPanel class="basketList" expanded *ngIf="!loading">
     <mat-expansion-panel-header>
         <mat-panel-title>
-            <i class="fa fa-inbox panelIconMenu"></i>&nbsp;{{lang.myBaskets}}
+            <i class="fa fa-inbox panelIconMenu"></i>&nbsp;{{'lang.myBaskets' | translate}}
         </mat-panel-title>
-        <div title="{{lang.listConfiguration}}" (click)="$event.stopPropagation();editGroupOrder()" (mouseover)="hoverEditGroupOrder=true" (mouseleave)="hoverEditGroupOrder=false">
+        <div title="{{'lang.listConfiguration' | translate}}" (click)="$event.stopPropagation();editGroupOrder()" (mouseover)="hoverEditGroupOrder=true" (mouseleave)="hoverEditGroupOrder=false">
             <mat-icon [ngStyle]="{'color': editOrderGroups ? 'orange' : '#135F7F', 'opacity': editOrderGroups || hoverEditGroupOrder ? '1' : '0.4'}" mat-list-icon class="fa fa-cog" style="height:auto;"></mat-icon>
         </div>
     </mat-expansion-panel-header>
     <ng-container *ngIf="!loading">
         <mat-form-field [style.display]="(homeData.assignedBaskets.length > 0 || homeData.regroupedBaskets.length > 0) && !editOrderGroups ? 'inline-block' : 'none'" floatLabel="never" appearance="outline" class="basketsFilter"
             style="padding-left:20px;padding-right:20px;font-size: 11px;">
-            <input matInput placeholder="{{lang.filterBy}}" #listFilter>
+            <input matInput placeholder="{{'lang.filterBy' | translate}}" #listFilter>
         </mat-form-field>
         <div *ngIf="editOrderGroups" style="color: rgba(0,0,0,0.25);text-align:center;">
-            {{lang.noticeGroupeOrder}}
+            {{'lang.noticeGroupeOrder' | translate}}
         </div>
         <mat-list *ngIf="editOrderGroups">
             <span dnd-sortable-container [dropZones]="['boxers-zone']" [sortableData]="homeData.regroupedBaskets">
-                <mat-list-item disableRipple="true" *ngFor="let regroupedBasket of homeData.regroupedBaskets;let i = index" title="{{lang.move}}" dnd-sortable
+                <mat-list-item disableRipple="true" *ngFor="let regroupedBasket of homeData.regroupedBaskets;let i = index" title="{{'lang.move' | translate}}" dnd-sortable
                                [sortableIndex]="i" (onDropSuccess)="updateGroupsOrder()">
                     <mat-icon color="primary" mat-list-icon class="fa fa-arrows-alt" style="font-size:19px"></mat-icon>
                     <span class="basketGroupTitle">{{regroupedBasket.groupDesc}}</span>
@@ -37,7 +37,7 @@
                         <span *ngIf="basket.resourceNumber==0" class="nbResZero">{{basket.resourceNumber}}</span>
                         <span *ngIf="basket.resourceNumber!=0" class="nbRes">{{basket.resourceNumber}}</span>
                         <p mat-line title="{{basket.basket_name}}" [ngStyle]="{'color': basket.color}">
-                            {{basket.basket_name}}<br /><small color="primary">({{lang.redirectedTo}}
+                            {{basket.basket_name}}<br /><small color="primary">({{'lang.redirectedTo' | translate}}
                                 {{basket.redirectedUser}})</small>
                         </p>
                     </a>
@@ -58,7 +58,7 @@
         </ng-container>
         <ng-container *ngIf="homeData.assignedBaskets.length>0 && !editOrderGroups">
             <span color="primary" style="font-weight:bold;"
-                title="{{lang.basketsAssigned}}">{{lang.basketsAssignedShort}}</span>
+                title="{{'lang.basketsAssigned' | translate}}">{{'lang.basketsAssignedShort' | translate}}</span>
             <mat-divider></mat-divider>
             <mat-nav-list>
                 <a mat-list-item
@@ -77,7 +77,7 @@
             </mat-nav-list>
         </ng-container>
         <div class="noBasket" *ngIf="homeData.assignedBaskets.length === 0 && homeData.regroupedBaskets.length === 0">
-            {{lang.noAvailableBasket}}
+            {{'lang.noAvailableBasket' | translate}}
         </div>
     </ng-container>
 </mat-expansion-panel>

@@ -25,12 +25,12 @@
                             <i class="{{shortcut.style}}" style="position: absolute;"></i>
                         </div>
                         <span style="font-size: 40px;">{{shortcut.count}}</span>&nbsp;
-                        {{shortcut.label}}
+                        {{shortcut.label | translate}}
                     </mat-card>
                 </div>
                 <mat-divider></mat-divider>
                 <mat-form-field style="padding:10px;font-size: 10px;width: 250px !important;">
-                    <input matInput #searchServiceInput [formControl]="searchService" [placeholder]="lang.filterBy">
+                    <input matInput #searchServiceInput [formControl]="searchService" [placeholder]="this.translate.instant('lang.filterBy')">
                 </mat-form-field>
                 <div
                     style="margin: 20px;display: grid;grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));gap: 20px;padding:20px;padding-top:0px;margin-top:0px;">
@@ -42,7 +42,7 @@
                                 <i class="avatarCount2 {{administration.style}}"></i>
                             </span>
                             <span class="countLabel" style="white-space: initial;text-align: left;">
-                                {{administration.label}}
+                                {{administration.label | translate}}
                             </span>
                         </div>
                     </button>

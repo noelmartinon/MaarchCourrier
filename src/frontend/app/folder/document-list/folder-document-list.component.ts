@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -103,6 +104,7 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
     @ViewChild('basketHome', { static: true }) basketHome: BasketHomeComponent;
 
     constructor(
+        private translate: TranslateService,
         private router: Router,
         private route: ActivatedRoute,
         public http: HttpClient,
@@ -146,7 +148,7 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
                 .subscribe((data: any) => {
                     const keywordEntities = [{
                         keyword: 'ALL_ENTITIES',
-                        text: this.lang.allEntities,
+                        text: this.translate.instant('lang.allEntities'),
                     }];
                     this.folderInfo = {
                         'id': params['folderId'],
@@ -270,7 +272,7 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
             .subscribe((data: any) => {
                 const keywordEntities = [{
                     keyword: 'ALL_ENTITIES',
-                    text: this.lang.allEntities,
+                    text: this.translate.instant('lang.allEntities'),
                 }];
                 this.folderInfo = {
                     'id': data.folder.id,
@@ -324,7 +326,7 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
                 if (key === 'statusImage' && element[key] == null) {
                     element[key] = 'fa-question undefined';
                 } else if ((element[key] == null || element[key] === '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'mailTracking', 'hasDocument'].indexOf(key) === -1) {
-                    element[key] = this.lang.undefined;
+                    element[key] = this.translate.instant('lang.undefined');
                 }
             });
 

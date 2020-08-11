@@ -6,6 +6,7 @@ import { NotificationService } from '../../../service/notification/notification.
 import { of } from 'rxjs/internal/observable/of';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../environments/environment';
 import { MatTooltip } from '@angular/material/tooltip';
 
@@ -110,6 +111,7 @@ export class PrerequisiteComponent implements OnInit {
     @ViewChildren('packageItem') packageItem: QueryList<any>;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private _formBuilder: FormBuilder
@@ -130,7 +132,12 @@ export class PrerequisiteComponent implements OnInit {
                     this.packagesList[group].forEach((item: any, key: number) => {
                         this.packagesList[group][key].state = this.prerequisites[this.packagesList[group][key].label] ? 'ok' : 'ko';
                         if (this.packagesList[group][key].label === 'phpVersionValid') {
-                            this.lang.install_phpVersionValid_desc = `${this.lang.currentVersion} : ${this.prerequisites['phpVersion']}`;
+                            this.translate.setTranslation(this.translate.getDefaultLang(), {
+                                lang: {
+                                    install_phpVersionValid_desc: this.translate.instant('lang.currentVersion') + ' : ' + this.prerequisites['phpVersion']
+                                }
+                            }, true);
+                            console.log(this.translate);
                         }
                     });
                 });

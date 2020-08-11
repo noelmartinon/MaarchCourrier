@@ -191,7 +191,7 @@ class SignatureBookController
             'orderBy'   => [$orderBy]
         ]);
 
-        $canManageAttachment = PrivilegeController::hasPrivilege(['privilegeId' => 'manage_attachments', 'userId' => $args['userId']]);
+        $canUpdateDocuments = SignatureBookController::isResourceInSignatureBook(['resId' => $args['resId'], 'userId' => $args['userId'], 'canUpdateDocuments' => true]);
 
         foreach ($attachments as $key => $value) {
             if (($value['attachment_type'] == 'signed_response' && !empty($value['origin']))) {
@@ -230,7 +230,7 @@ class SignatureBookController
 
             $attachments[$key]['canModify'] = false;
             $attachments[$key]['canDelete'] = false;
-            if ($canManageAttachment || $value['typist'] == $args['userId']) {
+            if ($canUpdateDocuments || $value['typist'] == $args['userId']) {
                 $attachments[$key]['canModify'] = true;
                 $attachments[$key]['canDelete'] = true;
             }
@@ -301,7 +301,7 @@ class SignatureBookController
             $attachments[0]['sign'] = true;
             $attachments[0]['viewerLink'] = "../rest/resources/{$args['resId']}/content?".rand();
 
-            $attachments[0]['canModify'] = SignatureBookController::isResourceInSignatureBook(['resId' => $args['resId'], 'userId' => $args['userId'], 'canUpdateDocument' => true]);
+            $attachments[0]['canModify'] = $canUpdateDocuments;
             $attachments[0]['canDelete'] = false;
 
             $isSigned = AdrModel::getDocuments([
@@ -693,8 +693,8 @@ class SignatureBookController
 
             $where = ['group_id in (?)', 'list_event = ?'];
             $data = [$groups, 'signatureBookAction'];
-            if (!empty($args['canUpdateDocument'])) {
-                $where[] = "list_event_data->>'canUpdateDocument' = ?";
+            if (!empty($args['canUpdateDocuments'])) {
+                $where[] = "list_event_data->>'canUpdateDocuments' = ?";
                 $data[] = 'true';
             }
 
@@ -717,8 +717,8 @@ class SignatureBookController
         foreach ($assignedBaskets as $basket) {
             $where = ['basket_id = ?', 'group_id = ?', 'list_event = ?'];
             $data = [$basket['basket_id'], $basket['oldGroupId'], 'signatureBookAction'];
-            if (!empty($args['canUpdateDocument'])) {
-                $where[] = "list_event_data->>'canUpdateDocument' = ?";
+            if (!empty($args['canUpdateDocuments'])) {
+                $where[] = "list_event_data->>'canUpdateDocuments' = ?";
                 $data[] = 'true';
             }
 

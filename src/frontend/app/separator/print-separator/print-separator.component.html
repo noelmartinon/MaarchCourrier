@@ -16,12 +16,12 @@
             <div class="container-content">
                 <div style="height:90%;overflow:auto;position:absolute;width:100%;">
                     <div class="alert-message alert-message-info" role="alert" style="max-width: 100%;margin: 30px;"
-                        [innerHTML]="lang.printSeparatorInfo"></div>
+                        [innerHTML]="this.translate.instant('lang.printSeparatorInfo')"></div>
 
                     <div class="col-md-12">
                         <div class="col-md-6">
                             <mat-form-field>
-                                <mat-label>{{lang.separatorType}}</mat-label>
+                                <mat-label>{{'lang.separatorType' | translate}}</mat-label>
                                 <mat-select [(ngModel)]="separator.type" (selectionChange)="this.docBuffer = null">
                                     <mat-option *ngFor="let separatorType of separatorTypes" [value]="separatorType">
                                         {{lang[separatorType]}}
@@ -31,7 +31,7 @@
                         </div>
                         <div class="col-md-6">
                             <mat-form-field>
-                                <mat-label>{{lang.separatorTarget}}</mat-label>
+                                <mat-label>{{'lang.separatorTarget' | translate}}</mat-label>
                                 <mat-select [(ngModel)]="separator.target" (selectionChange)="changeType($event)">
                                     <mat-option *ngFor="let separatorTarget of separatorTargets"
                                         [value]="separatorTarget">
@@ -42,15 +42,15 @@
                         </div>
                         <mat-form-field>
                             <input matInput id="jstree_search" name="jstree_search" type="text"
-                                placeholder="{{lang.searchEntities}}">
-                            <mat-hint>{{lang.entityTreeInfoSeparator}}</mat-hint>
+                                placeholder="{{'lang.searchEntities' | translate}}">
+                            <mat-hint>{{'lang.entityTreeInfoSeparator' | translate}}</mat-hint>
                         </mat-form-field>
                         <div id="jstree"></div>
                     </div>
                 </div>
                 <div class="col-md-12 text-center" style="bottom:0px;padding-top: 10px;position: absolute;height:10%;width:100%;">
                     <button mat-raised-button color="primary" (click)="generateSeparators()"
-                        [disabled]="loading || (separator.target == 'entities' && separator.entities.length == 0)">{{lang.generateAndDownload}}</button>
+                        [disabled]="loading || (separator.target == 'entities' && separator.entities.length == 0)">{{'lang.generateAndDownload' | translate}}</button>
                 </div>
                 <div class="table-head">
                 </div>
@@ -66,7 +66,7 @@
         </div>
         <div class="titlePanel">
             <span color="primary"
-                style="flex:1;font-size: 20px;font-weight: bold;padding: 10px;">{{lang.separators}}</span>
+                style="flex:1;font-size: 20px;font-weight: bold;padding: 10px;">{{'lang.separators' | translate}}</span>
         </div>
         <pdf-viewer class="viewSep" [src]="this.docBuffer" [render-text]="false" [autoresize]="true"
             [original-size]="false" [show-all]="true"></pdf-viewer>

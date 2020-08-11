@@ -27,11 +27,13 @@ ALTER TABLE users DROP COLUMN IF EXISTS cookie_key;
 ALTER TABLE users DROP COLUMN IF EXISTS cookie_date;
 ALTER TABLE users DROP COLUMN IF EXISTS refresh_token;
 ALTER TABLE users ADD COLUMN refresh_token jsonb NOT NULL DEFAULT '[]';
+ALTER TABLE users DROP COLUMN IF EXISTS mode;
 DROP TYPE IF EXISTS users_modes;
 CREATE TYPE users_modes AS ENUM ('standard', 'rest', 'root_visible', 'root_invisible');
-ALTER TABLE users DROP COLUMN IF EXISTS mode;
 ALTER TABLE users ADD COLUMN mode users_modes NOT NULL DEFAULT 'standard';
 UPDATE users set mode = 'root_invisible' WHERE user_id = 'superadmin';
+ALTER TABLE users DROP COLUMN IF EXISTS authorized_api;
+ALTER TABLE users ADD COLUMN authorized_api jsonb NOT NULL DEFAULT '[]';
 
 DO $$ BEGIN
     IF (SELECT count(column_name) from information_schema.columns where table_name = 'users' and column_name = 'loginmode') THEN
@@ -183,6 +185,33 @@ UPDATE groupbasket SET list_event_data = list_event_data - 'canUpdate';
 /* TEMPLATES */
 ALTER TABLE templates DROP COLUMN IF EXISTS subject;
 ALTER TABLE templates ADD COLUMN subject character varying(255);
+
+UPDATE groupbasket SET list_event_data = '{"canUpdateDocuments":true}' WHERE list_event_data->'canUpdateDocument' = true;
+
+/* RECOMMENDED */
+CREATE TABLE IF NOT EXISTS issuing_sites (
+   id SERIAL NOT NULL,
+   site_label CHARACTER VARYING(256) NOT NULL,
+   post_office_label CHARACTER VARYING(256),
+   account_number CHARACTER VARYING(256),
+   address_name CHARACTER VARYING(256),
+   address_number CHARACTER VARYING(256),
+   address_street CHARACTER VARYING(256),
+   address_additional1 CHARACTER VARYING(256),
+   address_additional2 CHARACTER VARYING(256),
+   address_postcode CHARACTER VARYING(256),
+   address_town CHARACTER VARYING(256),
+   address_country CHARACTER VARYING(256),
+   CONSTRAINT issuing_sites_pkey PRIMARY KEY (id)
+);
+CREATE TABLE IF NOT EXISTS issuing_sites_entities (
+   id SERIAL NOT NULL,
+   site_id INTEGER NOT NULL,
+   entity_id INTEGER NOT NULL,
+   CONSTRAINT issuing_sites_entities_pkey PRIMARY KEY (id),
+   CONSTRAINT issuing_sites_entities_unique_key UNIQUE (site_id, entity_id)
+);
+
 
 /* RE CREATE VIEWS */
 CREATE OR REPLACE VIEW res_view_letterbox AS

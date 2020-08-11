@@ -12,13 +12,13 @@
     {{this.currentResource.subject | shorten: 50: '...'}}
 </div>
 <mat-tab-group *ngIf="this.mode == 'diffusion'" [(selectedIndex)]="selectedDiffusionTab" class="diffusionTab">
-    <mat-tab label="{{lang.diffusionList}}">
+    <mat-tab label="{{'lang.diffusionList' | translate}}">
         <app-diffusions-list #appDiffusionsList [adminMode]="false"></app-diffusions-list>
     </mat-tab>
-    <mat-tab label="{{lang.visaWorkflow}}" [disabled]="appVisaWorkflow.getVisaCount() == 0">
+    <mat-tab label="{{'lang.visaWorkflow' | translate}}" [disabled]="appVisaWorkflow.getVisaCount() == 0">
         <app-visa-workflow #appVisaWorkflow [adminMode]="false" [injectDatas]="injectDatasParam"></app-visa-workflow>
     </mat-tab>
-    <mat-tab label="{{lang.avis}}" [disabled]="appAvisWorkflow.getAvisCount() == 0">
+    <mat-tab label="{{'lang.avis' | translate}}" [disabled]="appAvisWorkflow.getAvisCount() == 0">
         <app-avis-workflow #appAvisWorkflow [adminMode]="false" [injectDatas]="injectDatasParam"></app-avis-workflow>
     </mat-tab>
 </mat-tab-group>

@@ -7,7 +7,7 @@
     <div class="row" style="margin: 0px;">
         <div class="col-md-12" style="padding-bottom: 10px;">
             <mat-button-toggle-group *ngIf="sentResources.length > 0" class="filterTypes" (change)="filterType($event)">
-                <mat-button-toggle [checked]="currentFilter === ''" [value]="''">{{lang.all}}</mat-button-toggle>
+                <mat-button-toggle [checked]="currentFilter === ''" [value]="''">{{'lang.all' | translate}}</mat-button-toggle>
                 <mat-button-toggle *ngFor="let type of filterTypes | sortBy : 'label'"
                     [checked]="currentFilter === type.id" [value]="type.id">{{type.label}}
                 </mat-button-toggle>
@@ -25,22 +25,22 @@
                         {{row.type == 'm2m_ARCHIVETRANSFER' ? 'Reçu' : lang.sent}} : <b>{{row.sendDate | timeAgo : 'full'}}</b>
                     </span>
                     <span *ngIf="row.status === 'DRAFT'" style="flex:1;color:orange">
-                        {{lang.draft}}
+                        {{'lang.draft' | translate}}
                     </span>
                     <span *ngIf="row.sendDate === null && row.status === 'SENT'" style="flex:1;color:orange">
                         En attente de réception
                     </span>
                     <span *ngIf="row.status === 'WAITING'" style="flex:1;color:orange;font-weight: bold;">
-                        {{lang.emailSendInProgress}}
+                        {{'lang.emailSendInProgress' | translate}}
                     </span>
                     <span *ngIf="row.status === 'ERROR'" style="flex:1;color:red;font-weight: bold;">
-                        {{lang.notSent}}
+                        {{'lang.notSent' | translate}}
                     </span>
                     <span *ngIf="row.status !== 'ERROR' && row.type == 'acknowledgementReceipt' && functions.empty(row.sendDate)" style="flex:1;color:orange">
-                        {{lang.manualSendingAR}}
+                        {{'lang.manualSendingAR' | translate}}
                     </span>
                     <span style="flex:1;color:green" *ngIf="!functions.empty(row.operationDate)" [title]="row.operationDate | fullDate">
-                        {{lang.delivery}} : <b>{{row.operationDate | timeAgo : 'full'}}</b>
+                        {{'lang.delivery' | translate}} : <b>{{row.operationDate | timeAgo : 'full'}}</b>
                     </span>
                 </div>
                 <div style="display: grid;grid-template-columns: 100px 1fr 170px;width: 100%;grid-gap: 10px;align-items: center;padding:10px;">
@@ -57,10 +57,10 @@
                     <div class="desc" [innerHTML]="row.desc"></div>
                     <div class="contact">
                         <span *ngIf="row.sender" style="white-space: pre;overflow: hidden;text-overflow: ellipsis;" [title]="row.sender">
-                            {{lang.senderShort}} : {{row.sender}}
+                            {{'lang.senderShort' | translate}} : {{row.sender}}
                         </span>
                         <span style="white-space: pre;overflow: hidden;text-overflow: ellipsis;" [title]="row.recipients">
-                            {{lang.recipientShort}} : {{row.recipients}}
+                            {{'lang.recipientShort' | translate}} : {{row.recipients}}
                         </span>
                     </div>
                 </div>
@@ -68,10 +68,10 @@
         </ng-container>
         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
     </mat-table>
-    <button mat-fab *ngIf="privilegeService.hasCurrentUserPrivilege('sendmail')" class="addSentResource" color="primary" [title]="lang.sendElement" (click)="openPromptMail()">
+    <button mat-fab *ngIf="privilegeService.hasCurrentUserPrivilege('sendmail')" class="addSentResource" color="primary" [title]="this.translate.instant('lang.sendElement')" (click)="openPromptMail()">
         <mat-icon style="height: auto;width: auto;" class="fa fa-plus"></mat-icon>
     </button>
-    <button mat-fab *ngIf="privilegeService.hasCurrentUserPrivilege('sendmail')" class="addSentResource" color="primary" [title]="lang.sendNumericPackage" (click)="openPromptNumericPackage()">
+    <button mat-fab *ngIf="privilegeService.hasCurrentUserPrivilege('sendmail')" class="addSentResource" color="primary" [title]="this.translate.instant('lang.sendNumericPackage')" (click)="openPromptNumericPackage()">
         <mat-icon style="height: auto;width: auto;font-size: 20px;">
             <i class="fas fa-envelope-open-text" style="left: -5px;position: relative;"></i>
             <i class="fas fa-wifi" style="position: absolute;font-size: 10px;transform: rotate(35deg);margin-left: -3px;margin-top: -3px;"></i>

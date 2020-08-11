@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LANG } from '../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { catchError, finalize, map, tap } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { HttpClient } from '@angular/common/http';
@@ -33,65 +34,67 @@ export class RedirectIndexingModelComponent implements OnInit {
     availableFields: any[] = [
         {
             identifier: 'doctype',
-            label: this.lang.doctype
+            label: this.translate.instant('lang.doctype')
         },
         {
             identifier: 'subject',
-            label: this.lang.subject
+            label: this.translate.instant('lang.subject')
         },
         {
             identifier: 'recipients',
-            label: this.lang.getRecipients
+            label: this.translate.instant('lang.getRecipients')
         },
         {
             identifier: 'priority',
-            label: this.lang.priority
+            label: this.translate.instant('lang.priority')
         },
         {
             identifier: 'confidentiality',
-            label: this.lang.confidential
+            label: this.translate.instant('lang.confidential')
         },
         {
             identifier: 'initiator',
-            label: this.lang.initiatorEntityAlt
+            label: this.translate.instant('lang.initiatorEntityAlt')
         },
         {
             identifier: 'departureDate',
-            label: this.lang.departureDate
+            label: this.translate.instant('lang.departureDate')
         },
         {
             identifier: 'processLimitDate',
-            label: this.lang.processLimitDate
+            label: this.translate.instant('lang.processLimitDate')
         },
         {
             identifier: 'tags',
-            label: this.lang.tags
+            label: this.translate.instant('lang.tags')
         },
         {
             identifier: 'senders',
-            label: this.lang.getSenders
+            label: this.translate.instant('lang.getSenders')
         },
         {
             identifier: 'destination',
-            label: this.lang.destination
+            label: this.translate.instant('lang.destination')
         },
         {
             identifier: 'folders',
-            label: this.lang.folders
+            label: this.translate.instant('lang.folders')
         },
         {
             identifier: 'documentDate',
-            label: this.lang.docDate
+            label: this.translate.instant('lang.docDate')
         },
         {
             identifier: 'arrivalDate',
-            label: this.lang.arrivalDate
+            label: this.translate.instant('lang.arrivalDate')
         },
     ];
 
     loading: boolean = false;
 
-    constructor(@Inject(MAT_DIALOG_DATA) public data: any,
+    constructor(
+        private translate: TranslateService,
+        @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<RedirectIndexingModelComponent>,
         public http: HttpClient,
         private notify: NotificationService,
@@ -137,7 +140,7 @@ export class RedirectIndexingModelComponent implements OnInit {
                 this.mainIndexingModelFields = this.mainIndexingModelFields.map(field => {
                     const availableField = this.availableFields.find(elem => elem.identifier === field.identifier);
 
-                    field.label = availableField === undefined ? this.lang.undefined : availableField.label;
+                    field.label = availableField === undefined ? this.translate.instant('lang.undefined') : availableField.label;
                     return field;
                 });
             }),
@@ -211,7 +214,7 @@ export class RedirectIndexingModelComponent implements OnInit {
     onSubmit() {
         this.http.request('DELETE', '../rest/indexingModels/' + this.mainIndexingModel.id, { body: { targetId: this.selectedModelId } }).pipe(
             tap(() => {
-                this.notify.success(this.lang.indexingModelDeleted);
+                this.notify.success(this.translate.instant('lang.indexingModelDeleted'));
                 this.dialogRef.close('ok');
             }),
             catchError((err: any) => {

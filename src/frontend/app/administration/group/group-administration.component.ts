@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatPaginator } from '@angular/material/paginator';
@@ -63,6 +64,7 @@ export class GroupAdministrationComponent implements OnInit {
     }
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -79,7 +81,7 @@ export class GroupAdministrationComponent implements OnInit {
         this.route.params.subscribe(params => {
             if (typeof params['id'] === 'undefined') {
 
-                this.headerService.setHeader(this.lang.groupCreation);
+                this.headerService.setHeader(this.translate.instant('lang.groupCreation'));
 
                 this.creationMode = true;
                 this.loading = false;
@@ -105,19 +107,19 @@ export class GroupAdministrationComponent implements OnInit {
                                 services = [
                                     {
                                         'id': 'indexing_diffList',
-                                        'label': this.lang.diffListPrivilegeMsgIndexing,
+                                        'label': this.translate.instant('lang.diffListPrivilegeMsgIndexing'),
                                         'current': this.group.privileges.filter((priv: any) => ['update_diffusion_indexing', 'update_diffusion_except_recipient_indexing'].indexOf(priv) > -1)[0] !== undefined ? this.group.privileges.filter((priv: any) => ['update_diffusion_indexing', 'update_diffusion_except_recipient_indexing'].indexOf(priv) > -1)[0] : '',
                                         'services': this.privilegeService.getPrivileges(['update_diffusion_indexing', 'update_diffusion_except_recipient_indexing'])
                                     },
                                     {
                                         'id': 'process_diffList',
-                                        'label': this.lang.diffListPrivilegeMsgProcess,
+                                        'label': this.translate.instant('lang.diffListPrivilegeMsgProcess'),
                                         'current': this.group.privileges.filter((priv: any) => ['update_diffusion_process', 'update_diffusion_except_recipient_process'].indexOf(priv) > -1)[0] !== undefined ? this.group.privileges.filter((priv: any) => ['update_diffusion_process', 'update_diffusion_except_recipient_process'].indexOf(priv) > -1)[0] : '',
                                         'services': this.privilegeService.getPrivileges(['update_diffusion_process', 'update_diffusion_except_recipient_process'])
                                     },
                                     {
                                         'id': 'details_diffList',
-                                        'label': this.lang.diffListPrivilegeMsgDetails,
+                                        'label': this.translate.instant('lang.diffListPrivilegeMsgDetails'),
                                         'current': this.group.privileges.filter((priv: any) => ['update_diffusion_details', 'update_diffusion_except_recipient_details'].indexOf(priv) > -1)[0] !== undefined ? this.group.privileges.filter((priv: any) => ['update_diffusion_details', 'update_diffusion_except_recipient_details'].indexOf(priv) > -1)[0] : '',
                                         'services': this.privilegeService.getPrivileges(['update_diffusion_details', 'update_diffusion_except_recipient_details'])
                                     }
@@ -132,7 +134,7 @@ export class GroupAdministrationComponent implements OnInit {
                                 services = [
                                     {
                                         'id': 'confidentialityAndSecurity_personal_data',
-                                        'label': this.lang.personalDataMsg,
+                                        'label': this.translate.instant('lang.personalDataMsg'),
                                         'current': priv,
                                         'services': this.privilegeService.getPrivileges(['view_personal_data', 'manage_personal_data'])
                                     }
@@ -145,7 +147,7 @@ export class GroupAdministrationComponent implements OnInit {
                                 services: services
                             });
                         });
-                        this.headerService.setHeader(this.lang.groupModification, this.group['group_desc']);
+                        this.headerService.setHeader(this.translate.instant('lang.groupModification'), this.group['group_desc']);
 
                         this.loading = false;
                         setTimeout(() => {
@@ -204,7 +206,7 @@ export class GroupAdministrationComponent implements OnInit {
                 tap(() => {
                     this.group.privileges.splice(this.group.privileges.indexOf(servicesId[1]), 1);
                     this.headerService.resfreshCurrentUser();
-                    this.notify.success(this.lang.groupServicesUpdated);
+                    this.notify.success(this.translate.instant('lang.groupServicesUpdated'));
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
@@ -220,7 +222,7 @@ export class GroupAdministrationComponent implements OnInit {
                 tap(() => {
                     this.group.privileges.splice(this.group.privileges.indexOf(servicesId[1]), 1);
                     this.headerService.resfreshCurrentUser();
-                    this.notify.success(this.lang.groupServicesUpdated);
+                    this.notify.success(this.translate.instant('lang.groupServicesUpdated'));
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
@@ -245,7 +247,7 @@ export class GroupAdministrationComponent implements OnInit {
                 tap(() => {
                     this.group.privileges.splice(this.group.privileges.indexOf('manage_personal_data'), 1);
                     this.headerService.resfreshCurrentUser();
-                    this.notify.success(this.lang.groupServicesUpdated);
+                    this.notify.success(this.translate.instant('lang.groupServicesUpdated'));
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
@@ -276,7 +278,7 @@ export class GroupAdministrationComponent implements OnInit {
         if (this.creationMode) {
             this.http.post('../rest/groups', this.group)
                 .subscribe((data: any) => {
-                    this.notify.success(this.lang.groupAdded);
+                    this.notify.success(this.translate.instant('lang.groupAdded'));
                     this.router.navigate(['/administration/groups/' + data.group]);
                 }, (err) => {
                     this.notify.error(err.error.errors);
@@ -284,7 +286,7 @@ export class GroupAdministrationComponent implements OnInit {
         } else {
             this.http.put('../rest/groups/' + this.group['id'], { 'description': this.group['group_desc'], 'security': this.group['security'] })
                 .subscribe(() => {
-                    this.notify.success(this.lang.groupUpdated);
+                    this.notify.success(this.translate.instant('lang.groupUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -294,7 +296,7 @@ export class GroupAdministrationComponent implements OnInit {
     toggleService(ev: any, service: any) {
         if (ev.checked) {
             if (service.id === 'admin_groups') {
-                const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.confirmAction, msg: this.lang.enableGroupMsg } });
+                const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirmAction'), msg: this.translate.instant('lang.enableGroupMsg') } });
 
                 dialogRef.afterClosed().pipe(
                     tap((data: string) => {
@@ -326,7 +328,7 @@ export class GroupAdministrationComponent implements OnInit {
             tap(() => {
                 this.group.privileges.push(service.id);
                 this.headerService.resfreshCurrentUser();
-                this.notify.success(this.lang.groupServicesUpdated);
+                this.notify.success(this.translate.instant('lang.groupServicesUpdated'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -340,7 +342,7 @@ export class GroupAdministrationComponent implements OnInit {
             tap(() => {
                 this.group.privileges.splice(this.group.privileges.indexOf(service.id), 1);
                 this.headerService.resfreshCurrentUser();
-                this.notify.success(this.lang.groupServicesUpdated);
+                this.notify.success(this.translate.instant('lang.groupServicesUpdated'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -368,7 +370,7 @@ export class GroupAdministrationComponent implements OnInit {
                 this.usersDataSource = new MatTableDataSource(this.group.users);
                 this.usersDataSource.paginator = this.paginator;
                 this.usersDataSource.sort = this.sortUsers;
-                this.notify.success(this.lang.userAdded);
+                this.notify.success(this.translate.instant('lang.userAdded'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -419,7 +421,7 @@ export class GroupAdministrationComponent implements OnInit {
         }
         this.http.put(`../rest/groups/${this.group.id}/privileges/${this.panelMode}/parameters`, { parameters: obj }).pipe(
             tap(() => {
-                this.notify.success(this.lang.parameterUpdated);
+                this.notify.success(this.translate.instant('lang.parameterUpdated'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

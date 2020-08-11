@@ -3,7 +3,7 @@
         <span style="flex: 1;">
             {{functions.empty(reference) ? lang.sendNumericPackage : reference}}
         </span>
-        <button [title]="lang.close" mat-icon-button (click)="closeModal()">
+        <button [title]="this.translate.instant('lang.close')" mat-icon-button (click)="closeModal()">
             <mat-icon class="fa fa-times"></mat-icon>
         </button></h1>
     <mat-dialog-content class="modal-container">
@@ -13,7 +13,7 @@
         <div *ngIf="canManageMail()" class="alert-message alert-message-info"
             [innerHTML]="lang.sendNumericPackageInfo | scan: [maarch2maarchUrl]"></div>
         <mat-form-field>
-            <mat-label class="attachLabel">{{lang.sender}}</mat-label>
+            <mat-label class="attachLabel">{{'lang.sender' | translate}}</mat-label>
             <input *ngIf="!canManageMail()" matInput [value]="currentSender.label" readonly>
             <mat-select *ngIf="canManageMail()" [compareWith]="this.compareSenders" [(ngModel)]="currentSender"
                 required>
@@ -23,7 +23,7 @@
             </mat-select>
         </mat-form-field>
         <mat-form-field>
-            <mat-label class="attachLabel">{{lang.recipient}} *</mat-label>
+            <mat-label class="attachLabel">{{'lang.recipient' | translate}} *</mat-label>
             <mat-chip-list id="recipients-list" #recipientsList>
                 <mat-chip class="recipients" *ngFor="let recipient of recipients"
                     [removable]="canManageMail()" (removed)="remove(recipient, 'recipients')"
@@ -33,7 +33,7 @@
                             {{recipient.label}} - <b>{{recipient.m2m}}</b>
                         </div>
                         <div class="attachLabel">
-                            ({{lang.communicationMean}} : {{recipient.communicationMeans}})
+                            ({{'lang.communicationMean' | translate}} : {{recipient.communicationMeans}})
                         </div>
                     </span>
                     <mat-icon matChipRemove class="fa fa-times" *ngIf="canManageMail()"></mat-icon>
@@ -47,13 +47,13 @@
                         {{option.label}} - <b>{{option.m2m}}</b>
                     </div>
                     <div class="attachLabel">
-                        ({{lang.communicationMean}} : {{option.communicationMeans}})
+                        ({{'lang.communicationMean' | translate}} : {{option.communicationMeans}})
                     </div>
                 </mat-option>
             </mat-autocomplete>
         </mat-form-field>
         <mat-form-field>
-            <mat-label class="attachLabel">{{lang.mailSubject}}</mat-label>
+            <mat-label class="attachLabel">{{'lang.mailSubject' | translate}}</mat-label>
             <input matInput [readonly]="!canManageMail()" [(ngModel)]="numericPackage.object" maxlength="70" required>
             <button mat-icon-button matSuffix *ngFor="let keyVal of numericPackageAttachTool | keyvalue"
                 [disabled]="!canManageMail() || numericPackageAttachTool[keyVal.key].list.length === 0" [title]="numericPackageAttachTool[keyVal.key].title"
@@ -82,12 +82,12 @@
             </mat-menu>
         </mat-form-field>
         <mat-form-field *ngIf="!canManageMail()">
-            <mat-label class="attachLabel">{{lang.reference}}</mat-label>
+            <mat-label class="attachLabel">{{'lang.reference' | translate}}</mat-label>
             <input matInput [value]="reference" readonly>
         </mat-form-field>
         <div class="attachMsg"
             *ngIf="numericPackage.mainExchangeDoc === null && numericPackageAttach.length === 0 && canManageMail()">
-            {{lang.attachItemToNumericPackage}}
+            {{'lang.attachItemToNumericPackage' | translate}}
             <i class="fas fa-arrow-up"></i>
         </div>
         <div style="overflow: auto;max-height: 300px;">
@@ -122,13 +122,13 @@
             </mat-list>
         </div>
         <div class="models" *ngIf="canManageMail()">
-            <plugin-select-search *ngIf="availableEmailModels.length > 0" [label]="lang.emailModel"
-                [placeholderLabel]="lang.emailModel" [datas]="availableEmailModels"
+            <plugin-select-search *ngIf="availableEmailModels.length > 0" [label]="this.translate.instant('lang.emailModel')"
+                [placeholderLabel]="this.translate.instant('lang.emailModel')" [datas]="availableEmailModels"
                 [formControlSelect]="templateEmailListForm" (afterSelected)="mergeEmailTemplate($event)">
             </plugin-select-search>
 
             <plugin-select-search #templateList *ngIf="availableSignEmailModels.length > 0"
-                [label]="lang.emailSignatures" [placeholderLabel]="lang.emailSignatures"
+                [label]="this.translate.instant('lang.emailSignatures')" [placeholderLabel]="this.translate.instant('lang.emailSignatures')"
                 [datas]="availableSignEmailModels" [formControlSelect]="emailSignListForm"
                 (afterSelected)="mergeSignEmailTemplate($event)">
             </plugin-select-search>
@@ -136,7 +136,7 @@
         <mat-divider></mat-divider>
         <div class="row" style="margin: 0;padding-top: 10px;" *ngIf="!canManageMail()">
             <div class="col-md-9">
-                <label class="attachLabel">{{lang.actionsHistory}}</label>
+                <label class="attachLabel">{{'lang.actionsHistory' | translate}}</label>
                 <div class="messageExchangeHistory">
                     <div class="messageExchangeHistoryItem" *ngFor="let item of messageReview">
                         <div class="messageExchangeHistoryDate">
@@ -147,21 +147,21 @@
                         </div>
                         
                     </div>
-                    <div *ngIf="messageReview.length === 0" class="noAction">{{lang.noActionProcessed}}</div>
+                    <div *ngIf="messageReview.length === 0" class="noAction">{{'lang.noActionProcessed' | translate}}</div>
                 </div>
             </div>
             <div class="col-md-3 text-center">
                 <button mat-button color="primary" style="width: 180px;white-space: initial;line-height: 20px;padding: 10px;" (click)="saveNumericPackageFile()">
                     <i class="fas fa-file-download" style="font-size: 40px;"></i><br/>
-                    <span>{{lang.downloadNumericPackage}}</span>
+                    <span>{{'lang.downloadNumericPackage' | translate}}</span>
                 </button>
             </div>
         </div>
 
         <div style="padding-top: 10px;">
             <mat-form-field appearance="outline">
-                <mat-label class="attachLabel">{{lang.note}}</mat-label>
-                <textarea matInput [placeholder]="lang.addNoteToNumericPackage" [(ngModel)]="numericPackage.content"
+                <mat-label class="attachLabel">{{'lang.note' | translate}}</mat-label>
+                <textarea matInput [placeholder]="this.translate.instant('lang.addNoteToNumericPackage')" [(ngModel)]="numericPackage.content"
                     matTextareaAutosize style="padding:0" [readonly]="!canManageMail()"></textarea>
             </mat-form-field>
         </div>
@@ -170,9 +170,9 @@
     <div mat-dialog-actions class="actions">
         <button mat-raised-button color="primary"
             *ngIf="canManageMail() && privilegeService.hasCurrentUserPrivilege('sendmail') && numericPackageStatus !== 'ERROR'" (click)="onSubmit()"
-            [disabled]="recipients.length === 0 || numericPackage.mainExchangeDoc === null || loading">{{lang.send}}</button>
+            [disabled]="recipients.length === 0 || numericPackage.mainExchangeDoc === null || loading">{{'lang.send' | translate}}</button>
         <button mat-raised-button color="warn" (click)="deleteEmail()"
             *ngIf="data.emailId && !loading && numericPackageStatus === 'ERROR'"
-            [disabled]="headerService.user.id !== numericPackageCreatorId">{{lang.delete}}</button>
+            [disabled]="headerService.user.id !== numericPackageCreatorId">{{'lang.delete' | translate}}</button>
     </div>
 </div>

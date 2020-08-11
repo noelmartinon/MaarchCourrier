@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -105,6 +106,7 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
     @ViewChild('menuShortcut', { static: true }) menuShortcut: MenuShortcutComponent;
 
     constructor(
+        private translate: TranslateService,
         private router: Router,
         private route: ActivatedRoute,
         public http: HttpClient,
@@ -139,7 +141,7 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
 
             this.http.get('../rest/followedResources')
                 .subscribe((data: any) => {
-                    this.headerService.setHeader(this.lang.followedMail, '', 'fas fa-star');
+                    this.headerService.setHeader(this.translate.instant('lang.followedMail'), '', 'fas fa-star');
                 });
             this.basketUrl = '../rest/followedResources';
             this.filtersListService.filterMode = false;
@@ -276,7 +278,7 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
                 if (key === 'statusImage' && element[key] == null) {
                     element[key] = 'fa-question undefined';
                 } else if ((element[key] == null || element[key] === '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'mailTracking', 'hasDocument', 'folders'].indexOf(key) === -1) {
-                    element[key] = this.lang.undefined;
+                    element[key] = this.translate.instant('lang.undefined');
                 }
             });
 
@@ -340,7 +342,7 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
     }
 
     unfollowMail(row: any) {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.stopFollowingAlert } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.stopFollowingAlert') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),

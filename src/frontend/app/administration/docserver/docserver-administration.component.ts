@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -25,6 +26,7 @@ export class DocserverAdministrationComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private router: Router,
         private notify: NotificationService,
@@ -33,7 +35,7 @@ export class DocserverAdministrationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.docserverCreation);
+        this.headerService.setHeader(this.translate.instant('lang.docserverCreation'));
 
         this.loading = true;
 
@@ -49,7 +51,7 @@ export class DocserverAdministrationComponent implements OnInit {
         docserver.size_limit_number = docserver.limitSizeFormatted * 1000000000;
         this.http.post('../rest/docservers', docserver)
             .subscribe((data: any) => {
-                this.notify.success(this.lang.docserverAdded);
+                this.notify.success(this.translate.instant('lang.docserverAdded'));
                 this.router.navigate(['/administration/docservers/']);
             }, (err) => {
                 this.notify.error(err.error.errors);

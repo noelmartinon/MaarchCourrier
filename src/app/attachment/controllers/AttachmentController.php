@@ -30,6 +30,7 @@ use Resource\controllers\WatermarkController;
 use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
 use Respect\Validation\Validator;
+use SignatureBook\controllers\SignatureBookController;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\CoreController;
@@ -150,7 +151,7 @@ class AttachmentController
         if (!ResController::hasRightByResId(['resId' => [$attachment['res_id_master']], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(400)->withJson(['errors' => 'Attachment out of perimeter']);
         }
-        if ($GLOBALS['id'] != $attachment['typist'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'manage_attachments', 'userId' => $GLOBALS['id']])) {
+        if ($GLOBALS['id'] != $attachment['typist'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'manage_attachments', 'userId' => $GLOBALS['id']]) && !SignatureBookController::isResourceInSignatureBook(['resId' => $attachment['res_id_master'], 'userId' => $GLOBALS['id'], 'canUpdateDocuments' => true])) {
             return $response->withStatus(403)->withJson(['errors' => 'Attachment out of perimeter']);
         }
 
@@ -231,8 +232,8 @@ class AttachmentController
         if (!ResController::hasRightByResId(['resId' => [$attachment['res_id_master']], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
-        if ($GLOBALS['id'] != $attachment['typist'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'manage_attachments', 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        if ($GLOBALS['id'] != $attachment['typist'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'manage_attachments', 'userId' => $GLOBALS['id']]) && !SignatureBookController::isResourceInSignatureBook(['resId' => $attachment['res_id_master'], 'userId' => $GLOBALS['id'], 'canUpdateDocuments' => true])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Attachment out of perimeter']);
         }
 
         if (empty($attachment['origin_id'])) {

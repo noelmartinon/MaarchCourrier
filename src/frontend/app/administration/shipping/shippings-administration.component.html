@@ -1,11 +1,11 @@
 <mat-sidenav-container autosize class="maarch-container">
     <ng-template #adminMenuTemplate>
         <mat-nav-list>
-            <h3 mat-subheader>{{lang.actions}}</h3>
+            <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
             <a mat-list-item routerLink="/administration/shippings/new">
                 <mat-icon color="primary" mat-list-icon class="fa fa-plus"></mat-icon>
                 <p mat-line>
-                    {{lang.add}}
+                    {{'lang.add' | translate}}
                 </p>
             </a>
         </mat-nav-list>
@@ -32,8 +32,7 @@
                     <div class="row">
                         <div class="col-md-6 col-xs-6">
                             <mat-form-field>
-                                <input matInput (keyup)="applyFilter($event.target.value)"
-                                    placeholder="{{lang.filterBy}}">
+                                <input matInput [formControl]="adminService.getFilterField()" placeholder="{{'lang.filterBy' | translate}}">
                             </mat-form-field>
                         </div>
                         <div class="col-md-6 col-xs-6">
@@ -41,27 +40,27 @@
                             </mat-paginator>
                         </div>
                     </div>
-                    <mat-table #table [dataSource]="dataSource" matSort matSortActive="id" matSortDirection="asc">
+                    <mat-table #table [dataSource]="adminService.getDataSource()" matSort matSortDisableClear>
                         <ng-container matColumnDef="label">
                             <mat-header-cell *matHeaderCellDef mat-sort-header
-                                [class.hide-for-mobile]="appService.getViewMode()">{{lang.label}}</mat-header-cell>
+                                [class.hide-for-mobile]="appService.getViewMode()">{{'lang.label' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element" [class.hide-for-mobile]="appService.getViewMode()">
                                 {{element.label}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="description">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.description}}</mat-header-cell>
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.description' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element">
                                 {{element.description}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="accountid">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.mailevaAccount}}</mat-header-cell>
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.mailevaAccount' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element">
                                 {{element.accountid}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="actions">
                             <mat-header-cell *matHeaderCellDef></mat-header-cell>
                             <mat-cell *matCellDef="let element" style="justify-content: flex-end;">
-                                <button mat-icon-button color="warn" matTooltip="{{lang.delete}}"
+                                <button mat-icon-button color="warn" matTooltip="{{'lang.delete' | translate}}"
                                     (click)="$event.stopPropagation();deleteShipping(element.id)">
                                     <mat-icon class="fa fa-trash-alt fa-2x" aria-hidden="true"></mat-icon>
                                 </button>
@@ -70,11 +69,11 @@
                         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                         <mat-row *matRowDef="let row; columns: displayedColumns;"
                             routerLink="/administration/shippings/{{row.id}}" style="cursor:pointer;"
-                            matTooltip="{{lang.view}}"></mat-row>
+                            matTooltip="{{'lang.view' | translate}}"></mat-row>
                     </mat-table>
                     <div class="mat-paginator"
                         style="min-height:48px;display: flex;justify-content: end;align-items: center;padding-right: 20px;">
-                        {{shippings.length}} {{lang.shippings}}</div>
+                        {{shippings.length}} {{'lang.shippings' | translate}}</div>
                 </mat-card>
             </div>
         </div>

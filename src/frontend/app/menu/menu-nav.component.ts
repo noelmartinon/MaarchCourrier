@@ -3,6 +3,7 @@ import { Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'menu-nav',
@@ -15,6 +16,7 @@ export class MenuNavComponent implements OnInit {
     user: any = {};
 
     constructor(
+        public translate: TranslateService,
         public http: HttpClient,
         private _router: Router,
         private activatedRoute: ActivatedRoute,

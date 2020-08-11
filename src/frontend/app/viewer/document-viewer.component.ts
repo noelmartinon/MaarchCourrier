@@ -1,6 +1,7 @@
 import {Component, OnInit, Input, ViewChild, EventEmitter, Output, OnDestroy} from '@angular/core';
 import { HttpClient, HttpEventType } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { HeaderService } from '../../service/header.service';
 import { AppService } from '../../service/app.service';
@@ -141,6 +142,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     docToUploadValue: any;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public headerService: HeaderService,
@@ -308,7 +310,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             src: null
         };
         this.noConvertedFound = false;
-        this.loadingInfo.message = this.lang.loadingFile + '...';
+        this.loadingInfo.message = this.translate.instant('lang.loadingFile') + '...';
         this.loadingInfo.mode = 'indeterminate';
     }
 
@@ -390,7 +392,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                     const downloadProgress = Math.round(100 * event.loaded / event.total);
                     this.loadingInfo.percent = downloadProgress;
                     this.loadingInfo.mode = 'determinate';
-                    this.loadingInfo.message = `3/3 ${this.lang.downloadConvertedFile}...`;
+                    this.loadingInfo.message = `3/3 ${this.translate.instant('lang.downloadConvertedFile')}...`;
 
                     return { status: 'progress', message: downloadProgress };
 
@@ -400,10 +402,10 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
                     if (progress === 100) {
                         this.loadingInfo.mode = 'indeterminate';
-                        this.loadingInfo.message = `2/3 ${this.lang.convertingFile}...`;
+                        this.loadingInfo.message = `2/3 ${this.translate.instant('lang.convertingFile')}...`;
                     } else {
                         this.loadingInfo.mode = 'determinate';
-                        this.loadingInfo.message = `1/3 ${this.lang.loadingFile}...`;
+                        this.loadingInfo.message = `1/3 ${this.translate.instant('lang.loadingFile')}...`;
                     }
                     return { status: 'progress', message: progress };
 
@@ -448,7 +450,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     cleanFile() {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -535,10 +537,10 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     isExtensionAllowed(file: any) {
         const fileExtension = '.' + file.name.toLowerCase().split('.').pop();
         if (this.allowedExtensions.filter(ext => ext.mimeType === file.type && ext.extension === fileExtension).length === 0) {
-            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.notAllowedExtension + ' !', msg: this.lang.file + ' : <b>' + file.name + '</b>, ' + this.lang.type + ' : <b>' + file.type + '</b><br/><br/><u>' + this.lang.allowedExtensions + '</u> : <br/>' + this.allowedExtensions.map(ext => ext.extension).filter((elem: any, index: any, self: any) => index === self.indexOf(elem)).join(', ') } });
+            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.notAllowedExtension') + ' !', msg: this.translate.instant('lang.file') + ' : <b>' + file.name + '</b>, ' + this.translate.instant('lang.type') + ' : <b>' + file.type + '</b><br/><br/><u>' + this.translate.instant('lang.allowedExtensions') + '</u> : <br/>' + this.allowedExtensions.map(ext => ext.extension).filter((elem: any, index: any, self: any) => index === self.indexOf(elem)).join(', ') } });
             return false;
         } else if (file.size > this.maxFileSize && this.maxFileSize > 0) {
-            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.maxFileSizeReached + ' ! ', msg: this.lang.maxFileSize + ' : ' + this.maxFileSizeLabel } });
+            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.maxFileSizeReached') + ' ! ', msg: this.translate.instant('lang.maxFileSize') + ' : ' + this.maxFileSizeLabel } });
             return false;
         } else {
             return true;
@@ -607,6 +609,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                         this.file.contentView = `../rest/attachments/${resId}/content?mode=base64`;
                         this.file.src = this.base64ToArrayBuffer(data.encodedDocument);
                         this.loading = false;
+                        this.noFile = false;
                     }
                 },
                 (err: any) => {
@@ -646,6 +649,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                             this.file.contentView = `../rest/resources/${resId}/content?mode=base64`;
                             this.file.src = this.base64ToArrayBuffer(data.encodedDocument);
                             this.loading = false;
+                            this.noFile = false;
                         }
                     },
                     (err: any) => {
@@ -705,11 +709,11 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     editTemplate(templateId: number) {
         let confirmMsg = '';
         if (this.mode === 'attachment') {
-            confirmMsg = this.lang.editionAttachmentConfirmFirst + '<br><br>' + this.lang.editionAttachmentConfirmThird;
+            confirmMsg = this.translate.instant('lang.editionAttachmentConfirmFirst') + '<br><br>' + this.translate.instant('lang.editionAttachmentConfirmThird');
         } else {
-            confirmMsg = this.lang.editionAttachmentConfirmFirst + '<br><br>' + this.lang.editionAttachmentConfirmSecond;
+            confirmMsg = this.translate.instant('lang.editionAttachmentConfirmFirst') + '<br><br>' + this.translate.instant('lang.editionAttachmentConfirmSecond');
         }
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.templateEdition, msg: confirmMsg } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.templateEdition'), msg: confirmMsg } });
 
         this.dialogRef.afterClosed().pipe(
             tap((data: string) => {
@@ -906,7 +910,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 arrTypes = this.sortPipe.transform(arrTypes, 'label');
                 arrTypes.push({
                     id: 'all',
-                    label: this.lang.others
+                    label: this.translate.instant('lang.others')
                 });
 
             }),
@@ -929,7 +933,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                         arrValues.push({
                             id: template.id,
                             label: '&nbsp;&nbsp;&nbsp;&nbsp;' + template.label,
-                            title: template.exists ? template.label : this.lang.fileDoesNotExists,
+                            title: template.exists ? template.label : this.translate.instant('lang.fileDoesNotExists'),
                             extension: template.extension,
                             disabled: !template.exists,
                         });
@@ -951,8 +955,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                         this.listTemplates = data.templates;
                         arrValues.push({
                             id: 'all',
-                            label: this.lang.indexation,
-                            title: this.lang.indexation,
+                            label: this.translate.instant('lang.indexation'),
+                            title: this.translate.instant('lang.indexation'),
                             disabled: true,
                             isTitle: true,
                             color: '#135f7f'
@@ -961,7 +965,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                             arrValues.push({
                                 id: template.id,
                                 label: '&nbsp;&nbsp;&nbsp;&nbsp;' + template.label,
-                                title: template.exists ? template.label : this.lang.fileDoesNotExists,
+                                title: template.exists ? template.label : this.translate.instant('lang.fileDoesNotExists'),
                                 extension: template.extension,
                                 disabled: !template.exists,
                             });
@@ -976,7 +980,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                     tap((data: any) => {
                         arrTypes.push({
                             id: 'all',
-                            label: this.lang.others
+                            label: this.translate.instant('lang.others')
                         });
                         Object.keys(data.attachmentsTypes).forEach(templateType => {
                             arrTypes.push({
@@ -1007,7 +1011,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                                 arrValues.push({
                                     id: template.id,
                                     label: '&nbsp;&nbsp;&nbsp;&nbsp;' + template.label,
-                                    title: template.exists ? template.label : this.lang.fileDoesNotExists,
+                                    title: template.exists ? template.label : this.translate.instant('lang.fileDoesNotExists'),
                                     extension: template.extension,
                                     disabled: !template.exists,
                                 });
@@ -1123,7 +1127,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     openResourceVersion(version: number, type: string) {
 
-        const title = type !== 'PDF' ? this.lang[type + '_version'] : `${this.lang.version} ${version}`;
+        const title = type !== 'PDF' ? this.lang[type + '_version'] : `${this.translate.instant('lang.version')} ${version}`;
 
         // TO SHOW ORIGINAL DOC (because autoload signed doc)
         type = type === 'SIGN' ? 'PDF' : type;
@@ -1141,13 +1145,13 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     unsignMainDocument() {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.UNSIGN, msg: this.lang.confirmAction } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.UNSIGN'), msg: this.translate.instant('lang.confirmAction') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.put(`../rest/resources/${this.resId}/unsign`, {})),
             tap(() => {
-                this.notify.success(this.lang.documentUnsigned);
+                this.notify.success(this.translate.instant('lang.documentUnsigned'));
                 this.loadRessource(this.resId);
             }),
             catchError((err: any) => {

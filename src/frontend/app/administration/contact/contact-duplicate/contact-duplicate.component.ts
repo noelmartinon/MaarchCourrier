@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { LANG } from '../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../service/header.service';
@@ -29,31 +30,31 @@ export class ContactDuplicateComponent implements OnInit {
         {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
-            label: this.lang.contactsList,
+            label: this.translate.instant('lang.contactsList'),
             current: false
         },
         {
             icon: 'fa fa-code',
             route: '/administration/contacts/contactsCustomFields',
-            label: this.lang.customFieldsAdmin,
+            label: this.translate.instant('lang.customFieldsAdmin'),
             current: false
         },
         {
             icon: 'fa fa-cog',
             route: '/administration/contacts/contacts-parameters',
-            label: this.lang.contactsParameters,
+            label: this.translate.instant('lang.contactsParameters'),
             current: false
         },
         {
             icon: 'fa fa-users',
             route: '/administration/contacts/contacts-groups',
-            label: this.lang.contactsGroups,
+            label: this.translate.instant('lang.contactsGroups'),
             current: false
         },
         {
             icon: 'fas fa-magic',
             route: '/administration/contacts/duplicates',
-            label: this.lang.duplicatesContactsAdmin,
+            label: this.translate.instant('lang.duplicatesContactsAdmin'),
             current: true
         },
     ];
@@ -77,6 +78,7 @@ export class ContactDuplicateComponent implements OnInit {
     openedSearchTool: boolean = true;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -90,7 +92,7 @@ export class ContactDuplicateComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
-        this.headerService.setHeader(this.lang.contactsDuplicates, '', '');
+        this.headerService.setHeader(this.translate.instant('lang.contactsDuplicates'), '', '');
         await this.getContactFields();
         this.setDefaultSearchCriteria();
         this.loading = false;
@@ -220,7 +222,7 @@ export class ContactDuplicateComponent implements OnInit {
         dialogRef.afterClosed().pipe(
             filter((data: any) => !this.functionsService.empty(data)),
             tap((data) => {
-                this.notify.success(this.lang.contactsMerged);
+                this.notify.success(this.translate.instant('lang.contactsMerged'));
                 this.duplicatesContactsCount--;
                 this.duplicatesContactsRealCount--;
                 if (data !== 'removeAll') {

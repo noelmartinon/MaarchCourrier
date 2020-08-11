@@ -191,7 +191,7 @@ class TemplateController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $template = TemplateModel::getById(['select' => ['template_style', 'template_file_name', 'template_type', 'template_target'], 'id' => $aArgs['id']]);
+        $template = TemplateModel::getById(['select' => ['template_type', 'template_target'], 'id' => $aArgs['id']]);
         if (empty($template)) {
             return $response->withStatus(400)->withJson(['errors' => 'Template does not exist']);
         }
@@ -210,10 +210,19 @@ class TemplateController
             }
         }
 
+        $subject = null;
+        if (!empty($body['subject'])) {
+            if (!Validator::stringType()->validate($body['subject']) && !Validator::length(1, 255)->validate($body['subject'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body subject is too long or not a string']);
+            }
+            $subject = $body['subject'];
+        }
+
         $template = [
             'template_label'            => $body['label'],
             'template_comment'          => $body['description'],
-            'template_attachment_type'  => $body['template_attachment_type']
+            'template_attachment_type'  => $body['template_attachment_type'],
+            'subject'                   => $subject
         ];
         if ($body['type'] == 'TXT' || $body['type'] == 'HTML' || ($body['type'] == 'OFFICE_HTML' && !empty($body['file']['electronic']['content']))) {
             $template['template_content'] = $body['type'] == 'OFFICE_HTML' ? $body['file']['electronic']['content'] : $body['file']['content'];
@@ -241,13 +250,6 @@ class TemplateController
 
             $template['template_path'] = $storeResult['destination_dir'];
             $template['template_file_name'] = $storeResult['file_destination_name'];
-        }
-
-        if (!empty($body['subject'])) {
-            if (!Validator::stringType()->validate($body['subject']) && !Validator::length(1, 255)->validate($body['subject'])) {
-                return $response->withStatus(400)->withJson(['errors' => 'Body subject is too long or not a string']);
-            }
-            $template['subject'] = $body['subject'];
         }
 
         TemplateAssociationModel::delete(['where' => ['template_id = ?'], 'data' => [$aArgs['id']]]);

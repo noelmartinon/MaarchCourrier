@@ -9,7 +9,7 @@
                 <span>{{dep}}</span>
             </button>
         </mat-menu>
-        <input type="text" #autoCompleteInput [placeholder]="lang.searchAddressBan" matInput [formControl]="myControl"
+        <input type="text" #autoCompleteInput [placeholder]="this.translate.instant('lang.searchAddressBan')" matInput [formControl]="myControl"
             [matAutocomplete]="auto" (click)="$event.stopPropagation()" (focus)="resetAutocomplete()">
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectOpt($event)">
             <ng-container *ngIf="options.length > 0 && !loading">
@@ -40,7 +40,7 @@
             </mat-chip>
         </mat-chip-list>
         <div class="noResult" *ngIf="controlAutocomplete.value.length === 0">
-            {{lang.noSelectedAddress}}
+            {{'lang.noSelectedAddress' | translate}}
         </div>
     </div>
 </form>

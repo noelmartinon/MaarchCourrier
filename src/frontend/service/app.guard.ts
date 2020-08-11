@@ -12,7 +12,8 @@ import { LocalStorageService } from './local-storage.service';
 import { FunctionsService } from './functions.service';
 import {AlertComponent} from '../plugins/modal/alert.component';
 import {MatDialog} from '@angular/material/dialog';
-import {LANG} from '../app/translate.component';
+import { LANG } from '../app/translate.component';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
     providedIn: 'root'
@@ -21,6 +22,7 @@ export class AppGuard implements CanActivate {
     lang: any = LANG;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private router: Router,
         private authService: AuthService,

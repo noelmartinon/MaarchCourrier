@@ -19,40 +19,40 @@
                 </div>
                 <mat-card *ngIf="!loading" class="card-app-content">
                     <mat-tab-group>
-                        <mat-tab label="{{lang.informations}}">
+                        <mat-tab label="{{'lang.informations' | translate}}">
                             <form class="form-horizontal" (ngSubmit)="onSubmit()" #groupForm="ngForm">
                                 <mat-form-field>
-                                    <input matInput *ngIf="creationMode" name="identifier" placeholder="{{lang.id}}"
+                                    <input matInput *ngIf="creationMode" name="identifier" placeholder="{{'lang.id' | translate}}"
                                            [(ngModel)]="group.group_id" pattern="^[\w.-]*$" maxlength="32" required>
-                                    <input matInput *ngIf="!creationMode" name="identifier" placeholder="{{lang.id}}"
-                                           title="{{lang.id}}" [(ngModel)]="group.group_id" disabled>
+                                    <input matInput *ngIf="!creationMode" name="identifier" placeholder="{{'lang.id' | translate}}"
+                                           title="{{'lang.id' | translate}}" [(ngModel)]="group.group_id" disabled>
                                 </mat-form-field>
                                 <mat-form-field>
-                                    <input matInput name="description" title="{{lang.label}}" placeholder="{{lang.label}}"
+                                    <input matInput name="description" title="{{'lang.label' | translate}}" placeholder="{{'lang.label' | translate}}"
                                            [(ngModel)]="group.group_desc" maxlength="255" required>
                                 </mat-form-field>
                                 <mat-form-field>
-                                    <input matInput name="comment" title="{{lang.description}}"
-                                           placeholder="{{lang.description}}" [(ngModel)]="group.security.maarch_comment">
+                                    <input matInput name="comment" title="{{'lang.description' | translate}}"
+                                           placeholder="{{'lang.description' | translate}}" [(ngModel)]="group.security.maarch_comment">
                                 </mat-form-field>
                                 <mat-form-field>
-                                <textarea matInput name="clause" title="{{lang.clauseGroup}}"
-                                          placeholder="{{lang.clauseGroup}}" [(ngModel)]="group.security.where_clause"
+                                <textarea matInput name="clause" title="{{'lang.clauseGroup' | translate}}"
+                                          placeholder="{{'lang.clauseGroup' | translate}}" [(ngModel)]="group.security.where_clause"
                                           required matTextareaAutosize matAutosizeMinRows="1"
                                           matAutosizeMaxRows="5"></textarea>
                                     <mat-icon style="cursor:pointer;" color="primary" matSuffix class="fa fa-info-circle"
-                                              matTooltip="{{lang.keywordHelper}}"
+                                              matTooltip="{{'lang.keywordHelper' | translate}}"
                                               (click)="panelMode='keywordInfos';snav2.toggle()"></mat-icon>
                                 </mat-form-field>
                                 <div class="col-md-12 text-center" style="padding:10px;">
                                     <button mat-raised-button [disabled]="!groupForm.form.valid"
-                                            color="primary">{{lang.save}}</button>
+                                            color="primary">{{'lang.save' | translate}}</button>
                                 </div>
                             </form>
                         </mat-tab>
-                        <mat-tab label="{{lang.privileges}}" *ngIf="!creationMode">
+                        <mat-tab label="{{'lang.privileges' | translate}}" *ngIf="!creationMode">
                             <mat-tab-group *ngIf="!creationMode">
-                                <mat-tab label="{{lang.menus}}">
+                                <mat-tab label="{{'lang.menus' | translate}}">
                                     <mat-list>
                                         <mat-list-item *ngFor="let menu of privilegeService.getMenus() | sortBy: 'label'">
                                             <mat-slide-toggle color="primary" name="{{menu.label}}"
@@ -62,10 +62,10 @@
                                         </mat-list-item>
                                     </mat-list>
                                 </mat-tab>
-                                <mat-tab label="{{lang.administrationServices}}">
+                                <mat-tab label="{{'lang.administrationServices' | translate}}">
                                     <mat-form-field floatLabel="never" appearance="outline" class="basketsFilter"
                                                     style="padding-left:20px;padding-right:20px;font-size: 11px;">
-                                        <input matInput placeholder="{{lang.filterBy}}" #listFilterAdmin>
+                                        <input matInput placeholder="{{'lang.filterBy' | translate}}" #listFilterAdmin>
                                     </mat-form-field>
                                     <div class="col-md-3"
                                          *ngFor="let administration of administrationPrivileges | sortBy: 'label' | filterList:listFilterAdmin.value:'label'"
@@ -78,16 +78,16 @@
                                         <button mat-icon-button [class.active]="panelMode === administration.id"
                                                 *ngIf="administration.hasParams"
                                                 (click)="$event.stopPropagation();openUserParams(administration.id)"
-                                                color="primary" [title]="lang.goToAdminParams"
+                                                color="primary" [title]="this.translate.instant('lang.goToAdminParams')"
                                                 [disabled]="group.privileges.indexOf(administration.id) === -1">
                                             <mat-icon class="fa fa-cogs"></mat-icon>
                                         </button>
                                     </div>
                                 </mat-tab>
-                                <mat-tab label="{{lang.functionnalities}}">
+                                <mat-tab label="{{'lang.functionnalities' | translate}}">
                                     <mat-form-field floatLabel="never" appearance="outline" class="basketsFilter"
                                                     style="padding-left:20px;padding-right:20px;font-size: 11px;">
-                                        <input matInput placeholder="{{lang.filterBy}}" #listFilter>
+                                        <input matInput placeholder="{{'lang.filterBy' | translate}}" #listFilter>
                                     </mat-form-field>
                                     <mat-expansion-panel *ngFor="let unit of unitPrivileges | sortBy: 'label'" expanded [class.emptyExpansionPanel]="(unit.services | filterList:listFilter.value:'label').length == 0">
                                         <mat-expansion-panel-header>
@@ -116,7 +116,7 @@
                                                         style="width: 250px !important;padding-left: 10px;padding-right: 10px;">
                                                     <mat-select [(ngModel)]="fakePrivilege.current"
                                                                 (selectionChange)="changeDifflistPrivilege($event, fakePrivilege.id)">
-                                                        <mat-option value="">{{lang.noRole}}</mat-option>
+                                                        <mat-option value="">{{'lang.noRole' | translate}}</mat-option>
                                                         <mat-option *ngFor="let subservice of fakePrivilege.services"
                                                                     [value]="subservice.id">{{subservice.label}}</mat-option>
                                                     </mat-select>
@@ -131,7 +131,7 @@
                                                         style="width: 300px !important;padding-left: 10px;padding-right: 10px;">
                                                     <mat-select [(ngModel)]="fakePrivilege.current"
                                                                 (selectionChange)="changePersonalDataPrivilege($event)">
-                                                        <mat-option value="">{{lang.notVisible}}</mat-option>
+                                                        <mat-option value="">{{'lang.notVisible' | translate}}</mat-option>
                                                         <mat-option *ngFor="let subservice of fakePrivilege.services"
                                                                     [value]="subservice.id">{{subservice.label}}</mat-option>
                                                     </mat-select>
@@ -143,25 +143,25 @@
                                 </mat-tab>
                             </mat-tab-group>
                         </mat-tab>
-                        <mat-tab label="{{lang.indexation}}" *ngIf="!creationMode">
+                        <mat-tab label="{{'lang.indexation' | translate}}" *ngIf="!creationMode">
                             <ng-template matTabContent>
                                 <app-indexing-administration [groupId]="group.id" (resfreshShortcut)="resfreshShortcut()">
                                 </app-indexing-administration>
                             </ng-template>
                         </mat-tab>
-                        <mat-tab label="{{lang.relatedUsers}}" *ngIf="!creationMode">
+                        <mat-tab label="{{'lang.relatedUsers' | translate}}" *ngIf="!creationMode">
                             <div class="row" style="margin:0px;">
                                 <div class="col-md-12" *ngIf="group.canAdminUsers" style="padding:5px;">
-                                    <plugin-autocomplete [labelPlaceholder]="lang.linkUser"
-                                                         [labelList]="lang.availableUsers" [routeDatas]="['/rest/autocomplete/users/administration']"
-                                                         [targetSearchKey]="'idToDisplay'" [subInfoKey]="'id'"
+                                    <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.linkUser')"
+                                                         [labelList]="this.translate.instant('lang.availableUsers')" [routeDatas]="['/rest/autocomplete/users/administration']"
+                                                         [targetSearchKey]="'idToDisplay'"
                                                          (triggerEvent)="linkUser($event)"></plugin-autocomplete>
                                     <hr />
                                 </div>
                                 <div class="col-md-6 col-xs-6">
                                     <mat-form-field>
                                         <input matInput (keyup)="applyFilter($event.target.value)"
-                                               placeholder="{{lang.filterBy}}">
+                                               placeholder="{{'lang.filterBy' | translate}}">
                                     </mat-form-field>
                                 </div>
                                 <div class="col-md-6 col-xs-6">
@@ -172,25 +172,25 @@
                             <mat-table #sortUsers="matSort" [dataSource]="usersDataSource" matSort matSortActive="lastname"
                                        matSortDirection="asc">
                                 <ng-container matColumnDef="firstname">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.firstname}}</mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.firstname' | translate}}</mat-header-cell>
                                     <mat-cell *matCellDef="let element"> {{element.firstname}} </mat-cell>
                                 </ng-container>
                                 <ng-container matColumnDef="lastname">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.lastname}}</mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.lastname' | translate}}</mat-header-cell>
                                     <mat-cell *matCellDef="let element"> {{element.lastname}} </mat-cell>
                                 </ng-container>
                                 <mat-header-row *matHeaderRowDef="usersDisplayedColumns"></mat-header-row>
-                                <mat-row *matRowDef="let row; columns: usersDisplayedColumns;" matTooltip="{{lang.view}}" [matTooltipDisabled]="!row.allowed"
+                                <mat-row *matRowDef="let row; columns: usersDisplayedColumns;" matTooltip="{{'lang.view' | translate}}" [matTooltipDisabled]="!row.allowed"
                                          [ngStyle]="{'cursor': row.allowed ? 'pointer' : '', 'opacity': row.allowed ? '1' : '0.6'}" (click)="goToUserAdmin(row)">
                                 </mat-row>
                             </mat-table>
                         </mat-tab>
-                        <mat-tab label="{{lang.relatedBaskets}}" *ngIf="!creationMode">
+                        <mat-tab label="{{'lang.relatedBaskets' | translate}}" *ngIf="!creationMode">
                             <div class="row" style="margin:0px;">
                                 <div class="col-md-6 col-xs-6">
                                     <mat-form-field>
                                         <input matInput (keyup)="applyBasketsFilter($event.target.value)"
-                                               placeholder="{{lang.filterBy}}">
+                                               placeholder="{{'lang.filterBy' | translate}}">
                                     </mat-form-field>
                                 </div>
                                 <div class="col-md-6 col-xs-6">
@@ -201,17 +201,17 @@
                             <mat-table #sortBaskets="matSort" [dataSource]="basketsDataSource" matSort
                                        matSortActive="basket_name" matSortDirection="asc">
                                 <ng-container matColumnDef="basket_name">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.label}}</mat-header-cell>
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.label' | translate}}</mat-header-cell>
                                     <mat-cell *matCellDef="let element"> {{element.basket_name}} </mat-cell>
                                 </ng-container>
                                 <ng-container matColumnDef="basket_desc">
-                                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.description}}
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.description' | translate}}
                                     </mat-header-cell>
                                     <mat-cell *matCellDef="let element"> {{element.basket_desc}} </mat-cell>
                                 </ng-container>
                                 <mat-header-row *matHeaderRowDef="basketsDisplayedColumns"></mat-header-row>
                                 <mat-row *matRowDef="let row; columns: basketsDisplayedColumns;"
-                                         routerLink="/administration/baskets/{{row.basket_id}}" matTooltip="{{lang.view}}"
+                                         routerLink="/administration/baskets/{{row.basket_id}}" matTooltip="{{'lang.view' | translate}}"
                                          style="cursor:pointer;"></mat-row>
                             </mat-table>
                         </mat-tab>
@@ -226,51 +226,51 @@
                  [opened]="appService.getViewMode() ? false : false">
         <ng-container *ngIf="panelMode === 'keywordInfos'">
             <mat-nav-list>
-                <h3 mat-subheader>{{lang.keywordHelp}}</h3>
+                <h3 mat-subheader>{{'lang.keywordHelp' | translate}}</h3>
             </mat-nav-list>
             <mat-list role="list" style="width: 400px;padding: 5px;">
-                <p style="font-size:10px;">{{lang.keywordHelpDesc_11}}</p>
+                <p style="font-size:10px;">{{'lang.keywordHelpDesc_11' | translate}}</p>
                 <div style="border:1px black solid; padding:3px;font-size:10px;">
                     <b>DESTINATION = @my_primary_entity or DESTINATION in (@subentities[@my_primary_entity])</b>
                 </div>
                 <h4 mat-line style="font-weight:bold;font-size:10px;">@user :</h4>
-                <p mat-line style="font-size:10px;">{{lang.keywordHelpDesc_1}}</p>
+                <p mat-line style="font-size:10px;">{{'lang.keywordHelpDesc_1' | translate}}</p>
                 <h4 mat-line style="font-weight:bold;font-size:10px;">@user_id :</h4>
-                <p mat-line style="font-size:10px;">{{lang.keywordHelpDesc_12}}</p>
+                <p mat-line style="font-size:10px;">{{'lang.keywordHelpDesc_12' | translate}}</p>
                 <h4 mat-line style="font-weight:bold;font-size:10px;">@email :</h4>
-                <p mat-line style="font-size:10px;">{{lang.keywordHelpDesc_2}}</p>
+                <p mat-line style="font-size:10px;">{{'lang.keywordHelpDesc_2' | translate}}</p>
                 <h4 mat-line style="font-weight:bold;font-size:10px;">@my_entities :</h4>
-                <p mat-line style="font-size:10px;">{{lang.keywordHelpDesc_3}}</p>
+                <p mat-line style="font-size:10px;">{{'lang.keywordHelpDesc_3' | translate}}</p>
                 <h4 mat-line style="font-weight:bold;font-size:10px;">@my_entities_id :</h4>
-                <p mat-line style="font-size:10px;">{{lang.keywordHelpDesc_13}}</p>
+                <p mat-line style="font-size:10px;">{{'lang.keywordHelpDesc_13' | translate}}</p>
                 <h4 mat-line style="font-weight:bold;font-size:10px;">@my_primary_entity :</h4>
-                <p mat-line style="font-size:10px;">{{lang.keywordHelpDesc_4}}</p>
+                <p mat-line style="font-size:10px;">{{'lang.keywordHelpDesc_4' | translate}}</p>
                 <h4 mat-line style="font-weight:bold;font-size:10px;">@my_primary_entity_id :</h4>
-                <p mat-line style="font-size:10px;">{{lang.keywordHelpDesc_14}}</p>
+                <p mat-line style="font-size:10px;">{{'lang.keywordHelpDesc_14' | translate}}</p>
                 <h4 mat-line style="font-weight:bold;font-size:10px;">@subentities[('entity_1',...,'entity_n')] :
                 </h4>
-                <p mat-line style="font-size:10px;">{{lang.keywordHelpDesc_5}}</p>
+                <p mat-line style="font-size:10px;">{{'lang.keywordHelpDesc_5' | translate}}</p>
                 <h4 mat-line style="font-weight:bold;font-size:10px;">@parent_entity['entity_id'] :</h4>
-                <p mat-line style="font-size:10px;">{{lang.keywordHelpDesc_6}}</p>
+                <p mat-line style="font-size:10px;">{{'lang.keywordHelpDesc_6' | translate}}</p>
                 <h4 mat-line style="font-weight:bold;font-size:10px;">@sisters_entities['entity_id'] :</h4>
-                <p mat-line style="font-size:10px;">{{lang.keywordHelpDesc_7}}</p>
+                <p mat-line style="font-size:10px;">{{'lang.keywordHelpDesc_7' | translate}}</p>
                 <h4 mat-line style="font-weight:bold;font-size:10px;">@entity_type['type'] :</h4>
-                <p mat-line style="font-size:10px;">{{lang.keywordHelpDesc_8}}</p>
+                <p mat-line style="font-size:10px;">{{'lang.keywordHelpDesc_8' | translate}}</p>
                 <h4 mat-line style="font-weight:bold;font-size:10px;">@all_entities :</h4>
-                <p mat-line style="font-size:10px;">{{lang.keywordHelpDesc_9}}</p>
+                <p mat-line style="font-size:10px;">{{'lang.keywordHelpDesc_9' | translate}}</p>
                 <h4 mat-line style="font-weight:bold;font-size:10px;">@immediate_children['entity_1',...,
                     'entity_id'] :
                 </h4>
-                <p mat-line style="font-size:10px;">{{lang.keywordHelpDesc_10}}</p>
+                <p mat-line style="font-size:10px;">{{'lang.keywordHelpDesc_10' | translate}}</p>
             </mat-list>
         </ng-container>
         <ng-container *ngIf="panelMode === 'admin_users'">
             <mat-nav-list>
-                <h3 mat-subheader>{{lang.adminParamsUsers}}</h3>
+                <h3 mat-subheader>{{'lang.adminParamsUsers' | translate}}</h3>
             </mat-nav-list>
             <mat-list role="list" style="width: 400px;padding: 5px;">
                 <p color="primary">
-                    {{lang.chooseAllowedGroups}} :
+                    {{'lang.chooseAllowedGroups' | translate}} :
                 </p>
                 <mat-selection-list #paramsList
                                     (selectionChange)="updatePrivilegeParams(paramsList.selectedOptions.selected)">

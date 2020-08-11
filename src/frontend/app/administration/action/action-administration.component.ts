@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { HeaderService } from '../../../service/header.service';
@@ -39,6 +40,7 @@ export class ActionAdministrationComponent implements OnInit {
     selectStatusId = new FormControl();
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -71,7 +73,7 @@ export class ActionAdministrationComponent implements OnInit {
 
                         this.actionPages = data['actionPages'];
                         this.keywordsList = data.keywordsList;
-                        this.headerService.setHeader(this.lang.actionCreation);
+                        this.headerService.setHeader(this.translate.instant('lang.actionCreation'));
                         this.loading = false;
                     });
             } else {
@@ -92,7 +94,7 @@ export class ActionAdministrationComponent implements OnInit {
                         });
                         this.actionPages = data['actionPages'];
                         this.keywordsList = data.keywordsList;
-                        this.headerService.setHeader(this.lang.actionCreation, data.action.label_action);
+                        this.headerService.setHeader(this.translate.instant('lang.actionCreation'), data.action.label_action);
                         await this.getCustomFields();
                         this.loading = false;
                         if (this.action.actionPageId === 'close_mail') {
@@ -167,7 +169,7 @@ export class ActionAdministrationComponent implements OnInit {
             this.http.post('../rest/actions', this.action)
                 .subscribe(() => {
                     this.router.navigate(['/administration/actions']);
-                    this.notify.success(this.lang.actionAdded);
+                    this.notify.success(this.translate.instant('lang.actionAdded'));
 
                 }, (err) => {
                     this.notify.error(err.error.errors);
@@ -176,7 +178,7 @@ export class ActionAdministrationComponent implements OnInit {
             this.http.put('../rest/actions/' + this.action.id, this.action)
                 .subscribe(() => {
                     this.router.navigate(['/administration/actions']);
-                    this.notify.success(this.lang.actionUpdated);
+                    this.notify.success(this.translate.instant('lang.actionUpdated'));
 
                 }, (err) => {
                     this.notify.error(err.error.errors);

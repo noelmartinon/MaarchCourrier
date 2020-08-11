@@ -6,17 +6,17 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                {{lang.makeActionOn}}
+                {{'lang.makeActionOn' | translate}}
                 <b *ngIf="data.resIds.length === 1" color="primary" class="highlight">{{data.resource.chrono}}</b>
                 <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{data.resIds.length}}
-                    {{lang.elements}}</b> ?
+                    {{'lang.elements' | translate}}</b> ?
                 <div class="alert-message alert-message-info" role="alert" style="margin-top: 30px;"
-                    [innerHTML]="lang.interruptVisaWorkflow"></div>
+                    [innerHTML]="this.translate.instant('lang.interruptVisaWorkflow')"></div>
 
                 <div *ngIf="resourcesErrors.length > 0" class="alert-message alert-message-danger mailList"
                     role="alert">
                     <p>
-                        {{lang.canNotMakeAction}} :
+                        {{'lang.canNotMakeAction' | translate}} :
                     </p>
                     <ul>
                         <li *ngFor="let ressource of resourcesErrors">
@@ -45,8 +45,8 @@
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
         <button mat-raised-button mat-button color="primary" [disabled]="loading || !isValidAction()"
-            (click)="onSubmit()">{{lang.validate}}</button>
-        <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{lang.cancel}}</button>
+            (click)="onSubmit()">{{'lang.validate' | translate}}</button>
+        <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
     </div>
 
 </div>

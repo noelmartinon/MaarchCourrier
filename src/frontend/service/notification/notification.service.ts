@@ -3,6 +3,7 @@ import { Injectable, Component, Inject } from '@angular/core';
 import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { LANG } from '../../app/translate.component';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'custom-snackbar',
@@ -21,7 +22,7 @@ export class CustomSnackbarComponent {
 export class NotificationService {
     lang: any = LANG;
 
-    constructor(private router: Router, public snackBar: MatSnackBar) {
+    constructor(private translate: TranslateService, private router: Router, public snackBar: MatSnackBar) {
     }
     success(message: string) {
         const duration = this.getMessageDuration(message, 2000);
@@ -48,18 +49,18 @@ export class NotificationService {
         /*if (err.status === 401 && this.router.url !== '/home') {
             this.router.navigate(['/home']);
             window.location.reload(true);
-            this.error(this.lang.mustReconnect);
+            this.error(this.translate.instant('lang.mustReconnect'));
         } else*/ if (err.status === 0 && err.statusText === 'Unknown Error') {
-            this.error(this.lang.connectionFailed);
+            this.error(this.translate.instant('lang.connectionFailed'));
         } else {
             if (err.error !== undefined) {
                 if (err.error.errors !== undefined) {
                     if (err.error.lang !== undefined) {
                         this.error(this.lang[err.error.lang]);
                     } else if (err.error.errors === 'Document out of perimeter' || err.error.errors === 'Resource out of perimeter') {
-                        this.error(this.lang.documentOutOfPerimeter);
+                        this.error(this.translate.instant('lang.documentOutOfPerimeter'));
                     } else if (err.error.errors === 'Resources out of perimeter') {
-                        this.error(this.lang.documentsOutOfPerimeter);
+                        this.error(this.translate.instant('lang.documentsOutOfPerimeter'));
                     } else {
                         this.error(err.error.errors, err.url);
                     }
@@ -86,9 +87,9 @@ export class NotificationService {
                 if (err.error.lang !== undefined) {
                     this.error(this.lang[err.error.lang]);
                 } else if (err.error.errors === 'Document out of perimeter' || err.error.errors === 'Resource out of perimeter') {
-                    this.error(this.lang.documentOutOfPerimeter);
+                    this.error(this.translate.instant('lang.documentOutOfPerimeter'));
                 } else if (err.error.errors === 'Resources out of perimeter') {
-                    this.error(this.lang.documentsOutOfPerimeter);
+                    this.error(this.translate.instant('lang.documentsOutOfPerimeter'));
                 } else {
                     this.error(err.error.errors, err.url);
                 }

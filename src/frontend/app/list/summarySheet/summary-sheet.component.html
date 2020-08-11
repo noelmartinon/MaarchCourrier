@@ -5,16 +5,16 @@
         </div>
         <div class="row header">
             <div class="col-md-4 text-left">
-                {{lang.appName}} / {{lang.printDate}}
+                {{'lang.appName' | translate}} / {{'lang.printDate' | translate}}
             </div>
             <div class="col-md-4 text-center">
-                <b>{{lang.summarySheet}}</b><br />{{lang.chronoNumber}}
+                <b>{{'lang.summarySheet' | translate}}</b><br />{{'lang.chronoNumber' | translate}}
             </div>
             <div class="col-md-4 text-right" [class.disabled]="!withQrcode">
                 <mat-button-toggle-group style="position: absolute;top:-2px;right:0px;" multiple
                     (change)="toggleQrcode()">
                     <mat-button-toggle style="width: 40px;height: 40px;" class="qrcode" [checked]="withQrcode"
-                        title="{{lang.toggleQrcode}}">
+                        title="{{'lang.toggleQrcode' | translate}}">
                         <mat-icon fontSet="fas" fontIcon="fa-qrcode" style="height: auto;font-size: 30px;"></mat-icon>
                     </mat-button-toggle>
                 </mat-button-toggle-group>
@@ -22,7 +22,7 @@
         </div>
         <div class="row">
             <div class="col-md-12 title">
-                {{lang.object}}
+                {{'lang.object' | translate}}
             </div>
         </div>
         <div class="row">
@@ -42,7 +42,7 @@
                                     </svg>
                                 </div>
                                 <mat-form-field floatLabel="never" style="margin-top: -10px;">
-                                    <input matInput placeholder="{{lang.label}}" [(ngModel)]="item.label"
+                                    <input matInput placeholder="{{'lang.label' | translate}}" [(ngModel)]="item.label"
                                         (click)="$event.stopPropagation();">
                                 </mat-form-field>
                             </div>
@@ -54,7 +54,7 @@
                             <mat-slide-toggle [(ngModel)]="item.enabled" color="primary" class="unitToggle">
                             </mat-slide-toggle>
                             <button *ngIf="item.unit == 'freeField'" mat-icon-button color="warn"
-                                style="position: absolute;right:5px;top:0px;" title="{{lang.deleteUnit}}"
+                                style="position: absolute;right:5px;top:0px;" title="{{'lang.deleteUnit' | translate}}"
                                 (click)="removeCustomUnit(i)">
                                 <mat-icon fontSet="fas" fontIcon="fa-minus"></mat-icon>
                             </button>
@@ -65,22 +65,22 @@
         </div>
         <div *ngIf="!functions.empty(data.selectedRes) && data.selectedRes.length > 500 && !paramMode"
             mat-dialog-actions class="actions">
-            <span style="color: #d24747; font-style: italic">{{lang.firstSummarySheetsGenerated}}</span>
+            <span style="color: #d24747; font-style: italic">{{'lang.firstSummarySheetsGenerated' | translate}}</span>
         </div>
         <div style="padding: 10px">
-            <span class="alert-message alert-message-info">{{lang.arGenWithModelMessage}}</span>
+            <span class="alert-message alert-message-info">{{'lang.arGenWithModelMessage' | translate}}</span>
         </div>
     </div>
 
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
         <button *ngIf="paramMode" mat-raised-button mat-button color="primary"
-            (click)="closeModalWithParams();">{{lang.validate}}</button>
+            (click)="closeModalWithParams();">{{'lang.validate' | translate}}</button>
         <button *ngIf="!paramMode" mat-raised-button mat-button color="primary"
-            (click)="genSummarySheets();">{{lang.genSummarySheets}}</button>
-        <button mat-raised-button mat-button [mat-dialog-close]="">{{lang.cancel}}</button>
+            (click)="genSummarySheets();">{{'lang.genSummarySheets' | translate}}</button>
+        <button mat-raised-button mat-button [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
         <button mat-mini-fab color="primary" (click)="addCustomUnit()" style="position: absolute;right: 30px;"
-            title="{{lang.addCustomUnit}}">
+            title="{{'lang.addCustomUnit' | translate}}">
             <mat-icon fontSet="fas" fontIcon="fa-plus" style="height: auto;"></mat-icon>
         </button>
     </div>

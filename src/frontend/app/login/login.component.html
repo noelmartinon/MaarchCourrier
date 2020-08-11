@@ -5,14 +5,14 @@
                 <mat-icon svgIcon="maarchLogoFull" class="maarchLogo"></mat-icon>
                 <p>MAARCH COURRIER {{environment.VERSION}}</p>
                 <mat-form-field class="input-row">
-                    <input id="login" name="login" matInput [placeholder]="lang.id" formControlName="login" type="text">
+                    <input id="login" name="login" matInput [placeholder]="this.translate.instant('lang.id')" formControlName="login" type="text">
                 </mat-form-field>
                 <mat-form-field class="input-row">
-                    <input id="password" name="password" matInput [placeholder]="lang.password" type="password" formControlName="password">
-                    <mat-hint align="end" *ngIf="authService.authMode === 'default'"><a routerLink="/forgot-password" class="infoLogin">{{lang.forgotPassword}} ?</a></mat-hint>
+                    <input id="password" name="password" matInput [placeholder]="this.translate.instant('lang.password')" type="password" formControlName="password">
+                    <mat-hint align="end" *ngIf="authService.authMode === 'default'"><a routerLink="/forgot-password" class="infoLogin">{{'lang.forgotPassword' | translate}} ?</a></mat-hint>
                     <mat-hint align="end" *ngIf="authService.authMode === 'ldap'"><span class="infoLogin">lang.ldapEnabled</span></mat-hint>
                 </mat-form-field>
-                <button type="submit" mat-button [disabled]="loginForm.invalid || loading">{{lang.LOGIN}}</button>
+                <button type="submit" mat-button [disabled]="loginForm.invalid || loading">{{'lang.LOGIN' | translate}}</button>
             </form>
             <div class="blur"></div>
         </div>
@@ -30,21 +30,21 @@
                 <p style="color: white;font-size: 14px;font-weight: bold;">{{applicationName}}</p>
                 <div style="padding-left: 30px;padding-right: 30px;">
                     <mat-form-field class="input-row login" appearance="outline" style="padding-bottom: 0px;">
-                        <input id="login" name="login" matInput [placeholder]="lang.id" formControlName="login"
+                        <input id="login" name="login" matInput [placeholder]="this.translate.instant('lang.id')" formControlName="login"
                             type="text">
                     </mat-form-field>
                     <mat-form-field class="input-row" appearance="outline">
-                        <input id="password" name="password" matInput [placeholder]="lang.password" type="password"
+                        <input id="password" name="password" matInput [placeholder]="this.translate.instant('lang.password')" type="password"
                             formControlName="password">
                         <mat-hint align="end" *ngIf="authService.authMode === 'default'"><a
-                                routerLink="/forgot-password" class="infoLogin">{{lang.forgotPassword}} ?</a></mat-hint>
+                                routerLink="/forgot-password" class="infoLogin">{{'lang.forgotPassword' | translate}} ?</a></mat-hint>
                         <mat-hint align="end" *ngIf="authService.authMode === 'ldap'"><span
                                 class="infoLogin">lang.ldapEnabled</span></mat-hint>
                     </mat-form-field>
                 </div>
 
                 <button id="submit" type="submit" mat-stroked-button [disabled]="loginForm.invalid || loading"
-                    style="color: white;border-color: #24b0ed;background: #24b0ed;">{{lang.LOGIN}}</button>
+                    style="color: white;border-color: #24b0ed;background: #24b0ed;">{{'lang.LOGIN' | translate}}</button>
             </form>
         </div>
         <footer>

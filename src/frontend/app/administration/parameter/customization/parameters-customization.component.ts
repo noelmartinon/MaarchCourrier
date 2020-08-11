@@ -1,0 +1,217 @@
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
+import { DomSanitizer } from '@angular/platform-browser';
+import { NotificationService } from '../../../../service/notification/notification.service';
+import { ScanPipe } from 'ngx-pipes';
+import { debounceTime, tap, catchError, exhaustMap } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { of } from 'rxjs/internal/observable/of';
+
+declare var tinymce: any;
+
+@Component({
+    selector: 'app-parameters-customization',
+    templateUrl: './parameters-customization.component.html',
+    styleUrls: ['./parameters-customization.component.scss'],
+    providers: [ScanPipe]
+})
+export class ParametersCustomizationComponent implements OnInit, OnDestroy {
+    stepFormGroup: FormGroup;
+    readonlyState: boolean = false;
+
+    backgroundList: any[] = [];
+
+    constructor(
+        private translate: TranslateService,
+        private _formBuilder: FormBuilder,
+        private notify: NotificationService,
+        private sanitizer: DomSanitizer,
+        private scanPipe: ScanPipe,
+        public http: HttpClient,
+    ) {
+        const valIdentifier: ValidatorFn[] = [Validators.pattern(/^[a-zA-Z0-9_\-]*$/), Validators.required];
+
+        this.stepFormGroup = this._formBuilder.group({
+            appName: ['', Validators.required],
+            loginpage_message: [''],
+            homepage_message: [''],
+            bodyImage: ['../rest/images?image=loginPage'],
+            logo: ['../rest/images?image=logo'],
+        });
+
+        this.backgroundList = Array.from({ length: 16 }).map((_, i) => {
+            return {
+                filename: `${i + 1}.jpg`,
+                url: `assets/${i + 1}.jpg`,
+            };
+        });
+    }
+
+    async ngOnInit(): Promise<void> {
+        await this.getParameters();
+    }
+
+    getParameters() {
+        return new Promise((resolve) => {
+            this.http.get('../rest/parameters').pipe(
+                tap((data: any) => {
+                    this.stepFormGroup.controls['homepage_message'].setValue(data.parameters.filter((item: any) => item.id === 'homepage_message')[0].value);
+                    this.stepFormGroup.controls['loginpage_message'].setValue(data.parameters.filter((item: any) => item.id === 'loginpage_message')[0].value);
+                }),
+                exhaustMap(() => this.http.get('../rest/authenticationInformations')),
+                tap((data: any) => {
+                    this.stepFormGroup.controls['appName'].setValue(data.applicationName);
+                    setTimeout(() => {
+
+                        this.stepFormGroup.controls['appName'].valueChanges.pipe(
+                            debounceTime(500),
+                            tap(() => this.saveParameter('appName'))
+                        ).subscribe();
+
+
+                        this.stepFormGroup.controls['homepage_message'].valueChanges.pipe(
+                            debounceTime(500),
+                            tap(() => this.saveParameter('homepage_message'))
+                        ).subscribe();
+
+                        this.stepFormGroup.controls['loginpage_message'].valueChanges.pipe(
+                            debounceTime(500),
+                            tap(() => this.saveParameter('loginpage_message'))
+                        ).subscribe();
+                        this.initMce();
+                    }, 0);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    isValidStep() {
+        return this.stepFormGroup === undefined ? false : this.stepFormGroup.valid;
+    }
+
+    initMce(readonly = false) {
+        tinymce.init({
+            selector: 'textarea',
+            setup: (editor) => {
+                editor.on('keyup', (e) => {
+                    this.stepFormGroup.controls[e.target.dataset.id].setValue(tinymce.get(e.target.dataset.id).getContent());
+                });
+            },
+            base_url: '../node_modules/tinymce/',
+            height: '150',
+            suffix: '.min',
+            language: this.translate.instant('lang.langISO').replace('-', '_'),
+            language_url: `../node_modules/tinymce-i18n/langs/${this.translate.instant('lang.langISO').replace('-', '_')}.js`,
+            menubar: false,
+            statusbar: false,
+            readonly: readonly,
+            plugins: [
+                'autolink'
+            ],
+            external_plugins: {
+                'maarch_b64image': '../../src/frontend/plugins/tinymce/maarch_b64image/plugin.min.js'
+            },
+            toolbar_sticky: true,
+            toolbar_drawer: 'floating',
+            toolbar: !readonly ? 'undo redo | fontselect fontsizeselect | bold italic underline strikethrough forecolor | maarch_b64image | \
+        alignleft aligncenter alignright alignjustify \
+        bullist numlist outdent indent | removeformat' : ''
+        });
+    }
+
+    uploadTrigger(fileInput: any, mode: string) {
+        if (fileInput.target.files && fileInput.target.files[0]) {
+            const res = this.canUploadFile(fileInput.target.files[0], mode);
+            if (res === true) {
+                const reader = new FileReader();
+
+                reader.readAsDataURL(fileInput.target.files[0]);
+                reader.onload = (value: any) => {
+                    if (mode === 'logo') {
+                        this.stepFormGroup.controls['logo'].setValue(value.target.result);
+                        this.saveParameter('logo');
+                    } else {
+                        const img = new Image();
+                        img.onload = (imgDim: any) => {
+                            if (imgDim.target.width < 1920 || imgDim.target.height < 1080) {
+                                this.notify.error(this.scanPipe.transform(this.translate.instant('lang.badImageResolution'), ['1920x1080']));
+                            } else {
+                                this.backgroundList.push({
+                                    filename: value.target.result,
+                                    url: value.target.result,
+                                });
+                                this.stepFormGroup.controls['bodyImage'].setValue(value.target.result);
+                                this.saveParameter('bodyImage');
+                            }
+                        };
+                        img.src = value.target.result;
+                    }
+                };
+            } else {
+                this.notify.error(res);
+            }
+        }
+    }
+
+    canUploadFile(file: any, mode: string) {
+        const allowedExtension = mode !== 'logo' ? ['image/jpg', 'image/jpeg'] : ['image/svg+xml'];
+
+        if (mode === 'logo') {
+            if (file.size > 5000000) {
+                return this.scanPipe.transform(this.translate.instant('lang.maxFileSizeExceeded'), ['5mo']);
+            } else if (allowedExtension.indexOf(file.type) === -1) {
+                return this.scanPipe.transform(this.translate.instant('lang.onlyExtensionsAllowed'), [allowedExtension.join(', ')]);
+            }
+        } else {
+            if (file.size > 10000000) {
+                return this.scanPipe.transform(this.translate.instant('lang.maxFileSizeExceeded'), ['10mo']);
+            } else if (allowedExtension.indexOf(file.type) === -1) {
+                return this.scanPipe.transform(this.translate.instant('lang.onlyExtensionsAllowed'), [allowedExtension.join(', ')]);
+            }
+        }
+        return true;
+    }
+
+    logoURL() {
+        return this.sanitizer.bypassSecurityTrustUrl(this.stepFormGroup.controls['logo'].value);
+    }
+
+    selectBg(content: string) {
+        if (!this.stepFormGroup.controls['bodyImage'].disabled) {
+            this.stepFormGroup.controls['bodyImage'].setValue(content);
+            this.saveParameter('bodyImage');
+        }
+    }
+
+    clickLogoButton(uploadLogo: any) {
+        if (!this.stepFormGroup.controls['logo'].disabled) {
+            uploadLogo.click();
+        }
+    }
+
+    saveParameter(parameterId: string) {
+        let param = {};
+        if (parameterId === 'logo' || parameterId === 'bodyImage') {
+            param['image'] = this.stepFormGroup.controls[parameterId].value;
+        } else {
+            param = {
+                param_value_string: this.stepFormGroup.controls[parameterId].value
+            };
+        }
+        this.http.put('../rest/parameters/' + parameterId, param)
+            .subscribe(() => {
+                this.notify.success(this.translate.instant('lang.parameterUpdated'));
+            }, (err) => {
+                this.notify.error(err.error.errors);
+            });
+    }
+
+    ngOnDestroy(): void {
+        tinymce.remove();
+    }
+}

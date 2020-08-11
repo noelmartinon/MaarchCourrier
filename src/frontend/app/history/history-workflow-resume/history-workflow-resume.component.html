@@ -17,14 +17,14 @@
             </div>
         </div>
         <button mat-button *ngIf="histories.length === 3" class="showMore"
-            (click)="showMore()">{{lang.showMore}}</button>
+            (click)="showMore()">{{'lang.showMore' | translate}}</button>
         <div class="noData" *ngIf="histories.length === 0">
-            {{lang.noEvent}}
+            {{'lang.noEvent' | translate}}
         </div>
     </ng-container>
     <ng-template #noPrivilegeTemplate>
         <div class="noData">
-            {{lang.historyDisabled}}
+            {{'lang.historyDisabled' | translate}}
         </div>
     </ng-template>
 </ng-template>

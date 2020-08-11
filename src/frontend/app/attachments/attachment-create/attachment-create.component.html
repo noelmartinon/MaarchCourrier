@@ -4,9 +4,9 @@
     </div>
     <h1 mat-dialog-title>
         <span style="flex: 1;">
-            {{lang.attachmentCreation}}
+            {{'lang.attachmentCreation' | translate}}
         </span>
-        <button *ngIf="!loading" [title]="lang.close" mat-icon-button (click)="dialogRef.close();">
+        <button *ngIf="!loading" [title]="this.translate.instant('lang.close')" mat-icon-button (click)="dialogRef.close();">
             <mat-icon class="fa fa-times"></mat-icon>
         </button></h1>
     <mat-dialog-content class="attach-content">
@@ -16,16 +16,16 @@
         <mat-tab-group #pjList style="width: 100%;" [(selectedIndex)]="indexTab" (selectedIndexChange)="updateFile($event)" *ngIf="!loading">
             <mat-tab *ngFor="let attachment of attachments; let i=index" [disabled]="isDocLoading()">
                 <ng-template mat-tab-label>
-                    <span [class.complete]="isPjValid(i)">{{lang.attachmentShort}} n°{{i+1}}&nbsp;<i *ngIf="isPjValid(i)"
+                    <span [class.complete]="isPjValid(i)">{{'lang.attachmentShort' | translate}} n°{{i+1}}&nbsp;<i *ngIf="isPjValid(i)"
                             class="fa fa-check"></i><button mat-icon-button *ngIf="attachments.length > 1" [disabled]="isDocLoading()" color="warn"
-                            [title]="lang.delAttachment" (click)="$event.stopPropagation();removePj(i)">
+                            [title]="this.translate.instant('lang.delAttachment')" (click)="$event.stopPropagation();removePj(i)">
                             <mat-icon class="fa fa-minus"></mat-icon>
                         </button></span>
                 </ng-template>
                 <div style="height:100%;overflow: auto;">
                     <div class="attachment-form col-md-3 col-sm-12" *ngIf="!loading">
                         <div class="attachment-form-item">
-                            <plugin-select-search [label]="lang.type" [placeholderLabel]="lang.type"
+                            <plugin-select-search [label]="this.translate.instant('lang.type')" [placeholderLabel]="this.translate.instant('lang.type')"
                                 [formControlSelect]="attachment['type']" [datas]="attachmentsTypes"
                                 (afterSelected)="getAttachType($event, i)" style="width:100%;">
                             </plugin-select-search>
@@ -40,7 +40,7 @@
                         </div>
                         <div class="attachment-form-item">
                             <mat-form-field class="input-form">
-                                <input matInput placeholder="{{lang.subject}}" [formControl]="attachment['title']">
+                                <input matInput placeholder="{{'lang.subject' | translate}}" [formControl]="attachment['title']">
                             </mat-form-field>
                             <div class="fieldState">
                                 <i class="fas fa-asterisk fieldRequired"
@@ -52,8 +52,8 @@
                             </div>
                         </div>
                         <div class="attachment-form-item" *ngIf="resourceContacts.length > 1">
-                            <plugin-select-search [label]="lang.selectContact"
-                                [placeholderLabel]="lang.selectContact" [datas]="resourceContacts"
+                            <plugin-select-search [label]="this.translate.instant('lang.selectContact')"
+                                [placeholderLabel]="this.translate.instant('lang.selectContact')" [datas]="resourceContacts"
                                 [returnValue]="'object'" [formControlSelect]="selectedContact"
                                 (afterSelected)="selectContact($event)" style="width:100%;">
                             </plugin-select-search>
@@ -67,7 +67,7 @@
                             </div>
                         </div>
                         <div class="attachment-form-item" *ngIf="sendMassMode" style="display: block;">
-                            <div class="alert alert-info" role="alert" [innerHTML]="lang.mailingMsg"></div>
+                            <div class="alert alert-info" role="alert" [innerHTML]="this.translate.instant('lang.mailingMsg')"></div>
                         </div>
                         <div class="attachment-form-item" *ngIf="!sendMassMode">
                             <app-contact-autocomplete *ngIf="!loadingContact" [control]="attachment['recipient']"
@@ -81,9 +81,9 @@
                         <div class="attachment-form-item">
                             <mat-form-field class="input-form input-date" (click)="picker.open()"
                                 style="cursor:pointer;">
-                                <mat-label>{{lang.expectedReturnDate}}</mat-label>
+                                <mat-label>{{'lang.expectedReturnDate' | translate}}</mat-label>
                                 <input [formControl]="attachment['validationDate']" matInput [matDatepicker]="picker"
-                                    [placeholder]="lang.expectedReturnDate" [min]="now" readonly
+                                    [placeholder]="this.translate.instant('lang.expectedReturnDate')" [min]="now" readonly
                                     style="cursor:pointer;">
                                 <mat-datepicker-toggle matSuffix [for]="picker"
                                     *ngIf="!attachment['validationDate'].value">
@@ -92,7 +92,7 @@
                                 <button mat-button color="warn" matSuffix mat-icon-button
                                     *ngIf="attachment['validationDate'].value && !attachment['validationDate'].disabled"
                                     (click)="$event.stopPropagation();attachment['validationDate'].reset();"
-                                    [title]="lang.eraseValue">
+                                    [title]="this.translate.instant('lang.eraseValue')">
                                     <mat-icon color="warn" class="fa fa-calendar-times">
                                     </mat-icon>
                                 </button>
@@ -118,7 +118,7 @@
             </mat-tab>
             <mat-tab disabled class="addPJ">
                 <ng-template mat-tab-label>
-                    <span><button mat-icon-button [disabled]="sendMassMode || isDocLoading()" [title]="lang.newAttachment"
+                    <span><button mat-icon-button [disabled]="sendMassMode || isDocLoading()" [title]="this.translate.instant('lang.newAttachment')"
                             (click)="$event.stopPropagation();newPj()">
                             <mat-icon class="fa fa-plus"></mat-icon>
                         </button></span>
@@ -128,10 +128,10 @@
     </mat-dialog-content>
     <div mat-dialog-actions class="actions">
         <button mat-raised-button color="primary" *ngIf="creationMode && !loading" (click)="onSubmit()"
-            [disabled]="canValidatePj()">{{lang.validate}}</button>
+            [disabled]="canValidatePj()">{{'lang.validate' | translate}}</button>
         <button mat-raised-button color="primary" *ngIf="sendMassMode && !loading" (click)="onSubmit('mailing')"
-            [disabled]="canValidatePj()">{{lang.mailing}}</button>
+            [disabled]="canValidatePj()">{{'lang.mailing' | translate}}</button>
         <button mat-raised-button mat-button *ngIf="creationMode && !loading" [disabled]="canValidatePj()"
-            [mat-dialog-close]="">{{lang.cancel}}</button>
+            [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
     </div>
 </div>

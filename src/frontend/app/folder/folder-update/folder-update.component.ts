@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject, HostListener } from '@angular/core';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { map, tap, catchError, exhaustMap, finalize } from 'rxjs/operators';
 import { NotificationService } from '../../../service/notification/notification.service';
@@ -42,6 +43,7 @@ export class FolderUpdateComponent implements OnInit {
     }
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialogRef: MatDialogRef<FolderUpdateComponent>,
@@ -64,11 +66,11 @@ export class FolderUpdateComponent implements OnInit {
                     parent: '#',
                     icon: 'fa fa-hashtag',
                     allowed: true,
-                    text: this.lang.allEntities,
+                    text: this.translate.instant('lang.allEntities'),
                     state: { 'opened': false, 'selected': false },
                     parent_entity_id: '',
                     id: 'ALL_ENTITIES',
-                    entity_label: this.lang.allEntities
+                    entity_label: this.translate.instant('lang.allEntities')
                 };
                 data.entities.unshift(keywordEntities);
 
@@ -240,7 +242,7 @@ export class FolderUpdateComponent implements OnInit {
                 }
             }),
             tap(() => {
-                this.notify.success(this.lang.folderUpdated);
+                this.notify.success(this.translate.instant('lang.folderUpdated'));
                 this.dialogRef.close('success');
             }),
             catchError((err: any) => {

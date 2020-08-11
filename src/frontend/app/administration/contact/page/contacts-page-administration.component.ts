@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from '../../../../service/header.service';
 import { AppService } from '../../../../service/app.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -23,31 +24,31 @@ export class ContactsPageAdministrationComponent implements OnInit {
         {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
-            label: this.lang.contactsList,
+            label: this.translate.instant('lang.contactsList'),
             current: false
         },
         {
             icon: 'fa fa-code',
             route: '/administration/contacts/contactsCustomFields',
-            label: this.lang.customFieldsAdmin,
+            label: this.translate.instant('lang.customFieldsAdmin'),
             current: false
         },
         {
             icon: 'fa fa-cog',
             route: '/administration/contacts/contacts-parameters',
-            label: this.lang.contactsParameters,
+            label: this.translate.instant('lang.contactsParameters'),
             current: false
         },
         {
             icon: 'fa fa-users',
             route: '/administration/contacts/contacts-groups',
-            label: this.lang.contactsGroups,
+            label: this.translate.instant('lang.contactsGroups'),
             current: false
         },
         {
             icon: 'fas fa-magic',
             route: '/administration/contacts/duplicates',
-            label: this.lang.duplicatesContactsAdmin,
+            label: this.translate.instant('lang.duplicatesContactsAdmin'),
             current: false
         }
     ];
@@ -55,6 +56,7 @@ export class ContactsPageAdministrationComponent implements OnInit {
     contactId: number = null;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -72,13 +74,13 @@ export class ContactsPageAdministrationComponent implements OnInit {
         this.route.params.subscribe((params: any) => {
 
             if (typeof params['id'] === 'undefined') {
-                this.headerService.setHeader(this.lang.contactCreation);
+                this.headerService.setHeader(this.translate.instant('lang.contactCreation'));
                 this.creationMode = true;
                 this.loading = false;
 
             } else {
 
-                this.headerService.setHeader(this.lang.contactModification);
+                this.headerService.setHeader(this.translate.instant('lang.contactModification'));
 
                 this.creationMode = false;
 

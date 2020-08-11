@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
@@ -8,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AppService } from '../../../service/app.service';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
+import { MaarchFlatTreeComponent } from '../../../plugins/tree/maarch-flat-tree.component';
 
 declare var $: any;
 
@@ -18,6 +20,8 @@ declare var $: any;
 export class ShippingAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
+    @ViewChild('maarchTree', { static: true }) maarchTree: MaarchFlatTreeComponent;
+
 
     lang: any = LANG;
     loading: boolean = false;
@@ -65,6 +69,7 @@ export class ShippingAdministrationComponent implements OnInit {
 
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -86,18 +91,22 @@ export class ShippingAdministrationComponent implements OnInit {
 
         this.route.params.subscribe(params => {
             if (typeof params['id'] === 'undefined') {
-                this.headerService.setHeader(this.lang.shippingCreation);
+                this.headerService.setHeader(this.translate.instant('lang.shippingCreation'));
 
                 this.creationMode = true;
 
                 this.http.get('../rest/administration/shippings/new')
                     .subscribe((data: any) => {
-                        this.entities = data['entities'];
+                        this.entities = data['entities'].map(
+                            (item: any) => {
+                                return {
+                                    ...item,
+                                    id : parseInt(item.id)
+                                };
+                            }
+                        );
                         this.entitiesClone = JSON.parse(JSON.stringify(this.entities));
-                        setTimeout(() => {
-                            this.initEntitiesTree(this.entities);
-                        }, 0);
-
+                        this.initEntitiesTree(this.entities);
                         this.shippingClone = JSON.parse(JSON.stringify(this.shipping));
                         this.loading = false;
                     }, (err) => {
@@ -107,7 +116,7 @@ export class ShippingAdministrationComponent implements OnInit {
                 this.loading = false;
 
             } else {
-                this.headerService.setHeader(this.lang.shippingModification);
+                this.headerService.setHeader(this.translate.instant('lang.shippingModification'));
                 this.creationMode = false;
 
                 this.http.get('../rest/administration/shippings/' + params['id'])
@@ -115,11 +124,7 @@ export class ShippingAdministrationComponent implements OnInit {
                         this.shipping = data['shipping'];
                         this.entities = data['entities'];
                         this.entitiesClone = JSON.parse(JSON.stringify(this.entities));
-
-                        setTimeout(() => {
-                            this.initEntitiesTree(this.entities);
-                        }, 0);
-
+                        this.initEntitiesTree(this.entities);
                         this.shippingClone = JSON.parse(JSON.stringify(this.shipping));
                         this.loading = false;
                     }, (err) => {
@@ -131,45 +136,19 @@ export class ShippingAdministrationComponent implements OnInit {
     }
 
     initEntitiesTree(entities: any) {
-        $('#jstree')
-            .on('select_node.jstree', (e: any, data: any) => {
-                if (data.event) {
-                    data.instance.select_node(data.node.children_d);
-                    this.shipping.entities = data.selected;
-                }
-            }).on('deselect_node.jstree', (e: any, data: any) => {
-                this.shipping.entities = data.selected;
-            })
-            .jstree({
-                'checkbox': { three_state: false },
-                'core': {
-                    force_text: true,
-                    'themes': {
-                        'name': 'proton',
-                        'responsive': true
-                    },
-                    'data': entities
-                },
-                'plugins': ['checkbox', 'search', 'sort']
-            });
-        let to: any = false;
-        $('#jstree_search').keyup(function () {
-            if (to) { clearTimeout(to); }
-            to = setTimeout(function () {
-                const v: any = $('#jstree_search').val();
-                $('#jstree').jstree(true).search(v);
-            }, 250);
-        });
+        this.maarchTree.initData(entities);
+    }
+
+    updateSelectedEntities() {
+        this.shipping.entities = this.maarchTree.getSelectedNodes().map(ent => ent.id);
     }
 
     onSubmit() {
-        this.shipping.entities = $('#jstree').jstree('get_checked', null, true);
-
         if (this.creationMode) {
             this.http.post('../rest/administration/shippings', this.shipping)
                 .subscribe((data: any) => {
                     this.shippingClone = JSON.parse(JSON.stringify(this.shipping));
-                    this.notify.success(this.lang.shippingAdded);
+                    this.notify.success(this.translate.instant('lang.shippingAdded'));
                     this.router.navigate(['/administration/shippings']);
                 }, (err) => {
                     this.notify.handleErrors(err);
@@ -178,7 +157,7 @@ export class ShippingAdministrationComponent implements OnInit {
             this.http.put('../rest/administration/shippings/' + this.shipping.id, this.shipping)
                 .subscribe((data: any) => {
                     this.shippingClone = JSON.parse(JSON.stringify(this.shipping));
-                    this.notify.success(this.lang.shippingUpdated);
+                    this.notify.success(this.translate.instant('lang.shippingUpdated'));
                     this.router.navigate(['/administration/shippings']);
                 }, (err) => {
                     this.notify.handleErrors(err);
@@ -202,7 +181,6 @@ export class ShippingAdministrationComponent implements OnInit {
     cancelModification() {
         this.shipping = JSON.parse(JSON.stringify(this.shippingClone));
         this.entities = JSON.parse(JSON.stringify(this.entitiesClone));
-        $('#jstree').jstree(true).destroy();
         this.initEntitiesTree(this.entities);
     }
 }

@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { FunctionsService } from '../../../../../service/functions.service';
 import { ContactDetailComponent } from '../../../../contact/contact-detail/contact-detail.component';
 import { LANG } from '../../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { tap, catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { NotificationService } from '../../../../../service/notification/notification.service';
@@ -25,6 +26,7 @@ export class ManageDuplicateComponent implements OnInit {
     @ViewChildren('appContactDetail') appContactDetail: QueryList<ContactDetailComponent>;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any,

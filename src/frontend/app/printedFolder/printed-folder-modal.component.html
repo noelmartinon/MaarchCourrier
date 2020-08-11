@@ -1,9 +1,9 @@
 <div class="mat-dialog-content-container">
     <h1 mat-dialog-title>
         <span style="flex: 1;">
-            {{lang.generateAndDownloadPrintedFolder}}
+            {{'lang.generateAndDownloadPrintedFolder' | translate}}
         </span>
-        <button [title]="lang.close" mat-icon-button (click)="dialogRef.close();">
+        <button [title]="this.translate.instant('lang.close')" mat-icon-button (click)="dialogRef.close();">
             <mat-icon class="fa fa-times"></mat-icon>
         </button></h1>
     <mat-dialog-content style="padding-bottom:10px;">
@@ -16,11 +16,11 @@
             </div>
             <div style="padding: 10px;">
                 <mat-slide-toggle color="primary" [(ngModel)]="summarySheet"
-                    (change)="$event.checked ? openSummarySheet() : false">{{lang.attachSummarySheet}}
+                    (change)="$event.checked ? openSummarySheet() : false">{{'lang.attachSummarySheet' | translate}}
                 </mat-slide-toggle>
             </div>
             <div style="padding: 10px;">
-                <mat-slide-toggle color="primary" [(ngModel)]="withSeparator">{{lang.generateSeparators}}
+                <mat-slide-toggle color="primary" [(ngModel)]="withSeparator">{{'lang.generateSeparators' | translate}}
                 </mat-slide-toggle>
             </div>
             <div class="printedFolderContainer">
@@ -29,7 +29,7 @@
                     <mat-expansion-panel-header>
                         <mat-panel-title style="color: #135f7f;font-weight: bold;">
                             <mat-checkbox color="primary" [(ngModel)]="mainDocument"
-                                [disabled]="!mainDocumentInformation.canConvert" disableRipple>{{lang.mainDocument}}
+                                [disabled]="!mainDocumentInformation.canConvert" disableRipple>{{'lang.mainDocument' | translate}}
                             </mat-checkbox>
                         </mat-panel-title>
                     </mat-expansion-panel-header>
@@ -102,6 +102,6 @@
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
         <button mat-raised-button color="primary" [disabled]="isLoadingResults || isEmptySelection()"
-            (click)="onSubmit()">{{lang.validate}}</button>
+            (click)="onSubmit()">{{'lang.validate' | translate}}</button>
     </div>
 </div>

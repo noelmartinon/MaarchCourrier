@@ -57,9 +57,7 @@ class ParameterControllerTest extends TestCase
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $parameterController->update($fullRequest, new \Slim\Http\Response(), ['id' => 'TEST-PARAMETER123']);
-        $responseBody = json_decode((string)$response->getBody());
-
-        $this->assertSame('success', $responseBody->success);
+        $this->assertSame(204, $response->getStatusCode());
 
         //  READ
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);

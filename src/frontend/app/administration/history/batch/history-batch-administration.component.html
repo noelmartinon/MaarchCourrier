@@ -22,10 +22,10 @@
             <div class="bg-head-content" [class.fullContainer]="appService.getViewMode()">
                 <div style="display: grid;grid-template-columns: repeat(2, 1fr);grid-gap: 10px;width: 100%;">
                     <mat-form-field (click)="startPicker.open()" style="cursor:pointer;" class="dateFilter">
-                        <mat-label style="color:white;">{{lang.since}}
+                        <mat-label style="color:white;">{{'lang.since' | translate}}
                         </mat-label>
                         <input [(ngModel)]="startDateFilter" matInput [matDatepicker]="startPicker"
-                            [placeholder]="lang.since" [max]="endDateFilter" readonly style="cursor:pointer;"
+                            [placeholder]="this.translate.instant('lang.since')" [max]="endDateFilter" readonly style="cursor:pointer;"
                             (dateChange)="filterStartDate()">
                         <mat-datepicker-toggle matSuffix [for]="startPicker" *ngIf="!startDateFilter">
                         </mat-datepicker-toggle>
@@ -33,16 +33,16 @@
                         </mat-datepicker>
                         <button mat-button color="warn" matSuffix mat-icon-button *ngIf="startDateFilter"
                             (click)="$event.stopPropagation();startDateFilter = '';filterStartDate()"
-                            [title]="lang.eraseValue">
+                            [title]="this.translate.instant('lang.eraseValue')">
                             <mat-icon color="warn" class="fa fa-calendar-times">
                             </mat-icon>
                         </button>
                     </mat-form-field>
                     <mat-form-field (click)="endPicker.open()" style="cursor:pointer;" class="dateFilter">
-                        <mat-label style="color:white;">{{lang.until}}
+                        <mat-label style="color:white;">{{'lang.until' | translate}}
                         </mat-label>
                         <input [(ngModel)]="endDateFilter" matInput [matDatepicker]="endPicker"
-                            [placeholder]="lang.until" [min]="startDateFilter" readonly style="cursor:pointer;"
+                            [placeholder]="this.translate.instant('lang.until')" [min]="startDateFilter" readonly style="cursor:pointer;"
                             (dateChange)="filterEndDate()">
                         <mat-datepicker-toggle matSuffix [for]="endPicker" *ngIf="!endDateFilter">
                         </mat-datepicker-toggle>
@@ -50,7 +50,7 @@
                         </mat-datepicker>
                         <button mat-button color="warn" matSuffix mat-icon-button *ngIf="endDateFilter"
                             (click)="$event.stopPropagation();endDateFilter = '';filterEndDate()"
-                            [title]="lang.eraseValue">
+                            [title]="this.translate.instant('lang.eraseValue')">
                             <mat-icon color="warn" class="fa fa-calendar-times">
                             </mat-icon>
                         </button>
@@ -66,7 +66,7 @@
                 <div class="table-head">
                     <div class="table-head-result">
                         <mat-form-field floatLabel="never" style="font-size: 13px;">
-                            <input type="text" #autoCompleteInput [matAutocomplete]="auto" [placeholder]="lang.filterBy"
+                            <input type="text" #autoCompleteInput [matAutocomplete]="auto" [placeholder]="this.translate.instant('lang.filterBy')"
                                 matInput [formControl]="searchHistory" (click)="$event.stopPropagation()"
                                 maxlength="128">
                             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addItemFilter($event.option)"
@@ -112,7 +112,7 @@
                     <mat-table id="history-list" #tableHistoryListSort="matSort" [dataSource]="data" matSort
                         matSortActive="event_date" matSortDirection="desc" style="width:100%;">
                         <ng-container matColumnDef="event_date">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.event}}</mat-header-cell>
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.event' | translate}}</mat-header-cell>
                             <mat-cell mat-cell *matCellDef="let element" [title]="element.event_date | fullDate">
                                 {{element.event_date  | timeAgo : 'full' | ucfirst}} </mat-cell>
                         </ng-container>
@@ -123,20 +123,20 @@
                                 {{element.total_processed}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="total_errors">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.totalErrors}}
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.totalErrors' | translate}}
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" [class.empty]="element.total_errors === 0"
                                 [class.error]="element.total_errors > 0">
                                 {{element.total_errors}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="info">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex: 2;">{{lang.information}}
+                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex: 2;">{{'lang.information' | translate}}
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" style="flex: 2;">
                                 {{element.info}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="module_name">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.module}}
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.module' | translate}}
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element">
                                 {{element.module_name}} </mat-cell>
@@ -147,7 +147,7 @@
                     </mat-table>
                     <div class="mat-paginator"
                         style="min-height:48px;min-height: 48px;display: flex;justify-content: end;align-items: center;padding-right: 20px;">
-                        {{resultsLength}} {{lang.elements}}</div>
+                        {{resultsLength}} {{'lang.elements' | translate}}</div>
                 </div>
                 <div class="table-head">
                 </div>

@@ -10,10 +10,14 @@ import { EcplOnlyofficeViewerComponent } from '../../plugins/onlyoffice-api-js/o
 import { PdfViewerModule } from 'ng2-pdf-viewer';
 import {CollaboraOnlineViewerComponent} from '../../plugins/collabora-online/collabora-online-viewer.component';
 
+import { InternationalizationModule } from '../../service/translate/internationalization.module';
+import { TranslateService } from '@ngx-translate/core';
+
 @NgModule({
     imports: [
         SharedModule,
-        PdfViewerModule
+        PdfViewerModule,
+        InternationalizationModule
     ],
     declarations: [
         DocumentViewerComponent,
@@ -31,4 +35,8 @@ import {CollaboraOnlineViewerComponent} from '../../plugins/collabora-online/col
         DocumentViewerModalComponent
     ]
 })
-export class DocumentViewerModule { }
+export class DocumentViewerModule {
+    constructor(translate: TranslateService) {
+        translate.setDefaultLang('fr');
+    }
+}

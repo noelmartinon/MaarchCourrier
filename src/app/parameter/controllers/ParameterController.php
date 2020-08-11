@@ -23,6 +23,7 @@ use Parameter\models\ParameterModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\models\CoreConfigModel;
 
 class ParameterController
 {
@@ -87,37 +88,92 @@ class ParameterController
         return $response->withJson(['success' => 'success']);
     }
 
-    public function update(Request $request, Response $response, array $aArgs)
+    public function update(Request $request, Response $response, array $args)
     {
         if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_parameters', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $parameter = ParameterModel::getById(['id' => $aArgs['id']]);
+        $body = $request->getParsedBody();
+
+        if ($args['id'] == 'logo' || $args['id'] == 'bodyImage') {
+            $customId = CoreConfigModel::getCustomId();
+            if (empty($customId)) {
+                return $response->withStatus(400)->withJson(['errors' => 'A custom is needed for this operation']);
+            }
+
+            $tmpPath = CoreConfigModel::getTmpPath();
+            if ($args['id'] == 'logo') {
+                if (strpos($body['image'], 'data:image/svg+xml;base64,') === false) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Body image is not a base64 image']);
+                }
+                $tmpFileName = $tmpPath . 'parameter_logo_' . rand() . '_file.svg';
+                $body['logo'] = str_replace('data:image/svg+xml;base64,', '', $body['logo']);
+                $file = base64_decode($body['logo']);
+                file_put_contents($tmpFileName, $file);
+
+                $size = strlen($file);
+                if ($size > 5000000) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Logo size is not allowed']);
+                }
+                copy($tmpFileName, "custom/{$customId}/img/logo.svg");
+            } elseif ($args['id'] == 'bodyImage') {
+                if (strpos($body['image'], 'data:image/jpeg;base64,') === false) {
+                    if (!is_file("dist/{$body['image']}")) {
+                        return $response->withStatus(400)->withJson(['errors' => 'Body image does not exist']);
+                    }
+                    copy("dist/{$body['image']}", "custom/{$customId}/img/bodylogin.jpg");
+                } else {
+                    $tmpFileName = $tmpPath . 'parameter_body_' . rand() . '_file.jpg';
+                    $body['image'] = str_replace('data:image/jpeg;base64,', '', $body['image']);
+                    $file = base64_decode($body['image']);
+                    file_put_contents($tmpFileName, $file);
+
+                    $size = strlen($file);
+                    $imageSizes = getimagesize($tmpFileName);
+                    if ($imageSizes[0] < 1920 || $imageSizes[1] < 1080) {
+                        return $response->withStatus(400)->withJson(['errors' => 'Body image is not wide enough']);
+                    } elseif ($size > 10000000) {
+                        return $response->withStatus(400)->withJson(['errors' => 'Body size is not allowed']);
+                    }
+                    copy($tmpFileName, "custom/{$customId}/img/bodylogin.jpg");
+                }
+            } elseif ($args['id'] == 'applicationName') {
+                $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+                $config['config']['applicationName'] = $body['applicationName'];
+                $fp = fopen("custom/{$body['customId']}/apps/maarch_entreprise/xml/config.json", 'w');
+                fwrite($fp, json_encode($config, JSON_PRETTY_PRINT));
+                fclose($fp);
+            }
+            if (!empty($tmpFileName) && is_file($tmpFileName)) {
+                unset($tmpFileName);
+            }
+            return $response->withStatus(204);
+        }
+
+        $parameter = ParameterModel::getById(['id' => $args['id']]);
         if (empty($parameter)) {
             return $response->withStatus(400)->withJson(['errors' => 'Parameter not found']);
         }
 
-        $data = $request->getParams();
-
-        $check = (empty($data['param_value_int']) || Validator::intVal()->validate($data['param_value_int']));
-        $check = $check && (empty($data['param_value_string']) || Validator::stringType()->validate($data['param_value_string']));
+        $check = (empty($body['param_value_int']) || Validator::intVal()->validate($body['param_value_int']));
+        $check = $check && (empty($body['param_value_string']) || Validator::stringType()->validate($body['param_value_string']));
         if (!$check) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        $data['id'] = $aArgs['id'];
-        ParameterModel::update($data);
+        $body['id'] = $args['id'];
+        ParameterModel::update($body);
         HistoryController::add([
             'tableName' => 'parameters',
-            'recordId'  => $aArgs['id'],
+            'recordId'  => $args['id'],
             'eventType' => 'UP',
-            'info'      => _PARAMETER_MODIFICATION . " : {$aArgs['id']}",
+            'info'      => _PARAMETER_MODIFICATION . " : {$args['id']}",
             'moduleId'  => 'parameter',
             'eventId'   => 'parameterModification',
         ]);
 
-        return $response->withJson(['success' => 'success']);
+        return $response->withStatus(204);
     }
 
     public function delete(Request $request, Response $response, array $aArgs)

@@ -27,6 +27,7 @@
             "Parameter\\"               : "src/app/parameter/",
             "Priority\\"                : "src/app/priority/",
             "Resource\\"                : "src/app/resource/",
+            "RegisteredMail\\"          : "src/app/registeredMail/",
             "SignatureBook\\"           : "src/app/signatureBook/",
             "Search\\"                  : "src/app/search/",
             "Shipping\\"                : "src/app/shipping/",

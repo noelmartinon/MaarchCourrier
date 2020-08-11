@@ -12,6 +12,7 @@ import { take, takeUntil, startWith, map } from 'rxjs/operators';
 import { Subject, ReplaySubject, Observable } from 'rxjs';
 import { LatinisePipe } from 'ngx-pipes';
 import { LANG } from '../../app/translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../service/app.service';
 
 @Component({
@@ -22,7 +23,7 @@ import { AppService } from '../../service/app.service';
 export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterViewInit, ControlValueAccessor {
     lang: any = LANG;
     /** Label of the search placeholder */
-    @Input() placeholderLabel = this.lang.chooseValue;
+    @Input() placeholderLabel = this.translate.instant('lang.chooseValue');
 
     @Input() formControlSelect: FormControl = new FormControl();
 
@@ -91,6 +92,7 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     onTouched: Function = (_: any) => { };
 
     constructor(
+        private translate: TranslateService,
         private latinisePipe: LatinisePipe,
         private changeDetectorRef: ChangeDetectorRef,
         private renderer: Renderer2,
@@ -322,9 +324,9 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
 
     getErrorMsg(error: any) {
         if (error.required !== undefined) {
-            return this.lang.requiredField;
+            return this.translate.instant('lang.requiredField');
         } else if (error.pattern !== undefined || error.email !== undefined) {
-            return this.lang.badFormat;
+            return this.translate.instant('lang.badFormat');
         } else {
             return 'unknow validator';
         }

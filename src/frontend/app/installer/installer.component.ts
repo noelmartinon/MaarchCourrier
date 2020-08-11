@@ -7,6 +7,7 @@ import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { MatStepper } from '@angular/material/stepper';
 import { AppService } from '../../service/app.service';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { SortPipe } from '../../plugins/sorting.pipe';
 import { StepAction } from './types';
 import { MatDialog } from '@angular/material/dialog';
@@ -37,6 +38,7 @@ export class InstallerComponent implements OnInit, AfterViewInit {
     @ViewChild('stepper', { static: true }) stepper: MatStepper;
 
     constructor(
+        private translate: TranslateService,
         private http: HttpClient,
         private router: Router,
         private headerService: HeaderService,

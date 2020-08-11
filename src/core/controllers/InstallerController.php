@@ -485,6 +485,7 @@ class InstallerController
                 return $response->withStatus(400)->withJson(['errors' => 'BodyLogin size is not allowed']);
             }
             copy($tmpFileName, "custom/{$body['customId']}/img/bodylogin.jpg");
+            unset($tmpFileName);
         }
 
         if (strpos($body['logo'], 'data:image/svg+xml;base64,') !== false) {
@@ -499,6 +500,7 @@ class InstallerController
                 return $response->withStatus(400)->withJson(['errors' => 'Logo size is not allowed']);
             }
             copy($tmpFileName, "custom/{$body['customId']}/img/logo.svg");
+            unset($tmpFileName);
         }
 
         DatabasePDO::reset();

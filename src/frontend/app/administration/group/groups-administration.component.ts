@@ -1,15 +1,16 @@
 import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
+import { AdministrationService } from '../administration.service';
 
 @Component({
     templateUrl: 'groups-administration.component.html'
@@ -30,32 +31,25 @@ export class GroupsAdministrationComponent implements OnInit {
 
 
     displayedColumns = ['group_id', 'group_desc', 'actions'];
-    dataSource = new MatTableDataSource(this.groups);
-
+    filterColumns = ['group_id', 'group_desc'];
 
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
-    applyFilter(filterValue: string) {
-        filterValue = filterValue.trim();
-        filterValue = filterValue.toLowerCase();
-        this.dataSource.filter = filterValue;
-        this.dataSource.filterPredicate = (template, filter: string) => {
-            return this.functions.filterUnSensitive(template, filter, ['group_id', 'group_desc']);
-        };
-    }
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
         private headerService: HeaderService,
         public appService: AppService,
         public functions: FunctionsService,
+        public adminService: AdministrationService,
         private viewContainerRef: ViewContainerRef
     ) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.administration + ' ' + this.lang.groups);
+        this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.groups'));
 
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
@@ -66,12 +60,7 @@ export class GroupsAdministrationComponent implements OnInit {
                 this.groups = data['groups'];
                 this.loading = false;
                 setTimeout(() => {
-                    this.dataSource = new MatTableDataSource(this.groups);
-                    this.dataSource.paginator = this.paginator;
-                    this.dataSource.sortingDataAccessor = this.functions.listSortingDataAccessor;
-                    this.sort.active = 'group_desc';
-                    this.sort.direction = 'asc';
-                    this.dataSource.sort = this.sort;
+                    this.adminService.setDataSource('admin_groups', this.groups, this.sort, this.paginator, this.filterColumns);
                 }, 0);
             }, (err) => {
                 this.notify.handleErrors(err);
@@ -80,7 +69,7 @@ export class GroupsAdministrationComponent implements OnInit {
 
     preDelete(group: any) {
         if (group.users.length === 0) {
-            const r = confirm(this.lang.reallyWantToDeleteThisGroup);
+            const r = confirm(this.translate.instant('lang.reallyWantToDeleteThisGroup'));
 
             if (r) {
                 this.deleteGroup(group);
@@ -118,11 +107,9 @@ export class GroupsAdministrationComponent implements OnInit {
             .subscribe((data: any) => {
                 setTimeout(() => {
                     this.groups = data['groups'];
-                    this.dataSource = new MatTableDataSource(this.groups);
-                    this.dataSource.paginator = this.paginator;
-                    this.dataSource.sort = this.sort;
+                    this.adminService.setDataSource('admin_groups', this.groups, this.sort, this.paginator, this.filterColumns);
                 }, 0);
-                this.notify.success(this.lang.groupDeleted);
+                this.notify.success(this.translate.instant('lang.groupDeleted'));
 
             }, (err) => {
                 this.notify.error(err.error.errors);

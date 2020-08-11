@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { StepAction } from '../types';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NotificationService } from '../../../service/notification/notification.service';
@@ -27,6 +28,7 @@ export class CustomizationComponent implements OnInit {
     backgroundList: any[] = [];
 
     constructor(
+        private translate: TranslateService,
         private _formBuilder: FormBuilder,
         private notify: NotificationService,
         private sanitizer: DomSanitizer,
@@ -160,7 +162,7 @@ export class CustomizationComponent implements OnInit {
                     customId: this.stepFormGroup.controls['customId'].value,
                     applicationName: this.stepFormGroup.controls['appName'].value,
                 },
-                description: this.lang.stepInstanceActionDesc,
+                description: this.translate.instant('lang.stepInstanceActionDesc'),
                 route: {
                     method: 'POST',
                     url: '../rest/installer/custom'
@@ -175,7 +177,7 @@ export class CustomizationComponent implements OnInit {
                     bodyLoginBackground: this.stepFormGroup.controls['bodyLoginBackground'].value,
                     logo: this.stepFormGroup.controls['uploadedLogo'].value,
                 },
-                description: this.lang.stepCustomizationActionDesc,
+                description: this.translate.instant('lang.stepCustomizationActionDesc'),
                 route: {
                     method: 'POST',
                     url: '../rest/installer/customization'
@@ -199,7 +201,7 @@ export class CustomizationComponent implements OnInit {
                         const img = new Image();
                         img.onload = (imgDim: any) => {
                             if (imgDim.target.width < 1920 || imgDim.target.height < 1080) {
-                                this.notify.error(this.scanPipe.transform(this.lang.badImageResolution, ['1920x1080']));
+                                this.notify.error(this.scanPipe.transform(this.translate.instant('lang.badImageResolution'), ['1920x1080']));
                             } else {
                                 this.backgroundList.push({
                                     filename: value.target.result,
@@ -222,15 +224,15 @@ export class CustomizationComponent implements OnInit {
 
         if (mode === 'logo') {
             if (file.size > 5000000) {
-                return this.scanPipe.transform(this.lang.maxFileSizeExceeded, ['5mo']);
+                return this.scanPipe.transform(this.translate.instant('lang.maxFileSizeExceeded'), ['5mo']);
             } else if (allowedExtension.indexOf(file.type) === -1) {
-                return this.scanPipe.transform(this.lang.onlyExtensionsAllowed, [allowedExtension.join(', ')]);
+                return this.scanPipe.transform(this.translate.instant('lang.onlyExtensionsAllowed'), [allowedExtension.join(', ')]);
             }
         } else {
             if (file.size > 10000000) {
-                return this.scanPipe.transform(this.lang.maxFileSizeExceeded, ['10mo']);
+                return this.scanPipe.transform(this.translate.instant('lang.maxFileSizeExceeded'), ['10mo']);
             } else if (allowedExtension.indexOf(file.type) === -1) {
-                return this.scanPipe.transform(this.lang.onlyExtensionsAllowed, [allowedExtension.join(', ')]);
+                return this.scanPipe.transform(this.translate.instant('lang.onlyExtensionsAllowed'), [allowedExtension.join(', ')]);
             }
         }
         return true;

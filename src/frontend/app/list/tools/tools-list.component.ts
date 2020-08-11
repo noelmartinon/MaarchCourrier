@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -46,7 +47,7 @@ export class ToolsListComponent implements OnInit {
     @Input('selectedRes') selectedRes: any;
     @Input('totalRes') totalRes: number;
 
-    constructor(public http: HttpClient, public dialog: MatDialog) { }
+    constructor(private translate: TranslateService, public http: HttpClient, public dialog: MatDialog) { }
 
     ngOnInit(): void {
 

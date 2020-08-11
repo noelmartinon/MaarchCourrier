@@ -12,6 +12,7 @@ import './onlyoffice-api.js';
 import { HttpClient } from '@angular/common/http';
 import { catchError, tap, filter, finalize } from 'rxjs/operators';
 import { LANG } from '../../app/translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { ConfirmComponent } from '../modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { HeaderService } from '../../service/header.service';
@@ -89,10 +90,10 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
         }
     }
 
-    constructor(public http: HttpClient, public dialog: MatDialog, private notify: NotificationService, public headerService: HeaderService) { }
+    constructor(private translate: TranslateService, public http: HttpClient, public dialog: MatDialog, private notify: NotificationService, public headerService: HeaderService) { }
 
     quit() {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.close, msg: this.lang.confirmCloseEditor } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.close'), msg: this.translate.instant('lang.confirmCloseEditor') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -164,7 +165,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
         if (this.isAllowedEditExtension(this.file.format)) {
             return true;
         } else {
-            this.notify.error(this.lang.onlyofficeEditDenied + ' <b>' + this.file.format + '</b> ' + this.lang.onlyofficeEditDenied2);
+            this.notify.error(this.translate.instant('lang.onlyofficeEditDenied') + ' <b>' + this.file.format + '</b> ' + this.translate.instant('lang.onlyofficeEditDenied2'));
             this.triggerCloseEditor.emit();
             return false;
         }
@@ -206,7 +207,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
             const regex = /127\.0\.0\.1/g;
             const regex2 = /localhost/g;
             if (this.appUrl.match(regex) !== null || this.appUrl.match(regex2) !== null) {
-                this.notify.error(`${this.lang.errorOnlyoffice1}`);
+                this.notify.error(`${this.translate.instant('lang.errorOnlyoffice1')}`);
                 this.triggerCloseEditor.emit();
             } else {
                 this.http.get(`../rest/onlyOffice/available`).pipe(
@@ -214,7 +215,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
                         if (data.isAvailable) {
                             resolve(true);
                         } else {
-                            this.notify.error(`${this.lang.errorOnlyoffice2} ${this.onlyOfficeUrl}`);
+                            this.notify.error(`${this.translate.instant('lang.errorOnlyoffice2')} ${this.onlyOfficeUrl}`);
                             this.triggerCloseEditor.emit();
                         }
                     }),
@@ -307,8 +308,8 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
             },
             editorConfig: {
                 callbackUrl: `${this.appUrl}rest/onlyOfficeCallback`,
-                lang: this.lang.language,
-                region: this.lang.langISO,
+                lang: this.translate.instant('lang.language'),
+                region: this.translate.instant('lang.langISO'),
                 mode: 'edit',
                 customization: {
                     chat: false,

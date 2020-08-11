@@ -32,11 +32,12 @@ export class UsersImportComponent implements OnInit {
 
     ];
 
-    delimiters = [';', ',', 'TAB'];
+    delimiters = [';', ',', '\t'];
     currentDelimiter = ';';
 
     associatedColmuns: any = {};
     dataSource = new MatTableDataSource(null);
+    hasHeader: boolean = true;
     csvData: any[] = [];
     userData: any[] = [];
     countAll: number = 0;
@@ -63,7 +64,7 @@ export class UsersImportComponent implements OnInit {
     changeColumn(coldb: string, colCsv: string) {
         this.userData = [];
         const limit = this.csvData.length < 10 ? this.csvData.length : 10;
-        for (let index = 0; index < limit; index++) {
+        for (let index = this.hasHeader ? 1 : 0; index < limit; index++) {
             const data = this.csvData[index];
             this.userData.push({
                 'id': coldb === 'id' ? data[this.csvColumns.filter(col => col === colCsv)[0]] : data[this.associatedColmuns['id']],
@@ -74,6 +75,9 @@ export class UsersImportComponent implements OnInit {
                 'phone': coldb === 'phone' ? data[this.csvColumns.filter(col => col === colCsv)[0]] : data[this.associatedColmuns['phone']]
             });
         }
+
+        this.countAdd = this.csvData.filter((data: any, index: number) => index > 0 && this.functionsService.empty(data[this.associatedColmuns['id']])).length;
+        this.countUp = this.csvData.filter((data: any, index: number) => index > 0 && !this.functionsService.empty(data[this.associatedColmuns['id']])).length;
 
         this.dataSource = new MatTableDataSource(this.userData);
     }
@@ -89,25 +93,27 @@ export class UsersImportComponent implements OnInit {
 
             reader.onload = (value: any) => {
                 rawCsv = value.target.result.split('\n');
+                rawCsv = rawCsv.filter(data => data !== '');
 
-                if (rawCsv[0].split(this.currentDelimiter).map(s => s.replace(/"/gi, '').trim()).length >= this.userColmuns.length) {
-                    this.csvColumns = rawCsv[0].split(';').map(s => s.replace(/"/gi, '').trim());
+                if (rawCsv[0].split(this.currentDelimiter).map(s => s.replace(/"/gi, '').trim()).length >= this.userColmuns.length - 1) {
                     let dataCol = [];
                     let objData = {};
+                    this.setCsvColumns(rawCsv[0].split(this.currentDelimiter).map(s => s.replace(/"/gi, '').trim()));
 
-                    this.countAll = rawCsv.length - 2;
+                    this.countAll = this.hasHeader ? rawCsv.length - 1 : rawCsv.length;
 
-                    for (let index = 1; index < rawCsv.length - 1; index++) {
+                    for (let index = 0; index < rawCsv.length; index++) {
                         objData = {};
-                        dataCol = rawCsv[index].split(';').map(s => s.replace(/"/gi, '').trim());
+                        dataCol = rawCsv[index].split(this.currentDelimiter).map(s => s.replace(/"/gi, '').trim());
+
                         dataCol.forEach((element: any, index2: number) => {
                             objData[this.csvColumns[index2]] = element;
                         });
                         this.csvData.push(objData);
                     }
                     this.initData();
-                    this.countAdd = this.csvData.filter((data: any) => this.functionsService.empty(data[this.associatedColmuns['id']])).length;
-                    this.countUp = this.csvData.filter((data: any) => !this.functionsService.empty(data[this.associatedColmuns['id']])).length;
+                    this.countAdd = this.csvData.filter((data: any, index: number) => index > 0 && this.functionsService.empty(data[this.associatedColmuns['id']])).length;
+                    this.countUp = this.csvData.filter((data: any, index: number) => index > 0 && !this.functionsService.empty(data[this.associatedColmuns['id']])).length;
                     this.localStorage.save(`importUsersFields_${this.headerService.user.id}`, this.currentDelimiter);
                 } else {
                     this.notify.error(this.translate.instant('lang.mustAtLeastMinValues'));
@@ -119,10 +125,31 @@ export class UsersImportComponent implements OnInit {
         }
     }
 
+    setCsvColumns(headerData: string[] = null) {
+        if (headerData.filter(col => this.functionsService.empty(col)).length > 0) {
+            this.csvColumns = Object.keys(headerData).map((val, index) => `${index}`);
+        } else {
+            this.csvColumns = headerData;
+        }
+    }
+
+    toggleHeader() {
+        this.hasHeader = !this.hasHeader;
+        this.countAll = this.hasHeader ? this.csvData.length - 1 : this.csvData.length;
+        if (this.hasHeader) {
+            this.countAdd = this.csvData.filter((data: any, index: number) => index > 0 && this.functionsService.empty(data[this.associatedColmuns['id']])).length;
+            this.countUp = this.csvData.filter((data: any, index: number) => index > 0 && !this.functionsService.empty(data[this.associatedColmuns['id']])).length;
+        } else {
+            this.countAdd = this.csvData.filter((data: any, index: number) => this.functionsService.empty(data[this.associatedColmuns['id']])).length;
+            this.countUp = this.csvData.filter((data: any, index: number) => !this.functionsService.empty(data[this.associatedColmuns['id']])).length;
+        }
+        this.initData();
+    }
+
     initData() {
         this.userData = [];
         const limit = this.csvData.length < 10 ? this.csvData.length : 10;
-        for (let index = 0; index < limit; index++) {
+        for (let index = this.hasHeader ? 1 : 0; index < limit; index++) {
             const data = this.csvData[index];
             this.associatedColmuns['id'] = this.csvColumns[0];
             this.associatedColmuns['user_id'] = this.csvColumns[1];
@@ -167,24 +194,26 @@ export class UsersImportComponent implements OnInit {
             filter((data: string) => data === 'ok'),
             tap(() => {
                 this.loading = true;
-                this.csvData.forEach((element: any) => {
-                    dataToSend.push({
-                        'id': element[this.associatedColmuns['id']],
-                        'user_id': element[this.associatedColmuns['user_id']],
-                        'firstname': element[this.associatedColmuns['firstname']],
-                        'lastname': element[this.associatedColmuns['lastname']],
-                        'mail': element[this.associatedColmuns['mail']],
-                        'phone': element[this.associatedColmuns['phone']]
-                    });
+                this.csvData.forEach((element: any, index: number) => {
+                    if ((this.hasHeader && index > 0) || !this.hasHeader) {
+                        dataToSend.push({
+                            'id': element[this.associatedColmuns['id']],
+                            'user_id': element[this.associatedColmuns['user_id']],
+                            'firstname': element[this.associatedColmuns['firstname']],
+                            'lastname': element[this.associatedColmuns['lastname']],
+                            'mail': element[this.associatedColmuns['mail']],
+                            'phone': element[this.associatedColmuns['phone']]
+                        });
+                    }
                 });
             }),
             exhaustMap(() => this.http.put(`../rest/users/import`, { users: dataToSend })),
             tap((data: any) => {
                 let textModal = '';
                 if (data.warnings.count > 0) {
-                    textModal = `<br/>${data.warning.count} ${this.translate.instant('lang.withWarnings')}  : <ul>`;
+                    textModal = `<br/>${data.warnings.count} ${this.translate.instant('lang.withWarnings')}  : <ul>`;
                     data.errors.details.forEach(element => {
-                        textModal  += `<li> ${this.translate.instant('element.lang')} (${this.translate.instant('lang.line')} : ${element.index + 1})</li>`;
+                        textModal  += `<li> ${this.translate.instant('element.lang')} (${this.translate.instant('lang.line')} : ${this.hasHeader ? element.index + 2 :  element.index + 1})</li>`;
                     });
                     textModal += '</ul>';
                 }
@@ -192,7 +221,7 @@ export class UsersImportComponent implements OnInit {
                 if (data.errors.count > 0) {
                     textModal += `<br/>${data.errors.count} ${this.translate.instant('lang.withErrors')}  : <ul>`;
                     data.errors.details.forEach(element => {
-                        textModal  += `<li> ${this.translate.instant('element.lang')} (${this.translate.instant('lang.line')} : ${element.index + 1})</li>`;
+                        textModal  += `<li> ${this.translate.instant('element.lang')} (${this.translate.instant('lang.line')} : ${this.hasHeader ? element.index + 2 :  element.index + 1})</li>`;
                     });
                     textModal += '</ul>';
                 }

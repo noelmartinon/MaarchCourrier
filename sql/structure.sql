@@ -226,7 +226,8 @@ CREATE TABLE users
   reset_token text,
   failed_authentication INTEGER DEFAULT 0,
   locked_until TIMESTAMP without time zone,
-  external_id jsonb DEFAULT '{}',
+    authorized_api jsonb NOT NULL DEFAULT '[]',
+    external_id jsonb DEFAULT '{}',
   CONSTRAINT users_pkey PRIMARY KEY (user_id),
   CONSTRAINT users_id_key UNIQUE (id)
 )
@@ -1405,3 +1406,28 @@ CREATE TABLE users_followed_resources
     CONSTRAINT users_followed_resources_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);
+
+CREATE TABLE IF NOT EXISTS issuing_sites
+(
+    id                  SERIAL                 NOT NULL,
+    site_label          CHARACTER VARYING(256) NOT NULL,
+    post_office_label   CHARACTER VARYING(256),
+    account_number      CHARACTER VARYING(256),
+    address_name        CHARACTER VARYING(256),
+    address_number      CHARACTER VARYING(256),
+    address_street      CHARACTER VARYING(256),
+    address_additional1 CHARACTER VARYING(256),
+    address_additional2 CHARACTER VARYING(256),
+    address_postcode    CHARACTER VARYING(256),
+    address_town        CHARACTER VARYING(256),
+    address_country     CHARACTER VARYING(256),
+    CONSTRAINT issuing_sites_pkey PRIMARY KEY (id)
+);
+CREATE TABLE IF NOT EXISTS issuing_sites_entities
+(
+    id        SERIAL  NOT NULL,
+    site_id   INTEGER NOT NULL,
+    entity_id INTEGER NOT NULL,
+    CONSTRAINT issuing_sites_entities_pkey PRIMARY KEY (id),
+    CONSTRAINT issuing_sites_entities_unique_key UNIQUE (site_id, entity_id)
+);

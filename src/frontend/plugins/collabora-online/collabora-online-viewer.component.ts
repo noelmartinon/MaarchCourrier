@@ -1,7 +1,8 @@
 import {AfterViewInit, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {catchError, filter, tap} from 'rxjs/operators';
-import {LANG} from '../../app/translate.component';
+import { LANG } from '../../app/translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import {ConfirmComponent} from '../modal/confirm.component';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {HeaderService} from '../../service/header.service';
@@ -90,6 +91,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
     }
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         public dialog: MatDialog,
         private notify: NotificationService,
@@ -97,7 +99,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
         public headerService: HeaderService) { }
 
     quit() {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.close, msg: this.lang.confirmCloseEditor } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.close'), msg: this.translate.instant('lang.confirmCloseEditor') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -169,7 +171,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
         if (this.isAllowedEditExtension(this.file.format)) {
             return true;
         } else {
-            this.notify.error(this.lang.onlyofficeEditDenied + ' <b>' + this.file.format + '</b> ' + this.lang.collaboraOnlineEditDenied2);
+            this.notify.error(this.translate.instant('lang.onlyofficeEditDenied') + ' <b>' + this.file.format + '</b> ' + this.translate.instant('lang.collaboraOnlineEditDenied2'));
             this.triggerCloseEditor.emit();
             return false;
         }
@@ -178,7 +180,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
     checkServerStatus() {
         return new Promise((resolve) => {
             if (location.host === '127.0.0.1' || location.host === 'localhost') {
-                this.notify.error(`${this.lang.errorCollaboraOnline1}`);
+                this.notify.error(`${this.translate.instant('lang.errorCollaboraOnline1')}`);
                 this.triggerCloseEditor.emit();
             } else {
                 this.http.get(`../rest/collaboraOnline/available`).pipe(
@@ -186,7 +188,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
                         if (data.isAvailable) {
                             resolve(true);
                         } else {
-                            this.notify.error(`${this.lang.errorCollaboraOnline2}`);
+                            this.notify.error(`${this.translate.instant('lang.errorCollaboraOnline2')}`);
                             this.triggerCloseEditor.emit();
                         }
                     }),
@@ -276,7 +278,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
                 format: this.file.format,
                 path: this.params.objectPath,
                 data: this.params.dataToMerge,
-                lang: this.lang.langISO
+                lang: this.translate.instant('lang.langISO')
             }).pipe(
                 tap((data: any) => {
                     this.editorUrl = data.url;

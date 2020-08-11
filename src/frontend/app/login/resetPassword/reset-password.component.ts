@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { finalize } from 'rxjs/operators';
 import { AuthService } from '../../../service/auth.service';
 
@@ -22,7 +23,7 @@ export class ResetPasswordComponent implements OnInit {
         newPassword: '',
         passwordConfirmation: ''
     };
-    labelButton: string = this.lang.update;
+    labelButton: string = this.translate.instant('lang.update');
 
     hideNewPassword: Boolean = true;
     hideNewPasswordConfirm: Boolean = true;
@@ -47,6 +48,7 @@ export class ResetPasswordComponent implements OnInit {
 
 
     constructor(
+        private translate: TranslateService,
         private router: Router,
         private route: ActivatedRoute,
         public http: HttpClient,
@@ -64,19 +66,19 @@ export class ResetPasswordComponent implements OnInit {
 
 
     updatePassword() {
-        this.labelButton = this.lang.emailSendInProgress;
+        this.labelButton = this.translate.instant('lang.emailSendInProgress');
         this.loading = true;
 
         this.http.put('../rest/password', { 'token': this.token, 'password': this.password.newPassword })
             .pipe(
                 finalize(() => {
-                    this.labelButton = this.lang.update;
+                    this.labelButton = this.translate.instant('lang.update');
                     this.loading = false;
                 })
             )
             .subscribe((data: any) => {
                 this.loadingForm = true;
-                this.notificationService.success(this.lang.passwordChanged);
+                this.notificationService.success(this.translate.instant('lang.passwordChanged'));
                 this.router.navigate(['/login']);
             }, (err: any) => {
                 this.notificationService.handleSoftErrors(err);
@@ -87,13 +89,13 @@ export class ResetPasswordComponent implements OnInit {
         this.handlePassword.error = true;
 
         if (!password.match(/[A-Z]/g) && this.passwordRules.complexityUpper.enabled) {
-            this.handlePassword.errorMsg = this.lang.passwordcomplexityUpperRequired;
+            this.handlePassword.errorMsg = this.translate.instant('lang.passwordcomplexityUpperRequired');
         } else if (!password.match(/[0-9]/g) && this.passwordRules.complexityNumber.enabled) {
-            this.handlePassword.errorMsg = this.lang.passwordcomplexityNumberRequired;
+            this.handlePassword.errorMsg = this.translate.instant('lang.passwordcomplexityNumberRequired');
         } else if (!password.match(/[^A-Za-z0-9]/g) && this.passwordRules.complexitySpecial.enabled) {
-            this.handlePassword.errorMsg = this.lang.passwordcomplexitySpecialRequired;
+            this.handlePassword.errorMsg = this.translate.instant('lang.passwordcomplexitySpecialRequired');
         } else if (password.length < this.passwordRules.minLength.value && this.passwordRules.minLength.enabled) {
-            this.handlePassword.errorMsg = this.passwordRules.minLength.value + ' ' + this.lang.passwordminLength + ' !';
+            this.handlePassword.errorMsg = this.passwordRules.minLength.value + ' ' + this.translate.instant('lang.passwordminLength') + ' !';
         } else {
             this.handlePassword.error = false;
             this.handlePassword.errorMsg = '';
@@ -142,7 +144,7 @@ export class ResetPasswordComponent implements OnInit {
                         this.passwordRules.renewal.enabled = rule.enabled;
                         this.passwordRules.renewal.value = rule.value;
                         if (rule.enabled) {
-                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.lang.days + '</b>. ' + this.lang['password2' + rule.label] + '.');
+                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.translate.instant('lang.days') + '</b>. ' + this.lang['password2' + rule.label] + '.');
 
                         }
                     } else if (rule.label === 'historyLastUse') {

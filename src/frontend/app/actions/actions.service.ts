@@ -1,6 +1,7 @@
 import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../app/translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { tap, catchError, filter, finalize, exhaustMap } from 'rxjs/operators';
 import { of, Subject, Observable } from 'rxjs';
 import { NotificationService } from '../../service/notification/notification.service';
@@ -63,6 +64,7 @@ export class ActionsService implements OnDestroy {
     private eventAction = new Subject<any>();
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         public dialog: MatDialog,
         private notify: NotificationService,
@@ -140,7 +142,7 @@ export class ActionsService implements OnDestroy {
             } catch (error) {
                 console.log(error);
                 console.log(action.component);
-                alert(this.lang.actionNotExist);
+                alert(this.translate.instant('lang.actionNotExist'));
             }
         }
     }
@@ -165,7 +167,7 @@ export class ActionsService implements OnDestroy {
                             console.log(error);
                             console.log(action);
                             this.unlockResourceAfterActionModal([]);
-                            alert(this.lang.actionNotExist);
+                            alert(this.translate.instant('lang.actionNotExist'));
                         }
                     }
                 }
@@ -175,7 +177,7 @@ export class ActionsService implements OnDestroy {
                 } catch (error) {
                     console.log(error);
                     console.log(action);
-                    alert(this.lang.actionNotExist);
+                    alert(this.translate.instant('lang.actionNotExist'));
                 }
             }
         }
@@ -185,10 +187,10 @@ export class ActionsService implements OnDestroy {
         return new Promise((resolve) => {
             this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/locked`, { resources: resIds }).pipe(
                 tap((data: any) => {
-                    let msgWarn = this.lang.warnLockRes + ' : ' + data.lockers.join(', ');
+                    let msgWarn = this.translate.instant('lang.warnLockRes') + ' : ' + data.lockers.join(', ');
 
                     if (data.countLockedResources != resIds.length) {
-                        msgWarn += this.lang.warnLockRes2 + '.';
+                        msgWarn += this.translate.instant('lang.warnLockRes2') + '.';
                     }
 
                     if (data.countLockedResources > 0) {
@@ -288,7 +290,7 @@ export class ActionsService implements OnDestroy {
             this.headerService.nbResourcesFollowed++;
         }
 
-        this.notify.success(this.lang.action + ' : "' + this.currentAction.label + '" ' + this.lang.done);
+        this.notify.success(this.translate.instant('lang.action') + ' : "' + this.currentAction.label + '" ' + this.translate.instant('lang.done'));
 
         this.actionEnded = true;
         this.eventAction.next(resIds);

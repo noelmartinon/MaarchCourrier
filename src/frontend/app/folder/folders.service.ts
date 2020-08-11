@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../app/translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { Subject, Observable, of } from 'rxjs';
 import { NotificationService } from '../../service/notification/notification.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -24,6 +25,7 @@ export class FoldersService {
     private eventAction = new Subject<any>();
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         public dialog: MatDialog,
         private notify: NotificationService,
@@ -105,7 +107,7 @@ export class FoldersService {
             tap(() => {
                 this.getPinnedFolders();
                 this.eventAction.next({type:'refreshFolderPinned', content: {id: folder.id, pinned : true}});
-                this.notify.success(this.lang.folderPinned);
+                this.notify.success(this.translate.instant('lang.folderPinned'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -119,7 +121,7 @@ export class FoldersService {
             tap(() => {
                 this.getPinnedFolders();
                 this.eventAction.next({type:'refreshFolderPinned', content: {id: folder.id, pinned : false}});
-                this.notify.success(this.lang.folderUnpinned);
+                this.notify.success(this.translate.instant('lang.folderUnpinned'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -144,7 +146,7 @@ export class FoldersService {
                 this.eventAction.next({type:'refreshFolderCount', content: {id: folder.id, countResources : data.countResources}});
             }),
             tap(() => {
-                this.notify.success(this.lang.mailClassified);
+                this.notify.success(this.translate.instant('lang.mailClassified'));
                 this.eventAction.next({type:'function', content: 'refreshDao'});
             }),
             finalize(() => folder.drag = false),

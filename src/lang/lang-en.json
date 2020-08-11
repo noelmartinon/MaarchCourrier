@@ -1888,5 +1888,13 @@
     "mustAtLeastMinValues": "The data must have at least <b>6</b> values",
     "enableField": "Enable field",
     "disableField": "Disable field",
-    "emailSubject": "E-mail's subject"
+    "emailSubject": "E-mail's subject",
+    "authorizedRoutes": "Authorized routes",
+    "infoImportusers": "The <b>id</b> column is used to identify a user",
+    "infoImportusers2": "The <b>id</b> and <b>user_id</b> columns are ignored when updating users",
+    "usersExport": "Export users",
+    "hotkeyInfo": "Hold <b>SHIFT</b> to propagate your selections to sub-elements",
+    "hotkeyMsg": "<b>SHIFT</b>&nbsp;Propagation to sub-elements",
+    "hotkeyTitle": "Hold the shift key",
+    "advancedParameters": "Advanced parameters"
 }

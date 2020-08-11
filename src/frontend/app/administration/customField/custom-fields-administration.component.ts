@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -31,31 +32,31 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
     customFieldsTypes: any[] = [
         {
-            label: this.lang.stringInput,
+            label: this.translate.instant('lang.stringInput'),
             type: 'string'
         },
         {
-            label: this.lang.integerInput,
+            label: this.translate.instant('lang.integerInput'),
             type: 'integer'
         },
         {
-            label: this.lang.selectInput,
+            label: this.translate.instant('lang.selectInput'),
             type: 'select'
         },
         {
-            label: this.lang.dateInput,
+            label: this.translate.instant('lang.dateInput'),
             type: 'date'
         },
         {
-            label: this.lang.radioInput,
+            label: this.translate.instant('lang.radioInput'),
             type: 'radio'
         },
         {
-            label: this.lang.checkboxInput,
+            label: this.translate.instant('lang.checkboxInput'),
             type: 'checkbox'
         },
         {
-            label: this.lang.banAutocompleteInput,
+            label: this.translate.instant('lang.banAutocompleteInput'),
             type: 'banAutocomplete'
         }
     ];
@@ -72,6 +73,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -84,7 +86,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.administration + ' ' + this.lang.customFieldsAdmin);
+        this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.customFieldsAdmin'));
 
         this.getTables();
 
@@ -121,13 +123,13 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
         let newCustomField: any = {};
 
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.add, msg: this.lang.confirmAction } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.add'), msg: this.translate.instant('lang.confirmAction') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             tap(() => {
                 newCustomField = {
-                    label: this.lang.newField + ' ' + this.incrementCreation,
+                    label: this.translate.instant('lang.newField') + ' ' + this.incrementCreation,
                     type: customFieldType.type,
                     values: []
                 };
@@ -136,7 +138,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
             tap((data: any) => {
                 newCustomField.id = data.customFieldId;
                 this.customFields.push(newCustomField);
-                this.notify.success(this.lang.customFieldAdded);
+                this.notify.success(this.translate.instant('lang.customFieldAdded'));
                 this.incrementCreation++;
             }),
             catchError((err: any) => {
@@ -159,14 +161,14 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     }
 
     removeCustomField(indexCustom: number) {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete + ' "' + this.customFields[indexCustom].label + '"', msg: this.lang.confirmAction } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete') + ' "' + this.customFields[indexCustom].label + '"', msg: this.translate.instant('lang.confirmAction') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.delete('../rest/customFields/' + this.customFields[indexCustom].id)),
             tap(() => {
                 this.customFields.splice(indexCustom, 1);
-                this.notify.success(this.lang.customFieldDeleted);
+                this.notify.success(this.translate.instant('lang.customFieldDeleted'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -186,7 +188,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
             customFieldToUpdate.values = customField.values.map((data: any) => data.label);
             const alreadyExists = this.customFields.filter(customFieldItem => customFieldItem.label === customFieldToUpdate.label);
             if (alreadyExists.length > 1) {
-                this.notify.handleErrors(this.lang.customFieldAlreadyExists);
+                this.notify.handleErrors(this.translate.instant('lang.customFieldAlreadyExists'));
                 return of(false);
             }
         } else {
@@ -202,7 +204,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         this.http.put('../rest/customFields/' + customField.id, customFieldToUpdate).pipe(
             tap(() => {
                 this.customFieldsClone[indexCustom] = JSON.parse(JSON.stringify(customField));
-                this.notify.success(this.lang.customFieldUpdated);
+                this.notify.success(this.translate.instant('lang.customFieldUpdated'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

@@ -1,19 +1,19 @@
 <div class="mat-dialog-content-container">
-    <h2 mat-dialog-title>{{lang.entityReplacement}}</h2>
+    <h2 mat-dialog-title>{{'lang.entityReplacement' | translate}}</h2>
     <mat-dialog-content>
         <div class="alert-message alert-message-info" role="alert">
             <mat-list>
                 <mat-list-item *ngIf="data.entity.documents > 0">
                     <mat-icon color="primary" mat-list-icon class="fa fa-file fa-2x"></mat-icon>
                     <p mat-line>
-                        <b>{{data.entity.entity_label}}</b> {{lang.isDestTo}}
-                        <b>{{data.entity.documents}}</b> {{lang.documents}}</p>
+                        <b>{{data.entity.entity_label}}</b> {{'lang.isDestTo' | translate}}
+                        <b>{{data.entity.documents}}</b> {{'lang.documents' | translate}}</p>
                 </mat-list-item>
                 <mat-list-item *ngIf="data.entity.instances > 0">
                     <mat-icon color="primary" mat-list-icon class="fa fa-sitemap fa-2x"></mat-icon>
                     <p mat-line>
-                        <b>{{data.entity.entity_label}}</b> {{lang.isCopyTo}}
-                        <b>{{data.entity.instances}}</b> {{lang.documents}}</p>
+                        <b>{{data.entity.entity_label}}</b> {{'lang.isCopyTo' | translate}}
+                        <b>{{data.entity.instances}}</b> {{'lang.documents' | translate}}</p>
                 </mat-list-item>
                 <mat-list-item *ngIf="data.entity.users.length > 0">
                     <mat-icon color="primary" mat-list-icon class="fa fa-user fa-2x"></mat-icon>
@@ -29,7 +29,7 @@
                 </mat-list-item>
             </mat-list>
         </div>
-        <plugin-autocomplete [labelPlaceholder]="lang.chooseEntity" [labelList]="lang.availableEntities"
+        <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.chooseEntity')" [labelList]="this.translate.instant('lang.availableEntities')"
             [routeDatas]="['/rest/autocomplete/entities']" [targetSearchKey]="'idToDisplay'"
             [subInfoKey]="'descriptionToDisplay'" (triggerEvent)="setRedirectEntity($event)" singleMode required>
         </plugin-autocomplete>
@@ -38,6 +38,6 @@
     <mat-dialog-actions>
         <button mat-raised-button color="warn" type="submit" class="btn btn-danger"
             (click)="dialogRef.close(data.entity)"
-            [disabled]="data.entity.redirectEntity === undefined || data.entity.redirectEntity == data.entity.entity_id">{{lang.delete}}</button>
+            [disabled]="data.entity.redirectEntity === undefined || data.entity.redirectEntity == data.entity.entity_id">{{'lang.delete' | translate}}</button>
     </mat-dialog-actions>
 </div>

@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Inject, ViewChildren, QueryList } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { catchError, tap, filter, distinctUntilChanged, take } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { NotificationService } from '../../../service/notification/notification.service';
@@ -61,6 +62,7 @@ export class AttachmentCreateComponent implements OnInit {
     @ViewChildren('contactAutocomplete') contactAutocomplete: ContactAutocompleteComponent;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<AttachmentCreateComponent>,
@@ -280,12 +282,12 @@ export class AttachmentCreateComponent implements OnInit {
                     }
 
                     this.sendingData = false;
-                    this.notify.success(this.lang.attachmentAdded);
+                    this.notify.success(this.translate.instant('lang.attachmentAdded'));
                     this.dialogRef.close('success');
 
                 } else {
                     this.sendingData = false;
-                    this.notify.error(this.lang.mustCompleteAllAttachments);
+                    this.notify.error(this.translate.instant('lang.mustCompleteAllAttachments'));
                 }
             })
         ).subscribe();
@@ -425,7 +427,7 @@ export class AttachmentCreateComponent implements OnInit {
     }
 
     removePj(i: number) {
-        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete + ' : ' + this.lang.attachmentShort + ' n°' + (i + 1), msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete') + ' : ' + this.translate.instant('lang.attachmentShort') + ' n°' + (i + 1), msg: this.translate.instant('lang.confirmAction') } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),

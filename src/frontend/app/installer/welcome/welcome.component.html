@@ -5,7 +5,7 @@
     </div>
     <form [formGroup]="stepFormGroup" style="width: 850px;margin: auto;">
         <mat-form-field appearance="outline" floatLabel="never">
-            <mat-label>{{lang.chooseAppLanguage}} : </mat-label>
+            <mat-label>{{'lang.chooseAppLanguage' | translate}} : </mat-label>
             <mat-select formControlName="lang" required>
                 <mat-option *ngFor="let language of langs" [value]="language">
                     {{lang[language + 'Full']}}
@@ -15,7 +15,7 @@
     </form>
     <mat-divider></mat-divider>
     <mat-list>
-        <div mat-subheader>{{lang.installDescription}} :
+        <div mat-subheader>{{'lang.installDescription' | translate}} :
         </div>
         <mat-list-item *ngFor="let step of steps">
             <mat-icon mat-list-icon color="primary" [class]="step.icon"></mat-icon>
@@ -24,14 +24,14 @@
     </mat-list>
     <mat-divider></mat-divider>
     <p>
-        {{lang.externalInfoSite}} :
+        {{'lang.externalInfoSite' | translate}} :
     </p>
     <a mat-raised-button color="primary" href="https://community.maarch.org/" target="_blank">
         community.maarch.org
     </a>
-    {{lang.or}}
+    {{'lang.or' | translate}}
     <a mat-raised-button color="primary" href="http://www.maarch.com" target="_blank">
         www.maarch.com
     </a>
-    <p style="font-style: italic;padding-top: 30px;text-align: right;" [innerHTML]="lang.maarchLicenceInstall"></p>
+    <p style="font-style: italic;padding-top: 30px;text-align: right;" [innerHTML]="this.translate.instant('lang.maarchLicenceInstall')"></p>
 </div>

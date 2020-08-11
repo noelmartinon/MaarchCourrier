@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ViewContainerRef, TemplateRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -65,62 +66,62 @@ export class ProcessComponent implements OnInit, OnDestroy {
         {
             id: 'dashboard',
             icon: 'fas fa-columns',
-            label: this.lang.newsFeed,
+            label: this.translate.instant('lang.newsFeed'),
             count: 0
         },
         {
             id: 'history',
             icon: 'fas fa-history',
-            label: this.lang.history,
+            label: this.translate.instant('lang.history'),
             count: 0
         },
         {
             id: 'notes',
             icon: 'fas fa-pen-square',
-            label: this.lang.notesAlt,
+            label: this.translate.instant('lang.notesAlt'),
             count: 0
         },
         {
             id: 'attachments',
             icon: 'fas fa-paperclip',
-            label: this.lang.attachments,
+            label: this.translate.instant('lang.attachments'),
             count: 0
         },
         {
             id: 'linkedResources',
             icon: 'fas fa-link',
-            label: this.lang.links,
+            label: this.translate.instant('lang.links'),
             count: 0
         },
         {
             id: 'emails',
             icon: 'fas fa-envelope',
-            label: this.lang.mailsSentAlt,
+            label: this.translate.instant('lang.mailsSentAlt'),
             count: 0
         },
         {
             id: 'diffusionList',
             icon: 'fas fa-share-alt',
-            label: this.lang.diffusionList,
+            label: this.translate.instant('lang.diffusionList'),
             editMode: false,
             count: 0
         },
         {
             id: 'visaCircuit',
             icon: 'fas fa-list-ol',
-            label: this.lang.visaWorkflow,
+            label: this.translate.instant('lang.visaWorkflow'),
             count: 0
         },
         {
             id: 'opinionCircuit',
             icon: 'fas fa-comment-alt',
-            label: this.lang.avis,
+            label: this.translate.instant('lang.avis'),
             count: 0
         },
         {
             id: 'info',
             icon: 'fas fa-info-circle',
-            label: this.lang.informations,
+            label: this.translate.instant('lang.informations'),
             count: 0
         }
     ];
@@ -159,6 +160,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     resourceFollowed: boolean = false;
 
     constructor(
+        private translate: TranslateService,
         private route: ActivatedRoute,
         private _activatedRoute: ActivatedRoute,
         public http: HttpClient,
@@ -205,7 +207,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu', 'form');
-        this.headerService.setHeader(this.lang.eventProcessDoc);
+        this.headerService.setHeader(this.translate.instant('lang.eventProcessDoc'));
     }
 
 
@@ -216,7 +218,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                     if (data.isAllowed) {
                         resolve(true);
                     } else {
-                        this.notify.error(this.lang.documentOutOfPerimeter);
+                        this.notify.error(this.translate.instant('lang.documentOutOfPerimeter'));
                         this.router.navigate([`/home`]);
                     }
                 }),
@@ -245,7 +247,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
         this.headerService.sideBarButton = {
             icon: 'fa fa-inbox',
-            label: this.lang.backBasket,
+            label: this.translate.instant('lang.backBasket'),
             route: `/basketList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}`
         };
 
@@ -297,7 +299,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
         };
         this.headerService.sideBarButton = {
             icon: 'fas fa-arrow-left',
-            label: this.lang.back,
+            label: this.translate.instant('lang.back'),
             route: `__GOBACK`
         };
 
@@ -332,7 +334,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                 }
 
                 this.loadAvaibleIntegrations(data.integrations);
-                this.headerService.setHeader(this.detailMode ? this.lang.detailDoc : this.lang.eventProcessDoc, this.lang[this.currentResourceInformations.categoryId]);
+                this.headerService.setHeader(this.detailMode ? this.translate.instant('lang.detailDoc') : this.translate.instant('lang.eventProcessDoc'), this.lang[this.currentResourceInformations.categoryId]);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -396,7 +398,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
         this.http.put(`../rest/resourcesList/integrations`, { resources: [this.currentResourceInformations.resId], integrations: { [integrationId]: !this.currentResourceInformations.integrations[integrationId] } }).pipe(
             tap(() => {
                 this.currentResourceInformations.integrations[integrationId] = !this.currentResourceInformations.integrations[integrationId];
-                this.notify.success(this.lang.actionDone);
+                this.notify.success(this.translate.instant('lang.actionDone'));
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
@@ -423,7 +425,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
         if (this.currentResourceInformations.senders === undefined || this.currentResourceInformations.senders.length === 0) {
             this.hasContact = false;
-            this.senderLightInfo = { 'displayName': this.lang.noSelectedContact, 'filling': null };
+            this.senderLightInfo = { 'displayName': this.translate.instant('lang.noSelectedContact'), 'filling': null };
         } else if (this.currentResourceInformations.senders.length === 1) {
             this.hasContact = true;
             if (this.currentResourceInformations.senders[0].type === 'contact') {
@@ -467,7 +469,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
             }
         } else if (this.currentResourceInformations.senders.length > 1) {
             this.hasContact = true;
-            this.senderLightInfo = { 'displayName': this.currentResourceInformations.senders.length + ' ' + this.lang.senders, 'filling': null };
+            this.senderLightInfo = { 'displayName': this.currentResourceInformations.senders.length + ' ' + this.translate.instant('lang.senders'), 'filling': null };
         }
     }
 
@@ -475,7 +477,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
         if (this.currentResourceInformations.recipients === undefined || this.currentResourceInformations.recipients.length === 0) {
             this.hasContact = false;
-            this.senderLightInfo = { 'displayName': this.lang.noSelectedContact, 'filling': null };
+            this.senderLightInfo = { 'displayName': this.translate.instant('lang.noSelectedContact'), 'filling': null };
         } else if (this.currentResourceInformations.recipients.length === 1) {
             this.hasContact = true;
             if (this.currentResourceInformations.recipients[0].type === 'contact') {
@@ -519,7 +521,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
             }
         } else if (this.currentResourceInformations.recipients.length > 1) {
             this.hasContact = true;
-            this.senderLightInfo = { 'displayName': this.currentResourceInformations.recipients.length + ' ' + this.lang.recipients, 'filling': null };
+            this.senderLightInfo = { 'displayName': this.currentResourceInformations.recipients.length + ' ' + this.translate.instant('lang.recipients'), 'filling': null };
         }
     }
 
@@ -591,7 +593,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                 this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false);
             }
         } else {
-            this.notify.error(this.lang.mustFixErrors);
+            this.notify.error(this.translate.instant('lang.mustFixErrors'));
         }
     }
 
@@ -695,7 +697,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     }
 
     openConfirmModification() {
-        return this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.confirm, msg: this.lang.saveModifiedData, buttonValidate: this.lang.yes, buttonCancel: this.lang.no } });
+        return this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirm'), msg: this.translate.instant('lang.saveModifiedData'), buttonValidate: this.translate.instant('lang.yes'), buttonCancel: this.translate.instant('lang.no') } });
     }
 
     confirmModification() {

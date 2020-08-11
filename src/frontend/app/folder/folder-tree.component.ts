@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, Input, Renderer2, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { tap, catchError, filter, exhaustMap } from 'rxjs/operators';
 import { FlatTreeControl } from '@angular/cdk/tree';
 import { trigger, transition, style, animate } from '@angular/animations';
@@ -125,6 +126,7 @@ export class FolderTreeComponent implements OnInit, OnDestroy {
     dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private dialog: MatDialog,
@@ -277,7 +279,7 @@ export class FolderTreeComponent implements OnInit, OnDestroy {
                 this.createItemNode = false;
                 this.foldersService.getPinnedFolders();
             }),
-            tap(() => this.notify.success(this.lang.folderAdded)),
+            tap(() => this.notify.success(this.translate.instant('lang.folderAdded'))),
             catchError((err) => {
                 this.notify.handleErrors(err);
                 return of(false);
@@ -316,7 +318,7 @@ export class FolderTreeComponent implements OnInit, OnDestroy {
 
     deleteNode(node: any) {
 
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -342,7 +344,7 @@ export class FolderTreeComponent implements OnInit, OnDestroy {
             }),
             tap(() => {
                 this.foldersService.getPinnedFolders();
-                this.notify.success(this.lang.folderDeleted);
+                this.notify.success(this.translate.instant('lang.folderDeleted'));
             }),
             catchError((err) => {
                 this.notify.handleErrors(err);

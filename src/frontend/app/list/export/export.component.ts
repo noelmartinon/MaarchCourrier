@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -36,177 +37,177 @@ export class ExportComponent implements OnInit {
     dataAvailable: any[] = [
         {
             value: 'res_id',
-            label: this.lang.resId,
+            label: this.translate.instant('lang.resId'),
             isFunction: false
         },
         {
             value: 'type_label',
-            label: this.lang.doctype,
+            label: this.translate.instant('lang.doctype'),
             isFunction: false
         },
         {
             value: 'doctypes_first_level_label',
-            label: this.lang.firstLevelDoctype,
+            label: this.translate.instant('lang.firstLevelDoctype'),
             isFunction: false
         },
         {
             value: 'doctypes_second_level_label',
-            label: this.lang.secondLevelDoctype,
+            label: this.translate.instant('lang.secondLevelDoctype'),
             isFunction: false
         },
         {
             value: 'format',
-            label: this.lang.format,
+            label: this.translate.instant('lang.format'),
             isFunction: false
         },
         {
             value: 'doc_date',
-            label: this.lang.docDate,
+            label: this.translate.instant('lang.docDate'),
             isFunction: false
         },
         {
             value: 'departure_date',
-            label: this.lang.departureDate,
+            label: this.translate.instant('lang.departureDate'),
             isFunction: false
         },
         {
             value: 'barcode',
-            label: this.lang.barcode,
+            label: this.translate.instant('lang.barcode'),
             isFunction: false
         },
         {
             value: 'getFolder',
-            label: this.lang.folderName,
+            label: this.translate.instant('lang.folderName'),
             isFunction: true
         },
         {
             value: 'confidentiality',
-            label: this.lang.confidentiality,
+            label: this.translate.instant('lang.confidentiality'),
             isFunction: false
         },
         {
             value: 'alt_identifier',
-            label: this.lang.chronoNumber,
+            label: this.translate.instant('lang.chronoNumber'),
             isFunction: false
         },
         {
             value: 'admission_date',
-            label: this.lang.admissionDate,
+            label: this.translate.instant('lang.admissionDate'),
             isFunction: false
         },
         {
             value: 'process_limit_date',
-            label: this.lang.processLimitDate,
+            label: this.translate.instant('lang.processLimitDate'),
             isFunction: false
         },
         {
             value: 'opinion_limit_date',
-            label: this.lang.getOpinionLimitDate,
+            label: this.translate.instant('lang.getOpinionLimitDate'),
             isFunction: false
         },
         {
             value: 'closing_date',
-            label: this.lang.closingDate,
+            label: this.translate.instant('lang.closingDate'),
             isFunction: false
         },
         {
             value: 'subject',
-            label: this.lang.subject,
+            label: this.translate.instant('lang.subject'),
             isFunction: false
         },
         {
             value: 'getStatus',
-            label: this.lang.status,
+            label: this.translate.instant('lang.status'),
             isFunction: true
         },
         {
             value: 'getPriority',
-            label: this.lang.priority,
+            label: this.translate.instant('lang.priority'),
             isFunction: true
         },
         {
             value: 'getCopies',
-            label: this.lang.copyUsersEntities,
+            label: this.translate.instant('lang.copyUsersEntities'),
             isFunction: true
         },
         {
             value: 'getDetailLink',
-            label: this.lang.detailLink,
+            label: this.translate.instant('lang.detailLink'),
             isFunction: true
         },
         {
             value: 'getParentFolder',
-            label: this.lang.parentFolder,
+            label: this.translate.instant('lang.parentFolder'),
             isFunction: true
         },
         {
             value: 'getCategory',
-            label: this.lang.category_id,
+            label: this.translate.instant('lang.category_id'),
             isFunction: true
         },
         {
             value: 'getInitiatorEntity',
-            label: this.lang.initiatorEntity,
+            label: this.translate.instant('lang.initiatorEntity'),
             isFunction: true
         },
         {
             value: 'getDestinationEntity',
-            label: this.lang.destinationEntity,
+            label: this.translate.instant('lang.destinationEntity'),
             isFunction: true
         },
         {
             value: 'getDestinationEntityType',
-            label: this.lang.destinationEntityType,
+            label: this.translate.instant('lang.destinationEntityType'),
             isFunction: true
         },
         {
             value: 'getSenders',
-            label: this.lang.getSenders,
+            label: this.translate.instant('lang.getSenders'),
             isFunction: true
         },
         {
             value: 'getRecipients',
-            label: this.lang.getRecipients,
+            label: this.translate.instant('lang.getRecipients'),
             isFunction: true
         },
         {
             value: 'getTypist',
-            label: this.lang.typist,
+            label: this.translate.instant('lang.typist'),
             isFunction: true
         },
         {
             value: 'getAssignee',
-            label: this.lang.dest_user,
+            label: this.translate.instant('lang.dest_user'),
             isFunction: true
         },
         {
             value: 'getTags',
-            label: this.lang.tags,
+            label: this.translate.instant('lang.tags'),
             isFunction: true
         },
         {
             value: 'getSignatories',
-            label: this.lang.signUser,
+            label: this.translate.instant('lang.signUser'),
             isFunction: true
         },
         {
             value: 'getSignatureDates',
-            label: this.lang.signatureDate,
+            label: this.translate.instant('lang.signatureDate'),
             isFunction: true
         },
         {
             value: 'getDepartment',
-            label: this.lang.department,
+            label: this.translate.instant('lang.department'),
             isFunction: true
         },
         {
             value: 'getAcknowledgementSendDate',
-            label: this.lang.acknowledgementSendDate,
+            label: this.translate.instant('lang.acknowledgementSendDate'),
             isFunction: true
         },
         {
             value: '',
-            label: this.lang.comment,
+            label: this.translate.instant('lang.comment'),
             isFunction: true
         }
     ];
@@ -215,7 +216,7 @@ export class ExportComponent implements OnInit {
     @ViewChild('listFilter', { static: true }) private listFilter: any;
 
 
-    constructor(public http: HttpClient, private notify: NotificationService, @Inject(MAT_DIALOG_DATA) public data: any, private sortPipe: SortPipe) { }
+    constructor(private translate: TranslateService, public http: HttpClient, private notify: NotificationService, @Inject(MAT_DIALOG_DATA) public data: any, private sortPipe: SortPipe) { }
 
     ngOnInit(): void {
         this.dataAvailableClone = JSON.parse(JSON.stringify(this.dataAvailable));
@@ -316,7 +317,7 @@ export class ExportComponent implements OnInit {
                     downloadLink.click();
                     this.exportModelList[this.exportModel.format.toLowerCase()].data = this.exportModel.data;
                 } else {
-                    alert(this.lang.tooMuchDatas);
+                    alert(this.translate.instant('lang.tooMuchDatas'));
                 }
             }),
             finalize(() => this.loadingExport = false),

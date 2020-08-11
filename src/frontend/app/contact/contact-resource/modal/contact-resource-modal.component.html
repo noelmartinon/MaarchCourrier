@@ -3,7 +3,7 @@
         <span style="flex: 1;" [title]="data.title">
             {{data.title | shorten: 50: '...'}}
         </span>
-        <button [title]="lang.close" mat-icon-button (click)="dialogRef.close();">
+        <button [title]="this.translate.instant('lang.close')" mat-icon-button (click)="dialogRef.close();">
             <mat-icon class="fa fa-times"></mat-icon>
         </button></h1>
     <mat-dialog-content>

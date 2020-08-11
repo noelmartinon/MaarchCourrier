@@ -3,7 +3,7 @@
     <input type="hidden" name="meta[]" value="welcome#welcome#welcome">
     <input type="hidden" name="baskets_clause" value="true">
     <mat-form-field id="searchInput" floatLabel="never" style="width:100%">
-        <input matInput type="text" name="welcome" placeholder="{{lang.searchMails}}" style="width:100%">
+        <input matInput type="text" name="welcome" placeholder="{{'lang.searchMails' | translate}}" style="width:100%">
         <button title="{{lang.quickSearchInfo + ' : '+ lang.quickSearchTarget}}" mat-button matSuffix mat-icon-button type="submit" aria-label="Clear" style="opacity:0.5;">
           <mat-icon class="fa fa-search"></mat-icon>
         </button>

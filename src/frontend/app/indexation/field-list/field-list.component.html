@@ -57,7 +57,7 @@
                     </div>
                     <mat-chip-list class="checkbox-selected-list">
                         <mat-chip *ngFor="let chip of checkboxCustomElement.selectedOptions.selected" selected>
-                            {{lang.selectedValue}}
+                            {{'lang.selectedValue' | translate}}
                         </mat-chip>
                     </mat-chip-list>
                 </ng-container>
@@ -127,7 +127,7 @@
                     </div>
                     <mat-chip-list class="checkbox-selected-list">
                         <mat-chip *ngFor="let chip of checkboxElement.selectedOptions.selected" selected>
-                            {{lang.selectedValue}}
+                            {{'lang.selectedValue' | translate}}
                         </mat-chip>
                     </mat-chip-list>
                 </ng-container>

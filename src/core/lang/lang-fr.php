@@ -103,6 +103,7 @@ define('_USER_ENTITY_CREATION', 'Entité ajoutée pour utilisateur');
 define('_USER_ENTITY_MODIFICATION', 'Entité modifiée pour utilisateur');
 define('_USER_ENTITY_SUPPRESSION', 'Entité supprimée pour utilisateur');
 define('_USER_ALREADY_LINK_GROUP', 'L\'utilisateur est déjà lié à ce groupe');
+define('_CANNOT_ADD_USER_IN_THIS_GROUP', 'Vous n\'avez pas les droits suffisants pour ajouter des utilisateurs à ce groupe');
 define('_USER_ALREADY_LINK_ENTITY', 'L\'utilisateur est déjà lié à cette entité');
 define('_VISA_USER', 'Pour visa');
 define('_WRONG_FILE_TYPE', 'Ce type de fichier n\'est pas permis');
@@ -461,3 +462,7 @@ define("_DOC_ADD_TO_SIGNATORY_BOOK", "Courrier intégré au parapheur électroni
 define("_DOC_REMOVE_FROM_SIGNATORY_BOOK", "Courrier retiré du parapheur électronique");
 define("_DOC_ADD_TO_MAILEVA", "Courrier intégré aux envois Maileva");
 define("_DOC_REMOVE_FROM_MAILEVA", "Courrier retiré des envois Maileva");
+
+define("_ISSUING_SITE_CREATED", "Site émetteur créé");
+define("_ISSUING_SITE_UPDATED", "Site émetteur modifié");
+define("_ISSUING_SITE_DELETED", "Site émetteur supprimé");

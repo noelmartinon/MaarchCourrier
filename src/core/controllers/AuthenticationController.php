@@ -133,17 +133,19 @@ class AuthenticationController
 
     public static function isRouteAvailable(array $args)
     {
-        ValidatorModel::notEmpty($args, ['userId', 'currentRoute']);
+        ValidatorModel::notEmpty($args, ['userId', 'currentRoute', 'currentMethod']);
         ValidatorModel::intVal($args, ['userId']);
-        ValidatorModel::stringType($args, ['currentRoute']);
+        ValidatorModel::stringType($args, ['currentRoute', 'currentMethod']);
 
-        $user = UserModel::getById(['select' => ['status', 'password_modification_date', 'mode'], 'id' => $args['userId']]);
+        $user = UserModel::getById(['select' => ['status', 'password_modification_date', 'mode', 'authorized_api'], 'id' => $args['userId']]);
 
         if ($user['mode'] == 'rest') {
+            $authorizedApi = json_decode($user['authorized_api'], true);
+            if (!empty($authorizedApi) && !in_array($args['currentMethod'].$args['currentRoute'], $authorizedApi)) {
+                return ['isRouteAvailable' => false, 'errors' => 'This route is not authorized for this user'];
+            }
             return ['isRouteAvailable' => true];
-        }
-
-        if ($user['status'] == 'ABS' && !in_array($args['currentRoute'], ['/users/{id}/status', '/currentUser/profile', '/header', '/passwordRules', '/users/{id}/password'])) {
+        } elseif ($user['status'] == 'ABS' && !in_array($args['currentRoute'], ['/users/{id}/status', '/currentUser/profile', '/header', '/passwordRules', '/users/{id}/password'])) {
             return ['isRouteAvailable' => false, 'errors' => 'User is ABS and must be activated'];
         }
 

@@ -1,7 +1,7 @@
 
 <mat-list *ngIf="!loading">
     <mat-form-field appearance="outline" *ngIf="adminMode && !linkedToMaarchParapheur">
-        <input type="text" #searchVisaSignUserInput matInput placeholder="{{lang.addUsers}}" id="searchVisaSignUserInput"
+        <input type="text" #searchVisaSignUserInput matInput placeholder="{{'lang.addUsers' | translate}}" id="searchVisaSignUserInput"
             [formControl]="searchVisaSignUser" [matAutocomplete]="autoGroup">
         <mat-autocomplete #autoGroup="matAutocomplete" (optionSelected)="addItemToWorkflow($event.option.value)" (opened)="initFilterVisaModelList()">
             <mat-option disabled *ngIf="visaModelListNotLoaded">
@@ -9,13 +9,13 @@
                     <mat-spinner diameter="35"></mat-spinner>
                 </div>
             </mat-option>
-            <mat-optgroup [label]="lang.publicModel" *ngIf="(filteredPublicModels | async)?.length > 0"
+            <mat-optgroup [label]="this.translate.instant('lang.publicModel')" *ngIf="(filteredPublicModels | async)?.length > 0"
                 class="visaSignList">
                 <mat-option *ngFor="let model of filteredPublicModels | async | sortBy : 'label'" [value]="model">
                     {{model.label}}
                 </mat-option>
             </mat-optgroup>
-            <mat-optgroup [label]="lang.privateModel" *ngIf="(filteredPrivateModels | async)?.length > 0"
+            <mat-optgroup [label]="this.translate.instant('lang.privateModel')" *ngIf="(filteredPrivateModels | async)?.length > 0"
                 class="visaSignList">
                 <mat-option *ngFor="let model of filteredPrivateModels | async | sortBy : 'label'" [value]="model">
                     <div style="display: flex;align-items: center;">
@@ -37,19 +37,19 @@
             </mat-optgroup>
         </mat-autocomplete>
         <button mat-icon-button matSuffix *ngIf="visaWorkflow.items.length > 0 && showListModels" color="primary"
-            (click)="$event.stopPropagation();openPromptSaveModel()" title="{{lang.saveAsPrivateModel}}">
+            (click)="$event.stopPropagation();openPromptSaveModel()" title="{{'lang.saveAsPrivateModel' | translate}}">
             <mat-icon class="fa fa-plus"></mat-icon>
         </button>
     </mat-form-field>
-    <plugin-autocomplete *ngIf="linkedToMaarchParapheur && adminMode" [labelPlaceholder]="lang.addPerson"
+    <plugin-autocomplete *ngIf="linkedToMaarchParapheur && adminMode" [labelPlaceholder]="this.translate.instant('lang.addPerson')"
         [routeDatas]="['/rest/autocomplete/maarchParapheurUsers']" [targetSearchKey]="'idToDisplay'"
         [subInfoKey]="'email'" (triggerEvent)="addItemToWorkflow($event, true)" appearance="outline">
     </plugin-autocomplete>
-    <!--<div class="alert alert-danger" *ngIf="visaWorkflow.itemRemovedFromVisaTemplate.length > 0" [innerHTML]="this.lang.itemRemovedFromVisaTemplate + ' : ' + visaWorkflow.itemRemovedFromVisaTemplate.join(', ')"></div>-->
+    <!--<div class="alert alert-danger" *ngIf="visaWorkflow.itemRemovedFromVisaTemplate.length > 0" [innerHTML]="this.translate.instant('lang.itemRemovedFromVisaTemplate') + ' : ' + visaWorkflow.itemRemovedFromVisaTemplate.join(', ')"></div>-->
     <div cdkDropList #dataAvailableList="cdkDropList" [cdkDropListData]="visaWorkflow.items" class="cdk-list"
         (cdkDropListDropped)="drop($event)" [cdkDropListDisabled]="!adminMode">
         <div class="emptyContent" *ngIf="visaWorkflow.items.length === 0">
-            {{lang.noPerson}}
+            {{'lang.noPerson' | translate}}
         </div>
         <mat-list-item disableRipple *ngFor="let diffusion of visaWorkflow.items;let i=index" cdkDrag class="columns workflow"
             [cdkDragDisabled]="!canManageUser(diffusion, i)"
@@ -89,7 +89,7 @@
                     </div>
                     <div class="workflowLineSubLabel" *ngIf="(showComment && ((!linkedToMaarchParapheur && adminMode && functions.empty(diffusion.process_date)) || (!linkedToMaarchParapheur && getCurrentVisaUserIndex() === i && !functions.empty(diffusion.process_comment)))) && diffusion.hasPrivilege">
                         <mat-form-field>
-                            <input matInput class="comment" [disabled]="!adminMode || diffusion.process_date != null || (target === 'signatureBook' && getCurrentVisaUserIndex() === i)" [placeholder]="lang.visaNote" [(ngModel)]="diffusion.process_comment">
+                            <input matInput class="comment" [disabled]="!adminMode || diffusion.process_date != null || (target === 'signatureBook' && getCurrentVisaUserIndex() === i)" [placeholder]="this.translate.instant('lang.visaNote')" [(ngModel)]="diffusion.process_comment">
                         </mat-form-field>
                     </div>
                     <div *ngIf="diffusion.process_date != null && [lang.visaWorkflowInterrupted, lang.hasInterruptedWorkflow].indexOf(diffusion.process_comment) === -1" class="workflowLineProcessDate"
@@ -98,7 +98,7 @@
                                                 | timeAgo : 'full'}}</div>
                     <div *ngIf="diffusion.process_date != null && ['A terminé le circuit'].indexOf(diffusion.process_comment) > -1" class="workflowLineProcessDate"
                             title='{{diffusion.process_date | fullDate}}'
-                            color="warn">{{lang.interrupted}} {{diffusion.process_date | timeAgo : 'full'}}</div>
+                            color="warn">{{'lang.interrupted' | translate}} {{diffusion.process_date | timeAgo : 'full'}}</div>
                 </div>
                 <div *ngIf="diffusion.hasPrivilege">
                     <button class="currentRoleButton" [color]="diffusion.requested_signature ? 'primary': '' "
@@ -107,7 +107,7 @@
                         (click)="changeRole(i)">{{diffusion.requested_signature ? lang.signUser : lang.visaUser}}</button>
                 </div>
                 <div *ngIf="!diffusion.hasPrivilege" class="invalid">
-                    {{lang.noPrivileges}}
+                    {{'lang.noPrivileges' | translate}}
                 </div>
             </div>
             <button mat-icon-button *ngIf="canManageUser(diffusion, i)"

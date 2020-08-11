@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { LANG } from '../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/internal/operators/tap';
@@ -22,6 +23,7 @@ export class ThesaurusModalComponent implements OnInit {
     tag: any = null;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialogRef: MatDialogRef<ThesaurusModalComponent>,

@@ -1,7 +1,7 @@
 <div class="mat-dialog-content-container">
-  <h1 mat-dialog-title>{{lang.linkAccount}}</h1>
+  <h1 mat-dialog-title>{{'lang.linkAccount' | translate}}</h1>
   <mat-dialog-content>
-    <plugin-autocomplete [labelPlaceholder]="lang.searchUserInMaarchParapheur"
+    <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.searchUserInMaarchParapheur')"
       [routeDatas]="['/rest/autocomplete/maarchParapheurUsers?exludeAlreadyConnected=true']"
       [targetSearchKey]="'idToDisplay'" [subInfoKey]="'email'" (triggerEvent)="selectUser($event)" appearance="outline">
     </plugin-autocomplete>
@@ -11,13 +11,13 @@
           [style.background-image]="'url('+externalUser.picture+')'"></mat-icon>
         <h4 mat-line>{{externalUser.firstname}} {{externalUser.lastname}}</h4>
         <p mat-line style="color:#666">{{externalUser.email}}</p>
-        <button mat-icon-button color="warn" [title]="lang.unlinkAccount" (click)="unlinkMaarchParapheurAccount()">
+        <button mat-icon-button color="warn" [title]="this.translate.instant('lang.unlinkAccount')" (click)="unlinkMaarchParapheurAccount()">
           <mat-icon class="fas fa-unlink"></mat-icon>
         </button>
       </mat-list-item>
     </mat-list>
     <mat-form-field *ngIf="!externalUser.inMaarchParapheur">
-      <input type="text" matInput placeholder="{{lang.newLoginInMaarchParapheur}}" [(ngModel)]="externalUser.login">
+      <input type="text" matInput placeholder="{{'lang.newLoginInMaarchParapheur' | translate}}" [(ngModel)]="externalUser.login">
     </mat-form-field>
     <div *ngIf="!externalUser.inMaarchParapheur" class="alert-message alert-message-danger" role="alert"
       style="margin-top: 30px;"
@@ -27,7 +27,7 @@
   <span class="divider-modal"></span>
   <mat-dialog-actions>
     <button color="primary" mat-raised-button (click)="this.dialogRef.close(externalUser);"
-      [disabled]="externalUser.login === ''">{{lang.validate}}</button>
-    <button mat-raised-button (click)="this.dialogRef.close('');">{{lang.cancel}}</button>
+      [disabled]="externalUser.login === ''">{{'lang.validate' | translate}}</button>
+    <button mat-raised-button (click)="this.dialogRef.close('');">{{'lang.cancel' | translate}}</button>
   </mat-dialog-actions>
 </div>

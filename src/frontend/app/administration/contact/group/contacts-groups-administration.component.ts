@@ -1,14 +1,15 @@
 import { Component, ViewChild, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../service/header.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { AppService } from '../../../../service/app.service';
 import { FunctionsService } from '../../../../service/functions.service';
+import { AdministrationService } from '../../administration.service';
 
 @Component({
     templateUrl: 'contacts-groups-administration.component.html',
@@ -34,59 +35,54 @@ export class ContactsGroupsAdministrationComponent implements OnInit {
         {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
-            label: this.lang.contactsList,
+            label: this.translate.instant('lang.contactsList'),
             current: false
         },
         {
             icon: 'fa fa-code',
             route: '/administration/contacts/contactsCustomFields',
-            label: this.lang.customFieldsAdmin,
+            label: this.translate.instant('lang.customFieldsAdmin'),
             current: false
         },
         {
             icon: 'fa fa-cog',
             route: '/administration/contacts/contacts-parameters',
-            label: this.lang.contactsParameters,
+            label: this.translate.instant('lang.contactsParameters'),
             current: false
         },
         {
             icon: 'fa fa-users',
             route: '/administration/contacts/contacts-groups',
-            label: this.lang.contactsGroups,
+            label: this.translate.instant('lang.contactsGroups'),
             current: true
         },
         {
             icon: 'fas fa-magic',
             route: '/administration/contacts/duplicates',
-            label: this.lang.duplicatesContactsAdmin,
+            label: this.translate.instant('lang.duplicatesContactsAdmin'),
             current: false
         },
     ];
 
-    displayedColumns = ['label', 'description', 'nbContacts', 'public', 'owner', 'actions',];
-    dataSource = new MatTableDataSource(this.contactsGroups);
+    displayedColumns = ['label', 'description', 'nbContacts', 'public', 'owner', 'actions'];
+    filterColumns = ['label', 'description'];
+
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
-    applyFilter(filterValue: string) {
-        filterValue = filterValue.trim(); // Remove whitespace
-        filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-        this.dataSource.filter = filterValue;
-        this.dataSource.filterPredicate = (template, filter: string) => {
-            return this.functions.filterUnSensitive(template, filter, ['label', 'description']);
-        };
-    }
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
         public functions: FunctionsService,
+        public adminService: AdministrationService,
         private viewContainerRef: ViewContainerRef
     ) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.administration + ' ' + this.lang.contactsGroups);
+        this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.contactsGroups'));
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
@@ -96,9 +92,7 @@ export class ContactsGroupsAdministrationComponent implements OnInit {
                 this.contactsGroups = data['contactsGroups'];
                 this.loading = false;
                 setTimeout(() => {
-                    this.dataSource = new MatTableDataSource(this.contactsGroups);
-                    this.dataSource.paginator = this.paginator;
-                    this.dataSource.sort = this.sort;
+                    this.adminService.setDataSource('admin_contacts_groups', this.contactsGroups, this.sort, this.paginator, this.filterColumns);
                 }, 0);
             }, (err) => {
                 this.notify.handleErrors(err);
@@ -107,7 +101,7 @@ export class ContactsGroupsAdministrationComponent implements OnInit {
 
     deleteContactsGroup(row: any) {
         const contactsGroup = this.contactsGroups[row];
-        const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + contactsGroup.label + ' »');
+        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + contactsGroup.label + ' »');
 
         if (r) {
             this.http.delete('../rest/contactsGroups/' + contactsGroup.id)
@@ -116,12 +110,8 @@ export class ContactsGroupsAdministrationComponent implements OnInit {
                     this.contactsGroups[row] = this.contactsGroups[lastElement];
                     this.contactsGroups[row].position = row;
                     this.contactsGroups.splice(lastElement, 1);
-
-                    this.dataSource = new MatTableDataSource(this.contactsGroups);
-                    this.dataSource.paginator = this.paginator;
-                    this.dataSource.sort = this.sort;
-                    this.notify.success(this.lang.contactsGroupDeleted);
-
+                    this.adminService.setDataSource('admin_contacts_groups', this.contactsGroups, this.sort, this.paginator, this.filterColumns);
+                    this.notify.success(this.translate.instant('lang.contactsGroupDeleted'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });

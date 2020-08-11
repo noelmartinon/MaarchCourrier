@@ -22,10 +22,10 @@
             <div class="bg-head-content" [class.fullContainer]="appService.getViewMode()">
                 <div style="display: grid;grid-template-columns: repeat(2, 1fr);grid-gap: 10px;width: 100%;">
                     <mat-form-field (click)="startPicker.open()" style="cursor:pointer;" class="dateFilter">
-                        <mat-label style="color:white;">{{lang.since}}
+                        <mat-label style="color:white;">{{'lang.since' | translate}}
                         </mat-label>
                         <input [(ngModel)]="appHistoryList.startDateFilter" matInput [matDatepicker]="startPicker"
-                            [placeholder]="lang.since" [max]="appHistoryList.endDateFilter" readonly
+                            [placeholder]="this.translate.instant('lang.since')" [max]="appHistoryList.endDateFilter" readonly
                             style="cursor:pointer;" (dateChange)="appHistoryList.filterStartDate()">
                         <mat-datepicker-toggle matSuffix [for]="startPicker" *ngIf="!appHistoryList.startDateFilter">
                         </mat-datepicker-toggle>
@@ -33,16 +33,16 @@
                         </mat-datepicker>
                         <button mat-button color="warn" matSuffix mat-icon-button *ngIf="appHistoryList.startDateFilter"
                             (click)="$event.stopPropagation();appHistoryList.startDateFilter = '';appHistoryList.filterStartDate()"
-                            [title]="lang.eraseValue">
+                            [title]="this.translate.instant('lang.eraseValue')">
                             <mat-icon color="warn" class="fa fa-calendar-times">
                             </mat-icon>
                         </button>
                     </mat-form-field>
                     <mat-form-field (click)="endPicker.open()" style="cursor:pointer;" class="dateFilter">
-                        <mat-label style="color:white;">{{lang.until}}
+                        <mat-label style="color:white;">{{'lang.until' | translate}}
                         </mat-label>
                         <input [(ngModel)]="appHistoryList.endDateFilter" matInput [matDatepicker]="endPicker"
-                            [placeholder]="lang.until" [min]="appHistoryList.startDateFilter" readonly
+                            [placeholder]="this.translate.instant('lang.until')" [min]="appHistoryList.startDateFilter" readonly
                             style="cursor:pointer;" (dateChange)="appHistoryList.filterEndDate()">
                         <mat-datepicker-toggle matSuffix [for]="endPicker" *ngIf="!appHistoryList.endDateFilter">
                         </mat-datepicker-toggle>
@@ -50,7 +50,7 @@
                         </mat-datepicker>
                         <button mat-button color="warn" matSuffix mat-icon-button *ngIf="appHistoryList.endDateFilter"
                             (click)="$event.stopPropagation();appHistoryList.endDateFilter = '';appHistoryList.filterEndDate()"
-                            [title]="lang.eraseValue">
+                            [title]="this.translate.instant('lang.eraseValue')">
                             <mat-icon color="warn" class="fa fa-calendar-times">
                             </mat-icon>
                         </button>

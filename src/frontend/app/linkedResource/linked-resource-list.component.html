@@ -18,29 +18,29 @@
             <mat-cell *matCellDef="let row" style="flex: 1;flex-direction: column;padding: 0px;">
                 <div class="sub-info">
                     <span class="sub-info-data col-md-4">
-                        <i class="fas fa-exchange-alt" title="{{lang.category_id}}"></i>
+                        <i class="fas fa-exchange-alt" title="{{'lang.category_id' | translate}}"></i>
                         &nbsp;
                         <span title="{{lang[row.categoryId]}}">{{lang[row.categoryId]}}</span>
                     </span>
                     <span class="sub-info-data col-md-4 text-center senders" (click)="openContact(row,'senders')">
-                        <i class="fas fa-user" title="{{lang.contact}}"></i>
+                        <i class="fas fa-user" title="{{'lang.contact' | translate}}"></i>
                         &nbsp;
                         <span [title]="row.senders">{{row.senders}}</span>
                     </span>
                     <span class="sub-info-data col-md-4 text-right">
-                        <i class="fas fa-calendar" title="{{lang.creationDate}}"></i>
+                        <i class="fas fa-calendar" title="{{'lang.creationDate' | translate}}"></i>
                         &nbsp;
                         <span
                             [title]="row.documentDate | fullDate">{{row.documentDate | timeAgo : 'full' | ucfirst}}</span>
                     </span>
                     <span class="sub-info-data col-md-6">
-                        <i class="fas fa-sitemap" title="{{lang.getAssignee}}"></i>
+                        <i class="fas fa-sitemap" title="{{'lang.getAssignee' | translate}}"></i>
                         &nbsp;
                         <span
                             [title]="row.destUserLabel + ' (' + row.destinationLabel +  ')'">{{row.destUserLabel + ' (' + row.destinationLabel +  ')'}}</span>
                     </span>
                     <span class="sub-info-data col-md-6 text-right" *ngIf="row.visaCircuit.length > 0">
-                        <i class="fas fa-list-ol" title="{{lang.visaWorkflow}}"></i>
+                        <i class="fas fa-list-ol" title="{{'lang.visaWorkflow' | translate}}"></i>
                         &nbsp;
                         <span [title]="getUsersVisaCircuit(row)">{{getUsersVisaCircuit(row)}}</span>
                     </span>
@@ -50,7 +50,7 @@
                         <mat-icon title="{{row.statusLabel}}" [ngStyle]="{'color': row.priorityColor}" color="primary"
                             class="{{row.statusImage.charAt(0)}}{{row.statusImage.charAt(1)}} {{row.statusImage}} {{row.statusImage.charAt(0)}}{{row.statusImage.charAt(1)}}-2x">
                         </mat-icon>
-                        <span *ngIf="row.confidentiality" class="watermark">{{lang.confidential}}</span>
+                        <span *ngIf="row.confidentiality" class="watermark">{{'lang.confidential' | translate}}</span>
                     </span>
                     <span class="main-info-data" style="width:200px;text-align:center;">
                         {{row.chrono}}
@@ -59,7 +59,7 @@
                         [class.undefined]="row.subject == lang.undefined"
                         title="{{row.subject}}">{{row.subject | shorten: 150: '...'}}</span>
                     <span class="main-info-data">
-                        <button *ngIf="privilegeService.hasCurrentUserPrivilege('add_links')" mat-icon-button color="warn" [title]="lang.unlink"
+                        <button *ngIf="privilegeService.hasCurrentUserPrivilege('add_links')" mat-icon-button color="warn" [title]="this.translate.instant('lang.unlink')"
                             (click)="$event.stopPropagation();unlinkResource(row)">
                             <mat-icon class="fa fa-unlink fa-2x" aria-hidden="true"></mat-icon>
                         </button>
@@ -70,7 +70,7 @@
         <mat-row *matRowDef="let row; columns: displayedColumns;" routerLink="/resources/{{row.resId}}" (mouseenter)="viewThumbnail(row);"
             (mouseleave)="closeThumbnail();" style="cursor: pointer;"></mat-row>
     </mat-table>
-    <button *ngIf="privilegeService.hasCurrentUserPrivilege('add_links')" mat-fab class="linkRes" color="primary" [title]="lang.linkResource" (click)="openSearchResourceModal()">
+    <button *ngIf="privilegeService.hasCurrentUserPrivilege('add_links')" mat-fab class="linkRes" color="primary" [title]="this.translate.instant('lang.linkResource')" (click)="openSearchResourceModal()">
         <mat-icon class="fa fa-link" style="height:auto;"></mat-icon>
     </button>
 </ng-template>

@@ -9,7 +9,7 @@
         </div>
         <div *ngIf="functions.empty(fatalError) && shippings.length == 0"
             class="alert-message alert-message-danger mailList" role="alert">
-            {{lang.noShippingTemplate}} :<br />
+            {{'lang.noShippingTemplate' | translate}} :<br />
             <div class="mailList">
                 <ul>
                     <li *ngFor="let entity of entitiesList">
@@ -17,19 +17,19 @@
                     </li>
                 </ul>
             </div>
-            <span [innerHTML]="lang.doShippingParameter"></span>
+            <span [innerHTML]="this.translate.instant('lang.doShippingParameter')"></span>
         </div>
         <mat-sidenav-container *ngIf="shippings.length > 0" autosize style="height:100%;">
             <mat-sidenav-content style="background: white;">
                 <div class="row" style="margin: 0;">
                     <div class="col-md-12">
-                        {{lang.makeActionOn}}
+                        {{'lang.makeActionOn' | translate}}
                         <b *ngIf="data.resIds.length === 0" color="primary"
-                            class="highlight">{{lang.currentIndexingMail}}</b>
+                            class="highlight">{{'lang.currentIndexingMail' | translate}}</b>
                         <b *ngIf="data.resIds.length == 1" color="primary"
                             class="highlight">{{data.resource.chrono}}</b>
                         <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{data.resIds.length}}
-                            {{lang.elements}}</b> ?
+                            {{'lang.elements' | translate}}</b> ?
                     </div>
                     <div *ngIf="data.resIds.length > 0" style="padding:10px;display: flex;flex-direction: column;">
                         <mat-checkbox color="primary" *ngFor="let inteKey of integrationsInfo | keyvalue"
@@ -39,7 +39,7 @@
                     </div>
                     <div class="col-md-12" style="padding-top: 10px;">
                         <mat-form-field>
-                            <mat-label>{{lang.shippings}}</mat-label>
+                            <mat-label>{{'lang.shippings' | translate}}</mat-label>
                             <mat-select name="currentShipping" [(ngModel)]="currentShipping" required>
                                 <mat-option *ngFor="let shipping of shippings" [value]="shipping">
                                     {{shipping.label}}
@@ -50,7 +50,7 @@
                     <div class="col-md-12" *ngIf="attachList.length > 0">
                         <div>
                             <div class="alert-message alert-message-info mailList" role="alert">
-                                <b>{{attachList.length}}</b> {{lang.shippingReadyToSend}}
+                                <b>{{attachList.length}}</b> {{'lang.shippingReadyToSend' | translate}}
                             </div>
                         </div>
                     </div>
@@ -58,7 +58,7 @@
                         <div>
                             <div class="alert-message alert-message-danger mailList" role="alert">
                                 <p>
-                                    <b>{{mailsNotSend.length}}</b> {{lang.shippingNotEligible}} :
+                                    <b>{{mailsNotSend.length}}</b> {{'lang.shippingNotEligible' | translate}} :
                                 </p>
                                 <ul>
                                     <li *ngFor="let mail of mailsNotSend">
@@ -71,13 +71,13 @@
                     <div *ngIf="currentShipping != null" class="col-md-12">
                         <div class="formType" style="flex-direction: column;">
                             <div class="formType-title">
-                                {{lang.pricesInformations}}
+                                {{'lang.pricesInformations' | translate}}
                             </div>
                             <div class="priceContent">
                                 <div class="priceInfo">
                                     <div class="col-md-6">
                                         <p>
-                                            {{lang.sendMode}} :
+                                            {{'lang.sendMode' | translate}} :
                                         </p>
                                         <ul>
                                             <li>
@@ -87,7 +87,7 @@
                                     </div>
                                     <div class="col-md-6">
                                         <p>
-                                            {{lang.shapingOptions}} :
+                                            {{'lang.shapingOptions' | translate}} :
                                         </p>
                                         <ul>
                                             <li *ngFor="let option of currentShipping.options.shapingOptions">
@@ -98,7 +98,7 @@
                                 </div>
                                 <mat-form-field appearance="outline">
                                     <input matInput [(ngModel)]="currentShipping.fee" required name="totalPrice"
-                                        id="totalPrice" title="{{lang.totalPrice}}" type="number" disabled>
+                                        id="totalPrice" title="{{'lang.totalPrice' | translate}}" type="number" disabled>
                                     <span matSuffix>&nbsp;€</span>
                                 </mat-form-field>
                             </div>
@@ -123,7 +123,7 @@
     <div mat-dialog-actions class="actions">
         <button mat-raised-button mat-button color="primary"
             [disabled]="loading || currentShipping == null || attachList.length == 0"
-            (click)="onSubmit()">{{lang.validate}}</button>
-        <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{lang.cancel}}</button>
+            (click)="onSubmit()">{{'lang.validate' | translate}}</button>
+        <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
     </div>
 </div>

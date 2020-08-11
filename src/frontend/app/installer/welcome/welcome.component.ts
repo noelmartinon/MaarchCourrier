@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { tap } from 'rxjs/internal/operators/tap';
 import { of } from 'rxjs/internal/observable/of';
@@ -27,31 +28,32 @@ export class WelcomeComponent implements OnInit {
     steps: any[] = [
         {
             icon : 'fas fa-check-square',
-            desc: this.lang.prerequisiteCheck
+            desc: this.translate.instant('lang.prerequisiteCheck')
         },
         {
             icon : 'fa fa-database',
-            desc: this.lang.databaseCreation
+            desc: this.translate.instant('lang.databaseCreation')
         },
         {
             icon : 'fa fa-database',
-            desc: this.lang.dataSampleCreation
+            desc: this.translate.instant('lang.dataSampleCreation')
         },
         {
             icon : 'fa fa-hdd',
-            desc: this.lang.docserverCreation
+            desc: this.translate.instant('lang.docserverCreation')
         },
         {
             icon : 'fas fa-tools',
-            desc: this.lang.stepCustomizationActionDesc
+            desc: this.translate.instant('lang.stepCustomizationActionDesc')
         },
         {
             icon : 'fa fa-user',
-            desc: this.lang.adminUserCreation
+            desc: this.translate.instant('lang.adminUserCreation')
         },
     ];
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private _formBuilder: FormBuilder
@@ -95,7 +97,7 @@ export class WelcomeComponent implements OnInit {
                 method : 'POST',
                 url : '../rest/installer/lang'
             },
-            description: this.lang.langSetting,
+            description: this.translate.instant('lang.langSetting'),
             installPriority: 3
         }];*/
     }

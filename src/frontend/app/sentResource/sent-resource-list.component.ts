@@ -1,6 +1,7 @@
 import {Component, OnInit, ViewChild, EventEmitter, Input, Output} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
@@ -40,6 +41,7 @@ export class SentResourceListComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -77,7 +79,7 @@ export class SentResourceListComponent implements OnInit {
                         if (!this.functions.empty(item.contact.email)) {
                             email = item.contact.email;
                         } else {
-                            email = this.lang.withoutEmail;
+                            email = this.translate.instant('lang.withoutEmail');
                         }
                         let name;
                         if (!this.functions.empty(item.contact.firstname) || !this.functions.empty(item.contact.lastname)) {
@@ -85,7 +87,7 @@ export class SentResourceListComponent implements OnInit {
                         } else if (!this.functions.empty(item.contact.company)) {
                             name = item.contact.company;
                         } else {
-                            name = this.lang.contactDeleted;
+                            name = this.translate.instant('lang.contactDeleted');
                         }
 
                         return {
@@ -96,7 +98,7 @@ export class SentResourceListComponent implements OnInit {
                             sendDate: item.sendDate,
                             type: 'acknowledgementReceipt',
                             typeColor: '#7d5ba6',
-                            desc: item.format === 'html' ? this.lang.ARelectronic : this.lang.ARPaper,
+                            desc: item.format === 'html' ? this.translate.instant('lang.ARelectronic') : this.translate.instant('lang.ARPaper'),
                             status: item.format === 'html' && item.sendDate === null ? 'ERROR' : 'SENT',
                             hasAttach: false,
                             hasNote: false,
@@ -133,7 +135,7 @@ export class SentResourceListComponent implements OnInit {
                             sendDate: item.send_date,
                             type: 'email',
                             typeColor: '#5bc0de',
-                            desc: !this.functions.empty(item.object) ? item.object : `<i>${this.lang.emptySubject}<i>`,
+                            desc: !this.functions.empty(item.object) ? item.object : `<i>${this.translate.instant('lang.emptySubject')}<i>`,
                             status: item.status,
                             hasAttach: !this.functions.empty(item.document.attachments),
                             hasNote: !this.functions.empty(item.document.notes),
@@ -171,7 +173,7 @@ export class SentResourceListComponent implements OnInit {
                             operationDate: item.operationDate,
                             type: 'm2m_ARCHIVETRANSFER',
                             typeColor: '#F99830',
-                            desc: this.lang.m2m_ARCHIVETRANSFER,
+                            desc: this.translate.instant('lang.m2m_ARCHIVETRANSFER'),
                             status: item.status.toUpperCase(),
                             hasAttach: false,
                             hasNote: false,
@@ -208,7 +210,7 @@ export class SentResourceListComponent implements OnInit {
                             sendDate: item.creationDate,
                             type: 'shipping',
                             typeColor: '#9440D5',
-                            desc: this.lang.shipping,
+                            desc: this.translate.instant('lang.shipping'),
                             status: 'SENT',
                             hasAttach: item.creationDate === 'attachment',
                             hasNote: false,
@@ -259,7 +261,7 @@ export class SentResourceListComponent implements OnInit {
 
     openPromptMail(row: any = {id: null, type: null}) {
 
-        let title = this.lang.sendElement;
+        let title = this.translate.instant('lang.sendElement');
 
         if (row.id !== null) {
             title = this.lang[row.type];
@@ -286,7 +288,7 @@ export class SentResourceListComponent implements OnInit {
 
     openPromptNumericPackage(row: any = {id: null, type: null}) {
 
-        let title = this.lang.sendElement;
+        let title = this.translate.instant('lang.sendElement');
 
         if (row.id !== null) {
             title = this.lang[row.type];
@@ -315,9 +317,9 @@ export class SentResourceListComponent implements OnInit {
                     tap((data: any) => {
                         if (data.status == 'SENT' || data.status == 'ERROR') {
                             if (data.status == 'SENT') {
-                                this.notify.success(this.lang.emailSent);
+                                this.notify.success(this.translate.instant('lang.emailSent'));
                             } else {
-                                this.notify.error(this.lang.emailCannotSent);
+                                this.notify.error(this.translate.instant('lang.emailCannotSent'));
                             }
                             this.sentResources.forEach((element: any, key: number) => {
                                 if (element.id == draftElement.id && element.type == 'email') {
@@ -349,7 +351,7 @@ export class SentResourceListComponent implements OnInit {
                             sendDate: item.send_date,
                             type: 'email',
                             typeColor: '#5bc0de',
-                            desc: !this.functions.empty(item.object) ? item.object : `<i>${this.lang.emptySubject}<i>`,
+                            desc: !this.functions.empty(item.object) ? item.object : `<i>${this.translate.instant('lang.emptySubject')}<i>`,
                             status: item.status,
                             hasAttach: !this.functions.empty(item.document.attachments),
                             hasNote: !this.functions.empty(item.document.notes),

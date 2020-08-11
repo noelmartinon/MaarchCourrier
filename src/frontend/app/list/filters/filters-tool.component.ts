@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, EventEmitter, Output, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
 import { FiltersListService } from '../../../service/filtersList.service';
@@ -66,7 +67,7 @@ export class FiltersToolComponent implements OnInit {
     @Output() refreshEventAfterAction = new EventEmitter<string>();
     @Output() toggleAllRes = new EventEmitter<string>();
 
-    constructor(public http: HttpClient, private filtersListService: FiltersListService, private fb: FormBuilder, private latinisePipe: LatinisePipe, public dialog: MatDialog) { }
+    constructor(private translate: TranslateService, public http: HttpClient, private filtersListService: FiltersListService, private fb: FormBuilder, private latinisePipe: LatinisePipe, public dialog: MatDialog) { }
 
     ngOnInit(): void {
 
@@ -173,31 +174,31 @@ export class FiltersToolComponent implements OnInit {
         this.stateForm.controls['stateGroup'].reset();
         this.stateGroups = [
             {
-                letter: this.lang.categories,
+                letter: this.translate.instant('lang.categories'),
                 names: []
             },
             {
-                letter: this.lang.priorities,
+                letter: this.translate.instant('lang.priorities'),
                 names: []
             },
             {
-                letter: this.lang.statuses,
+                letter: this.translate.instant('lang.statuses'),
                 names: []
             },
             {
-                letter: this.lang.entities,
+                letter: this.translate.instant('lang.entities'),
                 names: []
             },
             {
-                letter: this.lang.subEntities,
+                letter: this.translate.instant('lang.subEntities'),
                 names: []
             },
             {
-                letter: this.lang.doctypes,
+                letter: this.translate.instant('lang.doctypes'),
                 names: []
             },
             {
-                letter: this.lang.folders,
+                letter: this.translate.instant('lang.folders'),
                 names: []
             },
         ];
@@ -210,7 +211,7 @@ export class FiltersToolComponent implements OnInit {
                             {
                                 id: 'categories',
                                 value: element.id,
-                                label: (element.id !== null ? element.label : this.lang.undefined),
+                                label: (element.id !== null ? element.label : this.translate.instant('lang.undefined')),
                                 count: element.count
                             }
                         );
@@ -222,7 +223,7 @@ export class FiltersToolComponent implements OnInit {
                             {
                                 id: 'priorities',
                                 value: element.id,
-                                label: (element.id !== null ? element.label : this.lang.undefined),
+                                label: (element.id !== null ? element.label : this.translate.instant('lang.undefined')),
                                 count: element.count
                             }
                         );
@@ -234,7 +235,7 @@ export class FiltersToolComponent implements OnInit {
                             {
                                 id: 'statuses',
                                 value: element.id,
-                                label: (element.id !== null ? element.label : this.lang.undefined),
+                                label: (element.id !== null ? element.label : this.translate.instant('lang.undefined')),
                                 count: element.count
                             }
                         );
@@ -248,7 +249,7 @@ export class FiltersToolComponent implements OnInit {
                             {
                                 id: 'entities',
                                 value: element.entityId,
-                                label: (element.entityId !== null ? element.label : this.lang.undefined),
+                                label: (element.entityId !== null ? element.label : this.translate.instant('lang.undefined')),
                                 count: element.count
                             }
                         );
@@ -262,7 +263,7 @@ export class FiltersToolComponent implements OnInit {
                             {
                                 id: 'subEntities',
                                 value: element.entityId,
-                                label: (element.entityId !== null ? element.label : this.lang.undefined),
+                                label: (element.entityId !== null ? element.label : this.translate.instant('lang.undefined')),
                                 count: element.count
                             }
                         );
@@ -275,7 +276,7 @@ export class FiltersToolComponent implements OnInit {
                             {
                                 id: 'doctypes',
                                 value: element.id,
-                                label: (element.id !== null ? element.label : this.lang.undefined),
+                                label: (element.id !== null ? element.label : this.translate.instant('lang.undefined')),
                                 count: element.count
                             }
                         );
@@ -288,7 +289,7 @@ export class FiltersToolComponent implements OnInit {
                             {
                                 id: 'folders',
                                 value: element.id,
-                                label: (element.id !== null ? element.label : this.lang.undefined),
+                                label: (element.id !== null ? element.label : this.translate.instant('lang.undefined')),
                                 count: element.count
                             }
                         );

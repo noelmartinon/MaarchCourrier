@@ -23,11 +23,11 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [formControl]="statusId" [(ngModel)]="status.id"
-                                        *ngIf="creationMode" maxlength="10" name="id" id="id" title="{{lang.id}}"
-                                        placeholder="{{lang.id}}" (blur)="isAvailable()" type="text" pattern="^[\w.-]*$"
+                                        *ngIf="creationMode" maxlength="10" name="id" id="id" title="{{'lang.id' | translate}}"
+                                        placeholder="{{'lang.id' | translate}}" (blur)="isAvailable()" type="text" pattern="^[\w.-]*$"
                                         required>
                                     <input matInput [(ngModel)]="status.id" *ngIf="!creationMode" maxlength="10"
-                                        name="id" id="id" title="{{lang.id}}" placeholder="{{lang.id}}" required
+                                        name="id" id="id" title="{{'lang.id' | translate}}" placeholder="{{'lang.id' | translate}}" required
                                         disabled>
                                     <mat-error *ngIf="statusId.invalid">{{getErrorMessage()}}</mat-error>
                                 </mat-form-field>
@@ -37,24 +37,24 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput name="label_status" id="label_status" maxlength="50"
-                                        [(ngModel)]="status.label_status" title="{{lang.label}}"
-                                        placeholder="{{lang.label}}" type="text" required>
+                                        [(ngModel)]="status.label_status" title="{{'lang.label' | translate}}"
+                                        placeholder="{{'lang.label' | translate}}" type="text" required>
                                 </mat-form-field>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="col-sm-6" style="white-space:nowrap;text-align:center;">
-                                <mat-slide-toggle matTooltip="{{lang.tooltipSearchStatus}}"
+                                <mat-slide-toggle matTooltip="{{'lang.tooltipSearchStatus' | translate}}"
                                     [(ngModel)]="status.can_be_searched" id="can_be_search" name="can_be_search"
                                     color="primary" [checked]="status.can_be_searched == true">
-                                    {{lang.canBeSearched}}
+                                    {{'lang.canBeSearched' | translate}}
                                 </mat-slide-toggle>
                             </div>
                             <div class="col-sm-6" style="white-space:nowrap;text-align:center;">
-                                <mat-slide-toggle matTooltip="{{lang.tooltipIndexStatus}}"
+                                <mat-slide-toggle matTooltip="{{'lang.tooltipIndexStatus' | translate}}"
                                     [(ngModel)]="status.can_be_modified" id="can_be_modified" name="can_be_modified"
                                     color="primary" [checked]="status.can_be_modified == true">
-                                    {{lang.canBeModified}}
+                                    {{'lang.canBeModified' | translate}}
                                 </mat-slide-toggle>
                             </div>
                         </div>
@@ -65,7 +65,7 @@
                             </div>
                             <div class="col-sm-11">
                                 <mat-form-field>
-                                    <mat-select [(ngModel)]="status.img_filename" placeholder="{{lang.imgRelated}}"
+                                    <mat-select [(ngModel)]="status.img_filename" placeholder="{{'lang.imgRelated' | translate}}"
                                         id="status" name="status" required>
                                         <mat-option *ngFor="let image of statusImages" [value]="image.image_name">
                                             <i [ngClass]="[image.image_name.indexOf('fm') == 0 ? 'fm' : 'fa']"
@@ -78,7 +78,7 @@
                         <div class="form-group">
                             <div class="col-sm-12" style="text-align:center;">
                                 <button mat-raised-button color="primary" type="submit"
-                                    [disabled]="!statusFormUp.form.valid">{{lang.save}}</button>
+                                    [disabled]="!statusFormUp.form.valid">{{'lang.save' | translate}}</button>
                             </div>
                         </div>
                     </form>

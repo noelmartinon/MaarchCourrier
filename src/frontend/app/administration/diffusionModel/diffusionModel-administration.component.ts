@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -33,11 +34,11 @@ export class DiffusionModelAdministrationComponent implements OnInit {
     itemTypeList: any = [
         {
             id: "visaCircuit",
-            label: this.lang.visaCircuit
+            label: this.translate.instant('lang.visaCircuit')
         },
         {
             id: "opinionCircuit",
-            label: this.lang.opinionCircuit
+            label: this.translate.instant('lang.opinionCircuit')
         }
     ];
     creationMode: boolean;
@@ -47,6 +48,7 @@ export class DiffusionModelAdministrationComponent implements OnInit {
     @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -62,7 +64,7 @@ export class DiffusionModelAdministrationComponent implements OnInit {
         this.route.params.subscribe(async params => {
             
             if (typeof params['id'] == "undefined") {
-                this.headerService.setHeader(this.lang.diffusionModelCreation);
+                this.headerService.setHeader(this.translate.instant('lang.diffusionModelCreation'));
 
                 this.creationMode = true;
                 this.loading = false;
@@ -138,7 +140,7 @@ export class DiffusionModelAdministrationComponent implements OnInit {
         this.http.post("../rest/listTemplates?admin=true", this.formatCircuit()).pipe(
             tap(() => {
                 this.router.navigate(["/administration/diffusionModels"]);
-                this.notify.success(this.lang.diffusionModelAdded);
+                this.notify.success(this.translate.instant('lang.diffusionModelAdded'));
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
@@ -151,7 +153,7 @@ export class DiffusionModelAdministrationComponent implements OnInit {
         this.http.put(`../rest/listTemplates/${this.diffusionModel.id}`, this.formatCircuit()).pipe(
             tap(() => {
                 this.router.navigate(["/administration/diffusionModels"]);
-                this.notify.success(this.lang.diffusionModelUpdated);
+                this.notify.success(this.translate.instant('lang.diffusionModelUpdated'));
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);

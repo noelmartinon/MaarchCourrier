@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService }        from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
@@ -50,6 +51,7 @@ export class SearchAdvListComponent implements OnInit {
     private destroy$ = new Subject<boolean>();
     
     constructor(
+        private translate: TranslateService,
         public http: HttpClient, 
         private notify: NotificationService, 
         private headerService: HeaderService,
@@ -102,7 +104,7 @@ export class SearchAdvListComponent implements OnInit {
                 if (key == 'statusImage' && this.functions.empty(linkeRes[key])) {
                     linkeRes[key] = 'fa-question undefined';
                 } else if (this.functions.empty(linkeRes[key]) && ['senders', 'recipients', 'attachments', 'hasDocument'].indexOf(key) === -1) {
-                    linkeRes[key] = this.lang.undefined;
+                    linkeRes[key] = this.translate.instant('lang.undefined');
                 }
             });
         });

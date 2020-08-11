@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpHandler, HttpInterceptor, HttpRequest, HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { LANG } from '../app/translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { catchError, switchMap } from 'rxjs/operators';
 import { NotificationService } from './notification/notification.service';
 import { AuthService } from './auth.service';
@@ -45,6 +46,7 @@ export class AuthInterceptor implements HttpInterceptor {
         }
     ];
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private router: Router,
         public notificationService: NotificationService,
@@ -65,7 +67,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
     logout() {
         this.authService.logout(false);
-        this.notificationService.error(this.lang.sessionExpired);
+        this.notificationService.error(this.translate.instant('lang.sessionExpired'));
     }
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {

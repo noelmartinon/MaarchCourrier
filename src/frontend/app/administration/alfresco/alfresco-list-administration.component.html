@@ -1,11 +1,11 @@
 <mat-sidenav-container autosize class="maarch-container">
     <ng-template #adminMenuTemplate>
         <mat-nav-list>
-            <h3 mat-subheader>{{lang.actions}}</h3>
+            <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
             <a mat-list-item routerLink="/administration/alfresco/new">
                 <mat-icon color="primary" mat-list-icon class="fa fa-plus"></mat-icon>
                 <p mat-line>
-                    {{lang.add}}
+                    {{'lang.add' | translate}}
                 </p>
             </a>
         </mat-nav-list>
@@ -32,7 +32,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             <mat-form-field appearance="outline">
-                                <mat-label>{{lang.alfrescoAPI}}</mat-label>
+                                <mat-label>{{'lang.alfrescoAPI' | translate}}</mat-label>
                                 <input matInput required name="accountId" [(ngModel)]="alfrescoUrl"
                                     id="accountId" [title]="alfrescoUrl" type="text" placeholder="https://alfresco/api/" (blur)="saveUrl()">
                             </mat-form-field>
@@ -40,7 +40,7 @@
                         <div class="col-md-6 col-xs-6">
                             <mat-form-field>
                                 <input matInput [formControl]="adminService.getFilterField()"
-                                    placeholder="{{lang.filterBy}}">
+                                    placeholder="{{'lang.filterBy' | translate}}">
                             </mat-form-field>
                         </div>
                         <div class="col-md-6 col-xs-6">
@@ -48,15 +48,15 @@
                             </mat-paginator>
                         </div>
                     </div>
-                    <mat-table #table [dataSource]="adminService.getDataSource()" matSort [matSortActive]="adminService.getFilter('admin_alfresco', 'sort')" [matSortDirection]="adminService.getFilter('admin_alfresco', 'sortDirection')">
+                    <mat-table #table [dataSource]="adminService.getDataSource()" matSortDisableClear matSort>
                         <ng-container matColumnDef="label">
                             <mat-header-cell *matHeaderCellDef mat-sort-header
-                                [class.hide-for-mobile]="appService.getViewMode()">{{lang.label}}</mat-header-cell>
+                                [class.hide-for-mobile]="appService.getViewMode()">{{'lang.label' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element" [class.hide-for-mobile]="appService.getViewMode()">
                                 {{element.label}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="entitiesLabel">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex: 2">{{lang.linkedEntities}}</mat-header-cell>
+                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex: 2">{{'lang.linkedEntities' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element" style="flex: 2">
                                 <div>
                                     <span class="label" *ngFor="let entity of element.entitiesLabel">{{entity}}</span>
@@ -66,7 +66,7 @@
                         <ng-container matColumnDef="actions">
                             <mat-header-cell *matHeaderCellDef style="flex:none"></mat-header-cell>
                             <mat-cell *matCellDef="let element" style="flex:none;justify-content: flex-end;">
-                                <button mat-icon-button color="warn" matTooltip="{{lang.delete}}"
+                                <button mat-icon-button color="warn" matTooltip="{{'lang.delete' | translate}}"
                                     (click)="$event.stopPropagation();deleteAccount(element.id)">
                                     <mat-icon class="fa fa-trash-alt fa-2x" aria-hidden="true"></mat-icon>
                                 </button>
@@ -75,11 +75,11 @@
                         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                         <mat-row *matRowDef="let row; columns: displayedColumns;"
                             routerLink="/administration/alfresco/{{row.id}}" style="cursor:pointer;"
-                            matTooltip="{{lang.view}}"></mat-row>
+                            matTooltip="{{'lang.view' | translate}}"></mat-row>
                     </mat-table>
                     <div class="mat-paginator"
                         style="min-height:48px;display: flex;justify-content: end;align-items: center;padding-right: 20px;">
-                        {{accounts.length}} {{lang.accounts}}</div>
+                        {{accounts.length}} {{'lang.accounts' | translate}}</div>
                 </mat-card>
             </div>
         </div>

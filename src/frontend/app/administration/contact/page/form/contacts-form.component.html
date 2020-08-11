@@ -4,23 +4,23 @@
 <ng-template #elseTemplate>
     <mat-menu #menu="matMenu">
         <button mat-menu-item [matMenuTriggerFor]="mainInfo"
-            [disabled]="noField('mainInfo')">{{lang.denomination}}</button>
-        <button mat-menu-item [matMenuTriggerFor]="address" [disabled]="noField('address')">{{lang.address}}</button>
+            [disabled]="noField('mainInfo')">{{'lang.denomination' | translate}}</button>
+        <button mat-menu-item [matMenuTriggerFor]="address" [disabled]="noField('address')">{{'lang.address' | translate}}</button>
         <button mat-menu-item [matMenuTriggerFor]="complement"
-            [disabled]="noField('complement')">{{lang.additionals}}</button>
+            [disabled]="noField('complement')">{{'lang.additionals' | translate}}</button>
         <button mat-menu-item [matMenuTriggerFor]="maarch2maarch"
             [disabled]="noField('maarch2maarch')">Maarch2Maarch</button>
     </mat-menu>
 
     <mat-menu #mainInfo="matMenu">
         <button mat-menu-item (click)="toogleAllFieldsUnit('mainInfo')"
-            style="text-align: center;">{{lang.addAll}}</button>
+            style="text-align: center;">{{'lang.addAll' | translate}}</button>
         <mat-divider></mat-divider>
         <ng-container *ngFor="let field of contactForm">
             <button mat-menu-item *ngIf="!field.display && field.unit === 'mainInfo'"
                 (click)="field.display=!field.display">
                 <mat-icon *ngIf="field.filling" style="height: auto;padding-right: 10px;"
-                    [title]="lang.targetFillingField" [style.color]="fillingRate.color" class="fas fa-circle rate">
+                    [title]="this.translate.instant('lang.targetFillingField')" [style.color]="fillingRate.color" class="fas fa-circle rate">
                 </mat-icon>
                 <span>{{field.label}}</span>
             </button>
@@ -29,13 +29,13 @@
 
     <mat-menu #address="matMenu">
         <button mat-menu-item (click)="toogleAllFieldsUnit('address')"
-            style="text-align: center;">{{lang.addAll}}</button>
+            style="text-align: center;">{{'lang.addAll' | translate}}</button>
         <mat-divider></mat-divider>
         <ng-container *ngFor="let field of contactForm">
             <button mat-menu-item *ngIf="!field.display && field.unit === 'address'"
                 (click)="field.display=!field.display">
                 <mat-icon *ngIf="field.filling" style="height: auto;padding-right: 10px;"
-                    [title]="lang.targetFillingField" [style.color]="fillingRate.color" class="fas fa-circle rate">
+                    [title]="this.translate.instant('lang.targetFillingField')" [style.color]="fillingRate.color" class="fas fa-circle rate">
                 </mat-icon>
                 <span>{{field.label}}</span>
             </button>
@@ -43,13 +43,13 @@
     </mat-menu>
     <mat-menu #complement="matMenu">
         <button mat-menu-item (click)="toogleAllFieldsUnit('complement')"
-            style="text-align: center;">{{lang.addAll}}</button>
+            style="text-align: center;">{{'lang.addAll' | translate}}</button>
         <mat-divider></mat-divider>
         <ng-container *ngFor="let field of contactForm">
             <button mat-menu-item *ngIf="!field.display && field.unit === 'complement'"
                 (click)="field.display=!field.display">
                 <mat-icon *ngIf="field.filling" style="height: auto;padding-right: 10px;"
-                    [title]="lang.targetFillingField" [style.color]="fillingRate.color" class="fas fa-circle rate">
+                    [title]="this.translate.instant('lang.targetFillingField')" [style.color]="fillingRate.color" class="fas fa-circle rate">
                 </mat-icon>
                 <span>{{field.label}}</span>
             </button>
@@ -57,20 +57,20 @@
     </mat-menu>
     <mat-menu #maarch2maarch="matMenu">
         <button mat-menu-item (click)="toogleAllFieldsUnit('maarch2maarch')"
-            style="text-align: center;">{{lang.addAll}}</button>
+            style="text-align: center;">{{'lang.addAll' | translate}}</button>
         <mat-divider></mat-divider>
         <ng-container *ngFor="let field of contactForm">
             <button mat-menu-item *ngIf="!field.display && field.unit === 'maarch2maarch'"
                 (click)="field.display=!field.display">
                 <mat-icon *ngIf="field.filling" style="height: auto;padding-right: 10px;"
-                    [title]="lang.targetFillingField" [style.color]="fillingRate.color" class="fas fa-circle rate">
+                    [title]="this.translate.instant('lang.targetFillingField')" [style.color]="fillingRate.color" class="fas fa-circle rate">
                 </mat-icon>
                 <span>{{field.label}}</span>
             </button>
         </ng-container>
     </mat-menu>
     <div style="padding: 10px;" *ngIf="this.fillingParameters.enable">
-        <div class="rate" [style.color]="fillingRate.color">{{lang.contactFilledTo}} <b>{{fillingRate.value}} %</b>
+        <div class="rate" [style.color]="fillingRate.color">{{'lang.contactFilledTo' | translate}} <b>{{fillingRate.value}} %</b>
         </div>
         <mat-progress-bar mode="determinate" class="fillingBar" [color]="fillingRate.class" [value]="fillingRate.value">
         </mat-progress-bar>
@@ -78,12 +78,12 @@
     </div>
     <div *ngIf="companyFound !== null" class="alert-message alert-message-info" role="alert" [@hideShow]>
         <div style="padding:10px;">
-            {{lang.contactsParameters_company}} <b>{{companyFound.company}}</b>
-            {{lang.found}}
+            {{'lang.contactsParameters_company' | translate}} <b>{{companyFound.company}}</b>
+            {{'lang.found' | translate}}
             !
             <a (click)="setAddress(companyFound)"
-                style="cursor: pointer;font-weight:bold;font-style: italic;">{{lang.click}} {{lang.here}}</a>
-            {{lang.toCopyAddress}} :<br/>
+                style="cursor: pointer;font-weight:bold;font-style: italic;">{{'lang.click' | translate}} {{'lang.here' | translate}}</a>
+            {{'lang.toCopyAddress' | translate}} :<br/>
             <q style="font-weight: bold;width: 100%;display: block;text-align: center;">{{companyFound.addressNumber}} {{companyFound.addressStreet}}, {{companyFound.addressPostcode}}
                 {{companyFound.addressTown}}, {{companyFound.addressCountry}}</q>
         </div>
@@ -114,7 +114,7 @@
                                         <mat-error *ngIf="field.control.status!=='VALID'  && field.control.touched">
                                             {{getErrorMsg(field.control.errors)}}</mat-error>
                                         <mat-icon style="height: auto;" *ngIf="field.filling" matSuffix
-                                            [title]="lang.targetFillingField" [style.color]="fillingRate.color"
+                                            [title]="this.translate.instant('lang.targetFillingField')" [style.color]="fillingRate.color"
                                             class="fas fa-circle rate"></mat-icon>
                                     </mat-form-field>
                                 </ng-container>
@@ -147,7 +147,7 @@
                                         <button mat-button color="warn" matSuffix mat-icon-button
                                             *ngIf="field.control.value && !field.control.disabled"
                                             (click)="$event.stopPropagation();field.control.reset();"
-                                            [title]="lang.eraseValue">
+                                            [title]="this.translate.instant('lang.eraseValue')">
                                             <mat-icon color="warn" class="fa fa-calendar-times">
                                             </mat-icon>
                                         </button>
@@ -163,7 +163,7 @@
                                     </mat-radio-group>
                                     <i *ngIf="field.filling"
                                         style="position:absolute;height: auto;padding-right: 10px;right: 0px;z-index: 1;top: 50%;transform: translateY(-50%);"
-                                        [title]="lang.targetFillingField" [style.color]="fillingRate.color"
+                                        [title]="this.translate.instant('lang.targetFillingField')" [style.color]="fillingRate.color"
                                         class="fas fa-circle rate"></i>
                                     <mat-error *ngIf="field.control.status!=='VALID'  && field.control.touched">
                                         {{getErrorMsg(field.control.errors)}}</mat-error>
@@ -179,7 +179,7 @@
                                     </mat-selection-list>
                                     <i *ngIf="field.filling"
                                         style="position:absolute;height: auto;padding-right: 10px;right: 0px;z-index: 1;top: 50%;transform: translateY(-50%);"
-                                        [title]="lang.targetFillingField" [style.color]="fillingRate.color"
+                                        [title]="this.translate.instant('lang.targetFillingField')" [style.color]="fillingRate.color"
                                         class="fas fa-circle rate"></i>
                                     <mat-error *ngIf="field.control.status!=='VALID'  && field.control.touched">
                                         {{getErrorMsg(field.control.errors)}}</mat-error>
@@ -187,7 +187,7 @@
                                 <ng-container *ngIf="field.id === 'communicationMeans'">
                                     <mat-form-field *ngIf="annuaryEnabled">
                                         <input type="text" #autoCompleteInputCommunicationMean
-                                            [placeholder]="lang.searchCommunicationMean" matInput
+                                            [placeholder]="this.translate.instant('lang.searchCommunicationMean')" matInput
                                             [formControl]="field.control" [matAutocomplete]="auto"
                                             (click)="$event.stopPropagation()" (keyup)="resetM2MFields()">
                                         <mat-hint *ngIf="!isEmptyValue(field.desc)" align="end"
@@ -213,7 +213,7 @@
                                     </mat-form-field>
                                     <mat-form-field *ngIf="!annuaryEnabled">
                                         <input type="text" #autoCompleteInputCommunicationMean
-                                            [placeholder]="lang.communicationMean" matInput
+                                            [placeholder]="this.translate.instant('lang.communicationMean')" matInput
                                             [formControl]="field.control">
                                         <mat-hint *ngIf="!isEmptyValue(field.desc)" align="end"
                                                   [innerHTML]="field.desc"></mat-hint>
@@ -222,7 +222,7 @@
                                 <ng-container *ngIf="field.id === 'externalId_m2m'">
                                     <mat-form-field *ngIf="annuaryEnabled">
                                         <input type="text" #autoCompleteInputExternalIdM2M
-                                            [placeholder]="lang.searchExternalIdM2M" matInput
+                                            [placeholder]="this.translate.instant('lang.searchExternalIdM2M')" matInput
                                             [formControl]="field.control" [matAutocomplete]="auto"
                                             (click)="$event.stopPropagation()"
                                             (keyup)="resetAutocompleteExternalIdM2M()">
@@ -249,7 +249,7 @@
                                     </mat-form-field>
                                     <mat-form-field *ngIf="!annuaryEnabled">
                                         <input type="text" #autoCompleteInputExternalIdM2M
-                                            [placeholder]="lang.IdMaarch2Maarch" matInput
+                                            [placeholder]="this.translate.instant('lang.IdMaarch2Maarch')" matInput
                                             [formControl]="field.control">
                                         <mat-hint *ngIf="!isEmptyValue(field.desc)" align="end"
                                                   [innerHTML]="field.desc"></mat-hint>
@@ -269,7 +269,7 @@
                                         <input matInput [formControl]="field.control" [placeholder]="field.label"
                                             [required]="field.required">
                                         <mat-error *ngIf="field.control.hasError('required')">
-                                            {{lang.requiredField}}</mat-error>
+                                            {{'lang.requiredField' | translate}}</mat-error>
                                     </mat-form-field>
                                 </p>
                                 <button *ngIf="field.display" [disabled]="!canDelete(field)" mat-icon-button matSuffix
@@ -284,7 +284,7 @@
                                 <p mat-line class="contact-content">
                                     <mat-form-field appearance='outline' class="smallInput">
                                         <button mat-button matSuffix [matMenuTriggerFor]="menuDep"
-                                            (click)="$event.stopPropagation();" [title]="lang.targetDepartment">
+                                            (click)="$event.stopPropagation();" [title]="this.translate.instant('lang.targetDepartment')">
                                             {{addressBANCurrentDepartment}}&nbsp;<i class="fa fa-chevron-down"></i>
                                         </button>
                                         <mat-menu #menuDep="matMenu">
@@ -293,7 +293,7 @@
                                         </mat-menu>
                                         <mat-icon color="primary" class="fa fa-search" matPrefix
                                             style="font-size: 15px;"></mat-icon>
-                                        <input type="text" #autoCompleteInput [placeholder]="lang.searchAddressBan"
+                                        <input type="text" #autoCompleteInput [placeholder]="this.translate.instant('lang.searchAddressBan')"
                                             matInput [formControl]="addressBANControl" [matAutocomplete]="auto"
                                             (click)="$event.stopPropagation()" (focus)="resetAutocompleteAddressBan()"
                                             maxlength="128">
@@ -317,7 +317,7 @@
                                     </mat-form-field>
                                     <mat-card style="margin:10px;" *ngIf="!emptyAddress()">
                                         <mat-list-item class="contact-address" (click)="goTo()"
-                                            [title]="lang.address">
+                                            [title]="this.translate.instant('lang.address')">
                                             <mat-icon mat-list-icon color="primary"
                                                 class="contact-group fas fa-map-marker-alt"></mat-icon>
                                             <p mat-line class="contact-content" *ngIf="!isEmptyValue(getValue('addressAdditional1'))">
@@ -348,8 +348,8 @@
     </div>
     <div style="text-align:center;padding-top: 10px;">
         <button mat-raised-button color="default" type="button"
-            [matMenuTriggerFor]="menu">{{lang.moreInfos}}...</button>
+            [matMenuTriggerFor]="menu">{{'lang.moreInfos' | translate}}...</button>
 
-        <button mat-raised-button color="primary" type="button" (click)="onSubmit()">{{lang.validate}}</button>
+        <button mat-raised-button color="primary" type="button" (click)="onSubmit()">{{'lang.validate' | translate}}</button>
     </div>
 </ng-template>

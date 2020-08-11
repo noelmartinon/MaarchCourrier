@@ -40,10 +40,14 @@ import { ValidateAvisParallelComponent } from './avis-parallel-validate-action/v
 import { ReconcileActionComponent } from './reconciliation-action/reconcile-action.component';
 import { SendAlfrescoActionComponent } from './send-alfresco-action/send-alfresco-action.component';
 
+import { InternationalizationModule } from '../../service/translate/internationalization.module';
+import { TranslateService } from '@ngx-translate/core';
+
 @NgModule({
     imports: [
         SharedModule,
-        DocumentViewerModule
+        DocumentViewerModule,
+        InternationalizationModule
     ],
     declarations: [
         CriteriaToolComponent,
@@ -151,4 +155,8 @@ import { SendAlfrescoActionComponent } from './send-alfresco-action/send-alfresc
         ReconcileActionComponent,
     ]
 })
-export class ActionsModule { }
+export class ActionsModule {
+    constructor(translate: TranslateService) {
+        translate.setDefaultLang('fr');
+    }
+}

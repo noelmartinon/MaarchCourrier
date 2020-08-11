@@ -20,9 +20,9 @@
                 <mat-card *ngIf="!loading" class="card-app-content">
                     <div style="display: flex;">
                         <mat-form-field>
-                            <mat-label>{{lang.category_id}}</mat-label>
+                            <mat-label>{{'lang.category_id' | translate}}</mat-label>
                             <mat-select name="category" [(ngModel)]="indexingModel.category"
-                                [placeholder]="lang.category_id" required (selectionChange)="changeCategory($event)">
+                                [placeholder]="this.translate.instant('lang.category_id')" required (selectionChange)="changeCategory($event)">
                                 <mat-option *ngFor="let category of categoriesList;let i=index" [value]="category.id">
                                     {{category.label}}
                                 </mat-option>
@@ -32,18 +32,18 @@
                     <div style="display: flex;">
                         <div style="flex:1;">
                             <mat-form-field class="indexingModelLabel" appearance="outline">
-                                <mat-label>{{lang.modelName}}</mat-label>
+                                <mat-label>{{'lang.modelName' | translate}}</mat-label>
                                 <input matInput name="label" [(ngModel)]="indexingModel.label">
                             </mat-form-field>
                         </div>
                         <div class="defaultModel">
                             <mat-slide-toggle color="primary" name="default" [(ngModel)]="indexingModel.default">
-                                {{lang.defaultModel}}
+                                {{'lang.defaultModel' | translate}}
                             </mat-slide-toggle>
                         </div>
                     </div>
                     <mat-tab-group>
-                        <mat-tab [label]="lang.indexingForm">
+                        <mat-tab [label]="this.translate.instant('lang.indexingForm')">
                             <app-indexing-form #indexingForm [indexingFormId]="indexingModel.id" [admin]="true">
                             </app-indexing-form>
                             <div class="col-md-12 text-center">
@@ -59,11 +59,11 @@
     <mat-sidenav #snav2 [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()"
         fixedTopGap="56" position='end' opened class="col-md-4 col-sm-12">
         <mat-tab-group>
-            <mat-tab [label]="lang.availableFields">
+            <mat-tab [label]="this.translate.instant('lang.availableFields')">
                 <app-field-list *ngIf="indexingForm !== undefined" [dataFields]="indexingForm.getAvailableFields()">
                 </app-field-list>
             </mat-tab>
-            <mat-tab [label]="lang.availableCustomFields">
+            <mat-tab [label]="this.translate.instant('lang.availableCustomFields')">
                 <app-field-list *ngIf="indexingForm !== undefined"
                     [dataCustomFields]="indexingForm.getAvailableCustomFields()"></app-field-list>
             </mat-tab>

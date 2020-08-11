@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { LANG } from '../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { HttpClient } from '@angular/common/http';
 
@@ -24,7 +25,7 @@ export class IParaphComponent implements OnInit {
     @Input() additionalsInfos: any;
     @Input() externalSignatoryBookDatas: any;
 
-    constructor(public http: HttpClient, private notify: NotificationService) { }
+    constructor(private translate: TranslateService, public http: HttpClient, private notify: NotificationService) { }
 
     ngOnInit(): void {
     }

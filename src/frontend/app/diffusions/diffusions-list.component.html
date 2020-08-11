@@ -1,11 +1,11 @@
 <ng-container *ngIf="!loading">
-    <plugin-autocomplete *ngIf="adminMode && canUpdateRoles()" #test [labelPlaceholder]="lang.addUserOrEntity"
+    <plugin-autocomplete *ngIf="adminMode && canUpdateRoles()" #test [labelPlaceholder]="this.translate.instant('lang.addUserOrEntity')"
         [routeDatas]="['/rest/autocomplete/users','/rest/autocomplete/entities']" [targetSearchKey]="'idToDisplay'"
         [subInfoKey]="'descriptionToDisplay'" (triggerEvent)="addElem($event)" appearance="ouline"></plugin-autocomplete>
     <div *ngIf="isEmptyList() && !loading" style="text-align:center;font-size:24px;font-weight:bold;opacity:0.3;">
-        {{lang.noDiffusionList}}
+        {{'lang.noDiffusionList' | translate}}
     </div>
-    <div *ngIf="hasNoDest" class="alert-message alert-message-danger" role="alert" [innerHTML]="lang.diffNoDestmsg"></div>
+    <div *ngIf="hasNoDest" class="alert-message alert-message-danger" role="alert" [innerHTML]="this.translate.instant('lang.diffNoDestmsg')"></div>
     <ng-container *ngFor="let role of availableRoles">
         <mat-expansion-panel *ngIf="diffList[role.id].items.length > 0" class="diffusionList"
             [expanded]="role.id === 'dest' || this.adminMode || expanded">
@@ -28,7 +28,7 @@
                     </div>
                     <div *ngIf="role.id === 'dest' && target === 'redirect' && adminMode" >
                         <button mat-icon-button (click)="loadDestUserList()" [matMenuTriggerFor]="menuDestUserList"
-                            title="{{lang.chooseAnotherEntityUser}}">
+                            title="{{'lang.chooseAnotherEntityUser' | translate}}">
                             <mat-icon class="fa fa-edit" color="primary"></mat-icon>
                         </button>
                         <mat-menu #menuDestUserList="matMenu">

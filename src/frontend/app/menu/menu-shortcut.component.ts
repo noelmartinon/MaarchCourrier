@@ -2,6 +2,7 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AppService } from '../../service/app.service';
 import { PrivilegeService } from '../../service/privileges.service';
@@ -23,6 +24,7 @@ export class MenuShortcutComponent implements OnInit {
     shortcuts: any;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private _router: Router,
         public dialog: MatDialog,

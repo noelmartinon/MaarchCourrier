@@ -19,7 +19,7 @@
                 </div>
                 <mat-card *ngIf="!loading" class="card-app-content">
                     <mat-tab-group>
-                        <mat-tab label="{{lang.password}}">
+                        <mat-tab label="{{'lang.password' | translate}}">
                             <form (ngSubmit)="onSubmit()" #passwordForm="ngForm">
                                 <mat-list>
                                     <p style="margin-bottom: 40px;text-align: center;">
@@ -52,7 +52,7 @@
                                                     [(ngModel)]="passwordRules['minLength'].value" min="1"
                                                     pattern="^[1-9][0-9]*" matInput
                                                     placeholder="{{passwordRules['minLength'].label}}" required>
-                                                <span matSuffix>&nbsp;{{lang.chars}}</span>
+                                                <span matSuffix>&nbsp;{{'lang.chars' | translate}}</span>
                                             </mat-form-field>
                                         </p>
                                     </mat-list-item>
@@ -77,7 +77,7 @@
                                                     [(ngModel)]="passwordRules['lockTime'].value" min="1"
                                                     pattern="^[1-9][0-9]*" matInput
                                                     placeholder="{{passwordRules['lockTime'].label}}" required>
-                                                <span matSuffix>&nbsp;{{lang.minutes}}</span>
+                                                <span matSuffix>&nbsp;{{'lang.minutes' | translate}}</span>
                                             </mat-form-field>
                                         </p>
                                     </mat-list-item>
@@ -94,7 +94,7 @@
                                                     [(ngModel)]="passwordRules['renewal'].value" min="1"
                                                     pattern="^[1-9][0-9]*" matInput
                                                     placeholder="{{passwordRules['renewal'].label}}" required>
-                                                <span matSuffix>&nbsp;{{lang.days}}</span>
+                                                <span matSuffix>&nbsp;{{'lang.days' | translate}}</span>
                                             </mat-form-field>
                                         </p>
                                     </mat-list-item>
@@ -119,9 +119,9 @@
                                 </mat-list>
                                 <div class="col-md-12 text-center" style="padding:10px;">
                                     <button mat-raised-button type="submit" color="primary"
-                                        [disabled]="(!passwordForm.valid && !disabledForm()) || checkModif()">{{lang.validate}}</button>
+                                        [disabled]="(!passwordForm.valid && !disabledForm()) || checkModif()">{{'lang.validate' | translate}}</button>
                                     <button mat-raised-button type="button" color="default" [disabled]="checkModif()"
-                                        (click)="cancelModification()">{{lang.cancel}}</button>
+                                        (click)="cancelModification()">{{'lang.cancel' | translate}}</button>
                                 </div>
                             </form>
                         </mat-tab>

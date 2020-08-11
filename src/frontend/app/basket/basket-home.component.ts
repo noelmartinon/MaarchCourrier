@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, EventEmitter, Output, ViewChild, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../service/app.service';
 import { tap, finalize, catchError } from 'rxjs/operators';
@@ -35,6 +36,7 @@ export class BasketHomeComponent implements OnInit, OnDestroy {
     subscription: Subscription;
 
     constructor(
+        public translate: TranslateService,
         public http: HttpClient,
         public appService: AppService,
         public headerService: HeaderService,
@@ -107,7 +109,7 @@ export class BasketHomeComponent implements OnInit, OnDestroy {
     updateGroupsOrder() {
         const groupsOrder = this.homeData.regroupedBaskets.map((element: any) => element.groupSerialId);
         this.http.put('../rest/currentUser/profile/preferences', { homeGroups: groupsOrder }).pipe(
-            tap(() => this.notify.success(this.lang.parameterUpdated)),
+            tap(() => this.notify.success(this.translate.instant('lang.parameterUpdated'))),
             catchError((err) => {
                 this.notify.handleErrors(err);
                 return of(false);

@@ -38,12 +38,12 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
         if (!empty($userId)) {
             \SrcCore\controllers\CoreController::setGlobals(['userId' => $userId]);
             if (!empty($currentRoute)) {
-                $r = \SrcCore\controllers\AuthenticationController::isRouteAvailable(['userId' => $userId, 'currentRoute' => $currentRoute]);
+                $r = \SrcCore\controllers\AuthenticationController::isRouteAvailable(['userId' => $userId, 'currentRoute' => $currentRoute, 'currentMethod' => $currentMethod]);
                 if (!$r['isRouteAvailable']) {
                     return $response->withStatus(403)->withJson(['errors' => $r['errors']]);
                 }
             }
-        } elseif ($currentMethod.$currentRoute != 'GET/initialize') {
+        } else {
             return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
         }
     }
@@ -223,6 +223,7 @@ $app->delete('/emails/{id}', \Email\controllers\EmailController::class . ':delet
 
 //Entities
 $app->get('/entities', \Entity\controllers\EntityController::class . ':get');
+$app->put('/entities/export', \Entity\controllers\EntityController::class . ':export');
 $app->post('/entities', \Entity\controllers\EntityController::class . ':create');
 $app->get('/entities/{id}', \Entity\controllers\EntityController::class . ':getById');
 $app->put('/entities/{id}', \Entity\controllers\EntityController::class . ':update');
@@ -612,5 +613,13 @@ $app->get('/collaboraOnline/available', \ContentManagement\controllers\Collabora
 $app->post('/collaboraOnline/file', \ContentManagement\controllers\CollaboraOnlineController::class . ':getTmpFile');
 $app->delete('/collaboraOnline/file', \ContentManagement\controllers\CollaboraOnlineController::class . ':deleteTmpFile');
 $app->post('/collaboraOnline/encodedFile', \ContentManagement\controllers\CollaboraOnlineController::class . ':saveTmpEncodedDocument');
+
+// Recommended
+$app->get('/recommended/sites', \Recommended\controllers\IssuingSiteController::class . ':get');
+$app->get('/recommended/sites/{id}', \Recommended\controllers\IssuingSiteController::class . ':getById');
+$app->post('/recommended/sites', \Recommended\controllers\IssuingSiteController::class . ':create');
+$app->put('/recommended/sites/{id}', \Recommended\controllers\IssuingSiteController::class . ':update');
+$app->delete('/recommended/sites/{id}', \Recommended\controllers\IssuingSiteController::class . ':delete');
+
 
 $app->run();

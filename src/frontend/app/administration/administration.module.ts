@@ -47,6 +47,7 @@ import { NotificationAdministrationComponent } from './notification/notification
 import { NotificationsAdministrationComponent } from './notification/notifications-administration.component';
 import { ParameterAdministrationComponent } from './parameter/parameter-administration.component';
 import { ParametersAdministrationComponent } from './parameter/parameters-administration.component';
+import { ParametersCustomizationComponent } from './parameter/customization/parameters-customization.component';
 import { PrioritiesAdministrationComponent } from './priority/priorities-administration.component';
 import { PriorityAdministrationComponent } from './priority/priority-administration.component';
 import { SecuritiesAdministrationComponent } from './security/securities-administration.component';
@@ -69,6 +70,10 @@ import { UsersAdministrationComponent, UsersAdministrationRedirectModalComponent
 import { UsersImportComponent } from './user/import/users-import.component';
 import { UsersExportComponent } from './user/export/users-export.component';
 import { TranslateService } from '@ngx-translate/core';
+import {EntitiesExportComponent} from './entity/export/entities-export.component';
+import { RegisteredMailComponent } from './registered-mail/registered-mail.component';
+import { IssuingSiteListComponent } from './registered-mail/issuing-site/issuing-site-list.component';
+import { IssuingSiteComponent } from './registered-mail/issuing-site/issuing-site.component';
 
 
 @NgModule({
@@ -123,6 +128,7 @@ import { TranslateService } from '@ngx-translate/core';
         NotificationsAdministrationComponent,
         ParameterAdministrationComponent,
         ParametersAdministrationComponent,
+        ParametersCustomizationComponent,
         PrioritiesAdministrationComponent,
         PriorityAdministrationComponent,
         SecuritiesAdministrationComponent,
@@ -145,7 +151,11 @@ import { TranslateService } from '@ngx-translate/core';
         UsersAdministrationComponent,
         UsersAdministrationRedirectModalComponent,
         UsersImportComponent,
-        UsersExportComponent
+        UsersExportComponent,
+        EntitiesExportComponent,
+        RegisteredMailComponent,
+        IssuingSiteListComponent,
+        IssuingSiteComponent,
     ],
     entryComponents: [
         AccountLinkComponent,
@@ -162,7 +172,8 @@ import { TranslateService } from '@ngx-translate/core';
         UserAdministrationRedirectModalComponent,
         UsersAdministrationRedirectModalComponent,
         UsersImportComponent,
-        UsersExportComponent
+        UsersExportComponent,
+        EntitiesExportComponent
     ],
     providers: [
         AdministrationService
@@ -171,5 +182,5 @@ import { TranslateService } from '@ngx-translate/core';
 export class AdministrationModule {
     constructor(translate: TranslateService) {
         translate.setDefaultLang('fr');
-      }
+    }
 }

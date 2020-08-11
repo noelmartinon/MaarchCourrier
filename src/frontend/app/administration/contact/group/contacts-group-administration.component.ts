@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@an
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../service/header.service';
 import { FormControl } from '@angular/forms';
@@ -32,31 +33,31 @@ export class ContactsGroupAdministrationComponent implements OnInit {
         {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
-            label: this.lang.contactsList,
+            label: this.translate.instant('lang.contactsList'),
             current: false
         },
         {
             icon: 'fa fa-code',
             route: '/administration/contacts/contactsCustomFields',
-            label: this.lang.customFieldsAdmin,
+            label: this.translate.instant('lang.customFieldsAdmin'),
             current: false
         },
         {
             icon: 'fa fa-cog',
             route: '/administration/contacts/contacts-parameters',
-            label: this.lang.contactsParameters,
+            label: this.translate.instant('lang.contactsParameters'),
             current: false
         },
         {
             icon: 'fa fa-users',
             route: '/administration/contacts/contacts-groups',
-            label: this.lang.contactsGroups,
+            label: this.translate.instant('lang.contactsGroups'),
             current: false
         },
         {
             icon: 'fas fa-magic',
             route: '/administration/contacts/duplicates',
-            label: this.lang.duplicatesContactsAdmin,
+            label: this.translate.instant('lang.duplicatesContactsAdmin'),
             current: false
         },
     ];
@@ -101,6 +102,7 @@ export class ContactsGroupAdministrationComponent implements OnInit {
     }
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -129,7 +131,7 @@ export class ContactsGroupAdministrationComponent implements OnInit {
         this.route.params.subscribe(params => {
 
             if (typeof params['id'] === 'undefined') {
-                this.headerService.setHeader(this.lang.contactGroupCreation);
+                this.headerService.setHeader(this.translate.instant('lang.contactGroupCreation'));
 
                 this.creationMode = true;
                 this.contactsGroup.public = false;
@@ -141,7 +143,7 @@ export class ContactsGroupAdministrationComponent implements OnInit {
                 this.http.get('../rest/contactsGroups/' + params['id'])
                     .subscribe((data: any) => {
                         this.contactsGroup = data.contactsGroup;
-                        this.headerService.setHeader(this.lang.contactsGroupModification, this.contactsGroup.label);
+                        this.headerService.setHeader(this.translate.instant('lang.contactsGroupModification'), this.contactsGroup.label);
                         this.nbContact = this.contactsGroup.nbContacts;
                         setTimeout(() => {
                             this.dataSourceAdded = new MatTableDataSource(this.contactsGroup.contacts);
@@ -156,14 +158,14 @@ export class ContactsGroupAdministrationComponent implements OnInit {
     }
 
     saveContactsList(elem: any): void {
-        elem.textContent = this.lang.loading + '...';
+        elem.textContent = this.translate.instant('lang.loading') + '...';
         elem.disabled = true;
         this.http.post('../rest/contactsGroups/' + this.contactsGroup.id + '/contacts', { 'contacts': this.selection.selected })
             .subscribe((data: any) => {
-                this.notify.success(this.lang.contactAdded);
+                this.notify.success(this.translate.instant('lang.contactAdded'));
                 this.nbContact = this.nbContact + this.selection.selected.length;
                 this.selection.clear();
-                elem.textContent = this.lang.add;
+                elem.textContent = this.translate.instant('lang.add');
                 this.contactsGroup = data.contactsGroup;
                 setTimeout(() => {
                     this.dataSourceAdded = new MatTableDataSource(this.contactsGroup.contacts);
@@ -180,7 +182,7 @@ export class ContactsGroupAdministrationComponent implements OnInit {
             this.http.post('../rest/contactsGroups', this.contactsGroup)
                 .subscribe((data: any) => {
                     this.router.navigate(['/administration/contacts/contacts-groups/' + data.contactsGroup]);
-                    this.notify.success(this.lang.contactsGroupAdded);
+                    this.notify.success(this.translate.instant('lang.contactsGroupAdded'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -188,7 +190,7 @@ export class ContactsGroupAdministrationComponent implements OnInit {
             this.http.put('../rest/contactsGroups/' + this.contactsGroup.id, this.contactsGroup)
                 .subscribe(() => {
                     this.router.navigate(['/administration/contacts-groups']);
-                    this.notify.success(this.lang.contactsGroupUpdated);
+                    this.notify.success(this.translate.instant('lang.contactsGroupUpdated'));
 
                 }, (err) => {
                     this.notify.error(err.error.errors);
@@ -197,7 +199,7 @@ export class ContactsGroupAdministrationComponent implements OnInit {
     }
 
     preDelete(row: any) {
-        const r = confirm(this.lang.reallyWantToDeleteContactFromGroup);
+        const r = confirm(this.translate.instant('lang.reallyWantToDeleteContactFromGroup'));
 
         if (r) {
             this.removeContact(this.contactsGroup.contacts[row], row);
@@ -215,7 +217,7 @@ export class ContactsGroupAdministrationComponent implements OnInit {
                 this.dataSourceAdded = new MatTableDataSource(this.contactsGroup.contacts);
                 this.dataSourceAdded.paginator = this.paginatorAdded;
                 this.dataSourceAdded.sort = this.sortAdded;
-                this.notify.success(this.lang.contactDeletedFromGroup);
+                this.notify.success(this.translate.instant('lang.contactDeletedFromGroup'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });

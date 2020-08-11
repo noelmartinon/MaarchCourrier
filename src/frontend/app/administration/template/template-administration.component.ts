@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef, On
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -13,7 +14,7 @@ import { of } from 'rxjs/internal/observable/of';
 import { TemplateFileEditorModalComponent } from './templateFileEditorModal/template-file-editor-modal.component';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AlertComponent } from '../../../plugins/modal/alert.component';
-import {TranslateService} from '@ngx-translate/core';
+import { MaarchFlatTreeComponent } from '../../../plugins/tree/maarch-flat-tree.component';
 
 declare var tinymce: any;
 
@@ -25,6 +26,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild('maarchTree', { static: true }) maarchTree: MaarchFlatTreeComponent;
 
     lang: any = LANG;
     loading: boolean = false;
@@ -229,34 +231,12 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
         this.attachmentTypesList = data.attachmentTypes;
         this.datasourcesList = data.datasources;
-        setTimeout(() => {
-            $('#jstree')
-                .on('select_node.jstree', function (e: any, item: any) {
-                    if (item.event) {
-                        item.instance.select_node(item.node.children_d);
-                    }
-                })
-                .jstree({
-                    'checkbox': { three_state: false },
-                    'core': {
-                        force_text: true,
-                        'themes': {
-                            'name': 'proton',
-                            'responsive': true
-                        },
-                        'data': data.entities
-                    },
-                    'plugins': ['checkbox', 'search', 'sort']
-                });
-            let to: any = false;
-            $('#jstree_search').keyup(function () {
-                if (to) { clearTimeout(to); }
-                to = setTimeout(function () {
-                    const v: any = $('#jstree_search').val();
-                    $('#jstree').jstree(true).search(v);
-                }, 250);
-            });
-        }, 0);
+        this.maarchTree.initData(data.entities.map(ent => {
+            return {
+                ...ent,
+                id : ent.serialId,
+            };
+        }));
     }
 
     getBase64Document(buffer: ArrayBuffer) {
@@ -576,7 +556,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
     formatTemplate() {
         const template = { ...this.template };
-        template.entities = $('#jstree').jstree('get_checked', null, true);
+        template.entities = this.maarchTree.getSelectedNodes().map(ent => ent.entity_id);
         return template;
     }
 

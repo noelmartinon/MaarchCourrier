@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
@@ -21,7 +22,7 @@ export class UpdateAcknowledgementSendDateActionComponent implements OnInit {
     acknowledgementSendDate    : Date      = new Date();
     acknowledgementSendDateEnd : Date      = new Date();
 
-    constructor(public http: HttpClient, private notify: NotificationService, public dialogRef: MatDialogRef<UpdateAcknowledgementSendDateActionComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
+    constructor(private translate: TranslateService, public http: HttpClient, private notify: NotificationService, public dialogRef: MatDialogRef<UpdateAcknowledgementSendDateActionComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
     ngOnInit(): void { }
 

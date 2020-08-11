@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'search-home',
@@ -9,7 +10,7 @@ export class SearchHomeComponent implements OnInit {
 
     lang: any = LANG;
 
-    constructor() {
+    constructor(private translate: TranslateService) {
     }
 
     ngOnInit(): void { }

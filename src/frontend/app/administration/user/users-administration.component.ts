@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -27,7 +28,7 @@ export class UsersAdministrationComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
 
     lang: any = LANG;
-    loading: boolean = false;
+    loading: boolean = true;
     updateListModel: boolean = true;
     updateListInstance: boolean = true;
 
@@ -49,6 +50,7 @@ export class UsersAdministrationComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -56,16 +58,16 @@ export class UsersAdministrationComponent implements OnInit {
         public appService: AppService,
         public functions: FunctionsService,
         public adminService: AdministrationService,
-        private viewContainerRef: ViewContainerRef
+        private viewContainerRef: ViewContainerRef,
     ) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.administration + ' ' + this.lang.users);
+        this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.users'));
 
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.user = this.headerService.user;
-        this.loading = true;
+
         this.getData();
     }
 
@@ -87,7 +89,7 @@ export class UsersAdministrationComponent implements OnInit {
                 this.data = this.noWebserviceAccounts;
                 this.quota = data['quota'];
                 if (this.quota.actives > this.quota.userQuota) {
-                    this.notify.error(this.lang.quotaExceeded);
+                    this.notify.error(this.translate.instant('lang.quotaExceeded'));
                 }
 
                 this.loading = false;
@@ -103,18 +105,18 @@ export class UsersAdministrationComponent implements OnInit {
     }
 
     activateUser(user: any) {
-        const r = confirm(this.lang.confirmAction + ' ' + this.lang.authorize + ' « ' + user.user_id + ' »');
+        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.authorize') + ' « ' + user.user_id + ' »');
 
         if (r) {
             user.status = 'OK';
             this.http.put('../rest/users/' + user.id, user)
                 .subscribe(() => {
-                    this.notify.success(this.lang.userAuthorized);
+                    this.notify.success(this.translate.instant('lang.userAuthorized'));
                     if (this.quota.userQuota) {
                         this.quota.inactives--;
                         this.quota.actives++;
                         if (this.quota.actives > this.quota.userQuota) {
-                            this.notify.error(this.lang.quotaExceeded);
+                            this.notify.error(this.translate.instant('lang.quotaExceeded'));
                         }
                     }
                 }, (err) => {
@@ -211,7 +213,7 @@ export class UsersAdministrationComponent implements OnInit {
                                                                     this.quota.inactives--;
                                                                 }
 
-                                                                this.notify.success(this.lang.userDeleted + ' « ' + user.user_id + ' »');
+                                                                this.notify.success(this.translate.instant('lang.userDeleted') + ' « ' + user.user_id + ' »');
 
                                                                 // end delete user
                                                             }, (err) => {
@@ -222,7 +224,7 @@ export class UsersAdministrationComponent implements OnInit {
                                                         this.http.put('../rest/users/' + user.id + '/suspend', user)
                                                             .subscribe(() => {
                                                                 user.status = 'SPD';
-                                                                this.notify.success(this.lang.userSuspended);
+                                                                this.notify.success(this.translate.instant('lang.userSuspended'));
                                                                 if (this.quota.userQuota) {
                                                                     this.quota.inactives++;
                                                                     this.quota.actives--;
@@ -263,7 +265,7 @@ export class UsersAdministrationComponent implements OnInit {
                                                         this.quota.inactives--;
                                                     }
 
-                                                    this.notify.success(this.lang.userDeleted + ' « ' + user.user_id + ' »');
+                                                    this.notify.success(this.translate.instant('lang.userDeleted') + ' « ' + user.user_id + ' »');
 
                                                     // end delete user
                                                 }, (err) => {
@@ -274,7 +276,7 @@ export class UsersAdministrationComponent implements OnInit {
                                             this.http.put('../rest/users/' + user.id + '/suspend', user)
                                                 .subscribe(() => {
                                                     user.status = 'SPD';
-                                                    this.notify.success(this.lang.userSuspended);
+                                                    this.notify.success(this.translate.instant('lang.userSuspended'));
                                                     if (this.quota.userQuota) {
                                                         this.quota.inactives++;
                                                         this.quota.actives--;
@@ -314,7 +316,7 @@ export class UsersAdministrationComponent implements OnInit {
                                                             this.quota.inactives--;
                                                         }
 
-                                                        this.notify.success(this.lang.userDeleted + ' « ' + user.user_id + ' »');
+                                                        this.notify.success(this.translate.instant('lang.userDeleted') + ' « ' + user.user_id + ' »');
 
                                                         // end delete user
                                                     }, (err) => {
@@ -325,7 +327,7 @@ export class UsersAdministrationComponent implements OnInit {
                                                 this.http.put('../rest/users/' + user.id + '/suspend', user)
                                                     .subscribe(() => {
                                                         user.status = 'SPD';
-                                                        this.notify.success(this.lang.userSuspended);
+                                                        this.notify.success(this.translate.instant('lang.userSuspended'));
                                                         if (this.quota.userQuota) {
                                                             this.quota.inactives++;
                                                             this.quota.actives--;
@@ -361,7 +363,7 @@ export class UsersAdministrationComponent implements OnInit {
                                                 this.quota.inactives--;
                                             }
 
-                                            this.notify.success(this.lang.userDeleted + ' « ' + user.user_id + ' »');
+                                            this.notify.success(this.translate.instant('lang.userDeleted') + ' « ' + user.user_id + ' »');
 
                                             // end delete user
                                         }, (err) => {
@@ -372,7 +374,7 @@ export class UsersAdministrationComponent implements OnInit {
                                     this.http.put('../rest/users/' + user.id + '/suspend', user)
                                         .subscribe(() => {
                                             user.status = 'SPD';
-                                            this.notify.success(this.lang.userSuspended);
+                                            this.notify.success(this.translate.instant('lang.userSuspended'));
                                             if (this.quota.userQuota) {
                                                 this.quota.inactives++;
                                                 this.quota.actives--;
@@ -439,9 +441,10 @@ export class UsersAdministrationRedirectModalComponent implements OnInit {
     lang: any = LANG;
     loadModel: boolean = false;
     loadInstance: boolean = false;
-    modalTitle: string = this.lang.confirmAction;
+    modalTitle: string = this.translate.instant('lang.confirmAction');
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<UsersAdministrationRedirectModalComponent>,
@@ -462,9 +465,9 @@ export class UsersAdministrationRedirectModalComponent implements OnInit {
             }
         } else {
             if (this.data.userDestRedirect.actionMode === 'delete') {
-                this.modalTitle = this.lang.unableToDelete;
+                this.modalTitle = this.translate.instant('lang.unableToDelete');
             } else {
-                this.modalTitle = this.lang.unableToSuspend;
+                this.modalTitle = this.translate.instant('lang.unableToSuspend');
             }
             // get listModel
             if (this.data.listTemplateEntities.length > 0) {
@@ -483,7 +486,7 @@ export class UsersAdministrationRedirectModalComponent implements OnInit {
             this.data.redirectListModels[index].redirectUserId = user.id;
         } else {
             this.data.redirectListModels[index].redirectUserId = null;
-            this.notify.error(this.lang.userUnauthorized);
+            this.notify.error(this.translate.instant('lang.userUnauthorized'));
         }
 
     }
@@ -493,7 +496,7 @@ export class UsersAdministrationRedirectModalComponent implements OnInit {
             this.data.redirectDestResUserId = user.id;
         } else {
             this.data.redirectDestResUserId = null;
-            this.notify.error(this.lang.userUnauthorized);
+            this.notify.error(this.translate.instant('lang.userUnauthorized'));
         }
 
     }

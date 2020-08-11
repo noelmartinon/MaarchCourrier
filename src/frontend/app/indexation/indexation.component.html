@@ -19,11 +19,11 @@
                     <mat-menu #menu="matMenu" [class]="'menuForm menuAction'">
                         <div class="menuTitle">
                             <span>
-                                {{lang.actions}}
+                                {{'lang.actions' | translate}}
                             </span>
                             <mat-form-field floatLabel="never" appearance="outline" class="smallInput"
                                 (click)="$event.stopPropagation();">
-                                <input matInput id="searchTerm" placeholder="{{lang.filterBy}}" #listFilter
+                                <input matInput id="searchTerm" placeholder="{{'lang.filterBy' | translate}}" #listFilter
                                     autocomplete="off" (click)="$event.stopPropagation();"
                                     (keydown)="$event.stopPropagation()">
                             </mat-form-field>
@@ -35,7 +35,7 @@
                                 [disabled]="!action.enabled">
                                 <span style="flex:1;">{{action.label}}</span><small
                                     style="position: absolute;top: 15px;left: 140px;" color="warn"
-                                    *ngIf="!action.enabled">{{lang.badActionParam}}</small>
+                                    *ngIf="!action.enabled">{{'lang.badActionParam' | translate}}</small>
                             </button>
                         </ng-container>
                     </mat-menu>
@@ -43,16 +43,16 @@
                         [disabled]="actionService.loading || selectedAction.id === 0 || (appDocumentViewer !== undefined && !appDocumentViewer.isEditorLoaded())"
                         class="button-form-primary-filled"
                         style="width: 150px;align-items: center;justify-content: center;text-align: center;display: flex;"
-                        (click)="onSubmit()">{{lang.validate}}</button>
+                        (click)="onSubmit()">{{'lang.validate' | translate}}</button>
                     <button mat-icon-button *ngIf="appService.getViewMode()" class="button-form-primary"
                         (click)="onSubmit()">
                         <mat-icon class="fa fa-check"></mat-icon>
                     </button>
                 </ng-container>
-                <div class="emptyAction" *ngIf="actionsList.length === 0" [innerHTML]="lang.noAvailableAction"></div>
+                <div class="emptyAction" *ngIf="actionsList.length === 0" [innerHTML]="this.translate.instant('lang.noAvailableAction')"></div>
             </div>
         </ng-container>
-        <div *ngIf="isEmptyIndexingModels()" class="emptyModel" [innerHTML]="lang.noAvailableIndexingModel"></div>
+        <div *ngIf="isEmptyIndexingModels()" class="emptyModel" [innerHTML]="this.translate.instant('lang.noAvailableIndexingModel')"></div>
     </ng-template>
     <mat-sidenav-content>
         <div class="bg-head">

@@ -1,17 +1,23 @@
 <mat-sidenav-container autosize class="maarch-container">
     <ng-template #adminMenuTemplate>
         <mat-nav-list>
-            <h3 mat-subheader>{{lang.actions}}</h3>
+            <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
             <a mat-list-item (click)="snav2.open();prepareEntityAdd()" *ngIf="!creationMode">
                 <mat-icon color="primary" mat-list-icon class="fa fa-plus"></mat-icon>
                 <p mat-line>
-                    {{lang.add}}
+                    {{'lang.add' | translate}}
+                </p>
+            </a>
+            <a mat-list-item (click)="openExportModal()">
+                <mat-icon color="primary" mat-list-icon class="fas fa-file-export"></mat-icon>
+                <p mat-line>
+                    {{lang.toExport}}
                 </p>
             </a>
         </mat-nav-list>
         <mat-divider></mat-divider>
         <mat-nav-list>
-            <h3 mat-subheader>{{lang.additionalRoles}}</h3>
+            <h3 mat-subheader>{{'lang.additionalRoles' | translate}}</h3>
             <ng-container *ngFor="let role of listTemplateRoles">
                 <a mat-list-item disableRipple="true" *ngIf="role.id != 'dest' && role.id != 'cc'">
                     <mat-icon color="primary" mat-list-icon>
@@ -47,14 +53,14 @@
 
                     <mat-form-field>
                         <input matInput id="jstree_search" name="jstree_search" type="text"
-                            placeholder="{{lang.searchEntities}}">
-                        <mat-hint *ngIf="!creationMode">{{lang.entityTreeInfo}}</mat-hint>
-                        <mat-hint *ngIf="creationMode">{{lang.entityTreeInfoCreation}}</mat-hint>
+                            placeholder="{{'lang.searchEntities' | translate}}">
+                        <mat-hint *ngIf="!creationMode">{{'lang.entityTreeInfo' | translate}}</mat-hint>
+                        <mat-hint *ngIf="creationMode">{{'lang.entityTreeInfoCreation' | translate}}</mat-hint>
                     </mat-form-field>
                     <div id="jstree"></div>
                     <div class="mat-paginator"
                         style="min-height:48px;min-height: 48px;display: flex;justify-content: end;align-items: center;padding-right: 20px;">
-                        {{entities.length}} {{lang.entities}}</div>
+                        {{entities.length}} {{'lang.entities' | translate}}</div>
                 </mat-card>
             </div>
         </div>
@@ -70,11 +76,11 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <mat-select id="parent_entity_id" name="parent_entity_id"
-                                        title="{{lang.isLinkedTo}}" placeholder="{{lang.isLinkedTo}}"
+                                        title="{{'lang.isLinkedTo' | translate}}" placeholder="{{'lang.isLinkedTo' | translate}}"
                                         [(ngModel)]="currentEntity.parent_entity_id"
                                         (selectionChange)="selectParentEntity(currentEntity.parent_entity_id)">
                                         <mat-option value="">
-                                            <i style="opacity:0.5;text-align:center;">- {{lang.noEntity}} -</i>
+                                            <i style="opacity:0.5;text-align:center;">- {{'lang.noEntity' | translate}} -</i>
                                         </mat-option>
                                         <ng-container *ngFor="let entity of entities | sortBy : 'entity_label'">
                                             <mat-option [value]="entity.entity_id"
@@ -85,8 +91,8 @@
                                     </mat-select>
                                 </mat-form-field>
                                 <mat-form-field>
-                                    <mat-select id="entity_type" name="entity_type" title="{{lang.entityType}}"
-                                        placeholder="{{lang.entityType}}" [(ngModel)]="currentEntity.entity_type"
+                                    <mat-select id="entity_type" name="entity_type" title="{{'lang.entityType' | translate}}"
+                                        placeholder="{{'lang.entityType' | translate}}" [(ngModel)]="currentEntity.entity_type"
                                         maxlength="32" required>
                                         <mat-option *ngFor="let entity_type of entityTypeList" [value]="entity_type.id">
                                             {{entity_type.label}}
@@ -99,7 +105,7 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentEntity.id" name="id" id="id"
-                                        title="{{lang.technicalId}}" type="text" placeholder="{{lang.technicalId}}"
+                                        title="{{'lang.technicalId' | translate}}" type="text" placeholder="{{'lang.technicalId' | translate}}"
                                         disabled>
                                 </mat-form-field>
                             </div>
@@ -108,7 +114,7 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentEntity.entity_id" required name="entity_id"
-                                        id="entity_id" title="{{lang.id}}" type="text" placeholder="{{lang.id}}"
+                                        id="entity_id" title="{{'lang.id' | translate}}" type="text" placeholder="{{'lang.id' | translate}}"
                                         [disabled]="!creationMode" maxlength="32" pattern="^[\w-]*$">
                                 </mat-form-field>
                             </div>
@@ -117,8 +123,8 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentEntity.entity_label" required
-                                        name="entity_label" id="entity_label" title="{{lang.label}}" type="text"
-                                        placeholder="{{lang.label}}" maxlength="255">
+                                        name="entity_label" id="entity_label" title="{{'lang.label' | translate}}" type="text"
+                                        placeholder="{{'lang.label' | translate}}" maxlength="255">
                                 </mat-form-field>
                             </div>
                         </div>
@@ -126,8 +132,8 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentEntity.short_label" required name="short_label"
-                                        id="short_label" title="{{lang.shortLabel}}" type="text"
-                                        placeholder="{{lang.shortLabel}}" maxlength="50">
+                                        id="short_label" title="{{'lang.shortLabel' | translate}}" type="text"
+                                        placeholder="{{'lang.shortLabel' | translate}}" maxlength="50">
                                 </mat-form-field>
                             </div>
                         </div>
@@ -135,7 +141,7 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentEntity.email" name="email" id="email"
-                                        title="{{lang.email}}" type="text" placeholder="{{lang.email}}" maxlength="255"
+                                        title="{{'lang.email' | translate}}" type="text" placeholder="{{'lang.email' | translate}}" maxlength="255"
                                         pattern="(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)">
                                 </mat-form-field>
                             </div>
@@ -144,14 +150,14 @@
                             <mat-expansion-panel>
                                 <mat-expansion-panel-header>
                                     <mat-panel-title>
-                                        {{lang.otherInformations}}
+                                        {{'lang.otherInformations' | translate}}
                                     </mat-panel-title>
                                 </mat-expansion-panel-header>
                                 <div class="form-group">
                                     <div class="col-sm-4">
                                         <mat-form-field>
                                             <input matInput [(ngModel)]="currentEntity.adrs_1" name="adrs_1" id="adrs_1"
-                                                title="{{lang.address}}1" type="text" placeholder="{{lang.address}}1"
+                                                title="{{'lang.address' | translate}}1" type="text" placeholder="{{'lang.address' | translate}}1"
                                                 maxlength="255">
                                         </mat-form-field>
 
@@ -159,14 +165,14 @@
                                     <div class="col-sm-4">
                                         <mat-form-field>
                                             <input matInput [(ngModel)]="currentEntity.adrs_2" name="adrs_2" id="adrs_2"
-                                                title="{{lang.address}}2" type="text" placeholder="{{lang.address}}2"
+                                                title="{{'lang.address' | translate}}2" type="text" placeholder="{{'lang.address' | translate}}2"
                                                 maxlength="255">
                                         </mat-form-field>
                                     </div>
                                     <div class="col-sm-4">
                                         <mat-form-field>
                                             <input matInput [(ngModel)]="currentEntity.adrs_3" name="adrs_3" id="adrs_3"
-                                                title="{{lang.address}}3" type="text" placeholder="{{lang.address}}3"
+                                                title="{{'lang.address' | translate}}3" type="text" placeholder="{{'lang.address' | translate}}3"
                                                 maxlength="255">
                                         </mat-form-field>
                                     </div>
@@ -175,22 +181,22 @@
                                     <div class="col-sm-4">
                                         <mat-form-field>
                                             <input matInput [(ngModel)]="currentEntity.zipcode" name="zipcode"
-                                                id="zipcode" title="{{lang.zipcode}}" type="text"
-                                                placeholder="{{lang.zipcode}}" maxlength="32">
+                                                id="zipcode" title="{{'lang.zipcode' | translate}}" type="text"
+                                                placeholder="{{'lang.zipcode' | translate}}" maxlength="32">
                                         </mat-form-field>
                                     </div>
                                     <div class="col-sm-4">
                                         <mat-form-field>
                                             <input matInput [(ngModel)]="currentEntity.city" name="city" id="city"
-                                                title="{{lang.city}}" type="text" placeholder="{{lang.city}}"
+                                                title="{{'lang.city' | translate}}" type="text" placeholder="{{'lang.city' | translate}}"
                                                 maxlength="255">
                                         </mat-form-field>
                                     </div>
                                     <div class="col-sm-4">
                                         <mat-form-field>
                                             <input matInput [(ngModel)]="currentEntity.country" name="country"
-                                                id="country" title="{{lang.country}}" type="text"
-                                                placeholder="{{lang.country}}" maxlength="255">
+                                                id="country" title="{{'lang.country' | translate}}" type="text"
+                                                placeholder="{{'lang.country' | translate}}" maxlength="255">
                                         </mat-form-field>
                                     </div>
                                 </div>
@@ -199,7 +205,7 @@
                                         <mat-form-field>
                                             <textarea matInput [(ngModel)]="currentEntity.entity_full_name"
                                                 name="entity_full_name" id="entity_full_name"
-                                                placeholder="{{lang.entityFullName}}" title="{{lang.entityFullName}}"
+                                                placeholder="{{'lang.entityFullName' | translate}}" title="{{'lang.entityFullName' | translate}}"
                                                 matTextareaAutosize matAutosizeMinRows="1"
                                                 matAutosizeMaxRows="5"></textarea>
                                         </mat-form-field>
@@ -209,12 +215,12 @@
                                     <div class="col-sm-12">
                                         <mat-form-field>
                                             <input *ngIf="!currentEntity.canSynchronizeSiret" matInput
-                                                value="Paramètre SIRET manquant" title="{{lang.siretCode}}" type="text"
-                                                placeholder="{{lang.siretCode}}" maxlength="255" disabled>
+                                                value="Paramètre SIRET manquant" title="{{'lang.siretCode' | translate}}" type="text"
+                                                placeholder="{{'lang.siretCode' | translate}}" maxlength="255" disabled>
                                             <input *ngIf="currentEntity.canSynchronizeSiret" matInput
                                                 [(ngModel)]="currentEntity.business_id" name="business_id"
-                                                id="business_id" title="{{lang.siretCode}}" type="text"
-                                                placeholder="{{lang.siretCode}}" maxlength="255" disabled>
+                                                id="business_id" title="{{'lang.siretCode' | translate}}" type="text"
+                                                placeholder="{{'lang.siretCode' | translate}}" maxlength="255" disabled>
                                             <button *ngIf="currentEntity.canSynchronizeSiret" color="primary"
                                                 mat-icon-button matSuffix title="Générer un numéro SIRET"
                                                 (click)="addEntityToAnnuary()">
@@ -228,16 +234,16 @@
                                         <mat-form-field>
                                             <input matInput [(ngModel)]="currentEntity.archival_agency"
                                                 name="archival_agency" id="archival_agency"
-                                                title="{{lang.archivalAgency}}" type="text"
-                                                placeholder="{{lang.archivalAgency}}" maxlength="255">
+                                                title="{{'lang.archivalAgency' | translate}}" type="text"
+                                                placeholder="{{'lang.archivalAgency' | translate}}" maxlength="255">
                                         </mat-form-field>
                                     </div>
                                     <div class="col-sm-6">
                                         <mat-form-field>
                                             <input matInput [(ngModel)]="currentEntity.archival_agreement"
                                                 name="archival_agreement" id="archival_agreement"
-                                                title="{{lang.archivalAgreement}}" type="text"
-                                                placeholder="{{lang.archivalAgreement}}" maxlength="255">
+                                                title="{{'lang.archivalAgreement' | translate}}" type="text"
+                                                placeholder="{{'lang.archivalAgreement' | translate}}" maxlength="255">
                                         </mat-form-field>
                                     </div>
                                 </div>
@@ -246,17 +252,17 @@
                         <div class="form-group">
                             <div class="col-md-12 text-center" style="padding:10px;">
                                 <button mat-raised-button [disabled]="!entityForm.form.valid" color="primary"
-                                    (click)="saveEntity()">{{lang.save}}</button>
+                                    (click)="saveEntity()">{{'lang.save' | translate}}</button>
                                 <button mat-raised-button *ngIf="!creationMode"
                                     [disabled]="!entityForm.form.valid || this.currentEntity.hasChildren" color="warn"
-                                    (click)="removeEntity()">{{lang.delete}}</button>
+                                    (click)="removeEntity()">{{'lang.delete' | translate}}</button>
                                 <button mat-raised-button *ngIf="creationMode" color="default"
-                                    (click)="readMode()">{{lang.cancel}}</button>
+                                    (click)="readMode()">{{'lang.cancel' | translate}}</button>
                             </div>
                         </div>
                     </form>
                 </mat-tab>
-                <mat-tab label="{{lang.diffusionList}}" *ngIf="!creationMode">
+                <mat-tab label="{{'lang.diffusionList' | translate}}" *ngIf="!creationMode">
                     <div class="row" style="margin:0px;">
                         <div class="col-md-12">
                             <app-diffusions-list #appDiffusionsList [adminMode]="true" [target]="'redirect'">
@@ -265,17 +271,17 @@
                         <div class="form-group" *ngIf="currentEntity.entity_id">
                             <div class="col-md-12 text-center" style="padding:10px;">
                                 <button mat-raised-button color="primary" (click)="saveDiffList()"
-                                    [disabled]="appDiffusionsList.hasEmptyDest() || !appDiffusionsList.isModified()">{{lang.save}}</button>
+                                    [disabled]="appDiffusionsList.hasEmptyDest() || !appDiffusionsList.isModified()">{{'lang.save' | translate}}</button>
                                 <button mat-raised-button color="default"
                                     (click)="appDiffusionsList.loadListModel(currentEntity.id)"
-                                    [disabled]="!appDiffusionsList.isModified()">{{lang.cancel}}</button>
+                                    [disabled]="!appDiffusionsList.isModified()">{{'lang.cancel' | translate}}</button>
                                 <button *ngIf="!appDiffusionsList.isEmptyList() && currentEntity.listTemplate.id"
-                                    mat-raised-button color="warn" (click)="deleteDiffList()">{{lang.delete}}</button>
+                                    mat-raised-button color="warn" (click)="deleteDiffList()">{{'lang.delete' | translate}}</button>
                             </div>
                         </div>
                     </div>
                 </mat-tab>
-                <mat-tab label="{{lang.visaWorkflow}}" *ngIf="!creationMode">
+                <mat-tab label="{{'lang.visaWorkflow' | translate}}" *ngIf="!creationMode">
                     <div class="row" style="margin:0px;" id="visaCircuitContent">
                         <div class="col-md-12">
                             <app-visa-workflow [adminMode]="true" [showListModels]="false" [showComment]="false"
@@ -284,15 +290,15 @@
                         <div class="form-group" *ngIf="currentEntity.entity_id">
                             <div class="col-md-12 text-center" style="padding:10px;">
                                 <button mat-raised-button color="primary" (click)="saveDiffListVisa()"
-                                    [disabled]="!appVisaWorkflow.isModified()">{{lang.save}}</button>
+                                    [disabled]="!appVisaWorkflow.isModified()">{{'lang.save' | translate}}</button>
                                 <button mat-raised-button color="default"
                                     (click)="appVisaWorkflow.loadListModel(currentEntity.id)"
-                                    [disabled]="!appVisaWorkflow.isModified()">{{lang.cancel}}</button>
+                                    [disabled]="!appVisaWorkflow.isModified()">{{'lang.cancel' | translate}}</button>
                             </div>
                         </div>
                     </div>
                 </mat-tab>
-                <mat-tab label="{{lang.avis}}" *ngIf="!creationMode">
+                <mat-tab label="{{'lang.avis' | translate}}" *ngIf="!creationMode">
                     <div class="row" style="margin:0px;" id="opinionCircuitContent">
                         <div class="col-md-12">
                             <app-avis-workflow [adminMode]="true" [showListModels]="false" #appAvisWorkflow>
@@ -301,18 +307,18 @@
                         <div class="form-group" *ngIf="currentEntity.entity_id">
                             <div class="col-md-12 text-center" style="padding:10px;">
                                 <button mat-raised-button color="primary" (click)="saveDiffListOpinion()"
-                                    [disabled]="!appAvisWorkflow.isModified()">{{lang.save}}</button>
+                                    [disabled]="!appAvisWorkflow.isModified()">{{'lang.save' | translate}}</button>
                                 <button mat-raised-button color="default"
                                     (click)="appAvisWorkflow.loadListModel(currentEntity.id)"
-                                    [disabled]="!appAvisWorkflow.isModified()">{{lang.cancel}}</button>
+                                    [disabled]="!appAvisWorkflow.isModified()">{{'lang.cancel' | translate}}</button>
                             </div>
                         </div>
                     </div>
                 </mat-tab>
-                <mat-tab label="{{lang.users}}" *ngIf="!creationMode">
+                <mat-tab label="{{'lang.users' | translate}}" *ngIf="!creationMode">
                     <div class="row" style="margin:0px;">
                         <div class="col-md-12" *ngIf="currentEntity.canAdminUsers" style="padding:5px;">
-                            <plugin-autocomplete [labelPlaceholder]="lang.linkUser" [labelList]="lang.availableUsers"
+                            <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.linkUser')" [labelList]="this.translate.instant('lang.availableUsers')"
                                 [routeDatas]="['/rest/autocomplete/users/administration']"
                                 [targetSearchKey]="'idToDisplay'" [subInfoKey]="'descriptionToDisplay'"
                                 (triggerEvent)="linkUser($event)"></plugin-autocomplete>
@@ -321,7 +327,7 @@
                         <div class="col-md-6 col-xs-6">
                             <mat-form-field>
                                 <input matInput (keyup)="applyFilterUsers($event.target.value)"
-                                    placeholder="{{lang.filterBy}}">
+                                    placeholder="{{'lang.filterBy' | translate}}">
                             </mat-form-field>
                         </div>
                         <div class="col-md-6 col-xs-6">
@@ -332,25 +338,25 @@
                     <mat-table #tableUsers="matSort" [dataSource]="dataSourceUsers" matSort matSortActive="lastname"
                         matSortDirection="asc">
                         <ng-container matColumnDef="firstname">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.firstname}}</mat-header-cell>
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.firstname' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element"> {{element.firstname}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="lastname">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.lastname}}</mat-header-cell>
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.lastname' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element"> {{element.lastname}} </mat-cell>
                         </ng-container>
                         <mat-header-row *matHeaderRowDef="displayedColumnsUsers"></mat-header-row>
                         <mat-row *matRowDef="let row; columns: displayedColumnsUsers;"
-                            routerLink="/administration/users/{{row.id}}" matTooltip="{{lang.view}}"
+                            routerLink="/administration/users/{{row.id}}" matTooltip="{{'lang.view' | translate}}"
                             style="cursor:pointer;"></mat-row>
                     </mat-table>
                 </mat-tab>
-                <mat-tab label="{{lang.templates}}" *ngIf="!creationMode">
+                <mat-tab label="{{'lang.templates' | translate}}" *ngIf="!creationMode">
                     <div class="row" style="margin:0px;">
                         <div class="col-md-6 col-xs-6">
                             <mat-form-field>
                                 <input matInput (keyup)="applyFilterTemplates($event.target.value)"
-                                    placeholder="{{lang.filterBy}}">
+                                    placeholder="{{'lang.filterBy' | translate}}">
                             </mat-form-field>
                         </div>
                         <div class="col-md-6 col-xs-6">
@@ -361,13 +367,13 @@
                     <mat-table #tableTemplates="matSort" [dataSource]="dataSourceTemplates" matSort
                         matSortActive="template_label" matSortDirection="asc">
                         <ng-container matColumnDef="template_label">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2;">{{lang.templateName}}
+                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2;">{{'lang.templateName' | translate}}
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" style="flex:2;"
                                 matTooltip="{{element.template_comment}}"> {{element.template_label}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="template_target">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:1;">{{lang.templateTarget}}
+                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:1;">{{'lang.templateTarget' | translate}}
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" style="flex:1;"> {{lang[element.template_target]}}
                             </mat-cell>

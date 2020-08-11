@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -40,6 +41,7 @@ export class LinkedResourceListComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public appService: AppService,
@@ -80,12 +82,12 @@ export class LinkedResourceListComponent implements OnInit {
                 if (key === 'statusImage' && this.functions.empty(linkeRes[key])) {
                     linkeRes[key] = 'fa-question undefined';
                 } else if (this.functions.empty(linkeRes[key]) && ['senders', 'recipients', 'attachments', 'hasDocument', 'confidentiality', 'visaCircuit'].indexOf(key) === -1) {
-                    linkeRes[key] = this.lang.undefined;
+                    linkeRes[key] = this.translate.instant('lang.undefined');
                 }
 
                 if (key === 'senders' && linkeRes[key].length > 1) {
                     if (linkeRes[key].length > 1) {
-                        linkeRes[key] = linkeRes[key].length + ' ' + this.lang.contactsAlt;
+                        linkeRes[key] = linkeRes[key].length + ' ' + this.translate.instant('lang.contactsAlt');
                     } else {
                         linkeRes[key] = linkeRes[key][0];
                     }
@@ -106,7 +108,7 @@ export class LinkedResourceListComponent implements OnInit {
     }
 
     unlinkResource(row: any) {
-        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.unlink, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.unlink'), msg: this.translate.instant('lang.confirmAction') } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -117,7 +119,7 @@ export class LinkedResourceListComponent implements OnInit {
                 this.dataSource = new MatTableDataSource(this.linkedResources);
                 this.dataSource.paginator = this.paginator;
                 this.dataSource.sort = this.sort;
-                this.notify.success(this.lang.resourceUnlinked);
+                this.notify.success(this.translate.instant('lang.resourceUnlinked'));
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
@@ -143,7 +145,7 @@ export class LinkedResourceListComponent implements OnInit {
             filter((data: string) => data === 'success'),
             tap(() => {
                 this.initLinkedResources();
-                this.notify.success(this.lang.resourcesLinked);
+                this.notify.success(this.translate.instant('lang.resourcesLinked'));
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);

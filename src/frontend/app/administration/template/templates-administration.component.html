@@ -1,11 +1,11 @@
 <mat-sidenav-container autosize class="maarch-container">
     <ng-template #adminMenuTemplate>
         <mat-nav-list>
-            <h3 mat-subheader>{{lang.actions}}</h3>
+            <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
             <a mat-list-item routerLink="/administration/templates/new">
                 <mat-icon color="primary" mat-list-icon class="fa fa-plus"></mat-icon>
                 <p mat-line>
-                    {{lang.add}}
+                    {{'lang.add' | translate}}
                 </p>
             </a>
         </mat-nav-list>
@@ -32,8 +32,7 @@
                     <div class="row">
                         <div class="col-md-6 col-xs-6">
                             <mat-form-field>
-                                <input matInput (keyup)="applyFilter($event.target.value)"
-                                    placeholder="{{lang.filterBy}}">
+                                <input matInput [formControl]="adminService.getFilterField()" placeholder="{{'lang.filterBy' | translate}}">
                             </mat-form-field>
                         </div>
                         <div class="col-md-6 col-xs-6">
@@ -41,21 +40,20 @@
                             </mat-paginator>
                         </div>
                     </div>
-                    <mat-table #table [dataSource]="dataSource" matSort matSortActive="template_label"
-                        matSortDirection="asc">
+                    <mat-table #table [dataSource]="adminService.getDataSource()" matSort matSortDisableClear>
                         <ng-container matColumnDef="template_id">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2;">{{lang.technicalId}}
+                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:1;">{{'lang.technicalId' | translate}}
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" style="flex:1;"> {{element.template_id}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="template_label">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2;">{{lang.templateName}}
+                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2;">{{'lang.templateName' | translate}}
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" style="flex:2;"> {{element.template_label}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="template_comment">
                             <mat-header-cell *matHeaderCellDef mat-sort-header
-                                [class.hide-for-mobile]="appService.getViewMode()" style="flex:2;">{{lang.description}}
+                                [class.hide-for-mobile]="appService.getViewMode()" style="flex:2;">{{'lang.description' | translate}}
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" [class.hide-for-mobile]="appService.getViewMode()"
                                 style="flex:2;"> {{element.template_comment}} </mat-cell>
@@ -63,13 +61,13 @@
                         <ng-container matColumnDef="template_target">
                             <mat-header-cell *matHeaderCellDef mat-sort-header
                                 [class.hide-for-mobile]="appService.getViewMode()" style="flex:1;">
-                                {{lang.templateTarget}}</mat-header-cell>
+                                {{'lang.templateTarget' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element" [class.hide-for-mobile]="appService.getViewMode()"
                                 style="flex:1;"> {{lang[element.template_target]}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="template_type">
                             <mat-header-cell *matHeaderCellDef mat-sort-header
-                                [class.hide-for-mobile]="appService.getViewMode()" style="flex:1;">{{lang.templateType}}
+                                [class.hide-for-mobile]="appService.getViewMode()" style="flex:1;">{{'lang.templateType' | translate}}
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" [class.hide-for-mobile]="appService.getViewMode()"
                                 style="flex:1;"> {{element.template_type}} </mat-cell>
@@ -78,7 +76,7 @@
                             <mat-header-cell *matHeaderCellDef></mat-header-cell>
                             <mat-cell *matCellDef="let element" style="justify-content: flex-end;">
                                 <button mat-icon-button color="warn" [disabled]="element.is_system == 'Y'"
-                                    matTooltip="{{lang.delete}}"
+                                    matTooltip="{{'lang.delete' | translate}}"
                                     (click)="$event.stopPropagation();deleteTemplate(element)">
                                     <mat-icon class="fa fa-trash-alt fa-2x" aria-hidden="true"></mat-icon>
                                 </button>
@@ -87,11 +85,11 @@
                         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                         <mat-row *matRowDef="let row; columns: displayedColumns;"
                             routerLink="/administration/templates/{{row.template_id}}" style="cursor:pointer;"
-                            matTooltip="{{lang.view}}"></mat-row>
+                            matTooltip="{{'lang.view' | translate}}"></mat-row>
                     </mat-table>
                     <div class="mat-paginator"
                         style="min-height:48px;display: flex;justify-content: end;align-items: center;padding-right: 20px;">
-                        {{templates.length}} {{lang.templates}}</div>
+                        {{templates.length}} {{'lang.templates' | translate}}</div>
                 </mat-card>
             </div>
         </div>

@@ -2,10 +2,10 @@
     <div class="editInProgress">
         <i class="fas fa-file-word bounce"></i>
         <div>
-            {{lang.editInProgress}}
+            {{'lang.editInProgress' | translate}}
         </div>
         <div>
-            <button mat-button (click)="cancelTemplateEdition()">{{lang.cancel}}</button>
+            <button mat-button (click)="cancelTemplateEdition()">{{'lang.cancel' | translate}}</button>
         </div>
     </div>
 </ng-container>
@@ -13,7 +13,7 @@
     <ng-container *ngIf="noFile; else elseHaveFile">
         <div class="noFile">
             <i class="far fa-times-circle"></i>
-            {{lang.noFile}}
+            {{'lang.noFile' | translate}}
         </div>
     </ng-container>
     <ng-template #elseHaveFile>
@@ -25,25 +25,25 @@
         <div *ngIf="file.content === null && !loading" class="view-doc-container" appUploadFileDragDrop
             (onFileDropped)="dndUploadFile($event)" [disabled]="!editMode">
             <i class="fa fa-file-upload upload-icon"></i><br />
-            {{lang.dragAndDrop}}<br />{{lang.or}}
+            {{'lang.dragAndDrop' | translate}}<br />{{'lang.or' | translate}}
             <div style="display: flex;">
                 <div
                     style="margin-right:20px;align-items: center;justify-content: center;text-align: center;display: flex;">
-                    <plugin-select-search #templateList *ngIf="listTemplates.length > 0" [label]="lang.chooseModel"
-                        [placeholderLabel]="lang.chooseModel" [datas]="listTemplates" [class]="'input-form-filled'"
+                    <plugin-select-search #templateList *ngIf="listTemplates.length > 0" [label]="this.translate.instant('lang.chooseModel')"
+                        [placeholderLabel]="this.translate.instant('lang.chooseModel')" [datas]="listTemplates" [class]="'input-form-filled'"
                         [formControlSelect]="templateListForm" (afterSelected)="editTemplate($event)"
                         style="width: 240px;text-align: left;font-weight:normal;font-size: 13px;">
                     </plugin-select-search>
                 </div>
                 <button mat-button (click)="docToUpload.click()" class="button-form-primary-alt"
-                    style="align-items: center;justify-content: center;text-align: center;display: flex;">{{lang.chooseFile}}</button>
+                    style="align-items: center;justify-content: center;text-align: center;display: flex;">{{'lang.chooseFile' | translate}}</button>
             </div>
         </div>
         <input type="file" #docToUpload [ngModel]="docToUploadValue" name="files[]" (change)="uploadTrigger($event)" style="display:none;">
         <div style="display: block;width:100%;" appUploadFileDragDrop (onFileDropped)="dndUploadFile($event)"
             [disabled]="!editMode">
             <div *ngIf="!loading && file.content !== null && !hideTools" class="viewer-tools">
-                <button mat-icon-button (click)="downloadOriginalFile()" [matTooltip]="lang.downloadOriginalFile">
+                <button mat-icon-button (click)="downloadOriginalFile()" [matTooltip]="this.translate.instant('lang.downloadOriginalFile')">
                     <mat-icon class="fa fa-download"></mat-icon>
                 </button>
                 <button [disabled]="!functions.empty(file.subinfos) && file.subinfos.signedDocVersions" [class.disabledButton]="!functions.empty(file.subinfos) && file.subinfos.signedDocVersions" *ngIf="editMode && resId !== null && !noConvertedFound" mat-icon-button (click)="editResource()"
@@ -56,38 +56,38 @@
                 <mat-menu #menuOptions="matMenu" [class]="'optionsListMenu'">
                     <button mat-menu-item *ngIf="file.contentView !== undefined || base64 !== null" (click)="openPdfInTab()">
                         <mat-icon color="primary" class="fas fa-external-link-alt"></mat-icon>
-                        <span>{{lang.openInExternalModal}}</span>
+                        <span>{{'lang.openInExternalModal' | translate}}</span>
                     </button>
                     <button mat-menu-item *ngIf="(file.contentView !== undefined || base64 !== null) && resId != null && mode !== 'attachment' && externalId.signatureBookId" (click)="openMaarchParapheurWorkflow()">
                         <mat-icon color="primary" class="fas fa-list-ol"></mat-icon>
-                        <span>{{lang.externalVisaWorkflow}}</span>
+                        <span>{{'lang.externalVisaWorkflow' | translate}}</span>
                     </button>
                     <button mat-menu-item *ngIf="editMode && resId === null" (click)="docToUpload.click()">
                         <mat-icon color="primary" class="fa fa-file-upload"></mat-icon>
-                        <span>{{lang.uploadAnOtherFile}}</span>
+                        <span>{{'lang.uploadAnOtherFile' | translate}}</span>
                     </button>
                     <button mat-menu-item *ngIf="editMode && resId === null" (click)="cleanFile()">
                         <mat-icon class="fa fa-trash" color="warn"></mat-icon>
-                        <span>{{lang.removeFile}}</span>
+                        <span>{{'lang.removeFile' | translate}}</span>
                     </button>
                 </mat-menu>
                 <ng-container *ngIf="mode === 'mainDocument' && !functions.empty(file.subinfos)">
                     <button *ngIf="file.subinfos.mainDocVersions.length > 1 && !file.subinfos.signedDocVersions" mat-button
                         [matBadge]="file.subinfos.mainDocVersions.length" [matMenuTriggerFor]="menuVersionsDoc">
-                        {{lang.versions}}
+                        {{'lang.versions' | translate}}
                     </button>
                     <mat-menu #menuVersionsDoc="matMenu">
                         <button mat-menu-item *ngFor="let version of file.subinfos.mainDocVersions" (click)="openResourceVersion(version,'PDF')">
-                            <span>{{lang.version}} {{version}}</span>
+                            <span>{{'lang.version' | translate}} {{version}}</span>
                         </button>
                     </mat-menu>
                     <button *ngIf="file.subinfos.signedDocVersions" mat-button
                         (click)="openResourceVersion(file.subinfos.mainDocVersions[file.subinfos.mainDocVersions.length -1],'SIGN')">
-                        {{lang.SIGN_version}}
+                        {{'lang.SIGN_version' | translate}}
                     </button>
                     <button *ngIf="file.subinfos.commentedDocVersions > 0" mat-button
                         (click)="openResourceVersion(file.subinfos.mainDocVersions[file.subinfos.mainDocVersions.length -1],'NOTE')">
-                        {{lang.NOTE_version}}
+                        {{'lang.NOTE_version' | translate}}
                     </button>
                 </ng-container>
             </div>
@@ -101,9 +101,9 @@
         <div *ngIf="file.content !== null && noConvertedFound" class="no-doc-container" appUploadFileDragDrop
             (onFileDropped)="dndUploadFile($event)" [disabled]="!editMode">
             <div class="loaded-file"><i class="fa fa-file"></i>&nbsp;<a
-                    (click)="downloadOriginalFile()">{{file.name}}</a>&nbsp;<b>{{lang.loaded}}</b></div>
+                    (click)="downloadOriginalFile()">{{file.name}}</a>&nbsp;<b>{{'lang.loaded' | translate}}</b></div>
 
-            <div class="no-view"><i class="far fa-eye-slash no-view-icon"></i><br />{{lang.noAvailablePreview}}</div>
+            <div class="no-view"><i class="far fa-eye-slash no-view-icon"></i><br />{{'lang.noAvailablePreview' | translate}}</div>
 
         </div>
     </ng-template>
@@ -122,19 +122,19 @@
     </div>
 </ng-container>
 <button mat-fab *ngIf="isDocModified && mode === 'mainDocument' && resId !== null" color="accent"
-    [title]="lang.saveModifications" style="position: absolute;z-index: 3;bottom: 40px;right: 60px;"
+    [title]="this.translate.instant('lang.saveModifications')" style="position: absolute;z-index: 3;bottom: 40px;right: 60px;"
     (click)="saveMainDocument()">
     <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
 </button>
 <button mat-fab *ngIf="isDocModified && mode === 'attachment'" color="accent"
-    [title]="lang.saveModifications" style="position: absolute;z-index: 3;bottom: 40px;right: 60px;"
+    [title]="this.translate.instant('lang.saveModifications')" style="position: absolute;z-index: 3;bottom: 40px;right: 60px;"
     (click)="saveTmpDocument()">
     <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
 </button>
 <button mat-raised-button 
     *ngIf="(!isDocModified && mode === 'mainDocument' && resId !== null && !functions.empty(file.subinfos) && file.subinfos.signedDocVersions && (privilegeService.hasCurrentUserPrivilege('sign_document') || this.headerService.user.id == file.creatorId)) && !hideTools" 
     color="warn"
-    [title]="lang.unsign" style="position: fixed;z-index: 1;bottom: 100px;right: 150px;"
+    [title]="this.translate.instant('lang.unsign')" style="position: fixed;z-index: 1;bottom: 100px;right: 150px;"
     (click)="unsignMainDocument()">
-    {{lang.removeSignature}}
+    {{'lang.removeSignature' | translate}}
 </button>

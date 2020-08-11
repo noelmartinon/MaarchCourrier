@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { StepAction } from '../types';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { tap, catchError } from 'rxjs/operators';
@@ -32,25 +33,25 @@ export class MailserverComponent implements OnInit {
     smtpTypeList = [
         {
             id: 'smtp',
-            label: this.lang.smtpclient
+            label: this.translate.instant('lang.smtpclient')
         },
         {
             id: 'sendmail',
-            label: this.lang.smtprelay
+            label: this.translate.instant('lang.smtprelay')
         },
         {
             id: 'qmail',
-            label: this.lang.qmail
+            label: this.translate.instant('lang.qmail')
         },
         {
             id: 'mail',
-            label: this.lang.phpmail
+            label: this.translate.instant('lang.phpmail')
         }
     ];
     smtpSecList = [
         {
             id: '',
-            label: this.lang.none
+            label: this.translate.instant('lang.none')
         },
         {
             id: 'ssl',
@@ -65,6 +66,7 @@ export class MailserverComponent implements OnInit {
     @ViewChild('checkMailserverContent', { static: true }) checkMailserverContent: MatDrawer;
 
     constructor(
+        private translate: TranslateService,
         private _formBuilder: FormBuilder,
         private notify: NotificationService,
         public http: HttpClient,
@@ -93,7 +95,7 @@ export class MailserverComponent implements OnInit {
                 this.emailSendLoading = false;
                 this.emailSendResult = {
                     icon: 'fa-paper-plane primary',
-                    msg: this.lang.emailSendInProgress,
+                    msg: this.translate.instant('lang.emailSendInProgress'),
                     debug: ''
                 };
             }
@@ -135,15 +137,15 @@ export class MailserverComponent implements OnInit {
     testEmailSend() {
         this.emailSendResult = {
             icon: 'fa-paper-plane primary',
-            msg: this.lang.emailSendInProgress,
+            msg: this.translate.instant('lang.emailSendInProgress'),
             debug: ''
         };
         const email = {
             'sender': { 'email': this.stepFormGroup.controls['from'] },
             'recipients': [this.recipientTest],
-            'object': '[' + this.lang.doNotReply + '] ' + this.lang.emailSendTest,
+            'object': '[' + this.translate.instant('lang.doNotReply') + '] ' + this.translate.instant('lang.emailSendTest'),
             'status': 'EXPRESS',
-            'body': this.lang.emailSendTest,
+            'body': this.translate.instant('lang.emailSendTest'),
             'isHtml': false
         };
         this.emailSendLoading = true;
@@ -153,7 +155,7 @@ export class MailserverComponent implements OnInit {
                 this.emailSendLoading = false;
                 this.emailSendResult = {
                     icon: 'fa-check green',
-                    msg: this.lang.emailSendSuccess,
+                    msg: this.translate.instant('lang.emailSendSuccess'),
                     debug: ''
                 };
             }),
@@ -163,7 +165,7 @@ export class MailserverComponent implements OnInit {
                 this.emailSendLoading = false;
                 this.emailSendResult = {
                     icon: 'fa-times red',
-                    msg: this.lang.emailSendFailed,
+                    msg: this.translate.instant('lang.emailSendFailed'),
                     debug: err.error.errors
                 };
                 return of(false);
@@ -204,7 +206,7 @@ export class MailserverComponent implements OnInit {
                 from: this.stepFormGroup.controls['from'].value
             },
             route: '../rest/installer/mailserver',
-            description: this.lang.stepMailServerActionDesc,
+            description: this.translate.instant('lang.stepMailServerActionDesc'),
             installPriority: 3
         }];*/
     }

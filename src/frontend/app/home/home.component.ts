@@ -1,6 +1,7 @@
 import { Component, OnInit, QueryList, ViewChildren, AfterViewInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { MatTableDataSource } from '@angular/material/table';
@@ -40,6 +41,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     @ViewChildren(MatExpansionPanel) viewPanels: QueryList<MatExpansionPanel>;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         public dialog: MatDialog,
         private sanitizer: DomSanitizer,
@@ -57,12 +59,12 @@ export class HomeComponent implements OnInit, AfterViewInit {
         if (this.appService.getViewMode()) {
             this.displayedColumns = ['res_id', 'subject'];
         }
-        this.headerService.setHeader(this.lang.home);
+        this.headerService.setHeader(this.translate.instant('lang.home'));
 
         const event = new Date();
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
-        this.currentDate = event.toLocaleDateString(this.lang.langISO, options);
+        this.currentDate = event.toLocaleDateString(this.translate.instant('lang.langISO'), options);
 
         this.http.get('../rest/home')
             .subscribe((data: any) => {
@@ -118,10 +120,10 @@ export class HomeComponent implements OnInit, AfterViewInit {
                 if (data['isAllowed']) {
                     this.router.navigate([`/resources/${row.res_id}`]);
                 } else {
-                    this.notify.error(this.lang.documentOutOfPerimeter);
+                    this.notify.error(this.translate.instant('lang.documentOutOfPerimeter'));
                 }
             }, () => {
-                this.notify.error(this.lang.errorOccured);
+                this.notify.error(this.translate.instant('lang.errorOccured'));
             });
     }
 

@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
@@ -30,6 +31,7 @@ export class GiveAvisParallelActionComponent implements OnInit {
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialogRef: MatDialogRef<GiveAvisParallelActionComponent>,
@@ -78,7 +80,7 @@ export class GiveAvisParallelActionComponent implements OnInit {
     }
 
     executeAction(realResSelected: number[]) {
-        const noteContent: string = `[${this.lang.avisUserState}] ${this.noteEditor.getNoteContent()}`;
+        const noteContent: string = `[${this.translate.instant('lang.avisUserState')}] ${this.noteEditor.getNoteContent()}`;
         this.noteEditor.setNoteContent(noteContent);
         this.http.put(this.data.processActionRoute, { resources: realResSelected, note: this.noteEditor.getNote()}).pipe(
             tap((data: any) => {

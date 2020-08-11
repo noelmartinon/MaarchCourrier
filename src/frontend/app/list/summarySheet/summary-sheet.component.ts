@@ -1,6 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -23,93 +24,94 @@ export class SummarySheetComponent implements OnInit {
         {
             id: 'primaryInformations',
             unit: 'primaryInformations',
-            label: this.lang.primaryInformations,
+            label: this.translate.instant('lang.primaryInformations'),
             css: 'col-md-6 text-left',
             desc: [
-                this.lang.mailDate,
-                this.lang.arrivalDate,
-                this.lang.nature,
-                this.lang.creation_date,
-                this.lang.mailType,
-                this.lang.initiator
+                this.translate.instant('lang.mailDate'),
+                this.translate.instant('lang.arrivalDate'),
+                this.translate.instant('lang.nature'),
+                this.translate.instant('lang.creation_date'),
+                this.translate.instant('lang.mailType'),
+                this.translate.instant('lang.initiator')
             ],
             enabled: true
         },
         {
             id: 'senderRecipientInformations',
             unit: 'senderRecipientInformations',
-            label: this.lang.senderRecipientInformations,
+            label: this.translate.instant('lang.senderRecipientInformations'),
             css: 'col-md-6 text-left',
             desc: [
-                this.lang.senders,
-                this.lang.recipients
+                this.translate.instant('lang.senders'),
+                this.translate.instant('lang.recipients')
             ],
             enabled: true
         },
         {
             id: 'secondaryInformations',
             unit: 'secondaryInformations',
-            label: this.lang.secondaryInformations,
+            label: this.translate.instant('lang.secondaryInformations'),
             css: 'col-md-6 text-left',
             desc: [
-                this.lang.category_id,
-                this.lang.status,
-                this.lang.priority,
-                this.lang.processLimitDate,
-                this.lang.customFieldsAdmin
+                this.translate.instant('lang.category_id'),
+                this.translate.instant('lang.status'),
+                this.translate.instant('lang.priority'),
+                this.translate.instant('lang.processLimitDate'),
+                this.translate.instant('lang.customFieldsAdmin')
             ],
             enabled: true
         },
         {
             id: 'diffusionList',
             unit: 'diffusionList',
-            label: this.lang.diffusionList,
+            label: this.translate.instant('lang.diffusionList'),
             css: 'col-md-6 text-left',
             desc: [
-                this.lang.dest_user,
-                this.lang.copyUsersEntities
+                this.translate.instant('lang.dest_user'),
+                this.translate.instant('lang.copyUsersEntities')
             ],
             enabled: true
         },
         {
             id: 'opinionWorkflow',
             unit: 'opinionWorkflow',
-            label: this.lang.avis,
+            label: this.translate.instant('lang.avis'),
             css: 'col-md-4 text-center',
             desc: [
-                this.lang.firstname + ' ' + this.lang.lastname + ' (' + this.lang.destination.toLowerCase() + ')',
-                this.lang.role,
-                this.lang.processDate
+                this.translate.instant('lang.firstname') + ' ' + this.translate.instant('lang.lastname') + ' (' + this.translate.instant('lang.destination').toLowerCase() + ')',
+                this.translate.instant('lang.role'),
+                this.translate.instant('lang.processDate')
             ],
             enabled: true
         },
         {
             id: 'visaWorkflow',
             unit: 'visaWorkflow',
-            label: this.lang.visaWorkflow,
+            label: this.translate.instant('lang.visaWorkflow'),
             css: 'col-md-4 text-center',
             desc: [
-                this.lang.firstname + ' ' + this.lang.lastname + ' (' + this.lang.destination.toLowerCase() + ')',
-                this.lang.role,
-                this.lang.processDate
+                this.translate.instant('lang.firstname') + ' ' + this.translate.instant('lang.lastname') + ' (' + this.translate.instant('lang.destination').toLowerCase() + ')',
+                this.translate.instant('lang.role'),
+                this.translate.instant('lang.processDate')
             ],
             enabled: true
         },
         {
             id: 'notes',
             unit: 'notes',
-            label: this.lang.notes,
+            label: this.translate.instant('lang.notes'),
             css: 'col-md-4 text-center',
             desc: [
-                this.lang.firstname + ' ' + this.lang.lastname,
-                this.lang.creation_date,
-                this.lang.content
+                this.translate.instant('lang.firstname') + ' ' + this.translate.instant('lang.lastname'),
+                this.translate.instant('lang.creation_date'),
+                this.translate.instant('lang.content')
             ],
             enabled: true
         }
     ];
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialogRef: MatDialogRef<SummarySheetComponent>,
@@ -153,11 +155,11 @@ export class SummarySheetComponent implements OnInit {
                         mm = '0' + mm;
                     }
                     today = dd + '-' + mm + '-' + yyyy;
-                    downloadLink.setAttribute('download', this.lang.summarySheetsAlt + '_' + today + '.pdf');
+                    downloadLink.setAttribute('download', this.translate.instant('lang.summarySheetsAlt') + '_' + today + '.pdf');
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
                 } else {
-                    alert(this.lang.tooMuchDatas);
+                    alert(this.translate.instant('lang.tooMuchDatas'));
                 }
 
                 this.loading = false;
@@ -195,10 +197,10 @@ export class SummarySheetComponent implements OnInit {
         this.dataAvailable.push({
             id: 'freeField_' + this.dataAvailable.length,
             unit: 'freeField',
-            label: this.lang.comments,
+            label: this.translate.instant('lang.comments'),
             css: 'col-md-12 text-left',
             desc: [
-                this.lang.freeNote
+                this.translate.instant('lang.freeNote')
             ],
             enabled: true
         });

@@ -1,6 +1,7 @@
 import { Component, OnInit, Inject, AfterViewInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { LANG } from '../../../app/translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/internal/operators/tap';
 import { catchError } from 'rxjs/internal/operators/catchError';
@@ -23,6 +24,7 @@ export class InstallActionComponent implements OnInit, AfterViewInit {
     disableAnimation = true;
 
     constructor(
+        private translate: TranslateService,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<InstallActionComponent>,
         public http: HttpClient,

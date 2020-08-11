@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Location } from '@angular/common';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from '../../service/header.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -14,7 +15,7 @@ import { Router } from '@angular/router';
 })
 export class HeaderPanelComponent implements OnInit {
 
-    lang: any = LANG;
+    // lang: any = LANG;
 
     dialogRef: MatDialogRef<any>;
     config: any = {};
@@ -24,6 +25,7 @@ export class HeaderPanelComponent implements OnInit {
     @Input() snavLeft: MatSidenav;
 
     constructor(
+        public translate: TranslateService,
         public headerService: HeaderService,
         public appService: AppService,
         private router: Router,

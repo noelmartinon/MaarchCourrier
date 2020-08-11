@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from './translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../service/notification/notification.service';
 import { Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -42,6 +43,7 @@ export class ActivateUserComponent implements OnInit {
     }
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private authService: AuthService,
         private headerService: HeaderService,
@@ -102,13 +104,13 @@ export class ActivateUserComponent implements OnInit {
                     this.http.delete('../rest/users/' + this.headerService.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basketsRedirectedIds)
                         .subscribe((data: any) => {
                             this.router.navigate(['/home']);
-                            this.notify.success(this.lang.absOff);
+                            this.notify.success(this.translate.instant('lang.absOff'));
                         }, (err) => {
                             this.notify.error(err.error.errors);
                         });
                 } else {
                     this.router.navigate(['/home']);
-                    this.notify.success(this.lang.absOff);
+                    this.notify.success(this.translate.instant('lang.absOff'));
                 }
 
 

@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -48,6 +49,7 @@ export class FolderInputComponent implements OnInit {
     @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -65,7 +67,7 @@ export class FolderInputComponent implements OnInit {
     }
 
     initAutocompleteRoute() {
-        this.listInfo = this.lang.autocompleteInfo;
+        this.listInfo = this.translate.instant('lang.autocompleteInfo');
         this.options = [];
         this.myControl.valueChanges
             .pipe(
@@ -77,7 +79,7 @@ export class FolderInputComponent implements OnInit {
                 switchMap((data: any) => this.getDatas(data)),
                 tap((data: any) => {
                     if (data.length === 0) {
-                        this.listInfo = this.lang.noAvailableValue;
+                        this.listInfo = this.translate.instant('lang.noAvailableValue');
                     } else {
                         this.listInfo = '';
                     }
@@ -125,7 +127,7 @@ export class FolderInputComponent implements OnInit {
 
     resetAutocomplete() {
         this.options = [];
-        this.listInfo = this.lang.autocompleteInfo;
+        this.listInfo = this.translate.instant('lang.autocompleteInfo');
     }
 
     private _filter(value: string): string[] {

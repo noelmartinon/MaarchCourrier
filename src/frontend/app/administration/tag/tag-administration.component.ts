@@ -2,6 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
@@ -49,6 +50,7 @@ export class TagAdministrationComponent implements OnInit {
     @ViewChild('linkedTagInput') linkedTagInput: ElementRef<HTMLInputElement>;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -68,7 +70,7 @@ export class TagAdministrationComponent implements OnInit {
             this.id = params['id'];
             await this.getTags();
             if (typeof params['id'] === 'undefined') {
-                this.headerService.setHeader(this.lang.tagCreation);
+                this.headerService.setHeader(this.translate.instant('lang.tagCreation'));
                 this.creationMode = true;
                 this.loading = false;
             } else {
@@ -85,7 +87,7 @@ export class TagAdministrationComponent implements OnInit {
                             this.toggleAdvancedTag();
                         }
 
-                        this.headerService.setHeader(this.lang.tagModification, this.tag.label.value);
+                        this.headerService.setHeader(this.translate.instant('lang.tagModification'), this.tag.label.value);
                     }),
                     finalize(() => this.loading = false),
                     catchError((err: any) => {
@@ -117,7 +119,7 @@ export class TagAdministrationComponent implements OnInit {
     createTag() {
         this.http.post(`../rest/tags`, this.formatTag()).pipe(
             tap(() => {
-                this.notify.success(this.lang.tagAdded);
+                this.notify.success(this.translate.instant('lang.tagAdded'));
                 this.router.navigate(['/administration/tags']);
             }),
             catchError((err: any) => {
@@ -131,7 +133,7 @@ export class TagAdministrationComponent implements OnInit {
 
         this.http.put(`../rest/tags/${this.id}`, this.formatTag()).pipe(
             tap(() => {
-                this.notify.success(this.lang.tagUpdated);
+                this.notify.success(this.translate.instant('lang.tagUpdated'));
                 this.router.navigate(['/administration/tags']);
             }),
             catchError((err: any) => {
@@ -169,14 +171,14 @@ export class TagAdministrationComponent implements OnInit {
         this.selectMergeTag.reset();
         const selectedTag = this.tags.filter(tag => tag.id === tagId)[0];
 
-        const dialogMessage = `${this.lang.confirmAction}<br/><br/>${this.lang.theTag}<b> "${this.tag.label.value}" </b>${this.lang.willBeDeletedAndMerged}<b> "${selectedTag.label}"</b><br/><br/>${this.lang.willBeTransferredToNewTag}<b> "${selectedTag.label}"</b> : <b>${this.tag.countResources.value}</b>`;
+        const dialogMessage = `${this.translate.instant('lang.confirmAction')}<br/><br/>${this.translate.instant('lang.theTag')}<b> "${this.tag.label.value}" </b>${this.translate.instant('lang.willBeDeletedAndMerged')}<b> "${selectedTag.label}"</b><br/><br/>${this.translate.instant('lang.willBeTransferredToNewTag')}<b> "${selectedTag.label}"</b> : <b>${this.tag.countResources.value}</b>`;
 
-        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.lang.mergeWith}  "${selectedTag.label}"`, msg: dialogMessage } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.mergeWith')}  "${selectedTag.label}"`, msg: dialogMessage } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.put(`../rest/mergeTags`, { idMaster: selectedTag.id, idMerge: this.id })),
             tap(() => {
-                this.notify.success(this.lang.tagMerged);
+                this.notify.success(this.translate.instant('lang.tagMerged'));
                 this.router.navigate([`/administration/tags/${selectedTag.id}`]);
             }),
             catchError((err: any) => {

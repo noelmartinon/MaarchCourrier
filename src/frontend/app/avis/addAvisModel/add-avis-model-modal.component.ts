@@ -1,6 +1,7 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { tap, catchError } from 'rxjs/operators';
 import { NotificationService } from '../../../service/notification/notification.service';
@@ -23,6 +24,7 @@ export class AddAvisModelModalComponent {
     };
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient, 
         @Inject(MAT_DIALOG_DATA) public data: any, 
         public dialogRef: MatDialogRef<AddAvisModelModalComponent>,
@@ -42,7 +44,7 @@ export class AddAvisModelModalComponent {
         this.http.post(`../rest/listTemplates`, this.template).pipe(
             tap((data: any) => {
                 this.template.id = data.id;
-                this.notify.success(this.lang.modelSaved);
+                this.notify.success(this.translate.instant('lang.modelSaved'));
                 this.dialogRef.close(this.template);
             }),
             catchError((err: any) => {

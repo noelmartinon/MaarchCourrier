@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { LANG } from './translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from '../service/header.service';
 import { AppService } from '../service/app.service';
 import { environment } from '../environments/environment';
@@ -19,16 +20,17 @@ export class AboutUsComponent implements OnInit {
 
     loading: boolean = false;
 
-    commitHash: string = this.lang.undefined;
+    commitHash: string = this.translate.instant('lang.undefined');
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService) { }
 
     async ngOnInit() {
-        this.headerService.setHeader(this.lang.aboutUs);
+        this.headerService.setHeader(this.translate.instant('lang.aboutUs'));
 
         this.applicationVersion = environment.VERSION;
         this.loading = false;
@@ -40,7 +42,7 @@ export class AboutUsComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get('../rest/commitInformation').pipe(
                 tap((data: any) => {
-                    this.commitHash = data.hash !== null ? data.hash : this.lang.undefined;
+                    this.commitHash = data.hash !== null ? data.hash : this.translate.instant('lang.undefined');
                     console.log(data);
                     resolve(true);
                 }),

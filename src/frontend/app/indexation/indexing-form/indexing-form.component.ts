@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, ViewChild, EventEmitter, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -46,7 +47,7 @@ export class IndexingFormComponent implements OnInit {
     indexingModelsCore: any[] = [
         {
             identifier: 'doctype',
-            label: this.lang.doctype,
+            label: this.translate.instant('lang.doctype'),
             unit: 'mail',
             type: 'select',
             system: true,
@@ -57,7 +58,7 @@ export class IndexingFormComponent implements OnInit {
         },
         {
             identifier: 'subject',
-            label: this.lang.subject,
+            label: this.translate.instant('lang.subject'),
             unit: 'mail',
             type: 'string',
             system: true,
@@ -83,7 +84,7 @@ export class IndexingFormComponent implements OnInit {
     availableFields: any[] = [
         {
             identifier: 'recipients',
-            label: this.lang.getRecipients,
+            label: this.translate.instant('lang.getRecipients'),
             type: 'autocomplete',
             default_value: null,
             values: [],
@@ -91,7 +92,7 @@ export class IndexingFormComponent implements OnInit {
         },
         {
             identifier: 'priority',
-            label: this.lang.priority,
+            label: this.translate.instant('lang.priority'),
             type: 'select',
             default_value: null,
             values: [],
@@ -99,15 +100,15 @@ export class IndexingFormComponent implements OnInit {
         },
         {
             identifier: 'confidentiality',
-            label: this.lang.confidential,
+            label: this.translate.instant('lang.confidential'),
             type: 'radio',
             default_value: null,
-            values: [{ 'id': true, 'label': this.lang.yes }, { 'id': false, 'label': this.lang.no }],
+            values: [{ 'id': true, 'label': this.translate.instant('lang.yes') }, { 'id': false, 'label': this.translate.instant('lang.no') }],
             enabled: true,
         },
         {
             identifier: 'initiator',
-            label: this.lang.initiatorEntityAlt,
+            label: this.translate.instant('lang.initiatorEntityAlt'),
             type: 'select',
             default_value: null,
             values: [],
@@ -115,7 +116,7 @@ export class IndexingFormComponent implements OnInit {
         },
         {
             identifier: 'departureDate',
-            label: this.lang.departureDate,
+            label: this.translate.instant('lang.departureDate'),
             type: 'date',
             default_value: null,
             values: [],
@@ -123,7 +124,7 @@ export class IndexingFormComponent implements OnInit {
         },
         {
             identifier: 'processLimitDate',
-            label: this.lang.processLimitDate,
+            label: this.translate.instant('lang.processLimitDate'),
             type: 'date',
             default_value: null,
             values: [],
@@ -131,7 +132,7 @@ export class IndexingFormComponent implements OnInit {
         },
         {
             identifier: 'tags',
-            label: this.lang.tags,
+            label: this.translate.instant('lang.tags'),
             type: 'autocomplete',
             default_value: null,
             values: ['/rest/autocomplete/tags', '/rest/tags'],
@@ -139,7 +140,7 @@ export class IndexingFormComponent implements OnInit {
         },
         {
             identifier: 'senders',
-            label: this.lang.getSenders,
+            label: this.translate.instant('lang.getSenders'),
             type: 'autocomplete',
             default_value: null,
             values: ['/rest/autocomplete/correspondents'],
@@ -147,7 +148,7 @@ export class IndexingFormComponent implements OnInit {
         },
         {
             identifier: 'destination',
-            label: this.lang.destination,
+            label: this.translate.instant('lang.destination'),
             type: 'select',
             default_value: null,
             values: [],
@@ -155,7 +156,7 @@ export class IndexingFormComponent implements OnInit {
         },
         {
             identifier: 'folders',
-            label: this.lang.folders,
+            label: this.translate.instant('lang.folders'),
             type: 'autocomplete',
             default_value: null,
             values: ['/rest/autocomplete/folders', '/rest/folders'],
@@ -163,7 +164,7 @@ export class IndexingFormComponent implements OnInit {
         },
         {
             identifier: 'documentDate',
-            label: this.lang.docDate,
+            label: this.translate.instant('lang.docDate'),
             unit: 'mail',
             type: 'date',
             default_value: null,
@@ -172,7 +173,7 @@ export class IndexingFormComponent implements OnInit {
         },
         {
             identifier: 'arrivalDate',
-            label: this.lang.arrivalDate,
+            label: this.translate.instant('lang.arrivalDate'),
             unit: 'mail',
             type: 'date',
             default_value: null,
@@ -194,9 +195,12 @@ export class IndexingFormComponent implements OnInit {
 
     currentResourceValues: any = null;
 
+    selfDest: boolean = false;
+
     dialogRef: MatDialogRef<any>;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -296,7 +300,7 @@ export class IndexingFormComponent implements OnInit {
     }
 
     removeItem(arrTarget: string, item: any, index: number) {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.indexingModelModification, msg: this.lang.updateIndexingFieldWarning } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.indexingModelModification'), msg: this.translate.instant('lang.updateIndexingFieldWarning') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -376,7 +380,7 @@ export class IndexingFormComponent implements OnInit {
                 this.http.put(`../rest/resources/${this.resId}`, formatdatas).pipe(
                     tap(() => {
                         this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas(false)));
-                        this.notify.success(this.lang.dataUpdated);
+                        this.notify.success(this.translate.instant('lang.dataUpdated'));
                         resolve(true);
                     }),
                     catchError((err: any) => {
@@ -386,7 +390,7 @@ export class IndexingFormComponent implements OnInit {
                 ).subscribe();
                 return true;
             } else {
-                this.notify.error(this.lang.mustFixErrors);
+                this.notify.error(this.translate.instant('lang.mustFixErrors'));
                 return false;
             }
         });
@@ -485,8 +489,8 @@ export class IndexingFormComponent implements OnInit {
                         elem.values = [
                             {
                                 id: '#myPrimaryEntity',
-                                title: this.lang.myPrimaryEntity,
-                                label: `<i class="fa fa-hashtag"></i>&nbsp;${this.lang.myPrimaryEntity}`,
+                                title: this.translate.instant('lang.myPrimaryEntity'),
+                                label: `<i class="fa fa-hashtag"></i>&nbsp;${this.translate.instant('lang.myPrimaryEntity')}`,
                                 disabled: false
                             }
                         ];
@@ -506,9 +510,11 @@ export class IndexingFormComponent implements OnInit {
                     } else {
                         let title = '';
                         if (elem.default_value === '#myPrimaryEntity') {
+                            this.selfDest = this.currentCategory === 'outgoing';
                             elem.default_value = this.headerService.user.entities[0].id;
                             this.arrFormControl[elem.identifier].setValue(elem.default_value);
                         } else {
+                            this.selfDest = false;
                             const defaultVal = data.entities.filter((entity: any) => entity.enabled === true && entity.id === elem.default_value);
                             elem.default_value = defaultVal.length > 0 ? defaultVal[0].id : null;
                             this.arrFormControl[elem.identifier].setValue(defaultVal.length > 0 ? defaultVal[0].id : '');
@@ -792,7 +798,7 @@ export class IndexingFormComponent implements OnInit {
                 let fieldExist: boolean;
                 if (data.indexingModel.fields.length === 0) {
                     this.initFields();
-                    this.notify.error(this.lang.noFieldInModelMsg);
+                    this.notify.error(this.translate.instant('lang.noFieldInModelMsg'));
                 } else {
                     data.indexingModel.fields.forEach((field: any) => {
                         fieldExist = false;
@@ -848,7 +854,7 @@ export class IndexingFormComponent implements OnInit {
                             this['indexingModels_' + field.unit].push(field);
                             this.initValidator(field);
                         } else {
-                            this.notify.error(this.lang.fieldNotExist + ': ' + field.identifier);
+                            this.notify.error(this.translate.instant('lang.fieldNotExist') + ': ' + field.identifier);
                         }
 
                     });

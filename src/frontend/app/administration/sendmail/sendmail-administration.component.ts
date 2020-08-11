@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
@@ -36,25 +37,25 @@ export class SendmailAdministrationComponent implements OnInit {
     smtpTypeList = [
         {
             id: 'smtp',
-            label: this.lang.smtpclient
+            label: this.translate.instant('lang.smtpclient')
         },
         {
             id: 'sendmail',
-            label: this.lang.smtprelay
+            label: this.translate.instant('lang.smtprelay')
         },
         {
             id: 'qmail',
-            label: this.lang.qmail
+            label: this.translate.instant('lang.qmail')
         },
         {
             id: 'mail',
-            label: this.lang.phpmail
+            label: this.translate.instant('lang.phpmail')
         }
     ];
     smtpSecList = [
         {
             id: '',
-            label: this.lang.none
+            label: this.translate.instant('lang.none')
         },
         {
             id: 'ssl',
@@ -81,6 +82,7 @@ export class SendmailAdministrationComponent implements OnInit {
 
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -89,7 +91,7 @@ export class SendmailAdministrationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.sendmailShort);
+        this.headerService.setHeader(this.translate.instant('lang.sendmailShort'));
 
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
@@ -112,12 +114,12 @@ export class SendmailAdministrationComponent implements OnInit {
 
     onSubmit() {
         if (this.sendmailFormCpt.invalid) {
-            this.notify.handleErrors({ 'error': { 'errors': this.lang.notSavedBecauseInvalid } });
+            this.notify.handleErrors({ 'error': { 'errors': this.translate.instant('lang.notSavedBecauseInvalid') } });
         } else {
             this.http.put('../rest/configurations/admin_email_server', this.sendmail)
                 .subscribe((data: any) => {
                     this.sendmailClone = JSON.parse(JSON.stringify(this.sendmail));
-                    this.notify.success(this.lang.configurationUpdated);
+                    this.notify.success(this.translate.instant('lang.configurationUpdated'));
                 }, (err) => {
                     this.notify.handleErrors(err);
                 });
@@ -149,15 +151,15 @@ export class SendmailAdministrationComponent implements OnInit {
         }
         this.emailSendResult = {
             icon: 'fa-paper-plane primary',
-            msg: this.lang.emailSendInProgress,
+            msg: this.translate.instant('lang.emailSendInProgress'),
             debug: ''
         };
         const email = {
             'sender': { 'email': this.currentUser.mail },
             'recipients': [this.recipientTest],
-            'object': '[' + this.lang.doNotReply + '] ' + this.lang.emailSendTest,
+            'object': '[' + this.translate.instant('lang.doNotReply') + '] ' + this.translate.instant('lang.emailSendTest'),
             'status': 'EXPRESS',
-            'body': this.lang.emailSendTest,
+            'body': this.translate.instant('lang.emailSendTest'),
             'isHtml': false
         };
         this.emailSendLoading = true;
@@ -167,14 +169,14 @@ export class SendmailAdministrationComponent implements OnInit {
                 this.emailSendLoading = false;
                 this.emailSendResult = {
                     icon: 'fa-check green',
-                    msg: this.lang.emailSendSuccess,
+                    msg: this.translate.instant('lang.emailSendSuccess'),
                     debug: ''
                 };
             }, (err) => {
                 this.emailSendLoading = false;
                 this.emailSendResult = {
                     icon: 'fa-times red',
-                    msg: this.lang.emailSendFailed,
+                    msg: this.translate.instant('lang.emailSendFailed'),
                     debug: err.error.errors
                 };
             });

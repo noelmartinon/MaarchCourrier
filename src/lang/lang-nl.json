@@ -1898,5 +1898,14 @@
     "import": "Importer__TO_TRANSLATE",
     "confirmImportUsers": "Voulez-vous importer <b>{{0}}</b> utilisateurs__TO_TRANSLATE",
     "mustAtLeastMinValues": "Les données doivent avoir au mimimum <b>6</b> valeurs__TO_TRANSLATE",
-    "emailSubject": "E-mail's subject__TO_TRANSLATE"
+    "emailSubject": "E-mail's subject__TO_TRANSLATE",
+    "enableField": "Activer le champ__TO_TRANSLATE",
+    "disableField": "Désactiver le champ__TO_TRANSLATE",
+    "infoImportusers": "La colonne <b>id</b> est utilisée pour identifier un utilisateur__TO_TRANSLATE",
+    "infoImportusers2": "Les colonnes <b>id</b> et <b>user_id</b> ne sont pas prises en compte lors de mise à jour d'utilisateurs__TO_TRANSLATE",
+    "usersExport": "Exporter des utilisateurs__TO_TRANSLATE",
+    "hotkeyInfo": "Maintenez <b>SHIFT</b> pour propager vos selections aux sous-éléments__TO_TRANSLATE",
+    "hotkeyMsg": "<b>SHIFT</b>&nbsp;Propagation aux sous-élements__TO_TRANSLATE",
+    "hotkeyTitle": "Maintient de la touche shift__TO_TRANSLATE",
+    "advancedParameters": "Paramètres avancés__TO_TRANSLATE"
 }

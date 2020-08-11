@@ -1,6 +1,7 @@
 import { Component, OnInit, Inject, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { switchMap, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize, map } from 'rxjs/operators';
@@ -50,17 +51,17 @@ export class SentNumericPackagePageComponent implements OnInit {
     numericPackageAttachTool: any = {
         document: {
             icon: 'fa fa-file',
-            title: this.lang.attachMainDocument,
+            title: this.translate.instant('lang.attachMainDocument'),
             list: []
         },
         notes: {
             icon: 'fas fa-pen-square',
-            title: this.lang.attachNote,
+            title: this.translate.instant('lang.attachNote'),
             list: []
         },
         attachments: {
             icon: 'fa fa-paperclip',
-            title: this.lang.attachAttachment,
+            title: this.translate.instant('lang.attachAttachment'),
             list: []
         },
     };
@@ -85,6 +86,7 @@ export class SentNumericPackagePageComponent implements OnInit {
     @ViewChild('recipientsInput', { static: true }) recipientsInput: ElementRef<HTMLInputElement>;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any,
@@ -205,7 +207,7 @@ export class SentNumericPackagePageComponent implements OnInit {
                     if (data.disposition.tablename === 'res_letterbox') {
                         this.numericPackage.mainExchangeDoc = {
                             ...this.numericPackageAttachTool['document'].list[0],
-                            typeLabel: this.lang.mainDocument,
+                            typeLabel: this.translate.instant('lang.mainDocument'),
                             type: 'document'
                         };
 
@@ -222,7 +224,7 @@ export class SentNumericPackagePageComponent implements OnInit {
                     if (data.resMasterAttached && data.disposition.tablename !== 'res_letterbox') {
                         this.numericPackageAttach.push({
                             ...this.numericPackageAttachTool['document'].list[0],
-                            typeLabel: this.lang.mainDocument,
+                            typeLabel: this.translate.instant('lang.mainDocument'),
                             type: 'document'
                         });
                     }
@@ -396,7 +398,7 @@ export class SentNumericPackagePageComponent implements OnInit {
         this.numericPackageStatus = 'WAITING';
         if (this.data.emailId === null) {
             if (this.numericPackage.object === '') {
-                const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.confirm, msg: this.lang.warnEmptySubject } });
+                const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirm'), msg: this.translate.instant('lang.warnEmptySubject') } });
 
                 dialogRef.afterClosed().pipe(
                     filter((data: string) => data === 'ok'),
@@ -416,7 +418,7 @@ export class SentNumericPackagePageComponent implements OnInit {
     createEmail(closeModal: boolean = true) {
         this.http.post(`../rest/resources/${this.data.resId}/messageExchange`, this.formatNumericPackage()).pipe(
             tap(() => {
-                this.notify.success(this.lang.numericPackageSent);
+                this.notify.success(this.translate.instant('lang.numericPackageSent'));
 
                 this.closeModal('success');
             }),
@@ -429,13 +431,13 @@ export class SentNumericPackagePageComponent implements OnInit {
     }
 
     deleteEmail() {
-        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.delete(`../rest/messageExchanges/${this.data.emailId}`)),
             tap(() => {
-                this.notify.success(this.lang.numericPackageDeleted);
+                this.notify.success(this.translate.instant('lang.numericPackageDeleted'));
                 this.closeModal('success');
             }),
             finalize(() => this.loading = false),
@@ -450,7 +452,7 @@ export class SentNumericPackagePageComponent implements OnInit {
         this.http.put(`../rest/emails/${this.data.emailId}`, this.formatNumericPackage()).pipe(
             tap(() => {
 
-                this.notify.success(this.lang.numericPackageSent);
+                this.notify.success(this.translate.instant('lang.numericPackageSent'));
 
                 if (closeModal) {
                     this.closeModal('success');
@@ -468,13 +470,13 @@ export class SentNumericPackagePageComponent implements OnInit {
         if (this.numericPackage.mainExchangeDoc === null && type !== 'notes') {
             this.numericPackage.mainExchangeDoc = {
                 ...item,
-                typeLabel: item.typeLabel !== undefined ? item.typeLabel : this.lang.mainDocument,
+                typeLabel: item.typeLabel !== undefined ? item.typeLabel : this.translate.instant('lang.mainDocument'),
                 type: type
             };
         } else {
             this.numericPackageAttach.push({
                 ...item,
-                typeLabel: item.typeLabel !== undefined ? item.typeLabel : this.lang.mainDocument,
+                typeLabel: item.typeLabel !== undefined ? item.typeLabel : this.translate.instant('lang.mainDocument'),
                 type: type
             });
         }
@@ -551,7 +553,7 @@ export class SentNumericPackagePageComponent implements OnInit {
                     mm = '0' + mm;
                 }
                 today = dd + '-' + mm + '-' + yyyy;
-                downloadLink.setAttribute('download', this.lang.summarySheetsAlt + '_' + today + '.pdf');
+                downloadLink.setAttribute('download', this.translate.instant('lang.summarySheetsAlt') + '_' + today + '.pdf');
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
             }),

@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ElementRef, EventEmitter, Output, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
 import { Observable } from 'rxjs';
@@ -22,14 +23,14 @@ export class CriteriaToolComponent implements OnInit {
         mailInformations: [
             {
                 id : 'resourceField',
-                label: this.lang.criteriaResourceField,
-                desc: this.lang.criteriaResourceFieldDesc,
+                label: this.translate.instant('lang.criteriaResourceField'),
+                desc: this.translate.instant('lang.criteriaResourceFieldDesc'),
                 control : new FormControl()
             },
             {
                 id : 'contactField',
-                label: this.lang.criteriaContactField,
-                desc: this.lang.criteriaContactFieldDesc,
+                label: this.translate.instant('lang.criteriaContactField'),
+                desc: this.translate.instant('lang.criteriaContactFieldDesc'),
                 control : new FormControl()
             },
         ]
@@ -49,6 +50,7 @@ export class CriteriaToolComponent implements OnInit {
     @ViewChild('searchCriteriaInput', { static: false }) searchCriteriaInput: ElementRef;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         public appService: AppService,
         public functions: FunctionsService,

@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { tap, finalize, catchError, filter, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -63,6 +64,7 @@ export class AttachmentsListComponent implements OnInit {
     @Output() afterActionAttachment = new EventEmitter<string>();
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -145,7 +147,7 @@ export class AttachmentsListComponent implements OnInit {
             .subscribe(() => {
                 attachment.inSignatureBook = !attachment.inSignatureBook;
                 this.afterActionAttachment.emit('setInSignatureBook');
-                this.notify.success(this.lang.actionDone);
+                this.notify.success(this.translate.instant('lang.actionDone'));
             }, (err: any) => {
                 this.notify.error(err.error.errors);
             });
@@ -156,7 +158,7 @@ export class AttachmentsListComponent implements OnInit {
             .subscribe(() => {
                 attachment.inSendAttach = !attachment.inSendAttach;
                 this.afterActionAttachment.emit('setInSendAttachment');
-                this.notify.success(this.lang.actionDone);
+                this.notify.success(this.translate.instant('lang.actionDone'));
             }, (err: any) => {
                 this.notify.error(err.error.errors);
             });
@@ -207,7 +209,7 @@ export class AttachmentsListComponent implements OnInit {
     }
 
     deleteAttachment(attachment: any) {
-        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -215,7 +217,7 @@ export class AttachmentsListComponent implements OnInit {
             tap(() => {
                 this.loadAttachments(this.resId);
                 this.afterActionAttachment.emit('setInSendAttachment');
-                this.notify.success(this.lang.attachmentDeleted);
+                this.notify.success(this.translate.instant('lang.attachmentDeleted'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

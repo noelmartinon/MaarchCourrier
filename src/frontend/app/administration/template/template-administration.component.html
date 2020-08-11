@@ -290,11 +290,7 @@
         <mat-list>
             <h3 mat-subheader>{{'lang.chooseEntityAssociationModel' | translate}}</h3>
             <div style="padding:10px;">
-                <mat-form-field>
-                    <input matInput id="jstree_search" name="jstree_search" type="text"
-                        placeholder="{{'lang.searchEntities' | translate}}">
-                </mat-form-field>
-                <div id="jstree"></div>
+                <app-maarch-flat-tree #maarchTree></app-maarch-flat-tree>
             </div>
         </mat-list>
     </mat-sidenav>

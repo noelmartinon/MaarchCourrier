@@ -985,28 +985,28 @@ class ResControllerTest extends TestCase
             'model_id'   => 1,
             'identifier' => 'indexingCustomField_1',
             'mandatory'  => 'true',
-            'enabled  '  => 'true',
+            'enabled'    => 'true',
             'unit'       => 'mail'
         ]);
         \IndexingModel\models\IndexingModelFieldModel::create([
             'model_id'   => 1,
             'identifier' => 'indexingCustomField_2',
             'mandatory'  => 'false',
-            'enabled  '  => 'true',
+            'enabled'    => 'true',
             'unit'       => 'mail'
         ]);
         \IndexingModel\models\IndexingModelFieldModel::create([
             'model_id'   => 1,
             'identifier' => 'indexingCustomField_3',
             'mandatory'  => 'false',
-            'enabled  '  => 'true',
+            'enabled'    => 'true',
             'unit'       => 'mail'
         ]);
         \IndexingModel\models\IndexingModelFieldModel::create([
             'model_id'   => 1,
             'identifier' => 'indexingCustomField_4',
             'mandatory'  => 'false',
-            'enabled  '  => 'true',
+            'enabled'    => 'true',
             'unit'       => 'mail'
         ]);
 

@@ -103,6 +103,7 @@ define('_USER_ENTITY_CREATION', 'Entity added to user');
 define('_USER_ENTITY_MODIFICATION', 'Entity updated for user');
 define('_USER_ENTITY_SUPPRESSION', 'Entity deleted for user');
 define('_USER_ALREADY_LINK_GROUP', 'User is already linked to this group');
+define('_CANNOT_ADD_USER_IN_THIS_GROUP', 'You cannot add users in this group');
 define('_USER_ALREADY_LINK_ENTITY', 'User is already linked to this entity');
 define('_VISA_USER', 'For approval');
 define('_WRONG_FILE_TYPE', 'This type of file is not allowed');
@@ -461,3 +462,7 @@ define("_DOC_ADD_TO_SIGNATORY_BOOK", "Mail added to signatory book");
 define("_DOC_REMOVE_FROM_SIGNATORY_BOOK", "Mail removed from signatory book");
 define("_DOC_ADD_TO_MAILEVA", "Mail added to Maileva shippings");
 define("_DOC_REMOVE_FROM_MAILEVA", "Mail removed from Maileva shippings");
+
+define("_ISSUING_SITE_CREATED", "Issuing site created");
+define("_ISSUING_SITE_UPDATED", "Issuing site updated");
+define("_ISSUING_SITE_DELETED", "Issuing site deleted");

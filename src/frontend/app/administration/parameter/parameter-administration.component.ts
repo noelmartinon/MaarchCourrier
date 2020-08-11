@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
@@ -20,6 +21,7 @@ export class ParameterAdministrationComponent implements OnInit {
 
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -34,7 +36,7 @@ export class ParameterAdministrationComponent implements OnInit {
         this.route.params.subscribe((params) => {
 
             if (typeof params['id'] === 'undefined') {
-                this.headerService.setHeader(this.lang.parameterCreation);
+                this.headerService.setHeader(this.translate.instant('lang.parameterCreation'));
 
                 this.creationMode = true;
                 this.loading = false;
@@ -44,7 +46,7 @@ export class ParameterAdministrationComponent implements OnInit {
                 this.http.get('../rest/parameters/' + params['id'])
                     .subscribe((data: any) => {
                         this.parameter = data.parameter;
-                        this.headerService.setHeader(this.lang.parameterModification, this.parameter.id);
+                        this.headerService.setHeader(this.translate.instant('lang.parameterModification'), this.parameter.id);
                         if (typeof (this.parameter.param_value_int) === 'number') {
                             this.type = 'int';
                         } else if (this.parameter.param_value_date) {
@@ -81,7 +83,7 @@ export class ParameterAdministrationComponent implements OnInit {
             this.http.post('../rest/parameters', this.parameter)
                 .subscribe(() => {
                     this.router.navigate(['administration/parameters']);
-                    this.notify.success(this.lang.parameterAdded);
+                    this.notify.success(this.translate.instant('lang.parameterAdded'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -89,7 +91,7 @@ export class ParameterAdministrationComponent implements OnInit {
             this.http.put('../rest/parameters/' + this.parameter.id, this.parameter)
                 .subscribe(() => {
                     this.router.navigate(['administration/parameters']);
-                    this.notify.success(this.lang.parameterUpdated);
+                    this.notify.success(this.translate.instant('lang.parameterUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });

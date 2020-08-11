@@ -1,19 +1,19 @@
 <div class="mat-dialog-content-container">
-  <h1 mat-dialog-title>{{lang.indexingModelReassign}}</h1>
+  <h1 mat-dialog-title>{{'lang.indexingModelReassign' | translate}}</h1>
   <div mat-dialog-content>
     <div class="alert-message alert-message-info">
-      {{lang.indexingModelUsedBy}}
+      {{'lang.indexingModelUsedBy' | translate}}
       <ul>
         <li *ngFor="let usage of mainIndexingModel.used">
-          <b>{{usage.count}}</b> {{lang.mailsWithStatus}} <b>{{usage.status}}</b>
+          <b>{{usage.count}}</b> {{'lang.mailsWithStatus' | translate}} <b>{{usage.status}}</b>
         </li>
       </ul>
-      {{lang.indexingModelReplaceToDelete}}
+      {{'lang.indexingModelReplaceToDelete' | translate}}
     </div>
     <div *ngIf="!loading">
       <mat-form-field style="padding: 10px; margin-top: 15px">
         <mat-select name="model" [(ngModel)]="modelIds"
-                    [placeholder]="lang.indexingModel" required (selectionChange)="changeModel($event)">
+                    [placeholder]="this.translate.instant('lang.indexingModel')" required (selectionChange)="changeModel($event)">
           <mat-option *ngFor="let model of indexingModels;let i=index" [value]="model.id" [disabled]="model.id === mainIndexingModel.id">
             {{model.label}}
           </mat-option>
@@ -21,20 +21,20 @@
       </mat-form-field>
     </div>
     <div class="alert-message alert-message-danger" *ngIf="resetFields.length !== 0">
-      {{lang.indexingModelFieldsReset}}
+      {{'lang.indexingModelFieldsReset' | translate}}
       <ul>
         <li *ngFor="let field of resetFields">
           {{field.label}}
         </li>
       </ul>
 
-      {{this.lang.confirmAction}}
+      {{'lang.confirmAction' | translate}}
     </div>
     <span class="divider-modal"></span>
     <div mat-dialog-actions>
       <button class="actions" color="primary" mat-raised-button [disabled]="selectedModelId === undefined"
-        (click)="onSubmit()">{{this.lang.validate}}</button>
-      <button class="actions" color="" mat-raised-button (click)="this.dialogRef.close('');">{{this.lang.cancel}}</button>
+        (click)="onSubmit()">{{'lang.validate' | translate}}</button>
+      <button class="actions" color="" mat-raised-button (click)="this.dialogRef.close('');">{{'lang.cancel' | translate}}</button>
     </div>
   </div>
 </div>

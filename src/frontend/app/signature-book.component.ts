@@ -2,6 +2,7 @@ import { Component, OnInit, NgZone, ViewChild, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from './translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../service/notification/notification.service';
 import { tap, catchError, filter } from 'rxjs/operators';
 import { PrivilegeService } from '../service/privileges.service';
@@ -67,25 +68,25 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
         {
             id: 'notes',
             icon: 'fas fa-pen-square fa-2x',
-            label: this.lang.notesAlt,
+            label: this.translate.instant('lang.notesAlt'),
             count: 0
         },
         {
             id: 'visaCircuit',
             icon: 'fas fa-list-ol fa-2x',
-            label: this.lang.visaWorkflow,
+            label: this.translate.instant('lang.visaWorkflow'),
             count: 0
         },
         {
             id: 'history',
             icon: 'fas fa-history fa-2x',
-            label: this.lang.history,
+            label: this.translate.instant('lang.history'),
             count: 0
         },
         {
             id: 'linkedResources',
             icon: 'fas fa-link fa-2x',
-            label: this.lang.links,
+            label: this.translate.instant('lang.links'),
             count: 0
         }
     ];
@@ -94,6 +95,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     @ViewChild('appDocumentViewer', { static: false }) appDocumentViewer: DocumentViewerComponent;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private appService: AppService,
         private route: ActivatedRoute,

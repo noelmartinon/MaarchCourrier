@@ -5,7 +5,7 @@
     <div style="display: flex;align-items: center;">
         <b>{{allResInSearch.length}}
         {{lang.records | ucfirst}}</b>&nbsp;<small *ngIf="selectedRes.length > 0" style="color: #029BB6;">- {{selectedRes.length}}
-            {{lang.selected}}</small>
+            {{'lang.selected' | translate}}</small>
     </div>
     <div style="flex:1;">
         <mat-paginator #paginatorResultList [length]="resultsLength" [hidePageSize]="true" [pageSize]="10"
@@ -22,7 +22,7 @@
                     *ngIf="!singleMode"
                     [checked]="selectedRes.length == allResInSearch.length && selectedRes.length > 0"
                     [indeterminate]="selectedRes.length > 0 && selectedRes.length < allResInSearch.length"
-                    title="{{lang.selectAllResInBasket}}" (change)="toggleAllRes($event)"></mat-checkbox>
+                    title="{{'lang.selectAllResInBasket' | translate}}" (change)="toggleAllRes($event)"></mat-checkbox>
             </mat-header-cell>
             <mat-cell *matCellDef="let row" style="width: 70px;flex: initial;">
                 <mat-checkbox color="primary" [checked]="this.selectedRes.indexOf(row.resId) !== -1" (change)="toggleRes($event,row)"
@@ -31,20 +31,20 @@
             </mat-cell>
         </ng-container>
         <ng-container matColumnDef="category">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{lang.category_id}} </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{'lang.category_id' | translate}} </mat-header-cell>
             <mat-cell *matCellDef="let row">
                 {{lang[row.category]}}
             </mat-cell>
         </ng-container>
 
         <ng-container matColumnDef="chrono">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{lang.chrono}} </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{'lang.chrono' | translate}} </mat-header-cell>
             <mat-cell *matCellDef="let row">
                 {{row.chrono}}
             </mat-cell>
         </ng-container>
         <ng-container matColumnDef="status">
-            <mat-header-cell *matHeaderCellDef mat-sort-header style="width: 100px;flex: initial"> {{lang.status}} </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header style="width: 100px;flex: initial"> {{'lang.status' | translate}} </mat-header-cell>
             <mat-cell *matCellDef="let row" style="width: 100px;flex: initial">
                 <mat-icon title="{{row.statusLabel}}" [ngStyle]="{'color': row.priorityColor}" color="primary"
                     class="{{row.statusImage.charAt(0)}}{{row.statusImage.charAt(1)}} {{row.statusImage}} {{row.statusImage.charAt(0)}}{{row.statusImage.charAt(1)}}-2x">
@@ -52,19 +52,19 @@
             </mat-cell>
         </ng-container>
         <ng-container matColumnDef="subject">
-            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2"> {{lang.subject}} </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2"> {{'lang.subject' | translate}} </mat-header-cell>
             <mat-cell *matCellDef="let row" style="flex:2">
                 {{row.subject}}
             </mat-cell>
         </ng-container>
         <ng-container matColumnDef="typeLabel">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{lang.doctype}} </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{'lang.doctype' | translate}} </mat-header-cell>
             <mat-cell *matCellDef="let row">
                 {{row.typeLabel}}
             </mat-cell>
         </ng-container>
         <ng-container matColumnDef="creationDate">
-            <mat-header-cell *matHeaderCellDef mat-sort-header> {{lang.creationDate}} </mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header> {{'lang.creationDate' | translate}} </mat-header-cell>
             <mat-cell *matCellDef="let row">
                 {{row.creationDate | timeAgo : 'full' | ucfirst}}
             </mat-cell>

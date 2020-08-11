@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 export class LocalStorageService {
     appSession: any;
 
-    constructor() {}
+    constructor() { }
 
     setAppSession(id: string) {
         this.appSession = id;
@@ -26,5 +26,19 @@ export class LocalStorageService {
 
     remove(id: string) {
         localStorage.removeItem(id + '_' + this.getAppSession());
+    }
+
+    resetLocal() {
+        const arr = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            if (localStorage.key(i).substring(0, 13) === 'filtersAdmin_') {
+                arr.push(localStorage.key(i));
+            }
+        }
+
+        // Iterate over arr and remove the items by key
+        for (let i = 0; i < arr.length; i++) {
+            localStorage.removeItem(arr[i]);
+        }
     }
 }

@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@an
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
@@ -21,6 +22,7 @@ export class NotificationAdministrationComponent implements OnInit {
     lang: any = LANG;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -38,7 +40,7 @@ export class NotificationAdministrationComponent implements OnInit {
         this.route.params.subscribe((params: any) => {
 
             if (typeof params['identifier'] === 'undefined') {
-                this.headerService.setHeader(this.lang.notificationCreation);
+                this.headerService.setHeader(this.translate.instant('lang.notificationCreation'));
 
                 this.creationMode = true;
                 this.http.get('../rest/administration/notifications/new')
@@ -54,7 +56,7 @@ export class NotificationAdministrationComponent implements OnInit {
                 this.creationMode = false;
                 this.http.get('../rest/notifications/' + params['identifier'])
                     .subscribe((data: any) => {
-                        this.headerService.setHeader(this.lang.notificationModification, data.notification.description);
+                        this.headerService.setHeader(this.translate.instant('lang.notificationModification'), data.notification.description);
 
                         this.notification = data.notification;
                         this.notification.attachfor_properties = [];
@@ -71,7 +73,7 @@ export class NotificationAdministrationComponent implements OnInit {
         this.http.post('../rest/scriptNotification', this.notification)
             .subscribe((data: any) => {
                 this.notification.scriptcreated = data;
-                this.notify.success(this.lang.scriptCreated);
+                this.notify.success(this.translate.instant('lang.scriptCreated'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -83,7 +85,7 @@ export class NotificationAdministrationComponent implements OnInit {
             this.http.post('../rest/notifications', this.notification)
                 .subscribe((data: any) => {
                     this.router.navigate(['/administration/notifications']);
-                    this.notify.success(this.lang.notificationAdded);
+                    this.notify.success(this.translate.instant('lang.notificationAdded'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -91,7 +93,7 @@ export class NotificationAdministrationComponent implements OnInit {
             this.http.put('../rest/notifications/' + this.notification.notification_sid, this.notification)
                 .subscribe((data: any) => {
                     this.router.navigate(['/administration/notifications']);
-                    this.notify.success(this.lang.notificationUpdated);
+                    this.notify.success(this.translate.instant('lang.notificationUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -106,7 +108,7 @@ export class NotificationAdministrationComponent implements OnInit {
         }
         this.http.put('../rest/notifications/' + this.notification.notification_sid, this.notification)
             .subscribe((data: any) => {
-                this.notify.success(this.lang.notificationUpdated);
+                this.notify.success(this.translate.instant('lang.notificationUpdated'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });

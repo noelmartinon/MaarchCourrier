@@ -5,7 +5,7 @@
             [id]="'folder-list-'+folder.id" cdkDropListConnectedTo="['document-list','folder-list']"
             (cdkDropListDropped)="drop($event, folder)" (cdkDropListEntered)="dragEnter(folder)"
             (cdkDropListExited)="folder.drag=false">
-            <mat-icon mat-list-icon class="pinnedIcon" [title]="lang.unpinFolder"
+            <mat-icon mat-list-icon class="pinnedIcon" [title]="this.translate.instant('lang.unpinFolder')"
                 (click)="$event.stopPropagation();foldersService.unpinFolder(folder)">
                 <i class="fa fa-thumbtack"></i>
             </mat-icon>
@@ -22,6 +22,6 @@
 </ng-container>
 <ng-template #elseTemplate>
     <div class="noPinnedFolder">
-        {{lang.noPinnedFolder}}
+        {{'lang.noPinnedFolder' | translate}}
     </div>
 </ng-template>

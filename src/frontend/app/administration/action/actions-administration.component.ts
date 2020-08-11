@@ -1,6 +1,7 @@
 import { Component, ViewChild, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -34,6 +35,7 @@ export class ActionsAdministrationComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -51,7 +53,7 @@ export class ActionsAdministrationComponent implements OnInit {
         this.http.get('../rest/actions')
             .subscribe((data) => {
                 this.actions = data['actions'];
-                this.headerService.setHeader(this.lang.administration + ' ' + this.lang.actions);
+                this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.actions'));
                 this.loading = false;
                 setTimeout(() => {
                     this.adminService.setDataSource('admin_actions', this.actions, this.sort, this.paginator, this.filterColumns);
@@ -62,14 +64,14 @@ export class ActionsAdministrationComponent implements OnInit {
     }
 
     deleteAction(action: any) {
-        const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + action.label_action + ' »');
+        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + action.label_action + ' »');
 
         if (r) {
             this.http.delete('../rest/actions/' + action.id)
                 .subscribe((data: any) => {
                     this.actions = data.actions;
                     this.adminService.setDataSource('admin_actions', this.actions, this.sort, this.paginator, this.filterColumns);
-                    this.notify.success(this.lang.actionDeleted);
+                    this.notify.success(this.translate.instant('lang.actionDeleted'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../app/translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { tap, catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FunctionsService } from './functions.service';
@@ -11,6 +12,7 @@ export class ContactService {
     lang: any = LANG;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         public functions: FunctionsService 
     ) { }

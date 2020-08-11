@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -14,10 +15,11 @@ import { ConfirmComponent } from '../../../../plugins/modal/confirm.component';
 import { FormControl } from '@angular/forms';
 import { FunctionsService } from '../../../../service/functions.service';
 import { ContactExportComponent } from './export/contact-export.component';
+import { AdministrationService } from '../../../../app/administration/administration.service';
 
 @Component({
     selector: 'contact-list',
-    templateUrl: "contacts-list-administration.component.html",
+    templateUrl: 'contacts-list-administration.component.html',
     styleUrls: ['contacts-list-administration.component.scss']
 })
 export class ContactsListAdministrationComponent implements OnInit {
@@ -52,57 +54,64 @@ export class ContactsListAdministrationComponent implements OnInit {
         {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
-            label: this.lang.contactsList,
+            label: this.translate.instant('lang.contactsList'),
             current: true
         },
         {
             icon: 'fa fa-code',
             route: '/administration/contacts/contactsCustomFields',
-            label: this.lang.customFieldsAdmin,
+            label: this.translate.instant('lang.customFieldsAdmin'),
             current: false
         },
         {
             icon: 'fa fa-cog',
             route: '/administration/contacts/contacts-parameters',
-            label: this.lang.contactsParameters,
+            label: this.translate.instant('lang.contactsParameters'),
             current: false
         },
         {
             icon: 'fa fa-users',
             route: '/administration/contacts/contacts-groups',
-            label: this.lang.contactsGroups,
+            label: this.translate.instant('lang.contactsGroups'),
             current: false
         },
         {
             icon: 'fas fa-magic',
             route: '/administration/contacts/duplicates',
-            label: this.lang.duplicatesContactsAdmin,
+            label: this.translate.instant('lang.duplicatesContactsAdmin'),
             current: false
         },
     ];
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
         public dialog: MatDialog,
         public functions: FunctionsService,
+        public adminService: AdministrationService,
         private viewContainerRef: ViewContainerRef) { }
 
 
     ngOnInit(): void {
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
         this.loading = true;
+        this.adminService.setAdminId('admin_contacts_list');
+        if (this.functions.empty(this.adminService.getFilter())) {
+            this.adminService.saveDefaultFilter();
+        }
         this.initContactList();
+
         this.initAutocompleteContacts();
     }
 
     initContactList() {
         this.resultListDatabase = new ContactListHttpDao(this.http);
-        this.paginator.pageIndex = 0;
-        this.sort.active = 'lastname';
-        this.sort.direction = 'asc';
+        this.paginator.pageIndex = this.adminService.getFilter('page');
+        this.sort.active = this.adminService.getFilter('sort');
+        this.sort.direction = this.adminService.getFilter('sortDirection');
         this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
         // When list is refresh (sort, page, filters)
@@ -111,6 +120,16 @@ export class ContactsListAdministrationComponent implements OnInit {
                 takeUntil(this.destroy$),
                 startWith({}),
                 switchMap(() => {
+                    this.adminService.saveFilter(
+                        {
+                            sort: this.sort.active,
+                            sortDirection: this.sort.direction,
+                            page: this.paginator.pageIndex,
+                            field: this.adminService.getFilter('field')
+                        }
+                    );
+                    // this.searchContact.setValue(this.adminService.getFilter('field'));
+                    this.search = this.adminService.getFilter('field');
                     this.isLoadingResults = true;
                     return this.resultListDatabase!.getRepoIssues(
                         this.sort.active, this.sort.direction, this.paginator.pageIndex, this.routeUrl, this.search);
@@ -119,7 +138,7 @@ export class ContactsListAdministrationComponent implements OnInit {
                     this.isLoadingResults = false;
                     data = this.processPostData(data);
                     this.resultsLength = data.count;
-                    this.headerService.setHeader(this.lang.administration + ' ' + this.lang.contacts.toLowerCase(), '', '');
+                    this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.contacts').toLowerCase(), '', '');
                     return data.contacts;
                 }),
                 catchError((err: any) => {
@@ -162,7 +181,7 @@ export class ContactsListAdministrationComponent implements OnInit {
                     this.http.request('DELETE', `../rest/contacts/${contact.id}${queryparams}`)
                         .subscribe(() => {
                             this.refreshDao();
-                            this.notify.success(this.lang.contactDeleted);
+                            this.notify.success(this.translate.instant('lang.contactDeleted'));
                         }, (err) => {
                             this.notify.error(err.error.errors);
                         });
@@ -170,13 +189,13 @@ export class ContactsListAdministrationComponent implements OnInit {
                 this.dialogRef = null;
             });
         } else {
-            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
             dialogRef.afterClosed().pipe(
                 filter((data: string) => data === 'ok'),
                 exhaustMap(() => this.http.delete(`../rest/contacts/${contact.id}`)),
                 tap((data: any) => {
                     this.refreshDao();
-                    this.notify.success(this.lang.contactDeleted);
+                    this.notify.success(this.translate.instant('lang.contactDeleted'));
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
@@ -187,7 +206,7 @@ export class ContactsListAdministrationComponent implements OnInit {
     }
 
     toggleContact(contact: any) {
-        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.suspend, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.suspend'), msg: this.translate.instant('lang.confirmAction') } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -195,9 +214,9 @@ export class ContactsListAdministrationComponent implements OnInit {
             tap((data: any) => {
                 this.refreshDao();
                 if (!contact.enabled === true) {
-                    this.notify.success(this.lang.contactEnabled);
+                    this.notify.success(this.translate.instant('lang.contactEnabled'));
                 } else {
-                    this.notify.success(this.lang.contactDisabled);
+                    this.notify.success(this.translate.instant('lang.contactDisabled'));
                 }
             }),
             catchError((err: any) => {
@@ -216,9 +235,13 @@ export class ContactsListAdministrationComponent implements OnInit {
     }
 
     initAutocompleteContacts() {
+        this.searchContact = new FormControl(this.adminService.getFilter('field'));
         this.searchContact.valueChanges
             .pipe(
                 tap((value) => {
+                    this.adminService.setFilter('field', value);
+                    this.adminService.saveFilter(this.adminService.getFilter());
+
                     if (value.length === 0) {
                         this.search = '';
                         this.paginator.pageIndex = 0;
@@ -277,11 +300,12 @@ export class ContactListHttpDao {
 })
 export class ContactsListAdministrationRedirectModalComponent {
     lang: any = LANG;
-    modalTitle: string = this.lang.confirmAction;
+    modalTitle: string = this.translate.instant('lang.confirmAction');
     redirectContact: number;
     processMode: string = 'delete';
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<ContactsListAdministrationRedirectModalComponent>,

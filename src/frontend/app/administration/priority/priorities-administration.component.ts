@@ -1,14 +1,15 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
+import { AdministrationService } from '../administration.service';
 
 @Component({
     templateUrl: 'priorities-administration.component.html'
@@ -23,32 +24,26 @@ export class PrioritiesAdministrationComponent implements OnInit {
 
     priorities: any[] = [];
     prioritiesOrder: any[] = [];
-    dataSource: any;
     displayedColumns = ['id', 'label', 'delays', 'actions'];
+    filterColumns = ['id', 'label', 'delays'];
 
 
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
-    applyFilter(filterValue: string) {
-        filterValue = filterValue.trim(); // Remove whitespace
-        filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-        this.dataSource.filter = filterValue;
-        this.dataSource.filterPredicate = (template: any, filter: string) => {
-            return this.functions.filterUnSensitive(template, filter, ['id', 'label', 'delays']);
-        };
-    }
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
         public functions: FunctionsService,
+        public adminService: AdministrationService,
         private viewContainerRef: ViewContainerRef
     ) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.administration + ' ' + this.lang.prioritiesAlt);
+        this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.prioritiesAlt'));
 
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
@@ -64,30 +59,23 @@ export class PrioritiesAdministrationComponent implements OnInit {
                     }, (err) => {
                         this.notify.handleErrors(err);
                     });
-                setTimeout(() => {
-                    this.dataSource = new MatTableDataSource(this.priorities);
-                    this.dataSource.paginator = this.paginator;
-                    this.dataSource.sortingDataAccessor = this.functions.listSortingDataAccessor;
-                    this.sort.active = 'label';
-                    this.sort.direction = 'asc';
-                    this.dataSource.sort = this.sort;
-                }, 0);
+                    setTimeout(() => {
+                        this.adminService.setDataSource('admin_priorities', this.priorities, this.sort, this.paginator, this.filterColumns);
+                    }, 0);
             }, (err) => {
                 this.notify.handleErrors(err);
             });
     }
 
     deletePriority(id: string) {
-        const r = confirm(this.lang.deleteMsg);
+        const r = confirm(this.translate.instant('lang.deleteMsg'));
 
         if (r) {
             this.http.delete('../rest/priorities/' + id)
                 .subscribe((data: any) => {
                     this.priorities = data['priorities'];
-                    this.dataSource = new MatTableDataSource(this.priorities);
-                    this.dataSource.paginator = this.paginator;
-                    this.dataSource.sort = this.sort;
-                    this.notify.success(this.lang.priorityDeleted);
+                    this.adminService.setDataSource('admin_priorities', this.priorities, this.sort, this.paginator, this.filterColumns);
+                    this.notify.success(this.translate.instant('lang.priorityDeleted'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -98,7 +86,7 @@ export class PrioritiesAdministrationComponent implements OnInit {
         this.http.put('../rest/sortedPriorities', this.prioritiesOrder)
             .subscribe((data: any) => {
                 this.prioritiesOrder = data['priorities'];
-                this.notify.success(this.lang.modificationSaved);
+                this.notify.success(this.translate.instant('lang.modificationSaved'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });

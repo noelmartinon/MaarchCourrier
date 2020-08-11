@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { FormControl } from '@angular/forms';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -22,15 +23,15 @@ export class ListAdministrationComponent implements OnInit {
     displayedMainData: any = [
         {
             'value': 'chronoNumberShort',
-            'label': this.lang.chronoNumberShort,
+            'label': this.translate.instant('lang.chronoNumberShort'),
             'sample': 'MAARCH/2019A/1',
             'cssClasses': ['align_centerData', 'normalData'],
             'icon': ''
         },
         {
             'value': 'object',
-            'label': this.lang.object,
-            'sample': this.lang.objectSample,
+            'label': this.translate.instant('lang.object'),
+            'sample': this.translate.instant('lang.objectSample'),
             'cssClasses': ['longData'],
             'icon': ''
         }
@@ -39,92 +40,92 @@ export class ListAdministrationComponent implements OnInit {
     availableData: any = [
         {
             'value': 'getPriority',
-            'label': this.lang.getPriority,
-            'sample': this.lang.getPrioritySample,
+            'label': this.translate.instant('lang.getPriority'),
+            'sample': this.translate.instant('lang.getPrioritySample'),
             'cssClasses': ['align_leftData'],
             'icon': 'fa-traffic-light'
         },
         {
             'value': 'getCategory',
-            'label': this.lang.getCategory,
-            'sample': this.lang.incoming,
+            'label': this.translate.instant('lang.getCategory'),
+            'sample': this.translate.instant('lang.incoming'),
             'cssClasses': ['align_leftData'],
             'icon': 'fa-exchange-alt'
         },
         {
             'value': 'getDoctype',
-            'label': this.lang.getDoctype,
-            'sample': this.lang.getDoctypeSample,
+            'label': this.translate.instant('lang.getDoctype'),
+            'sample': this.translate.instant('lang.getDoctypeSample'),
             'cssClasses': ['align_leftData'],
             'icon': 'fa-suitcase'
         },
         {
             'value': 'getAssignee',
-            'label': this.lang.getAssignee,
-            'sample': this.lang.getAssigneeSample,
+            'label': this.translate.instant('lang.getAssignee'),
+            'sample': this.translate.instant('lang.getAssigneeSample'),
             'cssClasses': ['align_leftData'],
             'icon': 'fa-sitemap'
         },
         {
             'value': 'getRecipients',
-            'label': this.lang.getRecipients,
+            'label': this.translate.instant('lang.getRecipients'),
             'sample': 'Patricia PETIT',
             'cssClasses': ['align_leftData'],
             'icon': 'fa-user'
         },
         {
             'value': 'getSenders',
-            'label': this.lang.getSenders,
+            'label': this.translate.instant('lang.getSenders'),
             'sample': 'Alain DUBOIS (MAARCH)',
             'cssClasses': ['align_leftData'],
             'icon': 'fa-book'
         },
         {
             'value': 'getCreationAndProcessLimitDates',
-            'label': this.lang.getCreationAndProcessLimitDates,
-            'sample': this.lang.getCreationAndProcessLimitDatesSample,
+            'label': this.translate.instant('lang.getCreationAndProcessLimitDates'),
+            'sample': this.translate.instant('lang.getCreationAndProcessLimitDatesSample'),
             'cssClasses': ['align_leftData'],
             'icon': 'fa-calendar'
         },
         {
             'value': 'getVisaWorkflow',
-            'label': this.lang.getVisaWorkflow,
+            'label': this.translate.instant('lang.getVisaWorkflow'),
             'sample': '<i color="accent" class="fa fa-check"></i> Barbara BAIN -> <i class="fa fa-hourglass-half"></i> <b>Bruno BOULE</b> -> <i class="fa fa-hourglass-half"></i> Patricia PETIT',
             'cssClasses': ['align_leftData'],
             'icon': 'fa-list-ol'
         },
         {
             'value': 'getSignatories',
-            'label': this.lang.getSignatories,
+            'label': this.translate.instant('lang.getSignatories'),
             'sample': 'Denis DAULL, Patricia PETIT',
             'cssClasses': ['align_leftData'],
             'icon': 'fa-certificate'
         },
         {
             'value': 'getModificationDate',
-            'label': this.lang.getModificationDate,
+            'label': this.translate.instant('lang.getModificationDate'),
             'sample': '01-01-2019',
             'cssClasses': ['align_leftData'],
             'icon': 'fa-calendar-check'
         },
         {
             'value': 'getOpinionLimitDate',
-            'label': this.lang.getOpinionLimitDate,
+            'label': this.translate.instant('lang.getOpinionLimitDate'),
             'sample': '01-01-2019',
             'cssClasses': ['align_leftData'],
             'icon': 'fa-stopwatch'
         },
         {
             'value': 'getParallelOpinionsNumber',
-            'label': this.lang.getParallelOpinionsNumber,
-            'sample': this.lang.getParallelOpinionsNumberSample,
+            'label': this.translate.instant('lang.getParallelOpinionsNumber'),
+            'sample': this.translate.instant('lang.getParallelOpinionsNumberSample'),
             'cssClasses': ['align_leftData'],
             'icon': 'fa-comment-alt'
         },
         {
             'value': 'getFolders',
-            'label': this.lang.getFolders,
-            'sample': this.lang.getFoldersSample,
+            'label': this.translate.instant('lang.getFolders'),
+            'sample': this.translate.instant('lang.getFoldersSample'),
             'cssClasses': ['align_leftData'],
             'icon': 'fa-folder'
         }
@@ -162,66 +163,66 @@ export class ListAdministrationComponent implements OnInit {
         {
             id: 'dashboard',
             icon: 'fas fa-columns',
-            label: this.lang.newsFeed,
+            label: this.translate.instant('lang.newsFeed'),
         },
         {
             id: 'history',
             icon: 'fas fa-history',
-            label: this.lang.history,
+            label: this.translate.instant('lang.history'),
         },
         {
             id: 'notes',
             icon: 'fas fa-pen-square',
-            label: this.lang.notesAlt,
+            label: this.translate.instant('lang.notesAlt'),
         },
         {
             id: 'attachments',
             icon: 'fas fa-paperclip',
-            label: this.lang.attachments,
+            label: this.translate.instant('lang.attachments'),
         },
         {
             id: 'linkedResources',
             icon: 'fas fa-link',
-            label: this.lang.links,
+            label: this.translate.instant('lang.links'),
         },
         {
             id: 'diffusionList',
             icon: 'fas fa-share-alt',
-            label: this.lang.diffusionList,
+            label: this.translate.instant('lang.diffusionList'),
         },
         {
             id: 'emails',
             icon: 'fas fa-envelope',
-            label: this.lang.mailsSentAlt,
+            label: this.translate.instant('lang.mailsSentAlt'),
         },
         {
             id: 'visaCircuit',
             icon: 'fas fa-list-ol',
-            label: this.lang.visaWorkflow,
+            label: this.translate.instant('lang.visaWorkflow'),
         },
         {
             id: 'opinionCircuit',
             icon: 'fas fa-comment-alt',
-            label: this.lang.avis,
+            label: this.translate.instant('lang.avis'),
         },
         {
             id: 'info',
             icon: 'fas fa-info-circle',
-            label: this.lang.informations,
+            label: this.translate.instant('lang.informations'),
         }
     ];
     selectedProcessTool: any = {
         defaultTab: null,
         canUpdateData: false,
         canUpdateModel: false,
-        canUpdateDocument: false,
+        canUpdateDocuments: false,
     };
     selectedProcessToolClone: string = null;
 
     @Input('currentBasketGroup') private basketGroup: any;
     @Output('refreshBasketGroup') refreshBasketGroup = new EventEmitter<any>();
 
-    constructor(public http: HttpClient, private notify: NotificationService) { }
+    constructor(private translate: TranslateService, public http: HttpClient, private notify: NotificationService) { }
 
     ngOnInit(): void {
         this.filteredDataOptions = this.dataControl.valueChanges
@@ -247,7 +248,7 @@ export class ListAdministrationComponent implements OnInit {
             this.selectedProcessTool.canUpdateData = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdateData;
             this.selectedProcessTool.canUpdateModel = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdateModel;
         } else if (this.basketGroup.list_event === 'signatureBookAction') {
-            this.selectedProcessTool.canUpdateDocument = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdateDocument;
+            this.selectedProcessTool.canUpdateDocuments = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdateDocuments;
         }
 
         this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));
@@ -288,7 +289,7 @@ export class ListAdministrationComponent implements OnInit {
     addData(event: any) {
         if (this.displayedSecondaryData.filter((data: any) => data.value !== 'getFolders').length >= 7 && event.option.value.value !== 'getFolders') {
             this.dataControl.setValue('');
-            alert(this.lang.warnMaxDataList);
+            alert(this.translate.instant('lang.warnMaxDataList'));
         } else {
             const i = this.availableData.map((e: any) => e.value).indexOf(event.option.value.value);
             this.displayedSecondaryData.push(event.option.value);
@@ -336,7 +337,7 @@ export class ListAdministrationComponent implements OnInit {
                 this.selectedListEventClone = this.selectedListEvent;
                 this.basketGroup.list_event_data = this.selectedProcessTool;
                 this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));
-                this.notify.success(this.lang.modificationsProcessed);
+                this.notify.success(this.translate.instant('lang.modificationsProcessed'));
                 this.refreshBasketGroup.emit(this.basketGroup);
             }, (err) => {
                 this.notify.error(err.error.errors);

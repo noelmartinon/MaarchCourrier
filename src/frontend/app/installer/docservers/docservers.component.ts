@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms'
 import { NotificationService } from '../../../service/notification/notification.service';
 import { tap } from 'rxjs/internal/operators/tap';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { of } from 'rxjs/internal/observable/of';
@@ -20,6 +21,7 @@ export class DocserversComponent implements OnInit {
     @Output() nextStep = new EventEmitter<string>();
 
     constructor(
+        private translate: TranslateService,
         private _formBuilder: FormBuilder,
         private notify: NotificationService,
         public http: HttpClient,
@@ -66,12 +68,12 @@ export class DocserversComponent implements OnInit {
 
         this.http.get(`../rest/installer/docservers`, { params: info }).pipe(
             tap((data: any) => {
-                this.notify.success(this.lang.rightInformations);
+                this.notify.success(this.translate.instant('lang.rightInformations'));
                 this.stepFormGroup.controls['stateStep'].setValue('success');
                 this.nextStep.emit();
             }),
             catchError((err: any) => {
-                this.notify.error(this.lang.pathUnreacheable);
+                this.notify.error(this.translate.instant('lang.pathUnreacheable'));
                 this.stepFormGroup.controls['stateStep'].setValue('');
                 return of(false);
             })
@@ -88,7 +90,7 @@ export class DocserversComponent implements OnInit {
                 method : 'POST',
                 url : '../rest/installer/docservers'
             },
-            description: this.lang.stepDocserversActionDesc,
+            description: this.translate.instant('lang.stepDocserversActionDesc'),
             installPriority: 3
         }];
     }

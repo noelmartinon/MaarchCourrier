@@ -9,7 +9,7 @@
             (click)="$event.stopPropagation()" (focus)="resetAutocomplete()" [required]="required"
             (keyup.enter)="addItem()">
         <button type="button" *ngIf="myControl.disabled" matSuffix mat-icon-button color="warn" (click)="unsetValue()">
-            <mat-icon class="fa fa-times" color="warn" [title]="lang.delete"></mat-icon>
+            <mat-icon class="fa fa-times" color="warn" [title]="this.translate.instant('lang.delete')"></mat-icon>
         </button>
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectOpt($event)">
             <ng-container *ngIf="options.length > 0 && !loading">
@@ -37,7 +37,7 @@
             </mat-chip>
         </mat-chip-list>
         <div class="noResult" *ngIf="controlAutocomplete.value.length === 0">
-            {{lang.noSelectedValue}}
+            {{'lang.noSelectedValue' | translate}}
         </div>
     </ng-container>
 </form>

@@ -22,8 +22,8 @@
             {{attachment.typeLabel}}
         </div>
     </div>
-    <button mat-button *ngIf="attachments.length === 3" class="showMore" (click)="showMore()">{{lang.showMore}}</button>
+    <button mat-button *ngIf="attachments.length === 3" class="showMore" (click)="showMore()">{{'lang.showMore' | translate}}</button>
     <div class="noData" *ngIf="attachments.length === 0">
-        {{lang.noAttachment}}
+        {{'lang.noAttachment' | translate}}
     </div>
 </ng-template>

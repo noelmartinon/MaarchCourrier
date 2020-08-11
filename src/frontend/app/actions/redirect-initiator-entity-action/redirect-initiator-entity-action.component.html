@@ -6,14 +6,14 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                {{lang.makeActionOn}}
+                {{'lang.makeActionOn' | translate}}
                 <b *ngIf="data.resIds.length == 1" color="primary" class="highlight">{{data.resource.chrono}}</b>
                 <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{data.resIds.length}}
-                    {{lang.elements}}</b> ?
+                    {{'lang.elements' | translate}}</b> ?
                 <div *ngIf="resourcesInfo.withoutEntity.length > 0">
                     <div class="alert-message alert-message-danger acknowledgementList" role="alert">
                         <p>
-                            {{lang.hasNoEntity}} :
+                            {{'lang.hasNoEntity' | translate}} :
                         </p>
                         <ul>
                             <li *ngFor="let info of resourcesInfo.withoutEntity">
@@ -25,7 +25,7 @@
                 <div *ngIf="resourcesInfo.withEntity.length > 0">
                     <div class="alert-message alert-message-success" role="alert">
                         <p>
-                            {{lang.destUserSetToDefault}}
+                            {{'lang.destUserSetToDefault' | translate}}
                         </p>
                     </div>
                 </div>
@@ -38,7 +38,7 @@
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
         <button mat-raised-button mat-button color="primary"
-            [disabled]="loading || resourcesInfo.withEntity.length == 0" (click)="onSubmit()">{{lang.validate}}</button>
-        <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{lang.cancel}}</button>
+            [disabled]="loading || resourcesInfo.withEntity.length == 0" (click)="onSubmit()">{{'lang.validate' | translate}}</button>
+        <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
     </div>
 </div>

@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
 import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
 import { tap } from 'rxjs/internal/operators/tap';
@@ -44,6 +44,7 @@ export class AlfrescoListAdministrationComponent implements OnInit {
 
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -55,7 +56,7 @@ export class AlfrescoListAdministrationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.administration + ' ' + this.lang.alfresco);
+        this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.alfresco'));
 
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
@@ -80,7 +81,7 @@ export class AlfrescoListAdministrationComponent implements OnInit {
 
     deleteAccount(id: number) {
 
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -90,7 +91,7 @@ export class AlfrescoListAdministrationComponent implements OnInit {
                 setTimeout(() => {
                     this.adminService.setDataSource('admin_alfresco', this.accounts, this.sort, this.paginator, this.filterColumns);
                 }, 0);
-                this.notify.success(this.lang.accountDeleted);
+                this.notify.success(this.translate.instant('lang.accountDeleted'));
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);

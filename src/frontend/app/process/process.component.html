@@ -14,22 +14,22 @@
         </div>
         <div class="indexing-form-container">
             <div *ngIf="!isModalOpen() && currentTool !== 'dashboard'" style="display: flex;justify-content: flex-end;">
-                <button mat-icon-button (click)="createModal()" color="primary" [title]="lang.openInExternalModal">
+                <button mat-icon-button (click)="createModal()" color="primary" [title]="this.translate.instant('lang.openInExternalModal')">
                     <mat-icon class="fas fa-external-link-alt"></mat-icon>
                 </button>
             </div>
             <ng-container *ngIf="currentTool === 'dashboard'">
                 <div
                     style="display: flex;align-items: center;justify-content: flex-end;margin-top: 10px;margin-bottom: -20px;">
-                    <button mat-button color="primary" [title]="lang.generateAndDownloadPrintedFolder"
+                    <button mat-button color="primary" [title]="this.translate.instant('lang.generateAndDownloadPrintedFolder')"
                         (click)="openPrintedFolderPrompt()">
                         <mat-icon class="fa fa-print" style="height:auto"></mat-icon>
-                        {{lang.printedFolder}}
+                        {{'lang.printedFolder' | translate}}
                     </button>
                 </div>
                 <div class="banner">
                     <div class="title" (click)="currentTool = 'history'">
-                        {{lang.history}}
+                        {{'lang.history' | translate}}
                         <div class="title-divider"></div>
                     </div>
                     <div class="content">
@@ -40,7 +40,7 @@
                 </div>
                 <div class="banner">
                     <div class="title" (click)="currentTool = 'notes'">
-                        {{lang.notesAlt}}
+                        {{'lang.notesAlt' | translate}}
                         <div class="title-divider"></div>
                     </div>
                     <div class="content">
@@ -50,7 +50,7 @@
                 </div>
                 <div class="banner">
                     <div class="title" (click)="currentTool = 'attachments'">
-                        {{lang.attachments}}
+                        {{'lang.attachments' | translate}}
                         <div class="title-divider"></div>
                     </div>
                     <div class="content">
@@ -61,7 +61,7 @@
                 </div>
                 <div class="banner">
                     <div class="title" (click)="currentTool = 'emails'">
-                        {{lang.mailsSentAlt}}
+                        {{'lang.mailsSentAlt' | translate}}
                         <div class="title-divider"></div>
                     </div>
                     <div class="content">
@@ -108,7 +108,7 @@
                     (loadingFormEndEvent)="triggerProcessAction()"
                     (retrieveDocumentEvent)="appDocumentViewer.saveDocService()"></app-indexing-form>
                 <div style="position: sticky;bottom: 0px;text-align:right;">
-                    <button mat-fab [title]="lang.saveModifications" *ngIf="isToolModified()" (click)="saveTool()"
+                    <button mat-fab [title]="this.translate.instant('lang.saveModifications')" *ngIf="isToolModified()" (click)="saveTool()"
                         color="accent">
                         <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
                     </button>
@@ -118,7 +118,7 @@
             <ng-template #elseTemplate>
                 <div class="openedModal">
                     <i class="fas fa-external-link-alt"></i>
-                    {{lang.openedInExternalModal}}
+                    {{'lang.openedInExternalModal' | translate}}
                 </div>
             </ng-template>
         </div>
@@ -132,11 +132,11 @@
                 <mat-menu #menu="matMenu" [class]="'menuForm menuAction'">
                     <div class="menuTitle">
                         <span>
-                            {{lang.actions}}
+                            {{'lang.actions' | translate}}
                         </span>
                         <mat-form-field floatLabel="never" appearance="outline" class="smallInput"
                             (click)="$event.stopPropagation();">
-                            <input matInput id="searchTerm" placeholder="{{lang.filterBy}}" #listFilter
+                            <input matInput id="searchTerm" placeholder="{{'lang.filterBy' | translate}}" #listFilter
                                 autocomplete="off" (click)="$event.stopPropagation();"
                                 (keydown)="$event.stopPropagation()">
                         </mat-form-field>
@@ -151,13 +151,13 @@
                 <button mat-button *ngIf="!appService.getViewMode()"
                     [disabled]="actionService.loading || selectedAction.id === 0 || (appDocumentViewer !== undefined && !appDocumentViewer.isEditorLoaded())" class="button-form-primary-filled"
                     style="width: 150px;align-items: center;justify-content: center;text-align: center;display: flex;"
-                    (click)="onSubmit()">{{lang.validate}}</button>
+                    (click)="onSubmit()">{{'lang.validate' | translate}}</button>
                 <button mat-icon-button *ngIf="appService.getViewMode()" class="button-form-primary"
                     (click)="onSubmit()">
                     <mat-icon class="fa fa-check"></mat-icon>
                 </button>
             </ng-container>
-            <div class="emptyAction" *ngIf="actionsList.length === 0" [innerHTML]="lang.noAvailableActionProcess"></div>
+            <div class="emptyAction" *ngIf="actionsList.length === 0" [innerHTML]="this.translate.instant('lang.noAvailableActionProcess')"></div>
         </div>
     </ng-template>
     <mat-sidenav-content class="process-content">
@@ -194,7 +194,7 @@
                                     {{this.currentResourceInformations.priorityLabel}}</b>
                             </div>
                             <div class="content-item">
-                                <div>{{lang.chronoNumberShort}} :</div>
+                                <div>{{'lang.chronoNumberShort' | translate}} :</div>
                                 <div class="content-item-value" [title]="'N° '+this.currentResourceInformations.resId">
                                     {{this.currentResourceInformations.chrono}}</div>
                             </div>
@@ -210,12 +210,12 @@
                                     *ngIf="this.currentResourceInformations.closingDate !== null; else elseLimitDate">
                                     <div style="font-weight: bold;"
                                         [title]="this.currentResourceInformations.closingDate | fullDate">
-                                        {{this.lang.closed}}
+                                        {{'lang.closed' | translate}}
                                         {{this.currentResourceInformations.closingDate | timeAgo : 'full'}}&nbsp;&nbsp;<i
                                             class="fa fa-lock"></i></div>
                                 </ng-container>
                                 <ng-template #elseLimitDate>
-                                    <div>{{lang.processLimitDate}} :</div>
+                                    <div>{{'lang.processLimitDate' | translate}} :</div>
                                     <div class="content-item-value"
                                         [title]="this.currentResourceInformations.processLimitDate | fullDate"
                                         [innerHTML]="this.currentResourceInformations.processLimitDate | timeLimit : 'badge'">
@@ -296,15 +296,15 @@
                 <div style="position: sticky;bottom: 0px;text-align:right;padding:15px;">
                     <button mat-fab
                         *ngIf="indexingForm !== undefined && indexingForm.isResourceModified() && modal.id === 'info'"
-                        (click)="confirmModification()" color="accent" [title]="lang.saveModifications">
+                        (click)="confirmModification()" color="accent" [title]="this.translate.instant('lang.saveModifications')">
                         <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
                     </button>
-                    <button mat-fab [title]="lang.saveModifications"
+                    <button mat-fab [title]="this.translate.instant('lang.saveModifications')"
                         *ngIf="appDiffusionsList !== undefined && appDiffusionsList.isModified() && modal.id === 'diffusionList'"
                         (click)="saveListinstance()" color="accent">
                         <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
                     </button>
-                    <button mat-fab [title]="lang.saveModifications"
+                    <button mat-fab [title]="this.translate.instant('lang.saveModifications')"
                         *ngIf="appVisaWorkflow !== undefined && appVisaWorkflow.isModified() && modal.id === 'visaCircuit'"
                         (click)="saveVisaWorkflow()" color="accent">
                         <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>

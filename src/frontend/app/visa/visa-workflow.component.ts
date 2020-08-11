@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FunctionsService } from '../../service/functions.service';
@@ -58,6 +59,7 @@ export class VisaWorkflowComponent implements OnInit {
     loadedInConstructor: boolean = false;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public functions: FunctionsService,
@@ -100,7 +102,7 @@ export class VisaWorkflowComponent implements OnInit {
             if (this.canManageUser(this.visaWorkflow.items[event.currentIndex], event.currentIndex)) {
                 moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
             } else {
-                this.notify.error(`${this.scanPipe.transform(this.lang.moveVisaUserErr, [this.visaWorkflow.items[event.previousIndex].labelToDisplay])}`);
+                this.notify.error(`${this.scanPipe.transform(this.translate.instant('lang.moveVisaUserErr'), [this.visaWorkflow.items[event.previousIndex].labelToDisplay])}`);
             }
         }
     }
@@ -419,7 +421,7 @@ export class VisaWorkflowComponent implements OnInit {
                 this.http.delete(`../rest/resources/${resIds[0]}/circuits/visaCircuit`).pipe(
                     tap(() => {
                         this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
-                        this.notify.success(this.lang.visaWorkflowDeleted);
+                        this.notify.success(this.translate.instant('lang.visaWorkflowDeleted'));
                         resolve(true);
                     }),
                     catchError((err: any) => {
@@ -437,7 +439,7 @@ export class VisaWorkflowComponent implements OnInit {
                 this.http.put(`../rest/circuits/visaCircuit`, { resources: arrVisa }).pipe(
                     tap((data: any) => {
                         this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
-                        this.notify.success(this.lang.visaWorkflowUpdated);
+                        this.notify.success(this.translate.instant('lang.visaWorkflowUpdated'));
                         resolve(true);
                     }),
                     catchError((err: any) => {
@@ -531,9 +533,9 @@ export class VisaWorkflowComponent implements OnInit {
 
     getError() {
         if (this.visaWorkflow.items.filter((item: any) => item.requested_signature).length === 0) {
-            return this.lang.signUserRequired;
+            return this.translate.instant('lang.signUserRequired');
         } else if (this.visaWorkflow.items.filter((item: any) => !item.hasPrivilege).length > 0) {
-            return this.lang.mustDeleteUsersWithNoPrivileges;
+            return this.translate.instant('lang.mustDeleteUsersWithNoPrivileges');
         }
     }
 
@@ -572,7 +574,7 @@ export class VisaWorkflowComponent implements OnInit {
     }
 
     deletePrivateModel(model: any) {
-        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -580,7 +582,7 @@ export class VisaWorkflowComponent implements OnInit {
             tap(() => {
                 this.visaTemplates.private = this.visaTemplates.private.filter((template: any) => template.id !== model.id);
                 this.searchVisaSignUser.reset();
-                this.notify.success(this.lang.modelDeleted);
+                this.notify.success(this.translate.instant('lang.modelDeleted'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

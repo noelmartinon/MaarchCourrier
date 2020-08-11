@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { LANG } from '../app/translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { JoyrideService } from 'ngx-joyride';
 import { LocalStorageService } from './local-storage.service';
 import { HeaderService } from './header.service';
@@ -21,71 +22,71 @@ export class FeatureTourService {
         {
             type: 'welcome',
             stepId: 'welcome',
-            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.lang.welcomeTourTitle}</b>`,
-            description: this.lang.welcomeTourDescription,
+            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.translate.instant('lang.welcomeTourTitle')}</b>`,
+            description: this.translate.instant('lang.welcomeTourDescription'),
             redirectToAdmin: false,
         },
         {
             type: 'email',
             stepId: 'admin_email_server@administration',
-            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.lang.admin_email_serverTitle}</b>`,
-            description: this.lang.admin_email_serverTour,
+            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.translate.instant('lang.admin_email_serverTitle')}</b>`,
+            description: this.translate.instant('lang.admin_email_serverTour'),
             redirectToAdmin: false,
         },
         {
             type: 'email',
             stepId: 'emailTour@administration/sendmail',
-            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.lang.emailTourTitle}</b>`,
-            description: this.lang.emailTourDescription,
+            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.translate.instant('lang.emailTourTitle')}</b>`,
+            description: this.translate.instant('lang.emailTourDescription'),
             redirectToAdmin: false,
         },
         {
             type: 'email',
             stepId: 'emailTour2@administration/sendmail',
-            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.lang.emailTour2Title}</b>`,
-            description: this.lang.emailTour2Description,
+            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.translate.instant('lang.emailTour2Title')}</b>`,
+            description: this.translate.instant('lang.emailTour2Description'),
             redirectToAdmin: false,
         },
         {
             type: 'notification',
             stepId: 'admin_notif@administration',
-            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.lang.admin_notifTitle}</b>`,
-            description: this.lang.admin_notifTour,
+            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.translate.instant('lang.admin_notifTitle')}</b>`,
+            description: this.translate.instant('lang.admin_notifTour'),
             redirectToAdmin: false,
         },
         {
             type: 'notification',
             stepId: 'BASKETS_Tour@administration/notifications',
-            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.lang.notifTour2Title}</b>`,
-            description: this.lang.notifTour2Description,
+            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.translate.instant('lang.notifTour2Title')}</b>`,
+            description: this.translate.instant('lang.notifTour2Description'),
             redirectToAdmin: false,
         },
         {
             type: 'notification',
             stepId: 'createScriptTour@administration/notifications/4',
-            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.lang.createScriptTourTitle}</b>`,
-            description: this.lang.createScriptTourDescription,
+            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.translate.instant('lang.createScriptTourTitle')}</b>`,
+            description: this.translate.instant('lang.createScriptTourDescription'),
             redirectToAdmin: false,
         },
         {
             type: 'notification',
             stepId: 'notifTour@administration/notifications',
-            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.lang.notifTourTitle}</b>`,
-            description: this.lang.notifTourDescription,
+            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.translate.instant('lang.notifTourTitle')}</b>`,
+            description: this.translate.instant('lang.notifTourDescription'),
             redirectToAdmin: false,
         },
         {
             type: 'notification',
             stepId: 'notifTour3@administration/notifications',
-            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.lang.notifTour3Title}</b>`,
-            description: this.lang.notifTour3Description,
+            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.translate.instant('lang.notifTour3Title')}</b>`,
+            description: this.translate.instant('lang.notifTour3Description'),
             redirectToAdmin: false,
         },
         {
             type: 'notification',
             stepId: 'notifTour4@administration/notifications',
-            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.lang.notifTour4Title}</b>`,
-            description: this.lang.notifTour4Description,
+            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.translate.instant('lang.notifTour4Title')}</b>`,
+            description: this.translate.instant('lang.notifTour4Description'),
             redirectToAdmin: true,
         },
     ];
@@ -93,6 +94,7 @@ export class FeatureTourService {
     featureTourEnd: any[] = [];
 
     constructor(
+        private translate: TranslateService,
         private readonly joyrideService: JoyrideService,
         private localStorage: LocalStorageService,
         private headerService: HeaderService,
@@ -110,7 +112,7 @@ export class FeatureTourService {
                     customTexts: {
                         next: '>>',
                         prev: '<<',
-                        done: this.lang.getIt
+                        done: this.translate.instant('lang.getIt')
                     },
                     steps: steps,
                     waitingTime: 500

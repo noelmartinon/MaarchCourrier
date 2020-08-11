@@ -3,29 +3,29 @@
     <mat-dialog-content>
         <ng-container *ngIf="data.isDeletable">
             <ng-container *ngIf="data.inDiffListDest">
-                <h2>{{lang.redirectUserListDiff}}</h2>
+                <h2>{{'lang.redirectUserListDiff' | translate}}</h2>
                 <div class="alert-message alert-message-info" role="alert">
                     <b>{{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;<span
-                        [innerHTML]="lang.chooseNewDest"></span> :
+                        [innerHTML]="this.translate.instant('lang.chooseNewDest')"></span> :
                 </div>
 
                 <div *ngFor="let redirectModel of data.redirectListModels; index as i" id="{{redirectModel.object_id}}"
                     class="form-group">
                     <plugin-autocomplete [labelPlaceholder]="lang.newDest + ' : ' + redirectModel.title"
-                        [labelList]="lang.availableUsers" [routeDatas]="['/rest/autocomplete/users']"
+                        [labelList]="this.translate.instant('lang.availableUsers')" [routeDatas]="['/rest/autocomplete/users']"
                         [targetSearchKey]="'idToDisplay'" [subInfoKey]="'descriptionToDisplay'"
                         (triggerEvent)="setRedirectUserListModels(i, $event)" singleMode required></plugin-autocomplete>
                 </div>
             </ng-container>
             <ng-container *ngIf="data.isResDestUser">
-                <h2>{{lang.redirectUserListInstances}}</h2>
+                <h2>{{'lang.redirectUserListInstances' | translate}}</h2>
                 <div class="alert-message alert-message-info" role="alert">
                     <b>{{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;<span
-                        [innerHTML]="lang.chooseNewDestUser"></span> :
+                        [innerHTML]="this.translate.instant('lang.chooseNewDestUser')"></span> :
                 </div>
 
                 <div id="{{this.data.userDestRedirect.user_id}}" class="form-group">
-                    <plugin-autocomplete [labelPlaceholder]="lang.newDestRes" [labelList]="lang.availableUsers"
+                    <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.newDestRes')" [labelList]="this.translate.instant('lang.availableUsers')"
                         [routeDatas]="['/rest/autocomplete/users']" [targetSearchKey]="'idToDisplay'"
                         [subInfoKey]="'descriptionToDisplay'" (triggerEvent)="setRedirectUserRes($event)" singleMode
                         required></plugin-autocomplete>
@@ -33,22 +33,22 @@
             </ng-container>
             <ng-container *ngIf="!data.inDiffListDest && !data.isResDestUser">
                 <div class="alert" role="alert">
-                    <b *ngIf="data.userDestRedirect.actionMode == 'delete'">{{lang.delete}}
+                    <b *ngIf="data.userDestRedirect.actionMode == 'delete'">{{'lang.delete' | translate}}
                         {{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;
-                    <b *ngIf="data.userDestRedirect.actionMode == 'suspend'">{{lang.suspend}}
+                    <b *ngIf="data.userDestRedirect.actionMode == 'suspend'">{{'lang.suspend' | translate}}
                         {{this.data.userDestRedirect.firstname}} {{this.data.userDestRedirect.lastname}}</b>&nbsp;
                 </div>
             </ng-container>
         </ng-container>
         <ng-container *ngIf="!data.isDeletable">
             <div class="alert-message alert-message-info" role="alert">
-                <p><span [innerHTML]="lang.userIsNotDeletable"></span> <b>{{this.data.userDestRedirect.firstname}}
+                <p><span [innerHTML]="this.translate.instant('lang.userIsNotDeletable')"></span> <b>{{this.data.userDestRedirect.firstname}}
                         {{this.data.userDestRedirect.lastname}}</b>&nbsp;</p>
-                <p><span [innerHTML]="lang.userIsDeletableBy"></span></p>
+                <p><span [innerHTML]="this.translate.instant('lang.userIsDeletableBy')"></span></p>
             </div>
             <div class="modal-body" *ngIf="data.inTemplateList" class="col-md-6">
                 <mat-list>
-                    <p mat-line>{{lang.diffusionList}}</p>
+                    <p mat-line>{{'lang.diffusionList' | translate}}</p>
                     <mat-list-item *ngFor="let templateEntity of data.listTemplateEntities">
                         <mat-icon mat-list-icon><i class="fa fa-share-alt" color="primary"></i></mat-icon>
                         <p mat-line><span> {{templateEntity}} </span></p>
@@ -57,7 +57,7 @@
             </div>
             <div class="modal-body" *ngIf="data.inInstanceList" class="col-md-6">
                 <mat-list>
-                    <p mat-line>{{lang.mailEntitiesList}}</p>
+                    <p mat-line>{{'lang.mailEntitiesList' | translate}}</p>
                     <mat-list-item *ngFor="let instanceEntity of data.listInstanceEntities">
                         <mat-icon mat-list-icon><i class="fa fa-inbox" color="primary"></i></mat-icon>
                         <p mat-line><span> {{instanceEntity}} </span></p>
@@ -70,12 +70,12 @@
     <mat-dialog-actions>
         <button mat-raised-button color="warn" *ngIf="data.userDestRedirect.actionMode == 'delete' && data.isDeletable"
             type="submit" class="btn btn-danger" (click)="dialogRef.close(this.data)"
-            [disabled]="!sendFunction()">{{lang.delete}}
-            {{lang.user}}</button>
+            [disabled]="!sendFunction()">{{'lang.delete' | translate}}
+            {{'lang.user' | translate}}</button>
         <button mat-raised-button color="primary" *ngIf="data.userDestRedirect.actionMode == 'suspend' && data.isDeletable"
-            type="submit" (click)="dialogRef.close(this.data)" [disabled]="!sendFunction()">{{lang.suspend}}
-            {{lang.user}}</button>
+            type="submit" (click)="dialogRef.close(this.data)" [disabled]="!sendFunction()">{{'lang.suspend' | translate}}
+            {{'lang.user' | translate}}</button>
         <button mat-raised-button color="primary" *ngIf="!data.isDeletable" type="submit"
-            (click)="dialogRef.close()">{{lang.close}}</button>
+            (click)="dialogRef.close()">{{'lang.close' | translate}}</button>
     </mat-dialog-actions>
 </div>

@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { tap, finalize, catchError, exhaustMap, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -31,6 +32,7 @@ export class NotesListComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public headerService: HeaderService,
@@ -73,7 +75,7 @@ export class NotesListComponent implements OnInit {
     }
 
     removeNote(note: any) {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: false, data: { title: this.lang.confirmRemoveNote, msg: this.lang.confirmAction } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: false, data: { title: this.translate.instant('lang.confirmRemoveNote'), msg: this.translate.instant('lang.confirmAction') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -83,7 +85,7 @@ export class NotesListComponent implements OnInit {
                 if (index > -1) {
                     this.notes.splice(index, 1);
                 }
-                this.notify.success(this.lang.noteRemoved);
+                this.notify.success(this.translate.instant('lang.noteRemoved'));
                 this.reloadBadgeNotes.emit(`${this.notes.length}`);
             })
         ).subscribe();

@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../service/header.service';
 import { AppService } from '../../../../service/app.service';
@@ -22,31 +23,31 @@ export class ContactsParametersAdministrationComponent implements OnInit {
         {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
-            label: this.lang.contactsList,
+            label: this.translate.instant('lang.contactsList'),
             current: false
         },
         {
             icon: 'fa fa-code',
             route: '/administration/contacts/contactsCustomFields',
-            label: this.lang.customFieldsAdmin,
+            label: this.translate.instant('lang.customFieldsAdmin'),
             current: false
         },
         {
             icon: 'fa fa-cog',
             route: '/administration/contacts/contacts-parameters',
-            label: this.lang.contactsParameters,
+            label: this.translate.instant('lang.contactsParameters'),
             current: true
         },
         {
             icon: 'fa fa-users',
             route: '/administration/contacts/contacts-groups',
-            label: this.lang.contactsGroups,
+            label: this.translate.instant('lang.contactsGroups'),
             current: false
         },
         {
             icon: 'fas fa-magic',
             route: '/administration/contacts/duplicates',
-            label: this.lang.duplicatesContactsAdmin,
+            label: this.translate.instant('lang.duplicatesContactsAdmin'),
             current: false
         },
     ];
@@ -75,6 +76,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -85,7 +87,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.headerService.setHeader(this.lang.contactsParameters);
+        this.headerService.setHeader(this.translate.instant('lang.contactsParameters'));
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.http.get('../rest/contactsParameters')
@@ -117,7 +119,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
         }
         this.http.put('../rest/contactsParameters', { 'contactsFilling': this.contactsFilling, 'contactsParameters': this.contactsParameters })
             .subscribe(() => {
-                this.notify.success(this.lang.parameterUpdated);
+                this.notify.success(this.translate.instant('lang.parameterUpdated'));
 
             }, (err) => {
                 this.notify.error(err.error.errors);

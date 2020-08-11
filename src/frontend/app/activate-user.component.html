@@ -3,7 +3,7 @@
         <button mat-button>
             <mat-icon class="maarchLogoWhiteFull" [svgIcon]="appService.getViewMode() ? 'maarchLogoOnly' : 'maarchLogo'"></mat-icon>
         </button>
-        <h1 class="admin-toolbar-title text-center" >{{lang.missingAdvertTitle}}</h1>
+        <h1 class="admin-toolbar-title text-center" >{{'lang.missingAdvertTitle' | translate}}</h1>
         <span style="flex: 1 1 auto;"></span>
     </mat-toolbar>
 
@@ -14,11 +14,11 @@
             </div>
             <div *ngIf="!loading" class="card-app-content">         
                 <div class="text-center" style="margin-top: 50px;">
-                    {{lang.missingAdvert}}<br>
-                    {{lang.missingAdvert2}}<br>
+                    {{'lang.missingAdvert' | translate}}<br>
+                    {{'lang.missingAdvert2' | translate}}<br>
                     <ng-container *ngIf="user.redirectedBaskets.length > 0">
                         <br>
-                        {{lang.missingBasket}}<br>
+                        {{'lang.missingBasket' | translate}}<br>
                     </ng-container>
                 </div>
                 <div class="col-sm-4" style="overflow:hidden;"></div>
@@ -27,14 +27,14 @@
                         <mat-list-item>
                             <mat-icon mat-list-icon color="primary">
                                 <mat-checkbox color="primary" (change)="$event ? masterToggleBaskets($event) : null" [checked]="selectionBaskets.hasValue()"
-                                    matTooltip="{{lang.selectAll}}"></mat-checkbox>
+                                    matTooltip="{{'lang.selectAll' | translate}}"></mat-checkbox>
                             </mat-icon>
                             <p mat-line>
                                 <span *ngIf="!selectionBaskets.hasValue()" style="opacity: 0.5;font-style: italic;font-size: 80%;">
-                                    {{lang.selectAll}}
+                                    {{'lang.selectAll' | translate}}
                                 </span>
                                 <span *ngIf="selectionBaskets.hasValue()" style="opacity: 1;font-style: normal;font-size: 100%;">
-                                    {{lang.selectAll}}
+                                    {{'lang.selectAll' | translate}}
                                 </span>
                             </p>
                         </mat-list-item>
@@ -47,10 +47,10 @@
                                         color="primary"></mat-checkbox>
                                 </mat-icon>
                                 <h4 mat-line color="primary" style="display: flex;align-items: center;">
-                                    <span (click)="selectionBaskets.toggle(basket);" matTooltip="{{basket.basket_name}} [{{basket.group_desc}}] {{lang.redirectedTo}} {{basket.userToDisplay}}" style="flex: 2;overflow: hidden;text-overflow: ellipsis;">
+                                    <span (click)="selectionBaskets.toggle(basket);" matTooltip="{{basket.basket_name}} [{{basket.group_desc}}] {{'lang.redirectedTo' | translate}} {{basket.userToDisplay}}" style="flex: 2;overflow: hidden;text-overflow: ellipsis;">
                                         {{basket.basket_name}}
                                         <span class="label label-primary" style="font-weight:normal">{{basket.group_desc}}</span>
-                                        <span style="opacity: 0.5;font-style: italic;font-size: 80%;"> {{lang.redirectedTo}} {{basket.userToDisplay}}</span>
+                                        <span style="opacity: 0.5;font-style: italic;font-size: 80%;"> {{'lang.redirectedTo' | translate}} {{basket.userToDisplay}}</span>
                                     </span>
                                 </h4>
                             </mat-list-item>
@@ -62,10 +62,10 @@
                 <div style="clear:both;"></div>
                 
                 <div *ngIf="!loading" class="text-center" style="position:relative; top:50px;">
-                    {{lang.missingChoose}}<br>
+                    {{'lang.missingChoose' | translate}}<br>
                     <br>
-                    <button mat-raised-button color="primary" type="button" (click)="activateUser()">{{lang.validate}}</button>
-                    <button mat-raised-button color="primary" type="button" (click)="logout()">{{lang.cancel}}</button>
+                    <button mat-raised-button color="primary" type="button" (click)="activateUser()">{{'lang.validate' | translate}}</button>
+                    <button mat-raised-button color="primary" type="button" (click)="logout()">{{'lang.cancel' | translate}}</button>
                 </div>
 
             </div>

@@ -16,7 +16,7 @@
             [style.borderColor]="currentPriorityColor">
             <div class="title" [style.color]="currentPriorityColor">
                 {{lang[category] | uppercase}} <small *ngIf="category === 'mail'"
-                    [title]="lang.category_id">{{lang['indexing_' + currentCategory] | titlecase}}</small>
+                    [title]="this.translate.instant('lang.category_id')">{{lang['indexing_' + currentCategory] | titlecase}}</small>
                 <div class="title-divider"></div>
             </div>
             <div class="content">
@@ -29,36 +29,36 @@
                         <div class="fieldRow" *ngIf="field.unit === category" cdkDrag cdkDragLockAxis="y"
                             [cdkDragData]="field">
                             <div class="fieldLabel" *ngIf="(!adminMode && !appService.getViewMode()) || adminMode">
-                                <i *ngIf="adminMode" [title]="lang.move" class="fas fa-bars fa-2x" color="primary"
+                                <i *ngIf="adminMode" [title]="this.translate.instant('lang.move')" class="fas fa-bars fa-2x" color="primary"
                                     style="cursor: move" cdkDragHandle></i>&nbsp;
                                 {{field.label}}
                                 <button *ngIf="adminMode" mat-icon-button
                                     [matMenuTriggerFor]="fieldActions">
                                     <mat-icon class="fa fa-ellipsis-v" color="secondary"></mat-icon>
                                 </button>
-                                <mat-menu #fieldActions="matMenu">
+                                <mat-menu #fieldActions="matMenu" [class]="'parametersFieldsMenu'">
                                     <button mat-menu-item (click)="field.mandatory = !field.mandatory" *ngIf="!field.system">
-                                        <span *ngIf="!field.mandatory">{{lang.mandatoryField}}</span>
-                                        <span *ngIf="field.mandatory">{{lang.optionalField}}</span>
+                                        <span *ngIf="!field.mandatory">{{'lang.mandatoryField' | translate}}</span>
+                                        <span *ngIf="field.mandatory">{{'lang.optionalField' | translate}}</span>
                                     </button>
                                     <mat-divider *ngIf="!field.system"></mat-divider>
                                     <button mat-menu-item *ngIf="!field.enabled" (click)="enableField(field, true)">
-                                        <span>{{lang.enableField}}</span>
+                                        <span>{{'lang.enableField' | translate}}</span>
                                     </button>
                                     <button mat-menu-item *ngIf="field.enabled" (click)="enableField(field, false)">
-                                        <span>{{lang.disableField}}</span>
+                                        <span>{{'lang.disableField' | translate}}</span>
                                     </button>
                                     <mat-divider *ngIf="!field.system"></mat-divider>
                                     <button mat-menu-item (click)="removeItem('indexingModels_'+category,field,i)" *ngIf="!field.system">
                                         <mat-icon class="fa fa-trash" color="warn"></mat-icon>
-                                        <span>{{lang.delete}} {{field.enabled}} {{arrFormControl[field.identifier].enabled}} {{isAlwaysDisabledField(field)}}</span>
+                                        <span>{{'lang.delete' | translate}}</span>
                                     </button>
                                 </mat-menu>
                             </div>
                             <div class="fieldInput" [class.textareaInput]="field.type === 'string'" [class.checkboxInput]="field.type === 'checkbox'">
                                 <ng-container *ngIf="field.type === 'string'">
                                     <button mat-button color="primary"  *ngIf="field.SQLMode && adminMode" matPrefix mat-icon-button
-                                        disabled  style="position: absolute;left: -40px;" [title]="lang.bddModeCustomFieldMsg">
+                                        disabled  style="position: absolute;left: -40px;" [title]="this.translate.instant('lang.bddModeCustomFieldMsg')">
                                         <mat-icon color="primary"
                                             class="fas fa-database">
                                         </mat-icon>
@@ -74,7 +74,7 @@
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'integer'">
                                     <button mat-button color="primary"  *ngIf="field.SQLMode && adminMode" matPrefix mat-icon-button
-                                        disabled  style="position: absolute;left: -40px;" [title]="lang.bddModeCustomFieldMsg">
+                                        disabled  style="position: absolute;left: -40px;" [title]="this.translate.instant('lang.bddModeCustomFieldMsg')">
                                         <mat-icon color="primary"
                                             class="fas fa-database">
                                         </mat-icon>
@@ -89,7 +89,7 @@
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'select'">
                                     <button mat-button color="primary" *ngIf="field.SQLMode && adminMode" matPrefix mat-icon-button
-                                        disabled  style="position: absolute;left: -40px;" [title]="lang.bddModeCustomFieldMsg">
+                                        disabled  style="position: absolute;left: -40px;" [title]="this.translate.instant('lang.bddModeCustomFieldMsg')">
                                         <mat-icon color="primary"
                                             class="fas fa-database">
                                         </mat-icon>
@@ -102,14 +102,14 @@
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'date'">
                                     <button mat-button color="primary"  *ngIf="field.SQLMode && adminMode" matPrefix mat-icon-button
-                                        disabled  style="position: absolute;left: -40px;" [title]="lang.bddModeCustomFieldMsg">
+                                        disabled  style="position: absolute;left: -40px;" [title]="this.translate.instant('lang.bddModeCustomFieldMsg')">
                                         <mat-icon color="primary"
                                             class="fas fa-database">
                                         </mat-icon>
                                     </button>
                                     <button mat-button color="primary" *ngIf="adminMode && !field.SQLMode" matPrefix mat-icon-button
                                         (click)="$event.stopPropagation();toggleTodayDate(field);"
-                                        [matTooltip]="lang.todayDate" style="position: absolute;left: -40px;">
+                                        [matTooltip]="this.translate.instant('lang.todayDate')" style="position: absolute;left: -40px;">
                                         <mat-icon color="primary"
                                             class="{{field.today ? 'far fa-bell-slash' : 'far fa-bell'}}">
                                         </mat-icon>
@@ -130,7 +130,7 @@
                                         <button mat-button color="warn" matSuffix mat-icon-button
                                             *ngIf="arrFormControl[field.identifier].value && !arrFormControl[field.identifier].disabled"
                                             (click)="$event.stopPropagation();arrFormControl[field.identifier].reset();"
-                                            [title]="lang.eraseValue">
+                                            [title]="this.translate.instant('lang.eraseValue')">
                                             <mat-icon color="warn" class="fa fa-calendar-times">
                                             </mat-icon>
                                         </button>
@@ -138,7 +138,7 @@
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'radio'">
                                     <button mat-button color="primary"  *ngIf="field.SQLMode && adminMode" matPrefix mat-icon-button
-                                        disabled  style="position: absolute;left: -40px;" [title]="lang.bddModeCustomFieldMsg">
+                                        disabled  style="position: absolute;left: -40px;" [title]="this.translate.instant('lang.bddModeCustomFieldMsg')">
                                         <mat-icon color="primary"
                                             class="fas fa-database">
                                         </mat-icon>
@@ -157,7 +157,7 @@
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'checkbox'">
                                     <button mat-button color="primary"  *ngIf="field.SQLMode && adminMode" matPrefix mat-icon-button
-                                        disabled  style="position: absolute;left: -40px;" [title]="lang.bddModeCustomFieldMsg">
+                                        disabled  style="position: absolute;left: -40px;" [title]="this.translate.instant('lang.bddModeCustomFieldMsg')">
                                         <mat-icon color="primary"
                                             class="fas fa-database">
                                         </mat-icon>
@@ -179,7 +179,7 @@
                                     </mat-chip-list>
                                 </ng-container>
                                 <!--<ng-container *ngIf="field.type === 'autocomplete'">
-                                    <plugin-autocomplete [labelPlaceholder]="lang.searchValue"
+                                    <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.searchValue')"
                                         [routeDatas]="[field.values[0]]" [targetSearchKey]="'idToDisplay'"
                                         [size]="'small'" [control]="arrFormControl[field.identifier]"
                                         [manageDatas]="!adminMode ? field.values[1] : undefined" style="width:100%;">
@@ -216,8 +216,8 @@
                             <div style="padding: 10px;font-size: 16px;color: #135F7F;letter-spacing: 2px;font-weight: bold;display: flex;
                                 align-items: center;">
                                 <div style="display: flex;flex: 1;align-items: center;">
-                                    {{lang.diffusionList}} <button mat-icon-button  *ngIf="appDiffusionsList.canUpdateRoles() && canEdit && mode !== 'process' && field.enabled" color="primary"
-                                            (click)="appDiffusionsList.switchMode()" [title]="lang.modifyDiffusionList">
+                                    {{'lang.diffusionList' | translate}} <button mat-icon-button  *ngIf="appDiffusionsList.canUpdateRoles() && canEdit && mode !== 'process' && field.enabled" color="primary"
+                                            (click)="appDiffusionsList.switchMode()" [title]="this.translate.instant('lang.modifyDiffusionList')">
                                             <mat-icon class="fa fa-edit"></mat-icon>
                                         </button>
                                 </div>
@@ -229,7 +229,7 @@
                                     <i class="fas fa-check fieldFull" *ngIf="!adminMode && arrFormControl['diffusionList'].valid && !isEmptyField(field)"></i>
                                 </div>
                             </div>
-                            <app-diffusions-list #appDiffusionsList [resId]="resId" [entityId]="arrFormControl[field.identifier].value" [diffFormControl]="arrFormControl['diffusionList']" [allowedEntities]="field.allowedEntities" [target]="'indexation'" [categoryId]="currentCategory" (triggerEvent)="changeDestination($event,field.allowedEntities)">
+                            <app-diffusions-list #appDiffusionsList [resId]="resId" [entityId]="arrFormControl[field.identifier].value" [diffFormControl]="arrFormControl['diffusionList']" [allowedEntities]="field.allowedEntities" [target]="'indexation'" [selfDest]="selfDest" (triggerEvent)="changeDestination($event,field.allowedEntities)">
                             </app-diffusions-list>
                             <mat-divider></mat-divider>
                         </div>

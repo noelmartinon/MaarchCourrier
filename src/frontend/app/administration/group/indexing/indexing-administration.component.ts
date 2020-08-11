@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { tap } from 'rxjs/internal/operators/tap';
 import { map, catchError, filter, exhaustMap, finalize } from 'rxjs/operators';
@@ -38,6 +39,7 @@ export class IndexingAdministrationComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private dialog: MatDialog,
@@ -49,56 +51,56 @@ export class IndexingAdministrationComponent implements OnInit {
             parent: '#',
             icon: 'fa fa-hashtag',
             allowed: true,
-            text: this.lang.allEntities
+            text: this.translate.instant('lang.allEntities')
         }, {
             id: 'ENTITIES_JUST_BELOW',
             keyword: 'ENTITIES_JUST_BELOW',
             parent: '#',
             icon: 'fa fa-hashtag',
             allowed: true,
-            text: this.lang.immediatelyBelowMyPrimaryEntity
+            text: this.translate.instant('lang.immediatelyBelowMyPrimaryEntity')
         }, {
             id: 'ENTITIES_BELOW',
             keyword: 'ENTITIES_BELOW',
             parent: '#',
             icon: 'fa fa-hashtag',
             allowed: true,
-            text: this.lang.belowAllMyEntities
+            text: this.translate.instant('lang.belowAllMyEntities')
         }, {
             id: 'ALL_ENTITIES_BELOW',
             keyword: 'ALL_ENTITIES_BELOW',
             parent: '#',
             icon: 'fa fa-hashtag',
             allowed: true,
-            text: this.lang.belowMyPrimaryEntity
+            text: this.translate.instant('lang.belowMyPrimaryEntity')
         }, {
             id: 'MY_ENTITIES',
             keyword: 'MY_ENTITIES',
             parent: '#',
             icon: 'fa fa-hashtag',
             allowed: true,
-            text: this.lang.myEntities
+            text: this.translate.instant('lang.myEntities')
         }, {
             id: 'MY_PRIMARY_ENTITY',
             keyword: 'MY_PRIMARY_ENTITY',
             parent: '#',
             icon: 'fa fa-hashtag',
             allowed: true,
-            text: this.lang.myPrimaryEntity
+            text: this.translate.instant('lang.myPrimaryEntity')
         }, {
             id: 'SAME_LEVEL_ENTITIES',
             keyword: 'SAME_LEVEL_ENTITIES',
             parent: '#',
             icon: 'fa fa-hashtag',
             allowed: true,
-            text: this.lang.sameLevelMyPrimaryEntity
+            text: this.translate.instant('lang.sameLevelMyPrimaryEntity')
         }, {
             id: 'ENTITIES_JUST_UP',
             keyword: 'ENTITIES_JUST_UP',
             parent: '#',
             icon: 'fa fa-hashtag',
             allowed: true,
-            text: this.lang.immediatelySuperiorMyPrimaryEntity
+            text: this.translate.instant('lang.immediatelySuperiorMyPrimaryEntity')
         }];
     }
 
@@ -205,7 +207,7 @@ export class IndexingAdministrationComponent implements OnInit {
                 this.indexingInfo.entities.push(entityId);
             }),
             tap(() => {
-                this.notify.success(this.lang.entityAdded);
+                this.notify.success(this.translate.instant('lang.entityAdded'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -224,7 +226,7 @@ export class IndexingAdministrationComponent implements OnInit {
                 this.indexingInfo.entities.splice(index, 1);
             }),
             tap(() => {
-                this.notify.success(this.lang.entityDeleted);
+                this.notify.success(this.translate.instant('lang.entityDeleted'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -241,7 +243,7 @@ export class IndexingAdministrationComponent implements OnInit {
                 this.indexingInfo.keywords.push(keyword);
             }),
             tap(() => {
-                this.notify.success(this.lang.keywordAdded);
+                this.notify.success(this.translate.instant('lang.keywordAdded'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -260,7 +262,7 @@ export class IndexingAdministrationComponent implements OnInit {
                 this.indexingInfo.keywords.splice(index, 1);
             }),
             tap(() => {
-                this.notify.success(this.lang.keywordDeleted);
+                this.notify.success(this.translate.instant('lang.keywordDeleted'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -280,7 +282,7 @@ export class IndexingAdministrationComponent implements OnInit {
                 this.actionList.splice(index, 1);
             }),
             tap(() => {
-                this.notify.success(this.lang.actionAdded);
+                this.notify.success(this.translate.instant('lang.actionAdded'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -290,7 +292,7 @@ export class IndexingAdministrationComponent implements OnInit {
     }
 
     removeAction(index: number) {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -306,7 +308,7 @@ export class IndexingAdministrationComponent implements OnInit {
                 this.indexingInfo.actions.splice(index, 1);
             }),
             tap(() => {
-                this.notify.success(this.lang.actionDeleted);
+                this.notify.success(this.translate.instant('lang.actionDeleted'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -324,9 +326,9 @@ export class IndexingAdministrationComponent implements OnInit {
             }),
             tap(() => {
                 if (this.indexingInfo.canIndex) {
-                    this.notify.success(this.lang.indexEnabled);
+                    this.notify.success(this.translate.instant('lang.indexEnabled'));
                 } else {
-                    this.notify.success(this.lang.indexDisabled);
+                    this.notify.success(this.translate.instant('lang.indexDisabled'));
                 }
             }),
             catchError((err: any) => {
@@ -343,7 +345,7 @@ export class IndexingAdministrationComponent implements OnInit {
 
             this.http.put('../rest/groups/' + this.groupId + '/indexing', { actions: newActionListIds }).pipe(
                 tap(() => {
-                    this.notify.success(this.lang.actionAdded);
+                    this.notify.success(this.translate.instant('lang.actionAdded'));
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);

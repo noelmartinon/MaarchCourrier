@@ -1,6 +1,7 @@
 import { Component, OnInit, NgZone, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from './translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../service/notification/notification.service';
 import { HeaderService } from '../service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -30,6 +31,7 @@ export class SaveNumericPackageComponent implements OnInit {
     @ViewChild('snav', { static: true }) sidenavLeft: MatSidenav;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private zone: NgZone,
         private notify: NotificationService,
@@ -42,7 +44,7 @@ export class SaveNumericPackageComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.saveNumericPackage);
+        this.headerService.setHeader(this.translate.instant('lang.saveNumericPackage'));
 
         this.loading = false;
     }
@@ -92,7 +94,7 @@ export class SaveNumericPackageComponent implements OnInit {
                             extension: '',
                         };
                         $('#numericPackageFilePath').val(null);
-                        this.notify.success(this.lang.numericPackageImported);
+                        this.notify.success(this.translate.instant('lang.numericPackageImported'));
 
                         if (data.basketRedirection != null) {
                             window.location.href = data.basketRedirection;
@@ -109,7 +111,7 @@ export class SaveNumericPackageComponent implements OnInit {
             this.numericPackage.base64 = '';
             this.numericPackage.extension = '';
 
-            this.notify.error(this.lang.noNumericPackageSelected);
+            this.notify.error(this.translate.instant('lang.noNumericPackageSelected'));
         }
     }
 

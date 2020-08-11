@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { FormControl, Validators } from '@angular/forms';
@@ -32,11 +33,12 @@ export class StatusAdministrationComponent implements OnInit {
     statusId = new FormControl('', [Validators.required, Validators.pattern(/^[\w.-]*$/)]);
 
     getErrorMessage() {
-        return this.statusId.hasError('required') ? this.lang.enterValue :
-            this.statusId.hasError('pattern') ? this.lang.patternId : '';
+        return this.statusId.hasError('required') ? this.translate.instant('lang.enterValue') :
+            this.statusId.hasError('pattern') ? this.translate.instant('lang.patternId') : '';
     }
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -50,7 +52,7 @@ export class StatusAdministrationComponent implements OnInit {
 
         this.route.params.subscribe((params: any) => {
             if (typeof params['identifier'] === 'undefined') {
-                this.headerService.setHeader(this.lang.statusCreation);
+                this.headerService.setHeader(this.translate.instant('lang.statusCreation'));
 
                 this.http.get('../rest/administration/statuses/new')
                     .subscribe((data: any) => {
@@ -69,7 +71,7 @@ export class StatusAdministrationComponent implements OnInit {
                 this.http.get('../rest/statuses/' + params['identifier'])
                     .subscribe((data: any) => {
                         this.status = data['status'][0];
-                        this.headerService.setHeader(this.lang.statusModification, this.status['label_status']);
+                        this.headerService.setHeader(this.translate.instant('lang.statusModification'), this.status['label_status']);
 
                         if (this.status.can_be_searched === 'Y') {
                             this.status.can_be_searched = true;
@@ -111,7 +113,7 @@ export class StatusAdministrationComponent implements OnInit {
         if (this.creationMode === true) {
             this.http.post('../rest/statuses', this.status)
                 .subscribe(() => {
-                    this.notify.success(this.lang.statusAdded);
+                    this.notify.success(this.translate.instant('lang.statusAdded'));
                     this.router.navigate(['administration/statuses']);
                 }, (err) => {
                     this.notify.error(err.error.errors);
@@ -120,7 +122,7 @@ export class StatusAdministrationComponent implements OnInit {
 
             this.http.put('../rest/statuses/' + this.statusIdentifier, this.status)
                 .subscribe(() => {
-                    this.notify.success(this.lang.statusUpdated);
+                    this.notify.success(this.translate.instant('lang.statusUpdated'));
                     this.router.navigate(['administration/statuses']);
                 }, (err) => {
                     this.notify.error(err.error.errors);

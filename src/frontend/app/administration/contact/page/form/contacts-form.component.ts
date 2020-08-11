@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, Input, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../../service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -56,15 +57,15 @@ export class ContactsFormComponent implements OnInit {
     contactUnit = [
         {
             id: 'mainInfo',
-            label: this.lang.denomination
+            label: this.translate.instant('lang.denomination')
         },
         {
             id: 'address',
-            label: this.lang.address
+            label: this.translate.instant('lang.address')
         },
         {
             id: 'complement',
-            label: this.lang.additionals
+            label: this.translate.instant('lang.additionals')
         },
         {
             id: 'maarch2maarch',
@@ -76,7 +77,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'company',
             unit: 'mainInfo',
-            label: this.lang.contactsParameters_company,
+            label: this.translate.instant('lang.contactsParameters_company'),
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -87,7 +88,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'civility',
             unit: 'mainInfo',
-            label: this.lang.contactsParameters_civility,
+            label: this.translate.instant('lang.contactsParameters_civility'),
             type: 'select',
             control: new FormControl(),
             required: false,
@@ -98,7 +99,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'firstname',
             unit: 'mainInfo',
-            label: this.lang.contactsParameters_firstname,
+            label: this.translate.instant('lang.contactsParameters_firstname'),
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -109,7 +110,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'lastname',
             unit: 'mainInfo',
-            label: this.lang.contactsParameters_lastname,
+            label: this.translate.instant('lang.contactsParameters_lastname'),
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -120,7 +121,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'function',
             unit: 'mainInfo',
-            label: this.lang.contactsParameters_function,
+            label: this.translate.instant('lang.contactsParameters_function'),
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -131,7 +132,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'department',
             unit: 'mainInfo',
-            label: this.lang.contactsParameters_department,
+            label: this.translate.instant('lang.contactsParameters_department'),
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -142,7 +143,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'email',
             unit: 'mainInfo',
-            label: this.lang.email,
+            label: this.translate.instant('lang.email'),
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -153,7 +154,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'phone',
             unit: 'mainInfo',
-            label: this.lang.phoneNumber,
+            label: this.translate.instant('lang.phoneNumber'),
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -164,7 +165,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'addressAdditional1',
             unit: 'address',
-            label: this.lang.contactsParameters_addressAdditional1,
+            label: this.translate.instant('lang.contactsParameters_addressAdditional1'),
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -175,7 +176,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'addressNumber',
             unit: 'address',
-            label: this.lang.contactsParameters_addressNumber,
+            label: this.translate.instant('lang.contactsParameters_addressNumber'),
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -186,7 +187,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'addressStreet',
             unit: 'address',
-            label: this.lang.contactsParameters_addressStreet,
+            label: this.translate.instant('lang.contactsParameters_addressStreet'),
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -197,7 +198,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'addressAdditional2',
             unit: 'address',
-            label: this.lang.contactsParameters_addressAdditional2,
+            label: this.translate.instant('lang.contactsParameters_addressAdditional2'),
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -208,7 +209,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'addressPostcode',
             unit: 'address',
-            label: this.lang.contactsParameters_addressPostcode,
+            label: this.translate.instant('lang.contactsParameters_addressPostcode'),
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -219,7 +220,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'addressTown',
             unit: 'address',
-            label: this.lang.contactsParameters_addressTown,
+            label: this.translate.instant('lang.contactsParameters_addressTown'),
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -230,7 +231,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'addressCountry',
             unit: 'address',
-            label: this.lang.contactsParameters_addressCountry,
+            label: this.translate.instant('lang.contactsParameters_addressCountry'),
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -241,8 +242,8 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'communicationMeans',
             unit: 'maarch2maarch',
-            label: this.lang.communicationMean,
-            desc: `${this.lang.communicationMeanDesc} (${this.lang.see} <a href="${this.maarch2maarchUrl}" target="_blank">MAARCH2MAARCH</a>)`,
+            label: this.translate.instant('lang.communicationMean'),
+            desc: `${this.translate.instant('lang.communicationMeanDesc')} (${this.translate.instant('lang.see')} <a href="${this.maarch2maarchUrl}" target="_blank">MAARCH2MAARCH</a>)`,
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -253,8 +254,8 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'externalId_m2m',
             unit: 'maarch2maarch',
-            label: this.lang.IdMaarch2Maarch,
-            desc: `${this.lang.m2mContactInfo} (${this.lang.see} <a href="${this.maarch2maarchUrl}" target="_blank">MAARCH2MAARCH</a>)`,
+            label: this.translate.instant('lang.IdMaarch2Maarch'),
+            desc: `${this.translate.instant('lang.m2mContactInfo')} (${this.translate.instant('lang.see')} <a href="${this.maarch2maarchUrl}" target="_blank">MAARCH2MAARCH</a>)`,
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -295,6 +296,7 @@ export class ContactsFormComponent implements OnInit {
     annuaryEnabled: boolean = false;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -588,7 +590,7 @@ export class ContactsFormComponent implements OnInit {
     onSubmit() {
         this.checkFilling();
         if (this.addressBANMode && this.emptyAddress() && !this.noAddressRequired()) {
-            this.notify.error(this.lang.chooseBAN);
+            this.notify.error(this.translate.instant('lang.chooseBAN'));
         } else if (this.isValidForm()) {
             if (this.contactId !== null) {
                 this.updateContact();
@@ -596,7 +598,7 @@ export class ContactsFormComponent implements OnInit {
                 this.createContact();
             }
         } else {
-            this.notify.error(this.lang.mustFixErrors);
+            this.notify.error(this.translate.instant('lang.mustFixErrors'));
         }
 
     }
@@ -605,7 +607,7 @@ export class ContactsFormComponent implements OnInit {
         this.http.post('../rest/contacts', this.formatContact()).pipe(
             tap((data: any) => {
                 this.onSubmitEvent.emit(data.id);
-                this.notify.success(this.lang.contactAdded);
+                this.notify.success(this.translate.instant('lang.contactAdded'));
                 if (!this.functions.empty(data.warning)) {
                     this.notify.error(data.warning);
                 }
@@ -622,7 +624,7 @@ export class ContactsFormComponent implements OnInit {
         this.http.put(`../rest/contacts/${this.contactId}`, this.formatContact()).pipe(
             tap((data: any) => {
                 this.onSubmitEvent.emit(this.contactId);
-                this.notify.success(this.lang.contactUpdated);
+                this.notify.success(this.translate.instant('lang.contactUpdated'));
                 if (!this.functions.empty(data) && !this.functions.empty(data.warning)) {
                     this.notify.error(data.warning);
                 }
@@ -791,7 +793,7 @@ export class ContactsFormComponent implements OnInit {
     }
 
     initAutocompleteCommunicationMeans() {
-        this.communicationMeanInfo = this.lang.autocompleteInfo;
+        this.communicationMeanInfo = this.translate.instant('lang.autocompleteInfo');
         this.communicationMeanResult = [];
         const indexFieldCommunicationMeans = this.contactForm.map(field => field.id).indexOf('communicationMeans');
         this.contactForm[indexFieldCommunicationMeans].control.valueChanges
@@ -803,7 +805,7 @@ export class ContactsFormComponent implements OnInit {
                 switchMap((data: any) => this.http.get('../rest/autocomplete/ouM2MAnnuary', { params: { 'company': data } })),
                 tap((data: any) => {
                     if (this.isEmptyValue(data)) {
-                        this.communicationMeanInfo = this.lang.noAvailableValue;
+                        this.communicationMeanInfo = this.translate.instant('lang.noAvailableValue');
                     } else {
                         this.communicationMeanInfo = '';
                     }
@@ -832,7 +834,7 @@ export class ContactsFormComponent implements OnInit {
     }
 
     initAutocompleteExternalIdM2M() {
-        this.externalId_m2mInfo = this.lang.autocompleteInfo;
+        this.externalId_m2mInfo = this.translate.instant('lang.autocompleteInfo');
         this.externalId_m2mResult = [];
         const indexFieldCommunicationMeans = this.contactForm.map(field => field.id).indexOf('communicationMeans');
         const indexFieldExternalId = this.contactForm.map(field => field.id).indexOf('externalId_m2m');
@@ -844,7 +846,7 @@ export class ContactsFormComponent implements OnInit {
                 switchMap((data: any) => this.http.get('../rest/autocomplete/businessIdM2MAnnuary', { params: { 'query': data, 'communicationValue': this.contactForm[indexFieldCommunicationMeans].control.value } })),
                 tap((data: any) => {
                     if (this.isEmptyValue(data)) {
-                        this.externalId_m2mInfo = this.lang.noAvailableValue;
+                        this.externalId_m2mInfo = this.translate.instant('lang.noAvailableValue');
                     } else {
                         this.externalId_m2mInfo = '';
                     }
@@ -896,7 +898,7 @@ export class ContactsFormComponent implements OnInit {
     }
 
     initAutocompleteAddressBan() {
-        this.addressBANInfo = this.lang.autocompleteInfo;
+        this.addressBANInfo = this.translate.instant('lang.autocompleteInfo');
         this.addressBANResult = [];
         this.addressBANControl.valueChanges
             .pipe(
@@ -907,7 +909,7 @@ export class ContactsFormComponent implements OnInit {
                 switchMap((data: any) => this.http.get('../rest/autocomplete/banAddresses', { params: { 'address': data, 'department': this.addressBANCurrentDepartment } })),
                 tap((data: any) => {
                     if (data.length === 0) {
-                        this.addressBANInfo = this.lang.noAvailableValue;
+                        this.addressBANInfo = this.translate.instant('lang.noAvailableValue');
                     } else {
                         this.addressBANInfo = '';
                     }
@@ -920,7 +922,7 @@ export class ContactsFormComponent implements OnInit {
 
     resetAutocompleteAddressBan() {
         this.addressBANResult = [];
-        this.addressBANInfo = this.lang.autocompleteInfo;
+        this.addressBANInfo = this.translate.instant('lang.autocompleteInfo');
     }
 
     selectAddressBan(ev: any) {
@@ -991,9 +993,9 @@ export class ContactsFormComponent implements OnInit {
     getErrorMsg(error: any) {
         if (!this.isEmptyValue(error)) {
             if (error.required !== undefined) {
-                return this.lang.requiredField;
+                return this.translate.instant('lang.requiredField');
             } else if (error.pattern !== undefined || error.email !== undefined) {
-                return this.lang.badFormat;
+                return this.translate.instant('lang.badFormat');
             } else {
                 return 'unknow validator';
             }

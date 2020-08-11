@@ -9,13 +9,13 @@
                     <mat-spinner diameter="35"></mat-spinner>
                 </div>
             </mat-option>
-            <mat-optgroup [label]="lang.publicModel" *ngIf="(filteredPublicModels | async)?.length > 0"
+            <mat-optgroup [label]="this.translate.instant('lang.publicModel')" *ngIf="(filteredPublicModels | async)?.length > 0"
                 class="avisSignList">
                 <mat-option *ngFor="let model of filteredPublicModels | async | sortBy : 'label'" [value]="model">
                     {{model.label}}
                 </mat-option>
             </mat-optgroup>
-            <mat-optgroup [label]="lang.privateModel" *ngIf="(filteredPrivateModels | async)?.length > 0"
+            <mat-optgroup [label]="this.translate.instant('lang.privateModel')" *ngIf="(filteredPrivateModels | async)?.length > 0"
                 class="avisSignList">
                 <mat-option *ngFor="let model of filteredPrivateModels | async | sortBy : 'label'" [value]="model">
                     <div style="display: flex;align-items: center;">
@@ -37,14 +37,14 @@
             </mat-optgroup>
         </mat-autocomplete>
         <button mat-icon-button matSuffix *ngIf="avisWorkflow.items.length > 0 && showListModels" color="primary"
-            (click)="$event.stopPropagation();openPromptSaveModel()" title="{{lang.saveAsPrivateModel}}">
+            (click)="$event.stopPropagation();openPromptSaveModel()" title="{{'lang.saveAsPrivateModel' | translate}}">
             <mat-icon class="fa fa-plus"></mat-icon>
         </button>
     </mat-form-field>
     <div cdkDropList #dataAvailableList="cdkDropList" [cdkDropListData]="avisWorkflow.items" class="cdk-list"
         (cdkDropListDropped)="drop($event)" [cdkDropListDisabled]="!adminMode">
         <div class="emptyContent" *ngIf="avisWorkflow.items.length === 0">
-            {{lang.noPerson}}
+            {{'lang.noPerson' | translate}}
         </div>
         <mat-list-item disableRipple *ngFor="let diffusion of avisWorkflow.items;let i=index" cdkDrag class="columns workflow"
             [cdkDragDisabled]="!adminMode || !functions.empty(diffusion.process_date)"
@@ -73,7 +73,7 @@
                         {{diffusion.item_entity}}
                     </div>
                     <div *ngIf="diffusion.process_date != null" class="workflowLineProcessDate"
-                        title='{{diffusion.process_date | fullDate}}' color="accent">{{lang.avisSent}} {{diffusion.process_date
+                        title='{{diffusion.process_date | fullDate}}' color="accent">{{'lang.avisSent' | translate}} {{diffusion.process_date
                                                 | timeAgo : 'full'}}</div>
                 </div>
                 <div *ngIf="mode === 'parallel'">
@@ -84,7 +84,7 @@
                     </mat-menu>
                 </div>
                 <div *ngIf="!diffusion.hasPrivilege" class="invalid">
-                    {{lang.noPrivileges}}
+                    {{'lang.noPrivileges' | translate}}
                 </div>
             </div>
             <button mat-icon-button *ngIf="adminMode && functions.empty(diffusion.process_date)"

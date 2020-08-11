@@ -3,7 +3,7 @@
         <span style="flex: 1;">
             {{creationMode ? lang.contactCreation : lang.contact}}
         </span>
-        <button [title]="lang.close" mat-icon-button (click)="dialogRef.close();">
+        <button [title]="this.translate.instant('lang.close')" mat-icon-button (click)="dialogRef.close();">
             <mat-icon class="fa fa-times"></mat-icon>
         </button></h1>
     <mat-dialog-content class="modal-container">
@@ -23,7 +23,7 @@
     </mat-dialog-content>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions" *ngIf="canUpdate && mode === 'read' && contact.type === 'contact'">
-        <button mat-raised-button color="primary" (click)="switchMode()">{{lang.update}}</button>
+        <button mat-raised-button color="primary" (click)="switchMode()">{{'lang.update' | translate}}</button>
     </div>
 </div>
 

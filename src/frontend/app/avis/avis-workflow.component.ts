@@ -1,6 +1,7 @@
 import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FunctionsService } from '../../service/functions.service';
@@ -54,6 +55,7 @@ export class AvisWorkflowComponent implements OnInit {
     searchAvisUser = new FormControl();
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public functions: FunctionsService,
@@ -80,7 +82,7 @@ export class AvisWorkflowComponent implements OnInit {
             if (this.functions.empty(this.avisWorkflow.items[event.currentIndex].process_date)) {
                 moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
             } else {
-                this.notify.error(`${this.lang.moveAvisUserErr1} <b>${this.avisWorkflow.items[event.previousIndex].labelToDisplay}</b> ${this.lang.moveAvisUserErr2}.`);
+                this.notify.error(`${this.translate.instant('lang.moveAvisUserErr1')} <b>${this.avisWorkflow.items[event.previousIndex].labelToDisplay}</b> ${this.translate.instant('lang.moveAvisUserErr2')}.`);
             }
         }
     }
@@ -209,7 +211,7 @@ export class AvisWorkflowComponent implements OnInit {
             this.http.get(`../rest/resources/${this.resId}/defaultCircuit?circuit=opinion`).pipe(
                 tap((data: any) => {
                     if (!this.functions.empty(data.itemsRemoved)) {
-                        this.notify.error(this.lang.itemRemovedFromAvisTemplate + ' : ' + data.itemsRemoved.join(', '));
+                        this.notify.error(this.translate.instant('lang.itemRemovedFromAvisTemplate') + ' : ' + data.itemsRemoved.join(', '));
                     }
                 }),
                 filter((data: any) => !this.functions.empty(data.circuit)),
@@ -281,7 +283,7 @@ export class AvisWorkflowComponent implements OnInit {
             this.http.get("../rest/resources/" + resId + "/opinionCircuit").pipe(
                 tap((data: any) => {
                     if (!this.functions.empty(data.itemsRemoved)) {
-                        this.notify.error(this.lang.itemRemovedFromAvisTemplate + ' : ' + data.itemsRemoved.join(', '));
+                        this.notify.error(this.translate.instant('lang.itemRemovedFromAvisTemplate') + ' : ' + data.itemsRemoved.join(', '));
                     }
                 }),
                 filter((data: any) => !this.functions.empty(data.circuit)),
@@ -338,7 +340,7 @@ export class AvisWorkflowComponent implements OnInit {
         this.http.get("../rest/resources/" + resId + "/defaultCircuit?circuit=opinion").pipe(
             tap((data: any) => {
                 if (!this.functions.empty(data.itemsRemoved)) {
-                    this.notify.error(this.lang.itemRemovedFromAvisTemplate + ' : ' + data.itemsRemoved.join(', '));
+                    this.notify.error(this.translate.instant('lang.itemRemovedFromAvisTemplate') + ' : ' + data.itemsRemoved.join(', '));
                 }
             }),
             filter((data: any) => !this.functions.empty(data.circuit)),
@@ -414,7 +416,7 @@ export class AvisWorkflowComponent implements OnInit {
                 this.http.delete(`../rest/resources/${resIds[0]}/circuits/opinionCircuit`).pipe(
                     tap(() => {
                         this.avisWorkflowClone = JSON.parse(JSON.stringify(this.avisWorkflow.items));
-                        this.notify.success(this.lang.avisWorkflowDeleted);
+                        this.notify.success(this.translate.instant('lang.avisWorkflowDeleted'));
                         resolve(true);
                     }),
                     catchError((err: any) => {
@@ -432,7 +434,7 @@ export class AvisWorkflowComponent implements OnInit {
                 this.http.put(`../rest/circuits/opinionCircuit`, { resources: arrAvis }).pipe(
                     tap((data: any) => {
                         this.avisWorkflowClone = JSON.parse(JSON.stringify(this.avisWorkflow.items));
-                        this.notify.success(this.lang.avisWorkflowUpdated);
+                        this.notify.success(this.translate.instant('lang.avisWorkflowUpdated'));
                         resolve(true);
                     }),
                     catchError((err: any) => {
@@ -501,7 +503,7 @@ export class AvisWorkflowComponent implements OnInit {
     }
 
     getError() {
-        return this.lang.mustDeleteUsersWithNoPrivileges;
+        return this.translate.instant('lang.mustDeleteUsersWithNoPrivileges');
     }
 
     emptyWorkflow() {
@@ -539,7 +541,7 @@ export class AvisWorkflowComponent implements OnInit {
     }
 
     deletePrivateModel(model: any) {
-        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -547,7 +549,7 @@ export class AvisWorkflowComponent implements OnInit {
             tap(() => {
                 this.avisTemplates.private = this.avisTemplates.private.filter((template: any) => template.id !== model.id);
                 this.searchAvisUser.reset();
-                this.notify.success(this.lang.modelDeleted);
+                this.notify.success(this.translate.instant('lang.modelDeleted'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

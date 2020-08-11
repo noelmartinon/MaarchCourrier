@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/internal/operators/tap';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { finalize, catchError, exhaustMap, filter } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
@@ -34,6 +35,7 @@ export class SelectIndexingModelComponent implements OnInit {
     currentIndexingModel: any = {};
 
     constructor(
+        private translate: TranslateService,
         private http: HttpClient,
         private headerService: HeaderService,
         private notify: NotificationService,
@@ -54,7 +56,7 @@ export class SelectIndexingModelComponent implements OnInit {
 
                     if (this.currentIndexingModel === undefined) {
                         this.currentIndexingModel = this.indexingModels[0];
-                        this.notify.error(this.lang.noDefaultIndexingModel);
+                        this.notify.error(this.translate.instant('lang.noDefaultIndexingModel'));
                     }
                     this.loadIndexingModelsList();
                 }
@@ -155,8 +157,8 @@ export class SelectIndexingModelComponent implements OnInit {
                 autoFocus: false,
                 disableClose: true,
                 data: {
-                    title: this.lang.delete,
-                    msg: this.lang.confirmAction
+                    title: this.translate.instant('lang.delete'),
+                    msg: this.translate.instant('lang.confirmAction')
                 }
             }
         );
@@ -166,7 +168,7 @@ export class SelectIndexingModelComponent implements OnInit {
             exhaustMap(() => this.http.delete(`../rest/indexingModels/${id}`)),
             tap(() => {
                 this.indexingModels.splice(index, 1);
-                this.notify.success(this.lang.indexingModelDeleted);
+                this.notify.success(this.translate.instant('lang.indexingModelDeleted'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

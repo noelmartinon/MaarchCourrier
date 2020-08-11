@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -46,6 +47,7 @@ export class ActionsListComponent implements OnInit {
     @Output('refreshPanelFolders') refreshPanelFolders = new EventEmitter<string>();
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -113,7 +115,7 @@ export class ActionsListComponent implements OnInit {
                     } else {
                         this.actionsList = [{
                             id: 0,
-                            label: this.lang.noAction,
+                            label: this.translate.instant('lang.noAction'),
                             component: ''
                         }];
                     }
@@ -133,13 +135,13 @@ export class ActionsListComponent implements OnInit {
     }
 
     unFollow() {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.stopFollowingAlert } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.stopFollowingAlert') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.request('DELETE', '../rest/resources/unfollow', { body: { resources: this.selectedRes } })),
             tap((data: any) => {
-                this.notify.success(this.lang.removedFromFolder);
+                this.notify.success(this.translate.instant('lang.removedFromFolder'));
                 this.headerService.nbResourcesFollowed -= data.unFollowed;
                 this.refreshList();
             })

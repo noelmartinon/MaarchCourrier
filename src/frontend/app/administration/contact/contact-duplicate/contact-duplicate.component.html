@@ -29,11 +29,11 @@
                         <mat-expansion-panel [expanded]="openedSearchTool">
                             <mat-expansion-panel-header>
                                 <mat-panel-title>
-                                    {{lang.criteriaSearch}}
+                                    {{'lang.criteriaSearch' | translate}}
                                 </mat-panel-title>
                             </mat-expansion-panel-header>
-                            <plugin-select-search [label]="lang.addCriteria" [formControlSelect]="addCriteriaSelect"
-                                [placeholderLabel]="lang.addCriteria" [datas]="contactFields"
+                            <plugin-select-search [label]="this.translate.instant('lang.addCriteria')" [formControlSelect]="addCriteriaSelect"
+                                [placeholderLabel]="this.translate.instant('lang.addCriteria')" [datas]="contactFields"
                                 (afterSelected)="addCriteria($event)">
                             </plugin-select-search>
                             <mat-divider style="margin-top:20px;margin-bottom:20px;"></mat-divider>
@@ -47,13 +47,13 @@
                             </mat-chip-list>
                             <div class="col-md-12 text-center">
                                 <button mat-raised-button color="primary" type="button" (click)="searchDuplicates()"
-                                    [disabled]="currentFieldsSearch.length === 0 || isLoadingResults">{{lang.launchSearch}}</button>
+                                    [disabled]="currentFieldsSearch.length === 0 || isLoadingResults">{{'lang.launchSearch' | translate}}</button>
                             </div>
                         </mat-expansion-panel>
                     </mat-accordion>
                 </div>
                 <div *ngIf="duplicatesContactsCount === 0" style="padding: 10px;text-align: center;color: rgba(0,0,0,0.54);">
-                    <em>{{lang.noDuplicatesFound}}</em>
+                    <em>{{'lang.noDuplicatesFound' | translate}}</em>
                 </div>
                 <div *ngIf="duplicatesContacts.length > 0" style="padding: 10px;text-align: right;color: rgba(0,0,0,0.54);">
                     {{lang.duplicatesContactDisplayed | scan: [''+duplicatesContactsRealCount+'', ''+duplicatesContactsCount+'']}}

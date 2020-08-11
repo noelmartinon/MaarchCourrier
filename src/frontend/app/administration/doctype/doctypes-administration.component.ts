@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -41,6 +42,7 @@ export class DoctypesAdministrationComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -50,7 +52,7 @@ export class DoctypesAdministrationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.administration + ' ' + this.lang.documentTypes);
+        this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.documentTypes'));
 
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
@@ -164,10 +166,10 @@ export class DoctypesAdministrationComponent implements OnInit {
                                     this.saveType();
                                 }
                             } else {
-                                alert(this.lang.cantMoveDoctype);
+                                alert(this.translate.instant('lang.cantMoveDoctype'));
                             }
                         } else {
-                            alert(this.lang.noDoctypeSelected);
+                            alert(this.translate.instant('lang.noDoctypeSelected'));
                         }
                     }
 
@@ -194,10 +196,10 @@ export class DoctypesAdministrationComponent implements OnInit {
                                     this.saveSecondLevel();
                                 }
                             } else {
-                                alert(this.lang.cantMoveFirstLevel);
+                                alert(this.translate.instant('lang.cantMoveFirstLevel'));
                             }
                         } else {
-                            alert(this.lang.noFirstLevelSelected);
+                            alert(this.translate.instant('lang.noFirstLevelSelected'));
                         }
                     }
 
@@ -237,7 +239,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                     this.readMode();
                     this.doctypes = data['doctypeTree'];
                     this.refreshTree();
-                    this.notify.success(this.lang.firstLevelAdded);
+                    this.notify.success(this.translate.instant('lang.firstLevelAdded'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -246,7 +248,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                 .subscribe((data: any) => {
                     this.doctypes = data['doctypeTree'];
                     this.refreshTree();
-                    this.notify.success(this.lang.firstLevelUpdated);
+                    this.notify.success(this.translate.instant('lang.firstLevelUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -261,7 +263,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                     this.readMode();
                     this.doctypes = data['doctypeTree'];
                     this.refreshTree();
-                    this.notify.success(this.lang.secondLevelAdded);
+                    this.notify.success(this.translate.instant('lang.secondLevelAdded'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -270,7 +272,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                 .subscribe((data: any) => {
                     this.doctypes = data['doctypeTree'];
                     this.refreshTree();
-                    this.notify.success(this.lang.secondLevelUpdated);
+                    this.notify.success(this.translate.instant('lang.secondLevelUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -285,7 +287,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                     this.readMode();
                     this.doctypes = data['doctypeTree'];
                     this.refreshTree();
-                    this.notify.success(this.lang.documentTypeAdded);
+                    this.notify.success(this.translate.instant('lang.documentTypeAdded'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -294,7 +296,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                 .subscribe((data: any) => {
                     this.doctypes = data['doctypeTree'];
                     this.refreshTree();
-                    this.notify.success(this.lang.documentTypeUpdated);
+                    this.notify.success(this.translate.instant('lang.documentTypeUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -308,7 +310,7 @@ export class DoctypesAdministrationComponent implements OnInit {
     }
 
     removeFirstLevel() {
-        const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + this.currentFirstLevel.doctypes_first_level_label + ' »');
+        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + this.currentFirstLevel.doctypes_first_level_label + ' »');
 
         if (r) {
             this.http.delete('../rest/doctypes/firstLevel/' + this.currentFirstLevel.doctypes_first_level_id)
@@ -322,7 +324,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                     } else if (this.sidenavRight.opened === true) {
                         this.sidenavRight.close();
                     }
-                    this.notify.success(this.lang.firstLevelDeleted);
+                    this.notify.success(this.translate.instant('lang.firstLevelDeleted'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -330,7 +332,7 @@ export class DoctypesAdministrationComponent implements OnInit {
     }
 
     removeSecondLevel() {
-        const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + this.currentSecondLevel.doctypes_second_level_label + ' »');
+        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + this.currentSecondLevel.doctypes_second_level_label + ' »');
 
         if (r) {
             this.http.delete('../rest/doctypes/secondLevel/' + this.currentSecondLevel.doctypes_second_level_id)
@@ -340,7 +342,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                     this.doctypes = data['doctypeTree'];
                     this.refreshTree();
                     $('#jstree').jstree('select_node', this.doctypes[0]);
-                    this.notify.success(this.lang.secondLevelDeleted);
+                    this.notify.success(this.translate.instant('lang.secondLevelDeleted'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -348,7 +350,7 @@ export class DoctypesAdministrationComponent implements OnInit {
     }
 
     removeType() {
-        const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + this.currentType.description + ' »');
+        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + this.currentType.description + ' »');
 
         if (r) {
             this.http.delete('../rest/doctypes/types/' + this.currentType.type_id)
@@ -359,7 +361,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                         this.doctypes = data['doctypeTree'];
                         this.refreshTree();
                         $('#jstree').jstree('select_node', this.doctypes[0]);
-                        this.notify.success(this.lang.documentTypeDeleted);
+                        this.notify.success(this.translate.instant('lang.documentTypeDeleted'));
                     } else {
                         this.config = { panelClass: 'maarch-modal', data: { count: data.deleted, types: data.doctypes } };
                         this.dialogRef = this.dialog.open(DoctypesAdministrationRedirectModalComponent, this.config);
@@ -372,7 +374,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                                         this.doctypes = dataDoctypes['doctypeTree'];
                                         this.refreshTree();
                                         $('#jstree').jstree('select_node', this.doctypes[0]);
-                                        this.notify.success(this.lang.documentTypeDeleted);
+                                        this.notify.success(this.translate.instant('lang.documentTypeDeleted'));
                                     }, (err) => {
                                         this.notify.error(err.error.errors);
                                     });

@@ -16,7 +16,7 @@
     <mat-divider></mat-divider>
     <button mat-menu-item class="followAction" (click)="unFollow()" [disabled]="selectedRes.length === 0">
         <mat-icon class="far fa-star fa-2x"></mat-icon>
-        <span>{{lang.untrackThisMail}}</span>
+        <span>{{'lang.untrackThisMail' | translate}}</span>
     </button>
     <mat-divider></mat-divider>
     <folder-menu [resIds]="selectedRes" [currentFolders]="folderList" (refreshList)="refreshList()" (refreshFolders)="refreshFolders()"></folder-menu>

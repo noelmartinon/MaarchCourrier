@@ -7,7 +7,7 @@
                 <mat-icon class="fa fa-search"></mat-icon>
             </button>
             <mat-button-toggle matSuffix class="processLimitButton" (click)="$event.stopPropagation();"
-                [checked]="this.listProperties.delayed" value="delayed" title="{{lang.displayProcessLimitRes}}"
+                [checked]="this.listProperties.delayed" value="delayed" title="{{'lang.displayProcessLimitRes' | translate}}"
                 (change)="setFilters($event, 'delayed')">
                 <mat-icon fontSet="fas" fontIcon="fa-stopwatch fa-2x"></mat-icon>
             </mat-button-toggle>
@@ -36,7 +36,7 @@
         <mat-form-field class="basket-order">
             <mat-icon matPrefix class="fa fa-list"></mat-icon>
             <mat-select [(ngModel)]="this.listProperties.order" (selectionChange)="updateFilters()">
-                <mat-option value="" style="text-align: center;">{{lang.defaultOrder}}</mat-option>
+                <mat-option value="" style="text-align: center;">{{'lang.defaultOrder' | translate}}</mat-option>
                 <mat-option [value]="column.id" *ngFor="let column of displayColsOrder">
                     {{lang[column.id]}}
                 </mat-option>
@@ -59,7 +59,7 @@
 
 <!--<mat-button-toggle-group #group="matButtonToggleGroup" class="envFilter" multiple>
     
-    <mat-button-toggle class="processLimitButton" [checked]="this.listProperties.delayed" value="delayed" title="{{lang.displayProcessLimitRes}}"
+    <mat-button-toggle class="processLimitButton" [checked]="this.listProperties.delayed" value="delayed" title="{{'lang.displayProcessLimitRes' | translate}}"
         (change)="setFilters($event, 'delayed')">
         <mat-icon fontSet="fas" fontIcon="fa-stopwatch fa-2x"></mat-icon>
     </mat-button-toggle>
@@ -67,38 +67,38 @@
 
 </mat-button-toggle-group>-->
 <div class="filterBadges">
-    <span *ngIf="haveFilters()" class="label badge-eraser" title="{{lang.eraseAllFilters}}"
+    <span *ngIf="haveFilters()" class="label badge-eraser" title="{{'lang.eraseAllFilters' | translate}}"
         (click)="this.listProperties.search='';removeFilters();"><i class="fas fa-eraser"></i></span>
 
     <span class="label badge-search" *ngIf="this.listProperties.search !== ''"
-        title="{{lang.subject}} / {{lang.chronoNumber}}"
+        title="{{'lang.subject' | translate}} / {{'lang.chronoNumber' | translate}}"
         (click)="this.listProperties.search='';updateFilters();">{{this.listProperties.search}}
         <i class="fa fa-times-circle"></i></span>
-    <span class="label badge-categories" title="{{lang.categories}}"
+    <span class="label badge-categories" title="{{'lang.categories' | translate}}"
         *ngFor="let category of this.listProperties.categories; let i=index"
         (click)="removeFilter('categories', i)">{{category.label}}
         <i class="fa fa-times-circle"></i></span>
-    <span class="label badge-priorities" title="{{lang.priorities}}"
+    <span class="label badge-priorities" title="{{'lang.priorities' | translate}}"
         *ngFor="let priority of this.listProperties.priorities; let i=index"
         (click)="removeFilter('priorities', i)">{{priority.label}}
         <i class="fa fa-times-circle"></i></span>
-    <span class="label badge-statuses" title="{{lang.statuses}}"
+    <span class="label badge-statuses" title="{{'lang.statuses' | translate}}"
         *ngFor="let status of this.listProperties.statuses; let i=index"
         (click)="removeFilter('statuses', i)">{{status.label}}
         <i class="fa fa-times-circle"></i></span>
-    <span class="label badge-entities" title="{{lang.entities}}"
+    <span class="label badge-entities" title="{{'lang.entities' | translate}}"
         *ngFor="let entity of this.listProperties.entities; let i=index"
         (click)="removeFilter('entities', i)">{{entity.label}}
         <i class="fa fa-times-circle"></i></span>
-    <span class="label badge-subEntities" title="{{lang.subEntities}}"
+    <span class="label badge-subEntities" title="{{'lang.subEntities' | translate}}"
         *ngFor="let subEntity of this.listProperties.subEntities; let i=index"
         (click)="removeFilter('subEntities', i)">{{subEntity.label}}
         <i class="fa fa-times-circle"></i></span>
-    <span class="label badge-doctypes" title="{{lang.doctypes}}"
+    <span class="label badge-doctypes" title="{{'lang.doctypes' | translate}}"
         *ngFor="let doctype of this.listProperties.doctypes; let i=index"
         (click)="removeFilter('doctypes', i)">{{doctype.label}}
         <i class="fa fa-times-circle"></i></span>
-    <span class="label badge-folders" title="{{lang.folders}}"
+    <span class="label badge-folders" title="{{'lang.folders' | translate}}"
         *ngFor="let folder of this.listProperties.folders; let i=index"
         (click)="removeFilter('folders', i)">{{folder.label}}
         <i class="fa fa-times-circle"></i></span>

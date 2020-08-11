@@ -1,6 +1,7 @@
 import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { catchError, tap, debounceTime, filter } from 'rxjs/operators';
 import { HeaderService } from '../../service/header.service';
@@ -24,7 +25,7 @@ export class NoteEditorComponent implements OnInit {
 
     entitiesRestriction: string[] = [];
 
-    @Input('title') title: string = this.lang.addNote;
+    @Input('title') title: string = this.translate.instant('lang.addNote');
     @Input('content') content: string = '';
     @Input('resIds') resIds: any[];
     @Input('addMode') addMode: boolean;
@@ -40,6 +41,7 @@ export class NoteEditorComponent implements OnInit {
     entitiesList: any[] = [];
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public headerService: HeaderService,
@@ -55,7 +57,7 @@ export class NoteEditorComponent implements OnInit {
 
         if (this.upMode) {
             this.content = this.noteContent;
-            if (this.content.startsWith(`[${this.lang.avisUserState}]`) || this.content.startsWith(`[${this.lang.avisUserAsk.toUpperCase()}]`)) {
+            if (this.content.startsWith(`[${this.translate.instant('lang.avisUserState')}]`) || this.content.startsWith(`[${this.translate.instant('lang.avisUserAsk').toUpperCase()}]`)) {
                 this.disableRestriction = true;
             }
             this.entitiesRestriction = this.entitiesNoteRestriction;

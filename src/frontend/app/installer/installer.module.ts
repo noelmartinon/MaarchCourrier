@@ -13,6 +13,8 @@ import { MailserverComponent } from './mailserver/mailserver.component';
 import { InstallerRoutingModule } from './installer-routing.module';
 import { InstallerService } from './installer.service';
 
+import { TranslateService } from '@ngx-translate/core';
+
 @NgModule({
     imports: [
         SharedModule,
@@ -33,4 +35,8 @@ import { InstallerService } from './installer.service';
     entryComponents: [InstallActionComponent],
     providers: [InstallerService]
 })
-export class InstallerModule { }
+export class InstallerModule {
+    constructor(translate: TranslateService) {
+        translate.setDefaultLang('fr');
+    }
+}

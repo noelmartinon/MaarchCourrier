@@ -1,6 +1,7 @@
 import { Injectable, ComponentFactoryResolver, Injector, ApplicationRef, ViewContainerRef, TemplateRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../app/translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { tap, catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -38,6 +39,7 @@ export class HeaderService {
     private portalHost: DomPortalHost;
     
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         public foldersService: FoldersService,
         private componentFactoryResolver: ComponentFactoryResolver,

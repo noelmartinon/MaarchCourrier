@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { tap } from 'rxjs/internal/operators/tap';
@@ -23,6 +24,7 @@ export class UpdateStatusAdministrationComponent implements OnInit {
     chronoList: string[] = [];
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -30,7 +32,7 @@ export class UpdateStatusAdministrationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.updateStatus);
+        this.headerService.setHeader(this.translate.instant('lang.updateStatus'));
 
         this.loading = true;
 
@@ -57,7 +59,7 @@ export class UpdateStatusAdministrationComponent implements OnInit {
                 this.statusId = '';
                 this.resIdList = [];
                 this.chronoList = [];
-                this.notify.success(this.lang.modificationSaved);
+                this.notify.success(this.translate.instant('lang.modificationSaved'));
             }, (err: any) => {
                 this.notify.error(err.error.errors);
             });

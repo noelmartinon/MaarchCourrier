@@ -4,20 +4,20 @@
 <div class="row" style="margin:0px;">
     <div class="col-md-12">
         <div *ngIf="!indexingInfo.canIndex" class="alert-message alert-message-danger" role="alert"
-            style="margin-top: 30px;">{{lang.warnIndex}}
-            <button mat-raised-button (click)="toggleIndex(!indexingInfo.canIndex)">{{lang.enableIndex}}</button>
+            style="margin-top: 30px;">{{'lang.warnIndex' | translate}}
+            <button mat-raised-button (click)="toggleIndex(!indexingInfo.canIndex)">{{'lang.enableIndex' | translate}}</button>
         </div>
         <button *ngIf="indexingInfo.canIndex" color="warn" mat-raised-button
-            (click)="toggleIndex(!indexingInfo.canIndex)">{{lang.disableIndex}}</button>
+            (click)="toggleIndex(!indexingInfo.canIndex)">{{'lang.disableIndex' | translate}}</button>
     </div>
     <div class="col-md-8" style="margin-top:20px;">
         <div class="formType">
             <div class="formType-title">
-                {{lang.availableIndexingActions}}
+                {{'lang.availableIndexingActions' | translate}}
             </div>
-            <mat-hint class="infoActions" [innerHTML]="lang.actionsInfo">
+            <mat-hint class="infoActions" [innerHTML]="this.translate.instant('lang.actionsInfo')">
             </mat-hint>
-            <plugin-autocomplete [labelPlaceholder]="lang.linkNewAction"  [datas]="actionList" [targetSearchKey]="'label_action'"
+            <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.linkNewAction')"  [datas]="actionList" [targetSearchKey]="'label_action'"
                 (triggerEvent)="addAction($event)" appearance="outline"></plugin-autocomplete>
             <mat-list cdkDropList [cdkDropListData]="indexingInfo.actions" (cdkDropListDropped)="drop($event)"
                 class="selectedActionList" role="list">
@@ -42,12 +42,12 @@
     <div class="col-md-4" style="margin-top:20px;">
         <div class="formType jstreeEntities">
             <div class="formType-title">
-                {{lang.authorizedEntities}}
+                {{'lang.authorizedEntities' | translate}}
             </div>
             <mat-form-field appearance="outline">
                 <mat-icon color="primary" class="fa fa-search" matPrefix></mat-icon>
                 <input matInput id="jstree_search" name="jstree_search" type="text"
-                    placeholder="{{lang.searchEntities}}">
+                    placeholder="{{'lang.searchEntities' | translate}}">
             </mat-form-field>
             <div #jstree id="jstree"></div>
         </div>

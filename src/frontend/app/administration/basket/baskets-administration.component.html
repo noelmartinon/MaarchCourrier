@@ -1,17 +1,17 @@
 <mat-sidenav-container autosize class="maarch-container">
     <ng-template #adminMenuTemplate>
         <mat-nav-list>
-            <h3 mat-subheader>{{lang.actions}}</h3>
+            <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
             <a mat-list-item routerLink="/administration/baskets/new">
                 <mat-icon color="primary" mat-list-icon class="fa fa-plus"></mat-icon>
                 <p mat-line>
-                    {{lang.add}}
+                    {{'lang.add' | translate}}
                 </p>
             </a>
             <a mat-list-item (click)="snav2.toggle()">
                 <mat-icon color="primary" mat-list-icon class="fa fa-list-ol"></mat-icon>
                 <p mat-line>
-                    {{lang.basketsOrder}}
+                    {{'lang.basketsOrder' | translate}}
                 </p>
             </a>
         </mat-nav-list>
@@ -38,8 +38,7 @@
                     <div class="row">
                         <div class="col-md-6 col-xs-6">
                             <mat-form-field>
-                                <input matInput (keyup)="applyFilter($event.target.value)"
-                                    placeholder="{{lang.filterBy}}">
+                                <input matInput [formControl]="adminService.getFilterField()" placeholder="{{'lang.filterBy' | translate}}">
                             </mat-form-field>
                         </div>
                         <div class="col-md-6 col-xs-6">
@@ -47,21 +46,20 @@
                             </mat-paginator>
                         </div>
                     </div>
-                    <mat-table #table [dataSource]="dataSource" matSort matSortActive="basket_id"
-                        matSortDirection="asc">
+                    <mat-table #table [dataSource]="adminService.getDataSource()" matSortDisableClear matSort>
                         <ng-container matColumnDef="basket_id">
                             <mat-header-cell *matHeaderCellDef mat-sort-header
-                                [class.hide-for-mobile]="appService.getViewMode()">{{lang.id}}</mat-header-cell>
+                                [class.hide-for-mobile]="appService.getViewMode()">{{'lang.id' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element" [class.hide-for-mobile]="appService.getViewMode()">
                                 {{element.basket_id}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="basket_name">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.label}}</mat-header-cell>
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.label' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element"> {{element.basket_name}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="basket_desc">
                             <mat-header-cell *matHeaderCellDef mat-sort-header
-                                [class.hide-for-mobile]="appService.getViewMode()">{{lang.description}}
+                                [class.hide-for-mobile]="appService.getViewMode()">{{'lang.description' | translate}}
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" [class.hide-for-mobile]="appService.getViewMode()">
                                 {{element.basket_desc}} </mat-cell>
@@ -69,7 +67,7 @@
                         <ng-container matColumnDef="actions">
                             <mat-header-cell *matHeaderCellDef></mat-header-cell>
                             <mat-cell *matCellDef="let element" style="justify-content: flex-end;">
-                                <button mat-icon-button color="warn" matTooltip="{{lang.delete}}"
+                                <button mat-icon-button color="warn" matTooltip="{{'lang.delete' | translate}}"
                                     (click)="$event.stopPropagation();delete(element)">
                                     <mat-icon class="fa fa-trash-alt fa-2x" aria-hidden="true"></mat-icon>
                                 </button>
@@ -78,11 +76,11 @@
                         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                         <mat-row *matRowDef="let row; columns: displayedColumns;"
                             routerLink="/administration/baskets/{{row.basket_id}}" style="cursor:pointer;"
-                            matTooltip="{{lang.view}}"></mat-row>
+                            matTooltip="{{'lang.view' | translate}}"></mat-row>
                     </mat-table>
                     <div class="mat-paginator"
                         style="min-height:48px;min-height: 48px;display: flex;justify-content: end;align-items: center;padding-right: 20px;">
-                        {{baskets.length}} {{lang.baskets}}</div>
+                        {{baskets.length}} {{'lang.baskets' | translate}}</div>
                 </mat-card>
             </div>
         </div>
@@ -90,11 +88,11 @@
 
     <mat-sidenav #snav2 [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()"
         fixedTopGap="56" position='end' [opened]="appService.getViewMode() ? false : false">
-        <p style="font-size:15px;padding:10px"> {{lang.basketHelpDesc}} </p>
+        <p style="font-size:15px;padding:10px"> {{'lang.basketHelpDesc' | translate}} </p>
         <mat-list>
             <span dnd-sortable-container [dropZones]="['boxers-zone']" [sortableData]="basketsOrder">
                 <mat-list-item disableRipple="true" *ngFor="let basket of basketsOrder;let i = index"
-                    title="{{lang.move}}" dnd-sortable [sortableIndex]="i" (onDropSuccess)="updateBasketOrder(basket)">
+                    title="{{'lang.move' | translate}}" dnd-sortable [sortableIndex]="i" (onDropSuccess)="updateBasketOrder(basket)">
                     <mat-icon color="primary" mat-list-icon class="fa fa-inbox"></mat-icon>
                     <p mat-line>{{i+1}} - {{basket.basket_name}}</p>
                 </mat-list-item>

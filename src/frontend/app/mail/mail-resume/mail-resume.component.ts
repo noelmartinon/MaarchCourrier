@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { catchError, tap, finalize, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { NotificationService } from '../../../service/notification/notification.service';
@@ -27,6 +28,7 @@ export class MailResumeComponent implements OnInit {
     @Output('goTo') goTo = new EventEmitter<string>();
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public functions: FunctionsService
@@ -46,15 +48,15 @@ export class MailResumeComponent implements OnInit {
                     let object = elem.object;
                     let type = elem.type;
                     if (elem.type == 'aknowledgement_receipt' && this.functions.empty(elem.object)) {
-                        object = this.lang.ARPaper;
+                        object = this.translate.instant('lang.ARPaper');
                         type = 'aknowledgement_receipt';
                     } else if (elem.type == 'aknowledgement_receipt' && elem.object.startsWith("[AR]")) {
-                        object = this.lang.ARelectronic;
+                        object = this.translate.instant('lang.ARelectronic');
                         type = 'aknowledgement_receipt';
                     }
 
                     return {
-                        object: !this.functions.empty(object) ? object : `<i>${this.lang.emptySubject}<i>`,
+                        object: !this.functions.empty(object) ? object : `<i>${this.translate.instant('lang.emptySubject')}<i>`,
                         send_date: elem.send_date,
                         status: elem.status,
                         userInfo: elem.userInfo,

@@ -20,17 +20,17 @@
                 <mat-card *ngIf="!loading" class="card-app-content">
                     <form class="form-horizontal" (ngSubmit)="onSubmit()" #updateStatusForm="ngForm">
                         <mat-tab-group (selectedTabChange)="resetInput($event)" >
-                            <mat-tab label="{{lang.chronoNumber}}" >
+                            <mat-tab label="{{'lang.chronoNumber' | translate}}" >
                                 <div class="alert alert-info" role="alert">
-                                    {{lang.updateStatusInformationsChrono}}
+                                    {{'lang.updateStatusInformationsChrono' | translate}}
                                 </div>
                                 <mat-form-field>
-                                    <input matInput name="chrono" title="{{lang.chronoNumber}}" placeholder="{{lang.chronoNumber}}" [(ngModel)]="chrono">
+                                    <input matInput name="chrono" title="{{'lang.chronoNumber' | translate}}" placeholder="{{'lang.chronoNumber' | translate}}" [(ngModel)]="chrono">
                                 </mat-form-field>
                                 <div class="row">
                                     <div class="form-group">
                                         <div class="col-md-12 text-left" style="padding:10px;">
-                                            <button mat-raised-button [disabled]="!chrono" type="button" color="primary" (click)="addChrono()" >{{lang.add}}</button>
+                                            <button mat-raised-button [disabled]="!chrono" type="button" color="primary" (click)="addChrono()" >{{'lang.add' | translate}}</button>
                                         </div>
                                     </div>
                                     <mat-chip-list [(ngModel)]="chronoList" name="chronoChips" #chipList>
@@ -42,17 +42,17 @@
                                 </div>
                                 <mat-divider></mat-divider>
                             </mat-tab>
-                            <mat-tab label="{{lang.resId}}" >
+                            <mat-tab label="{{'lang.resId' | translate}}" >
                                 <div class="alert alert-info" role="alert">
-                                    {{lang.updateStatusInformationsGed}}
+                                    {{'lang.updateStatusInformationsGed' | translate}}
                                 </div>
                                 <mat-form-field>
-                                    <input type="number" id="" matInput name="resId" title="{{lang.resId}}" placeholder="{{lang.resId}}" [(ngModel)]="resId">
+                                    <input type="number" id="" matInput name="resId" title="{{'lang.resId' | translate}}" placeholder="{{'lang.resId' | translate}}" [(ngModel)]="resId">
                                 </mat-form-field>
                                 <div class="row">
                                     <div class="form-group">
                                         <div class="col-md-12 text-left" style="padding:10px;">
-                                            <button mat-raised-button [disabled]="!resId" color="primary" type="button" (click)="addResId();">{{lang.add}}</button>
+                                            <button mat-raised-button [disabled]="!resId" color="primary" type="button" (click)="addResId();">{{'lang.add' | translate}}</button>
                                         </div>
                                     </div>
                                     <mat-chip-list [(ngModel)]="resIdList" name="resIdChips" #chipList>
@@ -65,10 +65,10 @@
                                 <mat-divider></mat-divider>
                             </mat-tab>
                         </mat-tab-group>
-                        <plugin-autocomplete [labelPlaceholder]="lang.availableStatuses" [labelList]="lang.availableStatuses" [datas]="statuses" [targetSearchKey]="'idToDisplay'" [subInfoKey]="'id'" (triggerEvent)="setStatus($event)" singleMode required></plugin-autocomplete>
+                        <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.availableStatuses')" [labelList]="this.translate.instant('lang.availableStatuses')" [datas]="statuses" [targetSearchKey]="'idToDisplay'" [subInfoKey]="'id'" (triggerEvent)="setStatus($event)" singleMode required></plugin-autocomplete>
                         <div class="form-group">
                             <div class="col-md-12 text-center" style="padding:10px;">
-                                <button mat-raised-button [disabled]="(resIdList.length == 0 && chronoList.length == 0) || (resIdList.length > 0 && chronoList.length > 0) || !statusId" color="primary">{{lang.save}}</button>
+                                <button mat-raised-button [disabled]="(resIdList.length == 0 && chronoList.length == 0) || (resIdList.length > 0 && chronoList.length > 0) || !statusId" color="primary">{{'lang.save' | translate}}</button>
                             </div>
                         </div>
                     </form>

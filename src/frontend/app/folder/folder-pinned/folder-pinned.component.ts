@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 
 import { Subscription } from 'rxjs';
 import { FoldersService } from '../folders.service';
@@ -19,6 +20,7 @@ export class FolderPinnedComponent implements OnInit {
     @Input('noInit') noInit: boolean = false;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         public foldersService: FoldersService
     ) {

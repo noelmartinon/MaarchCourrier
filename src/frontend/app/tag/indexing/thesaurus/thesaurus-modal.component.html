@@ -1,7 +1,7 @@
 <div class="mat-dialog-content-container">
     <h1 mat-dialog-title>
-        <span style="flex: 1;">{{lang.tags}}</span>
-        <button title="{{lang.close}}" mat-icon-button [mat-dialog-close]="">
+        <span style="flex: 1;">{{'lang.tags' | translate}}</span>
+        <button title="{{'lang.close' | translate}}" mat-icon-button [mat-dialog-close]="">
             <mat-icon class="fa fa-times-circle fa-2x"></mat-icon>
         </button>
     </h1>
@@ -11,15 +11,15 @@
         </div>
         <div class="col-md-6" *ngIf="!functionsService.empty(tag)">
             <div class="alert-message alert-message-info" role="alert">
-                <b>{{lang.description}} :</b><br />
+                <b>{{'lang.description' | translate}} :</b><br />
                 {{!functionsService.empty(tag.description) ? tag.description : lang.undefined}}
                 <br /><br />
-                <b>{{lang.usage}} :</b><br />
+                <b>{{'lang.usage' | translate}} :</b><br />
                 {{!functionsService.empty(tag.usage) ? tag.usage : lang.undefined}}
                 <ng-container *ngIf="tag.links.length > 0">
                     <br />
                     <hr />
-                    <span class="badge" [title]="lang.linkedTags" style="cursor: pointer;"
+                    <span class="badge" [title]="this.translate.instant('lang.linkedTags')" style="cursor: pointer;"
                         *ngFor="let link of tag.links" (click)="selectTag(link)">{{getTagLabel(link)}}</span>
                 </ng-container>
             </div>
@@ -28,7 +28,7 @@
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions" *ngIf="functionsService.empty(data.id)">
         <button mat-raised-button mat-button color="primary" [disabled]="loading || functionsService.empty(tag)"
-            (click)="onSubmit()">{{lang.validate}}</button>
-        <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{lang.cancel}}</button>
+            (click)="onSubmit()">{{'lang.validate' | translate}}</button>
+        <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
     </div>
 </div>

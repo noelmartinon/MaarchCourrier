@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -17,6 +18,7 @@ import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
 import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 import { of } from 'rxjs/internal/observable/of';
+import {EntitiesExportComponent} from './export/entities-export.component';
 
 declare var $: any;
 @Component({
@@ -73,6 +75,7 @@ export class EntitiesAdministrationComponent implements OnInit {
     }
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -84,7 +87,7 @@ export class EntitiesAdministrationComponent implements OnInit {
     ) { }
 
     async ngOnInit(): Promise<void> {
-        this.headerService.setHeader(this.lang.administration + ' ' + this.lang.entities);
+        this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.entities'));
 
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
@@ -319,7 +322,7 @@ export class EntitiesAdministrationComponent implements OnInit {
 
         let r = true;
         if (this.currentEntity.parent_entity_id === '') {
-            r = confirm(this.lang.entityWithoutParentMessage);
+            r = confirm(this.translate.instant('lang.entityWithoutParentMessage'));
         }
 
         if (r) {
@@ -337,7 +340,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                             $('#jstree').jstree('deselect_all');
                             $('#jstree').jstree('select_node', this.currentEntity.entity_id);
                         });
-                        this.notify.success(this.lang.entityAdded);
+                        this.notify.success(this.translate.instant('lang.entityAdded'));
                     }, (err) => {
                         this.notify.error(err.error.errors);
                     });
@@ -347,7 +350,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                         this.entities = data['entities'];
                         $('#jstree').jstree(true).settings.core.data = this.entities;
                         $('#jstree').jstree('refresh');
-                        this.notify.success(this.lang.entityUpdated);
+                        this.notify.success(this.translate.instant('lang.entityUpdated'));
                     }, (err) => {
                         this.notify.error(err.error.errors);
                     });
@@ -358,7 +361,7 @@ export class EntitiesAdministrationComponent implements OnInit {
     moveEntity() {
         this.http.put('../rest/entities/' + this.currentEntity.entity_id, this.currentEntity)
             .subscribe(() => {
-                this.notify.success(this.lang.entityUpdated);
+                this.notify.success(this.translate.instant('lang.entityUpdated'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -425,9 +428,9 @@ export class EntitiesAdministrationComponent implements OnInit {
                             this.sidenavRight.close();
 
                             if (typeof data['deleted'] !== 'undefined' && !data['deleted']) {
-                                this.notify.success(this.lang.entityDeletedButAnnuaryUnreachable);
+                                this.notify.success(this.translate.instant('lang.entityDeletedButAnnuaryUnreachable'));
                             } else {
-                                this.notify.success(this.lang.entityDeleted);
+                                this.notify.success(this.translate.instant('lang.entityDeleted'));
                             }
                         }, (err) => {
                             this.notify.error(err.error.errors);
@@ -436,7 +439,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                 this.dialogRef = null;
             });
         } else {
-            const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + this.currentEntity.entity_label + ' »');
+            const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + this.currentEntity.entity_label + ' »');
 
             if (r) {
                 if (this.currentEntity.listTemplate.id) {
@@ -470,9 +473,9 @@ export class EntitiesAdministrationComponent implements OnInit {
                         $('#jstree').jstree('refresh');
                         this.sidenavRight.close();
                         if (typeof data['deleted'] !== 'undefined' && !data['deleted']) {
-                            this.notify.success(this.lang.entityDeletedButAnnuaryUnreachable);
+                            this.notify.success(this.translate.instant('lang.entityDeletedButAnnuaryUnreachable'));
                         } else {
-                            this.notify.success(this.lang.entityDeleted);
+                            this.notify.success(this.translate.instant('lang.entityDeleted'));
                         }
                     }, (err: any) => {
                         this.notify.error(err.error.errors);
@@ -533,7 +536,7 @@ export class EntitiesAdministrationComponent implements OnInit {
         if (!this.functions.empty(this.currentEntity.listTemplate.id)) {
             this.http.put(`../rest/listTemplates/${this.currentEntity.listTemplate.id}`, newDiffList).pipe(
                 tap(() => {
-                    this.notify.success(this.lang.diffusionModelUpdated);
+                    this.notify.success(this.translate.instant('lang.diffusionModelUpdated'));
                     this.appDiffusionsList.loadListModel(this.currentEntity.id);
                 }),
                 catchError((err: any) => {
@@ -545,7 +548,7 @@ export class EntitiesAdministrationComponent implements OnInit {
             this.http.post(`../rest/listTemplates?admin=true`, newDiffList).pipe(
                 tap((data: any) => {
                     this.currentEntity.listTemplate.id = data.id;
-                    this.notify.success(this.lang.diffusionModelUpdated);
+                    this.notify.success(this.translate.instant('lang.diffusionModelUpdated'));
                     this.appDiffusionsList.loadListModel(this.currentEntity.id);
                 }),
                 catchError((err: any) => {
@@ -557,13 +560,13 @@ export class EntitiesAdministrationComponent implements OnInit {
     }
 
     deleteDiffList() {
-        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.delete(`../rest/listTemplates/${this.currentEntity.listTemplate.id}`)),
             tap(() => {
                 this.currentEntity.listTemplate.id = null;
-                this.notify.success(this.lang.diffusionModelDeleted);
+                this.notify.success(this.translate.instant('lang.diffusionModelDeleted'));
                 this.appDiffusionsList.loadListModel(this.currentEntity.id);
             }),
             catchError((err: any) => {
@@ -595,7 +598,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                 this.http.delete(`../rest/listTemplates/${this.idVisaCircuit}`).pipe(
                     tap(() => {
                         this.idVisaCircuit = null;
-                        this.notify.success(this.lang.diffusionModelDeleted);
+                        this.notify.success(this.translate.instant('lang.diffusionModelDeleted'));
                         this.appVisaWorkflow.loadListModel(this.currentEntity.id);
                     }),
                     catchError((err: any) => {
@@ -606,7 +609,7 @@ export class EntitiesAdministrationComponent implements OnInit {
             } else if (!this.functions.empty(this.idVisaCircuit)) {
                 this.http.put(`../rest/listTemplates/${this.idVisaCircuit}`, newDiffList).pipe(
                     tap(() => {
-                        this.notify.success(this.lang.diffusionModelUpdated);
+                        this.notify.success(this.translate.instant('lang.diffusionModelUpdated'));
                         this.appVisaWorkflow.loadListModel(this.currentEntity.id);
                     }),
                     catchError((err: any) => {
@@ -618,7 +621,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                 this.http.post(`../rest/listTemplates?admin=true`, newDiffList).pipe(
                     tap((data: any) => {
                         this.idVisaCircuit = data.id;
-                        this.notify.success(this.lang.diffusionModelUpdated);
+                        this.notify.success(this.translate.instant('lang.diffusionModelUpdated'));
                         this.appVisaWorkflow.loadListModel(this.currentEntity.id);
                     }),
                     catchError((err: any) => {
@@ -650,7 +653,7 @@ export class EntitiesAdministrationComponent implements OnInit {
             this.http.delete(`../rest/listTemplates/${this.idOpinionCircuit}`).pipe(
                 tap(() => {
                     this.idOpinionCircuit = null;
-                    this.notify.success(this.lang.diffusionModelDeleted);
+                    this.notify.success(this.translate.instant('lang.diffusionModelDeleted'));
                     this.appAvisWorkflow.loadListModel(this.currentEntity.id);
                 }),
                 catchError((err: any) => {
@@ -661,7 +664,7 @@ export class EntitiesAdministrationComponent implements OnInit {
         } else if (!this.functions.empty(this.idOpinionCircuit)) {
             this.http.put(`../rest/listTemplates/${this.idOpinionCircuit}`, newDiffList).pipe(
                 tap(() => {
-                    this.notify.success(this.lang.diffusionModelUpdated);
+                    this.notify.success(this.translate.instant('lang.diffusionModelUpdated'));
                     this.appAvisWorkflow.loadListModel(this.currentEntity.id);
                 }),
                 catchError((err: any) => {
@@ -673,7 +676,7 @@ export class EntitiesAdministrationComponent implements OnInit {
             this.http.post(`../rest/listTemplates?admin=true`, newDiffList).pipe(
                 tap((data: any) => {
                     this.idOpinionCircuit = data.id;
-                    this.notify.success(this.lang.diffusionModelUpdated);
+                    this.notify.success(this.translate.instant('lang.diffusionModelUpdated'));
                     this.appAvisWorkflow.loadListModel(this.currentEntity.id);
                 }),
                 catchError((err: any) => {
@@ -691,7 +694,7 @@ export class EntitiesAdministrationComponent implements OnInit {
 
     toggleRole(role: any) {
         if (role.usedIn.length > 0) {
-            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, data: { title: this.lang.confirmAction, msg: this.lang.roleUsedInTemplateInfo + ' : <b>' + role.usedIn.join(', ') + '</b><br/>' + this.lang.roleUsedInTemplateInfo2 } });
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, data: { title: this.translate.instant('lang.confirmAction'), msg: this.translate.instant('lang.roleUsedInTemplateInfo') + ' : <b>' + role.usedIn.join(', ') + '</b><br/>' + this.translate.instant('lang.roleUsedInTemplateInfo2') } });
 
             dialogRef.afterClosed().subscribe(result => {
                 if (result === 'ok') {
@@ -702,7 +705,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                             if (this.currentEntity.listTemplate) {
                                 this.currentEntity.listTemplate.items[role.id] = [];
                             }
-                            this.notify.success(this.lang.listTemplatesRolesUpdated);
+                            this.notify.success(this.translate.instant('lang.listTemplatesRolesUpdated'));
                         }, (err) => {
                             this.notify.error(err.error.errors);
                         });
@@ -721,7 +724,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                                 this.notify.error(err.error.errors);
                             });
                     }
-                    this.notify.success(this.lang.listTemplatesRolesUpdated);
+                    this.notify.success(this.translate.instant('lang.listTemplatesRolesUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -747,7 +750,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                 this.dataSourceUsers = new MatTableDataSource(this.currentEntity.users);
                 this.dataSourceUsers.paginator = this.paginatorUsers;
                 this.dataSourceUsers.sort = this.sortUsers;
-                this.notify.success(this.lang.userAdded);
+                this.notify.success(this.translate.instant('lang.userAdded'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -764,17 +767,22 @@ export class EntitiesAdministrationComponent implements OnInit {
             .subscribe((data: any) => {
                 this.currentEntity.business_id = data['entitySiret'];
                 if (typeof data['synchronized'] === 'undefined') {
-                    this.notify.success(this.lang.siretGenerated);
+                    this.notify.success(this.translate.instant('lang.siretGenerated'));
                 } else {
                     if (data['synchronized']) {
-                        this.notify.success(this.lang.siretGeneratedAndSynchronizationDone);
+                        this.notify.success(this.translate.instant('lang.siretGeneratedAndSynchronizationDone'));
                     } else {
-                        this.notify.success(this.lang.siretGeneratedButAnnuaryUnreachable);
+                        this.notify.success(this.translate.instant('lang.siretGeneratedButAnnuaryUnreachable'));
                     }
                 }
             }, (err: any) => {
                 this.notify.handleErrors(err);
             });
+    }
+
+    openExportModal() {
+        this.dialog.open(EntitiesExportComponent, { panelClass: 'maarch-modal', width: '800px', autoFocus: false });
+
     }
 }
 @Component({

@@ -1,6 +1,7 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { catchError, tap, finalize, exhaustMap, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { NotificationService } from '../../../service/notification/notification.service';
@@ -48,6 +49,7 @@ export class AttachmentPageComponent implements OnInit {
     @ViewChild('appAttachmentViewer', { static: false }) appAttachmentViewer: DocumentViewerComponent;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialog: MatDialog,
@@ -158,7 +160,7 @@ export class AttachmentPageComponent implements OnInit {
                 this.attachment.encodedFile.setValue(data.content);
                 this.attachment.format.setValue(data.format);
                 if (this.functions.empty(this.attachment.encodedFile.value)) {
-                    this.notify.error(this.lang.mustEditAttachmentFirst);
+                    this.notify.error(this.translate.instant('lang.mustEditAttachmentFirst'));
                     this.sendingData = false;
                 }
             }),
@@ -167,9 +169,9 @@ export class AttachmentPageComponent implements OnInit {
             tap(async (data: any) => {
                 if (this.sendMassMode && mode === 'mailing') {
                     await this.generateMailling(data.id);
-                    this.notify.success(this.lang.attachmentGenerated);
+                    this.notify.success(this.translate.instant('lang.attachmentGenerated'));
                 } else {
-                    this.notify.success(this.lang.newVersionAdded);
+                    this.notify.success(this.translate.instant('lang.newVersionAdded'));
                 }
                 this.dialogRef.close('success');
             }),
@@ -194,9 +196,9 @@ export class AttachmentPageComponent implements OnInit {
             tap(async () => {
                 if (this.sendMassMode && mode === 'mailing') {
                     await this.generateMailling(this.attachment.resId.value);
-                    this.notify.success(this.lang.attachmentGenerated);
+                    this.notify.success(this.translate.instant('lang.attachmentGenerated'));
                 } else {
-                    this.notify.success(this.lang.attachmentUpdated);
+                    this.notify.success(this.translate.instant('lang.attachmentUpdated'));
                 }
                 this.dialogRef.close('success');
             }),
@@ -300,7 +302,7 @@ export class AttachmentPageComponent implements OnInit {
 
     setNewVersion() {
         if (!this.newVersion) {
-            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.createNewVersion, msg: this.lang.confirmAction } });
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.createNewVersion'), msg: this.translate.instant('lang.confirmAction') } });
 
             dialogRef.afterClosed().pipe(
                 filter((data: string) => data === 'ok'),
@@ -317,7 +319,7 @@ export class AttachmentPageComponent implements OnInit {
     }
 
     deleteSignedVersion() {
-        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.deleteSignedVersion, msg: this.lang.confirmAction } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.deleteSignedVersion'), msg: this.translate.instant('lang.confirmAction') } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -329,7 +331,7 @@ export class AttachmentPageComponent implements OnInit {
                     this.editMode = true;
                     this.enableForm(this.editMode);
                 }
-                this.notify.success(this.lang.signedVersionDeleted);
+                this.notify.success(this.translate.instant('lang.signedVersionDeleted'));
                 this.dialogRef.close('success');
             }),
             catchError((err: any) => {
@@ -368,7 +370,7 @@ export class AttachmentPageComponent implements OnInit {
     closeModal() {
 
         if (this.appAttachmentViewer.isEditingTemplate()) {
-            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.close, msg: this.lang.editingDocumentMsg } });
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.close'), msg: this.translate.instant('lang.editingDocumentMsg') } });
 
             dialogRef.afterClosed().pipe(
                 filter((data: string) => data === 'ok'),

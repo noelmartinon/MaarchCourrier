@@ -22,7 +22,7 @@
                     </div>
                     <div style="text-align: right;opacity: 0.5;">
                         <button mat-button routerLink="/about-us"
-                            style="position:absolute;font-size:10px;right: 0px;bottom: 0px;">{{lang.aboutUs}}</button>
+                            style="position:absolute;font-size:10px;right: 0px;bottom: 0px;">{{'lang.aboutUs' | translate}}</button>
                     </div>
                 </mat-card>
             </div>
@@ -33,11 +33,11 @@
                     <mat-tab *ngIf="homeData !== undefined && homeData.isLinkedToMaarchParapheur">
                         <ng-template matTabLabel>
                             <span [class.noDoc]="nbMpDocs === 0" matBadge="{{nbMpDocs}}"
-                                matBadgeOverlap="false">{{lang.maarchParapheurDocuments}}</span>
+                                matBadgeOverlap="false">{{'lang.maarchParapheurDocuments' | translate}}</span>
                         </ng-template>
                         <app-maarch-parapheur-list (triggerEvent)="updateNbMpDocs($event)"></app-maarch-parapheur-list>
                     </mat-tab>
-                    <mat-tab label="{{lang.myLastResources}}" *ngIf="homeData !== undefined">
+                    <mat-tab label="{{'lang.myLastResources' | translate}}" *ngIf="homeData !== undefined">
                         <div *ngIf="loading" style="display:flex;height:100%;">
                             <mat-spinner style="margin:auto;"></mat-spinner>
                         </div>
@@ -51,7 +51,7 @@
                                         id="{{row.res_id}}_creation_date"
                                         style="color: rgba(0,0,0,0.4);font-size: 90%;overflow: hidden;text-overflow: ellipsis;"
                                         title='{{row.creation_date | date : lang.onRange + " dd/MM/y " + lang.atRange +" HH:mm"}}'>
-                                        <i class="fa fa-calendar" title="{{lang.creationDate}}"></i>
+                                        <i class="fa fa-calendar" title="{{'lang.creationDate' | translate}}"></i>
                                         {{row.creation_date | timeAgo}}
                                     </div>
                                     <div style="overflow: hidden;text-overflow: ellipsis;">
@@ -59,7 +59,7 @@
                                             class="{{row.status_icon.charAt(0)}}{{row.status_icon.charAt(1)}} {{row.status_icon}} {{row.status_icon.charAt(0)}}{{row.status_icon.charAt(1)}}-2x"
                                             title="{{row.status_label}} ({{row.status_id}})"></mat-icon>
                                         <span *ngIf="row.confidentiality === 'Y'"
-                                            class="watermark">{{lang.confidential}}</span>
+                                            class="watermark">{{'lang.confidential' | translate}}</span>
                                     </div>
                                     <div style="padding-top: 5px;color: rgba(0,0,0,0.4);font-size: 90%;overflow: hidden;text-overflow: ellipsis;"
                                         title="{{row.alt_identifier}} (n°{{row.res_id}})">
@@ -72,7 +72,7 @@
                                     style="width:45%;overflow:hidden;text-overflow: ellipsis;padding: 5px;vertical-align: middle;">
                                     <div *ngIf="row.closing_date == null && appService.getViewMode()"
                                         style="color: rgba(0,0,0,0.4);font-size: 90%;overflow: hidden;text-overflow: ellipsis;text-align: right;">
-                                        <i class="fa fa-stopwatch" title="{{lang.processLimitDate}}"></i>&nbsp;
+                                        <i class="fa fa-stopwatch" title="{{'lang.processLimitDate' | translate}}"></i>&nbsp;
                                         <span [innerHTML]="row.process_limit_date | timeLimit"
                                             title='{{row.process_limit_date | date : lang.onRange + " dd/MM/y " + lang.atRange +" HH:mm"}}'></span>
                                     </div>
@@ -88,18 +88,18 @@
                                     <div *ngIf="row.closing_date == null" id="{{row.res_id}}_creation_date"
                                         style="color: rgba(0,0,0,0.4);font-size: 90%;overflow: hidden;text-overflow: ellipsis;"
                                         title='{{row.creation_date | date : lang.onRange + " dd/MM/y " + lang.atRange +" HH:mm"}}'>
-                                        <i class="fa fa-calendar" title="{{lang.creationDate}}"></i>
+                                        <i class="fa fa-calendar" title="{{'lang.creationDate' | translate}}"></i>
                                         {{row.creation_date | timeAgo}}
                                     </div>
                                     <div *ngIf="row.closing_date == null"
                                         style="color: rgba(0,0,0,0.4);font-size: 90%;overflow: hidden;text-overflow: ellipsis;">
-                                        <i class="fa fa-stopwatch" title="{{lang.processLimitDate}}"></i>&nbsp;
+                                        <i class="fa fa-stopwatch" title="{{'lang.processLimitDate' | translate}}"></i>&nbsp;
                                         <span [innerHTML]="row.process_limit_date | timeLimit"
                                             title='{{row.process_limit_date | date : lang.onRange + " dd/MM/y " + lang.atRange +" HH:mm"}}'></span>
                                     </div>
                                     <div *ngIf="row.closing_date != null"
                                         style="color: rgba(0,0,0,0.4);font-size: 90%;overflow: hidden;text-overflow: ellipsis;">
-                                        <i class="fa fa-lock" title="{{lang.closingDate}}"></i>&nbsp;
+                                        <i class="fa fa-lock" title="{{'lang.closingDate' | translate}}"></i>&nbsp;
                                         <span
                                             title='{{row.closing_date | date : lang.onRange + " dd/MM/y " + lang.atRange +" HH:mm"}}'>{{row.closing_date | timeAgo}}</span>
                                     </div>

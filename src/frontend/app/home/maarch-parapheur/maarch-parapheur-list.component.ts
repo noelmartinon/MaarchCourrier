@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { NotificationService } from '../../../service/notification/notification.service';
@@ -34,7 +35,7 @@ export class MaarchParapheurListComponent implements OnInit, AfterViewInit {
 
     @Output() triggerEvent = new EventEmitter<string>();
 
-    constructor(public http: HttpClient, public dialog: MatDialog, private notify: NotificationService, private headerService: HeaderService) {
+    constructor(private translate: TranslateService, public http: HttpClient, public dialog: MatDialog, private notify: NotificationService, private headerService: HeaderService) {
         this.dataSource = new MatTableDataSource(this.userList);
     }
 

@@ -9,7 +9,7 @@
             </ng-container>
             {{attachment.title.value | shorten: 50: '...'}}
         </span>
-        <button [title]="lang.close" mat-icon-button (click)="dialogRef.close();">
+        <button [title]="this.translate.instant('lang.close')" mat-icon-button (click)="dialogRef.close();">
             <mat-icon class="fa fa-times"></mat-icon>
         </button></h1>
     <mat-dialog-content class="attach-content">
@@ -17,15 +17,15 @@
                     <div class="attachment-form col-md-3 col-sm-12">
                         <div *ngIf="editMode" class="attachment-form-item">
                             <mat-slide-toggle [checked]="newVersion" color="primary"
-                                (change)="newVersion = !newVersion;">{{lang.newVersion}}</mat-slide-toggle>
+                                (change)="newVersion = !newVersion;">{{'lang.newVersion' | translate}}</mat-slide-toggle>
                         </div>
                         <div *ngIf="newVersion" class="attachment-form-item">
                             <div class="alert-message alert-message-danger" role="alert"
-                                [innerHTML]="lang.mustEditDocument"></div>
+                                [innerHTML]="this.translate.instant('lang.mustEditDocument')"></div>
                         </div>
                         <div class="attachment-form-item">
                             <mat-form-field class="input-form">
-                                <input matInput placeholder="{{lang.status}}" [formControl]="attachment['status']"
+                                <input matInput placeholder="{{'lang.status' | translate}}" [formControl]="attachment['status']"
                                     [value]="lang['attachment_'+attachment['status'].value]">
                             </mat-form-field>
                             <div class="fieldState">
@@ -33,7 +33,7 @@
                             </div>
                         </div>
                         <div class="attachment-form-item">
-                            <plugin-select-search [label]="lang.type" [placeholderLabel]="lang.type"
+                            <plugin-select-search [label]="this.translate.instant('lang.type')" [placeholderLabel]="this.translate.instant('lang.type')"
                                 [formControlSelect]="attachment['type']" [datas]="attachmentsTypes"
                                 (afterSelected)="getAttachType($event)" style="width:100%;">
                             </plugin-select-search>
@@ -48,7 +48,7 @@
                         </div>
                         <div class="attachment-form-item">
                             <mat-form-field class="input-form">
-                                <input matInput placeholder="{{lang.subject}}" [formControl]="attachment['title']">
+                                <input matInput placeholder="{{'lang.subject' | translate}}" [formControl]="attachment['title']">
                             </mat-form-field>
                             <div class="fieldState">
                                 <i class="fas fa-asterisk fieldRequired"
@@ -60,7 +60,7 @@
                             </div>
                         </div>
                         <div class="attachment-form-item" *ngIf="sendMassMode" style="display: block;">
-                            <div class="alert alert-info" role="alert" [innerHTML]="lang.mailingMsg"></div>
+                            <div class="alert alert-info" role="alert" [innerHTML]="this.translate.instant('lang.mailingMsg')"></div>
                         </div>
                         <div class="attachment-form-item" *ngIf="!sendMassMode">
                             <app-contact-autocomplete [control]="attachment['recipient']" style="width:100%;" [singleMode]="true">
@@ -71,7 +71,7 @@
                         </div>
                         <div class="attachment-form-item" *ngIf="attachment['signedResponse'].value !== undefined">
                             <mat-form-field class="input-form">
-                                <input matInput placeholder="{{lang.signedAlt}}" [formControl]="attachment['signDate']"
+                                <input matInput placeholder="{{'lang.signedAlt' | translate}}" [formControl]="attachment['signDate']"
                                     [value]="attachment['signDate'].value | timeAgo : 'full'">
                             </mat-form-field>
                             <div class="fieldState">
@@ -80,7 +80,7 @@
                         </div>
                         <div class="attachment-form-item" *ngIf="attachment['signedResponse'].value !== undefined">
                             <mat-form-field class="input-form">
-                                <input matInput placeholder="{{lang.signedAlt}} {{lang.by}}"
+                                <input matInput placeholder="{{'lang.signedAlt' | translate}} {{'lang.by' | translate}}"
                                     [formControl]="attachment['signatory']">
                             </mat-form-field>
                             <div class="fieldState">
@@ -90,12 +90,12 @@
                         <mat-expansion-panel>
                             <mat-expansion-panel-header>
                                 <mat-panel-title>
-                                    {{lang.othersInfos}}
+                                    {{'lang.othersInfos' | translate}}
                                 </mat-panel-title>
                             </mat-expansion-panel-header>
                             <div class="attachment-form-item">
                                 <mat-form-field class="input-form">
-                                    <input matInput placeholder="{{lang.created}}"
+                                    <input matInput placeholder="{{'lang.created' | translate}}"
                                         [formControl]="attachment['creationDate']"
                                         [value]="attachment['creationDate'].value | timeAgo : 'full'">
                                 </mat-form-field>
@@ -105,7 +105,7 @@
                             </div>
                             <div class="attachment-form-item">
                                 <mat-form-field class="input-form">
-                                    <input matInput placeholder="{{lang.created}} {{lang.by}}"
+                                    <input matInput placeholder="{{'lang.created' | translate}} {{'lang.by' | translate}}"
                                         [formControl]="attachment['typistLabel']">
                                 </mat-form-field>
                                 <div class="fieldState">
@@ -114,7 +114,7 @@
                             </div>
                             <div class="attachment-form-item" *ngIf="attachment['modificationDate'].value !== null">
                                 <mat-form-field class="input-form">
-                                    <input matInput placeholder="{{lang.modified}}"
+                                    <input matInput placeholder="{{'lang.modified' | translate}}"
                                         [formControl]="attachment['modificationDate']"
                                         [value]="attachment['modificationDate'].value | timeAgo : 'full'">
                                 </mat-form-field>
@@ -124,7 +124,7 @@
                             </div>
                             <div class="attachment-form-item" *ngIf="attachment['modificationDate'].value !== null">
                                 <mat-form-field class="input-form">
-                                    <input matInput placeholder="{{lang.modified}} {{lang.by}}"
+                                    <input matInput placeholder="{{'lang.modified' | translate}} {{'lang.by' | translate}}"
                                         [formControl]="attachment['modifiedBy']">
                                 </mat-form-field>
                                 <div class="fieldState">
@@ -133,7 +133,7 @@
                             </div>
                             <div class="attachment-form-item">
                                 <mat-form-field class="input-form">
-                                    <input matInput placeholder="{{lang.version}}"
+                                    <input matInput placeholder="{{'lang.version' | translate}}"
                                         [formControl]="attachment['relation']"
                                         [value]="lang.version + ' ' + attachment.relation.value">
                                 </mat-form-field>
@@ -144,7 +144,7 @@
                             <div class="attachment-form-item">
                                 <mat-form-field class="input-form" (click)="picker.open()" style="cursor:pointer;">
                                     <input [formControl]="attachment['validationDate']" matInput
-                                        [matDatepicker]="picker" [placeholder]="lang.expectedReturnDate" [min]="now"
+                                        [matDatepicker]="picker" [placeholder]="this.translate.instant('lang.expectedReturnDate')" [min]="now"
                                         readonly style="cursor:pointer;">
                                     <mat-datepicker-toggle matSuffix [for]="picker"
                                         *ngIf="!attachment['validationDate'].value">
@@ -153,7 +153,7 @@
                                     <button mat-button color="warn" matSuffix mat-icon-button
                                         *ngIf="attachment['validationDate'].value && !attachment['validationDate'].disabled"
                                         (click)="$event.stopPropagation();attachment['validationDate'].reset();"
-                                        [title]="lang.eraseValue">
+                                        [title]="this.translate.instant('lang.eraseValue')">
                                         <mat-icon color="warn" class="fa fa-calendar-times">
                                         </mat-icon>
                                     </button>
@@ -178,7 +178,7 @@
                         </mat-tab>
                         <mat-tab *ngIf="attachment.status.value === 'SIGN'">
                             <ng-template mat-tab-label>
-                                <span style="color:green">{{lang.signedAttachment}}</span>
+                                <span style="color:green">{{'lang.signedAttachment' | translate}}</span>
                             </ng-template>
                             <app-document-viewer #appDocumentViewer style="display:block;height:100%;width:100%;overflow: auto;" [editMode]="false"
                                 [resId]="attachment.signedResponse.value" [mode]="'attachment'"
@@ -187,7 +187,7 @@
                         </mat-tab>
                         <mat-tab>
                             <ng-template mat-tab-label>
-                                <span style="color:#135f7f">{{lang.attachment}}</span>
+                                <span style="color:#135f7f">{{'lang.attachment' | translate}}</span>
                             </ng-template>
                             <app-document-viewer #appAttachmentViewer style="display:block;height:100%;width:100%;overflow: auto;" [editMode]="editMode"
                                 [resId]="data.resId" [resIdMaster]="attachment['resIdMaster'].value" [mode]="'attachment'"
@@ -196,7 +196,7 @@
                                 [title]="attachment.chrono.value + ' - ' + attachment.title.value">
                             </app-document-viewer>
                         </mat-tab>
-                        <mat-tab label="{{lang.attachment}} ({{lang.version}} {{version.relation}})"
+                        <mat-tab label="{{'lang.attachment' | translate}} ({{'lang.version' | translate}} {{version.relation}})"
                             *ngFor="let version of versions">
                             <ng-template matTabContent>
                                 <app-document-viewer #appDocumentViewer style="display:block;height:100%;width:100%;overflow: auto;" [editMode]="false"
@@ -210,15 +210,15 @@
     </mat-dialog-content>
     <div mat-dialog-actions class="actions">
         <button mat-raised-button color="primary" *ngIf="!newVersion" (click)="updateAttachment()"
-            [disabled]="!loading && (!editMode || !attachFormGroup.valid)">{{lang.validate}}</button>
+            [disabled]="!loading && (!editMode || !attachFormGroup.valid)">{{'lang.validate' | translate}}</button>
         <button mat-raised-button color="primary" *ngIf="!newVersion && sendMassMode && !loading" (click)="updateAttachment('mailing')"
-            [disabled]="!loading && (!editMode || !attachFormGroup.valid)">{{lang.mailing}}</button>
+            [disabled]="!loading && (!editMode || !attachFormGroup.valid)">{{'lang.mailing' | translate}}</button>
         <button mat-raised-button color="primary" *ngIf="newVersion" (click)="createNewVersion()"
-            [disabled]="!editMode || !isEditing()">{{lang.createNewVersion}}</button>
+            [disabled]="!editMode || !isEditing()">{{'lang.createNewVersion' | translate}}</button>
         <button mat-raised-button color="primary" *ngIf="newVersion && sendMassMode && !loading" (click)="createNewVersion('mailing')"
-            [disabled]="!editMode || !isEditing()">{{lang.mailing}}</button>
+            [disabled]="!editMode || !isEditing()">{{'lang.mailing' | translate}}</button>
         <button mat-raised-button color="warn" *ngIf=" !loading && attachment.status.value === 'SIGN' && (privilegeService.hasCurrentUserPrivilege('sign_document') || this.headerService.user.id == attachment.typist.value)"
-            (click)="deleteSignedVersion()">{{lang.deleteSignedVersion}}</button>
-        <button mat-raised-button mat-button [disabled]="loading" (click)="closeModal()">{{lang.close}}</button>
+            (click)="deleteSignedVersion()">{{'lang.deleteSignedVersion' | translate}}</button>
+        <button mat-raised-button mat-button [disabled]="loading" (click)="closeModal()">{{'lang.close' | translate}}</button>
     </div>
 </div>

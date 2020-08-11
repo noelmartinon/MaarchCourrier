@@ -2,6 +2,7 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ValidatorFn } from '@angular/forms';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { tap } from 'rxjs/internal/operators/tap';
 import { InstallerService } from '../installer.service';
 import { StepAction } from '../types';
@@ -20,6 +21,7 @@ export class UseradminComponent implements OnInit {
     @Output() tiggerInstall = new EventEmitter<string>();
 
     constructor(
+        private translate: TranslateService,
         private _formBuilder: FormBuilder,
         private notify: NotificationService,
         private installerService: InstallerService
@@ -93,7 +95,7 @@ export class UseradminComponent implements OnInit {
                 method : 'PUT',
                 url : '../rest/installer/administrator'
             },
-            description: this.lang.stepUserAdminActionDesc,
+            description: this.translate.instant('lang.stepUserAdminActionDesc'),
             installPriority: 3
         }];
     }

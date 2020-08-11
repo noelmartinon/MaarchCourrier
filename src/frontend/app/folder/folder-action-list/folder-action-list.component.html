@@ -1,4 +1,4 @@
-<button *ngIf="!contextMode" mat-stroked-button [matMenuTriggerFor]="menu">{{lang.actionsAlt}}<mat-icon matSuffix
+<button *ngIf="!contextMode" mat-stroked-button [matMenuTriggerFor]="menu">{{'lang.actionsAlt' | translate}}<mat-icon matSuffix
         class="fa fa-caret-down"></mat-icon>
 </button>
 <span *ngIf="contextMode" [matMenuTriggerFor]="menu" #menu2 style="position: fixed;"
@@ -10,7 +10,7 @@
         {{this.contextMenuTitle}}
     </div>
     <button *ngIf="selectedRes.length == 1" mat-menu-item [matMenuTriggerFor]="baskets" (menuOpened)="getBaskets()">
-        <span>{{lang.goToBasket}}</span>
+        <span>{{'lang.goToBasket' | translate}}</span>
     </button>
     <mat-menu #baskets="matMenu" [class]="'folderListMenu'">
         <ng-container *ngFor="let group of basketList.groups | sortBy : 'groupName'">
@@ -22,18 +22,18 @@
             </ng-container>
         </ng-container>
         <div class="noAvailableBasket" *ngIf="basketList.groups.length == 0">
-            {{lang.mailNotPresentInBasket}}
+            {{'lang.mailNotPresentInBasket' | translate}}
         </div>
     </mat-menu>
     <mat-divider></mat-divider>
     <button mat-menu-item class="followAction" (click)="unFollow()" [disabled]="selectedRes.length === 0">
         <mat-icon class="far fa-star fa-2x"></mat-icon>
-        <span>{{lang.untrackThisMail}}</span>
+        <span>{{'lang.untrackThisMail' | translate}}</span>
     </button>
     <mat-divider></mat-divider>
     <button mat-menu-item class="folderAction" (click)="unclassify()" [disabled]="selectedRes.length === 0">
         <mat-icon class="fa fa-folder-minus fa-2x"></mat-icon>
-        <span>{{lang.removeFromFolder}}</span>
+        <span>{{'lang.removeFromFolder' | translate}}</span>
     </button>
     <folder-menu [resIds]="selectedRes" (refreshList)="refreshDaoAfterAction()" (refreshFolders)="refreshFolders()"></folder-menu>
 </mat-menu>

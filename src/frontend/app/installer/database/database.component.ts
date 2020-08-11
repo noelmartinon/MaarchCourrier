@@ -6,6 +6,7 @@ import { tap } from 'rxjs/internal/operators/tap';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { of } from 'rxjs/internal/observable/of';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { StepAction } from '../types';
 import { FunctionsService } from '../../../service/functions.service';
 import { InstallerService } from '../installer.service';
@@ -28,6 +29,7 @@ export class DatabaseComponent implements OnInit {
     @Output() nextStep = new EventEmitter<string>();
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private _formBuilder: FormBuilder,
         private notify: NotificationService,
@@ -103,16 +105,16 @@ export class DatabaseComponent implements OnInit {
         this.http.get(`../rest/installer/databaseConnection`, { observe: 'response', params: info }).pipe(
             tap((data: any) => {
                 this.dbExist = data.status === 200;
-                this.notify.success(this.lang.rightInformations);
+                this.notify.success(this.translate.instant('lang.rightInformations'));
                 this.stepFormGroup.controls['stateStep'].setValue('success');
                 this.nextStep.emit();
             }),
             catchError((err: any) => {
                 this.dbExist = false;
                 if (err.error.errors === 'Given database has tables') {
-                    this.notify.error(this.lang.dbNotEmpty);
+                    this.notify.error(this.translate.instant('lang.dbNotEmpty'));
                 } else {
-                    this.notify.error(this.lang.badInformations);
+                    this.notify.error(this.translate.instant('lang.badInformations'));
                 }
                 this.stepFormGroup.markAllAsTouched();
                 this.stepFormGroup.controls['stateStep'].setValue('');
@@ -160,7 +162,7 @@ export class DatabaseComponent implements OnInit {
                 method : 'POST',
                 url : '../rest/installer/database'
             },
-            description: this.lang.stepDatabaseActionDesc,
+            description: this.translate.instant('lang.stepDatabaseActionDesc'),
             installPriority: 2
         }];
     }

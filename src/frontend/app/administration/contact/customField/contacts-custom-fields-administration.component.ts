@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -33,58 +34,58 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
         {
             icon: 'fa fa-book',
             route: '/administration/contacts/list',
-            label: this.lang.contactsList,
+            label: this.translate.instant('lang.contactsList'),
             current: false
         },
         {
             icon: 'fa fa-code',
             route: '/administration/contacts/contactsCustomFields',
-            label: this.lang.customFieldsAdmin,
+            label: this.translate.instant('lang.customFieldsAdmin'),
             current: true
         },
         {
             icon: 'fa fa-cog',
             route: '/administration/contacts/contacts-parameters',
-            label: this.lang.contactsParameters,
+            label: this.translate.instant('lang.contactsParameters'),
             current: false
         },
         {
             icon: 'fa fa-users',
             route: '/administration/contacts/contacts-groups',
-            label: this.lang.contactsGroups,
+            label: this.translate.instant('lang.contactsGroups'),
             current: false
         },
         {
             icon: 'fas fa-magic',
             route: '/administration/contacts/duplicates',
-            label: this.lang.duplicatesContactsAdmin,
+            label: this.translate.instant('lang.duplicatesContactsAdmin'),
             current: false
         },
     ];
 
     customFieldsTypes: any[] = [
         {
-            label: this.lang.stringInput,
+            label: this.translate.instant('lang.stringInput'),
             type: 'string'
         },
         {
-            label: this.lang.integerInput,
+            label: this.translate.instant('lang.integerInput'),
             type: 'integer'
         },
         {
-            label: this.lang.selectInput,
+            label: this.translate.instant('lang.selectInput'),
             type: 'select'
         },
         {
-            label: this.lang.dateInput,
+            label: this.translate.instant('lang.dateInput'),
             type: 'date'
         },
         {
-            label: this.lang.radioInput,
+            label: this.translate.instant('lang.radioInput'),
             type: 'radio'
         },
         {
-            label: this.lang.checkboxInput,
+            label: this.translate.instant('lang.checkboxInput'),
             type: 'checkbox'
         }
     ];
@@ -99,6 +100,7 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -111,7 +113,7 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.administration + ' ' + this.lang.customFields + ' ' + this.lang.contacts);
+        this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.customFields') + ' ' + this.translate.instant('lang.contacts'));
 
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
@@ -144,13 +146,13 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
 
         let newCustomField: any = {};
 
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.add, msg: this.lang.confirmAction } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.add'), msg: this.translate.instant('lang.confirmAction') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             tap(() => {
                 newCustomField = {
-                    label: this.lang.newField + ' ' + this.incrementCreation,
+                    label: this.translate.instant('lang.newField') + ' ' + this.incrementCreation,
                     type: customFieldType.type,
                     values: []
                 };
@@ -159,7 +161,7 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
             tap((data: any) => {
                 newCustomField.id = data.id;
                 this.customFields.push(newCustomField);
-                this.notify.success(this.lang.customFieldAdded);
+                this.notify.success(this.translate.instant('lang.customFieldAdded'));
                 this.incrementCreation++;
             }),
             catchError((err: any) => {
@@ -182,14 +184,14 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
     }
 
     removeCustomField(indexCustom: number) {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete + ' "' + this.customFields[indexCustom].label + '"', msg: this.lang.confirmAction } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete') + ' "' + this.customFields[indexCustom].label + '"', msg: this.translate.instant('lang.confirmAction') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.delete('../rest/contactsCustomFields/' + this.customFields[indexCustom].id)),
             tap(() => {
                 this.customFields.splice(indexCustom, 1);
-                this.notify.success(this.lang.customFieldDeleted);
+                this.notify.success(this.translate.instant('lang.customFieldDeleted'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -209,14 +211,14 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
 
         const alreadyExists = this.customFields.filter(customFieldItem => customFieldItem.label === customFieldToUpdate.label);
         if (alreadyExists.length > 1) {
-            this.notify.handleErrors(this.lang.customFieldAlreadyExists);
+            this.notify.handleErrors(this.translate.instant('lang.customFieldAlreadyExists'));
             return of(false);
         }
 
         this.http.put('../rest/contactsCustomFields/' + customField.id, customFieldToUpdate).pipe(
             tap(() => {
                 this.customFieldsClone[indexCustom] = JSON.parse(JSON.stringify(customField));
-                this.notify.success(this.lang.customFieldUpdated);
+                this.notify.success(this.translate.instant('lang.customFieldUpdated'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

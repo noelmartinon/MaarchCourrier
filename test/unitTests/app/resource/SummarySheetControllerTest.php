@@ -47,7 +47,7 @@ class SummarySheetControllerTest extends TestCase
             'model_id'   => 1,
             'identifier' => 'indexingCustomField_4',
             'mandatory'  => 'false',
-            'enabled  '  => 'true',
+            'enabled'    => 'true',
             'unit'       => 'mail'
         ]);
 
@@ -55,7 +55,7 @@ class SummarySheetControllerTest extends TestCase
             'model_id'   => 1,
             'identifier' => 'recipients',
             'mandatory'  => 'false',
-            'enabled  '  => 'true',
+            'enabled'    => 'true',
             'unit'       => 'mail'
         ]);
 

@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -102,6 +103,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
     @ViewChild('tableBasketListSort', { static: true }) sort: MatSort;
 
     constructor(
+        private translate: TranslateService,
         private router: Router,
         private _activatedRoute: ActivatedRoute,
         private route: ActivatedRoute,
@@ -301,7 +303,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
                 if (key === 'statusImage' && element[key] == null) {
                     element[key] = 'fa-question undefined';
                 } else if ((element[key] == null || element[key] === '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'folders', 'hasDocument', 'integrations', 'mailTracking'].indexOf(key) === -1) {
-                    element[key] = this.lang.undefined;
+                    element[key] = this.translate.instant('lang.undefined');
                 }
             });
 
@@ -310,17 +312,17 @@ export class BasketListComponent implements OnInit, OnDestroy {
                 key.event = false;
                 key.displayTitle = key.displayValue;
                 if ((key.displayValue == null || key.displayValue === '') && ['getCreationAndProcessLimitDates', 'getParallelOpinionsNumber'].indexOf(key.value) === -1) {
-                    key.displayValue = this.lang.undefined;
+                    key.displayValue = this.translate.instant('lang.undefined');
                     key.displayTitle = '';
                 } else if (['getSenders', 'getRecipients'].indexOf(key.value) > -1) {
                     key.event = true;
                     if (key.displayValue.length > 1) {
                         key.displayTitle = key.displayValue.join(' - ');
-                        key.displayValue = '<b>' + key.displayValue.length + '</b> ' + this.lang.contactsAlt;
+                        key.displayValue = '<b>' + key.displayValue.length + '</b> ' + this.translate.instant('lang.contactsAlt');
                     } else if (key.displayValue.length === 1) {
                         key.displayValue = key.displayValue[0];
                     } else {
-                        key.displayValue = this.lang.undefined;
+                        key.displayValue = this.translate.instant('lang.undefined');
                     }
                 } else if (key.value === 'getCreationAndProcessLimitDates') {
                     key.icon = '';
@@ -386,12 +388,12 @@ export class BasketListComponent implements OnInit, OnDestroy {
                     key.displayValue = userList.join(', ');
                     key.displayTitle = userList.join(', ');
                 } else if (key.value === 'getParallelOpinionsNumber') {
-                    key.displayTitle = key.displayValue + ' ' + this.lang.opinionsSent;
+                    key.displayTitle = key.displayValue + ' ' + this.translate.instant('lang.opinionsSent');
 
                     if (key.displayValue > 0) {
-                        key.displayValue = '<b color="primary">' + key.displayValue + '</b> ' + this.lang.opinionsSent;
+                        key.displayValue = '<b color="primary">' + key.displayValue + '</b> ' + this.translate.instant('lang.opinionsSent');
                     } else {
-                        key.displayValue = key.displayValue + ' ' + this.lang.opinionsSent;
+                        key.displayValue = key.displayValue + ' ' + this.translate.instant('lang.opinionsSent');
                     }
                 }
                 key.label = this.lang[key.value];
@@ -475,7 +477,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
 
     launchEventSubData(data: any, row: any) {
         if (data.event) {
-            if (['getSenders', 'getRecipients'].indexOf(data.value) > -1 && data.displayValue !== this.lang.undefined) {
+            if (['getSenders', 'getRecipients'].indexOf(data.value) > -1 && data.displayValue !== this.translate.instant('lang.undefined')) {
                 const mode = data.value === 'getSenders' ? 'senders' : 'recipients';
                 this.openContact(row, mode);
             }

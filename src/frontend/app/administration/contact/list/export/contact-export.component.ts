@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../../service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -37,7 +38,7 @@ export class ContactExportComponent implements OnInit {
     dataAvailable: any[] = [
         {
             value: 'id',
-            label: this.lang.id
+            label: this.translate.instant('lang.id')
         },
         {
             value: 'externalId',
@@ -45,11 +46,11 @@ export class ContactExportComponent implements OnInit {
         },
         {
             value: 'enabled',
-            label: this.lang.status
+            label: this.translate.instant('lang.status')
         },
         {
             value: 'communicationMeans',
-            label: this.lang.communicationMean
+            label: this.translate.instant('lang.communicationMean')
         }
     ];
 
@@ -57,6 +58,7 @@ export class ContactExportComponent implements OnInit {
 
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any,
@@ -164,7 +166,7 @@ export class ContactExportComponent implements OnInit {
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
                 } else {
-                    alert(this.lang.tooMuchDatas);
+                    alert(this.translate.instant('lang.tooMuchDatas'));
                 }
             }),
             finalize(() => this.loadingExport = false),

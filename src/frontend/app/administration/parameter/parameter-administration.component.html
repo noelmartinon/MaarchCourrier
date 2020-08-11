@@ -22,7 +22,7 @@
                         <div class="form-group">
                             <div class="col-sm-12">
                                 <mat-form-field>
-                                    <input matInput [(ngModel)]="parameter.id" [disabled]="!creationMode" name="id" title="{{lang.id}}" type="text" placeholder="{{lang.id}}"
+                                    <input matInput [(ngModel)]="parameter.id" [disabled]="!creationMode" name="id" title="{{'lang.id' | translate}}" type="text" placeholder="{{'lang.id' | translate}}"
                                            pattern="^[\w-]*$" required>
                                 </mat-form-field>
                             </div>
@@ -30,36 +30,36 @@
                         <div class="form-group">
                             <div class="col-sm-12">
                                 <mat-form-field>
-                                    <input matInput [(ngModel)]="parameter.description" name="description" id="description" title="{{lang.description}}" type="text"
-                                           placeholder="{{lang.description}}">
+                                    <input matInput [(ngModel)]="parameter.description" name="description" id="description" title="{{'lang.description' | translate}}" type="text"
+                                           placeholder="{{'lang.description' | translate}}">
                                 </mat-form-field>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="col-sm-6">
                                 <mat-form-field>
-                                    <mat-select name="type" placeholder="{{lang.type}}" [(ngModel)]="type" [disabled]="!creationMode" required>
+                                    <mat-select name="type" placeholder="{{'lang.type' | translate}}" [(ngModel)]="type" [disabled]="!creationMode" required>
                                         <mat-option value="string">
-                                            {{lang.stringInput}}
+                                            {{'lang.stringInput' | translate}}
                                         </mat-option>
                                         <mat-option value="int">
-                                            {{lang.integer}}
+                                            {{'lang.integer' | translate}}
                                         </mat-option>
                                         <mat-option value="date">
-                                            {{lang.date}}
+                                            {{'lang.date' | translate}}
                                         </mat-option>
                                     </mat-select>
                                 </mat-form-field>
                             </div>
                             <div class="col-sm-6">
                                 <mat-form-field *ngIf="type == 'string'">
-                                    <input matInput [(ngModel)]="parameter.param_value_string" name="paramValueString" type="text" placeholder="{{lang.value}}" required>
+                                    <input matInput [(ngModel)]="parameter.param_value_string" name="paramValueString" type="text" placeholder="{{'lang.value' | translate}}" required>
                                 </mat-form-field>
                                 <mat-form-field *ngIf="type == 'int'">
-                                    <input matInput [(ngModel)]="parameter.param_value_int" name="paramValueInt" type="number" placeholder="{{lang.value}}" pattern="^[0-9]*$" required>
+                                    <input matInput [(ngModel)]="parameter.param_value_int" name="paramValueInt" type="number" placeholder="{{'lang.value' | translate}}" pattern="^[0-9]*$" required>
                                 </mat-form-field>
                                 <mat-form-field *ngIf="type == 'date'">
-                                    <input matInput [(ngModel)]="parameter.param_value_date" name="paramValueDate" [matDatepicker]="picker" placeholder="{{lang.date}}" required>
+                                    <input matInput [(ngModel)]="parameter.param_value_date" name="paramValueDate" [matDatepicker]="picker" placeholder="{{'lang.date' | translate}}" required>
                                     <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                                     <mat-datepicker #picker startView="month"></mat-datepicker>
                                 </mat-form-field>
@@ -67,7 +67,7 @@
                         </div>
                         <div class="form-group">
                             <div class="col-sm-12" style="text-align:center;">
-                                <button mat-raised-button color="primary" type="submit" [disabled]="!parameterForm.form.valid">{{lang.save}}</button>
+                                <button mat-raised-button color="primary" type="submit" [disabled]="!parameterForm.form.valid">{{'lang.save' | translate}}</button>
                             </div>
                         </div>
                     </form>

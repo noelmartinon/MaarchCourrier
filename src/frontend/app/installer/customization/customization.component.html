@@ -1,16 +1,16 @@
 <div class="stepContent">
-    <h2 class="stepContentTitle"><i class="fas fa-tools"></i> {{lang.customization}}</h2>
+    <h2 class="stepContentTitle"><i class="fas fa-tools"></i> {{'lang.customization' | translate}}</h2>
     <div class="alert-message alert-message-info" role="alert" style="margin-top: 30px;min-width: 100%;">
-        {{lang.stepCustomization_desc}}
+        {{'lang.stepCustomization_desc' | translate}}
     </div>
     <form [formGroup]="stepFormGroup" style="display: contents;">
         <div class="col-md-6">
             <mat-form-field appearance="outline">
-                <mat-label>{{lang.instanceId}}</mat-label>
+                <mat-label>{{'lang.instanceId' | translate}}</mat-label>
                 <input matInput formControlName="customId">
                 <mat-error>
                     <ng-container *ngIf="stepFormGroup.controls['customId'].errors?.customExist">
-                        {{lang.customAlreadyExist}}
+                        {{'lang.customAlreadyExist' | translate}}
                     </ng-container>
                     <ng-container *ngIf="stepFormGroup.controls['customId'].errors?.pattern">
                         {{lang.onlySpecialCharAllowed | scan : ['"_", "-"']}}
@@ -18,22 +18,22 @@
                 </mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline">
-                <mat-label>{{lang.applicationName}}</mat-label>
+                <mat-label>{{'lang.applicationName' | translate}}</mat-label>
                 <input matInput formControlName="appName">
             </mat-form-field>
-            <div>{{lang.loginMsg}} : </div>
+            <div>{{'lang.loginMsg' | translate}} : </div>
             <textarea style="padding-top: 10px;" name="loginMessage" id="loginMessage"
                 formControlName="loginMessage"></textarea>
             <br />
             <br />
-            <div>{{lang.homeMsg}} : </div>
+            <div>{{'lang.homeMsg' | translate}} : </div>
             <textarea style="padding-top: 10px;" name="homeMessage" id="homeMessage"
                 formControlName="homeMessage"></textarea>
             <br />
             <br />
         </div>
         <div class="col-md-6">
-            <div>{{lang.chooseLogo}} : </div>
+            <div>{{'lang.chooseLogo' | translate}} : </div>
             <div>
                 <mat-card style="width: 350px;background-size: 100%;cursor: pointer;" matRipple>
                     <img [src]="logoURL()" (click)="clickLogoButton(uploadLogo)" style="width: 100%;" />
@@ -42,7 +42,7 @@
                 </mat-card>
             </div>
             <br />
-            <div>{{lang.chooseLoginBg}} : </div>
+            <div>{{'lang.chooseLoginBg' | translate}} : </div>
             <div class="backgroundList">
                 <mat-card (click)="selectBg('assets/bodylogin.jpg')" style="opacity: 0.3;" class="backgroundItem"
                     [class.disabled]="stepFormGroup.controls['bodyLoginBackground'].disabled"

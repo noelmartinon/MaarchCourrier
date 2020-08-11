@@ -72,7 +72,7 @@ class ResourceControlController
             return ['errors' => $control['errors']];
         }
 
-        $control = ResourceControlController::controlAdjacentData(['body' => $body, 'isWebServiceUser' => $isWebServiceUser]);
+        $control = ResourceControlController::controlAdjacentData(['body' => $body]);
         if (!empty($control['errors'])) {
             return ['errors' => $control['errors']];
         }
@@ -175,7 +175,7 @@ class ResourceControlController
             return ['errors' => 'Body doctype does not exist'];
         }
 
-        $control = ResourceControlController::controlAdjacentData(['body' => $body, 'isWebServiceUser' => false]);
+        $control = ResourceControlController::controlAdjacentData(['body' => $body]);
         if (!empty($control['errors'])) {
             return ['errors' => $control['errors']];
         }

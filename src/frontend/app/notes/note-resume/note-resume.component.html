@@ -15,8 +15,8 @@
             {{note.firstname}} {{note.lastname}}
         </div>
     </div>
-    <button mat-button *ngIf="notes.length === 3" class="showMore" (click)="showMore()">{{lang.showMore}}</button>
+    <button mat-button *ngIf="notes.length === 3" class="showMore" (click)="showMore()">{{'lang.showMore' | translate}}</button>
     <div class="noData" *ngIf="notes.length === 0">
-        {{lang.noNote}}
+        {{'lang.noNote' | translate}}
     </div>
 </ng-template>

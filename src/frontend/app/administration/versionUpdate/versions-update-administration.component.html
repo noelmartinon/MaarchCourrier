@@ -1,7 +1,7 @@
 <div *ngIf="updateInprogress" class="updateInProgress">
     <mat-spinner diameter="30"></mat-spinner>&nbsp;
     <div>
-        {{lang.updateInProgress}}
+        {{'lang.updateInProgress' | translate}}
     </div>
 </div>
 
@@ -27,14 +27,14 @@
                 <mat-card *ngIf="!loading" class="card-app-content">
                     <div class="alert alert-info" *ngIf="versions.lastAvailableMinorVersion==null" style="display: flex;">
                         <mat-icon class="fa fa-check fa-2x" style="flex: 1;text-align: left;"></mat-icon>
-                        <span style="flex: 1;text-align: center;">{{lang.appUpToDate}} !</span>
+                        <span style="flex: 1;text-align: center;">{{'lang.appUpToDate' | translate}} !</span>
                         <mat-icon class="fa fa-check fa-2x" style="flex: 1;text-align: right;"></mat-icon>
                     </div>
                     <div class="alert alert-success" *ngIf="versions.lastAvailableMinorVersion!=null"
                          style="display: flex;">
                         <mat-icon class="fa fa-info-circle fa-2x" style="flex: 1;text-align: left;"></mat-icon>
                         <span style="flex: 1;text-align: center;">
-                        {{lang.newVersionAvailable}} ! <a style="font-weight: bold;"
+                        {{'lang.newVersionAvailable' | translate}} ! <a style="font-weight: bold;"
                                                           href="https://labs.maarch.org/maarch/MaarchCourrier/tags/{{versions.lastAvailableMinorVersion}}"
                                                           target="_blank">{{versions.lastAvailableMinorVersion}}</a>
                     </span>
@@ -44,7 +44,7 @@
                     </div>
                     <div class="col-sm-12" style="text-align:center;" *ngIf="versions.lastAvailableMinorVersion!=null">
                         <button mat-raised-button color="primary" [disabled]="!versions.canUpdate"
-                                (click)="updateVersionAccess();">{{lang.makeUpdate}}</button>
+                                (click)="updateVersionAccess();">{{'lang.makeUpdate' | translate}}</button>
                     </div>
                 </mat-card>
             </div>
@@ -56,10 +56,10 @@
              style="display: flex;">
             Maarch Courrier&nbsp;<a style="font-weight: bold;"
                                     href="https://labs.maarch.org/maarch/MaarchCourrier/tags/{{versions.lastAvailableMajorVersion}}"
-                                    target="_blank">{{versions.lastAvailableMajorVersion}}</a>&nbsp;{{lang.isAvailable}} !
+                                    target="_blank">{{versions.lastAvailableMajorVersion}}</a>&nbsp;{{'lang.isAvailable' | translate}} !
         </div>
         <mat-list>
-            <h3 mat-subheader>{{lang.currentVersion}}</h3>
+            <h3 mat-subheader>{{'lang.currentVersion' | translate}}</h3>
             <mat-list-item>
                 <b>{{versions.currentVersion}}</b>
             </mat-list-item>

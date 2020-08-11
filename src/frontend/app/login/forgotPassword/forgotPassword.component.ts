@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { finalize } from 'rxjs/operators';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from '../../../service/header.service';
 import { Router } from '@angular/router';
 
@@ -18,9 +19,10 @@ export class ForgotPasswordComponent implements OnInit {
     newLogin: any = {
         login: ''
     };
-    labelButton: string = this.lang.send;
+    labelButton: string = this.translate.instant('lang.send');
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private router: Router,
         public notificationService: NotificationService,
@@ -33,19 +35,19 @@ export class ForgotPasswordComponent implements OnInit {
     }
 
     generateLink() {
-        this.labelButton = this.lang.generation;
+        this.labelButton = this.translate.instant('lang.generation');
         this.loading = true;
 
         this.http.post('../rest/password', { 'login': this.newLogin.login })
             .pipe(
                 finalize(() => {
-                    this.labelButton = this.lang.send;
+                    this.labelButton = this.translate.instant('lang.send');
                     this.loading = false;
                 })
             )
             .subscribe((data: any) => {
                 this.loadingForm = true;
-                this.notificationService.success(this.lang.requestSentByEmail);
+                this.notificationService.success(this.translate.instant('lang.requestSentByEmail'));
                 this.router.navigate(['/login']);
             }, (err: any) => {
                 this.notificationService.handleErrors(err);

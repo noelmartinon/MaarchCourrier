@@ -1,6 +1,7 @@
 import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu';
@@ -48,6 +49,7 @@ export class FolderActionListComponent implements OnInit {
     @Output() refreshPanelFolders = new EventEmitter<string>();
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -85,13 +87,13 @@ export class FolderActionListComponent implements OnInit {
     }
 
     unclassify() {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: 'Voulez-vous enlever <b>' + this.selectedRes.length + '</b> document(s) du classement ?' } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: 'Voulez-vous enlever <b>' + this.selectedRes.length + '</b> document(s) du classement ?' } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.request('DELETE', '../rest/folders/' + this.currentFolderInfo.id + '/resources', { body: { resources: this.selectedRes } })),
             tap((data: any) => {
-                this.notify.success(this.lang.removedFromFolder);
+                this.notify.success(this.translate.instant('lang.removedFromFolder'));
                 this.refreshFolders();
                 this.foldersService.getPinnedFolders();
                 this.refreshDaoAfterAction();
@@ -118,7 +120,7 @@ export class FolderActionListComponent implements OnInit {
 
 
     goTo(basket: any) {
-        if (this.contextMenuTitle !== this.lang.undefined) {
+        if (this.contextMenuTitle !== this.translate.instant('lang.undefined')) {
             this.router.navigate(['/basketList/users/' + this.headerService.user.id + '/groups/' + basket.groupId + '/baskets/' + basket.basketId], { queryParams: { chrono: '"' + this.contextMenuTitle + '"' } });
         } else {
             this.router.navigate(['/basketList/users/' + this.headerService.user.id + '/groups/' + basket.groupId + '/baskets/' + basket.basketId]);
@@ -126,13 +128,13 @@ export class FolderActionListComponent implements OnInit {
     }
 
     unFollow() {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.stopFollowingAlert } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.stopFollowingAlert') } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.request('DELETE', '../rest/resources/unfollow', { body: { resources: this.selectedRes } })),
             tap((data: any) => {
-                this.notify.success(this.lang.removedFromFolder);
+                this.notify.success(this.translate.instant('lang.removedFromFolder'));
                 this.headerService.nbResourcesFollowed -= data.unFollowed;
                 this.refreshDaoAfterAction();
             }),

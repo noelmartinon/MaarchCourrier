@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, ViewContainerRef, TemplateRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
@@ -62,6 +63,7 @@ export class IndexationComponent implements OnInit {
     isMailing: boolean = false;
 
     constructor(
+        private translate: TranslateService,
         private route: ActivatedRoute,
         private _activatedRoute: ActivatedRoute,
         public http: HttpClient,
@@ -105,14 +107,14 @@ export class IndexationComponent implements OnInit {
 
     ngOnInit(): void {
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu', 'form');
-        this.headerService.sideBarButton = { icon: 'fa fa-home', label: this.lang.backHome, route: '/home' };
+        this.headerService.sideBarButton = { icon: 'fa fa-home', label: this.translate.instant('lang.backHome'), route: '/home' };
 
         this.fetchData();
     }
 
     fetchData() {
         this.loading = false;
-        this.headerService.setHeader(this.lang.recordingMail);
+        this.headerService.setHeader(this.translate.instant('lang.recordingMail'));
 
         this.route.params.subscribe(params => {
             this.currentGroupId = params['groupId'];
@@ -174,8 +176,8 @@ export class IndexationComponent implements OnInit {
                             autoFocus: false,
                             disableClose: true,
                             data: {
-                                title: this.lang.noFile,
-                                msg: this.lang.noFileMsg
+                                title: this.translate.instant('lang.noFile'),
+                                msg: this.translate.instant('lang.noFileMsg')
                             }
                         }
                         );
@@ -209,7 +211,7 @@ export class IndexationComponent implements OnInit {
                 })
             ).subscribe();
         } else {
-            this.notify.error(this.lang.mustFixErrors);
+            this.notify.error(this.translate.instant('lang.mustFixErrors'));
         }
     }
 

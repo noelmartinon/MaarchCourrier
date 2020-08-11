@@ -19,10 +19,10 @@
                 </div>
                 <mat-card *ngIf="!loading" class="card-app-content">
                     <mat-tab-group>
-                        <mat-tab label="{{lang.informations}}">
+                        <mat-tab label="{{'lang.informations' | translate}}">
                             <form (ngSubmit)="onSubmit()" #diffusionModelForm="ngForm">
                                 <mat-form-field>
-                                    <mat-select id="type" name="type" placeholder="{{lang.diffusionType}}"
+                                    <mat-select id="type" name="type" placeholder="{{'lang.diffusionType' | translate}}"
                                         [(ngModel)]="diffusionModel.type" [disabled]="!creationMode">
                                         <mat-option *ngFor="let itemType of this.itemTypeList" [value]="itemType.id">
                                             {{ itemType.label }}
@@ -30,20 +30,20 @@
                                     </mat-select>
                                 </mat-form-field>
                                 <mat-form-field>
-                                    <input matInput name="title" title="{{lang.label}}" placeholder="{{lang.label}}"
+                                    <input matInput name="title" title="{{'lang.label' | translate}}" placeholder="{{'lang.label' | translate}}"
                                         [(ngModel)]="diffusionModel.title" maxlength="255" required>
                                 </mat-form-field>
                                 <mat-form-field>
-                                    <textarea matInput name="description" title="{{lang.description}}"
-                                        placeholder="{{lang.description}}" [(ngModel)]="diffusionModel.description"
+                                    <textarea matInput name="description" title="{{'lang.description' | translate}}"
+                                        placeholder="{{'lang.description' | translate}}" [(ngModel)]="diffusionModel.description"
                                         matTextareaAutosize matAutosizeMinRows="1" matAutosizeMaxRows="5"
                                         maxlength="255"></textarea>
                                 </mat-form-field>
                                 <div class="col-md-12 text-center" style="padding:10px;">
                                     <button mat-raised-button [disabled]="!isValidForm()"
-                                        color="primary">{{lang.save}}</button>
+                                        color="primary">{{'lang.save' | translate}}</button>
                                     <button mat-raised-button *ngIf="!creationMode" type="button" color="default"
-                                        (click)="cancelModification()">{{lang.cancel}}</button>
+                                        (click)="cancelModification()">{{'lang.cancel' | translate}}</button>
                                 </div>
                             </form>
                         </mat-tab>

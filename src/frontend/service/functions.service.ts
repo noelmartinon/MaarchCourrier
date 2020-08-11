@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { LANG } from '../app/translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { LatinisePipe } from 'ngx-pipes';
 import { AuthService } from './auth.service';
 import { HeaderService } from './header.service';
@@ -13,6 +14,7 @@ export class FunctionsService {
     lang: any = LANG;
 
     constructor(
+        private translate: TranslateService,
         private authService: AuthService,
         private headerService: HeaderService,
         private latinisePipe: LatinisePipe,

@@ -1,11 +1,11 @@
 <mat-sidenav-container autosize class="maarch-container">
     <ng-template #adminMenuTemplate>
         <mat-nav-list>
-            <h3 mat-subheader>{{lang.actions}}</h3>
+            <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
             <a mat-list-item routerLink="/administration/tags/new">
                 <mat-icon color="primary" mat-list-icon class="fa fa-plus"></mat-icon>
                 <p mat-line>
-                    {{lang.add}}
+                    {{'lang.add' | translate}}
                 </p>
             </a>
         </mat-nav-list>
@@ -28,7 +28,7 @@
                 <div class="table-head">
                     <div class="table-head-result">
                         <mat-form-field style="font-size: 13px;">
-                            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="{{lang.filterBy}}">
+                            <input matInput [formControl]="adminService.getFilterField()" placeholder="{{'lang.filterBy' | translate}}">
                         </mat-form-field>
                     </div>
                     <div class="table-head-tool">
@@ -37,15 +37,14 @@
                     </div>
                 </div>
                 <div style="height:90%;overflow:auto;position:absolute;width:100%;">
-                    <mat-table id="contact-list" #tableContactListSort="matSort" [dataSource]="dataSource" matSort
-                        matSortActive="label" matSortDirection="asc" style="width:100%;">
+                    <mat-table id="contact-list" #tableContactListSort="matSort" [dataSource]="adminService.getDataSource()" matSort matSortDisableClear style="width:100%;">
                         <ng-container matColumnDef="label">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.label}}</mat-header-cell>
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.label' | translate}}</mat-header-cell>
                             <mat-cell mat-cell *matCellDef="let element">
                                 {{element.label}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="description">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.description}}</mat-header-cell>
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.description' | translate}}</mat-header-cell>
                             <mat-cell mat-cell *matCellDef="let element">
                                 {{element.description}} </mat-cell>
                         </ng-container>
@@ -53,7 +52,7 @@
                             <mat-header-cell *matHeaderCellDef>
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" style="justify-content: flex-end;">
-                                <button mat-icon-button color="warn" [title]="lang.delete"
+                                <button mat-icon-button color="warn" [title]="this.translate.instant('lang.delete')"
                                     (click)="$event.stopPropagation();deleteTag(element)">
                                     <mat-icon class="fa fa-trash-alt fa-2x"></mat-icon>
                                 </button>
@@ -66,7 +65,7 @@
                     </mat-table>
                     <div class="mat-paginator"
                         style="min-height:48px;display: flex;justify-content: end;align-items: center;padding-left: 20px;">
-                        {{resultsLength}} {{lang.tags}}</div>
+                        {{resultsLength}} {{'lang.tags' | translate}}</div>
                 </div>
             </div>
         </div>

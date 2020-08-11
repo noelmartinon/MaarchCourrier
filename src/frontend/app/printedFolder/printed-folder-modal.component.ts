@@ -1,6 +1,7 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../service/notification/notification.service';
 import { map, tap, catchError, finalize } from 'rxjs/operators';
@@ -42,6 +43,7 @@ export class PrintedFolderModalComponent implements OnInit {
     selectedPrintedFolderElement: any = {};
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any,
@@ -97,7 +99,7 @@ export class PrintedFolderModalComponent implements OnInit {
                         return {
                             id: attachment.resId,
                             label: attachment.title,
-                            chrono: !this.functions.empty(attachment.chrono) ? attachment.chrono : this.lang.undefined,
+                            chrono: !this.functions.empty(attachment.chrono) ? attachment.chrono : this.translate.instant('lang.undefined'),
                             type: attachment.typeLabel,
                             creationDate: attachment.creationDate,
                             canConvert: attachment.canConvert,
@@ -128,7 +130,7 @@ export class PrintedFolderModalComponent implements OnInit {
                         this.printedFolderElement.linkedResources.push({
                             id: data.linkedResources[index].resId,
                             label: data.linkedResources[index].subject,
-                            chrono: !this.functions.empty(data.linkedResources[index].chrono) ? data.linkedResources[index].chrono : this.lang.undefined,
+                            chrono: !this.functions.empty(data.linkedResources[index].chrono) ? data.linkedResources[index].chrono : this.translate.instant('lang.undefined'),
                             creationDate: data.linkedResources[index].documentDate,
                             canConvert: data.linkedResources[index].canConvert
                         });
@@ -155,7 +157,7 @@ export class PrintedFolderModalComponent implements OnInit {
                             label: attachment.title,
                             resIdMaster : resourceMaster.resId,
                             chronoMaster: resourceMaster.chrono,
-                            chrono: !this.functions.empty(attachment.chrono) ? attachment.chrono : this.lang.undefined,
+                            chrono: !this.functions.empty(attachment.chrono) ? attachment.chrono : this.translate.instant('lang.undefined'),
                             type: attachment.typeLabel,
                             creationDate: attachment.creationDate,
                             canConvert: attachment.canConvert,
@@ -186,7 +188,7 @@ export class PrintedFolderModalComponent implements OnInit {
                             id: item.id,
                             recipients: item.recipients,
                             creationDate: item.creation_date,
-                            label: !this.functions.empty(item.object) ? item.object : `<i>${this.lang.emptySubject}<i>`,
+                            label: !this.functions.empty(item.object) ? item.object : `<i>${this.translate.instant('lang.emptySubject')}<i>`,
                             canConvert: true
                         };
                     });
@@ -244,13 +246,13 @@ export class PrintedFolderModalComponent implements OnInit {
                         if (!this.functions.empty(item.contact.email)) {
                             email = item.contact.email;
                         } else {
-                            email = this.lang.contactDeleted;
+                            email = this.translate.instant('lang.contactDeleted');
                         }
                         let name;
                         if (!this.functions.empty(item.contact.firstname) && !this.functions.empty(item.contact.lastname)) {
                             name = `${item.contact.firstname} ${item.contact.lastname}`;
                         } else {
-                            name = this.lang.contactDeleted;
+                            name = this.translate.instant('lang.contactDeleted');
                         }
 
                         return {
@@ -258,7 +260,7 @@ export class PrintedFolderModalComponent implements OnInit {
                             sender: false,
                             recipients: item.format === 'html' ? email : name,
                             creationDate: item.creationDate,
-                            label: item.format === 'html' ? this.lang.ARelectronic : this.lang.ARPaper,
+                            label: item.format === 'html' ? this.translate.instant('lang.ARelectronic') : this.translate.instant('lang.ARPaper'),
                             canConvert: true
                         };
                     });

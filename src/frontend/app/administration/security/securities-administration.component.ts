@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
@@ -29,6 +30,7 @@ export class SecuritiesAdministrationComponent implements OnInit {
 
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -36,7 +38,7 @@ export class SecuritiesAdministrationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.securitiesAdministration);
+        this.headerService.setHeader(this.translate.instant('lang.securitiesAdministration'));
 
         this.loading = true;
 
@@ -104,7 +106,7 @@ export class SecuritiesAdministrationComponent implements OnInit {
         this.http.put('../rest/passwordRules', { rules: this.passwordRulesList })
             .subscribe((data: any) => {
                 this.passwordRulesClone = JSON.parse(JSON.stringify(this.passwordRules));
-                this.notify.success(this.lang.passwordRulesUpdated);
+                this.notify.success(this.translate.instant('lang.passwordRulesUpdated'));
             }, (err: any) => {
                 this.notify.error(err.error.errors);
             });

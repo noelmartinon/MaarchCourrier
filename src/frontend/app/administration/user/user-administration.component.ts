@@ -2,6 +2,7 @@ import { Component, OnInit, NgZone, ViewChild, Inject, TemplateRef, ViewContaine
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -14,6 +15,7 @@ import { SelectionModel } from '@angular/cdk/collections';
 import { AccountLinkComponent } from './account-link/account-link.component';
 import { AppService } from '../../../service/app.service';
 import { PrivilegeService } from '../../../service/privileges.service';
+import { MaarchFlatTreeComponent } from '../../../plugins/tree/maarch-flat-tree.component';
 
 declare var $: any;
 
@@ -25,6 +27,8 @@ export class UserAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild('maarchTree', { static: false }) maarchTree: MaarchFlatTreeComponent;
+
 
     lang: any = LANG;
     loading: boolean = false;
@@ -35,7 +39,8 @@ export class UserAdministrationComponent implements OnInit {
     userId: string;
     mode: string = '';
     user: any = {
-        mode : 'standard'
+        mode: 'standard',
+        authorizedApi: ''
     };
     _search: string = '';
     creationMode: boolean;
@@ -92,19 +97,19 @@ export class UserAdministrationComponent implements OnInit {
     adminModes: any[] = [
         {
             id: 'standard',
-            label : this.lang.standard
+            label: this.translate.instant('lang.standard')
         },
         {
             id: 'root_visible',
-            label : this.lang.root_visible
+            label: this.translate.instant('lang.root_visible')
         },
         {
             id: 'root_invisible',
-            label : this.lang.root_invisible
+            label: this.translate.instant('lang.root_invisible')
         },
         {
             id: 'rest',
-            label : this.lang.rest
+            label: this.translate.instant('lang.rest')
         }
     ];
 
@@ -134,6 +139,7 @@ export class UserAdministrationComponent implements OnInit {
 
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -160,7 +166,7 @@ export class UserAdministrationComponent implements OnInit {
 
             if (typeof params['id'] === 'undefined') {
 
-                this.headerService.setHeader(this.lang.userCreation);
+                this.headerService.setHeader(this.translate.instant('lang.userCreation'));
                 this.creationMode = true;
                 this.canViewPersonalDatas = false;
                 this.canManagePersonalDatas = this.privilegeService.hasCurrentUserPrivilege('manage_personal_data');
@@ -172,6 +178,10 @@ export class UserAdministrationComponent implements OnInit {
                 this.http.get('../rest/users/' + this.serialId + '/details')
                     .subscribe((data: any) => {
                         this.user = data;
+
+                        if (this.user.mode === 'rest') {
+                            this.user.authorizedApi = this.user.authorizedApi.join('\n');
+                        }
 
                         if (this.headerService.user.id === this.user.id) {
                             this.canViewPersonalDatas = true;
@@ -190,7 +200,7 @@ export class UserAdministrationComponent implements OnInit {
                         this.data = data.history;
                         this.userId = data.user_id;
                         this.minDate = new Date(this.CurrentYear + '-' + this.currentMonth + '-01');
-                        this.headerService.setHeader(this.lang.userModification, data.firstname + ' ' + data.lastname);
+                        this.headerService.setHeader(this.translate.instant('lang.userModification'), data.firstname + ' ' + data.lastname);
 
                         if (this.user.external_id.maarchParapheur !== undefined) {
                             this.checkInfoMaarchParapheurAccount();
@@ -242,7 +252,7 @@ export class UserAdministrationComponent implements OnInit {
                 this.user.canCreateMaarchParapheurUser = false;
                 this.user.external_id['maarchParapheur'] = externalId;
                 this.checkInfoMaarchParapheurAccount();
-                this.notify.success(this.lang.accountLinked);
+                this.notify.success(this.translate.instant('lang.accountLinked'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -254,10 +264,10 @@ export class UserAdministrationComponent implements OnInit {
                 this.user.canCreateMaarchParapheurUser = false;
                 this.user.external_id['maarchParapheur'] = data.externalId;
                 this.checkInfoMaarchParapheurAccount();
-                this.notify.success(this.lang.accountAdded);
+                this.notify.success(this.translate.instant('lang.accountAdded'));
             }, (err) => {
                 if (err.error.errors === 'Login already exists') {
-                    err.error.errors = this.lang.loginAlreadyExistsInMaarchParapheur;
+                    err.error.errors = this.translate.instant('lang.loginAlreadyExistsInMaarchParapheur');
                 }
                 this.notify.error(err.error.errors);
             });
@@ -274,7 +284,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     unlinkMaarchParapheurAccount() {
-        const r = confirm(this.lang.confirmAction + ' ' + this.lang.unlinkAccount);
+        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.unlinkAccount'));
 
         if (r) {
             this.http.put('../rest/users/' + this.serialId + '/unlinkToMaarchParapheur', {})
@@ -282,7 +292,7 @@ export class UserAdministrationComponent implements OnInit {
                     this.user.canCreateMaarchParapheurUser = true;
                     this.maarchParapheurLink.login = '';
                     this.maarchParapheurLink.picture = '';
-                    this.notify.success(this.lang.accountUnlinked);
+                    this.notify.success(this.translate.instant('lang.accountUnlinked'));
                     this.maarchParapheurConnectionStatus = true;
                 }, (err) => {
                     this.notify.error(err.error.errors);
@@ -303,7 +313,15 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     initService() {
-        if ($('.jstree-container-ul').length === 0) {
+        if (this.maarchTree.rawData.length === 0) {
+            this.maarchTree.initData(this.user.allEntities.map((ent: any) => {
+                return {
+                    ...ent,
+                    parent_id : ent.parent,
+            };
+            }));
+        }
+        /*if ($('.jstree-container-ul').length === 0) {
             $('#jstree').jstree({
                 'checkbox': {
                     'three_state': false // no cascade selection
@@ -338,7 +356,7 @@ export class UserAdministrationComponent implements OnInit {
                     $('#jstree').jstree(true).search(v);
                 }, 250);
             });
-        }
+        }*/
     }
 
     processAfterUpload(b64Content: any) {
@@ -390,12 +408,12 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     resendActivationNotification() {
-        let r = confirm(this.lang.confirmAction + ' ' + this.lang.sendActivationNotification);
+        let r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.sendActivationNotification'));
 
         if (r) {
             this.http.put('../rest/users/' + this.serialId + '/accountActivationNotification', {})
                 .subscribe((data: any) => {
-                    this.notify.success(this.lang.activationNotificationSend);
+                    this.notify.success(this.translate.instant('lang.activationNotificationSend'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -416,7 +434,7 @@ export class UserAdministrationComponent implements OnInit {
                         await this.headerService.resfreshCurrentUser();
                         this.privilegeService.resfreshUserShortcuts();
                     }
-                    this.notify.success(this.lang.groupAdded);
+                    this.notify.success(this.translate.instant('lang.groupAdded'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -430,7 +448,7 @@ export class UserAdministrationComponent implements OnInit {
                         await this.headerService.resfreshCurrentUser();
                         this.privilegeService.resfreshUserShortcuts();
                     }
-                    this.notify.success(this.lang.groupDeleted);
+                    this.notify.success(this.translate.instant('lang.groupDeleted'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -440,35 +458,37 @@ export class UserAdministrationComponent implements OnInit {
     updateGroup(group: any) {
         this.http.put('../rest/users/' + this.serialId + '/groups/' + group.group_id, group)
             .subscribe((data: any) => {
-                this.notify.success(this.lang.groupUpdated);
+                this.notify.success(this.translate.instant('lang.groupUpdated'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
     }
 
-    addEntity(entiyId: any) {
-        const entity = {
-            'entityId': entiyId,
-            'role': ''
-        };
+    addEntity(entities: any[]) {
+        entities.forEach(ent => {
+            const entity = {
+                'entityId': ent.entity_id,
+                'role': ''
+            };
+            this.http.post('../rest/users/' + this.serialId + '/entities', entity)
+                .subscribe((data: any) => {
+                    this.user.entities = data.entities;
+                    this.user.allEntities = data.allEntities;
+                    if (this.headerService.user.id == this.serialId) {
+                        this.headerService.resfreshCurrentUser();
+                    }
+                    this.notify.success(this.translate.instant('lang.entityAdded'));
+                }, (err) => {
+                    this.notify.error(err.error.errors);
+                });
+        });
 
-        this.http.post('../rest/users/' + this.serialId + '/entities', entity)
-            .subscribe((data: any) => {
-                this.user.entities = data.entities;
-                this.user.allEntities = data.allEntities;
-                if (this.headerService.user.id == this.serialId) {
-                    this.headerService.resfreshCurrentUser();
-                }
-                this.notify.success(this.lang.entityAdded);
-            }, (err) => {
-                this.notify.error(err.error.errors);
-            });
     }
 
     updateEntity(entity: any) {
         this.http.put('../rest/users/' + this.serialId + '/entities/' + entity.entity_id, entity)
             .subscribe(() => {
-                this.notify.success(this.lang.entityUpdated);
+                this.notify.success(this.translate.instant('lang.entityUpdated'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -478,65 +498,77 @@ export class UserAdministrationComponent implements OnInit {
         this.http.put('../rest/users/' + this.serialId + '/entities/' + entity.entity_id + '/primaryEntity', {})
             .subscribe((data: any) => {
                 this.user['entities'] = data.entities;
-                this.notify.success(this.lang.entityTooglePrimary + ' « ' + entity.entity_id + ' »');
+                this.notify.success(this.translate.instant('lang.entityTooglePrimary') + ' « ' + entity.entity_id + ' »');
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
     }
 
-    deleteEntity(entityId: any) {
+    deleteEntity(entities: any[]) {
 
-        // first check confidential state
-        this.http.get('../rest/users/' + this.serialId + '/entities/' + entityId)
-            .subscribe((data: any) => {
-                if (!data['hasConfidentialityInstances'] && !data['hasListTemplates']) {
-                    this.http.delete('../rest/users/' + this.serialId + '/entities/' + entityId)
-                        .subscribe((dataEntities: any) => {
-                            this.user.entities = dataEntities.entities;
-                            this.user.allEntities = dataEntities.allEntities;
-                            if (this.headerService.user.id == this.serialId) {
-                                this.headerService.resfreshCurrentUser();
+        entities.forEach(ent => {
+            const entityId = ent.entity_id;
+            // first check confidential state
+            this.http.get('../rest/users/' + this.serialId + '/entities/' + entityId)
+                .subscribe((data: any) => {
+                    if (!data['hasConfidentialityInstances'] && !data['hasListTemplates']) {
+                        this.http.delete('../rest/users/' + this.serialId + '/entities/' + entityId)
+                            .subscribe((dataEntities: any) => {
+                                this.user.entities = dataEntities.entities;
+                                this.user.allEntities = dataEntities.allEntities;
+                                if (this.headerService.user.id == this.serialId) {
+                                    this.headerService.resfreshCurrentUser();
+                                }
+                                this.notify.success(this.translate.instant('lang.entityDeleted'));
+                            }, (err) => {
+                                this.notify.error(err.error.errors);
+                            });
+                    } else {
+                        this.config = { panelClass: 'maarch-modal', data: { hasConfidentialityInstances: data['hasConfidentialityInstances'], hasListTemplates: data['hasListTemplates'] } };
+                        this.dialogRef = this.dialog.open(UserAdministrationRedirectModalComponent, this.config);
+                        this.dialogRef.afterClosed().subscribe((result: any) => {
+                            this.mode = 'delete';
+                            if (result) {
+                                this.mode = result.processMode;
+                                this.http.request('DELETE', '../rest/users/' + this.serialId + '/entities/' + entityId, { body: { 'mode': this.mode, 'newUser': result.newUser } })
+                                    .subscribe((dataEntities: any) => {
+                                        this.user.entities = dataEntities.entities;
+                                        this.user.allEntities = dataEntities.allEntities;
+                                        if (this.headerService.user.id == this.serialId) {
+                                            this.headerService.resfreshCurrentUser();
+                                        }
+                                        this.notify.success(this.translate.instant('lang.entityDeleted'));
+                                    }, (err) => {
+                                        this.notify.error(err.error.errors);
+                                    });
+                            } else {
+                                this.maarchTree.toggleNode(
+                                    this.maarchTree.dataSource.data,
+                                    {
+                                        selected: true,
+                                        opened: true
+                                    },
+                                    [ent.id]
+                                );
+                                // $('#jstree').jstree('select_node', entityId);
+                                this.mode = '';
                             }
-                            this.notify.success(this.lang.entityDeleted);
-                        }, (err) => {
-                            this.notify.error(err.error.errors);
+                            this.dialogRef = null;
                         });
-                } else {
-                    this.config = { panelClass: 'maarch-modal', data: { hasConfidentialityInstances: data['hasConfidentialityInstances'], hasListTemplates: data['hasListTemplates'] } };
-                    this.dialogRef = this.dialog.open(UserAdministrationRedirectModalComponent, this.config);
-                    this.dialogRef.afterClosed().subscribe((result: any) => {
-                        this.mode = 'delete';
-                        if (result) {
-                            this.mode = result.processMode;
-                            this.http.request('DELETE', '../rest/users/' + this.serialId + '/entities/' + entityId, { body: { 'mode': this.mode, 'newUser': result.newUser } })
-                                .subscribe((dataEntities: any) => {
-                                    this.user.entities = dataEntities.entities;
-                                    this.user.allEntities = dataEntities.allEntities;
-                                    if (this.headerService.user.id == this.serialId) {
-                                        this.headerService.resfreshCurrentUser();
-                                    }
-                                    this.notify.success(this.lang.entityDeleted);
-                                }, (err) => {
-                                    this.notify.error(err.error.errors);
-                                });
-                        } else {
-                            $('#jstree').jstree('select_node', entityId);
-                            this.mode = '';
-                        }
-                        this.dialogRef = null;
-                    });
-                }
+                    }
 
-            }, (err) => {
-                this.notify.error(err.error.errors);
-            });
+                }, (err) => {
+                    this.notify.error(err.error.errors);
+                });
+        });
+
     }
 
     submitSignature() {
         this.http.post('../rest/users/' + this.serialId + '/signatures', this.signatureModel)
             .subscribe((data: any) => {
                 this.user.signatures = data.signatures;
-                this.notify.success(this.lang.signAdded);
+                this.notify.success(this.translate.instant('lang.signAdded'));
                 this.signatureModel = {
                     base64: '',
                     base64ForJs: '',
@@ -557,20 +589,20 @@ export class UserAdministrationComponent implements OnInit {
         this.http.put('../rest/users/' + this.serialId + '/signatures/' + id, { 'label': label })
             .subscribe((data: any) => {
                 this.user.signatures[selectedSignature].signature_label = data.signature.signature_label;
-                this.notify.success(this.lang.signUpdated);
+                this.notify.success(this.translate.instant('lang.signUpdated'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
     }
 
     deleteSignature(signature: any) {
-        const r = confirm(this.lang.confirmAction + ' ' + this.lang.delete + ' « ' + signature.signature_label + ' »');
+        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + signature.signature_label + ' »');
 
         if (r) {
             this.http.delete('../rest/users/' + this.serialId + '/signatures/' + signature.id)
                 .subscribe((data: any) => {
                     this.user.signatures = data.signatures;
-                    this.notify.success(this.lang.signDeleted);
+                    this.notify.success(this.translate.instant('lang.signDeleted'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -611,7 +643,7 @@ export class UserAdministrationComponent implements OnInit {
             );
         });
 
-        const r = confirm(this.lang.confirmAction + ' ' + this.lang.redirectBasket);
+        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.redirectBasket'));
 
         if (r) {
             this.http.post('../rest/users/' + this.serialId + '/redirectedBaskets', basketsRedirect)
@@ -619,7 +651,7 @@ export class UserAdministrationComponent implements OnInit {
                     this.user.baskets = data['baskets'];
                     this.user.redirectedBaskets = data['redirectedBaskets'];
                     this.selectionBaskets.clear();
-                    this.notify.success(this.lang.basketUpdated);
+                    this.notify.success(this.translate.instant('lang.basketUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -627,7 +659,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     reassignBasketRedirection(newUser: any, basket: any, i: number) {
-        const r = confirm(this.lang.confirmAction + ' ' + this.lang.redirectBasket);
+        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.redirectBasket'));
 
         if (r) {
             this.http.post('../rest/users/' + this.serialId + '/redirectedBaskets', [
@@ -641,7 +673,7 @@ export class UserAdministrationComponent implements OnInit {
                 .subscribe((data: any) => {
                     this.user.baskets = data['baskets'];
                     this.user.assignedBaskets.splice(i, 1);
-                    this.notify.success(this.lang.basketUpdated);
+                    this.notify.success(this.translate.instant('lang.basketUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -649,14 +681,14 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     delBasketRedirection(basket: any, i: number) {
-        const r = confirm(this.lang.confirmAction);
+        const r = confirm(this.translate.instant('lang.confirmAction'));
 
         if (r) {
             this.http.delete('../rest/users/' + this.serialId + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
                 .subscribe((data: any) => {
                     this.user.baskets = data['baskets'];
                     this.user.redirectedBaskets.splice(i, 1);
-                    this.notify.success(this.lang.basketUpdated);
+                    this.notify.success(this.translate.instant('lang.basketUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -664,14 +696,14 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     delBasketAssignRedirection(basket: any, i: number) {
-        const r = confirm(this.lang.confirmAction);
+        const r = confirm(this.translate.instant('lang.confirmAction'));
 
         if (r) {
             this.http.delete('../rest/users/' + this.serialId + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
                 .subscribe((data: any) => {
                     this.user.baskets = data['baskets'];
                     this.user.assignedBaskets.splice(i, 1);
-                    this.notify.success(this.lang.basketUpdated);
+                    this.notify.success(this.translate.instant('lang.basketUpdated'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
@@ -692,7 +724,7 @@ export class UserAdministrationComponent implements OnInit {
             this.http.put('../rest/users/' + this.serialId + '/baskets', { 'baskets': basketsDisable })
                 .subscribe((data: any) => {
                     this.selectionBaskets.clear();
-                    this.notify.success(this.lang.basketsUpdated);
+                    this.notify.success(this.translate.instant('lang.basketsUpdated'));
                 }, (err: any) => {
                     this.notify.error(err.error.errors);
                 });
@@ -704,7 +736,7 @@ export class UserAdministrationComponent implements OnInit {
             .subscribe((data: any) => {
                 this.user.status = data.user.status;
                 this.userAbsenceModel = [];
-                this.notify.success(this.lang.absOn);
+                this.notify.success(this.translate.instant('lang.absOn'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -714,7 +746,7 @@ export class UserAdministrationComponent implements OnInit {
         this.http.put('../rest/users/' + this.serialId + '/status', { 'status': 'OK' })
             .subscribe((data: any) => {
                 this.user.status = data.user.status;
-                this.notify.success(this.lang.absOff);
+                this.notify.success(this.translate.instant('lang.absOff'));
             }, (err: any) => {
                 this.notify.error(err.error.errors);
             });
@@ -727,19 +759,19 @@ export class UserAdministrationComponent implements OnInit {
             this.firstFormGroup.controls['retypePasswordCtrl'].setErrors(null);
         }
         if (this.firstFormGroup.controls['newPasswordCtrl'].hasError('required')) {
-            return this.lang.requiredField + ' !';
+            return this.translate.instant('lang.requiredField') + ' !';
 
         } else if (this.firstFormGroup.controls['newPasswordCtrl'].hasError('minlength') && this.passwordRules.minLength.enabled) {
-            return this.passwordRules.minLength.value + ' ' + this.lang.passwordminLength + ' !';
+            return this.passwordRules.minLength.value + ' ' + this.translate.instant('lang.passwordminLength') + ' !';
 
         } else if (this.firstFormGroup.controls['newPasswordCtrl'].errors != null && this.firstFormGroup.controls['newPasswordCtrl'].errors.complexityUpper !== undefined && this.passwordRules.complexityUpper.enabled) {
-            return this.lang.passwordcomplexityUpper + ' !';
+            return this.translate.instant('lang.passwordcomplexityUpper') + ' !';
 
         } else if (this.firstFormGroup.controls['newPasswordCtrl'].errors != null && this.firstFormGroup.controls['newPasswordCtrl'].errors.complexityNumber !== undefined && this.passwordRules.complexityNumber.enabled) {
-            return this.lang.passwordcomplexityNumber + ' !';
+            return this.translate.instant('lang.passwordcomplexityNumber') + ' !';
 
         } else if (this.firstFormGroup.controls['newPasswordCtrl'].errors != null && this.firstFormGroup.controls['newPasswordCtrl'].errors.complexitySpecial !== undefined && this.passwordRules.complexitySpecial.enabled) {
-            return this.lang.passwordcomplexitySpecial + ' !';
+            return this.translate.instant('lang.passwordcomplexitySpecial') + ' !';
 
         } else {
             this.firstFormGroup.controls['newPasswordCtrl'].setErrors(null);
@@ -815,7 +847,7 @@ export class UserAdministrationComponent implements OnInit {
                         this.passwordRules.renewal.enabled = rule.enabled;
                         this.passwordRules.renewal.value = rule.value;
                         if (rule.enabled) {
-                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.lang.days + '</b>. ' + this.lang['password2' + rule.label] + '.');
+                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.translate.instant('lang.days') + '</b>. ' + this.lang['password2' + rule.label] + '.');
                         }
                     } else if (rule.label === 'historyLastUse') {
                         this.passwordRules.historyLastUse.enabled = rule.enabled;
@@ -869,7 +901,7 @@ export class UserAdministrationComponent implements OnInit {
                     newPassword: '',
                     reNewPassword: '',
                 };
-                this.notify.success(this.lang.passwordUpdated);
+                this.notify.success(this.translate.instant('lang.passwordUpdated'));
             }, (err: any) => {
                 this.notify.error(err.error.errors);
             });
@@ -883,16 +915,16 @@ export class UserAdministrationComponent implements OnInit {
                 .subscribe((data: any) => {
                     let deletedUser = false;
                     if (data.status && data.status === 'DEL') {
-                        r = confirm(this.lang.reactivateUserDeleted);
+                        r = confirm(this.translate.instant('lang.reactivateUserDeleted'));
                         deletedUser = true;
                     }
                     if (r) {
                         this.http.post('../rest/users', this.user)
                             .subscribe((result: any) => {
                                 if (deletedUser) {
-                                    this.notify.success(this.lang.userUpdated);
+                                    this.notify.success(this.translate.instant('lang.userUpdated'));
                                 } else {
-                                    this.notify.success(this.lang.userAdded);
+                                    this.notify.success(this.translate.instant('lang.userAdded'));
                                 }
                                 this.router.navigate(['/administration/users/' + result.id]);
                             }, (err: any) => {
@@ -903,12 +935,18 @@ export class UserAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put('../rest/users/' + this.serialId, this.user)
+            const user = {
+                ...this.user
+            };
+            if (this.user.mode === 'rest') {
+                user.authorizedApi = this.user.authorizedApi.split('\n')[0] !== '' ? this.user.authorizedApi.split('\n') : [];
+            }
+            this.http.put('../rest/users/' + this.serialId, user)
                 .subscribe((data: any) => {
                     if (this.headerService.user.id == this.serialId) {
                         this.headerService.resfreshCurrentUser();
                     }
-                    this.notify.success(this.lang.userUpdated);
+                    this.notify.success(this.translate.instant('lang.userUpdated'));
                 }, (err: any) => {
                     this.notify.error(err.error.errors);
                 });
@@ -924,12 +962,12 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     sendToMaarchParapheur() {
-        const r = confirm(this.lang.confirmAction + ' ' + this.lang.createUserInMaarchParapheur);
+        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.createUserInMaarchParapheur'));
 
         if (r) {
             this.http.put('../rest/users/' + this.serialId + '/maarchParapheur', '')
                 .subscribe((data: any) => {
-                    this.notify.success(this.lang.userCreatedInMaarchParapheur);
+                    this.notify.success(this.translate.instant('lang.userCreatedInMaarchParapheur'));
                     this.user.external_id['maarchParapheur'] = data.externalId;
                     this.user.canCreateMaarchParapheurUser = false;
                 }, (err: any) => {
@@ -948,7 +986,7 @@ export class UserAdministrationComponent implements OnInit {
         this.http.put('../rest/users/' + this.user.id + '/externalSignatures', {})
             .subscribe((data: any) => {
                 this.loadingSign = false;
-                this.notify.success(this.lang.signsSynchronized);
+                this.notify.success(this.translate.instant('lang.signsSynchronized'));
             }, (err) => {
                 this.loadingSign = false;
                 this.notify.error(err.error.errors);

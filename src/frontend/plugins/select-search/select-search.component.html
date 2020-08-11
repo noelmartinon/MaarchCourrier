@@ -8,7 +8,7 @@
       [ngClass]="{'mat-select-search-inner-multiple': matSelect.multiple}">
       <input matInput id="searchSelectInput" [formControl]="formControlSearch" class="mat-select-search-input"
         #searchSelectInput (keydown)="_handleKeydown($event)" (input)="onInputChange($event.target.value)"
-        (blur)="onBlur($event.target.value)" [placeholder]="lang.filterBy" />
+        (blur)="onBlur($event.target.value)" [placeholder]="this.translate.instant('lang.filterBy')" />
       <button mat-button *ngIf="formControlSearch.value" mat-icon-button aria-label="Clear" (click)="_reset(true)"
         class="mat-select-search-clear">
         <mat-icon class="fa fa-times"></mat-icon>
@@ -16,7 +16,7 @@
     </div>
 
     <div *ngIf="value && _options?.length === 0 && datas.length > 5" class="mat-select-search-no-entries-found">
-      {{lang.noResult}}
+      {{'lang.noResult' | translate}}
     </div>
     <mat-option *ngIf="showResetOption" [value]="null"></mat-option>
     <mat-option *ngFor="let value of filteredDatas | async" [value]="returnValue === 'id' ? value.id : value"

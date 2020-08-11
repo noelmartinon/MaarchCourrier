@@ -13,6 +13,8 @@ import { HeaderService } from '../../service/header.service';
 import { FunctionsService } from '../../service/functions.service';
 import { TimeLimitPipe } from '../../plugins/timeLimit.pipe';
 import { AlertComponent } from '../../plugins/modal/alert.component';
+import { TranslateService } from '@ngx-translate/core';
+import { LocalStorageService } from '../../service/local-storage.service';
 
 @Component({
     templateUrl: 'login.component.html',
@@ -30,11 +32,13 @@ export class LoginComponent implements OnInit {
     loginMessage: string = '';
 
     constructor(
+        private translate: TranslateService,
         private langService: LangService,
         private http: HttpClient,
         private router: Router,
         private headerService: HeaderService,
         public authService: AuthService,
+        private localStorage: LocalStorageService,
         private functionsService: FunctionsService,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -75,6 +79,7 @@ export class LoginComponent implements OnInit {
             }
         ).pipe(
             tap((data: any) => {
+                this.localStorage.resetLocal();
                 this.authService.saveTokens(data.headers.get('Token'), data.headers.get('Refresh-Token'));
                 this.authService.setUser({});
                 if (this.authService.getCachedUrl()) {
@@ -89,11 +94,11 @@ export class LoginComponent implements OnInit {
             catchError((err: any) => {
                 this.loading = false;
                 if (err.error.errors === 'Authentication Failed') {
-                    this.notify.error(this.lang.wrongLoginPassword);
+                    this.notify.error(this.translate.instant('lang.wrongLoginPassword'));
                 } else if (err.error.errors === 'Account Suspended') {
-                    this.notify.error(this.lang.accountSuspended);
+                    this.notify.error(this.translate.instant('lang.accountSuspended'));
                 } else if (err.error.errors === 'Account Locked') {
-                    this.notify.error(this.lang.accountLocked + ' ' + this.timeLimit.transform(err.error.date));
+                    this.notify.error(this.translate.instant('lang.accountLocked') + ' ' + this.timeLimit.transform(err.error.date));
                 } else {
                     this.notify.handleSoftErrors(err);
                 }
@@ -119,9 +124,9 @@ export class LoginComponent implements OnInit {
                         if (!this.functionsService.empty(data.url)) {
                             window.location.href = data.url;
                         } else if (data.lang === 'moreOneCustom') {
-                            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.accessNotFound, msg: this.lang.moreOneCustom, hideButton: true } });
+                            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.accessNotFound'), msg: this.translate.instant('lang.moreOneCustom'), hideButton: true } });
                         } else if (data.lang === 'noConfiguration') {
-                            // TO DO : LAUNCH INSTALLER
+                            this.router.navigate(['/install']);
                         } else {
                             this.notify.handleSoftErrors(err);
                         }

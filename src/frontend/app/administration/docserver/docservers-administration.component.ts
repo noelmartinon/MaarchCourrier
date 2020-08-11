@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -27,6 +28,7 @@ export class DocserversAdministrationComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -35,7 +37,7 @@ export class DocserversAdministrationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.administration + ' ' + this.lang.docservers);
+        this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.docservers'));
 
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
@@ -78,7 +80,7 @@ export class DocserversAdministrationComponent implements OnInit {
             .subscribe((data: any) => {
                 this.docservers[docserver.docserver_type_id][i] = data['docserver'];
                 this.docserversClone[docserver.docserver_type_id][i] = JSON.parse(JSON.stringify(this.docservers[docserver.docserver_type_id][i]));
-                this.notify.success(this.lang.docserverUpdated);
+                this.notify.success(this.translate.instant('lang.docserverUpdated'));
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -87,16 +89,16 @@ export class DocserversAdministrationComponent implements OnInit {
     delete(docserver: any, i: number) {
         let r = null;
         if (docserver.actual_size_number === 0) {
-            r = confirm(this.lang.delete + ' ?');
+            r = confirm(this.translate.instant('lang.delete') + ' ?');
         } else {
-            r = confirm(this.lang.docserverdeleteWarning);
+            r = confirm(this.translate.instant('lang.docserverdeleteWarning'));
         }
 
         if (r) {
             this.http.delete('../rest/docservers/' + docserver.id)
                 .subscribe(() => {
                     this.docservers[docserver.docserver_type_id].splice(i, 1);
-                    this.notify.success(this.lang.docserverDeleted);
+                    this.notify.success(this.translate.instant('lang.docserverDeleted'));
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });

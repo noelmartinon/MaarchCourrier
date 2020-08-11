@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, ElementRef, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../service/header.service';
 import { AppService } from '../../../../service/app.service';
@@ -62,6 +63,7 @@ export class HistoryBatchAdministrationComponent implements OnInit {
     subMenus: any[] = [];
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -80,13 +82,13 @@ export class HistoryBatchAdministrationComponent implements OnInit {
                 {
                     icon: 'fa fa-history',
                     route: '/administration/history',
-                    label: this.lang.history,
+                    label: this.translate.instant('lang.history'),
                     current: false
                 },
                 {
                     icon: 'fa fa-history',
                     route: '/administration/history-batch',
-                    label: this.lang.historyBatch,
+                    label: this.translate.instant('lang.historyBatch'),
                     current: true
                 }
             ];
@@ -95,7 +97,7 @@ export class HistoryBatchAdministrationComponent implements OnInit {
                 {
                     icon: 'fa fa-history',
                     route: '/administration/history-batch',
-                    label: this.lang.historyBatch,
+                    label: this.translate.instant('lang.historyBatch'),
                     current: true
                 }
             ];
@@ -125,7 +127,7 @@ export class HistoryBatchAdministrationComponent implements OnInit {
                     this.isLoadingResults = false;
                     data = this.processPostData(data);
                     this.resultsLength = data.count;
-                    this.headerService.setHeader(this.lang.administration + ' ' + this.lang.historyBatch.toLowerCase(), '', '');
+                    this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.historyBatch').toLowerCase(), '', '');
                     return data.history;
                 }),
                 catchError((err: any) => {
@@ -166,7 +168,7 @@ export class HistoryBatchAdministrationComponent implements OnInit {
                     returnData.totalErrors = [
                         {
                             id: 'errorElement',
-                            label: this.lang.totalErrors
+                            label: this.translate.instant('lang.totalErrors')
                         }
                     ];
 

@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild, EventEmitter, Output } from '@angular/core';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { DiffusionsListComponent } from '../../diffusions/diffusions-list.component';
 import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
 import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
@@ -38,7 +39,7 @@ export class PanelListComponent implements OnInit {
     @ViewChild('appNotesList', { static: false }) appNotesList: NotesListComponent;
     @ViewChild('appAttachmentsList', { static: false }) appAttachmentsList: AttachmentsListComponent;
 
-    constructor() { }
+    constructor(private translate: TranslateService) { }
 
     ngOnInit(): void { }
 

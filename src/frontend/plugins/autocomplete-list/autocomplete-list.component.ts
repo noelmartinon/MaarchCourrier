@@ -4,6 +4,7 @@ import { Input, EventEmitter, Output, ViewChild, ElementRef } from '@angular/cor
 import { map, startWith } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
 import { LANG } from '../../app/translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatChipInputEvent } from '@angular/material/chips';
@@ -73,6 +74,7 @@ export class AutocompleteListComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,

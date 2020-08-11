@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
 import { HistoryComponent } from '../../history/history.component';
@@ -27,18 +28,19 @@ export class HistoryAdministrationComponent implements OnInit {
         {
             icon: 'fa fa-history',
             route: '/administration/history',
-            label: this.lang.history,
+            label: this.translate.instant('lang.history'),
             current: true
         },
         {
             icon: 'fa fa-history',
             route: '/administration/history-batch',
-            label: this.lang.historyBatch,
+            label: this.translate.instant('lang.historyBatch'),
             current: false
         }
     ];
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         public appService: AppService,
         public functions: FunctionsService,
@@ -47,7 +49,7 @@ export class HistoryAdministrationComponent implements OnInit {
         private viewContainerRef: ViewContainerRef) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.lang.administration + ' ' + this.lang.history.toLowerCase(), '', '');
+        this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.history').toLowerCase(), '', '');
 
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
         
@@ -56,13 +58,13 @@ export class HistoryAdministrationComponent implements OnInit {
                 {
                     icon: 'fa fa-history',
                     route: '/administration/history',
-                    label: this.lang.history,
+                    label: this.translate.instant('lang.history'),
                     current: true
                 },
                 {
                     icon: 'fa fa-history',
                     route: '/administration/history-batch',
-                    label: this.lang.historyBatch,
+                    label: this.translate.instant('lang.historyBatch'),
                     current: false
                 }
             ];
@@ -71,7 +73,7 @@ export class HistoryAdministrationComponent implements OnInit {
                 {
                     icon: 'fa fa-history',
                     route: '/administration/history',
-                    label: this.lang.history,
+                    label: this.translate.instant('lang.history'),
                     current: true
                 }
             ];

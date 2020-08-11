@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, ElementRef, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { HeaderService } from '../../service/header.service';
 import { Observable, merge, Subject, of as observableOf, of } from 'rxjs';
@@ -65,6 +66,7 @@ export class HistoryComponent implements OnInit {
     private destroy$ = new Subject<boolean>();
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -145,7 +147,7 @@ export class HistoryComponent implements OnInit {
         data.history = data.history.map((item: any) => {
             return {
                 ...item,
-                userLabel : !this.functions.empty(item.userLabel) ? item.userLabel : this.lang.userDeleted
+                userLabel : !this.functions.empty(item.userLabel) ? item.userLabel : this.translate.instant('lang.userDeleted')
             }
         })
         return data;
@@ -173,7 +175,7 @@ export class HistoryComponent implements OnInit {
                     if (deletedActions.length > 0) {
                         data.actions.push({
                             id: deletedActions,
-                            label: this.lang.actionDeleted
+                            label: this.translate.instant('lang.actionDeleted')
                         });
                     }
 
@@ -182,7 +184,7 @@ export class HistoryComponent implements OnInit {
                     if (deletedUser.length > 0) {
                         data.users.push({
                             id: deletedUser,
-                            label: this.lang.userDeleted
+                            label: this.translate.instant('lang.userDeleted')
                         });
                     }
 

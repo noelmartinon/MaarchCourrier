@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { LANG } from '../../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { HttpClient } from '@angular/common/http';
 import { FormControl } from '@angular/forms';
@@ -32,7 +33,7 @@ export class XParaphComponent implements OnInit {
     @Input() additionalsInfos: any;
     @Input() externalSignatoryBookDatas: any;
 
-    constructor(public http: HttpClient, private notify: NotificationService) { }
+    constructor(private translate: TranslateService, public http: HttpClient, private notify: NotificationService) { }
 
     ngOnInit(): void { }
 
@@ -143,7 +144,7 @@ export class XParaphComponent implements OnInit {
                 this.loading = false;
                 this.addAccountMode = false;
 
-                this.notify.success(this.lang.accountAdded);
+                this.notify.success(this.translate.instant('lang.accountAdded'));
             }, (err: any) => {
                 this.notify.handleErrors(err);
                 this.loading = false;
@@ -151,13 +152,13 @@ export class XParaphComponent implements OnInit {
     }
 
     removeAccount(index: number) {
-        const r = confirm(this.lang.confirmDeleteAccount);
+        const r = confirm(this.translate.instant('lang.confirmDeleteAccount'));
 
         if (r) {
             this.http.delete('../rest/xParaphAccount?siret=' + this.additionalsInfos.accounts[index].siret + '&login=' + this.additionalsInfos.accounts[index].login)
                 .subscribe((data: any) => {
                     this.additionalsInfos.accounts.splice(index, 1);
-                    this.notify.success(this.lang.accountDeleted);
+                    this.notify.success(this.translate.instant('lang.accountDeleted'));
                 }, (err: any) => {
                     this.notify.handleErrors(err);
                     this.loading = false;

@@ -5,6 +5,7 @@ import { Observable, of, forkJoin } from 'rxjs';
 import { map, startWith, debounceTime, filter, distinctUntilChanged, switchMap, tap, exhaustMap, catchError } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
 import { LANG } from '../../app/translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { ConfirmComponent } from '../modal/confirm.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -104,6 +105,7 @@ export class PluginAutocomplete implements OnInit {
     dialogRef: MatDialogRef<any>;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -113,8 +115,8 @@ export class PluginAutocomplete implements OnInit {
     ngOnInit() {
         this.appearance = this.appearance === undefined ? 'legacy' : 'outline';
         this.singleMode = this.singleMode === undefined ? false : true;
-        this.optGroupLabel = this.optGroupLabel === undefined ? this.lang.availableValues : this.optGroupLabel;
-        this.placeholder = this.placeholder === undefined ? this.lang.chooseValue : this.placeholder;
+        this.optGroupLabel = this.optGroupLabel === undefined ? this.translate.instant('lang.availableValues') : this.optGroupLabel;
+        this.placeholder = this.placeholder === undefined ? this.translate.instant('lang.chooseValue') : this.placeholder;
 
         if (this.controlAutocomplete !== undefined) {
             this.controlAutocomplete.setValue(this.controlAutocomplete.value === null || this.controlAutocomplete.value === '' ? [] : this.controlAutocomplete.value);
@@ -131,7 +133,7 @@ export class PluginAutocomplete implements OnInit {
     }
 
     initAutocompleteData() {
-        this.listInfo = this.lang.noAvailableValue;
+        this.listInfo = this.translate.instant('lang.noAvailableValue');
         this.filteredOptions = this.myControl.valueChanges
             .pipe(
                 startWith(''),
@@ -140,7 +142,7 @@ export class PluginAutocomplete implements OnInit {
     }
 
     initAutocompleteRoute() {
-        this.listInfo = this.lang.autocompleteInfo;
+        this.listInfo = this.translate.instant('lang.autocompleteInfo');
         this.options = [];
         this.myControl.valueChanges
             .pipe(
@@ -152,9 +154,9 @@ export class PluginAutocomplete implements OnInit {
                 tap((data: any) => {
                     if (data.length === 0) {
                         if (this.manageDatas !== undefined) {
-                            this.listInfo = this.lang.noAvailableValue + ' <div>' + this.lang.typeEnterToCreate + '</div>';
+                            this.listInfo = this.translate.instant('lang.noAvailableValue') + ' <div>' + this.translate.instant('lang.typeEnterToCreate') + '</div>';
                         } else {
-                            this.listInfo = this.lang.noAvailableValue;
+                            this.listInfo = this.translate.instant('lang.noAvailableValue');
                         }
                     } else {
                         this.listInfo = '';
@@ -230,7 +232,7 @@ export class PluginAutocomplete implements OnInit {
         }
         if (this.routeDatas !== undefined) {
             this.options = [];
-            this.listInfo = this.lang.autocompleteInfo;
+            this.listInfo = this.translate.instant('lang.autocompleteInfo');
         }
     }
 
@@ -261,7 +263,7 @@ export class PluginAutocomplete implements OnInit {
 
             newElem[this.key] = this.myControl.value;
 
-            this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.confirm, msg: 'Voulez-vous créer cet élément <b>' + newElem[this.key] + '</b>&nbsp;?' } });
+            this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirm'), msg: 'Voulez-vous créer cet élément <b>' + newElem[this.key] + '</b>&nbsp;?' } });
 
             this.dialogRef.afterClosed().pipe(
                 filter((data: string) => data === 'ok'),
@@ -271,7 +273,7 @@ export class PluginAutocomplete implements OnInit {
                         newElem['id'] = data[key];
                     }
                     this.setFormValue(newElem);
-                    this.notify.success(this.lang.elementAdded);
+                    this.notify.success(this.translate.instant('lang.elementAdded'));
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);

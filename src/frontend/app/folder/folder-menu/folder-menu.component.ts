@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, Renderer2 } from '@angular/core';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { map, tap, catchError, filter, exhaustMap, debounceTime, switchMap, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -36,6 +37,7 @@ export class FolderMenuComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -105,7 +107,7 @@ export class FolderMenuComponent implements OnInit {
                 this.foldersService.getPinnedFolders();
                 this.refreshList.emit();
                 this.refreshFolders.emit();
-                this.notify.success(this.lang.mailClassified);
+                this.notify.success(this.translate.instant('lang.mailClassified'));
             }),
             catchError((err) => {
                 this.notify.handleErrors(err);
@@ -115,13 +117,13 @@ export class FolderMenuComponent implements OnInit {
     }
 
     unclassifyDocuments(folder: any) {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.unclassifyQuestion + ' <b>' + this.resIds.length + '</b>&nbsp;' + this.lang.mailsInFolder + ' ?' } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.unclassifyQuestion') + ' <b>' + this.resIds.length + '</b>&nbsp;' + this.translate.instant('lang.mailsInFolder') + ' ?' } });
 
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.request('DELETE', '../rest/folders/' + folder.id + '/resources', { body: { resources: this.resIds } })),
             tap(() => {
-                this.notify.success(this.lang.removedFromFolder);
+                this.notify.success(this.translate.instant('lang.removedFromFolder'));
                 this.foldersService.getPinnedFolders();
                 this.refreshList.emit();
                 this.refreshFolders.emit();

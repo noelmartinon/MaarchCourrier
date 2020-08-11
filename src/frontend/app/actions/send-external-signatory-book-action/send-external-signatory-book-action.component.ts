@@ -1,5 +1,6 @@
 import { Component, OnInit, Inject, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
@@ -52,6 +53,7 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
     @ViewChild('ixbus', { static: false }) ixbus: IxbusParaphComponent;
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialogRef: MatDialogRef<SendExternalSignatoryBookActionComponent>,

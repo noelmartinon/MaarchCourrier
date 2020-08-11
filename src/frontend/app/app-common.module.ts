@@ -13,6 +13,7 @@ import { AppServiceModule } from './app-service.module';
 import { NotificationModule } from '../service/notification/notification.module';
 
 import { MaarchTreeComponent } from '../plugins/tree/maarch-tree.component';
+import { MaarchFlatTreeComponent } from '../plugins/tree/maarch-flat-tree.component';
 import { AutocompleteListComponent } from '../plugins/autocomplete-list/autocomplete-list.component';
 
 /*FRONT IMPORTS*/
@@ -67,6 +68,9 @@ import { FolderActionListComponent } from './folder/folder-action-list/folder-ac
 
 import { LinkedResourceListComponent } from './linkedResource/linked-resource-list.component';
 
+import { InternationalizationModule } from '../service/translate/internationalization.module';
+import { TranslateService } from '@ngx-translate/core';
+
 @NgModule({
     imports: [
         CommonModule,
@@ -76,7 +80,8 @@ import { LinkedResourceListComponent } from './linkedResource/linked-resource-li
         AppMaterialModule,
         DragDropModule,
         AppServiceModule,
-        NotificationModule
+        NotificationModule,
+        InternationalizationModule
     ],
     declarations: [
         MenuNavComponent,
@@ -104,6 +109,7 @@ import { LinkedResourceListComponent } from './linkedResource/linked-resource-li
         VisaWorkflowComponent,
         AvisWorkflowComponent,
         MaarchTreeComponent,
+        MaarchFlatTreeComponent,
         ContactResourceComponent,
         ContactDetailComponent,
         AutocompleteListComponent,
@@ -146,6 +152,7 @@ import { LinkedResourceListComponent } from './linkedResource/linked-resource-li
         VisaWorkflowComponent,
         AvisWorkflowComponent,
         MaarchTreeComponent,
+        MaarchFlatTreeComponent,
         ContactResourceComponent,
         ContactDetailComponent,
         AutocompleteListComponent,
@@ -163,4 +170,8 @@ import { LinkedResourceListComponent } from './linkedResource/linked-resource-li
         ConfirmComponent
     ],
 })
-export class SharedModule { }
+export class SharedModule {
+    constructor(translate: TranslateService) {
+        translate.setDefaultLang('fr');
+    }
+}

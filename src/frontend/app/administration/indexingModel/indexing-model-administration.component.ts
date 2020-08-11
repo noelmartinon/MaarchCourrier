@@ -1,6 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
+import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
 import {MatDialog} from '@angular/material/dialog';
@@ -49,6 +50,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
     categoriesList: any[];
 
     constructor(
+        private translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -65,7 +67,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
             if (typeof params['id'] === 'undefined') {
                 this.creationMode = true;
 
-                this.headerService.setHeader(this.lang.indexingModelCreation);
+                this.headerService.setHeader(this.translate.instant('lang.indexingModelCreation'));
 
                 this.http.get('../rest/categories').pipe(
                     tap((data: any) => {
@@ -92,7 +94,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
                     tap((data: any) => {
                         this.indexingModel = data.indexingModel;
 
-                        this.headerService.setHeader(this.lang.indexingModelModification, this.indexingModel.label);
+                        this.headerService.setHeader(this.translate.instant('lang.indexingModelModification'), this.indexingModel.label);
 
                         this.indexingModelClone = JSON.parse(JSON.stringify(this.indexingModel));
 
@@ -131,7 +133,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
                     this.indexingForm.setModification();
                     this.setModification();
                     this.router.navigate(['/administration/indexingModels']);
-                    this.notify.success(this.lang.indexingModelAdded);
+                    this.notify.success(this.translate.instant('lang.indexingModelAdded'));
                 }),
                 finalize(() => this.loading = false),
                 catchError((err: any) => {
@@ -145,7 +147,7 @@ export class IndexingModelAdministrationComponent implements OnInit {
                     this.indexingForm.setModification();
                     this.setModification();
                     this.router.navigate(['/administration/indexingModels']);
-                    this.notify.success(this.lang.indexingModelUpdated);
+                    this.notify.success(this.translate.instant('lang.indexingModelUpdated'));
                 }),
                 finalize(() => this.loading = false),
                 catchError((err: any) => {

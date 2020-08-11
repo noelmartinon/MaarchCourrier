@@ -20,12 +20,14 @@ use ContentManagement\controllers\MergeController;
 use CustomField\models\CustomFieldModel;
 use Docserver\controllers\DocserverController;
 use Entity\models\EntityModel;
+use IndexingModel\models\IndexingModelFieldModel;
 use IndexingModel\models\IndexingModelModel;
 use Resource\models\ChronoModel;
-use SrcCore\models\DatabaseModel;
-use SrcCore\models\ValidatorModel;
 use Resource\models\ResModel;
 use SrcCore\models\CoreConfigModel;
+use SrcCore\models\DatabaseModel;
+use SrcCore\models\ValidatorModel;
+use User\models\UserModel;
 
 class StoreController
 {
@@ -47,8 +49,8 @@ class StoreController
                 $fileContent = base64_decode(str_replace(['-', '_'], ['+', '/'], $args['encodedFile']));
 
                 if (empty($args['resId']) && in_array($args['format'], MergeController::OFFICE_EXTENSIONS) && empty($args['integrations']['inMailing'])) {
-                    $tmpPath = CoreConfigModel::getTmpPath();
-                    $uniqueId = CoreConfigModel::uniqueId();
+                    $tmpPath     = CoreConfigModel::getTmpPath();
+                    $uniqueId    = CoreConfigModel::uniqueId();
                     $tmpFilename = "storeTmp_{$GLOBALS['id']}_{$uniqueId}.{$args['format']}";
                     file_put_contents($tmpPath . $tmpFilename, $fileContent);
                     $fileContent = MergeController::mergeChronoDocument(['chrono' => $data['alt_identifier'], 'path' => $tmpPath . $tmpFilename, 'type' => 'resource']);
@@ -137,6 +139,32 @@ class StoreController
         } catch (\Exception $e) {
             return ['errors' => '[storeAttachment] ' . $e->getMessage()];
         }
+    }
+
+    public static function setDisabledFields(array $args)
+    {
+        $disabledFields = IndexingModelFieldModel::get([
+            'select' => ['identifier', 'default_value'],
+            'where'  => ['model_id = ?', 'enabled = ?'],
+            'data'   => [$args['modelId'], 'false']
+        ]);
+        foreach ($disabledFields as $field) {
+            $defaultValue = json_decode($field['default_value'], true);
+            if ($defaultValue == "_TODAY") {
+                $defaultValue = date('d-m-Y');
+            } elseif ($defaultValue == "#myPrimaryEntity") {
+                $entity       = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => ['entities.id']]);
+                $defaultValue = $entity['id'];
+            }
+            if (strpos($field['identifier'], 'indexingCustomField_') !== false) {
+                $idCustom = explode("_", $field['identifier']);
+                $idCustom = $idCustom[1];
+                $args['customFields'][$idCustom] = $defaultValue;
+            } else {
+                $args[$field['identifier']] = $defaultValue;
+            }
+        }
+        return $args;
     }
 
     public static function prepareResourceStorage(array $args)

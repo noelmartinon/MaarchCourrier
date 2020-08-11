@@ -73,7 +73,7 @@ class AuthenticationControllerTest extends TestCase
 
     public function testIsRouteAvailable()
     {
-        $response = \SrcCore\controllers\AuthenticationController::isRouteAvailable(['userId' => 23, 'currentRoute' => '/actions']);
+        $response = \SrcCore\controllers\AuthenticationController::isRouteAvailable(['userId' => 23, 'currentRoute' => '/actions', 'currentMethod' => 'POST']);
         $this->assertSame(true, $response['isRouteAvailable']);
     }
 

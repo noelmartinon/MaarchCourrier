@@ -6,10 +6,10 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                {{lang.makeActionOn}} 
-                <b *ngIf="data.resIds.length === 0" color="primary" class="highlight">{{lang.currentIndexingMail}}</b>
+                {{'lang.makeActionOn' | translate}} 
+                <b *ngIf="data.resIds.length === 0" color="primary" class="highlight">{{'lang.currentIndexingMail' | translate}}</b>
                 <b *ngIf="data.resIds.length == 1" color="primary" class="highlight">{{data.resource.chrono}}</b>
-                <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{data.resIds.length}} {{lang.elements}}</b> ?
+                <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{data.resIds.length}} {{'lang.elements' | translate}}</b> ?
             </div>
             <div class="col-md-12">
                 <app-note-editor #noteEditor [resIds]="data.resIds"></app-note-editor>
@@ -18,8 +18,8 @@
     </div>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
-        <button mat-raised-button mat-button color="primary" [disabled]="loading" (click)="onSubmit()">{{lang.validate}}</button>
-        <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{lang.cancel}}</button>
+        <button mat-raised-button mat-button color="primary" [disabled]="loading" (click)="onSubmit()">{{'lang.validate' | translate}}</button>
+        <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
     </div>
 </div>
 
