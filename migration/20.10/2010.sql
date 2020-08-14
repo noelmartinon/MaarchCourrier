@@ -188,13 +188,13 @@ ALTER TABLE templates ADD COLUMN subject character varying(255);
 
 UPDATE groupbasket SET list_event_data = '{"canUpdateDocuments":true}' WHERE list_event_data->'canUpdateDocument' = true;
 
-/* RECOMMENDED */
+/* REGISTERED MAIL */
+DROP TABLE IF EXISTS issuing_sites;
 CREATE TABLE IF NOT EXISTS issuing_sites (
    id SERIAL NOT NULL,
-   site_label CHARACTER VARYING(256) NOT NULL,
+   label CHARACTER VARYING(256) NOT NULL,
    post_office_label CHARACTER VARYING(256),
    account_number CHARACTER VARYING(256),
-   address_name CHARACTER VARYING(256),
    address_number CHARACTER VARYING(256),
    address_street CHARACTER VARYING(256),
    address_additional1 CHARACTER VARYING(256),
@@ -204,6 +204,7 @@ CREATE TABLE IF NOT EXISTS issuing_sites (
    address_country CHARACTER VARYING(256),
    CONSTRAINT issuing_sites_pkey PRIMARY KEY (id)
 );
+DROP TABLE IF EXISTS issuing_sites_entities;
 CREATE TABLE IF NOT EXISTS issuing_sites_entities (
    id SERIAL NOT NULL,
    site_id INTEGER NOT NULL,
@@ -212,6 +213,36 @@ CREATE TABLE IF NOT EXISTS issuing_sites_entities (
    CONSTRAINT issuing_sites_entities_unique_key UNIQUE (site_id, entity_id)
 );
 
+DROP TABLE IF EXISTS registered_number_range;
+CREATE TABLE IF NOT EXISTS registered_number_range (
+    id SERIAL NOT NULL,
+    type CHARACTER VARYING(15) NOT NULL,
+    tracking_account_number CHARACTER VARYING(256),
+    range_start INTEGER,
+    range_end INTEGER,
+    creator INTEGER,
+    created timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
+    site_id INTEGER,
+    status CHARACTER VARYING(10),
+    current_number INTEGER,
+    CONSTRAINT registered_number_range_pkey PRIMARY KEY (id),
+    CONSTRAINT registered_number_range_unique_key UNIQUE (tracking_account_number)
+);
+
+DROP TABLE IF EXISTS registered_mail_resources;
+CREATE TABLE IF NOT EXISTS registered_mail_resources (
+   id SERIAL NOT NULL,
+   res_id INTEGER NOT NULL,
+   type CHARACTER VARYING(2) NOT NULL,
+   issuing_site INTEGER NOT NULL,
+   warranty INTEGER NOT NULL,
+   letter BOOL NOT NULL DEFAULT FALSE,
+   recipient jsonb NOT NULL,
+   number INTEGER NOT NULL,
+   reference TEXT,
+   generated BOOL NOT NULL DEFAULT FALSE,
+   CONSTRAINT registered_mail_resources_pkey PRIMARY KEY (id)
+);
 
 /* RE CREATE VIEWS */
 CREATE OR REPLACE VIEW res_view_letterbox AS

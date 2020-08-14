@@ -614,12 +614,22 @@ $app->post('/collaboraOnline/file', \ContentManagement\controllers\CollaboraOnli
 $app->delete('/collaboraOnline/file', \ContentManagement\controllers\CollaboraOnlineController::class . ':deleteTmpFile');
 $app->post('/collaboraOnline/encodedFile', \ContentManagement\controllers\CollaboraOnlineController::class . ':saveTmpEncodedDocument');
 
-// Recommended
-$app->get('/recommended/sites', \Recommended\controllers\IssuingSiteController::class . ':get');
-$app->get('/recommended/sites/{id}', \Recommended\controllers\IssuingSiteController::class . ':getById');
-$app->post('/recommended/sites', \Recommended\controllers\IssuingSiteController::class . ':create');
-$app->put('/recommended/sites/{id}', \Recommended\controllers\IssuingSiteController::class . ':update');
-$app->delete('/recommended/sites/{id}', \Recommended\controllers\IssuingSiteController::class . ':delete');
+// Registered mail
+$app->get('/registeredMail/sites', \RegisteredMail\controllers\IssuingSiteController::class . ':get');
+$app->get('/registeredMail/sites/{id}', \RegisteredMail\controllers\IssuingSiteController::class . ':getById');
+$app->post('/registeredMail/sites', \RegisteredMail\controllers\IssuingSiteController::class . ':create');
+$app->put('/registeredMail/sites/{id}', \RegisteredMail\controllers\IssuingSiteController::class . ':update');
+$app->delete('/registeredMail/sites/{id}', \RegisteredMail\controllers\IssuingSiteController::class . ':delete');
+
+$app->get('/registeredMail/ranges', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':get');
+$app->get('/registeredMail/ranges/{id}', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':getById');
+$app->post('/registeredMail/ranges', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':create');
+$app->put('/registeredMail/ranges/{id}', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':update');
+$app->delete('/registeredMail/ranges/{id}', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':delete');
+$app->get('/registeredMail/ranges/last/type/{type}', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':getLastNumberByType');
+$app->get('/registeredMail/sites/type/{type}', \RegisteredMail\controllers\IssuingSiteController::class . ':getByType');
+
+$app->get('/registeredMail/countries', \RegisteredMail\controllers\RegisteredMailController::class . ':getCountries');
 
 
 $app->run();

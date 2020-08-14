@@ -7,9 +7,10 @@ import { NotificationService } from '../../../../service/notification/notificati
 import { HeaderService } from '../../../../service/header.service';
 import { AppService } from '../../../../service/app.service';
 import { MaarchFlatTreeComponent } from '../../../../plugins/tree/maarch-flat-tree.component';
-import { map, tap, catchError, debounceTime, filter, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { map, tap, catchError, debounceTime, filter, distinctUntilChanged, switchMap, startWith } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { Observable } from 'rxjs/internal/Observable';
+import { LatinisePipe } from 'ngx-pipes';
 
 @Component({
     selector: 'app-issuing-site',
@@ -24,6 +25,11 @@ export class IssuingSiteComponent implements OnInit {
     adminFormGroup: FormGroup;
     entities: any = [];
 
+    countries: any = [];
+    countriesFilteredResult: Observable<string[]>;
+
+    id: number = null;
+
     addressBANInfo: string = '';
     addressBANMode: boolean = true;
     addressBANControl = new FormControl();
@@ -33,7 +39,7 @@ export class IssuingSiteComponent implements OnInit {
     addressBANCurrentDepartment: string = '75';
     departmentList: any[] = [];
 
-    @ViewChild('maarchTree', { static: false }) maarchTree: MaarchFlatTreeComponent;
+    @ViewChild('maarchTree', { static: true }) maarchTree: MaarchFlatTreeComponent;
 
     constructor(
         private translate: TranslateService,
@@ -44,24 +50,22 @@ export class IssuingSiteComponent implements OnInit {
         private headerService: HeaderService,
         public appService: AppService,
         private _formBuilder: FormBuilder,
+        private latinisePipe: LatinisePipe,
     ) { }
 
     ngOnInit(): void {
-        this.route.params.subscribe((params) => {
+        this.route.params.subscribe(async (params) => {
 
             if (typeof params['id'] === 'undefined') {
                 this.creationMode = true;
-
                 this.headerService.setHeader(this.translate.instant('lang.issuingSiteCreation'));
-                this.getEntities();
                 this.initBanSearch();
                 this.initAutocompleteAddressBan();
                 this.adminFormGroup = this._formBuilder.group({
                     id: [null],
-                    siteLabel: ['', Validators.required],
+                    label: ['', Validators.required],
                     postOfficeLabel: ['', Validators.required],
                     accountNumber: ['', Validators.required],
-                    addressName: [''],
                     addressNumber: [''],
                     addressStreet: [''],
                     addressAdditional1: [''],
@@ -70,28 +74,65 @@ export class IssuingSiteComponent implements OnInit {
                     addressTown: [''],
                     addressCountry: ['']
                 });
-
+                this.getCountries();
+                this.initAutocompleteCountries();
                 this.loading = false;
+
+                await this.getEntities();
+                this.maarchTree.initData(this.entities);
             } else {
+                this.id = params['id'];
+                this.creationMode = false;
+                this.headerService.setHeader(this.translate.instant('lang.issuingSiteModification'));
+                this.initBanSearch();
+                this.initAutocompleteAddressBan();
 
-                /*this.creationMode = false;
-                this.http.get('../rest/parameters/' + params['id'])
-                    .subscribe((data: any) => {
-                        this.parameter = data.parameter;
-                        this.headerService.setHeader(this.translate.instant('lang.issuingSiteModification'), this.parameter.id);
-                        if (typeof (this.parameter.param_value_int) === 'number') {
-                            this.type = 'int';
-                        } else if (this.parameter.param_value_date) {
-                            this.type = 'date';
-                        } else {
-                            this.type = 'string';
-                        }
+                await this.getEntities();
+                await this.getData();
 
-                        this.loading = false;
-                    }, (err) => {
-                        this.notify.handleErrors(err);
-                    });*/
+                this.getCountries();
+                this.initAutocompleteCountries();
+                this.maarchTree.initData(this.entities);
             }
+        });
+    }
+
+    getData() {
+        return new Promise((resolve) => {
+            this.http.get(`../rest/registeredMail/sites/${this.id}`).pipe(
+                tap((data: any) => {
+                    this.adminFormGroup = this._formBuilder.group({
+                        id: [this.id],
+                        label: [data.site.label, Validators.required],
+                        postOfficeLabel: [data.site.postOfficeLabel, Validators.required],
+                        accountNumber: [data.site.accountNumber, Validators.required],
+                        addressNumber: [data.site.addressNumber],
+                        addressStreet: [data.site.addressStreet],
+                        addressAdditional1: [data.site.addressAdditional1],
+                        addressadditional2: [data.site.addressadditional2],
+                        addressPostcode: [data.site.addressPostcode],
+                        addressTown: [data.site.addressTown],
+                        addressCountry: [data.site.addressCountry],
+                        entities: [data.site.entities]
+                    });
+
+                    this.entities = this.entities.map((entity: any) => {
+                        return {
+                            ...entity,
+                            state: {
+                                opened: true,
+                                selected: data.site.entities.indexOf(entity.id) > -1
+                            }
+                        };
+                    });
+                    resolve(true);
+                    this.loading = false;
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
         });
     }
 
@@ -108,6 +149,19 @@ export class IssuingSiteComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    initAutocompleteCountries() {
+        this.countriesFilteredResult = this.adminFormGroup.controls['addressCountry'].valueChanges
+            .pipe(
+                startWith(''),
+                map(value => this._filter(value))
+            );
+    }
+
+    private _filter(value: string): string[] {
+        const filterValue = value.toLowerCase();
+        return this.countries.filter(option => option.toLowerCase().includes(filterValue));
     }
 
     initAutocompleteAddressBan() {
@@ -148,23 +202,39 @@ export class IssuingSiteComponent implements OnInit {
     }
 
     getEntities() {
-        this.http.get(`../rest/entities`).pipe(
-            map((data: any) => {
-                data.entities = data.entities.map((entity: any) => {
-                    return {
-                        text: entity.entity_label,
-                        icon: entity.icon,
-                        parent_id: entity.parentSerialId,
-                        id: entity.serialId,
-                        state: {
-                            opened: true
-                        }
-                    };
-                });
-                return data.entities;
-            }),
-            tap((entities: any) => {
-                this.entities = entities;
+        return new Promise((resolve) => {
+            this.http.get(`../rest/entities`).pipe(
+                map((data: any) => {
+                    data.entities = data.entities.map((entity: any) => {
+                        return {
+                            text: entity.entity_label,
+                            icon: entity.icon,
+                            parent_id: entity.parentSerialId,
+                            id: entity.serialId,
+                            state: {
+                                opened: true,
+                            }
+                        };
+                    });
+                    return data.entities;
+                }),
+                tap((entities: any) => {
+                    this.entities = entities;
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    getCountries() {
+        this.http.get(`../rest/registeredMail/countries`).pipe(
+            tap((data: any) => {
+                this.countries = data.countries.map(
+                    (item: any) => this.latinisePipe.transform(item.toUpperCase()));
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
@@ -181,24 +251,22 @@ export class IssuingSiteComponent implements OnInit {
 
         objToSubmit['entities'] = this.maarchTree.getSelectedNodes().map((ent: any) => ent.id);
 
-        console.log(objToSubmit);
-
         if (this.creationMode) {
-            this.http.post('../rest/recommended/sites', objToSubmit)
+            this.http.post('../rest/registeredMail/sites', objToSubmit)
                 .subscribe(() => {
-                    this.notify.success(this.translate.instant('lang.priorityAdded'));
-                    this.router.navigate(['/administration/issuingSite']);
+                    this.notify.success(this.translate.instant('lang.issuingSiteAdded'));
+                    this.router.navigate(['/administration/issuingSites']);
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            /*this.http.put('../rest/recommended/sites/' + this.id, objToSubmit)
+            this.http.put('../rest/registeredMail/sites/' + this.id, objToSubmit)
                 .subscribe(() => {
-                    this.notify.success(this.translate.instant('lang.priorityUpdated'));
-                    this.router.navigate(['/administration/priorities']);
+                    this.notify.success(this.translate.instant('lang.issuingSiteUpdated'));
+                    this.router.navigate(['/administration/issuingSites']);
                 }, (err) => {
                     this.notify.error(err.error.errors);
-                });*/
+                });
         }
     }
 }

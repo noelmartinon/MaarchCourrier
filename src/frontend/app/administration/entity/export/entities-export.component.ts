@@ -85,7 +85,7 @@ export class EntitiesExportComponent implements OnInit {
     }
 
     setConfiguration() {
-        if (this.localStorage.get(`exportUsersFields_${this.headerService.user.id}`) !== null) {
+        if (this.localStorage.get(`exportEntitiesFields_${this.headerService.user.id}`) !== null) {
             this.exportModel.delimiter = JSON.parse(this.localStorage.get(`exportEntitiesFields_${this.headerService.user.id}`)).delimiter;
         }
     }

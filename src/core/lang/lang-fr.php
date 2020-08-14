@@ -466,3 +466,7 @@ define("_DOC_REMOVE_FROM_MAILEVA", "Courrier retiré des envois Maileva");
 define("_ISSUING_SITE_CREATED", "Site émetteur créé");
 define("_ISSUING_SITE_UPDATED", "Site émetteur modifié");
 define("_ISSUING_SITE_DELETED", "Site émetteur supprimé");
+
+define("_REGISTERED_NUMBER_RANGE_CREATED", "Plage de recommandé créé");
+define("_REGISTERED_NUMBER_RANGE_UPDATED", "Plage de recommandé modifié");
+define("_REGISTERED_NUMBER_RANGE_DELETED", "Plage de recommandé supprimé");

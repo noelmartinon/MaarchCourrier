@@ -539,8 +539,7 @@ class EntityController
 
         $fields = [
             'id', 'entity_id', 'entity_label', 'short_label', 'entity_full_name', 'enabled', 'adrs_1', 'adrs_2', 'adrs_3', 'zipcode', 'city',
-            'country', 'email', 'parent_entity_id', 'entity_type', 'business_id', 'ldap_id', 'archival_agency', 'archival_agreement',
-            'folder_import', 'external_id',
+            'country', 'email', 'parent_entity_id', 'entity_type', 'business_id', 'archival_agency', 'archival_agreement', 'folder_import'
         ];
 
         $csvHead = array_merge($fields, [ 'diffusionList', 'visaCircuit', 'opinionCircuit', 'users', 'templates']);
@@ -564,6 +563,9 @@ class EntityController
 
         $templateType = ['diffusionList', 'visaCircuit', 'opinionCircuit'];
 
+        $roles = EntityModel::getRoles();
+        $roles = array_column($roles, 'label', 'id');
+
         foreach ($entities as $key => $entity) {
             // list templates
             foreach ($templateType as $type) {
@@ -584,19 +586,10 @@ class EntityController
                     ]);
                     foreach ($templateItems as $templateItem) {
                         $item = [];
-                        if ($templateItem['item_mode'] == 'dest') {
-                            $item[] = _ASSIGNEE;
-                        } elseif ($templateItem['item_mode'] == 'cc') {
-                            $item[] = _TO_CC;
-                        } elseif ($templateItem['item_mode'] == 'avis') {
-                            $item[] = _AVIS_USER;
-                        } elseif ($templateItem['item_mode'] == 'avis_copy') {
-                            $item[] = _AVIS_USER_COPY;
-                        } elseif ($templateItem['item_mode'] == 'visa') {
-                            $item[] = _VISA_USER_MIN;
-                        } elseif ($templateItem['item_mode'] == 'sign') {
-                            $item[] = _SIGNATORY;
+                        if ($templateItem['item_mode'] == 'cc') {
+                            $templateItem['item_mode'] = 'copy';
                         }
+                        $item[] = $roles[$templateItem['item_mode']];
 
                         if ($templateItem['item_type'] == 'user') {
                             $item[] = UserModel::getLabelledUserById(['id' => $templateItem['item_id']]);

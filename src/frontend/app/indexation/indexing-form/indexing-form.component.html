@@ -149,7 +149,7 @@
                                         <input matInput style="display: none;">
                                         <mat-radio-group class="radio-form" color="primary"
                                             [formControl]="arrFormControl[field.identifier]">
-                                            <mat-radio-button *ngFor="let value of field.values" [value]="value.id">
+                                            <mat-radio-button *ngFor="let value of field.values" [value]="value.id" [disabled]="value.disabled">
                                                 {{value.label}}
                                             </mat-radio-button>
                                         </mat-radio-group>
@@ -200,6 +200,10 @@
                                 <ng-container *ngIf="field.type === 'banAutocomplete'">
                                     <app-address-ban-input [control]="arrFormControl[field.identifier]" [admin]="adminMode" style="width:100%;">
                                     </app-address-ban-input>
+                                </ng-container>
+                                <ng-container *ngIf="field.identifier === 'registeredMail_issuingSite'">
+                                    <app-issuing-site-input #appIssuingSiteInput [registedMailType]="arrFormControl['registeredMail_type'].value" [control]="arrFormControl[field.identifier]" (afterSelected)="launchEvent($event, field)" style="width:100%;">
+                                    </app-issuing-site-input>
                                 </ng-container>
                             </div>
                             <div class="fieldState">

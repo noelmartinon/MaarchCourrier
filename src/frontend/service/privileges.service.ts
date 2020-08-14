@@ -292,7 +292,7 @@ export class PrivilegeService {
             'id': 'admin_registered_mail',
             'label': this.translate.instant('lang.registeredMail'),
             'comment': this.translate.instant('lang.adminRegisteredMailDesc'),
-            'route': '/administration/issuingSite',
+            'route': '/administration/registeredMails',
             'unit': 'supervision',
             'style': 'fas fa-dolly-flatbed',
             'angular': true,

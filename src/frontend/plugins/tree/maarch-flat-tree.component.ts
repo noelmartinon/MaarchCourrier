@@ -141,8 +141,11 @@ export class MaarchFlatTreeComponent implements OnInit {
             };
         });
 
-        let FlatToNested, flatToNested;
+        // order data
+        this.rawData = this.sortPipe.transform(this.rawData, 'text');
 
+        // Convert flat data to nested data
+        let FlatToNested, flatToNested;
         FlatToNested = require('flat-to-nested');
         flatToNested = new FlatToNested({
             id: 'id',
@@ -150,14 +153,17 @@ export class MaarchFlatTreeComponent implements OnInit {
             children: 'children',
             options : { deleteParent: false }
         });
-
-        this.rawData = this.sortPipe.transform(this.rawData, 'text');
         let nestedData = flatToNested.convert(this.rawData);
         nestedData = nestedData.children;
 
+        // Set last child of children nodes to fix css tree lines
+        this.initLastNodes(nestedData);
+
+        // Set data to tree
         this.dataSource.data = nestedData;
         this.treeControl.dataNodes = nestedData;
 
+        // Set search filter
         this.searchTerm.valueChanges
             .pipe(
                 debounceTime(300),
@@ -303,6 +309,25 @@ export class MaarchFlatTreeComponent implements OnInit {
                 }
                 this.searchNode(f, term);
 
+            }); // and call function on each child
+        }
+    }
+
+    initLastNodes(data) {
+        // traverse throuh each node
+        if (Array.isArray(data)) { // if data is an array
+            data.forEach((d, index) => {
+                if (index === data.length - 1) {
+                    d.last = true;
+                }
+                this.initLastNodes(d);
+            }); // call the function on each item
+        } else if (data instanceof Object) { // otherwise, if data is an object
+            (data.children || []).forEach((f, index) => {
+                if (index === data.children.length - 1) {
+                    f.last = true;
+                }
+                this.initLastNodes(f);
             }); // and call function on each child
         }
     }

@@ -86,6 +86,8 @@ class SignatureBookController
         $datas['hasWorkflow']           = ((int)$listInstances[0]['count'] > 0);
         $datas['listinstance']          = ListInstanceModel::getCurrentStepByResId(['resId' => $resId]);
         $datas['canSign']               = PrivilegeController::hasPrivilege(['privilegeId' => 'sign_document', 'userId' => $GLOBALS['id']]);
+        $datas['canUpdateDocuments']    = SignatureBookController::isResourceInSignatureBook(['resId' => $resId, 'userId' => $GLOBALS['id'], 'canUpdateDocuments' => true]);
+
         $datas['isCurrentWorkflowUser'] = $datas['listinstance']['item_id'] == $GLOBALS['login'];
 
         return $response->withJson($datas);

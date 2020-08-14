@@ -74,6 +74,7 @@ import {EntitiesExportComponent} from './entity/export/entities-export.component
 import { RegisteredMailComponent } from './registered-mail/registered-mail.component';
 import { IssuingSiteListComponent } from './registered-mail/issuing-site/issuing-site-list.component';
 import { IssuingSiteComponent } from './registered-mail/issuing-site/issuing-site.component';
+import { RegisteredMailListComponent } from './registered-mail/registered-mail-list.component';
 
 
 @NgModule({
@@ -156,6 +157,7 @@ import { IssuingSiteComponent } from './registered-mail/issuing-site/issuing-sit
         RegisteredMailComponent,
         IssuingSiteListComponent,
         IssuingSiteComponent,
+        RegisteredMailListComponent,
     ],
     entryComponents: [
         AccountLinkComponent,

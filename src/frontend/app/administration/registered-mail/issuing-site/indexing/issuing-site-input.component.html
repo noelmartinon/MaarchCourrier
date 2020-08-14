@@ -1,0 +1,32 @@
+<form>
+    <plugin-select-search
+        *ngIf="!loading"
+        [label]="'lang.issuingSite' | translate" [placeholderLabel]="'lang.issuingSite' | translate"
+        [formControlSelect]="control" [datas]="issuingSiteList"
+        (afterSelected)="afterSelected.emit($event);setAddress($event)" style="width:100%;">
+    </plugin-select-search>
+    <mat-card *ngIf="issuingSiteAddress !== null" color="primary">
+        <i class="fas fa-map-marked-alt address-icon"></i>
+        <div>
+            {{issuingSiteAddress.siteLabel}}
+        </div>
+        <div>
+            {{issuingSiteAddress.addressAdditional1}}
+        </div>
+        <div>
+            {{issuingSiteAddress.postOfficeLabel}}
+        </div>
+        <div>
+            {{issuingSiteAddress.addressNumber}} {{issuingSiteAddress.addressStreet}}
+        </div>
+        <div>
+            {{issuingSiteAddress.addressAdditional2}}
+        </div>
+        <div>
+            {{issuingSiteAddress.addressPostcode}} {{issuingSiteAddress.addressTown}}
+        </div>
+        <div *ngIf="registedMailType === 'RW'">
+            {{issuingSiteAddress.addressCountry}}
+        </div>
+    </mat-card>
+</form>

@@ -7,7 +7,7 @@
 */
 
 /**
- * @brief Issuing Site Model
+ * @brief Registered Number Range Model
  * @author dev@maarch.org
  */
 
@@ -16,7 +16,7 @@ namespace RegisteredMail\models;
 use SrcCore\models\ValidatorModel;
 use SrcCore\models\DatabaseModel;
 
-class IssuingSiteModel
+class RegisteredNumberRangeModel
 {
     public static function get(array $args = [])
     {
@@ -24,7 +24,7 @@ class IssuingSiteModel
 
         return DatabaseModel::select([
             'select'   => empty($args['select']) ? ['*'] : $args['select'],
-            'table'    => ['issuing_sites'],
+            'table'    => ['registered_number_range'],
             'where'    => empty($args['where']) ? [] : $args['where'],
             'data'     => empty($args['data']) ? [] : $args['data'],
             'order_by' => empty($args['orderBy']) ? [] : $args['orderBy'],
@@ -40,7 +40,7 @@ class IssuingSiteModel
 
         $site = DatabaseModel::select([
             'select' => empty($args['select']) ? ['*'] : $args['select'],
-            'table'  => ['issuing_sites'],
+            'table'  => ['registered_number_range'],
             'where'  => ['id = ?'],
             'data'   => [$args['id']]
         ]);
@@ -54,25 +54,24 @@ class IssuingSiteModel
 
     public static function create(array $args)
     {
-        ValidatorModel::notEmpty($args, ['label']);
-        ValidatorModel::stringType($args, ['label']);
+        ValidatorModel::notEmpty($args, ['type', 'rangeStart', 'rangeEnd', 'siteId', 'status']);
+        ValidatorModel::stringType($args, ['type', 'status']);
+        ValidatorModel::intVal($args, ['rangeStart', 'rangeEnd', 'siteId', 'currentNumber']);
 
-        $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'issuing_sites_id_seq']);
+        $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'registered_number_range_id_seq']);
 
         DatabaseModel::insert([
-            'table'         => 'issuing_sites',
+            'table'         => 'registered_number_range',
             'columnsValues' => [
-                'id'                  => $nextSequenceId,
-                'label'               => $args['label'],
-                'post_office_label'   => $args['postOfficeLabel'] ?? null,
-                'account_number'      => $args['accountNumber'] ?? null,
-                'address_number'      => $args['addressNumber'] ?? null,
-                'address_street'      => $args['addressStreet'] ?? null,
-                'address_additional1' => $args['addressAdditional1'] ?? null,
-                'address_additional2' => $args['addressAdditional2'] ?? null,
-                'address_postcode'    => $args['addressPostcode'] ?? null,
-                'address_town'        => $args['addressTown'] ?? null,
-                'address_country'     => $args['addressCountry'] ?? null
+                'id'                      => $nextSequenceId,
+                'type'                    => $args['type'],
+                'tracking_account_number' => $args['trackingAccountNumber'],
+                'range_start'             => $args['rangeStart'],
+                'range_end'               => $args['rangeEnd'],
+                'creator'                 => $args['creator'],
+                'site_id'                 => $args['siteId'],
+                'current_number'          => $args['currentNumber'],
+                'status'                  => $args['status']
             ]
         ]);
 
@@ -85,7 +84,7 @@ class IssuingSiteModel
         ValidatorModel::arrayType($args, ['set', 'where', 'data']);
 
         DatabaseModel::update([
-            'table' => 'issuing_sites',
+            'table' => 'registered_number_range',
             'set'   => empty($args['set']) ? [] : $args['set'],
             'where' => $args['where'],
             'data'  => empty($args['data']) ? [] : $args['data']
@@ -100,7 +99,7 @@ class IssuingSiteModel
         ValidatorModel::arrayType($args, ['where', 'data']);
 
         DatabaseModel::delete([
-            'table' => 'issuing_sites',
+            'table' => 'registered_number_range',
             'where' => $args['where'],
             'data'  => $args['data']
         ]);

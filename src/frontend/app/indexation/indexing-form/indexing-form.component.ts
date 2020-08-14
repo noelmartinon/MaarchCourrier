@@ -14,6 +14,7 @@ import { FormControl, Validators, FormGroup, ValidationErrors, ValidatorFn, Abst
 import { DiffusionsListComponent } from '../../diffusions/diffusions-list.component';
 import { FunctionsService } from '../../../service/functions.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
+import { IssuingSiteInputComponent } from '../../administration/registered-mail/issuing-site/indexing/issuing-site-input.component';
 
 @Component({
     selector: 'app-indexing-form',
@@ -41,6 +42,7 @@ export class IndexingFormComponent implements OnInit {
     @Output() loadingFormEndEvent = new EventEmitter<string>();
 
     @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
+    @ViewChild('appIssuingSiteInput', { static: false }) appIssuingSiteInput: IssuingSiteInputComponent;
 
     fieldCategories: any[] = ['mail', 'contact', 'process', 'classifying'];
 
@@ -180,6 +182,54 @@ export class IndexingFormComponent implements OnInit {
             values: [],
             enabled: true,
         },
+        {
+            identifier: 'registeredMail_type',
+            label: this.translate.instant('lang.registredMailType'),
+            type: 'select',
+            default_value: null,
+            values: [{ 'id': '2D', 'label': this.translate.instant('lang.registeredMail_2D') }, { 'id': '2C', 'label': this.translate.instant('lang.registeredMail_2C') }, { 'id': 'RW', 'label': this.translate.instant('lang.registeredMail_RW') }],
+            enabled: true,
+        },
+        {
+            identifier: 'registeredMail_issuingSite',
+            label: this.translate.instant('lang.issuingSite'),
+            type: 'issuingSite',
+            default_value: null,
+            values: [],
+            enabled: true,
+        },
+        {
+            identifier: 'registeredMail_number',
+            label: this.translate.instant('lang.registeredMailNumber'),
+            type: 'string',
+            default_value: null,
+            values: [],
+            enabled: false,
+        },
+        {
+            identifier: 'registeredMail_warranty',
+            label: this.translate.instant('lang.warrantyLevel'),
+            type: 'radio',
+            default_value: null,
+            values: [{ 'id': 'R1', 'label': 'R1' }, { 'id': 'R2', 'label': 'R2' }, { 'id': 'R3', 'label': 'R3' }],
+            enabled: true,
+        },
+        {
+            identifier: 'registeredMail_letter',
+            label: this.translate.instant('lang.letter'),
+            type: 'radio',
+            default_value: null,
+            values: [{ 'id': true, 'label': this.translate.instant('lang.yes') }, { 'id': false, 'label': this.translate.instant('lang.no') }],
+            enabled: true,
+        },
+        {
+            identifier: 'Destinataire de recommandés',
+            label: this.translate.instant('Destinataire de recommandés'),
+            type: 'registeredMailDest',
+            default_value: null,
+            values: [],
+            enabled: true,
+        },
     ];
     availableFieldsClone: any[] = [];
 
@@ -280,16 +330,25 @@ export class IndexingFormComponent implements OnInit {
         if (event.previousContainer === event.container) {
             moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
         } else {
-            this.initValidator(event.item.data);
-            transferArrayItem(event.previousContainer.data,
-                event.container.data,
-                event.previousIndex,
-                event.currentIndex);
+            const regex = /registeredMail_[.]*/g;
+
+            if (event.item.data.identifier.match(regex) !== null && event.previousContainer.id === 'fieldsList') {
+                this.transferRegisteredMailInput(event);
+            } else {
+                this.transferInput(event);
+            }
             if (['destination', 'priority'].indexOf(event.item.data.identifier) > -1) {
                 this.initElemForm();
             }
-
         }
+    }
+
+    transferInput(event: CdkDragDrop<string[]>) {
+        this.initValidator(event.item.data);
+        transferArrayItem(event.previousContainer.data,
+            event.container.data,
+            event.previousIndex,
+            event.currentIndex);
     }
 
     onSubmit() {
@@ -307,7 +366,9 @@ export class IndexingFormComponent implements OnInit {
             tap(() => {
                 item.mandatory = false;
                 item.enabled = true;
-                if (item.identifier.indexOf('indexingCustomField') > -1) {
+                if (item.identifier.indexOf('registeredMail_') > -1) {
+                    this.removeRegisteredMailItems();
+                } else if (item.identifier.indexOf('indexingCustomField') > -1) {
                     this.availableCustomFields.push(item);
                     this[arrTarget].splice(index, 1);
                 } else {
@@ -669,6 +730,9 @@ export class IndexingFormComponent implements OnInit {
 
                 } else if (elem.identifier === 'doctype') {
                     await this.setDoctypeField(elem);
+                } else if (elem.identifier === 'registeredMail_type') {
+                    elem.event = 'getIssuingSites';
+                    // await this.setDoctypeField(elem);
                 }
             }));
         }));
@@ -1104,5 +1168,65 @@ export class IndexingFormComponent implements OnInit {
 
     getCheckboxListLabel(selectedItemId: any, items: any) {
         return items.filter((item: any) => item.id === selectedItemId)[0].label;
+    }
+
+    /**
+     * [Registered mail module]
+     */
+    getIssuingSites(field: any, value: any) {
+        this.fieldCategories.forEach(element => {
+            this['indexingModels_' + element].forEach((fieldItem: any) => {
+                if (fieldItem.identifier === 'registeredMail_warranty') {
+                    console.log(fieldItem);
+                    fieldItem.values[2].disabled = value === 'RW';
+                }
+            });
+            if (value === 'RW' && this.arrFormControl['registeredMail_warranty'].value === 'R3') {
+                this.arrFormControl['registeredMail_warranty'].setValue('R1');
+            }
+        });
+        if (!this.functions.empty(this.appIssuingSiteInput)) {
+            this.appIssuingSiteInput.getIssuingSites(value);
+        }
+    }
+
+    /**
+     * [Registered mail module]
+     */
+    transferRegisteredMailInput(event: CdkDragDrop<string[]>) {
+        const regex = /registeredMail_[.]*/g;
+
+        this.transferInput(event);
+        if (event.item.data.identifier !== 'registeredMail_type') {
+            const obj = event.previousContainer.data.map((item: any, indexItem: number) => ({ index: indexItem, identifier: item.identifier })).filter((item: any) => item.identifier === 'registeredMail_type')[0];
+
+            this.initValidator(event.previousContainer.data[obj.index]);
+
+            event.previousContainer.data[obj.index]['unit'] = event.container.id.split('_')[1];
+            event.container.data.splice(event.currentIndex, 0, event.previousContainer.data[obj.index]);
+            event.previousContainer.data.splice(obj.index, 1);
+        }
+
+        event.previousContainer.data.forEach((item: any, indexData: number) => {
+            if (item.identifier.match(regex) !== null) {
+                this.initValidator(item);
+                item.unit = event.container.id.split('_')[1];
+                event.container.data.splice(event.currentIndex, 0, item);
+                event.previousContainer.data.splice(indexData, 1);
+            }
+        });
+        this.initElemForm();
+    }
+
+    /**
+     * [Registered mail module]
+     */
+    removeRegisteredMailItems() {
+        this.fieldCategories.forEach(category => {
+
+            this.availableFields = this.availableFields.concat(this['indexingModels_' + category].filter((item: any) => item.identifier.indexOf('registeredMail_') > -1));
+
+            this['indexingModels_' + category] = this['indexingModels_' + category].filter((item: any) => item.identifier.indexOf('registeredMail_') === -1);
+        });
     }
 }

@@ -129,16 +129,6 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
             this.actionService.lockResource(this.userId, this.groupId, this.basketId, [this.resId]);
 
-            this.http.get(`../rest/resources/${this.resId}/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/processingData`).pipe(
-                tap((data: any) => {
-                    this.canUpdateDocument = data.listEventData.canUpdateDocument;
-                }),
-                catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
-
             this.http.get('../rest/signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + this.resId)
                 .subscribe((data: any) => {
                     if (data.error) {
@@ -147,6 +137,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                         return;
                     }
                     this.signatureBook = data;
+                    this.canUpdateDocument = data.canUpdateDocuments;
 
                     this.headerTab = 'document';
                     this.leftSelectedThumbnail = 0;

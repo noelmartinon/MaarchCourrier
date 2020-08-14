@@ -6,7 +6,7 @@
             <i color="primary" class="fas fa-arrows-alt fa-2x" cdkDragHandle></i>
         </div>
         <div style="flex:1;display: flex;">
-            <div class="fieldLabel">
+            <div [id]="field.identifier" class="fieldLabel">
                 {{field.label}}
             </div>
             <div class="fieldInput" [class.advancedInput]="field.type === 'checkbox'">
@@ -71,12 +71,15 @@
 <div *ngIf="dataFields !== undefined" class="content" cdkDropList id="fieldsList"
     [cdkDropListConnectedTo]="['indexingModelsCustomFieldsList_mail','indexingModelsCustomFieldsList_contact','indexingModelsCustomFieldsList_process','indexingModelsCustomFieldsList_classifying']"
     [cdkDropListData]="dataFields" (cdkDropListDropped)="drop($event)">
+    <div class="alert-message alert-message-info" style="font-size: 12px;margin: 0;">
+        <i class="fa fa-circle" style="color: orange;"></i> {{'lang.requiredForRegisteredMail' | translate}}
+    </div>
     <div class="customFieldRow" *ngFor="let field of dataFields | sortBy: 'label'" cdkDrag [cdkDragData]="field">
         <div class="customFieldDrag" cdkDragHandle>
             <i color="primary" class="fas fa-arrows-alt fa-2x"></i>
         </div>
         <div style="flex:1;display: flex;">
-            <div class="fieldLabel">
+            <div [id]="field.identifier" class="fieldLabel">
                 {{field.label}}
             </div>
             <div class="fieldInput">

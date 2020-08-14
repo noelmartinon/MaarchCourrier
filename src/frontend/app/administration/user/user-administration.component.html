@@ -233,7 +233,7 @@
                                         <div *ngIf="user.mode === 'rest'">
                                             <mat-form-field>
                                                 <mat-label>{{'lang.authorizedRoutes' | translate}}</mat-label>
-                                                <textarea matInput name="authorizedApi" [(ngModel)]="user.authorizedApi" placeholder="POST/attachments\nPUT/attachments/{id}"></textarea>
+                                                <textarea matInput name="authorizedApi" [(ngModel)]="user.authorizedApi" placeholder="Ex : PUT/attachments/{id}"></textarea>
                                             </mat-form-field>
                                         </div>
                                     </mat-expansion-panel>

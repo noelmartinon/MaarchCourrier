@@ -27,7 +27,7 @@
         <br />
         <div>{{'lang.chooseLoginBg' | translate}} : </div>
         <div class="backgroundList">
-            <mat-card (click)="selectBg('../rest/images?image=loginPage')" style="opacity: 0.3;" class="backgroundItem"
+            <mat-card style="opacity: 0.3;" class="backgroundItem"
                 [class.disabled]="stepFormGroup.controls['bodyImage'].disabled"
                 [class.selected]="stepFormGroup.controls['bodyImage'].value === '../rest/images?image=loginPage'"
                 style="background:url(../rest/images?image=loginPage);background-size: cover;">

@@ -103,6 +103,9 @@ class ParameterController
             }
 
             $tmpPath = CoreConfigModel::getTmpPath();
+            if (!is_dir("custom/{$customId}/img")) {
+                mkdir("custom/{$customId}/img", 0755, true);
+            }
             if ($args['id'] == 'logo') {
                 if (strpos($body['image'], 'data:image/svg+xml;base64,') === false) {
                     return $response->withStatus(400)->withJson(['errors' => 'Body image is not a base64 image']);

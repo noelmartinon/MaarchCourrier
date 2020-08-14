@@ -569,6 +569,10 @@
             color: rgba(0, 0, 0, 0.54);
         }
     }
+
+    .mat-radio-disabled {
+        opacity: 0.5;
+    }
 }
 
 .input-radio {

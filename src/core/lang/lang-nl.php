@@ -468,3 +468,7 @@ define("_DOC_REMOVE_FROM_MAILEVA", "Mail removed from Maileva shippings"); //TO 
 define("_ISSUING_SITE_CREATED", "Issuing site created"); //TO TRANSLATE
 define("_ISSUING_SITE_UPDATED", "Issuing site updated"); //TO TRANSLATE
 define("_ISSUING_SITE_DELETED", "Issuing site deleted"); //TO TRANSLATE
+
+define("_REGISTERED_NUMBER_RANGE_CREATED", "Registered number range created"); //TO TRANSLATE
+define("_REGISTERED_NUMBER_RANGE_UPDATED", "Registered number range updated"); //TO TRANSLATE
+define("_REGISTERED_NUMBER_RANGE_DELETED", "Registered number range deleted"); //TO TRANSLATE

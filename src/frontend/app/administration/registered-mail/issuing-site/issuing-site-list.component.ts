@@ -22,6 +22,21 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class IssuingSiteListComponent implements OnInit {
 
+    subMenus: any[] = [
+        {
+            icon: 'fas fa-dolly-flatbed',
+            route: '/administration/registeredMails',
+            label: this.translate.instant('lang.registeredMailNumberRanges'),
+            current: false
+        },
+        {
+            icon: 'fas fa-warehouse',
+            route: '/administration/issuingSites',
+            label: this.translate.instant('lang.issuingSites'),
+            current: true
+        },
+    ];
+
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     parameters: any = {};
@@ -30,8 +45,8 @@ export class IssuingSiteListComponent implements OnInit {
 
     data: any[] = [];
 
-    displayedColumns = ['account_number', 'site_label', 'post_office_label', 'actions'];
-    filterColumns = ['account_number', 'site_label', 'post_office_label'];
+    displayedColumns = ['accountNumber', 'label', 'postOfficeLabel', 'actions'];
+    filterColumns = ['accountNumber', 'label', 'postOfficeLabel'];
 
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
@@ -58,7 +73,7 @@ export class IssuingSiteListComponent implements OnInit {
 
     getData() {
         this.data = [];
-        this.http.get('../rest/recommended/sites').pipe(
+        this.http.get('../rest/registeredMail/sites').pipe(
             tap((data: any) => {
                 this.data = data['sites'];
                 this.loading = false;
@@ -78,7 +93,7 @@ export class IssuingSiteListComponent implements OnInit {
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.delete(`../rest/recommended/sites/${row.id}`)),
+            exhaustMap(() => this.http.delete(`../rest/registeredMail/sites/${row.id}`)),
             tap(() => {
                 this.data = this.data.filter((item: any) => item.id !== row.id);
                 setTimeout(() => {
