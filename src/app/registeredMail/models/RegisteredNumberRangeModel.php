@@ -24,7 +24,7 @@ class RegisteredNumberRangeModel
 
         return DatabaseModel::select([
             'select'   => empty($args['select']) ? ['*'] : $args['select'],
-            'table'    => ['registered_number_range'],
+            'table'    => ['registered_mail_number_range'],
             'where'    => empty($args['where']) ? [] : $args['where'],
             'data'     => empty($args['data']) ? [] : $args['data'],
             'order_by' => empty($args['orderBy']) ? [] : $args['orderBy'],
@@ -40,7 +40,7 @@ class RegisteredNumberRangeModel
 
         $site = DatabaseModel::select([
             'select' => empty($args['select']) ? ['*'] : $args['select'],
-            'table'  => ['registered_number_range'],
+            'table'  => ['registered_mail_number_range'],
             'where'  => ['id = ?'],
             'data'   => [$args['id']]
         ]);
@@ -58,10 +58,10 @@ class RegisteredNumberRangeModel
         ValidatorModel::stringType($args, ['type', 'status']);
         ValidatorModel::intVal($args, ['rangeStart', 'rangeEnd', 'siteId', 'currentNumber']);
 
-        $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'registered_number_range_id_seq']);
+        $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'registered_mail_number_range_id_seq']);
 
         DatabaseModel::insert([
-            'table'         => 'registered_number_range',
+            'table'         => 'registered_mail_number_range',
             'columnsValues' => [
                 'id'                      => $nextSequenceId,
                 'type'                    => $args['type'],
@@ -84,7 +84,7 @@ class RegisteredNumberRangeModel
         ValidatorModel::arrayType($args, ['set', 'where', 'data']);
 
         DatabaseModel::update([
-            'table' => 'registered_number_range',
+            'table' => 'registered_mail_number_range',
             'set'   => empty($args['set']) ? [] : $args['set'],
             'where' => $args['where'],
             'data'  => empty($args['data']) ? [] : $args['data']
@@ -99,7 +99,7 @@ class RegisteredNumberRangeModel
         ValidatorModel::arrayType($args, ['where', 'data']);
 
         DatabaseModel::delete([
-            'table' => 'registered_number_range',
+            'table' => 'registered_mail_number_range',
             'where' => $args['where'],
             'data'  => $args['data']
         ]);

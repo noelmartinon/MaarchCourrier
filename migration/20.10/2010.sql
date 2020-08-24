@@ -189,8 +189,8 @@ ALTER TABLE templates ADD COLUMN subject character varying(255);
 UPDATE groupbasket SET list_event_data = '{"canUpdateDocuments":true}' WHERE list_event_data->'canUpdateDocument' = true;
 
 /* REGISTERED MAIL */
-DROP TABLE IF EXISTS issuing_sites;
-CREATE TABLE IF NOT EXISTS issuing_sites (
+DROP TABLE IF EXISTS registered_mail_issuing_sites;
+CREATE TABLE IF NOT EXISTS registered_mail_issuing_sites (
    id SERIAL NOT NULL,
    label CHARACTER VARYING(256) NOT NULL,
    post_office_label CHARACTER VARYING(256),
@@ -202,28 +202,28 @@ CREATE TABLE IF NOT EXISTS issuing_sites (
    address_postcode CHARACTER VARYING(256),
    address_town CHARACTER VARYING(256),
    address_country CHARACTER VARYING(256),
-   CONSTRAINT issuing_sites_pkey PRIMARY KEY (id)
+   CONSTRAINT registered_mail_issuing_sites_pkey PRIMARY KEY (id)
 );
-DROP TABLE IF EXISTS issuing_sites_entities;
-CREATE TABLE IF NOT EXISTS issuing_sites_entities (
+DROP TABLE IF EXISTS registered_mail_issuing_sites_entities;
+CREATE TABLE IF NOT EXISTS registered_mail_issuing_sites_entities (
    id SERIAL NOT NULL,
    site_id INTEGER NOT NULL,
    entity_id INTEGER NOT NULL,
-   CONSTRAINT issuing_sites_entities_pkey PRIMARY KEY (id),
-   CONSTRAINT issuing_sites_entities_unique_key UNIQUE (site_id, entity_id)
+   CONSTRAINT registered_mail_issuing_sites_entities_pkey PRIMARY KEY (id),
+   CONSTRAINT registered_mail_issuing_sites_entities_unique_key UNIQUE (site_id, entity_id)
 );
 
-DROP TABLE IF EXISTS registered_number_range;
-CREATE TABLE IF NOT EXISTS registered_number_range (
+DROP TABLE IF EXISTS registered_mail_number_range;
+CREATE TABLE IF NOT EXISTS registered_mail_number_range (
     id SERIAL NOT NULL,
     type CHARACTER VARYING(15) NOT NULL,
-    tracking_account_number CHARACTER VARYING(256),
-    range_start INTEGER,
-    range_end INTEGER,
-    creator INTEGER,
-    created timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
-    site_id INTEGER,
-    status CHARACTER VARYING(10),
+    tracking_account_number CHARACTER VARYING(256) NOT NULL,
+    range_start INTEGER NOT NULL,
+    range_end INTEGER NOT NULL,
+    creator INTEGER NOT NULL,
+    creation_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    site_id INTEGER NOT NULL,
+    status CHARACTER VARYING(10) NOT NULL,
     current_number INTEGER,
     CONSTRAINT registered_number_range_pkey PRIMARY KEY (id),
     CONSTRAINT registered_number_range_unique_key UNIQUE (tracking_account_number)
@@ -231,17 +231,18 @@ CREATE TABLE IF NOT EXISTS registered_number_range (
 
 DROP TABLE IF EXISTS registered_mail_resources;
 CREATE TABLE IF NOT EXISTS registered_mail_resources (
-   id SERIAL NOT NULL,
-   res_id INTEGER NOT NULL,
-   type CHARACTER VARYING(2) NOT NULL,
-   issuing_site INTEGER NOT NULL,
-   warranty INTEGER NOT NULL,
-   letter BOOL NOT NULL DEFAULT FALSE,
-   recipient jsonb NOT NULL,
-   number INTEGER NOT NULL,
-   reference TEXT,
-   generated BOOL NOT NULL DEFAULT FALSE,
-   CONSTRAINT registered_mail_resources_pkey PRIMARY KEY (id)
+    id SERIAL NOT NULL,
+    res_id INTEGER NOT NULL,
+    type CHARACTER VARYING(2) NOT NULL,
+    issuing_site INTEGER NOT NULL,
+    warranty CHARACTER VARYING(2) NOT NULL,
+    letter BOOL NOT NULL DEFAULT FALSE,
+    recipient jsonb NOT NULL,
+    number INTEGER NOT NULL,
+    reference TEXT,
+    generated BOOL NOT NULL DEFAULT FALSE,
+    CONSTRAINT registered_mail_resources_pkey PRIMARY KEY (id),
+    CONSTRAINT registered_mail_resources_unique_key UNIQUE (res_id)
 );
 
 /* RE CREATE VIEWS */

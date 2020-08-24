@@ -21,7 +21,6 @@ use Attachment\controllers\AttachmentController;
 use Attachment\models\AttachmentModel;
 use Convert\controllers\ConvertPdfController;
 use Convert\models\AdrModel;
-use CustomField\models\CustomFieldModel;
 use Docserver\controllers\DocserverController;
 use Docserver\models\DocserverModel;
 use Entity\controllers\ListInstanceController;
@@ -35,6 +34,7 @@ use History\controllers\HistoryController;
 use MessageExchange\controllers\MessageExchangeReviewController;
 use Note\models\NoteEntityModel;
 use Note\models\NoteModel;
+use RegisteredMail\controllers\RegisteredMailTrait;
 use Resource\controllers\ResController;
 use Resource\controllers\StoreController;
 use Resource\models\ResModel;
@@ -49,6 +49,7 @@ use User\models\UserModel;
 class ActionMethodController
 {
     use AcknowledgementReceiptTrait;
+    use RegisteredMailTrait;
     use ShippingTrait;
     use ExternalSignatoryBookTrait;
 

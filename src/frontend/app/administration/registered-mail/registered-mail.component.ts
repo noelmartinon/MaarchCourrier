@@ -162,7 +162,7 @@ export class RegisteredMailComponent implements OnInit {
     }
 
     getMinRange() {
-        this.http.get(`../rest/registeredMail/ranges/last/type/${this.adminFormGroup.controls['registeredMailType'].value}`).pipe(
+        this.http.get(`../rest/registeredMail/ranges/type/${this.adminFormGroup.controls['registeredMailType'].value}/last`).pipe(
             tap((data: any) => {
                 if (data.lastNumber === 1) {
                     this.minRange = data.lastNumber;

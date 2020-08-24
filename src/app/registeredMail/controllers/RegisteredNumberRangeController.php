@@ -46,7 +46,7 @@ class RegisteredNumberRangeController
                 'rangeStart'            => $range['range_start'],
                 'rangeEnd'              => $range['range_end'],
                 'creator'               => $range['creator'],
-                'created'               => $range['created'],
+                'creationDate'          => $range['creation_date'],
                 'status'                => $range['status'],
                 'customerAccountNumber' => $site['account_number'],
                 'currentNumber'         => $range['current_number'],
@@ -86,7 +86,7 @@ class RegisteredNumberRangeController
             'rangeStart'            => $range['range_start'],
             'rangeEnd'              => $range['range_end'],
             'creator'               => $range['creator'],
-            'created'               => $range['created'],
+            'creationDate'          => $range['creation_date'],
             'status'                => $range['status'],
             'customerAccountNumber' => $site['account_number'],
             'currentNumber'         => $range['current_number'],
@@ -200,6 +200,9 @@ class RegisteredNumberRangeController
         }
         if (!Validator::intVal()->notEmpty()->validate($body['siteId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body siteId is empty or not an integer']);
+        }
+        if ($body['rangeStart'] >= $body['rangeEnd']) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body rangeStart cannot be larger than rangeEnd']);
         }
 
         $site = IssuingSiteModel::getById(['id' => $body['siteId']]);
@@ -329,7 +332,8 @@ class RegisteredNumberRangeController
             'select'  => ['range_end'],
             'where'   => ['type = ?', 'status in (?)'],
             'data'    => [$args['type'], ['OK', 'SPD']],
-            'orderBy' => ['range_end desc']
+            'orderBy' => ['range_end desc'],
+            'limit'   => 1
         ]);
 
         if (empty($range)) {

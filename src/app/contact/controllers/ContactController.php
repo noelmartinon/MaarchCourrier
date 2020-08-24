@@ -726,7 +726,9 @@ class ContactController
 
     public static function getContactAfnor(array $args)
     {
-        $afnorAddress = ['Afnor',
+        $afnorAddress = [
+            'Afnor',
+            '',
             '',
             '',
             '',
@@ -777,6 +779,11 @@ class ContactController
         $args['address_postcode'] = strtoupper($args['address_postcode']);
         $args['address_town'] = strtoupper($args['address_town']);
         $afnorAddress[6] = trim(substr($args['address_postcode'].' '.$args['address_town'], 0, 38));
+
+        // Ligne 7
+        if (!empty($args['address_country'])) {
+            $afnorAddress[7] = trim(substr($args['address_country'], 0, 38));
+        }
 
         return $afnorAddress;
     }

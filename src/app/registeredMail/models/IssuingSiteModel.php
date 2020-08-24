@@ -24,7 +24,7 @@ class IssuingSiteModel
 
         return DatabaseModel::select([
             'select'   => empty($args['select']) ? ['*'] : $args['select'],
-            'table'    => ['issuing_sites'],
+            'table'    => ['registered_mail_issuing_sites'],
             'where'    => empty($args['where']) ? [] : $args['where'],
             'data'     => empty($args['data']) ? [] : $args['data'],
             'order_by' => empty($args['orderBy']) ? [] : $args['orderBy'],
@@ -40,7 +40,7 @@ class IssuingSiteModel
 
         $site = DatabaseModel::select([
             'select' => empty($args['select']) ? ['*'] : $args['select'],
-            'table'  => ['issuing_sites'],
+            'table'  => ['registered_mail_issuing_sites'],
             'where'  => ['id = ?'],
             'data'   => [$args['id']]
         ]);
@@ -57,10 +57,10 @@ class IssuingSiteModel
         ValidatorModel::notEmpty($args, ['label']);
         ValidatorModel::stringType($args, ['label']);
 
-        $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'issuing_sites_id_seq']);
+        $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'registered_mail_issuing_sites_id_seq']);
 
         DatabaseModel::insert([
-            'table'         => 'issuing_sites',
+            'table'         => 'registered_mail_issuing_sites',
             'columnsValues' => [
                 'id'                  => $nextSequenceId,
                 'label'               => $args['label'],
@@ -85,7 +85,7 @@ class IssuingSiteModel
         ValidatorModel::arrayType($args, ['set', 'where', 'data']);
 
         DatabaseModel::update([
-            'table' => 'issuing_sites',
+            'table' => 'registered_mail_issuing_sites',
             'set'   => empty($args['set']) ? [] : $args['set'],
             'where' => $args['where'],
             'data'  => empty($args['data']) ? [] : $args['data']
@@ -100,7 +100,7 @@ class IssuingSiteModel
         ValidatorModel::arrayType($args, ['where', 'data']);
 
         DatabaseModel::delete([
-            'table' => 'issuing_sites',
+            'table' => 'registered_mail_issuing_sites',
             'where' => $args['where'],
             'data'  => $args['data']
         ]);

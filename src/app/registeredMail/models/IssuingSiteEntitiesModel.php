@@ -26,7 +26,7 @@ class IssuingSiteEntitiesModel
 
         return DatabaseModel::select([
             'select'    => $args['select'],
-            'table'     => ['issuing_sites_entities'],
+            'table'     => ['registered_mail_issuing_sites_entities'],
             'where'     => empty($args['where']) ? [] : $args['where'],
             'data'      => empty($args['data']) ? [] : $args['data'],
             'order_by'  => empty($args['orderBy']) ? [] : $args['orderBy'],
@@ -41,7 +41,7 @@ class IssuingSiteEntitiesModel
         ValidatorModel::intVal($args, ['siteId', 'entityId']);
 
         DatabaseModel::insert([
-            'table'         => 'issuing_sites_entities',
+            'table'         => 'registered_mail_issuing_sites_entities',
             'columnsValues' => [
                 'site_id'   => $args['siteId'],
                 'entity_id' => $args['entityId'],
@@ -57,7 +57,7 @@ class IssuingSiteEntitiesModel
         ValidatorModel::arrayType($args, ['where', 'data']);
 
         DatabaseModel::delete([
-            'table' => 'issuing_sites_entities',
+            'table' => 'registered_mail_issuing_sites_entities',
             'where' => $args['where'],
             'data'  => $args['data']
         ]);

@@ -626,10 +626,12 @@ $app->get('/registeredMail/ranges/{id}', \RegisteredMail\controllers\RegisteredN
 $app->post('/registeredMail/ranges', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':create');
 $app->put('/registeredMail/ranges/{id}', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':update');
 $app->delete('/registeredMail/ranges/{id}', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':delete');
-$app->get('/registeredMail/ranges/last/type/{type}', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':getLastNumberByType');
+$app->get('/registeredMail/ranges/type/{type}/last', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':getLastNumberByType');
 $app->get('/registeredMail/sites/type/{type}', \RegisteredMail\controllers\IssuingSiteController::class . ':getByType');
 
 $app->get('/registeredMail/countries', \RegisteredMail\controllers\RegisteredMailController::class . ':getCountries');
+//TODO remove
+$app->get('/registeredMail/print', \RegisteredMail\controllers\RegisteredMailController::class . ':printTest');
 
 
 $app->run();
