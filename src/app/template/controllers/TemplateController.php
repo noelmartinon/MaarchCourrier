@@ -459,7 +459,7 @@ class TemplateController
                 $entities = [0];
             }
         }
-        $where = ['(templates_association.value_field in (?) OR templates_association.template_id IS NULL)', 'templates.template_type = ?', 'templates.template_target = ?'];
+        $where = ['templates_association.value_field in (?)', 'templates.template_type = ?', 'templates.template_target = ?'];
         $data = [$entities, 'HTML', 'sendmail'];
 
         $templates = TemplateModel::getWithAssociation([
