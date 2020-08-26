@@ -563,7 +563,6 @@ export class IndexingFormComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get(`../../rest/doctypes`).pipe(
                 tap((data: any) => {
-                    let title = '';
                     let arrValues: any[] = [];
                     data.structure.forEach((doctype: any) => {
                         if (doctype['doctypes_second_level_id'] === undefined) {
@@ -575,25 +574,25 @@ export class IndexingFormComponent implements OnInit {
                                 isTitle: true,
                                 color: doctype.css_style
                             });
-                        } else if (doctype['description'] === undefined) {
-                            arrValues.push({
-                                id: doctype.doctypes_second_level_id,
-                                label: '&nbsp;&nbsp;&nbsp;&nbsp;' + doctype.doctypes_second_level_label,
-                                title: doctype.doctypes_second_level_label,
-                                disabled: true,
-                                isTitle: true,
-                                color: doctype.css_style
+                            data.structure.filter((info: any) => info.doctypes_first_level_id === doctype.doctypes_first_level_id && info.doctypes_second_level_id !== undefined && info.description === undefined).forEach((secondDoctype: any) => {
+                                arrValues.push({
+                                    id: secondDoctype.doctypes_second_level_id,
+                                    label: '&nbsp;&nbsp;&nbsp;&nbsp;' + secondDoctype.doctypes_second_level_label,
+                                    title: secondDoctype.doctypes_second_level_label,
+                                    disabled: true,
+                                    isTitle: true,
+                                    color: secondDoctype.css_style
+                                });
+                                arrValues = arrValues.concat(data.structure.filter((infoDoctype: any) => infoDoctype.doctypes_second_level_id === secondDoctype.doctypes_second_level_id && infoDoctype.description !== undefined).map((infoType: any) => {
+                                    return {
+                                        id: infoType.type_id,
+                                        label: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + infoType.description,
+                                        title: infoType.description,
+                                        disabled: false,
+                                        isTitle: false,
+                                    };
+                                }));
                             });
-
-                            arrValues = arrValues.concat(data.structure.filter((info: any) => info.doctypes_second_level_id === doctype.doctypes_second_level_id && info.description !== undefined).map((info: any) => {
-                                return {
-                                    id: info.type_id,
-                                    label: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + info.description,
-                                    title: info.description,
-                                    disabled: false,
-                                    isTitle: false,
-                                }
-                            }));
                         }
                     });
                     elem.values = arrValues;
