@@ -1,5 +1,4 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -14,12 +13,12 @@ import { of } from 'rxjs';
 })
 export class ResMarkAsReadActionComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
 
-    constructor(private translate: TranslateService, public http: HttpClient, private notify: NotificationService, public dialogRef: MatDialogRef<ResMarkAsReadActionComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
+    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, public dialogRef: MatDialogRef<ResMarkAsReadActionComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
     ngOnInit(): void { }
 

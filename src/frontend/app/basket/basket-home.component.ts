@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, EventEmitter, Output, ViewChild, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../service/app.service';
@@ -19,7 +18,7 @@ import { of } from 'rxjs/internal/observable/of';
 })
 export class BasketHomeComponent implements OnInit, OnDestroy {
 
-    lang: any = LANG;
+    
     loading: boolean = true;
     hoverEditGroupOrder: boolean = false;
 

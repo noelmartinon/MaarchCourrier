@@ -114,6 +114,7 @@ define('_OUTGOING', 'Outgoing mail');
 define('_INTERNAL', 'Internal Mail');
 define('_ATTACHMENT', 'Attachment');
 define('_GED_DOC', 'EDM Document');
+define('_REGISTERED_MAIL', 'Registered mail');
 define('_UNCHANGED', 'Unchanged');
 define('_NO_PAGE', 'No page');
 define('_NO_KEYWORD', 'No keyword');
@@ -470,3 +471,8 @@ define("_ISSUING_SITE_DELETED", "Issuing site deleted");
 define("_REGISTERED_NUMBER_RANGE_CREATED", "Registered number range created");
 define("_REGISTERED_NUMBER_RANGE_UPDATED", "Registered number range updated");
 define("_REGISTERED_NUMBER_RANGE_DELETED", "Registered number range deleted");
+
+define('_SAVE_REGISTERED_MAIL', 'Save registered mail');
+define('_SAVE_PRINT_REGISTERED_MAIL', 'Save and print registered mail');
+define('_SAVE_INDEX_REGISTERED_MAIL', 'Save registered mail and start indexing');
+define('_PRINT_REGISTERED_MAIL', 'Print registered mail');

@@ -56,7 +56,7 @@
         fixedTopGap="56" position='end' [opened]="!appService.getViewMode()" class="col-md-4 col-xs-11">
         <mat-nav-list>
             <mat-tab-group>
-                <mat-tab label="{{lang[diffusionModel.type]}}">
+                <mat-tab label="{{'lang.' + diffusionModel.type | translate}}">
                     <app-visa-workflow *ngIf="diffusionModel.type === 'visaCircuit'" [showListModels]="false"
                         [showComment]="false" [adminMode]="true" #appVisaWorkflow></app-visa-workflow>
                     <app-avis-workflow *ngIf="diffusionModel.type === 'opinionCircuit'" [showListModels]="false"

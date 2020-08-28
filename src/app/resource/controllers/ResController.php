@@ -38,6 +38,9 @@ use IndexingModel\models\IndexingModelFieldModel;
 use MessageExchange\models\MessageExchangeModel;
 use Note\models\NoteModel;
 use Priority\models\PriorityModel;
+use RegisteredMail\controllers\RegisteredMailController;
+use RegisteredMail\models\IssuingSiteModel;
+use RegisteredMail\models\RegisteredMailModel;
 use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
 use Resource\models\UserFollowedResourceModel;
@@ -230,6 +233,13 @@ class ResController extends ResourceControlController
 
             $tags = ResourceTagModel::get(['select' => ['tag_id'], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
             $formattedData['tags'] = array_column($tags, 'tag_id');
+
+            if ($formattedData['categoryId'] == 'registeredMail') {
+                $registeredMailInfo = RegisteredMailController::getFormattedRegisteredMail(['resId' => $args['resId']]);
+                foreach ($registeredMailInfo as $key => $value) {
+                    $formattedData['registeredMail_' . $key] = $value;
+                }
+            }
         } else {
             $followed = UserFollowedResourceModel::get([
                 'select'    => [1],
@@ -237,6 +247,9 @@ class ResController extends ResourceControlController
                 'data'      => [$GLOBALS['id'], $args['resId']]
             ]);
             $formattedData['followed'] = !empty($followed);
+
+            $registeredMail = RegisteredMailModel::getByResId(['select' => ['deposit_id'], 'resId' => $args['resId']]);
+            $formattedData['registeredMail_deposit_id'] = $registeredMail['deposit_id'];
         }
 
         return $response->withJson($formattedData);

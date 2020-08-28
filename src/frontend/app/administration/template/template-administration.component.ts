@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -28,7 +27,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
     @ViewChild('maarchTree', { static: true }) maarchTree: MaarchFlatTreeComponent;
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     creationMode: boolean;
@@ -100,7 +99,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
         public appService: AppService,
         private viewContainerRef: ViewContainerRef,
         public functionsService: FunctionsService,
-        private translate: TranslateService
+        public translate: TranslateService
     ) { }
 
     ngOnInit(): void {
@@ -668,7 +667,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
     styleUrls: ['template-administration-checkEntities-modal.scss']
 })
 export class TemplateAdministrationCheckEntitiesModalComponent {
-    lang: any = LANG;
+    
 
     constructor(public http: HttpClient, @Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<TemplateAdministrationCheckEntitiesModalComponent>) {
     }

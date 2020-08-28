@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, EventEmitter, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../service/header.service';
@@ -27,7 +26,7 @@ export class ContactsListAdministrationComponent implements OnInit {
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     filtersChange = new EventEmitter();
@@ -84,7 +83,7 @@ export class ContactsListAdministrationComponent implements OnInit {
     ];
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -299,13 +298,13 @@ export class ContactListHttpDao {
     styleUrls: [],
 })
 export class ContactsListAdministrationRedirectModalComponent {
-    lang: any = LANG;
+    
     modalTitle: string = this.translate.instant('lang.confirmAction');
     redirectContact: number;
     processMode: string = 'delete';
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<ContactsListAdministrationRedirectModalComponent>,

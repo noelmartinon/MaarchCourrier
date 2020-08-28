@@ -17,7 +17,7 @@
                 <div class="alert-message alert-message-info"
                     *ngIf="data.resIds.length == 1 && appVisaWorkflow !== undefined && appVisaWorkflow.getNextVisaUser() !== ''"
                     role="alert" style="margin-top: 30px;"
-                    [innerHTML]="lang.sendToDocTo + ' <b>' + appVisaWorkflow.getNextVisaUser().labelToDisplay + '</b>'">
+                    [innerHTML]="this.translate.instant('lang.sendToDocTo') + ' <b>' + appVisaWorkflow.getNextVisaUser().labelToDisplay + '</b>'">
                 </div>
 
                 <div class="alert-message alert-message-info"
@@ -31,7 +31,7 @@
                     </p>
                     <ul>
                         <li *ngFor="let ressource of resourcesErrors">
-                            <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
+                            <b>{{ressource.alt_identifier}}</b> : {{'lang.' + ressource.reason | translate}}
                         </li>
                     </ul>
                 </div>
@@ -39,7 +39,7 @@
                     role="alert">
                     <ul style="margin: 0;padding-bottom: 0px;">
                         <li *ngFor="let ressource of resourcesWarnings">
-                            <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
+                            <b>{{ressource.alt_identifier}}</b> : {{'lang.' + ressource.reason | translate}}
                         </li>
                     </ul>
                 </div>

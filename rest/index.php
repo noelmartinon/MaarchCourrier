@@ -630,8 +630,11 @@ $app->get('/registeredMail/ranges/type/{type}/last', \RegisteredMail\controllers
 $app->get('/registeredMail/sites/type/{type}', \RegisteredMail\controllers\IssuingSiteController::class . ':getByType');
 
 $app->get('/registeredMail/countries', \RegisteredMail\controllers\RegisteredMailController::class . ':getCountries');
+
+$app->put('/registeredMails/{resId}', \RegisteredMail\controllers\RegisteredMailController::class . ':update');
 //TODO remove
 $app->get('/registeredMail/print', \RegisteredMail\controllers\RegisteredMailController::class . ':printTest');
+$app->get('/registeredMail/printDeposit', \RegisteredMail\controllers\RegisteredMailController::class . ':printDepositSlipTest');
 
 
 $app->run();

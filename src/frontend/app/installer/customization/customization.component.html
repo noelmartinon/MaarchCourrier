@@ -13,7 +13,7 @@
                         {{'lang.customAlreadyExist' | translate}}
                     </ng-container>
                     <ng-container *ngIf="stepFormGroup.controls['customId'].errors?.pattern">
-                        {{lang.onlySpecialCharAllowed | scan : ['"_", "-"']}}
+                        {{'lang.onlySpecialCharAllowed' | translate:{value1: '"_", "-"'} }}
                     </ng-container>
                 </mat-error>
             </mat-form-field>

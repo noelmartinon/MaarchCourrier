@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { AppService } from '../../../service/app.service';
@@ -19,8 +18,6 @@ import { moveItemInArray, CdkDragDrop, transferArrayItem } from '@angular/cdk/dr
 
 export class FieldListComponent implements OnInit {
 
-    lang: any = LANG;
-
     loading: boolean = false;
 
     @Input() dataCustomFields: any[];
@@ -28,7 +25,7 @@ export class FieldListComponent implements OnInit {
     @Input() dataFields: any[];
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         public dialog: MatDialog,
         public appService: AppService,

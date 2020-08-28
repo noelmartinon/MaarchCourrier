@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -11,7 +10,7 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class MenuNavComponent implements OnInit {
 
-    lang: any = LANG;
+    
     router: any;
     user: any = {};
 

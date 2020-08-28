@@ -103,6 +103,32 @@ class IssuingSiteController
         if (!Validator::stringType()->notEmpty()->validate($body['label'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body label is empty or not a string']);
         }
+        if (!Validator::intVal()->notEmpty()->length(1, 10)->validate($body['accountNumber'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body accountNumber is empty or not an integer with less than 11 digits']);
+        }
+        if (!Validator::intVal()->notEmpty()->validate($body['addressNumber'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body addressNumber is empty or not an integer']);
+        }
+        if (!Validator::stringType()->notEmpty()->validate($body['addressStreet'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body addressStreet is empty or not a string']);
+        }
+        if (!Validator::stringType()->notEmpty()->validate($body['addressPostcode'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body addressPostcode is empty or not a string']);
+        }
+        if (!Validator::stringType()->notEmpty()->validate($body['addressTown'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body addressTown is empty or not a string']);
+        }
+
+        $site = IssuingSiteModel::get([
+            'select' => [1],
+            'where'  => ['account_number = ?'],
+            'data'   => [$body['accountNumber']],
+            'limit ' => 1
+        ]);
+        if (!empty($site)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body accountNumber is already used by another site']);
+        }
+
         if (!empty($body['entities']) && !Validator::arrayType()->validate($body['entities'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body entities is not an array']);
         } elseif (!empty($body['entities']) && Validator::arrayType()->validate($body['entities'])) {
@@ -160,6 +186,32 @@ class IssuingSiteController
         if (!Validator::stringType()->notEmpty()->validate($body['label'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body label is empty or not a string']);
         }
+        if (!Validator::intVal()->notEmpty()->length(1, 10)->validate($body['accountNumber'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body accountNumber is empty or not an integer with less than 11 digits']);
+        }
+        if (!Validator::intVal()->notEmpty()->validate($body['addressNumber'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body addressNumber is empty or not an integer']);
+        }
+        if (!Validator::stringType()->notEmpty()->validate($body['addressStreet'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body addressStreet is empty or not a string']);
+        }
+        if (!Validator::stringType()->notEmpty()->validate($body['addressPostcode'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body addressPostcode is empty or not a string']);
+        }
+        if (!Validator::stringType()->notEmpty()->validate($body['addressTown'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body addressTown is empty or not a string']);
+        }
+
+        $site = IssuingSiteModel::get([
+            'select' => [1],
+            'where'  => ['account_number = ?', 'id != ?'],
+            'data'   => [$body['accountNumber'], $args['id']],
+            'limit ' => 1
+        ]);
+        if (!empty($site)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body accountNumber is already used by another site']);
+        }
+
         if (!empty($body['entities']) && !Validator::arrayType()->validate($body['entities'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body entities is not an array']);
         } elseif (!empty($body['entities']) && Validator::arrayType()->validate($body['entities'])) {
@@ -174,7 +226,7 @@ class IssuingSiteController
             'set'   => [
                 'label'               => $body['label'],
                 'post_office_label'   => $body['postOfficeLabel'] ?? null,
-                'account_number'      => $body['accountNumber'] ?? null,
+                'account_number'      => $body['accountNumber'],
                 'address_number'      => $body['addressNumber'] ?? null,
                 'address_street'      => $body['addressStreet'] ?? null,
                 'address_additional1' => $body['addressAdditional1'] ?? null,

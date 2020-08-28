@@ -416,4 +416,44 @@ An action page is described in a ACTIONPAGE tag :
         <MODULE></MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
     </ACTIONPAGE>
+    <ACTIONPAGE>
+        <ID>saveRegisteredMail</ID>
+        <LABEL>_SAVE_REGISTERED_MAIL</LABEL>
+        <NAME>saveRegisteredMail</NAME>
+        <DESC>_SAVE_REGISTERED_MAIL</DESC>
+        <component>saveRegisteredMailAction</component>
+        <ORIGIN>apps</ORIGIN>
+        <MODULE></MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+    </ACTIONPAGE>
+    <ACTIONPAGE>
+        <ID>saveAndPrintRegisteredMail</ID>
+        <LABEL>_SAVE_PRINT_REGISTERED_MAIL</LABEL>
+        <NAME>saveAndPrintRegisteredMail</NAME>
+        <DESC>_SAVE_PRINT_REGISTERED_MAIL</DESC>
+        <component>saveAndPrintRegisteredMailAction</component>
+        <ORIGIN>apps</ORIGIN>
+        <MODULE></MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+    </ACTIONPAGE>
+    <ACTIONPAGE>
+        <ID>saveAndIndexRegisteredMail</ID>
+        <LABEL>_SAVE_INDEX_REGISTERED_MAIL</LABEL>
+        <NAME>saveAndIndexRegisteredMail</NAME>
+        <DESC>_SAVE_INDEX_REGISTERED_MAIL</DESC>
+        <component>saveAndIndexRegisteredMailAction</component>
+        <ORIGIN>apps</ORIGIN>
+        <MODULE></MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+    </ACTIONPAGE>
+    <ACTIONPAGE>
+        <ID>printRegisteredMail</ID>
+        <LABEL>_PRINT_REGISTERED_MAIL</LABEL>
+        <NAME>printRegisteredMail</NAME>
+        <DESC>_PRINT_REGISTERED_MAIL</DESC>
+        <component>printRegisteredMailAction</component>
+        <ORIGIN>apps</ORIGIN>
+        <MODULE></MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+    </ACTIONPAGE>
 </ROOT>

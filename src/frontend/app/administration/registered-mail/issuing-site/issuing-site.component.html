@@ -26,7 +26,7 @@
                             </mat-form-field>
                             <mat-form-field>
                                 <mat-label>{{'lang.coclicoNumber' | translate}}</mat-label>
-                                <input matInput formControlName="accountNumber">
+                                <input type="text" pattern="[0-9]+" maxlength="10" matInput formControlName="accountNumber">
                             </mat-form-field>
                             <mat-form-field>
                                 <mat-label>{{'lang.postOffice' | translate}}</mat-label>
@@ -85,7 +85,7 @@
                                 </mat-form-field>
                                 <mat-form-field>
                                     <mat-label>{{'lang.contactsParameters_addressAdditional2' | translate}}</mat-label>
-                                    <input matInput formControlName="addressadditional2">
+                                    <input matInput formControlName="addressAdditional2">
                                 </mat-form-field>
                                 <mat-form-field>
                                     <mat-label>{{'lang.contactsParameters_addressPostcode' | translate}}</mat-label>
@@ -100,7 +100,7 @@
                                     <input matInput #autoCompleteInput [matAutocomplete]="matAutocompleteCountries"
                                         formControlName="addressCountry">
                                     <mat-autocomplete #matAutocompleteCountries="matAutocomplete"
-                                        (optionSelected)="adminFormGroup.controls['addressCountry'].setValue($event.option.value)" [isOpen]="true">
+                                        (optionSelected)="adminFormGroup.controls['addressCountry'].setValue($event.option.value)" isOpen="true">
                                         <mat-option *ngFor="let country of countriesFilteredResult | async"
                                             [value]="country">
                                             {{country}}

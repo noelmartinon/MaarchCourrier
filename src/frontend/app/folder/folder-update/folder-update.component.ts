@@ -1,5 +1,4 @@
 import { Component, OnInit, Inject, HostListener } from '@angular/core';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { map, tap, catchError, exhaustMap, finalize } from 'rxjs/operators';
@@ -16,7 +15,7 @@ declare var $: any;
 })
 export class FolderUpdateComponent implements OnInit {
 
-    lang: any = LANG;
+    
 
     folder: any = {
         id: 0,
@@ -43,7 +42,7 @@ export class FolderUpdateComponent implements OnInit {
     }
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialogRef: MatDialogRef<FolderUpdateComponent>,

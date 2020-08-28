@@ -1,6 +1,5 @@
 import {Component, OnInit, Input, ViewChild, EventEmitter, Output, OnDestroy} from '@angular/core';
 import { HttpClient, HttpEventType } from '@angular/common/http';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { HeaderService } from '../../service/header.service';
@@ -85,7 +84,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
      */
     @Output() triggerEvent = new EventEmitter<string>();
 
-    lang: any = LANG;
+    
 
     loading: boolean = true;
     noConvertedFound: boolean = false;
@@ -142,7 +141,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     docToUploadValue: any;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public headerService: HeaderService,
@@ -1127,7 +1126,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     openResourceVersion(version: number, type: string) {
 
-        const title = type !== 'PDF' ? this.lang[type + '_version'] : `${this.translate.instant('lang.version')} ${version}`;
+        const title = type !== 'PDF' ? this.translate.instant('lang.' + type + '_version') : `${this.translate.instant('lang.version')} ${version}`;
 
         // TO SHOW ORIGINAL DOC (because autoload signed doc)
         type = type === 'SIGN' ? 'PDF' : type;

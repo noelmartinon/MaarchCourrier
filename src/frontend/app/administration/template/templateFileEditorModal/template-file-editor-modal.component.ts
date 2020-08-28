@@ -1,5 +1,4 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
-import { LANG } from '../../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { take } from 'rxjs/internal/operators/take';
@@ -13,7 +12,7 @@ import {CollaboraOnlineViewerComponent} from '../../../../plugins/collabora-onli
 })
 export class TemplateFileEditorModalComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
     editorOptions: any = null;
     file: any = null;
@@ -23,7 +22,7 @@ export class TemplateFileEditorModalComponent implements OnInit {
     @ViewChild('onlyofficeViewer', { static: false }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
     @ViewChild('collaboraOnlineViewer', { static: false }) collaboraOnlineViewer: CollaboraOnlineViewerComponent;
 
-    constructor(private translate: TranslateService, public dialogRef: MatDialogRef<TemplateFileEditorModalComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
+    constructor(public translate: TranslateService, public dialogRef: MatDialogRef<TemplateFileEditorModalComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
     ngOnInit(): void {
         this.editorOptions = this.data.editorOptions;

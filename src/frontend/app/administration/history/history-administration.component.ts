@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
@@ -17,7 +16,7 @@ export class HistoryAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    lang: any = LANG;
+    
 
     startDateFilter: any = '';
     endDateFilter: any = '';
@@ -40,7 +39,7 @@ export class HistoryAdministrationComponent implements OnInit {
     ];
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         public appService: AppService,
         public functions: FunctionsService,

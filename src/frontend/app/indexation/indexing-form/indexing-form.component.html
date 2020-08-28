@@ -5,8 +5,8 @@
     <div *ngIf="!adminMode && mode == 'indexation'"
         style="display: flex;align-items: center;justify-content: flex-end;margin-top: 10px;margin-bottom: -20px;">
         <button mat-button class="categoryLabel" (click)="toggleMailTracking()"
-            [title]="arrFormControl['mail­tracking'].value ? lang.untrackThisMail : lang.trackThisMail">
-            {{arrFormControl['mail­tracking'].value ? lang.untrackThisMail : lang.trackThisMail}}
+            [title]="arrFormControl['mail­tracking'].value ? this.translate.instant('lang.untrackThisMail') : this.translate.instant('lang.trackThisMail')">
+            {{arrFormControl['mail­tracking'].value ? this.translate.instant('lang.untrackThisMail') : this.translate.instant('lang.trackThisMail')}}
             <mat-icon color="primary" class="{{this.arrFormControl['mail­tracking'].value ? 'fas':'far'}} fa-star"
                 style="font-size: 20px;"></mat-icon>
         </button>
@@ -15,8 +15,8 @@
         <div *ngIf="this['indexingModels_'+category].length > 0 || adminMode" class="banner"
             [style.borderColor]="currentPriorityColor">
             <div class="title" [style.color]="currentPriorityColor">
-                {{lang[category] | uppercase}} <small *ngIf="category === 'mail'"
-                    [title]="this.translate.instant('lang.category_id')">{{lang['indexing_' + currentCategory] | titlecase}}</small>
+                {{'lang.' + category| translate | uppercase }} <small *ngIf="category === 'mail'"
+                    [title]="this.translate.instant('lang.category_id')">{{'lang.indexing_' + currentCategory | translate | titlecase}}</small>
                 <div class="title-divider"></div>
             </div>
             <div class="content">
@@ -49,7 +49,8 @@
                                         <span>{{'lang.disableField' | translate}}</span>
                                     </button>
                                     <mat-divider *ngIf="!field.system"></mat-divider>
-                                    <button mat-menu-item (click)="removeItem('indexingModels_'+category,field,i)" *ngIf="!field.system">
+                                    <button mat-menu-item (click)="removeItem('indexingModels_'+category,field,i)" 
+                                        *ngIf="!field.system && field.identifier.indexOf('registeredMail_') === -1">
                                         <mat-icon class="fa fa-trash" color="warn"></mat-icon>
                                         <span>{{'lang.delete' | translate}}</span>
                                     </button>
@@ -68,7 +69,7 @@
                                         <mat-label *ngIf="appService.getViewMode()">{{field.label}}</mat-label>
                                         <textarea [id]="field.identifier" matInput matTextareaAutosize
                                              [formControl]="arrFormControl[field.identifier]"
-                                            [placeholder]="!adminMode ? lang.typeValue : lang.defaultValue"
+                                            [placeholder]="!adminMode ? this.translate.instant('lang.typeValue') : this.translate.instant('lang.defaultValue')"
                                              class="subject"></textarea>
                                     </mat-form-field>
                                 </ng-container>
@@ -83,7 +84,7 @@
                                         [floatLabel]="appService.getViewMode() ? '' : 'never'">
                                         <mat-label *ngIf="appService.getViewMode()">{{field.label}}</mat-label>
                                         <input [id]="field.identifier" type="number" matInput [formControl]="arrFormControl[field.identifier]"
-                                            [placeholder]="!adminMode ? lang.typeValue : lang.defaultValue" min="0"
+                                            [placeholder]="!adminMode ? this.translate.instant('lang.typeValue') : this.translate.instant('lang.defaultValue')" min="0"
                                             step="0.1">
                                     </mat-form-field>
                                 </ng-container>
@@ -95,7 +96,7 @@
                                         </mat-icon>
                                     </button>
                                     <plugin-select-search [id]="field.identifier" [showResetOption]="adminMode || !field.mandatory" [label]="field.label"
-                                        [placeholderLabel]="!adminMode ? lang.chooseValue : lang.defaultValue"
+                                        [placeholderLabel]="!adminMode ? this.translate.instant('lang.chooseValue') : this.translate.instant('lang.defaultValue')"
                                         [formControlSelect]="arrFormControl[field.identifier]" [datas]="field.values"
                                         (afterSelected)="launchEvent($event, field)" style="width:100%;">
                                     </plugin-select-search>
@@ -120,7 +121,7 @@
                                         <mat-label *ngIf="appService.getViewMode()">{{field.label}}</mat-label>
                                         <input [id]="field.identifier" [formControl]="arrFormControl[field.identifier]" matInput
                                             [matDatepicker]="picker"
-                                            [placeholder]="!adminMode ? lang.chooseDate : lang.defaultValue"
+                                            [placeholder]="!adminMode ? this.translate.instant('lang.chooseDate') : this.translate.instant('lang.defaultValue')"
                                             [min]="getMinDate(field.startDate)" [max]="getMaxDate(field.endDate)"
                                             readonly style="cursor:pointer;" (dateChange)="launchEvent($event, field)">
                                         <mat-datepicker-toggle matSuffix [for]="picker"

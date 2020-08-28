@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { LANG } from './translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from '../service/header.service';
 import { AppService } from '../service/app.service';
@@ -16,14 +15,14 @@ import {NotificationService} from '../service/notification/notification.service'
 export class AboutUsComponent implements OnInit {
 
     applicationVersion: string;
-    lang: any = LANG;
+    
 
     loading: boolean = false;
 
     commitHash: string = this.translate.instant('lang.undefined');
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,

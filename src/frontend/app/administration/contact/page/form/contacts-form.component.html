@@ -97,7 +97,7 @@
                 <mat-list>
                     <h3 mat-subheader class="unitTitle"><span style="flex:1">{{unit.label}}</span><a
                             *ngIf="unit.id === 'address'" (click)="addressBANMode=!addressBANMode"
-                            style="cursor: pointer;">{{addressBANMode ? lang.switchManualAddress : lang.searchAddressDb}}</a>
+                            style="cursor: pointer;">{{addressBANMode ? this.translate.instant('lang.switchManualAddress') : this.translate.instant('lang.searchAddressDb')}}</a>
                     </h3>
                     <ng-container *ngFor="let field of contactForm;let i=index">
                         <mat-list-item class="contact-item"
@@ -131,7 +131,7 @@
                                         [showLabel]="true" [formControlSelect]="field.control"
                                         [placeholderLabel]="field.label" [hideErrorDesc]="false" [datas]="field.values"
                                         [class]="''"
-                                        [suffixIcon]="field.filling ? {class:'fa-circle', color:fillingRate.color, title: lang.targetFillingField} : null">
+                                        [suffixIcon]="field.filling ? {class:'fa-circle', color:fillingRate.color, title: this.translate.instant('lang.targetFillingField')} : null">
                                     </plugin-select-search>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'date'">

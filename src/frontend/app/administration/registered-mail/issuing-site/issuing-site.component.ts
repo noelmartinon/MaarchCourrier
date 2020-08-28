@@ -42,7 +42,7 @@ export class IssuingSiteComponent implements OnInit {
     @ViewChild('maarchTree', { static: true }) maarchTree: MaarchFlatTreeComponent;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -66,12 +66,12 @@ export class IssuingSiteComponent implements OnInit {
                     label: ['', Validators.required],
                     postOfficeLabel: ['', Validators.required],
                     accountNumber: ['', Validators.required],
-                    addressNumber: [''],
-                    addressStreet: [''],
+                    addressNumber: ['', Validators.required],
+                    addressStreet: ['', Validators.required],
                     addressAdditional1: [''],
-                    addressadditional2: [''],
-                    addressPostcode: [''],
-                    addressTown: [''],
+                    addressAdditional2: [''],
+                    addressPostcode: ['', Validators.required],
+                    addressTown: ['', Validators.required],
                     addressCountry: ['']
                 });
                 this.getCountries();
@@ -106,12 +106,12 @@ export class IssuingSiteComponent implements OnInit {
                         label: [data.site.label, Validators.required],
                         postOfficeLabel: [data.site.postOfficeLabel, Validators.required],
                         accountNumber: [data.site.accountNumber, Validators.required],
-                        addressNumber: [data.site.addressNumber],
-                        addressStreet: [data.site.addressStreet],
+                        addressNumber: [data.site.addressNumber, Validators.required],
+                        addressStreet: [data.site.addressStreet, Validators.required],
                         addressAdditional1: [data.site.addressAdditional1],
-                        addressadditional2: [data.site.addressadditional2],
-                        addressPostcode: [data.site.addressPostcode],
-                        addressTown: [data.site.addressTown],
+                        addressAdditional2: [data.site.addressAdditional2],
+                        addressPostcode: [data.site.addressPostcode, Validators.required],
+                        addressTown: [data.site.addressTown, Validators.required],
                         addressCountry: [data.site.addressCountry],
                         entities: [data.site.entities]
                     });

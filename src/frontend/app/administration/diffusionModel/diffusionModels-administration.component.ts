@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
@@ -22,7 +21,7 @@ export class DiffusionModelsAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     listTemplates: any[] = [];
@@ -35,7 +34,7 @@ export class DiffusionModelsAdministrationComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -67,7 +66,7 @@ export class DiffusionModelsAdministrationComponent implements OnInit {
                     data.listTemplates = data.listTemplates.filter((template: any) => template.entityId === null && ['visaCircuit', 'opinionCircuit'].indexOf(template.type) > -1).map((template: any) => {
                         return {
                             ...template,
-                            typeLabel: this.lang[template.type]
+                            typeLabel: this.translate.instant('lang.' + template.type)
                         };
                     });
                     return data.listTemplates;

@@ -45,7 +45,7 @@ export class UsersImportComponent implements OnInit {
     countUp: number = 0;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private functionsService: FunctionsService,

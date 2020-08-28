@@ -63,7 +63,7 @@
                                 [class.hide-for-mobile]="appService.getViewMode()" style="flex:1;">
                                 {{'lang.templateTarget' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element" [class.hide-for-mobile]="appService.getViewMode()"
-                                style="flex:1;"> {{lang[element.template_target]}} </mat-cell>
+                                style="flex:1;"> {{'lang.' + element.template_target | translate}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="template_type">
                             <mat-header-cell *matHeaderCellDef mat-sort-header

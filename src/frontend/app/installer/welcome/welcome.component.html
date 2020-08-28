@@ -1,5 +1,5 @@
 <div class="stepContent">
-    <h2 class="stepContentTitle">{{lang.welcomeApp | scan : [appVersion]}} !</h2>
+    <h2 class="stepContentTitle">{{'lang.welcomeApp' | translate:{value1: appVersion} }} !</h2>
     <div style="text-align: center;">
         <mat-icon class="maarchLogoFull" svgIcon="maarchLogoFull"></mat-icon>
     </div>
@@ -8,7 +8,7 @@
             <mat-label>{{'lang.chooseAppLanguage' | translate}} : </mat-label>
             <mat-select formControlName="lang" required>
                 <mat-option *ngFor="let language of langs" [value]="language">
-                    {{lang[language + 'Full']}}
+                    {{'lang.' + language + 'Full' | translate}}
                 </mat-option>
             </mat-select>
         </mat-form-field>

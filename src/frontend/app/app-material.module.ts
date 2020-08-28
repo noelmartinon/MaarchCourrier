@@ -1,9 +1,7 @@
-// import { LANG } from '../app/translate.component';
 import { NativeDateAdapter, DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from "@angular/material/core";
 
 @Injectable()
 export class AppDateAdapter extends NativeDateAdapter {
-    // lang: any = LANG;
     parse(value: any): Date | null {
         if ((typeof value === 'string') && (value.indexOf('/') > -1)) {
             const str = value.split('/');

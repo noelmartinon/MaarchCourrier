@@ -1,6 +1,5 @@
 import { Injectable, ComponentFactoryResolver, Injector, ApplicationRef, ViewContainerRef, TemplateRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../app/translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { tap, catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -32,14 +31,13 @@ export class HeaderService {
     headerMessage: string = '';
     subHeaderMessage: string = '';
     user: any = { firstname: '', lastname: '', groups: [], privileges: [], preferences: [] };
-    lang: any = LANG;
     nbResourcesFollowed: number = 0;
     base64: string = null;
 
     private portalHost: DomPortalHost;
     
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         public foldersService: FoldersService,
         private componentFactoryResolver: ComponentFactoryResolver,

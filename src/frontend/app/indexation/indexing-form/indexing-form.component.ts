@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, ViewChild, EventEmitter, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
@@ -24,8 +23,6 @@ import { IssuingSiteInputComponent } from '../../administration/registered-mail/
 })
 
 export class IndexingFormComponent implements OnInit {
-
-    lang: any = LANG;
 
     loading: boolean = true;
 
@@ -184,7 +181,7 @@ export class IndexingFormComponent implements OnInit {
         },
         {
             identifier: 'registeredMail_type',
-            label: this.translate.instant('lang.registredMailType'),
+            label: this.translate.instant('lang.registeredMailType'),
             type: 'select',
             default_value: null,
             values: [{ 'id': '2D', 'label': this.translate.instant('lang.registeredMail_2D') }, { 'id': '2C', 'label': this.translate.instant('lang.registeredMail_2C') }, { 'id': 'RW', 'label': this.translate.instant('lang.registeredMail_RW') }],
@@ -223,9 +220,17 @@ export class IndexingFormComponent implements OnInit {
             enabled: true,
         },
         {
-            identifier: 'Destinataire de recommandés',
-            label: this.translate.instant('Destinataire de recommandés'),
-            type: 'registeredMailDest',
+            identifier: 'registeredMail_recipient',
+            label: this.translate.instant('lang.registeredMailRecipient'),
+            type: 'string',
+            default_value: null,
+            values: [],
+            enabled: true,
+        },
+        {
+            identifier: 'registeredMail_reference',
+            label: this.translate.instant('lang.registeredMailReference'),
+            type: 'string',
             default_value: null,
             values: [],
             enabled: true,
@@ -250,7 +255,7 @@ export class IndexingFormComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -366,9 +371,7 @@ export class IndexingFormComponent implements OnInit {
             tap(() => {
                 item.mandatory = false;
                 item.enabled = true;
-                if (item.identifier.indexOf('registeredMail_') > -1) {
-                    this.removeRegisteredMailItems();
-                } else if (item.identifier.indexOf('indexingCustomField') > -1) {
+                if (item.identifier.indexOf('indexingCustomField') > -1) {
                     this.availableCustomFields.push(item);
                     this[arrTarget].splice(index, 1);
                 } else {
@@ -439,6 +442,19 @@ export class IndexingFormComponent implements OnInit {
                 const formatdatas = this.formatDatas(this.getDatas());
 
                 this.http.put(`../rest/resources/${this.resId}`, formatdatas).pipe(
+                    tap(() => {
+                        if (this.currentCategory == 'registeredMail') {
+                            this.http.put(`../rest/registeredMails/${this.resId}`, {
+                                    departureDate: formatdatas.departureDate,
+                                    type: formatdatas.registeredMail_type,
+                                    warranty: formatdatas.registeredMail_warranty,
+                                    issuingSiteId: formatdatas.registeredMail_issuingSite.split('#').slice(-1)[0],
+                                    letter: formatdatas.registeredMail_letter,
+                                    recipient: formatdatas.registeredMail_recipient,
+                                    reference: formatdatas.registeredMail_reference
+                            }).subscribe();
+                        }
+                    }),
                     tap(() => {
                         this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas(false)));
                         this.notify.success(this.translate.instant('lang.dataUpdated'));
@@ -642,7 +658,6 @@ export class IndexingFormComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get(`../rest/doctypes`).pipe(
                 tap((data: any) => {
-                    let title = '';
                     let arrValues: any[] = [];
                     data.structure.forEach((doctype: any) => {
                         if (doctype['doctypes_second_level_id'] === undefined) {
@@ -654,25 +669,25 @@ export class IndexingFormComponent implements OnInit {
                                 isTitle: true,
                                 color: doctype.css_style
                             });
-                        } else if (doctype['description'] === undefined) {
-                            arrValues.push({
-                                id: doctype.doctypes_second_level_id,
-                                label: '&nbsp;&nbsp;&nbsp;&nbsp;' + doctype.doctypes_second_level_label,
-                                title: doctype.doctypes_second_level_label,
-                                disabled: true,
-                                isTitle: true,
-                                color: doctype.css_style
+                            data.structure.filter((info: any) => info.doctypes_first_level_id === doctype.doctypes_first_level_id && info.doctypes_second_level_id !== undefined && info.description === undefined).forEach((secondDoctype: any) => {
+                                arrValues.push({
+                                    id: secondDoctype.doctypes_second_level_id,
+                                    label: '&nbsp;&nbsp;&nbsp;&nbsp;' + secondDoctype.doctypes_second_level_label,
+                                    title: secondDoctype.doctypes_second_level_label,
+                                    disabled: true,
+                                    isTitle: true,
+                                    color: secondDoctype.css_style
+                                });
+                                arrValues = arrValues.concat(data.structure.filter((infoDoctype: any) => infoDoctype.doctypes_second_level_id === secondDoctype.doctypes_second_level_id && infoDoctype.description !== undefined).map((infoType: any) => {
+                                    return {
+                                        id: infoType.type_id,
+                                        label: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + infoType.description,
+                                        title: infoType.description,
+                                        disabled: false,
+                                        isTitle: false,
+                                    };
+                                }));
                             });
-
-                            arrValues = arrValues.concat(data.structure.filter((info: any) => info.doctypes_second_level_id === doctype.doctypes_second_level_id && info.description !== undefined).map((info: any) => {
-                                return {
-                                    id: info.type_id,
-                                    label: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + info.description,
-                                    title: info.description,
-                                    disabled: false,
-                                    isTitle: false,
-                                }
-                            }));
                         }
                     });
                     elem.values = arrValues;
@@ -942,6 +957,10 @@ export class IndexingFormComponent implements OnInit {
             }
             field.enabled = true;
         } else {
+            if (this.functions.empty(this.arrFormControl[field.identifier].value) && field.mandatory) {
+                alert(this.translate.instant('lang.canNotDisabledField'));
+                return false;
+            }
             this.arrFormControl[field.identifier].disable();
             field.enabled = false;
         }
@@ -1072,6 +1091,7 @@ export class IndexingFormComponent implements OnInit {
 
     changeCategory(categoryId: string) {
         this.currentCategory = categoryId;
+        this.changeRegisteredMailItems(categoryId);
     }
 
     changeDestination(entityIds: number[], allowedEntities: number[]) {
@@ -1221,12 +1241,23 @@ export class IndexingFormComponent implements OnInit {
     /**
      * [Registered mail module]
      */
-    removeRegisteredMailItems() {
-        this.fieldCategories.forEach(category => {
-
-            this.availableFields = this.availableFields.concat(this['indexingModels_' + category].filter((item: any) => item.identifier.indexOf('registeredMail_') > -1));
-
-            this['indexingModels_' + category] = this['indexingModels_' + category].filter((item: any) => item.identifier.indexOf('registeredMail_') === -1);
-        });
+    changeRegisteredMailItems(categoryId: string) {
+        if (categoryId != 'registeredMail') {
+            this.fieldCategories.forEach(category => {
+                this.availableFields = this.availableFields.concat(this['indexingModels_' + category].filter((item: any) => item.identifier.indexOf('registeredMail_') > -1));
+                this['indexingModels_' + category] = this['indexingModels_' + category].filter((item: any) => item.identifier.indexOf('registeredMail_') === -1);
+            });
+        } else {
+            this['indexingModels_mail'] = this['indexingModels_mail'].concat(this.availableFields.filter((field: any) => field.identifier.indexOf('registeredMail_') > -1 || field.identifier === 'departureDate'));
+            this['indexingModels_mail'].forEach((item: any) => {
+                if (item.identifier.indexOf('registeredMail_') > -1 || item.identifier === 'departureDate') {
+                    if (this.functions.empty(item.unit)) {
+                        item.unit = 'mail';
+                    }
+                    this.initValidator(item);
+                }
+            });
+            this.availableFields = this.availableFields.filter((item: any) => item.identifier.indexOf('registeredMail_') === -1 && item.identifier !== 'departureDate');
+        }
     }
 }

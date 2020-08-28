@@ -68,22 +68,22 @@
                 </div>
                 <div class="subInfos" *ngIf="attachment.hideMainInfo">
                     <ng-container *ngIf="attachment.signDate !== undefined; else elseTemplate">
-                        {{'lang.signedAlt' | translate}} <b>{{attachment.signDate | timeAgo : 'full'}}</b> {{lang.by | lowercase}}
+                        {{'lang.signedAlt' | translate}} <b>{{attachment.signDate | timeAgo : 'full'}}</b> {{'lang.by' | translate | lowercase}}
                         <b>{{attachment.signatory}}</b>
                     </ng-container>
                     <ng-template #elseTemplate>
                         <ng-container *ngIf="attachment.modificationDate !== null; else creationTemplate">
                             {{'lang.modified' | translate}} <b>{{attachment.modificationDate | timeAgo : 'full'}}</b>
-                            {{lang.by | lowercase}} <b>{{attachment.modifiedBy}}</b>
+                            {{'lang.by' | translate | lowercase}} <b>{{attachment.modifiedBy}}</b>
                         </ng-container>
                         <ng-template #creationTemplate>
                             {{'lang.created' | translate}} <b>{{attachment.creationDate | timeAgo : 'full'}}</b>
-                            {{lang.by | lowercase}} <b>{{attachment.typistLabel}}</b>
+                            {{'lang.by' | translate | lowercase}} <b>{{attachment.typistLabel}}</b>
                         </ng-template>
                     </ng-template>
                 </div>
                 <div class="statusInfo">
-                    {{lang['attachment_'+attachment.status]}}
+                    {{'lang.attachment_' + attachment.status | translate}}
                 </div>
             </div>
         </mat-card>

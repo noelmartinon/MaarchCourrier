@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
@@ -17,7 +16,7 @@ export class StatusesAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     statuses: Status[] = [];
@@ -29,7 +28,7 @@ export class StatusesAdministrationComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,

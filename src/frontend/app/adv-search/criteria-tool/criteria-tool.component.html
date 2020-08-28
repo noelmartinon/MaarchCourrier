@@ -12,7 +12,7 @@
                     [formControl]="searchCriteria" [matAutocomplete]="autoGroup">
                 <mat-autocomplete #autoGroup="matAutocomplete" (optionSelected)="addCriteria($event.option.value)">
                     <ng-container *ngFor="let keyVal of criteria | keyvalue">
-                        <mat-optgroup [label]="lang[keyVal.key]" *ngIf="(filteredCriteria[keyVal.key] | async)?.length > 0">
+                        <mat-optgroup [label]="this.translate.instant('lang.' + keyVal.key)" *ngIf="(filteredCriteria[keyVal.key] | async)?.length > 0">
                             <mat-option *ngFor="let crit of filteredCriteria[keyVal.key] | async | sortBy : 'label'"
                                 [value]="crit" [disabled]="isCurrentCriteria(crit.id)">
                                 {{crit.label}}

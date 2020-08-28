@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { NotificationService } from '../../../service/notification/notification.service';
@@ -19,7 +18,7 @@ export class SendmailAdministrationComponent implements OnInit {
 
     @ViewChild('sendmailForm', { static: false }) public sendmailFormCpt: NgForm;
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     sendmail: any = {
@@ -82,7 +81,7 @@ export class SendmailAdministrationComponent implements OnInit {
 
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,

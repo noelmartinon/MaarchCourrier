@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from '../../../../service/header.service';
 import { AppService } from '../../../../service/app.service';
@@ -15,7 +14,7 @@ export class ContactsPageAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     creationMode: boolean = true;
@@ -56,7 +55,7 @@ export class ContactsPageAdministrationComponent implements OnInit {
     contactId: number = null;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,

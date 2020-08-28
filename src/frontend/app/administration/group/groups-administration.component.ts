@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -22,7 +21,7 @@ export class GroupsAdministrationComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     config: any = {};
@@ -37,7 +36,7 @@ export class GroupsAdministrationComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -121,7 +120,7 @@ export class GroupsAdministrationComponent implements OnInit {
     templateUrl: 'groups-administration-redirect-modal.component.html'
 })
 export class GroupsAdministrationRedirectModalComponent {
-    lang: any = LANG;
+    
 
     constructor(public http: HttpClient, @Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<GroupsAdministrationRedirectModalComponent>) {
     }

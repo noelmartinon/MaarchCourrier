@@ -40,7 +40,7 @@
                     </span>
                         <mat-icon class="fa fa-info-circle fa-2x" style="flex: 1;text-align: right;"></mat-icon>
                     </div>
-                    <div class="alert-message alert-message-danger" *ngIf="!versions.canUpdate && versions.lastAvailableMinorVersion!=null" [innerHTML]="lang.updateWarn + versions.diffOutput.join('<br/>')">
+                    <div class="alert-message alert-message-danger" *ngIf="!versions.canUpdate && versions.lastAvailableMinorVersion!=null" [innerHTML]="this.translate.instant('lang.updateWarn') + versions.diffOutput.join('<br/>')">
                     </div>
                     <div class="col-sm-12" style="text-align:center;" *ngIf="versions.lastAvailableMinorVersion!=null">
                         <button mat-raised-button color="primary" [disabled]="!versions.canUpdate"

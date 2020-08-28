@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
@@ -14,7 +13,7 @@ export class PriorityAdministrationComponent implements OnInit {
 
     id: string;
     creationMode: boolean;
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     priority: any = {
@@ -23,7 +22,7 @@ export class PriorityAdministrationComponent implements OnInit {
     };
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,

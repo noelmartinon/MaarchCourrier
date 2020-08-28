@@ -1,6 +1,5 @@
 import { Component, OnInit, Inject, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -26,7 +25,7 @@ import { environment } from '../../../environments/environment';
 export class SentNumericPackagePageComponent implements OnInit {
 
 
-    lang: any = LANG;
+    
     loading: boolean = true;
 
     availableEmailModels: any[] = [];
@@ -86,7 +85,7 @@ export class SentNumericPackagePageComponent implements OnInit {
     @ViewChild('recipientsInput', { static: true }) recipientsInput: ElementRef<HTMLInputElement>;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any,

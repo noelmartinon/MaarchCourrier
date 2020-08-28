@@ -1,5 +1,4 @@
 import { Component, OnInit, Inject, ViewChild, AfterViewInit } from '@angular/core';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -16,7 +15,7 @@ import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 })
 export class SendAvisWorkflowComponent implements AfterViewInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     resourcesError: any[] = [];
@@ -31,7 +30,7 @@ export class SendAvisWorkflowComponent implements AfterViewInit {
     @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialogRef: MatDialogRef<SendAvisWorkflowComponent>,

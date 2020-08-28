@@ -48,7 +48,7 @@
                             </app-indexing-form>
                             <div class="col-md-12 text-center">
                                 <button mat-raised-button color="primary" (click)="onSubmit()"
-                                    [disabled]="(!indexingForm.isModified() && !isModified()) || indexingModel.label === ''">{{creationMode ? lang.save : lang.update}}</button>
+                                    [disabled]="(!indexingForm.isModified() && !isModified()) || indexingModel.label === ''">{{creationMode ? this.translate.instant('lang.save') : this.translate.instant('lang.update')}}</button>
                             </div>
                         </mat-tab>
                     </mat-tab-group>

@@ -12,10 +12,10 @@
         <div class="col-md-6" *ngIf="!functionsService.empty(tag)">
             <div class="alert-message alert-message-info" role="alert">
                 <b>{{'lang.description' | translate}} :</b><br />
-                {{!functionsService.empty(tag.description) ? tag.description : lang.undefined}}
+                {{!functionsService.empty(tag.description) ? tag.description : this.translate.instant('lang.undefined')}}
                 <br /><br />
                 <b>{{'lang.usage' | translate}} :</b><br />
-                {{!functionsService.empty(tag.usage) ? tag.usage : lang.undefined}}
+                {{!functionsService.empty(tag.usage) ? tag.usage : this.translate.instant('lang.undefined')}}
                 <ng-container *ngIf="tag.links.length > 0">
                     <br />
                     <hr />

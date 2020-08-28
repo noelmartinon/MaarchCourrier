@@ -29,7 +29,7 @@
                     </div>
                 </mat-option>
             </mat-optgroup>
-            <mat-optgroup [label]="lang.user | titlecase" *ngIf="(filteredSignAvisUsers | async)?.length > 0"
+            <mat-optgroup [label]="'lang.user' | translate | titlecase" *ngIf="(filteredSignAvisUsers | async)?.length > 0"
                 class="avisSignList">
                 <mat-option *ngFor="let user of filteredSignAvisUsers | async | sortBy : 'label'" [value]="user">
                     {{user.label}} <small>({{user.entity}})</small>

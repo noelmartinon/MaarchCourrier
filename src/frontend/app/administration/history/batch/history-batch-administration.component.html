@@ -79,7 +79,7 @@
                                 <ng-container *ngIf="filterList!==null && !loadingFilters">
                                     <ng-container *ngFor="let keyVal of filterList | keyvalue">
                                         <mat-optgroup *ngIf="(filteredList[keyVal.key] | async)?.length > 0"
-                                            [label]="lang[keyVal.key]" class="filterList">
+                                            [label]="this.translate.instant('lang.' + keyVal.key)" class="filterList">
                                             <mat-option [id]="keyVal.key"
                                                 [style.color]="!filter.used ? filterColor[keyVal.key] : ''"
                                                 *ngFor="let filter of filteredList[keyVal.key] | async | sortBy : 'label'"
@@ -103,7 +103,7 @@
                         <ng-container *ngFor="let keyVal of filterUsed | keyvalue">
                             <ng-container *ngIf="['startDate','endDate'].indexOf(keyVal.key) === -1">
                                 <span *ngFor="let filter of filterUsed[keyVal.key]; let i=index;" class="label"
-                                    [style.background]="filterColor[keyVal.key]" [title]="lang[keyVal.key]"
+                                    [style.background]="filterColor[keyVal.key]" [title]="this.translate.instant('lang.' + keyVal.key)"
                                     (click)="removeItemFilter(filter,keyVal.key,i)">{{filter.label}}
                                     <i class="fa fa-times-circle"></i></span>
                             </ng-container>
@@ -117,7 +117,7 @@
                                 {{element.event_date  | timeAgo : 'full' | ucfirst}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="total_processed">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.totalProcessed | ucfirst}}
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.totalProcessed' | translate | ucfirst}}
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" [class.empty]="element.total_processed === 0">
                                 {{element.total_processed}} </mat-cell>

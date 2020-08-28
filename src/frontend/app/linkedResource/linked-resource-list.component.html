@@ -20,7 +20,7 @@
                     <span class="sub-info-data col-md-4">
                         <i class="fas fa-exchange-alt" title="{{'lang.category_id' | translate}}"></i>
                         &nbsp;
-                        <span title="{{lang[row.categoryId]}}">{{lang[row.categoryId]}}</span>
+                        <span title="{{'lang.' + row.categoryId | translate}}">{{'lang.' + row.categoryId | translate}}</span>
                     </span>
                     <span class="sub-info-data col-md-4 text-center senders" (click)="openContact(row,'senders')">
                         <i class="fas fa-user" title="{{'lang.contact' | translate}}"></i>
@@ -56,7 +56,7 @@
                         {{row.chrono}}
                     </span>
                     <span class="main-info-data" style="font-weight:bold;flex:1;"
-                        [class.undefined]="row.subject == lang.undefined"
+                        [class.undefined]="row.subject == this.translate.instant('lang.undefined')"
                         title="{{row.subject}}">{{row.subject | shorten: 150: '...'}}</span>
                     <span class="main-info-data">
                         <button *ngIf="privilegeService.hasCurrentUserPrivilege('add_links')" mat-icon-button color="warn" [title]="this.translate.instant('lang.unlink')"

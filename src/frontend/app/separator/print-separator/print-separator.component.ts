@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from '../../../service/header.service';
 import { NotificationService } from '../../../service/notification/notification.service';
@@ -15,7 +14,7 @@ declare var $: any;
 })
 export class PrintSeparatorComponent implements OnInit {
 
-    lang: any = LANG;
+    
     entities: any[] = [];
     entitiesChosen: any[] = [];
     loading: boolean = false;
@@ -35,7 +34,7 @@ export class PrintSeparatorComponent implements OnInit {
     @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,

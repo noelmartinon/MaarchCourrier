@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, Input, Renderer2, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { tap, catchError, filter, exhaustMap } from 'rxjs/operators';
 import { FlatTreeControl } from '@angular/cdk/tree';
@@ -69,7 +68,7 @@ export class ItemFlatNode {
 })
 export class FolderTreeComponent implements OnInit, OnDestroy {
 
-    lang: any = LANG;
+    
     loading: boolean = true;
 
     searchTerm: FormControl = new FormControl();
@@ -126,7 +125,7 @@ export class FolderTreeComponent implements OnInit, OnDestroy {
     dataSource = new MatTreeFlatDataSource(this.treeControl, this.treeFlattener);
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private dialog: MatDialog,

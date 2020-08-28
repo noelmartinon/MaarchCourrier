@@ -56,7 +56,7 @@
                             <button mat-raised-button [disabled]="!tagFormGroup.valid"
                                 color="primary">{{'lang.validate' | translate}}</button>
                             <button type="button" mat-raised-button color="default" (click)="toggleAdvancedTag()">
-                                {{advancedMode ? lang.defaultMode : lang.advancedMode}}
+                                {{advancedMode ? this.translate.instant('lang.defaultMode') : this.translate.instant('lang.advancedMode')}}
                             </button>
                         </div>
                     </form>

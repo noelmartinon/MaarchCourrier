@@ -2,7 +2,7 @@
     <mat-label>{{'lang.eventList' | translate}}</mat-label>
     <mat-select [(ngModel)]="selectedListEvent" (selectionChange)="changeEventList($event)">
         <mat-option *ngFor="let event of listEvent" [value]="event.value">
-            {{lang[event.id]}}
+            {{'lang.' + event.id | translate}}
         </mat-option>
     </mat-select>
 </mat-form-field>

@@ -96,7 +96,7 @@ class ParameterController
 
         $body = $request->getParsedBody();
 
-        if ($args['id'] == 'logo' || $args['id'] == 'bodyImage') {
+        if (in_array($args['id'], ['logo', 'bodyImage', 'applicationName'])) {
             $customId = CoreConfigModel::getCustomId();
             if (empty($customId)) {
                 return $response->withStatus(400)->withJson(['errors' => 'A custom is needed for this operation']);
@@ -144,7 +144,7 @@ class ParameterController
             } elseif ($args['id'] == 'applicationName') {
                 $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
                 $config['config']['applicationName'] = $body['applicationName'];
-                $fp = fopen("custom/{$body['customId']}/apps/maarch_entreprise/xml/config.json", 'w');
+                $fp = fopen("custom/{$customId}/apps/maarch_entreprise/xml/config.json", 'w');
                 fwrite($fp, json_encode($config, JSON_PRETTY_PRINT));
                 fclose($fp);
             }

@@ -18,14 +18,14 @@
                 <mat-list-item *ngIf="data.entity.users.length > 0">
                     <mat-icon color="primary" mat-list-icon class="fa fa-user fa-2x"></mat-icon>
                     <p mat-line>
-                        <b>{{data.entity.entity_label}}</b> {{lang.isLinkedTo | lowercase}}
-                        <b>{{data.entity.users.length}}</b> {{lang.usersAlt | lowercase}}</p>
+                        <b>{{data.entity.entity_label}}</b> {{'lang.isLinkedTo' | translate | lowercase}}
+                        <b>{{data.entity.users.length}}</b> {{'lang.usersAlt' | translate | lowercase}}</p>
                 </mat-list-item>
                 <mat-list-item *ngIf="data.entity.templates.length > 0">
                     <mat-icon color="primary" mat-list-icon class="fa fa-file-alt fa-2x"></mat-icon>
                     <p mat-line>
-                        <b>{{data.entity.entity_label}}</b> {{lang.isLinkedTo | lowercase}}
-                        <b>{{data.entity.templates.length}}</b> {{lang.templates | lowercase}}</p>
+                        <b>{{data.entity.entity_label}}</b> {{'lang.isLinkedTo' | translate | lowercase}}
+                        <b>{{data.entity.templates.length}}</b> {{'lang.templates' | translate | lowercase}}</p>
                 </mat-list-item>
             </mat-list>
         </div>

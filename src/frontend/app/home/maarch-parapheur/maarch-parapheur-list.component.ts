@@ -1,6 +1,5 @@
 import { Component, OnInit, Output, EventEmitter, AfterViewInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
@@ -23,7 +22,7 @@ export interface MPDocument {
 })
 export class MaarchParapheurListComponent implements OnInit, AfterViewInit {
 
-    lang: any = LANG;
+    
     loading: boolean = true;
 
     userList: MPDocument[] = [];
@@ -35,7 +34,7 @@ export class MaarchParapheurListComponent implements OnInit, AfterViewInit {
 
     @Output() triggerEvent = new EventEmitter<string>();
 
-    constructor(private translate: TranslateService, public http: HttpClient, public dialog: MatDialog, private notify: NotificationService, private headerService: HeaderService) {
+    constructor(public translate: TranslateService, public http: HttpClient, public dialog: MatDialog, private notify: NotificationService, private headerService: HeaderService) {
         this.dataSource = new MatTableDataSource(this.userList);
     }
 

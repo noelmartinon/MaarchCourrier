@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
-import { LANG } from '../../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { VisaWorkflowComponent } from '../../../visa/visa-workflow.component';
@@ -11,7 +10,7 @@ import { VisaWorkflowComponent } from '../../../visa/visa-workflow.component';
 })
 export class MaarchParaphComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     currentAccount: any = null;
@@ -27,7 +26,7 @@ export class MaarchParaphComponent implements OnInit {
     @Input() additionalsInfos: any;
     @Input() externalSignatoryBookDatas: any;
 
-    constructor(private translate: TranslateService, public http: HttpClient) { }
+    constructor(public translate: TranslateService, public http: HttpClient) { }
 
     ngOnInit(): void {
         if (typeof this.additionalsInfos.destinationId !== 'undefined' && this.additionalsInfos.destinationId !== '') {

@@ -47,7 +47,7 @@
                         </ng-container>
                         <ng-container matColumnDef="category">
                             <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.category_id' | translate}}</mat-header-cell>
-                            <mat-cell *matCellDef="let element"> {{lang[element.category]}} </mat-cell>
+                            <mat-cell *matCellDef="let element"> {{'lang.' + element.category | translate}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="label">
                             <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2">{{'lang.label' | translate}}</mat-header-cell>
@@ -57,14 +57,14 @@
                             <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.perimeter' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element">
                             <span [ngClass]="{'dataLabelWarn': element.private, 'dataLabelPrimary': !element.private}"
-                                  class="label">{{element.private ? lang.private : lang.public}}</span>
+                                  class="label">{{element.private ? this.translate.instant('lang.private') : this.translate.instant('lang.public')}}</span>
                             </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="default">
                             <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.default' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element">
                             <span [ngClass]="{'dataLabelWarn': !element.default, 'dataLabelPrimary': element.default}"
-                                  class="label">{{element.default ? lang.yes : lang.no}}</span>
+                                  class="label">{{element.default ? this.translate.instant('lang.yes') : this.translate.instant('lang.no')}}</span>
                             </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="enabled">

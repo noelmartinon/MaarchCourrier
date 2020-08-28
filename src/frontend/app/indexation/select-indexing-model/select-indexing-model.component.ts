@@ -2,7 +2,6 @@ import { Component, OnInit, Input, ViewEncapsulation, EventEmitter, Output } fro
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/internal/operators/tap';
 import { NotificationService } from '../../../service/notification/notification.service';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { finalize, catchError, exhaustMap, filter } from 'rxjs/operators';
@@ -21,7 +20,7 @@ import { IndexingFormComponent } from '../indexing-form/indexing-form.component'
 })
 export class SelectIndexingModelComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = true;
 
     @Input() defaultIndexingModelId: number = null;
@@ -35,7 +34,7 @@ export class SelectIndexingModelComponent implements OnInit {
     currentIndexingModel: any = {};
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         private http: HttpClient,
         private headerService: HeaderService,
         private notify: NotificationService,

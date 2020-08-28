@@ -3,7 +3,7 @@
     <mat-dialog-content>
         <form #submitForm="ngForm" (ngSubmit)="onSubmit()">
             <div class="alert-message alert-message-info" role="alert" style="margin-top: 30px;"
-                [innerHTML]="lang.addPrivateIndexingModelMsg +' <b>'+data.masterIndexingModel.label+'</b> ' + lang.addPrivateIndexingModelMsg2">
+                [innerHTML]="this.translate.instant('lang.addPrivateIndexingModelMsg') +' <b>'+data.masterIndexingModel.label+'</b> ' + this.translate.instant('lang.addPrivateIndexingModelMsg2')">
             </div>
             <mat-form-field appearance="outline">
                 <mat-label>{{'lang.label' | translate}}</mat-label>

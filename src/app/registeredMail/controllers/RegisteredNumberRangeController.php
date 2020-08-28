@@ -15,6 +15,7 @@ namespace RegisteredMail\controllers;
 
 use Group\controllers\PrivilegeController;
 use History\controllers\HistoryController;
+use RegisteredMail\models\IssuingSiteEntitiesModel;
 use RegisteredMail\models\IssuingSiteModel;
 use RegisteredMail\models\RegisteredNumberRangeModel;
 use Respect\Validation\Validator;
@@ -25,10 +26,6 @@ class RegisteredNumberRangeController
 {
     public function get(Request $request, Response $response)
     {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_registered_mail', 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
-        }
-
         $ranges = RegisteredNumberRangeModel::get();
 
         foreach ($ranges as $key => $range) {
@@ -54,6 +51,16 @@ class RegisteredNumberRangeController
                 'siteId'                => $range['site_id'],
                 'label'                 => $site['label']
             ];
+
+            $entities = IssuingSiteEntitiesModel::get([
+                'select' => ['entity_id'],
+                'where'  => ['site_id = ?'],
+                'data'   => [$site['id']]
+            ]);
+
+            $entities = array_column($entities, 'entity_id');
+    
+            $ranges[$key]['entities'] = $entities;
         }
 
         return $response->withJson(['ranges' => $ranges]);
@@ -120,6 +127,9 @@ class RegisteredNumberRangeController
         }
         if (!Validator::intVal()->notEmpty()->validate($body['siteId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body siteId is empty or not an integer']);
+        }
+        if ($body['rangeStart'] >= $body['rangeEnd']) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body rangeStart cannot be larger or equal than rangeEnd']);
         }
 
         $site = IssuingSiteModel::getById(['id' => $body['siteId']]);
@@ -202,7 +212,7 @@ class RegisteredNumberRangeController
             return $response->withStatus(400)->withJson(['errors' => 'Body siteId is empty or not an integer']);
         }
         if ($body['rangeStart'] >= $body['rangeEnd']) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body rangeStart cannot be larger than rangeEnd']);
+            return $response->withStatus(400)->withJson(['errors' => 'Body rangeStart cannot be larger or equal  than rangeEnd']);
         }
 
         $site = IssuingSiteModel::getById(['id' => $body['siteId']]);

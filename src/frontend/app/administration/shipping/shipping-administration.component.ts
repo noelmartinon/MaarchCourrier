@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatSidenav } from '@angular/material/sidenav';
 import { NotificationService } from '../../../service/notification/notification.service';
@@ -23,7 +22,7 @@ export class ShippingAdministrationComponent implements OnInit {
     @ViewChild('maarchTree', { static: true }) maarchTree: MaarchFlatTreeComponent;
 
 
-    lang: any = LANG;
+    
     loading: boolean = false;
     creationMode: boolean = true;
 
@@ -69,7 +68,7 @@ export class ShippingAdministrationComponent implements OnInit {
 
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,

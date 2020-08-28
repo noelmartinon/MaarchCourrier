@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, EventEmitter, Input, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../../service/header.service';
@@ -44,7 +43,7 @@ export class ContactsFormComponent implements OnInit {
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
 
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     @Input() creationMode: boolean = true;
@@ -296,7 +295,7 @@ export class ContactsFormComponent implements OnInit {
     annuaryEnabled: boolean = false;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,

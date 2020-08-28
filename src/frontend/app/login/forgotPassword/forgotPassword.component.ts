@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { finalize } from 'rxjs/operators';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from '../../../service/header.service';
 import { Router } from '@angular/router';
@@ -13,7 +12,7 @@ import { Router } from '@angular/router';
 })
 export class ForgotPasswordComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loadingForm: boolean = false;
     loading: boolean = false;
     newLogin: any = {
@@ -22,7 +21,7 @@ export class ForgotPasswordComponent implements OnInit {
     labelButton: string = this.translate.instant('lang.send');
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private router: Router,
         public notificationService: NotificationService,

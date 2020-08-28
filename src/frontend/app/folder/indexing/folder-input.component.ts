@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
@@ -24,7 +23,7 @@ import { LatinisePipe } from 'ngx-pipes';
 
 export class FolderInputComponent implements OnInit {
 
-    lang: any = LANG;
+    
 
     loading: boolean = false;
 
@@ -49,7 +48,7 @@ export class FolderInputComponent implements OnInit {
     @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,

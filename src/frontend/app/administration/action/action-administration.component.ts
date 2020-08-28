@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -20,7 +19,7 @@ export class ActionAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
 
-    lang: any = LANG;
+    
     creationMode: boolean;
     action: any = {};
     statuses: any[] = [];
@@ -40,7 +39,7 @@ export class ActionAdministrationComponent implements OnInit {
     selectStatusId = new FormControl();
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,

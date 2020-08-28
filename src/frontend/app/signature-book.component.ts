@@ -1,7 +1,6 @@
 import { Component, OnInit, NgZone, ViewChild, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
-import { LANG } from './translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../service/notification/notification.service';
 import { tap, catchError, filter } from 'rxjs/operators';
@@ -30,7 +29,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     basketId: number;
     groupId: number;
     userId: number;
-    lang: any = LANG;
+    
 
     signatureBook: any = {
         consigne: '',
@@ -95,7 +94,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     @ViewChild('appDocumentViewer', { static: false }) appDocumentViewer: DocumentViewerComponent;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private appService: AppService,
         private route: ActivatedRoute,

@@ -1,6 +1,5 @@
 import { Component, ViewChild, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -25,7 +24,7 @@ export class NotificationsAdministrationComponent implements OnInit {
 
     notifications: any[] = [];
     loading: boolean = false;
-    lang: any = LANG;
+    
 
     hours: any;
     minutes: any;
@@ -55,7 +54,7 @@ export class NotificationsAdministrationComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,

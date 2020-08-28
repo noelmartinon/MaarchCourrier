@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, tap, finalize, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -19,7 +18,7 @@ import { AttachmentPageComponent } from '../attachments-page/attachment-page.com
 
 export class AttachmentsResumeComponent implements OnInit {
 
-    lang: any = LANG;
+    
 
     loading: boolean = true;
 
@@ -31,7 +30,7 @@ export class AttachmentsResumeComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
     
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,

@@ -1,5 +1,4 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { LANG } from '../../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 
@@ -10,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class FastParaphComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     currentAccount: any = null;
@@ -24,7 +23,7 @@ export class FastParaphComponent implements OnInit {
     @Input() additionalsInfos: any;
     @Input() externalSignatoryBookDatas: any;
 
-    constructor(private translate: TranslateService, public http: HttpClient) { }
+    constructor(public translate: TranslateService, public http: HttpClient) { }
 
     ngOnInit(): void {
     }

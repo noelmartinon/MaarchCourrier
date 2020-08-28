@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from './translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../service/notification/notification.service';
 import { Router } from '@angular/router';
@@ -17,7 +16,7 @@ declare var $: any;
 
 export class ActivateUserComponent implements OnInit {
 
-    lang: any = LANG;
+    
 
     user: any = {
         baskets: []
@@ -43,7 +42,7 @@ export class ActivateUserComponent implements OnInit {
     }
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private authService: AuthService,
         private headerService: HeaderService,

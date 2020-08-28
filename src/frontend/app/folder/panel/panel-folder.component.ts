@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, ViewChild, Output, EventEmitter, OnDestroy } from '@angular/core';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { FolderTreeComponent } from '../folder-tree.component';
 import { FoldersService } from '../folders.service';
@@ -13,7 +12,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 })
 export class PanelFolderComponent implements OnInit, OnDestroy {
 
-    lang: any = LANG;
+    
 
     @Input() selectedId: number;
 
@@ -24,7 +23,7 @@ export class PanelFolderComponent implements OnInit, OnDestroy {
     subscription: Subscription;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public foldersService: FoldersService,
         public actionService: ActionsService
     ) {

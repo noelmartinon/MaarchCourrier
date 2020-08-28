@@ -189,7 +189,7 @@
                                                         (selectionChange)="updateUserPreferences();">
                                                 <mat-option *ngFor='let editor of editorsList' [value]="editor">{{editor}}</mat-option>
                                             </mat-select>
-                                            <mat-hint>{{lang['documentEditor_' + user.preferences.documentEdition]}}</mat-hint>
+                                            <mat-hint>{{'lang.documentEditor_' + user.preferences.documentEdition | translate}}</mat-hint>
                                         </mat-form-field>
                                     </div>
                                 </mat-expansion-panel>

@@ -1,6 +1,5 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { LANG } from '../../app/translate.component';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -8,8 +7,6 @@ import { TranslateService } from '@ngx-translate/core';
     styleUrls: ['alert.component.scss']
 })
 export class AlertComponent {
-
-    lang: any = LANG;
 
     constructor(public translate: TranslateService, @Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<AlertComponent>) {
         if (this.data.mode === null || this.data.mode === undefined) {

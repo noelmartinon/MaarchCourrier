@@ -13,7 +13,7 @@
         <input #searchHome type="submit" name="submit" value="" style="display:none;">
     </form>
 
-    <button title="{{lang.quickSearchInfo + ' : '+ lang.quickSearchTarget}}" (click)="showSearchInput()" mat-icon-button *ngIf="hideSearch && privilegeService.hasCurrentUserPrivilege('adv_search_mlb')" 
+    <button title="{{'lang.quickSearchInfo' | translate}} : {{'lang.quickSearchTarget' | translate}}" (click)="showSearchInput()" mat-icon-button *ngIf="hideSearch && privilegeService.hasCurrentUserPrivilege('adv_search_mlb')" 
             style="opacity:0.5;">
         <mat-icon class="fa fa-search" style="font-size:22px;"></mat-icon>
     </button>

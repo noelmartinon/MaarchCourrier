@@ -5,7 +5,7 @@
             <mat-spinner style="margin:auto;"></mat-spinner>
         </div>
         <div *ngIf="!functions.empty(fatalError)" class="alert-message alert-message-danger mailList" role="alert">
-            {{lang[fatalError.reason]}}
+            {{'lang.' + fatalError.reason | translate}}
         </div>
         <div *ngIf="functions.empty(fatalError) && shippings.length == 0"
             class="alert-message alert-message-danger mailList" role="alert">
@@ -34,7 +34,7 @@
                     <div *ngIf="data.resIds.length > 0" style="padding:10px;display: flex;flex-direction: column;">
                         <mat-checkbox color="primary" *ngFor="let inteKey of integrationsInfo | keyvalue"
                             (click)="toggleIntegration(inteKey.key)"
-                            [checked]="data.resource.integrations[inteKey.key]">{{lang[inteKey.key+'_doc']}}
+                            [checked]="data.resource.integrations[inteKey.key]">{{inteKey.key + '_doc' | translate}}
                         </mat-checkbox>
                     </div>
                     <div class="col-md-12" style="padding-top: 10px;">
@@ -62,7 +62,7 @@
                                 </p>
                                 <ul>
                                     <li *ngFor="let mail of mailsNotSend">
-                                        <b>{{mail.chrono}}</b> : {{lang[mail.reason]}}
+                                        <b>{{mail.chrono}}</b> : {{'lang.' + mail.reason | translate}}
                                     </li>
                                 </ul>
                             </div>
@@ -81,7 +81,7 @@
                                         </p>
                                         <ul>
                                             <li>
-                                                {{lang['maileva_'+currentShipping.options.sendMode]}}
+                                                {{'lang.maileva_' + currentShipping.options.sendMode | translate}}
                                             </li>
                                         </ul>
                                     </div>
@@ -91,7 +91,7 @@
                                         </p>
                                         <ul>
                                             <li *ngFor="let option of currentShipping.options.shapingOptions">
-                                                {{lang['maileva_'+option]}}
+                                                {{'lang.maileva_' + option | translate}}
                                             </li>
                                         </ul>
                                     </div>

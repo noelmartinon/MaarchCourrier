@@ -1,12 +1,12 @@
 <div class="listModels">
     <div *ngIf="!adminMode; else menuModel" class="primary">
-        Modèle utilisé : {{currentIndexingModel.label}} {{currentIndexingModel.default ? '(' + lang.default + ')': ''}}
+        Modèle utilisé : {{currentIndexingModel.label}} {{currentIndexingModel.default ? '(' + this.translate.instant('lang.default') + ')': ''}}
     </div>
     <ng-template #menuModel>
         <button mat-button class="button-form-primary listModels-button" [matMenuTriggerFor]="IndexingModelsMenu">
             <mat-icon mattPrefix class="fab fa-wpforms"></mat-icon>
             <span class="menu-label" [title]="currentIndexingModel.label">
-                {{currentIndexingModel.label}} {{currentIndexingModel.default ? '(' + lang.default + ')': ''}}
+                {{currentIndexingModel.label}} {{currentIndexingModel.default ? '(' + this.translate.instant('lang.default') + ')': ''}}
             </span>
             <i class="fa fa-chevron-down menu-icon"></i>
         </button>
@@ -28,7 +28,7 @@
                     [class.private]="indexingModel.private" style="display: flex;align-items: center;">
                     <div *ngIf="!indexingModel.private" style="flex:1;">
                         {{indexingModel.label | shorten: 45: '...'}}
-                        {{indexingModel.default ? '(' + lang.default + ')': ''}}
+                        {{indexingModel.default ? '(' + this.translate.instant('lang.default') + ')': ''}}
                     </div>
                     <div *ngIf="indexingModel.private" style="flex:1;">
                         {{indexingModel.label | shorten: 45: '...'}}&nbsp;<span

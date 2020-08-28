@@ -4,7 +4,6 @@ import { Input, EventEmitter, Output, ViewChild, ElementRef } from '@angular/cor
 import { Observable, of, forkJoin } from 'rxjs';
 import { map, startWith, debounceTime, filter, distinctUntilChanged, switchMap, tap, exhaustMap, catchError } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
-import { LANG } from '../../app/translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { ConfirmComponent } from '../modal/confirm.component';
@@ -17,7 +16,6 @@ import { NotificationService } from '../../service/notification/notification.ser
     styleUrls: ['autocomplete.component.scss', '../../app/indexation/indexing-form/indexing-form.component.scss'],
 })
 export class PluginAutocomplete implements OnInit {
-    lang: any = LANG;
     myControl = new FormControl();
     loading = false;
 
@@ -105,7 +103,7 @@ export class PluginAutocomplete implements OnInit {
     dialogRef: MatDialogRef<any>;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,

@@ -1,7 +1,6 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
@@ -22,7 +21,7 @@ export class TagAdministrationComponent implements OnInit {
 
     id: string;
     creationMode: boolean;
-    lang: any = LANG;
+    
     loading: boolean = false;
     loadingTags: boolean = true;
     advancedMode: boolean = false;
@@ -50,7 +49,7 @@ export class TagAdministrationComponent implements OnInit {
     @ViewChild('linkedTagInput') linkedTagInput: ElementRef<HTMLInputElement>;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,

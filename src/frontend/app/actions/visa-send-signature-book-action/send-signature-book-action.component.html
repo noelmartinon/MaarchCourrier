@@ -17,7 +17,7 @@
                 <div *ngIf="data.resIds.length > 0" style="padding:10px;display: flex;flex-direction: column;">
                     <mat-checkbox color="primary" *ngFor="let inteKey of integrationsInfo | keyvalue"
                         (click)="toggleIntegration(inteKey.key)" [checked]="data.resource.integrations[inteKey.key]">
-                        {{lang[inteKey.key+'_doc']}}</mat-checkbox>
+                        {{'lang.' + inteKey.key + '_doc' | translate}}</mat-checkbox>
                 </div>
                 <div *ngIf="resourcesError.length > 0" class="alert-message alert-message-danger mailList" role="alert">
                     <p>
@@ -25,7 +25,7 @@
                     </p>
                     <ul>
                         <li *ngFor="let ressource of resourcesError">
-                            <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
+                            <b>{{ressource.alt_identifier}}</b> : {{'lang.' + ressource.reason | translate}}
                         </li>
                     </ul>
                 </div>

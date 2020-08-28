@@ -11,7 +11,6 @@ import { MatSelect } from '@angular/material/select';
 import { take, takeUntil, startWith, map } from 'rxjs/operators';
 import { Subject, ReplaySubject, Observable } from 'rxjs';
 import { LatinisePipe } from 'ngx-pipes';
-import { LANG } from '../../app/translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../service/app.service';
 
@@ -21,7 +20,6 @@ import { AppService } from '../../service/app.service';
     styleUrls: ['select-search.component.scss', '../../app/indexation/indexing-form/indexing-form.component.scss']
 })
 export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterViewInit, ControlValueAccessor {
-    lang: any = LANG;
     /** Label of the search placeholder */
     @Input() placeholderLabel = this.translate.instant('lang.chooseValue');
 
@@ -92,7 +90,7 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     onTouched: Function = (_: any) => { };
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         private latinisePipe: LatinisePipe,
         private changeDetectorRef: ChangeDetectorRef,
         private renderer: Renderer2,

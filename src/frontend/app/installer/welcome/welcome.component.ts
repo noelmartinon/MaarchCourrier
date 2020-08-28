@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../../service/notification/notification.service';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { tap } from 'rxjs/internal/operators/tap';
@@ -17,7 +16,7 @@ import { environment } from '../../../environments/environment';
 })
 export class WelcomeComponent implements OnInit {
 
-    lang: any = LANG;
+    
 
     stepFormGroup: FormGroup;
 
@@ -53,7 +52,7 @@ export class WelcomeComponent implements OnInit {
     ];
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private _formBuilder: FormBuilder

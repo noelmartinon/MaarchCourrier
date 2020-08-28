@@ -1,5 +1,4 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -16,7 +15,7 @@ import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 })
 export class ContinueAvisCircuitActionComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     resourcesWarnings: any[] = [];
@@ -33,7 +32,7 @@ export class ContinueAvisCircuitActionComponent implements OnInit {
     @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient, 
         private notify: NotificationService, 
         public dialogRef: MatDialogRef<ContinueAvisCircuitActionComponent>, 

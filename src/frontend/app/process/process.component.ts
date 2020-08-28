@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, ViewContainerRef, TemplateRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -39,8 +38,6 @@ import { of } from 'rxjs/internal/observable/of';
     providers: [ActionsService, ContactService],
 })
 export class ProcessComponent implements OnInit, OnDestroy {
-
-    lang: any = LANG;
 
     loading: boolean = true;
 
@@ -160,7 +157,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     resourceFollowed: boolean = false;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         private route: ActivatedRoute,
         private _activatedRoute: ActivatedRoute,
         public http: HttpClient,
@@ -334,7 +331,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                 }
 
                 this.loadAvaibleIntegrations(data.integrations);
-                this.headerService.setHeader(this.detailMode ? this.translate.instant('lang.detailDoc') : this.translate.instant('lang.eventProcessDoc'), this.lang[this.currentResourceInformations.categoryId]);
+                this.headerService.setHeader(this.detailMode ? this.translate.instant('lang.detailDoc') : this.translate.instant('lang.eventProcessDoc'), this.translate.instant('lang.' + this.currentResourceInformations.categoryId));
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {

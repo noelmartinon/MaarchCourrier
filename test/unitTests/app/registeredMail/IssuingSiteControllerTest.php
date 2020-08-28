@@ -25,7 +25,8 @@ class IssuingSiteControllerTest extends TestCase
             'label'              => 'Scranton',
             'postOfficeLabel'    => 'Scranton Post Office',
             'accountNumber'      => 42,
-            'addressStreet'      => '1725',
+            'addressNumber'      => '1725',
+            'addressStreet'      => 'Slough Avenue',
             'addressAdditional1' => null,
             'addressAdditional2' => null,
             'addressPostcode'    => '18505',
@@ -53,8 +54,9 @@ class IssuingSiteControllerTest extends TestCase
         $this->assertSame(self::$id, $responseBody['site']['id']);
         $this->assertSame('Scranton', $responseBody['site']['label']);
         $this->assertSame('Scranton Post Office', $responseBody['site']['postOfficeLabel']);
-        $this->assertSame('42', $responseBody['site']['accountNumber']);
-        $this->assertSame('1725', $responseBody['site']['addressStreet']);
+        $this->assertSame(42, $responseBody['site']['accountNumber']);
+        $this->assertSame('1725', $responseBody['site']['addressNumber']);
+        $this->assertSame('Slough Avenue', $responseBody['site']['addressStreet']);
         $this->assertEmpty($responseBody['site']['addressAdditional1']);
         $this->assertEmpty($responseBody['site']['addressAdditional2']);
         $this->assertSame('18505', $responseBody['site']['addressPostcode']);
@@ -80,8 +82,9 @@ class IssuingSiteControllerTest extends TestCase
         $body = [
             'label'              => 'Scranton',
             'postOfficeLabel'    => 'Scranton Post Office',
-            'accountNumber'      => 42,
-            'addressStreet'      => '1725',
+            'accountNumber'      => 43,
+            'addressNumber'      => '1725',
+            'addressStreet'      => 'Slough Avenue',
             'addressAdditional1' => null,
             'addressAdditional2' => null,
             'addressPostcode'    => '18505',
@@ -99,8 +102,9 @@ class IssuingSiteControllerTest extends TestCase
         $body = [
             'label'              => 'Scranton',
             'postOfficeLabel'    => 'Scranton Post Office',
-            'accountNumber'      => 42,
-            'addressStreet'      => '1725',
+            'accountNumber'      => 43,
+            'addressNumber'      => '1725',
+            'addressStreet'      => 'Slough Avenue',
             'addressAdditional1' => null,
             'addressAdditional2' => null,
             'addressPostcode'    => '18505',
@@ -153,8 +157,9 @@ class IssuingSiteControllerTest extends TestCase
         $this->assertSame(self::$id, $responseBody['sites'][0]['id']);
         $this->assertSame('Scranton', $responseBody['sites'][0]['label']);
         $this->assertSame('Scranton Post Office', $responseBody['sites'][0]['postOfficeLabel']);
-        $this->assertSame('42', $responseBody['sites'][0]['accountNumber']);
-        $this->assertSame('1725', $responseBody['sites'][0]['addressStreet']);
+        $this->assertSame(42, $responseBody['sites'][0]['accountNumber']);
+        $this->assertSame('1725', $responseBody['sites'][0]['addressNumber']);
+        $this->assertSame('Slough Avenue', $responseBody['sites'][0]['addressStreet']);
         $this->assertEmpty($responseBody['sites'][0]['addressAdditional1']);
         $this->assertEmpty($responseBody['sites'][0]['addressAdditional2']);
         $this->assertSame('18505', $responseBody['sites'][0]['addressPostcode']);
@@ -191,8 +196,9 @@ class IssuingSiteControllerTest extends TestCase
         $this->assertSame(self::$id, $responseBody['site']['id']);
         $this->assertSame('Scranton', $responseBody['site']['label']);
         $this->assertSame('Scranton Post Office', $responseBody['site']['postOfficeLabel']);
-        $this->assertSame('42', $responseBody['site']['accountNumber']);
-        $this->assertSame('1725', $responseBody['site']['addressStreet']);
+        $this->assertSame(42, $responseBody['site']['accountNumber']);
+        $this->assertSame('1725', $responseBody['site']['addressNumber']);
+        $this->assertSame('Slough Avenue', $responseBody['site']['addressStreet']);
         $this->assertEmpty($responseBody['site']['addressAdditional1']);
         $this->assertEmpty($responseBody['site']['addressAdditional2']);
         $this->assertSame('18505', $responseBody['site']['addressPostcode']);
@@ -228,8 +234,8 @@ class IssuingSiteControllerTest extends TestCase
             'label'              => 'Scranton - UP',
             'postOfficeLabel'    => 'Scranton Post Office',
             'accountNumber'      => 42,
-            'addressName'        => 'Dunder Mifflin Scranton',
-            'addressStreet'      => '1725',
+            'addressNumber'      => '1725',
+            'addressStreet'      => 'Slough Avenue',
             'addressAdditional1' => null,
             'addressAdditional2' => null,
             'addressPostcode'    => '18505',
@@ -252,8 +258,9 @@ class IssuingSiteControllerTest extends TestCase
         $this->assertSame(self::$id, $responseBody['site']['id']);
         $this->assertSame('Scranton - UP', $responseBody['site']['label']);
         $this->assertSame('Scranton Post Office', $responseBody['site']['postOfficeLabel']);
-        $this->assertSame('42', $responseBody['site']['accountNumber']);
-        $this->assertSame('1725', $responseBody['site']['addressStreet']);
+        $this->assertSame(42, $responseBody['site']['accountNumber']);
+        $this->assertSame('1725', $responseBody['site']['addressNumber']);
+        $this->assertSame('Slough Avenue', $responseBody['site']['addressStreet']);
         $this->assertEmpty($responseBody['site']['addressAdditional1']);
         $this->assertEmpty($responseBody['site']['addressAdditional2']);
         $this->assertSame('18505', $responseBody['site']['addressPostcode']);
@@ -281,7 +288,8 @@ class IssuingSiteControllerTest extends TestCase
             'label'              => 'Scranton',
             'postOfficeLabel'    => 'Scranton Post Office',
             'accountNumber'      => 42,
-            'addressStreet'      => '1725',
+            'addressNumber'      => '1725',
+            'addressStreet'      => 'Slough Avenue',
             'addressAdditional1' => null,
             'addressAdditional2' => null,
             'addressPostcode'    => '18505',
@@ -300,7 +308,8 @@ class IssuingSiteControllerTest extends TestCase
             'label'              => 'Scranton',
             'postOfficeLabel'    => 'Scranton Post Office',
             'accountNumber'      => 42,
-            'addressStreet'      => '1725',
+            'addressNumber'      => '1725',
+            'addressStreet'      => 'Slough Avenue',
             'addressAdditional1' => null,
             'addressAdditional2' => null,
             'addressPostcode'    => '18505',
@@ -383,8 +392,9 @@ class IssuingSiteControllerTest extends TestCase
         $this->assertSame(self::$id, $responseBody['sites'][0]['id']);
         $this->assertSame('Scranton - UP', $responseBody['sites'][0]['label']);
         $this->assertSame('Scranton Post Office', $responseBody['sites'][0]['postOfficeLabel']);
-        $this->assertSame('42', $responseBody['sites'][0]['accountNumber']);
-        $this->assertSame('1725', $responseBody['sites'][0]['addressStreet']);
+        $this->assertSame(42, $responseBody['sites'][0]['accountNumber']);
+        $this->assertSame('1725', $responseBody['sites'][0]['addressNumber']);
+        $this->assertSame('Slough Avenue', $responseBody['sites'][0]['addressStreet']);
         $this->assertEmpty($responseBody['sites'][0]['addressAdditional1']);
         $this->assertEmpty($responseBody['sites'][0]['addressAdditional2']);
         $this->assertSame('18505', $responseBody['sites'][0]['addressPostcode']);

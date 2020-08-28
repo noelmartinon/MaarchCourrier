@@ -24,7 +24,7 @@
                                 <mat-label>{{'lang.separatorType' | translate}}</mat-label>
                                 <mat-select [(ngModel)]="separator.type" (selectionChange)="this.docBuffer = null">
                                     <mat-option *ngFor="let separatorType of separatorTypes" [value]="separatorType">
-                                        {{lang[separatorType]}}
+                                        {{'lang.' + separatorType | translate}}
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>
@@ -35,7 +35,7 @@
                                 <mat-select [(ngModel)]="separator.target" (selectionChange)="changeType($event)">
                                     <mat-option *ngFor="let separatorTarget of separatorTargets"
                                         [value]="separatorTarget">
-                                        {{lang[separatorTarget]}}
+                                        {{'lang.' + separatorTarget | translate}}
                                     </mat-option>
                                 </mat-select>
                             </mat-form-field>

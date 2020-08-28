@@ -15,7 +15,7 @@
                 </mat-option>
                 <ng-container *ngIf="filterList!==null && !loadingFilters">
                     <ng-container *ngFor="let keyVal of filterList | keyvalue">
-                        <mat-optgroup *ngIf="(filteredList[keyVal.key] | async)?.length > 0" [label]="lang[keyVal.key]"
+                        <mat-optgroup *ngIf="(filteredList[keyVal.key] | async)?.length > 0" [label]="this.translate.instant('lang.' + keyVal.key)"
                             class="filterList">
                             <mat-option [id]="keyVal.key" [style.color]="!filter.used ? filterColor[keyVal.key] : ''"
                                 *ngFor="let filter of filteredList[keyVal.key] | async | sortBy : 'label'"
@@ -28,7 +28,7 @@
             </mat-autocomplete>
         </mat-form-field>
     </div>
-    <button *ngIf="privilegeService.hasCurrentUserPrivilege('view_full_history') && privilegeService.hasCurrentUserPrivilege('view_doc_history')" color="primary" mat-icon-button [title]="!fullHistoryMode ? lang.viewAllHistory : lang.viewActionsHistory" (click)="switchHistoryMode()">
+    <button *ngIf="privilegeService.hasCurrentUserPrivilege('view_full_history') && privilegeService.hasCurrentUserPrivilege('view_doc_history')" color="primary" mat-icon-button [title]="!fullHistoryMode ? this.translate.instant('lang.viewAllHistory') : this.translate.instant('lang.viewActionsHistory')" (click)="switchHistoryMode()">
         <mat-icon class="fas" [class.fa-exchange-alt]="fullHistoryMode" [class.fa-history]="!fullHistoryMode"></mat-icon>
     </button>
     <div class="table-head-tool">
@@ -41,7 +41,7 @@
         <ng-container *ngFor="let keyVal of filterUsed | keyvalue">
             <ng-container *ngIf="['startDate','endDate'].indexOf(keyVal.key) === -1">
                 <span *ngFor="let filter of filterUsed[keyVal.key]; let i=index;" class="label"
-                    [style.background]="filterColor[keyVal.key]" [title]="lang[keyVal.key]"
+                    [style.background]="filterColor[keyVal.key]" [title]="this.translate.instant('lang.' + keyVal.key)"
                     (click)="removeItemFilter(filter,keyVal.key,i)">{{filter.label}}
                     <i class="fa fa-times-circle"></i></span>
             </ng-container>
@@ -68,7 +68,7 @@
             </mat-cell>
         </ng-container>
         <ng-container matColumnDef="userLabel">
-            <mat-header-cell *matHeaderCellDef mat-sort-header>{{lang.user | ucfirst}}</mat-header-cell>
+            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.user' | translate | ucfirst}}</mat-header-cell>
             <mat-cell *matCellDef="let element">
                 {{element.userLabel}} </mat-cell>
         </ng-container>

@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
-import { LANG } from '../../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../../../service/notification/notification.service';
@@ -23,7 +22,7 @@ export class ContactDuplicateComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    lang: any = LANG;
+    
     loading: boolean = true;
 
     subMenus: any[] = [
@@ -78,7 +77,7 @@ export class ContactDuplicateComponent implements OnInit {
     openedSearchTool: boolean = true;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -107,7 +106,7 @@ export class ContactDuplicateComponent implements OnInit {
                     data.contactsParameters = data.contactsParameters.filter((field: any) => field.identifier.match(regex) === null).map((field: any) => {
                         return {
                             ...field,
-                            label: this.lang['contactsParameters_' + field.identifier]
+                            label: this.translate.instant('lang.contactsParameters_' + field.identifier)
                         };
                     });
                     return data.contactsParameters;
@@ -239,10 +238,10 @@ export class ContactDuplicateComponent implements OnInit {
     }
 
     getLabel(item: any) {
-        if (this.lang['contactsParameters_' + item] !== undefined) {
-            return this.lang['contactsParameters_' + item];
-        } else if (this.lang[item] !== undefined) {
-            return this.lang[item];
+        if (this.translate.instant('lang.contactsParameters_' + item) !== undefined) {
+            return this.translate.instant('lang.contactsParameters_' + item);
+        } else if (this.translate.instant('lang.' + item) !== undefined) {
+            return this.translate.instant('lang.' + item);
         } else {
             return this.contactFields.filter((field: any) => field.id === 'contactCustomField_' + item)[0].label;
         }

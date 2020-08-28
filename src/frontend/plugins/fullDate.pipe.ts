@@ -1,5 +1,4 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { LANG } from '../app/translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { FunctionsService } from "../service/functions.service";
 
@@ -8,9 +7,8 @@ import { FunctionsService } from "../service/functions.service";
 	pure: false
 })
 export class FullDatePipe implements PipeTransform {
-	lang: any = LANG;
 	constructor(
-		private translate: TranslateService,
+		public translate: TranslateService,
 		public functions: FunctionsService
 	) { }
 	transform(value: string) {

@@ -55,6 +55,10 @@ export class IssuingSiteInputComponent implements OnInit {
             tap((data: any) => {
                 this.issuingSiteAddress = null;
                 this.issuingSiteList = data['ranges'].filter((item: any) => item.registeredMailType === registeredMailType && item.status === 'OK' && item.entities.indexOf(this.headerService.user.entities[0].id) > -1).map((item: any) => {
+                    if (this.control.value === item.siteId) {
+                        this.control.setValue(`${item.trackerNumber}#${item.siteId}`);
+                        this.setAddress(this.control.value);
+                    }
                     return {
                         ...item,
                         id : `${item.trackerNumber}#${item.siteId}`,
@@ -72,7 +76,7 @@ export class IssuingSiteInputComponent implements OnInit {
     }
 
     setAddress(id: any) {
-        const siteId = id.split('#')[1];
+        const siteId = id.split('#').slice(-1)[0];
 
         this.http.get(`../rest/registeredMail/sites/${siteId}`).pipe(
             tap((data: any) => {

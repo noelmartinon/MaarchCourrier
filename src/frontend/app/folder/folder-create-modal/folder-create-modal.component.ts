@@ -1,5 +1,4 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -13,12 +12,12 @@ import { of } from 'rxjs';
 })
 export class FolderCreateModalComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
     folderName: string = '';
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient, 
         private notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any, 

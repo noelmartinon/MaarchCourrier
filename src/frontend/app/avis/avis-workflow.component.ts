@@ -1,6 +1,5 @@
 import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -20,7 +19,7 @@ import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 })
 export class AvisWorkflowComponent implements OnInit {
 
-    lang: any = LANG;
+    
     avisWorkflow: any = {
         roles: ['sign', 'avis'],
         items: []
@@ -55,7 +54,7 @@ export class AvisWorkflowComponent implements OnInit {
     searchAvisUser = new FormControl();
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public functions: FunctionsService,

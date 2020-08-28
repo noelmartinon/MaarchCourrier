@@ -59,7 +59,7 @@
                             </plugin-select-search>
                             <div class="fieldState">
                                 <button mat-icon-button color="primary"
-                                    [title]="sendMassMode ? lang.disableMailing : lang.enableMailing"
+                                    [title]="sendMassMode ? this.translate.instant('lang.disableMailing') : this.translate.instant('lang.enableMailing')"
                                     [class.active]="sendMassMode" (click)="toggleSendMass()">
                                     <mat-icon class="fas fa-mail-bulk"></mat-icon>
                                 </button>

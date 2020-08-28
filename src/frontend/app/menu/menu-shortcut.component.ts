@@ -1,7 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AppService } from '../../service/app.service';
@@ -15,7 +14,7 @@ import { HeaderService } from '../../service/header.service';
 })
 export class MenuShortcutComponent implements OnInit {
 
-    lang: any = LANG;
+    
     router: any;
     dialogRef: MatDialogRef<any>;
     config: any = {};
@@ -24,7 +23,7 @@ export class MenuShortcutComponent implements OnInit {
     shortcuts: any;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private _router: Router,
         public dialog: MatDialog,
@@ -57,7 +56,7 @@ export class MenuShortcutComponent implements OnInit {
     styles: ['.mat-dialog-content{max-height: 65vh;width:600px;}']
 })
 export class IndexingGroupModalComponent {
-    lang: any = LANG;
+    
 
     constructor(
         public http: HttpClient,

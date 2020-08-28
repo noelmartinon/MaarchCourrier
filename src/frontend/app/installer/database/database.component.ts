@@ -5,7 +5,6 @@ import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/internal/operators/tap';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { of } from 'rxjs/internal/observable/of';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { StepAction } from '../types';
 import { FunctionsService } from '../../../service/functions.service';
@@ -17,7 +16,7 @@ import { InstallerService } from '../installer.service';
     styleUrls: ['./database.component.scss']
 })
 export class DatabaseComponent implements OnInit {
-    lang: any = LANG;
+    
     stepFormGroup: FormGroup;
     hide: boolean = true;
 
@@ -29,7 +28,7 @@ export class DatabaseComponent implements OnInit {
     @Output() nextStep = new EventEmitter<string>();
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private _formBuilder: FormBuilder,
         private notify: NotificationService,

@@ -184,6 +184,10 @@ abstract class ResModelAbstract
             [
                 'id'              => 'ged_doc',
                 'label'           => _GED_DOC
+            ],
+            [
+                'id'              => 'registeredMail',
+                'label'           => _REGISTERED_MAIL
             ]
         ];
 

@@ -6,7 +6,6 @@ import { NotificationService } from '../../service/notification/notification.ser
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { MatStepper } from '@angular/material/stepper';
 import { AppService } from '../../service/app.service';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { SortPipe } from '../../plugins/sorting.pipe';
 import { StepAction } from './types';
@@ -32,13 +31,13 @@ import { InstallerService } from './installer.service';
 })
 export class InstallerComponent implements OnInit, AfterViewInit {
 
-    lang: any = LANG;
+    
 
     @ViewChildren('stepContent') stepContent: any;
     @ViewChild('stepper', { static: true }) stepper: MatStepper;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         private http: HttpClient,
         private router: Router,
         private headerService: HeaderService,

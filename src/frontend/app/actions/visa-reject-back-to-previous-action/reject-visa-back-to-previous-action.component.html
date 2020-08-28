@@ -11,7 +11,7 @@
                 <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{data.resIds.length}}
                     {{'lang.elements' | translate}}</b> ?
                     <div *ngIf="data.resIds.length > 1" class="alert-message alert-message-info" role="alert" style="margin-top: 30px;" [innerHTML]="this.translate.instant('lang.rejectVisaBack')"></div>
-                    <div *ngIf="data.resIds.length == 1 && appVisaWorkflow !== undefined && appVisaWorkflow.getLastVisaUser() !== ''" class="alert-message alert-message-info" role="alert" style="margin-top: 30px;" [innerHTML]="lang.rejectVisaBackUser + ' <b>' + appVisaWorkflow.getLastVisaUser().labelToDisplay + '</b>'"></div>
+                    <div *ngIf="data.resIds.length == 1 && appVisaWorkflow !== undefined && appVisaWorkflow.getLastVisaUser() !== ''" class="alert-message alert-message-info" role="alert" style="margin-top: 30px;" [innerHTML]="this.translate.instant('lang.rejectVisaBackUser') + ' <b>' + appVisaWorkflow.getLastVisaUser().labelToDisplay + '</b>'"></div>
     
                 <div *ngIf="resourcesErrors.length > 0" class="alert-message alert-message-danger mailList" role="alert">
                     <p>
@@ -19,14 +19,14 @@
                     </p>
                     <ul>
                         <li *ngFor="let ressource of resourcesErrors">
-                            <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
+                            <b>{{ressource.alt_identifier}}</b> : {{'lang.' + ressource.reason | translate}}
                         </li>
                     </ul>
                 </div>
                 <div *ngIf="resourcesWarnings.length > 0" class="alert-message alert-message-info mailList" role="alert">
                     <ul style="margin: 0;padding-bottom: 0px;">
                         <li *ngFor="let ressource of resourcesWarnings">
-                            <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
+                            <b>{{ressource.alt_identifier}}</b> : {{'lang.' + ressource.reason | translate}}
                         </li>
                     </ul>
                 </div>

@@ -11,7 +11,6 @@ import {
 import './onlyoffice-api.js';
 import { HttpClient } from '@angular/common/http';
 import { catchError, tap, filter, finalize } from 'rxjs/operators';
-import { LANG } from '../../app/translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmComponent } from '../modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
@@ -29,8 +28,6 @@ declare var DocsAPI: any;
     styleUrls: ['onlyoffice-viewer.component.scss'],
 })
 export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnDestroy {
-
-    lang: any = LANG;
 
     loading: boolean = true;
 
@@ -90,7 +87,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
         }
     }
 
-    constructor(private translate: TranslateService, public http: HttpClient, public dialog: MatDialog, private notify: NotificationService, public headerService: HeaderService) { }
+    constructor(public translate: TranslateService, public http: HttpClient, public dialog: MatDialog, private notify: NotificationService, public headerService: HeaderService) { }
 
     quit() {
         this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.close'), msg: this.translate.instant('lang.confirmCloseEditor') } });
@@ -220,7 +217,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
                         }
                     }),
                     catchError((err) => {
-                        this.notify.error(`${this.lang[err.error.lang]}`);
+                        this.notify.error(this.translate.instant('lang.' + err.error.lang));
                         this.triggerCloseEditor.emit();
                         return of(false);
                     }),

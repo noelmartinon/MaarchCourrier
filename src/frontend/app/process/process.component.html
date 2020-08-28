@@ -108,7 +108,7 @@
                     (loadingFormEndEvent)="triggerProcessAction()"
                     (retrieveDocumentEvent)="appDocumentViewer.saveDocService()"></app-indexing-form>
                 <div style="position: sticky;bottom: 0px;text-align:right;">
-                    <button mat-fab [title]="this.translate.instant('lang.saveModifications')" *ngIf="isToolModified()" (click)="saveTool()"
+                    <button mat-fab [title]="this.translate.instant('lang.saveModifications')" *ngIf="isToolModified() && functions.empty(currentResourceInformations.registeredMail_deposit_id)" (click)="saveTool()"
                         color="accent">
                         <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
                     </button>
@@ -183,7 +183,7 @@
                         </div>
                         <div class="content">
                             <button mat-icon-button
-                                [title]="this.resourceFollowed ? lang.untrackThisMail:lang.trackThisMail"
+                                [title]="this.resourceFollowed ? this.translate.instant('lang.untrackThisMail') : this.translate.instant('lang.trackThisMail')"
                                 class="categoryLabel" (click)="toggleFollow()">
                                 <mat-icon class="followIcon {{this.resourceFollowed ? 'fas':'far'}} fa-star"
                                     style="font-size: 20px;"></mat-icon>
@@ -199,7 +199,7 @@
                                     {{this.currentResourceInformations.chrono}}</div>
                             </div>
                             <div class="content-item" (click)="openContact()" style="cursor:pointer">
-                                <div>{{this.currentResourceInformations.categoryId !== 'outgoing' ? lang.senders : lang.recipient}} :</div>
+                                <div>{{this.currentResourceInformations.categoryId !== 'outgoing' ? this.translate.instant('lang.senders') : this.translate.instant('lang.recipient')}} :</div>
                                 <div class="content-item-value">{{senderLightInfo.displayName}} <i
                                         *ngIf="this.senderLightInfo.filling" class="fas fa-circle"
                                         style="font-size: 8px" [style.color]="this.senderLightInfo.filling"></i></div>
@@ -225,7 +225,7 @@
                             <div
                                 style="position: absolute;right: 0px;top: 0px;height: 100%;display: flex;flex-direction: column;justify-content: center;">
                                 <button mat-icon-button *ngFor="let inteKey of integrationsInfo | keyvalue"
-                                    [matTooltip]="lang[inteKey.key]" (click)="toggleIntegration(inteKey.key)">
+                                    matTooltip="{{'lang.' + inteKey.key | translate}}" (click)="toggleIntegration(inteKey.key)">
                                     <mat-icon [class]="inteKey.value.icon"
                                         [class.checked]="currentResourceInformations.integrations[inteKey.key]"
                                         [class.unchecked]="!currentResourceInformations.integrations[inteKey.key]">
@@ -295,7 +295,7 @@
                 </app-indexing-form>
                 <div style="position: sticky;bottom: 0px;text-align:right;padding:15px;">
                     <button mat-fab
-                        *ngIf="indexingForm !== undefined && indexingForm.isResourceModified() && modal.id === 'info'"
+                        *ngIf="indexingForm !== undefined && indexingForm.isResourceModified() && modal.id === 'info' && functions.empty(currentResourceInformations.registeredMail_deposit_id)"
                         (click)="confirmModification()" color="accent" [title]="this.translate.instant('lang.saveModifications')">
                         <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
                     </button>

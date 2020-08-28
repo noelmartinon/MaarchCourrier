@@ -11,7 +11,7 @@
             <a mat-list-item (click)="openExportModal()">
                 <mat-icon color="primary" mat-list-icon class="fas fa-file-export"></mat-icon>
                 <p mat-line>
-                    {{lang.toExport}}
+                    {{'lang.toExport' | translate}}
                 </p>
             </a>
         </mat-nav-list>
@@ -70,7 +70,7 @@
         fixedTopGap="56" position='end' [opened]="false" class="col-md-5 col-xs-11">
         <mat-nav-list>
             <mat-tab-group>
-                <mat-tab [label]="creationMode ? lang.createNewEntity : lang.informations">
+                <mat-tab [label]="creationMode ? this.translate.instant('lang.createNewEntity') : this.translate.instant('lang.informations')">
                     <form class="form-horizontal" #entityForm="ngForm" style="overflow:hidden;">
                         <div class="form-group">
                             <div class="col-sm-12">
@@ -375,7 +375,7 @@
                         <ng-container matColumnDef="template_target">
                             <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:1;">{{'lang.templateTarget' | translate}}
                             </mat-header-cell>
-                            <mat-cell *matCellDef="let element" style="flex:1;"> {{lang[element.template_target]}}
+                            <mat-cell *matCellDef="let element" style="flex:1;"> {{'lang.' + element.template_target | translate}}
                             </mat-cell>
                         </ng-container>
                         <mat-header-row *matHeaderRowDef="displayedColumnsTemplates"></mat-header-row>

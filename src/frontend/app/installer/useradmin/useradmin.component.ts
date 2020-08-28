@@ -1,7 +1,6 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ValidatorFn } from '@angular/forms';
 import { NotificationService } from '../../../service/notification/notification.service';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { tap } from 'rxjs/internal/operators/tap';
 import { InstallerService } from '../installer.service';
@@ -13,7 +12,7 @@ import { StepAction } from '../types';
     styleUrls: ['./useradmin.component.scss']
 })
 export class UseradminComponent implements OnInit {
-    lang: any = LANG;
+    
     stepFormGroup: FormGroup;
 
     hide: boolean = true;
@@ -21,7 +20,7 @@ export class UseradminComponent implements OnInit {
     @Output() tiggerInstall = new EventEmitter<string>();
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         private _formBuilder: FormBuilder,
         private notify: NotificationService,
         private installerService: InstallerService

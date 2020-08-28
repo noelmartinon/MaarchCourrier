@@ -33,8 +33,11 @@
                                 [datas]="customerAccountNumberList" [class]="''"
                                 [formControlSelect]="adminFormGroup.controls['siteId']">
                             </plugin-select-search>
-                            <plugin-select-search [showLabel]="true" [label]="this.translate.instant('lang.registredMailType')"
-                                [placeholderLabel]="this.translate.instant('lang.registredMailType')" [datas]="registeredMailType"
+                            <div *ngIf="customerAccountNumberList.length === 0" class="alert-message alert-message-danger">
+                                {{'lang.registeredMailNoIssuingSites' | translate}}
+                            </div>
+                            <plugin-select-search [showLabel]="true" [label]="this.translate.instant('lang.registeredMailType')"
+                                [placeholderLabel]="this.translate.instant('lang.registeredMailType')" [datas]="registeredMailType"
                                 [class]="''" [formControlSelect]="adminFormGroup.controls['registeredMailType']">
                             </plugin-select-search>
                             <div style="display: grid;grid-template-columns: 1fr 1fr;grid-gap: 20px;">

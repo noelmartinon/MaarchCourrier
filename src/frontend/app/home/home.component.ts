@@ -1,6 +1,5 @@
 import { Component, OnInit, QueryList, ViewChildren, AfterViewInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatExpansionPanel } from '@angular/material/expansion';
@@ -23,7 +22,7 @@ declare var $: any;
 })
 export class HomeComponent implements OnInit, AfterViewInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     thumbnailUrl: string;
@@ -41,7 +40,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     @ViewChildren(MatExpansionPanel) viewPanels: QueryList<MatExpansionPanel>;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         public dialog: MatDialog,
         private sanitizer: DomSanitizer,

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
@@ -8,6 +8,7 @@ import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
+import {MaarchFlatTreeComponent} from '../../../plugins/tree/maarch-flat-tree.component';
 
 @Component({
     selector: 'app-registered-mail',
@@ -41,7 +42,7 @@ export class RegisteredMailComponent implements OnInit {
     ];
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -74,12 +75,13 @@ export class RegisteredMailComponent implements OnInit {
                 this.id = params['id'];
                 this.creationMode = false;
                 await this.getData();
-                this.getMinRange();
             }
 
             this.adminFormGroup.controls['registeredMailType'].valueChanges.pipe(
-                tap((value: string) => {
-                    this.getMinRange();
+                tap(() => {
+                    if (this.creationMode) {
+                        this.getMinRange();
+                    }
                 })
             ).subscribe();
 

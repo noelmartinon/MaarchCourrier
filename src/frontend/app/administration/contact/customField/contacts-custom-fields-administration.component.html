@@ -36,7 +36,7 @@
                                         {{custom.label}}
                                     </mat-panel-title>
                                     <mat-panel-description>
-                                        {{lang[custom.type + 'Input']}}
+                                        {{'lang.' + custom.type + 'Input' | translate}}
                                     </mat-panel-description>
                                 </mat-expansion-panel-header>
                                 <div class="col-md-12">
@@ -113,18 +113,18 @@
                         <div style="color: rgba(0,0,0,0.54);">{{customField.label}} :</div>
                         <ng-container *ngIf="customField.type === 'string'">
                             <mat-form-field class="input-form" floatLabel="never">
-                                <textarea matInput [placeholder]="lang[customField.type + 'Input']" matTextareaAutosize
+                                <textarea matInput [placeholder]="this.translate.instant('lang.' + customField.type + 'Input')" matTextareaAutosize
                                     matAutosizeMinRows="1" cdkAutosizeMaxRows="6" disabled></textarea>
                             </mat-form-field>
                         </ng-container>
                         <ng-container *ngIf="customField.type === 'integer'">
                             <mat-form-field class="input-form" floatLabel="never">
-                                <input type="number" matInput [placeholder]="lang[customField.type + 'Input']" disabled>
+                                <input type="number" matInput [placeholder]="this.translate.instant('lang.' + customField.type + 'Input')" disabled>
                             </mat-form-field>
                         </ng-container>
                         <ng-container *ngIf="customField.type === 'select'">
                             <mat-form-field class="input-form" floatLabel="never">
-                                <mat-select [placeholder]="lang[customField.type + 'Input']" disabled>
+                                <mat-select [placeholder]="this.translate.instant('lang.' + customField.type + 'Input')" disabled>
                                     <mat-option *ngFor="let sample of sampleIncrement" [value]="sample">
                                         {{'lang.choice' | translate}} {{sample}}
                                     </mat-option>
@@ -134,7 +134,7 @@
                         <ng-container *ngIf="customField.type === 'date'">
                             <mat-form-field class="input-form" floatLabel="never">
                                 <input matInput [matDatepicker]="picker"
-                                    [placeholder]="lang[customField.type + 'Input']" (click)="picker.open()" disabled>
+                                    [placeholder]="this.translate.instant('lang.' + customField.type + 'Input')" (click)="picker.open()" disabled>
                                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                                 <mat-datepicker #picker></mat-datepicker>
                             </mat-form-field>

@@ -8,7 +8,7 @@
             <div [class.col-md-12]="exportModel.format != 'csv'" [class.col-md-3]="exportModel.format == 'csv'">
                 <mat-form-field appearance="outline">
                     <mat-label>{{'lang.format' | translate}}</mat-label>
-                    <mat-select placeholder="{{lang.format}}" [(ngModel)]="exportModel.format">
+                    <mat-select placeholder="{{'lang.format' | translate}}" [(ngModel)]="exportModel.format">
                         <mat-option *ngFor="let format of formats" [value]="format">
                             {{format}}
                         </mat-option>

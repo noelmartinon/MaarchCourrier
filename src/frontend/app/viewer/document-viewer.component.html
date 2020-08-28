@@ -47,7 +47,7 @@
                     <mat-icon class="fa fa-download"></mat-icon>
                 </button>
                 <button [disabled]="!functions.empty(file.subinfos) && file.subinfos.signedDocVersions" [class.disabledButton]="!functions.empty(file.subinfos) && file.subinfos.signedDocVersions" *ngIf="editMode && resId !== null && !noConvertedFound" mat-icon-button (click)="editResource()"
-                    [matTooltip]="functions.empty(file.subinfos) || (!functions.empty(file.subinfos) && !file.subinfos.signedDocVersions) ? lang.editDocument : lang.documentSignedMsg">
+                    [matTooltip]="functions.empty(file.subinfos) || (!functions.empty(file.subinfos) && !file.subinfos.signedDocVersions) ? this.translate.instant('lang.editDocument') : this.translate.instant('lang.documentSignedMsg')">
                     <mat-icon class="fa fa-edit"></mat-icon>
                 </button>
                 <button mat-icon-button [matMenuTriggerFor]="menuOptions">

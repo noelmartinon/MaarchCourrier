@@ -1697,36 +1697,36 @@ class UserController
         $errors = [];
         foreach ($body['users'] as $key => $user) {
             if (!empty($user['firstname']) && (!Validator::stringType()->validate($user['firstname']) || !Validator::length(1, 255)->validate($user['firstname']))) {
-                $errors[] = ['error' => "Argument firstname is not a string for user {$key}", 'index' => $key, 'lang' => ''];
+                $errors[] = ['error' => "Argument firstname is not a string for user {$key}", 'index' => $key, 'lang' => 'argumentFirstnameNotString'];
                 continue;
             } elseif (!empty($user['lastname']) && (!Validator::stringType()->validate($user['lastname']) || !Validator::length(1, 255)->validate($user['lastname']))) {
-                $errors[] = ['error' => "Argument lastname is not a string for user {$key}", 'index' => $key, 'lang' => ''];
+                $errors[] = ['error' => "Argument lastname is not a string for user {$key}", 'index' => $key, 'lang' => 'argumentLastnameNotString'];
                 continue;
             } elseif (!empty($user['mail']) && (!filter_var($user['mail'], FILTER_VALIDATE_EMAIL) || !Validator::length(1, 255)->validate($user['mail']))) {
-                $errors[] = ['error' => "Argument mail is not correct for user {$key}", 'index' => $key, 'lang' => ''];
+                $errors[] = ['error' => "Argument mail is not correct for user {$key}", 'index' => $key, 'lang' => 'argumentMailNotCorrect'];
                 continue;
             } elseif (!empty($user['phone']) && (!preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $user['phone']) || !Validator::length(1, 32)->validate($user['phone']))) {
-                $errors[] = ['error' => "Argument phone is not correct for user {$key}", 'index' => $key, 'lang' => ''];
+                $errors[] = ['error' => "Argument phone is not correct for user {$key}", 'index' => $key, 'lang' => 'argumentPhoneNotCorrect'];
                 continue;
             }
             if (empty($user['id'])) {
                 if (empty($user['user_id'])) {
-                    $errors[] = ['error' => "Argument user_id is empty for user {$key}", 'index' => $key, 'lang' => ''];
+                    $errors[] = ['error' => "Argument user_id is empty for user {$key}", 'index' => $key, 'lang' => 'argumentUserIdEmpty'];
                     continue;
                 } elseif (empty($user['firstname'])) {
-                    $errors[] = ['error' => "Argument firstname is empty for user {$key}", 'index' => $key, 'lang' => ''];
+                    $errors[] = ['error' => "Argument firstname is empty for user {$key}", 'index' => $key, 'lang' => 'argumentFirstnameEmpty'];
                     continue;
                 } elseif (empty($user['lastname'])) {
-                    $errors[] = ['error' => "Argument lastname is empty for user {$key}", 'index' => $key, 'lang' => ''];
+                    $errors[] = ['error' => "Argument lastname is empty for user {$key}", 'index' => $key, 'lang' => 'argumentLastnameEmpty'];
                     continue;
                 } elseif (empty($user['mail'])) {
-                    $errors[] = ['error' => "Argument mail is empty for user {$key}", 'index' => $key, 'lang' => ''];
+                    $errors[] = ['error' => "Argument mail is empty for user {$key}", 'index' => $key, 'lang' => 'argumentMailEmpty'];
                     continue;
                 }
 
                 $existingUser = UserModel::getByLogin(['login' => strtolower($user['user_id']), 'select' => ['id', 'status']]);
                 if (!empty($existingUser) && $existingUser['status'] != 'DEL') {
-                    $errors[] = ['error' => "User already exists with login {$user['user_id']}", 'index' => $key, 'lang' => ''];
+                    $errors[] = ['error' => "User already exists with login {$user['user_id']}", 'index' => $key, 'lang' => 'userLoginAlreadyExists'];
                     continue;
                 } elseif (!empty($existingUser) && $existingUser['status'] == 'DEL') {
                     UserModel::update([
@@ -1739,7 +1739,7 @@ class UserController
                         'data'  => [$existingUser['id']]
                     ]);
                     $id = $existingUser['id'];
-                    $warnings[] = ['warning' => "User {$user['user_id']} was deleted and is now reactivated", 'index' => $key, 'lang' => ''];
+                    $warnings[] = ['warning' => "User {$user['user_id']} was deleted and is now reactivated", 'index' => $key, 'lang' => 'userDeletedNowActivated'];
                 } else {
                     $userToCreate = [
                         'userId'        => $user['user_id'],
@@ -1751,7 +1751,7 @@ class UserController
                     if (!empty($user['phone']) && PrivilegeController::hasPrivilege(['privilegeId' => 'manage_personal_data', 'userId' => $GLOBALS['id']])) {
                         $userToCreate['phone'] = $user['phone'];
                     } elseif (!empty($user['phone']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'manage_personal_data', 'userId' => $GLOBALS['id']])) {
-                        $warnings[] = ['warning' => "Phone is not allowed to be modified", 'index' => $key, 'lang' => ''];
+                        $warnings[] = ['warning' => "Phone is not allowed to be modified", 'index' => $key, 'lang' => 'phoneModificationNotAllowed'];
                     }
                     $id = UserModel::create(['user' => $userToCreate]);
                 }
@@ -1762,7 +1762,7 @@ class UserController
                 }
             } else {
                 if (!$isRoot && !in_array($user['id'], $allowedUsers)) {
-                    $errors[] = ['error' => "User is not allowed to be modified {$user['user_id']}", 'index' => $key, 'lang' => ''];
+                    $errors[] = ['error' => "User is not allowed to be modified {$user['user_id']}", 'index' => $key, 'lang' => 'userModificationNotAllowed'];
                     continue;
                 }
 
@@ -1779,7 +1779,7 @@ class UserController
                 if (!empty($user['phone']) && PrivilegeController::hasPrivilege(['privilegeId' => 'manage_personal_data', 'userId' => $GLOBALS['id']])) {
                     $set['phone'] = $user['phone'];
                 } elseif (!empty($user['phone']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'manage_personal_data', 'userId' => $GLOBALS['id']])) {
-                    $warnings[] = ['warning' => "Phone is not allowed to be modified", 'index' => $key, 'lang' => ''];
+                    $warnings[] = ['warning' => "Phone is not allowed to be modified", 'index' => $key, 'lang' => 'phoneModificationNotAllowed'];
                 }
 
                 if (!empty($set)) {

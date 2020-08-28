@@ -1,6 +1,5 @@
 import { Component, OnInit, NgZone, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from './translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../service/notification/notification.service';
 import { HeaderService } from '../service/header.service';
@@ -15,7 +14,7 @@ declare var $: any;
 })
 export class SaveNumericPackageComponent implements OnInit {
 
-    lang: any = LANG;
+    
 
     numericPackage: any = {
         base64: '',
@@ -31,7 +30,7 @@ export class SaveNumericPackageComponent implements OnInit {
     @ViewChild('snav', { static: true }) sidenavLeft: MatSidenav;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private zone: NgZone,
         private notify: NotificationService,

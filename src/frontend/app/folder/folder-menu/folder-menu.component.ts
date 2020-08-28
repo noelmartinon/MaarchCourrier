@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, Output, EventEmitter, Renderer2 } from '@angular/core';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { map, tap, catchError, filter, exhaustMap, debounceTime, switchMap, finalize } from 'rxjs/operators';
@@ -19,7 +18,7 @@ import { FunctionsService } from '../../../service/functions.service';
 })
 export class FolderMenuComponent implements OnInit {
 
-    lang: any = LANG;
+    
 
     foldersList: any[] = [];
     pinnedFolder: boolean = true;
@@ -37,7 +36,7 @@ export class FolderMenuComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,

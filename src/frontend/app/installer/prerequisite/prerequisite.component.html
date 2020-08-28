@@ -4,13 +4,13 @@
         {{'lang.stepPrerequisite_desc' | translate}} : <a href="{{docMaarchUrl}}" target="_blank" class="link">{{docMaarchUrl}}</a>
     </div>
     <mat-list style="background: white;" *ngFor="let groupPackage of packagesList | keyvalue">
-        <div mat-subheader>{{lang[groupPackage.key]}}</div>
+        <div mat-subheader>{{'lang.' + groupPackage.key | translate}}</div>
         <mat-grid-list cols="3" rowHeight="50px">
             <mat-grid-tile *ngFor="let package of packagesList[groupPackage.key]">
                 <mat-list-item>
                     <mat-icon mat-list-icon class="fa iconCheckPackage icon_{{package.state}}"></mat-icon>
                     <div mat-line class="packageName">
-                        {{lang['install_'+package.label]}} <i #packageItem="matTooltip" [id]="package.label" class="fa fa-info-circle" 
+                        {{'lang.install_' + package.label | translate}} <i #packageItem="matTooltip" [id]="package.label" class="fa fa-info-circle" 
                         [matTooltip]="this.translate.instant('lang.install_'+package.label+'_desc')"
                         [matTooltipClass]="package.state !== 'ok' ? 'tooltip-red' : ''" matTooltipPosition="right"></i>
                     </div>

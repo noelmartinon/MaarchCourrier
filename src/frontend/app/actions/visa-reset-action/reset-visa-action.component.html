@@ -20,7 +20,7 @@
                     </p>
                     <ul>
                         <li *ngFor="let ressource of resourcesErrors">
-                            <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
+                            <b>{{ressource.alt_identifier}}</b> : {{'lang.' + ressource.reason | translate}}
                         </li>
                     </ul>
                 </div>
@@ -28,7 +28,7 @@
                     role="alert">
                     <ul style="margin: 0;padding-bottom: 0px;">
                         <li *ngFor="let ressource of resourcesWarnings">
-                            <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
+                            <b>{{ressource.alt_identifier}}</b> : {{'lang.' + ressource.reason | translate}}
                         </li>
                     </ul>
                 </div>

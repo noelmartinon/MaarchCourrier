@@ -47,7 +47,7 @@
                                 [class.revertPinnedActionIcon]="node.pinned">
                                 <i class="fas fa-thumbtack"></i>
                             </mat-icon>
-                            <span>{{node.pinned ? lang.unpinFolder : lang.pinFolder}}</span>
+                            <span>{{node.pinned ? this.translate.instant('lang.unpinFolder') : this.translate.instant('lang.pinFolder')}}</span>
                         </button>
                         <button mat-menu-item [disabled]="createItemNode || !node.canAdd || node.level > 6"
                             (click)="addNewItem(node)">
@@ -127,7 +127,7 @@
                                 [class.revertPinnedActionIcon]="node.pinned">
                                 <i class="fas fa-thumbtack"></i>
                             </mat-icon>
-                            <span>{{node.pinned ? lang.unpinFolder : lang.pinFolder}}</span>
+                            <span>{{node.pinned ? this.translate.instant('lang.unpinFolder') : this.translate.instant('lang.pinFolder')}}</span>
                         </button>
 
                         <button mat-menu-item [disabled]="createItemNode || !node.canAdd || node.level > 6"

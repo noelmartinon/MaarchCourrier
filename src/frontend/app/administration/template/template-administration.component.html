@@ -69,7 +69,7 @@
                                             [(ngModel)]="template.target"
                                             (selectionChange)="updateTemplateType()">
                                             <mat-option *ngFor="let target of targetTypes" [value]="target">
-                                                {{lang[target]}}</mat-option>
+                                                {{'lang.' + target | translate}}</mat-option>
                                         </mat-select>
                                     </mat-form-field>
                                 </div>
@@ -146,7 +146,7 @@
                                                     [value]="template.file.name">
                                                     <mat-icon class="fa fa-paperclip" color="primary"
                                                         style="height:auto;"></mat-icon>
-                                                    {{!functionsService.empty(template.file) && !functionsService.empty(template.file.name) ? template.file.name : lang.importFile}}
+                                                    {{!functionsService.empty(template.file) && !functionsService.empty(template.file.name) ? template.file.name : this.translate.instant('lang.importFile')}}
                                                 </mat-option>
                                             </mat-optgroup>
                                             <ng-container *ngFor="let extension of extensionModels">
@@ -245,7 +245,7 @@
                                                             [value]="template.file.paper.name">
                                                             <mat-icon class="fa fa-paperclip" color="primary"
                                                                 style="height:auto;"></mat-icon>
-                                                            {{!functionsService.empty(template.file.paper) && !functionsService.empty(template.file.paper.name) ? template.file.paper.name : lang.importFile}}
+                                                            {{!functionsService.empty(template.file.paper) && !functionsService.empty(template.file.paper.name) ? template.file.paper.name : this.translate.instant('lang.importFile')}}
                                                         </mat-option>
                                                     </mat-optgroup>
                                                     <ng-container *ngFor="let extension of extensionModels">

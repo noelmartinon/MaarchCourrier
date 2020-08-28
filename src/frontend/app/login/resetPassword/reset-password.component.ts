@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NotificationService } from '../../../service/notification/notification.service';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { finalize } from 'rxjs/operators';
 import { AuthService } from '../../../service/auth.service';
@@ -13,7 +12,7 @@ import { AuthService } from '../../../service/auth.service';
 })
 export class ResetPasswordComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loadingForm: boolean = false;
     loading: boolean = false;
 
@@ -48,7 +47,7 @@ export class ResetPasswordComponent implements OnInit {
 
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         private router: Router,
         private route: ActivatedRoute,
         public http: HttpClient,
@@ -116,7 +115,7 @@ export class ResetPasswordComponent implements OnInit {
                         this.passwordRules.minLength.enabled = rule.enabled;
                         this.passwordRules.minLength.value = rule.value;
                         if (rule.enabled) {
-                            ruleTextArr.push(rule.value + ' ' + this.lang['password' + rule.label]);
+                            ruleTextArr.push(rule.value + ' ' + this.translate.instant('lang.password' + rule.label));
 
                         }
 
@@ -124,34 +123,34 @@ export class ResetPasswordComponent implements OnInit {
                         this.passwordRules.complexityUpper.enabled = rule.enabled;
                         this.passwordRules.complexityUpper.value = rule.value;
                         if (rule.enabled) {
-                            ruleTextArr.push(this.lang['password' + rule.label]);
+                            ruleTextArr.push(this.translate.instant('lang.password' + rule.label));
                         }
 
                     } else if (rule.label === 'complexityNumber') {
                         this.passwordRules.complexityNumber.enabled = rule.enabled;
                         this.passwordRules.complexityNumber.value = rule.value;
                         if (rule.enabled) {
-                            ruleTextArr.push(this.lang['password' + rule.label]);
+                            ruleTextArr.push(this.translate.instant('lang.password' + rule.label));
                         }
 
                     } else if (rule.label === 'complexitySpecial') {
                         this.passwordRules.complexitySpecial.enabled = rule.enabled;
                         this.passwordRules.complexitySpecial.value = rule.value;
                         if (rule.enabled) {
-                            ruleTextArr.push(this.lang['password' + rule.label]);
+                            ruleTextArr.push(this.translate.instant('lang.password' + rule.label));
                         }
                     } else if (rule.label === 'renewal') {
                         this.passwordRules.renewal.enabled = rule.enabled;
                         this.passwordRules.renewal.value = rule.value;
                         if (rule.enabled) {
-                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.translate.instant('lang.days') + '</b>. ' + this.lang['password2' + rule.label] + '.');
+                            otherRuleTextArr.push(this.translate.instant('lang.password' + rule.label) + ' <b>' + rule.value + ' ' + this.translate.instant('lang.days') + '</b>. ' + this.translate.instant('lang.password2' + rule.label) + '.');
 
                         }
                     } else if (rule.label === 'historyLastUse') {
                         this.passwordRules.historyLastUse.enabled = rule.enabled;
                         this.passwordRules.historyLastUse.value = rule.value;
                         if (rule.enabled) {
-                            otherRuleTextArr.push(this.lang['passwordhistoryLastUseDesc'] + ' <b>' + rule.value + '</b> ' + this.lang['passwordhistoryLastUseDesc2'] + '.');
+                            otherRuleTextArr.push(this.translate.instant('lang.passwordhistoryLastUseDesc') + ' <b>' + rule.value + '</b> ' + this.translate.instant('lang.passwordhistoryLastUseDesc2') + '.');
                         }
                     }
                 });

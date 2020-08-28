@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
@@ -13,7 +12,7 @@ import { AppService } from '../../../service/app.service';
 })
 export class UpdateStatusAdministrationComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     statuses: any[] = [];
@@ -24,7 +23,7 @@ export class UpdateStatusAdministrationComponent implements OnInit {
     chronoList: string[] = [];
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,

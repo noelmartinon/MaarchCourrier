@@ -1,7 +1,7 @@
 <div class="mat-dialog-content-container">
     <h1 mat-dialog-title>
         <span style="flex: 1;">
-            {{creationMode ? lang.contactCreation : lang.contact}}
+            {{creationMode ? this.translate.instant('lang.contactCreation') : this.translate.instant('lang.contact')}}
         </span>
         <button [title]="this.translate.instant('lang.close')" mat-icon-button (click)="dialogRef.close();">
             <mat-icon class="fa fa-times"></mat-icon>

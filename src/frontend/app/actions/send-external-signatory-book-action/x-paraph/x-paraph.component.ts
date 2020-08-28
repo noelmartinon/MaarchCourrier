@@ -1,5 +1,4 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { LANG } from '../../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { HttpClient } from '@angular/common/http';
@@ -17,7 +16,7 @@ declare var $: any;
 })
 export class XParaphComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     newAccount: any = {};
@@ -33,7 +32,7 @@ export class XParaphComponent implements OnInit {
     @Input() additionalsInfos: any;
     @Input() externalSignatoryBookDatas: any;
 
-    constructor(private translate: TranslateService, public http: HttpClient, private notify: NotificationService) { }
+    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService) { }
 
     ngOnInit(): void { }
 

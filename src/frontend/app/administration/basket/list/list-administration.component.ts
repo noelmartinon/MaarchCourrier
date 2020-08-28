@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { FormControl } from '@angular/forms';
@@ -17,7 +16,7 @@ declare var $: any;
 })
 export class ListAdministrationComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     displayedMainData: any = [
@@ -222,7 +221,7 @@ export class ListAdministrationComponent implements OnInit {
     @Input('currentBasketGroup') private basketGroup: any;
     @Output('refreshBasketGroup') refreshBasketGroup = new EventEmitter<any>();
 
-    constructor(private translate: TranslateService, public http: HttpClient, private notify: NotificationService) { }
+    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService) { }
 
     ngOnInit(): void {
         this.filteredDataOptions = this.dataControl.valueChanges

@@ -23,7 +23,7 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
     backgroundList: any[] = [];
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         private _formBuilder: FormBuilder,
         private notify: NotificationService,
         private sanitizer: DomSanitizer,
@@ -33,7 +33,7 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
         const valIdentifier: ValidatorFn[] = [Validators.pattern(/^[a-zA-Z0-9_\-]*$/), Validators.required];
 
         this.stepFormGroup = this._formBuilder.group({
-            appName: ['', Validators.required],
+            applicationName: ['', Validators.required],
             loginpage_message: [''],
             homepage_message: [''],
             bodyImage: ['../rest/images?image=loginPage'],
@@ -61,22 +61,22 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
                 }),
                 exhaustMap(() => this.http.get('../rest/authenticationInformations')),
                 tap((data: any) => {
-                    this.stepFormGroup.controls['appName'].setValue(data.applicationName);
+                    this.stepFormGroup.controls['applicationName'].setValue(data.applicationName);
                     setTimeout(() => {
 
-                        this.stepFormGroup.controls['appName'].valueChanges.pipe(
-                            debounceTime(500),
-                            tap(() => this.saveParameter('appName'))
+                        this.stepFormGroup.controls['applicationName'].valueChanges.pipe(
+                            debounceTime(1000),
+                            tap(() => this.saveParameter('applicationName'))
                         ).subscribe();
 
 
                         this.stepFormGroup.controls['homepage_message'].valueChanges.pipe(
-                            debounceTime(500),
+                            debounceTime(1000),
                             tap(() => this.saveParameter('homepage_message'))
                         ).subscribe();
 
                         this.stepFormGroup.controls['loginpage_message'].valueChanges.pipe(
-                            debounceTime(500),
+                            debounceTime(1000),
                             tap(() => this.saveParameter('loginpage_message'))
                         ).subscribe();
                         this.initMce();
@@ -139,7 +139,7 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
                         const img = new Image();
                         img.onload = (imgDim: any) => {
                             if (imgDim.target.width < 1920 || imgDim.target.height < 1080) {
-                                this.notify.error(this.scanPipe.transform(this.translate.instant('lang.badImageResolution'), ['1920x1080']));
+                                this.notify.error(this.translate.instant('lang.badImageResolution', {value1: '1920x1080'}));
                             } else {
                                 this.backgroundList.push({
                                     filename: value.target.result,
@@ -163,15 +163,15 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
 
         if (mode === 'logo') {
             if (file.size > 5000000) {
-                return this.scanPipe.transform(this.translate.instant('lang.maxFileSizeExceeded'), ['5mo']);
+                return this.translate.instant('lang.maxFileSizeExceeded', {value1: '5mo'});
             } else if (allowedExtension.indexOf(file.type) === -1) {
-                return this.scanPipe.transform(this.translate.instant('lang.onlyExtensionsAllowed'), [allowedExtension.join(', ')]);
+                return this.translate.instant('lang.onlyExtensionsAllowed', {value1: allowedExtension.join(', ')});
             }
         } else {
             if (file.size > 10000000) {
-                return this.scanPipe.transform(this.translate.instant('lang.maxFileSizeExceeded'), ['10mo']);
+                return this.translate.instant('lang.maxFileSizeExceeded', {value1: '10mo'});
             } else if (allowedExtension.indexOf(file.type) === -1) {
-                return this.scanPipe.transform(this.translate.instant('lang.onlyExtensionsAllowed'), [allowedExtension.join(', ')]);
+                return this.translate.instant('lang.onlyExtensionsAllowed', {value1: allowedExtension.join(', ')});
             }
         }
         return true;
@@ -198,6 +198,8 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
         let param = {};
         if (parameterId === 'logo' || parameterId === 'bodyImage') {
             param['image'] = this.stepFormGroup.controls[parameterId].value;
+        } else if (parameterId === 'applicationName') {
+            param['applicationName'] = this.stepFormGroup.controls[parameterId].value;
         } else {
             param = {
                 param_value_string: this.stepFormGroup.controls[parameterId].value

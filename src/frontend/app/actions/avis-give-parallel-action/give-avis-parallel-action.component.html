@@ -16,7 +16,7 @@
                 </div>
                 <div class="alert-message alert-message-info" *ngIf="data.resIds.length == 1  && !noResourceToProcess"
                     role="alert" style="margin-top: 30px;"
-                    [innerHTML]="'<b>' + ownerOpinion + '</b> '+ lang.askOpinionUser + ' :<br/><br/>' + opinionContent">
+                    [innerHTML]="'<b>' + ownerOpinion + '</b> '+ this.translate.instant('lang.askOpinionUser') + ' :<br/><br/>' + opinionContent">
                 </div>
 
                 <div class="alert-message alert-message-info" *ngIf="data.resIds.length > 1 && !noResourceToProcess"
@@ -29,7 +29,7 @@
                     </p>
                     <ul>
                         <li *ngFor="let ressource of resourcesErrors">
-                            <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
+                            <b>{{ressource.alt_identifier}}</b> : {{'lang.' + ressource.reason | translate}}
                         </li>
                     </ul>
                 </div>
@@ -37,7 +37,7 @@
                     role="alert">
                     <ul style="margin: 0;padding-bottom: 0px;">
                         <li *ngFor="let ressource of resourcesWarnings">
-                            <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
+                            <b>{{ressource.alt_identifier}}</b> : {{'lang.' + ressource.reason | translate}}
                         </li>
                     </ul>
                 </div>

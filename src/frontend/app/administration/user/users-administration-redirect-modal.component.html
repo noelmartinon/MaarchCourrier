@@ -11,7 +11,7 @@
 
                 <div *ngFor="let redirectModel of data.redirectListModels; index as i" id="{{redirectModel.object_id}}"
                     class="form-group">
-                    <plugin-autocomplete [labelPlaceholder]="lang.newDest + ' : ' + redirectModel.title"
+                    <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.newDest') + ' : ' + redirectModel.title"
                         [labelList]="this.translate.instant('lang.availableUsers')" [routeDatas]="['/rest/autocomplete/users']"
                         [targetSearchKey]="'idToDisplay'" [subInfoKey]="'descriptionToDisplay'"
                         (triggerEvent)="setRedirectUserListModels(i, $event)" singleMode required></plugin-autocomplete>

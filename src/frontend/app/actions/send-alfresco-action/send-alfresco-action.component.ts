@@ -1,5 +1,4 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -19,7 +18,7 @@ declare var $: any;
 })
 export class SendAlfrescoActionComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     errors: any;
@@ -38,7 +37,7 @@ export class SendAlfrescoActionComponent implements OnInit {
     @ViewChild('maarchTree', { static: false }) maarchTree: MaarchTreeComponent;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialogRef: MatDialogRef<SendAlfrescoActionComponent>,
@@ -79,7 +78,7 @@ export class SendAlfrescoActionComponent implements OnInit {
             this.http.post('../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkSendAlfresco', { resources: this.data.resIds })
                 .subscribe((data: any) => {
                     if (!this.functions.empty(data.fatalError)) {
-                        this.notify.error(this.lang[data.reason]);
+                        this.notify.error(this.translate.instant('lang.' + data.reason));
                         this.dialogRef.close();
                     } else if (!this.functions.empty(data.resourcesInformations.error)) {
                         this.resourcesErrors = data.resourcesInformations.error;

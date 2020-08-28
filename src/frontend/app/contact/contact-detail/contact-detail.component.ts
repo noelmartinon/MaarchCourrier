@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { ContactService } from '../../../service/contact.service';
 import { tap, catchError, finalize } from 'rxjs/operators';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { FunctionsService } from '../../../service/functions.service';
 import { of } from 'rxjs/internal/observable/of';
@@ -28,14 +27,14 @@ export class ContactDetailComponent implements OnInit {
     @Output() afterSelectedEvent = new EventEmitter<any>();
     @Output() afterDeselectedEvent = new EventEmitter<any>();
 
-    lang: any = LANG;
+    
     loading: boolean = true;
 
     contactClone: any = {};
     customFields: any[] = [];
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private contactService: ContactService,

@@ -6,7 +6,6 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
@@ -27,7 +26,7 @@ export class BasketAdministrationComponent implements OnInit {
 
     selectedIndex: number = 0;
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     config: any = {};
@@ -59,7 +58,7 @@ export class BasketAdministrationComponent implements OnInit {
     }
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private route: ActivatedRoute,
         private router: Router,
@@ -334,11 +333,11 @@ export class BasketAdministrationComponent implements OnInit {
 })
 export class BasketAdministrationSettingsModalComponent implements OnInit {
 
-    lang: any = LANG;
+    
     allEntities: any[] = [];
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any,
@@ -555,7 +554,7 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
 export class BasketAdministrationGroupListModalComponent implements OnInit {
 
     coreUrl: string;
-    lang: any = LANG;
+    
     actionAll: any = [];
     newBasketGroup: any = {};
 

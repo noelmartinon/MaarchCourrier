@@ -12,17 +12,15 @@ import { LocalStorageService } from './local-storage.service';
 import { FunctionsService } from './functions.service';
 import {AlertComponent} from '../plugins/modal/alert.component';
 import {MatDialog} from '@angular/material/dialog';
-import { LANG } from '../app/translate.component';
 import { TranslateService } from '@ngx-translate/core';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AppGuard implements CanActivate {
-    lang: any = LANG;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private router: Router,
         private authService: AuthService,
@@ -193,7 +191,7 @@ export class AppGuard implements CanActivate {
     providedIn: 'root'
 })
 export class AfterProcessGuard implements CanDeactivate<ProcessComponent> {
-    constructor() { }
+    constructor(public translate: TranslateService) { }
 
     async canDeactivate(component: ProcessComponent, currentRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Promise<boolean> {
         /* if (nextState.url !== '/login' && !component.isActionEnded() && !component.detailMode) {
@@ -201,7 +199,7 @@ export class AfterProcessGuard implements CanDeactivate<ProcessComponent> {
         }*/
 
         if ((component.isToolModified() && !component.isModalOpen()) || (component.appDocumentViewer !== undefined && component.appDocumentViewer.isEditingTemplate())) {
-            if (confirm(component.lang.saveModifiedData)) {
+            if (confirm(this.translate.instant('lang.saveModifiedData'))) {
                 await component.saveModificationBeforeClose();
             }
         }

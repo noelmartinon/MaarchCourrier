@@ -1,7 +1,6 @@
 import {AfterViewInit, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {catchError, filter, tap} from 'rxjs/operators';
-import { LANG } from '../../app/translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import {ConfirmComponent} from '../modal/confirm.component';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
@@ -19,8 +18,6 @@ declare var $: any;
     styleUrls: ['collabora-online-viewer.component.scss'],
 })
 export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, OnDestroy {
-
-    lang: any = LANG;
 
     loading: boolean = true;
 
@@ -91,7 +88,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
     }
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         public dialog: MatDialog,
         private notify: NotificationService,
@@ -193,7 +190,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
                         }
                     }),
                     catchError((err) => {
-                        this.notify.error(`${this.lang[err.error.lang]}`);
+                        this.notify.error(this.translate.instant('lang.' + err.error.lang));
                         this.triggerCloseEditor.emit();
                         return of(false);
                     }),

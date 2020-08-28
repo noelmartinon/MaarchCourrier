@@ -1,6 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
@@ -13,7 +12,7 @@ import { FunctionsService } from '../../../service/functions.service';
 })
 export class SummarySheetComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     withQrcode: boolean = true;
@@ -111,7 +110,7 @@ export class SummarySheetComponent implements OnInit {
     ];
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialogRef: MatDialogRef<SummarySheetComponent>,

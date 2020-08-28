@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -34,7 +33,7 @@ declare var $: any;
 })
 export class FollowedDocumentListComponent implements OnInit, OnDestroy {
 
-    lang: any = LANG;
+    
 
     loading: boolean = false;
     docUrl: string = '';
@@ -106,7 +105,7 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
     @ViewChild('menuShortcut', { static: true }) menuShortcut: MenuShortcutComponent;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         private router: Router,
         private route: ActivatedRoute,
         public http: HttpClient,

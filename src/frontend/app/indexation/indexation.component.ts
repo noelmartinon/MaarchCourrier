@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, ViewContainerRef, TemplateRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -32,7 +31,7 @@ import { SelectIndexingModelComponent } from './select-indexing-model/select-ind
 })
 export class IndexationComponent implements OnInit {
 
-    lang: any = LANG;
+    
 
     loading: boolean = false;
 
@@ -63,7 +62,7 @@ export class IndexationComponent implements OnInit {
     isMailing: boolean = false;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         private route: ActivatedRoute,
         private _activatedRoute: ActivatedRoute,
         public http: HttpClient,
@@ -86,7 +85,7 @@ export class IndexationComponent implements OnInit {
 
         // Event after process action
         this.subscription = this.actionService.catchAction().subscribe(resIds => {
-            if (this.selectedAction.component === 'closeAndIndexAction') {
+            if (['closeAndIndexAction', 'saveAndIndexRegisteredMailAction'].indexOf(this.selectedAction.component) > -1) {
                 this.appDocumentViewer.templateListForm.reset();
                 this.appDocumentViewer.file = {
                     name: '',

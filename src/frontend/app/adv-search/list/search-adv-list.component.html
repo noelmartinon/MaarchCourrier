@@ -4,7 +4,7 @@
 <div style="display: flex;">
     <div style="display: flex;align-items: center;">
         <b>{{allResInSearch.length}}
-        {{lang.records | ucfirst}}</b>&nbsp;<small *ngIf="selectedRes.length > 0" style="color: #029BB6;">- {{selectedRes.length}}
+        {{'lang.records' | translate | ucfirst}}</b>&nbsp;<small *ngIf="selectedRes.length > 0" style="color: #029BB6;">- {{selectedRes.length}}
             {{'lang.selected' | translate}}</small>
     </div>
     <div style="flex:1;">
@@ -33,7 +33,7 @@
         <ng-container matColumnDef="category">
             <mat-header-cell *matHeaderCellDef mat-sort-header> {{'lang.category_id' | translate}} </mat-header-cell>
             <mat-cell *matCellDef="let row">
-                {{lang[row.category]}}
+                {{'lang.' + row.category | translate}}
             </mat-cell>
         </ng-container>
 

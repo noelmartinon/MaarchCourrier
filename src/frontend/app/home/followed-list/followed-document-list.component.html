@@ -33,7 +33,7 @@
                             [indeterminate]="selectedRes.length > 0 && selectedRes.length < allResInBasket.length"
                             style="margin: 10px;padding-right: 10px;" title="{{'lang.selectAllResInBasket' | translate}}"
                             (change)="toggleAllRes($event)"></mat-checkbox>&nbsp;{{resultsLength}}
-                        {{lang.records | ucfirst}}&nbsp;<small *ngIf="selectedRes.length > 0">- {{selectedRes.length}}
+                        {{'lang.records' | translate | ucfirst}}&nbsp;<small *ngIf="selectedRes.length > 0">- {{selectedRes.length}}
                             {{'lang.selected' | translate}}</small>
                     </div>
                     <div class="table-head-tool">
@@ -86,17 +86,17 @@
                                     <span *ngIf="!appService.getViewMode()" class="main-info-data"
                                         style="width:200px;text-align:center;cursor:pointer;">
                                         <ng-container
-                                            *ngIf="row.chrono == lang.undefined && row.barcode != lang.undefined">
+                                            *ngIf="row.chrono == this.translate.instant('lang.undefined') && row.barcode != this.translate.instant('lang.undefined')">
                                             <span style="color: rgba(0,0,0,0.4);font-size: 90%;">
                                                 <i title="{{'lang.barcode' | translate}}" class="fas fa-barcode"></i>
                                                 {{row.barcode}}</span>
                                         </ng-container>
-                                        <ng-container *ngIf="row.chrono != lang.undefined">
+                                        <ng-container *ngIf="row.chrono != this.translate.instant('lang.undefined')">
                                             {{row.chrono}}
                                         </ng-container>
                                     </span>
                                     <span class="main-info-data" style="font-weight:bold;flex:1;cursor:pointer;"
-                                        [class.undefined]="row.subject == lang.undefined"
+                                        [class.undefined]="row.subject == this.translate.instant('lang.undefined')"
                                         title="{{row.subject}}">{{row.subject | shorten: 150: '...'}}</span>
                                     <span class="main-info-action">
                                         <div *ngIf="!row.allowed" color="warn">
@@ -125,7 +125,7 @@
                                                 [color]="snav2.opened && row.checked && currentMode == 'diffusion' ? 'primary' : ''">
                                             </mat-icon>
                                         </button>
-                                        <button mat-icon-button title="{{row.hasDocument ? lang.viewResource : lang.noDocument}}" (click)="$event.stopPropagation();viewDocument(row)"
+                                        <button mat-icon-button title="{{row.hasDocument ? this.translate.instant('lang.viewResource') : this.translate.instant('lang.noDocument')}}" (click)="$event.stopPropagation();viewDocument(row)"
                                             (mouseenter)="viewThumbnail(row);" (mouseleave)="closeThumbnail();"
                                             [disabled]="!row.hasDocument">
                                             <mat-icon class="fa" [ngClass]="[row.hasDocument ? 'fa-eye' : 'fa-eye-slash']"></mat-icon>

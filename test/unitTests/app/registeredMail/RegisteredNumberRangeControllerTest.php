@@ -28,7 +28,8 @@ class RegisteredNumberRangeControllerTest extends TestCase
             'label'              => 'Scranton',
             'postOfficeLabel'    => 'Scranton Post Office',
             'accountNumber'      => 42,
-            'addressStreet'      => '1725',
+            'addressNumber'      => '1725',
+            'addressStreet'      => 'Slough Avenue',
             'addressAdditional1' => null,
             'addressAdditional2' => null,
             'addressPostcode'    => '18505',
@@ -238,16 +239,8 @@ class RegisteredNumberRangeControllerTest extends TestCase
         $this->assertSame(self::$siteId, $responseBody['ranges'][0]['siteId']);
         $this->assertSame($GLOBALS['id'], $responseBody['ranges'][0]['creator']);
         $this->assertNull($responseBody['ranges'][0]['currentNumber']);
+        $this->assertIsArray($responseBody['ranges'][0]['entities']);
         $this->assertSame(0, $responseBody['ranges'][0]['fullness']);
-
-        $GLOBALS['login'] = 'bbain';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-        $GLOBALS['id'] = $userInfo['id'];
-
-        $response = $registeredNumberRangeController->get($request, new \Slim\Http\Response());
-        $this->assertSame(403, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Service forbidden', $responseBody['errors']);
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);

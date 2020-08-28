@@ -113,6 +113,7 @@ define('_OUTGOING', 'Brief Vertrek');
 define('_INTERNAL', 'Interne brief');
 define('_ATTACHMENT', 'Bijlage');
 define('_GED_DOC', 'GED document');
+define('_REGISTERED_MAIL', 'Registered mail'); //TO TRANSLATE
 define('_UNCHANGED', 'Ongewijzigd');
 define('_NO_PAGE', 'Geen pagina');
 define('_NO_KEYWORD', 'Geen sleutelwoord');

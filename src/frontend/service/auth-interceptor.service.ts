@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpHandler, HttpInterceptor, HttpRequest, HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { LANG } from '../app/translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, switchMap } from 'rxjs/operators';
 import { NotificationService } from './notification/notification.service';
@@ -12,7 +11,6 @@ import { FunctionsService } from './functions.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-    lang: any = LANG;
     byPassToken: any[] = [
         {
             route: '../rest/prerequisites',
@@ -46,7 +44,7 @@ export class AuthInterceptor implements HttpInterceptor {
         }
     ];
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private router: Router,
         public notificationService: NotificationService,

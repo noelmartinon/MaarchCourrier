@@ -11,7 +11,7 @@
                     'fa-file-signature':row.mode == 'sign',
                     'fa-thumbs-up':row.mode == 'visa',
                     'fa-comment-dots':row.mode == 'note'
-                  }" title="{{lang['to_'+row.mode]}}"></mat-icon>
+                  }" title="{{'lang.to_' + row.mode | translate}}"></mat-icon>
             </div>
             <div style="padding-top: 5px;color: rgba(0,0,0,0.4);font-size: 90%;overflow: hidden;text-overflow: ellipsis;"
                 title="{{row.reference}}">

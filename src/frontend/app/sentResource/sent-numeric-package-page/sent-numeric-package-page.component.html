@@ -1,7 +1,7 @@
 <div class="mat-dialog-content-container">
     <h1 mat-dialog-title>
         <span style="flex: 1;">
-            {{functions.empty(reference) ? lang.sendNumericPackage : reference}}
+            {{functions.empty(reference) ? this.translate.instant('lang.sendNumericPackage') : reference}}
         </span>
         <button [title]="this.translate.instant('lang.close')" mat-icon-button (click)="closeModal()">
             <mat-icon class="fa fa-times"></mat-icon>
@@ -11,7 +11,7 @@
             <mat-spinner style="margin:auto;"></mat-spinner>
         </div>
         <div *ngIf="canManageMail()" class="alert-message alert-message-info"
-            [innerHTML]="lang.sendNumericPackageInfo | scan: [maarch2maarchUrl]"></div>
+            [innerHTML]="'lang.sendNumericPackageInfo' | translate:{value1: maarch2maarchUrl}"></div>
         <mat-form-field>
             <mat-label class="attachLabel">{{'lang.sender' | translate}}</mat-label>
             <input *ngIf="!canManageMail()" matInput [value]="currentSender.label" readonly>
@@ -92,7 +92,7 @@
         </div>
         <div style="overflow: auto;max-height: 300px;">
             <mat-list *ngIf="numericPackage.mainExchangeDoc !== null">
-                <h3 mat-subheader class="attachLabel">{{canManageMail() ? lang.mainDocNumericPackageToSend : lang.mainDocNumericPackage}}</h3>
+                <h3 mat-subheader class="attachLabel">{{canManageMail() ? this.translate.instant('lang.mainDocNumericPackageToSend') : this.translate.instant('lang.mainDocNumericPackage')}}</h3>
                 <mat-list-item class="numericPackageAttach" *ngIf="numericPackage.mainExchangeDoc !== null">
                     <p mat-line class="numericPackageAttachItem">
                         <span
@@ -107,7 +107,7 @@
             </mat-list>
             <mat-divider *ngIf="numericPackageAttach.length > 0"></mat-divider>
             <mat-list *ngIf="numericPackageAttach.length > 0">
-                <h3 mat-subheader class="attachLabel">{{canManageMail() ? lang.attachmentsNumericPackageToSend : lang.attachmentsNumericPackage}}</h3>
+                <h3 mat-subheader class="attachLabel">{{canManageMail() ? this.translate.instant('lang.attachmentsNumericPackageToSend') : this.translate.instant('lang.attachmentsNumericPackage')}}</h3>
                 <mat-list-item class="numericPackageAttach" *ngFor="let attach of numericPackageAttach; let i=index">
                     <p mat-line class="numericPackageAttachItem">
                         <span style="overflow: hidden;text-overflow: ellipsis;"

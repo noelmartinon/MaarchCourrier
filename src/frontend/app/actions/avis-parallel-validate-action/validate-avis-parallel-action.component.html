@@ -16,7 +16,7 @@
                 </div>
                 <div class="alert-message alert-message-info" *ngIf="data.resIds.length == 1  && !noResourceToProcess"
                     role="alert" style="margin-top: 30px;"
-                    [innerHTML]="lang.validateAvisParallelSingle + ' <b>' + ownerOpinion + '</b>'">
+                    [innerHTML]="this.translate.instant('lang.validateAvisParallelSingle') + ' <b>' + ownerOpinion + '</b>'">
                 </div>
 
                 <div class="alert-message alert-message-info" *ngIf="data.resIds.length > 1 && !noResourceToProcess"
@@ -29,7 +29,7 @@
                     </p>
                     <ul>
                         <li *ngFor="let ressource of resourcesErrors">
-                            <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
+                            <b>{{ressource.alt_identifier}}</b> : {{'lang.' + ressource.reason | translate}}
                         </li>
                     </ul>
                 </div>

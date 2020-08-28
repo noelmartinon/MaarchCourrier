@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../app/translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { Subject, Observable, of } from 'rxjs';
 import { NotificationService } from '../../service/notification/notification.service';
@@ -11,8 +10,6 @@ import { map, tap, filter, exhaustMap, catchError, finalize } from 'rxjs/operato
 
 @Injectable()
 export class FoldersService {
-
-    lang: any = LANG;
 
     loading: boolean = true;
 
@@ -25,7 +22,7 @@ export class FoldersService {
     private eventAction = new Subject<any>();
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         public dialog: MatDialog,
         private notify: NotificationService,
@@ -65,7 +62,7 @@ export class FoldersService {
         this.http.get("../rest/folders").pipe(
             tap((data: any) => {
                 this.folders = data.folders;
-                this.eventAction.next({type:'initTree', content: ''});
+                this.eventAction.next({type: 'initTree', content: ''});
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -106,7 +103,7 @@ export class FoldersService {
         this.http.post(`../rest/folders/${folder.id}/pin`, {}).pipe(
             tap(() => {
                 this.getPinnedFolders();
-                this.eventAction.next({type:'refreshFolderPinned', content: {id: folder.id, pinned : true}});
+                this.eventAction.next({type: 'refreshFolderPinned', content: {id: folder.id, pinned : true}});
                 this.notify.success(this.translate.instant('lang.folderPinned'));
             }),
             catchError((err: any) => {
@@ -120,7 +117,7 @@ export class FoldersService {
         this.http.delete(`../rest/folders/${folder.id}/unpin`).pipe(
             tap(() => {
                 this.getPinnedFolders();
-                this.eventAction.next({type:'refreshFolderPinned', content: {id: folder.id, pinned : false}});
+                this.eventAction.next({type: 'refreshFolderPinned', content: {id: folder.id, pinned : false}});
                 this.notify.success(this.translate.instant('lang.folderUnpinned'));
             }),
             catchError((err: any) => {
@@ -143,11 +140,11 @@ export class FoldersService {
                 if (this.pinnedFolders.filter((pinFolder: any) => pinFolder.id === folder.id)[0] !== undefined) {
                     this.pinnedFolders.filter((pinFolder: any) => pinFolder.id === folder.id)[0].countResources = data.countResources;
                 }
-                this.eventAction.next({type:'refreshFolderCount', content: {id: folder.id, countResources : data.countResources}});
+                this.eventAction.next({type: 'refreshFolderCount', content: {id: folder.id, countResources : data.countResources}});
             }),
             tap(() => {
                 this.notify.success(this.translate.instant('lang.mailClassified'));
-                this.eventAction.next({type:'function', content: 'refreshDao'});
+                this.eventAction.next({type: 'function', content: 'refreshDao'});
             }),
             finalize(() => folder.drag = false),
             catchError((err) => {

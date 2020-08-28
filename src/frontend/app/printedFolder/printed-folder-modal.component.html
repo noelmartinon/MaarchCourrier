@@ -43,7 +43,7 @@
                                         (change)="$event ? toggleAllElements($event.checked, keyVal.key) : null"
                                         [checked]="selectedPrintedFolderElement[keyVal.key].value.length > 0 && selectedPrintedFolderElement[keyVal.key].value.length === printedFolderElement[keyVal.key].length"
                                         [indeterminate]="selectedPrintedFolderElement[keyVal.key].value.length > 0 && selectedPrintedFolderElement[keyVal.key].value.length !== printedFolderElement[keyVal.key].length"
-                                        (click)="$event.stopPropagation()" disableRipple>{{lang[keyVal.key]}}
+                                        (click)="$event.stopPropagation()" disableRipple>{{'lang.' + keyVal.key | translate}}
                                     </mat-checkbox>
                                 </mat-panel-title>
                             </mat-expansion-panel-header>
@@ -66,7 +66,7 @@
                                         <div color="primary"
                                             style="flex:1;display: flex;font-size: 80%;white-space: pre;padding-right: 10px;"
                                             *ngIf="!functions.empty(element.recipients)">
-                                            {{lang.for | ucfirst}} : {{element.recipients}}
+                                            {{'lang.for' | translate | ucfirst}} : {{element.recipients}}
                                         </div>
                                         <div *ngIf="!functions.empty(element.creator)" color="primary"
                                             style="flex:1;font-size: 80%;padding-right: 10px;">
@@ -82,7 +82,7 @@
 
                                         <div *ngIf="!functions.empty(element.status)">
                                             <div *ngIf="element.status === 'SIGN'" style="color: green">
-                                                {{lang['attachment_' + element.status]}}
+                                                {{'lang.attachment_' + element.status | translate}}
                                             </div>
                                         </div>
 

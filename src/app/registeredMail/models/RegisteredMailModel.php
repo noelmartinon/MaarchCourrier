@@ -93,4 +93,33 @@ class RegisteredMailModel
 
         return true;
     }
+
+    public static function update(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['where', 'data']);
+        ValidatorModel::arrayType($args, ['set', 'where', 'data']);
+
+        DatabaseModel::update([
+            'table'     => 'registered_mail_resources',
+            'set'       => $args['set'],
+            'where'     => $args['where'],
+            'data'      => $args['data']
+        ]);
+
+        return true;
+    }
+
+    public static function getWithResources(array $args = [])
+    {
+        ValidatorModel::arrayType($args, ['select', 'where', 'data']);
+
+        return DatabaseModel::select([
+            'select'    => empty($args['select']) ? ['*'] : $args['select'],
+            'table'     => ['registered_mail_resources', 'res_letterbox'],
+            'left_join' => ['registered_mail_resources.res_id = res_letterbox.res_id'],
+            'where'     => empty($args['where']) ? [] : $args['where'],
+            'data'      => empty($args['data']) ? [] : $args['data'],
+            'groupBy'   => empty($args['groupBy']) ? [] : $args['groupBy']
+        ]);
+    }
 }

@@ -21,7 +21,7 @@
     </mat-form-field>
     <div *ngIf="!externalUser.inMaarchParapheur" class="alert-message alert-message-danger" role="alert"
       style="margin-top: 30px;"
-      [innerHTML]="lang.maarchParapheurAccountMsg + ' <b>' + externalUser.login + '</b> ' + lang.maarchParapheurAccountMsg2">
+      [innerHTML]="this.translate.instant('lang.maarchParapheurAccountMsg') + ' <b>' + externalUser.login + '</b> ' + this.translate.instant('lang.maarchParapheurAccountMsg2')">
     </div>
   </mat-dialog-content>
   <span class="divider-modal"></span>

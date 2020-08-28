@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from '../../service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -19,7 +18,7 @@ import { AuthService } from '../../service/auth.service';
 })
 export class HeaderRightComponent implements OnInit {
 
-    lang: any = LANG;
+    
 
     dialogRef: MatDialogRef<any>;
     config: any = {};

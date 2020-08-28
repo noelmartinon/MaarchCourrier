@@ -73,7 +73,7 @@
                     <p mat-line> {{emailSendResult.msg}} </p>
                 </mat-list-item>
             </mat-nav-list>
-            <div class="bash" *ngIf="this.emailSendResult.msg === lang.emailSendFailed">
+            <div class="bash" *ngIf="this.emailSendResult.msg === this.translate.instant('lang.emailSendFailed')">
                 {{this.emailSendResult.debug}}
             </div>
         </mat-drawer>

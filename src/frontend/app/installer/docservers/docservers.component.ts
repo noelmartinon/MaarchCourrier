@@ -2,7 +2,6 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { tap } from 'rxjs/internal/operators/tap';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/internal/operators/catchError';
@@ -15,13 +14,13 @@ import { InstallerService } from '../installer.service';
     styleUrls: ['./docservers.component.scss']
 })
 export class DocserversComponent implements OnInit {
-    lang: any = LANG;
+    
     stepFormGroup: FormGroup;
 
     @Output() nextStep = new EventEmitter<string>();
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         private _formBuilder: FormBuilder,
         private notify: NotificationService,
         public http: HttpClient,

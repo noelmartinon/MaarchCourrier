@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, Renderer2 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -19,7 +18,7 @@ import { HeaderService } from '../../service/header.service';
 })
 export class DiffusionsListComponent implements OnInit {
 
-    lang: any = LANG;
+    
     roles: any = [];
     loading: boolean = true;
     availableRoles: any[] = [];
@@ -88,7 +87,7 @@ export class DiffusionsListComponent implements OnInit {
     @Output('triggerEvent') triggerEvent = new EventEmitter();
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private renderer: Renderer2,

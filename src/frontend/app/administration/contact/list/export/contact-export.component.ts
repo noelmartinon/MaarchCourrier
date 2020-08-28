@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../../service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -20,7 +19,7 @@ declare var $: any;
 })
 export class ContactExportComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
     loadingExport: boolean = false;
 
@@ -58,7 +57,7 @@ export class ContactExportComponent implements OnInit {
 
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any,
@@ -80,7 +79,7 @@ export class ContactExportComponent implements OnInit {
                     data.contactsParameters = data.contactsParameters.filter((field: any) => field.identifier.match(regex) === null).map((field: any) => {
                         return {
                             value: field.identifier,
-                            label: this.lang['contactsParameters_' + field.identifier]
+                            label: this.translate.instant('lang.contactsParameters_' + field.identifier)
                         };
                     });
                     return data.contactsParameters;

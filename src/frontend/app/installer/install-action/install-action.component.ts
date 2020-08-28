@@ -1,6 +1,5 @@
 import { Component, OnInit, Inject, AfterViewInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { LANG } from '../../../app/translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { tap } from 'rxjs/internal/operators/tap';
@@ -16,7 +15,6 @@ import { NotificationService } from '../../../service/notification/notification.
     styleUrls: ['./install-action.component.scss']
 })
 export class InstallActionComponent implements OnInit, AfterViewInit {
-    lang: any = LANG;
     steps: any[] = [];
     customId: string = '';
 
@@ -24,7 +22,7 @@ export class InstallActionComponent implements OnInit, AfterViewInit {
     disableAnimation = true;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<InstallActionComponent>,
         public http: HttpClient,
@@ -85,7 +83,7 @@ export class InstallActionComponent implements OnInit, AfterViewInit {
                     catchError((err: any) => {
                         this.steps[index].state = 'KO';
                         if (err.error.lang !== undefined) {
-                            this.steps[index].msgErr = this.lang[err.error.lang];
+                            this.steps[index].msgErr = this.translate.instant('lang.' + err.error.lang);
                         } else {
                             this.steps[index].msgErr = err.error.errors;
                         }

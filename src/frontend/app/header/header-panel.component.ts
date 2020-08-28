@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Location } from '@angular/common';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from '../../service/header.service';
 import { MatDialogRef } from '@angular/material/dialog';
@@ -15,7 +14,7 @@ import { Router } from '@angular/router';
 })
 export class HeaderPanelComponent implements OnInit {
 
-    // lang: any = LANG;
+    // 
 
     dialogRef: MatDialogRef<any>;
     config: any = {};

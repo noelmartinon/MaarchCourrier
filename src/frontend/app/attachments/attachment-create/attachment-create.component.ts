@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, Inject, ViewChildren, QueryList } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, tap, filter, distinctUntilChanged, take } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -26,7 +25,7 @@ import { ContactAutocompleteComponent } from '../../contact/autocomplete/contact
 
 export class AttachmentCreateComponent implements OnInit {
 
-    lang: any = LANG;
+    
 
     loading: boolean = true;
 
@@ -62,7 +61,7 @@ export class AttachmentCreateComponent implements OnInit {
     @ViewChildren('contactAutocomplete') contactAutocomplete: ContactAutocompleteComponent;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<AttachmentCreateComponent>,

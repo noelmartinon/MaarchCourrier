@@ -38,7 +38,7 @@
             <mat-select [(ngModel)]="this.listProperties.order" (selectionChange)="updateFilters()">
                 <mat-option value="" style="text-align: center;">{{'lang.defaultOrder' | translate}}</mat-option>
                 <mat-option [value]="column.id" *ngFor="let column of displayColsOrder">
-                    {{lang[column.id]}}
+                    {{'lang.' + column.id | translate}}
                 </mat-option>
             </mat-select>
         </mat-form-field>
@@ -46,7 +46,7 @@
     <div class="ascDescTool">
         <button [disabled]="this.listProperties.order == ''"
             [style.opacity]="this.listProperties.order == '' ? '0.2' : '1'" mat-fab
-            [title]="this.listProperties.orderDir == 'DESC' ? lang.descOrder : lang.ascOrder"
+            [title]="this.listProperties.orderDir == 'DESC' ? this.translate.instant('lang.descOrder') : this.translate.instant('lang.ascOrder')"
             style="color: rgba(0,0,0,0.38);" (click)="changeOrderDir();">
             <mat-icon *ngIf="this.listProperties.orderDir == 'DESC'" fontSet="fas" fontIcon="fa-sort-amount-down fa-2x">
             </mat-icon>

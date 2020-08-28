@@ -3,7 +3,6 @@ import { FormControl } from '@angular/forms';
 import { Input, EventEmitter, Output, ViewChild, ElementRef } from '@angular/core';
 import { map, startWith } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
-import { LANG } from '../../app/translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -18,7 +17,6 @@ import { NotificationService } from '../../service/notification/notification.ser
     styleUrls: ['autocomplete-list.component.scss'],
 })
 export class AutocompleteListComponent implements OnInit {
-    lang: any = LANG;
     inputFormControl = new FormControl();
     loading = false;
 
@@ -74,7 +72,7 @@ export class AutocompleteListComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,

@@ -1,6 +1,5 @@
 import { Component, OnInit, NgZone, ViewChild, QueryList, ViewChildren, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from './translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../service/notification/notification.service';
 import { HeaderService } from '../service/header.service';
@@ -29,7 +28,7 @@ declare var tinymce: any;
 export class ProfileComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
-    lang: any = LANG;
+    
 
     highlightMe: boolean = false;
     user: any = {
@@ -163,7 +162,7 @@ export class ProfileComponent implements OnInit {
 
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private zone: NgZone,
         private notify: NotificationService,
@@ -799,7 +798,7 @@ export class ProfileComponent implements OnInit {
                         this.passwordRules.minLength.value = rule.value;
                         if (rule.enabled) {
                             valArr.push(Validators.minLength(this.passwordRules.minLength.value));
-                            ruleTextArr.push(rule.value + ' ' + this.lang['password' + rule.label]);
+                            ruleTextArr.push(rule.value + ' ' + this.translate.instant('lang.password' + rule.label));
                         }
 
 
@@ -808,7 +807,7 @@ export class ProfileComponent implements OnInit {
                         this.passwordRules.complexityUpper.value = rule.value;
                         if (rule.enabled) {
                             valArr.push(this.regexValidator(new RegExp('[A-Z]'), { 'complexityUpper': '' }));
-                            ruleTextArr.push(this.lang['password' + rule.label]);
+                            ruleTextArr.push(this.translate.instant('lang.password' + rule.label));
                         }
 
 
@@ -817,7 +816,7 @@ export class ProfileComponent implements OnInit {
                         this.passwordRules.complexityNumber.value = rule.value;
                         if (rule.enabled) {
                             valArr.push(this.regexValidator(new RegExp('[0-9]'), { 'complexityNumber': '' }));
-                            ruleTextArr.push(this.lang['password' + rule.label]);
+                            ruleTextArr.push(this.translate.instant('lang.password' + rule.label));
                         }
 
 
@@ -826,19 +825,19 @@ export class ProfileComponent implements OnInit {
                         this.passwordRules.complexitySpecial.value = rule.value;
                         if (rule.enabled) {
                             valArr.push(this.regexValidator(new RegExp('[^A-Za-z0-9]'), { 'complexitySpecial': '' }));
-                            ruleTextArr.push(this.lang['password' + rule.label]);
+                            ruleTextArr.push(this.translate.instant('lang.password' + rule.label));
                         }
                     } else if (rule.label == 'renewal') {
                         this.passwordRules.renewal.enabled = rule.enabled;
                         this.passwordRules.renewal.value = rule.value;
                         if (rule.enabled) {
-                            otherRuleTextArr.push(this.lang['password' + rule.label] + ' <b>' + rule.value + ' ' + this.translate.instant('lang.days') + '</b>. ' + this.lang['password2' + rule.label] + '.');
+                            otherRuleTextArr.push(this.translate.instant('lang.password' + rule.label) + ' <b>' + rule.value + ' ' + this.translate.instant('lang.days') + '</b>. ' + this.translate.instant('lang.password2' + rule.label) + '.');
                         }
                     } else if (rule.label == 'historyLastUse') {
                         this.passwordRules.historyLastUse.enabled = rule.enabled;
-                        this.passwordRules.historyLastUse.value = rule.value
+                        this.passwordRules.historyLastUse.value = rule.value;
                         if (rule.enabled) {
-                            otherRuleTextArr.push(this.lang['passwordhistoryLastUseDesc'] + ' <b>' + rule.value + '</b> ' + this.lang['passwordhistoryLastUseDesc2'] + '.');
+                            otherRuleTextArr.push(this.translate.instant('lang.passwordhistoryLastUseDesc') + ' <b>' + rule.value + '</b> ' + this.translate.instant('lang.passwordhistoryLastUseDesc2') + '.');
                         }
                     }
 
@@ -867,9 +866,9 @@ export class ProfileComponent implements OnInit {
             validator: this.matchValidator
         });
         this.validPassword = false;
-        this.firstFormGroup.controls['currentPasswordCtrl'].setErrors(null)
-        this.firstFormGroup.controls['newPasswordCtrl'].setErrors(null)
-        this.firstFormGroup.controls['retypePasswordCtrl'].setErrors(null)
+        this.firstFormGroup.controls['currentPasswordCtrl'].setErrors(null);
+        this.firstFormGroup.controls['newPasswordCtrl'].setErrors(null);
+        this.firstFormGroup.controls['retypePasswordCtrl'].setErrors(null);
         this.selectedIndex = 0;
         this.showPassword = true;
     }
@@ -879,7 +878,7 @@ export class ProfileComponent implements OnInit {
         if (group.controls['newPasswordCtrl'].value == group.controls['retypePasswordCtrl'].value) {
             return false;
         } else {
-            group.controls['retypePasswordCtrl'].setErrors({ 'mismatch': true })
+            group.controls['retypePasswordCtrl'].setErrors({ 'mismatch': true });
             return { 'mismatch': true };
         }
     }

@@ -34,7 +34,7 @@
                                     </p>
                                     <ul>
                                         <li *ngFor="let mail of additionalsInfos.noMail">
-                                            <b>{{mail.alt_identifier}}</b> : {{lang[mail.reason]}}
+                                            <b>{{mail.alt_identifier}}</b> : {{'lang.' + mail.reason | translate}}
                                         </li>
                                     </ul>
                                 </div>

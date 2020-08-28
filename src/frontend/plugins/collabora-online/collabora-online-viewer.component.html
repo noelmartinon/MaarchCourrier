@@ -4,11 +4,11 @@
     <mat-icon class="fa fa-times" style="height:auto;"></mat-icon>
 </button>
 <button mat-mini-fab class="collaboraOnlineButton_close" [class.buttonsHide]="hideButtons" [class.fullScreen]="fullscreenMode" color="default"
-    [title]="fullscreenMode ? lang.closeFullscreen : lang.openFullscreen" (click)="openFullscreen()">
+    [title]="fullscreenMode ? this.translate.instant('lang.closeFullscreen') : this.translate.instant('lang.openFullscreen')" (click)="openFullscreen()">
     <mat-icon class="fas" [class.fa-expand]="!fullscreenMode" [class.fa-compress]="fullscreenMode" style="height:auto;"></mat-icon>
 </button>
 <button class="collaboraOnlineButton_hide" [class.buttonsHide]="hideButtons" [class.fullScreen]="fullscreenMode" mat-mini-fab color="default"
-        [title]="!hideButtons ? lang.hideTool : lang.showTool" (click)="hideButtons = !hideButtons">
+        [title]="!hideButtons ? this.translate.instant('lang.hideTool') : this.translate.instant('lang.showTool')" (click)="hideButtons = !hideButtons">
     <mat-icon class="fa fa-arrow-right" style="height:auto;"></mat-icon>
 </button>
 

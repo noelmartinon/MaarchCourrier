@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -18,7 +17,7 @@ declare var $: any;
 })
 export class ExportComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
     loadingExport: boolean = false;
 
@@ -216,7 +215,7 @@ export class ExportComponent implements OnInit {
     @ViewChild('listFilter', { static: true }) private listFilter: any;
 
 
-    constructor(private translate: TranslateService, public http: HttpClient, private notify: NotificationService, @Inject(MAT_DIALOG_DATA) public data: any, private sortPipe: SortPipe) { }
+    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, @Inject(MAT_DIALOG_DATA) public data: any, private sortPipe: SortPipe) { }
 
     ngOnInit(): void {
         this.dataAvailableClone = JSON.parse(JSON.stringify(this.dataAvailable));

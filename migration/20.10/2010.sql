@@ -194,13 +194,13 @@ CREATE TABLE IF NOT EXISTS registered_mail_issuing_sites (
    id SERIAL NOT NULL,
    label CHARACTER VARYING(256) NOT NULL,
    post_office_label CHARACTER VARYING(256),
-   account_number CHARACTER VARYING(256),
-   address_number CHARACTER VARYING(256),
-   address_street CHARACTER VARYING(256),
+   account_number INTEGER,
+   address_number CHARACTER VARYING(256) NOT NULL,
+   address_street CHARACTER VARYING(256) NOT NULL,
    address_additional1 CHARACTER VARYING(256),
    address_additional2 CHARACTER VARYING(256),
-   address_postcode CHARACTER VARYING(256),
-   address_town CHARACTER VARYING(256),
+   address_postcode CHARACTER VARYING(256) NOT NULL,
+   address_town CHARACTER VARYING(256) NOT NULL,
    address_country CHARACTER VARYING(256),
    CONSTRAINT registered_mail_issuing_sites_pkey PRIMARY KEY (id)
 );
@@ -225,8 +225,8 @@ CREATE TABLE IF NOT EXISTS registered_mail_number_range (
     site_id INTEGER NOT NULL,
     status CHARACTER VARYING(10) NOT NULL,
     current_number INTEGER,
-    CONSTRAINT registered_number_range_pkey PRIMARY KEY (id),
-    CONSTRAINT registered_number_range_unique_key UNIQUE (tracking_account_number)
+    CONSTRAINT registered_mail_number_range_pkey PRIMARY KEY (id),
+    CONSTRAINT registered_mail_number_range_unique_key UNIQUE (tracking_account_number)
 );
 
 DROP TABLE IF EXISTS registered_mail_resources;
@@ -241,6 +241,7 @@ CREATE TABLE IF NOT EXISTS registered_mail_resources (
     number INTEGER NOT NULL,
     reference TEXT,
     generated BOOL NOT NULL DEFAULT FALSE,
+    deposit_id INTEGER,
     CONSTRAINT registered_mail_resources_pkey PRIMARY KEY (id),
     CONSTRAINT registered_mail_resources_unique_key UNIQUE (res_id)
 );

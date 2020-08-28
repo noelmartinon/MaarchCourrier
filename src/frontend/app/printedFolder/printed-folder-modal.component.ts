@@ -1,6 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../service/notification/notification.service';
@@ -20,7 +19,7 @@ import { of } from 'rxjs/internal/observable/of';
 export class PrintedFolderModalComponent implements OnInit {
     loading: boolean = true;
 
-    lang: any = LANG;
+    
 
     document: any[] = [];
 
@@ -43,7 +42,7 @@ export class PrintedFolderModalComponent implements OnInit {
     selectedPrintedFolderElement: any = {};
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any,

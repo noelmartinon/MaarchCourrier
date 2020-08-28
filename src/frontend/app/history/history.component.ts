@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, EventEmitter, ElementRef, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { HeaderService } from '../../service/header.service';
@@ -21,7 +20,7 @@ import { PrivilegeService } from '../../service/privileges.service';
 })
 export class HistoryComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     fullHistoryMode : boolean = true;
@@ -66,7 +65,7 @@ export class HistoryComponent implements OnInit {
     private destroy$ = new Subject<boolean>();
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -191,7 +190,7 @@ export class HistoryComponent implements OnInit {
                     data.systemActions = data.systemActions.map((syst: any) => {
                         return {
                             id: syst.id,
-                            label: !this.functions.empty(this.lang[syst.id]) ? this.lang[syst.id] : syst.id
+                            label: !this.functions.empty(this.translate.instant('lang.' + syst.id)) ? this.translate.instant('lang.' + syst.id) : syst.id
                         }
                     });
                     return data;

@@ -1,6 +1,5 @@
 import { Component, Input, EventEmitter, Output, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { catchError, tap, debounceTime, filter } from 'rxjs/operators';
@@ -17,7 +16,7 @@ import { LatinisePipe } from 'ngx-pipes';
 })
 export class NoteEditorComponent implements OnInit {
 
-    lang: any = LANG;
+    
     notes: any;
     loading: boolean = false;
     templatesNote: any = [];
@@ -41,7 +40,7 @@ export class NoteEditorComponent implements OnInit {
     entitiesList: any[] = [];
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public headerService: HeaderService,

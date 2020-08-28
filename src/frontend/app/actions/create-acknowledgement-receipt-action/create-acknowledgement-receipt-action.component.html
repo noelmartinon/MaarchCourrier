@@ -69,7 +69,7 @@
                             <p><b>{{acknowledgement.noSendAR.number}}</b> {{'lang.canNotSendAr' | translate}} :</p>
                             <ul>
                                 <li *ngFor="let info of acknowledgement.noSendAR.list">
-                                    <b>{{info.alt_identifier != null ? info.alt_identifier : lang.undefined}}</b> :
+                                    <b>{{info.alt_identifier != null ? info.alt_identifier : this.translate.instant('lang.undefined')}}</b> :
                                     {{info.info}}
                                 </li>
                             </ul>

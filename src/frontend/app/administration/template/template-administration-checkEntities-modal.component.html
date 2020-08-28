@@ -2,7 +2,7 @@
     <h1 mat-dialog-title>{{'lang.templateAssociateEntities' | translate}}</h1>
     <mat-dialog-content>
         <div class="alert-message alert-message-info" role="alert">
-            <p>{{'lang.templateCheckEntities' | translate}}<b>{{lang['AR'+data.template_attachment_type]}}</b></p>
+            <p>{{'lang.templateCheckEntities' | translate}}<b>{{'lang.AR' + data.template_attachment_type | translate}}</b></p>
         </div>
         <mat-list>
             <mat-list-item *ngFor="let entity of data.entitiesList">

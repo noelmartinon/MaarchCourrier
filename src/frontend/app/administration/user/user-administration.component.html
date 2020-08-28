@@ -223,7 +223,7 @@
                                                     <ng-container *ngFor="let mode of adminModes | sortBy : 'label'">
                                                         <mat-option [value]="mode.id"
                                                             [disabled]="headerService.user.mode === 'standard' && ['root_visible','root_invisible'].indexOf(mode.id) > -1"
-                                                            [title]="headerService.user.mode === 'standard' && ['root_visible','root_invisible'].indexOf(mode.id) > -1 ? lang.mustSuperadmin : ''">
+                                                            [title]="headerService.user.mode === 'standard' && ['root_visible','root_invisible'].indexOf(mode.id) > -1 ? this.translate.instant('lang.mustSuperadmin') : ''">
                                                             {{mode.label}}
                                                         </mat-option>
                                                     </ng-container>
@@ -234,6 +234,7 @@
                                             <mat-form-field>
                                                 <mat-label>{{'lang.authorizedRoutes' | translate}}</mat-label>
                                                 <textarea matInput name="authorizedApi" [(ngModel)]="user.authorizedApi" placeholder="Ex : PUT/attachments/{id}"></textarea>
+                                                <mat-hint>{{'lang.authorizedRoutesInformations' | translate}} <a href="https://docs.maarch.org/gitbook/html/MaarchCourrier/{{appVersion}}/guat/guat_architecture/API_REST/home.html">{{'lang.here' | translate}}</a></mat-hint>
                                             </mat-form-field>
                                         </div>
                                     </mat-expansion-panel>

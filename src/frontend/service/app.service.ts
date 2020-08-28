@@ -19,7 +19,7 @@ export class AppService {
     screenWidth: number = 1920;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public authService: AuthService,

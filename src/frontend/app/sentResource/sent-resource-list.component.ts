@@ -1,6 +1,5 @@
 import {Component, OnInit, ViewChild, EventEmitter, Input, Output} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { of } from 'rxjs';
@@ -20,7 +19,7 @@ import { SentNumericPackagePageComponent } from './sent-numeric-package-page/sen
 })
 export class SentResourceListComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = true;
 
     dataSource: any;
@@ -41,7 +40,7 @@ export class SentResourceListComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -239,7 +238,7 @@ export class SentResourceListComponent implements OnInit {
             if (this.filterTypes.filter(type => type.id === element.type).length === 0) {
                 this.filterTypes.push({
                     id: element.type,
-                    label: this.lang[element.type]
+                    label: this.translate.instant('lang.' + element.type)
                 });
             }
         });
@@ -264,7 +263,7 @@ export class SentResourceListComponent implements OnInit {
         let title = this.translate.instant('lang.sendElement');
 
         if (row.id !== null) {
-            title = this.lang[row.type];
+            title = this.translate.instant('lang.' + row.type);
         }
 
         if (row.canManage || row.id === null) {
@@ -291,7 +290,7 @@ export class SentResourceListComponent implements OnInit {
         let title = this.translate.instant('lang.sendElement');
 
         if (row.id !== null) {
-            title = this.lang[row.type];
+            title = this.translate.instant('lang.' + row.type);
         }
 
         if (row.canManage || row.id === null) {

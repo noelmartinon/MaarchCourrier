@@ -5,7 +5,6 @@ import { tap } from 'rxjs/internal/operators/tap';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { of } from 'rxjs/internal/observable/of';
 import { catchError } from 'rxjs/internal/operators/catchError';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../environments/environment';
 import { MatTooltip } from '@angular/material/tooltip';
@@ -17,7 +16,7 @@ import { MatTooltip } from '@angular/material/tooltip';
 })
 export class PrerequisiteComponent implements OnInit {
 
-    lang: any = LANG;
+    
 
     stepFormGroup: FormGroup;
 
@@ -111,7 +110,7 @@ export class PrerequisiteComponent implements OnInit {
     @ViewChildren('packageItem') packageItem: QueryList<any>;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private _formBuilder: FormBuilder

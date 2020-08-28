@@ -14,7 +14,7 @@
                                 [class.fa-address-card]="option.type === 'contact'"
                                 [class.fa-users]="option.type ==='contactGroup'"
                                 [class.fa-sitemap]="option.type ==='entity'" [class.fa-user]="option.type ==='user'"
-                                [title]="lang['contact_'+option.type]">
+                                [title]="this.translate.instant('lang.contact_' + option.type)">
                             </div>
                             <mat-card-title *ngIf="!empty(option.firstname) || !empty(option.lastname)"
                                 [title]="option.civility.label + ' ' + option.firstname + ' ' + option.lastname">
@@ -27,7 +27,7 @@
                             </mat-card-subtitle>
                             <i class="contact-filling fa fa-circle"
                                 *ngIf="option.type === 'contact' && !empty(option.fillingRate.rate)"
-                                [title]="lang.contactsFillingRate + ' : ' + option.fillingRate.rate + '%'" [style.color]="option.fillingRate.color"></i>
+                                [title]="this.translate.instant('lang.contactsFillingRate') + ' : ' + option.fillingRate.rate + '%'" [style.color]="option.fillingRate.color"></i>
                         </mat-card-header>
                         <mat-card-content>
                             <mat-list>
@@ -117,7 +117,7 @@
                         <i class="fa" [class.fa-address-card]="this.valuesToDisplay[item.id].type === 'contact'"
                             [class.fa-sitemap]="this.valuesToDisplay[item.id].type ==='entity'"
                             [class.fa-user]="this.valuesToDisplay[item.id].type ==='user'"
-                            [title]="lang[this.valuesToDisplay[item.id].type]" style="padding-right:5px;"></i>
+                            [title]="this.translate.instant('lang.' + this.valuesToDisplay[item.id].type)" style="padding-right:5px;"></i>
                         <ng-container *ngIf="!empty(this.valuesToDisplay[item.id].firstname)">
                             {{this.valuesToDisplay[item.id].firstname}}
                         </ng-container>

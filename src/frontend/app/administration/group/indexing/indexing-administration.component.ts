@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { tap } from 'rxjs/internal/operators/tap';
@@ -21,7 +20,7 @@ export class IndexingAdministrationComponent implements OnInit {
 
     mobileQuery: MediaQueryList;
 
-    lang: any = LANG;
+    
     loading: boolean = true;
 
     @Input() groupId: number;
@@ -39,7 +38,7 @@ export class IndexingAdministrationComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private dialog: MatDialog,

@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MatPaginator } from '@angular/material/paginator';
@@ -15,7 +14,7 @@ import { AppService } from '../../../service/app.service';
 
 export class DocserverAdministrationComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
     dataSource: any;
 
@@ -26,7 +25,7 @@ export class DocserverAdministrationComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private router: Router,
         private notify: NotificationService,

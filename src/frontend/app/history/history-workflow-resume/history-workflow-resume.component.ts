@@ -1,6 +1,5 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, tap, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -18,7 +17,7 @@ import { PrivilegeService } from '../../../service/privileges.service';
 
 export class HistoryWorkflowResumeComponent implements OnInit {
 
-    lang: any = LANG;
+    
 
     loading: boolean = true;
     disabledHistory: boolean = true;
@@ -29,7 +28,7 @@ export class HistoryWorkflowResumeComponent implements OnInit {
     @Output('goTo') goTo = new EventEmitter<string>();
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public privilegeService: PrivilegeService

@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { StepAction } from '../types';
 import { NotificationService } from '../../../service/notification/notification.service';
@@ -18,7 +17,7 @@ declare var tinymce: any;
     styleUrls: ['./mailserver.component.scss'],
 })
 export class MailserverComponent implements OnInit {
-    lang: any = LANG;
+    
 
     hidePassword: boolean = true;
     stepFormGroup: FormGroup;
@@ -66,7 +65,7 @@ export class MailserverComponent implements OnInit {
     @ViewChild('checkMailserverContent', { static: true }) checkMailserverContent: MatDrawer;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         private _formBuilder: FormBuilder,
         private notify: NotificationService,
         public http: HttpClient,

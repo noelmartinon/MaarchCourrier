@@ -93,7 +93,7 @@
                             <mat-cell *matCellDef="let element">
                                 <span
                                     [ngClass]="{'statusUserLabelWarn': ['SPD','ABS'].indexOf(element.status) > -1, 'statusUserLabelPrimary': ['SPD','ABS'].indexOf(element.status) == -1}"
-                                    class="label">{{lang['user'+element.status]}}</span>
+                                    class="label">{{'lang.user' + element.status | translate}}</span>
                             </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="mail">

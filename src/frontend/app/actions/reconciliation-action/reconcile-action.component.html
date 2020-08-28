@@ -22,14 +22,14 @@
                         </p>
                         <ul>
                             <li *ngFor="let ressource of resourcesErrors">
-                                <b>{{ressource.alt_identifier}}</b> : {{lang[ressource.reason]}}
+                                <b>{{ressource.alt_identifier}}</b> : {{'lang.' + ressource.reason | translate}}
                             </li>
                         </ul>
                     </div>
                 </div>
                 <div *ngIf="!noResourceToProcess" class="col-md-12">
                     <div class="alert-message alert-message-info" role="alert" style="max-width: 100%;"
-                        [innerHTML]="data.resIds.length === 1 ? lang.reconcileMsg : lang.reconcileMsg + '<br/>' + lang.reconcileMsg2">
+                        [innerHTML]="data.resIds.length === 1 ? this.translate.instant('lang.reconcileMsg') : this.translate.instant('lang.reconcileMsg') + '<br/>' + this.translate.instant('lang.reconcileMsg2')">
                     </div>
                 </div>
                 <div *ngIf="!noResourceToProcess" class="col-md-12">

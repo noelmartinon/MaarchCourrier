@@ -17,7 +17,7 @@
             </p>
             <ul>
                 <li *ngFor="let visaError of additionalsInfos.visaWorkflowError">
-                    <b>{{visaError.alt_identifier}}</b> : {{lang[visaError.reason]}}
+                    <b>{{visaError.alt_identifier}}</b> : {{'lang.' + visaError.reason | translate}}
                 </li>
             </ul>
         </div>

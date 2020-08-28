@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { LANG } from '../app/translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from './header.service';
 
@@ -34,8 +33,6 @@ interface privilege {
 
 @Injectable()
 export class PrivilegeService {
-
-    lang: any = LANG;
 
     private administrations: administration[] = [
         {

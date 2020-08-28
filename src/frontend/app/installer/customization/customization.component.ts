@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { StepAction } from '../types';
 import { DomSanitizer } from '@angular/platform-browser';
@@ -21,14 +20,14 @@ declare var tinymce: any;
     providers: [ScanPipe]
 })
 export class CustomizationComponent implements OnInit {
-    lang: any = LANG;
+
     stepFormGroup: FormGroup;
     readonlyState: boolean = false;
 
     backgroundList: any[] = [];
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         private _formBuilder: FormBuilder,
         private notify: NotificationService,
         private sanitizer: DomSanitizer,
@@ -135,8 +134,8 @@ export class CustomizationComponent implements OnInit {
             base_url: '../node_modules/tinymce/',
             height: '150',
             suffix: '.min',
-            language: LANG.langISO.replace('-', '_'),
-            language_url: `../node_modules/tinymce-i18n/langs/${LANG.langISO.replace('-', '_')}.js`,
+            language: this.translate.instant('lang.langISO').replace('-', '_'),
+            language_url: `../node_modules/tinymce-i18n/langs/${this.translate.instant('lang.langISO').replace('-', '_')}.js`,
             menubar: false,
             statusbar: false,
             readonly: readonly,
@@ -201,7 +200,7 @@ export class CustomizationComponent implements OnInit {
                         const img = new Image();
                         img.onload = (imgDim: any) => {
                             if (imgDim.target.width < 1920 || imgDim.target.height < 1080) {
-                                this.notify.error(this.scanPipe.transform(this.translate.instant('lang.badImageResolution'), ['1920x1080']));
+                                this.notify.error(this.translate.instant('lang.badImageResolution', {value1: '1920x1080'}));
                             } else {
                                 this.backgroundList.push({
                                     filename: value.target.result,
@@ -224,15 +223,15 @@ export class CustomizationComponent implements OnInit {
 
         if (mode === 'logo') {
             if (file.size > 5000000) {
-                return this.scanPipe.transform(this.translate.instant('lang.maxFileSizeExceeded'), ['5mo']);
+                return this.translate.instant('lang.maxFileSizeExceeded', {value1: '5mo'});
             } else if (allowedExtension.indexOf(file.type) === -1) {
-                return this.scanPipe.transform(this.translate.instant('lang.onlyExtensionsAllowed'), [allowedExtension.join(', ')]);
+                return this.translate.instant('lang.onlyExtensionsAllowed', {value1: allowedExtension.join(', ')});
             }
         } else {
             if (file.size > 10000000) {
-                return this.scanPipe.transform(this.translate.instant('lang.maxFileSizeExceeded'), ['10mo']);
+                return this.translate.instant('lang.maxFileSizeExceeded', {value1: '10mo'});
             } else if (allowedExtension.indexOf(file.type) === -1) {
-                return this.scanPipe.transform(this.translate.instant('lang.onlyExtensionsAllowed'), [allowedExtension.join(', ')]);
+                return this.translate.instant('lang.onlyExtensionsAllowed', {value1: allowedExtension.join(', ')});
             }
         }
         return true;

@@ -50,7 +50,7 @@ export class RegisteredMailListComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -98,7 +98,7 @@ export class RegisteredMailListComponent implements OnInit {
         const dataTosend = JSON.parse(JSON.stringify(row));
         dataTosend.status = 'OK';
 
-        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.activate'), msg: 'En activant cette plage, cela clôtura la plage actuelle utilisée pour ce type de recommandé.' } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.activate'), msg: 'En activant cette plage, cela clôturera la plage actuelle utilisée pour ce type de recommandé.' } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),

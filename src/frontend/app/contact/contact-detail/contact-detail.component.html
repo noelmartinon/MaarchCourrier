@@ -15,7 +15,7 @@
                 [class.fa-address-card]="contact.type === 'contact'"
                 [class.fa-users]="contact.type ==='contactGroup'"
                 [class.fa-sitemap]="contact.type ==='entity'"
-                [class.fa-user]="contact.type ==='user'" [title]="lang['contact_'+contact.type]">
+                [class.fa-user]="contact.type ==='user'" [title]="this.translate.instant('lang.contact_' + contact.type)">
             </div>
             <mat-card-title *ngIf="!functionsService.empty(contact.firstname) || !functionsService.empty(contact.lastname)"
                 [title]="contact.civility.label + ' ' + contact.firstname + ' ' + contact.lastname">

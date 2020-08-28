@@ -47,7 +47,7 @@
                                 <mat-list role="list">
                                     <mat-list-item role="listitem" *ngFor="let option of shapingOptions">
                                         <mat-slide-toggle color="primary" name="{{option}}" [checked]="shipping.options.shapingOptions.indexOf(option) > -1"
-                                                          (change)="toggleShapingOption(option)">{{lang['maileva_'+option]}}</mat-slide-toggle>
+                                                          (change)="toggleShapingOption(option)">{{'lang.maileva_' + option | translate}}</mat-slide-toggle>
                                     </mat-list-item>
                                     <div *ngIf="shipping.options.shapingOptions.indexOf('addressPage') == -1" class="alert-message alert-message-danger" role="alert" style="margin-top: 30px;max-width: none;" [innerHTML]="this.translate.instant('lang.warnShapingOption')"></div>
                                 </mat-list>
@@ -58,7 +58,7 @@
                                 </div>
                                 <mat-radio-group class="radio-group" name="sendMode" [(ngModel)]="shipping.options.sendMode">
                                     <mat-radio-button *ngFor="let mode of sendModes" name="{{mode}}" [value]="mode" color="primary">
-                                        {{lang['maileva_'+mode]}}
+                                        {{'lang.maileva_' + mode | translate}}
                                     </mat-radio-button>
                                 </mat-radio-group>
                             </div>

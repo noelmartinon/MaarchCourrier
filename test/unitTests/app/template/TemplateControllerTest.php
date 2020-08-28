@@ -713,8 +713,8 @@ class TemplateControllerTest extends TestCase
         $this->assertIsArray($responseBody['templates']);
         $this->assertNotEmpty($responseBody['templates']);
 
-        $this->assertSame(1043, $responseBody['templates'][0]['id']);
-        $this->assertSame('AR TYPE SIMPLE- Courriel Manuel', $responseBody['templates'][0]['label']);
+        $this->assertSame(1046, $responseBody['templates'][0]['id']);
+        $this->assertSame('TEST TEMPLATE UPDATE', $responseBody['templates'][0]['label']);
 
 
         // Fail

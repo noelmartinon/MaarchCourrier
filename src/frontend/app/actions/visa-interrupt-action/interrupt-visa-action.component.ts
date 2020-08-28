@@ -1,5 +1,4 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -15,7 +14,7 @@ import { FunctionsService } from "../../../service/functions.service";
 })
 export class InterruptVisaActionComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     resourcesWarnings: any[] = [];
@@ -26,7 +25,7 @@ export class InterruptVisaActionComponent implements OnInit {
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialogRef: MatDialogRef<InterruptVisaActionComponent>,

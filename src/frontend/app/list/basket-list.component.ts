@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -34,7 +33,7 @@ declare var $: any;
 })
 export class BasketListComponent implements OnInit, OnDestroy {
 
-    lang: any = LANG;
+    
 
     loading: boolean = false;
     docUrl: string = '';
@@ -103,7 +102,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
     @ViewChild('tableBasketListSort', { static: true }) sort: MatSort;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         private router: Router,
         private _activatedRoute: ActivatedRoute,
         private route: ActivatedRoute,
@@ -341,9 +340,9 @@ export class BasketListComponent implements OnInit, OnDestroy {
                             user = '<u>' + user + '</u>';
                         }
                         if (visa.date === '') {
-                            content = '<i class="fa fa-hourglass-half"></i> <span title="' + this.lang[visa.mode + 'User'] + '">' + user + '</span>';
+                            content = '<i class="fa fa-hourglass-half"></i> <span title="' + this.translate.instant('lang.' + visa.mode + 'User') + '">' + user + '</span>';
                         } else {
-                            content = '<span color="accent" style=""><i class="fa fa-check"></i> <span title="' + this.lang[visa.mode + 'User'] + '">' + user + '</span></span>';
+                            content = '<span color="accent" style=""><i class="fa fa-check"></i> <span title="' + this.translate.instant('lang.' + visa.mode + 'User') + '">' + user + '</span></span>';
                         }
 
                         if (visa.current && keyVis >= 0) {
@@ -396,7 +395,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
                         key.displayValue = key.displayValue + ' ' + this.translate.instant('lang.opinionsSent');
                     }
                 }
-                key.label = this.lang[key.value];
+                key.label = this.translate.instant('lang.' + key.value);
             });
 
             if (this.selectedRes.indexOf(element['resId']) === -1) {

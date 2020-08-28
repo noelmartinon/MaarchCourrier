@@ -36,9 +36,9 @@
                                     <mat-form-field>
                                         <input matInput [(ngModel)]="alfresco.account.password"
                                             [required]="creationMode" name="password" id="password"
-                                            [title]="creationMode ? lang.password : lang.changePassword"
+                                            [title]="creationMode ? this.translate.instant('lang.password') : this.translate.instant('lang.changePassword')"
                                             [type]="hidePassword ? 'password' : 'text'"
-                                            [placeholder]="creationMode ? lang.password : lang.changePassword">
+                                            [placeholder]="creationMode ? this.translate.instant('lang.password') : this.translate.instant('lang.changePassword')">
                                         <mat-icon color="primary" style="cursor: pointer;" matSuffix
                                             (click)="hidePassword = !hidePassword" class="fa fa-2x"
                                             [ngClass]="[hidePassword ? 'fa-eye-slash' : 'fa-eye']"></mat-icon>

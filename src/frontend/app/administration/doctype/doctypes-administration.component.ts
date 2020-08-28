@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
@@ -21,7 +20,7 @@ export class DoctypesAdministrationComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
     config: any = {};
-    lang: any = LANG;
+    
 
     doctypes: any[] = [];
     currentType: any = false;
@@ -42,7 +41,7 @@ export class DoctypesAdministrationComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -421,7 +420,7 @@ export class DoctypesAdministrationComponent implements OnInit {
     templateUrl: 'doctypes-administration-redirect-modal.component.html'
 })
 export class DoctypesAdministrationRedirectModalComponent {
-    lang: any = LANG;
+    
 
     constructor(public http: HttpClient, @Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<DoctypesAdministrationRedirectModalComponent>) {
 

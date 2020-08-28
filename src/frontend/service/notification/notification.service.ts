@@ -2,7 +2,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Injectable, Component, Inject } from '@angular/core';
 import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-import { LANG } from '../../app/translate.component';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
@@ -20,9 +19,8 @@ export class CustomSnackbarComponent {
 
 @Injectable()
 export class NotificationService {
-    lang: any = LANG;
 
-    constructor(private translate: TranslateService, private router: Router, public snackBar: MatSnackBar) {
+    constructor(public translate: TranslateService, private router: Router, public snackBar: MatSnackBar) {
     }
     success(message: string) {
         const duration = this.getMessageDuration(message, 2000);
@@ -56,7 +54,7 @@ export class NotificationService {
             if (err.error !== undefined) {
                 if (err.error.errors !== undefined) {
                     if (err.error.lang !== undefined) {
-                        this.error(this.lang[err.error.lang]);
+                        this.error(this.translate.instant('lang.' + err.error.lang));
                     } else if (err.error.errors === 'Document out of perimeter' || err.error.errors === 'Resource out of perimeter') {
                         this.error(this.translate.instant('lang.documentOutOfPerimeter'));
                     } else if (err.error.errors === 'Resources out of perimeter') {
@@ -85,7 +83,7 @@ export class NotificationService {
         if (err.error !== undefined) {
             if (err.error.errors !== undefined) {
                 if (err.error.lang !== undefined) {
-                    this.error(this.lang[err.error.lang]);
+                    this.error(this.translate.instant('lang.' + err.error.lang));
                 } else if (err.error.errors === 'Document out of perimeter' || err.error.errors === 'Resource out of perimeter') {
                     this.error(this.translate.instant('lang.documentOutOfPerimeter'));
                 } else if (err.error.errors === 'Resources out of perimeter') {

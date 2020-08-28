@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
@@ -11,7 +10,7 @@ import { AppService } from '../../../service/app.service';
 })
 export class SecuritiesAdministrationComponent implements OnInit {
 
-    lang: any = LANG;
+    
     loading: boolean = false;
 
     passwordRules: any = {
@@ -30,7 +29,7 @@ export class SecuritiesAdministrationComponent implements OnInit {
 
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
@@ -49,7 +48,7 @@ export class SecuritiesAdministrationComponent implements OnInit {
                 data.rules.forEach((rule: any) => {
                     this.passwordRules[rule.label].enabled = rule.enabled;
                     this.passwordRules[rule.label].value = rule.value;
-                    this.passwordRules[rule.label].label = this.lang['password' + rule.label + 'Required'];
+                    this.passwordRules[rule.label].label = this.translate.instant('lang.password' + rule.label + 'Required');
                     this.passwordRules[rule.label].id = rule.label;
 
                     this.loading = false;

@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef, EventEmitter, Output, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
@@ -17,7 +16,7 @@ import { MatExpansionPanel } from '@angular/material/expansion';
 })
 export class CriteriaToolComponent implements OnInit {
 
-    lang: any = LANG;
+    
 
     criteria: any = {
         mailInformations: [
@@ -50,7 +49,7 @@ export class CriteriaToolComponent implements OnInit {
     @ViewChild('searchCriteriaInput', { static: false }) searchCriteriaInput: ElementRef;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         public appService: AppService,
         public functions: FunctionsService,

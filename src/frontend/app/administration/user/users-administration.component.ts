@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef, ElementRef, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LANG } from '../../translate.component';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
@@ -27,7 +26,7 @@ export class UsersAdministrationComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
-    lang: any = LANG;
+    
     loading: boolean = true;
     updateListModel: boolean = true;
     updateListInstance: boolean = true;
@@ -50,7 +49,7 @@ export class UsersAdministrationComponent implements OnInit {
     @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
@@ -79,7 +78,7 @@ export class UsersAdministrationComponent implements OnInit {
             tap((data: any) => {
                 this.data = data['users'];
                 this.data.forEach(element => {
-                    element.statusLabel = this.lang['user' + element.status];
+                    element.statusLabel = this.translate.instant('lang.user' + element.status);
                     if (element.mode === 'rest') {
                         this.webserviceAccounts.push(element);
                     } else {
@@ -438,13 +437,13 @@ export class UsersAdministrationComponent implements OnInit {
     styleUrls: ['users-administration-redirect-modal.scss'],
 })
 export class UsersAdministrationRedirectModalComponent implements OnInit {
-    lang: any = LANG;
+    
     loadModel: boolean = false;
     loadInstance: boolean = false;
     modalTitle: string = this.translate.instant('lang.confirmAction');
 
     constructor(
-        private translate: TranslateService,
+        public translate: TranslateService,
         public http: HttpClient,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<UsersAdministrationRedirectModalComponent>,
