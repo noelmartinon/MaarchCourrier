@@ -36,6 +36,7 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
             applicationName: ['', Validators.required],
             loginpage_message: [''],
             homepage_message: [''],
+            traffic_record_summary_sheet: [''],
             bodyImage: ['../rest/images?image=loginPage'],
             logo: ['../rest/images?image=logo'],
         });
@@ -58,6 +59,7 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
                 tap((data: any) => {
                     this.stepFormGroup.controls['homepage_message'].setValue(data.parameters.filter((item: any) => item.id === 'homepage_message')[0].value);
                     this.stepFormGroup.controls['loginpage_message'].setValue(data.parameters.filter((item: any) => item.id === 'loginpage_message')[0].value);
+                    this.stepFormGroup.controls['traffic_record_summary_sheet'].setValue(data.parameters.filter((item: any) => item.id === 'traffic_record_summary_sheet')[0].value);
                 }),
                 exhaustMap(() => this.http.get('../rest/authenticationInformations')),
                 tap((data: any) => {
@@ -78,6 +80,11 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
                         this.stepFormGroup.controls['loginpage_message'].valueChanges.pipe(
                             debounceTime(1000),
                             tap(() => this.saveParameter('loginpage_message'))
+                        ).subscribe();
+
+                        this.stepFormGroup.controls['traffic_record_summary_sheet'].valueChanges.pipe(
+                            debounceTime(1000),
+                            tap(() => this.saveParameter('traffic_record_summary_sheet'))
                         ).subscribe();
                         this.initMce();
                     }, 0);
@@ -103,7 +110,7 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
                 });
             },
             base_url: '../node_modules/tinymce/',
-            height: '150',
+            height: '200',
             suffix: '.min',
             language: this.translate.instant('lang.langISO').replace('-', '_'),
             language_url: `../node_modules/tinymce-i18n/langs/${this.translate.instant('lang.langISO').replace('-', '_')}.js`,
@@ -111,14 +118,16 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
             statusbar: false,
             readonly: readonly,
             plugins: [
-                'autolink'
+                'autolink', 'table'
             ],
             external_plugins: {
                 'maarch_b64image': '../../src/frontend/plugins/tinymce/maarch_b64image/plugin.min.js'
             },
+            table_toolbar: '',
+            table_sizing_mode: 'relative',
             toolbar_sticky: true,
             toolbar_drawer: 'floating',
-            toolbar: !readonly ? 'undo redo | fontselect fontsizeselect | bold italic underline strikethrough forecolor | maarch_b64image | \
+            toolbar: !readonly ? 'undo redo | fontselect fontsizeselect | bold italic underline strikethrough forecolor | table maarch_b64image | \
         alignleft aligncenter alignright alignjustify \
         bullist numlist outdent indent | removeformat' : ''
         });

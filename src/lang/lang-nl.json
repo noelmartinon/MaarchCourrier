@@ -1109,7 +1109,7 @@
     "keywordAdded": "Keyword added__TO_TRANSLATE",
     "keywordDeleted": "Keyword deleted__TO_TRANSLATE",
     "availableIndexingActions": "Available actions when indexing__TO_TRANSLATE",
-    "actionsInfo": "Only actions with \"simple confirmation\", \"close mail\", \"no confirmation\" and \"send to visa\" will be displayed__TO_TRANSLATE",
+    "actionsInfo": "The available actions will be the ones with the parameter <b>System action</b> set as : \"Simple confirmation\", \"No confirmation\", \"Send for visa\", \"Close a mail\" and actions to save registered mail__TO_TRANSLATE",
     "eventList": "Open page__TO_TRANSLATE",
     "folderAdded": "Folder added__TO_TRANSLATE",
     "folderDeleted": "Folder deleted__TO_TRANSLATE",
@@ -1907,5 +1907,5 @@
     "hotkeyInfo": "Maintenez <b>SHIFT</b> pour propager vos selections aux sous-éléments__TO_TRANSLATE",
     "hotkeyMsg": "<b>SHIFT</b>&nbsp;Propagation aux sous-élements__TO_TRANSLATE",
     "hotkeyTitle": "Maintient de la touche shift__TO_TRANSLATE",
-    "advancedParameters": "Paramètres avancés__TO_TRANSLATE"
+    "technicalParameters": "Paramètres techniques"
 }

@@ -14,6 +14,7 @@ import { DiffusionsListComponent } from '../../diffusions/diffusions-list.compon
 import { FunctionsService } from '../../../service/functions.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { IssuingSiteInputComponent } from '../../administration/registered-mail/issuing-site/indexing/issuing-site-input.component';
+import { RegisteredMailRecipientInputComponent } from '../../administration/registered-mail/indexing/recipient-input.component';
 
 @Component({
     selector: 'app-indexing-form',
@@ -40,6 +41,7 @@ export class IndexingFormComponent implements OnInit {
 
     @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
     @ViewChild('appIssuingSiteInput', { static: false }) appIssuingSiteInput: IssuingSiteInputComponent;
+    @ViewChild('appRegisteredMailRecipientInput', { static: false }) appRegisteredMailRecipientInput: RegisteredMailRecipientInputComponent;
 
     fieldCategories: any[] = ['mail', 'contact', 'process', 'classifying'];
 
@@ -222,7 +224,7 @@ export class IndexingFormComponent implements OnInit {
         {
             identifier: 'registeredMail_recipient',
             label: this.translate.instant('lang.registeredMailRecipient'),
-            type: 'string',
+            type: 'registeredMailRecipient',
             default_value: null,
             values: [],
             enabled: true,
@@ -443,16 +445,20 @@ export class IndexingFormComponent implements OnInit {
 
                 this.http.put(`../rest/resources/${this.resId}`, formatdatas).pipe(
                     tap(() => {
-                        if (this.currentCategory == 'registeredMail') {
+                        if (this.currentCategory === 'registeredMail') {
                             this.http.put(`../rest/registeredMails/${this.resId}`, {
-                                    departureDate: formatdatas.departureDate,
                                     type: formatdatas.registeredMail_type,
                                     warranty: formatdatas.registeredMail_warranty,
                                     issuingSiteId: formatdatas.registeredMail_issuingSite.split('#').slice(-1)[0],
                                     letter: formatdatas.registeredMail_letter,
                                     recipient: formatdatas.registeredMail_recipient,
                                     reference: formatdatas.registeredMail_reference
-                            }).subscribe();
+                            }).pipe(
+                                catchError((err: any) => {
+                                    this.notify.handleErrors(err);
+                                    return of(false);
+                                })
+                            ).subscribe();
                         }
                     }),
                     tap(() => {
@@ -486,6 +492,8 @@ export class IndexingFormComponent implements OnInit {
 
                 formatData['customFields'][element.identifier.split('_')[1]] = element.default_value;
 
+            } else if (element.identifier === 'registeredMail_recipient') {
+                formatData[element.identifier] = this.appRegisteredMailRecipientInput.getFormatedAdress();
             } else {
                 formatData[element.identifier] = element.default_value;
             }

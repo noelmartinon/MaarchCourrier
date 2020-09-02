@@ -111,7 +111,7 @@ export class FunctionsService {
         filteredColumns.forEach((column: any) => {
             let val = template[column];
             if (typeof template[column] !== 'string') {
-                val = JSON.stringify(val);
+                val = val === undefined || null ? '' : JSON.stringify(val);
             }
             filterReturn = filterReturn || this.latinisePipe.transform(val.toLowerCase()).includes(filter);
         });

@@ -37,8 +37,8 @@ export class PrivilegeService {
     private administrations: administration[] = [
         {
             'id': 'admin_users',
-            'label': this.translate.instant('lang.users'),
-            'comment': this.translate.instant('lang.adminUsersDesc'),
+            'label': 'lang.users',
+            'comment': 'lang.adminUsersDesc',
             'route': '/administration/users',
             'unit': 'organisation',
             'style': 'fa fa-user',
@@ -47,8 +47,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_groups',
-            'label': this.translate.instant('lang.groups'),
-            'comment': this.translate.instant('lang.adminGroupsDesc'),
+            'label': 'lang.groups',
+            'comment': 'lang.adminGroupsDesc',
             'route': '/administration/groups',
             'unit': 'organisation',
             'style': 'fa fa-users',
@@ -57,8 +57,8 @@ export class PrivilegeService {
         },
         {
             'id': 'manage_entities',
-            'label': this.translate.instant('lang.entities'),
-            'comment': this.translate.instant('lang.adminEntitiesDesc'),
+            'label': 'lang.entities',
+            'comment': 'lang.adminEntitiesDesc',
             'route': '/administration/entities',
             'unit': 'organisation',
             'style': 'fa fa-sitemap',
@@ -67,8 +67,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_listmodels',
-            'label': this.translate.instant('lang.workflowModels'),
-            'comment': this.translate.instant('lang.adminWorkflowModelsDesc'),
+            'label': 'lang.workflowModels',
+            'comment': 'lang.adminWorkflowModelsDesc',
             'route': '/administration/diffusionModels',
             'unit': 'organisation',
             'style': 'fa fa-th-list',
@@ -77,8 +77,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_architecture',
-            'label': this.translate.instant('lang.documentTypes'),
-            'comment': this.translate.instant('lang.adminDocumentTypesDesc'),
+            'label': 'lang.documentTypes',
+            'comment': 'lang.adminDocumentTypesDesc',
             'route': '/administration/doctypes',
             'unit': 'classement',
             'style': 'fa fa-suitcase',
@@ -87,8 +87,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_tag',
-            'label': this.translate.instant('lang.tags'),
-            'comment': this.translate.instant('lang.adminTagsDesc'),
+            'label': 'lang.tags',
+            'comment': 'lang.adminTagsDesc',
             'route': '/administration/tags',
             'unit': 'classement',
             'style': 'fa fa-tags',
@@ -97,8 +97,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_baskets',
-            'label': this.translate.instant('lang.baskets'),
-            'comment': this.translate.instant('lang.adminBasketsDesc'),
+            'label': 'lang.baskets',
+            'comment': 'lang.adminBasketsDesc',
             'route': '/administration/baskets',
             'unit': 'production',
             'style': 'fa fa-inbox',
@@ -107,8 +107,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_status',
-            'label': this.translate.instant('lang.statuses'),
-            'comment': this.translate.instant('lang.statusesAdmin'),
+            'label': 'lang.statuses',
+            'comment': 'lang.statusesAdmin',
             'route': '/administration/statuses',
             'unit': 'production',
             'style': 'fa fa-check-circle',
@@ -117,8 +117,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_actions',
-            'label': this.translate.instant('lang.actions'),
-            'comment': this.translate.instant('lang.actionsAdmin'),
+            'label': 'lang.actions',
+            'comment': 'lang.actionsAdmin',
             'route': '/administration/actions',
             'unit': 'production',
             'style': 'fa fa-exchange-alt',
@@ -127,8 +127,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_contacts',
-            'label': this.translate.instant('lang.contacts'),
-            'comment': this.translate.instant('lang.contactsAdmin'),
+            'label': 'lang.contacts',
+            'comment': 'lang.contactsAdmin',
             'route': '/administration/contacts',
             'unit': 'production',
             'style': 'fa fa-address-book',
@@ -137,8 +137,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_priorities',
-            'label': this.translate.instant('lang.prioritiesAlt'),
-            'comment': this.translate.instant('lang.prioritiesAlt'),
+            'label': 'lang.prioritiesAlt',
+            'comment': 'lang.prioritiesAlt',
             'route': '/administration/priorities',
             'unit': 'production',
             'style': 'fa fa-clock',
@@ -147,8 +147,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_templates',
-            'label': this.translate.instant('lang.templates'),
-            'comment': this.translate.instant('lang.templatesAdmin'),
+            'label': 'lang.templates',
+            'comment': 'lang.templatesAdmin',
             'route': '/administration/templates',
             'unit': 'production',
             'style': 'fa fa-file-alt',
@@ -157,8 +157,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_indexing_models',
-            'label': this.translate.instant('lang.indexingModels'),
-            'comment': this.translate.instant('lang.indexingModels'),
+            'label': 'lang.indexingModels',
+            'comment': 'lang.indexingModels',
             'route': '/administration/indexingModels',
             'unit': 'production',
             'style': 'fab fa-wpforms',
@@ -167,8 +167,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_custom_fields',
-            'label': this.translate.instant('lang.customFieldsAdmin'),
-            'comment': this.translate.instant('lang.customFieldsAdmin'),
+            'label': 'lang.customFieldsAdmin',
+            'comment': 'lang.customFieldsAdmin',
             'route': '/administration/customFields',
             'unit': 'production',
             'style': 'fa fa-code',
@@ -177,8 +177,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_notif',
-            'label': this.translate.instant('lang.notifications'),
-            'comment': this.translate.instant('lang.notificationsAdmin'),
+            'label': 'lang.notifications',
+            'comment': 'lang.notificationsAdmin',
             'route': '/administration/notifications',
             'unit': 'production',
             'style': 'fa fa-bell',
@@ -187,8 +187,8 @@ export class PrivilegeService {
         },
         {
             'id': 'update_status_mail',
-            'label': this.translate.instant('lang.updateStatus'),
-            'comment': this.translate.instant('lang.updateStatus'),
+            'label': 'lang.updateStatus',
+            'comment': 'lang.updateStatus',
             'route': '/administration/update-status',
             'unit': 'supervision',
             'style': 'fa fa-envelope-square',
@@ -197,8 +197,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_docservers',
-            'label': this.translate.instant('lang.docservers'),
-            'comment': this.translate.instant('lang.docserversAdmin'),
+            'label': 'lang.docservers',
+            'comment': 'lang.docserversAdmin',
             'route': '/administration/docservers',
             'unit': 'supervision',
             'style': 'fa fa-hdd',
@@ -207,8 +207,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_parameters',
-            'label': this.translate.instant('lang.parameters'),
-            'comment': this.translate.instant('lang.parameters'),
+            'label': 'lang.parameters',
+            'comment': 'lang.parameters',
             'route': '/administration/parameters',
             'unit': 'supervision',
             'style': 'fa fa-wrench',
@@ -217,8 +217,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_password_rules',
-            'label': this.translate.instant('lang.securities'),
-            'comment': this.translate.instant('lang.securities'),
+            'label': 'lang.securities',
+            'comment': 'lang.securities',
             'route': '/administration/securities',
             'unit': 'supervision',
             'style': 'fa fa-lock',
@@ -227,8 +227,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_email_server',
-            'label': this.translate.instant('lang.emailServerParam'),
-            'comment': this.translate.instant('lang.emailServerParamDesc'),
+            'label': 'lang.emailServerParam',
+            'comment': 'lang.emailServerParamDesc',
             'route': '/administration/sendmail',
             'unit': 'supervision',
             'style': 'fa fa-mail-bulk',
@@ -237,8 +237,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_shippings',
-            'label': this.translate.instant('lang.mailevaAdmin'),
-            'comment': this.translate.instant('lang.mailevaAdminDesc'),
+            'label': 'lang.mailevaAdmin',
+            'comment': 'lang.mailevaAdminDesc',
             'route': '/administration/shippings',
             'unit': 'supervision',
             'style': 'fa fa-shipping-fast',
@@ -247,8 +247,8 @@ export class PrivilegeService {
         },
         {
             'id': 'view_history',
-            'label': this.translate.instant('lang.history'),
-            'comment': this.translate.instant('lang.viewHistoryDesc'),
+            'label': 'lang.history',
+            'comment': 'lang.viewHistoryDesc',
             'route': '/administration/history',
             'unit': 'supervision',
             'style': 'fa fa-history',
@@ -257,8 +257,8 @@ export class PrivilegeService {
         },
         {
             'id': 'view_history_batch',
-            'label': this.translate.instant('lang.historyBatch'),
-            'comment': this.translate.instant('lang.historyBatchAdmin'),
+            'label': 'lang.historyBatch',
+            'comment': 'lang.historyBatchAdmin',
             'route': '/administration/history-batch',
             'unit': 'supervision',
             'style': 'fa fa-history',
@@ -267,8 +267,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_update_control',
-            'label': this.translate.instant('lang.updateControl'),
-            'comment': this.translate.instant('lang.updateControlDesc'),
+            'label': 'lang.updateControl',
+            'comment': 'lang.updateControlDesc',
             'route': '/administration/versions-update',
             'unit': 'supervision',
             'style': 'fa fa-sync',
@@ -277,8 +277,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_alfresco',
-            'label': this.translate.instant('lang.alfresco'),
-            'comment': this.translate.instant('lang.adminAlfrescoDesc'),
+            'label': 'lang.alfresco',
+            'comment': 'lang.adminAlfrescoDesc',
             'route': '/administration/alfresco',
             'unit': 'supervision',
             'style': 'alfresco',
@@ -287,8 +287,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_registered_mail',
-            'label': this.translate.instant('lang.registeredMail'),
-            'comment': this.translate.instant('lang.adminRegisteredMailDesc'),
+            'label': 'lang.registeredMail',
+            'comment': 'lang.adminRegisteredMailDesc',
             'route': '/administration/registeredMails',
             'unit': 'supervision',
             'style': 'fas fa-dolly-flatbed',
@@ -300,182 +300,182 @@ export class PrivilegeService {
     private privileges: privilege[] = [
         {
             'id': 'view_doc_history',
-            'label': this.translate.instant('lang.viewDocHistory'),
-            'comment': this.translate.instant('lang.viewHistoryDesc'),
+            'label': 'lang.viewDocHistory',
+            'comment': 'lang.viewHistoryDesc',
             'unit': 'history'
         },
         {
             'id': 'view_full_history',
-            'label': this.translate.instant('lang.viewFullHistory'),
-            'comment': this.translate.instant('lang.viewFullHistoryDesc'),
+            'label': 'lang.viewFullHistory',
+            'comment': 'lang.viewFullHistoryDesc',
             'unit': 'history'
         },
         {
             'id': 'edit_resource',
-            'label': this.translate.instant('lang.editResource'),
-            'comment': this.translate.instant('lang.editResourceDesc'),
+            'label': 'lang.editResource',
+            'comment': 'lang.editResourceDesc',
             'unit': 'application'
         },
         {
             'id': 'add_links',
-            'label': this.translate.instant('lang.addLinks'),
-            'comment': this.translate.instant('lang.addLinks'),
+            'label': 'lang.addLinks',
+            'comment': 'lang.addLinks',
             'unit': 'application'
         },
         {
             'id': 'manage_tags_application',
-            'label': this.translate.instant('lang.manageTagsInApplication'),
-            'comment': this.translate.instant('lang.manageTagsInApplicationDesc'),
+            'label': 'lang.manageTagsInApplication',
+            'comment': 'lang.manageTagsInApplicationDesc',
             'unit': 'application'
         },
         {
             'id': 'create_contacts',
-            'label': this.translate.instant('lang.manageCreateContacts'),
-            'comment': this.translate.instant('lang.manageCreateContactsDesc'),
+            'label': 'lang.manageCreateContacts',
+            'comment': 'lang.manageCreateContactsDesc',
             'unit': 'application'
         },
         {
             'id': 'update_contacts',
-            'label': this.translate.instant('lang.manageUpdateContacts'),
-            'comment': this.translate.instant('lang.manageUpdateContactsDesc'),
+            'label': 'lang.manageUpdateContacts',
+            'comment': 'lang.manageUpdateContactsDesc',
             'unit': 'application'
         },
         {
             'id': 'update_diffusion_indexing',
-            'label': this.translate.instant('lang.allRoles'),
-            'comment': this.translate.instant('lang.updateDiffusionWhileIndexing'),
+            'label': 'lang.allRoles',
+            'comment': 'lang.updateDiffusionWhileIndexing',
             'unit': 'diffusionList'
         },
         {
             'id': 'update_diffusion_except_recipient_indexing',
-            'label': this.translate.instant('lang.rolesExceptAssignee'),
-            'comment': this.translate.instant('lang.updateDiffusionExceptRecipientWhileIndexing'),
+            'label': 'lang.rolesExceptAssignee',
+            'comment': 'lang.updateDiffusionExceptRecipientWhileIndexing',
             'unit': 'diffusionList'
         },
         {
             'id': 'update_diffusion_process',
-            'label': this.translate.instant('lang.allRoles'),
-            'comment': this.translate.instant('lang.updateDiffusionWhileProcess'),
+            'label': 'lang.allRoles',
+            'comment': 'lang.updateDiffusionWhileProcess',
             'unit': 'diffusionList'
         },
         {
             'id': 'update_diffusion_except_recipient_process',
-            'label': this.translate.instant('lang.rolesExceptAssignee'),
-            'comment': this.translate.instant('lang.updateDiffusionExceptRecipientWhileProcess'),
+            'label': 'lang.rolesExceptAssignee',
+            'comment': 'lang.updateDiffusionExceptRecipientWhileProcess',
             'unit': 'diffusionList'
         },
         {
             'id': 'update_diffusion_details',
-            'label': this.translate.instant('lang.allRoles'),
-            'comment': this.translate.instant('lang.updateDiffusionWhileDetails'),
+            'label': 'lang.allRoles',
+            'comment': 'lang.updateDiffusionWhileDetails',
             'unit': 'diffusionList'
         },
         {
             'id': 'update_diffusion_except_recipient_details',
-            'label': this.translate.instant('lang.rolesExceptAssignee'),
-            'comment': this.translate.instant('lang.updateDiffusionExceptRecipientWhileDetails'),
+            'label': 'lang.rolesExceptAssignee',
+            'comment': 'lang.updateDiffusionExceptRecipientWhileDetails',
             'unit': 'diffusionList'
         },
         {
             'id': 'sendmail',
-            'label': this.translate.instant('lang.sendmail'),
-            'comment': this.translate.instant('lang.sendmail'),
+            'label': 'lang.sendmail',
+            'comment': 'lang.sendmail',
             'unit': 'sendmail'
         },
         {
             'id': 'use_mail_services',
-            'label': this.translate.instant('lang.useMailServices'),
-            'comment': this.translate.instant('lang.useMailServices'),
+            'label': 'lang.useMailServices',
+            'comment': 'lang.useMailServices',
             'unit': 'sendmail'
         },
         {
             'id': 'view_documents_with_notes',
-            'label': this.translate.instant('lang.viewDocumentsWithNotes'),
-            'comment': this.translate.instant('lang.viewDocumentsWithNotesDesc'),
+            'label': 'lang.viewDocumentsWithNotes',
+            'comment': 'lang.viewDocumentsWithNotesDesc',
             'unit': 'application'
         },
         {
             'id': 'view_technical_infos',
-            'label': this.translate.instant('lang.viewTechnicalInformation'),
-            'comment': this.translate.instant('lang.viewTechnicalInformation'),
+            'label': 'lang.viewTechnicalInformation',
+            'comment': 'lang.viewTechnicalInformation',
             'unit': 'application'
         },
         {
             'id': 'config_avis_workflow',
-            'label': this.translate.instant('lang.configAvisWorkflow'),
-            'comment': this.translate.instant('lang.configAvisWorkflowDesc'),
+            'label': 'lang.configAvisWorkflow',
+            'comment': 'lang.configAvisWorkflowDesc',
             'unit': 'avis'
         },
         {
             'id': 'config_avis_workflow_in_detail',
-            'label': this.translate.instant('lang.configAvisWorkflowInDetail'),
-            'comment': this.translate.instant('lang.configAvisWorkflowInDetailDesc'),
+            'label': 'lang.configAvisWorkflowInDetail',
+            'comment': 'lang.configAvisWorkflowInDetailDesc',
             'unit': 'avis'
         },
         {
             'id': 'avis_documents',
-            'label': this.translate.instant('lang.avisAnswer'),
-            'comment': this.translate.instant('lang.avisAnswerDesc'),
+            'label': 'lang.avisAnswer',
+            'comment': 'lang.avisAnswerDesc',
             'unit': 'avis'
         },
         {
             'id': 'config_visa_workflow',
-            'label': this.translate.instant('lang.configVisaWorkflow'),
-            'comment': this.translate.instant('lang.configVisaWorkflowDesc'),
+            'label': 'lang.configVisaWorkflow',
+            'comment': 'lang.configVisaWorkflowDesc',
             'unit': 'visaWorkflow'
         },
         {
             'id': 'config_visa_workflow_in_detail',
-            'label': this.translate.instant('lang.configVisaWorkflowInDetail'),
-            'comment': this.translate.instant('lang.configVisaWorkflowInDetailDesc'),
+            'label': 'lang.configVisaWorkflowInDetail',
+            'comment': 'lang.configVisaWorkflowInDetailDesc',
             'unit': 'visaWorkflow'
         },
         {
             'id': 'visa_documents',
-            'label': this.translate.instant('lang.visaAnswers'),
-            'comment': this.translate.instant('lang.visaAnswersDesc'),
+            'label': 'lang.visaAnswers',
+            'comment': 'lang.visaAnswersDesc',
             'unit': 'visaWorkflow'
         },
         {
             'id': 'sign_document',
-            'label': this.translate.instant('lang.signDocs'),
-            'comment': this.translate.instant('lang.signDocs'),
+            'label': 'lang.signDocs',
+            'comment': 'lang.signDocs',
             'unit': 'visaWorkflow'
         },
         {
             'id': 'modify_visa_in_signatureBook',
-            'label': this.translate.instant('lang.modifyVisaInSignatureBook'),
-            'comment': this.translate.instant('lang.modifyVisaInSignatureBookDesc'),
+            'label': 'lang.modifyVisaInSignatureBook',
+            'comment': 'lang.modifyVisaInSignatureBookDesc',
             'unit': 'visaWorkflow'
         },
         {
             'id': 'print_folder_doc',
-            'label': this.translate.instant('lang.printFolderDoc'),
-            'comment': this.translate.instant('lang.printFolderDoc'),
+            'label': 'lang.printFolderDoc',
+            'comment': 'lang.printFolderDoc',
             'unit': 'application'
         },
         {
             'id': 'manage_attachments',
-            'label': this.translate.instant('lang.manageAttachments'),
-            'comment': this.translate.instant('lang.manageAttachments'),
+            'label': 'lang.manageAttachments',
+            'comment': 'lang.manageAttachments',
             'unit': 'application'
         },
         {
             'id': 'view_personal_data',
-            'label': this.translate.instant('lang.viewPersonalData'),
-            'comment': this.translate.instant('lang.viewPersonalData'),
+            'label': 'lang.viewPersonalData',
+            'comment': 'lang.viewPersonalData',
             'unit': 'confidentialityAndSecurity'
         },
         {
             'id': 'manage_personal_data',
-            'label': this.translate.instant('lang.managePersonalData'),
-            'comment': this.translate.instant('lang.managePersonalData'),
+            'label': 'lang.managePersonalData',
+            'comment': 'lang.managePersonalData',
             'unit': 'confidentialityAndSecurity'
         },
         {
             'id': 'include_folders_and_followed_resources_perimeter',
-            'label': this.translate.instant('lang.includeFolderPerimeter'),
-            'comment': this.translate.instant('lang.includeFolderPerimeter'),
+            'label': 'lang.includeFolderPerimeter',
+            'comment': 'lang.includeFolderPerimeter',
             'unit': 'application'
         },
     ];
@@ -483,8 +483,8 @@ export class PrivilegeService {
     private menus: menu[] = [
         {
             'id': 'admin',
-            'label': this.translate.instant('lang.administration'),
-            'comment': this.translate.instant('lang.administration'),
+            'label': 'lang.administration',
+            'comment': 'lang.administration',
             'route': '/administration',
             'style': 'fa fa-cogs',
             'unit': 'application',
@@ -493,8 +493,8 @@ export class PrivilegeService {
         },
         {
             'id': 'adv_search_mlb',
-            'label': this.translate.instant('lang.search'),
-            'comment': this.translate.instant('lang.search'),
+            'label': 'lang.search',
+            'comment': 'lang.search',
             'route': 'index.php?page=search_adv&dir=indexing_searching',
             'style': 'fa fa-search',
             'unit': 'application',
@@ -503,8 +503,8 @@ export class PrivilegeService {
         },
         {
             'id': 'entities_print_sep_mlb',
-            'label': this.translate.instant('lang.entitiesSeparator'),
-            'comment': this.translate.instant('lang.entitiesSeparator'),
+            'label': 'lang.entitiesSeparator',
+            'comment': 'lang.entitiesSeparator',
             'route': '/separators/print',
             'style': 'fa fa-print',
             'unit': 'entities',
@@ -513,11 +513,21 @@ export class PrivilegeService {
         },
         {
             'id': 'manage_numeric_package',
-            'label': this.translate.instant('lang.manageNumericPackage'),
-            'comment': this.translate.instant('lang.manageNumericPackage'),
+            'label': 'lang.manageNumericPackage',
+            'comment': 'lang.manageNumericPackage',
             'route': '/saveNumericPackage',
             'style': 'fa fa-file-archive',
             'unit': 'sendmail',
+            'angular': true,
+            'shortcut': false
+        },
+        {
+            'id': 'registered_mail_receive_ar',
+            'label': 'lang.arReception',
+            'comment': 'lang.arReception',
+            'route': '/registeredMail/acknowledgement',
+            'style': 'fa fa-file-archive',
+            'unit': 'registeredMails',
             'angular': true,
             'shortcut': false
         }
@@ -526,8 +536,8 @@ export class PrivilegeService {
     shortcuts: any[] = [
         {
             'id': 'followed',
-            'label': this.translate.instant('lang.followedMail'),
-            'comment': this.translate.instant('lang.followedMail'),
+            'label': 'lang.followedMail',
+            'comment': 'lang.followedMail',
             'route': '/followed',
             'style': 'fas fa-star',
             'unit': 'application',
@@ -585,8 +595,8 @@ export class PrivilegeService {
 
             const indexingmenu: any = {
                 'id': 'indexing',
-                'label': this.translate.instant('lang.recordMail'),
-                'comment': this.translate.instant('lang.recordMail'),
+                'label': 'lang.recordMail',
+                'comment': 'lang.recordMail',
                 'route': '/indexing/' + indexingGroups[0].id,
                 'style': 'fa fa-file-medical',
                 'unit': 'application',
@@ -612,8 +622,8 @@ export class PrivilegeService {
         this.shortcuts = [
             {
                 'id': 'followed',
-                'label': this.translate.instant('lang.followedMail'),
-                'comment': this.translate.instant('lang.followedMail'),
+                'label': 'lang.followedMail',
+                'comment': 'lang.followedMail',
                 'route': '/followed',
                 'style': 'fas fa-star',
                 'unit': 'application',
@@ -636,8 +646,8 @@ export class PrivilegeService {
 
             const indexingShortcut: any = {
                 'id': 'indexing',
-                'label': this.translate.instant('lang.recordMail'),
-                'comment': this.translate.instant('lang.recordMail'),
+                'label': 'lang.recordMail',
+                'comment': 'lang.recordMail',
                 'route': '/indexing',
                 'style': 'fa fa-file-medical',
                 'unit': 'application',

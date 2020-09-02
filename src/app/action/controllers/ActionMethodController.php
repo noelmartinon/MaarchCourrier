@@ -85,6 +85,7 @@ class ActionMethodController
         'saveAndPrintRegisteredMailAction'          => 'saveAndPrintRegisteredMail',
         'saveAndIndexRegisteredMailAction'          => 'saveRegisteredMail',
         'printRegisteredMailAction'                 => 'printRegisteredMail',
+        'printDepositListAction'                    => 'printDepositList',
         'noConfirmAction'                           => null
     ];
 

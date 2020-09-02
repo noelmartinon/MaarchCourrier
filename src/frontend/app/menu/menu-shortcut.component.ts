@@ -14,7 +14,6 @@ import { HeaderService } from '../../service/header.service';
 })
 export class MenuShortcutComponent implements OnInit {
 
-    
     router: any;
     dialogRef: MatDialogRef<any>;
     config: any = {};
@@ -56,7 +55,6 @@ export class MenuShortcutComponent implements OnInit {
     styles: ['.mat-dialog-content{max-height: 65vh;width:600px;}']
 })
 export class IndexingGroupModalComponent {
-    
 
     constructor(
         public http: HttpClient,

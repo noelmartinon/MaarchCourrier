@@ -5,6 +5,7 @@ import { tap, catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { NotificationService } from '../../../../../service/notification/notification.service';
 import { HeaderService } from '../../../../../service/header.service';
+import { FunctionsService } from '../../../../../service/functions.service';
 
 @Component({
     selector: 'app-issuing-site-input',
@@ -37,7 +38,8 @@ export class IssuingSiteInputComponent implements OnInit {
     constructor(
         public http: HttpClient,
         private notify: NotificationService,
-        private headerService: HeaderService
+        private headerService: HeaderService,
+        public functions: FunctionsService
     ) {
 
     }
@@ -45,6 +47,9 @@ export class IssuingSiteInputComponent implements OnInit {
     ngOnInit() {
         if (this.registedMailType !== null) {
             this.getIssuingSites(this.registedMailType);
+        }
+        if (!this.functions.empty(this.control.value)) {
+            this.setAddress(this.control.value);
         }
     }
 
@@ -55,13 +60,9 @@ export class IssuingSiteInputComponent implements OnInit {
             tap((data: any) => {
                 this.issuingSiteAddress = null;
                 this.issuingSiteList = data['ranges'].filter((item: any) => item.registeredMailType === registeredMailType && item.status === 'OK' && item.entities.indexOf(this.headerService.user.entities[0].id) > -1).map((item: any) => {
-                    if (this.control.value === item.siteId) {
-                        this.control.setValue(`${item.trackerNumber}#${item.siteId}`);
-                        this.setAddress(this.control.value);
-                    }
                     return {
                         ...item,
-                        id : `${item.trackerNumber}#${item.siteId}`,
+                        id : `issuingSite#${item.siteId}`,
                         label: `${item.label} (${item.customerAccountNumber})`,
                         disabled: item.fullness === 100,
                     };
@@ -87,5 +88,9 @@ export class IssuingSiteInputComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    goTo() {
+        window.open(`https://www.google.com/maps/search/${this.issuingSiteAddress.addressNumber}+${this.issuingSiteAddress.addressStreet},+${this.issuingSiteAddress.addressPostcode}+${this.issuingSiteAddress.addressTown},+${this.issuingSiteAddress.addressCountry}`, '_blank');
     }
 }

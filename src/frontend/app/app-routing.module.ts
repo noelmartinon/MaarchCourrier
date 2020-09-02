@@ -17,6 +17,7 @@ import { SignatureBookComponent } from './signature-book.component';
 import { FollowedDocumentListComponent } from './home/followed-list/followed-document-list.component';
 import { FolderDocumentListComponent } from './folder/document-list/folder-document-list.component';
 import { BasketListComponent } from './list/basket-list.component';
+import { AcknowledgementReceptionComponent } from './registeredMails/acknowledgement-reception/acknowledgement-reception.component';
 
 
 const routes: Routes = [
@@ -43,6 +44,7 @@ const routes: Routes = [
     { path: 'home', canActivate: [AppGuard], component: HomeComponent },
     { path: 'basketList/users/:userSerialId/groups/:groupSerialId/baskets/:basketId', canActivate: [AppGuard], component: BasketListComponent },
     { path: 'login', component: LoginComponent },
+    { path: 'registeredMail/acknowledgement', canActivate: [AppGuard], component: AcknowledgementReceptionComponent },
     {
         path: '',
         redirectTo: 'home',

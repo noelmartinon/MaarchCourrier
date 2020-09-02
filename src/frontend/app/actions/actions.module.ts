@@ -46,6 +46,7 @@ import { PrintRegisteredMailActionComponent } from './print-registered-mail-acti
 
 import { InternationalizationModule } from '../../service/translate/internationalization.module';
 import { TranslateService } from '@ngx-translate/core';
+import { PrintDepositListActionComponent } from './print-deposit-list-action/print-deposit-list-action.component';
 
 @NgModule({
     imports: [
@@ -92,6 +93,7 @@ import { TranslateService } from '@ngx-translate/core';
         SaveAndPrintRegisteredMailActionComponent,
         SaveAndIndexRegisteredMailActionComponent,
         PrintRegisteredMailActionComponent,
+        PrintDepositListActionComponent,
         ReconcileActionComponent,
     ],
     exports: [
@@ -133,6 +135,7 @@ import { TranslateService } from '@ngx-translate/core';
         SaveAndPrintRegisteredMailActionComponent,
         SaveAndIndexRegisteredMailActionComponent,
         PrintRegisteredMailActionComponent,
+        PrintDepositListActionComponent,
         ReconcileActionComponent,
         DocumentViewerModule
     ],
@@ -167,6 +170,7 @@ import { TranslateService } from '@ngx-translate/core';
         SaveAndPrintRegisteredMailActionComponent,
         SaveAndIndexRegisteredMailActionComponent,
         PrintRegisteredMailActionComponent,
+        PrintDepositListActionComponent,
         ViewDocActionComponent,
         ReconcileActionComponent,
     ]

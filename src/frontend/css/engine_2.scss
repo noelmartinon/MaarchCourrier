@@ -170,6 +170,10 @@ body {
     padding-bottom: 0 !important;
 }
 
+.mat-menu-panel {
+    min-height: auto !important;
+}
+
 .sideBarForm {
     width: 600px !important;
     .mat-drawer-inner-container {

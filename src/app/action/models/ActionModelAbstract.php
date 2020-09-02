@@ -178,6 +178,7 @@ abstract class ActionModelAbstract
                     'label'     => $label,
                     'name'      => (string)$actionPage->NAME,
                     'component' => $component,
+                    'category' => (string)$actionPage->MODULE,
                     'desc'      => $desc
                 ];
             }

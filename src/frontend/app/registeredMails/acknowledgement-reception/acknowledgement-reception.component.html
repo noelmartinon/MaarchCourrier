@@ -1,0 +1,68 @@
+<mat-sidenav-container autosize class="maarch-container">
+    <mat-sidenav-content>
+        <div class="bg-head">
+            <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
+                <div class="bg-head-title-label">
+                    <header-left></header-left>
+                </div>
+                <div class="bg-head-title-tool">
+                    <header-right></header-right>
+                </div>
+            </div>
+            <div class="bg-head-content" [class.fullContainer]="appService.getViewMode()">
+            </div>
+        </div>
+        <div class="container" [class.fullContainer]="appService.getViewMode()">
+            <div class="container-content">
+                <div *ngIf="loading" style="display:flex;height:100%;">
+                    <mat-spinner style="margin:auto;"></mat-spinner>
+                </div>
+                <mat-card *ngIf="!loading" class="card-app-content">
+                    <form style="display: contents;" [formGroup]="adminFormGroup">
+                        <div>
+                            <mat-form-field>
+                                <mat-select [(ngModel)]="type" required placeholder="{{'lang.returnType' | translate}}" formControlName="type">
+                                    <mat-option [value]="'distributed'">{{'lang.registeredMailDistributed' | translate}}</mat-option>
+                                    <mat-option [value]="'notDistributed'">{{'lang.registeredMailNotDistributed' | translate}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+
+                            <mat-form-field>
+                                <mat-label>{{'lang.registeredMailNumber' | translate}}</mat-label>
+                                <input type="text" matInput required (change)="receiveAcknowledgement()" [(ngModel)]="number" formControlName="number">
+                            </mat-form-field>
+
+                            <mat-form-field  *ngIf="type === 'notDistributed'" (click)="picker.open()" appearance="outline" style="cursor:pointer;margin-top: 10px;">
+                                <mat-label>{{'lang.registeredMailReceivedDate' | translate}}</mat-label>
+                                <input matInput [(ngModel)]="receivedDate" [matDatepicker]="picker"
+                                       [placeholder]="this.translate.instant('lang.chooseDate')" [max]="today" readonly style="cursor:pointer;" formControlName="receivedDate" required>
+                                <mat-datepicker-toggle matSuffix [for]="picker" *ngIf="!receivedDate">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker #picker></mat-datepicker>
+                                <button mat-button color="warn" matSuffix mat-icon-button *ngIf="receivedDate"
+                                        (click)="$event.stopPropagation();receivedDate = null;" [title]="this.translate.instant('lang.eraseValue')">
+                                    <mat-icon color="warn" class="fa fa-calendar-times">
+                                    </mat-icon>
+                                </button>
+                            </mat-form-field>
+
+                            <mat-form-field *ngIf="type === 'notDistributed'" >
+                                <mat-select [(ngModel)]="reason" formControlName="returnReason" placeholder="{{'lang.returnReason' | translate}}" required>
+                                    <mat-option value="{{'lang.returnReasonCannotAccess' | translate}}">{{'lang.returnReasonCannotAccess' | translate}}</mat-option>
+                                    <mat-option value="{{'lang.returnReasonNotClaimed' | translate}}">{{'lang.returnReasonNotClaimed' | translate}}</mat-option>
+                                    <mat-option value="{{'lang.returnReasonRejected' | translate}}">{{'lang.returnReasonRejected' | translate}}</mat-option>
+                                    <mat-option value="{{'lang.returnReasonUnknown' | translate}}">{{'lang.returnReasonUnknown' | translate}}</mat-option>
+                                    <mat-option value="{{'lang.others' | translate}}">{{'lang.others' | translate}}</mat-option>
+                                </mat-select>
+                            </mat-form-field>
+                            <mat-form-field *ngIf="type === 'notDistributed' && reason === this.translate.instant('lang.others')">
+                                <mat-label>{{'lang.precise' | translate}}</mat-label>
+                                <input matInput name="returnReasonOther" formControlName="returnReasonOther" [(ngModel)]="reasonOther">
+                            </mat-form-field>
+                        </div>
+                    </form>
+                </mat-card>
+            </div>
+        </div>
+    </mat-sidenav-content>
+</mat-sidenav-container>

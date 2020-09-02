@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
@@ -8,7 +8,6 @@ import { HeaderService } from '../../../service/header.service';
 import { AppService } from '../../../service/app.service';
 import { tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
-import {MaarchFlatTreeComponent} from '../../../plugins/tree/maarch-flat-tree.component';
 
 @Component({
     selector: 'app-registered-mail',
@@ -195,7 +194,7 @@ export class RegisteredMailComponent implements OnInit {
                     this.notify.success(this.translate.instant('lang.registeredMailNumberRangesAdded'));
                     this.router.navigate(['/administration/registeredMails']);
                 }, (err) => {
-                    this.notify.error(err.error.errors);
+                    this.notify.handleSoftErrors(err);
                 });
         } else {
             this.http.put('../rest/registeredMail/ranges/' + this.id, objToSubmit)
@@ -203,7 +202,7 @@ export class RegisteredMailComponent implements OnInit {
                     this.notify.success(this.translate.instant('lang.registeredMailNumberRangesUpdated'));
                     this.router.navigate(['/administration/registeredMails']);
                 }, (err) => {
-                    this.notify.error(err.error.errors);
+                    this.notify.handleSoftErrors(err);
                 });
         }
     }

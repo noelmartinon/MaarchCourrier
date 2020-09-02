@@ -157,4 +157,19 @@ class ContactModel
 
         return '';
     }
+
+    public static function getCivilityId(array $args)
+    {
+        ValidatorModel::stringType($args, ['civilityLabel']);
+
+        if (!empty($args['civilityLabel'])) {
+            $aCivility = ContactModel::getCivilities();
+            foreach ($aCivility as $civilityId => $civility) {
+                if (mb_strtolower($civility['label']) == mb_strtolower($args['civilityLabel'])) {
+                    return $civilityId;
+                }
+            }
+        }
+        return null;
+    }
 }

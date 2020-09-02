@@ -714,6 +714,18 @@ class SummarySheetController
 
                 $pdf->SetY($pdf->GetY() + 2);
                 $pdf->Cell(0, 60, '', 1, 2, 'L', false);
+            } elseif ($unit['unit'] == 'trafficRecords') {
+                $pdf->SetY($pdf->GetY() + 40);
+                if (($pdf->GetY() + 77) > $bottomHeight) {
+                    $pdf->AddPage();
+                }
+                $pdf->SetFont('', 'B', 11);
+                $pdf->Cell(0, 15, $unit['label'], 0, 2, 'L', false);
+                $pdf->SetFont('', '', 9);
+
+                $parameter = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'traffic_record_summary_sheet']);
+                $pdf->writeHTMLCell(575, 0, 25, $pdf->GetY(), $parameter['param_value_string']);
+                // $pdf->writeHTML($parameter['param_value_string']);
             }
         }
     }

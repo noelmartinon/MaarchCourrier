@@ -57,8 +57,8 @@
                                         <mat-list-item *ngFor="let menu of privilegeService.getMenus() | sortBy: 'label'">
                                             <mat-slide-toggle color="primary" name="{{menu.label}}"
                                                               [checked]="group.privileges.indexOf(menu.id) > -1"
-                                                              (change)="toggleService($event,menu)" matTooltip="{{menu.comment}}">
-                                                {{menu.label}}</mat-slide-toggle>
+                                                              (change)="toggleService($event,menu)" matTooltip="{{menu.comment | translate}}">
+                                                {{menu.label | translate}}</mat-slide-toggle>
                                         </mat-list-item>
                                     </mat-list>
                                 </mat-tab>
@@ -73,7 +73,7 @@
                                         <mat-slide-toggle color="primary" name="{{administration.label}}" [(ngModel)]="administration.checked"
                                                           [checked]="administration.checked"
                                                           (change)="toggleService($event,administration)"
-                                                          matTooltip="{{administration.comment}}">{{administration.label}}
+                                                          matTooltip="{{administration.comment | translate}}">{{administration.label | translate}}
                                         </mat-slide-toggle>
                                         <button mat-icon-button [class.active]="panelMode === administration.id"
                                                 *ngIf="administration.hasParams"
@@ -103,7 +103,7 @@
                                                     <mat-slide-toggle color="primary" name="{{privilege.label}}"
                                                                       [checked]="group.privileges.indexOf(privilege.id) > -1"
                                                                       (change)="toggleService($event,privilege)"
-                                                                      matTooltip="{{privilege.comment}}">{{privilege.label}}
+                                                                      matTooltip="{{privilege.comment | translate}}">{{privilege.label | translate}}
                                                     </mat-slide-toggle>
                                                 </mat-list-item>
                                             </mat-list>
@@ -118,7 +118,7 @@
                                                                 (selectionChange)="changeDifflistPrivilege($event, fakePrivilege.id)">
                                                         <mat-option value="">{{'lang.noRole' | translate}}</mat-option>
                                                         <mat-option *ngFor="let subservice of fakePrivilege.services"
-                                                                    [value]="subservice.id">{{subservice.label}}</mat-option>
+                                                                    [value]="subservice.id">{{subservice.label | translate}}</mat-option>
                                                     </mat-select>
                                                 </mat-form-field>.
                                             </mat-list-item>
@@ -133,7 +133,7 @@
                                                                 (selectionChange)="changePersonalDataPrivilege($event)">
                                                         <mat-option value="">{{'lang.notVisible' | translate}}</mat-option>
                                                         <mat-option *ngFor="let subservice of fakePrivilege.services"
-                                                                    [value]="subservice.id">{{subservice.label}}</mat-option>
+                                                                    [value]="subservice.id">{{subservice.label | translate}}</mat-option>
                                                     </mat-select>
                                                 </mat-form-field>.
                                             </mat-list-item>

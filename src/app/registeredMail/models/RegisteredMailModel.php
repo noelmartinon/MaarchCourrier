@@ -119,7 +119,8 @@ class RegisteredMailModel
             'left_join' => ['registered_mail_resources.res_id = res_letterbox.res_id'],
             'where'     => empty($args['where']) ? [] : $args['where'],
             'data'      => empty($args['data']) ? [] : $args['data'],
-            'groupBy'   => empty($args['groupBy']) ? [] : $args['groupBy']
+            'groupBy'   => empty($args['groupBy']) ? [] : $args['groupBy'],
+            'order_by'  => empty($args['orderBy']) ? [] : $args['orderBy'],
         ]);
     }
 }

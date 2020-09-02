@@ -348,7 +348,7 @@ foreach ($customs as $custom) {
 
     // Acknowledgement Receipts
     $query = "update acknowledgement_receipts as ar set
-            contact_id = tmp.old_address_id
+            contact_id = tmp.new_id
         from (values
                $valuesOldAddress 
             ) as tmp(new_id, old_address_id) 
@@ -358,7 +358,7 @@ foreach ($customs as $custom) {
 
     // Group list
     $query = "update contacts_groups_lists as cgl set
-            contact_id = tmp.old_address_id
+            contact_id = tmp.new_id
         from (values
                $valuesOldAddress
             ) as tmp(new_id, old_address_id) 
@@ -369,7 +369,7 @@ foreach ($customs as $custom) {
 
     // Resources contacts
     $query = "update resource_contacts as rc set
-        item_id = tmp.old_address_id, type = 'contact_v3'
+        item_id = tmp.new_id, type = 'contact_v3'
     from (values
            $valuesOldAddress
         ) as tmp(new_id, old_address_id) 

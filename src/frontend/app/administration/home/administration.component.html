@@ -25,7 +25,7 @@
                             <i class="{{shortcut.style}}" style="position: absolute;"></i>
                         </div>
                         <span style="font-size: 40px;">{{shortcut.count}}</span>&nbsp;
-                        {{shortcut.label}}
+                        {{shortcut.label | translate}}
                     </mat-card>
                 </div>
                 <mat-divider></mat-divider>
@@ -35,14 +35,14 @@
                 <div
                     style="margin: 20px;display: grid;grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));gap: 20px;padding:20px;padding-top:0px;margin-top:0px;">
                     <button [joyrideStep]="administration.id" mat-button *ngFor="let administration of filteredAdministrations | async | sortBy : 'label'"
-                        [title]="administration.comment" style="font-size:20px;height:80px;"
+                        [title]="administration.comment | translate" style="font-size:20px;height:80px;"
                         (click)="goToSpecifiedAdministration(administration)">
                         <div style="display: flex;align-items: center;">
                             <span style="padding-right: 10px;">
                                 <i class="avatarCount2 {{administration.style}}"></i>
                             </span>
                             <span class="countLabel" style="white-space: initial;text-align: left;">
-                                {{administration.label}}
+                                {{administration.label | translate}}
                             </span>
                         </div>
                     </button>

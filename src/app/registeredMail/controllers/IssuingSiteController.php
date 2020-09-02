@@ -69,13 +69,13 @@ class IssuingSiteController
             'id'                 => $site['id'],
             'label'              => $site['label'],
             'postOfficeLabel'    => $site['post_office_label'] ?? null,
-            'accountNumber'      => $site['account_number'] ?? null,
-            'addressNumber'      => $site['address_number'] ?? null,
-            'addressStreet'      => $site['address_street'] ?? null,
+            'accountNumber'      => $site['account_number'],
+            'addressNumber'      => $site['address_number'],
+            'addressStreet'      => $site['address_street'],
             'addressAdditional1' => $site['address_additional1'] ?? null,
             'addressAdditional2' => $site['address_additional2'] ?? null,
-            'addressPostcode'    => $site['address_postcode'] ?? null,
-            'addressTown'        => $site['address_town'] ?? null,
+            'addressPostcode'    => $site['address_postcode'],
+            'addressTown'        => $site['address_town'],
             'addressCountry'     => $site['address_country'] ?? null
         ];
 
@@ -126,7 +126,7 @@ class IssuingSiteController
             'limit ' => 1
         ]);
         if (!empty($site)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body accountNumber is already used by another site']);
+            return $response->withStatus(400)->withJson(['errors' => 'Body accountNumber is already used by another site', 'lang' => 'accountNumberAlreadyUsed']);
         }
 
         if (!empty($body['entities']) && !Validator::arrayType()->validate($body['entities'])) {
@@ -143,12 +143,12 @@ class IssuingSiteController
             'label'              => $body['label'],
             'postOfficeLabel'    => $body['postOfficeLabel'] ?? null,
             'accountNumber'      => $body['accountNumber'],
-            'addressNumber'      => $body['addressNumber'] ?? null,
-            'addressStreet'      => $body['addressStreet'] ?? null,
+            'addressNumber'      => $body['addressNumber'],
+            'addressStreet'      => $body['addressStreet'],
             'addressAdditional1' => $body['addressAdditional1'] ?? null,
             'addressAdditional2' => $body['addressAdditional2'] ?? null,
-            'addressPostcode'    => $body['addressPostcode'] ?? null,
-            'addressTown'        => $body['addressTown'] ?? null,
+            'addressPostcode'    => $body['addressPostcode'],
+            'addressTown'        => $body['addressTown'],
             'addressCountry'     => $body['addressCountry'] ?? null
         ]);
 
@@ -209,7 +209,7 @@ class IssuingSiteController
             'limit ' => 1
         ]);
         if (!empty($site)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body accountNumber is already used by another site']);
+            return $response->withStatus(400)->withJson(['errors' => 'Body accountNumber is already used by another site', 'lang' => 'accountNumberAlreadyUsed']);
         }
 
         if (!empty($body['entities']) && !Validator::arrayType()->validate($body['entities'])) {
@@ -227,12 +227,12 @@ class IssuingSiteController
                 'label'               => $body['label'],
                 'post_office_label'   => $body['postOfficeLabel'] ?? null,
                 'account_number'      => $body['accountNumber'],
-                'address_number'      => $body['addressNumber'] ?? null,
-                'address_street'      => $body['addressStreet'] ?? null,
+                'address_number'      => $body['addressNumber'],
+                'address_street'      => $body['addressStreet'],
                 'address_additional1' => $body['addressAdditional1'] ?? null,
                 'address_additional2' => $body['addressAdditional2'] ?? null,
-                'address_postcode'    => $body['addressPostcode'] ?? null,
-                'address_town'        => $body['addressTown'] ?? null,
+                'address_postcode'    => $body['addressPostcode'],
+                'address_town'        => $body['addressTown'],
                 'address_country'     => $body['addressCountry'] ?? null
             ],
             'where' => ['id = ?'],
@@ -271,6 +271,14 @@ class IssuingSiteController
         $site = IssuingSiteModel::getById(['id' => $args['id']]);
         if (empty($site)) {
             return $response->withStatus(204);
+        }
+
+        $ranges = RegisteredNumberRangeModel::get([
+            'where' => ['site_id = ?', 'status = ?'],
+            'data'  => [$args['id'], 'OK']
+        ]);
+        if (!empty($ranges)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Cannot delete site : site is used by an active range', 'lang' => 'siteIsUsedByActiveRange']);
         }
 
         IssuingSiteEntitiesModel::delete([

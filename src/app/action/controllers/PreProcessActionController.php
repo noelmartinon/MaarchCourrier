@@ -33,6 +33,7 @@ use Group\models\GroupModel;
 use IndexingModel\models\IndexingModelFieldModel;
 use Note\models\NoteModel;
 use Parameter\models\ParameterModel;
+use RegisteredMail\models\RegisteredMailModel;
 use Resource\controllers\ResController;
 use Resource\controllers\ResourceListController;
 use Resource\controllers\StoreController;
@@ -1571,6 +1572,80 @@ class PreProcessActionController
         }
 
         return $response->withJson(['resourcesInformations' => $resourcesInformations]);
+    }
+
+    public function checkPrintDepositList(Request $request, Response $response, array $args)
+    {
+        $body = $request->getParsedBody();
+
+        if (!Validator::arrayType()->notEmpty()->validate($body['resources'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body resources is empty or not an array']);
+        }
+
+        $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $GLOBALS['id']]);
+        if (!empty($errors['errors'])) {
+            return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
+        }
+
+        $body['resources'] = array_slice($body['resources'], 0, 500);
+        if (!ResController::hasRightByResId(['resId' => $body['resources'], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+        $body['resources'] = PreProcessActionController::getNonLockedResources(['resources' => $body['resources'], 'userId' => $GLOBALS['id']]);
+
+        $processedResources = [];
+        $data = [
+            '2D' => 0,
+            '2C' => 0,
+            'RW' => 0
+        ];
+        $cannotGenerate = [];
+        $canGenerate = [];
+
+        foreach ($body['resources'] as $resource) {
+            if (in_array($resource, $processedResources)) {
+                continue;
+            }
+
+            $registeredMail = RegisteredMailModel::getWithResources([
+                'select' => ['issuing_site', 'type', 'number', 'warranty', 'recipient', 'generated', 'departure_date', 'deposit_id'],
+                'where'  => ['res_letterbox.res_id = ?'],
+                'data'   => [$resource]
+            ]);
+            if (empty($registeredMail[0])) {
+                $cannotGenerate[] = $resource . ' - ' . _NOT_REGISTERED_MAIL;
+                continue;
+            }
+            $registeredMail = $registeredMail[0];
+
+            if (!$registeredMail['generated']) {
+                $cannotGenerate[] = $resource . ' - ' . _NOT_GENERATED;
+                continue;
+            }
+
+        if (empty($registeredMail['deposit_id'])) {
+            $registeredMails = RegisteredMailModel::getWithResources([
+                'select' => ['number', 'warranty', 'reference', 'recipient', 'res_letterbox.res_id'],
+                'where'  => ['type = ?', 'issuing_site = ?', 'departure_date = ?', 'generated = ?'],
+                'data'   => [$registeredMail['type'], $registeredMail['issuing_site'], $registeredMail['departure_date'], true]
+            ]);
+        } else {
+            $registeredMails = RegisteredMailModel::getWithResources([
+                'select' => ['number', 'warranty', 'reference', 'recipient', 'res_letterbox.res_id'],
+                'where'  => ['deposit_id = ?'],
+                'data'   => [$registeredMail['deposit_id']]
+            ]);
+        }
+
+            $resIds = array_column($registeredMails, 'res_id');
+
+            $processedResources = array_merge($processedResources, $resIds);
+
+            $data[$registeredMail['type']] = count($registeredMails);
+            $canGenerate[] = $resource;
+        }
+
+        return $response->withJson(['types' => $data, 'cannotGenerate' => $cannotGenerate, 'canGenerate' => $canGenerate]);
     }
 
     private static function getNonLockedResources(array $args)

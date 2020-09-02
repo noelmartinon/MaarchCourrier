@@ -476,3 +476,6 @@ define('_SAVE_REGISTERED_MAIL', 'Save registered mail');
 define('_SAVE_PRINT_REGISTERED_MAIL', 'Save and print registered mail');
 define('_SAVE_INDEX_REGISTERED_MAIL', 'Save registered mail and start indexing');
 define('_PRINT_REGISTERED_MAIL', 'Print registered mail');
+define('_PRINT_DEPOSIT_LIST', "Print deposit list");
+define('_NOT_REGISTERED_MAIL', 'Not a registered mail');
+define('_NOT_GENERATED', 'Not generated');

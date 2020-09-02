@@ -155,7 +155,7 @@ export class IndexationComponent implements OnInit {
     onSubmit() {
         if (this.indexingForm.isValidForm()) {
             this.actionService.loading = true;
-            const formatdatas = this.formatDatas(this.indexingForm.getDatas());
+            const formatdatas = this.indexingForm.formatDatas(this.indexingForm.getDatas());
 
             formatdatas['modelId'] = this.currentIndexingModel.master !== null ? this.currentIndexingModel.master : this.currentIndexingModel.id;
             formatdatas['chrono'] = true;
@@ -271,7 +271,7 @@ export class IndexationComponent implements OnInit {
     }
 
     refreshDatas() {
-        this.appDocumentViewer.setDatas(this.formatDatas(this.indexingForm.getDatas()));
+        this.appDocumentViewer.setDatas(this.indexingForm.formatDatas(this.indexingForm.getDatas()));
     }
 
 }

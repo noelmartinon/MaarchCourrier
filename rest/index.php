@@ -450,6 +450,7 @@ $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/ac
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkCloseWithFieldsAction', \Action\controllers\PreProcessActionController::class . ':checkCloseWithFieldsAction');
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkReconcile', \Action\controllers\PreProcessActionController::class . ':checkReconcile');
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkSendAlfresco', \Action\controllers\PreProcessActionController::class . ':checkSendAlfresco');
+$app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkPrintDepositList', \Action\controllers\PreProcessActionController::class . ':checkPrintDepositList');
 
 //Search
 $app->get('/search', \Search\controllers\SearchController::class . ':get');
@@ -631,10 +632,7 @@ $app->get('/registeredMail/sites/type/{type}', \RegisteredMail\controllers\Issui
 
 $app->get('/registeredMail/countries', \RegisteredMail\controllers\RegisteredMailController::class . ':getCountries');
 
+$app->put('/registeredMails/acknowledgement', \RegisteredMail\controllers\RegisteredMailController::class . ':receiveAcknowledgement');
 $app->put('/registeredMails/{resId}', \RegisteredMail\controllers\RegisteredMailController::class . ':update');
-//TODO remove
-$app->get('/registeredMail/print', \RegisteredMail\controllers\RegisteredMailController::class . ':printTest');
-$app->get('/registeredMail/printDeposit', \RegisteredMail\controllers\RegisteredMailController::class . ':printDepositSlipTest');
-
 
 $app->run();

@@ -5,6 +5,9 @@ import { NotificationService } from '../../../service/notification/notification.
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FunctionsService } from '../../../service/functions.service';
+import { tap } from 'rxjs/operators';
+
+declare var tinymce: any;
 
 @Component({
     templateUrl: 'summary-sheet.component.html',
@@ -12,11 +15,8 @@ import { FunctionsService } from '../../../service/functions.service';
 })
 export class SummarySheetComponent implements OnInit {
 
-    
     loading: boolean = false;
-
     withQrcode: boolean = true;
-
     paramMode: boolean = false;
 
     dataAvailable: any[] = [
@@ -106,6 +106,14 @@ export class SummarySheetComponent implements OnInit {
                 this.translate.instant('lang.content')
             ],
             enabled: true
+        },
+        {
+            id: 'trafficRecords',
+            unit: 'trafficRecords',
+            label: this.translate.instant('lang.trafficRecordSummarySheet'),
+            css: 'col-md-4 text-center',
+            desc: [],
+            enabled: true
         }
     ];
 
@@ -119,6 +127,39 @@ export class SummarySheetComponent implements OnInit {
 
     ngOnInit(): void {
         this.paramMode = !this.functions.empty(this.data.paramMode);
+        this.http.get('../rest/parameters').pipe(
+            tap((data: any) => {
+                const trafficRecordsInfo = data.parameters.filter((item: any) => ('traffic_record_summary_sheet' === item.id && !this.functions.empty(item.param_value_string)));
+                if (trafficRecordsInfo.length === 0) {
+                    this.dataAvailable = this.dataAvailable.filter((item: any) => item.id !== 'trafficRecords');
+                } else {
+                    this.dataAvailable = this.dataAvailable.map((item: any) => {
+                        if (item.id === 'trafficRecords') {
+                            item.advanced_desc = trafficRecordsInfo[0].param_value_string;
+                        }
+                        return item;
+                    });
+                    setTimeout(() => {
+                        this.initMce();
+                    });
+                }
+            })
+        ).subscribe();
+    }
+
+    initMce() {
+        tinymce.init({
+            selector: 'textarea',
+            base_url: '../node_modules/tinymce/',
+            height: '200',
+            suffix: '.min',
+            language: this.translate.instant('lang.langISO').replace('-', '_'),
+            language_url: `../node_modules/tinymce-i18n/langs/${this.translate.instant('lang.langISO').replace('-', '_')}.js`,
+            menubar: false,
+            statusbar: false,
+            readonly: true,
+            toolbar: ''
+        });
     }
 
     drop(event: CdkDragDrop<string[]>) {

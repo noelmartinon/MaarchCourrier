@@ -32,7 +32,7 @@ export class RegisteredMailListComponent implements OnInit {
             route: '/administration/issuingSites',
             label: this.translate.instant('lang.issuingSites'),
             current: false
-        },
+        }
     ];
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;

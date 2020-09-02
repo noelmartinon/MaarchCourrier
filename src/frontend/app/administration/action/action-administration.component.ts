@@ -27,6 +27,8 @@ export class ActionAdministrationComponent implements OnInit {
     categoriesList: any[] = [];
     keywordsList: any[] = [];
 
+    group: any[] = [];
+
     loading: boolean = false;
     availableCustomFields: Array<any> = [];
     customFieldsFormControl = new FormControl({ value: '', disabled: false });
@@ -71,6 +73,13 @@ export class ActionAdministrationComponent implements OnInit {
                         });
 
                         this.actionPages = data['actionPages'];
+                        this.actionPages.map(action => action.category).filter((cat, index, self) => self.indexOf(cat) === index).forEach(element => {
+                            this.group.push({
+                                id : element,
+                                label : this.translate.instant('lang.' + element)
+                            });
+                        });
+
                         this.keywordsList = data.keywordsList;
                         this.headerService.setHeader(this.translate.instant('lang.actionCreation'));
                         this.loading = false;
@@ -119,6 +128,12 @@ export class ActionAdministrationComponent implements OnInit {
 
     getCustomFields() {
         this.action.actionPageId = this.selectActionPageId.value;
+        this.action.actionPageGroup = this.actionPages.filter(action => action.id === this.action.actionPageId)[0].category;
+
+        if (this.action.actionPageGroup === 'registeredMail') {
+            this.action.actionCategories = ['registeredMail'];
+        }
+
         return new Promise((resolve, reject) => {
             if (this.action.actionPageId === 'close_mail' && this.functions.empty(this.availableCustomFields)) {
                 this.http.get('../rest/customFields').pipe(

@@ -46,10 +46,14 @@
                                         (click)="$event.stopPropagation();">
                                 </mat-form-field>
                             </div>
-                            <div class="row" class="unitData" (click)="item.enabled = !item.enabled">
+                            <div class="row" class="unitData" (click)="item.enabled = !item.enabled" *ngIf="!functions.empty(item.desc)">
                                 <div class="{{item.css}}" *ngFor="let itemData of item.desc">
                                     {{itemData}}
                                 </div>
+                            </div><br>
+                            <div class="row" class="unitData" (click)="item.enabled = !item.enabled" *ngIf="item.advanced_desc">
+                                <textarea  style="padding-top: 10px;" name="traffic_record_summary_sheet" id="traffic_record_summary_sheet"
+                                    [value]="item.advanced_desc"></textarea>
                             </div>
                             <mat-slide-toggle [(ngModel)]="item.enabled" color="primary" class="unitToggle">
                             </mat-slide-toggle>

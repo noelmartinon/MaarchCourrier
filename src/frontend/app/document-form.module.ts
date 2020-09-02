@@ -5,6 +5,7 @@ import { IndexingFormComponent } from './indexation/indexing-form/indexing-form.
 import { TagInputComponent } from './tag/indexing/tag-input.component';
 import { FolderInputComponent } from '../app/folder/indexing/folder-input.component';
 import { IssuingSiteInputComponent } from '../app/administration/registered-mail/issuing-site/indexing/issuing-site-input.component';
+import { RegisteredMailRecipientInputComponent } from '../app/administration/registered-mail/indexing/recipient-input.component';
 
 import { InternationalizationModule } from '../service/translate/internationalization.module';
 import { TranslateService } from '@ngx-translate/core';
@@ -18,13 +19,15 @@ import { TranslateService } from '@ngx-translate/core';
         IndexingFormComponent,
         TagInputComponent,
         FolderInputComponent,
-        IssuingSiteInputComponent
+        IssuingSiteInputComponent,
+        RegisteredMailRecipientInputComponent
     ],
     exports: [
         IndexingFormComponent,
         TagInputComponent,
         FolderInputComponent,
-        IssuingSiteInputComponent
+        IssuingSiteInputComponent,
+        RegisteredMailRecipientInputComponent
     ],
     entryComponents: [
     ],

@@ -14,9 +14,13 @@
 namespace RegisteredMail\controllers;
 
 use Com\Tecnick\Barcode\Barcode;
+use Parameter\models\ParameterModel;
+use Contact\controllers\ContactController;
+use Contact\models\ContactModel;
 use RegisteredMail\models\RegisteredMailModel;
 use RegisteredMail\models\RegisteredNumberRangeModel;
 use Resource\controllers\ResController;
+use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use Slim\Http\Request;
@@ -44,25 +48,32 @@ class RegisteredMailController
             return $response->withStatus(400)->withJson(['errors' => 'Body type is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['warranty'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body warranty is empty or not a string']);
-        } elseif (!Validator::date()->notEmpty()->validate($body['departureDate'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body departureDate is empty or not a date']);
-        } elseif (!in_array($body['type'], ['2D', '2C', 'RW'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body type is not correct']);
         } elseif (!in_array($body['type'], ['2D', '2C', 'RW'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body type is not correct']);
         } elseif (!in_array($body['warranty'], ['R1', 'R2', 'R3'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body warranty is not correct']);
         } elseif ($body['type'] == 'RW' && $body['warranty'] == 'R3') {
             return $response->withStatus(400)->withJson(['errors' => 'Body warranty R3 is not allowed for type RW']);
+        } elseif (!Validator::notEmpty()->validate($body['recipient'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body recipient is empty']);
         }
 
-        $date = new \DateTime($body['departureDate']);
+        $resource = ResModel::getById(['select' => ['departure_date'], 'resId' => $args['resId']]);
+        $date = new \DateTime($resource['departure_date']);
         $date = $date->format('d/m/Y');
 
+        $refPos = strpos($body['reference'], '-');
+        if ($refPos !== false) {
+            $body['reference'] = substr_replace($body['reference'], "{$date} ", 0, $refPos);
+        } else {
+            $body['reference'] = "{$date} - {$body['reference']}";
+        }
         $set = [
             'type'      => $body['type'],
             'warranty'  => $body['warranty'],
-            'reference' => "{$date} - {$body['reference']}"
+            'reference' => $body['reference'],
+            'letter'    => empty($body['letter']) ? 'false' : 'true',
+            'recipient' => json_encode($body['recipient']),
         ];
 
         if ($registeredMail['type'] != $body['type']) {
@@ -105,6 +116,69 @@ class RegisteredMailController
             fclose($handle);
         }
         return $response->withJson(['countries' => $countries]);
+    }
+
+    public function receiveAcknowledgement(Request $request, Response $response)
+    {
+        $body = $request->getParsedBody();
+
+        if (!Validator::stringType()->notEmpty()->validate($body['type']) && !in_array($body['type'], ['distributed', 'notDistributed'])) {
+            return $response->withStatus(400)->withJson(['errors' => "Body type is empty or is not 'distributed' or 'notDistributed'"]);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['number'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body number is empty or not a string']);
+        } elseif (!preg_match("/(2C|2D|RW) ([0-9]{3} [0-9]{3} [0-9]{4}) ([0-9])/", $body['number'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body number is not valid']);
+        }
+
+        $number = substr($body['number'], 3, 12);
+        $number = str_replace(' ', '', $number);
+
+        $registeredMail = RegisteredMailModel::get([
+            'select' => ['id', 'res_id'],
+            'where'  => ['number = ?'],
+            'data'   => [$number]
+        ]);
+        if (empty($registeredMail)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Registered mail number not found']);
+        }
+        $registeredMail = $registeredMail[0];
+
+        if ($body['type'] == 'distributed') {
+            $set = ['received_date' => 'CURRENT_TIMESTAMP'];
+            $status = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'registeredMailDistributedStatus']);
+            $status = $status['param_value_string'];
+        } else {
+            if (!Validator::stringType()->notEmpty()->validate($body['returnReason'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body returnReason is empty or not a string']);
+            } elseif (!Validator::date()->notEmpty()->validate($body['receivedDate'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body receivedDate is empty or not a date']);
+            }
+            $receivedDate = new \DateTime($body['receivedDate']);
+            $today = new \DateTime();
+            $today->setTime(00, 00, 00);
+            if ($receivedDate > $today) {
+                return ['errors' => "Body receivedDate is not a valid date"];
+            }
+
+            $set = ['received_date' => $body['receivedDate'], 'return_reason' => $body['returnReason'], 'return_reason_other' => $body['returnReasonOther'] ?? null];
+            $status = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'registeredMailNotDistributedStatus']);
+            $status = $status['param_value_string'];
+        }
+
+        RegisteredMailModel::update([
+            'set'   => $set,
+            'where' => ['id = ?'],
+            'data'  => [$registeredMail['id']]
+        ]);
+        if (!empty($status)) {
+            ResModel::update([
+                'set'   => ['status' => $status],
+                'where' => ['res_id = ?'],
+                'data'  => [$registeredMail['res_id']]
+            ]);
+        }
+
+        return $response->withStatus(204);
     }
 
     public static function getRegisteredMailNumber(array $args)
@@ -161,47 +235,6 @@ class RegisteredMailController
         return $response->withJson(['test' => 2]);
     }
 
-    public function printDepositSlipTest(Request $request, Response $response)
-    {
-        $args = [
-            'site' => [
-                'label'           => 'Dunder Mifflin Scranton',
-                'accountNumber'   => 42,
-                'addressNumber'   => '1725',
-                'addressStreet'   => 'Slough Avenue',
-                'addressPostcode' => '18505',
-                'addressTown'     => 'Scranton',
-                'postOfficeLabel' => 'Scranton Post Office'
-            ],
-            'type' => '2D',
-            'trackingNumber' => '1234567890',
-            'departureDate' => '26/08/2010',
-            'registeredMails' => [
-                [
-                    'type'      => '2D',
-                    'number'    => '551',
-                    'warranty'  => 'R2',
-                    'letter'    => true,
-                    'reference' => '15/08/2020 - ma ref',
-                    'recipient' => [
-                        'AFNOR',
-                        'PSG',
-                        'Eric Choupo',
-                        'Porte 160',
-                        '5 Rue de Paris',
-                        'Batiment C',
-                        '75001 Paris',
-                        'FRANCE'
-                    ]
-                ]
-            ]
-        ];
-
-        $result = RegisteredMailController::getDepositSlipPdf($args);
-
-        return $response->withJson($result);
-    }
-
     public static function getRegisteredMailPDF(array $args)
     {
         $registeredMailNumber = RegisteredMailController::getRegisteredMailNumber(['type' => $args['type'], 'rawNumber' => $args['number']]);
@@ -216,6 +249,17 @@ class RegisteredMailController
         $barcode = new Barcode();
 
         if ($args['type'] != 'RW') {
+            // DATA TEST
+            // if ($args['type'] == '2C') {
+            //     $pdf->setSourceFile('/var/www/html/ar.pdf');
+            // } else {
+            //     $pdf->setSourceFile('/var/www/html/sansar.pdf');
+            // }
+            // $pageId = $pdf->ImportPage(1);
+            // $pageInfo = $pdf->getTemplatesize($pageId);
+            // $pdf->AddPage($pageInfo['orientation'], $pageInfo);
+            // $pdf->useImportedPage($pageId);
+
             // TODO INFO FEUILLE 1 : GAUCHE
             $pdf->SetXY(50, 8);
             $pdf->cell(0, 0, $registeredMailNumber);
@@ -420,7 +464,13 @@ class RegisteredMailController
             $pdf->SetXY(5, 280);
             $pdf->Multicell(40, 5, $args['reference']);
         } else {
-            //TODO INFO RW
+            // DATA TEST
+            // $pdf->setSourceFile('/var/www/html/international.pdf');
+            // $pageId = $pdf->ImportPage(1);
+            // $pageInfo = $pdf->getTemplatesize($pageId);
+            // $pdf->AddPage($pageInfo['orientation'], $pageInfo);
+            // $pdf->useImportedPage($pageId);
+
             $pdf->setFont('times', '', '8');
 
             $y = 27;
@@ -451,47 +501,56 @@ class RegisteredMailController
             $pdf->SetXY(127, $y);
             $pdf->cell(0, 0, $args['recipient'][7]);
 
-
-            $y = 7;
-            $pdf->SetXY(10, $y);
+            $y = 2;
+            $pdf->SetXY(26, $y);
             $pdf->cell(0, 0, $args['sender'][1]);
 
             $y += 3;
-            $pdf->SetXY(10, $y);
+            $pdf->SetXY(26, $y);
             $pdf->cell(0, 0, $args['sender'][2]);
 
             $y += 3;
-            $pdf->SetXY(10, $y);
+            $pdf->SetXY(26, $y);
             $pdf->cell(0, 0, $args['sender'][3]);
 
             $y += 3;
-            $pdf->SetXY(10, $y);
+            $pdf->SetXY(26, $y);
             $pdf->cell(0, 0, $args['sender'][4]);
 
             $y += 3;
-            $pdf->SetXY(10, $y);
+            $pdf->SetXY(26, $y);
             $pdf->cell(0, 0, $args['sender'][5]);
 
             $y += 3;
-            $pdf->SetXY(10, $y);
+            $pdf->SetXY(26, $y);
             $pdf->cell(0, 0, "{$args['sender'][6]}, {$args['sender'][7]}");
+
+            $pdf->SetXY(37.5, 22);
+            $pdf->cell(0, 0, $args['sender'][7]);
 
             $pdf->SetFont('times', '', 11);
 
             if ($args['warranty'] == 'R1') {
-                $pdf->SetXY(71, 27);
+                $pdf->SetXY(70.2, 24.4);
                 $pdf->cell(0, 0, 'X');
             } elseif ($args['warranty'] == 'R2') {
-                $pdf->SetXY(78, 27);
+                $pdf->SetXY(77.2, 24.4);
                 $pdf->cell(0, 0, 'X');
             }
 
-            $pdf->SetXY(56, 37);
+            $pdf->SetXY(52, 27.5);
+            $pdf->cell(0, 0, $registeredMailNumber);
+
+            $pdf->SetXY(52, 36.5);
             $pdf->cell(0, 0, $registeredMailNumber);
             $barcodeObj = $barcode->getBarcodeObj('C128', $registeredMailNumber, -4, -100);
-            $pdf->Image('@'.$barcodeObj->getPngData(), 56, 42, 60, 12, '', '', '', false, 300);
+            $pdf->Image('@'.$barcodeObj->getPngData(), 38, 41, 60, 10, '', '', '', false, 300);
 
-            $pdf->SetXY(56, 53);
+            $pdf->SetXY(52, 57);
+            $pdf->cell(0, 0, $registeredMailNumber);
+            $barcodeObj = $barcode->getBarcodeObj('C128', $registeredMailNumber, -4, -100);
+            $pdf->Image('@'.$barcodeObj->getPngData(), 38, 62, 60, 10, '', '', '', false, 300);
+            $pdf->SetXY(52, 72);
             $pdf->cell(0, 0, $registeredMailNumber);
 
             $pdf->setFont('times', '', '8');
@@ -524,23 +583,13 @@ class RegisteredMailController
             $pdf->SetXY(103, $y);
             $pdf->cell(0, 0, $args['sender'][7]);
 
-            $pdf->SetFont('times', '', 11);
-
-            if ($args['letter'] === true) {
-                $pdf->SetXY(21, 239);
-                $pdf->cell(0, 0, 'X');
-            } else {
-                $pdf->SetXY(29, 239);
-                $pdf->cell(0, 0, 'X');
-            }
-
-            $pdf->setFont('times', '', '8');
-
-            $pdf->SetXY(120, 210);
+            $pdf->SetXY(120, 209);
             $pdf->cell(0, 0, $registeredMailNumber);
 
+            $pdf->setFont('times', '', '10');
             $pdf->SetXY(95, 219);
             $pdf->Multicell(70, 5, $args['reference']);
+            $pdf->setFont('times', '', '8');
 
             $y = 208;
             $pdf->SetXY(20, $y);
@@ -576,7 +625,7 @@ class RegisteredMailController
         return ['fileContent' => $fileContent];
     }
 
-    public static function getDepositSlipPdf(array $args)
+    public static function getDepositListPdf(array $args)
     {
         $pdf = new Fpdi();
         $pdf->setPrintHeader(false);
@@ -665,33 +714,43 @@ class RegisteredMailController
 
             $registeredMailNumber = RegisteredMailController::getRegisteredMailNumber(['type' => $args['type'], 'rawNumber' => $registeredMail['number']]);
 
+            $referenceInfo = json_decode($registeredMail['recipient'], true);
+            $recipient = ContactController::getContactAfnor([
+                'company'               => $referenceInfo['company'],
+                'civility'              => ContactModel::getCivilityId(['civilityLabel' => $referenceInfo['civility']]),
+                'firstname'             => $referenceInfo['firstname'],
+                'lastname'              => $referenceInfo['lastname'],
+                'address_number'        => $referenceInfo['addressNumber'],
+                'address_street'        => $referenceInfo['addressStreet'],
+                'address_additional1'   => $referenceInfo['addressAdditional1'],
+                'address_additional2'   => $referenceInfo['addressAdditional2'],
+                'address_postcode'      => $referenceInfo['addressPostcode'],
+                'address_town'          => $referenceInfo['addressTown'],
+                'address_country'       => $referenceInfo['addressCountry']
+            ]);
+
             $pdf->setFont('times', '', 9);
             $pdf->Cell(10, 10, $position + 1, 1);
             $pdf->setFont('times', '', 9);
             $pdf->Cell(30, 10, $registeredMailNumber, 1);
             $pdf->Cell(10, 10, $registeredMail['warranty'], 1);
             $pdf->Cell(15, 10, "", 1);
-            if (strlen($registeredMail['reference']) > 19) {
-                $pdf->Cell(30, 10, "", 1);
-            } else {
-//                    $pdf->Cell(30, 10, mb_strimwidth($registeredMail['reference'], 0, 10, ""), 1); // TODO strim width ???
-                $pdf->Cell(30, 10, $registeredMail['reference'], 1);
-            }
+            $pdf->Cell(30, 10, mb_strimwidth($registeredMail['reference'], 0, 25, ""), 1);
 
             $pdf->setFont('times', '', 6);
-            if (strlen($registeredMail['recipient'][1] . " " . $registeredMail['recipient'][4] . " " . $registeredMail['recipient'][6]) > 60) {
-                $pdf->Cell(95, 10, $registeredMail['recipient'][1], 1);
+            if (strlen($recipient[1] . " " . $recipient[4] . " " . $recipient[6]) > 60) {
+                $pdf->Cell(95, 10, $recipient[1], 1);
                 $pdf->SetXY($pdf->GetX() - 95, $pdf->GetY() + 3);
-                $pdf->Cell(95, 10, $registeredMail['recipient'][4] . " " . $registeredMail['recipient'][6], 0);
+                $pdf->Cell(95, 10, $recipient[4] . " " . $recipient[6], 0);
                 $pdf->SetXY($pdf->GetX() + 95, $pdf->GetY() - 3);
             } else {
-                $pdf->Cell(95, 10, $registeredMail['recipient'][1] . " " . $registeredMail['recipient'][4] . " " . $registeredMail['recipient'][6], 1);
+                $pdf->Cell(95, 10, $recipient[1] . " " . $recipient[4] . " " . $recipient[6], 1);
             }
 
 
             $pdf->Ln();
             //contrôle du nb de reco présent sur la page. Si 16 lignes, changement de page et affichage du footer
-            if ($position % 16 >= 15) {
+            if ($position % 12 >= 11) {
                 $pdf->SetXY(10, 276);
                 $pdf->setFont('times', 'I', 8);
                 $pdf->Cell(0, 0, "*Niveau de garantie (R1 pour tous ou R2, R3");
@@ -703,7 +762,6 @@ class RegisteredMailController
             }
         }
 
-        $position = 0;
         //contrôle du nb de reco présent sur la page. Si trop, saut de page pour la partie réservé à la poste
         if ($position % 10 >= 9) {
             $pdf->SetXY(10, 276);
@@ -743,7 +801,7 @@ class RegisteredMailController
         $pdf->Cell(0, 0, $page . '/' . $nb);
 
         $fileContent = $pdf->Output('', 'S');
-        return ['encodedFileContent' => base64_encode($fileContent)];
+        return ['fileContent' => $fileContent];
     }
 
     public static function getFormattedRegisteredMail(array $args)
@@ -756,7 +814,7 @@ class RegisteredMailController
         if (!empty($registeredMail)) {
             $registeredMail['recipient']   = json_decode($registeredMail['recipient'], true);
             $registeredMail['number']      = RegisteredMailController::getRegisteredMailNumber(['type' => $registeredMail['type'], 'rawNumber' => $registeredMail['number']]);
-            $registeredMail['issuingSite'] = $registeredMail['issuing_site'];
+            $registeredMail['issuingSite'] = 'issuingSite#'.$registeredMail['issuing_site'];
             unset($registeredMail['issuing_site']);
         }
 

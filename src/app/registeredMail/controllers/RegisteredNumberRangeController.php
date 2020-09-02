@@ -129,7 +129,7 @@ class RegisteredNumberRangeController
             return $response->withStatus(400)->withJson(['errors' => 'Body siteId is empty or not an integer']);
         }
         if ($body['rangeStart'] >= $body['rangeEnd']) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body rangeStart cannot be larger or equal than rangeEnd']);
+            return $response->withStatus(400)->withJson(['errors' => 'Body rangeStart cannot be larger or equal than rangeEnd', 'lang' => 'rangeStartLargerThanRangeEnd']);
         }
 
         $site = IssuingSiteModel::getById(['id' => $body['siteId']]);
@@ -143,7 +143,7 @@ class RegisteredNumberRangeController
             'data'   => [$body['trackerNumber']]
         ]);
         if (!empty($ranges)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body trackerNumber is already used by another range']);
+            return $response->withStatus(400)->withJson(['errors' => 'Body trackerNumber is already used by another range', 'lang' => 'trackingNumberAlreadyUsed']);
         }
 
         $ranges = RegisteredNumberRangeModel::get([
@@ -156,7 +156,7 @@ class RegisteredNumberRangeController
         foreach ($ranges as $range) {
             if ($body['rangeStart'] <= $range['range_start'] && $range['range_start'] <= $body['rangeEnd']
                 || $body['rangeStart'] <= $range['range_end'] && $range['range_end'] <= $body['rangeEnd']) {
-                return $response->withStatus(400)->withJson(['errors' => 'Range overlaps another range']);
+                return $response->withStatus(400)->withJson(['errors' => 'Range overlaps another range', 'lang' => 'rangeOverlaps']);
             }
         }
 
@@ -212,7 +212,7 @@ class RegisteredNumberRangeController
             return $response->withStatus(400)->withJson(['errors' => 'Body siteId is empty or not an integer']);
         }
         if ($body['rangeStart'] >= $body['rangeEnd']) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body rangeStart cannot be larger or equal  than rangeEnd']);
+            return $response->withStatus(400)->withJson(['errors' => 'Body rangeStart cannot be larger or equal  than rangeEnd', 'lang' => 'rangeStartLargerThanRangeEnd']);
         }
 
         $site = IssuingSiteModel::getById(['id' => $body['siteId']]);
@@ -226,7 +226,7 @@ class RegisteredNumberRangeController
             'data'   => [$body['trackerNumber'], $args['id']]
         ]);
         if (!empty($ranges)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body trackerNumber is already used by another range']);
+            return $response->withStatus(400)->withJson(['errors' => 'Body trackerNumber is already used by another range', 'lang' => 'trackingNumberAlreadyUsed']);
         }
 
         $ranges = RegisteredNumberRangeModel::get([
@@ -239,7 +239,7 @@ class RegisteredNumberRangeController
         foreach ($ranges as $item) {
             if ($body['rangeStart'] <= $item['range_start'] && $item['range_start'] <= $body['rangeEnd']
                 || $body['rangeStart'] <= $item['range_end'] && $item['range_end'] <= $body['rangeEnd']) {
-                return $response->withStatus(400)->withJson(['errors' => 'Range overlaps another range']);
+                return $response->withStatus(400)->withJson(['errors' => 'Range overlaps another range', 'lang' => 'rangeOverlaps']);
             }
         }
 

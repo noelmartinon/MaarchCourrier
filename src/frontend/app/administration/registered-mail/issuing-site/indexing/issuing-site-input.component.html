@@ -6,7 +6,6 @@
         (afterSelected)="afterSelected.emit($event);setAddress($event)" style="width:100%;">
     </plugin-select-search>
     <mat-card *ngIf="issuingSiteAddress !== null" color="primary">
-        <i class="fas fa-map-marked-alt address-icon"></i>
         <div>
             {{issuingSiteAddress.siteLabel}}
         </div>
@@ -28,5 +27,8 @@
         <div *ngIf="registedMailType === 'RW'">
             {{issuingSiteAddress.addressCountry}}
         </div>
+        <button mat-icon-button class="map-icon" (click)="goTo()" [title]="'lang.openMap' | translate">
+            <mat-icon class="fa fas fa-map-marked-alt"></mat-icon>
+        </button>
     </mat-card>
 </form>

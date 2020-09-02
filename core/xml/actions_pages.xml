@@ -19,7 +19,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_REDIRECTION_DESC</DESC>
         <component>redirectAction</component>
         <ORIGIN>module</ORIGIN>
-        <MODULE>entities</MODULE>
+        <MODULE>application</MODULE>
         <KEYWORD>redirect</KEYWORD>
         <FLAG_CREATE>false</FLAG_CREATE>
     </ACTIONPAGE>
@@ -30,7 +30,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_SIMPLE_CONFIRM_DESC</DESC>
         <component>confirmAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>application</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
     </ACTIONPAGE>
     <ACTIONPAGE>
@@ -40,7 +40,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_SIMPLE_CONFIRM_DESC</DESC>
         <component>updateDepartureDateAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>application</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
         <COLLECTIONS>
             <COLL_ID>letterbox_coll</COLL_ID>
@@ -53,7 +53,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_CLOSE_MAIL_DESC</DESC>
         <component>closeMailAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>application</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
         <COLLECTIONS>
             <COLL_ID>letterbox_coll</COLL_ID>
@@ -66,7 +66,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_SET_PERSISTENT_MODE_ON_DESC</DESC>
         <component>enabledBasketPersistenceAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>application</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
         <COLLECTIONS>
             <COLL_ID>letterbox_coll</COLL_ID>
@@ -79,7 +79,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_SET_PERSISTENT_MODE_OFF_DESC</DESC>
         <component>disabledBasketPersistenceAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>application</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
         <COLLECTIONS>
             <COLL_ID>letterbox_coll</COLL_ID>
@@ -92,7 +92,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_MARK_AS_READ_DESC</DESC>
         <component>resMarkAsReadAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>application</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
         <COLLECTIONS>
             <COLL_ID>letterbox_coll</COLL_ID>
@@ -105,7 +105,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_CREATE_ACKNOWLEDGEMENT_RECEIPT</DESC>
         <component>createAcknowledgementReceiptsAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>acknowledgementReceipt</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
         <COLLECTIONS>
             <COLL_ID>letterbox_coll</COLL_ID>
@@ -118,7 +118,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_UPDATE_ACKNOWLEDGEMENT_SEND_DATE</DESC>
         <component>updateAcknowledgementSendDateAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>acknowledgementReceipt</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
         <COLLECTIONS>
             <COLL_ID>letterbox_coll</COLL_ID>
@@ -130,7 +130,7 @@ An action page is described in a ACTIONPAGE tag :
         <NAME>sendToExternalSignatureBook</NAME>
         <component>sendExternalSignatoryBookAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>externalSignatoryBook</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
         <COLLECTIONS>
             <COLL_ID>letterbox_coll</COLL_ID>
@@ -142,7 +142,7 @@ An action page is described in a ACTIONPAGE tag :
         <NAME>sendToExternalNoteBook</NAME>
         <component>sendExternalNoteBookAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>externalSignatoryBook</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
         <COLLECTIONS>
             <COLL_ID>letterbox_coll</COLL_ID>
@@ -155,7 +155,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_CLOSE_MAIL_AND_INDEX_DESC</DESC>
         <component>closeAndIndexAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>application</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
         <COLLECTIONS>
             <COLL_ID>letterbox_coll</COLL_ID>
@@ -168,7 +168,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_CLOSE_MAIL_WITH_ATTACHMENT_DESC</DESC>
         <component>closeMailWithAttachmentsOrNotesAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>application</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
         <COLLECTIONS>
             <COLL_ID>letterbox_coll</COLL_ID>
@@ -383,7 +383,7 @@ An action page is described in a ACTIONPAGE tag :
         <NAME>send_shipping</NAME>
         <component>sendShippingAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>maileva</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
     </ACTIONPAGE>
     <ACTIONPAGE>
@@ -393,7 +393,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_NO_CONFIRM_DESC</DESC>
         <component>noConfirmAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>application</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
     </ACTIONPAGE>
     <ACTIONPAGE>
@@ -403,7 +403,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_RECONCILE_RESOURCE_DESC</DESC>
         <component>reconcileAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>application</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
     </ACTIONPAGE>
     <ACTIONPAGE>
@@ -413,7 +413,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_SEND_ALFRESCO</DESC>
         <component>sendAlfrescoAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>alfresco</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
     </ACTIONPAGE>
     <ACTIONPAGE>
@@ -423,7 +423,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_SAVE_REGISTERED_MAIL</DESC>
         <component>saveRegisteredMailAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>registeredMail</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
     </ACTIONPAGE>
     <ACTIONPAGE>
@@ -433,7 +433,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_SAVE_PRINT_REGISTERED_MAIL</DESC>
         <component>saveAndPrintRegisteredMailAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>registeredMail</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
     </ACTIONPAGE>
     <ACTIONPAGE>
@@ -443,7 +443,7 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_SAVE_INDEX_REGISTERED_MAIL</DESC>
         <component>saveAndIndexRegisteredMailAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>registeredMail</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
     </ACTIONPAGE>
     <ACTIONPAGE>
@@ -453,7 +453,17 @@ An action page is described in a ACTIONPAGE tag :
         <DESC>_PRINT_REGISTERED_MAIL</DESC>
         <component>printRegisteredMailAction</component>
         <ORIGIN>apps</ORIGIN>
-        <MODULE></MODULE>
+        <MODULE>registeredMail</MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+    </ACTIONPAGE>
+    <ACTIONPAGE>
+        <ID>printDepositList</ID>
+        <LABEL>_PRINT_DEPOSIT_LIST</LABEL>
+        <NAME>printDepositList</NAME>
+        <DESC>_PRINT_DEPOSIT_LIST</DESC>
+        <component>printDepositListAction</component>
+        <ORIGIN>apps</ORIGIN>
+        <MODULE>registeredMail</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
     </ACTIONPAGE>
 </ROOT>

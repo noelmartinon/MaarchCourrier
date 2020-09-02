@@ -343,7 +343,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     setEditDataPrivilege() {
         if (this.detailMode) {
-            this.canEditData = this.privilegeService.hasCurrentUserPrivilege('edit_resource') && this.currentResourceInformations.statusAlterable;
+            this.canEditData = this.privilegeService.hasCurrentUserPrivilege('edit_resource') && this.currentResourceInformations.statusAlterable && this.functions.empty(this.currentResourceInformations.registeredMail_deposit_id);
             if (this.isMailing && this.isToolEnabled('attachments')) {
                 this.currentTool = 'attachments';
 
@@ -359,7 +359,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                         if (this.isToolEnabled(data.listEventData.defaultTab)) {
                             this.currentTool = data.listEventData.defaultTab;
                         }
-                        this.canEditData = data.listEventData.canUpdateData;
+                        this.canEditData = data.listEventData.canUpdateData && this.functions.empty(this.currentResourceInformations.registeredMail_deposit_id);
                         this.canChangeModel = data.listEventData.canUpdateModel;
                     }
                 }),

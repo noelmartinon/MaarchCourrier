@@ -55,6 +55,8 @@ import { VisaWorkflowModalComponent } from './visa/modal/visa-workflow-modal.com
 
 import { DevToolComponent } from '../service/debug/dev-tool.component';
 import { DevLangComponent } from '../service/debug/dev-lang.component';
+import { AcknowledgementReceptionComponent } from './registeredMails/acknowledgement-reception/acknowledgement-reception.component';
+
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
     overrides = <any>{
@@ -110,7 +112,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         SignatureBookComponent,
         VisaWorkflowModalComponent,
         DevLangComponent,
-        DevToolComponent
+        DevToolComponent,
+        AcknowledgementReceptionComponent
     ],
     exports : [
         SharedModule

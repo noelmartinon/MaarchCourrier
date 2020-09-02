@@ -6,7 +6,7 @@
 # Maarch Courrier
 Gestionnaire Électronique de Correspondances – Libre et Open Source –
 
-**Dernière version stable V20.03**
+**Dernière version stable V20.03** 
 
 Démonstration : http://demo.maarchcourrier.com/
 

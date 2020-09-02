@@ -108,7 +108,7 @@
                     (loadingFormEndEvent)="triggerProcessAction()"
                     (retrieveDocumentEvent)="appDocumentViewer.saveDocService()"></app-indexing-form>
                 <div style="position: sticky;bottom: 0px;text-align:right;">
-                    <button mat-fab [title]="this.translate.instant('lang.saveModifications')" *ngIf="isToolModified() && functions.empty(currentResourceInformations.registeredMail_deposit_id)" (click)="saveTool()"
+                    <button mat-fab [title]="this.translate.instant('lang.saveModifications')" *ngIf="isToolModified()" (click)="saveTool()"
                         color="accent">
                         <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
                     </button>
@@ -295,7 +295,7 @@
                 </app-indexing-form>
                 <div style="position: sticky;bottom: 0px;text-align:right;padding:15px;">
                     <button mat-fab
-                        *ngIf="indexingForm !== undefined && indexingForm.isResourceModified() && modal.id === 'info' && functions.empty(currentResourceInformations.registeredMail_deposit_id)"
+                        *ngIf="indexingForm !== undefined && indexingForm.isResourceModified() && modal.id === 'info'"
                         (click)="confirmModification()" color="accent" [title]="this.translate.instant('lang.saveModifications')">
                         <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
                     </button>

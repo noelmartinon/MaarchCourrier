@@ -157,7 +157,7 @@ import { RegisteredMailListComponent } from './registered-mail/registered-mail-l
         RegisteredMailComponent,
         IssuingSiteListComponent,
         IssuingSiteComponent,
-        RegisteredMailListComponent,
+        RegisteredMailListComponent
     ],
     entryComponents: [
         AccountLinkComponent,

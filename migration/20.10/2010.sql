@@ -186,7 +186,7 @@ UPDATE groupbasket SET list_event_data = list_event_data - 'canUpdate';
 ALTER TABLE templates DROP COLUMN IF EXISTS subject;
 ALTER TABLE templates ADD COLUMN subject character varying(255);
 
-UPDATE groupbasket SET list_event_data = '{"canUpdateDocuments":true}' WHERE list_event_data->'canUpdateDocument' = true;
+UPDATE groupbasket SET list_event_data = '{"canUpdateDocuments":true}' WHERE list_event_data->'canUpdateDocument' = 'true';
 
 /* REGISTERED MAIL */
 DROP TABLE IF EXISTS registered_mail_issuing_sites;
@@ -242,9 +242,18 @@ CREATE TABLE IF NOT EXISTS registered_mail_resources (
     reference TEXT,
     generated BOOL NOT NULL DEFAULT FALSE,
     deposit_id INTEGER,
+    received_date TIMESTAMP WITHOUT TIME ZONE,
+    return_reason CHARACTER VARYING(256),
+    return_reason_other TEXT,
     CONSTRAINT registered_mail_resources_pkey PRIMARY KEY (id),
     CONSTRAINT registered_mail_resources_unique_key UNIQUE (res_id)
 );
+
+DELETE FROM parameters WHERE id = 'last_deposit_id';
+INSERT INTO parameters (id, param_value_int) VALUES ('last_deposit_id', 0);
+
+DELETE FROM parameters WHERE id = 'traffic_record_summary_sheet';
+INSERT INTO parameters (id, description, param_value_string) VALUES ('traffic_record_summary_sheet', 'Module circulation pour la fiche de liaison', '');
 
 /* RE CREATE VIEWS */
 CREATE OR REPLACE VIEW res_view_letterbox AS

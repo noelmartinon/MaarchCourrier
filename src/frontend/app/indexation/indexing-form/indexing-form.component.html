@@ -50,7 +50,8 @@
                                     </button>
                                     <mat-divider *ngIf="!field.system"></mat-divider>
                                     <button mat-menu-item (click)="removeItem('indexingModels_'+category,field,i)" 
-                                        *ngIf="!field.system && field.identifier.indexOf('registeredMail_') === -1">
+                                        *ngIf="!field.system && field.identifier.indexOf('registeredMail_') === -1 && ((currentCategory == 'registeredMail' && field.identifier != 'departureDate') || 
+                                            currentCategory != 'registeredMail')">
                                         <mat-icon class="fa fa-trash" color="warn"></mat-icon>
                                         <span>{{'lang.delete' | translate}}</span>
                                     </button>
@@ -205,6 +206,10 @@
                                 <ng-container *ngIf="field.identifier === 'registeredMail_issuingSite'">
                                     <app-issuing-site-input #appIssuingSiteInput [registedMailType]="arrFormControl['registeredMail_type'].value" [control]="arrFormControl[field.identifier]" (afterSelected)="launchEvent($event, field)" style="width:100%;">
                                     </app-issuing-site-input>
+                                </ng-container>
+                                <ng-container *ngIf="field.identifier === 'registeredMail_recipient'">
+                                    <app-registered-mail-recipient-input #appRegisteredMailRecipientInput [control]="arrFormControl[field.identifier]" [registeredMailType]="arrFormControl['registeredMail_type'].value" style="width:100%;">
+                                    </app-registered-mail-recipient-input>
                                 </ng-container>
                             </div>
                             <div class="fieldState">

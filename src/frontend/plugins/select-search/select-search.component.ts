@@ -13,11 +13,13 @@ import { Subject, ReplaySubject, Observable } from 'rxjs';
 import { LatinisePipe } from 'ngx-pipes';
 import { TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../service/app.service';
+import { SortPipe } from '../../plugins/sorting.pipe';
 
 @Component({
     selector: 'plugin-select-search',
     templateUrl: 'select-search.component.html',
-    styleUrls: ['select-search.component.scss', '../../app/indexation/indexing-form/indexing-form.component.scss']
+    styleUrls: ['select-search.component.scss', '../../app/indexation/indexing-form/indexing-form.component.scss'],
+    providers: [SortPipe]
 })
 export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterViewInit, ControlValueAccessor {
     /** Label of the search placeholder */
@@ -40,6 +42,14 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     @Input() required: boolean = false;
 
     @Input() hideErrorDesc: boolean = true;
+
+    @Input() optGroupTarget: string = null;
+
+    /**
+     * ex : [ { id : 'group1' , label: 'Group 1'} ]
+     */
+    @Input() optGroupList: any = null;
+
 
     /**
      * ex : {class:'fa-circle', color:'#fffff', title: 'foo'}
@@ -94,9 +104,14 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         private latinisePipe: LatinisePipe,
         private changeDetectorRef: ChangeDetectorRef,
         private renderer: Renderer2,
-        public appService: AppService) { }
+        public appService: AppService,
+        private sortPipe: SortPipe) { }
 
     ngOnInit() {
+        if (this.optGroupList !== null) {
+            this.initOptGroups();
+        }
+
         // set custom panel class
         const panelClass = 'mat-select-search-panel';
         if (this.matSelect.panelClass) {
@@ -155,6 +170,26 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
 
         // this.initMultipleHandling();
 
+    }
+
+    initOptGroups() {
+        this.datas.unshift({ id : 0, label : 'toto', disabled : true});
+
+        let tmpArr = [];
+
+        this.optGroupList = this.sortPipe.transform(this.optGroupList, 'label');
+        this.optGroupList.forEach(group => {
+            tmpArr.push({ id : group.id, label : group.label, disabled : true});
+            tmpArr = tmpArr.concat(this.datas.filter(data => data[this.optGroupTarget] === group.id).map(data => {
+                return {
+                    ...data,
+                    title: data.label,
+                    label : '&nbsp;&nbsp;&nbsp' + data.label
+                };
+            }));
+        });
+
+        this.datas = tmpArr;
     }
 
     ngOnDestroy() {
