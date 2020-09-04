@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '20.03.9' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '20.03.10' WHERE id = 'database_version';
 
 UPDATE parameters SET description = 'Département par défaut sélectionné dans les autocomplétions de la Base Adresse Nationale' WHERE id = 'defaultDepartment';
 

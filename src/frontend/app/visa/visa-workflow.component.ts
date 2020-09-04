@@ -70,13 +70,11 @@ export class VisaWorkflowComponent implements OnInit {
         this.route.params.subscribe(params => {
             this.loading = true;
 
-            if (params['resId'] !== undefined && params['resId'] !== null) {
-                this.resId = params['resId'];
-            }
+            this.resId = params['resId'];
 
-            if (this.resId !== undefined && this.resId !== null) {
+            if (!this.functions.empty(this.resId)) {
                 this.loadedInConstructor = true;
-                this.loadWorkflow(params['resId']);
+                this.loadWorkflow(this.resId);
             } else {
                 this.loadedInConstructor = false;
             }
@@ -87,7 +85,7 @@ export class VisaWorkflowComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        if (this.resId !== null && !this.loadedInConstructor) {
+        if (!this.functions.empty(this.resId) && !this.loadedInConstructor) {
             //this.initFilterVisaModelList();
             this.loadWorkflow(this.resId);
         } else {
