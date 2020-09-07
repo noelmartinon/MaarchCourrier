@@ -102,11 +102,12 @@
                     (reloadBadgeAttachments)="refreshBadge($event,'attachments')">
                 </app-attachments-list>
                 <app-select-indexing-model *ngIf="currentTool === 'info' && !loading" #appSelectIndexingModel [defaultIndexingModelId]="currentResourceInformations.modelId" [adminMode]="canChangeModel" [indexingForm]="indexingForm" (afterSelectedListModel)="indexingForm.loadForm($event.id, false)"></app-select-indexing-model>
+                <div *ngIf="currentTool === 'info' && !loading && !functions.empty(currentResourceInformations.registeredMail_deposit_id)" class="alert-message alert-message-info" style="min-width: 100%;" [innerHTML]="'lang.dispositListGeneratedMsg' | translate"></div>
                 <app-indexing-form *ngIf="currentTool === 'info' && !loading" #indexingForm [groupId]="currentGroupId"
                     [resId]="currentResourceInformations.resId" [indexingFormId]="currentResourceInformations.modelId"
                     [mode]="'process'" [canEdit]="canEditData" [hideDiffusionList]="true"
                     (loadingFormEndEvent)="triggerProcessAction()"
-                    (retrieveDocumentEvent)="appDocumentViewer.saveDocService()"></app-indexing-form>
+                    (retrieveDocumentEvent)="appDocumentViewer.saveDocService()" (afterSaveEvent)="refreshData()"></app-indexing-form>
                 <div style="position: sticky;bottom: 0px;text-align:right;">
                     <button mat-fab [title]="this.translate.instant('lang.saveModifications')" *ngIf="isToolModified()" (click)="saveTool()"
                         color="accent">
@@ -204,6 +205,16 @@
                                         *ngIf="this.senderLightInfo.filling" class="fas fa-circle"
                                         style="font-size: 8px" [style.color]="this.senderLightInfo.filling"></i></div>
                             </div>
+                            <div class="content-item" *ngIf="!functions.empty(currentResourceInformations.registeredMail_returnDate)">
+                                <div>{{'lang.returnDate' | translate}} :</div>
+                                <div class="content-item-value" [title]="this.currentResourceInformations.registeredMail_returnDate">
+                                    {{this.currentResourceInformations.registeredMail_returnDate}}</div>
+                            </div>
+                            <div class="content-item" *ngIf="!functions.empty(currentResourceInformations.registeredMail_returnReason)">
+                                <div>{{'lang.returnReason' | translate}} :</div>
+                                <div class="content-item-value" [title]="this.currentResourceInformations.registeredMail_returnReason">
+                                    {{this.currentResourceInformations.registeredMail_returnReason}}</div>
+                            </div>
                             <div class="content-item"
                                 *ngIf="this.currentResourceInformations.processLimitDate !== undefined">
                                 <ng-container
@@ -288,10 +299,11 @@
                     [resId]="currentResourceInformations.resId" [autoOpenCreation]="isMailing" (reloadBadgeAttachments)="refreshBadge($event,'attachments')">
                 </app-attachments-list>
                 <app-select-indexing-model *ngIf="modal.id === 'info' && !loading" #appSelectIndexingModel [adminMode]="canChangeModel" [indexingForm]="indexingForm" [defaultIndexingModelId]="currentResourceInformations.modelId" (afterSelectedListModel)="indexingForm.loadForm($event.id, false)"></app-select-indexing-model>
+                <div *ngIf="modal.id === 'info' && !loading && !functions.empty(currentResourceInformations.registeredMail_deposit_id)" class="alert-message alert-message-info" style="min-width: 100%;" [innerHTML]="'lang.dispositListGeneratedMsg' | translate"></div>
                 <app-indexing-form *ngIf="modal.id === 'info' && !loading" #indexingForm [groupId]="currentGroupId"
                     [indexingFormId]="currentResourceInformations.modelId" [resId]="currentResourceInformations.resId"
                     [mode]="'process'" [canEdit]="canEditData" [hideDiffusionList]="true"
-                    (loadingFormEndEvent)="triggerProcessAction()" (retrieveDocumentEvent)="appDocumentViewer.saveDocService()">
+                    (loadingFormEndEvent)="triggerProcessAction()" (retrieveDocumentEvent)="appDocumentViewer.saveDocService()" (afterSaveEvent)="refreshData()">
                 </app-indexing-form>
                 <div style="position: sticky;bottom: 0px;text-align:right;padding:15px;">
                     <button mat-fab

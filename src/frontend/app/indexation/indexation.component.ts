@@ -168,7 +168,7 @@ export class IndexationComponent implements OnInit {
 
                     this.isMailing = !this.functions.empty(formatdatas.recipients) && formatdatas.recipients.length > 0 && this.currentIndexingModel.category === 'outgoing' && formatdatas['encodedFile'] === null;
 
-                    if (formatdatas['encodedFile'] === null) {
+                    if (formatdatas['encodedFile'] === null && this.currentIndexingModel.category !== 'registeredMail') {
                         this.dialogRef = this.dialog.open(
                             ConfirmComponent, {
                             panelClass: 'maarch-modal',

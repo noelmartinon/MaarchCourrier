@@ -3,11 +3,10 @@
     <div mat-dialog-content>
         <mat-toolbar class="import-tool" [class.hide]="csvData.length === 0 || loading">
             <span style="flex:1;">
-                <mat-slide-toggle color="primary" [checked]="hasHeader" (change)="toggleHeader()">En-tête csv</mat-slide-toggle>
+                <mat-slide-toggle color="primary" [checked]="hasHeader" (change)="toggleHeader()">{{'lang.csvHeader' | translate}}</mat-slide-toggle>
             </span>
             <span style="flex:1;text-align: center;"><i class="fa fa-users"
                     color="primary"></i>&nbsp;{{'lang.usersOfFile' | translate}} : <b color="primary">{{countAll}}</b>
-                <ng-container *ngIf="countAll > 10">&nbsp;(10 {{'lang.previewed' | translate}})</ng-container>
             </span>
             <span style="flex:1;text-align: center;"><i class="fa fa-user-plus"
                     color="primary"></i>&nbsp;{{'lang.additions' | translate}} : <b
@@ -36,6 +35,12 @@
                             </mat-option>
                         </mat-select>
                     </mat-form-field>
+                </div>
+            </div>
+            <div class="row" style="margin: 0px;">
+                <div class="col-md-12">
+                    <mat-paginator #paginator [length]="100" [hidePageSize]="true" [pageSize]="10">
+                    </mat-paginator>
                 </div>
             </div>
             <mat-table *ngIf="csvData.length > 0" #table [dataSource]="dataSource">

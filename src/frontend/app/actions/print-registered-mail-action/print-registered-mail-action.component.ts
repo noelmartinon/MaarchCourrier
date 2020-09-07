@@ -14,7 +14,6 @@ import { FunctionsService } from '../../../service/functions.service';
 })
 export class PrintRegisteredMailActionComponent implements OnInit {
 
-    
     loading: boolean = false;
 
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
@@ -44,8 +43,30 @@ export class PrintRegisteredMailActionComponent implements OnInit {
                 } else {
                     Object.values(data.data).forEach((encodedFile: string) => {
                         if (!this.functions.empty(encodedFile)) {
+                            let filenameDetail: string;
                             downloadLink.href = `data:application/pdf;base64,${encodedFile}`;
-                            downloadLink.setAttribute('download', 'recommande.pdf');
+                            if (this.data.resIds.length === 1) {
+                                filenameDetail = this.data.resource.chrono.split(' ').join('_');
+                            } else {
+                                let today: any;
+                                let dd: any;
+                                let mm: any;
+                                let yyyy: any;
+
+                                today = new Date();
+                                dd = today.getDate();
+                                mm = today.getMonth() + 1;
+                                yyyy = today.getFullYear();
+
+                                if (dd < 10) {
+                                    dd = '0' + dd;
+                                }
+                                if (mm < 10) {
+                                    mm = '0' + mm;
+                                }
+                                filenameDetail = dd + '-' + mm + '-' + yyyy;
+                            }
+                            downloadLink.setAttribute('download', 'recommande_' + filenameDetail + '.pdf');
                             document.body.appendChild(downloadLink);
                             downloadLink.click();
                             this.dialogRef.close(this.data.resIds);

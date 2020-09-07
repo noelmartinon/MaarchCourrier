@@ -15,6 +15,7 @@ import { FormControl } from '@angular/forms';
 import { FunctionsService } from '../../../../service/functions.service';
 import { ContactExportComponent } from './export/contact-export.component';
 import { AdministrationService } from '../../../../app/administration/administration.service';
+import { ContactImportComponent } from './import/contact-import.component';
 
 @Component({
     selector: 'contact-list',
@@ -227,6 +228,26 @@ export class ContactsListAdministrationComponent implements OnInit {
 
     openContactExport() {
         this.dialog.open(ContactExportComponent, { panelClass: 'maarch-modal', width: '800px', autoFocus: false });
+    }
+
+    openContactImportModal() {
+        const dialogRef = this.dialog.open(ContactImportComponent, {
+            disableClose: true,
+            width: '99vw',
+            maxWidth: '99vw',
+            panelClass: 'maarch-full-height-modal'
+        });
+
+        dialogRef.afterClosed().pipe(
+            filter((data: any) => data === 'success'),
+            tap(() => {
+                this.refreshDao();
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     refreshDao() {

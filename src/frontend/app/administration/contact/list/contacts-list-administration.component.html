@@ -14,6 +14,12 @@
                     {{'lang.exportContacts' | translate}}
                 </p>
             </a>
+            <a mat-list-item (click)="openContactImportModal()">
+                <mat-icon color="primary" mat-list-icon class="fas fa-file-import"></mat-icon>
+                <p mat-line>
+                    {{'lang.importContacts' | translate}}
+                </p>
+            </a>
         </mat-nav-list>
         <mat-divider></mat-divider>
         <mat-nav-list>

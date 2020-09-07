@@ -42,6 +42,12 @@ export class PrintDepositListActionComponent implements OnInit {
         this.http.post('../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkPrintDepositList', { resources: this.data.resIds })
             .subscribe((data: any) => {
                 this.types = data.types;
+
+                this.types['2C'] = this.functions.empty(this.types['2C']) ? this.translate.instant('lang.noneItalic') : this.types['2C'];
+                this.types['2D'] = this.functions.empty(this.types['2D']) ? this.translate.instant('lang.noneItalic') : this.types['2D'];
+                this.types['RW'] = this.functions.empty(this.types['RW']) ? this.translate.instant('lang.noneItalic') : this.types['RW'];
+
+
                 this.canGenerate = data.canGenerate;
                 this.cannotGenerate = data.cannotGenerate;
                 this.loadingInit = false;
@@ -70,7 +76,24 @@ export class PrintDepositListActionComponent implements OnInit {
 
                 if (!this.functions.empty(data.data.encodedFile)) {
                     downloadLink.href = `data:application/pdf;base64,${data.data.encodedFile}`;
-                    downloadLink.setAttribute('download', 'descriptif.pdf');
+                    let today: any;
+                    let dd: any;
+                    let mm: any;
+                    let yyyy: any;
+
+                    today = new Date();
+                    dd = today.getDate();
+                    mm = today.getMonth() + 1;
+                    yyyy = today.getFullYear();
+
+                    if (dd < 10) {
+                        dd = '0' + dd;
+                    }
+                    if (mm < 10) {
+                        mm = '0' + mm;
+                    }
+                    today = dd + '-' + mm + '-' + yyyy;
+                    downloadLink.setAttribute('download', 'descriptif_pli_' + today + '.pdf');
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
                     this.dialogRef.close(this.canGenerate);

@@ -714,6 +714,10 @@ export class ProcessComponent implements OnInit, OnDestroy {
         }
     }
 
+    refreshData() {
+        this.appDocumentViewer.loadRessource(this.currentResourceInformations.resId);
+    }
+
     refreshBadge(nbRres: any, id: string) {
         this.processTool.filter(tool => tool.id === id)[0].count = nbRres;
     }

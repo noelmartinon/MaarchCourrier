@@ -21,6 +21,7 @@ import { BasketAdministrationComponent, BasketAdministrationSettingsModalCompone
 import { BasketsAdministrationComponent } from './basket/baskets-administration.component';
 import { ContactDuplicateComponent } from './contact/contact-duplicate/contact-duplicate.component';
 import { ContactExportComponent } from './contact/list/export/contact-export.component';
+import { ContactImportComponent } from './contact/list/import/contact-import.component';
 import { ContactsCustomFieldsAdministrationComponent } from './contact/customField/contacts-custom-fields-administration.component';
 import { ContactsGroupAdministrationComponent } from './contact/group/contacts-group-administration.component';
 import { ContactsGroupsAdministrationComponent } from './contact/group/contacts-groups-administration.component';
@@ -99,6 +100,7 @@ import { RegisteredMailListComponent } from './registered-mail/registered-mail-l
         BasketsAdministrationComponent,
         ContactDuplicateComponent,
         ContactExportComponent,
+        ContactImportComponent,
         ContactsCustomFieldsAdministrationComponent,
         ContactsGroupAdministrationComponent,
         ContactsGroupsAdministrationComponent,
@@ -164,6 +166,7 @@ import { RegisteredMailListComponent } from './registered-mail/registered-mail-l
         BasketAdministrationGroupListModalComponent,
         BasketAdministrationSettingsModalComponent,
         ContactExportComponent,
+        ContactImportComponent,
         ContactsListAdministrationRedirectModalComponent,
         DoctypesAdministrationRedirectModalComponent,
         EntitiesAdministrationRedirectModalComponent,

@@ -526,7 +526,7 @@ export class PrivilegeService {
             'label': 'lang.arReception',
             'comment': 'lang.arReception',
             'route': '/registeredMail/acknowledgement',
-            'style': 'fa fa-file-archive',
+            'style': 'fa fa-barcode',
             'unit': 'registeredMails',
             'angular': true,
             'shortcut': false

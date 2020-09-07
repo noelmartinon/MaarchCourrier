@@ -81,9 +81,9 @@ class ActionMethodController
         'validateParallelOpinionDiffusionAction'    => 'validateParallelOpinionDiffusion',
         'reconcileAction'                           => 'reconcile',
         'sendAlfrescoAction'                        => 'sendResourceAlfresco',
-        'saveRegisteredMailAction'                  => 'saveRegisteredMail',
+        'saveRegisteredMailAction'                  => 'saveAndPrintRegisteredMail',
         'saveAndPrintRegisteredMailAction'          => 'saveAndPrintRegisteredMail',
-        'saveAndIndexRegisteredMailAction'          => 'saveRegisteredMail',
+        'saveAndIndexRegisteredMailAction'          => 'saveAndPrintRegisteredMail',
         'printRegisteredMailAction'                 => 'printRegisteredMail',
         'printDepositListAction'                    => 'printDepositList',
         'noConfirmAction'                           => null

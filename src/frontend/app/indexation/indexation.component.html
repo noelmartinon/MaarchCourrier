@@ -67,9 +67,12 @@
         </div>
         <div class="document-container" [class.fullContainer]="appService.getViewMode()">
             <div class="content">
-                <app-document-viewer #appDocumentViewer [editMode]="true" [tmpFilename]="tmpFilename"
+                <app-document-viewer [style.display]="this.currentIndexingModel.category !== 'registeredMail' ? 'block' : 'none'" #appDocumentViewer [editMode]="true" [tmpFilename]="tmpFilename"
                     (triggerEvent)="refreshDatas()" style="height:100%;width:100%;">
                 </app-document-viewer>
+                <div *ngIf="this.currentIndexingModel.category === 'registeredMail'" style="font-size: 120px;opacity: 0.4;">
+                    <i class="fas fa-dolly-flatbed"></i>
+                </div>
             </div>
         </div>
     </mat-sidenav-content>

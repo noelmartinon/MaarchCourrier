@@ -18,7 +18,7 @@ import { RegisteredMailRecipientInputComponent } from '../../administration/regi
 
 @Component({
     selector: 'app-indexing-form',
-    templateUrl: "indexing-form.component.html",
+    templateUrl: 'indexing-form.component.html',
     styleUrls: ['indexing-form.component.scss'],
     providers: [SortPipe]
 })
@@ -38,6 +38,7 @@ export class IndexingFormComponent implements OnInit {
 
     @Output() retrieveDocumentEvent = new EventEmitter<string>();
     @Output() loadingFormEndEvent = new EventEmitter<string>();
+    @Output() afterSaveEvent = new EventEmitter<string>();
 
     @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
     @ViewChild('appIssuingSiteInput', { static: false }) appIssuingSiteInput: IssuingSiteInputComponent;
@@ -449,11 +450,15 @@ export class IndexingFormComponent implements OnInit {
                             this.http.put(`../rest/registeredMails/${this.resId}`, {
                                     type: formatdatas.registeredMail_type,
                                     warranty: formatdatas.registeredMail_warranty,
-                                    issuingSiteId: formatdatas.registeredMail_issuingSite.split('#').slice(-1)[0],
+                                    issuingSiteId: formatdatas.registeredMail_issuingSite,
                                     letter: formatdatas.registeredMail_letter,
                                     recipient: formatdatas.registeredMail_recipient,
                                     reference: formatdatas.registeredMail_reference
                             }).pipe(
+                                tap(() => {
+                                    this.loadForm(this.indexingFormId);
+                                    this.afterSaveEvent.emit();
+                                }),
                                 catchError((err: any) => {
                                     this.notify.handleErrors(err);
                                     return of(false);
@@ -785,6 +790,10 @@ export class IndexingFormComponent implements OnInit {
                                     fieldValue = data.customFields[customId];
                                 } else {
                                     fieldValue = data[elem.identifier];
+                                }
+
+                                if (elem.identifier === 'registeredMail_type') {
+                                    this.getIssuingSites(null, fieldValue, false);
                                 }
 
                                 if (elem.identifier === 'priority') {
@@ -1201,12 +1210,15 @@ export class IndexingFormComponent implements OnInit {
     /**
      * [Registered mail module]
      */
-    getIssuingSites(field: any, value: any) {
+    getIssuingSites(field: any, value: any, resetIssuingSite: boolean = true) {
         this.fieldCategories.forEach(element => {
             this['indexingModels_' + element].forEach((fieldItem: any) => {
                 if (fieldItem.identifier === 'registeredMail_warranty') {
-                    console.log(fieldItem);
                     fieldItem.values[2].disabled = value === 'RW';
+                }
+
+                if (fieldItem.identifier === 'registeredMail_issuingSite' && resetIssuingSite) {
+                    this.arrFormControl['registeredMail_issuingSite'].setValue('');
                 }
             });
             if (value === 'RW' && this.arrFormControl['registeredMail_warranty'].value === 'R3') {

@@ -14,9 +14,9 @@
                         {{'lang.registeredMailsIncluded' | translate}}
                     </p>
                     <p>
-                        <b>{{'lang.registeredMail_2C' | translate}}</b> : {{types['2C']}}<br>
-                        <b>{{'lang.registeredMail_2D' | translate}}</b> : {{types['2D']}}<br>
-                        <b>{{'lang.registeredMail_RW' | translate}}</b> : {{types['RW']}}<br>
+                        <b>{{'lang.registeredMail_2C' | translate}}</b> : <span [innerHTML]="types['2C']"></span><br>
+                        <b>{{'lang.registeredMail_2D' | translate}}</b> : <span [innerHTML]="types['2D']"></span><br>
+                        <b>{{'lang.registeredMail_RW' | translate}}</b> : <span [innerHTML]="types['RW']"></span><br>
                     </p>
                 </div>
                 <div *ngIf="cannotGenerate.length !== 0" class="alert-message alert-message-danger" role="alert">

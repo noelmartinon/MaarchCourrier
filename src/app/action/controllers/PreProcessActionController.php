@@ -1595,9 +1595,9 @@ class PreProcessActionController
 
         $processedResources = [];
         $data = [
-            '2D' => 0,
-            '2C' => 0,
-            'RW' => 0
+            '2D' => '',
+            '2C' => '',
+            'RW' => ''
         ];
         $cannotGenerate = [];
         $canGenerate = [];
@@ -1608,40 +1608,52 @@ class PreProcessActionController
             }
 
             $registeredMail = RegisteredMailModel::getWithResources([
-                'select' => ['issuing_site', 'type', 'number', 'warranty', 'recipient', 'generated', 'departure_date', 'deposit_id'],
+                'select' => ['issuing_site', 'type', 'number', 'warranty', 'recipient', 'generated', 'departure_date', 'deposit_id', 'alt_identifier'],
                 'where'  => ['res_letterbox.res_id = ?'],
                 'data'   => [$resource]
             ]);
             if (empty($registeredMail[0])) {
-                $cannotGenerate[] = $resource . ' - ' . _NOT_REGISTERED_MAIL;
+                $mail = ResModel::getById(['resId' => $resource, 'select' => ['alt_identifier']]);
+                if (empty($mail)) {
+                    $cannotGenerate[] = _ID . ' ' . $resource . ' ' . _NOT_EXISTS;
+                }
+                $cannotGenerate[] = $mail['alt_identifier'] . ' - ' . _NOT_REGISTERED_MAIL;
                 continue;
             }
             $registeredMail = $registeredMail[0];
 
             if (!$registeredMail['generated']) {
-                $cannotGenerate[] = $resource . ' - ' . _NOT_GENERATED;
+                $cannotGenerate[] = $registeredMail['alt_identifier'] . ' - ' . _NOT_GENERATED;
                 continue;
             }
 
-        if (empty($registeredMail['deposit_id'])) {
-            $registeredMails = RegisteredMailModel::getWithResources([
-                'select' => ['number', 'warranty', 'reference', 'recipient', 'res_letterbox.res_id'],
-                'where'  => ['type = ?', 'issuing_site = ?', 'departure_date = ?', 'generated = ?'],
-                'data'   => [$registeredMail['type'], $registeredMail['issuing_site'], $registeredMail['departure_date'], true]
-            ]);
-        } else {
-            $registeredMails = RegisteredMailModel::getWithResources([
-                'select' => ['number', 'warranty', 'reference', 'recipient', 'res_letterbox.res_id'],
-                'where'  => ['deposit_id = ?'],
-                'data'   => [$registeredMail['deposit_id']]
-            ]);
-        }
+            if (empty($registeredMail['deposit_id'])) {
+                $registeredMails = RegisteredMailModel::getWithResources([
+                    'select' => ['alt_identifier', 'res_letterbox.res_id'],
+                    'where'  => ['type = ?', 'issuing_site = ?', 'departure_date = ?', 'warranty = ?', 'generated = ?', 'deposit_id is null'],
+                    'data'   => [$registeredMail['type'], $registeredMail['issuing_site'], $registeredMail['departure_date'], $registeredMail['warranty'], true]
+                ]);
+            } else {
+                $registeredMails = RegisteredMailModel::getWithResources([
+                    'select' => ['alt_identifier', 'res_letterbox.res_id'],
+                    'where'  => ['deposit_id = ?'],
+                    'data'   => [$registeredMail['deposit_id']]
+                ]);
+            }
 
             $resIds = array_column($registeredMails, 'res_id');
 
             $processedResources = array_merge($processedResources, $resIds);
 
-            $data[$registeredMail['type']] = count($registeredMails);
+            $registeredMailsNumbers = array_column($registeredMails, 'alt_identifier');
+
+            $numbers = $data[$registeredMail['type']];
+            if (!empty($numbers)) {
+                $numbers = explode(', ', $numbers);
+                $registeredMailsNumbers = array_merge($numbers, $registeredMailsNumbers);
+            }
+
+            $data[$registeredMail['type']] = implode(', ', $registeredMailsNumbers);
             $canGenerate[] = $resource;
         }
 

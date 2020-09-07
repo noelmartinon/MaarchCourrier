@@ -87,7 +87,7 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
                             tap(() => this.saveParameter('traffic_record_summary_sheet'))
                         ).subscribe();
                         this.initMce();
-                    }, 0);
+                    }, 100);
                 }),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);
@@ -118,18 +118,19 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
             statusbar: false,
             readonly: readonly,
             plugins: [
-                'autolink', 'table'
+                'autolink', 'table', 'code'
             ],
             external_plugins: {
                 'maarch_b64image': '../../src/frontend/plugins/tinymce/maarch_b64image/plugin.min.js'
             },
             table_toolbar: '',
             table_sizing_mode: 'relative',
+            table_resize_bars: false,
             toolbar_sticky: true,
             toolbar_drawer: 'floating',
             toolbar: !readonly ? 'undo redo | fontselect fontsizeselect | bold italic underline strikethrough forecolor | table maarch_b64image | \
         alignleft aligncenter alignright alignjustify \
-        bullist numlist outdent indent | removeformat' : ''
+        bullist numlist outdent indent | removeformat code' : ''
         });
     }
 

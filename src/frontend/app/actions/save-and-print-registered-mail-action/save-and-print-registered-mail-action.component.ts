@@ -45,10 +45,11 @@ export class SaveAndPrintRegisteredMailActionComponent implements OnInit {
                     data: {
                         type: this.data.resource.registeredMail_type,
                         warranty: this.data.resource.registeredMail_warranty,
-                        issuingSiteId: this.data.resource.registeredMail_issuingSite.split('#').slice(-1)[0],
+                        issuingSiteId: this.data.resource.registeredMail_issuingSite,
                         letter: this.data.resource.registeredMail_letter,
                         recipient: this.data.resource.registeredMail_recipient,
-                        reference: this.data.resource.registeredMail_reference
+                        reference: this.data.resource.registeredMail_reference,
+                        generated: true
                     }
                 })
             ),
@@ -57,8 +58,8 @@ export class SaveAndPrintRegisteredMailActionComponent implements OnInit {
                     this.notify.error(data.errors);
                 } else {
                     const downloadLink = document.createElement('a');
-                    downloadLink.href = `data:application/pdf;base64,${data}`;
-                    downloadLink.setAttribute('download', 'recommande.pdf');
+                    downloadLink.href = `data:application/pdf;base64,${data.fileContent}`;
+                    downloadLink.setAttribute('download', 'recommande_' + data.registeredMailNumber.split(' ').join('_') + '.pdf');
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
                     this.dialogRef.close(this.data.resIds);
@@ -69,7 +70,7 @@ export class SaveAndPrintRegisteredMailActionComponent implements OnInit {
                 this.notify.handleSoftErrors(err);
                 return of(false);
             })
-        ).subscribe()
+        ).subscribe();
     }
 
     executeAction() {

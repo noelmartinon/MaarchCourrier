@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../service/notification/notification.service';
@@ -13,7 +13,7 @@ declare var tinymce: any;
     templateUrl: 'summary-sheet.component.html',
     styleUrls: ['summary-sheet.component.scss']
 })
-export class SummarySheetComponent implements OnInit {
+export class SummarySheetComponent implements OnInit, OnDestroy {
 
     loading: boolean = false;
     withQrcode: boolean = true;
@@ -141,10 +141,14 @@ export class SummarySheetComponent implements OnInit {
                     });
                     setTimeout(() => {
                         this.initMce();
-                    });
+                    }, 200);
                 }
             })
         ).subscribe();
+    }
+
+    ngOnDestroy() {
+        tinymce.remove('textarea');
     }
 
     initMce() {

@@ -1201,6 +1201,153 @@ class ContactController
         return $response->withHeader('Content-Type', $contentType);
     }
 
+    public function importContacts(Request $request, Response $response)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        ini_set('memory_limit', -1);
+
+        $body = $request->getParsedBody();
+        if (!Validator::arrayType()->validate($body['contacts'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body contacts is empty or not an array']);
+        }
+
+        $contactCustoms = ContactCustomFieldListModel::get(['select' => ['id', 'type']]);
+        $customTypes = array_column($contactCustoms, 'type', 'id');
+
+        $contactCustoms = array_column($contactCustoms, 'id');
+
+        foreach ($contactCustoms as $contactCustom) {
+            $contactCustoms['contactCustomField_' . $contactCustom] = (string)$contactCustom;
+        }
+
+
+        $contactFields = ContactController::MAPPING_FIELDS;
+        $contactFields = array_merge($contactFields, $contactCustoms);
+
+        $errors = [];
+        foreach ($body['contacts'] as $key => $contact) {
+            if (!empty($contact['email']) && (!filter_var($contact['email'], FILTER_VALIDATE_EMAIL) || !Validator::length(1, 255)->validate($contact['email']))) {
+                $errors[] = ['error' => "Argument email is not correct for contact {$key}", 'index' => $key, 'lang' => 'argumentMailNotCorrect'];
+                continue;
+            } elseif (!empty($contact['phone']) && (!preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $contact['phone']) || !Validator::length(1, 32)->validate($contact['phone']))) {
+                $errors[] = ['error' => "Argument phone is not correct for contact {$key}", 'index' => $key, 'lang' => 'argumentPhoneNotCorrect'];
+                continue;
+            }
+
+            // Check format of fields
+            foreach ($contactFields as $frontField => $backField) {
+                if (!empty($contact[$frontField])) {
+                    if (strpos($frontField, 'contactCustomField_') !== false) {
+                        $customId = explode('_', $frontField)[1];
+                        // Check custom field format
+                        $type = $customTypes[(string)$customId];
+                        if (in_array($type, ['checkbox', 'select', 'radio']) && !Validator::arrayType()->validate($contact[$frontField])) {
+                            $errors[] = ['error' => "Argument {$frontField} is not an array for contact {$key}", 'index' => $key, 'lang' => 'argumentNotArray'];
+                            continue 2;
+                        } elseif ($customTypes[$customId] == 'integer' && !Validator::intVal()->validate($contact[$frontField])) {
+                            $errors[] = ['error' => "Argument {$frontField} is not an integer for contact {$key}", 'index' => $key, 'lang' => 'argumentNotInteger'];
+                            continue 2;
+                        } elseif ($customTypes[$customId] == 'date' && !Validator::date()->validate($contact[$frontField])) {
+                            $errors[] = ['error' => "Argument {$frontField} is not a date for contact {$key}", 'index' => $key, 'lang' => 'argumentNotDate'];
+                            continue 2;
+                        } elseif ($customTypes[$customId] == 'string' && !Validator::stringType()->validate($contact[$frontField]) || !Validator::length(1, 255)->validate($contact[$frontField])) {
+                            $errors[] = ['error' => "Argument {$frontField} is not a string for contact {$key}", 'index' => $key, 'lang' => 'argumentNotString'];
+                            continue 2;
+                        }
+                    } else {
+                        if (!Validator::stringType()->validate($contact[$frontField]) || !Validator::length(1, 255)->validate($contact[$frontField])) {
+                            $errors[] = ['error' => "Argument {$frontField} is not a string for contact {$key}", 'index' => $key, 'lang' => 'argumentNotString'];
+                            continue 2;
+                        }
+                    }
+                }
+            }
+
+            // Replace civility label by civility id
+            if (!empty($contact['civility'])) {
+                $civility = ContactModel::getCivilityId(['civilityLabel' => $contact['civility']]);
+                if (empty($civility)) {
+                    $errors[] = ['error' => "Argument civility is not a valid civility for contact {$key}", 'index' => $key, 'lang' => 'argumentCivilityNotCorrect'];
+                    continue;
+                }
+                $contact['civility'] = $civility;
+            }
+
+            // If no id, then we create a new contact
+            if (empty($contact['id'])) {
+                if (empty($contact['lastname']) && empty($contact['company'])) {
+                    $errors[] = ['error' => "Argument lastname and company are empty for contact {$key}", 'index' => $key, 'lang' => 'argumentLastnameAndCompanyEmpty'];
+                    continue;
+                }
+
+                $mandatoryParameters = ContactParameterModel::get(['select' => ['identifier'], 'where' => ['mandatory = ?', 'identifier not in (?)'], 'data' => [true, ['lastname', 'company']]]);
+                foreach ($mandatoryParameters as $mandatoryParameter) {
+                        if (empty($contact[$mandatoryParameter['identifier']])) {
+                            $errors[] = ['error' => "Argument {$mandatoryParameter['identifier']} is empty for contact {$key}", 'index' => $key, 'lang' => 'argumentMandatoryEmpty'];
+                            continue 2;
+                        }
+                }
+
+                $contactToCreate = ['creator' => $GLOBALS['id'], 'custom_fields' => []];
+                foreach ($contactFields as $frontField => $backField) {
+                    if (isset($contact[$frontField])) {
+                        if (strpos($frontField, 'contactCustomField_') !== false) {
+                            $contactToCreate['custom_fields'][$backField] = $contact[$frontField];
+                        } else {
+                            $contactToCreate[$backField] = $contact[$frontField];
+                        }
+                    }
+                }
+                $contactToCreate['custom_fields'] = json_encode($contactToCreate['custom_fields']);
+
+                ContactModel::create($contactToCreate);
+            } else {
+                // If id, then we update the contact
+                $set = ['modification_date' => 'CURRENT_TIMESTAMP', 'custom_fields' => []];
+                foreach ($contactFields as $frontField => $backField) {
+                    if (isset($contact[$frontField])) {
+                        if (strpos($frontField, 'contactCustomField_') !== false) {
+                            $set['custom_fields'][$backField] = $contact[$frontField];
+                        } else {
+                            $set[$backField] = $contact[$frontField];
+                        }
+                    }
+                }
+
+                if (empty($set['custom_fields'])) {
+                    unset($set['custom_fields']);
+                } else {
+                    $oldContact = ContactModel::getById(['id' => $contact['id'], 'select' => ['custom_fields']]);
+                    if (!empty($oldContact['custom_fields'])) {
+                        $set['custom_fields'] = $set['custom_fields'] + json_decode($oldContact['custom_fields'], true);
+                    }
+                    $set['custom_fields'] = json_encode($set['custom_fields']);
+                }
+
+                if (!empty($set)) {
+                    ContactModel::update([
+                        'set'   => $set,
+                        'where' => ['id = ?'],
+                        'data'  => [$contact['id']]
+                    ]);
+                }
+            }
+        }
+
+        $return = [
+            'success'   => count($body['contacts']) - count($errors),
+            'errors'    => [
+                'count'     => count($errors),
+                'details'   => $errors
+            ]
+        ];
+
+        return $response->withJson($return);
+    }
+
     public static function getParsedContacts(array $args)
     {
         ValidatorModel::notEmpty($args, ['resId', 'mode']);

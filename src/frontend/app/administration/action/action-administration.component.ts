@@ -19,7 +19,6 @@ export class ActionAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
 
-    
     creationMode: boolean;
     action: any = {};
     statuses: any[] = [];
@@ -101,6 +100,12 @@ export class ActionAdministrationComponent implements OnInit {
                             };
                         });
                         this.actionPages = data['actionPages'];
+                        this.actionPages.map(action => action.category).filter((cat, index, self) => self.indexOf(cat) === index).forEach(element => {
+                            this.group.push({
+                                id : element,
+                                label : this.translate.instant('lang.' + element)
+                            });
+                        });
                         this.keywordsList = data.keywordsList;
                         this.headerService.setHeader(this.translate.instant('lang.actionCreation'), data.action.label_action);
                         await this.getCustomFields();

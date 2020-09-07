@@ -60,7 +60,7 @@ export class ParametersAdministrationComponent implements OnInit {
         if (r) {
             this.http.delete('../rest/parameters/' + paramId)
                 .subscribe((data: any) => {
-                    this.parameters = data.parameters.filter((item: any) => ['homepage_message', 'loginpage_message', 'traffic_record_summary_sheet'].indexOf(item) === -1);
+                    this.parameters = data.parameters.filter((item: any) => ['homepage_message', 'loginpage_message', 'traffic_record_summary_sheet'].indexOf(item.id) === -1);
                     this.adminService.setDataSource('admin_parameters', this.parameters, this.sort, this.paginator, this.filterColumns);
                     this.notify.success(this.translate.instant('lang.parameterDeleted'));
                 }, (err) => {
