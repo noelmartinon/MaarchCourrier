@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
 import { HeaderService } from '../../../service/header.service';
-import {MatDialog, MatDialogRef} from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AppService } from '../../../service/app.service';
 import { tap, catchError, exhaustMap, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -12,11 +12,11 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 import { FormControl, Validators, FormGroup, ValidationErrors, ValidatorFn, AbstractControl } from '@angular/forms';
 import { DiffusionsListComponent } from '../../diffusions/diffusions-list.component';
 import { FunctionsService } from '../../../service/functions.service';
-import {ConfirmComponent} from "../../../plugins/modal/confirm.component";
+import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 
 @Component({
     selector: 'app-indexing-form',
-    templateUrl: "indexing-form.component.html",
+    templateUrl: 'indexing-form.component.html',
     styleUrls: ['indexing-form.component.scss'],
     providers: [NotificationService, AppService, SortPipe]
 })
@@ -83,7 +83,7 @@ export class IndexingFormComponent implements OnInit {
             identifier: 'recipients',
             label: this.lang.getRecipients,
             type: 'autocomplete',
-            default_value: null,
+            default_value: [],
             values: []
         },
         {
@@ -125,14 +125,14 @@ export class IndexingFormComponent implements OnInit {
             identifier: 'tags',
             label: this.lang.tags,
             type: 'autocomplete',
-            default_value: null,
+            default_value: [],
             values: ['/rest/autocomplete/tags', '/rest/tags']
         },
         {
             identifier: 'senders',
             label: this.lang.getSenders,
             type: 'autocomplete',
-            default_value: null,
+            default_value: [],
             values: ['/rest/autocomplete/correspondents']
         },
         {
@@ -146,7 +146,7 @@ export class IndexingFormComponent implements OnInit {
             identifier: 'folders',
             label: this.lang.folders,
             type: 'autocomplete',
-            default_value: null,
+            default_value: [],
             values: ['/rest/autocomplete/folders', '/rest/folders']
         },
         {
@@ -230,19 +230,23 @@ export class IndexingFormComponent implements OnInit {
     initCustomFields() {
         return new Promise((resolve, reject) => {
 
-            this.http.get("../../rest/customFields").pipe(
+            this.http.get('../../rest/customFields').pipe(
                 tap((data: any) => {
                     this.availableCustomFields = data.customFields.map((info: any) => {
                         info.identifier = 'indexingCustomField_' + info.id;
                         info.system = false;
                         info.SQLMode = info.SQLMode;
 
-                        info.default_value = ['integer', 'string', 'date'].indexOf(info.type) > -1 && !this.functions.empty(info.values) ? info.values[0].key : null;
+                        if (['integer', 'string', 'date'].indexOf(info.type) > -1 && !this.functions.empty(info.values)) {
+                            info.default_value = info.values[0].key;
+                        } else {
+                            info.default_value = info.type === 'banAutocomplete' ? [] : null;
+                        }
                         info.values = info.values.length > 0 ? info.values.map((custVal: any) => {
                             return {
                                 id: custVal.key,
                                 label: custVal.label
-                            }
+                            };
                         }) : info.values;
                         return info;
                     });
@@ -328,7 +332,7 @@ export class IndexingFormComponent implements OnInit {
                 element.default_value = this.arrFormControl[element.identifier].value === '' ? null : this.arrFormControl[element.identifier].value;
             }
 
-            if (element.identifier === "destination" && !this.adminMode && withDiffusionList) {
+            if (element.identifier === 'destination' && !this.adminMode && withDiffusionList) {
                 arrIndexingModels.push({
                     identifier: 'diffusionList',
                     default_value: this.arrFormControl['diffusionList'].value
@@ -825,9 +829,9 @@ export class IndexingFormComponent implements OnInit {
                             field.default_value = new Date();
                         }
 
-                        if (field.identifier == 'initiator' && this.mode == 'indexation' && this.functions.empty(field.default_value)) {
+                        if (field.identifier === 'initiator' && this.mode === 'indexation' && this.functions.empty(field.default_value)) {
                             if (this.headerService.user.entities[0]) {
-                                field.default_value = this.headerService.user.entities.filter((entity: any) => entity.primary_entity == 'Y')[0].id;
+                                field.default_value = this.headerService.user.entities.filter((entity: any) => entity.primary_entity === 'Y')[0].id;
                             }
                         }
 
@@ -989,13 +993,13 @@ export class IndexingFormComponent implements OnInit {
     calcLimitDate(field: any, value: any) {
         let limitDate: Date = null;
         if (this.arrFormControl['processLimitDate'] !== undefined) {
-            this.http.get("../../rest/indexing/processLimitDate", { params: { "doctype": value } }).pipe(
+            this.http.get('../../rest/indexing/processLimitDate', { params: { 'doctype': value } }).pipe(
                 tap((data: any) => {
                     limitDate = new Date(data.processLimitDate);
                     this.arrFormControl['processLimitDate'].setValue(limitDate);
                 }),
                 filter(() => this.arrFormControl['priority'] !== undefined),
-                exhaustMap(() => this.http.get('../../rest/indexing/priority', { params: { "processLimitDate": limitDate.toDateString() } })),
+                exhaustMap(() => this.http.get('../../rest/indexing/priority', { params: { 'processLimitDate': limitDate.toDateString() } })),
                 tap((data: any) => {
                     this.arrFormControl['priority'].setValue(data.priority);
                     this.setPriorityColor(null, data.priority);
@@ -1013,7 +1017,7 @@ export class IndexingFormComponent implements OnInit {
         let limitDate: Date = null;
 
         if (this.arrFormControl['processLimitDate'] !== undefined) {
-            this.http.get("../../rest/indexing/processLimitDate", { params: { "priority": value } }).pipe(
+            this.http.get('../../rest/indexing/processLimitDate', { params: { 'priority': value } }).pipe(
                 tap((data: any) => {
                     limitDate = new Date(data.processLimitDate);
                     this.arrFormControl['processLimitDate'].setValue(limitDate);
@@ -1046,7 +1050,7 @@ export class IndexingFormComponent implements OnInit {
 
         const limitDate = new Date(value.value);
 
-        this.http.get("../../rest/indexing/priority", { params: { "processLimitDate": limitDate.toDateString() } }).pipe(
+        this.http.get('../../rest/indexing/priority', { params: { 'processLimitDate': limitDate.toDateString() } }).pipe(
             tap((data: any) => {
                 this.arrFormControl['priority'].setValue(data.priority);
                 this.setPriorityColor(null, data.priority);
