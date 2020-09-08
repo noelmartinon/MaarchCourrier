@@ -107,7 +107,7 @@
                                     *ngIf="field.type === 'string' && field.id !== 'communicationMeans' && field.id !== 'externalId_m2m'">
                                     <mat-form-field>
                                         <input matInput [formControl]="field.control" [placeholder]="field.label"
-                                            (blur)="checkCompany(field);checkFilling();" [required]="field.required">
+                                            (blur)="checkCompany(field);checkFilling();" (ngModelChange)="toUpperCase(field, $event)" [required]="field.required">
                                         <mat-hint *ngIf="!isEmptyValue(field.desc)" align="end"
                                             [innerHTML]="field.desc">
                                         </mat-hint>

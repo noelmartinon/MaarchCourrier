@@ -1017,4 +1017,24 @@ export class ContactsFormComponent implements OnInit {
             this.fillingRate.class = 'accent';
         }
     }
+
+    toUpperCase(target: any, ev: any) {
+        setTimeout(() => {
+            const test = target.control.value;
+            if (['lastname'].indexOf(target.id) > -1) {
+                target.control.setValue(test.toUpperCase());
+            } else if (['firstname', 'company'].indexOf(target.id) > -1) {
+                let splitStr = test.toLowerCase().split(' ');
+                for (let i = 0; i < splitStr.length; i++) {
+                    splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+                }
+                splitStr = splitStr.join(' ');
+                splitStr = splitStr.split('-');
+                for (let i = 0; i < splitStr.length; i++) {
+                    splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
+                }
+                target.control.setValue( splitStr.join('-'));
+            }
+        }, 100);
+    }
 }
