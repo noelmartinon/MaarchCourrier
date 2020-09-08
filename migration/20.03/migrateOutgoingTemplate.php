@@ -299,9 +299,11 @@ foreach ($customs as $custom) {
         $template['template_path']      = $storeResult['destination_dir'];
         $template['template_file_name'] = $storeResult['file_destination_name'];
 
+        $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'templates_seq']);
         DatabaseModel::insert([
             'table'         => 'templates',
             'columnsValues' => [
+                'template_id'               => $nextSequenceId,
                 'template_label'            => $template['template_label'] . ' (départ)',
                 'template_comment'          => $template['template_comment'],
                 'template_content'          => $template['template_content'],
@@ -314,6 +316,24 @@ foreach ($customs as $custom) {
                 'template_file_name'        => $template['template_file_name'],
             ]
         ]);
+        $templateAssociations = DatabaseModel::select([
+            'select'    => ['value_field'],
+            'table'     => ['templates_association'],
+            'where'     => ['template_id = ?'],
+            'data'      => [$template['template_id']]
+        ]);
+
+        $aValues = [];
+        foreach ($templateAssociations as $templateAssociation) {
+            $aValues[] = [$nextSequenceId, $templateAssociation['value_field']];
+        }
+        if (!empty($aValues)) {
+            DatabaseModel::insertMultiple([
+                'table'     => 'templates_association',
+                'columns'   => ['template_id', 'value_field'],
+                'values'    => $aValues
+            ]);
+        }
     }
 
     // END
