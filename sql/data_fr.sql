@@ -665,7 +665,7 @@ INSERT INTO baskets (basket_id, basket_name, basket_desc, basket_clause, coll_id
 DELETE FROM baskets WHERE basket_id = 'GedSampleBasket';
 DELETE FROM actions_groupbaskets WHERE basket_id = 'GedSampleBasket';
 DELETE FROM groupbasket_redirect WHERE basket_id = 'GedSampleBasket';
-INSERT INTO baskets (basket_id, basket_name, basket_desc, basket_clause, coll_id, is_visible, flag_notif, enabled, basket_order) VALUES ('GedSampleBasket', 'Contrats arrivant à expiration (date fin contrat < 3mois)', 'Contrats arrivant à expiration (date fin contrat < 3mois)', 'date(custom_fields->>''1'') < now()+ interval ''3 months''', 'letterbox_coll', 'Y', 'Y', 'Y',230);
+INSERT INTO baskets (basket_id, basket_name, basket_desc, basket_clause, coll_id, is_visible, flag_notif, enabled, basket_order) VALUES ('GedSampleBasket', 'Contrats arrivant à expiration (date fin contrat < 3mois)', 'Contrats arrivant à expiration (date fin contrat < 3mois)', 'custom_fields->>''1'' is not null and custom_fields->>''1'' <> '''' and date(custom_fields->>''1'') < now()+ interval ''3 months''', 'letterbox_coll', 'Y', 'Y', 'Y',230);
 DELETE FROM baskets WHERE basket_id = 'IntervBasket';
 DELETE FROM actions_groupbaskets WHERE basket_id = 'IntervBasket';
 DELETE FROM groupbasket_redirect WHERE basket_id = 'IntervBasket';
