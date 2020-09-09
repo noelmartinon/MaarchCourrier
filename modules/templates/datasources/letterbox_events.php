@@ -108,8 +108,8 @@ foreach ($events as $event) {
     }
 
     if (!empty($res['typist'])) {
-        $userInfo      = UserModel::getById(['select' => ['firstname', 'lastname'], 'id' => $res['typist']]);
-        $res['typist'] = $userInfo['firstname'] . ' ' . $userInfo['lastname'];
+        $userInfo            = UserModel::getById(['select' => ['firstname', 'lastname'], 'id' => $res['typist']]);
+        $res['typist_label'] = $userInfo['firstname'] . ' ' . $userInfo['lastname'];
     }
 
     // Insertion

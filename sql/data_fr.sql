@@ -1312,7 +1312,7 @@ INSERT INTO templates (template_id, template_label, template_comment, template_c
 </tr>
 <tr>
 <td><font face="arial,helvetica,sans-serif" size="2">[res_letterbox.res_id]</font></td>
-<td><font face="arial,helvetica,sans-serif" size="2">[res_letterbox.typist]</font></td>
+<td><font face="arial,helvetica,sans-serif" size="2">[res_letterbox.typist_label]</font></td>
 <td>
 <p><font face="arial,helvetica,sans-serif" size="2">[contact.company;block=tr] [contact.firstname] [contact.lastname] [contact.function] [contact.address_number] [contact.address_street] [contact.address_postcode] [contact.address_town]</font></p>
 </td>
@@ -1342,7 +1342,7 @@ INSERT INTO templates (template_id, template_label, template_comment, template_c
 </tr>
 <tr>
 <td><font face="arial,helvetica,sans-serif" size="2">[res_letterbox.res_id]</font></td>
-<td><font face="arial,helvetica,sans-serif" size="2">[res_letterbox.typist]</font></td>
+<td><font face="arial,helvetica,sans-serif" size="2">[res_letterbox.typist_label]</font></td>
 <td>
 <p><font face="arial,helvetica,sans-serif" size="2">[contact.company;block=tr] [contact.firstname] [contact.lastname] [contact.function] [contact.address_number] [contact.address_street] [contact.address_postcode] [contact.address_town]</font></p>
 </td>
@@ -1369,7 +1369,7 @@ INSERT INTO templates (template_id, template_label, template_comment, template_c
 </tr>
 <tr>
 <td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.res_id]</td>
-<td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.typist]</td>
+<td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.typist_label]</td>
 <td style="border: 1px solid #ddd; padding: 8px;">[contact.company;block=tr] [contact.firstname] [contact.lastname] [contact.function] [contact.address_number] [contact.address_street] [contact.address_postcode] [contact.address_town]</td>
 <td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.doc_date;block=tr;frm=dd/mm/yyyy]</td>
 <td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.subject]</td>
@@ -1399,7 +1399,7 @@ INSERT INTO templates (template_id, template_label, template_comment, template_c
 <td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.# ;frm=0000]</td>
 <td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.doc_date;block=tr;frm=dd/mm/yyyy]</td>
 <td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.subject]</td>
-<td style="border: 1px solid #ddd; padding: 8px;">[notes;block=tr]</td>
+<td style="border: 1px solid #ddd; padding: 8px;">[notes.content;block=tr]</td>
 <td style="border: 1px solid #ddd; padding: 8px;">[contact.company;block=tr] [contact.firstname] [contact.lastname]</td>
 <td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><a style="text-decoration: none; background: #135f7f; padding: 5px; color: white; -webkit-box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75); -moz-box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75); box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75);" href="[res_letterbox.linktodetail]" name="detail">D&eacute;tail</a> <a style="text-decoration: none; background: #135f7f; padding: 5px; color: white; -webkit-box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75); -moz-box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75); box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75);" href="[res_letterbox.linktodoc]" name="doc">Afficher</a></td>
 </tr>

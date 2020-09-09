@@ -164,7 +164,7 @@ $DATA_TO_REPLACE = [
 
     'notes.identifier'                       => '[res_letterbox.res_id]',
     'notes.subject'                          => '[res_letterbox.subject]',
-    'notes.note_text'                        => '[notes]',
+    'notes.note_text'                        => '[notes.content;block=tr]',
     'notes.user_id'                          => '',
     'notes.# ;frm=0000'                      => '[res_letterbox.# ;frm=0000]',
     'notes.doc_date;block=tr;frm=dd/mm/yyyy' => '[res_letterbox.doc_date;block=tr;frm=dd/mm/yyyy]',

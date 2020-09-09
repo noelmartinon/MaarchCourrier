@@ -115,7 +115,7 @@ foreach ($events as $event) {
     $datasources['contact'][] = $contact;
     
     // Insertion
-    $datasources['notes'][] = $note;
+    $datasources['notes'][] = ['content' => $note];
 }
 
 $datasources['images'][0]['imgdetail'] = str_replace('//', '/', $maarchUrl . '/apps/' . $maarchApps . '/img/object.gif');
