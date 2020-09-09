@@ -173,7 +173,7 @@ $DATA_TO_REPLACE = [
     'notes.doc_date'                         => '[res_letterbox.doc_date]',
     'notes.contact_society'                  => '[contact.company]',
     'notes.contact_firstname'                => '[contact.firstname]',
-    'notes.contact_lastname'                 => '[contact.lastname]',
+    'notes.contact_lastname'                 => '[contact.lastname;block=tr]',
     'notes.linktodetail'                     => '[res_letterbox.linktodetail]',
     'notes.linktodoc'                        => '[res_letterbox.linktodoc]',
 ];
