@@ -372,7 +372,8 @@ class StoreController
             'effective_date'        => $args['effectiveDate'] ?? null,
             'in_signature_book'     => $inSignatureBook ? 'true' : 'false',
             'external_id'           => $externalId,
-            'creation_date'         => 'CURRENT_TIMESTAMP'
+            'creation_date'         => 'CURRENT_TIMESTAMP',
+            'signatory_user_serial_id' => !empty($args['signatory_user_serial_id']) ? $args['signatory_user_serial_id'] : null
         ];
 
         return $preparedData;

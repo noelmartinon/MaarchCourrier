@@ -598,17 +598,18 @@ class SignatureBookController
         unlink($tmpPath.$convertedDocument['filename']);
 
         $data = [
-            'title'             => $attachment['title'],
-            'encodedFile'       => base64_encode($signedDocument),
-            'format'            => 'pdf',
-            'typist'            => $attachment['typist'],
-            'resIdMaster'       => $attachment['res_id_master'],
-            'chrono'            => $attachment['identifier'],
-            'type'              => 'signed_response',
-            'originId'          => $args['id'],
-            'recipientId'       => $attachment['recipient_id'],
-            'recipientType'     => $attachment['recipient_type'],
-            'inSignatureBook'   => true
+            'title'                    => $attachment['title'],
+            'encodedFile'              => base64_encode($signedDocument),
+            'format'                   => 'pdf',
+            'typist'                   => $attachment['typist'],
+            'resIdMaster'              => $attachment['res_id_master'],
+            'chrono'                   => $attachment['identifier'],
+            'type'                     => 'signed_response',
+            'originId'                 => $args['id'],
+            'recipientId'              => $attachment['recipient_id'],
+            'recipientType'            => $attachment['recipient_type'],
+            'inSignatureBook'          => true,
+            'signatory_user_serial_id' => $GLOBALS['id']
         ];
         $id = StoreController::storeAttachment($data);
         if (!empty($id['errors'])) {

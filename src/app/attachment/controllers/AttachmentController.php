@@ -128,13 +128,17 @@ class AttachmentController
 
         if ($attachment['status'] == 'SIGN') {
             $signedResponse = AttachmentModel::get([
-                'select'    => ['res_id', 'creation_date', 'typist'],
+                'select'    => ['res_id', 'creation_date', 'typist', 'signatory_user_serial_id'],
                 'where'     => ['origin = ?', 'status not in (?)'],
                 'data'      => ["{$args['id']},res_attachments", ['DEL']]
             ]);
             if (!empty($signedResponse[0])) {
                 $attachment['signedResponse'] = $signedResponse[0]['res_id'];
-                $attachment['signatory'] = UserModel::getLabelledUserById(['login' => $signedResponse[0]['typist']]);
+                if (!empty($signedResponse[0]['signatory_user_serial_id'])) {
+                    $attachment['signatory'] = UserModel::getLabelledUserById(['id' => $signedResponse[0]['signatory_user_serial_id']]);
+                } else {
+                    $attachment['signatory'] = UserModel::getLabelledUserById(['login' => $signedResponse[0]['typist']]);
+                }
                 $attachment['signDate'] = $signedResponse[0]['creation_date'];
             }
         }
@@ -306,12 +310,16 @@ class AttachmentController
 
             if ($attachment['status'] == 'SIGN') {
                 $signedResponse = AttachmentModel::get([
-                    'select'    => ['creation_date', 'typist'],
+                    'select'    => ['creation_date', 'typist', 'signatory_user_serial_id'],
                     'where'     => ['origin = ?', 'status not in (?)'],
                     'data'      => ["{$attachment['resId']},res_attachments", ['DEL']]
                 ]);
                 if (!empty($signedResponse[0])) {
-                    $attachments[$key]['signatory'] = UserModel::getLabelledUserById(['login' => $signedResponse[0]['typist']]);
+                    if (!empty($signedResponse[0]['signatory_user_serial_id'])) {
+                        $attachments[$key]['signatory'] = UserModel::getLabelledUserById(['id' => $signedResponse[0]['signatory_user_serial_id']]);
+                    } else {
+                        $attachments[$key]['signatory'] = UserModel::getLabelledUserById(['id' => $signedResponse[0]['typist']]);
+                    }
                     $attachments[$key]['signDate'] = $signedResponse[0]['creation_date'];
                 }
             }
