@@ -34,6 +34,7 @@
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
 use Resource\models\ResourceContactModel;
+use User\models\UserModel;
 
 $dbDatasource = new Database();
 //$contacts = new contacts_v2();
@@ -106,6 +107,11 @@ foreach ($events as $event) {
         }
     }
 
+    if (!empty($res['typist'])) {
+        $userInfo      = UserModel::getById(['select' => ['firstname', 'lastname'], 'id' => $res['typist']]);
+        $res['typist'] = $userInfo['firstname'] . ' ' . $userInfo['lastname'];
+    }
+
     // Insertion
     $datasources['res_letterbox'][] = $res;
 
@@ -116,15 +122,15 @@ foreach ($events as $event) {
     ]);
     $resourceContacts = $resourceContacts[0];
 
+    $contact = [];
     if (!empty($resourceContacts)) {
         $contact = ContactModel::getById(['id' => $resourceContacts['item_id'], 'select' => ['*']]);
 
         $postalAddress = ContactController::getContactAfnor($contact);
         unset($postalAddress[0]);
         $contact['postal_address'] = implode("\n", $postalAddress);
-
-        $datasources['contact'][] = $contact;
     }
+    $datasources['contact'][] = $contact;
 }
 
 $datasources['images'][0]['imgdetail'] = $maarchUrl.'/apps/'.$maarchApps.'/img/object.gif';

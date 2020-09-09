@@ -15,7 +15,6 @@ use Contact\models\ContactModel;
 use Note\models\NoteModel;
 use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
-use SrcCore\models\TextFormatModel;
 use User\models\UserModel;
 
 $dbDatasource = new Database();
@@ -91,6 +90,11 @@ foreach ($events as $event) {
         $note['linktoprocess'] = $urlToApp . 'linkToProcess='.$resId.'&groupId='.$preferenceBasket[0]['group_serial_id'].'&basketId='.$basket['id'].'&userId='.$user['id'];
     }
 
+    if (!empty($note['user_id'])) {
+        $userInfo        = UserModel::getById(['select' => ['firstname', 'lastname'], 'id' => $note['user_id']]);
+        $note['user_id'] = $userInfo['firstname'] . ' ' . $userInfo['lastname'];
+    }
+
     $resourceContacts = ResourceContactModel::get([
         'where' => ['res_id = ?', "type = 'contact'", "mode = 'sender'"],
         'data'  => [$resId],
@@ -102,19 +106,16 @@ foreach ($events as $event) {
         $datasources['res_letterbox'][0]['linktodoc'] = $note['linktodoc'];
         $datasources['res_letterbox'][0]['linktodetail'] = $note['linktodetail'];
         $datasources['res_letterbox'][0]['linktoprocess'] = $note['linktodoc'];
-
-        $labelledUser = UserModel::getLabelledUserById(['id' => $note['user_id']]);
-        $creationDate = TextFormatModel::formatDate($note['creation_date'], 'd/m/Y');
-        $note = "{$labelledUser}  {$creationDate} : {$note['note_text']}\n";
     }
 
+    $contact = [];
     if (!empty($resourceContacts)) {
         $contact = ContactModel::getById(['id' => $resourceContacts['item_id'], 'select' => ['*']]);
-        $datasources['contact'][] = $contact;
     }
+    $datasources['contact'][] = $contact;
     
     // Insertion
-    $datasources['notes'] = $note;
+    $datasources['notes'][] = $note;
 }
 
 $datasources['images'][0]['imgdetail'] = str_replace('//', '/', $maarchUrl . '/apps/' . $maarchApps . '/img/object.gif');

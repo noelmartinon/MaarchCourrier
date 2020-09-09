@@ -209,14 +209,14 @@ while ($state != 'END') {
                     //    . ' to basket '.$subject.' for user ' . $user_id . ' ('.count($basket_list['events']).' documents)', 'INFO');
 
                     $params = array(
-                        'recipient' => $tmpNotif['recipient'],
-                        'events' => $basket_list['events'],
+                        'recipient'    => $tmpNotif['recipient'],
+                        'events'       => $basket_list['events'],
                         'notification' => $notification,
-                        'maarchUrl' => $maarchUrl,
-                        'maarchApps' => $maarchApps,
-                        'coll_id' => $coll_id,
-                        'res_table' => $coll_table,
-                        'res_view' => $coll_view,
+                        'maarchUrl'    => $maarchUrl,
+                        'maarchApps'   => $maarchApps,
+                        'coll_id'      => $coll_id,
+                        'res_table'    => $coll_table,
+                        'res_view'     => $coll_view,
                     );
                     $html = $templates_controler->merge($notification->template_id, $params, 'content');
 
