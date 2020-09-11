@@ -248,8 +248,10 @@ class ResController extends ResourceControlController
             ]);
             $formattedData['followed'] = !empty($followed);
 
-            $registeredMail = RegisteredMailModel::getByResId(['select' => ['deposit_id'], 'resId' => $args['resId']]);
-            $formattedData['registeredMail_deposit_id'] = $registeredMail['deposit_id'];
+            $registeredMail = RegisteredMailModel::getByResId(['select' => ['deposit_id', 'received_date', 'return_reason'], 'resId' => $args['resId']]);
+            $formattedData['registeredMail_returnDate']   = $registeredMail['received_date'];
+            $formattedData['registeredMail_returnReason'] = $registeredMail['return_reason'];
+            $formattedData['registeredMail_deposit_id']   = $registeredMail['deposit_id'];
         }
 
         return $response->withJson($formattedData);

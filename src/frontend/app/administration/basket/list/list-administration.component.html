@@ -19,18 +19,22 @@
         </mat-select>
     </mat-form-field>
     <div style="padding: 10px;">
-        <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdateData" (change)="toggleCanUpdate($event.checked)">{{'lang.canUpdateData' | translate}}</mat-slide-toggle>
+        <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdateData"
+            (change)="toggleCanUpdate($event.checked)">{{'lang.canUpdateData' | translate}}</mat-slide-toggle>
     </div>
     <div style="padding: 10px;">
-        <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdateModel" [disabled]="!selectedProcessTool.canUpdateData">{{'lang.canUpdateIndexingModel' | translate}}</mat-slide-toggle>
-    </div> 
+        <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdateModel"
+            [disabled]="!selectedProcessTool.canUpdateData">{{'lang.canUpdateIndexingModel' | translate}}
+        </mat-slide-toggle>
+    </div>
 </div>
 <div class="formType ratio-2 col-sm-12" *ngIf="selectedListEvent === 'signatureBookAction'">
     <div class="formType-title">
         {{'lang.options' | translate}}
     </div>
     <div style="padding: 10px;">
-        <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdateDocuments">{{'lang.canUpdateResourcesInSignatureBook' | translate}}</mat-slide-toggle>
+        <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdateDocuments">
+            {{'lang.canUpdateResourcesInSignatureBook' | translate}}</mat-slide-toggle>
     </div>
 </div>
 <hr />
@@ -44,6 +48,12 @@
             title="{{'lang.edition' | translate}}">
             <mat-icon fontSet="fas" fontIcon="fa-edit"></mat-icon>
         </button>
+        <button color="primary" mat-button [title]="'lang.templateUsed' | translate" [matMenuTriggerFor]="menu">
+            {{selectedTemplateDisplayedSecondaryData}} <i class="fas fa-columns"></i>
+        </button>
+        <mat-menu #menu="matMenu">
+            <button mat-menu-item *ngFor="let colNum of templateDisplayedSecondaryData" (click)="selectedTemplateDisplayedSecondaryData=colNum">{{colNum}} colonne(s)</button>
+        </mat-menu>
     </span>
     <span class="area">
         <form>
@@ -74,7 +84,7 @@
 </mat-toolbar>
 <mat-card>
     <ng-container *ngIf="(displayedSecondaryData.length > 0 && displayMode=='sample') || displayMode=='label'">
-        <mat-toolbar class="secondaryInformations example-list" cdkDropListOrientation="horizontal" cdkDropList
+        <mat-toolbar class="secondaryInformations example-list column-{{selectedTemplateDisplayedSecondaryData}}-list" cdkDropListOrientation="horizontal" cdkDropList
             [cdkDropListData]="displayedSecondaryData" (cdkDropListDropped)="drop($event)">
             <ng-container *ngFor="let item of displayedSecondaryData;let itData=index">
                 <span class="example-box" *ngIf="item.value != 'getFolders'" cdkDrag>
@@ -140,18 +150,22 @@
             </span>
         </span>
         <mat-button-toggle-group class="actions" multiple>
-            <button color="primary" mat-icon-button title="{{'lang.notes' | translate}}" [disabled]="displayMode == 'label'">
+            <button color="primary" mat-icon-button title="{{'lang.notes' | translate}}"
+                [disabled]="displayMode == 'label'">
                 <mat-icon [matBadgeHidden]="displayMode == 'label'" fontSet="fas" matBadge="2"
                     fontIcon="fa-comments fa-2x"></mat-icon>
             </button>
-            <button color="primary" mat-icon-button title="{{'lang.attachments' | translate}}" [disabled]="displayMode == 'label'">
+            <button color="primary" mat-icon-button title="{{'lang.attachments' | translate}}"
+                [disabled]="displayMode == 'label'">
                 <mat-icon [matBadgeHidden]="displayMode == 'label'" fontSet="fas" matBadge="7"
                     fontIcon="fa-paperclip fa-2x"></mat-icon>
             </button>
-            <button color="primary" mat-icon-button title="{{'lang.diffusionList' | translate}}" [disabled]="displayMode == 'label'">
+            <button color="primary" mat-icon-button title="{{'lang.diffusionList' | translate}}"
+                [disabled]="displayMode == 'label'">
                 <mat-icon fontSet="fas" fontIcon="fa-sitemap fa-2x"></mat-icon>
             </button>
-            <button color="primary" mat-icon-button title="{{'lang.linkDetails' | translate}}" [disabled]="displayMode == 'label'">
+            <button color="primary" mat-icon-button title="{{'lang.linkDetails' | translate}}"
+                [disabled]="displayMode == 'label'">
                 <mat-icon fontSet="fas" fontIcon="fa-info-circle fa-2x"></mat-icon>
             </button>
         </mat-button-toggle-group>

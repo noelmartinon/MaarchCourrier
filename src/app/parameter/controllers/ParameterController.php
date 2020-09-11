@@ -111,7 +111,7 @@ class ParameterController
                     return $response->withStatus(400)->withJson(['errors' => 'Body image is not a base64 image']);
                 }
                 $tmpFileName = $tmpPath . 'parameter_logo_' . rand() . '_file.svg';
-                $body['logo'] = str_replace('data:image/svg+xml;base64,', '', $body['logo']);
+                $body['logo'] = str_replace('data:image/svg+xml;base64,', '', $body['image']);
                 $file = base64_decode($body['logo']);
                 file_put_contents($tmpFileName, $file);
 

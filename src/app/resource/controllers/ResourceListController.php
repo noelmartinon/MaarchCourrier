@@ -90,6 +90,7 @@ class ResourceListController
         $formattedResources = [];
         $defaultAction = [];
         $displayFolderTags = false;
+        $templateColumns = 0;
         if (!empty($resIds)) {
             $excludeAttachmentTypes = ['signed_response'];
             $attachments = AttachmentModel::get([
@@ -100,7 +101,9 @@ class ResourceListController
             ]);
 
             $groupBasket = GroupBasketModel::get(['select' => ['list_display', 'list_event', 'list_event_data'], 'where' => ['basket_id = ?', 'group_id = ?'], 'data' => [$basket['basket_id'], $group['group_id']]]);
-            $listDisplay = json_decode($groupBasket[0]['list_display']);
+            $listDisplay = json_decode($groupBasket[0]['list_display'], true);
+            $templateColumns = $listDisplay['templateColumns'];
+            $listDisplay = $listDisplay['subInfos'];
 
             $select = [
                 'res_letterbox.res_id', 'res_letterbox.subject', 'res_letterbox.barcode', 'res_letterbox.alt_identifier',
@@ -162,7 +165,16 @@ class ResourceListController
             }
         }
 
-        return $response->withJson(['resources' => $formattedResources, 'count' => $count, 'basketLabel' => $basket['basket_name'], 'basket_id' => $basket['basket_id'], 'allResources' => $allResources, 'defaultAction' => $defaultAction, 'displayFolderTags' => $displayFolderTags]);
+        return $response->withJson([
+            'resources'         => $formattedResources,
+            'count'             => $count,
+            'basketLabel'       => $basket['basket_name'],
+            'basket_id'         => $basket['basket_id'],
+            'allResources'      => $allResources,
+            'defaultAction'     => $defaultAction,
+            'displayFolderTags' => $displayFolderTags,
+            'templateColumns'   => $templateColumns
+        ]);
     }
 
     public function getFilters(Request $request, Response $response, array $aArgs)

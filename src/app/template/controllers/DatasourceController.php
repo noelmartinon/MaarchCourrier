@@ -104,6 +104,11 @@ class DatasourceController
                     $res['initiator_'.$key] = $value;
                 }
             }
+
+            if (!empty($res['typist'])) {
+                $userInfo            = UserModel::getById(['select' => ['firstname', 'lastname'], 'id' => $res['typist']]);
+                $res['typist_label'] = $userInfo['firstname'] . ' ' . $userInfo['lastname'];
+            }
         
             $datasources['res_letterbox'][] = $res;
         
@@ -114,15 +119,15 @@ class DatasourceController
             ]);
             $resourceContacts = $resourceContacts[0];
         
+            $contact = [];
             if (!empty($resourceContacts)) {
                 $contact = ContactModel::getById(['id' => $resourceContacts['item_id'], 'select' => ['*']]);
         
                 $postalAddress = ContactController::getContactAfnor($contact);
                 unset($postalAddress[0]);
                 $contact['postal_address'] = implode("\n", $postalAddress);
-        
-                $datasources['sender'][] = $contact;
             }
+            $datasources['sender'][] = $contact;
         }
 
         return $datasources;
@@ -183,12 +188,13 @@ class DatasourceController
                 $note = "{$labelledUser}  {$creationDate} : {$note['note_text']}\n";
             }
         
+            $contact = [];
             if (!empty($resourceContacts)) {
                 $contact = ContactModel::getById(['id' => $resourceContacts['item_id'], 'select' => ['*']]);
-                $datasources['sender'][] = $contact;
             }
+            $datasources['sender'][] = $contact;
             
-            $datasources['notes'] = $note;
+            $datasources['notes'][] = ['content' => $note];
         }
 
         return $datasources;

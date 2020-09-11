@@ -26,10 +26,6 @@ class IssuingSiteController
 {
     public function get(Request $request, Response $response)
     {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_registered_mail', 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
-        }
-
         $sites = IssuingSiteModel::get();
 
         foreach ($sites as $key => $site) {
@@ -55,10 +51,6 @@ class IssuingSiteController
 
     public function getById(Request $request, Response $response, array $args)
     {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_registered_mail', 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
-        }
-
         $site = IssuingSiteModel::getById(['id' => $args['id']]);
 
         if (empty($site)) {

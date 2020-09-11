@@ -17,7 +17,6 @@ declare var $: any;
 })
 export class ExportComponent implements OnInit {
 
-    
     loading: boolean = false;
     loadingExport: boolean = false;
 
@@ -202,6 +201,16 @@ export class ExportComponent implements OnInit {
         {
             value: 'getAcknowledgementSendDate',
             label: this.translate.instant('lang.acknowledgementSendDate'),
+            isFunction: true
+        },
+        {
+            value: 'getVisaCircuit',
+            label: this.translate.instant('lang.getVisaWorkflow'),
+            isFunction: true
+        },
+        {
+            value: 'getOpinionCircuit',
+            label: this.translate.instant('lang.opinionCircuit'),
             isFunction: true
         },
         {

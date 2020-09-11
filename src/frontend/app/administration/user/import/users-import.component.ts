@@ -88,7 +88,7 @@ export class UsersImportComponent implements OnInit {
     }
 
     uploadCsv(fileInput: any) {
-        if (fileInput.target.files && fileInput.target.files[0] && fileInput.target.files[0].type === 'text/csv') {
+        if (fileInput.target.files && fileInput.target.files[0] && (fileInput.target.files[0].type === 'text/csv' || fileInput.target.files[0].type === 'application/vnd.ms-excel')) {
             this.loading = true;
 
             let rawCsv = [];

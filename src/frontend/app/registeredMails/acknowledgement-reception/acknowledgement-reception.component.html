@@ -21,7 +21,7 @@
                     <form style="display: contents;" [formGroup]="adminFormGroup">
                         <div>
                             <mat-form-field>
-                                <mat-select [(ngModel)]="type" (ngModelChange)="changeType($event)" placeholder="{{'lang.returnType' | translate}}" formControlName="type">
+                                <mat-select [(ngModel)]="type" (ngModelChange)="focusRegisteredMailNumber()" placeholder="{{'lang.returnType' | translate}}" formControlName="type">
                                     <mat-option [value]="'distributed'">{{'lang.registeredMailDistributed' | translate}}</mat-option>
                                     <mat-option [value]="'notDistributed'">{{'lang.registeredMailNotDistributed' | translate}}</mat-option>
                                 </mat-select>
@@ -34,11 +34,6 @@
                                 <mat-datepicker-toggle matSuffix [for]="picker" *ngIf="!receivedDate">
                                 </mat-datepicker-toggle>
                                 <mat-datepicker #picker></mat-datepicker>
-                                <button mat-button color="warn" matSuffix mat-icon-button *ngIf="receivedDate"
-                                        (click)="$event.stopPropagation();receivedDate = null;" [title]="this.translate.instant('lang.eraseValue')">
-                                    <mat-icon color="warn" class="fa fa-calendar-times">
-                                    </mat-icon>
-                                </button>
                             </mat-form-field>
 
                             <mat-form-field *ngIf="type === 'notDistributed'" >
@@ -58,13 +53,13 @@
                             </mat-form-field>
 
                             <div style="text-align:center;">
-                                <button mat-raised-button color="primary" type="button" (click)="receiveAcknowledgement()"
+                                <button mat-raised-button color="primary" type="button" (click)="receiveAcknowledgement();focusRegisteredMailNumber()"
                                         [disabled]="!adminFormGroup.valid">{{'lang.validate' | translate}}</button>
                             </div>
                         </div>
                     </form>
 
-                    <mat-table #table [dataSource]="dataSource">
+                    <mat-table [dataSource]="dataSource">
                         <ng-container matColumnDef="type">
                             <mat-header-cell *matHeaderCellDef>{{'lang.returnType' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element">
@@ -82,10 +77,6 @@
                         <ng-container matColumnDef="returnReason">
                             <mat-header-cell *matHeaderCellDef>{{'lang.returnReason' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element">{{element.returnReason}} </mat-cell>
-                        </ng-container>
-                        <ng-container matColumnDef="returnReasonOther">
-                            <mat-header-cell *matHeaderCellDef>{{'lang.others' | translate}}</mat-header-cell>
-                            <mat-cell *matCellDef="let element">{{element.returnReasonOther}} </mat-cell>
                         </ng-container>
 
                         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>

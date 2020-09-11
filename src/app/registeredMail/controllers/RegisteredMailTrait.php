@@ -64,7 +64,7 @@ trait RegisteredMailTrait
         }
 
         if ($range[0]['current_number'] + 1 > $range[0]['range_end']) {
-            $status = 'DEL';
+            $status = 'END';
             $nextNumber = $range[0]['current_number'];
         } else {
             $status = 'OK';

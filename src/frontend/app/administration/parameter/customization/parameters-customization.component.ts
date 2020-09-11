@@ -73,17 +73,17 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
 
 
                         this.stepFormGroup.controls['homepage_message'].valueChanges.pipe(
-                            debounceTime(1000),
+                            debounceTime(100),
                             tap(() => this.saveParameter('homepage_message'))
                         ).subscribe();
 
                         this.stepFormGroup.controls['loginpage_message'].valueChanges.pipe(
-                            debounceTime(1000),
+                            debounceTime(100),
                             tap(() => this.saveParameter('loginpage_message'))
                         ).subscribe();
 
                         this.stepFormGroup.controls['traffic_record_summary_sheet'].valueChanges.pipe(
-                            debounceTime(1000),
+                            debounceTime(100),
                             tap(() => this.saveParameter('traffic_record_summary_sheet'))
                         ).subscribe();
                         this.initMce();
@@ -104,9 +104,9 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
     initMce(readonly = false) {
         tinymce.init({
             selector: 'textarea',
-            setup: (editor) => {
-                editor.on('keyup', (e) => {
-                    this.stepFormGroup.controls[e.target.dataset.id].setValue(tinymce.get(e.target.dataset.id).getContent());
+            setup: (editor: any) => {
+                editor.on('Blur', (e) => {
+                    this.stepFormGroup.controls[e.target.id].setValue(tinymce.get(e.target.id).getContent());
                 });
             },
             base_url: '../node_modules/tinymce/',
@@ -128,6 +128,9 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
             table_resize_bars: false,
             toolbar_sticky: true,
             toolbar_drawer: 'floating',
+            table_style_by_css: true,
+            content_style: 'table td { vertical-align: top; }',
+            forced_root_block : false,
             toolbar: !readonly ? 'undo redo | fontselect fontsizeselect | bold italic underline strikethrough forecolor | table maarch_b64image | \
         alignleft aligncenter alignright alignjustify \
         bullist numlist outdent indent | removeformat code' : ''

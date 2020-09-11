@@ -33,8 +33,6 @@ declare var $: any;
 })
 export class BasketListComponent implements OnInit, OnDestroy {
 
-    
-
     loading: boolean = false;
     docUrl: string = '';
     public innerHtml: SafeHtml;
@@ -52,6 +50,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
 
     @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
 
+    templateColumns: number = 7;
     displayedColumnsBasket: string[] = ['resId'];
 
     displayedMainData: any = [
@@ -203,6 +202,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
                     this.currentBasketInfo.basket_id = data.basket_id;
                     this.defaultAction = data.defaultAction;
                     this.displayFolderTags = data.displayFolderTags;
+                    this.templateColumns = data.templateColumns;
                     this.headerService.setHeader(data.basketLabel, '', 'fa fa-inbox');
                     return data.resources;
                 }),
@@ -533,6 +533,7 @@ export interface BasketList {
     basket_id: string;
     defaultAction: any;
     allResources: number[];
+    templateColmuns: number;
 }
 
 export class ResultListHttpDao {

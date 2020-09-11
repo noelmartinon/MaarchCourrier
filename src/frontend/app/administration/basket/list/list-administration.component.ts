@@ -4,8 +4,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { FormControl } from '@angular/forms';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { startWith, map } from 'rxjs/operators';
+import { startWith, map, tap, catchError } from 'rxjs/operators';
 import { Observable } from 'rxjs/internal/Observable';
+import { of } from 'rxjs/internal/observable/of';
 
 declare var $: any;
 
@@ -16,7 +17,7 @@ declare var $: any;
 })
 export class ListAdministrationComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     displayedMainData: any = [
@@ -155,6 +156,11 @@ export class ListAdministrationComponent implements OnInit {
             value: 'viewDoc'
         }
     ];
+
+    templateDisplayedSecondaryData: number[] = [1, 2, 3, 4, 5, 6, 7];
+    selectedTemplateDisplayedSecondaryData: number = 7;
+    selectedTemplateDisplayedSecondaryDataClone: number = 7;
+
     selectedListEvent: string = null;
     selectedListEventClone: string = null;
 
@@ -223,7 +229,8 @@ export class ListAdministrationComponent implements OnInit {
 
     constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService) { }
 
-    ngOnInit(): void {
+    async ngOnInit(): Promise<void> {
+        await this.initCustomFields();
         this.filteredDataOptions = this.dataControl.valueChanges
             .pipe(
                 startWith(''),
@@ -233,7 +240,9 @@ export class ListAdministrationComponent implements OnInit {
         this.availableDataClone = JSON.parse(JSON.stringify(this.availableData));
         this.displayedSecondaryData = [];
         let indexData: number = 0;
-        this.basketGroup.list_display.forEach((element: any) => {
+        this.selectedTemplateDisplayedSecondaryData = this.basketGroup.list_display.templateColumns;
+        this.selectedTemplateDisplayedSecondaryDataClone = this.selectedTemplateDisplayedSecondaryData;
+        this.basketGroup.list_display.subInfos.forEach((element: any) => {
             indexData = this.availableData.map((e: any) => e.value).indexOf(element.value);
             this.availableData[indexData].cssClasses = element.cssClasses;
             this.displayedSecondaryData.push(this.availableData[indexData]);
@@ -252,6 +261,36 @@ export class ListAdministrationComponent implements OnInit {
 
         this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));
         this.displayedSecondaryDataClone = JSON.parse(JSON.stringify(this.displayedSecondaryData));
+    }
+
+    initCustomFields() {
+        return new Promise((resolve, reject) => {
+
+            this.http.get('../rest/customFields').pipe(
+                map((data: any) => {
+                    data.customFields = data.customFields.map((info: any) => {
+                        return {
+                            'value': 'indexingCustomField_' + info.id,
+                            'label': info.label,
+                            'sample': this.translate.instant('lang.customField') + info.id,
+                            'cssClasses': ['align_leftData'],
+                            'icon': 'fa-hashtag'
+                        };
+                    });
+                    return data.customFields;
+                }),
+                tap((customs) => {
+                    console.log(customs);
+                    this.availableData = this.availableData.concat(customs);
+                    resolve(true);
+
+                }),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     toggleData() {
@@ -286,16 +325,11 @@ export class ListAdministrationComponent implements OnInit {
     }
 
     addData(event: any) {
-        if (this.displayedSecondaryData.filter((data: any) => data.value !== 'getFolders').length >= 7 && event.option.value.value !== 'getFolders') {
-            this.dataControl.setValue('');
-            alert(this.translate.instant('lang.warnMaxDataList'));
-        } else {
-            const i = this.availableData.map((e: any) => e.value).indexOf(event.option.value.value);
-            this.displayedSecondaryData.push(event.option.value);
-            this.availableData.splice(i, 1);
-            $('#availableData').blur();
-            this.dataControl.setValue('');
-        }
+        const i = this.availableData.map((e: any) => e.value).indexOf(event.option.value.value);
+        this.displayedSecondaryData.push(event.option.value);
+        this.availableData.splice(i, 1);
+        $('#availableData').blur();
+        this.dataControl.setValue('');
     }
 
     removeData(data: any, i: number) {
@@ -317,6 +351,7 @@ export class ListAdministrationComponent implements OnInit {
     }
 
     saveTemplate() {
+        let objToSend = {};
         const template: any = [];
         this.displayedSecondaryData.forEach((element: any) => {
             template.push(
@@ -328,7 +363,12 @@ export class ListAdministrationComponent implements OnInit {
             );
         });
 
-        this.http.put('../rest/baskets/' + this.basketGroup.basket_id + '/groups/' + this.basketGroup.group_id, { 'list_display': template, 'list_event': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
+        objToSend = {
+            templateColumns: this.selectedTemplateDisplayedSecondaryData,
+            subInfos: template
+        };
+
+        this.http.put('../rest/baskets/' + this.basketGroup.basket_id + '/groups/' + this.basketGroup.group_id, { 'list_display': objToSend, 'list_event': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
             .subscribe(() => {
                 this.displayedSecondaryDataClone = JSON.parse(JSON.stringify(this.displayedSecondaryData));
                 this.basketGroup.list_display = template;
@@ -336,6 +376,7 @@ export class ListAdministrationComponent implements OnInit {
                 this.selectedListEventClone = this.selectedListEvent;
                 this.basketGroup.list_event_data = this.selectedProcessTool;
                 this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));
+                this.selectedTemplateDisplayedSecondaryDataClone = JSON.parse(JSON.stringify(this.selectedTemplateDisplayedSecondaryData));
                 this.notify.success(this.translate.instant('lang.modificationsProcessed'));
                 this.refreshBasketGroup.emit(this.basketGroup);
             }, (err) => {
@@ -355,7 +396,7 @@ export class ListAdministrationComponent implements OnInit {
     }
 
     checkModif() {
-        if (JSON.stringify(this.displayedSecondaryData) === JSON.stringify(this.displayedSecondaryDataClone) && this.selectedListEvent === this.selectedListEventClone && JSON.stringify(this.selectedProcessTool) === JSON.stringify(this.selectedProcessToolClone)) {
+        if (JSON.stringify(this.displayedSecondaryData) === JSON.stringify(this.displayedSecondaryDataClone) && this.selectedListEvent === this.selectedListEventClone && JSON.stringify(this.selectedProcessTool) === JSON.stringify(this.selectedProcessToolClone) && JSON.stringify(this.selectedTemplateDisplayedSecondaryData) === JSON.stringify(this.selectedTemplateDisplayedSecondaryDataClone)) {
             return true;
         } else {
             return false;
@@ -367,6 +408,7 @@ export class ListAdministrationComponent implements OnInit {
         this.selectedListEvent = this.selectedListEventClone;
         this.selectedProcessTool = JSON.parse(JSON.stringify(this.selectedProcessToolClone));
         this.availableData = JSON.parse(JSON.stringify(this.availableDataClone));
+        this.selectedTemplateDisplayedSecondaryData = JSON.parse(JSON.stringify(this.selectedTemplateDisplayedSecondaryDataClone));
 
         let indexData: number = 0;
         this.displayedSecondaryData.forEach((element: any) => {

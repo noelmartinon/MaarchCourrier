@@ -1214,8 +1214,9 @@ class ContactController
             return $response->withStatus(400)->withJson(['errors' => 'Body contacts is empty or not an array']);
         }
 
-        $contactCustoms = ContactCustomFieldListModel::get(['select' => ['id', 'type']]);
+        $contactCustoms = ContactCustomFieldListModel::get(['select' => ['id', 'type', 'label']]);
         $customTypes = array_column($contactCustoms, 'type', 'id');
+        $customLabels = array_column($contactCustoms, 'label', 'id');
 
         $contactCustoms = array_column($contactCustoms, 'id');
 
@@ -1239,27 +1240,27 @@ class ContactController
 
             // Check format of fields
             foreach ($contactFields as $frontField => $backField) {
-                if (!empty($contact[$frontField])) {
+                if (!empty($contact[$frontField]) && $contact[$frontField] !== false) {
                     if (strpos($frontField, 'contactCustomField_') !== false) {
                         $customId = explode('_', $frontField)[1];
                         // Check custom field format
                         $type = $customTypes[(string)$customId];
-                        if (in_array($type, ['checkbox', 'select', 'radio']) && !Validator::arrayType()->validate($contact[$frontField])) {
-                            $errors[] = ['error' => "Argument {$frontField} is not an array for contact {$key}", 'index' => $key, 'lang' => 'argumentNotArray'];
+                        if ($type == 'checkbox' && !Validator::arrayType()->validate($contact[$frontField])) {
+                            $errors[] = ['error' => "Argument {$frontField} is not an array for contact {$key}", 'index' => $key, 'lang' => 'argumentNotArray', 'langParam' => $customLabels[$customId]];
                             continue 2;
-                        } elseif ($customTypes[$customId] == 'integer' && !Validator::intVal()->validate($contact[$frontField])) {
-                            $errors[] = ['error' => "Argument {$frontField} is not an integer for contact {$key}", 'index' => $key, 'lang' => 'argumentNotInteger'];
+                        } elseif ($type == 'integer' && !Validator::floatVal()->validate($contact[$frontField])) {
+                            $errors[] = ['error' => "Argument {$frontField} is not an integer for contact {$key}", 'index' => $key, 'lang' => 'argumentNotInteger', 'langParam' => $customLabels[$customId]];
                             continue 2;
-                        } elseif ($customTypes[$customId] == 'date' && !Validator::date()->validate($contact[$frontField])) {
-                            $errors[] = ['error' => "Argument {$frontField} is not a date for contact {$key}", 'index' => $key, 'lang' => 'argumentNotDate'];
+                        } elseif ($type == 'date' && !Validator::date()->validate($contact[$frontField])) {
+                            $errors[] = ['error' => "Argument {$frontField} is not a date for contact {$key}", 'index' => $key, 'lang' => 'argumentNotDate', 'langParam' => $customLabels[$customId]];
                             continue 2;
-                        } elseif ($customTypes[$customId] == 'string' && !Validator::stringType()->validate($contact[$frontField]) || !Validator::length(1, 255)->validate($contact[$frontField])) {
-                            $errors[] = ['error' => "Argument {$frontField} is not a string for contact {$key}", 'index' => $key, 'lang' => 'argumentNotString'];
+                        } elseif (in_array($type, ['string', 'select', 'radio']) && !Validator::stringType()->validate($contact[$frontField]) || !Validator::length(1, 255)->validate($contact[$frontField])) {
+                            $errors[] = ['error' => "Argument {$frontField} is not a string for contact {$key}", 'index' => $key, 'lang' => 'argumentNotString', 'langParam' => $customLabels[$customId]];
                             continue 2;
                         }
                     } else {
                         if (!Validator::stringType()->validate($contact[$frontField]) || !Validator::length(1, 255)->validate($contact[$frontField])) {
-                            $errors[] = ['error' => "Argument {$frontField} is not a string for contact {$key}", 'index' => $key, 'lang' => 'argumentNotString'];
+                            $errors[] = ['error' => "Argument {$frontField} is not a string for contact {$key}", 'index' => $key, 'lang' => 'argumentNotString', 'langParam' => $frontField];
                             continue 2;
                         }
                     }
@@ -1286,14 +1287,14 @@ class ContactController
                 $mandatoryParameters = ContactParameterModel::get(['select' => ['identifier'], 'where' => ['mandatory = ?', 'identifier not in (?)'], 'data' => [true, ['lastname', 'company']]]);
                 foreach ($mandatoryParameters as $mandatoryParameter) {
                         if (empty($contact[$mandatoryParameter['identifier']])) {
-                            $errors[] = ['error' => "Argument {$mandatoryParameter['identifier']} is empty for contact {$key}", 'index' => $key, 'lang' => 'argumentMandatoryEmpty'];
+                            $errors[] = ['error' => "Argument {$mandatoryParameter['identifier']} is empty for contact {$key}", 'index' => $key, 'lang' => 'argumentMandatoryEmpty', 'langParam' => $mandatoryParameter['identifier']];
                             continue 2;
                         }
                 }
 
                 $contactToCreate = ['creator' => $GLOBALS['id'], 'custom_fields' => []];
                 foreach ($contactFields as $frontField => $backField) {
-                    if (isset($contact[$frontField])) {
+                    if (!empty($contact[$frontField])) {
                         if (strpos($frontField, 'contactCustomField_') !== false) {
                             $contactToCreate['custom_fields'][$backField] = $contact[$frontField];
                         } else {
@@ -1307,25 +1308,32 @@ class ContactController
             } else {
                 // If id, then we update the contact
                 $set = ['modification_date' => 'CURRENT_TIMESTAMP', 'custom_fields' => []];
+                $customsToRemove = [];
                 foreach ($contactFields as $frontField => $backField) {
-                    if (isset($contact[$frontField])) {
+                    if (!empty($contact[$frontField])) {
                         if (strpos($frontField, 'contactCustomField_') !== false) {
                             $set['custom_fields'][$backField] = $contact[$frontField];
                         } else {
                             $set[$backField] = $contact[$frontField];
                         }
+                    } elseif ($contact[$frontField] === false && strpos($frontField, 'contactCustomField_') !== false) {
+                        $customsToRemove[] = $backField;
+                    } elseif ($contact[$frontField] === false && strpos($frontField, 'contactCustomField_') === false) {
+                        $set[$backField] = null;
                     }
                 }
 
-                if (empty($set['custom_fields'])) {
-                    unset($set['custom_fields']);
-                } else {
-                    $oldContact = ContactModel::getById(['id' => $contact['id'], 'select' => ['custom_fields']]);
-                    if (!empty($oldContact['custom_fields'])) {
-                        $set['custom_fields'] = $set['custom_fields'] + json_decode($oldContact['custom_fields'], true);
-                    }
-                    $set['custom_fields'] = json_encode($set['custom_fields']);
+
+                $oldContact = ContactModel::getById(['id' => $contact['id'], 'select' => ['custom_fields']]);
+                if (!empty($oldContact['custom_fields'])) {
+                    $set['custom_fields'] = $set['custom_fields'] + json_decode($oldContact['custom_fields'], true);
                 }
+                if (!empty($customsToRemove)) {
+                    foreach ($customsToRemove as $item) {
+                        unset($set['custom_fields'][$item]);
+                    }
+                }
+                $set['custom_fields'] = !empty($set['custom_fields']) ? json_encode($set['custom_fields']) : '{}';
 
                 if (!empty($set)) {
                     ContactModel::update([

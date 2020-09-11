@@ -3,11 +3,13 @@
     <div mat-dialog-content>
         <mat-toolbar class="import-tool" [class.hide]="csvData.length === 0 || loading">
             <span style="flex:1;">
-                <mat-slide-toggle color="primary" [checked]="hasHeader" (change)="toggleHeader()">{{'lang.csvHeader' | translate}}
+                <mat-slide-toggle color="primary" [checked]="hasHeader" (change)="toggleHeader()">
+                    {{'lang.csvHeader' | translate}}
                 </mat-slide-toggle>
             </span>
             <span style="flex:1;text-align: center;"><i class="fa fa-users"
-                    color="primary"></i>&nbsp;{{'lang.contactsOfFile' | translate}} : <b color="primary">{{countAll}}</b>
+                    color="primary"></i>&nbsp;{{'lang.contactsOfFile' | translate}} : <b
+                    color="primary">{{countAll}}</b>
             </span>
             <span style="flex:1;text-align: center;"><i class="fa fa-user-plus"
                     color="primary"></i>&nbsp;{{'lang.additions' | translate}} : <b
@@ -49,7 +51,7 @@
                     <mat-table *ngIf="csvData.length > 0" #table [dataSource]="dataSource" style="width:5000px;">
                         <ng-container *ngFor="let column of contactColumns;let i=index;">
                             <ng-container [matColumnDef]="column.id">
-                                <mat-header-cell *matHeaderCellDef>
+                                <mat-header-cell *matHeaderCellDef style="padding-left: 5px;padding-right: 5px;">
                                     <i class="fas fa-database" color="primary"
                                         [title]="'lang.dbColumn' | translate"></i>&nbsp;<b color="primary"
                                         [title]="'lang.dbColumn' | translate">{{column.label}}</b>
@@ -65,9 +67,17 @@
                                             </mat-option>
                                         </mat-select>
                                     </mat-form-field>
+                                    <mat-checkbox color="primary" (change)="toggleEmptyMode(column.id,$event.checked)"
+                                        [title]="'lang.toggleEmptyValues' | translate"></mat-checkbox>
                                 </mat-header-cell>
-                                <mat-cell *matCellDef="let element">
-                                    {{element[column.id]}}
+                                <mat-cell *matCellDef="let element" style="padding-left: 5px;padding-right: 5px;">
+                                    <ng-container
+                                        *ngIf="column.emptyValueMode && functionsService.empty(element[column.id]); else elseTemplate">
+                                        <i style="opacity: 0.5;">{{'lang.emptyValue' | translate}}</i>
+                                    </ng-container>
+                                    <ng-template #elseTemplate>
+                                        {{element[column.id]}}
+                                    </ng-template>
                                 </mat-cell>
                             </ng-container>
                         </ng-container>
@@ -77,6 +87,9 @@
                 </div>
             </div>
             <div class="alert-message alert-message-info" [innerHTML]="'lang.infoImportcontacts' | translate"
+                style="min-width: 100%">
+            </div>
+            <div class="alert-message alert-message-info" [innerHTML]="'lang.infoImportcontacts2' | translate"
                 style="min-width: 100%">
             </div>
         </ng-template>

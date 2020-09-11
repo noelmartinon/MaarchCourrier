@@ -273,6 +273,10 @@ class ExportController
                         $csvContent[] = empty($acknwoledgementSendDate[$resource['res_id']]) ? '' : $acknwoledgementSendDate[$resource['res_id']];
                     } elseif (strpos($value['value'], 'custom_', 0) !== false) {
                         $csvContent[] = ExportController::getCustomFieldValue(['custom' => $value['value'], 'resId' => $resource['res_id']]);
+                    } elseif ($value['value'] == 'getVisaCircuit') {
+                        $csvContent[] = ExportController::getCircuit(['listType' => 'VISA_CIRCUIT', 'resId' => $resource['res_id']]);
+                    } elseif ($value['value'] == 'getOpinionCircuit') {
+                        $csvContent[] = ExportController::getCircuit(['listType' => 'AVIS_CIRCUIT', 'resId' => $resource['res_id']]);
                     }
                 } else {
                     $allDates = ['doc_date', 'departure_date', 'admission_date', 'process_limit_date', 'opinion_limit_date', 'closing_date'];
@@ -385,6 +389,10 @@ class ExportController
                         $content[] = empty($acknwoledgementSendDate[$resource['res_id']]) ? '' : $acknwoledgementSendDate[$resource['res_id']];
                     } elseif (strpos($value['value'], 'custom_', 0) !== false) {
                         $content[] = ExportController::getCustomFieldValue(['custom' => $value['value'], 'resId' => $resource['res_id']]);
+                    } elseif ($value['value'] == 'getVisaCircuit') {
+                        $content[] = ExportController::getCircuit(['listType' => 'VISA_CIRCUIT', 'resId' => $resource['res_id']]);
+                    } elseif ($value['value'] == 'getOpinionCircuit') {
+                        $content[] = ExportController::getCircuit(['listType' => 'AVIS_CIRCUIT', 'resId' => $resource['res_id']]);
                     }
                 } else {
                     $allDates = ['doc_date', 'departure_date', 'admission_date', 'process_limit_date', 'opinion_limit_date', 'closing_date'];
@@ -762,5 +770,41 @@ class ExportController
         }
 
         return $customValues;
+    }
+
+    private static function getCircuit(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['resId', 'listType']);
+        ValidatorModel::intVal($args, ['resId']);
+        ValidatorModel::stringType($args, ['listType']);
+
+        $list = [];
+
+        $roles = EntityModel::getRoles();
+        $roles = array_column($roles, 'label', 'id');
+
+        $listInstances = ListInstanceModel::get([
+            'select'    => ['item_id', 'item_mode'],
+            'where'     => ['res_id in (?)', 'item_type = ?', 'difflist_type = ?'],
+            'data'      => [$args['resId'], 'user_id', $args['listType']],
+            'order_by'  => ['sequence']
+        ]);
+
+        foreach ($listInstances as $listInstance) {
+            $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['firstname', 'lastname']]);
+
+            if ($args['listType'] == 'VISA_CIRCUIT') {
+                if ($listInstance['item_mode'] == 'cc') {
+                    $listInstance['item_mode'] = 'copy';
+                }
+                $roleLabel = $roles[$listInstance['item_mode']];
+
+                $list[] = "{$user['firstname']} {$user['lastname']} ({$roleLabel})";
+            } else {
+                $list[] = "{$user['firstname']} {$user['lastname']}";
+            }
+        }
+
+        return implode("\n", $list);
     }
 }

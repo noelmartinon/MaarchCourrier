@@ -385,22 +385,23 @@ class StoreController
 
         $inSignatureBook = isset($args['inSignatureBook']) ? $args['inSignatureBook'] : $shouldBeInSignatureBook;
         $preparedData = [
-            'title'                 => $args['title'] ?? null,
-            'identifier'            => $args['chrono'] ?? null,
-            'typist'                => $typist,
-            'status'                => $args['status'] ?? 'A_TRA',
-            'relation'              => $relation,
-            'origin_id'             => $args['originId'] ?? null,
-            'origin'                => $linkSign ?? null,
-            'res_id_master'         => $args['resIdMaster'],
-            'attachment_type'       => $args['type'],
-            'recipient_id'          => $args['recipientId'] ?? null,
-            'recipient_type'        => !empty($args['recipientId']) ? $args['recipientType'] : null,
-            'validation_date'       => $args['validationDate'] ?? null,
-            'effective_date'        => $args['effectiveDate'] ?? null,
-            'in_signature_book'     => $inSignatureBook ? 'true' : 'false',
-            'external_id'           => $externalId,
-            'creation_date'         => 'CURRENT_TIMESTAMP'
+            'title'                    => $args['title'] ?? null,
+            'identifier'               => $args['chrono'] ?? null,
+            'typist'                   => $typist,
+            'status'                   => $args['status'] ?? 'A_TRA',
+            'relation'                 => $relation,
+            'origin_id'                => $args['originId'] ?? null,
+            'origin'                   => $linkSign ?? null,
+            'res_id_master'            => $args['resIdMaster'],
+            'attachment_type'          => $args['type'],
+            'recipient_id'             => $args['recipientId'] ?? null,
+            'recipient_type'           => !empty($args['recipientId']) ? $args['recipientType'] : null,
+            'validation_date'          => $args['validationDate'] ?? null,
+            'effective_date'           => $args['effectiveDate'] ?? null,
+            'in_signature_book'        => $inSignatureBook ? 'true' : 'false',
+            'external_id'              => $externalId,
+            'creation_date'            => 'CURRENT_TIMESTAMP',
+            'signatory_user_serial_id' => !empty($args['signatory_user_serial_id']) ? $args['signatory_user_serial_id'] : null
         ];
 
         return $preparedData;

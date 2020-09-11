@@ -5,7 +5,10 @@
 }
 
 .sub-info {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    height: auto;
     color: #8E8E8E;
     font-size: 11px;
     font-weight: bold;
@@ -16,6 +19,41 @@
         flex: 1;
 
     }
+}
+
+.column-1-list {
+    grid-template-columns: repeat(5, 1fr);
+
+}
+
+.column-2-list {
+    grid-template-columns: repeat(2, 1fr);
+
+}
+
+.column-3-list {
+    grid-template-columns: repeat(3, 1fr);
+
+}
+
+.column-4-list {
+    grid-template-columns: repeat(4, 1fr);
+
+}
+
+.column-5-list {
+    grid-template-columns: repeat(5, 1fr);
+
+}
+
+.column-6-list {
+    grid-template-columns: repeat(6, 1fr);
+
+}
+
+.column-7-list {
+    grid-template-columns: repeat(7, 1fr);
+
 }
 
 .main-info {

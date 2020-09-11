@@ -1616,6 +1616,7 @@ class PreProcessActionController
                 $mail = ResModel::getById(['resId' => $resource, 'select' => ['alt_identifier']]);
                 if (empty($mail)) {
                     $cannotGenerate[] = _ID . ' ' . $resource . ' ' . _NOT_EXISTS;
+                    continue;
                 }
                 $cannotGenerate[] = $mail['alt_identifier'] . ' - ' . _NOT_REGISTERED_MAIL;
                 continue;

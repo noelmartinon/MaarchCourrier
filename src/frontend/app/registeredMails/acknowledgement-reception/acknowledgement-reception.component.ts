@@ -31,7 +31,7 @@ export class AcknowledgementReceptionComponent implements OnInit {
     adminFormGroup: FormGroup;
 
     dataSource: MatTableDataSource<any>;
-    displayedColumns = ['type', 'number', 'receivedDate', 'returnReason', 'returnReasonOther'];
+    displayedColumns = ['type', 'number', 'receivedDate', 'returnReason'];
 
     returnReasons = [
         this.translate.instant('lang.returnReasonCannotAccess'),
@@ -79,8 +79,7 @@ export class AcknowledgementReceptionComponent implements OnInit {
             type: this.type,
             number: this.number,
             receivedDate: this.functions.formatDateObjectToDateString(this.receivedDate),
-            returnReason: this.reason,
-            returnReasonOther: this.reasonOther
+            returnReason: this.reason
         };
 
         if (this.functions.empty(this.number)) {
@@ -99,6 +98,8 @@ export class AcknowledgementReceptionComponent implements OnInit {
             if (this.reason === this.translate.instant('lang.others') && this.functions.empty(this.reasonOther)) {
                 this.notify.error(this.translate.instant('lang.fieldsNotValid'));
                 return;
+            } else if (this.reason === this.translate.instant('lang.others') && !this.functions.empty(this.reasonOther)) {
+                data.returnReason = this.reasonOther;
             }
         }
 
@@ -122,11 +123,9 @@ export class AcknowledgementReceptionComponent implements OnInit {
         ).subscribe();
     }
 
-    changeType(type: any) {
+    focusRegisteredMailNumber() {
         setTimeout(() => {
-            if (type === 'distributed') {
                 this.numberInput.nativeElement.focus();
-            }
         }, 0);
     }
 }

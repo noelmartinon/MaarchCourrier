@@ -99,7 +99,7 @@ class RegisteredMailController
             }
 
             if ($range[0]['current_number'] + 1 > $range[0]['range_end']) {
-                $status = 'DEL';
+                $status = 'END';
                 $nextNumber = $range[0]['current_number'];
             } else {
                 $status = 'OK';
@@ -171,19 +171,23 @@ class RegisteredMailController
             return $response->withStatus(400)->withJson(['errors' => 'Body number is not valid']);
         }
 
-        $type = substr($body['number'], 0, 2);
-        $number = substr($body['number'], 3, 12);
+        $number = trim($body['number'], ' ');
+        $type = substr($number, 0, 2);
+        $number = substr($number, 3, 12);
         $number = str_replace(' ', '', $number);
 
         $registeredMail = RegisteredMailModel::get([
-            'select' => ['id', 'res_id', 'received_date'],
+            'select' => ['id', 'res_id', 'received_date', 'deposit_id'],
             'where'  => ['number = ?', 'type = ?'],
             'data'   => [$number, $type]
         ]);
         if (empty($registeredMail)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Registered mail number not found']);
+            return $response->withStatus(400)->withJson(['errors' => 'Registered mail number not found', 'lang' => 'registeredMailNotFound']);
         }
         $registeredMail = $registeredMail[0];
+        if (empty($registeredMail['deposit_id'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Registered mail is not in a deposit list', 'lang' => 'registeredMailNotInDepositList']);
+        }
         if (!empty($registeredMail['received_date'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Registered mail was already received', 'lang' => 'arAlreadyReceived']);
         }
@@ -205,7 +209,7 @@ class RegisteredMailController
                 return ['errors' => "Body receivedDate is not a valid date"];
             }
 
-            $set = ['received_date' => $body['receivedDate'], 'return_reason' => $body['returnReason'], 'return_reason_other' => $body['returnReasonOther'] ?? null];
+            $set = ['received_date' => $body['receivedDate'], 'return_reason' => $body['returnReason']];
             $status = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'registeredMailNotDistributedStatus']);
             $status = $status['param_value_string'];
         }

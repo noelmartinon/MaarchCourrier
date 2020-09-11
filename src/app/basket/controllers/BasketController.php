@@ -331,11 +331,17 @@ class BasketController
         if (!isset($data['list_display']) || !is_array($data['list_display'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Data list_display is not set or not an array']);
         }
-        foreach ($data['list_display'] as $value) {
+        if (!isset($data['list_display']['subInfos']) || !is_array($data['list_display']['subInfos'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Data list_display[subInfos] is not set or not an array']);
+        }
+        if (!isset($data['list_display']['templateColumns']) || !Validator::intVal()->validate($data['list_display']['templateColumns'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Data list_display[templateColumns] is not set or not an array']);
+        }
+        foreach ($data['list_display']['subInfos'] as $value) {
             if (!Validator::stringType()->notEmpty()->validate($value['value'])) {
-                return $response->withStatus(400)->withJson(['errors' => 'Data list_display[\'value\'] is empty or not a string']);
+                return $response->withStatus(400)->withJson(['errors' => 'Data list_display[\'subInfos\'][\'value\'] is empty or not a string']);
             } elseif (!isset($value['cssClasses']) || !is_array($value['cssClasses'])) {
-                return $response->withStatus(400)->withJson(['errors' => 'Data list_display[\'cssClasses\'] is not set or not an array']);
+                return $response->withStatus(400)->withJson(['errors' => 'Data list_display[\'subInfos\'][\'cssClasses\'] is not set or not an array']);
             }
         }
 
@@ -484,11 +490,17 @@ class BasketController
         if (!isset($data['list_display']) || !is_array($data['list_display'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Data list_display is not set or not an array']);
         }
-        foreach ($data['list_display'] as $value) {
+        if (!isset($data['list_display']['subInfos']) || !is_array($data['list_display']['subInfos'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Data list_display[subInfos] is not set or not an array']);
+        }
+        if (!isset($data['list_display']['templateColumns']) || !Validator::intVal()->validate($data['list_display']['templateColumns'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Data list_display[templateColumns] is not set or not an array']);
+        }
+        foreach ($data['list_display']['subInfos'] as $value) {
             if (!Validator::stringType()->notEmpty()->validate($value['value'])) {
-                return $response->withStatus(400)->withJson(['errors' => 'Data list_display[\'value\'] is empty or not a string']);
+                return $response->withStatus(400)->withJson(['errors' => 'Data list_display[\'subInfos\'][\'value\'] is empty or not a string']);
             } elseif (!isset($value['cssClasses']) || !is_array($value['cssClasses'])) {
-                return $response->withStatus(400)->withJson(['errors' => 'Data list_display[\'cssClasses\'] is not set or not an array']);
+                return $response->withStatus(400)->withJson(['errors' => 'Data list_display[\'subInfos\'][\'cssClasses\'] is not set or not an array']);
             }
         }
         $data['list_display'] = json_encode($data['list_display']);

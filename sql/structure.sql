@@ -1459,7 +1459,6 @@ CREATE TABLE IF NOT EXISTS registered_mail_resources (
     deposit_id INTEGER,
     received_date TIMESTAMP WITHOUT TIME ZONE,
     return_reason CHARACTER VARYING(256),
-    return_reason_other TEXT,
     CONSTRAINT registered_mail_resources_pkey PRIMARY KEY (id),
     CONSTRAINT registered_mail_resources_unique_key UNIQUE (res_id)
 );

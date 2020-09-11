@@ -12,6 +12,7 @@ import { AlertComponent } from '../../../../../plugins/modal/alert.component';
 import { LocalStorageService } from '../../../../../service/local-storage.service';
 import { HeaderService } from '../../../../../service/header.service';
 import { MatPaginator } from '@angular/material/paginator';
+import { Papa } from 'ngx-papaparse';
 
 @Component({
     templateUrl: 'contact-import.component.html',
@@ -20,88 +21,87 @@ import { MatPaginator } from '@angular/material/paginator';
 export class ContactImportComponent implements OnInit {
 
     loading: boolean = false;
-    /*contactColumns: string[] = [
-        'id',
-        'company',
-        'civility',
-        'firstname',
-        'lastname',
-        'function',
-        'department',
-        'email',
-        'addressAdditional1',
-        'addressNumber',
-        'addressStreet',
-        'addressAdditional2',
-        'addressPostcode',
-        'addressTown',
-        'addressCountry',
-    ];*/
 
     contactColumns: any[] = [
         {
             id: 'id',
-            label: this.translate.instant('lang.id')
+            label: this.translate.instant('lang.id'),
+            emptyValueMode: false
         },
         {
             id: 'company',
-            label: this.translate.instant('lang.contactsParameters_company')
+            label: this.translate.instant('lang.contactsParameters_company'),
+            emptyValueMode: false,
         },
         {
             id: 'civility',
-            label: this.translate.instant('lang.contactsParameters_civility')
+            label: this.translate.instant('lang.contactsParameters_civility'),
+            emptyValueMode: false
         },
         {
             id: 'firstname',
-            label: this.translate.instant('lang.contactsParameters_firstname')
+            label: this.translate.instant('lang.contactsParameters_firstname'),
+            emptyValueMode: false
         },
         {
             id: 'lastname',
-            label: this.translate.instant('lang.contactsParameters_lastname')
+            label: this.translate.instant('lang.contactsParameters_lastname'),
+            emptyValueMode: false
         },
         {
             id: 'function',
-            label: this.translate.instant('lang.contactsParameters_function')
+            label: this.translate.instant('lang.contactsParameters_function'),
+            emptyValueMode: false
         },
         {
             id: 'department',
-            label: this.translate.instant('lang.contactsParameters_department')
+            label: this.translate.instant('lang.contactsParameters_department'),
+            emptyValueMode: false
         },
         {
             id: 'email',
-            label: this.translate.instant('lang.contactsParameters_email')
+            label: this.translate.instant('lang.contactsParameters_email'),
+            emptyValueMode: false
         },
         {
             id: 'phone',
-            label: this.translate.instant('lang.contactsParameters_phone')
+            label: this.translate.instant('lang.contactsParameters_phone'),
+            emptyValueMode: false
         },
         {
             id: 'addressAdditional1',
-            label: this.translate.instant('lang.contactsParameters_addressAdditional1')
+            label: this.translate.instant('lang.contactsParameters_addressAdditional1'),
+            emptyValueMode: false
         },
         {
             id: 'addressNumber',
-            label: this.translate.instant('lang.contactsParameters_addressNumber')
+            label: this.translate.instant('lang.contactsParameters_addressNumber'),
+            emptyValueMode: false
         },
         {
             id: 'addressStreet',
-            label: this.translate.instant('lang.contactsParameters_addressStreet')
+            label: this.translate.instant('lang.contactsParameters_addressStreet'),
+            emptyValueMode: false
         },
         {
             id: 'addressAdditional2',
-            label: this.translate.instant('lang.contactsParameters_addressAdditional2')
+            label: this.translate.instant('lang.contactsParameters_addressAdditional2'),
+            emptyValueMode: false
         },
         {
             id: 'addressPostcode',
-            label: this.translate.instant('lang.contactsParameters_addressPostcode')
+            label: this.translate.instant('lang.contactsParameters_addressPostcode'),
+            emptyValueMode: false
         },
         {
             id: 'addressTown',
-            label: this.translate.instant('lang.contactsParameters_addressTown')
+            label: this.translate.instant('lang.contactsParameters_addressTown'),
+            emptyValueMode: false
         },
         {
             id: 'addressCountry',
-            label: this.translate.instant('lang.contactsParameters_addressCountry')
+            label: this.translate.instant('lang.contactsParameters_addressCountry'),
+            emptyValueMode: false
         },
     ];
 
@@ -132,6 +132,7 @@ export class ContactImportComponent implements OnInit {
         private headerService: HeaderService,
         public dialog: MatDialog,
         public dialogRef: MatDialogRef<ContactImportComponent>,
+        private papa: Papa,
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
     }
@@ -150,7 +151,7 @@ export class ContactImportComponent implements OnInit {
             map((data: any) => {
                 data = data.customFields.map(custom => {
                     return {
-                        id : `contactCustomField_${custom.id}`,
+                        id: `contactCustomField_${custom.id}`,
                         label: custom.label
                     };
                 });
@@ -166,8 +167,14 @@ export class ContactImportComponent implements OnInit {
         ).subscribe();
     }
 
-    changeColumn(coldb: string, colCsv: string) {
+
+    toggleEmptyMode(id: string, state: boolean) {
+        this.contactColumns.filter(col => col.id === id)[0].emptyValueMode = state;
+    }
+
+    changeColumn(coldb: any, colCsv: string) {
         this.contactData = [];
+
         for (let index = this.hasHeader ? 1 : 0; index < this.csvData.length; index++) {
             const data = this.csvData[index];
 
@@ -190,7 +197,7 @@ export class ContactImportComponent implements OnInit {
     }
 
     uploadCsv(fileInput: any) {
-        if (fileInput.target.files && fileInput.target.files[0] && fileInput.target.files[0].type === 'text/csv') {
+        if (fileInput.target.files && fileInput.target.files[0] && (fileInput.target.files[0].type === 'text/csv' || fileInput.target.files[0].type === 'application/vnd.ms-excel')) {
             this.loading = true;
 
             let rawCsv = [];
@@ -199,33 +206,35 @@ export class ContactImportComponent implements OnInit {
             reader.readAsText(fileInput.target.files[0]);
 
             reader.onload = (value: any) => {
-                rawCsv = value.target.result.split('\n');
-                rawCsv = rawCsv.filter(data => data !== '');
+                this.papa.parse(value.target.result, {
+                    complete: (result) => {
+                        // console.log('Parsed: ', result);
 
-                if (rawCsv[0].split(this.currentDelimiter).map(s => s.replace(/"/gi, '').trim()).length >= this.contactColumns.length - 1) {
-                    let dataCol = [];
-                    let objData = {};
-                    this.setCsvColumns(rawCsv[0].split(this.currentDelimiter).map(s => s.replace(/"/gi, '').trim()));
+                        rawCsv = result.data;
+                        rawCsv = rawCsv.filter(data => data.length === rawCsv[0].length);
 
-                    this.countAll = this.hasHeader ? rawCsv.length - 1 : rawCsv.length;
+                        let dataCol = [];
+                        let objData = {};
 
-                    for (let index = 0; index < rawCsv.length; index++) {
-                        objData = {};
-                        dataCol = rawCsv[index].split(this.currentDelimiter).map(s => s.replace(/"/gi, '').trim());
+                        this.setCsvColumns(rawCsv[0]);
+                        this.countAll = this.hasHeader ? rawCsv.length - 1 : rawCsv.length;
 
-                        dataCol.forEach((element: any, index2: number) => {
-                            objData[this.csvColumns[index2]] = element;
-                        });
-                        this.csvData.push(objData);
+                        for (let index = 0; index < rawCsv.length; index++) {
+                            objData = {};
+                            dataCol = rawCsv[index];
+                            dataCol.forEach((element: any, index2: number) => {
+                                objData[this.csvColumns[index2]] = element;
+                            });
+                            this.csvData.push(objData);
+                        }
+                        this.initData();
+                        this.countAdd = this.csvData.filter((data: any, index: number) => index > 0 && this.functionsService.empty(data[this.associatedColmuns['id']])).length;
+                        this.countUp = this.csvData.filter((data: any, index: number) => index > 0 && !this.functionsService.empty(data[this.associatedColmuns['id']])).length;
+                        this.localStorage.save(`importContactFields_${this.headerService.user.id}`, this.currentDelimiter);
+
+                        this.loading = false;
                     }
-                    this.initData();
-                    this.countAdd = this.csvData.filter((data: any, index: number) => index > 0 && this.functionsService.empty(data[this.associatedColmuns['id']])).length;
-                    this.countUp = this.csvData.filter((data: any, index: number) => index > 0 && !this.functionsService.empty(data[this.associatedColmuns['id']])).length;
-                    this.localStorage.save(`importContactFields_${this.headerService.user.id}`, this.currentDelimiter);
-                } else {
-                    this.notify.error(this.translate.instant('lang.mustAtLeastMinValues'));
-                }
-                this.loading = false;
+                });
             };
         } else {
             this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.notAllowedExtension') + ' !', msg: this.translate.instant('lang.file') + ' : <b>' + fileInput.target.files[0].name + '</b>, ' + this.translate.instant('lang.type') + ' : <b>' + fileInput.target.files[0].type + '</b><br/><br/><u>' + this.translate.instant('lang.allowedExtensions') + '</u> : <br/>' + 'text/csv' } });
@@ -300,7 +309,15 @@ export class ContactImportComponent implements OnInit {
                     if ((this.hasHeader && index > 0) || !this.hasHeader) {
                         const objContact = {};
                         this.contactColumns.forEach((key) => {
-                            objContact[key.id] = element[this.associatedColmuns[key.id]];
+                            if (key.emptyValueMode && (element[this.associatedColmuns[key.id]] === undefined || this.functionsService.empty(element[this.associatedColmuns[key.id]]))) {
+                                objContact[key.id] = false;
+                            } else {
+                                if (element[this.associatedColmuns[key.id]] === undefined) {
+                                    objContact[key.id] = '';
+                                } else {
+                                    objContact[key.id] = element[this.associatedColmuns[key.id]].includes('\n') ? element[this.associatedColmuns[key.id]].split('\n') : element[this.associatedColmuns[key.id]];
+                                }
+                            }
                         });
                         dataToSend.push(objContact);
                     }
@@ -312,7 +329,7 @@ export class ContactImportComponent implements OnInit {
                 if (data.errors.count > 0) {
                     textModal += `<br/>${data.errors.count} ${this.translate.instant('lang.withErrors')}  : <ul>`;
                     data.errors.details.forEach(element => {
-                        textModal += `<li> ${this.translate.instant('lang.' + element.lang)} (${this.translate.instant('lang.line')} : ${this.hasHeader ? element.index + 2 : element.index + 1})</li>`;
+                        textModal += `<li> ${this.translate.instant('lang.' + element.lang, {0: element.langParam})} (${this.translate.instant('lang.line')} : ${this.hasHeader ? element.index + 2 : element.index + 1})</li>`;
                     });
                     textModal += '</ul>';
                 }

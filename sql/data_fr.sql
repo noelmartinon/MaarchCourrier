@@ -640,7 +640,7 @@ INSERT INTO baskets (basket_id, basket_name, basket_desc, basket_clause, coll_id
 DELETE FROM baskets WHERE basket_id = 'GedSampleBasket';
 DELETE FROM actions_groupbaskets WHERE basket_id = 'GedSampleBasket';
 DELETE FROM groupbasket_redirect WHERE basket_id = 'GedSampleBasket';
-INSERT INTO baskets (basket_id, basket_name, basket_desc, basket_clause, coll_id, is_visible, flag_notif, enabled, basket_order) VALUES ('GedSampleBasket', 'Contrats arrivant à expiration (date fin contrat < 3mois)', 'Contrats arrivant à expiration (date fin contrat < 3mois)', 'date(custom_fields->>''1'') < now()+ interval ''3 months''', 'letterbox_coll', 'Y', 'Y', 'Y',230);
+INSERT INTO baskets (basket_id, basket_name, basket_desc, basket_clause, coll_id, is_visible, flag_notif, enabled, basket_order) VALUES ('GedSampleBasket', 'Contrats arrivant à expiration (date fin contrat < 3mois)', 'Contrats arrivant à expiration (date fin contrat < 3mois)', 'custom_fields->>''1'' is not null and custom_fields->>''1'' <> '''' and date(custom_fields->>''1'') < now()+ interval ''3 months''', 'letterbox_coll', 'Y', 'Y', 'Y',230);
 DELETE FROM baskets WHERE basket_id = 'IntervBasket';
 DELETE FROM actions_groupbaskets WHERE basket_id = 'IntervBasket';
 DELETE FROM groupbasket_redirect WHERE basket_id = 'IntervBasket';
@@ -1293,9 +1293,9 @@ INSERT INTO templates (template_id, template_label, template_comment, template_c
 </tr>
 <tr>
 <td><font face="arial,helvetica,sans-serif" size="2">[res_letterbox.res_id]</font></td>
-<td><font face="arial,helvetica,sans-serif" size="2">[res_letterbox.typist]</font></td>
+<td><font face="arial,helvetica,sans-serif" size="2">[res_letterbox.typist_label]</font></td>
 <td>
-<p><font face="arial,helvetica,sans-serif" size="2">[sender.company] [sender.firstname] [sender.lastname][sender.function][sender.address_number][sender.address_street][sender.address_postcode][sender.address_town]</font></p>
+<p><font face="arial,helvetica,sans-serif" size="2">[sender.company;block=tr] [sender.firstname] [sender.lastname] [sender.function] [sender.address_number] [sender.address_street] [sender.address_postcode] [sender.address_town]</font></p>
 </td>
 <td><font face="arial,helvetica,sans-serif" size="2">[res_letterbox.doc_date;block=tr;frm=dd/mm/yyyy]</font></td>
 <td><font face="arial,helvetica,sans-serif" color="#FF0000"><strong><font size="2">[res_letterbox.subject]</font></strong></font></td>
@@ -1323,9 +1323,9 @@ INSERT INTO templates (template_id, template_label, template_comment, template_c
 </tr>
 <tr>
 <td><font face="arial,helvetica,sans-serif" size="2">[res_letterbox.res_id]</font></td>
-<td><font face="arial,helvetica,sans-serif" size="2">[res_letterbox.typist]</font></td>
+<td><font face="arial,helvetica,sans-serif" size="2">[res_letterbox.typist_label]</font></td>
 <td>
-<p><font face="arial,helvetica,sans-serif" size="2">[sender.company] [sender.firstname] [sender.lastname][sender.function][sender.address_number][sender.address_street][sender.address_postcode][sender.address_town]</font></p>
+<p><font face="arial,helvetica,sans-serif" size="2">[sender.company;block=tr] [sender.firstname] [sender.lastname] [sender.function] [sender.address_number] [sender.address_street] [sender.address_postcode] [sender.address_town]</font></p>
 </td>
 <td><font face="arial,helvetica,sans-serif" size="2">[res_letterbox.doc_date;block=tr;frm=dd/mm/yyyy]</font></td>
 <td><font face="arial,helvetica,sans-serif" color="#FF0000"><strong><font size="2">[res_letterbox.subject]</font></strong></font></td>
@@ -1350,8 +1350,8 @@ INSERT INTO templates (template_id, template_label, template_comment, template_c
 </tr>
 <tr>
 <td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.res_id]</td>
-<td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.typist]</td>
-<td style="border: 1px solid #ddd; padding: 8px;">[sender.company] [sender.firstname] [sender.lastname][sender.function][sender.address_number][sender.address_street][sender.address_postcode][sender.address_town]</td>
+<td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.typist_label]</td>
+<td style="border: 1px solid #ddd; padding: 8px;">[sender.company;block=tr] [sender.firstname] [sender.lastname][sender.function][sender.address_number][sender.address_street][sender.address_postcode][sender.address_town]</td>
 <td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.doc_date;block=tr;frm=dd/mm/yyyy]</td>
 <td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.subject]</td>
 <td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.type_label]</td>
@@ -1372,19 +1372,17 @@ INSERT INTO templates (template_id, template_label, template_comment, template_c
 <th style="border: 1px solid #ddd; padding: 8px; padding-top: 12px; padding-bottom: 12px; text-align: left; background-color: #135f7f; color: white;">Date</th>
 <th style="border: 1px solid #ddd; padding: 8px; padding-top: 12px; padding-bottom: 12px; text-align: left; background-color: #135f7f; color: white;">Objet</th>
 <th style="border: 1px solid #ddd; padding: 8px; padding-top: 12px; padding-bottom: 12px; text-align: left; background-color: #135f7f; color: white;">Note</th>
-<th style="border: 1px solid #ddd; padding: 8px; padding-top: 12px; padding-bottom: 12px; text-align: left; background-color: #135f7f; color: white;">Ajout&eacute; par</th>
 <th style="border: 1px solid #ddd; padding: 8px; padding-top: 12px; padding-bottom: 12px; text-align: left; background-color: #135f7f; color: white;">Contact</th>
 <th style="border: 1px solid #ddd; padding: 8px; padding-top: 12px; padding-bottom: 12px; text-align: left; background-color: #135f7f; color: white;">&nbsp;</th>
 </tr>
 <tr>
-<td style="border: 1px solid #ddd; padding: 8px;">[notes.identifier]</td>
-<td style="border: 1px solid #ddd; padding: 8px;">[notes.# ;frm=0000]</td>
-<td style="border: 1px solid #ddd; padding: 8px;">[notes.doc_date;block=tr;frm=dd/mm/yyyy]</td>
-<td style="border: 1px solid #ddd; padding: 8px;">[notes.subject]</td>
-<td style="border: 1px solid #ddd; padding: 8px;">[notes.note_text]</td>
-<td style="border: 1px solid #ddd; padding: 8px;">[notes.user_id]</td>
-<td style="border: 1px solid #ddd; padding: 8px;">[notes.contact_society] [notes.contact_firstname] [notes.contact_lastname]</td>
-<td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><a style="text-decoration: none; background: #135f7f; padding: 5px; color: white; -webkit-box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75); -moz-box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75); box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75);" href="[notes.linktodetail]" name="detail">D&eacute;tail</a> <a style="text-decoration: none; background: #135f7f; padding: 5px; color: white; -webkit-box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75); -moz-box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75); box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75);" href="[notes.linktodoc]" name="doc">Afficher</a></td>
+<td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.res_id]</td>
+<td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.# ;frm=0000]</td>
+<td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.doc_date;block=tr;frm=dd/mm/yyyy]</td>
+<td style="border: 1px solid #ddd; padding: 8px;">[res_letterbox.subject]</td>
+<td style="border: 1px solid #ddd; padding: 8px;">[notes.content;block=tr]</td>
+<td style="border: 1px solid #ddd; padding: 8px;">[sender.company;block=tr] [sender.firstname] [sender.lastname]</td>
+<td style="border: 1px solid #ddd; padding: 8px; text-align: right;"><a style="text-decoration: none; background: #135f7f; padding: 5px; color: white; -webkit-box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75); -moz-box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75); box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75);" href="[res_letterbox.linktodetail]" name="detail">D&eacute;tail</a> <a style="text-decoration: none; background: #135f7f; padding: 5px; color: white; -webkit-box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75); -moz-box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75); box-shadow: 6px 4px 5px 0px rgba(0,0,0,0.75);" href="[res_letterbox.linktodoc]" name="doc">Afficher</a></td>
 </tr>
 </tbody>
 </table>

@@ -495,10 +495,10 @@ export class PrivilegeService {
             'id': 'adv_search_mlb',
             'label': 'lang.search',
             'comment': 'lang.search',
-            'route': 'index.php?page=search_adv&dir=indexing_searching',
+            'route': '/search',
             'style': 'fa fa-search',
             'unit': 'application',
-            'angular': false,
+            'angular': true,
             'shortcut': true
         },
         {

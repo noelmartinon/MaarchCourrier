@@ -18,7 +18,10 @@ import { SentNumericPackagePageComponent } from '../sentResource/sent-numeric-pa
 import { ThesaurusModalComponent } from '../tag/indexing/thesaurus/thesaurus-modal.component';
 import { SelectIndexingModelComponent } from '../indexation/select-indexing-model/select-indexing-model.component';
 import { DocumentFormModule } from '../document-form.module';
-import {TranslateModule} from '@ngx-translate/core';
+import { AdvSearchComponent } from '../adv-search/adv-search.component';
+import { FilterToolComponent } from '../adv-search/filter-tool/filter-tool.component';
+
+import { TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
     imports: [
@@ -41,6 +44,8 @@ import {TranslateModule} from '@ngx-translate/core';
         SentNumericPackagePageComponent,
         ThesaurusModalComponent,
         SelectIndexingModelComponent,
+        AdvSearchComponent,
+        FilterToolComponent
     ],
     exports: [
         SharedModule,

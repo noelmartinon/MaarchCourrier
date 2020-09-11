@@ -1,0 +1,14 @@
+<mat-expansion-panel #basketPanel class="FilterContainer" expanded>
+    <mat-expansion-panel-header>
+        <mat-panel-title>
+            <i class="fas fa-filter panelIconMenu"></i>&nbsp;{{'lang.filterBy' | translate}}
+        </mat-panel-title>
+    </mat-expansion-panel-header>
+    <mat-selection-list *ngFor="let filterKey of filters | keyvalue" class="filter-list">
+        <div class="catGroupTitle">{{filterKey.key}} ({{filters[filterKey.key].length}})</div>
+        <mat-divider style="width: 80%;"></mat-divider>
+        <mat-list-option color="primary" class="catContent" *ngFor="let cat of filters[filterKey.key]" [selected]="cat.selected" checkboxPosition="before">
+            <span class="catLabel" [title]="cat.label">{{cat.label}}</span><span class="catBadge">{{cat.resCount}}</span>
+        </mat-list-option>
+    </mat-selection-list>
+</mat-expansion-panel>

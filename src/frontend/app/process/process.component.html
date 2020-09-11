@@ -207,8 +207,8 @@
                             </div>
                             <div class="content-item" *ngIf="!functions.empty(currentResourceInformations.registeredMail_returnDate)">
                                 <div>{{'lang.returnDate' | translate}} :</div>
-                                <div class="content-item-value" [title]="this.currentResourceInformations.registeredMail_returnDate">
-                                    {{this.currentResourceInformations.registeredMail_returnDate}}</div>
+                                <div class="content-item-value" [title]="this.currentResourceInformations.registeredMail_returnDate | fullDate">
+                                    {{this.currentResourceInformations.registeredMail_returnDate | date: 'dd/MM/y'}}</div>
                             </div>
                             <div class="content-item" *ngIf="!functions.empty(currentResourceInformations.registeredMail_returnReason)">
                                 <div>{{'lang.returnReason' | translate}} :</div>

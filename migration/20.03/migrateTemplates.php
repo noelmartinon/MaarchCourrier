@@ -164,7 +164,7 @@ $DATA_TO_REPLACE = [
 
     'notes.identifier'                       => '[res_letterbox.res_id]',
     'notes.subject'                          => '[res_letterbox.subject]',
-    'notes.note_text'                        => '[notes]',
+    'notes.note_text'                        => '[notes.content;block=tr]',
     'notes.user_id'                          => '',
     'notes.# ;frm=0000'                      => '[res_letterbox.# ;frm=0000]',
     'notes.doc_date;block=tr;frm=dd/mm/yyyy' => '[res_letterbox.doc_date;block=tr;frm=dd/mm/yyyy]',
@@ -173,7 +173,7 @@ $DATA_TO_REPLACE = [
     'notes.doc_date'                         => '[res_letterbox.doc_date]',
     'notes.contact_society'                  => '[contact.company]',
     'notes.contact_firstname'                => '[contact.firstname]',
-    'notes.contact_lastname'                 => '[contact.lastname]',
+    'notes.contact_lastname'                 => '[contact.lastname;block=tr]',
     'notes.linktodetail'                     => '[res_letterbox.linktodetail]',
     'notes.linktodoc'                        => '[res_letterbox.linktodoc]',
 ];
