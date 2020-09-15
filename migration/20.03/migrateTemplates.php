@@ -178,6 +178,38 @@ $DATA_TO_REPLACE = [
     'notes.linktodoc'                        => '[res_letterbox.linktodoc]',
 ];
 
+const DATA_CONTACT_NOTIFICATION = [
+    'sender.firstname'                  => '[contact.firstname]',
+    'sender.lastname'                   => '[contact.lastname]',
+    'sender.company'                    => '[contact.company]',
+    'contact.contact_type_label'        => '',
+    'contact.society_short'             => '',
+    'contact.contact_purpose_label'     => '',
+    'contact.website'                   => '',
+    'contact.salutation_header'         => '',
+    'contact.salutation_footer'         => '',
+    'contact.society'                   => '[contact.company]',
+    'contact.departement'               => '[contact.department]',
+    'contact.title'                     => '[contact.civility]',
+    'contact.contact_title'             => '[contact.civility]',
+    'contact.contact_lastname'          => '[contact.lastname]',
+    'contact.contact_firstname'         => '[contact.firstname]',
+    'contact.lastname'                  => '[contact.lastname]',
+    'contact.firstname'                 => '[contact.firstname]',
+    'contact.function'                  => '[contact.function]',
+    'contact.postal_address;strconv=no' => '[contact.postal_address;strconv=no]',
+    'contact.postal_address'            => '[contact.postal_address]',
+    'contact.address_num'               => '[contact.address_number]',
+    'contact.address_street'            => '[contact.address_street]',
+    'contact.occupancy'                 => '[contact.address_additional1]',
+    'contact.address_complement'        => '[contact.address_additional2]',
+    'contact.address_town'              => '[contact.address_town]',
+    'contact.address_postal_code'       => '[contact.address_postcode]',
+    'contact.address_country'           => '[contact.address_country]',
+    'contact.phone'                     => '[contact.phone]',
+    'contact.email'                     => '[contact.email]',
+];
+
 const DATA_CONTACT_ATTACHMENT = [
     'contact.contact_type_label'        => '',
     'contact.society_short'             => '',
@@ -307,6 +339,10 @@ foreach ($customs as $custom) {
 
             if ($template['template_target'] == 'acknowledgementReceipt') {
                 foreach (DATA_CONTACT_ACKNOWLEDGEMENT_RECEIPT as $key => $value) {
+                    $newContent = str_replace('[' . $key . ']', $value, $newContent);
+                }
+            } elseif ($template['template_target'] == 'notifications') {
+                foreach (DATA_CONTACT_NOTIFICATION as $key => $value) {
                     $newContent = str_replace('[' . $key . ']', $value, $newContent);
                 }
             } else {
