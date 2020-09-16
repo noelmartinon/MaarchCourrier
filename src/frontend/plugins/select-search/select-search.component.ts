@@ -14,6 +14,7 @@ import { LatinisePipe } from 'ngx-pipes';
 import { TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../service/app.service';
 import { SortPipe } from '../../plugins/sorting.pipe';
+import { FunctionsService } from '../../service/functions.service';
 
 @Component({
     selector: 'plugin-select-search',
@@ -42,6 +43,8 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     @Input() required: boolean = false;
 
     @Input() hideErrorDesc: boolean = true;
+
+    @Input() multiple: boolean = false;
 
     @Input() optGroupTarget: string = null;
 
@@ -105,6 +108,7 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         private changeDetectorRef: ChangeDetectorRef,
         private renderer: Renderer2,
         public appService: AppService,
+        public functions: FunctionsService,
         private sortPipe: SortPipe) { }
 
     ngOnInit() {
@@ -340,10 +344,12 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
             });
     }
 
-    private _filter(value: string): string[] {
-        if (typeof value === 'string') {
+    private _filter(value: string, showSelectedValues: boolean = false): string[] {
+        if (value === '__SELECTED') {
+            return this.datas.filter((option: any) => this.formControlSelect.value.indexOf(option['id']) > -1);
+        } else if (typeof value === 'string' && value !== '') {
             const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.datas.filter((option: any) => this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue));
+            return this.datas.filter((option: any) => !option['disabled'] && this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue));
         } else {
             return this.datas;
         }

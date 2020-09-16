@@ -33,6 +33,10 @@
             <id>outgoing_mail</id>
             <label>_OUTGOING_MAIL</label>
         </type>
+        <type show="true" with_chrono="true" icon="" sign="false">
+            <id>summary_sheet</id>
+            <label>_SUMMARY_SHEET</label>
+        </type>
     </attachment_types>
     <contact_check>
         <check_days_before>5</check_days_before>  <!-- 0 if you want to disabled -->

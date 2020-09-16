@@ -51,7 +51,7 @@
     "@types/jquery.nicescroll": "^3.7.1",
     "@types/jstree": "^3.3.40",
     "@types/tooltipster": "0.0.29",
-    "ajv": "^6.12.4",
+    "ajv": "^6.12.5",
     "bootstrap": "^3.4.1",
     "chosen-js": "^1.8.7",
     "codelyzer": "^5.2.2",

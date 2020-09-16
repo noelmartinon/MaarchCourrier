@@ -151,20 +151,20 @@ class IssuingSiteControllerTest extends TestCase
         $this->assertIsArray($responseBody['sites']);
         $this->assertNotEmpty($responseBody['sites']);
 
-        $this->assertIsArray($responseBody['sites'][0]);
-        $this->assertNotEmpty($responseBody['sites'][0]);
+        $this->assertIsArray($responseBody['sites'][1]);
+        $this->assertNotEmpty($responseBody['sites'][1]);
 
-        $this->assertSame(self::$id, $responseBody['sites'][0]['id']);
-        $this->assertSame('Scranton', $responseBody['sites'][0]['label']);
-        $this->assertSame('Scranton Post Office', $responseBody['sites'][0]['postOfficeLabel']);
-        $this->assertSame(42, $responseBody['sites'][0]['accountNumber']);
-        $this->assertSame('1725', $responseBody['sites'][0]['addressNumber']);
-        $this->assertSame('Slough Avenue', $responseBody['sites'][0]['addressStreet']);
-        $this->assertEmpty($responseBody['sites'][0]['addressAdditional1']);
-        $this->assertEmpty($responseBody['sites'][0]['addressAdditional2']);
-        $this->assertSame('18505', $responseBody['sites'][0]['addressPostcode']);
-        $this->assertSame('Scranton', $responseBody['sites'][0]['addressTown']);
-        $this->assertSame('USA', $responseBody['sites'][0]['addressCountry']);
+        $this->assertSame(self::$id, $responseBody['sites'][1]['id']);
+        $this->assertSame('Scranton', $responseBody['sites'][1]['label']);
+        $this->assertSame('Scranton Post Office', $responseBody['sites'][1]['postOfficeLabel']);
+        $this->assertSame(42, $responseBody['sites'][1]['accountNumber']);
+        $this->assertSame('1725', $responseBody['sites'][1]['addressNumber']);
+        $this->assertSame('Slough Avenue', $responseBody['sites'][1]['addressStreet']);
+        $this->assertEmpty($responseBody['sites'][1]['addressAdditional1']);
+        $this->assertEmpty($responseBody['sites'][1]['addressAdditional2']);
+        $this->assertSame('18505', $responseBody['sites'][1]['addressPostcode']);
+        $this->assertSame('Scranton', $responseBody['sites'][1]['addressTown']);
+        $this->assertSame('USA', $responseBody['sites'][1]['addressCountry']);
     }
 
     public function testGetById()
@@ -336,7 +336,7 @@ class IssuingSiteControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody(), true);
 
         $this->assertIsArray($responseBody['sites']);
-        $this->assertEmpty($responseBody['sites']);
+        $this->assertNotEmpty($responseBody['sites']);
 
         $body = [
             'registeredMailType' => '2D',
@@ -361,19 +361,19 @@ class IssuingSiteControllerTest extends TestCase
 
         $this->assertIsArray($responseBody['sites']);
         $this->assertNotEmpty($responseBody['sites']);
-        $this->assertSame(1, count($responseBody['sites']));
+        $this->assertSame(2, count($responseBody['sites']));
 
-        $this->assertSame(self::$id, $responseBody['sites'][0]['id']);
-        $this->assertSame('Scranton - UP', $responseBody['sites'][0]['label']);
-        $this->assertSame('Scranton Post Office', $responseBody['sites'][0]['postOfficeLabel']);
-        $this->assertSame(42, $responseBody['sites'][0]['accountNumber']);
-        $this->assertSame('1725', $responseBody['sites'][0]['addressNumber']);
-        $this->assertSame('Slough Avenue', $responseBody['sites'][0]['addressStreet']);
-        $this->assertEmpty($responseBody['sites'][0]['addressAdditional1']);
-        $this->assertEmpty($responseBody['sites'][0]['addressAdditional2']);
-        $this->assertSame('18505', $responseBody['sites'][0]['addressPostcode']);
-        $this->assertSame('Scranton', $responseBody['sites'][0]['addressTown']);
-        $this->assertSame('USA', $responseBody['sites'][0]['addressCountry']);
+        $this->assertSame(self::$id, $responseBody['sites'][1]['id']);
+        $this->assertSame('Scranton - UP', $responseBody['sites'][1]['label']);
+        $this->assertSame('Scranton Post Office', $responseBody['sites'][1]['postOfficeLabel']);
+        $this->assertSame(42, $responseBody['sites'][1]['accountNumber']);
+        $this->assertSame('1725', $responseBody['sites'][1]['addressNumber']);
+        $this->assertSame('Slough Avenue', $responseBody['sites'][1]['addressStreet']);
+        $this->assertEmpty($responseBody['sites'][1]['addressAdditional1']);
+        $this->assertEmpty($responseBody['sites'][1]['addressAdditional2']);
+        $this->assertSame('18505', $responseBody['sites'][1]['addressPostcode']);
+        $this->assertSame('Scranton', $responseBody['sites'][1]['addressTown']);
+        $this->assertSame('USA', $responseBody['sites'][1]['addressCountry']);
 
         \RegisteredMail\models\RegisteredNumberRangeModel::update([
             'set'   => [

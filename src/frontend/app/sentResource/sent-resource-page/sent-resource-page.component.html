@@ -102,9 +102,9 @@
             <input matInput [placeholder]="this.translate.instant('lang.object')" [readonly]="!canManageMail()" [(ngModel)]="emailsubject"
                 maxlength="255">
             <button mat-icon-button matSuffix *ngFor="let keyVal of emailAttachTool | keyvalue"
-                [disabled]="!canManageMail() || (emailAttachTool[keyVal.key].list.length === 0)"
+                [disabled]="!canManageMail() || (emailAttachTool[keyVal.key].list.length === 0 && keyVal.key !== 'summarySheet')"
                 [title]="emailAttachTool[keyVal.key].title"
-                (click)="$event.stopPropagation();currentEmailAttachTool=keyVal.key;"
+                (click)="$event.stopPropagation();currentEmailAttachTool=keyVal.key;openSummarySheetModal(keyVal.key)"
                 [matMenuTriggerFor]="emailAttachListMenu">
                 <mat-icon class="{{emailAttachTool[keyVal.key].icon}}"
                     [class.activeButton]="(keyVal.key === 'document' && emailAttach.document.isLinked) || (keyVal.key !== 'document' && emailAttach[keyVal.key].length > 0)"

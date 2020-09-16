@@ -87,8 +87,13 @@
     </mat-form-field>
     <mat-form-field floatLabel="always">
         <mat-label>{{'lang.contactsParameters_addressCountry' | translate}}</mat-label>
-        <input matInput name="addressCountry" [(ngModel)]="this.control.value.addressCountry"
-            (ngModelChange)="toUpperCase('addressCountry', $event)" [required]="registeredMailType === 'RW'">
+        <input matInput #autoCompleteInput [(ngModel)]="this.control.value.addressCountry" [matAutocomplete]="matAutocompleteCountries"
+            [formControl]="countryControl" [required]="registeredMailType === 'RW'">
+        <mat-autocomplete #matAutocompleteCountries="matAutocomplete" isOpen="true" (optionSelected)="this.control.value.addressCountry = $event.option.value">
+            <mat-option *ngFor="let country of countriesFilteredResult | async" [value]="country">
+                {{country}}
+            </mat-option>
+        </mat-autocomplete>
     </mat-form-field>
 </mat-card>
 <mat-card color="primary" *ngIf="!manualAddress && !emptyAddress()">

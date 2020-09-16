@@ -130,6 +130,8 @@ class ResourceListController
                     $select[] = 'res_letterbox.modification_date';
                 } elseif ($value['value'] == 'getOpinionLimitDate') {
                     $select[] = 'res_letterbox.opinion_limit_date';
+                } elseif (strpos($value['value'], 'indexingCustomField_') !== false && !in_array('res_letterbox.custom_fields', $select)) {
+                    $select[] = 'res_letterbox.custom_fields';
                 }
             }
 
@@ -928,6 +930,17 @@ class ResourceListController
                         $display[] = $value;
                     } elseif ($value['value'] == 'getOpinionLimitDate') {
                         $value['displayValue'] = $resource['opinion_limit_date'];
+                        $display[] = $value;
+                    } elseif ($value['value'] == 'getResId') {
+                        $value['displayValue'] = $resource['res_id'];
+                        $display[] = $value;
+                    } elseif ($value['value'] == 'getBarcode') {
+                        $value['displayValue'] = $resource['barcode'];
+                        $display[] = $value;
+                    } elseif (strpos($value['value'], 'indexingCustomField_') !== false) {
+                        $customId = explode('_', $value['value'])[1];
+                        $customValue = json_decode($resource['custom_fields'], true);
+                        $value['displayValue'] = $customValue[$customId] ?? '';
                         $display[] = $value;
                     }
                 }

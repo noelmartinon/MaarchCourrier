@@ -1,30 +1,36 @@
 <mat-form-field [class]="class + ' search-select'" [floatLabel]="appService.getViewMode() || showLabel ? '' : 'never'">
-  <mat-label *ngIf="appService.getViewMode() || showLabel">{{label}}</mat-label>
-  <mat-select [id]="id" [formControl]="formControlSelect" [placeholder]="placeholderLabel" #test
-    (selectionChange)="launchEvent($event)" [required]="required">
-    <input *ngIf="datas.length > 5" matInput class="mat-select-search-input mat-select-search-hidden" />
+    <mat-label *ngIf="appService.getViewMode() || showLabel">{{label}}</mat-label>
+    <mat-select [id]="id" [formControl]="formControlSelect" [placeholder]="placeholderLabel" #test
+        (selectionChange)="launchEvent($event)" [required]="required" [multiple]="multiple">
+        <input *ngIf="datas.length > 5" matInput class="mat-select-search-input mat-select-search-hidden" />
 
-    <div *ngIf="datas.length > 5" class="mat-select-search-inner"
-      [ngClass]="{'mat-select-search-inner-multiple': matSelect.multiple}">
-      <input matInput id="searchSelectInput" [formControl]="formControlSearch" class="mat-select-search-input"
-        #searchSelectInput (keydown)="_handleKeydown($event)" (input)="onInputChange($event.target.value)"
-        (blur)="onBlur($event.target.value)" [placeholder]="this.translate.instant('lang.filterBy')" />
-      <button mat-button *ngIf="formControlSearch.value" mat-icon-button aria-label="Clear" (click)="_reset(true)"
-        class="mat-select-search-clear">
-        <mat-icon class="fa fa-times"></mat-icon>
-      </button>
-    </div>
+        <div *ngIf="datas.length > 5" class="mat-select-search-inner"
+            [ngClass]="{'mat-select-search-inner-multiple': matSelect.multiple}">
+            <input matInput id="searchSelectInput" [formControl]="formControlSearch" class="mat-select-search-input"
+                #searchSelectInput (keydown)="_handleKeydown($event)" (input)="onInputChange($event.target.value)"
+                (blur)="onBlur($event.target.value)" [placeholder]="this.translate.instant('lang.filterBy')" />
+            <button mat-button *ngIf="formControlSearch.value" mat-icon-button aria-label="Clear" (click)="_reset(true)"
+                class="mat-select-search-clear">
+                <mat-icon class="fa fa-times"></mat-icon>
+            </button>
+            <button color="primary" mat-icon-button *ngIf="functions.empty(formControlSearch.value) && multiple" [title]="'lang.displaySelectedValues' | translate" (click)="formControlSearch.setValue('__SELECTED')" class="mat-select-search-clear">
+                <mat-icon class="fas fa-check-double"></mat-icon>
+            </button>
+        </div>
 
-    <div *ngIf="value && _options?.length === 0 && datas.length > 5" class="mat-select-search-no-entries-found">
-      {{'lang.noResult' | translate}}
-    </div>
-    <mat-option *ngIf="showResetOption" [value]="null"></mat-option>
-    <mat-option *ngFor="let value of filteredDatas | async" [value]="returnValue === 'id' ? value.id : value"
-      [title]="value.title !== undefined ? value.title : value.label" [disabled]="value.disabled"
-      [class.opt-group]="value.isTitle" [style.color]="value.color" [innerHTML]="value.label">
-    </mat-option>
-  </mat-select>
-  <mat-error *ngIf="formControlSelect.status!=='VALID' && formControlSelect.touched && !hideErrorDesc">
-    {{getErrorMsg(formControlSelect.errors)}}</mat-error>
-  <mat-icon *ngIf="suffixIcon !== null" style="height: auto;" matSuffix [style.color]="suffixIcon.color" class="fas fa-circle selectSuffixIcon" [title]="suffixIcon.title !== undefined ? suffixIcon.title : ''"></mat-icon>
+        <div *ngIf="value && _options?.length === 0 && datas.length > 5" class="mat-select-search-no-entries-found">
+            {{'lang.noResult' | translate}}
+        </div>
+        <mat-option *ngIf="showResetOption" [value]="null"></mat-option>
+        <mat-option *ngFor="let value of filteredDatas | async" [value]="returnValue === 'id' ? value.id : value"
+            [title]="value.title !== undefined ? value.title : value.label" [disabled]="value.disabled"
+            [class.opt-group]="value.isTitle" [style.color]="value.color">
+            <span [innerHTML]="value.label"></span>
+        </mat-option>
+    </mat-select>
+    <mat-error *ngIf="formControlSelect.status!=='VALID' && formControlSelect.touched && !hideErrorDesc">
+        {{getErrorMsg(formControlSelect.errors)}}</mat-error>
+    <mat-icon *ngIf="suffixIcon !== null" style="height: auto;" matSuffix [style.color]="suffixIcon.color"
+        class="fas fa-circle selectSuffixIcon" [title]="suffixIcon.title !== undefined ? suffixIcon.title : ''">
+    </mat-icon>
 </mat-form-field>

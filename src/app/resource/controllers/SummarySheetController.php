@@ -165,6 +165,11 @@ class SummarySheetController
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($fileContent);
 
+        $queryParams = $request->getQueryParams();
+        if (!empty($queryParams['mode']) && $queryParams['mode'] == 'base64') {
+            return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'mimeType' => $mimeType]);
+        }
+
         $response->write($fileContent);
         $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.pdf");
 

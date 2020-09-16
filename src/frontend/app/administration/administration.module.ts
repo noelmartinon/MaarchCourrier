@@ -66,7 +66,6 @@ import { UpdateStatusAdministrationComponent } from './updateStatus/update-statu
 import { UserAdministrationComponent, UserAdministrationRedirectModalComponent } from './user/user-administration.component';
 import { VersionsUpdateAdministrationComponent } from './versionUpdate/versions-update-administration.component';
 import { AdministrationComponent } from './home/administration.component';
-import { DocumentFormModule } from '../document-form.module';
 import { UsersAdministrationComponent, UsersAdministrationRedirectModalComponent } from './user/users-administration.component';
 import { UsersImportComponent } from './user/import/users-import.component';
 import { UsersExportComponent } from './user/export/users-export.component';
@@ -77,6 +76,13 @@ import { IssuingSiteListComponent } from './registered-mail/issuing-site/issuing
 import { IssuingSiteComponent } from './registered-mail/issuing-site/issuing-site.component';
 import { RegisteredMailListComponent } from './registered-mail/registered-mail-list.component';
 
+// DOCUMENT FORM
+import { IndexingFormComponent } from '../indexation/indexing-form/indexing-form.component';
+import { TagInputComponent } from '../tag/indexing/tag-input.component';
+import { FolderInputComponent } from '../../app/folder/indexing/folder-input.component';
+import { IssuingSiteInputComponent } from '../../app/administration/registered-mail/issuing-site/indexing/issuing-site-input.component';
+import { RegisteredMailRecipientInputComponent } from '../../app/administration/registered-mail/indexing/recipient-input.component';
+
 
 @NgModule({
     imports: [
@@ -84,7 +90,6 @@ import { RegisteredMailListComponent } from './registered-mail/registered-mail-l
         // NgxChartsModule,
         InternationalizationModule,
         JoyrideModule.forChild(),
-        DocumentFormModule,
         AdministrationRoutingModule,
         DocumentViewerModule
     ],
@@ -159,7 +164,12 @@ import { RegisteredMailListComponent } from './registered-mail/registered-mail-l
         RegisteredMailComponent,
         IssuingSiteListComponent,
         IssuingSiteComponent,
-        RegisteredMailListComponent
+        RegisteredMailListComponent,
+        IndexingFormComponent,
+        TagInputComponent,
+        FolderInputComponent,
+        IssuingSiteInputComponent,
+        RegisteredMailRecipientInputComponent
     ],
     entryComponents: [
         AccountLinkComponent,

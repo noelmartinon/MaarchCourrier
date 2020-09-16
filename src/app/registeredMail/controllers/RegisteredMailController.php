@@ -19,6 +19,7 @@ use Contact\models\ContactModel;
 use Convert\models\AdrModel;
 use Docserver\controllers\DocserverController;
 use Group\controllers\PrivilegeController;
+use History\controllers\HistoryController;
 use Parameter\models\ParameterModel;
 use RegisteredMail\models\IssuingSiteModel;
 use RegisteredMail\models\RegisteredMailModel;
@@ -196,6 +197,7 @@ class RegisteredMailController
             $set = ['received_date' => 'CURRENT_TIMESTAMP'];
             $status = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'registeredMailDistributedStatus']);
             $status = $status['param_value_string'];
+            $info = _REGISTERED_MAIL_DISTRIBUTED;
         } else {
             if (!Validator::stringType()->notEmpty()->validate($body['returnReason'])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Body returnReason is empty or not a string']);
@@ -212,6 +214,7 @@ class RegisteredMailController
             $set = ['received_date' => $body['receivedDate'], 'return_reason' => $body['returnReason']];
             $status = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'registeredMailNotDistributedStatus']);
             $status = $status['param_value_string'];
+            $info = _REGISTERED_MAIL_NOT_DISTRIBUTED;
         }
 
         RegisteredMailModel::update([
@@ -226,6 +229,15 @@ class RegisteredMailController
                 'data'  => [$registeredMail['res_id']]
             ]);
         }
+
+        HistoryController::add([
+            'tableName' => 'res_letterbox',
+            'recordId'  => $registeredMail['res_id'],
+            'eventType' => 'ACTION#0',
+            'info'      => $info,
+            'moduleId'  => 'resource',
+            'eventId'   => 'registeredMailReceived'
+        ]);
 
         return $response->withStatus(204);
     }
@@ -817,16 +829,16 @@ class RegisteredMailController
             $pdf->Cell(30, 10, $registeredMail['alt_identifier'], 1, 0, 'C');
             $pdf->Cell(10, 10, $registeredMail['warranty'], 1, 0, 'C');
             $pdf->Cell(15, 10, "", 1);
-            $pdf->Cell(30, 10, mb_strimwidth($registeredMail['reference'], 0, 22, "..."), 1, 0, 'C');
+            $pdf->Cell(30, 10, mb_strimwidth($registeredMail['reference'], 0, 22, "...", "UTF-8"), 1, 0, 'C');
 
             $pdf->setFont('times', '', 6);
-            if (strlen($recipient[1] . " " . $recipient[4] . " " . $recipient[6]) > 60) {
+            if (strlen($recipient[1] . " " . $recipient[4] . " " . $recipient[6] . " " . $recipient[7]) > 60) {
                 $pdf->Cell(95, 10, $recipient[1], 1);
                 $pdf->SetXY($pdf->GetX() - 95, $pdf->GetY() + 3);
-                $pdf->Cell(95, 10, $recipient[4] . " " . $recipient[6], 0);
+                $pdf->Cell(95, 10, $recipient[4] . " " . $recipient[6] . " " . $recipient[7], 0);
                 $pdf->SetXY($pdf->GetX() + 95, $pdf->GetY() - 3);
             } else {
-                $pdf->Cell(95, 10, $recipient[1] . " " . $recipient[4] . " " . $recipient[6], 1);
+                $pdf->Cell(95, 10, $recipient[1] . " " . $recipient[4] . " " . $recipient[6] . " " . $recipient[7], 1);
             }
 
 

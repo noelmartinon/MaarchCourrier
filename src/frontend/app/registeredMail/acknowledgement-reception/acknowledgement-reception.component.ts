@@ -115,6 +115,8 @@ export class AcknowledgementReceptionComponent implements OnInit {
                 this.receivedDate = this.today;
                 this.reason = '';
                 this.reasonOther = '';
+
+                this.focusRegisteredMailNumber();
             }),
             catchError((err) => {
                 this.notify.handleSoftErrors(err);

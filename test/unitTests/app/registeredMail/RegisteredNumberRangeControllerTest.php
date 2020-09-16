@@ -49,7 +49,7 @@ class RegisteredNumberRangeControllerTest extends TestCase
         $body = [
             'registeredMailType' => '2D',
             'trackerNumber'      => 'AZPOKF30KDZP',
-            'rangeStart'         => 1,
+            'rangeStart'         => 11,
             'rangeEnd'           => 1000,
             'siteId'             => self::$siteId
         ];
@@ -90,7 +90,7 @@ class RegisteredNumberRangeControllerTest extends TestCase
         $this->assertSame(self::$id, $responseBody['range']['id']);
         $this->assertSame('2D', $responseBody['range']['registeredMailType']);
         $this->assertSame('AZPOKF30KDZP', $responseBody['range']['trackerNumber']);
-        $this->assertSame(1, $responseBody['range']['rangeStart']);
+        $this->assertSame(11, $responseBody['range']['rangeStart']);
         $this->assertSame(1000, $responseBody['range']['rangeEnd']);
         $this->assertSame(self::$siteId, $responseBody['range']['siteId']);
         $this->assertSame($GLOBALS['id'], $responseBody['range']['creator']);
@@ -227,20 +227,27 @@ class RegisteredNumberRangeControllerTest extends TestCase
         $this->assertIsArray($responseBody['ranges']);
         $this->assertNotEmpty($responseBody['ranges']);
 
-        $this->assertIsArray($responseBody['ranges'][0]);
-        $this->assertNotEmpty($responseBody['ranges'][0]);
+        $found = false;
+        foreach ($responseBody['ranges'] as $range) {
+            $this->assertIsArray($range);
+            $this->assertNotEmpty($range);
+            if ($range['id'] == self::$id) {
+                $this->assertNotEmpty($range);
+                $this->assertSame(self::$id, $range['id']);
+                $this->assertSame('2D', $range['registeredMailType']);
+                $this->assertSame('AZPOKF30KDZP', $range['trackerNumber']);
+                $this->assertSame(11, $range['rangeStart']);
+                $this->assertSame(1000, $range['rangeEnd']);
+                $this->assertSame(self::$siteId, $range['siteId']);
+                $this->assertSame($GLOBALS['id'], $range['creator']);
+                $this->assertNull($range['currentNumber']);
+                $this->assertIsArray($range['entities']);
+                $this->assertSame(0, $range['fullness']);
+                $found = true;
+            }
+        }
 
-        $this->assertNotEmpty($responseBody['ranges'][0]);
-        $this->assertSame(self::$id, $responseBody['ranges'][0]['id']);
-        $this->assertSame('2D', $responseBody['ranges'][0]['registeredMailType']);
-        $this->assertSame('AZPOKF30KDZP', $responseBody['ranges'][0]['trackerNumber']);
-        $this->assertSame(1, $responseBody['ranges'][0]['rangeStart']);
-        $this->assertSame(1000, $responseBody['ranges'][0]['rangeEnd']);
-        $this->assertSame(self::$siteId, $responseBody['ranges'][0]['siteId']);
-        $this->assertSame($GLOBALS['id'], $responseBody['ranges'][0]['creator']);
-        $this->assertNull($responseBody['ranges'][0]['currentNumber']);
-        $this->assertIsArray($responseBody['ranges'][0]['entities']);
-        $this->assertSame(0, $responseBody['ranges'][0]['fullness']);
+        $this->assertSame(true, $found);
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
@@ -262,7 +269,7 @@ class RegisteredNumberRangeControllerTest extends TestCase
         $this->assertSame(self::$id, $responseBody['range']['id']);
         $this->assertSame('2D', $responseBody['range']['registeredMailType']);
         $this->assertSame('AZPOKF30KDZP', $responseBody['range']['trackerNumber']);
-        $this->assertSame(1, $responseBody['range']['rangeStart']);
+        $this->assertSame(11, $responseBody['range']['rangeStart']);
         $this->assertSame(1000, $responseBody['range']['rangeEnd']);
         $this->assertSame(self::$siteId, $responseBody['range']['siteId']);
         $this->assertSame($GLOBALS['id'], $responseBody['range']['creator']);
@@ -294,7 +301,7 @@ class RegisteredNumberRangeControllerTest extends TestCase
         $body = [
             'registeredMailType' => '2D',
             'trackerNumber'      => 'AZPOKF30KDZP',
-            'rangeStart'         => 1,
+            'rangeStart'         => 11,
             'rangeEnd'           => 900,
             'siteId'             => self::$siteId,
             'status'             => 'OK'
@@ -314,11 +321,11 @@ class RegisteredNumberRangeControllerTest extends TestCase
         $this->assertSame(self::$id, $responseBody['range']['id']);
         $this->assertSame('2D', $responseBody['range']['registeredMailType']);
         $this->assertSame('AZPOKF30KDZP', $responseBody['range']['trackerNumber']);
-        $this->assertSame(1, $responseBody['range']['rangeStart']);
+        $this->assertSame(11, $responseBody['range']['rangeStart']);
         $this->assertSame(900, $responseBody['range']['rangeEnd']);
         $this->assertSame(self::$siteId, $responseBody['range']['siteId']);
         $this->assertSame($GLOBALS['id'], $responseBody['range']['creator']);
-        $this->assertSame(1, $responseBody['range']['currentNumber']);
+        $this->assertSame(11, $responseBody['range']['currentNumber']);
         $this->assertSame(0, $responseBody['range']['fullness']);
         $this->assertSame('OK', $responseBody['range']['status']);
 
@@ -378,7 +385,7 @@ class RegisteredNumberRangeControllerTest extends TestCase
         $body = [
             'registeredMailType' => '2D',
             'trackerNumber'      => 'AZPOKF30KDZP',
-            'rangeStart'         => 1,
+            'rangeStart'         => 11,
             'rangeEnd'           => 900,
             'siteId'             => self::$siteId,
             'status'             => 'END'
@@ -469,7 +476,7 @@ class RegisteredNumberRangeControllerTest extends TestCase
         $body = [
             'registeredMailType' => '2D',
             'trackerNumber'      => 'AZPOKF30KDZP',
-            'rangeStart'         => 1,
+            'rangeStart'         => 11,
             'rangeEnd'           => 1000,
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -482,7 +489,7 @@ class RegisteredNumberRangeControllerTest extends TestCase
         $body = [
             'registeredMailType' => '2D',
             'trackerNumber'      => 'AZPOKF30KDZP',
-            'rangeStart'         => 1,
+            'rangeStart'         => 11,
             'rangeEnd'           => 1000,
             'siteId'             => self::$siteId * 1000
         ];
@@ -577,7 +584,7 @@ class RegisteredNumberRangeControllerTest extends TestCase
         $response = $registeredNumberRangeController->getLastNumberByType($request, new \Slim\Http\Response(), ['type' => '2C']);
         $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame(1, $responseBody['lastNumber']);
+        $this->assertSame(10, $responseBody['lastNumber']);
 
         $GLOBALS['login'] = 'bbain';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);

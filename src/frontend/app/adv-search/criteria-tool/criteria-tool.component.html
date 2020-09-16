@@ -1,44 +1,160 @@
-<mat-accordion>
-    <mat-expansion-panel expanded #criteriaTool>
-        <mat-expansion-panel-header>
-            <mat-panel-title>
-                {{'lang.criteriaSearch' | translate}}
-            </mat-panel-title>
-        </mat-expansion-panel-header>
-
-        <!--<div class="col-md-12">
+<form (ngSubmit)="getCurrentCriteriaValues()" #criteriaFormUp="ngForm">
+    <mat-form-field floatLabel="never" class="basket-search">
+        <input class="metaSearch" type="text" matInput [matAutocomplete]="autoCriteria"
+            [placeholder]="'lang.quickSearch' | translate" [formControl]="searchTermControl">
+        <button mat-icon-button matPrefix (click)="focusFilter()" [title]="'lang.displayCriteria' | translate">
+            <mat-icon class="fas fa-clipboard-list"></mat-icon>
+        </button>
+        <mat-autocomplete [class]="hideCriteriaList ? 'hide' : ''" #autoCriteria="matAutocomplete"
+            (closed)="hideCriteriaList = true;" (optionSelected)="addCriteria($event.option.value)" [showPanel]="false">
+            <mat-optgroup [label]="'Ajouter un critère de recherche'" class="criteria-list">
+                <input matInput type="text" #searchCriteriaInput [formControl]="getFilterControl()"
+                    style="margin-left:5px;width:150px !important;height: 20px;border: 1px solid #6666663d;padding: 10px;border-radius: 5px;"
+                    placeholder="{{'lang.filterBy' | translate}}">
+                <mat-option *ngIf="(getFilteredCriterias() | async)?.length===0" disabled>Aucun résultat</mat-option>
+                <mat-option *ngFor="let item of getFilteredCriterias()  | async | sortBy : 'label'" [value]="item"
+                    [disabled]="isCurrentCriteria(item.identifier)" style="padding-left: 0px;;">
+                    <i class="fa {{item.icon}}" color="primary"
+                        style="font-size:14px;width:50px;text-align:center;"></i> {{item.label}}
+                </mat-option>
+            </mat-optgroup>
+        </mat-autocomplete>
+    </mat-form-field>
+    <mat-accordion class="criteria-container">
+        <mat-expansion-panel expanded #criteriaTool [expanded]="false">
+            <mat-expansion-panel-header>
+                <mat-panel-title>
+                    {{'lang.criteriaSearch' | translate}}
+                    <span style="background: white;height: 1px;flex: 1;margin-top: 10px;margin-left: 10px;"></span>
+                </mat-panel-title>
+            </mat-expansion-panel-header>
+            <ng-container *ngIf="!loading; else loadingTemplate">
+                <!--<div class="col-md-12">
             <mat-form-field appearance="outline" class="addCriteriaField">
                 <input type="text" #searchCriteriaInput matInput placeholder="Ajouter un critère"
                     [formControl]="searchCriteria" [matAutocomplete]="autoGroup">
                 <mat-autocomplete #autoGroup="matAutocomplete" (optionSelected)="addCriteria($event.option.value)">
-                    <ng-container *ngFor="let keyVal of criteria | keyvalue">
-                        <mat-optgroup [label]="this.translate.instant('lang.' + keyVal.key)" *ngIf="(filteredCriteria[keyVal.key] | async)?.length > 0">
-                            <mat-option *ngFor="let crit of filteredCriteria[keyVal.key] | async | sortBy : 'label'"
-                                [value]="crit" [disabled]="isCurrentCriteria(crit.id)">
-                                {{crit.label}}
-                            </mat-option>
-                        </mat-optgroup>
-                    </ng-container>
+                    <mat-option *ngFor="let crit of filteredCriteria | async | sortBy : 'label'"
+                        [value]="crit" [disabled]="isCurrentCriteria(crit.id)">
+                        {{crit.label}}
+                    </mat-option>
                 </mat-autocomplete>
             </mat-form-field>
         </div>-->
-        <form (ngSubmit)="getSearchUrl()" #criteriaFormUp="ngForm">
-            <div class="col-md-6" *ngFor="let criteria of currentCriteria;let i=index">
-                <mat-form-field appearance="outline" class="criteriaField">
-                    <mat-label>{{criteria.label}}</mat-label>
-                    <input matInput [formControl]="criteria.control">
-                    <!--<button mat-icon-button type="button" matSuffix color="primary"
-                        (click)="$event.stopPropagation();removeCriteria(i)">
-                        <mat-icon color="warn" class="fa fa-trash"></mat-icon>
-                    </button>-->
-                    <mat-hint>{{criteria.desc}}</mat-hint>
-                </mat-form-field>
-            </div>
-            <div class="col-md-12">
-                <button mat-raised-button matSuffix color="primary" type="submit">
-                    {{'lang.searchMails' | translate}}
-                </button>
-            </div>
-        </form>
-    </mat-expansion-panel>
-</mat-accordion>
+                <div style="display: grid;align-items: center;grid-template-columns: repeat(2, 1fr);">
+                    <div style="display: grid;align-items: baseline;grid-template-columns: 35% 60% 5%;"
+                        *ngFor="let field of currentCriteria;let i=index">
+                        <ng-container *ngIf="field.type === 'string'">
+                            <span class="criteria-label">
+                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                            </span>
+                            <mat-form-field class="input-form" floatLabel="never">
+                                <input [id]="field.identifier" type="text" matInput
+                                    [placeholder]="'lang.typeValue' | translate" [formControl]="field.control">
+                            </mat-form-field>
+                        </ng-container>
+                        <ng-container *ngIf="field.type === 'integer'">
+                            <span class="criteria-label">
+                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                            </span>
+                            <mat-form-field class="input-form">
+                                <input [id]="field.identifier" type="number" matInput [formControl]="field.control"
+                                    [placeholder]="!adminMode ? this.translate.instant('lang.typeValue') : this.translate.instant('lang.defaultValue')"
+                                    min="0" step="0.1">
+                            </mat-form-field>
+                        </ng-container>
+                        <ng-container *ngIf="['select', 'radio', 'checkbox'].indexOf(field.type) > -1">
+                            <span class="criteria-label">
+                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                            </span>
+                            <plugin-select-search [id]="field.identifier" [showResetOption]="true" [label]="field.label"
+                                [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="field.control"
+                                [datas]="field.values" [multiple]="true" style="width:100%;">
+                            </plugin-select-search>
+                        </ng-container>
+                        <ng-container *ngIf="field.type === 'date'">
+                            <span class="criteria-label">
+                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                            </span>
+                            <mat-form-field class="input-form input-date" floatLabel="never" (click)="picker.open()"
+                                style="cursor:pointer;">
+                                <input [id]="field.identifier" [formControl]="field.control" matInput
+                                    [matDatepicker]="picker" [placeholder]="'lang.chooseDate' | translate" readonly
+                                    style="cursor:pointer;">
+                                <mat-datepicker-toggle matSuffix [for]="picker" *ngIf="!field.control.value">
+                                </mat-datepicker-toggle>
+                                <mat-datepicker [touchUi]="appService.getViewMode()" #picker></mat-datepicker>
+                                <button mat-button color="warn" matSuffix mat-icon-button
+                                    *ngIf="!functions.empty(field.control.value)"
+                                    (click)="$event.stopPropagation();field.control.reset();"
+                                    [title]="this.translate.instant('lang.eraseValue')">
+                                    <mat-icon color="warn" class="fa fa-calendar-times">
+                                    </mat-icon>
+                                </button>
+                            </mat-form-field>
+                        </ng-container>
+                        <ng-container *ngIf="['senders','recipients'].indexOf(field.identifier) > -1">
+                            <span class="criteria-label">
+                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                            </span>
+                            <app-contact-autocomplete [id]="field.identifier" [control]="field.control" style="width:100%;">
+                            </app-contact-autocomplete>
+                        </ng-container>
+                        <ng-container *ngIf="field.identifier === 'folders'">
+                            <span class="criteria-label">
+                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                            </span>
+                            <app-folder-input [control]="field.control" style="width:100%;">
+                            </app-folder-input>
+                        </ng-container>
+                        <ng-container *ngIf="field.identifier === 'tags'">
+                            <span class="criteria-label">
+                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                            </span>
+                            <app-tag-input [control]="field.control" style="width:100%;">
+                            </app-tag-input>
+                        </ng-container>
+                        <ng-container *ngIf="field.type === 'banAutocomplete'">
+                            <span class="criteria-label">
+                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                            </span>
+                            <app-address-ban-input [control]="field.control" style="width:100%;">
+                            </app-address-ban-input>
+                        </ng-container>
+                        <ng-container *ngIf="field.identifier === 'registeredMail_issuingSite'">
+                            <span class="criteria-label">
+                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                            </span>
+                            <app-issuing-site-input #appIssuingSiteInput [control]="field.control" style="width:100%;">
+                            </app-issuing-site-input>
+                        </ng-container>
+                        <ng-container *ngIf="field.identifier === 'registeredMail_recipient'">
+                            <span class="criteria-label">
+                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                            </span>
+                            <app-registered-mail-recipient-input #appRegisteredMailRecipientInput
+                                [control]="field.control" style="width:100%;">
+                            </app-registered-mail-recipient-input>
+                        </ng-container>
+                        <button mat-icon-button type="button" matSuffix color="primary"
+                            (click)="$event.stopPropagation();removeCriteria(i)">
+                            <mat-icon class="fa fa-trash" style="color:white;"></mat-icon>
+                        </button>
+                    </div>
+                </div>
+                <div
+                    style="color: white;font-size: 12px;font-style: inherit;padding: 10px;opacity: 0.5;padding-top: 25px;">
+                    Les critères de recherche se cumulent sur la recherche rapide
+                </div>
+            </ng-container>
+            <ng-template #loadingTemplate>
+                <mat-spinner class="loader"></mat-spinner>
+            </ng-template>
+        </mat-expansion-panel>
+    </mat-accordion>
+    <div class="col-md-12" style="text-align: center;">
+        <button mat-raised-button matSuffix color="default" type="submit">
+            {{'lang.searchMails' | translate}}
+        </button>
+    </div>
+</form>

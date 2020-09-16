@@ -6,14 +6,13 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FunctionsService } from '../../../service/functions.service';
 import { tap } from 'rxjs/operators';
-
-declare var tinymce: any;
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
     templateUrl: 'summary-sheet.component.html',
     styleUrls: ['summary-sheet.component.scss']
 })
-export class SummarySheetComponent implements OnInit, OnDestroy {
+export class SummarySheetComponent implements OnInit {
 
     loading: boolean = false;
     withQrcode: boolean = true;
@@ -123,7 +122,8 @@ export class SummarySheetComponent implements OnInit, OnDestroy {
         private notify: NotificationService,
         public dialogRef: MatDialogRef<SummarySheetComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
-        public functions: FunctionsService) { }
+        public functions: FunctionsService,
+        private sanitizer: DomSanitizer) { }
 
     ngOnInit(): void {
         this.paramMode = !this.functions.empty(this.data.paramMode);
@@ -135,35 +135,13 @@ export class SummarySheetComponent implements OnInit, OnDestroy {
                 } else {
                     this.dataAvailable = this.dataAvailable.map((item: any) => {
                         if (item.id === 'trafficRecords') {
-                            item.advanced_desc = trafficRecordsInfo[0].param_value_string;
+                            item.advanced_desc = this.sanitizer.bypassSecurityTrustHtml(trafficRecordsInfo[0].param_value_string);
                         }
                         return item;
                     });
-                    setTimeout(() => {
-                        this.initMce();
-                    }, 200);
                 }
             })
         ).subscribe();
-    }
-
-    ngOnDestroy() {
-        tinymce.remove('textarea');
-    }
-
-    initMce() {
-        tinymce.init({
-            selector: 'textarea',
-            base_url: '../node_modules/tinymce/',
-            height: '200',
-            suffix: '.min',
-            language: this.translate.instant('lang.langISO').replace('-', '_'),
-            language_url: `../node_modules/tinymce-i18n/langs/${this.translate.instant('lang.langISO').replace('-', '_')}.js`,
-            menubar: false,
-            statusbar: false,
-            readonly: true,
-            toolbar: ''
-        });
     }
 
     drop(event: CdkDragDrop<string[]>) {

@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { SharedModule } from './app-common.module';
 import { FiltersToolComponent } from './list/filters/filters-tool.component';
-import { PanelListComponent } from './list/panel/panel-list.component';
 import { SummarySheetComponent } from './list/summarySheet/summary-sheet.component';
 import { ExportComponent } from './list/export/export.component';
 import { ToolsListComponent } from './list/tools/tools-list.component';
@@ -21,7 +20,6 @@ import { TranslateService } from '@ngx-translate/core';
     ],
     declarations: [
         FiltersToolComponent,
-        PanelListComponent,
         SummarySheetComponent,
         ExportComponent,
         ToolsListComponent,
@@ -32,7 +30,6 @@ import { TranslateService } from '@ngx-translate/core';
     exports: [
         SharedModule,
         FiltersToolComponent,
-        PanelListComponent,
         SummarySheetComponent,
         ExportComponent,
         ToolsListComponent,

@@ -255,7 +255,7 @@ export class BasketAdministrationComponent implements OnInit {
                 if (this.basketGroups.length > 0) {
                     result.list_display = this.basketGroups[this.basketGroups.length - 1].list_display;
                 } else {
-                    result.list_display = [];
+                    result.list_display = {'subInfos': [], 'templateColumns' : 0};
                 }
                 this.http.post('../rest/baskets/' + this.id + '/groups', result)
                     .subscribe(() => {

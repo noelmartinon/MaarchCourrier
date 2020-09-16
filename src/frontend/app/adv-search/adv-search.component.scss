@@ -1,5 +1,9 @@
 @import '../../css/vars.scss';
 
+.bg-head-content {
+    flex-direction: column;
+}
+
 .dragPreview {
     text-align: center;
     border-radius: 5px;
@@ -42,11 +46,11 @@
             z-index: -1;
             top: 17px;
             background: lighten($primary, 10%);
-            height: 1px; 
+            height: 1px;
         }
     }
 
-    .content { 
+    .content {
         display: flex;
         font-size: 16px;
 

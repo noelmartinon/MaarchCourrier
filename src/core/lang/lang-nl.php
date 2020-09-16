@@ -473,3 +473,6 @@ define("_ISSUING_SITE_DELETED", "Issuing site deleted"); //TO TRANSLATE
 define("_REGISTERED_NUMBER_RANGE_CREATED", "Registered number range created"); //TO TRANSLATE
 define("_REGISTERED_NUMBER_RANGE_UPDATED", "Registered number range updated"); //TO TRANSLATE
 define("_REGISTERED_NUMBER_RANGE_DELETED", "Registered number range deleted"); //TO TRANSLATE
+
+define('_REGISTERED_MAIL_DISTRIBUTED', 'Acknowledgement receipt received : registered mail distributed'); //TO TRANSLATE
+define('_REGISTERED_MAIL_NOT_DISTRIBUTED', 'Acknowledgement receipt received : registered mail not distributed'); //TO TRANSLATE

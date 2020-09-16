@@ -128,6 +128,19 @@ export class ListAdministrationComponent implements OnInit {
             'sample': this.translate.instant('lang.getFoldersSample'),
             'cssClasses': ['align_leftData'],
             'icon': 'fa-folder'
+        },
+        {
+            'value': 'getResId',
+            'label': this.translate.instant('lang.getResId'),
+            'sample': this.translate.instant('lang.getResIdSample'),
+            'cssClasses': ['align_leftData'],
+            'icon': 'fa-sort-numeric-down'
+        }, {
+            'value': 'getBarcode',
+            'label': this.translate.instant('lang.getBarcode'),
+            'sample': this.translate.instant('lang.getBarcodeSample'),
+            'cssClasses': ['align_leftData'],
+            'icon': 'fa-barcode'
         }
     ];
     availableDataClone: any = [];

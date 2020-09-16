@@ -52,8 +52,8 @@
                                 </div>
                             </div><br>
                             <div class="row" class="unitData" (click)="item.enabled = !item.enabled" *ngIf="item.advanced_desc">
-                                <textarea  style="padding-top: 10px;" name="traffic_record_summary_sheet" id="traffic_record_summary_sheet"
-                                    [value]="item.advanced_desc"></textarea>
+                                <div  style="padding-top: 10px;" name="traffic_record_summary_sheet" id="traffic_record_summary_sheet"
+                                    [innerHTML]="item.advanced_desc"></div>
                             </div>
                             <mat-slide-toggle [(ngModel)]="item.enabled" color="primary" class="unitToggle">
                             </mat-slide-toggle>

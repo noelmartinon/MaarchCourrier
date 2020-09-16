@@ -479,3 +479,6 @@ define('_PRINT_REGISTERED_MAIL', 'Print registered mail');
 define('_PRINT_DEPOSIT_LIST', "Print deposit list");
 define('_NOT_REGISTERED_MAIL', 'Not a registered mail');
 define('_NOT_GENERATED', 'Not generated');
+
+define('_REGISTERED_MAIL_DISTRIBUTED', 'Acknowledgement receipt received : registered mail distributed');
+define('_REGISTERED_MAIL_NOT_DISTRIBUTED', 'Acknowledgement receipt received : registered mail not distributed');

@@ -119,7 +119,7 @@ export class RegisteredMailListComponent implements OnInit {
                 setTimeout(() => {
                     this.adminService.setDataSource('admin_regitered_mail', this.data, this.sort, this.paginator, this.filterColumns);
                 }, 0);
-                this.notify.success(this.translate.instant('Plage activée'));
+                this.notify.success(this.translate.instant('lang.registeredMailNumberRangesActivated'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -143,7 +143,7 @@ export class RegisteredMailListComponent implements OnInit {
                 setTimeout(() => {
                     this.adminService.setDataSource('admin_regitered_mail', this.data, this.sort, this.paginator, this.filterColumns);
                 }, 0);
-                this.notify.success(this.translate.instant('Plage cloturée'));
+                this.notify.success(this.translate.instant('lang.registeredMailNumberRangesClosed'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -163,7 +163,7 @@ export class RegisteredMailListComponent implements OnInit {
                 setTimeout(() => {
                     this.adminService.setDataSource('admin_regitered_mail', this.data, this.sort, this.paginator, this.filterColumns);
                 }, 0);
-                this.notify.success(this.translate.instant('lang.issuingSiteDeleted'));
+                this.notify.success(this.translate.instant('lang.registeredMailNumberRangesRemoved'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

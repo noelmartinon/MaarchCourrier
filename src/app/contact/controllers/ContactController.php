@@ -1302,7 +1302,7 @@ class ContactController
                         }
                     }
                 }
-                $contactToCreate['custom_fields'] = json_encode($contactToCreate['custom_fields']);
+                $contactToCreate['custom_fields'] = !empty($contactToCreate['custom_fields']) ? json_encode($contactToCreate['custom_fields']) : '{}';
 
                 ContactModel::create($contactToCreate);
             } else {
@@ -1325,8 +1325,9 @@ class ContactController
 
 
                 $oldContact = ContactModel::getById(['id' => $contact['id'], 'select' => ['custom_fields']]);
+                $oldContact['custom_fields'] = json_decode($oldContact['custom_fields'], true);
                 if (!empty($oldContact['custom_fields'])) {
-                    $set['custom_fields'] = $set['custom_fields'] + json_decode($oldContact['custom_fields'], true);
+                    $set['custom_fields'] = $set['custom_fields'] + $oldContact['custom_fields'];
                 }
                 if (!empty($customsToRemove)) {
                     foreach ($customsToRemove as $item) {

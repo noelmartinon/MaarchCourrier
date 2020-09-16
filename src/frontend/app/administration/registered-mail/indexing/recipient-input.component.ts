@@ -4,7 +4,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
-import { tap, catchError, debounceTime, filter, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { tap, catchError, debounceTime, filter, distinctUntilChanged, switchMap, startWith, map } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { LatinisePipe } from 'ngx-pipes';
 import { FunctionsService } from '../../../../service/functions.service';
@@ -34,6 +34,10 @@ export class RegisteredMailRecipientInputComponent implements OnInit {
     addressBANCurrentDepartment: string = '75';
     departmentList: any[] = [];
 
+    countries: any = [];
+    countriesFilteredResult: Observable<string[]>;
+    countryControl = new FormControl();
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -44,6 +48,8 @@ export class RegisteredMailRecipientInputComponent implements OnInit {
 
     ngOnInit(): void {
         this.getCivilities();
+        this.getCountries();
+        this.initAutocompleteCountries();
         this.initBanSearch();
         this.initAutocompleteAddressBan();
         if (this.control.value === null) {
@@ -67,6 +73,32 @@ export class RegisteredMailRecipientInputComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    getCountries() {
+        this.http.get(`../rest/registeredMail/countries`).pipe(
+            tap((data: any) => {
+                this.countries = data.countries.map(
+                    (item: any) => this.latinisePipe.transform(item.toUpperCase()));
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    initAutocompleteCountries() {
+        this.countriesFilteredResult = this.countryControl.valueChanges
+            .pipe(
+                startWith(''),
+                map(value => this._filter(value))
+            );
+    }
+
+    private _filter(value: string): string[] {
+        const filterValue = value.toLowerCase();
+        return this.countries.filter((option: any) => option.toLowerCase().includes(filterValue));
     }
 
     initBanSearch() {
@@ -118,6 +150,7 @@ export class RegisteredMailRecipientInputComponent implements OnInit {
         this.control.value.addressPostcode = ev.option.value.postalCode;
         this.control.value.addressTown = ev.option.value.city;
         this.control.value.addressCountry = 'FRANCE';
+        this.countryControl.setValue('FRANCE');
         this.addressBANControl.setValue('');
         this.control.setErrors({ 'required': true });
         this.control.markAsTouched();

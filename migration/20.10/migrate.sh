@@ -6,4 +6,5 @@ php ./migrateRemoteSignatureBookConfig.php
 php ./migrateImages.php
 php ./migrateCustomLang.php
 php ./migrateBasketListDisplay.php
+php ./migrateTemplates.php
 php ./migrateCustomXml.php # mettre en dernier

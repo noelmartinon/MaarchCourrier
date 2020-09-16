@@ -102,8 +102,8 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
     }
 
     initMce(readonly = false) {
-        tinymce.init({
-            selector: 'textarea',
+        let param = {
+            selector: '#loginpage_message',
             setup: (editor: any) => {
                 editor.on('Blur', (e) => {
                     this.stepFormGroup.controls[e.target.id].setValue(tinymce.get(e.target.id).getContent());
@@ -129,12 +129,18 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
             toolbar_sticky: true,
             toolbar_drawer: 'floating',
             table_style_by_css: true,
-            content_style: 'table td { vertical-align: top; }',
+            content_style: 'table td { padding: 1px; vertical-align: top; }',
             forced_root_block : false,
             toolbar: !readonly ? 'undo redo | fontselect fontsizeselect | bold italic underline strikethrough forecolor | table maarch_b64image | \
         alignleft aligncenter alignright alignjustify \
         bullist numlist outdent indent | removeformat code' : ''
-        });
+        };
+        tinymce.init(param);
+        param.selector = '#homepage_message';
+        tinymce.init(param);
+        param.selector = '#traffic_record_summary_sheet';
+        param.height = '500';
+        tinymce.init(param);
     }
 
     uploadTrigger(fileInput: any, mode: string) {
@@ -221,6 +227,11 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
         this.http.put('../rest/parameters/' + parameterId, param)
             .subscribe(() => {
                 this.notify.success(this.translate.instant('lang.parameterUpdated'));
+                if (parameterId === 'logo') {
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
+                }
             }, (err) => {
                 this.notify.error(err.error.errors);
             });

@@ -479,3 +479,6 @@ define('_PRINT_REGISTERED_MAIL', 'Imprimer le recommandé');
 define('_PRINT_DEPOSIT_LIST', "Imprimer le descriptif de pli");
 define('_NOT_REGISTERED_MAIL', "N'est pas un recommandé");
 define('_NOT_GENERATED', 'Non généré');
+
+define('_REGISTERED_MAIL_DISTRIBUTED', 'Accusé de réception reçu : recommandé distribué');
+define('_REGISTERED_MAIL_NOT_DISTRIBUTED', 'Accusé de réception reçu : recommandé non distribué');

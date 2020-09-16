@@ -127,7 +127,7 @@ export class ContactImportComponent implements OnInit {
         public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
-        private functionsService: FunctionsService,
+        public functionsService: FunctionsService,
         private localStorage: LocalStorageService,
         private headerService: HeaderService,
         public dialog: MatDialog,
@@ -152,7 +152,8 @@ export class ContactImportComponent implements OnInit {
                 data = data.customFields.map(custom => {
                     return {
                         id: `contactCustomField_${custom.id}`,
-                        label: custom.label
+                        label: custom.label,
+                        type: custom.type
                     };
                 });
                 return data;
@@ -315,7 +316,12 @@ export class ContactImportComponent implements OnInit {
                                 if (element[this.associatedColmuns[key.id]] === undefined) {
                                     objContact[key.id] = '';
                                 } else {
-                                    objContact[key.id] = element[this.associatedColmuns[key.id]].includes('\n') ? element[this.associatedColmuns[key.id]].split('\n') : element[this.associatedColmuns[key.id]];
+                                    if (key.type === 'checkbox') {
+                                        objContact[key.id] = !this.functionsService.empty(element[this.associatedColmuns[key.id]]) ? element[this.associatedColmuns[key.id]].split('\n') : [];
+
+                                    } else {
+                                        objContact[key.id] = element[this.associatedColmuns[key.id]];
+                                    }
                                 }
                             }
                         });

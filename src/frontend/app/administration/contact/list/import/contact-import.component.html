@@ -48,7 +48,7 @@
             </div>
             <div style="width:100%;box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.75);padding:10px;">
                 <div style="overflow: auto;">
-                    <mat-table *ngIf="csvData.length > 0" #table [dataSource]="dataSource" style="width:5000px;">
+                    <mat-table *ngIf="csvData.length > 0" #table [dataSource]="dataSource" [style.width.px]="contactColumns.length * 300">
                         <ng-container *ngFor="let column of contactColumns;let i=index;">
                             <ng-container [matColumnDef]="column.id">
                                 <mat-header-cell *matHeaderCellDef style="padding-left: 5px;padding-right: 5px;">

@@ -1928,6 +1928,11 @@
     "warrantyLevel": "Niveau de garantie",
     "letter": "Lettre",
     "requiredForRegisteredMail": "Champs nécesssaires à la génération de recommandés.",
+    "registeredMailNumberRangesActivated": "Plage activée",
+    "registeredMailNumberRangesClosed": "Plage clôturée",
+    "registeredMailNumberRangesUpdated": "Plage de numéros de recommandés mise à jour",
+    "registeredMailNumberRangesAdded": "Plage de numéros de recommandés créée",
+    "registeredMailNumberRangesRemoved": "Plage de numéros de recommandés supprimée",
     "registeredMailNumberRangeCreation": "Création d'une plage de numéros de recommandés",
     "registeredMailNumberRangeModification": "Modification d'une plage de numéros de recommandés",
     "registeredMailNumberRangeModificationMsg": "La plage est en <b>cours d'utilisation</b> ou <b>clôturée</b>, vous ne pouvez pas la modifier.",
@@ -1993,5 +1998,13 @@
     "registeredMailNotInDepositList": "Ce recommandé n'est pas dans un descriptif de pli",
     "toggleEmptyValues": "Prendre en compte les valeurs vides",
     "emptyValue": "Valeur vide",
-    "templateUsed": "Structure utilisée"
+    "templateUsed": "Structure utilisée",
+    "getResId": "Numéro GED",
+    "getResIdSample": "420",
+    "getBarcode": "Code à barre",
+    "getBarcodeSample": "123456789",
+    "displayCriteria": "Afficher les critères de recherche",
+    "displaySelectedValues": "Afficher les valeurs sélectionnées",
+    "quickSearch": "Recherche rapide"
+
 }

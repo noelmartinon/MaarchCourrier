@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
-import { AppGuard } from '../service/app.guard';
+import { AppGuard, AfterProcessGuard } from '../service/app.guard';
 
 import { ActivateUserComponent } from './activate-user.component';
 import { PasswordModificationComponent } from './login/passwordModification/password-modification.component';
@@ -17,8 +17,10 @@ import { SignatureBookComponent } from './signature-book.component';
 import { FollowedDocumentListComponent } from './home/followed-list/followed-document-list.component';
 import { FolderDocumentListComponent } from './folder/document-list/folder-document-list.component';
 import { BasketListComponent } from './list/basket-list.component';
-import { AcknowledgementReceptionComponent } from './registeredMails/acknowledgement-reception/acknowledgement-reception.component';
+import { AcknowledgementReceptionComponent } from './registeredMail/acknowledgement-reception/acknowledgement-reception.component';
 import { AdvSearchComponent } from './adv-search/adv-search.component';
+import { ProcessComponent } from './process/process.component';
+import { IndexationComponent } from './indexation/indexation.component';
 
 
 const routes: Routes = [
@@ -47,6 +49,23 @@ const routes: Routes = [
     { path: 'login', component: LoginComponent },
     { path: 'registeredMail/acknowledgement', canActivate: [AppGuard], component: AcknowledgementReceptionComponent },
     { path: 'search', canActivate: [AppGuard], component: AdvSearchComponent },
+    {
+        path: 'process/users/:userSerialId/groups/:groupSerialId/baskets/:basketId/resId/:resId',
+        canActivate: [AppGuard],
+        canDeactivate: [AfterProcessGuard],
+        component: ProcessComponent
+      },
+      {
+        path: 'resources/:detailResId',
+        canActivate: [AppGuard],
+        canDeactivate: [AfterProcessGuard],
+        component: ProcessComponent
+      },
+      {
+        path: 'indexing/:groupId',
+        canActivate: [AppGuard],
+        component: IndexationComponent
+      },
     {
         path: '',
         redirectTo: 'home',

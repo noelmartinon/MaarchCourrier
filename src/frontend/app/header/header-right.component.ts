@@ -18,11 +18,10 @@ import { AuthService } from '../../service/auth.service';
 })
 export class HeaderRightComponent implements OnInit {
 
-    
-
     dialogRef: MatDialogRef<any>;
     config: any = {};
     menus: any = [];
+    searchTarget: string = '';
 
     hideSearch: boolean = true;
 
@@ -31,7 +30,7 @@ export class HeaderRightComponent implements OnInit {
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
-        private router: Router,
+        public router: Router,
         public dialog: MatDialog,
         public authService: AuthService,
         public appService: AppService,
@@ -41,6 +40,7 @@ export class HeaderRightComponent implements OnInit {
 
     ngOnInit(): void {
         this.menus = this.privilegeService.getCurrentUserMenus();
+        console.log(this.router);
     }
 
     gotToMenu(shortcut: any) {
@@ -59,5 +59,13 @@ export class HeaderRightComponent implements OnInit {
         setTimeout(() => {
             this.searchInput.focus();
         }, 200);
+    }
+
+    hideSearchBar() {
+        return this.router.url.split('?')[0] !== '/search';
+    }
+
+    goTo() {
+        this.router.navigate([`/search`], { queryParams: { value: this.searchTarget } });
     }
 }
