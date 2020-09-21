@@ -51,13 +51,6 @@
                         </div>
                     </div>
                     <mat-table #table [dataSource]="adminService.getDataSource()" matSort matSortDisableClear>
-                        <ng-container matColumnDef="label">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2">
-                                {{'lang.issuingSite' | translate}}
-                            </mat-header-cell>
-                            <mat-cell *matCellDef="let element" style="flex:2">
-                                {{element.label}} </mat-cell>
-                        </ng-container>
                         <ng-container matColumnDef="trackerNumber">
                             <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2">
                                 {{'lang.trackerNumber' | translate}}

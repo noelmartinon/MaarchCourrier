@@ -1,24 +1,29 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../../service/notification/notification.service';
+import { NotificationService } from '../../../service/notification/notification.service';
 import { FormControl } from '@angular/forms';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { startWith, map, tap, catchError } from 'rxjs/operators';
 import { Observable } from 'rxjs/internal/Observable';
 import { of } from 'rxjs/internal/observable/of';
+import { AppService } from '../../../service/app.service';
+import { HeaderService } from '../../../service/header.service';
 
 declare var $: any;
 
+
 @Component({
-    selector: 'list-administration',
-    templateUrl: 'list-administration.component.html',
-    styleUrls: ['list-administration.component.scss'],
+    templateUrl: 'search-administration.component.html',
+    styleUrls: ['search-administration.component.scss'],
 })
-export class ListAdministrationComponent implements OnInit {
+
+export class SearchAdministrationComponent implements OnInit {
 
 
     loading: boolean = false;
+    customFieldsFormControl = new FormControl({ value: '', disabled: false });
+
 
     displayedMainData: any = [
         {
@@ -237,12 +242,12 @@ export class ListAdministrationComponent implements OnInit {
     };
     selectedProcessToolClone: string = null;
 
-    @Input('currentBasketGroup') private basketGroup: any;
-    @Output('refreshBasketGroup') refreshBasketGroup = new EventEmitter<any>();
+    searchAdv: any = { list_event: {}, list_display: {} };
 
-    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService) { }
+    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, public appService: AppService, public headerService: HeaderService) { }
 
     async ngOnInit(): Promise<void> {
+        this.headerService.setHeader(this.translate.instant('lang.searchAdministration'));
         await this.initCustomFields();
         this.filteredDataOptions = this.dataControl.valueChanges
             .pipe(
@@ -253,23 +258,23 @@ export class ListAdministrationComponent implements OnInit {
         this.availableDataClone = JSON.parse(JSON.stringify(this.availableData));
         this.displayedSecondaryData = [];
         let indexData: number = 0;
-        this.selectedTemplateDisplayedSecondaryData = this.basketGroup.list_display.templateColumns;
+        this.selectedTemplateDisplayedSecondaryData = this.searchAdv.list_display.templateColumns;
         this.selectedTemplateDisplayedSecondaryDataClone = this.selectedTemplateDisplayedSecondaryData;
-        this.basketGroup.list_display.subInfos.forEach((element: any) => {
+        /*this.searchAdv.list_display.subInfos.forEach((element: any) => {
             indexData = this.availableData.map((e: any) => e.value).indexOf(element.value);
             this.availableData[indexData].cssClasses = element.cssClasses;
             this.displayedSecondaryData.push(this.availableData[indexData]);
             this.availableData.splice(indexData, 1);
-        });
-        this.selectedListEvent = this.basketGroup.list_event;
+        });*/
+        this.selectedListEvent = this.searchAdv.list_event;
         this.selectedListEventClone = this.selectedListEvent;
 
-        if (this.basketGroup.list_event === 'processDocument') {
-            this.selectedProcessTool.defaultTab = this.basketGroup.list_event_data === null ? 'dashboard' : this.basketGroup.list_event_data.defaultTab;
-            this.selectedProcessTool.canUpdateData = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdateData;
-            this.selectedProcessTool.canUpdateModel = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdateModel;
-        } else if (this.basketGroup.list_event === 'signatureBookAction') {
-            this.selectedProcessTool.canUpdateDocuments = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdateDocuments;
+        if (this.searchAdv.list_event === 'processDocument') {
+            this.selectedProcessTool.defaultTab = this.searchAdv.list_event_data === null ? 'dashboard' : this.searchAdv.list_event_data.defaultTab;
+            this.selectedProcessTool.canUpdateData = this.searchAdv.list_event_data === null ? false : this.searchAdv.list_event_data.canUpdateData;
+            this.selectedProcessTool.canUpdateModel = this.searchAdv.list_event_data === null ? false : this.searchAdv.list_event_data.canUpdateModel;
+        } else if (this.searchAdv.list_event === 'signatureBookAction') {
+            this.selectedProcessTool.canUpdateDocuments = this.searchAdv.list_event_data === null ? false : this.searchAdv.list_event_data.canUpdateDocuments;
         }
 
         this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));
@@ -381,17 +386,16 @@ export class ListAdministrationComponent implements OnInit {
             subInfos: template
         };
 
-        this.http.put('../rest/baskets/' + this.basketGroup.basket_id + '/groups/' + this.basketGroup.group_id, { 'list_display': objToSend, 'list_event': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
+        this.http.put('../rest/baskets/' + this.searchAdv.basket_id + '/groups/' + this.searchAdv.group_id, { 'list_display': objToSend, 'list_event': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
             .subscribe(() => {
                 this.displayedSecondaryDataClone = JSON.parse(JSON.stringify(this.displayedSecondaryData));
-                this.basketGroup.list_display = template;
-                this.basketGroup.list_event = this.selectedListEvent;
+                this.searchAdv.list_display = template;
+                this.searchAdv.list_event = this.selectedListEvent;
                 this.selectedListEventClone = this.selectedListEvent;
-                this.basketGroup.list_event_data = this.selectedProcessTool;
+                this.searchAdv.list_event_data = this.selectedProcessTool;
                 this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));
                 this.selectedTemplateDisplayedSecondaryDataClone = JSON.parse(JSON.stringify(this.selectedTemplateDisplayedSecondaryData));
                 this.notify.success(this.translate.instant('lang.modificationsProcessed'));
-                this.refreshBasketGroup.emit(this.basketGroup);
             }, (err) => {
                 this.notify.error(err.error.errors);
             });

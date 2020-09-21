@@ -24,6 +24,31 @@
                     (toggleAllRes)="toggleAllRes($event)" (refreshEventAfterAction)="refreshDaoAfterAction()"
                     (refreshEvent)="refreshDao()" [title]="this.translate.instant('lang.searchMailInFolder')">
                 </app-filters-tool>-->
+                <div class="filterBadges">
+                    <span *ngIf="!emptyCriteria()" class="label badge-eraser"
+                        title="{{'lang.eraseAllFilters' | translate}}"><i class="fas fa-eraser"></i></span>
+                    <ng-container *ngFor="let critKey of criteria | keyvalue">
+                        <ng-container
+                            *ngIf="isArrayType(critKey.value.values) && critKey.value.values.length <= 3">
+                            <span class="label badge-search" *ngFor="let val of critKey.value.values"
+                                [title]="appCriteriaTool.getLabelValue(critKey.key,val)"
+                                (click)="removeCriteria(critKey.key, val)"><i
+                                    class="fa {{indexingFieldService.getField(critKey.key).icon}}"
+                                    [title]="indexingFieldService.getField(critKey.key).label"></i>&nbsp;{{appCriteriaTool.getLabelValue(critKey.key,val)}}&nbsp;<i class="fa fa-times-circle"></i></span>
+                        </ng-container>
+                        <ng-container *ngIf="isArrayType(critKey.value.values) && critKey.value.values.length > 3">
+                            <span class="label badge-search"
+                                [title]="appCriteriaTool.getLabelValues(critKey.key,critKey.value.values)"
+                                (click)="removeCriteria(critKey.key)"><i
+                                    class="fa {{indexingFieldService.getField(critKey.key).icon}}" [title]="indexingFieldService.getField(critKey.key).label"></i>&nbsp;{{critKey.value.values.length}} valeurs&nbsp;<i class="fa fa-times-circle"></i></span>
+                        </ng-container>
+                        <ng-container *ngIf="!isArrayType(critKey.value.values)">
+                            <span class="label badge-search" [title]="critKey.value.values" (click)="removeCriteria(critKey.key, val)"><i
+                                    class="fa {{indexingFieldService.getField(critKey.key).icon}}"
+                                    [title]="indexingFieldService.getField(critKey.key).label"></i>&nbsp;{{critKey.value.values}}&nbsp;<i class="fa fa-times-circle"></i></span>
+                        </ng-container>
+                    </ng-container>
+                </div>
             </div>
         </div>
         <div class="container" [class.fullContainer]="appService.getViewMode()">

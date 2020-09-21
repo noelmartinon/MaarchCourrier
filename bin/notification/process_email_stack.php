@@ -29,7 +29,7 @@ while ($state <> 'END') {
         /* Load parameters and send an e-mail                                    */
         /**********************************************************************/
         case 'SEND_AN_EMAIL':
-            $configuration = \Configuration\models\ConfigurationModel::getByService(['service' => 'admin_email_server', 'select' => ['value']]);
+            $configuration = \Configuration\models\ConfigurationModel::getByPrivilege(['privilege' => 'admin_email_server', 'select' => ['value']]);
             foreach ($emails as $key => $email) {
                 $configuration = json_decode($configuration['value'], true);
                 if (empty($configuration)) {

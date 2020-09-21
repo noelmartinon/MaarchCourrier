@@ -17,7 +17,7 @@ use Group\controllers\PrivilegeController;
 use History\controllers\HistoryController;
 use RegisteredMail\models\IssuingSiteEntitiesModel;
 use RegisteredMail\models\IssuingSiteModel;
-use RegisteredMail\models\RegisteredNumberRangeModel;
+use RegisteredMail\models\RegisteredMailModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -29,7 +29,6 @@ class IssuingSiteController
         $sites = IssuingSiteModel::get();
 
         foreach ($sites as $key => $site) {
-            $ranges = RegisteredNumberRangeModel::get(['where' => ['site_id = ?'], 'data' => [$site['id']]]);
             $sites[$key] = [
                 'id'                 => $site['id'],
                 'label'              => $site['label'],
@@ -41,9 +40,17 @@ class IssuingSiteController
                 'addressAdditional2' => $site['address_additional2'],
                 'addressPostcode'    => $site['address_postcode'],
                 'addressTown'        => $site['address_town'],
-                'addressCountry'     => $site['address_country'],
-                'countRanges'        => count($ranges)
+                'addressCountry'     => $site['address_country']
             ];
+
+            $entities = IssuingSiteEntitiesModel::get([
+                'select' => ['entity_id'],
+                'where'  => ['site_id = ?'],
+                'data'   => [$site['id']]
+            ]);
+    
+            $entities = array_column($entities, 'entity_id');
+            $sites[$key]['entities'] = $entities;
         }
 
         return $response->withJson(['sites' => $sites]);
@@ -265,12 +272,13 @@ class IssuingSiteController
             return $response->withStatus(204);
         }
 
-        $ranges = RegisteredNumberRangeModel::get([
-            'where' => ['site_id = ?', 'status = ?'],
-            'data'  => [$args['id'], 'OK']
+        $issuingSite = RegisteredMailModel::get([
+            'select'    => [1],
+            'where'     => ['issuing_site = ?'],
+            'data'      => [$args['id']]
         ]);
-        if (!empty($ranges)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Cannot delete site : site is used by an active range', 'lang' => 'siteIsUsedByActiveRange']);
+        if (!empty($issuingSite)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Cannot delete site : site is already used by a registered mail', 'lang' => 'siteIsUsedByRegisteredMail']);
         }
 
         IssuingSiteEntitiesModel::delete([
@@ -293,46 +301,5 @@ class IssuingSiteController
         ]);
 
         return $response->withStatus(204);
-    }
-
-    public function getByType(Request $request, Response $response, array $args)
-    {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_registered_mail', 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
-        }
-
-        $sitesIds = RegisteredNumberRangeModel::get([
-            'select' => ['site_id'],
-            'where'  => ['type = ?', 'status = ?'],
-            'data'   => [$args['type'], 'OK']
-        ]);
-
-        if (empty($sitesIds)) {
-            return $response->withStatus(200)->withJson(['sites' => []]);
-        }
-        $sitesIds = array_column($sitesIds, 'site_id');
-
-        $sites = IssuingSiteModel::get([
-            'where' => ['id in (?)'],
-            'data'  => [$sitesIds]
-        ]);
-
-        foreach ($sites as $key => $site) {
-            $sites[$key] = [
-                'id'                 => $site['id'],
-                'label'              => $site['label'],
-                'postOfficeLabel'    => $site['post_office_label'],
-                'accountNumber'      => $site['account_number'],
-                'addressNumber'      => $site['address_number'],
-                'addressStreet'      => $site['address_street'],
-                'addressAdditional1' => $site['address_additional1'],
-                'addressAdditional2' => $site['address_additional2'],
-                'addressPostcode'    => $site['address_postcode'],
-                'addressTown'        => $site['address_town'],
-                'addressCountry'     => $site['address_country']
-            ];
-        }
-
-        return $response->withJson(['sites' => $sites]);
     }
 }

@@ -43,8 +43,8 @@ export class RegisteredMailListComponent implements OnInit {
 
     data: any[] = [];
 
-    displayedColumns = ['trackerNumber', 'label', 'typeLabel', 'rangeNumber', 'currentNumber', 'status', 'fullness', 'actions'];
-    filterColumns = ['label', 'trackerNumber', 'typeLabel', 'rangeNumber', 'currentNumber', 'fullness', 'statusLabel'];
+    displayedColumns = ['trackerNumber', 'typeLabel', 'rangeNumber', 'currentNumber', 'status', 'fullness', 'actions'];
+    filterColumns = ['trackerNumber', 'typeLabel', 'rangeNumber', 'currentNumber', 'fullness', 'statusLabel'];
 
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;

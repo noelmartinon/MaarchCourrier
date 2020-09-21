@@ -798,23 +798,13 @@ CREATE TABLE contacts_groups_lists
 )
 WITH (OIDS=FALSE);
 
-CREATE SEQUENCE query_id_seq
-  INCREMENT 1
-  MINVALUE 1
-  MAXVALUE 9223372036854775807
-  START 10
-  CACHE 1;
-
-CREATE TABLE saved_queries (
-  query_id bigint NOT NULL DEFAULT nextval('query_id_seq'::regclass),
-  user_id character varying(128)  default NULL,
-  query_name character varying(255) NOT NULL,
+CREATE TABLE search_templates (
+  id serial,
+  user_id integer NOT NULL,
+  label character varying(255) NOT NULL,
   creation_date timestamp without time zone NOT NULL,
-  created_by character varying(128)  NOT NULL,
-  query_type character varying(50) NOT NULL,
-  query_txt text  NOT NULL,
-  last_modification_date timestamp without time zone,
-  CONSTRAINT saved_queries_pkey PRIMARY KEY  (query_id)
+  query json NOT NULL,
+  CONSTRAINT search_templates_pkey PRIMARY KEY (id)
 ) WITH (OIDS=FALSE);
 
 CREATE SEQUENCE doctypes_first_level_id_seq
@@ -1267,10 +1257,10 @@ WITH (OIDS=FALSE);
 CREATE TABLE configurations
 (
 id serial NOT NULL,
-service character varying(64) NOT NULL,
+privilege character varying(64) NOT NULL,
 value json DEFAULT '{}' NOT NULL,
 CONSTRAINT configuration_pkey PRIMARY KEY (id),
-CONSTRAINT configuration_unique_key UNIQUE (service)
+CONSTRAINT configuration_unique_key UNIQUE (privilege)
 )
 WITH (OIDS=FALSE);
 
@@ -1438,7 +1428,6 @@ CREATE TABLE IF NOT EXISTS registered_mail_number_range (
     range_end INTEGER NOT NULL,
     creator INTEGER NOT NULL,
     creation_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    site_id INTEGER NOT NULL,
     status CHARACTER VARYING(10) NOT NULL,
     current_number INTEGER,
     CONSTRAINT registered_mail_number_range_pkey PRIMARY KEY (id),

@@ -1647,7 +1647,8 @@ INSERT INTO contacts_filling (enable, first_threshold, second_threshold) VALUES 
 
 /* Configurations */
 TRUNCATE TABLE configurations;
-INSERT INTO configurations (service, value) VALUES ('admin_email_server', '{"type":"smtp","host":"smtp.gmail.com","port":465,"user":"notifications.maarch@gmail.com","password":"1OkrZQPFNJmI7uY8::7e870f0f61ecc7e9fb6e7065dd31aea5","auth":true,"secure":"ssl","from":"notifications.maarch@gmail.com","charset":"utf-8"}');
+INSERT INTO configurations (privilege, value) VALUES ('admin_email_server', '{"type":"smtp","host":"smtp.gmail.com","port":465,"user":"notifications.maarch@gmail.com","password":"1OkrZQPFNJmI7uY8::7e870f0f61ecc7e9fb6e7065dd31aea5","auth":true,"secure":"ssl","from":"notifications.maarch@gmail.com","charset":"utf-8"}');
+INSERT INTO configurations (privilege, value) VALUES ('admin_search', '{"listEvent": {"defaultTab": "dashboard"},"listDisplay":{"templateColumns":6,"subInfos":[{"value":"getPriority","cssClasses":["align_leftData"],"icon":"fa-traffic-light"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_leftData"],"icon":"fa-calendar"},{"value":"getAssignee","cssClasses":["align_leftData"],"icon":"fa-sitemap"},{"value":"getDoctype","cssClasses":["align_leftData"],"icon":"fa-suitcase"},{"value":"getRecipients","cssClasses":["align_leftData"],"icon":"fa-user"},{"value":"getSenders","cssClasses":["align_leftData"],"icon":"fa-book"}]}}');
 
 /* Modèle d’envois postaux */
 TRUNCATE TABLE shipping_templates;
@@ -1760,6 +1761,6 @@ SELECT setval('registered_mail_issuing_sites_id_seq', (select max(id)+1 from reg
 INSERT INTO registered_mail_issuing_sites_entities (site_id, entity_id) VALUES (1, 6);
 INSERT INTO registered_mail_issuing_sites_entities (site_id, entity_id) VALUES (1, 13);
 
-INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, site_id, status) VALUES ('2C', 'SuiviNumber', 1, 10, 23, '2020-09-14 14:38:09.008644', 1, 'OK');
-INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, site_id, status) VALUES ('RW', 'SuiviNumberInternational', 1, 10, 23, '2020-09-14 14:39:32.972626', 1, 'OK');
-INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, site_id, status) VALUES ('2D', 'suiviNumber', 1, 10, 23, '2020-09-14 14:39:16.779322', 1, 'OK');
+INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, status) VALUES ('2C', 'SuiviNumber', 1, 10, 23, '2020-09-14 14:38:09.008644', 'OK');
+INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, status) VALUES ('RW', 'SuiviNumberInternational', 1, 10, 23, '2020-09-14 14:39:32.972626', 'OK');
+INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, status) VALUES ('2D', 'suiviNumber', 1, 10, 23, '2020-09-14 14:39:16.779322', 'OK');

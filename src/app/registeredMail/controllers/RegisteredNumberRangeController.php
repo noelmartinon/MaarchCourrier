@@ -15,8 +15,6 @@ namespace RegisteredMail\controllers;
 
 use Group\controllers\PrivilegeController;
 use History\controllers\HistoryController;
-use RegisteredMail\models\IssuingSiteEntitiesModel;
-use RegisteredMail\models\IssuingSiteModel;
 use RegisteredMail\models\RegisteredNumberRangeModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
@@ -35,7 +33,6 @@ class RegisteredNumberRangeController
             $fullness = $fullness < 0 ? 0 : $fullness;
             $fullness = round($fullness, 2);
 
-            $site = IssuingSiteModel::getById(['id' => $range['site_id']]);
             $ranges[$key] = [
                 'id'                    => $range['id'],
                 'registeredMailType'    => $range['type'],
@@ -45,22 +42,9 @@ class RegisteredNumberRangeController
                 'creator'               => $range['creator'],
                 'creationDate'          => $range['creation_date'],
                 'status'                => $range['status'],
-                'customerAccountNumber' => $site['account_number'],
                 'currentNumber'         => $range['current_number'],
                 'fullness'              => $fullness,
-                'siteId'                => $range['site_id'],
-                'label'                 => $site['label']
             ];
-
-            $entities = IssuingSiteEntitiesModel::get([
-                'select' => ['entity_id'],
-                'where'  => ['site_id = ?'],
-                'data'   => [$site['id']]
-            ]);
-
-            $entities = array_column($entities, 'entity_id');
-    
-            $ranges[$key]['entities'] = $entities;
         }
 
         return $response->withJson(['ranges' => $ranges]);
@@ -78,8 +62,6 @@ class RegisteredNumberRangeController
             return $response->withStatus(400)->withJson(['errors' => 'Range not found']);
         }
 
-        $site = IssuingSiteModel::getById(['id' => $range['site_id']]);
-
         $fullness = $range['current_number'] - $range['range_start'];
         $rangeSize = $range['range_end'] - $range['range_start'];
         $fullness = ($fullness / $rangeSize) * 100;
@@ -95,11 +77,8 @@ class RegisteredNumberRangeController
             'creator'               => $range['creator'],
             'creationDate'          => $range['creation_date'],
             'status'                => $range['status'],
-            'customerAccountNumber' => $site['account_number'],
             'currentNumber'         => $range['current_number'],
-            'fullness'              => $fullness,
-            'siteId'                => $range['site_id'],
-            'label'                 => $site['label']
+            'fullness'              => $fullness
         ];
 
         return $response->withJson(['range' => $range]);
@@ -125,16 +104,8 @@ class RegisteredNumberRangeController
         if (!Validator::intVal()->notEmpty()->validate($body['rangeEnd'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body rangeEnd is empty or not an integer']);
         }
-        if (!Validator::intVal()->notEmpty()->validate($body['siteId'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body siteId is empty or not an integer']);
-        }
         if ($body['rangeStart'] >= $body['rangeEnd']) {
             return $response->withStatus(400)->withJson(['errors' => 'Body rangeStart cannot be larger or equal than rangeEnd', 'lang' => 'rangeStartLargerThanRangeEnd']);
-        }
-
-        $site = IssuingSiteModel::getById(['id' => $body['siteId']]);
-        if (empty($site)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body siteId does not exist']);
         }
 
         $ranges = RegisteredNumberRangeModel::get([
@@ -148,8 +119,8 @@ class RegisteredNumberRangeController
 
         $ranges = RegisteredNumberRangeModel::get([
             'select'  => ['range_start', 'range_end'],
-            'where'   => ['type = ?', 'site_id = ?', 'status = ?'],
-            'data'    => [$body['registeredMailType'], $body['siteId'], 'OK'],
+            'where'   => ['type = ?', 'status = ?'],
+            'data'    => [$body['registeredMailType'], 'OK'],
             'orderBy' => ['range_end desc']
         ]);
 
@@ -166,7 +137,6 @@ class RegisteredNumberRangeController
             'rangeStart'            => $body['rangeStart'],
             'rangeEnd'              => $body['rangeEnd'],
             'creator'               => $GLOBALS['id'],
-            'siteId'                => $body['siteId'],
             'status'                => empty($body['status']) ? 'SPD' : $body['status'],
             'currentNumber'         => null
         ]);
@@ -208,16 +178,8 @@ class RegisteredNumberRangeController
         if (!Validator::intVal()->notEmpty()->validate($body['rangeEnd'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body rangeEnd is empty or not an integer']);
         }
-        if (!Validator::intVal()->notEmpty()->validate($body['siteId'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body siteId is empty or not an integer']);
-        }
         if ($body['rangeStart'] >= $body['rangeEnd']) {
             return $response->withStatus(400)->withJson(['errors' => 'Body rangeStart cannot be larger or equal  than rangeEnd', 'lang' => 'rangeStartLargerThanRangeEnd']);
-        }
-
-        $site = IssuingSiteModel::getById(['id' => $body['siteId']]);
-        if (empty($site)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body siteId does not exist']);
         }
 
         $ranges = RegisteredNumberRangeModel::get([
@@ -231,8 +193,8 @@ class RegisteredNumberRangeController
 
         $ranges = RegisteredNumberRangeModel::get([
             'select'  => ['range_start', 'range_end'],
-            'where'   => ['type = ?', 'id != ?', 'site_id = ?'],
-            'data'    => [$body['registeredMailType'], $args['id'], $range['site_id']],
+            'where'   => ['type = ?', 'id != ?'],
+            'data'    => [$body['registeredMailType'], $args['id']],
             'orderBy' => ['range_end desc']
         ]);
 
@@ -249,8 +211,8 @@ class RegisteredNumberRangeController
                     'status' => 'END',
                     'current_number' => null
                 ],
-                'where' => ['type = ?', 'status = ?', 'site_id = ?'],
-                'data'  => [$body['registeredMailType'], 'OK', $range['site_id']]
+                'where' => ['type = ?', 'status = ?'],
+                'data'  => [$body['registeredMailType'], 'OK']
             ]);
         }
 
@@ -280,7 +242,6 @@ class RegisteredNumberRangeController
                 'tracking_account_number' => $body['trackerNumber'],
                 'range_start'             => $body['rangeStart'],
                 'range_end'               => $body['rangeEnd'],
-                'site_id'                 => $body['siteId'],
                 'status'                  => $body['status'],
                 'current_number'          => $currentNumber
             ],
@@ -289,12 +250,12 @@ class RegisteredNumberRangeController
         ]);
 
         HistoryController::add([
-            'tableName' => 'issuing_sites',
+            'tableName' => 'registered_number_range',
             'recordId'  => $args['id'],
             'eventType' => 'UP',
             'info'      => _REGISTERED_NUMBER_RANGE_UPDATED . " : {$args['id']}",
-            'moduleId'  => 'issuing_sites',
-            'eventId'   => 'issuingSitesModification',
+            'moduleId'  => 'registered_number_range',
+            'eventId'   => 'registered_number_rangeModification',
         ]);
 
         return $response->withStatus(204);

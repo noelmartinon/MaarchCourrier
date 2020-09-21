@@ -124,8 +124,8 @@ $app->get('/sortedBaskets', \Basket\controllers\BasketController::class . ':getS
 $app->put('/sortedBaskets/{id}', \Basket\controllers\BasketController::class . ':updateSort');
 
 //Configurations
-$app->get('/configurations/{service}', \Configuration\controllers\ConfigurationController::class . ':getByService');
-$app->put('/configurations/{service}', \Configuration\controllers\ConfigurationController::class . ':update');
+$app->get('/configurations/{privilege}', \Configuration\controllers\ConfigurationController::class . ':getByPrivilege');
+$app->put('/configurations/{privilege}', \Configuration\controllers\ConfigurationController::class . ':update');
 
 //Contacts
 $app->get('/contacts', \Contact\controllers\ContactController::class . ':get');
@@ -454,7 +454,13 @@ $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/ac
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkPrintDepositList', \Action\controllers\PreProcessActionController::class . ':checkPrintDepositList');
 
 //Search
-$app->get('/search', \Search\controllers\SearchController::class . ':get');
+$app->post('/search', \Search\controllers\SearchController::class . ':get');
+$app->get('/search/configuration', \Search\controllers\SearchAdministrationController::class . ':get');
+$app->put('/search/configuration', \Search\controllers\SearchAdministrationController::class . ':update');
+
+$app->get('/searchTemplates', \Search\controllers\SearchTemplateController::class . ':get');
+$app->post('/searchTemplates', \Search\controllers\SearchTemplateController::class . ':create');
+$app->delete('/searchTemplates/{id}', \Search\controllers\SearchTemplateController::class . ':delete');
 
 //shipping
 $app->get('/administration/shippings', \Shipping\controllers\ShippingTemplateController::class . ':get');
@@ -629,7 +635,6 @@ $app->post('/registeredMail/ranges', \RegisteredMail\controllers\RegisteredNumbe
 $app->put('/registeredMail/ranges/{id}', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':update');
 $app->delete('/registeredMail/ranges/{id}', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':delete');
 $app->get('/registeredMail/ranges/type/{type}/last', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':getLastNumberByType');
-$app->get('/registeredMail/sites/type/{type}', \RegisteredMail\controllers\IssuingSiteController::class . ':getByType');
 
 $app->get('/registeredMail/countries', \RegisteredMail\controllers\RegisteredMailController::class . ':getCountries');
 

@@ -167,7 +167,7 @@ export class RegisteredMailRecipientInputComponent implements OnInit {
     emptyAddress() {
         let state: boolean = true;
         Object.keys(this.control.value).forEach(key => {
-            if (this.control.value[key] !== '') {
+            if (!this.functions.empty(this.control.value[key])) {
                 state = false;
             }
         });

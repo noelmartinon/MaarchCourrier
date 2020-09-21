@@ -2,11 +2,11 @@
     <mat-form-field floatLabel="never" class="basket-search">
         <input class="metaSearch" type="text" matInput [matAutocomplete]="autoCriteria"
             [placeholder]="'lang.quickSearch' | translate" [formControl]="searchTermControl">
-        <button mat-icon-button matPrefix (click)="focusFilter()" [title]="'lang.displayCriteria' | translate">
+        <button mat-icon-button matPrefix type="button" (click)="focusFilter()" [title]="'lang.displayCriteria' | translate">
             <mat-icon class="fas fa-clipboard-list"></mat-icon>
         </button>
         <mat-autocomplete [class]="hideCriteriaList ? 'hide' : ''" #autoCriteria="matAutocomplete"
-            (closed)="hideCriteriaList = true;" (optionSelected)="addCriteria($event.option.value)" [showPanel]="false">
+            (closed)="hideCriteriaList = true;" (optionSelected)="addCriteria($event.option.value)">
             <mat-optgroup [label]="'Ajouter un critère de recherche'" class="criteria-list">
                 <input matInput type="text" #searchCriteriaInput [formControl]="getFilterControl()"
                     style="margin-left:5px;width:150px !important;height: 20px;border: 1px solid #6666663d;padding: 10px;border-radius: 5px;"
@@ -27,6 +27,39 @@
                     {{'lang.criteriaSearch' | translate}}
                     <span style="background: white;height: 1px;flex: 1;margin-top: 10px;margin-left: 10px;"></span>
                 </mat-panel-title>
+                <mat-panel-description class="myCriterias" (click)="$event.stopPropagation()">
+                    <button type="button" mat-button class="button-form-primary" style="width: auto; height: 24px; line-height: 0px;" [matMenuTriggerFor]="IndexingModelsMenu">
+                        {{'lang.mySearchTemplates' | translate}}
+                    </button>
+                    <mat-menu #IndexingModelsMenu="matMenu">
+                        <div class="menuTitle">
+                            <span>
+                                {{'lang.mySearchTemplates' | translate}}
+                            </span>
+                            <mat-form-field floatLabel="never" appearance="outline" class="smallInput"
+                                (click)="$event.stopPropagation();" style="width: 220px !important;">
+                                <input matInput id="searchTerm" placeholder="{{'lang.filterBy' | translate}}" #listFilter autocomplete="off"
+                                    (click)="$event.stopPropagation();" (keydown)="$event.stopPropagation()">
+                            </mat-form-field>
+                        </div>
+                        <ng-container
+                            *ngFor="let searchTemplate of searchTemplates | filterList:listFilter.value:'label'; let i=index">
+                            <button mat-menu-item (click)="selectSearchTemplate(searchTemplate)" [title]="searchTemplate.label" style="display: flex;align-items: center;">
+                                <div style="flex:1;">
+                                    {{searchTemplate.label | shorten: 45: '...'}}
+                                </div>
+                                <button mat-icon-button class="listModels-menu-delete"
+                                    [title]="this.translate.instant('lang.delete')"
+                                    (click)="$event.stopPropagation();deleteSearchTemplate(searchTemplate.id, i)">
+                                    <mat-icon class="fa fa-trash" color="warn">
+                                    </mat-icon>
+                                </button>
+                            </button>
+                        </ng-container>
+                    </mat-menu>
+                    <mat-icon class="far fa-copy" style="color: white; width: 30px; text-align: center; padding-top: 2px;" (click)="$event.stopPropagation();saveSearchTemplate()">
+                    </mat-icon>
+                </mat-panel-description>
             </mat-expansion-panel-header>
             <ng-container *ngIf="!loading; else loadingTemplate">
                 <!--<div class="col-md-12">
@@ -57,10 +90,10 @@
                             <span class="criteria-label">
                                 <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
                             </span>
-                            <mat-form-field class="input-form">
+                            <mat-form-field class="input-form" floatLabel="never">
                                 <input [id]="field.identifier" type="number" matInput [formControl]="field.control"
-                                    [placeholder]="!adminMode ? this.translate.instant('lang.typeValue') : this.translate.instant('lang.defaultValue')"
-                                    min="0" step="0.1">
+                                    [placeholder]="'lang.typeValue' | translate"
+                                    min="0" step="1">
                             </mat-form-field>
                         </ng-container>
                         <ng-container *ngIf="['select', 'radio', 'checkbox'].indexOf(field.type) > -1">
@@ -78,19 +111,12 @@
                             </span>
                             <mat-form-field class="input-form input-date" floatLabel="never" (click)="picker.open()"
                                 style="cursor:pointer;">
-                                <input [id]="field.identifier" [formControl]="field.control" matInput
-                                    [matDatepicker]="picker" [placeholder]="'lang.chooseDate' | translate" readonly
-                                    style="cursor:pointer;">
-                                <mat-datepicker-toggle matSuffix [for]="picker" *ngIf="!field.control.value">
-                                </mat-datepicker-toggle>
-                                <mat-datepicker [touchUi]="appService.getViewMode()" #picker></mat-datepicker>
-                                <button mat-button color="warn" matSuffix mat-icon-button
-                                    *ngIf="!functions.empty(field.control.value)"
-                                    (click)="$event.stopPropagation();field.control.reset();"
-                                    [title]="this.translate.instant('lang.eraseValue')">
-                                    <mat-icon color="warn" class="fa fa-calendar-times">
-                                    </mat-icon>
-                                </button>
+                                <mat-date-range-input [rangePicker]="picker">
+                                    <input matStartDate placeholder="Début" (dateChange)="field.control.value.start=$event.value">
+                                    <input matEndDate placeholder="Fin" (dateChange)="field.control.value.end=$event.value">
+                                  </mat-date-range-input>
+                                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                  <mat-date-range-picker #picker></mat-date-range-picker>
                             </mat-form-field>
                         </ng-container>
                         <ng-container *ngIf="['senders','recipients'].indexOf(field.identifier) > -1">

@@ -33,7 +33,7 @@
             <id>outgoing_mail</id>
             <label>_OUTGOING_MAIL</label>
         </type>
-        <type show="true" with_chrono="true" icon="" sign="false">
+        <type show="false" with_chrono="true" icon="" sign="false">
             <id>summary_sheet</id>
             <label>_SUMMARY_SHEET</label>
         </type>

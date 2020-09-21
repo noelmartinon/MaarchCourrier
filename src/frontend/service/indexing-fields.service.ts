@@ -42,6 +42,15 @@ export class IndexingFieldsService {
 
     fields: any[] = [
         {
+            identifier: 'resId',
+            label: this.translate.instant('lang.getResId'),
+            icon: 'fa-envelope',
+            type: 'integer',
+            default_value: [],
+            values: [],
+            enabled: true,
+        },
+        {
             identifier: 'recipients',
             label: this.translate.instant('lang.getRecipients'),
             icon: 'fa-user',
@@ -218,6 +227,8 @@ export class IndexingFieldsService {
 
     customFields: any[] = [];
 
+    roleFields: any[] = [];
+
     constructor(
         public http: HttpClient,
         public translate: TranslateService,
@@ -269,12 +280,49 @@ export class IndexingFieldsService {
         });
     }
 
+    getField(identifier: string) {
+        let mergedFields = this.getCoreFields().concat(this.getFields());
+        mergedFields = mergedFields.concat(this.customFields);
+        mergedFields = mergedFields.concat(this.roleFields);
+
+        return mergedFields.filter(field => field.identifier === identifier)[0];
+    }
+
     async getAllFields() {
         const customFields = await this.getCustomFields();
+        const roleFields = await this.getRolesFields();
 
         let mergedFields = this.getCoreFields().concat(this.getFields());
         mergedFields = mergedFields.concat(customFields);
+        mergedFields = mergedFields.concat(roleFields);
 
         return mergedFields;
+    }
+
+    getRolesFields() {
+        return new Promise((resolve, reject) => {
+            this.http.get(`../rest/roles`).pipe(
+                tap((data: any) => {
+                    const fields: any[] = [];
+                    data.roles.forEach((role: any) => {
+                        fields.push({
+                            identifier: `role_${role.id}`,
+                            label: role.label,
+                            icon: role.id === 'dest' ? 'fa-user-edit' : 'fa-users',
+                            type: 'select',
+                            default_value: null,
+                            values: [],
+                            enabled: true,
+                        });
+                    });
+                    this.roleFields = fields;
+                }),
+                finalize(() => resolve(this.roleFields)),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 }

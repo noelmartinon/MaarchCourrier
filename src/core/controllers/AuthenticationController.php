@@ -378,7 +378,7 @@ class AuthenticationController
 
         $url = UrlController::getCoreUrl() . 'dist/index.html#/reset-password?token=' . $resetToken;
 
-        $configuration = ConfigurationModel::getByService(['service' => 'admin_email_server', 'select' => ['value']]);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_email_server', 'select' => ['value']]);
         $configuration = json_decode($configuration['value'], true);
         if (!empty($configuration['from'])) {
             $sender = $configuration['from'];

@@ -3,13 +3,17 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../../service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { FormControl } from '@angular/forms';
-import { startWith, map, tap } from 'rxjs/operators';
+import { startWith, map, tap, filter, exhaustMap, catchError } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { IndexingFieldsService } from '../../../service/indexing-fields.service';
 import { ActivatedRoute } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
+import { NotificationService } from '../../../service/notification/notification.service';
+import { AddSearchTemplateModalComponent } from './search-template/search-template-modal.component';
 
 @Component({
     selector: 'app-criteria-tool',
@@ -20,6 +24,7 @@ export class CriteriaToolComponent implements OnInit {
 
     loading: boolean = true;
     criteria: any = [];
+    searchTemplates: any;
 
     currentCriteria: any = [];
 
@@ -45,6 +50,8 @@ export class CriteriaToolComponent implements OnInit {
         public appService: AppService,
         public functions: FunctionsService,
         public indexingFields: IndexingFieldsService,
+        private dialog: MatDialog,
+        private notify: NotificationService,
         private latinisePipe: LatinisePipe) {
             _activatedRoute.queryParams.subscribe(
                 params => {
@@ -85,6 +92,7 @@ export class CriteriaToolComponent implements OnInit {
             ).subscribe();
             this.criteriaTool.open();
         }, 500);
+        this.getSearchTemplates();
     }
 
     private _filter(value: string): string[] {
@@ -101,8 +109,10 @@ export class CriteriaToolComponent implements OnInit {
     }
 
     async addCriteria(criteria: any) {
-        criteria.control = new FormControl('');
-        await this.initField(criteria);
+        if (this.functions.empty(criteria.control.value)) {
+            criteria.control = criteria.type === 'date' ? new FormControl({}) : new FormControl('');
+        }
+        this.initField(criteria);
         this.currentCriteria.push(criteria);
         this.searchTermControl.setValue(this.searchTerm);
         this.searchCriteria.reset();
@@ -114,7 +124,13 @@ export class CriteriaToolComponent implements OnInit {
 
     initField(field: any) {
         try {
-            this['set_' + field.identifier + '_field'](field);
+            const regex = /role_[.]*/g;
+            if (field.identifier.match(regex) !== null) {
+                this['set_role_field'](field);
+            } else {
+                this['set_' + field.identifier + '_field'](field);
+
+            }
         } catch (error) {
             // console.log(error);
         }
@@ -125,17 +141,6 @@ export class CriteriaToolComponent implements OnInit {
         if (this.currentCriteria.length === 0) {
             this.criteriaTool.close();
         }
-    }
-
-    getSearchUrl() {
-        let arrUrl: any[] = [];
-        this.currentCriteria.forEach((crit: any) => {
-            if (!this.functions.empty(crit.control.value)) {
-                arrUrl.push(`${crit.id}=${crit.control.value}`);
-            }
-        });
-        this.criteriaTool.close();
-        this.searchUrlGenerated.emit('&' + arrUrl.join('&'));
     }
 
     getFilterControl() {
@@ -165,11 +170,46 @@ export class CriteriaToolComponent implements OnInit {
             };
         }
         this.currentCriteria.forEach((field: any) => {
-            objCriteria[field.identifier] = {
-                values: field.control.value
-            };
+            if (!this.functions.empty(field.control.value)) {
+                objCriteria[field.identifier] = {
+                    values: field.control.value
+                };
+            }
         });
         this.searchUrlGenerated.emit(objCriteria);
+        this.criteriaTool.close();
+    }
+
+
+    getLabelValue(identifier: string, value: string) {
+        if (this.functions.empty(value)) {
+            return this.translate.instant('lang.undefined');
+        } else  if (['doctype', 'destination'].indexOf(identifier) > -1) {
+            return this.criteria.filter((field: any) => field.identifier === identifier)[0].values.filter((val: any) => val.id === value)[0].title;
+        } else {
+            return this.criteria.filter((field: any) => field.identifier === identifier)[0].values.filter((val: any) => val.id === value)[0].label;
+
+        }
+    }
+
+    getLabelValues(identifier: string, values: string[]) {
+        if (values.length === 0) {
+            return this.translate.instant('lang.undefined');
+        } else  if (['doctype', 'destination'].indexOf(identifier) > -1) {
+            return this.criteria.filter((field: any) => field.identifier === identifier)[0].values.filter((val: any) => values.indexOf(val.id) > -1).map((val: any) => val.title);
+        } else {
+            return this.criteria.filter((field: any) => field.identifier === identifier)[0].values.filter((val: any) => values.indexOf(val.id) > -1).map((val: any) => val.label);
+        }
+    }
+
+    refreshCriteria(criteria: any) {
+        this.currentCriteria.forEach((field: any, index: number) => {
+            if (criteria[field.identifier] !== undefined) {
+                field.control.setValue(criteria[field.identifier].values);
+            }
+        });
+
+        this.getCurrentCriteriaValues();
     }
 
     set_doctype_field(elem: any) {
@@ -213,6 +253,138 @@ export class CriteriaToolComponent implements OnInit {
                     resolve(true);
                 })
             ).subscribe();
+        });
+    }
+
+    set_priority_field(elem: any) {
+        return new Promise((resolve, reject) => {
+            this.http.get(`../rest/priorities`).pipe(
+                tap((data: any) => {
+                    elem.values = data.priorities;
+                    resolve(true);
+                })
+            ).subscribe();
+        });
+    }
+
+    set_destination_field(elem: any) {
+        return new Promise((resolve, reject) => {
+            this.http.get(`../rest/indexingModels/entities`).pipe(
+                tap((data: any) => {
+                        let title = '';
+                        elem.values = elem.values.concat(data.entities.map((entity: any) => {
+                            title = entity.entity_label;
+
+                            for (let index = 0; index < entity.level; index++) {
+                                entity.entity_label = '&nbsp;&nbsp;&nbsp;&nbsp;' + entity.entity_label;
+                            }
+                            return {
+                                id: entity.id,
+                                title: title,
+                                label: entity.entity_label,
+                                disabled: false
+                            };
+                        }));
+                    resolve(true);
+                })
+            ).subscribe();
+        });
+    }
+
+    set_role_field(elem: any) {
+        return new Promise((resolve, reject) => {
+            this.http.get(`../rest/users`).pipe(
+                tap((data: any) => {
+                    const arrValues: any[] = [];
+                    data.users.forEach((user: any) => {
+                        arrValues.push({
+                            id: user.id,
+                            label: `${user.firstname} ${user.lastname}`,
+                            title: `${user.firstname} ${user.lastname}`,
+                        });
+                    });
+                    elem.values = arrValues;
+                    resolve(true);
+                })
+            ).subscribe();
+        });
+    }
+
+    getSearchTemplates() {
+        this.http.get(`../rest/searchTemplates`).pipe(
+            tap((data: any) => {
+                this.searchTemplates = data.searchTemplates;
+            })
+        ).subscribe();
+    }
+
+    saveSearchTemplate() {
+        let query: any = [];
+        this.currentCriteria.forEach((field: any, index: number) => {
+            query.push({'identifier': field.identifier, 'values': field.control.value});
+        });
+
+        const dialogRef = this.dialog.open(
+            AddSearchTemplateModalComponent,
+            {
+                panelClass: 'maarch-modal',
+                autoFocus: true,
+                disableClose: true,
+                data: {
+                    searchTemplate: {query: query}
+                }
+            }
+        );
+
+        dialogRef.afterClosed().pipe(
+            filter((data: any) => data !== undefined),
+            tap((data) => {
+                this.searchTemplates.push(data.searchTemplate);
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    deleteSearchTemplate(id: number, index: number) {
+        const dialogRef = this.dialog.open(
+            ConfirmComponent,
+            {
+                panelClass: 'maarch-modal',
+                autoFocus: false,
+                disableClose: true,
+                data: {
+                    title: this.translate.instant('lang.delete'),
+                    msg: this.translate.instant('lang.confirmAction')
+                }
+            }
+        );
+
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete(`../rest/searchTemplates/${id}`)),
+            tap(() => {
+                this.searchTemplates.splice(index, 1);
+                this.notify.success(this.translate.instant('lang.searchTemplateDeleted'));
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    selectSearchTemplate(searchTemplate: any) {
+        this.currentCriteria = [];
+        this.criteria.forEach((element: any) => {
+            let index = searchTemplate.query.map((field: any) => field.identifier).indexOf(element.identifier);
+            if (index > -1) {
+                element.control = new FormControl({ value: searchTemplate.query[index].values, disabled: false });
+                element.control.value = searchTemplate.query[index].values;
+                this.addCriteria(element);
+            }
         });
     }
 }

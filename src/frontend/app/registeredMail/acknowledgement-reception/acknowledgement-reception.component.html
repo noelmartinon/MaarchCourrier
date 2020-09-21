@@ -21,7 +21,7 @@
                     <form style="display: contents;" [formGroup]="adminFormGroup">
                         <div>
                             <mat-form-field>
-                                <mat-select [(ngModel)]="type" (ngModelChange)="focusRegisteredMailNumber();receivedDate = today" placeholder="{{'lang.returnType' | translate}}" formControlName="type">
+                                <mat-select [(ngModel)]="type" (ngModelChange)="changeType($event);focusRegisteredMailNumber();receivedDate = today" placeholder="{{'lang.returnType' | translate}}" formControlName="type">
                                     <mat-option [value]="'distributed'">{{'lang.registeredMailDistributed' | translate}}</mat-option>
                                     <mat-option [value]="'notDistributed'">{{'lang.registeredMailNotDistributed' | translate}}</mat-option>
                                 </mat-select>
@@ -29,7 +29,7 @@
 
                             <mat-form-field  *ngIf="type === 'notDistributed' || type === 'distributed'" (click)="picker.open()" appearance="outline" style="cursor:pointer;margin-top: 10px;">
                                 <mat-label>{{'lang.registeredMailReceivedDate' | translate}}</mat-label>
-                                <input matInput [(ngModel)]="receivedDate" [matDatepicker]="picker" [disabled]="type === 'distributed'"
+                                <input matInput [(ngModel)]="receivedDate" [matDatepicker]="picker"
                                        [placeholder]="this.translate.instant('lang.chooseDate')" [max]="today" readonly style="cursor:pointer;" formControlName="receivedDate" required>
                                 <mat-datepicker-toggle matSuffix [for]="picker" *ngIf="!receivedDate">
                                 </mat-datepicker-toggle>

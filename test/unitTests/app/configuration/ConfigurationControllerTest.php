@@ -32,7 +32,7 @@ class ConfigurationControllerTest extends TestCase
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
-        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['service' => 'admin_email_server']);
+        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['privilege' => 'admin_email_server']);
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame('success', $responseBody->success);
@@ -40,12 +40,12 @@ class ConfigurationControllerTest extends TestCase
         //  READ
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
-        $response       = $configurationController->getByService($request, new \Slim\Http\Response(), ['service' => 'admin_email_server']);
+        $response       = $configurationController->getByPrivilege($request, new \Slim\Http\Response(), ['privilege' => 'admin_email_server']);
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertNotNull($responseBody->configuration);
         $this->assertIsInt($responseBody->configuration->id);
-        $this->assertSame('admin_email_server', $responseBody->configuration->service);
+        $this->assertSame('admin_email_server', $responseBody->configuration->privilege);
         $this->assertNotNull($responseBody->configuration->value);
 
         $jsonTest = json_encode(
@@ -82,19 +82,19 @@ class ConfigurationControllerTest extends TestCase
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
-        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['service' => 'admin_email_server']);
+        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['privilege' => 'admin_email_server']);
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame('success', $responseBody->success);
 
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
-        $response       = $configurationController->getByService($request, new \Slim\Http\Response(), ['service' => 'admin_email_server']);
+        $response       = $configurationController->getByPrivilege($request, new \Slim\Http\Response(), ['privilege' => 'admin_email_server']);
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertNotNull($responseBody->configuration);
         $this->assertIsInt($responseBody->configuration->id);
-        $this->assertSame('admin_email_server', $responseBody->configuration->service);
+        $this->assertSame('admin_email_server', $responseBody->configuration->privilege);
         $this->assertNotNull($responseBody->configuration->value);
 
         $jsonTest = json_encode(
@@ -125,19 +125,19 @@ class ConfigurationControllerTest extends TestCase
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
-        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['service' => 'admin_email_server']);
+        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['privilege' => 'admin_email_server']);
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame('success', $responseBody->success);
 
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
-        $response       = $configurationController->getByService($request, new \Slim\Http\Response(), ['service' => 'admin_email_server']);
+        $response       = $configurationController->getByPrivilege($request, new \Slim\Http\Response(), ['privilege' => 'admin_email_server']);
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertNotNull($responseBody->configuration);
         $this->assertIsInt($responseBody->configuration->id);
-        $this->assertSame('admin_email_server', $responseBody->configuration->service);
+        $this->assertSame('admin_email_server', $responseBody->configuration->privilege);
         $this->assertNotNull($responseBody->configuration->value);
 
         $jsonTest = json_encode(
@@ -160,10 +160,10 @@ class ConfigurationControllerTest extends TestCase
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
-        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['service' => 'admin_email_server_fail']);
+        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['privilege' => 'admin_email_server_fail']);
         $responseBody = json_decode((string)$response->getBody());
 
-        $this->assertSame('Service configuration does not exist', $responseBody->errors);
+        $this->assertSame('Privilege configuration does not exist', $responseBody->errors);
 
         //  UPDATE ERROR
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
@@ -173,7 +173,7 @@ class ConfigurationControllerTest extends TestCase
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
-        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['service' => 'admin_email_server']);
+        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['privilege' => 'admin_email_server']);
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame('Configuration type is missing', $responseBody->errors);
@@ -194,7 +194,7 @@ class ConfigurationControllerTest extends TestCase
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
-        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['service' => 'admin_email_server']);
+        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['privilege' => 'admin_email_server']);
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame('Configuration data is missing or not well formatted', $responseBody->errors);
@@ -221,7 +221,7 @@ class ConfigurationControllerTest extends TestCase
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
-        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['service' => 'admin_email_server']);
+        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['privilege' => 'admin_email_server']);
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame('success', $responseBody->success);
@@ -229,12 +229,12 @@ class ConfigurationControllerTest extends TestCase
         //  READ
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
-        $response       = $configurationController->getByService($request, new \Slim\Http\Response(), ['service' => 'admin_email_server']);
+        $response       = $configurationController->getByPrivilege($request, new \Slim\Http\Response(), ['privilege' => 'admin_email_server']);
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertNotNull($responseBody->configuration);
         $this->assertIsInt($responseBody->configuration->id);
-        $this->assertSame('admin_email_server', $responseBody->configuration->service);
+        $this->assertSame('admin_email_server', $responseBody->configuration->privilege);
         $this->assertNotNull($responseBody->configuration->value);
 
         $jsonTest = json_encode(
@@ -271,7 +271,7 @@ class ConfigurationControllerTest extends TestCase
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
-        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['service' => 'admin_email_server']);
+        $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['privilege' => 'admin_email_server']);
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame('success', $responseBody->success);
@@ -279,12 +279,12 @@ class ConfigurationControllerTest extends TestCase
         //  READ
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
-        $response       = $configurationController->getByService($request, new \Slim\Http\Response(), ['service' => 'admin_email_server']);
+        $response       = $configurationController->getByPrivilege($request, new \Slim\Http\Response(), ['privilege' => 'admin_email_server']);
         $responseBody   = json_decode((string)$response->getBody());
 
         $this->assertNotNull($responseBody->configuration);
         $this->assertIsInt($responseBody->configuration->id);
-        $this->assertSame('admin_email_server', $responseBody->configuration->service);
+        $this->assertSame('admin_email_server', $responseBody->configuration->privilege);
         $this->assertNotNull($responseBody->configuration->value);
 
         $jsonTest = json_encode(

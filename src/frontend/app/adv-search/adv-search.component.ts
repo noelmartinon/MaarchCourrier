@@ -25,6 +25,8 @@ import { of } from 'rxjs/internal/observable/of';
 import { Observable } from 'rxjs/internal/Observable';
 import { CriteriaToolComponent } from './criteria-tool/criteria-tool.component';
 import { FormControl } from '@angular/forms';
+import { IndexingFieldsService } from '../../service/indexing-fields.service';
+import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 
 declare var $: any;
 
@@ -39,6 +41,7 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
     public innerHtml: SafeHtml;
     searchUrl: string = '../rest/search';
     searchTerm: string = '';
+    criteria: any = {};
     homeData: any;
 
     injectDatasParam = {
@@ -120,13 +123,14 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
         public viewContainerRef: ViewContainerRef,
         public appService: AppService,
         public foldersService: FoldersService,
-        public functions: FunctionsService) {
-            _activatedRoute.queryParams.subscribe(
-                params => {
-                    this.searchTerm = params.value;
-                }
-            );
-        }
+        public functions: FunctionsService,
+        public indexingFieldService: IndexingFieldsService) {
+        _activatedRoute.queryParams.subscribe(
+            params => {
+                this.searchTerm = params.value;
+            }
+        );
+    }
 
     ngOnInit(): void {
         this.headerService.sideBarAdmin = true;
@@ -191,8 +195,8 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
         this.destroy$.next(true);
     }
 
-    launchSearch(value: any) {
-        // this.searchUrl = value;
+    launchSearch(criteria: any) {
+        this.criteria = criteria;
         this.refreshDao();
     }
 
@@ -211,20 +215,20 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
                 switchMap(() => {
                     this.isLoadingResults = true;
                     return this.resultListDatabase!.getRepoIssues(
-                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.searchUrl, null, this.paginator.pageSize);
+                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.searchUrl, null, this.paginator.pageSize, this.criteria);
                 }),
                 map((data: any) => {
                     // Flip flag to show that loading has finished.
                     this.isLoadingResults = false;
                     data = this.processPostData(data);
-                    this.resultsLength = data.countResources;
+                    this.resultsLength = data.count;
                     this.allResInBasket = data.allResources;
                     // this.headerService.setHeader('Dossier : ' + this.folderInfo.label);
                     return data.resources;
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
-                    this.router.navigate(['/home']);
+                    // this.router.navigate(['/home']);
                     this.isLoadingResults = false;
                     return of(false);
                 })
@@ -438,6 +442,26 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
             })
         ).subscribe();
     }
+
+    emptyCriteria() {
+        return Object.keys(this.criteria).length === 0;
+    }
+
+    isArrayType(value: any) {
+        return (Array.isArray(value));
+    }
+
+    removeCriteria(identifier: string, value: any = null) {
+        const tmpArrCrit = [];
+        if (value === null || this.criteria[identifier].values.length === 1) {
+            this.criteria[identifier].values = [];
+        } else {
+            const indexArr = this.criteria[identifier].values.indexOf(value);
+            this.criteria[identifier].values.splice(indexArr, 1);
+        }
+
+        this.appCriteriaTool.refreshCriteria(this.criteria);
+    }
 }
 export interface BasketList {
     folder: any;
@@ -450,12 +474,12 @@ export class ResultListHttpDao {
 
     constructor(private http: HttpClient, private filtersListService: FiltersListService) { }
 
-    getRepoIssues(sort: string, order: string, page: number, href: string, filters: string, pageSize: number): Observable<BasketList> {
+    getRepoIssues(sort: string, order: string, page: number, href: string, filters: string, pageSize: number, criteria: any): Observable<BasketList> {
         // this.filtersListService.updateListsPropertiesPage(page);
         // this.filtersListService.updateListsPropertiesPageSize(pageSize);
         const offset = page * pageSize;
-        const requestUrl = `${href}?limit=${pageSize}&offset=${offset}${filters}`;
-
-        return this.http.get<BasketList>(requestUrl);
+        const requestUrl = `${href}?limit=${pageSize}&offset=${offset}`;
+        // console.log(criteria);
+        return this.http.post<BasketList>(requestUrl, criteria);
     }
 }

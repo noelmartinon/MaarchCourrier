@@ -40,7 +40,6 @@ export class HeaderRightComponent implements OnInit {
 
     ngOnInit(): void {
         this.menus = this.privilegeService.getCurrentUserMenus();
-        console.log(this.router);
     }
 
     gotToMenu(shortcut: any) {

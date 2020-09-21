@@ -56,8 +56,8 @@ trait RegisteredMailTrait
 
         $range = RegisteredNumberRangeModel::get([
             'select'    => ['id', 'range_end', 'current_number'],
-            'where'     => ['type = ?', 'site_id = ?', 'status = ?'],
-            'data'      => [$args['data']['type'], $args['data']['issuingSiteId'], 'OK']
+            'where'     => ['type = ?', 'status = ?'],
+            'data'      => [$args['data']['type'], 'OK']
         ]);
         if (empty($range)) {
             return ['errors' => ['No range found']];
@@ -265,8 +265,8 @@ trait RegisteredMailTrait
         $site = IssuingSiteModel::getById(['id' => $registeredMail['issuing_site']]);
 
         $range = RegisteredNumberRangeModel::get([
-            'where' => ['site_id = ?', 'type = ?', 'range_start <= ?', 'range_end >= ?'],
-            'data'  => [$registeredMail['issuing_site'], $registeredMail['type'], $registeredMail['number'], $registeredMail['number']]
+            'where' => ['type = ?', 'range_start <= ?', 'range_end >= ?'],
+            'data'  => [$registeredMail['type'], $registeredMail['number'], $registeredMail['number']]
         ]);
         if (empty($range[0])) {
             return ['errors' => ['No range found']];

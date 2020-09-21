@@ -22,13 +22,6 @@ import { ActionsService } from './actions/actions.service';
 
 import { AppComponent } from './app.component';
 
-// DOCUMENT FORM
-import { IndexingFormComponent } from './indexation/indexing-form/indexing-form.component';
-import { TagInputComponent } from './tag/indexing/tag-input.component';
-import { FolderInputComponent } from '../app/folder/indexing/folder-input.component';
-import { IssuingSiteInputComponent } from '../app/administration/registered-mail/issuing-site/indexing/issuing-site-input.component';
-import { RegisteredMailRecipientInputComponent } from '../app/administration/registered-mail/indexing/recipient-input.component';
-
 import { CriteriaToolComponent } from './adv-search/criteria-tool/criteria-tool.component';
 
 // ACTIONS
@@ -94,6 +87,7 @@ import { AboutUsComponent } from './about-us.component';
 import { ActivateUserComponent } from './activate-user.component';
 import { AddAvisModelModalComponent } from './avis/addAvisModel/add-avis-model-modal.component';
 import { AddPrivateIndexingModelModalComponent } from './indexation/private-indexing-model/add-private-indexing-model-modal.component';
+import { AddSearchTemplateModalComponent } from './adv-search/criteria-tool/search-template/search-template-modal.component';
 import { AddVisaModelModalComponent } from './visa/addVisaModel/add-visa-model-modal.component';
 import { AttachmentCreateComponent } from './attachments/attachment-create/attachment-create.component';
 import { AttachmentPageComponent } from './attachments/attachments-page/attachment-page.component';
@@ -147,11 +141,6 @@ export class MyHammerConfig extends HammerGestureConfig {
     ],
     declarations: [
         AppComponent,
-        IndexingFormComponent,
-        TagInputComponent,
-        FolderInputComponent,
-        IssuingSiteInputComponent,
-        RegisteredMailRecipientInputComponent,
         ProcessComponent,
         IndexationComponent,
         LinkResourceModalComponent,
@@ -171,6 +160,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         ActivateUserComponent,
         AddAvisModelModalComponent,
         AddPrivateIndexingModelModalComponent,
+        AddSearchTemplateModalComponent,
         AddVisaModelModalComponent,
         AttachmentCreateComponent,
         AttachmentPageComponent,
@@ -252,6 +242,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         ThesaurusModalComponent,
         AddAvisModelModalComponent,
         AddPrivateIndexingModelModalComponent,
+        AddSearchTemplateModalComponent,
         AddVisaModelModalComponent,
         AttachmentCreateComponent,
         AttachmentPageComponent,

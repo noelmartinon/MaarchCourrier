@@ -75,13 +75,7 @@ import { RegisteredMailComponent } from './registered-mail/registered-mail.compo
 import { IssuingSiteListComponent } from './registered-mail/issuing-site/issuing-site-list.component';
 import { IssuingSiteComponent } from './registered-mail/issuing-site/issuing-site.component';
 import { RegisteredMailListComponent } from './registered-mail/registered-mail-list.component';
-
-// DOCUMENT FORM
-import { IndexingFormComponent } from '../indexation/indexing-form/indexing-form.component';
-import { TagInputComponent } from '../tag/indexing/tag-input.component';
-import { FolderInputComponent } from '../../app/folder/indexing/folder-input.component';
-import { IssuingSiteInputComponent } from '../../app/administration/registered-mail/issuing-site/indexing/issuing-site-input.component';
-import { RegisteredMailRecipientInputComponent } from '../../app/administration/registered-mail/indexing/recipient-input.component';
+import { SearchAdministrationComponent } from './search/search-administration.component';
 
 
 @NgModule({
@@ -165,11 +159,7 @@ import { RegisteredMailRecipientInputComponent } from '../../app/administration/
         IssuingSiteListComponent,
         IssuingSiteComponent,
         RegisteredMailListComponent,
-        IndexingFormComponent,
-        TagInputComponent,
-        FolderInputComponent,
-        IssuingSiteInputComponent,
-        RegisteredMailRecipientInputComponent
+        SearchAdministrationComponent
     ],
     entryComponents: [
         AccountLinkComponent,

@@ -500,7 +500,7 @@ class EmailController
             }
         }
 
-        $configuration = ConfigurationModel::getByService(['service' => 'admin_email_server', 'select' => ['value']]);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_email_server', 'select' => ['value']]);
         $configuration = json_decode($configuration['value'], true);
         if (empty($configuration)) {
             return ['errors' => 'Configuration is missing'];
@@ -756,7 +756,7 @@ class EmailController
         }
 
         if (!empty($args['data']['sender']['email'])) {
-            $configuration = ConfigurationModel::getByService(['service' => 'admin_email_server', 'select' => ['value']]);
+            $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_email_server', 'select' => ['value']]);
             $configuration = json_decode($configuration['value'], true);
 
             $availableEmails = EmailController::getAvailableEmailsByUserId(['userId' => $args['userId']]);

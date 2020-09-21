@@ -164,12 +164,13 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
                         }
                     });
             });
-
-        this.filteredDatas = this.formControlSearch.valueChanges
-            .pipe(
-                startWith(''),
-                map(value => this._filter(value))
-            );
+        setTimeout(() => {
+            this.filteredDatas = this.formControlSearch.valueChanges
+                .pipe(
+                    startWith(''),
+                    map(value => this._filter(value))
+                );
+        }, 0);
 
 
         // this.initMultipleHandling();
@@ -177,18 +178,18 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     }
 
     initOptGroups() {
-        this.datas.unshift({ id : 0, label : 'toto', disabled : true});
+        this.datas.unshift({ id: 0, label: 'toto', disabled: true });
 
         let tmpArr = [];
 
         this.optGroupList = this.sortPipe.transform(this.optGroupList, 'label');
         this.optGroupList.forEach(group => {
-            tmpArr.push({ id : group.id, label : group.label, disabled : true});
+            tmpArr.push({ id: group.id, label: group.label, disabled: true });
             tmpArr = tmpArr.concat(this.datas.filter(data => data[this.optGroupTarget] === group.id).map(data => {
                 return {
                     ...data,
                     title: data.label,
-                    label : '&nbsp;&nbsp;&nbsp' + data.label
+                    label: '&nbsp;&nbsp;&nbsp' + data.label
                 };
             }));
         });

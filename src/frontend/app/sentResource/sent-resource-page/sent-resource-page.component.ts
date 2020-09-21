@@ -382,8 +382,6 @@ export class SentResourcePageComponent implements OnInit {
                         }
                     });
 
-                    console.log(this.emailAttach);
-
                     resolve(true);
                 }),
                 catchError((err) => {
@@ -604,12 +602,8 @@ export class SentResourcePageComponent implements OnInit {
         this.filteredEmails = of([]);
     }
 
-    async onSubmit() {
+    onSubmit() {
         this.emailStatus = 'WAITING';
-
-        if (this.summarySheetUnits !== null) {
-            await this.createSummarySheet();
-        }
 
         if (this.data.emailId === null) {
             if (!this.isAllEmailRightFormat()) {
@@ -633,7 +627,11 @@ export class SentResourcePageComponent implements OnInit {
         }
     }
 
-    createEmail(closeModal: boolean = true) {
+    async createEmail(closeModal: boolean = true) {
+        if (this.summarySheetUnits.length !== 0) {
+            await this.createSummarySheet();
+        }
+
         this.http.post(`../rest/emails`, this.formatEmail()).pipe(
             tap(() => {
                 if (this.emailStatus === 'DRAFT') {
@@ -675,7 +673,11 @@ export class SentResourcePageComponent implements OnInit {
         ).subscribe();
     }
 
-    updateEmail(closeModal: boolean = true) {
+    async updateEmail(closeModal: boolean = true) {
+        if (this.summarySheetUnits.length !== 0) {
+            await this.createSummarySheet();
+        }
+
         this.http.put(`../rest/emails/${this.data.emailId}`, this.formatEmail()).pipe(
             tap(() => {
                 if (this.emailStatus === 'DRAFT') {
@@ -919,12 +921,14 @@ export class SentResourcePageComponent implements OnInit {
             }
         });
         dialogRef.afterClosed().pipe(
+            filter((data: string) => data !== undefined),
             tap((data: any) => {
                 this.summarySheetUnits = data;
                 this.emailAttach['summarySheet'].push({
                     label: title,
                     format: 'pdf',
-                    title: title
+                    title: title,
+                    list: []
                 });
             }),
             catchError((err: any) => {
