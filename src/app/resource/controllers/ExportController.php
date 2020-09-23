@@ -39,7 +39,6 @@ use Tag\models\ResourceTagModel;
 use Tag\models\TagModel;
 use User\models\UserModel;
 
-
 class ExportController
 {
     public function getExportTemplates(Request $request, Response $response)
@@ -62,11 +61,6 @@ class ExportController
     {
         set_time_limit(240);
 
-        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $GLOBALS['id']]);
-        if (!empty($errors['errors'])) {
-            return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
-        }
-
         $body = $request->getParsedBody();
 
         if (!Validator::stringType()->notEmpty()->validate($body['format']) || !in_array($body['format'], ['pdf', 'csv'])) {
@@ -77,6 +71,8 @@ class ExportController
             return $response->withStatus(400)->withJson(['errors' => 'Data data is empty or not an array']);
         } elseif (!Validator::arrayType()->notEmpty()->validate($body['resources'])) {
             return $response->withStatus(403)->withJson(['errors' => 'Data resources is empty or not an array']);
+        } elseif (!ResController::hasRightByResId(['resId' => $body['resources'], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
         foreach ($body['data'] as $value) {
@@ -85,22 +81,8 @@ class ExportController
             }
         }
 
-        $basket = BasketModel::getById(['id' => $aArgs['basketId'], 'select' => ['basket_clause', 'basket_res_order', 'basket_name']]);
-        $user   = UserModel::getById(['id' => $aArgs['userId'], 'select' => ['user_id']]);
-
-        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $user['user_id']]);
-        $rawResourcesInBasket = ResModel::getOnView([
-            'select'    => ['res_id'],
-            'where'     => [$whereClause, 'res_view_letterbox.res_id in (?)'],
-            'data'      => [$body['resources']]
-        ]);
-        $allResourcesInBasket = array_column($rawResourcesInBasket, 'res_id');
-
         $order = 'CASE res_view_letterbox.res_id ';
         foreach ($body['resources'] as $key => $resId) {
-            if (!in_array($resId, $allResourcesInBasket)) {
-                return $response->withStatus(403)->withJson(['errors' => 'Resources out of perimeter']);
-            }
             $order .= "WHEN {$resId} THEN {$key} ";
         }
         $order .= 'END';

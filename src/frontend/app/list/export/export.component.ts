@@ -298,7 +298,7 @@ export class ExportComponent implements OnInit {
 
     exportData() {
         this.loadingExport = true;
-        this.http.put('../rest/resourcesList/users/' + this.data.ownerId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/exports', this.exportModel, { responseType: 'blob' }).pipe(
+        this.http.put('../rest/resourcesList/exports', this.exportModel, { responseType: 'blob' }).pipe(
             tap((data: any) => {
                 if (data.type !== 'text/html') {
                     const downloadLink = document.createElement('a');

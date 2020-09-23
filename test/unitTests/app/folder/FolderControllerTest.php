@@ -927,61 +927,6 @@ class FolderControllerTest extends TestCase
         $GLOBALS['id'] = $userInfo['id'];
     }
 
-    public function testGetBaskets()
-    {
-        $GLOBALS['login'] = 'aackermann';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-        $GLOBALS['id'] = $userInfo['id'];
-
-        $folderController = new \Folder\controllers\FolderController();
-
-        //  GET
-        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
-        $request        = \Slim\Http\Request::createFromEnvironment($environment);
-
-        // Errors
-        $response     = $folderController->getBasketsFromFolder($request, new \Slim\Http\Response(), ['id' => 'wrong format']);
-        $this->assertNotEmpty(400, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Route id is not an integer', $responseBody['errors']);
-
-        $response     = $folderController->getBasketsFromFolder($request, new \Slim\Http\Response(), ['id' => self::$id * 1000]);
-        $this->assertNotEmpty(400, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Folder out of perimeter', $responseBody['errors']);
-
-        $response     = $folderController->getBasketsFromFolder($request, new \Slim\Http\Response(), ['id' => self::$id, 'resId' => self::$idFirstResource * 100]);
-        $this->assertNotEmpty(403, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Resource out of perimeter', $responseBody['errors']);
-
-        // Success
-        $response     = $folderController->getBasketsFromFolder($request, new \Slim\Http\Response(), ['id' => self::$id, 'resId' => self::$idFirstResource]);
-        $this->assertSame(200, $response->getStatusCode());
-
-        $responseBody = json_decode((string)$response->getBody(), true);
-
-        $this->assertIsArray($responseBody['groupsBaskets']);
-        $this->assertNotEmpty($responseBody['groupsBaskets']);
-
-        $this->assertSame(2, count($responseBody['groupsBaskets']));
-
-        $this->assertSame(2, $responseBody['groupsBaskets'][0]['groupId']);
-        $this->assertSame('Utilisateur', $responseBody['groupsBaskets'][0]['groupName']);
-        $this->assertSame(6, $responseBody['groupsBaskets'][0]['basketId']);
-        $this->assertSame('AR en masse : non envoyés', $responseBody['groupsBaskets'][0]['basketName']);
-
-
-        $this->assertSame(2, $responseBody['groupsBaskets'][1]['groupId']);
-        $this->assertSame('Utilisateur', $responseBody['groupsBaskets'][1]['groupName']);
-        $this->assertSame(4, $responseBody['groupsBaskets'][1]['basketId']);
-        $this->assertSame('Courriers à traiter', $responseBody['groupsBaskets'][1]['basketName']);
-
-        $GLOBALS['login'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-        $GLOBALS['id'] = $userInfo['id'];
-    }
-
     public function testGetFilters()
     {
         $GLOBALS['login'] = 'aackermann';

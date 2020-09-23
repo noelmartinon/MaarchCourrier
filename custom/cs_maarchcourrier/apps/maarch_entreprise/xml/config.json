@@ -1,0 +1,21 @@
+{
+    "config": {
+        "lang": "fr",
+        "applicationName": "Maarch Courrier 20.10",
+        "cookieTime": 10080,
+        "timezone": "Europe\/Paris",
+        "maarchDirectory": "\/home\/ludo\/Documents\/suivi_client\/SGAMI\/MaarchCourrier20.10\/",
+        "customID": "cs_maarchcourrier",
+        "maarchUrl": ""
+    },
+    "database": [
+        {
+            "server": "localhost",
+            "port": "5432",
+            "type": "POSTGRESQL",
+            "name": "test12344",
+            "user": "maarch",
+            "password": "maarch"
+        }
+    ]
+}

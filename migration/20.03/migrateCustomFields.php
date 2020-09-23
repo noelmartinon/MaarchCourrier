@@ -95,7 +95,7 @@ foreach ($customs as $custom) {
                 $csColumn = "custom_fields->>''{$fieldId}''";
 
                 if ($type == 'date') {
-                    $csColumn = "($csColumn)::date";
+                    $csColumn = "custom_fields->>''{$fieldId}'' is not null and custom_fields->>''{$fieldId}'' <> '''' and ($csColumn)::date";
                 }
 
                 \Basket\models\BasketModel::update(['postSet' => ['basket_clause' => "REPLACE(basket_clause, 'doc_{$column}', '{$csColumn}')"], 'where' => ['1 = ?'], 'data' => [1]]);

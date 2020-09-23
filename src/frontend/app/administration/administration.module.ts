@@ -66,7 +66,6 @@ import { UpdateStatusAdministrationComponent } from './updateStatus/update-statu
 import { UserAdministrationComponent, UserAdministrationRedirectModalComponent } from './user/user-administration.component';
 import { VersionsUpdateAdministrationComponent } from './versionUpdate/versions-update-administration.component';
 import { AdministrationComponent } from './home/administration.component';
-import { DocumentFormModule } from '../document-form.module';
 import { UsersAdministrationComponent, UsersAdministrationRedirectModalComponent } from './user/users-administration.component';
 import { UsersImportComponent } from './user/import/users-import.component';
 import { UsersExportComponent } from './user/export/users-export.component';
@@ -76,6 +75,7 @@ import { RegisteredMailComponent } from './registered-mail/registered-mail.compo
 import { IssuingSiteListComponent } from './registered-mail/issuing-site/issuing-site-list.component';
 import { IssuingSiteComponent } from './registered-mail/issuing-site/issuing-site.component';
 import { RegisteredMailListComponent } from './registered-mail/registered-mail-list.component';
+import { SearchAdministrationComponent } from './search/search-administration.component';
 
 
 @NgModule({
@@ -84,7 +84,6 @@ import { RegisteredMailListComponent } from './registered-mail/registered-mail-l
         // NgxChartsModule,
         InternationalizationModule,
         JoyrideModule.forChild(),
-        DocumentFormModule,
         AdministrationRoutingModule,
         DocumentViewerModule
     ],
@@ -159,7 +158,8 @@ import { RegisteredMailListComponent } from './registered-mail/registered-mail-l
         RegisteredMailComponent,
         IssuingSiteListComponent,
         IssuingSiteComponent,
-        RegisteredMailListComponent
+        RegisteredMailListComponent,
+        SearchAdministrationComponent
     ],
     entryComponents: [
         AccountLinkComponent,

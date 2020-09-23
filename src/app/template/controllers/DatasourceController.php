@@ -45,7 +45,7 @@ class DatasourceController
     {
         $datasources['recipient'][0]  = $aArgs['params']['recipient'];
         $datasources['res_letterbox'] = [];
-        $datasources['contact']       = [];
+        $datasources['sender']        = [];
         
         $basket = BasketModel::getByBasketId(['select' => ['id'], 'basketId' => 'MyBasket']);
         $preferenceBasket = UserBasketPreferenceModel::get([

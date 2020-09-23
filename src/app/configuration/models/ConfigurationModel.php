@@ -19,17 +19,17 @@ use SrcCore\models\ValidatorModel;
 
 class ConfigurationModel
 {
-    public static function getByService(array $args)
+    public static function getByPrivilege(array $args)
     {
-        ValidatorModel::notEmpty($args, ['service']);
-        ValidatorModel::stringType($args, ['service']);
+        ValidatorModel::notEmpty($args, ['privilege']);
+        ValidatorModel::stringType($args, ['privilege']);
         ValidatorModel::arrayType($args, ['select']);
 
         $configuration = DatabaseModel::select([
             'select'    => empty($args['select']) ? ['*'] : $args['select'],
             'table'     => ['configurations'],
-            'where'     => ['service = ?'],
-            'data'      => [$args['service']],
+            'where'     => ['privilege = ?'],
+            'data'      => [$args['privilege']],
         ]);
 
         if (empty($configuration[0])) {
@@ -41,13 +41,13 @@ class ConfigurationModel
 
     public static function create(array $args)
     {
-        ValidatorModel::notEmpty($args, ['service', 'value']);
-        ValidatorModel::stringType($args, ['service', 'value']);
+        ValidatorModel::notEmpty($args, ['privilege', 'value']);
+        ValidatorModel::stringType($args, ['privilege', 'value']);
 
         DatabaseModel::insert([
             'table'         => 'configurations',
             'columnsValues' => [
-                'service'   => $args['service'],
+                'privilege' => $args['privilege'],
                 'value'     => $args['value']
             ]
         ]);

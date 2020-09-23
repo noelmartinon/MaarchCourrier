@@ -23,8 +23,6 @@ export class RegisteredMailComponent implements OnInit {
     id: number = null;
     minRange: number = 1;
 
-    customerAccountNumberList: any[] = [];
-
     registeredMailType: any[] = [
         {
             id: '2D',
@@ -53,14 +51,12 @@ export class RegisteredMailComponent implements OnInit {
 
     ngOnInit(): void {
         this.route.params.subscribe(async (params) => {
-            this.getIssuingSites();
             if (typeof params['id'] === 'undefined') {
                 this.creationMode = true;
                 this.headerService.setHeader(this.translate.instant('lang.registeredMailNumberRangeCreation'));
 
                 this.adminFormGroup = this._formBuilder.group({
                     id: [null],
-                    siteId: [null, Validators.required],
                     trackerNumber: [null, Validators.required],
                     registeredMailType: [null, Validators.required],
                     rangeStart: [1, Validators.required],
@@ -108,30 +104,12 @@ export class RegisteredMailComponent implements OnInit {
         });
     }
 
-    getIssuingSites() {
-        this.http.get('../rest/registeredMail/sites').pipe(
-            tap((data: any) => {
-                this.customerAccountNumberList = data['sites'].map((item: any) => {
-                    return {
-                        id: item.id,
-                        label: `${item.label} (${item.accountNumber})`
-                    };
-                });
-            }),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
-    }
-
     getData() {
         return new Promise((resolve) => {
             this.http.get(`../rest/registeredMail/ranges/${this.id}`).pipe(
                 tap((data: any) => {
                     this.adminFormGroup = this._formBuilder.group({
                         id: [this.id],
-                        siteId: [data.range.siteId],
                         trackerNumber: [data.range.trackerNumber],
                         registeredMailType: [data.range.registeredMailType],
                         rangeStart: [data.range.rangeStart],

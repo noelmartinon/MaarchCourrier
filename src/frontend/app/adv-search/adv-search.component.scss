@@ -2,6 +2,7 @@
 
 .bg-head-content {
     flex-direction: column;
+    padding-bottom: 70px;
 }
 
 .dragPreview {
@@ -114,4 +115,26 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.filterBadges {
+    width: 100%;
+}
+.filterBadges>.badge-eraser {
+    margin: 5px;
+    background: none;
+    cursor: pointer;
+    color: white;
+    font-size: 20px;
+}
+
+.filterBadges>.label {
+    white-space: inherit;
+}
+
+.filterBadges>.badge-search {
+    margin: 5px;
+    background: white;
+    color: $primary;
+    cursor: pointer;
 }

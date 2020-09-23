@@ -37,7 +37,7 @@
                                     {{'lang.address' | translate}}
                                 </div>
                                 <mat-form-field appearance='outline' class="smallInput">
-                                    <button mat-button matSuffix [matMenuTriggerFor]="menuDep"
+                                    <button type="button" mat-button matSuffix [matMenuTriggerFor]="menuDep"
                                         (click)="$event.stopPropagation();"
                                         [title]="this.translate.instant('lang.targetDepartment')">
                                         {{addressBANCurrentDepartment}}&nbsp;<i class="fa fa-chevron-down"></i>

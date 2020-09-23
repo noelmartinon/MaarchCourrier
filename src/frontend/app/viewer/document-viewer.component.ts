@@ -614,7 +614,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 (err: any) => {
                     if (err.error.errors === 'Document has no file') {
                         this.noFile = true;
-                    } else if (err.error.errors === 'Converted Document not found') {
+                    } else if (err.error.errors === 'Converted Document not found' || err.error.errors === 'Document can not be converted') {
                         this.file.contentMode = 'route';
                         this.file.content = `../rest/attachments/${resId}/originalContent?mode=base64`;
                         this.noConvertedFound = true;

@@ -36,6 +36,13 @@ import { BasketHomeComponent } from './basket/basket-home.component';
 
 import { FieldListComponent } from './indexation/field-list/field-list.component';
 
+// DOCUMENT FORM
+import { IndexingFormComponent } from './indexation/indexing-form/indexing-form.component';
+import { TagInputComponent } from './tag/indexing/tag-input.component';
+import { FolderInputComponent } from '../app/folder/indexing/folder-input.component';
+import { IssuingSiteInputComponent } from '../app/administration/registered-mail/issuing-site/indexing/issuing-site-input.component';
+import { RegisteredMailRecipientInputComponent } from '../app/administration/registered-mail/indexing/recipient-input.component';
+
 /*MODAL*/
 import { AlertComponent } from '../plugins/modal/alert.component';
 import { ConfirmComponent } from '../plugins/modal/confirm.component';
@@ -46,6 +53,7 @@ import { NoteEditorComponent } from './notes/note-editor.component';
 
 import { PluginAutocomplete } from '../plugins/autocomplete/autocomplete.component';
 import { PluginSelectSearchComponent } from '../plugins/select-search/select-search.component';
+import { PluginSelectAutocompleteSearchComponent } from '../plugins/select-autocomplete-search/plugin-select-autocomplete-search.component';
 
 import { DragDropDirective } from '../app/viewer/upload-file-dnd.directive';
 import { AddressBanAutocompleteComponent } from './contact/ban-autocomplete/address-ban-autocomplete.component';
@@ -95,11 +103,17 @@ import { TranslateService } from '@ngx-translate/core';
         SmdFabSpeedDialComponent,
         SmdFabSpeedDialTrigger,
         SmdFabSpeedDialActions,
+        IndexingFormComponent,
+        TagInputComponent,
+        FolderInputComponent,
+        IssuingSiteInputComponent,
+        RegisteredMailRecipientInputComponent,
         AlertComponent,
         ConfirmComponent,
         PluginAutocomplete,
         FieldListComponent,
         PluginSelectSearchComponent,
+        PluginSelectAutocompleteSearchComponent,
         DiffusionsListComponent,
         DragDropDirective,
         ContactAutocompleteComponent,
@@ -143,6 +157,7 @@ import { TranslateService } from '@ngx-translate/core';
         PluginAutocomplete,
         FieldListComponent,
         PluginSelectSearchComponent,
+        PluginSelectAutocompleteSearchComponent,
         DiffusionsListComponent,
         DragDropDirective,
         ContactAutocompleteComponent,
@@ -162,6 +177,11 @@ import { TranslateService } from '@ngx-translate/core';
         LinkedResourceListComponent,
         NotesListComponent,
         NoteEditorComponent,
+        IndexingFormComponent,
+        TagInputComponent,
+        FolderInputComponent,
+        IssuingSiteInputComponent,
+        RegisteredMailRecipientInputComponent,
     ],
     providers: [],
     entryComponents: [

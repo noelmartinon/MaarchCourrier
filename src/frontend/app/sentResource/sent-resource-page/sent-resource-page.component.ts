@@ -16,6 +16,7 @@ import { PrivilegeService } from '../../../service/privileges.service';
 import { HeaderService } from '../../../service/header.service';
 import { Observable } from 'rxjs/internal/Observable';
 import { of } from 'rxjs/internal/observable/of';
+import { SummarySheetComponent } from '../../list/summarySheet/summary-sheet.component';
 
 declare var $: any;
 declare var tinymce: any;
@@ -28,7 +29,6 @@ declare var tinymce: any;
 })
 export class SentResourcePageComponent implements OnInit {
 
-    
     loading: boolean = true;
 
     readonly separatorKeysCodes: number[] = [COMMA, SEMICOLON, FF_SEMICOLON, 190];
@@ -78,8 +78,16 @@ export class SentResourcePageComponent implements OnInit {
             title: this.translate.instant('lang.attachAttachment'),
             list: []
         },
+        summarySheet: {
+            icon: 'fa fa-link',
+            title: this.translate.instant('lang.attachSummarySheet'),
+            list: []
+        },
     };
     emailAttach: any = {};
+
+    encodedSummarySheet: any = null;
+    summarySheetUnits: any = [];
 
     canManage: boolean = false;
     pdfMode: boolean = false;
@@ -368,8 +376,8 @@ export class SentResourcePageComponent implements OnInit {
                             });
                         } else if (element === 'isLinked' && data.document.isLinked === true) {
                             this.emailAttach.document.isLinked = true;
-                            this.emailAttach.document.format = data.document.original || data.document.original === undefined ? this.emailAttachTool.document.list[0].format : 'pdf',
-                                this.emailAttach.document.original = data.document.original;
+                            this.emailAttach.document.format = data.document.original || data.document.original === undefined ? this.emailAttachTool.document.list[0].format : 'pdf';
+                            this.emailAttach.document.original = data.document.original;
                             this.emailAttach.document.size = this.emailAttach.document.original ? this.emailAttachTool.document.list[0].size : this.emailAttachTool.document.list[0].convertedDocument.size;
                         }
                     });
@@ -596,6 +604,7 @@ export class SentResourcePageComponent implements OnInit {
 
     onSubmit() {
         this.emailStatus = 'WAITING';
+
         if (this.data.emailId === null) {
             if (!this.isAllEmailRightFormat()) {
                 this.notify.error(this.translate.instant('lang.badEmailsFormat'));
@@ -618,7 +627,11 @@ export class SentResourcePageComponent implements OnInit {
         }
     }
 
-    createEmail(closeModal: boolean = true) {
+    async createEmail(closeModal: boolean = true) {
+        if (this.summarySheetUnits.length !== 0) {
+            await this.createSummarySheet();
+        }
+
         this.http.post(`../rest/emails`, this.formatEmail()).pipe(
             tap(() => {
                 if (this.emailStatus === 'DRAFT') {
@@ -660,7 +673,11 @@ export class SentResourcePageComponent implements OnInit {
         ).subscribe();
     }
 
-    updateEmail(closeModal: boolean = true) {
+    async updateEmail(closeModal: boolean = true) {
+        if (this.summarySheetUnits.length !== 0) {
+            await this.createSummarySheet();
+        }
+
         this.http.put(`../rest/emails/${this.data.emailId}`, this.formatEmail()).pipe(
             tap(() => {
                 if (this.emailStatus === 'DRAFT') {
@@ -716,8 +733,8 @@ export class SentResourcePageComponent implements OnInit {
         if (type === 'document') {
             if (this.emailAttach.document.isLinked === false) {
                 this.emailAttach.document.isLinked = true;
-                this.emailAttach.document.format = mode !== 'pdf' ? item.format : 'pdf',
-                    this.emailAttach.document.original = mode !== 'pdf';
+                this.emailAttach.document.format = mode !== 'pdf' ? item.format : 'pdf';
+                this.emailAttach.document.original = mode !== 'pdf';
                 this.emailAttach.document.size = mode === 'pdf' ? item.convertedDocument.size : item.size;
             }
         } else {
@@ -871,5 +888,120 @@ export class SentResourcePageComponent implements OnInit {
                 }
             });
         }
+    }
+
+    openSummarySheetModal(keyVal: any): void {
+        if (keyVal !== 'summarySheet') {
+            return;
+        }
+        let today: any;
+        let dd: any;
+        let mm: any;
+        let yyyy: any;
+
+        today = new Date();
+        dd = today.getDate();
+        mm = today.getMonth() + 1;
+        yyyy = today.getFullYear();
+
+        if (dd < 10) {
+            dd = '0' + dd;
+        }
+        if (mm < 10) {
+            mm = '0' + mm;
+        }
+        today = dd + '-' + mm + '-' + yyyy;
+        const title = this.translate.instant('lang.summarySheet') + ' ' + today;
+
+        const dialogRef = this.dialog.open(SummarySheetComponent, {
+            panelClass: 'maarch-full-height-modal',
+            width: '800px',
+            data: {
+                paramMode: true
+            }
+        });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data !== undefined),
+            tap((data: any) => {
+                this.summarySheetUnits = data;
+                this.emailAttach['summarySheet'].push({
+                    label: title,
+                    format: 'pdf',
+                    title: title,
+                    list: []
+                });
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    async createSummarySheet() {
+        return new Promise(resolve => {
+            this.http.post('../rest/resourcesList/summarySheets?mode=base64', {
+                units:     this.summarySheetUnits,
+                resources: [this.data.resId]
+            })
+                .pipe(
+                    tap(async (sheetData: any) => {
+                        await this.saveSummarySheet(sheetData.encodedDocument);
+
+                        this.loading = false;
+                        resolve(true);
+                    }),
+                    catchError((err) => {
+                        this.notify.handleErrors(err);
+                        resolve(false);
+                        return of(false);
+                    })
+                ).subscribe();
+        });
+    }
+
+    async saveSummarySheet(encodedDocument: any) {
+        return new Promise(resolve => {
+            let today: any;
+            let dd: any;
+            let mm: any;
+            let yyyy: any;
+
+            today = new Date();
+            dd = today.getDate();
+            mm = today.getMonth() + 1;
+            yyyy = today.getFullYear();
+
+            if (dd < 10) {
+                dd = '0' + dd;
+            }
+            if (mm < 10) {
+                mm = '0' + mm;
+            }
+            today = dd + '-' + mm + '-' + yyyy;
+            const title = this.translate.instant('lang.summarySheet') + ' ' + today;
+            this.http.post('../rest/attachments', {resIdMaster: this.data.resId, encodedFile: encodedDocument, type: 'summary_sheet', format: 'PDF', title: title})
+            .pipe(
+                tap((dataAttachment: any) => {
+                    this.emailAttach['summarySheet'] = undefined;
+
+                    this.emailAttach['attachments'].push({
+                        id:       dataAttachment.id,
+                        label:    title,
+                        format:   'pdf',
+                        title:    title,
+                        original: true
+                    });
+                    this.loading = false;
+                    resolve(true);
+                }),
+                catchError((err) => {
+                    this.notify.handleErrors(err);
+                    resolve(false);
+                    return of(false);
+                })
+            )
+            .subscribe();
+        });
     }
 }

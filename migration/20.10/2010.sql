@@ -222,7 +222,6 @@ CREATE TABLE IF NOT EXISTS registered_mail_number_range (
     range_end INTEGER NOT NULL,
     creator INTEGER NOT NULL,
     creation_date timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    site_id INTEGER NOT NULL,
     status CHARACTER VARYING(10) NOT NULL,
     current_number INTEGER,
     CONSTRAINT registered_mail_number_range_pkey PRIMARY KEY (id),
@@ -261,6 +260,19 @@ INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, ca
 DELETE FROM parameters WHERE id = 'traffic_record_summary_sheet';
 INSERT INTO parameters (id, description, param_value_string) VALUES ('traffic_record_summary_sheet', 'Module circulation pour la fiche de liaison', '');
 
+ALTER TABLE configurations RENAME COLUMN service TO privilege;
+DELETE FROM configurations WHERE privilege = 'admin_search';
+INSERT INTO configurations (privilege, value) VALUES ('admin_search', '{"listEvent": {"defaultTab": "dashboard"},"listDisplay":{"templateColumns":6,"subInfos":[{"value":"getPriority","cssClasses":["align_leftData"],"icon":"fa-traffic-light"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_leftData"],"icon":"fa-calendar"},{"value":"getAssignee","cssClasses":["align_leftData"],"icon":"fa-sitemap"},{"value":"getDoctype","cssClasses":["align_leftData"],"icon":"fa-suitcase"},{"value":"getRecipients","cssClasses":["align_leftData"],"icon":"fa-user"},{"value":"getSenders","cssClasses":["align_leftData"],"icon":"fa-book"}]}}');
+
+DROP TABLE IF EXISTS search_templates;
+CREATE TABLE search_templates (
+  id serial,
+  user_id integer NOT NULL,
+  label character varying(255) NOT NULL,
+  creation_date timestamp without time zone NOT NULL,
+  query json NOT NULL,
+  CONSTRAINT search_templates_pkey PRIMARY KEY (id)
+) WITH (OIDS=FALSE);
 
 /* RE CREATE VIEWS */
 CREATE OR REPLACE VIEW res_view_letterbox AS

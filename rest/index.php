@@ -124,8 +124,8 @@ $app->get('/sortedBaskets', \Basket\controllers\BasketController::class . ':getS
 $app->put('/sortedBaskets/{id}', \Basket\controllers\BasketController::class . ':updateSort');
 
 //Configurations
-$app->get('/configurations/{service}', \Configuration\controllers\ConfigurationController::class . ':getByService');
-$app->put('/configurations/{service}', \Configuration\controllers\ConfigurationController::class . ':update');
+$app->get('/configurations/{privilege}', \Configuration\controllers\ConfigurationController::class . ':getByPrivilege');
+$app->put('/configurations/{privilege}', \Configuration\controllers\ConfigurationController::class . ':update');
 
 //Contacts
 $app->get('/contacts', \Contact\controllers\ContactController::class . ':get');
@@ -251,7 +251,6 @@ $app->delete('/folders/{id}', \Folder\controllers\FolderController::class . ':de
 $app->get('/folders/{id}/resources', \Folder\controllers\FolderController::class . ':getResourcesById');
 $app->post('/folders/{id}/resources', \Folder\controllers\FolderController::class . ':addResourcesById');
 $app->delete('/folders/{id}/resources', \Folder\controllers\FolderController::class . ':removeResourcesById');
-$app->get('/folders/{id}/resources/{resId}/baskets', \Folder\controllers\FolderController::class . ':getBasketsFromFolder');
 $app->get('/folders/{id}/filters', \Folder\controllers\FolderController::class . ':getFilters');
 $app->put('/folders/{id}/sharing', \Folder\controllers\FolderController::class . ':sharing');
 $app->get('/pinnedFolders', \Folder\controllers\FolderController::class . ':getPinnedFolders');
@@ -411,6 +410,7 @@ $app->get('/resources/{resId}/fields/{fieldId}', \Resource\controllers\ResContro
 $app->delete('/resources/{resId}/linkedResources/{id}', \Resource\controllers\LinkController::class . ':unlinkResources');
 $app->delete('/resources/{resId}/circuits/{type}', \Entity\controllers\ListInstanceController::class . ':deleteCircuit');
 $app->get('/resources/{resId}/fileInformation', \Resource\controllers\ResController::class . ':getResourceFileInformation');
+$app->get('/resources/{resId}/baskets', \Resource\controllers\UserFollowedResourceController::class . ':getBaskets');
 
 $app->put('/res/resource/status', \Resource\controllers\ResController::class . ':updateStatus');
 $app->post('/res/list', \Resource\controllers\ResController::class . ':getList');
@@ -426,10 +426,10 @@ $app->get('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/act
 $app->put('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/lock', \Resource\controllers\ResourceListController::class . ':lock');
 $app->put('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/unlock', \Resource\controllers\ResourceListController::class . ':unlock');
 $app->get('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/filters', \Resource\controllers\ResourceListController::class . ':getFilters');
-$app->put('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/exports', \Resource\controllers\ExportController::class . ':updateExport');
-$app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/summarySheets', \Resource\controllers\SummarySheetController::class . ':createList');
 $app->put('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}', \Resource\controllers\ResourceListController::class . ':setAction');
 $app->put('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/locked', \Resource\controllers\ResourceListController::class . ':areLocked');
+$app->put('/resourcesList/exports', \Resource\controllers\ExportController::class . ':updateExport');
+$app->post('/resourcesList/summarySheets', \Resource\controllers\SummarySheetController::class . ':createList');
 $app->get('/resourcesList/exportTemplate', \Resource\controllers\ExportController::class . ':getExportTemplates');
 $app->put('/resourcesList/integrations', \Resource\controllers\ResController::class . ':setInIntegrations');
 
@@ -454,7 +454,13 @@ $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/ac
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkPrintDepositList', \Action\controllers\PreProcessActionController::class . ':checkPrintDepositList');
 
 //Search
-$app->get('/search', \Search\controllers\SearchController::class . ':get');
+$app->post('/search', \Search\controllers\SearchController::class . ':get');
+$app->get('/search/configuration', \Search\controllers\SearchAdministrationController::class . ':get');
+$app->put('/search/configuration', \Search\controllers\SearchAdministrationController::class . ':update');
+
+$app->get('/searchTemplates', \Search\controllers\SearchTemplateController::class . ':get');
+$app->post('/searchTemplates', \Search\controllers\SearchTemplateController::class . ':create');
+$app->delete('/searchTemplates/{id}', \Search\controllers\SearchTemplateController::class . ':delete');
 
 //shipping
 $app->get('/administration/shippings', \Shipping\controllers\ShippingTemplateController::class . ':get');
@@ -542,7 +548,6 @@ $app->put('/password', \User\controllers\UserController::class . ':passwordIniti
 $app->post('/resources/follow', \Resource\controllers\UserFollowedResourceController::class . ':follow');
 $app->delete('/resources/unfollow', \Resource\controllers\UserFollowedResourceController::class . ':unFollow');
 $app->get('/followedResources', \Resource\controllers\UserFollowedResourceController::class . ':getFollowedResources');
-$app->get('/followedResources/{resId}/baskets', \Resource\controllers\UserFollowedResourceController::class . ':getBaskets');
 $app->get('/followedResources/filters', \Resource\controllers\UserFollowedResourceController::class . ':getFilters');
 
 //VersionsUpdate
@@ -629,7 +634,6 @@ $app->post('/registeredMail/ranges', \RegisteredMail\controllers\RegisteredNumbe
 $app->put('/registeredMail/ranges/{id}', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':update');
 $app->delete('/registeredMail/ranges/{id}', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':delete');
 $app->get('/registeredMail/ranges/type/{type}/last', \RegisteredMail\controllers\RegisteredNumberRangeController::class . ':getLastNumberByType');
-$app->get('/registeredMail/sites/type/{type}', \RegisteredMail\controllers\IssuingSiteController::class . ':getByType');
 
 $app->get('/registeredMail/countries', \RegisteredMail\controllers\RegisteredMailController::class . ':getCountries');
 

@@ -23,13 +23,13 @@ use SrcCore\models\PasswordModel;
 
 class ConfigurationController
 {
-    public function getByService(Request $request, Response $response, array $aArgs)
+    public function getByPrivilege(Request $request, Response $response, array $args)
     {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => $aArgs['service'], 'userId' => $GLOBALS['id']])) {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => $args['privilege'], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $configuration = ConfigurationModel::getByService(['service' => $aArgs['service']]);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => $args['privilege']]);
         $configuration['value'] = json_decode($configuration['value'], true);
         if (!empty($configuration['value']['password'])) {
             $configuration['value']['password'] = '';
@@ -41,21 +41,21 @@ class ConfigurationController
         return $response->withJson(['configuration' => $configuration]);
     }
 
-    public function update(Request $request, Response $response, array $aArgs)
+    public function update(Request $request, Response $response, array $args)
     {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => $aArgs['service'], 'userId' => $GLOBALS['id']])) {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => $args['privilege'], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        if (empty(ConfigurationModel::getByService(['service' => $aArgs['service'], 'select' => [1]]))) {
-            return $response->withStatus(400)->withJson(['errors' => 'Service configuration does not exist']);
+        if (empty(ConfigurationModel::getByPrivilege(['privilege' => $args['privilege'], 'select' => [1]]))) {
+            return $response->withStatus(400)->withJson(['errors' => 'Privilege configuration does not exist']);
         }
 
         $data = $request->getParams();
 
-        if ($aArgs['service'] == 'admin_email_server') {
+        if ($args['privilege'] == 'admin_email_server') {
             if ($data['auth'] && empty($data['password'])) {
-                $configuration = ConfigurationModel::getByService(['service' => $aArgs['service']]);
+                $configuration = ConfigurationModel::getByPrivilege(['privilege' => $args['privilege']]);
                 $configuration['value'] = json_decode($configuration['value'], true);
                 if (!empty($configuration['value']['password'])) {
                     $data['password'] = $configuration['value']['password'];
@@ -72,29 +72,29 @@ class ConfigurationController
         }
 
         $data = json_encode($data);
-        ConfigurationModel::update(['set' => ['value' => $data], 'where' => ['service = ?'], 'data' => [$aArgs['service']]]);
+        ConfigurationModel::update(['set' => ['value' => $data], 'where' => ['privilege = ?'], 'data' => [$args['privilege']]]);
 
         return $response->withJson(['success' => 'success']);
     }
 
-    private static function checkMailer(array $aArgs)
+    private static function checkMailer(array $args)
     {
-        if (!Validator::stringType()->notEmpty()->validate($aArgs['type'])) {
+        if (!Validator::stringType()->notEmpty()->validate($args['type'])) {
             return ['errors' => 'Configuration type is missing', 'code' => 400];
         }
-        if (!Validator::email()->notEmpty()->validate($aArgs['from'])) {
+        if (!Validator::email()->notEmpty()->validate($args['from'])) {
             return ['errors' => 'Configuration from is missing or not well formatted', 'code' => 400];
         }
         
-        if (in_array($aArgs['type'], ['smtp', 'mail'])) {
-            $check = Validator::stringType()->notEmpty()->validate($aArgs['host']);
-            $check = $check && Validator::intVal()->notEmpty()->validate($aArgs['port']);
-            $check = $check && Validator::boolType()->validate($aArgs['auth']);
-            if ($aArgs['auth']) {
-                $check = $check && Validator::stringType()->notEmpty()->validate($aArgs['user']);
-                $check = $check && Validator::stringType()->notEmpty()->validate($aArgs['password']);
+        if (in_array($args['type'], ['smtp', 'mail'])) {
+            $check = Validator::stringType()->notEmpty()->validate($args['host']);
+            $check = $check && Validator::intVal()->notEmpty()->validate($args['port']);
+            $check = $check && Validator::boolType()->validate($args['auth']);
+            if ($args['auth']) {
+                $check = $check && Validator::stringType()->notEmpty()->validate($args['user']);
+                $check = $check && Validator::stringType()->notEmpty()->validate($args['password']);
             }
-            $check = $check && Validator::stringType()->validate($aArgs['secure']);
+            $check = $check && Validator::stringType()->validate($args['secure']);
             if (!$check) {
                 return ['errors' => "Configuration data is missing or not well formatted", 'code' => 400];
             }

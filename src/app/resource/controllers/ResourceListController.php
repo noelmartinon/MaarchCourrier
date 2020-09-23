@@ -24,6 +24,7 @@ use Basket\models\GroupBasketModel;
 use Basket\models\RedirectBasketModel;
 use Contact\controllers\ContactController;
 use Convert\models\AdrModel;
+use CustomField\models\CustomFieldModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
 use Entity\models\EntityModel;
@@ -32,6 +33,8 @@ use Folder\models\FolderModel;
 use Group\models\GroupModel;
 use Note\models\NoteModel;
 use Priority\models\PriorityModel;
+use RegisteredMail\models\IssuingSiteModel;
+use RegisteredMail\models\RegisteredMailModel;
 use Resource\models\ResModel;
 use Resource\models\ResourceListModel;
 use Resource\models\UserFollowedResourceModel;
@@ -854,6 +857,10 @@ class ResourceListController
 
         $currentUser = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
 
+        $customFields = CustomFieldModel::get(['select' => ['id', 'type', 'label']]);
+        $customFieldsLabels = array_column($customFields, 'label', 'id');
+        $customFields = array_column($customFields, 'type', 'id');
+
         foreach ($resources as $key => $resource) {
             $formattedResources[$key]['resId']              = $resource['res_id'];
             $formattedResources[$key]['chrono']             = $resource['alt_identifier'];
@@ -874,7 +881,7 @@ class ResourceListController
                     break;
                 }
             }
-            $formattedResources[$key]['countNotes'] = NoteModel::countByResId(['resId' => $resource['res_id'], 'login' => $currentUser['user_id'], 'userId' => $args['userId']]);
+            $formattedResources[$key]['countNotes'] = NoteModel::countByResId(['resId' => [$resource['res_id']], 'userId' => $args['userId']])[$resource['res_id']];
 
             if (!empty($args['checkLocked'])) {
                 $isLocked = true;
@@ -893,6 +900,11 @@ class ResourceListController
 
             if (isset($args['listDisplay'])) {
                 $display = [];
+                $listDisplayValues = array_column($args['listDisplay'], 'value');
+                if (in_array('getRegisteredMailRecipient', $listDisplayValues) || in_array('getRegisteredMailReference', $listDisplayValues)
+                    || in_array('getRegisteredMailIssuingSite', $listDisplayValues)) {
+                    $registeredMail = RegisteredMailModel::getByResId(['resId' => $resource['res_id'], 'select' => ['issuing_site', 'recipient', 'reference']]);
+                }
                 foreach ($args['listDisplay'] as $value) {
                     $value = (array)$value;
                     if ($value['value'] == 'getPriority') {
@@ -934,10 +946,47 @@ class ResourceListController
                     } elseif ($value['value'] == 'getResId') {
                         $value['displayValue'] = $resource['res_id'];
                         $display[] = $value;
+                    } elseif ($value['value'] == 'getBarcode') {
+                        $value['displayValue'] = $resource['barcode'];
+                        $display[] = $value;
+                    } elseif ($value['value'] == 'getRegisteredMailRecipient') {
+                        if (!empty($registeredMail)) {
+                            $recipient = json_decode($registeredMail['recipient'], true);
+                            $recipient = $recipient['company'] . ' ' . $recipient['firstname'] . ' ' . $recipient['lastname'];
+                            $value['displayValue'] = $recipient;
+                        } else {
+                            $value['displayValue'] = '';
+                        }
+                        $display[] = $value;
+                    }  elseif ($value['value'] == 'getRegisteredMailReference') {
+                        $value['displayValue'] = !empty($registeredMail) ? $registeredMail['reference'] : '';
+                        $display[] = $value;
+                    }  elseif ($value['value'] == 'getRegisteredMailIssuingSite') {
+                        if (!empty($registeredMail)) {
+                            $site = IssuingSiteModel::getById(['id' => $registeredMail['issuing_site'], 'select' => ['label']]);
+                            $value['displayValue'] = $site['label'];
+                        } else {
+                            $value['displayValue'] = '';
+                        }
+                        $display[] = $value;
                     } elseif (strpos($value['value'], 'indexingCustomField_') !== false) {
                         $customId = explode('_', $value['value'])[1];
                         $customValue = json_decode($resource['custom_fields'], true);
-                        $value['displayValue'] = $customValue[$customId] ?? '';
+
+                        $value['displayLabel'] = $customFieldsLabels[$customId] ?? '';
+                        if ($customFields[$customId] == 'banAutocomplete' && !empty($customValue[$customId])) {
+                            $value['displayValue'] = $customValue[$customId][0]['addressNumber'] ?? '';
+                            $value['displayValue'] .= ' ';
+                            $value['displayValue'] .= $customValue[$customId][0]['addressStreet'] ?? '';
+                            $value['displayValue'] .= ' ';
+                            $value['displayValue'] .= $customValue[$customId][0]['addressTown'] ?? '';
+                        } elseif ($customFields[$customId] == 'date' && !empty($customValue[$customId])) {
+                            $value['displayValue'] = TextFormatModel::formatDate($customValue[$customId], 'd-m-Y');
+                        } elseif ($customFields[$customId] == 'checkbox' && !empty($customValue[$customId])) {
+                            $value['displayValue'] = implode(', ', $customValue[$customId]);
+                        } else {
+                            $value['displayValue'] = $customValue[$customId] ?? '';
+                        }
                         $display[] = $value;
                     }
                 }

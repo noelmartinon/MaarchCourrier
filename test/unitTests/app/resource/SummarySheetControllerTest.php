@@ -109,7 +109,7 @@ class SummarySheetControllerTest extends TestCase
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
 
-        $response     = $summarySheetController->createList($fullRequest, new \Slim\Http\Response(), ['userId' => 19, 'groupId' => 2, 'basketId' => $myBasket['id']]);
+        $response     = $summarySheetController->createList($fullRequest, new \Slim\Http\Response());
         $responseBody = json_decode((string)$response->getBody());
 
         $this->assertSame(null, $responseBody);
@@ -121,32 +121,10 @@ class SummarySheetControllerTest extends TestCase
 
         unset($body['resources']);
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
-        $response = $summarySheetController->createList($fullRequest, new \Slim\Http\Response(), ['userId' => 19, 'groupId' => 2, 'basketId' => $myBasket['id']]);
+        $response = $summarySheetController->createList($fullRequest, new \Slim\Http\Response());
         $this->assertSame(403, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame('Resources is not set or empty', $responseBody['errors']);
-
-        $body = [
-            "resources" => $GLOBALS['resources'],
-            "units" => [
-                ['label' => 'Informations', 'unit' => 'primaryInformations']
-            ],
-        ];
-
-        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
-        $response = $summarySheetController->createList($fullRequest, new \Slim\Http\Response(), ['userId' => 19, 'groupId' => 2, 'basketId' => $myBasket['id'] * 1000]);
-        $this->assertSame(403, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Group or basket does not exist', $responseBody['errors']);
-
-        $GLOBALS['login'] = 'ddur';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-        $GLOBALS['id'] = $userInfo['id'];
-
-        $response = $summarySheetController->createList($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'groupId' => 8, 'basketId' => $myBasket['id']]);
-        $this->assertSame(403, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Resources out of perimeter', $responseBody['errors']);
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);

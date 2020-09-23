@@ -27,7 +27,8 @@
         </mat-option>
     </mat-autocomplete>
 </mat-form-field>
-<mat-card color="primary" *ngIf="manualAddress && !emptyAddress()">
+<a *ngIf="!manualAddress && emptyAddress()" (click)="manualAddress=!manualAddress" style="cursor: pointer;">{{'lang.switchManualAddress' | translate}}</a>
+<mat-card color="primary" *ngIf="manualAddress">
     <button mat-icon-button class="address-icon" (click)="manualAddress=!manualAddress"
         [title]="'lang.showAddress' | translate">
         <mat-icon class="fa fa-eye"></mat-icon>
@@ -96,7 +97,7 @@
         </mat-autocomplete>
     </mat-form-field>
 </mat-card>
-<mat-card color="primary" *ngIf="!manualAddress && !emptyAddress()">
+<mat-card color="primary" *ngIf="!manualAddress && !emptyAddress()" style="min-height: 60px">
     <button *ngIf="this.control.status !== 'DISABLED'" mat-icon-button class="address-icon"
         (click)="manualAddress=!manualAddress" [title]="'lang.update' | translate">
         <mat-icon class="fa fa-edit"></mat-icon>

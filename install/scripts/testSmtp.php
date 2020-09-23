@@ -20,7 +20,7 @@
          'charset'  => 'utf-8'
      ];
      $data = json_encode($data);
-     \Configuration\models\ConfigurationModel::update(['set' => ['value' => $data], 'where' => ['service = ?'], 'data' => ['admin_email_server']]);
+     \Configuration\models\ConfigurationModel::update(['set' => ['value' => $data], 'where' => ['privilege = ?'], 'data' => ['admin_email_server']]);
  }
 
 include($_SESSION['config']['corepath']

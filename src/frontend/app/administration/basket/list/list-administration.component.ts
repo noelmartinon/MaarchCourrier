@@ -128,6 +128,37 @@ export class ListAdministrationComponent implements OnInit {
             'sample': this.translate.instant('lang.getFoldersSample'),
             'cssClasses': ['align_leftData'],
             'icon': 'fa-folder'
+        },
+        {
+            'value': 'getResId',
+            'label': this.translate.instant('lang.getResId'),
+            'sample': this.translate.instant('lang.getResIdSample'),
+            'cssClasses': ['align_leftData'],
+            'icon': 'fa-envelope'
+        }, {
+            'value': 'getBarcode',
+            'label': this.translate.instant('lang.getBarcode'),
+            'sample': this.translate.instant('lang.getBarcodeSample'),
+            'cssClasses': ['align_leftData'],
+            'icon': 'fa-barcode'
+        }, {
+            'value': 'getRegisteredMailRecipient',
+            'label': this.translate.instant('lang.registeredMailRecipient'),
+            'sample': this.translate.instant('lang.registeredMailRecipientSample'),
+            'cssClasses': ['align_leftData'],
+            'icon': 'fa-user'
+        }, {
+            'value': 'getRegisteredMailReference',
+            'label': this.translate.instant('lang.registeredMailReference'),
+            'sample': this.translate.instant('lang.registeredMailReferenceSample'),
+            'cssClasses': ['align_leftData'],
+            'icon': 'fa-hashtag'
+        }, {
+            'value': 'getRegisteredMailIssuingSite',
+            'label': this.translate.instant('lang.issuingSite'),
+            'sample': this.translate.instant('lang.issuingSiteSample'),
+            'cssClasses': ['align_leftData'],
+            'icon': 'fas fa-warehouse'
         }
     ];
     availableDataClone: any = [];

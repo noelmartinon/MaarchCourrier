@@ -79,7 +79,7 @@ class SignatureBookController
         $datas['attachments']           = SignatureBookController::getAttachmentsForSignatureBook(['resId' => $resId, 'userId' => $GLOBALS['id']]);
         $datas['documents']             = $documents;
         $datas['resList']               = $resources;
-        $datas['nbNotes']               = NoteModel::countByResId(['resId' => $resId, 'userId' => $GLOBALS['id'], 'login' => $GLOBALS['login']]);
+        $datas['nbNotes']               = NoteModel::countByResId(['resId' => [$resId], 'userId' => $GLOBALS['id']])[$resId];
         $datas['nbLinks']               = 0;
         $datas['signatures']            = UserSignatureModel::getByUserSerialId(['userSerialid' => $GLOBALS['id']]);
         $datas['consigne']              = UserModel::getCurrentConsigneById(['resId' => $resId]);

@@ -1030,7 +1030,6 @@ INSERT INTO difflist_types (difflist_type_id, difflist_type_label, difflist_type
 --ACTIONS
 ------------
 TRUNCATE TABLE actions;
-TRUNCATE TABLE actions_categories;
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (1,  'redirect', 'Rediriger', 'NEW', 'Y', 'redirect', 'Y', 'redirectAction');
 --INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (2,  '', 'Attribuer au service', 'NEW', 'N', 'confirm_status', 'Y', 'confirmAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (3,  '', 'Retourner au service Courrier', 'RET', 'N', 'confirm_status', 'Y', 'confirmAction');
@@ -1083,7 +1082,32 @@ INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_pag
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component, parameters) VALUES (530, '', 'Re-Générér les accusés de réception papier si pb impression', '_NOSTATUS_', 'N', 'create_acknowledgement_receipt', 'Y', 'createAcknowledgementReceiptsAction', '{"mode": "both"}');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (531, '', 'Envoyer pour annotation sur la tablette (Maarch Parapheur)', 'ATT_MP', 'N', 'sendToExternalSignatureBook', 'Y', 'sendExternalSignatoryBookAction');
 --INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component, required_fields) VALUES (532, '', 'Cloturer intervention', 'END', 'N', 'close_mail', 'Y', 'closeMailAction','["indexingCustomField_2"]');
+INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (532, '', 'Enregistrer et imprimer le recommandé', 'NEW', 'N', 'saveAndPrintRegisteredMail', 'Y', 'saveAndPrintRegisteredMailAction');
+INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (533, '', 'Enregistrer le recommandé et rester sur la page d''indexation', 'NEW', 'N', 'saveAndIndexRegisteredMail', 'Y', 'saveAndIndexRegisteredMailAction');
+INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (534, '', 'Imprimer le recommandé', '_NOSTATUS_', 'N', 'printRegisteredMail', 'Y', 'printRegisteredMailAction');
+INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (535, '', 'Imprimer le descriptif de pli', '_NOSTATUS_', 'N', 'printDepositList', 'Y', 'printDepositListAction');
+INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (536, '', 'Enregistrer le recommandé', 'NEW', 'N', 'saveRegisteredMail', 'Y', 'saveRegisteredMailAction');
 Select setval('actions_id_seq', (select max(id)+1 from actions), false);
+
+TRUNCATE TABLE actions_categories;
+INSERT INTO actions_categories (action_id, category_id) VALUES (20, 'incoming');
+INSERT INTO actions_categories (action_id, category_id) VALUES (20, 'outgoing');
+INSERT INTO actions_categories (action_id, category_id) VALUES (20, 'internal');
+INSERT INTO actions_categories (action_id, category_id) VALUES (20, 'ged_doc');
+INSERT INTO actions_categories (action_id, category_id) VALUES (22, 'incoming');
+INSERT INTO actions_categories (action_id, category_id) VALUES (22, 'outgoing');
+INSERT INTO actions_categories (action_id, category_id) VALUES (22, 'internal');
+INSERT INTO actions_categories (action_id, category_id) VALUES (22, 'ged_doc');
+INSERT INTO actions_categories (action_id, category_id) VALUES (414, 'incoming');
+INSERT INTO actions_categories (action_id, category_id) VALUES (414, 'outgoing');
+INSERT INTO actions_categories (action_id, category_id) VALUES (414, 'internal');
+INSERT INTO actions_categories (action_id, category_id) VALUES (414, 'ged_doc');
+INSERT INTO actions_categories (action_id, category_id) VALUES (532, 'registeredMail');
+INSERT INTO actions_categories (action_id, category_id) VALUES (533, 'registeredMail');
+INSERT INTO actions_categories (action_id, category_id) VALUES (534, 'registeredMail');
+INSERT INTO actions_categories (action_id, category_id) VALUES (535, 'registeredMail');
+INSERT INTO actions_categories (action_id, category_id) VALUES (536, 'registeredMail');
+
 ------------
 -- BANNETTES SECONDAIRES
 TRUNCATE TABLE users_baskets_preferences;
@@ -1623,7 +1647,8 @@ INSERT INTO contacts_filling (enable, first_threshold, second_threshold) VALUES 
 
 /* Configurations */
 TRUNCATE TABLE configurations;
-INSERT INTO configurations (service, value) VALUES ('admin_email_server', '{"type":"smtp","host":"smtp.gmail.com","port":465,"user":"notifications.maarch@gmail.com","password":"1OkrZQPFNJmI7uY8::7e870f0f61ecc7e9fb6e7065dd31aea5","auth":true,"secure":"ssl","from":"notifications.maarch@gmail.com","charset":"utf-8"}');
+INSERT INTO configurations (privilege, value) VALUES ('admin_email_server', '{"type":"smtp","host":"smtp.gmail.com","port":465,"user":"notifications.maarch@gmail.com","password":"1OkrZQPFNJmI7uY8::7e870f0f61ecc7e9fb6e7065dd31aea5","auth":true,"secure":"ssl","from":"notifications.maarch@gmail.com","charset":"utf-8"}');
+INSERT INTO configurations (privilege, value) VALUES ('admin_search', '{"listEvent": {"defaultTab": "dashboard"},"listDisplay":{"templateColumns":6,"subInfos":[{"value":"getPriority","cssClasses":["align_leftData"],"icon":"fa-traffic-light"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_leftData"],"icon":"fa-calendar"},{"value":"getAssignee","cssClasses":["align_leftData"],"icon":"fa-sitemap"},{"value":"getDoctype","cssClasses":["align_leftData"],"icon":"fa-suitcase"},{"value":"getRecipients","cssClasses":["align_leftData"],"icon":"fa-user"},{"value":"getSenders","cssClasses":["align_leftData"],"icon":"fa-book"}]}}');
 
 /* Modèle d’envois postaux */
 TRUNCATE TABLE shipping_templates;
@@ -1728,3 +1753,14 @@ INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_val
 --INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (6, 'folders', FALSE, '[33]', 'classifying');
 
 INSERT INTO parameters (id, description, param_value_string) VALUES ('siret', 'Numéro SIRET de l''entreprise', '45239273100025');
+
+/* Recomande*/
+INSERT INTO registered_mail_issuing_sites (id, label, post_office_label, account_number, address_number, address_street, address_additional1, address_additional2, address_postcode, address_town, address_country) VALUES (1, 'MAARCH - Nanterre', 'La poste Nanterre', 1234567, '10', 'AVENUE DE LA GRANDE ARMEE', '', '', '75017', 'PARIS', 'FRANCE');
+SELECT setval('registered_mail_issuing_sites_id_seq', (select max(id)+1 from registered_mail_issuing_sites), false);
+
+INSERT INTO registered_mail_issuing_sites_entities (site_id, entity_id) VALUES (1, 6);
+INSERT INTO registered_mail_issuing_sites_entities (site_id, entity_id) VALUES (1, 13);
+
+INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, status) VALUES ('2C', 'SuiviNumber', 1, 10, 23, '2020-09-14 14:38:09.008644', 'OK');
+INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, status) VALUES ('RW', 'SuiviNumberInternational', 1, 10, 23, '2020-09-14 14:39:32.972626', 'OK');
+INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, status) VALUES ('2D', 'suiviNumber', 1, 10, 23, '2020-09-14 14:39:16.779322', 'OK');

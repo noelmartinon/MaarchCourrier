@@ -85,13 +85,11 @@ export class AcknowledgementReceptionComponent implements OnInit {
         if (this.functions.empty(this.number)) {
             return;
         }
-        if (this.type === 'distributed') {
-            if (!this.adminFormGroup.get('number').valid) {
-                this.notify.error(this.translate.instant('lang.fieldsNotValid'));
-                return;
-            }
-        } else {
-            if (!this.adminFormGroup.get('number').valid || !this.adminFormGroup.get('receivedDate').valid || !this.adminFormGroup.get('returnReason').valid) {
+        if (!this.adminFormGroup.get('number').valid) {
+            return;
+        }
+        if (this.type === 'notDistributed') {
+            if (!this.adminFormGroup.get('receivedDate').valid || !this.adminFormGroup.get('returnReason').valid) {
                 this.notify.error(this.translate.instant('lang.fieldsNotValid'));
                 return;
             }
@@ -129,5 +127,13 @@ export class AcknowledgementReceptionComponent implements OnInit {
         setTimeout(() => {
                 this.numberInput.nativeElement.focus();
         }, 0);
+    }
+
+    changeType(type: any) {
+        if (type === 'distributed') {
+            this.adminFormGroup.get('receivedDate').disable();
+        } else {
+            this.adminFormGroup.get('receivedDate').enable();
+        }
     }
 }

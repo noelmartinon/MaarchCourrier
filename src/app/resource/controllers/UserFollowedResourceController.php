@@ -176,11 +176,6 @@ class UserFollowedResourceController
             return $response->withStatus(400)->withJson(['errors' => 'Route resId is not an integer']);
         }
 
-        $followedResource = UserFollowedResourceModel::get(['select' => [1], 'where' => ['user_id = ?', 'res_id = ?'], 'data' => [$GLOBALS['id'], $args['resId']]]);
-        if (empty($followedResource)) {
-            return $response->withStatus(403)->withJson(['errors' => 'Resource out of perimeter']);
-        }
-
         $baskets = BasketModel::getWithPreferences([
             'select'    => ['baskets.id', 'baskets.basket_name', 'baskets.basket_clause', 'users_baskets_preferences.group_serial_id', 'usergroups.group_desc'],
             'where'     => ['users_baskets_preferences.user_serial_id = ?'],

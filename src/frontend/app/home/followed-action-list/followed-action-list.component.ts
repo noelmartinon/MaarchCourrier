@@ -19,7 +19,6 @@ import { of } from 'rxjs/internal/observable/of';
 })
 export class FollowedActionListComponent implements OnInit {
 
-    
     loading: boolean = false;
 
     @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
@@ -106,7 +105,7 @@ export class FollowedActionListComponent implements OnInit {
     }
 
     getBaskets() {
-        this.http.get('../rest/followedResources/' + this.selectedRes + '/baskets').pipe(
+        this.http.get('../rest/resources/' + this.selectedRes + '/baskets').pipe(
             tap((data: any) => {
                 this.basketList.groups = data.groupsBaskets.filter((x: any, i: any, a: any) => x && a.map((info: any) => info.groupId).indexOf(x.groupId) === i);
                 this.basketList.list = data.groupsBaskets;

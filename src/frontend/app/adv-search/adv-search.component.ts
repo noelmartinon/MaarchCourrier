@@ -25,6 +25,8 @@ import { of } from 'rxjs/internal/observable/of';
 import { Observable } from 'rxjs/internal/Observable';
 import { CriteriaToolComponent } from './criteria-tool/criteria-tool.component';
 import { FormControl } from '@angular/forms';
+import { IndexingFieldsService } from '../../service/indexing-fields.service';
+import { ValueConverter } from '@angular/compiler/src/render3/view/template';
 
 declare var $: any;
 
@@ -37,7 +39,9 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
     loading: boolean = false;
     docUrl: string = '';
     public innerHtml: SafeHtml;
-    basketUrl: string;
+    searchUrl: string = '../rest/search';
+    searchTerm: string = '';
+    criteria: any = {};
     homeData: any;
 
     injectDatasParam = {
@@ -70,7 +74,7 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
     ];
 
     resultListDatabase: ResultListHttpDao | null;
-    data: any;
+    data: any = [];
     resultsLength = 0;
     isLoadingResults = true;
     listProperties: any = {};
@@ -105,6 +109,7 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
     @ViewChild('basketHome', { static: true }) basketHome: BasketHomeComponent;
 
     constructor(
+        private _activatedRoute: ActivatedRoute,
         public translate: TranslateService,
         private router: Router,
         private route: ActivatedRoute,
@@ -118,7 +123,21 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
         public viewContainerRef: ViewContainerRef,
         public appService: AppService,
         public foldersService: FoldersService,
-        public functions: FunctionsService) { }
+        public functions: FunctionsService,
+        public indexingFieldService: IndexingFieldsService) {
+        _activatedRoute.queryParams.subscribe(
+            params => {
+                if (!this.functions.empty(params.value)) {
+                    this.searchTerm = params.value;
+                    this.criteria = {
+                        meta : {
+                            values : this.searchTerm
+                        }
+                    };
+                }
+            }
+        );
+    }
 
     ngOnInit(): void {
         this.headerService.sideBarAdmin = true;
@@ -130,7 +149,7 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
         this.headerService.setHeader(this.translate.instant('lang.searchMails'), '', '');
 
-        this.appCriteriaTool.getCriterias();
+        this.initResultList();
 
         /*this.route.params.subscribe(params => {
             this.folderInfoOpened = false;
@@ -159,7 +178,7 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
                     this.headerService.setHeader(this.folderInfo.label, '', 'fa fa-folder-open');
 
                 });
-            this.basketUrl = '../rest/folders/' + params['folderId'] + '/resources';
+            this.searchUrl = '../rest/folders/' + params['folderId'] + '/resources';
             this.filtersListService.filterMode = false;
             this.selectedRes = [];
             this.sidenavRight.close();
@@ -181,8 +200,8 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
         this.destroy$.next(true);
     }
 
-    launchSearch(value: any) {
-        // this.searchUrl = value;
+    launchSearch(criteria: any) {
+        this.criteria = criteria;
         this.refreshDao();
     }
 
@@ -201,20 +220,20 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
                 switchMap(() => {
                     this.isLoadingResults = true;
                     return this.resultListDatabase!.getRepoIssues(
-                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.basketUrl, this.filtersListService.getUrlFilters(), this.paginator.pageSize);
+                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.searchUrl, null, this.paginator.pageSize, this.criteria);
                 }),
                 map((data: any) => {
                     // Flip flag to show that loading has finished.
                     this.isLoadingResults = false;
                     data = this.processPostData(data);
-                    this.resultsLength = data.countResources;
+                    this.resultsLength = data.count;
                     this.allResInBasket = data.allResources;
                     // this.headerService.setHeader('Dossier : ' + this.folderInfo.label);
                     return data.resources;
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
-                    this.router.navigate(['/home']);
+                    // this.router.navigate(['/home']);
                     this.isLoadingResults = false;
                     return of(false);
                 })
@@ -428,6 +447,25 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
             })
         ).subscribe();
     }
+
+    emptyCriteria() {
+        return Object.keys(this.criteria).length === 0;
+    }
+
+    isArrayType(value: any) {
+        return (Array.isArray(value));
+    }
+
+    removeCriteria(identifier: string, value: any = null) {
+        const tmpArrCrit = [];
+        if (value === null || this.criteria[identifier].values.length === 1) {
+            this.criteria[identifier].values = [];
+        } else {
+            const indexArr = this.criteria[identifier].values.indexOf(value);
+            this.criteria[identifier].values.splice(indexArr, 1);
+        }
+        this.appCriteriaTool.refreshCriteria(this.criteria);
+    }
 }
 export interface BasketList {
     folder: any;
@@ -440,12 +478,12 @@ export class ResultListHttpDao {
 
     constructor(private http: HttpClient, private filtersListService: FiltersListService) { }
 
-    getRepoIssues(sort: string, order: string, page: number, href: string, filters: string, pageSize: number): Observable<BasketList> {
-        this.filtersListService.updateListsPropertiesPage(page);
-        this.filtersListService.updateListsPropertiesPageSize(pageSize);
+    getRepoIssues(sort: string, order: string, page: number, href: string, filters: string, pageSize: number, criteria: any): Observable<BasketList> {
+        // this.filtersListService.updateListsPropertiesPage(page);
+        // this.filtersListService.updateListsPropertiesPageSize(pageSize);
         const offset = page * pageSize;
-        const requestUrl = `${href}?limit=${pageSize}&offset=${offset}${filters}`;
-
-        return this.http.get<BasketList>(requestUrl);
+        const requestUrl = `${href}?limit=${pageSize}&offset=${offset}`;
+        // console.log(criteria);
+        return this.http.post<BasketList>(requestUrl, criteria);
     }
 }

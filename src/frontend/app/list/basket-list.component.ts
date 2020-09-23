@@ -395,7 +395,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
                         key.displayValue = key.displayValue + ' ' + this.translate.instant('lang.opinionsSent');
                     }
                 }
-                key.label = this.translate.instant('lang.' + key.value);
+                key.label = key.displayLabel === undefined ? this.translate.instant('lang.' + key.value) : key.displayLabel;
             });
 
             if (this.selectedRes.indexOf(element['resId']) === -1) {

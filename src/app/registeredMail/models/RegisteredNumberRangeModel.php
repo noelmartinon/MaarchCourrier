@@ -38,25 +38,25 @@ class RegisteredNumberRangeModel
         ValidatorModel::intVal($args, ['id']);
         ValidatorModel::arrayType($args, ['select']);
 
-        $site = DatabaseModel::select([
+        $range = DatabaseModel::select([
             'select' => empty($args['select']) ? ['*'] : $args['select'],
             'table'  => ['registered_mail_number_range'],
             'where'  => ['id = ?'],
             'data'   => [$args['id']]
         ]);
 
-        if (empty($site[0])) {
+        if (empty($range[0])) {
             return [];
         }
 
-        return $site[0];
+        return $range[0];
     }
 
     public static function create(array $args)
     {
-        ValidatorModel::notEmpty($args, ['type', 'rangeStart', 'rangeEnd', 'siteId', 'status']);
+        ValidatorModel::notEmpty($args, ['type', 'rangeStart', 'rangeEnd', 'status']);
         ValidatorModel::stringType($args, ['type', 'status']);
-        ValidatorModel::intVal($args, ['rangeStart', 'rangeEnd', 'siteId', 'currentNumber']);
+        ValidatorModel::intVal($args, ['rangeStart', 'rangeEnd', 'currentNumber']);
 
         $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'registered_mail_number_range_id_seq']);
 
@@ -69,7 +69,6 @@ class RegisteredNumberRangeModel
                 'range_start'             => $args['rangeStart'],
                 'range_end'               => $args['rangeEnd'],
                 'creator'                 => $args['creator'],
-                'site_id'                 => $args['siteId'],
                 'current_number'          => $args['currentNumber'],
                 'status'                  => $args['status']
             ]

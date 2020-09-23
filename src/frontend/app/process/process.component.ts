@@ -568,9 +568,10 @@ export class ProcessComponent implements OnInit, OnDestroy {
                             this.actionService.loading = false;
                         }
                     }),
-                    filter((data: string) => data === 'ok'),
-                    tap(async () => {
-                        await this.saveTool();
+                    tap(async (data: string) => {
+                        if (data === 'ok') {
+                            await this.saveTool();
+                        }
                         if (this.appDocumentViewer.isEditingTemplate()) {
                             await this.appDocumentViewer.saveMainDocument();
                         }

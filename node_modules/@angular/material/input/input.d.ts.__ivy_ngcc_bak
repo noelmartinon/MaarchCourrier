@@ -8,10 +8,10 @@
 import { BooleanInput } from '@angular/cdk/coercion';
 import { Platform } from '@angular/cdk/platform';
 import { AutofillMonitor } from '@angular/cdk/text-field';
-import { DoCheck, ElementRef, NgZone, OnChanges, OnDestroy, OnInit } from '@angular/core';
+import { AfterViewInit, DoCheck, ElementRef, NgZone, OnChanges, OnDestroy } from '@angular/core';
 import { FormGroupDirective, NgControl, NgForm } from '@angular/forms';
 import { CanUpdateErrorState, CanUpdateErrorStateCtor, ErrorStateMatcher } from '@angular/material/core';
-import { MatFormFieldControl } from '@angular/material/form-field';
+import { MatFormFieldControl, MatFormField } from '@angular/material/form-field';
 import { Subject } from 'rxjs';
 /** @docs-private */
 declare class MatInputBase {
@@ -26,17 +26,17 @@ declare class MatInputBase {
 }
 declare const _MatInputMixinBase: CanUpdateErrorStateCtor & typeof MatInputBase;
 /** Directive that allows a native input to work inside a `MatFormField`. */
-export declare class MatInput extends _MatInputMixinBase implements MatFormFieldControl<any>, OnChanges, OnDestroy, OnInit, DoCheck, CanUpdateErrorState {
+export declare class MatInput extends _MatInputMixinBase implements MatFormFieldControl<any>, OnChanges, OnDestroy, AfterViewInit, DoCheck, CanUpdateErrorState {
     protected _elementRef: ElementRef<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
     protected _platform: Platform;
     /** @docs-private */
     ngControl: NgControl;
     private _autofillMonitor;
+    private _formField?;
     protected _uid: string;
     protected _previousNativeValue: any;
     private _inputValueAccessor;
-    /** The aria-describedby attribute on the input for improved a11y. */
-    _ariaDescribedby: string;
+    private _previousPlaceholder;
     /** Whether the component is being rendered on the server. */
     readonly _isServer: boolean;
     /** Whether the component is a native html select. */
@@ -99,6 +99,11 @@ export declare class MatInput extends _MatInputMixinBase implements MatFormField
      * Implemented as part of MatFormFieldControl.
      * @docs-private
      */
+    userAriaDescribedBy: string;
+    /**
+     * Implemented as part of MatFormFieldControl.
+     * @docs-private
+     */
     get value(): string;
     set value(value: string);
     /** Whether the element is readonly. */
@@ -108,8 +113,8 @@ export declare class MatInput extends _MatInputMixinBase implements MatFormField
     protected _neverEmptyInputTypes: string[];
     constructor(_elementRef: ElementRef<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>, _platform: Platform, 
     /** @docs-private */
-    ngControl: NgControl, _parentForm: NgForm, _parentFormGroup: FormGroupDirective, _defaultErrorStateMatcher: ErrorStateMatcher, inputValueAccessor: any, _autofillMonitor: AutofillMonitor, ngZone: NgZone);
-    ngOnInit(): void;
+    ngControl: NgControl, _parentForm: NgForm, _parentFormGroup: FormGroupDirective, _defaultErrorStateMatcher: ErrorStateMatcher, inputValueAccessor: any, _autofillMonitor: AutofillMonitor, ngZone: NgZone, _formField?: MatFormField | undefined);
+    ngAfterViewInit(): void;
     ngOnChanges(): void;
     ngOnDestroy(): void;
     ngDoCheck(): void;
@@ -118,6 +123,8 @@ export declare class MatInput extends _MatInputMixinBase implements MatFormField
     /** Callback for the cases where the focused state of the input changes. */
     _focusChanged(isFocused: boolean): void;
     _onInput(): void;
+    /** Does some manual dirty checking on the native input `placeholder` attribute. */
+    private _dirtyCheckPlaceholder;
     /** Does some manual dirty checking on the native input `value` property. */
     protected _dirtyCheckNativeValue(): void;
     /** Make sure the input is a supported type. */

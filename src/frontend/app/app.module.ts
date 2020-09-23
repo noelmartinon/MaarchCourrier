@@ -11,7 +11,6 @@ import { InternationalizationModule } from '../service/translate/internationaliz
 import { JoyrideModule } from 'ngx-joyride';
 
 import { PanelListComponent } from './list/panel/panel-list.component';
-import { ActionsModule } from './actions/actions.module';
 import { DocumentViewerModule } from './viewer/document-viewer.module';
 import { AppListModule } from './app-list.module';
 
@@ -22,6 +21,51 @@ import { PrivilegeService } from '../service/privileges.service';
 import { ActionsService } from './actions/actions.service';
 
 import { AppComponent } from './app.component';
+
+import { CriteriaToolComponent } from './adv-search/criteria-tool/criteria-tool.component';
+
+// ACTIONS
+import { SearchAdvListComponent } from './adv-search/list/search-adv-list.component';
+
+import { ConfirmActionComponent } from './actions/confirm-action/confirm-action.component';
+import { DisabledBasketPersistenceActionComponent } from './actions/disabled-basket-persistence-action/disabled-basket-persistence-action.component';
+import { EnabledBasketPersistenceActionComponent } from './actions/enabled-basket-persistence-action/enabled-basket-persistence-action.component';
+import { ResMarkAsReadActionComponent } from './actions/res-mark-as-read-action/res-mark-as-read-action.component';
+import { CloseMailActionComponent } from './actions/close-mail-action/close-mail-action.component';
+import { RejectVisaBackToPrevousActionComponent } from './actions/visa-reject-back-to-previous-action/reject-visa-back-to-previous-action.component';
+import { ResetVisaActionComponent } from './actions/visa-reset-action/reset-visa-action.component';
+import { InterruptVisaActionComponent } from './actions/visa-interrupt-action/interrupt-visa-action.component';
+import { UpdateAcknowledgementSendDateActionComponent } from './actions/update-acknowledgement-send-date-action/update-acknowledgement-send-date-action.component';
+import { CreateAcknowledgementReceiptActionComponent } from './actions/create-acknowledgement-receipt-action/create-acknowledgement-receipt-action.component';
+import { CloseAndIndexActionComponent } from './actions/close-and-index-action/close-and-index-action.component';
+import { UpdateDepartureDateActionComponent } from './actions/update-departure-date-action/update-departure-date-action.component';
+import { SendExternalSignatoryBookActionComponent } from './actions/send-external-signatory-book-action/send-external-signatory-book-action.component';
+import { SendExternalNoteBookActionComponent } from './actions/send-external-note-book-action/send-external-note-book-action.component';
+import { XParaphComponent } from './actions/send-external-signatory-book-action/x-paraph/x-paraph.component';
+import { MaarchParaphComponent } from './actions/send-external-signatory-book-action/maarch-paraph/maarch-paraph.component';
+import { IParaphComponent } from './actions/send-external-signatory-book-action/i-paraph/i-paraph.component';
+import { IxbusParaphComponent } from './actions/send-external-signatory-book-action/ixbus-paraph/ixbus-paraph.component';
+import { FastParaphComponent } from './actions/send-external-signatory-book-action/fast-paraph/fast-paraph.component';
+import { ViewDocActionComponent } from './actions/view-doc-action/view-doc-action.component';
+import { RedirectActionComponent } from './actions/redirect-action/redirect-action.component';
+import { SendShippingActionComponent } from './actions/send-shipping-action/send-shipping-action.component';
+import { redirectInitiatorEntityActionComponent } from './actions/redirect-initiator-entity-action/redirect-initiator-entity-action.component';
+import { closeMailWithAttachmentsOrNotesActionComponent } from './actions/close-mail-with-attachments-or-notes-action/close-mail-with-attachments-or-notes-action.component';
+import { SendSignatureBookActionComponent } from './actions/visa-send-signature-book-action/send-signature-book-action.component';
+import { ContinueVisaCircuitActionComponent } from './actions/visa-continue-circuit-action/continue-visa-circuit-action.component';
+import { ContinueAvisCircuitActionComponent } from './actions/avis-continue-circuit-action/continue-avis-circuit-action.component';
+import { SendAvisWorkflowComponent } from './actions/avis-workflow-send-action/send-avis-workflow-action.component';
+import { SendAvisParallelComponent } from './actions/avis-parallel-send-action/send-avis-parallel-action.component';
+import { GiveAvisParallelActionComponent } from './actions/avis-give-parallel-action/give-avis-parallel-action.component';
+import { ValidateAvisParallelComponent } from './actions/avis-parallel-validate-action/validate-avis-parallel-action.component';
+import { ReconcileActionComponent } from './actions/reconciliation-action/reconcile-action.component';
+import { SendAlfrescoActionComponent } from './actions/send-alfresco-action/send-alfresco-action.component';
+import { SaveRegisteredMailActionComponent } from './actions/save-registered-mail-action/save-registered-mail-action.component';
+import { SaveAndIndexRegisteredMailActionComponent } from './actions/save-and-index-registered-mail-action/save-and-index-registered-mail-action.component';
+import { SaveAndPrintRegisteredMailActionComponent } from './actions/save-and-print-registered-mail-action/save-and-print-registered-mail-action.component';
+import { PrintRegisteredMailActionComponent } from './actions/print-registered-mail-action/print-registered-mail-action.component';
+import { PrintDepositListActionComponent } from './actions/print-deposit-list-action/print-deposit-list-action.component';
+
 
 // PROCESS
 import { ProcessComponent } from './process/process.component';
@@ -36,7 +80,6 @@ import { SentResourcePageComponent } from './sentResource/sent-resource-page/sen
 import { SentNumericPackagePageComponent } from './sentResource/sent-numeric-package-page/sent-numeric-package-page.component';
 import { ThesaurusModalComponent } from './tag/indexing/thesaurus/thesaurus-modal.component';
 import { SelectIndexingModelComponent } from './indexation/select-indexing-model/select-indexing-model.component';
-import { DocumentFormModule } from './document-form.module';
 import { FilterToolComponent } from './adv-search/filter-tool/filter-tool.component';
 
 import { AdvSearchComponent } from './adv-search/adv-search.component';
@@ -44,6 +87,7 @@ import { AboutUsComponent } from './about-us.component';
 import { ActivateUserComponent } from './activate-user.component';
 import { AddAvisModelModalComponent } from './avis/addAvisModel/add-avis-model-modal.component';
 import { AddPrivateIndexingModelModalComponent } from './indexation/private-indexing-model/add-private-indexing-model-modal.component';
+import { AddSearchTemplateModalComponent } from './adv-search/criteria-tool/search-template/search-template-modal.component';
 import { AddVisaModelModalComponent } from './visa/addVisaModel/add-visa-model-modal.component';
 import { AttachmentCreateComponent } from './attachments/attachment-create/attachment-create.component';
 import { AttachmentPageComponent } from './attachments/attachments-page/attachment-page.component';
@@ -89,8 +133,6 @@ export class MyHammerConfig extends HammerGestureConfig {
         BrowserAnimationsModule,
         HttpClientModule,
         InternationalizationModule,
-        ActionsModule,
-        DocumentFormModule,
         JoyrideModule.forRoot(),
         SharedModule,
         AppRoutingModule,
@@ -118,6 +160,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         ActivateUserComponent,
         AddAvisModelModalComponent,
         AddPrivateIndexingModelModalComponent,
+        AddSearchTemplateModalComponent,
         AddVisaModelModalComponent,
         AttachmentCreateComponent,
         AttachmentPageComponent,
@@ -147,7 +190,47 @@ export class MyHammerConfig extends HammerGestureConfig {
         VisaWorkflowModalComponent,
         DevLangComponent,
         DevToolComponent,
-        AcknowledgementReceptionComponent
+        AcknowledgementReceptionComponent,
+        CriteriaToolComponent,
+        SearchAdvListComponent,
+        ConfirmActionComponent,
+        ResMarkAsReadActionComponent,
+        EnabledBasketPersistenceActionComponent,
+        DisabledBasketPersistenceActionComponent,
+        CloseAndIndexActionComponent,
+        UpdateAcknowledgementSendDateActionComponent,
+        CreateAcknowledgementReceiptActionComponent,
+        CloseMailActionComponent,
+        RejectVisaBackToPrevousActionComponent,
+        ResetVisaActionComponent,
+        InterruptVisaActionComponent,
+        UpdateDepartureDateActionComponent,
+        SendExternalSignatoryBookActionComponent,
+        SendExternalNoteBookActionComponent,
+        XParaphComponent,
+        MaarchParaphComponent,
+        FastParaphComponent,
+        IxbusParaphComponent,
+        IParaphComponent,
+        ViewDocActionComponent,
+        RedirectActionComponent,
+        SendShippingActionComponent,
+        redirectInitiatorEntityActionComponent,
+        closeMailWithAttachmentsOrNotesActionComponent,
+        SendSignatureBookActionComponent,
+        ContinueVisaCircuitActionComponent,
+        ContinueAvisCircuitActionComponent,
+        SendAvisWorkflowComponent,
+        SendAvisParallelComponent,
+        GiveAvisParallelActionComponent,
+        ValidateAvisParallelComponent,
+        SendAlfrescoActionComponent,
+        SaveRegisteredMailActionComponent,
+        SaveAndPrintRegisteredMailActionComponent,
+        SaveAndIndexRegisteredMailActionComponent,
+        PrintRegisteredMailActionComponent,
+        PrintDepositListActionComponent,
+        ReconcileActionComponent,
     ],
     exports : [
         SharedModule
@@ -159,6 +242,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         ThesaurusModalComponent,
         AddAvisModelModalComponent,
         AddPrivateIndexingModelModalComponent,
+        AddSearchTemplateModalComponent,
         AddVisaModelModalComponent,
         AttachmentCreateComponent,
         AttachmentPageComponent,
@@ -169,7 +253,40 @@ export class MyHammerConfig extends HammerGestureConfig {
         InfoChangePasswordModalComponent,
         RedirectIndexingModelComponent,
         VisaWorkflowModalComponent,
-        DevLangComponent
+        DevLangComponent,
+        ConfirmActionComponent,
+        ResMarkAsReadActionComponent,
+        EnabledBasketPersistenceActionComponent,
+        DisabledBasketPersistenceActionComponent,
+        CloseAndIndexActionComponent,
+        UpdateAcknowledgementSendDateActionComponent,
+        CreateAcknowledgementReceiptActionComponent,
+        CloseMailActionComponent,
+        RejectVisaBackToPrevousActionComponent,
+        ResetVisaActionComponent,
+        InterruptVisaActionComponent,
+        SendAvisWorkflowComponent,
+        SendAvisParallelComponent,
+        UpdateDepartureDateActionComponent,
+        SendExternalSignatoryBookActionComponent,
+        SendExternalNoteBookActionComponent,
+        ContinueVisaCircuitActionComponent,
+        ContinueAvisCircuitActionComponent,
+        GiveAvisParallelActionComponent,
+        ValidateAvisParallelComponent,
+        RedirectActionComponent,
+        SendShippingActionComponent,
+        redirectInitiatorEntityActionComponent,
+        closeMailWithAttachmentsOrNotesActionComponent,
+        SendSignatureBookActionComponent,
+        SendAlfrescoActionComponent,
+        SaveRegisteredMailActionComponent,
+        SaveAndPrintRegisteredMailActionComponent,
+        SaveAndIndexRegisteredMailActionComponent,
+        PrintRegisteredMailActionComponent,
+        PrintDepositListActionComponent,
+        ViewDocActionComponent,
+        ReconcileActionComponent,
     ],
     providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }, FiltersListService, FoldersService, ActionsService, PrivilegeService, {
         provide: HAMMER_GESTURE_CONFIG,

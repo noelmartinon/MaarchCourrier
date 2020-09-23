@@ -45,9 +45,7 @@ export class IssuingSiteInputComponent implements OnInit {
     }
 
     ngOnInit() {
-        if (this.registedMailType !== null) {
-            this.getIssuingSites(this.registedMailType);
-        }
+        this.getIssuingSites();
         if (!this.functions.empty(this.control.value)) {
             setTimeout(() => {
                 this.setAddress(this.control.value);
@@ -55,18 +53,16 @@ export class IssuingSiteInputComponent implements OnInit {
         }
     }
 
-    getIssuingSites(registeredMailType: string) {
-        this.registedMailType = registeredMailType;
+    getIssuingSites() {
         this.loading = true;
-        this.http.get(`../rest/registeredMail/ranges`).pipe(
+        this.http.get(`../rest/registeredMail/sites`).pipe(
             tap((data: any) => {
                 this.issuingSiteAddress = null;
-                this.issuingSiteList = data['ranges'].filter((item: any) => item.registeredMailType === registeredMailType && item.status === 'OK' && item.entities.indexOf(this.headerService.user.entities[0].id) > -1).map((item: any) => {
+                this.issuingSiteList = data['sites'].filter((item: any) => item.entities.indexOf(this.headerService.user.entities[0].id) > -1).map((item: any) => {
                     return {
                         ...item,
-                        id: item.siteId,
-                        label: `${item.label} (${item.customerAccountNumber})`,
-                        disabled: item.fullness === 100,
+                        id: item.id,
+                        label: `${item.label} (${item.accountNumber})`
                     };
                 });
             }),

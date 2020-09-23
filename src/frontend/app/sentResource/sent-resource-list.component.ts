@@ -2,7 +2,7 @@ import {Component, OnInit, ViewChild, EventEmitter, Input, Output} from '@angula
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../service/notification/notification.service';
-import { of } from 'rxjs';
+import { of } from 'rxjs/internal/observable/of';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
@@ -14,12 +14,11 @@ import { SentNumericPackagePageComponent } from './sent-numeric-package-page/sen
 
 @Component({
     selector: 'app-sent-resource-list',
-    templateUrl: "sent-resource-list.component.html",
+    templateUrl: 'sent-resource-list.component.html',
     styleUrls: ['sent-resource-list.component.scss'],
 })
 export class SentResourceListComponent implements OnInit {
 
-    
     loading: boolean = true;
 
     dataSource: any;
@@ -34,6 +33,9 @@ export class SentResourceListComponent implements OnInit {
 
 
     @Input('resId') resId: number = null;
+    @Input() currentUserId: number = null;
+    @Input() currentGroupId: number = null;
+    @Input() currentBasketId: number = null;
 
     @Output() reloadBadgeSentResource = new EventEmitter<string>();
 
@@ -267,7 +269,11 @@ export class SentResourceListComponent implements OnInit {
         }
 
         if (row.canManage || row.id === null) {
-            const dialogRef = this.dialog.open(SentResourcePageComponent, { panelClass: 'maarch-modal', width:'60vw', disableClose: true, data: { title: title, resId: this.resId, emailId: row.id, emailType: row.type } });
+            const dialogRef = this.dialog.open(SentResourcePageComponent, {
+                panelClass: 'maarch-modal', width: '60vw', disableClose: true, data: {
+                    title: title, resId: this.resId, emailId: row.id, emailType: row.type, currentUserId: this.currentUserId, currentGroupId: this.currentGroupId, currentBasketId: this.currentBasketId
+                }
+            });
 
             dialogRef.afterClosed().pipe(
                 filter((data: any) => data.state === 'success' || data === 'success'),

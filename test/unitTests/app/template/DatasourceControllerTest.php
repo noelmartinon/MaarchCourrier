@@ -144,8 +144,8 @@ class DatasourceControllerTest extends TestCase
         $this->assertIsArray($result);
         $this->assertNotEmpty($result);
 
-        $this->assertIsArray($result['contact']);
-        $this->assertEmpty($result['contact']);
+        $this->assertIsArray($result['sender']);
+        $this->assertNotEmpty($result['sender']);
 
         $this->assertIsArray($result['recipient']);
         $this->assertNotEmpty($result['recipient']);
@@ -237,8 +237,8 @@ class DatasourceControllerTest extends TestCase
         $this->assertIsArray($result);
         $this->assertNotEmpty($result);
 
-        $this->assertIsArray($result['contact']);
-        $this->assertEmpty($result['contact']);
+        $this->assertIsArray($result['sender']);
+        $this->assertNotEmpty($result['sender']);
 
         $this->assertIsArray($result['recipient']);
         $this->assertNotEmpty($result['recipient']);

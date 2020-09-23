@@ -41,7 +41,7 @@ class SearchControllerTest extends TestCase
 
         $this->assertIsArray($responseBody->resources);
         $this->assertNotEmpty($responseBody->resources);
-        $this->assertSame(2, count($responseBody->resources));
+        $this->assertSame(3, count($responseBody->resources));
         foreach ($responseBody->resources as $resource) {
             $this->assertIsInt($resource->resId);
             $this->assertSame('incoming', $resource->category);

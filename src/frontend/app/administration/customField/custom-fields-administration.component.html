@@ -45,7 +45,7 @@
                                     </div>
                                     <div class="col-md-12" style="display: flex;align-items: center;">
                                         <div>
-                                            <button *ngIf="!custom.SQLMode && 'banAutocomplete' !== custom.type"
+                                            <button *ngIf="!custom.SQLMode && ['banAutocomplete','contact'].indexOf(custom.type) === -1"
                                                 mat-mini-fab color="primary" (click)="switchSQLMode(custom)">
                                                 <mat-icon class="fas fa-database" style="height: auto;"></mat-icon>
                                             </button>
@@ -192,7 +192,7 @@
                     </div>
                     <div style="flex:1;">
                         <div style="color: rgba(0,0,0,0.54);">{{customField.label}} :</div>
-                        <ng-container *ngIf="customField.type === 'string' || customField.type === 'banAutocomplete'">
+                        <ng-container *ngIf="['string','banAutocomplete','contact'].indexOf(customField.type) > -1">
                             <mat-form-field class="input-form" floatLabel="never">
                                 <textarea matInput [placeholder]="this.translate.instant('lang.' + customField.type + 'Input')" matTextareaAutosize
                                     matAutosizeMinRows="1" cdkAutosizeMaxRows="6" disabled></textarea>

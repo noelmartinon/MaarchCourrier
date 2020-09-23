@@ -39,40 +39,23 @@ use User\models\UserModel;
 
 class SummarySheetController
 {
-    public function createList(Request $request, Response $response, array $aArgs)
+    public function createList(Request $request, Response $response)
     {
         set_time_limit(240);
 
-        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $GLOBALS['id']]);
-        if (!empty($errors['errors'])) {
-            return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
-        }
-
         $bodyData = $request->getParsedBody();
-        $units    = empty($bodyData['units']) ? [] : $bodyData['units'];
 
         if (!Validator::arrayType()->notEmpty()->validate($bodyData['resources'])) {
             return $response->withStatus(403)->withJson(['errors' => 'Resources is not set or empty']);
+        } elseif (!ResController::hasRightByResId(['resId' => $bodyData['resources'], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
+        $units = empty($bodyData['units']) ? [] : $bodyData['units'];
         $bodyData['resources'] = array_slice($bodyData['resources'], 0, 500);
-        $basket = BasketModel::getById(['id' => $aArgs['basketId'], 'select' => ['basket_clause', 'basket_res_order', 'basket_name']]);
-        $user   = UserModel::getById(['id' => $aArgs['userId'], 'select' => ['user_id']]);
 
-        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $user['user_id']]);
-        $rawResourcesInBasket = ResModel::getOnView([
-            'select'    => ['res_id'],
-            'where'     => [$whereClause, 'res_view_letterbox.res_id in (?)'],
-            'data'      => [$bodyData['resources']]
-        ]);
-        $allResourcesInBasket = array_column($rawResourcesInBasket, 'res_id');
-
-//        $order = 'CASE res_view_letterbox.res_id ';
         $order = '';
         foreach ($bodyData['resources'] as $key => $resId) {
-            if (!in_array($resId, $allResourcesInBasket)) {
-                return $response->withStatus(403)->withJson(['errors' => 'Resources out of perimeter']);
-            }
             $order .= "WHEN {$resId} THEN {$key} ";
         }
         $order .= 'END';
@@ -164,6 +147,11 @@ class SummarySheetController
         $fileContent = $pdf->Output('', 'S');
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($fileContent);
+
+        $queryParams = $request->getQueryParams();
+        if (!empty($queryParams['mode']) && $queryParams['mode'] == 'base64') {
+            return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'mimeType' => $mimeType]);
+        }
 
         $response->write($fileContent);
         $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.pdf");

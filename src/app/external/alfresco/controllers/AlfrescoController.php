@@ -38,7 +38,7 @@ class AlfrescoController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_alfresco']);
         if (empty($configuration)) {
             return $response->withJson(['configuration' => null]);
         }
@@ -62,11 +62,11 @@ class AlfrescoController
 
         $value = json_encode(['uri' => trim($body['uri'])]);
 
-        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_alfresco']);
         if (empty($configuration)) {
-            ConfigurationModel::create(['service' => 'admin_alfresco', 'value' => $value]);
+            ConfigurationModel::create(['privilege' => 'admin_alfresco', 'value' => $value]);
         } else {
-            ConfigurationModel::update(['set' => ['value' => $value], 'where' => ['service = ?'], 'data' => ['admin_alfresco']]);
+            ConfigurationModel::update(['set' => ['value' => $value], 'where' => ['privilege = ?'], 'data' => ['admin_alfresco']]);
         }
 
         return $response->withStatus(204);
@@ -302,7 +302,7 @@ class AlfrescoController
             $body['password'] = PasswordModel::decrypt(['cryptedPassword' => $alfresco['alfresco']['password']]);
         }
 
-        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_alfresco']);
         if (empty($configuration)) {
             return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration is not enabled']);
         }
@@ -358,7 +358,7 @@ class AlfrescoController
 
     public function getRootFolders(Request $request, Response $response)
     {
-        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_alfresco']);
         if (empty($configuration)) {
             return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration is not enabled']);
         }
@@ -408,7 +408,7 @@ class AlfrescoController
 
     public function getChildrenFoldersById(Request $request, Response $response, array $args)
     {
-        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_alfresco']);
         if (empty($configuration)) {
             return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration is not enabled']);
         }
@@ -465,7 +465,7 @@ class AlfrescoController
             return $response->withStatus(400)->withJson(['errors' => 'Query params search is too short']);
         }
 
-        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_alfresco']);
         if (empty($configuration)) {
             return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration is not enabled']);
         }
@@ -527,7 +527,7 @@ class AlfrescoController
         ValidatorModel::intVal($args, ['resId', 'userId']);
         ValidatorModel::stringType($args, ['folderId', 'folderName']);
 
-        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_alfresco']);
         if (empty($configuration)) {
             return ['errors' => 'Alfresco configuration is not enabled'];
         }
