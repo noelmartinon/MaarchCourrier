@@ -24,48 +24,39 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     /** Label of the search placeholder */
     @Input() placeholderLabel = this.lang.chooseValue;
 
-    @Input('formControlSelect') formControlSelect: FormControl = new FormControl();
+    @Input() formControlSelect: FormControl = new FormControl();
 
-    @Input('datas') datas: any = [];
+    @Input() datas: any = [];
 
-    @Input('returnValue') returnValue: 'id' | 'object' = 'id';
+    @Input() returnValue: 'id' | 'object' = 'id';
 
-    @Input('label') label: string;
+    @Input() label: string;
 
-    @Input('showResetOption') showResetOption: boolean;
+    @Input() showResetOption: boolean;
 
-    @Input('showLabel') showLabel: boolean = false;
+    @Input() showLabel: boolean = false;
 
-    @Input('required') required: boolean = false;
+    @Input() required: boolean = false;
 
-    @Input('hideErrorDesc') hideErrorDesc: boolean = true;
+    @Input() hideErrorDesc: boolean = true;
 
     /**
      * ex : {class:'fa-circle', color:'#fffff', title: 'foo'}
      */
-    @Input('suffixIcon') suffixIcon: any = null;
+    @Input() suffixIcon: any = null;
 
-    @Input('class') class: string = "input-form";
+    @Input() class: string = 'input-form';
 
     /**
      * Catch external event after select an element in autocomplete
      */
-    @Output('afterSelected') afterSelected = new EventEmitter();
-    @Output('afterOpened') afterOpened = new EventEmitter();
+    @Output() afterSelected = new EventEmitter();
+    @Output() afterOpened = new EventEmitter();
 
     /** Reference to the search input field */
     @ViewChild('searchSelectInput', { read: ElementRef, static: true }) searchSelectInput: ElementRef;
 
     @ViewChild('test', { static: true }) matSelect: MatSelect;
-
-    /** Current search value */
-    get value(): string {
-        return this._value;
-    }
-    private _value: string;
-
-    onChange: Function = (_: any) => { };
-    onTouched: Function = (_: any) => { };
 
     public filteredDatas: Observable<string[]>;
 
@@ -88,11 +79,20 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
 
     formControlSearch = new FormControl();
 
-
-    constructor(private latinisePipe: LatinisePipe, private changeDetectorRef: ChangeDetectorRef, private renderer: Renderer2, public appService: AppService) {
-
-
+    /** Current search value */
+    get value(): string {
+        return this._value;
     }
+    private _value: string;
+
+    onChange: Function = (_: any) => { };
+    onTouched: Function = (_: any) => { };
+
+    constructor(
+        private latinisePipe: LatinisePipe,
+        private changeDetectorRef: ChangeDetectorRef,
+        private renderer: Renderer2,
+        public appService: AppService) { }
 
     ngOnInit() {
         // set custom panel class
@@ -115,12 +115,12 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
             .subscribe((opened) => {
                 if (opened) {
                     // focus the search field when opening
-                    if(!this.appService.getViewMode()) {
+                    if (!this.appService.getViewMode()) {
                         this._focus();
                     }
                 } else {
                     // clear it when closing
-                    //this._reset();
+                    // this._reset();
                     this.formControlSearch.reset();
                 }
             });
@@ -143,16 +143,25 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
                         }
                     });
             });
+        setTimeout(() => {
+            let group = '';
+            let index = 1;
+            this.datas.forEach((element: any) => {
+                if (element.isTitle) {
+                    group = `group_${index}`;
+                    element.id = group;
+                    index++;
+                } else {
+                    element.group = group;
+                }
+            });
 
-
-        /*setTimeout(() => {
-            
-        }, 800);*/
-        this.filteredDatas = this.formControlSearch.valueChanges
-            .pipe(
-                startWith(''),
-                map(value => this._filter(value))
-            );
+            this.filteredDatas = this.formControlSearch.valueChanges
+                .pipe(
+                    startWith(''),
+                    map(value => this._filter(value))
+                );
+        }, 0);
 
 
         // this.initMultipleHandling();
@@ -307,10 +316,15 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
             });
     }
 
-    private _filter(value: string): string[] {
-        if (typeof value === 'string') {
+    private _filter(value: string, showSelectedValues: boolean = false): string[] {
+        if (value === '__SELECTED') {
+            return this.datas.filter((option: any) => this.formControlSelect.value.indexOf(option['id']) > -1);
+        } else if (typeof value === 'string' && value !== '') {
             const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.datas.filter((option: any) => this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue));
+
+            const group = this.datas.filter((option: any) => option['isTitle'] && this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue)).map((opt: any) => opt.id);
+
+            return this.datas.filter((option: any) => (option['isTitle'] && group.indexOf(option['id']) > -1) || (group.indexOf(option['group']) > -1 || this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue)));
         } else {
             return this.datas;
         }
