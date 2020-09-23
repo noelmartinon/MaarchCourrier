@@ -66,6 +66,21 @@ class portal extends functions
             $_SESSION['businessapps'][$i] = array("appid" => (string) $BUSINESSAPPS->appid, "comment" => (string) $BUSINESSAPPS->comment);
             $i++;
         }
+
+        $customs =  scandir('custom');
+        if (count($customs) == 4) {
+            foreach ($customs as $custom) {
+                if ($custom == 'custom.xml' || $custom == '.' || $custom == '..') {
+                    continue;
+                }
+                if (file_exists("custom/{$custom}/apps/maarch_entreprise/xml/config.xml")) {
+                    $xmlfile = simplexml_load_file("custom/{$custom}/apps/maarch_entreprise/xml/config.xml");
+                    if ($xmlfile) {
+                        $_SESSION['config']['default_timezone'] = (string) $xmlfile->CONFIG->timezone;
+                    }
+                }
+            }
+        }
     }
 
     /**
