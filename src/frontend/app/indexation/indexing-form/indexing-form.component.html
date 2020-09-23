@@ -159,7 +159,7 @@
                                     </app-address-ban-input>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'contact'">
-                                    <app-contact-autocomplete [id]="field.identifier" [control]="arrFormControl[field.identifier]" [singleMode]="true" style="width:100%;" (retrieveDocumentEvent)="retrieveDocumentEvent.emit()">
+                                    <app-contact-autocomplete [id]="field.identifier" [control]="arrFormControl[field.identifier]" style="width:100%;" (retrieveDocumentEvent)="retrieveDocumentEvent.emit()">
                                     </app-contact-autocomplete>
                                 </ng-container>
                             </div>
