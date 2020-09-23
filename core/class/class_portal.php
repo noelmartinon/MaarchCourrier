@@ -74,13 +74,18 @@ class portal extends functions
                     if ($custom == 'custom.xml' || $custom == '.' || $custom == '..') {
                         continue;
                     }
-                    if (file_exists("custom/{$custom}/apps/maarch_entreprise/xml/config.xml")) {
+                    if (is_file("custom/{$custom}/apps/maarch_entreprise/xml/config.xml")) {
                         $xmlfile = simplexml_load_file("custom/{$custom}/apps/maarch_entreprise/xml/config.xml");
                         if ($xmlfile) {
                             $_SESSION['config']['default_timezone'] = (string) $xmlfile->CONFIG->timezone;
                         }
                     }
                 }
+            }
+        } elseif (is_file("xml/config.xml")) {
+            $xmlfile = simplexml_load_file("xml/config.xml");
+            if ($xmlfile && !empty((string)$xmlfile->CONFIG->timezone)) {
+                $_SESSION['config']['default_timezone'] = (string)$xmlfile->CONFIG->timezone;
             }
         }
     }
