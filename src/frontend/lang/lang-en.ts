@@ -1730,5 +1730,6 @@ export const LANG_EN = {
     "yes":                                         "Yes",
     "zipcode":                                     "Zip code",
     "hideTool": "Hide toolbar",
-    "showTool": "Show toolbar"
+    "showTool": "Show toolbar",
+    "contactInput" : "Contact input"
 };

@@ -1713,5 +1713,7 @@ export const LANG_NL = {
     "updateKO": "Mise à jour échouée !__TO_TRANSLATE",
     "saveInDocserversInfo": "L'historique de la mise à jour a été sauvegardé dans la zone de stockage <b>migration</b>.__TO_TRANSLATE",
     "hideTool": "Cacher la barre d'outils", // _TO_TRANSLATE
-    "showTool": "Afficher la barre d'outils" // _TO_TRANSLATE
+    "showTool": "Afficher la barre d'outils", // _TO_TRANSLATE
+    "contactInput" : "Contact input__TO_TRANSLATE" // _TO_TRANSLATE
+
 };

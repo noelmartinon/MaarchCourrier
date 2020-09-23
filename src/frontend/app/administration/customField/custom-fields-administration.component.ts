@@ -59,6 +59,10 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         {
             label: this.lang.banAutocompleteInput,
             type: 'banAutocomplete'
+        },
+        {
+            label: this.lang.contactInput,
+            type: 'contact'
         }
     ];
     customFields: any[] = [];
