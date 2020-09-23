@@ -185,7 +185,7 @@ class StoreController
                     $date = new \DateTime($value);
                     $value = $date->format('Y-m-d');
                     $args['customFields'][$key] = $value;
-                } elseif ($customField['type'] == 'banAutocomplete') {
+                } elseif (in_array($customField['type'], ['banAutocomplete', 'contact'])) {
                     $args['customFields'][$key] = $value;
                 } elseif ($customField['type'] != 'integer' && !is_array($value)) {
                     $args['customFields'][$key] = (string)$value;
@@ -307,7 +307,7 @@ class StoreController
                     $date = new \DateTime($value);
                     $value = $date->format('Y-m-d');
                     $args['customFields'][$key] = $value;
-                } elseif ($customField['type'] == 'banAutocomplete') {
+                } elseif (in_array($customField['type'], ['banAutocomplete', 'contact'])) {
                     $args['customFields'][$key] = $value;
                 } elseif ($customField['type'] != 'integer' && !is_array($value)) {
                     $args['customFields'][$key] = (string)$value;

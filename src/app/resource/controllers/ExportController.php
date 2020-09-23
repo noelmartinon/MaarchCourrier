@@ -742,7 +742,10 @@ class ExportController
         $field = CustomFieldModel::getById(['select' => ['type', 'values'], 'id' => $customFieldId]);
         $values = json_decode($field['values'], true);
 
-        if ($field['type'] == 'banAutocomplete') {
+        if ($field['type'] == 'contact') {
+            $customValues = ContactController::getContactCustomField(['contacts' => $customValues]);
+            $customValues = implode("\n", $customValues);
+        } elseif ($field['type'] == 'banAutocomplete') {
             $line = "{$customValues[0]['addressNumber']} {$customValues[0]['addressStreet']} {$customValues[0]['addressTown']} ({$customValues[0]['addressPostcode']})";
             $line .= "\n";
             $line .= "{$customValues[0]['latitude']},{$customValues[0]['longitude']}";

@@ -287,11 +287,19 @@ class MergeController
                 'where'  => ['id in (?)'],
                 'data'   => [$customFieldsIds]
             ]);
-            $customFieldsValues = array_column($customFields, 'values', 'id');
+            if (!empty($args['resId'])) {
+                $customFieldsValues = array_column($customFields, 'values', 'id');
+            } else {
+                $customFieldsValues = $customs;
+            }
             $customFieldsTypes = array_column($customFields, 'type', 'id');
 
             foreach ($customs as $customId => $custom) {
-                $rawValues = json_decode($customFieldsValues[$customId], true);
+                if (!empty($args['resId'])) {
+                    $rawValues = json_decode($customFieldsValues[$customId], true);
+                } else {
+                    $rawValues = $customFieldsValues[$customId];
+                }
 
                 if (!empty($rawValues['table']) && in_array($customFieldsTypes[$customId], ['radio', 'select', 'checkbox'])) {
                     $rawValues = CustomFieldModel::getValuesSQL($rawValues);
@@ -306,8 +314,11 @@ class MergeController
                 }
 
                 if (is_array($custom)) {
-                    if (is_array($custom[0])) { //Custom BAN
+                    if ($customFieldsTypes[$customId] == 'banAutocomplete') {
                         $resource['customField_' . $customId] = "{$custom[0]['addressNumber']} {$custom[0]['addressStreet']} {$custom[0]['addressTown']} ({$custom[0]['addressPostcode']})";
+                    } elseif ($customFieldsTypes[$customId] == 'contact') {
+                        $customValues = ContactController::getContactCustomField(['contacts' => $customFieldsValues[$customId]]);
+                        $resource['customField_' . $customId] = implode("\n", $customValues);
                     } else {
                         $resource['customField_' . $customId] = implode("\n", $custom);
                     }

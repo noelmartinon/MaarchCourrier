@@ -1453,6 +1453,37 @@ class ContactController
         return $contacts;
     }
 
+    public static function getContactCustomField(array $args)
+    {
+        $contacts = [];
+        foreach ($args['contacts'] as $savedContact) {
+            $contact = '';
+            if ($savedContact['type'] == 'contact') {
+                $contactRaw = ContactModel::getById([
+                    'select'    => ['*'],
+                    'id'        => $savedContact['id']
+                ]);
+
+                if (isset($args['onlyContact']) && $args['onlyContact']) {
+                    $contactToDisplay = ContactController::getFormattedOnlyContact(['contact' => $contactRaw]);
+                } else {
+                    $contactToDisplay = ContactController::getFormattedContactWithAddress(['contact' => $contactRaw]);
+                }
+
+                $contact = $contactToDisplay['contact']['otherInfo'];
+            } elseif ($savedContact['type'] == 'user') {
+                $contact = UserModel::getLabelledUserById(['id' => $savedContact['id']]);
+            } elseif ($savedContact['type'] == 'entity') {
+                $entity = EntityModel::getById(['id' => $savedContact['id'], 'select' => ['entity_label']]);
+                $contact = $entity['entity_label'];
+            }
+
+            $contacts[] = $contact;
+        }
+
+        return $contacts;
+    }
+
     private static function controlContact(array $args)
     {
         $body = $args['body'];
@@ -1551,7 +1582,7 @@ class ContactController
             'type'          => 'onlyContact',
             'id'            => $args['contact']['id'],
             'idToDisplay'   => $contactToDisplay,
-            'otherInfo'     => $contactToDisplay,
+            'otherInfo'     => trim($contactToDisplay),
             'rateColor'     => ''
         ];
 

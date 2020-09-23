@@ -491,6 +491,9 @@ class SummarySheetController
                 }
 
                 if (!empty($customFieldsIds)) {
+                    $fieldsType = CustomFieldModel::get(['select' => ['type', 'id'], 'where' => ['id in (?)'], 'data' => [$customFieldsIds]]);
+                    $fieldsType = array_column($fieldsType, 'type', 'id');
+
                     foreach ($customFieldsIds as $customFieldsId) {
                         $label = $customFields[$customFieldsId];
                         $rawValues = json_decode($customFieldsRawValues[$customFieldsId], true);
@@ -507,9 +510,13 @@ class SummarySheetController
                             }
                         }
                         if (is_array($customFieldsValues[$customFieldsId])) {
+                            $customValue = "";
                             if (!empty($customFieldsValues[$customFieldsId])) {
-                                if (is_array($customFieldsValues[$customFieldsId][0])) { //Custom BAN
+                                if ($fieldsType[$customFieldsId] == 'banAutocomplete') {
                                     $customValue = "{$customFieldsValues[$customFieldsId][0]['addressNumber']} {$customFieldsValues[$customFieldsId][0]['addressStreet']} {$customFieldsValues[$customFieldsId][0]['addressTown']} ({$customFieldsValues[$customFieldsId][0]['addressPostcode']})";
+                                } elseif ($fieldsType[$customFieldsId] == 'contact') {
+                                    $customValues = ContactController::getContactCustomField(['contacts' => $customFieldsValues[$customFieldsId]]);
+                                    $customValue = count($customValues) > 2 ? count($customValues) . ' ' . _CONTACTS : implode(", ", $customValues);
                                 } else {
                                     $customValue = implode(',', $customFieldsValues[$customFieldsId]);
                                 }
