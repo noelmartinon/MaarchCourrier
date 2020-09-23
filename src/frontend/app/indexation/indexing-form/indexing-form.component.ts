@@ -240,7 +240,7 @@ export class IndexingFormComponent implements OnInit {
                         if (['integer', 'string', 'date'].indexOf(info.type) > -1 && !this.functions.empty(info.values)) {
                             info.default_value = info.values[0].key;
                         } else {
-                            info.default_value = info.type === 'banAutocomplete' ? [] : null;
+                            info.default_value = ['contact', 'banAutocomplete'].indexOf(info.type) > -1 ? [] : null;
                         }
                         info.values = info.values.length > 0 ? info.values.map((custVal: any) => {
                             return {

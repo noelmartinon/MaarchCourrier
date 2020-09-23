@@ -146,6 +146,7 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         setTimeout(() => {
             let group = '';
             let index = 1;
+            this.datas = JSON.parse(JSON.stringify(this.datas));
             this.datas.forEach((element: any) => {
                 if (element.isTitle) {
                     group = `group_${index}`;
