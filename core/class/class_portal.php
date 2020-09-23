@@ -67,16 +67,18 @@ class portal extends functions
             $i++;
         }
 
-        $customs =  scandir('custom');
-        if (count($customs) == 4) {
-            foreach ($customs as $custom) {
-                if ($custom == 'custom.xml' || $custom == '.' || $custom == '..') {
-                    continue;
-                }
-                if (file_exists("custom/{$custom}/apps/maarch_entreprise/xml/config.xml")) {
-                    $xmlfile = simplexml_load_file("custom/{$custom}/apps/maarch_entreprise/xml/config.xml");
-                    if ($xmlfile) {
-                        $_SESSION['config']['default_timezone'] = (string) $xmlfile->CONFIG->timezone;
+        if (is_dir('custom')) {
+            $customs =  scandir('custom');
+            if (count($customs) == 4) {
+                foreach ($customs as $custom) {
+                    if ($custom == 'custom.xml' || $custom == '.' || $custom == '..') {
+                        continue;
+                    }
+                    if (file_exists("custom/{$custom}/apps/maarch_entreprise/xml/config.xml")) {
+                        $xmlfile = simplexml_load_file("custom/{$custom}/apps/maarch_entreprise/xml/config.xml");
+                        if ($xmlfile) {
+                            $_SESSION['config']['default_timezone'] = (string) $xmlfile->CONFIG->timezone;
+                        }
                     }
                 }
             }
