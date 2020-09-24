@@ -152,6 +152,8 @@ foreach ($customFields as $customField) {
         $arr_tmp2 = array('label' => $customField['label'], 'type' => 'date_range', 'param' => array('field_label' => $customField['label'], 'id1' => $field.'_from', 'id2' => $field.'_to'));
     } elseif ($customField['type'] == 'string') {
         $arr_tmp2 = array('label' => $customField['label'], 'type' => 'input_text', 'param' => array('field_label' => $customField['label'], 'other' => ''));
+    } elseif ($customField['type'] == 'contact') {
+        $arr_tmp2 = array('label' => $customField['label'], 'type' => 'input_text', 'param' => array('field_label' => $customField['label'], 'other' => $size, 'autocompletionCustomField' => true));
     } else {  // integer
         $arr_tmp2 = array('label' => $customField['label'], 'type' => 'num_range', 'param' => array('field_label' => $customField['label'], 'id1' => $field.'_min', 'id2' => $field.'_max'));
     }

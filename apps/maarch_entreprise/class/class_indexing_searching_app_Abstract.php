@@ -32,7 +32,7 @@ abstract class indexing_searching_app_Abstract extends Database
             $json_tab .= "'".$key."' : {";
             //echo 'key '.$key."<br/>val ";
             //$this->show_array($value);
-            if ($value['param']['autocompletion']) {
+            if ($value['param']['autocompletion'] || $value['param']['autocompletionCustomField']) {
                 $idListByName = $key.'ListByName';
                 $autocompleteId = 'ac_'.$key;
                 $options_criteria_list .= '<option id="option_'.$key.'" value="'.$value['label'].'" data-load={"id":"'.$key.'","idList":"'.$idListByName.'","autocompleteId":"'.$autocompleteId.'","config":"'.$_SESSION['config']['businessappurl'].'"} > '.$value['label'].'</option>';
@@ -57,7 +57,23 @@ abstract class indexing_searching_app_Abstract extends Database
         $end = "'";
         //$hidden = '<input type="hidden" name="meta[]" value="" />';
         if ($field_type == 'input_text') {
-            if ($param['autocompletion']) {
+            if ($param['autocompletionCustomField']) {
+                $str = $init.'<input type="hidden" name="meta[]" value="'.$id.'#'.$id.'#input_text"/>';
+                $str .= '<div class="adv_search_field indexing_field" style="width: 200px;>';
+                $str .= '<span style="position:relative;">';
+                $str .= '<div class="typeahead__container">';
+                $str .= '<div class="typeahead__field">';
+                $str .= '<span class="typeahead__query">';
+                $str .= '<input name="'.$id.'" type="text" id="'.$id.'" autocomplete="off" placeholder="'._CONTACTS_USERS_SEARCH.'" title="'._CONTACTS_USERS_SEARCH.'" />';
+                $str .= '<input type="hidden" name="meta[]" value="'.$id.'#'.$id.'#input_text" />';
+                $str .= '</span>';
+                $str .= '</div>';
+                $str .= '</div>';
+                $str .= '</span>';
+                $str .= '<input type="hidden" name="'.$id.'_id" id="'.$id.'_id" />';
+                $str .= '<input type="hidden" name="'.$id.'_type" id="'.$id.'_type" />';
+                $str .= '</div>'.$end;
+            } elseif ($param['autocompletion']) {
                 $idListByName = $id.'ListByName';
                 $autocompleteId = 'ac_'.$id;
                 $str = $init.'<input type="hidden" name="meta[]" value="'.$id.'#'.$id.'#input_text"/>';

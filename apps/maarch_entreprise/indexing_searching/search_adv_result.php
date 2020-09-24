@@ -781,6 +781,37 @@ where lower(translate(folders.label , 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓ�
                         $where_request .= " (custom_fields->'".$customFieldId."' <= :valueCustom_".$customFieldId."_".$j.") and ";
                     }
                     $arrayPDO = array_merge($arrayPDO, array(":valueCustom_".$customFieldId."_".$j => $_REQUEST[$tab_id_fields[$j]]));
+                } elseif ($customField['type'] == 'contact') {
+                    if (!empty($_REQUEST[$tab_id_fields[$j] . '_type']) && !empty($_REQUEST[$tab_id_fields[$j] . '_id'])) {
+                        $json_txt .= " '".$tab_id_fields[$j]."' : ['".addslashes(trim($_REQUEST[$tab_id_fields[$j]]))."'], '".$tab_id_fields[$j]."_id' : ['".addslashes(trim($_REQUEST[$tab_id_fields[$j] . '_id']))."'], '".$tab_id_fields[$j]."_type' : ['".addslashes(trim($_REQUEST[$tab_id_fields[$j] . '_type']))."']";
+        
+                        $where_request .= " (custom_fields->'".$customFieldId."' @> :valueCustom_".$customFieldId.") and ";
+                        $arrayPDO       = array_merge($arrayPDO, array(":valueCustom_".$customFieldId => '[{"id": '.$_REQUEST[$tab_id_fields[$j] . '_id'].', "type": "'.$_REQUEST[$tab_id_fields[$j] . '_type'].'"}]'));
+                    } elseif (!empty(trim($_REQUEST[$tab_id_fields[$j]])) && empty($_REQUEST[$tab_id_fields[$j] . '_type']) && empty($_REQUEST[$tab_id_fields[$j] . '_id'])) {
+                        $fields = \SrcCore\controllers\AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['company']]);
+                
+                        $requestData = \SrcCore\controllers\AutoCompleteController::getDataForRequest([
+                            'search'       => $_REQUEST[$tab_id_fields[$j]],
+                            'fields'       => $fields,
+                            'fieldsNumber' => 1
+                        ]);
+                
+                        $contacts = \Contact\models\ContactModel::get([
+                            'select'    => ['id'],
+                            'where'     => $requestData['where'],
+                            'data'      => $requestData['data']
+                        ]);
+                        $contactIds     = array_column($contacts, 'id');
+                        $contactIds    = !empty($contactIds) ? $contactIds : [0];
+                        $json_txt      .= " '".$tab_id_fields[$j]."' : ['".addslashes(trim($_REQUEST[$tab_id_fields[$j]]))."'],";
+
+                        $contactsStandalone = [];
+                        foreach ($contactIds as $key => $contactIdStandalone) {
+                            $contactsStandalone[] = " (custom_fields->'".$customFieldId."' @> :valueCustom_".$customFieldId."_".$key.")";
+                            $arrayPDO = array_merge($arrayPDO, array(":valueCustom_".$customFieldId."_".$key => '[{"id": '.$contactIdStandalone.', "type": "contact"}]'));
+                        }
+                        $where_request .= " (" . implode(' OR ', $contactsStandalone) . ") and ";
+                    }
                 }
             }
         }
