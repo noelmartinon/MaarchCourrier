@@ -81,7 +81,23 @@ class CoreController
 
     public function getHeader(Request $request, Response $response)
     {
-        $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id', 'user_id', 'firstname', 'lastname']]);
+        $user = UserModel::getByLogin(['login' => $GLOBALS['userId'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'password_modification_date', 'change_password']]);
+        $passwordRules = \SrcCore\models\PasswordModel::getEnabledRules();
+        $user['changePassword'] = false;
+        if ($user['change_password'] == 'Y') {
+            $user['changePassword'] = true;
+        } elseif (!empty($passwordRules['renewal'])) {
+            $currentDate = new \DateTime();
+            $lastModificationDate = new \DateTime($user['password_modification_date']);
+            $lastModificationDate->add(new \DateInterval("P{$passwordRules['renewal']}D"));
+
+            if ($currentDate > $lastModificationDate) {
+                $user['changePassword'] = true;
+            }
+        }
+        unset($user['change_password']);
+        unset($user['password_modification_date']);
+
         $user['groups'] = UserModel::getGroupsByUserId(['userId' => $GLOBALS['userId']]);
         $user['entities'] = UserModel::getEntitiesById(['userId' => $GLOBALS['userId']]);
         $user['indexingGroups'] = [];

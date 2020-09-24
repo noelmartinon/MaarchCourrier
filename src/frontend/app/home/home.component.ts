@@ -9,6 +9,7 @@ import { HeaderService }        from '../../service/header.service';
 
 import { AutoCompletePlugin } from '../../plugins/autocomplete.plugin';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import {Router} from "@angular/router";
 
 declare function $j(selector: any): any;
 
@@ -45,7 +46,7 @@ export class HomeComponent extends AutoCompletePlugin implements OnInit {
     @ViewChild('snav2') sidenavRight: MatSidenav;
     @ViewChildren(MatExpansionPanel) viewPanels: QueryList<MatExpansionPanel>;
 
-    constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, public http: HttpClient, public dialog: MatDialog, private sanitizer: DomSanitizer, private notify: NotificationService, private headerService: HeaderService) {
+    constructor(changeDetectorRef: ChangeDetectorRef, media: MediaMatcher, public http: HttpClient, public dialog: MatDialog, private sanitizer: DomSanitizer, private notify: NotificationService, private headerService: HeaderService, private router: Router) {
         super(http, ['users']);
         this.mobileMode = angularGlobals.mobileMode;
         $j("link[href='merged_css.php']").remove();
@@ -55,6 +56,9 @@ export class HomeComponent extends AutoCompletePlugin implements OnInit {
     }
 
     ngOnInit(): void {
+        if (this.headerService.user.changePassword) {
+            this.router.navigate(['/password-modification']);
+        }
         this.loading = true;
         if (this.mobileMode) {
             this.displayedColumns = ['res_id', 'subject'];
