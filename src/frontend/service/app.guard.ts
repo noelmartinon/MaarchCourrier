@@ -45,7 +45,8 @@ export class AppGuard implements CanActivate {
                             entities: data.entities,
                             groups: data.groups,
                             preferences: data.preferences,
-                            privileges: data.privileges[0] === 'ALL_PRIVILEGES' ? this.privilegeService.getAllPrivileges() : data.privileges
+                            privileges: data.privileges[0] === 'ALL_PRIVILEGES' ? this.privilegeService.getAllPrivileges() : data.privileges,
+                            changePassword: data.changePassword
                         };
                         
                         this.headerService.nbResourcesFollowed = data.nbFollowedResources;

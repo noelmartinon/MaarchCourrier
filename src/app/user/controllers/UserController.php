@@ -500,7 +500,21 @@ class UserController
 
     public function getProfile(Request $request, Response $response)
     {
-        $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'initials', 'preferences', 'external_id']]);
+        $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'initials', 'preferences', 'external_id', 'password_modification_date']]);
+
+        $passwordRules = \SrcCore\models\PasswordModel::getEnabledRules();
+        $user['changePassword'] = false;
+        if (!empty($passwordRules['renewal'])) {
+            $currentDate = new \DateTime();
+            $lastModificationDate = new \DateTime($user['password_modification_date']);
+            $lastModificationDate->add(new \DateInterval("P{$passwordRules['renewal']}D"));
+
+            if ($currentDate > $lastModificationDate) {
+                $user['changePassword'] = true;
+            }
+        }
+        unset($user['password_modification_date']);
+
         $user['external_id']        = json_decode($user['external_id'], true);
         $user['preferences']        = json_decode($user['preferences'], true);
         $user['signatures']         = UserSignatureModel::getByUserSerialId(['userSerialid' => $user['id']]);

@@ -51,6 +51,10 @@ export class HomeComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        if (this.headerService.user.changePassword) {
+            this.headerService.hideSideBar = true;
+            this.router.navigate(['/password-modification']);
+        }
         this.loading = true;
         if (this.appService.getViewMode()) {
             this.displayedColumns = ['res_id', 'subject'];
