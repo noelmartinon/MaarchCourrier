@@ -9,7 +9,6 @@ import { ExportComponent } from '../export/export.component';
 import { SummarySheetComponent } from '../summarySheet/summary-sheet.component';
 
 
-
 export interface StateGroup {
     letter: string;
     names: any[];
@@ -21,9 +20,6 @@ export interface StateGroup {
     styleUrls: ['tools-list.component.scss'],
 })
 export class ToolsListComponent implements OnInit {
-
-    
-
 
     @ViewChild(MatAutocompleteTrigger, { static: true }) autocomplete: MatAutocompleteTrigger;
 
@@ -38,7 +34,6 @@ export class ToolsListComponent implements OnInit {
 
     isLoading: boolean = false;
 
-    
     @Input('listProperties') listProperties: any;
     @Input('currentBasketInfo') currentBasketInfo: any;
 
@@ -57,9 +52,6 @@ export class ToolsListComponent implements OnInit {
             panelClass: 'maarch-modal',
             width: '800px',
             data: {
-                ownerId: this.currentBasketInfo.ownerId,
-                groupId: this.currentBasketInfo.groupId,
-                basketId: this.currentBasketInfo.basketId,
                 selectedRes: this.selectedRes
             }
         });
@@ -70,9 +62,6 @@ export class ToolsListComponent implements OnInit {
             panelClass: 'maarch-full-height-modal',
             width: '800px',
             data: {
-                ownerId: this.currentBasketInfo.ownerId,
-                groupId: this.currentBasketInfo.groupId,
-                basketId: this.currentBasketInfo.basketId,
                 selectedRes: this.selectedRes
             }
         });

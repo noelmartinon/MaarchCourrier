@@ -105,7 +105,7 @@ export class FolderActionListComponent implements OnInit {
     }
 
     getBaskets() {
-        this.http.get('../rest/folders/' + this.currentFolderInfo.id + '/resources/' + this.selectedRes + '/baskets').pipe(
+        this.http.get('../rest/resources/' + this.selectedRes + '/baskets').pipe(
             tap((data: any) => {
                 this.basketList.groups = data.groupsBaskets.filter((x: any, i: any, a: any) => x && a.map((info: any) => info.groupId).indexOf(x.groupId) === i);
                 this.basketList.list = data.groupsBaskets;

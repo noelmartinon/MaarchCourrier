@@ -10,7 +10,7 @@
                 {{field.label}}
             </div>
             <div class="fieldInput" [class.advancedInput]="field.type === 'checkbox'">
-                <ng-container *ngIf="['string', 'autocomplete', 'banAutocomplete'].indexOf(field.type) > -1">
+                <ng-container *ngIf="['string', 'autocomplete', 'banAutocomplete', 'contact'].indexOf(field.type) > -1">
                     <mat-form-field class="input-form" floatLabel="never">
                         <textarea matInput [placeholder]="this.translate.instant('lang.' + field.type + 'Input')" matTextareaAutosize
                             matAutosizeMinRows="1" cdkAutosizeMaxRows="6" disabled></textarea>

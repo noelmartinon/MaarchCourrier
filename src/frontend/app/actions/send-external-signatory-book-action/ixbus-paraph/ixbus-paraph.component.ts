@@ -3,6 +3,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { HttpClient } from '@angular/common/http';
 import { FormControl } from '@angular/forms';
+import { LocalStorageService } from '../../../../service/local-storage.service';
+import { HeaderService } from '../../../../service/header.service';
 
 @Component({
     selector: 'app-ixbus-paraph',
@@ -11,7 +13,6 @@ import { FormControl } from '@angular/forms';
 })
 export class IxbusParaphComponent implements OnInit {
 
-    
     loading: boolean = true;
 
     currentAccount: any = null;
@@ -37,7 +38,13 @@ export class IxbusParaphComponent implements OnInit {
     @Input() additionalsInfos: any;
     @Input() externalSignatoryBookDatas: any;
 
-    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService) { }
+    constructor(
+        public translate: TranslateService,
+        public http: HttpClient,
+        private notify: NotificationService,
+        public headerService: HeaderService,
+        private localStorage: LocalStorageService
+    ) { }
 
     ngOnInit(): void {
         this.natures = this.additionalsInfos.ixbus.natures.map((element: any) => {
@@ -52,6 +59,11 @@ export class IxbusParaphComponent implements OnInit {
                 label: element
             };
         });
+
+        if (this.localStorage.get(`ixBusSignatureMode_${this.headerService.user.id}`) !== null) {
+            this.ixbusDatas.signatureMode = this.localStorage.get(`ixBusSignatureMode_${this.headerService.user.id}`);
+        }
+
         this.loading = false;
     }
 
@@ -69,6 +81,7 @@ export class IxbusParaphComponent implements OnInit {
     }
 
     getDatas() {
+        this.localStorage.save(`ixBusSignatureMode_${this.headerService.user.id}`, this.ixbusDatas.signatureMode);
         this.externalSignatoryBookDatas = {
             'ixbus': this.ixbusDatas,
             'steps': []

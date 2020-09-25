@@ -759,7 +759,7 @@ class ResController extends ResourceControlController
             $formattedData[$type] = $item['count'];
         }
 
-        $formattedData['notes'] = NoteModel::countByResId(['resId' => $args['resId'], 'userId' => $GLOBALS['id'], 'login' => $GLOBALS['login']]);
+        $formattedData['notes'] = NoteModel::countByResId(['resId' => [$args['resId']], 'userId' => $GLOBALS['id']])[$args['resId']];
 
         $emails = EmailModel::get(['select' => ['count(1)'], 'where' => ["document->>'id' = ?", "(status != 'DRAFT' or (status = 'DRAFT' and user_id = ?))"], 'data' => [$args['resId'], $GLOBALS['id']]]);
         $acknowledgementReceipts = AcknowledgementReceiptModel::get([

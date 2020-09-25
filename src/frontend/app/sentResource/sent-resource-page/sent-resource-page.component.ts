@@ -940,7 +940,7 @@ export class SentResourcePageComponent implements OnInit {
 
     async createSummarySheet() {
         return new Promise(resolve => {
-            this.http.post('../rest/resourcesList/users/' + this.data.currentUserId + '/groups/' + this.data.currentGroupId + '/baskets/' + this.data.currentBasketId + '/summarySheets?mode=base64', {
+            this.http.post('../rest/resourcesList/summarySheets?mode=base64', {
                 units:     this.summarySheetUnits,
                 resources: [this.data.resId]
             })

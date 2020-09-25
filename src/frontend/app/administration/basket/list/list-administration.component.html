@@ -52,7 +52,7 @@
             {{selectedTemplateDisplayedSecondaryData}} <i class="fas fa-columns"></i>
         </button>
         <mat-menu #menu="matMenu">
-            <button mat-menu-item *ngFor="let colNum of templateDisplayedSecondaryData" (click)="selectedTemplateDisplayedSecondaryData=colNum">{{colNum}} colonne(s)</button>
+            <button mat-menu-item *ngFor="let colNum of templateDisplayedSecondaryData" (click)="selectedTemplateDisplayedSecondaryData=colNum;reorderDisplayedData()">{{colNum}} {{'lang.columns' | translate}}</button>
         </mat-menu>
     </span>
     <span class="area">
@@ -83,16 +83,16 @@
     </span>
 </mat-toolbar>
 <mat-card>
-    <ng-container *ngIf="(displayedSecondaryData.length > 0 && displayMode=='sample') || displayMode=='label'">
-        <mat-toolbar class="secondaryInformations example-list column-{{selectedTemplateDisplayedSecondaryData}}-list" cdkDropListOrientation="horizontal" cdkDropList
-            [cdkDropListData]="displayedSecondaryData" (cdkDropListDropped)="drop($event)">
-            <ng-container *ngFor="let item of displayedSecondaryData;let itData=index">
+    <div *ngIf="(displayedSecondaryData.length > 0 && displayMode=='sample') || displayMode=='label'" cdkDropListGroup style="border: solid 1px #F9983066;border-radius: 4px;">
+        <mat-toolbar *ngFor="let displayedData of displayedSecondaryData;let indexDisplayedData=index" class="secondaryInformations example-list column-{{selectedTemplateDisplayedSecondaryData}}-list" cdkDropListOrientation="horizontal" cdkDropList
+            [cdkDropListData]="displayedData" (cdkDropListDropped)="drop($event)">
+            <ng-container *ngFor="let item of displayedData;let itData=index">
                 <span class="example-box" *ngIf="item.value != 'getFolders'" cdkDrag>
                     <button *ngIf="displayMode=='label'" color="primary" mat-icon-button [matMenuTriggerFor]="menu">
                         <mat-icon fontSet="fas" fontIcon="fa-ellipsis-v fa-2x"></mat-icon>
                     </button>
                     <mat-menu #menu="matMenu">
-                        <button mat-menu-item (click)="removeData(item,itData)">
+                        <button mat-menu-item (click)="removeData(item,itData,indexDisplayedData)">
                             <mat-icon class="secondaryInformations_icon" color="warn" fontSet="fas"
                                 fontIcon="fa-trash fa-2x"></mat-icon>
                             <span>{{'lang.delete' | translate}}</span>
@@ -136,7 +136,7 @@
                 </span>
             </ng-container>
         </mat-toolbar>
-    </ng-container>
+    </div>
     <div class="resultRow newRow">
         <span class="resultCol" *ngFor="let item of displayedMainData;let i=index" [class]="item.cssClasses.join(' ')">
             <span *ngIf="i == 0">
@@ -170,21 +170,23 @@
             </button>
         </mat-button-toggle-group>
     </div>
-    <div *ngFor="let item of displayedSecondaryData;let itData=index" class="folder-info">
-        <ng-container *ngIf="item.value=='getFolders'">
-            <button *ngIf="displayMode=='label'" color="primary" mat-icon-button [matMenuTriggerFor]="menu">
-                <mat-icon fontSet="fas" fontIcon="fa-ellipsis-v fa-2x"></mat-icon>
-            </button>
-            <mat-menu #menu="matMenu">
-                <button mat-menu-item (click)="removeData(item,itData)">
-                    <mat-icon class="secondaryInformations_icon" color="warn" fontSet="fas" fontIcon="fa-trash fa-2x">
-                    </mat-icon>
-                    <span>{{'lang.delete' | translate}}</span>
+    <div *ngFor="let displayedData of displayedSecondaryData;let indexDisplayedData=index">
+        <div *ngFor="let item of displayedData;let itData=index" class="folder-info">
+            <ng-container *ngIf="item.value=='getFolders'">
+                <button *ngIf="displayMode=='label'" color="primary" mat-icon-button [matMenuTriggerFor]="menu">
+                    <mat-icon fontSet="fas" fontIcon="fa-ellipsis-v fa-2x"></mat-icon>
                 </button>
-            </mat-menu>
-            <span class="badge badge-folder"><i class="fa fa-folder"></i>
-                {{item[displayMode]}}</span>
-        </ng-container>
+                <mat-menu #menu="matMenu">
+                    <button mat-menu-item (click)="removeData(item,itData, indexDisplayedData)">
+                        <mat-icon class="secondaryInformations_icon" color="warn" fontSet="fas" fontIcon="fa-trash fa-2x">
+                        </mat-icon>
+                        <span>{{'lang.delete' | translate}}</span>
+                    </button>
+                </mat-menu>
+                <span class="badge badge-folder"><i class="fa fa-folder"></i>
+                    {{item[displayMode]}}</span>
+            </ng-container>
+        </div>
     </div>
 </mat-card>
 <div class="row">

@@ -16,7 +16,6 @@ namespace Resource\controllers;
 
 use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
 use Attachment\models\AttachmentModel;
-use Basket\models\BasketModel;
 use Contact\controllers\ContactController;
 use CustomField\models\CustomFieldModel;
 use Entity\models\EntityModel;
@@ -30,7 +29,6 @@ use Respect\Validation\Validator;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\controllers\PreparedClauseController;
 use SrcCore\controllers\UrlController;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\TextFormatModel;
@@ -38,7 +36,6 @@ use SrcCore\models\ValidatorModel;
 use Tag\models\ResourceTagModel;
 use Tag\models\TagModel;
 use User\models\UserModel;
-
 
 class ExportController
 {
@@ -62,11 +59,6 @@ class ExportController
     {
         set_time_limit(240);
 
-        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $GLOBALS['id']]);
-        if (!empty($errors['errors'])) {
-            return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
-        }
-
         $body = $request->getParsedBody();
 
         if (!Validator::stringType()->notEmpty()->validate($body['format']) || !in_array($body['format'], ['pdf', 'csv'])) {
@@ -77,6 +69,8 @@ class ExportController
             return $response->withStatus(400)->withJson(['errors' => 'Data data is empty or not an array']);
         } elseif (!Validator::arrayType()->notEmpty()->validate($body['resources'])) {
             return $response->withStatus(403)->withJson(['errors' => 'Data resources is empty or not an array']);
+        } elseif (!ResController::hasRightByResId(['resId' => $body['resources'], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
         foreach ($body['data'] as $value) {
@@ -85,22 +79,8 @@ class ExportController
             }
         }
 
-        $basket = BasketModel::getById(['id' => $aArgs['basketId'], 'select' => ['basket_clause', 'basket_res_order', 'basket_name']]);
-        $user   = UserModel::getById(['id' => $aArgs['userId'], 'select' => ['user_id']]);
-
-        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $user['user_id']]);
-        $rawResourcesInBasket = ResModel::getOnView([
-            'select'    => ['res_id'],
-            'where'     => [$whereClause, 'res_view_letterbox.res_id in (?)'],
-            'data'      => [$body['resources']]
-        ]);
-        $allResourcesInBasket = array_column($rawResourcesInBasket, 'res_id');
-
         $order = 'CASE res_view_letterbox.res_id ';
         foreach ($body['resources'] as $key => $resId) {
-            if (!in_array($resId, $allResourcesInBasket)) {
-                return $response->withStatus(403)->withJson(['errors' => 'Resources out of perimeter']);
-            }
             $order .= "WHEN {$resId} THEN {$key} ";
         }
         $order .= 'END';
@@ -748,7 +728,10 @@ class ExportController
         $field = CustomFieldModel::getById(['select' => ['type', 'values'], 'id' => $customFieldId]);
         $values = json_decode($field['values'], true);
 
-        if ($field['type'] == 'banAutocomplete') {
+        if ($field['type'] == 'contact') {
+            $customValues = ContactController::getContactCustomField(['contacts' => $customValues]);
+            $customValues = implode("\n", $customValues);
+        } elseif ($field['type'] == 'banAutocomplete') {
             $line = "{$customValues[0]['addressNumber']} {$customValues[0]['addressStreet']} {$customValues[0]['addressTown']} ({$customValues[0]['addressPostcode']})";
             $line .= "\n";
             $line .= "{$customValues[0]['latitude']},{$customValues[0]['longitude']}";

@@ -25,7 +25,6 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
 
-    
 
     loading: boolean = true;
 
@@ -57,6 +56,10 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         {
             label: this.translate.instant('lang.banAutocompleteInput'),
             type: 'banAutocomplete'
+        },
+        {
+            label: this.translate.instant('lang.contactInput'),
+            type: 'contact'
         }
     ];
     customFields: any[] = [];

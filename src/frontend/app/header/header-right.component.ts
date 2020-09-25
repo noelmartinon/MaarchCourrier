@@ -10,6 +10,8 @@ import { AppService } from '../../service/app.service';
 import { PrivilegeService } from '../../service/privileges.service';
 import { FunctionsService } from '../../service/functions.service';
 import { AuthService } from '../../service/auth.service';
+import { RegisteredMailImportComponent } from '@appRoot/registeredMail/import/registered-mail-import.component';
+
 
 @Component({
     selector: 'header-right',
@@ -47,7 +49,20 @@ export class HeaderRightComponent implements OnInit {
             this.config = { panelClass: 'maarch-modal', data: { indexingGroups: shortcut.groups, link: shortcut.route } };
             this.dialogRef = this.dialog.open(IndexingGroupModalComponent, this.config);
         } else if (shortcut.angular === true) {
-            this.router.navigate([shortcut.route]);
+            const component = shortcut.route.split('__');
+
+            if (component.length === 2) {
+                if (component[0] === 'RegisteredMailImportComponent') {
+                    this.dialog.open(RegisteredMailImportComponent, {
+                        disableClose: true,
+                        width: '99vw',
+                        maxWidth: '99vw',
+                        panelClass: 'maarch-full-height-modal'
+                    });
+                }
+            } else {
+                this.router.navigate([shortcut.route]);
+            }
         } else {
             location.href = shortcut.route;
         }

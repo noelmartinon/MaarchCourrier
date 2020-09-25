@@ -287,7 +287,7 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_registered_mail',
-            'label': 'lang.registeredMail',
+            'label': 'lang.registeredMails',
             'comment': 'lang.adminRegisteredMailDesc',
             'route': '/administration/registeredMails',
             'unit': 'supervision',
@@ -527,6 +527,16 @@ export class PrivilegeService {
             'comment': 'lang.arReception',
             'route': '/registeredMail/acknowledgement',
             'style': 'fa fa-barcode',
+            'unit': 'registeredMails',
+            'angular': true,
+            'shortcut': false
+        },
+        {
+            'id': 'registered_mail_mass_import',
+            'label': 'lang.importRegisteredMails',
+            'comment': 'lang.importRegisteredMails',
+            'route': 'RegisteredMailImportComponent__modal',
+            'style': 'fas fa-dolly-flatbed',
             'unit': 'registeredMails',
             'angular': true,
             'shortcut': false

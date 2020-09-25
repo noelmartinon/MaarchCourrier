@@ -256,6 +256,8 @@ INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailDistribut
 DELETE FROM status WHERE id = 'PND' OR id = 'DSTRIBUTED';
 INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('PND', 'AR Non distribué', 'Y', 'fm-letter-status-rejected', 'apps', 'Y', 'Y');
 INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('DSTRIBUTED', 'AR distribué', 'Y', 'fa-check', 'apps', 'Y', 'Y');
+DELETE FROM parameters WHERE id = 'registeredMailImportedStatus';
+INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailImportedStatus', 'NEW');
 
 DELETE FROM parameters WHERE id = 'traffic_record_summary_sheet';
 INSERT INTO parameters (id, description, param_value_string) VALUES ('traffic_record_summary_sheet', 'Module circulation pour la fiche de liaison', '');

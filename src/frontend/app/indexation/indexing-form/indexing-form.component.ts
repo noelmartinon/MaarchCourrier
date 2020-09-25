@@ -225,9 +225,9 @@ export class IndexingFormComponent implements OnInit {
         {
             identifier: 'registeredMail_recipient',
             label: this.translate.instant('lang.registeredMailRecipient'),
-            type: 'registeredMailRecipient',
+            type: 'autocomplete',
             default_value: null,
-            values: [],
+            values: ['/rest/autocomplete/correspondents'],
             enabled: true,
         },
         {
@@ -315,7 +315,7 @@ export class IndexingFormComponent implements OnInit {
                         if (['integer', 'string', 'date'].indexOf(info.type) > -1 && !this.functions.empty(info.values)) {
                             info.default_value = info.values[0].key;
                         } else {
-                            info.default_value = info.type === 'banAutocomplete' ? [] : null;
+                            info.default_value = ['contact', 'banAutocomplete'].indexOf(info.type) > -1 ? [] : null;
                         }
                         info.values = info.values.length > 0 ? info.values.map((custVal: any) => {
                             return {
@@ -501,8 +501,8 @@ export class IndexingFormComponent implements OnInit {
 
                 formatData['customFields'][element.identifier.split('_')[1]] = element.default_value;
 
-            } else if (element.identifier === 'registeredMail_recipient') {
-                formatData[element.identifier] = this.appRegisteredMailRecipientInput.getFormatedAdress();
+            // } else if (element.identifier === 'registeredMail_recipient') {
+            //     formatData[element.identifier] = this.appRegisteredMailRecipientInput.getFormatedAdress();
             } else {
                 formatData[element.identifier] = element.default_value;
             }

@@ -42,10 +42,13 @@
                                 (click)="removeCriteria(critKey.key)"><i
                                     class="fa {{indexingFieldService.getField(critKey.key).icon}}" [title]="indexingFieldService.getField(critKey.key).label"></i>&nbsp;{{critKey.value.values.length}} valeurs&nbsp;<i class="fa fa-times-circle"></i></span>
                         </ng-container>
-                        <ng-container *ngIf="!isArrayType(critKey.value.values)">
-                            <span class="label badge-search" [title]="critKey.value.values" (click)="removeCriteria(critKey.key, val)"><i
+                        <ng-container *ngIf="!isArrayType(critKey.value.values) && critKey.key !== 'meta'">
+                            <span class="label badge-search" [title]="appCriteriaTool.getFormatLabel(critKey.value.values)" (click)="removeCriteria(critKey.key)"><i
                                     class="fa {{indexingFieldService.getField(critKey.key).icon}}"
-                                    [title]="indexingFieldService.getField(critKey.key).label"></i>&nbsp;{{critKey.value.values}}&nbsp;<i class="fa fa-times-circle"></i></span>
+                                    [title]="indexingFieldService.getField(critKey.key).label"></i>&nbsp;{{appCriteriaTool.getFormatLabel(critKey.value.values)}}&nbsp;<i class="fa fa-times-circle"></i></span>
+                        </ng-container>
+                        <ng-container *ngIf="!isArrayType(critKey.value.values) && critKey.key === 'meta'">
+                            <span class="label badge-search" [title]="'meta'" (click)="removeCriteria(critKey.key)">"{{critKey.value.values}}"&nbsp;<i class="fa fa-times-circle"></i></span>
                         </ng-container>
                     </ng-container>
                 </div>
@@ -74,11 +77,15 @@
                                 [pageSizeOptions]="[10, 25, 50, 100, 150]" class="paginatorResultList"></mat-paginator>
                         </span>
                         <span>
-                            <!--<app-folder-action-list #actionsList [contextMode]="false" [currentFolderInfo]="folderInfo"
-                                [totalRes]="allResInBasket.length" [selectedRes]="selectedRes"
-                                (refreshEvent)="refreshDaoAfterAction()"
-                                (refreshPanelFolders)="foldersService.getFolders()">
-                            </app-folder-action-list>-->
+                            <span>
+                                <app-tools-list #actionsList [selectedRes]="selectedRes"></app-tools-list>
+                            </span>
+                            <span>
+                                <app-followed-action-list #actionsList [contextMode]="false" [currentFolderInfo]="folderInfo"
+                                    [totalRes]="allResInBasket.length" [selectedRes]="selectedRes"
+                                    (refreshEvent)="refreshDaoAfterAction()">
+                                </app-followed-action-list>
+                            </span>
                         </span>
                     </div>
                 </div>
@@ -216,7 +223,7 @@
         <mat-divider></mat-divider>
     </mat-sidenav>
 </mat-sidenav-container>
-<app-folder-action-list #actionsListContext [contextMode]="true" [currentFolderInfo]="folderInfo"
+<app-followed-action-list #actionsListContext [contextMode]="true" [currentFolderInfo]="folderInfo"
     [totalRes]="allResInBasket.length" [selectedRes]="selectedRes" (refreshEvent)="refreshDaoAfterAction()"
     (refreshPanelFolders)="foldersService.getFolders()">
-</app-folder-action-list>
+</app-followed-action-list>

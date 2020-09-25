@@ -110,13 +110,12 @@ class NoteModel
 
     public static function countByResId(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['resId', 'login', 'userId']);
-        ValidatorModel::intVal($aArgs, ['resId', 'userId']);
-        ValidatorModel::stringType($aArgs, ['login']);
+        ValidatorModel::notEmpty($aArgs, ['resId', 'userId']);
+        ValidatorModel::intVal($aArgs, ['userId']);
+        ValidatorModel::arrayType($aArgs, ['resId']);
 
-        $nb = 0;
+        $nb = [];
         $countedNotes = [];
-        $entities = [];
 
         $aEntities = DatabaseModel::select([
             'select'    => ['entity_id'],
@@ -125,29 +124,28 @@ class NoteModel
             'data'      => [$aArgs['userId']]
         ]);
 
-        foreach ($aEntities as $value) {
-            $entities[] = $value['entity_id'];
-        }
+        $entities = array_column($aEntities, 'entity_id');
 
         $aNotes = DatabaseModel::select([
-            'select'    => ['notes.id', 'user_id', 'item_id'],
+            'select'    => ['notes.id', 'user_id', 'item_id', 'identifier'],
             'table'     => ['notes', 'note_entities'],
             'left_join' => ['notes.id = note_entities.note_id'],
-            'where'     => ['identifier = ?'],
+            'where'     => ['identifier in (?)'],
             'data'      => [$aArgs['resId']]
         ]);
 
-        foreach ($aNotes as $value) {
-            if (empty($value['item_id']) && !in_array($value['id'], $countedNotes)) {
-                ++$nb;
-                $countedNotes[] = $value['id'];
-            } elseif (!empty($value['item_id'])) {
-                if ($value['user_id'] == $aArgs['userId'] && !in_array($value['id'], $countedNotes)) {
-                    ++$nb;
-                    $countedNotes[] = $value['id'];
-                } elseif (in_array($value['item_id'], $entities) && !in_array($value['id'], $countedNotes)) {
-                    ++$nb;
-                    $countedNotes[] = $value['id'];
+        foreach ($aArgs['resId'] as $resId) {
+            $nb[$resId] = 0;
+            $countedNotes[$resId] = [];
+            foreach ($aNotes as $key => $value) {
+                if ($value['identifier'] == $resId && !in_array($value['id'], $countedNotes[$resId])) {
+                    if (empty($value['item_id']) ||
+                        (!empty($value['item_id']) && (($value['user_id'] == $aArgs['userId']) || (in_array($value['item_id'], $entities))))
+                    ) {
+                        ++$nb[$resId];
+                        $countedNotes[$resId][] = $value['id'];
+                        unset($aNotes[$key]);
+                    }
                 }
             }
         }

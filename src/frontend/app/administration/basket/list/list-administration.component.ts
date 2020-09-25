@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../../service/notification/notification.service';
 import { FormControl } from '@angular/forms';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { startWith, map, tap, catchError } from 'rxjs/operators';
 import { Observable } from 'rxjs/internal/Observable';
 import { of } from 'rxjs/internal/observable/of';
@@ -141,6 +141,24 @@ export class ListAdministrationComponent implements OnInit {
             'sample': this.translate.instant('lang.getBarcodeSample'),
             'cssClasses': ['align_leftData'],
             'icon': 'fa-barcode'
+        }, {
+            'value': 'getRegisteredMailRecipient',
+            'label': this.translate.instant('lang.registeredMailRecipient'),
+            'sample': this.translate.instant('lang.registeredMailRecipientSample'),
+            'cssClasses': ['align_leftData'],
+            'icon': 'fa-user'
+        }, {
+            'value': 'getRegisteredMailReference',
+            'label': this.translate.instant('lang.registeredMailReference'),
+            'sample': this.translate.instant('lang.registeredMailReferenceSample'),
+            'cssClasses': ['align_leftData'],
+            'icon': 'fa-hashtag'
+        }, {
+            'value': 'getRegisteredMailIssuingSite',
+            'label': this.translate.instant('lang.issuingSite'),
+            'sample': this.translate.instant('lang.issuingSiteSample'),
+            'cssClasses': ['align_leftData'],
+            'icon': 'fas fa-warehouse'
         }
     ];
     availableDataClone: any = [];
@@ -170,7 +188,7 @@ export class ListAdministrationComponent implements OnInit {
         }
     ];
 
-    templateDisplayedSecondaryData: number[] = [1, 2, 3, 4, 5, 6, 7];
+    templateDisplayedSecondaryData: number[] = [2, 3, 4, 5, 6, 7];
     selectedTemplateDisplayedSecondaryData: number = 7;
     selectedTemplateDisplayedSecondaryDataClone: number = 7;
 
@@ -255,12 +273,26 @@ export class ListAdministrationComponent implements OnInit {
         let indexData: number = 0;
         this.selectedTemplateDisplayedSecondaryData = this.basketGroup.list_display.templateColumns;
         this.selectedTemplateDisplayedSecondaryDataClone = this.selectedTemplateDisplayedSecondaryData;
+
+        const tmpData = [];
         this.basketGroup.list_display.subInfos.forEach((element: any) => {
             indexData = this.availableData.map((e: any) => e.value).indexOf(element.value);
             this.availableData[indexData].cssClasses = element.cssClasses;
-            this.displayedSecondaryData.push(this.availableData[indexData]);
+            tmpData.push(this.availableData[indexData]);
             this.availableData.splice(indexData, 1);
         });
+
+        let previousIndex = 0;
+        this.displayedSecondaryData = [];
+        tmpData.forEach((object: any, index: any) => {
+            if (index % this.selectedTemplateDisplayedSecondaryData === 0 && index !== 0) {
+                const tmp = tmpData.slice(previousIndex, index);
+                this.displayedSecondaryData.push(tmp);
+                previousIndex = index;
+            }
+        });
+        this.displayedSecondaryData.push(tmpData.slice(previousIndex));
+
         this.selectedListEvent = this.basketGroup.list_event;
         this.selectedListEventClone = this.selectedListEvent;
 
@@ -293,7 +325,6 @@ export class ListAdministrationComponent implements OnInit {
                     return data.customFields;
                 }),
                 tap((customs) => {
-                    console.log(customs);
                     this.availableData = this.availableData.concat(customs);
                     resolve(true);
 
@@ -339,15 +370,18 @@ export class ListAdministrationComponent implements OnInit {
 
     addData(event: any) {
         const i = this.availableData.map((e: any) => e.value).indexOf(event.option.value.value);
-        this.displayedSecondaryData.push(event.option.value);
+        if (this.displayedSecondaryData[this.displayedSecondaryData.length - 1].length >= this.selectedTemplateDisplayedSecondaryData) {
+            this.displayedSecondaryData.push([]);
+        }
+        this.displayedSecondaryData[this.displayedSecondaryData.length - 1].push(event.option.value);
         this.availableData.splice(i, 1);
         $('#availableData').blur();
         this.dataControl.setValue('');
     }
 
-    removeData(data: any, i: number) {
+    removeData(data: any, i: number, indexDisplayedData) {
         this.availableData.push(data);
-        this.displayedSecondaryData.splice(i, 1);
+        this.displayedSecondaryData[indexDisplayedData].splice(i, 1);
         this.dataControl.setValue('');
     }
 
@@ -360,23 +394,34 @@ export class ListAdministrationComponent implements OnInit {
     drop(event: CdkDragDrop<string[]>) {
         if (event.previousContainer === event.container) {
             moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+        } else {
+            transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex - 1);
+
+            this.displayedSecondaryData.forEach((subArray: any, index) => {
+                if (subArray.length > this.selectedTemplateDisplayedSecondaryData) {
+                    transferArrayItem(subArray, this.displayedSecondaryData[index + 1], subArray.length, 0);
+                } else if (subArray.length < this.selectedTemplateDisplayedSecondaryData) {
+                    transferArrayItem(this.displayedSecondaryData[index + 1], subArray, 0, subArray.length);
+                }
+            });
         }
     }
 
     saveTemplate() {
-        let objToSend = {};
         const template: any = [];
-        this.displayedSecondaryData.forEach((element: any) => {
-            template.push(
-                {
-                    'value': element.value,
-                    'cssClasses': element.cssClasses,
-                    'icon': element.icon,
-                }
-            );
+        this.displayedSecondaryData.forEach((subArray: any) => {
+            subArray.forEach((element: any) => {
+                template.push(
+                    {
+                        'value':      element.value,
+                        'cssClasses': element.cssClasses,
+                        'icon':       element.icon,
+                    }
+                );
+            });
         });
 
-        objToSend = {
+        const objToSend = {
             templateColumns: this.selectedTemplateDisplayedSecondaryData,
             subInfos: template
         };
@@ -453,5 +498,23 @@ export class ListAdministrationComponent implements OnInit {
         if (!state) {
             this.selectedProcessTool.canUpdateModel = state;
         }
+    }
+
+    reorderDisplayedData() {
+        let mergedArray = [];
+        this.displayedSecondaryData.forEach((subArray: any) => {
+            mergedArray = mergedArray.concat(subArray);
+        });
+
+        let previousIndex = 0;
+        this.displayedSecondaryData = [];
+        mergedArray.forEach((object: any, index: any) => {
+            if (index % this.selectedTemplateDisplayedSecondaryData === 0 && index !== 0) {
+                const tmp = mergedArray.slice(previousIndex, index);
+                this.displayedSecondaryData.push(tmp);
+                previousIndex = index;
+            }
+        });
+        this.displayedSecondaryData.push(mergedArray.slice(previousIndex));
     }
 }

@@ -359,16 +359,6 @@ class UserFollowedResourceControllerTest extends TestCase
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
-        //  GET
-        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
-        $request        = \Slim\Http\Request::createFromEnvironment($environment);
-
-        $response     = $userFollowedResourceController->getBaskets($request, new \Slim\Http\Response(), ['resId' => self::$idFirst]);
-        $this->assertSame(403, $response->getStatusCode());
-
-        $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Resource out of perimeter', $responseBody['errors']);
-
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];

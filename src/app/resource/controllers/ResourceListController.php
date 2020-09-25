@@ -33,6 +33,8 @@ use Folder\models\FolderModel;
 use Group\models\GroupModel;
 use Note\models\NoteModel;
 use Priority\models\PriorityModel;
+use RegisteredMail\models\IssuingSiteModel;
+use RegisteredMail\models\RegisteredMailModel;
 use Resource\models\ResModel;
 use Resource\models\ResourceListModel;
 use Resource\models\UserFollowedResourceModel;
@@ -879,7 +881,7 @@ class ResourceListController
                     break;
                 }
             }
-            $formattedResources[$key]['countNotes'] = NoteModel::countByResId(['resId' => $resource['res_id'], 'login' => $currentUser['user_id'], 'userId' => $args['userId']]);
+            $formattedResources[$key]['countNotes'] = NoteModel::countByResId(['resId' => [$resource['res_id']], 'userId' => $args['userId']])[$resource['res_id']];
 
             if (!empty($args['checkLocked'])) {
                 $isLocked = true;
@@ -898,6 +900,11 @@ class ResourceListController
 
             if (isset($args['listDisplay'])) {
                 $display = [];
+                $listDisplayValues = array_column($args['listDisplay'], 'value');
+                if (in_array('getRegisteredMailRecipient', $listDisplayValues) || in_array('getRegisteredMailReference', $listDisplayValues)
+                    || in_array('getRegisteredMailIssuingSite', $listDisplayValues)) {
+                    $registeredMail = RegisteredMailModel::getByResId(['resId' => $resource['res_id'], 'select' => ['issuing_site', 'recipient', 'reference']]);
+                }
                 foreach ($args['listDisplay'] as $value) {
                     $value = (array)$value;
                     if ($value['value'] == 'getPriority') {
@@ -942,12 +949,40 @@ class ResourceListController
                     } elseif ($value['value'] == 'getBarcode') {
                         $value['displayValue'] = $resource['barcode'];
                         $display[] = $value;
+                    } elseif ($value['value'] == 'getRegisteredMailRecipient') {
+                        if (!empty($registeredMail)) {
+                            $recipient = json_decode($registeredMail['recipient'], true);
+                            if (!empty($recipient['company']) && (!empty($recipient['firstname']) || !empty($recipient['lastname']))) {
+                                $recipient = $recipient['firstname'] . ' ' . $recipient['lastname'] . ' (' . $recipient['company'] . ')';
+                            } elseif (empty($recipient['company']) && (!empty($recipient['firstname']) || !empty($recipient['lastname']))) {
+                                $recipient = $recipient['firstname'] . ' ' . $recipient['lastname'];
+                            } elseif (!empty($recipient['company']) && empty($recipient['firstname']) && empty($recipient['lastname'])) {
+                                $recipient = $recipient['company'];
+                            }
+                            $value['displayValue'] = $recipient;
+                        } else {
+                            $value['displayValue'] = '';
+                        }
+                        $display[] = $value;
+                    } elseif ($value['value'] == 'getRegisteredMailReference') {
+                        $value['displayValue'] = !empty($registeredMail) ? $registeredMail['reference'] : '';
+                        $display[] = $value;
+                    } elseif ($value['value'] == 'getRegisteredMailIssuingSite') {
+                        if (!empty($registeredMail)) {
+                            $site = IssuingSiteModel::getById(['id' => $registeredMail['issuing_site'], 'select' => ['label']]);
+                            $value['displayValue'] = $site['label'];
+                        } else {
+                            $value['displayValue'] = '';
+                        }
+                        $display[] = $value;
                     } elseif (strpos($value['value'], 'indexingCustomField_') !== false) {
                         $customId = explode('_', $value['value'])[1];
                         $customValue = json_decode($resource['custom_fields'], true);
 
                         $value['displayLabel'] = $customFieldsLabels[$customId] ?? '';
-                        if ($customFields[$customId] == 'banAutocomplete' && !empty($customValue[$customId])) {
+                        if ($customFields[$customId] == 'contact' && !empty($customValue[$customId])) {
+                            $value['displayValue'] = ContactController::getContactCustomField(['contacts' => $customValue[$customId], 'onlyContact' => true]);
+                        } elseif ($customFields[$customId] == 'banAutocomplete' && !empty($customValue[$customId])) {
                             $value['displayValue'] = $customValue[$customId][0]['addressNumber'] ?? '';
                             $value['displayValue'] .= ' ';
                             $value['displayValue'] .= $customValue[$customId][0]['addressStreet'] ?? '';

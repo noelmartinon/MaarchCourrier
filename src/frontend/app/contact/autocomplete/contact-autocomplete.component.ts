@@ -28,8 +28,6 @@ import { FunctionsService } from '../../../service/functions.service';
 
 export class ContactAutocompleteComponent implements OnInit {
 
-    
-
     loading: boolean = false;
     loadingValues: boolean = true;
 
@@ -56,6 +54,7 @@ export class ContactAutocompleteComponent implements OnInit {
     @Input('control') controlAutocomplete: FormControl;
 
     @Input() id: string = 'contact-autocomplete';
+    @Input() exclusion: string = '';
 
     @Input() singleMode: boolean = false;
 
@@ -156,7 +155,7 @@ export class ContactAutocompleteComponent implements OnInit {
     }
 
     getDatas(data: string) {
-        return this.http.get('../rest/autocomplete/correspondents', { params: { 'search': data } });
+        return this.http.get('../rest/autocomplete/correspondents' + this.exclusion, { params: { 'search': data } });
     }
 
     selectOpt(ev: any) {

@@ -881,50 +881,6 @@ class FolderController
         return $response->withJson(['countResources' => count($foldersResources) - count($resourcesToUnclassify)]);
     }
 
-    public function getBasketsFromFolder(Request $request, Response $response, array $args)
-    {
-        if (!Validator::numeric()->notEmpty()->validate($args['id'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Route id is not an integer']);
-        }
-
-        if (!FolderController::hasFolders(['folders' => [$args['id']], 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Folder out of perimeter']);
-        }
-
-        $foldersResource = ResourceFolderModel::get(['select' => [1], 'where' => ['folder_id = ?', 'res_id = ?'], 'data' => [$args['id'], $args['resId']]]);
-        if (empty($foldersResource)) {
-            return $response->withStatus(403)->withJson(['errors' => 'Resource out of perimeter']);
-        }
-
-        $baskets = BasketModel::getWithPreferences([
-            'select'  => ['baskets.id', 'baskets.basket_name', 'baskets.basket_clause', 'users_baskets_preferences.group_serial_id', 'usergroups.group_desc'],
-            'where'   => ['users_baskets_preferences.user_serial_id = ?'],
-            'data'    => [$GLOBALS['id']],
-            'orderBy' => ['baskets.basket_name']
-        ]);
-        $groupsBaskets = [];
-        $inCheckedBaskets = [];
-        $outCheckedBaskets = [];
-        foreach ($baskets as $basket) {
-            if (in_array($basket['id'], $outCheckedBaskets)) {
-                continue;
-            } else {
-                if (!in_array($basket['id'], $inCheckedBaskets)) {
-                    $preparedClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $GLOBALS['login']]);
-                    $resource = ResModel::getOnView(['select' => [1], 'where' => ['res_id = ?', "({$preparedClause})"], 'data' => [$args['resId']]]);
-                    if (empty($resource)) {
-                        $outCheckedBaskets[] = $basket['id'];
-                        continue;
-                    }
-                }
-                $inCheckedBaskets[] = $basket['id'];
-                $groupsBaskets[] = ['groupId' => $basket['group_serial_id'], 'groupName' => $basket['group_desc'], 'basketId' => $basket['id'], 'basketName' => $basket['basket_name']];
-            }
-        }
-
-        return $response->withJson(['groupsBaskets' => $groupsBaskets]);
-    }
-
     public function getFilters(Request $request, Response $response, array $args)
     {
         if (!Validator::numeric()->notEmpty()->validate($args['id'])) {

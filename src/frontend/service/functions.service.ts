@@ -34,6 +34,10 @@ export class FunctionsService {
         }
     }
 
+    isDate(value: any) {
+        return value instanceof Date && !isNaN(value.valueOf());
+    }
+
     formatFrenchDateToTechnicalDate(date: string) {
         if (!this.empty(date)) {
             let arrDate = date.split('-');

@@ -12,6 +12,7 @@
 
 namespace RegisteredMail\controllers;
 
+use Contact\models\ContactModel;
 use Parameter\models\ParameterModel;
 use RegisteredMail\models\IssuingSiteModel;
 use RegisteredMail\models\RegisteredMailModel;
@@ -42,7 +43,22 @@ trait RegisteredMailTrait
             return ['errors' => ['R3 warranty is not allowed for type RW']];
         } elseif (empty($args['data']['recipient']) || empty($args['data']['issuingSiteId'])) {
             return ['errors' => ['recipient or issuingSiteId is missing to print registered mail']];
-        } elseif ((empty($args['data']['recipient']['company']) && (empty($args['data']['recipient']['lastname']) || empty($args['data']['recipient']['firstname']))) || empty($args['data']['recipient']['addressStreet']) || empty($args['data']['recipient']['addressPostcode']) || empty($args['data']['recipient']['addressTown']) || empty($args['data']['recipient']['addressCountry'])) {
+        } elseif (empty($args['data']['recipient'][0]['id'])) {
+            return ['errors' => ['recipient is empty']];
+        }
+
+        $args['data']['recipient'] = ContactModel::getById(
+            [
+            'select' => ['company', 'lastname', 'firstname', 'address_town as "addressTown"', 'address_number as "addressNumber"', 'address_street as "addressStreet"', 'address_country as "addressCountry"', 'address_postcode as "addressPostcode"', 'address_additional1 as addressAdditional1', 'address_additional2 as addressAdditional2', 'department'],
+            'id' => $args['data']['recipient'][0]['id']]
+        );
+        
+        if (empty($args['data']['recipient']['lastname']) && !empty($args['data']['recipient']['department'])) {
+            $args['data']['recipient']['lastname'] = $args['data']['recipient']['department'];
+        }
+        unset($args['data']['recipient']['department']);
+
+        if ((empty($args['data']['recipient']['company']) && (empty($args['data']['recipient']['lastname']) || empty($args['data']['recipient']['firstname']))) || empty($args['data']['recipient']['addressStreet']) || empty($args['data']['recipient']['addressPostcode']) || empty($args['data']['recipient']['addressTown']) || empty($args['data']['recipient']['addressCountry'])) {
             return ['errors' => ['company and firstname/lastname, or addressStreet, addressPostcode, addressTown or addressCountry is empty in Recipient']];
         }
 

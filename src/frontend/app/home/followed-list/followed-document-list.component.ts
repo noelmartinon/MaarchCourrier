@@ -33,8 +33,6 @@ declare var $: any;
 })
 export class FollowedDocumentListComponent implements OnInit, OnDestroy {
 
-    
-
     loading: boolean = false;
     docUrl: string = '';
     public innerHtml: SafeHtml;

@@ -223,6 +223,15 @@ export class IndexingFieldsService {
             values: [],
             enabled: true,
         },
+        {
+            identifier: 'registeredMail_receivedDate',
+            label: this.translate.instant('lang.registeredMailReceivedDate'),
+            icon: 'fa-calendar-check',
+            type: 'date',
+            default_value: null,
+            values: [],
+            enabled: true,
+        },
     ];
 
     customFields: any[] = [];

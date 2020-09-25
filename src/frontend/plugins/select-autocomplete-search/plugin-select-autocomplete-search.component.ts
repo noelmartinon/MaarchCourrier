@@ -8,21 +8,22 @@ import {
 import { ControlValueAccessor, FormControl } from '@angular/forms';
 import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
-import { take, takeUntil, startWith, map } from 'rxjs/operators';
-import { Subject, ReplaySubject, Observable } from 'rxjs';
+import { take, takeUntil, startWith, map, debounceTime, filter, tap, switchMap } from 'rxjs/operators';
+import { Subject, ReplaySubject, Observable, forkJoin, of } from 'rxjs';
 import { LatinisePipe } from 'ngx-pipes';
 import { TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../service/app.service';
-import { SortPipe } from '../../plugins/sorting.pipe';
+import { SortPipe } from '../sorting.pipe';
 import { FunctionsService } from '../../service/functions.service';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
-    selector: 'plugin-select-search',
-    templateUrl: 'select-search.component.html',
-    styleUrls: ['select-search.component.scss', '../../app/indexation/indexing-form/indexing-form.component.scss'],
+    selector: 'plugin-select-autocomplete-search',
+    templateUrl: 'plugin-select-autocomplete-search.component.html',
+    styleUrls: ['plugin-select-autocomplete-search.component.scss', '../../app/indexation/indexing-form/indexing-form.component.scss'],
     providers: [SortPipe]
 })
-export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterViewInit, ControlValueAccessor {
+export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestroy, AfterViewInit, ControlValueAccessor {
     /** Label of the search placeholder */
     @Input() placeholderLabel = this.translate.instant('lang.chooseValue');
 
@@ -47,6 +48,11 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     @Input() multiple: boolean = false;
 
     @Input() optGroupTarget: string = null;
+
+    /**
+     * Route datas used in async autocomplete. Incompatible with @datas
+     */
+    @Input() routeDatas: string[];
 
     /**
      * ex : [ { id : 'group1' , label: 'Group 1'} ]
@@ -92,6 +98,7 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     private _onDestroy = new Subject<void>();
 
     formControlSearch = new FormControl();
+    selecteded: any = [];
 
     /** Current search value */
     get value(): string {
@@ -103,6 +110,7 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     onTouched: Function = (_: any) => { };
 
     constructor(
+        public http: HttpClient,
         public translate: TranslateService,
         private latinisePipe: LatinisePipe,
         private changeDetectorRef: ChangeDetectorRef,
@@ -164,30 +172,38 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
                         }
                     });
             });
-        setTimeout(() => {
-            let group = '';
-            let index = 1;
-            this.datas = JSON.parse(JSON.stringify(this.datas));
-            this.datas.forEach((element: any) => {
-                if (element.isTitle) {
-                    group = `group_${index}`;
-                    element.id = group;
-                    index++;
-                } else {
-                    element.group = group;
-                }
-            });
 
-            this.filteredDatas = this.formControlSearch.valueChanges
-                .pipe(
-                    startWith(''),
-                    map(value => this._filter(value))
-                );
-        }, 0);
+        this.formControlSearch.valueChanges
+            .pipe(
+                debounceTime(300),
+                filter(value => value !== null && value.length > 2),
+                // distinctUntilChanged(),
+                // tap(() => this.loading = true),
+                switchMap((data: any) => this.getDatas(data)),
+                tap((data: any) => {
+                    /*if (data.length === 0) {
+                        if (this.manageDatas !== undefined) {
+                            this.listInfo = this.translate.instant('lang.noAvailableValue') + ' <div>' + this.translate.instant('lang.typeEnterToCreate') + '</div>';
+                        } else {
+                            this.listInfo = this.translate.instant('lang.noAvailableValue');
+                        }
+                    } else {
+                        this.listInfo = '';
+                    }*/
+                    this.datas = this.datas.filter((val: any) =>  this.formControlSelect.value.indexOf(val.id) > -1).concat(data.filter((val: any) =>  this.formControlSelect.value.indexOf(val.id) === -1));
+                    this.filteredDatas = of(this.datas);
+                    // this.loading = false;
+                })
+            ).subscribe();
 
 
         // this.initMultipleHandling();
 
+    }
+
+    resetACDatas() {
+        this.datas = this.datas.filter((val: any) =>  this.formControlSelect.value.indexOf(val.id) > -1);
+        this.filteredDatas = of(this.datas);
     }
 
     initOptGroups() {
@@ -277,9 +293,8 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         const scrollTop = panel.scrollTop;
 
         // focus
-        if (this.datas.length > 5) {
-            this.renderer.selectRootElement('#searchSelectInput').focus();
-        }
+        this.renderer.selectRootElement('#searchSelectInput').focus();
+
         panel.scrollTop = scrollTop;
     }
 
@@ -291,6 +306,8 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     public _reset(focus?: boolean) {
 
         this.formControlSearch.reset();
+
+        this.resetACDatas();
 
         this.renderer.selectRootElement('#searchSelectInput').focus();
 
@@ -363,10 +380,7 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
             return this.datas.filter((option: any) => this.formControlSelect.value.indexOf(option['id']) > -1);
         } else if (typeof value === 'string' && value !== '') {
             const filterValue = this.latinisePipe.transform(value.toLowerCase());
-
-            const group = this.datas.filter((option: any) => option['isTitle'] && this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue)).map((opt: any) => opt.id);
-
-            return this.datas.filter((option: any) => (option['isTitle'] && group.indexOf(option['id']) > -1) || (group.indexOf(option['group']) > -1 || this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue)));
+            return this.datas.filter((option: any) => !option['disabled'] && this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue));
         } else {
             return this.datas;
         }
@@ -386,5 +400,27 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         } else {
             return 'unknow validator';
         }
+    }
+
+    getDatas(data: string) {
+        const arrayObs: any = [];
+        const test: any = [];
+        this.routeDatas.forEach(element => {
+            arrayObs.push(this.http.get('..' + element, { params: { 'search': data } }));
+        });
+
+        return forkJoin(arrayObs).pipe(
+            map(items => {
+                items.forEach((element: any) => {
+                    element.forEach((element2: any) => {
+                        test.push({
+                            id: element2.id,
+                            label: element2.idToDisplay
+                        });
+                    });
+                });
+                return test;
+            })
+        );
     }
 }

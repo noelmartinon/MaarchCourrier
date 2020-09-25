@@ -548,7 +548,10 @@ class AlfrescoController
         }
         $entityInformations['alfresco']['password'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfresco']['password']]);
 
-        $document = ResModel::getById(['select' => ['filename', 'subject', 'alt_identifier', 'external_id'], 'resId' => $args['resId']]);
+        $document = ResModel::getById([
+            'select'    => ['filename', 'subject', 'alt_identifier', 'external_id', 'type_id', 'priority'],
+            'resId'     => $args['resId']
+        ]);
         if (empty($document)) {
             return ['errors' => 'Document does not exist'];
         } elseif (empty($document['filename'])) {
@@ -605,6 +608,11 @@ class AlfrescoController
         $body = [
             'properties' => [
                 'cm:description'    => $document['alt_identifier'],
+                'cm:author'         => $entityInformations['alfresco']['login'],
+                'cm:owner'          => $entityInformations['alfresco']['login'],
+                'cm:creator'        => $entityInformations['alfresco']['login'],
+//                'maarch:type'       => $document['type_id'],
+//                'maarch:chrono'     => $document['alt_identifier']
             ],
         ];
         $curlResponse = CurlModel::execSimple([

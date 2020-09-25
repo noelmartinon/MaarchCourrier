@@ -197,6 +197,10 @@
     ::ng-deep.mat-date-range-input-start-wrapper {
         flex: 1;
     }
+
+    ::ng-deep.mat-date-range-input-inner {
+        color: $primary;
+    }
     /*::ng-deep.mat-form-field-infix {
         padding-top: 5px;
     }*/

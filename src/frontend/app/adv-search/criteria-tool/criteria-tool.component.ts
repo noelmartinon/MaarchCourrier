@@ -14,11 +14,13 @@ import { MatDialog } from '@angular/material/dialog';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { AddSearchTemplateModalComponent } from './search-template/search-template-modal.component';
+import { DatePipe } from '@angular/common';
 
 @Component({
     selector: 'app-criteria-tool',
     templateUrl: 'criteria-tool.component.html',
-    styleUrls: ['criteria-tool.component.scss', '../../indexation/indexing-form/indexing-form.component.scss']
+    styleUrls: ['criteria-tool.component.scss', '../../indexation/indexing-form/indexing-form.component.scss'],
+    providers: [DatePipe]
 })
 export class CriteriaToolComponent implements OnInit {
 
@@ -52,6 +54,7 @@ export class CriteriaToolComponent implements OnInit {
         public indexingFields: IndexingFieldsService,
         private dialog: MatDialog,
         private notify: NotificationService,
+        private datePipe: DatePipe,
         private latinisePipe: LatinisePipe) {
             _activatedRoute.queryParams.subscribe(
                 params => {
@@ -109,7 +112,7 @@ export class CriteriaToolComponent implements OnInit {
     }
 
     async addCriteria(criteria: any) {
-        if (this.functions.empty(criteria.control.value)) {
+        if (this.functions.empty(criteria.control) || this.functions.empty(criteria.control.value)) {
             criteria.control = criteria.type === 'date' ? new FormControl({}) : new FormControl('');
         }
         this.initField(criteria);
@@ -165,15 +168,23 @@ export class CriteriaToolComponent implements OnInit {
     getCurrentCriteriaValues() {
         const objCriteria = {};
         if (!this.functions.empty(this.searchTermControl.value)) {
-            objCriteria['quickSearch'] = {
+            objCriteria['meta'] = {
                 values: this.searchTermControl.value
             };
         }
         this.currentCriteria.forEach((field: any) => {
-            if (!this.functions.empty(field.control.value)) {
-                objCriteria[field.identifier] = {
-                    values: field.control.value
-                };
+            if (field.type === 'date') {
+                if (!this.functions.empty(field.control.value.start) || !this.functions.empty(field.control.value.end)) {
+                    objCriteria[field.identifier] = {
+                        values: field.control.value
+                    };
+                }
+            } else {
+                if (!this.functions.empty(field.control.value)) {
+                    objCriteria[field.identifier] = {
+                        values: field.control.value
+                    };
+                }
             }
         });
         this.searchUrlGenerated.emit(objCriteria);
@@ -187,7 +198,20 @@ export class CriteriaToolComponent implements OnInit {
         } else  if (['doctype', 'destination'].indexOf(identifier) > -1) {
             return this.criteria.filter((field: any) => field.identifier === identifier)[0].values.filter((val: any) => val.id === value)[0].title;
         } else {
-            return this.criteria.filter((field: any) => field.identifier === identifier)[0].values.filter((val: any) => val.id === value)[0].label;
+            if (this.criteria.filter((field: any) => field.identifier === identifier)[0].type === 'selectAutocomplete') {
+                return 'toto';
+            } else {
+                return this.criteria.filter((field: any) => field.identifier === identifier)[0].values.filter((val: any) => val.id === value)[0].label;
+
+            }
+        }
+    }
+
+    getFormatLabel(value: any) {
+        if (typeof value === 'object') {
+            return `${this.datePipe.transform(value.start, 'dd/MM/y') } - ${this.datePipe.transform(value.end, 'dd/MM/y')}`;
+        } else {
+            return value;
 
         }
     }
@@ -205,11 +229,26 @@ export class CriteriaToolComponent implements OnInit {
     refreshCriteria(criteria: any) {
         this.currentCriteria.forEach((field: any, index: number) => {
             if (criteria[field.identifier] !== undefined) {
-                field.control.setValue(criteria[field.identifier].values);
+                if (this.currentCriteria[index].type === 'date' && this.functions.empty(criteria[field.identifier].values)) {
+                    field.control.setValue({
+                        start: null,
+                        end: null
+                    });
+                } else {
+                    field.control.setValue(criteria[field.identifier].values);
+
+                }
             }
         });
 
+        if (Object.keys(criteria)[0] === 'meta') {
+            this.searchTermControl.setValue(criteria['meta'].values);
+        }
         this.getCurrentCriteriaValues();
+    }
+
+    set_meta_field(value: any) {
+        this.searchTermControl.setValue(value);
     }
 
     set_doctype_field(elem: any) {
@@ -291,8 +330,35 @@ export class CriteriaToolComponent implements OnInit {
         });
     }
 
-    set_role_field(elem: any) {
+    set_initiator_field(elem: any) {
         return new Promise((resolve, reject) => {
+            this.http.get(`../rest/indexingModels/entities`).pipe(
+                tap((data: any) => {
+                        let title = '';
+                        elem.values = elem.values.concat(data.entities.map((entity: any) => {
+                            title = entity.entity_label;
+
+                            for (let index = 0; index < entity.level; index++) {
+                                entity.entity_label = '&nbsp;&nbsp;&nbsp;&nbsp;' + entity.entity_label;
+                            }
+                            return {
+                                id: entity.id,
+                                title: title,
+                                label: entity.entity_label,
+                                disabled: false
+                            };
+                        }));
+                    resolve(true);
+                })
+            ).subscribe();
+        });
+    }
+
+    set_role_field(elem: any) {
+        elem.type = 'selectAutocomplete';
+        elem.routeDatas = elem.identifier === 'role_dest' ? ['/rest/autocomplete/users'] : ['/rest/autocomplete/users', '/rest/autocomplete/entities'];
+
+        /*return new Promise((resolve, reject) => {
             this.http.get(`../rest/users`).pipe(
                 tap((data: any) => {
                     const arrValues: any[] = [];
@@ -307,7 +373,7 @@ export class CriteriaToolComponent implements OnInit {
                     resolve(true);
                 })
             ).subscribe();
-        });
+        });*/
     }
 
     getSearchTemplates() {

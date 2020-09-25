@@ -76,8 +76,8 @@ class CustomFieldController
 
         if (!Validator::stringType()->notEmpty()->validate($body['label'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body label is empty or not a string']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['type']) || !in_array($body['type'], ['string', 'integer', 'select', 'date', 'radio', 'checkbox', 'banAutocomplete'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body type is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['type']) || !in_array($body['type'], ['string', 'integer', 'select', 'date', 'radio', 'checkbox', 'banAutocomplete', 'contact'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body type is empty, not a string or value is incorrect']);
         } elseif (!empty($body['values']) && !Validator::arrayType()->notEmpty()->validate($body['values'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body values is not an array']);
         }
@@ -280,7 +280,7 @@ class CustomFieldController
     {
         $body = $args['body'];
 
-        if ($body['type'] == 'banAutocomplete') {
+        if (in_array($body['type'], ['banAutocomplete', 'contact'])) {
             return ['errors' => 'SQL is not allowed for type BAN'];
         }
         if (!Validator::stringType()->notEmpty()->validate($body['values']['key'])) {

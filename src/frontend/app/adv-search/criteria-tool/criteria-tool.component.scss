@@ -102,5 +102,18 @@
 .hide {}
 
 .myCriterias {
-    flex-grow: 0.08;
+    flex-grow: 0;
+    margin-right: 0px;
+}
+
+::ng-deep.searchTemplateMenu.mat-menu-panel {
+    max-width: 400px !important;
+}
+
+.menuTitle {
+    display: flex;
+    padding-left: 20px;
+    align-items: center;
+    color: #135f7f;
+    font-weight: bold;
 }

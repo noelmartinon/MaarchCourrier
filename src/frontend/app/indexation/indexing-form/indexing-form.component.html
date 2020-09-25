@@ -203,12 +203,19 @@
                                     <app-address-ban-input [control]="arrFormControl[field.identifier]" [admin]="adminMode" style="width:100%;">
                                     </app-address-ban-input>
                                 </ng-container>
+                                <ng-container *ngIf="field.type === 'contact'">
+                                    <app-contact-autocomplete [id]="field.identifier" [control]="arrFormControl[field.identifier]" style="width:100%;" (retrieveDocumentEvent)="retrieveDocumentEvent.emit()">
+                                    </app-contact-autocomplete>
+                                </ng-container>
                                 <ng-container *ngIf="field.identifier === 'registeredMail_issuingSite'">
                                     <app-issuing-site-input #appIssuingSiteInput [registedMailType]="arrFormControl['registeredMail_type'].value" [control]="arrFormControl[field.identifier]" (afterSelected)="launchEvent($event, field)" style="width:100%;">
                                     </app-issuing-site-input>
                                 </ng-container>
                                 <ng-container *ngIf="field.identifier === 'registeredMail_recipient'">
-                                    <app-registered-mail-recipient-input #appRegisteredMailRecipientInput [control]="arrFormControl[field.identifier]" [registeredMailType]="arrFormControl['registeredMail_type'].value" style="width:100%;">
+                                    <app-contact-autocomplete *ngIf="mode === 'indexation'" [exclusion]="'?noUsers=true&noEntities=true&noContactsGroups=true'" [id]="field.identifier" [singleMode]="true" [control]="arrFormControl[field.identifier]" style="width:100%;" (retrieveDocumentEvent)="retrieveDocumentEvent.emit()">
+                                    </app-contact-autocomplete>
+                                    
+                                    <app-registered-mail-recipient-input *ngIf="mode !== 'indexation'" #appRegisteredMailRecipientInput [control]="arrFormControl[field.identifier]" [registeredMailType]="arrFormControl['registeredMail_type'].value" style="width:100%;">
                                     </app-registered-mail-recipient-input>
                                 </ng-container>
                             </div>

@@ -251,7 +251,6 @@ $app->delete('/folders/{id}', \Folder\controllers\FolderController::class . ':de
 $app->get('/folders/{id}/resources', \Folder\controllers\FolderController::class . ':getResourcesById');
 $app->post('/folders/{id}/resources', \Folder\controllers\FolderController::class . ':addResourcesById');
 $app->delete('/folders/{id}/resources', \Folder\controllers\FolderController::class . ':removeResourcesById');
-$app->get('/folders/{id}/resources/{resId}/baskets', \Folder\controllers\FolderController::class . ':getBasketsFromFolder');
 $app->get('/folders/{id}/filters', \Folder\controllers\FolderController::class . ':getFilters');
 $app->put('/folders/{id}/sharing', \Folder\controllers\FolderController::class . ':sharing');
 $app->get('/pinnedFolders', \Folder\controllers\FolderController::class . ':getPinnedFolders');
@@ -411,6 +410,7 @@ $app->get('/resources/{resId}/fields/{fieldId}', \Resource\controllers\ResContro
 $app->delete('/resources/{resId}/linkedResources/{id}', \Resource\controllers\LinkController::class . ':unlinkResources');
 $app->delete('/resources/{resId}/circuits/{type}', \Entity\controllers\ListInstanceController::class . ':deleteCircuit');
 $app->get('/resources/{resId}/fileInformation', \Resource\controllers\ResController::class . ':getResourceFileInformation');
+$app->get('/resources/{resId}/baskets', \Resource\controllers\UserFollowedResourceController::class . ':getBaskets');
 
 $app->put('/res/resource/status', \Resource\controllers\ResController::class . ':updateStatus');
 $app->post('/res/list', \Resource\controllers\ResController::class . ':getList');
@@ -426,10 +426,10 @@ $app->get('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/act
 $app->put('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/lock', \Resource\controllers\ResourceListController::class . ':lock');
 $app->put('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/unlock', \Resource\controllers\ResourceListController::class . ':unlock');
 $app->get('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/filters', \Resource\controllers\ResourceListController::class . ':getFilters');
-$app->put('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/exports', \Resource\controllers\ExportController::class . ':updateExport');
-$app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/summarySheets', \Resource\controllers\SummarySheetController::class . ':createList');
 $app->put('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}', \Resource\controllers\ResourceListController::class . ':setAction');
 $app->put('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/locked', \Resource\controllers\ResourceListController::class . ':areLocked');
+$app->put('/resourcesList/exports', \Resource\controllers\ExportController::class . ':updateExport');
+$app->post('/resourcesList/summarySheets', \Resource\controllers\SummarySheetController::class . ':createList');
 $app->get('/resourcesList/exportTemplate', \Resource\controllers\ExportController::class . ':getExportTemplates');
 $app->put('/resourcesList/integrations', \Resource\controllers\ResController::class . ':setInIntegrations');
 
@@ -548,7 +548,6 @@ $app->put('/password', \User\controllers\UserController::class . ':passwordIniti
 $app->post('/resources/follow', \Resource\controllers\UserFollowedResourceController::class . ':follow');
 $app->delete('/resources/unfollow', \Resource\controllers\UserFollowedResourceController::class . ':unFollow');
 $app->get('/followedResources', \Resource\controllers\UserFollowedResourceController::class . ':getFollowedResources');
-$app->get('/followedResources/{resId}/baskets', \Resource\controllers\UserFollowedResourceController::class . ':getBaskets');
 $app->get('/followedResources/filters', \Resource\controllers\UserFollowedResourceController::class . ':getFilters');
 
 //VersionsUpdate
@@ -639,6 +638,7 @@ $app->get('/registeredMail/ranges/type/{type}/last', \RegisteredMail\controllers
 $app->get('/registeredMail/countries', \RegisteredMail\controllers\RegisteredMailController::class . ':getCountries');
 
 $app->put('/registeredMails/acknowledgement', \RegisteredMail\controllers\RegisteredMailController::class . ':receiveAcknowledgement');
+$app->put('/registeredMails/import', \RegisteredMail\controllers\RegisteredMailController::class . ':setImport');
 $app->put('/registeredMails/{resId}', \RegisteredMail\controllers\RegisteredMailController::class . ':update');
 
 $app->run();

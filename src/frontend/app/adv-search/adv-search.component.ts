@@ -127,7 +127,14 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
         public indexingFieldService: IndexingFieldsService) {
         _activatedRoute.queryParams.subscribe(
             params => {
-                this.searchTerm = params.value;
+                if (!this.functions.empty(params.value)) {
+                    this.searchTerm = params.value;
+                    this.criteria = {
+                        meta : {
+                            values : this.searchTerm
+                        }
+                    };
+                }
             }
         );
     }
@@ -141,8 +148,6 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
 
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
         this.headerService.setHeader(this.translate.instant('lang.searchMails'), '', '');
-
-        this.appCriteriaTool.getCriterias();
 
         this.initResultList();
 
@@ -459,7 +464,6 @@ export class AdvSearchComponent implements OnInit, OnDestroy {
             const indexArr = this.criteria[identifier].values.indexOf(value);
             this.criteria[identifier].values.splice(indexArr, 1);
         }
-
         this.appCriteriaTool.refreshCriteria(this.criteria);
     }
 }
