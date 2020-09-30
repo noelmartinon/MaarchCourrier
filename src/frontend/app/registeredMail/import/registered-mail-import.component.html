@@ -1,6 +1,8 @@
 <div class="mat-dialog-content-container">
     <h1 mat-dialog-title>{{'lang.importRegisteredMails' | translate}}</h1>
     <div mat-dialog-content>
+        <div *ngIf="csvData.length > 0" class="alert-message alert-message-info" [innerHTML]="'lang.infoImportregisteredMails' | translate" style="min-width: 100%">
+        </div>
         <mat-toolbar class="import-tool" [class.hide]="csvData.length === 0 || loading">
             <span style="flex:1;">
                 <mat-slide-toggle color="primary" [checked]="hasHeader" (change)="toggleHeader()">
@@ -76,7 +78,7 @@
                                     </ng-container>
                                     <ng-template #formTemplate>
                                         <ng-container *ngIf="column.id !== 'departureDate'; else elseDateType">
-                                            <button mat-button [matMenuTriggerFor]="menu"><b class="colLabel"
+                                            <button mat-button [matMenuTriggerFor]="menu" style="padding:0px;"><b class="colLabel"
                                                     color="primary">{{column.label}}</b>
                                                 <mat-icon matSuffix class="fa fa-caret-down"></mat-icon>
                                             </button>
@@ -89,11 +91,10 @@
                                         </ng-container>
                                         <ng-template #elseDateType>
                                             <mat-form-field style="display: none;">
-                                                <mat-label>Choose a date</mat-label>
                                                 <input matInput [matDatepicker]="picker" (dateChange)="changeColumn(column, $event.value)">
                                                 <mat-datepicker #picker></mat-datepicker>
                                             </mat-form-field>
-                                            <button mat-button (click)="picker.open()"><b
+                                            <button mat-button (click)="picker.open()" style="padding:0px;"><b
                                                     color="primary">{{column.label}}</b>
                                                 <mat-icon matSuffix class="fa fa-caret-down"></mat-icon>
                                             </button>

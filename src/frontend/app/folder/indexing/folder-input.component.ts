@@ -13,7 +13,7 @@ import { LatinisePipe } from 'ngx-pipes';
 
 @Component({
     selector: 'app-folder-input',
-    templateUrl: "folder-input.component.html",
+    templateUrl: 'folder-input.component.html',
     styleUrls: [
         'folder-input.component.scss',
         '../../indexation/indexing-form/indexing-form.component.scss'
@@ -23,7 +23,6 @@ import { LatinisePipe } from 'ngx-pipes';
 
 export class FolderInputComponent implements OnInit {
 
-    
 
     loading: boolean = false;
 
@@ -184,5 +183,9 @@ export class FolderInputComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    getFolderLabel(id: string) {
+        return this.valuesToDisplay[id];
     }
 }

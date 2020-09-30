@@ -6,15 +6,16 @@
 
         <div class="mat-select-search-inner"
             [ngClass]="{'mat-select-search-inner-multiple': matSelect.multiple}">
-            <input matInput id="searchSelectInput" [formControl]="formControlSearch" class="mat-select-search-input"
+            <input id="searchSelectInput" [formControl]="formControlSearch" class="mat-select-search-input"
                 #searchSelectInput (keydown)="_handleKeydown($event)" (input)="onInputChange($event.target.value)"
-                (blur)="onBlur($event.target.value)" [placeholder]="'lang.search' | translate" />
-            <button mat-button *ngIf="formControlSearch.value" mat-icon-button aria-label="Clear" (click)="_reset(true)"
+                (blur)="onBlur($event.target.value)" [placeholder]="'Saisissez un terme de recherche' | translate" />
+            <button mat-button *ngIf="formControlSearch.value && !loadingSearch" mat-icon-button aria-label="Clear" (click)="_reset(true)"
                 class="mat-select-search-clear">
                 <mat-icon class="fa fa-times"></mat-icon>
             </button>
+            <mat-spinner *ngIf="loadingSearch" class="mat-select-search-loading" diameter="24"></mat-spinner>
         </div>
-        <div *ngIf="value && _options?.length === 0 && datas.length > 5" class="mat-select-search-no-entries-found">
+        <div *ngIf="noResult" class="mat-select-search-no-entries-found" style="font-style: italic;opacity: 0.5;">
             {{'lang.noResult' | translate}}
         </div>
         <mat-option *ngIf="showResetOption" [value]="null"><i>({{'lang.emptyValue' | translate}})</i></mat-option>

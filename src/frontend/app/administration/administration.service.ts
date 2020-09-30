@@ -5,13 +5,13 @@ import { FunctionsService } from '../../service/functions.service';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort, Sort, MatSortable } from '@angular/material/sort';
-import { merge } from 'rxjs/internal/observable/merge';
-import { startWith } from 'rxjs/internal/operators/startWith';
 import { tap } from 'rxjs/internal/operators/tap';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { of } from 'rxjs/internal/observable/of';
 import { NotificationService } from '../../service/notification/notification.service';
 import { FormControl } from '@angular/forms';
+import { startWith } from 'rxjs/operators';
+import { merge } from 'rxjs';
 
 @Injectable()
 export class AdministrationService {

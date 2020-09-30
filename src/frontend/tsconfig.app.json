@@ -9,6 +9,9 @@
       ],
       "@service/*": [
         "../../src/frontend/service/*"
+      ],
+      "@plugins/*": [
+        "../../src/frontend/plugins/*"
       ]
     }
   },

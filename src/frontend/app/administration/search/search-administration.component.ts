@@ -9,6 +9,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { of } from 'rxjs/internal/observable/of';
 import { AppService } from '../../../service/app.service';
 import { HeaderService } from '../../../service/header.service';
+import { data } from 'jquery';
 
 declare var $: any;
 
@@ -19,7 +20,6 @@ declare var $: any;
 })
 
 export class SearchAdministrationComponent implements OnInit {
-
 
     loading: boolean = false;
     customFieldsFormControl = new FormControl({ value: '', disabled: false });
@@ -149,7 +149,6 @@ export class SearchAdministrationComponent implements OnInit {
         }
     ];
     availableDataClone: any = [];
-
     displayedSecondaryData: any = [];
     displayedSecondaryDataClone: any = [];
 
@@ -242,13 +241,14 @@ export class SearchAdministrationComponent implements OnInit {
     };
     selectedProcessToolClone: string = null;
 
-    searchAdv: any = { list_event: {}, list_display: {} };
+    searchAdv: any = { list_event: {}, list_display: {}, list_event_data: {} };
 
     constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, public appService: AppService, public headerService: HeaderService) { }
 
     async ngOnInit(): Promise<void> {
         this.headerService.setHeader(this.translate.instant('lang.searchAdministration'));
         await this.initCustomFields();
+        await this.getTemplate();
         this.filteredDataOptions = this.dataControl.valueChanges
             .pipe(
                 startWith(''),
@@ -256,8 +256,7 @@ export class SearchAdministrationComponent implements OnInit {
             );
 
         this.availableDataClone = JSON.parse(JSON.stringify(this.availableData));
-        this.displayedSecondaryData = [];
-        let indexData: number = 0;
+        const indexData: number = 0;
         this.selectedTemplateDisplayedSecondaryData = this.searchAdv.list_display.templateColumns;
         this.selectedTemplateDisplayedSecondaryDataClone = this.selectedTemplateDisplayedSecondaryData;
         /*this.searchAdv.list_display.subInfos.forEach((element: any) => {
@@ -268,7 +267,6 @@ export class SearchAdministrationComponent implements OnInit {
         });*/
         this.selectedListEvent = this.searchAdv.list_event;
         this.selectedListEventClone = this.selectedListEvent;
-
         if (this.searchAdv.list_event === 'processDocument') {
             this.selectedProcessTool.defaultTab = this.searchAdv.list_event_data === null ? 'dashboard' : this.searchAdv.list_event_data.defaultTab;
             this.selectedProcessTool.canUpdateData = this.searchAdv.list_event_data === null ? false : this.searchAdv.list_event_data.canUpdateData;
@@ -283,8 +281,8 @@ export class SearchAdministrationComponent implements OnInit {
 
     initCustomFields() {
         return new Promise((resolve, reject) => {
-
             this.http.get('../rest/customFields').pipe(
+                // tslint:disable-next-line: no-shadowed-variable
                 map((data: any) => {
                     data.customFields = data.customFields.map((info: any) => {
                         return {
@@ -298,7 +296,7 @@ export class SearchAdministrationComponent implements OnInit {
                     return data.customFields;
                 }),
                 tap((customs) => {
-                    console.log(customs);
+                    // console.log(customs);
                     this.availableData = this.availableData.concat(customs);
                     resolve(true);
 
@@ -350,6 +348,7 @@ export class SearchAdministrationComponent implements OnInit {
         this.dataControl.setValue('');
     }
 
+    // tslint:disable-next-line: no-shadowed-variable
     removeData(data: any, i: number) {
         this.availableData.push(data);
         this.displayedSecondaryData.splice(i, 1);
@@ -368,6 +367,36 @@ export class SearchAdministrationComponent implements OnInit {
         }
     }
 
+    getTemplate() {
+        return new Promise((resolve, reject) => {
+            this.http.get('../rest/search/configuration').pipe(
+                tap((templateData: any) => {
+                    const defaultTab = templateData.configuration.listEvent.defaultTab;
+                    const subInfos = templateData.configuration.listDisplay.subInfos;
+                    const displayData = JSON.parse(JSON.stringify(subInfos));
+
+                    this.selectedProcessTool.defaultTab = defaultTab;
+                     displayData.forEach((element: { value: any; cssClasses: any; icon: any; }) => {
+                         displayData.slice()
+                        this.displayedSecondaryData.push({
+                            'value': element.value,
+                            'label': this.translate.instant('lang.' + element.value),
+                            'sample': this.translate.instant('lang.' + element.value + 'Sample'),
+                            'cssClasses': element.cssClasses,
+                            'icon': element.icon
+                        });
+                    });
+                    // console.log(this.displayedSecondaryData);
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
     saveTemplate() {
         let objToSend = {};
         const template: any = [];
@@ -380,13 +409,12 @@ export class SearchAdministrationComponent implements OnInit {
                 }
             );
         });
-
         objToSend = {
             templateColumns: this.selectedTemplateDisplayedSecondaryData,
             subInfos: template
         };
 
-        this.http.put('../rest/baskets/' + this.searchAdv.basket_id + '/groups/' + this.searchAdv.group_id, { 'list_display': objToSend, 'list_event': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
+        this.http.put('../rest/search/configuration', { 'listDisplay': objToSend, 'list_event': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
             .subscribe(() => {
                 this.displayedSecondaryDataClone = JSON.parse(JSON.stringify(this.displayedSecondaryData));
                 this.searchAdv.list_display = template;
@@ -436,6 +464,7 @@ export class SearchAdministrationComponent implements OnInit {
     }
 
     hasFolder() {
+        // tslint:disable-next-line: no-shadowed-variable
         if (this.displayedSecondaryData.map((data: any) => data.value).indexOf('getFolders') > -1) {
             return true;
         } else {

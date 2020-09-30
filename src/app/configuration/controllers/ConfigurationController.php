@@ -16,6 +16,7 @@ namespace Configuration\controllers;
 
 use Configuration\models\ConfigurationModel;
 use Group\controllers\PrivilegeController;
+use History\controllers\HistoryController;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -69,10 +70,42 @@ class ConfigurationController
             }
             $data['charset'] = empty($data['charset']) ? 'utf-8' : $data['charset'];
             unset($data['passwordAlreadyExists']);
+        } elseif ($args['privilege'] == 'admin_search') {
+            if (!Validator::notEmpty()->arrayType()->validate($data['listDisplay'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body listDisplay is empty or not an array']);
+            }
+            if (isset($data['listDisplay']['subInfos']) && !Validator::arrayType()->validate($data['listDisplay']['subInfos'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body listDisplay[subInfos] is not set or not an array']);
+            }
+            if (!Validator::intVal()->validate($data['listDisplay']['templateColumns'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body listDisplay[templateColumns] is not set or not an array']);
+            }
+            foreach ($data['listDisplay']['subInfos'] as $value) {
+                if (!Validator::stringType()->notEmpty()->validate($value['value'])) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Body listDisplay[subInfos][value] is empty or not a string']);
+                } elseif (!isset($value['cssClasses']) || !is_array($value['cssClasses'])) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Body listDisplay[subInfos][cssClasses] is not set or not an array']);
+                }
+            }
+
+            if (empty($data['listEvent']['defaultTab'])) {
+                $data['listEvent']['defaultTab'] = 'dashboard';
+            }
+
+            $data = ['listDisplay' => $data['listDisplay'], 'listEvent' => $data['listEvent']];
+
         }
 
         $data = json_encode($data);
         ConfigurationModel::update(['set' => ['value' => $data], 'where' => ['privilege = ?'], 'data' => [$args['privilege']]]);
+
+        HistoryController::add([
+            'tableName' => 'configurations',
+            'recordId'  => $args['privilege'],
+            'eventType' => 'UP',
+            'eventId'   => 'configurationUp',
+            'info'       => _CONFIGURATION_UPDATED . ' : ' . $args['privilege']
+        ]);
 
         return $response->withJson(['success' => 'success']);
     }

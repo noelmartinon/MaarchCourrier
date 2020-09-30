@@ -8,7 +8,7 @@ import {
 import { ControlValueAccessor, FormControl } from '@angular/forms';
 import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
-import { take, takeUntil, startWith, map, debounceTime, filter, tap, switchMap } from 'rxjs/operators';
+import { take, takeUntil, startWith, map, debounceTime, filter, tap, switchMap, finalize } from 'rxjs/operators';
 import { Subject, ReplaySubject, Observable, forkJoin, of } from 'rxjs';
 import { LatinisePipe } from 'ngx-pipes';
 import { TranslateService } from '@ngx-translate/core';
@@ -99,6 +99,8 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
 
     formControlSearch = new FormControl();
     selecteded: any = [];
+    noResult: boolean = null;
+    loadingSearch: boolean = null;
 
     /** Current search value */
     get value(): string {
@@ -145,6 +147,7 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
                 if (opened) {
                     // focus the search field when opening
                     if (!this.appService.getViewMode()) {
+                        this.noResult = null;
                         this._focus();
                     }
                 } else {
@@ -177,6 +180,7 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
             .pipe(
                 debounceTime(300),
                 filter(value => value !== null && value.length > 2),
+                tap(() => this.loadingSearch = true),
                 // distinctUntilChanged(),
                 // tap(() => this.loading = true),
                 switchMap((data: any) => this.getDatas(data)),
@@ -192,6 +196,8 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
                     }*/
                     this.datas = this.datas.filter((val: any) =>  this.formControlSelect.value.indexOf(val.id) > -1).concat(data.filter((val: any) =>  this.formControlSelect.value.indexOf(val.id) === -1));
                     this.filteredDatas = of(this.datas);
+                    this.noResult = this.datas.filter((val: any) =>  this.formControlSelect.value.indexOf(val.id) === -1).length === 0;
+                    this.loadingSearch = false;
                     // this.loading = false;
                 })
             ).subscribe();
@@ -422,5 +428,9 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
                 return test;
             })
         );
+    }
+
+    getDataLabel(id: string) {
+        return this.datas.filter((item: any) => item.id === id)[0].label;
     }
 }

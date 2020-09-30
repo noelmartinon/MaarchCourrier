@@ -216,4 +216,8 @@ export class TagInputComponent implements OnInit {
             })
         ).subscribe();
     }
+
+    getTagLabel(id: string) {
+        return this.valuesToDisplay[id];
+    }
 }

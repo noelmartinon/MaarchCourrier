@@ -13,9 +13,9 @@ import { of } from 'rxjs/internal/observable/of';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { MatDialogRef } from '@angular/material/dialog/dialog-ref';
 import { filter } from 'rxjs/internal/operators/filter';
-import { exhaustMap } from 'rxjs/internal/operators/exhaustMap';
 import { MatDialog } from '@angular/material/dialog';
 import { AdministrationService } from '../administration.service';
+import { exhaustMap } from 'rxjs/operators';
 
 @Component({
     templateUrl: 'alfresco-list-administration.component.html',
@@ -24,8 +24,6 @@ import { AdministrationService } from '../administration.service';
 export class AlfrescoListAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-
-    
 
     alfrescoUrl: string = '';
 

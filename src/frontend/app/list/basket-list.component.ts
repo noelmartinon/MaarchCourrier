@@ -21,9 +21,9 @@ import { ActionsService } from '../actions/actions.service';
 import { ContactResourceModalComponent } from '../contact/contact-resource/modal/contact-resource-modal.component';
 import { Subject } from 'rxjs/internal/Subject';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { merge } from 'rxjs/internal/observable/merge';
 import { of } from 'rxjs/internal/observable/of';
 import { Observable } from 'rxjs/internal/Observable';
+import { merge } from 'rxjs';
 
 declare var $: any;
 

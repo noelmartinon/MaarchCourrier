@@ -482,3 +482,5 @@ define('_NOT_GENERATED', 'Non généré');
 
 define('_REGISTERED_MAIL_DISTRIBUTED', 'Accusé de réception reçu : recommandé distribué');
 define('_REGISTERED_MAIL_NOT_DISTRIBUTED', 'Accusé de réception reçu : recommandé non distribué');
+
+define('_CONFIGURATION_UPDATED', 'Configuration modifiée');

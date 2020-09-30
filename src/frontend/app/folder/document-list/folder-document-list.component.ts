@@ -20,9 +20,9 @@ import { FoldersService } from '../folders.service';
 import { FunctionsService } from '../../../service/functions.service';
 import { Subject } from 'rxjs/internal/Subject';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { merge } from 'rxjs/internal/observable/merge';
 import { of } from 'rxjs/internal/observable/of';
 import { Observable } from 'rxjs/internal/Observable';
+import { merge } from 'rxjs';
 
 declare var $: any;
 
@@ -31,8 +31,6 @@ declare var $: any;
     styleUrls: ['folder-document-list.component.scss']
 })
 export class FolderDocumentListComponent implements OnInit, OnDestroy {
-
-    
 
     loading: boolean = false;
     docUrl: string = '';

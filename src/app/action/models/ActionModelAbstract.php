@@ -162,7 +162,7 @@ abstract class ActionModelAbstract
         if ($loadedXml) {
             foreach ($loadedXml->ACTIONPAGE as $actionPage) {
                 if (!defined((string) $actionPage->LABEL)) {
-                    $label = $actionPage->LABEL;
+                    $label = (string) $actionPage->LABEL;
                 } else {
                     $label = constant((string) $actionPage->LABEL);
                 }

@@ -61,6 +61,15 @@
         color: white;
     }
 
+    ::ng-deep .mat-expansion-panel-content {
+        background: white;
+        border-radius: 30px;
+    }
+
+    ::ng-deep .mat-expansion-panel-body {
+        padding-top: 5px;
+    }
+
     ::ng-deep .mat-expansion-indicator::after {
         color: white;
     }
@@ -85,7 +94,7 @@
 .criteria-label {
     // width: 50%;
     text-align: right;
-    color: white;
+    color: #4A4A4A;
     white-space: pre;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -116,4 +125,46 @@
     align-items: center;
     color: #135f7f;
     font-weight: bold;
+}
+
+.fieldDesc {
+    font-size: 10px;
+    text-align: right;
+    color: white;
+    font-style: italic;
+    opacity: 0.5;
+}
+
+.searchInAttachments {
+    cursor: help;
+}
+
+.infoSearchDesc {
+    color: #4A4A4A;
+    font-size: 12px;
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.range-number-container {
+    display: flex;
+}
+
+.range-number-input-element {
+    border: none;
+    background: none;
+    padding: 0 !important;
+    outline: none;
+    font: inherit;
+    text-align: center;
+    color: $primary;
+}
+
+
+.range-number-input-element::placeholder {
+    color: initial;
+}
+
+.range-number-container {
+    color: $primary;
 }

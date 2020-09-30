@@ -482,3 +482,5 @@ define('_NOT_GENERATED', 'Not generated');
 
 define('_REGISTERED_MAIL_DISTRIBUTED', 'Acknowledgement receipt received : registered mail distributed');
 define('_REGISTERED_MAIL_NOT_DISTRIBUTED', 'Acknowledgement receipt received : registered mail not distributed');
+
+define('_CONFIGURATION_UPDATED', 'Configuration updated');

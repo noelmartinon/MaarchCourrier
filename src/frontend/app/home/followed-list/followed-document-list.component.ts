@@ -21,9 +21,9 @@ import { MenuShortcutComponent } from '../../menu/menu-shortcut.component';
 import { FoldersService } from '../../folder/folders.service';
 import { Subject } from 'rxjs/internal/Subject';
 import { Subscription } from 'rxjs/internal/Subscription';
-import { merge } from 'rxjs/internal/observable/merge';
 import { Observable } from 'rxjs/internal/Observable';
 import { of } from 'rxjs/internal/observable/of';
+import { merge } from 'rxjs';
 
 declare var $: any;
 

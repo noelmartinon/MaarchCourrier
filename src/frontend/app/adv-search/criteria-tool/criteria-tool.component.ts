@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, EventEmitter, Output, Input } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, EventEmitter, Output, Input, QueryList, ViewChildren } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { AppService } from '../../../service/app.service';
@@ -15,6 +15,11 @@ import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { AddSearchTemplateModalComponent } from './search-template/search-template-modal.component';
 import { DatePipe } from '@angular/common';
+import { ContactAutocompleteComponent } from '@appRoot/contact/autocomplete/contact-autocomplete.component';
+import { PluginSelectAutocompleteSearchComponent } from '@plugins/select-autocomplete-search/plugin-select-autocomplete-search.component';
+import { FolderInputComponent } from '@appRoot/folder/indexing/folder-input.component';
+import { TagInputComponent } from '@appRoot/tag/indexing/tag-input.component';
+import { IssuingSiteInputComponent } from '@appRoot/administration/registered-mail/issuing-site/indexing/issuing-site-input.component';
 
 @Component({
     selector: 'app-criteria-tool',
@@ -37,13 +42,36 @@ export class CriteriaToolComponent implements OnInit {
 
     hideCriteriaList: boolean = true;
 
+    infoFields: any = [
+        {
+            id : 1,
+            desc : 'lang.searchInAttachmentsInfo'
+        },
+        {
+            id : 2,
+            desc : 'lang.searchFulltextInfo'
+        },
+        {
+            id : 3,
+            desc : 'lang.manualSearchInfo'
+        },
+    ];
+
     @Input() searchTerm: string = 'Foo';
     @Input() defaultCriteria: any = [];
 
     @Output() searchUrlGenerated = new EventEmitter<any>();
+    @Output() loaded = new EventEmitter<any>();
 
     @ViewChild('criteriaTool', { static: false }) criteriaTool: MatExpansionPanel;
     @ViewChild('searchCriteriaInput', { static: false }) searchCriteriaInput: ElementRef;
+    @ViewChild('appFolderInput', { static: false }) appFolderInput: FolderInputComponent;
+    @ViewChild('appTagInput', { static: false }) appTagInput: TagInputComponent;
+    @ViewChild('appIssuingSiteInput', { static: false }) appIssuingSiteInput: IssuingSiteInputComponent;
+
+    @ViewChildren('appContactAutocomplete') appContactAutocomplete: QueryList<ContactAutocompleteComponent>;
+    @ViewChildren('pluginSelectAutocompleteSearch') pluginSelectAutocompleteSearch: QueryList<PluginSelectAutocompleteSearchComponent>;
+
 
     constructor(
         private _activatedRoute: ActivatedRoute,
@@ -64,8 +92,6 @@ export class CriteriaToolComponent implements OnInit {
         }
 
     async ngOnInit(): Promise<void> {
-        // console.log('getAllFields()', await this.indexingFields.getAllFields());
-
         this.searchTermControl.setValue(this.searchTerm);
 
         this.criteria = await this.indexingFields.getAllFields();
@@ -73,9 +99,11 @@ export class CriteriaToolComponent implements OnInit {
         this.criteria.forEach((element: any) => {
             if (this.defaultCriteria.indexOf(element.identifier) > -1) {
                 element.control = new FormControl('');
-                this.addCriteria(element);
+                this.addCriteria(element, false);
             }
         });
+
+        this.loaded.emit(true);
 
         this.filteredCriteria = this.searchCriteria.valueChanges
             .pipe(
@@ -93,7 +121,6 @@ export class CriteriaToolComponent implements OnInit {
                     }
                 })
             ).subscribe();
-            this.criteriaTool.open();
         }, 500);
         this.getSearchTemplates();
     }
@@ -107,22 +134,29 @@ export class CriteriaToolComponent implements OnInit {
         }
     }
 
-    isCurrentCriteria(criteriaId: string) {
-        return this.currentCriteria.filter((currCrit: any) => currCrit.identifier === criteriaId).length > 0;
+    isCurrentCriteriaById(criteriaIds: string[]) {
+        return this.currentCriteria.filter((currCrit: any) => criteriaIds.indexOf(currCrit.identifier) > -1).length > 0;
     }
 
-    async addCriteria(criteria: any) {
+
+    isCurrentCriteriaByType(criteriaTypes: string[]) {
+        return this.currentCriteria.filter((currCrit: any) => criteriaTypes.indexOf(currCrit.type) > -1).length > 0;
+    }
+
+    async addCriteria(criteria: any, openPanel: boolean = true) {
         if (this.functions.empty(criteria.control) || this.functions.empty(criteria.control.value)) {
-            criteria.control = criteria.type === 'date' ? new FormControl({}) : new FormControl('');
+            criteria.control = criteria.type === 'date' || criteria.type === 'integer' ? new FormControl({}) : new FormControl('');
         }
         this.initField(criteria);
         this.currentCriteria.push(criteria);
         this.searchTermControl.setValue(this.searchTerm);
         this.searchCriteria.reset();
         // this.searchCriteriaInput.nativeElement.blur();
-        setTimeout(() => {
-            this.criteriaTool.open();
-        }, 0);
+        if (openPanel) {
+            setTimeout(() => {
+                this.criteriaTool.open();
+            }, 0);
+        }
     }
 
     initField(field: any) {
@@ -173,10 +207,14 @@ export class CriteriaToolComponent implements OnInit {
             };
         }
         this.currentCriteria.forEach((field: any) => {
-            if (field.type === 'date') {
+
+            if (field.type === 'date' || field.type === 'integer') {
                 if (!this.functions.empty(field.control.value.start) || !this.functions.empty(field.control.value.end)) {
                     objCriteria[field.identifier] = {
-                        values: field.control.value
+                        values: {
+                            start: !this.functions.empty(field.control.value.start) ? field.control.value.start : field.control.value.end,
+                            end: !this.functions.empty(field.control.value.end) ? field.control.value.end : field.control.value.start
+                        }
                     };
                 }
             } else {
@@ -184,22 +222,47 @@ export class CriteriaToolComponent implements OnInit {
                     objCriteria[field.identifier] = {
                         values: field.control.value
                     };
+                } else {
+                    if (['recipients', 'senders'].indexOf(field.identifier) > -1 || field.type === 'contact') {
+                        objCriteria[field.identifier] = {
+                            values: [this.appContactAutocomplete.toArray().filter((component: any) => component.id === field.identifier)[0].getInputValue()]
+                        };
+                    }
                 }
             }
         });
         this.searchUrlGenerated.emit(objCriteria);
-        this.criteriaTool.close();
     }
 
+    toggleTool(state: boolean) {
+        if (state) {
+            this.criteriaTool.open();
+        } else {
+            this.criteriaTool.close();
+        }
 
-    getLabelValue(identifier: string, value: string) {
+    }
+
+    getLabelValue(identifier: string, value: any) {
         if (this.functions.empty(value)) {
             return this.translate.instant('lang.undefined');
         } else  if (['doctype', 'destination'].indexOf(identifier) > -1) {
             return this.criteria.filter((field: any) => field.identifier === identifier)[0].values.filter((val: any) => val.id === value)[0].title;
         } else {
+            if (this.criteria.filter((field: any) => field.identifier === identifier)[0].type === 'contact' || ['registeredMail_recipient', 'senders', 'recipients'].indexOf(this.criteria.filter((field: any) => field.identifier === identifier)[0].identifier)  > -1 ) {
+                return this.appContactAutocomplete.toArray().filter((component: any) => component.id === identifier)[0].getFormatedContact(value.id);
+            } else
+            if (this.criteria.filter((field: any) => field.identifier === identifier)[0].identifier === 'folders') {
+                return this.appFolderInput.getFolderLabel(value);
+            } else
+            if (this.criteria.filter((field: any) => field.identifier === identifier)[0].identifier === 'tags') {
+                return this.appTagInput.getTagLabel(value);
+            } else
+            if (this.criteria.filter((field: any) => field.identifier === identifier)[0].type === 'banAutocomplete') {
+                return `${value.addressNumber} ${value.addressStreet}, ${value.addressTown} (${value.addressPostcode})`;
+            } else
             if (this.criteria.filter((field: any) => field.identifier === identifier)[0].type === 'selectAutocomplete') {
-                return 'toto';
+                return this.pluginSelectAutocompleteSearch.toArray().filter((component: any) => component.id === identifier)[0].getDataLabel(value);
             } else {
                 return this.criteria.filter((field: any) => field.identifier === identifier)[0].values.filter((val: any) => val.id === value)[0].label;
 
@@ -207,12 +270,18 @@ export class CriteriaToolComponent implements OnInit {
         }
     }
 
-    getFormatLabel(value: any) {
-        if (typeof value === 'object') {
-            return `${this.datePipe.transform(value.start, 'dd/MM/y') } - ${this.datePipe.transform(value.end, 'dd/MM/y')}`;
-        } else {
-            return value;
+    getFormatLabel(identifier: string, value: any) {
 
+        if (this.criteria.filter((field: any) => field.identifier === identifier)[0].type === 'date') {
+            return `${this.datePipe.transform(value.start, 'dd/MM/y') } - ${this.datePipe.transform(value.end, 'dd/MM/y')}`;
+        } else if (this.criteria.filter((field: any) => field.identifier === identifier)[0].type === 'integer') {
+            return `${value.start} - ${value.end}`;
+        } else {
+            if (identifier === 'registeredMail_issuingSite') {
+                return this.appIssuingSiteInput.getSiteLabel(value);
+            } else {
+                return value;
+            }
         }
     }
 
@@ -236,7 +305,6 @@ export class CriteriaToolComponent implements OnInit {
                     });
                 } else {
                     field.control.setValue(criteria[field.identifier].values);
-
                 }
             }
         });
@@ -245,6 +313,36 @@ export class CriteriaToolComponent implements OnInit {
             this.searchTermControl.setValue(criteria['meta'].values);
         }
         this.getCurrentCriteriaValues();
+    }
+
+    searchInAttachments(identifier: string) {
+        return ['subject', 'chrono', 'fulltext'].indexOf(identifier) > -1;
+    }
+
+    displayInfoSearch(infoSearchNumber: number) {
+        if (infoSearchNumber === 1 && (this.isCurrentCriteriaById(['subject', 'chrono', 'fulltext']))) {
+            return true;
+        } else if (infoSearchNumber === 2 && this.isCurrentCriteriaById(['fulltext'])) {
+            return true;
+        } else if (infoSearchNumber === 3 && (this.isCurrentCriteriaById(['recipients', 'senders', 'registeredMail_recipient']) || this.isCurrentCriteriaByType(['contact']))) {
+            return true;
+        }
+        return false;
+    }
+
+    getBadgesInfoField(field: any) {
+        const badges = [];
+
+        if (['subject', 'chrono', 'fulltext'].indexOf(field.identifier) > -1) {
+            badges.push(1);
+        }
+        if (['fulltext'].indexOf(field.identifier) > -1) {
+            badges.push(2);
+        }
+        if (['recipients', 'senders', 'registeredMail_recipient'].indexOf(field.identifier) > -1 || field.type === 'contact') {
+            badges.push(3);
+        }
+        return badges;
     }
 
     set_meta_field(value: any) {
@@ -300,6 +398,38 @@ export class CriteriaToolComponent implements OnInit {
             this.http.get(`../rest/priorities`).pipe(
                 tap((data: any) => {
                     elem.values = data.priorities;
+                    resolve(true);
+                })
+            ).subscribe();
+        });
+    }
+
+    set_status_field(elem: any) {
+        return new Promise((resolve, reject) => {
+            this.http.get(`../rest/statuses`).pipe(
+                tap((data: any) => {
+                    elem.values = data.statuses.map((val: any) => {
+                        return {
+                            id: val.identifier,
+                            label: val.label_status
+                        };
+                    });
+                    resolve(true);
+                })
+            ).subscribe();
+        });
+    }
+
+    set_category_field(elem: any) {
+        return new Promise((resolve, reject) => {
+            this.http.get(`../rest/categories`).pipe(
+                tap((data: any) => {
+                    elem.values = data.categories.map((val: any) => {
+                        return {
+                            id: val.id,
+                            label: val.label
+                        };
+                    });
                     resolve(true);
                 })
             ).subscribe();
@@ -390,6 +520,8 @@ export class CriteriaToolComponent implements OnInit {
             query.push({'identifier': field.identifier, 'values': field.control.value});
         });
 
+        query.push({'identifier': 'searchTerm', 'values': this.searchTermControl.value});
+
         const dialogRef = this.dialog.open(
             AddSearchTemplateModalComponent,
             {
@@ -442,15 +574,20 @@ export class CriteriaToolComponent implements OnInit {
         ).subscribe();
     }
 
-    selectSearchTemplate(searchTemplate: any) {
+    selectSearchTemplate(searchTemplate: any, openPanel: boolean = true) {
         this.currentCriteria = [];
         this.criteria.forEach((element: any) => {
             let index = searchTemplate.query.map((field: any) => field.identifier).indexOf(element.identifier);
             if (index > -1) {
                 element.control = new FormControl({ value: searchTemplate.query[index].values, disabled: false });
                 element.control.value = searchTemplate.query[index].values;
-                this.addCriteria(element);
+                this.addCriteria(element, openPanel);
             }
         });
+
+        let index = searchTemplate.query.map((field: any) => field.identifier).indexOf('searchTerm');
+        if (index > -1) {
+            this.searchTermControl.setValue(searchTemplate.query[index].values);
+        }
     }
 }

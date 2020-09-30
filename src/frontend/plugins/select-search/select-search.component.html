@@ -6,7 +6,7 @@
 
         <div *ngIf="datas.length > 5" class="mat-select-search-inner"
             [ngClass]="{'mat-select-search-inner-multiple': matSelect.multiple}">
-            <input matInput id="searchSelectInput" [formControl]="formControlSearch" class="mat-select-search-input"
+            <input id="searchSelectInput" [formControl]="formControlSearch" class="mat-select-search-input"
                 #searchSelectInput (keydown)="_handleKeydown($event)" (input)="onInputChange($event.target.value)"
                 (blur)="onBlur($event.target.value)" [placeholder]="this.translate.instant('lang.filterBy')" />
             <button mat-button *ngIf="formControlSearch.value" mat-icon-button aria-label="Clear" (click)="_reset(true)"

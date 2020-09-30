@@ -14,7 +14,6 @@
 
 namespace Resource\controllers;
 
-use Basket\models\BasketModel;
 use Contact\controllers\ContactController;
 use CustomField\models\CustomFieldModel;
 use Endroid\QrCode\QrCode;
@@ -30,7 +29,6 @@ use Respect\Validation\Validator;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\controllers\PreparedClauseController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
@@ -369,6 +367,9 @@ class SummarySheetController
                                 } elseif ($fieldsType[$customFieldsId] == 'contact') {
                                     $customValues = ContactController::getContactCustomField(['contacts' => $customFieldsValues[$customFieldsId]]);
                                     $customValue = count($customValues) > 2 ? count($customValues) . ' ' . _CONTACTS : implode(", ", $customValues);
+                                    if (count($customValues) < 3) {
+                                        $pdf->SetFont('', '', 8);
+                                    }
                                 } else {
                                     $customValue = implode(',', $customFieldsValues[$customFieldsId]);
                                 }
@@ -380,6 +381,7 @@ class SummarySheetController
 
                         $nextLine = ($nextLine + 1) % 2;
                         $pdf->MultiCell($widthNotes, 30, $label . " : {$value}", 1, 'L', false, $nextLine, '', '', true, 0, true);
+                        $pdf->SetFont('', '', 10);
                     }
                 }
             } elseif ($unit['unit'] == 'senderRecipientInformations') {
@@ -710,16 +712,24 @@ class SummarySheetController
                 $pdf->SetY($pdf->GetY() + 2);
                 $pdf->Cell(0, 60, '', 1, 2, 'L', false);
             } elseif ($unit['unit'] == 'trafficRecords') {
-                $pdf->SetY($pdf->GetY() + 40);
-                if (($pdf->GetY() + 77) > $bottomHeight) {
+                $pdf->SetY($pdf->GetY() + 30);
+
+                $parameter = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'traffic_record_summary_sheet']);
+
+                $pdf2 = clone $pdf;
+                $pdf2->AddPage();
+                $pdf2->writeHTMLCell($widthNoMargins + $dimensions['lm'], 0, $widthNoMargins + $dimensions['lm'], 0, $parameter['param_value_string'], 0, 1, 0, true, 'C', true);
+                $height = 10 - ($pdf2->GetY());
+                if (($pdf->GetY() + abs($height)) > $bottomHeight) {
                     $pdf->AddPage();
                 }
+
                 $pdf->SetFont('', 'B', 11);
                 $pdf->Cell(0, 15, $unit['label'], 0, 2, 'L', false);
                 $pdf->SetFont('', '', 9);
 
-                $parameter = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'traffic_record_summary_sheet']);
                 $pdf->writeHTMLCell($widthNoMargins + $dimensions['lm'], 0, $dimensions['lm'] - 2, $pdf->GetY(), $parameter['param_value_string']);
+                $pdf->SetY($pdf->GetY() + abs($height));
             }
         }
     }

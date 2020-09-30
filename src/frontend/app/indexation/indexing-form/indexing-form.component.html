@@ -208,7 +208,7 @@
                                     </app-contact-autocomplete>
                                 </ng-container>
                                 <ng-container *ngIf="field.identifier === 'registeredMail_issuingSite'">
-                                    <app-issuing-site-input #appIssuingSiteInput [registedMailType]="arrFormControl['registeredMail_type'].value" [control]="arrFormControl[field.identifier]" (afterSelected)="launchEvent($event, field)" style="width:100%;">
+                                    <app-issuing-site-input #appIssuingSiteInput [registedMailType]="arrFormControl['registeredMail_type'].value" [control]="arrFormControl[field.identifier]" [showResetOption]="adminMode || !field.mandatory" (afterSelected)="launchEvent($event, field)" style="width:100%;">
                                     </app-issuing-site-input>
                                 </ng-container>
                                 <ng-container *ngIf="field.identifier === 'registeredMail_recipient'">

@@ -198,7 +198,7 @@ export class RegisteredMailImportComponent implements OnInit {
     }
 
     getLabel(id: string, value: any) {
-        if (id === 'registeredMail_issuingSite') {
+        if (id === 'registeredMail_issuingSite' && !this.functionsService.empty(value)) {
             const sites = this.contactColumns.filter((col: any) => col.id === 'registeredMail_issuingSite')[0].values;
             return sites.filter((site: any) => site.id === value)[0].label;
         } else if ([true, false].indexOf(value) > -1) {

@@ -28,7 +28,10 @@ export class IssuingSiteInputComponent implements OnInit {
      * FormControl used when autocomplete is used in form and must be catched in a form control.
      */
     @Input() control: FormControl = new FormControl('');
+
     @Input() registedMailType: string = null;
+
+    @Input() showResetOption: boolean = false;
 
 
     @Output() afterSelected = new EventEmitter<string>();
@@ -58,13 +61,23 @@ export class IssuingSiteInputComponent implements OnInit {
         this.http.get(`../rest/registeredMail/sites`).pipe(
             tap((data: any) => {
                 this.issuingSiteAddress = null;
-                this.issuingSiteList = data['sites'].filter((item: any) => item.entities.indexOf(this.headerService.user.entities[0].id) > -1).map((item: any) => {
-                    return {
-                        ...item,
-                        id: item.id,
-                        label: `${item.label} (${item.accountNumber})`
-                    };
-                });
+                if (this.functions.empty(this.headerService.user.entities)) {
+                    this.issuingSiteList = data['sites'].map((item: any) => {
+                        return {
+                            ...item,
+                            id: item.id,
+                            label: `${item.label} (${item.accountNumber})`
+                        };
+                    });
+                } else {
+                    this.issuingSiteList = data['sites'].filter((item: any) => item.entities.indexOf(this.headerService.user.entities[0].id) > -1).map((item: any) => {
+                        return {
+                            ...item,
+                            id: item.id,
+                            label: `${item.label} (${item.accountNumber})`
+                        };
+                    });
+                }
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -75,15 +88,23 @@ export class IssuingSiteInputComponent implements OnInit {
     }
 
     setAddress(id: any) {
-        this.http.get(`../rest/registeredMail/sites/${id}`).pipe(
-            tap((data: any) => {
-                this.issuingSiteAddress = data['site'];
-            }),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+        if (id === null) {
+            this.issuingSiteAddress = null;
+        } else {
+            this.http.get(`../rest/registeredMail/sites/${id}`).pipe(
+                tap((data: any) => {
+                    this.issuingSiteAddress = data['site'];
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        }
+    }
+
+    getSiteLabel(id: string) {
+        return this.issuingSiteList.filter((site: any) => site.id === id)[0].label;
     }
 
     goTo() {

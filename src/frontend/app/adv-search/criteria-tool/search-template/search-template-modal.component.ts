@@ -20,10 +20,7 @@ export class AddSearchTemplateModalComponent {
         private notify: NotificationService) {
     }
 
-    ngOnInit(): void { }
-
     onSubmit() {
-        console.log(this.data.searchTemplate);
         this.http.post('../rest/searchTemplates', this.data.searchTemplate).pipe(
             tap((data: any) => {
                 this.data.searchTemplate.id = data.id;

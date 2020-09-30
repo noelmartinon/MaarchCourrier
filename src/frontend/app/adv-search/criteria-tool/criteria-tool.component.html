@@ -8,13 +8,13 @@
         </button>
         <mat-autocomplete [class]="hideCriteriaList ? 'hide' : ''" #autoCriteria="matAutocomplete"
             (closed)="hideCriteriaList = true;" (optionSelected)="addCriteria($event.option.value)">
-            <mat-optgroup [label]="'Ajouter un critère de recherche'" class="criteria-list">
-                <input matInput type="text" #searchCriteriaInput [formControl]="getFilterControl()"
+            <mat-optgroup [label]="'lang.addCriteria' | translate" class="criteria-list">
+                <input type="text" #searchCriteriaInput [formControl]="getFilterControl()"
                     style="margin-left:5px;width:150px !important;height: 20px;border: 1px solid #6666663d;padding: 10px;border-radius: 5px;"
                     placeholder="{{'lang.filterBy' | translate}}">
                 <mat-option *ngIf="(getFilteredCriterias() | async)?.length===0" disabled>Aucun résultat</mat-option>
                 <mat-option *ngFor="let item of getFilteredCriterias()  | async | sortBy : 'label'" [value]="item"
-                    [disabled]="isCurrentCriteria(item.identifier)" style="padding-left: 0px;;">
+                    [disabled]="isCurrentCriteriaById(item.identifier)" style="padding-left: 0px;;">
                     <i class="fa {{item.icon}}" color="primary"
                         style="font-size:14px;width:50px;text-align:center;"></i> {{item.label}}
                 </mat-option>
@@ -53,19 +53,21 @@
                                 <div style="flex:1;">
                                     {{searchTemplate.label | shorten: 45: '...'}}
                                 </div>
-                                <button mat-icon-button class="listModels-menu-delete"
+                                <mat-icon class="fa fa-trash" color="warn"
                                     [title]="this.translate.instant('lang.delete')"
                                     (click)="$event.stopPropagation();deleteSearchTemplate(searchTemplate.id, i)">
-                                    <mat-icon class="fa fa-trash" color="warn">
-                                    </mat-icon>
-                                </button>
+                                </mat-icon>
                             </button>
                         </ng-container>
+                        <mat-divider></mat-divider>
+                        <button mat-menu-item (click)="saveSearchTemplate()" style="display: flex;align-items: center;"
+                            [disabled]="functions.empty(currentCriteria) && functions.empty(searchTermControl.value)">
+                            <mat-icon class="fa fa-copy" color="primary" style="line-height: 21px;"></mat-icon>
+                            <div style="flex:1;">
+                                {{'lang.createSearchTemplate' | translate}}
+                            </div>
+                        </button>
                     </mat-menu>
-                    <mat-icon class="far fa-copy"
-                        style="color: white; width: 30px; text-align: center; padding-top: 2px;"
-                        (click)="$event.stopPropagation();saveSearchTemplate()">
-                    </mat-icon>
                 </mat-panel-description>
             </mat-expansion-panel-header>
             <ng-container *ngIf="!loading; else loadingTemplate">
@@ -75,18 +77,22 @@
                     [formControl]="searchCriteria" [matAutocomplete]="autoGroup">
                 <mat-autocomplete #autoGroup="matAutocomplete" (optionSelected)="addCriteria($event.option.value)">
                     <mat-option *ngFor="let crit of filteredCriteria | async | sortBy : 'label'"
-                        [value]="crit" [disabled]="isCurrentCriteria(crit.id)">
+                        [value]="crit" [disabled]="isCurrentCriteriaById(crit.id)">
                         {{crit.label}}
                     </mat-option>
                 </mat-autocomplete>
             </mat-form-field>
         </div>-->
-                <div style="display: grid;align-items: start;grid-template-columns: repeat(2, 1fr);max-height: 300px;overflow: hidden;overflow-y: auto;">
-                    <div style="display: grid;align-items: baseline;grid-template-columns: 35% 60% 5%;"
+                <div
+                    style="display: grid;align-items: start;grid-template-columns: repeat(2, 1fr);max-height: 300px;overflow: hidden;overflow-y: auto;">
+                    <div style="display: grid;align-items: baseline;grid-template-columns: 35% 60% 5%;padding:5px;"
                         *ngFor="let field of currentCriteria;let i=index">
                         <ng-container *ngIf="field.type === 'string'">
                             <span class="criteria-label">
-                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                                <i class="fa {{field.icon}}"></i> {{field.label}}
+                                <ng-container *ngFor="let num of getBadgesInfoField(field)">
+                                    <sup color="primary" class="searchInAttachments">({{num}})</sup>
+                                </ng-container>&nbsp;:&nbsp;
                             </span>
                             <mat-form-field class="input-form" floatLabel="never">
                                 <input [id]="field.identifier" type="text" matInput
@@ -95,16 +101,25 @@
                         </ng-container>
                         <ng-container *ngIf="field.type === 'integer'">
                             <span class="criteria-label">
-                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                                <i class="fa {{field.icon}}"></i> {{field.label}}
+                                <ng-container *ngFor="let num of getBadgesInfoField(field)">
+                                    <sup color="primary" class="searchInAttachments">({{num}})</sup>
+                                </ng-container>&nbsp;:&nbsp;
                             </span>
                             <mat-form-field class="input-form" floatLabel="never">
-                                <input [id]="field.identifier" type="number" matInput [formControl]="field.control"
-                                    [placeholder]="'lang.typeValue' | translate" min="0" step="1">
+                                <div role="group" class="range-number-container" >
+                                    <input matInput style="display: none;">
+                                    <input type="number" class="range-number-input-element" (input)="field.control.value.start = $event.target.value" [value]="field.control.value.start" [placeholder]="'lang.start' | translate" min="0" step="1">
+                                    <span class="range-number-spacer">&ndash;</span>
+                                    <input type="number" class="range-number-input-element" (input)="field.control.value.end = $event.target.value" [value]="field.control.value.end" [placeholder]="'lang.end' | translate" min="0" step="1">
+                                </div>
                             </mat-form-field>
                         </ng-container>
                         <ng-container *ngIf="['select', 'radio', 'checkbox'].indexOf(field.type) > -1">
                             <span class="criteria-label">
-                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                                <i class="fa {{field.icon}}"></i> {{field.label}}<ng-container *ngFor="let num of getBadgesInfoField(field)">
+                                    <sup color="primary" class="searchInAttachments">({{num}})</sup>
+                                </ng-container>&nbsp;:&nbsp;
                             </span>
                             <plugin-select-search [id]="field.identifier" [showResetOption]="true" [label]="field.label"
                                 [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="field.control"
@@ -113,7 +128,10 @@
                         </ng-container>
                         <ng-container *ngIf="['selectAutocomplete'].indexOf(field.type) > -1">
                             <span class="criteria-label">
-                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                                <i class="fa {{field.icon}}"></i> {{field.label}}
+                                <ng-container *ngFor="let num of getBadgesInfoField(field)">
+                                    <sup color="primary" class="searchInAttachments">({{num}})</sup>
+                                </ng-container>&nbsp;:&nbsp;
                             </span>
                             <plugin-select-autocomplete-search #pluginSelectAutocompleteSearch [id]="field.identifier"
                                 [showResetOption]="true" [label]="field.label"
@@ -124,74 +142,103 @@
                         </ng-container>
                         <ng-container *ngIf="field.type === 'date'">
                             <span class="criteria-label">
-                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                                <i class="fa {{field.icon}}"></i> {{field.label}}
+                                <ng-container *ngFor="let num of getBadgesInfoField(field)">
+                                    <sup color="primary" class="searchInAttachments">({{num}})</sup>
+                                </ng-container>&nbsp;:&nbsp;
                             </span>
                             <mat-form-field class="input-form input-date" floatLabel="never" (click)="picker.open()"
                                 style="cursor:pointer;">
                                 <mat-date-range-input [rangePicker]="picker">
-                                    <input matStartDate placeholder="Début" [value]="field.control.value.start"
+                                    <input matStartDate [placeholder]="'lang.start' | translate"
+                                        [value]="field.control.value.start"
                                         (dateChange)="field.control.value.start=$event.value">
-                                    <input matEndDate placeholder="Fin" [value]="field.control.value.end"
+                                    <input matEndDate [placeholder]="'lang.end' | translate"
+                                        [value]="field.control.value.end"
                                         (dateChange)="field.control.value.end=$event.value">
                                 </mat-date-range-input>
                                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                                 <mat-date-range-picker #picker></mat-date-range-picker>
                             </mat-form-field>
                         </ng-container>
-                        <ng-container *ngIf="['senders','recipients'].indexOf(field.identifier) > -1">
+                        <ng-container
+                            *ngIf="['senders','recipients'].indexOf(field.identifier) > -1 || field.type === 'contact'">
                             <span class="criteria-label">
-                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                                <i class="fa {{field.icon}}"></i> {{field.label}}
+                                <ng-container *ngFor="let num of getBadgesInfoField(field)">
+                                    <sup color="primary" class="searchInAttachments">({{num}})</sup>
+                                </ng-container>&nbsp;:&nbsp;
                             </span>
-                            <app-contact-autocomplete [id]="field.identifier" [control]="field.control"
-                                style="width:100%;">
+                            <app-contact-autocomplete #appContactAutocomplete [id]="field.identifier"
+                                [control]="field.control" style="width:100%;">
                             </app-contact-autocomplete>
                         </ng-container>
                         <ng-container *ngIf="field.identifier === 'folders'">
                             <span class="criteria-label">
-                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                                <i class="fa {{field.icon}}"></i> {{field.label}}
+                                <ng-container *ngFor="let num of getBadgesInfoField(field)">
+                                    <sup color="primary" class="searchInAttachments">({{num}})</sup>
+                                </ng-container>&nbsp;:&nbsp;
                             </span>
-                            <app-folder-input [control]="field.control" style="width:100%;">
+                            <app-folder-input #appFolderInput [control]="field.control" style="width:100%;">
                             </app-folder-input>
                         </ng-container>
                         <ng-container *ngIf="field.identifier === 'tags'">
                             <span class="criteria-label">
-                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                                <i class="fa {{field.icon}}"></i> {{field.label}}
+                                <ng-container *ngFor="let num of getBadgesInfoField(field)">
+                                    <sup color="primary" class="searchInAttachments">({{num}})</sup>
+                                </ng-container>&nbsp;:&nbsp;
                             </span>
-                            <app-tag-input [control]="field.control" style="width:100%;">
+                            <app-tag-input #appTagInput [control]="field.control" style="width:100%;">
                             </app-tag-input>
                         </ng-container>
                         <ng-container *ngIf="field.type === 'banAutocomplete'">
                             <span class="criteria-label">
-                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                                <i class="fa {{field.icon}}"></i> {{field.label}}
+                                <ng-container *ngFor="let num of getBadgesInfoField(field)">
+                                    <sup color="primary" class="searchInAttachments">({{num}})</sup>
+                                </ng-container>&nbsp;:&nbsp;
                             </span>
                             <app-address-ban-input [control]="field.control" style="width:100%;">
                             </app-address-ban-input>
                         </ng-container>
                         <ng-container *ngIf="field.identifier === 'registeredMail_issuingSite'">
                             <span class="criteria-label">
-                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                                <i class="fa {{field.icon}}"></i> {{field.label}}
+                                <ng-container *ngFor="let num of getBadgesInfoField(field)">
+                                    <sup color="primary" class="searchInAttachments">({{num}})</sup>
+                                </ng-container>&nbsp;:&nbsp;
                             </span>
                             <app-issuing-site-input #appIssuingSiteInput [control]="field.control" style="width:100%;">
                             </app-issuing-site-input>
                         </ng-container>
                         <ng-container *ngIf="field.identifier === 'registeredMail_recipient'">
                             <span class="criteria-label">
-                                <i class="fa {{field.icon}}"></i> {{field.label}}&nbsp;:&nbsp;
+                                <i class="fa {{field.icon}}"></i> {{field.label}}
+                                <ng-container *ngFor="let num of getBadgesInfoField(field)">
+                                    <sup color="primary" class="searchInAttachments">({{num}})</sup>
+                                </ng-container>&nbsp;:&nbsp;
                             </span>
-                            <app-registered-mail-recipient-input #appRegisteredMailRecipientInput
-                                [control]="field.control" style="width:100%;">
-                            </app-registered-mail-recipient-input>
+                            <app-contact-autocomplete #appContactAutocomplete [id]="field.identifier"
+                                [control]="field.control"
+                                [exclusion]="'?noUsers=true&noEntities=true&noContactsGroups=true'" style="width:100%;">
+                            </app-contact-autocomplete>
                         </ng-container>
-                        <button mat-icon-button type="button" matSuffix color="primary"
+                        <button mat-icon-button type="button" matSuffix color="warn"
                             (click)="$event.stopPropagation();removeCriteria(i)">
-                            <mat-icon class="fa fa-trash" style="color:white;"></mat-icon>
+                            <mat-icon class="fa fa-trash"></mat-icon>
                         </button>
                     </div>
                 </div>
-                <div
-                    style="color: white;font-size: 12px;font-style: inherit;padding: 10px;opacity: 0.5;padding-top: 25px;">
-                    Les critères de recherche se cumulent sur la recherche rapide
+                <div class="infoSearchDesc" style="padding-top: 25px;">
+                    {{'lang.criteriaOverQuickSearch' | translate}}
                 </div>
+                <ng-container *ngFor="let info of infoFields">
+                    <div class="infoSearchDesc" *ngIf="displayInfoSearch(info.id)">
+                        <sup color="primary">({{info.id}})</sup>&nbsp;<span [innerHTML]="info.desc | translate"></span>
+                    </div>
+                </ng-container>
             </ng-container>
             <ng-template #loadingTemplate>
                 <mat-spinner class="loader"></mat-spinner>

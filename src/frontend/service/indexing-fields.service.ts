@@ -29,7 +29,7 @@ export class IndexingFieldsService {
         {
             identifier: 'subject',
             label: this.translate.instant('lang.subject'),
-            icon: 'fa-question',
+            icon: 'fa-quote-left',
             unit: 'mail',
             type: 'string',
             system: true,
@@ -49,6 +49,46 @@ export class IndexingFieldsService {
             default_value: [],
             values: [],
             enabled: true,
+        },
+        {
+            identifier: 'chrono',
+            label: this.translate.instant('lang.chrono'),
+            icon: 'fa-compass',
+            type: 'string',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'status',
+            label: this.translate.instant('lang.status'),
+            icon: 'fa-mail-bulk',
+            type: 'select',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'category',
+            label: this.translate.instant('lang.category_id'),
+            icon: 'fa-map-signs',
+            type: 'select',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'creationDate',
+            label: this.translate.instant('lang.creationDate'),
+            icon: 'fa-calendar-day',
+            type: 'date',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
         },
         {
             identifier: 'recipients',
@@ -232,6 +272,16 @@ export class IndexingFieldsService {
             values: [],
             enabled: true,
         },
+        {
+            identifier: 'fulltext',
+            label: this.translate.instant('lang.fulltext'),
+            icon: 'fa-file-alt',
+            type: 'string',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        }
     ];
 
     customFields: any[] = [];

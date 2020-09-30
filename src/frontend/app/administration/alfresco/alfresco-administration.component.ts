@@ -10,8 +10,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { tap } from 'rxjs/internal/operators/tap';
 import { catchError } from 'rxjs/internal/operators/catchError';
 import { of } from 'rxjs/internal/observable/of';
-import { map } from 'rxjs/internal/operators/map';
 import { MaarchFlatTreeComponent } from '../../../plugins/tree/maarch-flat-tree.component';
+import { map } from 'rxjs/operators';
 
 @Component({
     selector: 'app-alfresco',
@@ -23,7 +23,6 @@ export class AlfrescoAdministrationComponent implements OnInit {
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('maarchTree', { static: true }) maarchTree: MaarchFlatTreeComponent;
 
-    
     loading: boolean = false;
     creationMode: boolean = true;
 

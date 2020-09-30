@@ -21,6 +21,9 @@
       ],
       "@service/*": [
         "./service/*"
+      ],
+      "@plugins/*": [
+        "./plugins/*"
       ]
     }
   },

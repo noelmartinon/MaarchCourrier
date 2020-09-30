@@ -119,7 +119,7 @@ class FullTextController
         return ['success' => 'success'];
     }
 
-    private static function isDirEmpty($dir)
+    public static function isDirEmpty($dir)
     {
         $dir = opendir($dir);
         $isEmpty = true;

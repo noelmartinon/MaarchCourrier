@@ -2,7 +2,7 @@
     <plugin-select-search
         *ngIf="!loading"
         [label]="'lang.issuingSite' | translate" [placeholderLabel]="'lang.issuingSite' | translate"
-        [formControlSelect]="control" [datas]="issuingSiteList"
+        [formControlSelect]="control" [showResetOption]="showResetOption" [datas]="issuingSiteList"
         (afterSelected)="afterSelected.emit($event);setAddress($event)" style="width:100%;">
     </plugin-select-search>
     <mat-card *ngIf="issuingSiteAddress !== null" color="primary">

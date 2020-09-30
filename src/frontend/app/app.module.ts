@@ -16,6 +16,7 @@ import { AppListModule } from './app-list.module';
 
 import { AuthInterceptor } from '../service/auth-interceptor.service';
 import { FiltersListService } from '../service/filtersList.service';
+import { CriteriaSearchService } from '../service/criteriaSearch.service';
 import { FoldersService } from './folder/folders.service';
 import { PrivilegeService } from '../service/privileges.service';
 import { ActionsService } from './actions/actions.service';
@@ -288,7 +289,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         ViewDocActionComponent,
         ReconcileActionComponent,
     ],
-    providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }, FiltersListService, FoldersService, ActionsService, PrivilegeService, {
+    providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }, FiltersListService, CriteriaSearchService, FoldersService, ActionsService, PrivilegeService, {
         provide: HAMMER_GESTURE_CONFIG,
         useClass: MyHammerConfig
     }],

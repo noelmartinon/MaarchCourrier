@@ -17,9 +17,9 @@ import { PluginAutocomplete } from '../../plugins/autocomplete/autocomplete.comp
 import { HeaderService } from '../../service/header.service';
 import { FolderCreateModalComponent } from './folder-create-modal/folder-create-modal.component';
 import { FunctionsService } from '../../service/functions.service';
-import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { of } from 'rxjs/internal/observable/of';
+import { BehaviorSubject } from 'rxjs';
 
 /**
  * Node for to-do item
@@ -68,7 +68,6 @@ export class ItemFlatNode {
 })
 export class FolderTreeComponent implements OnInit, OnDestroy {
 
-    
     loading: boolean = true;
 
     searchTerm: FormControl = new FormControl();

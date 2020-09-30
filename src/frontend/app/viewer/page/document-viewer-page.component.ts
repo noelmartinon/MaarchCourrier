@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { of } from 'rxjs/internal/observable/of';
-import { tap } from 'rxjs/internal/operators/tap';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '../../../service/notification/notification.service';
 import { HeaderService } from '../../../service/header.service';
+import { catchError, tap } from 'rxjs/operators';
+import { of } from 'rxjs/internal/observable/of';
 
 @Component({
     selector: 'app-document-viewer-page',

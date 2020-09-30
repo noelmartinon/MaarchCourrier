@@ -455,8 +455,7 @@ $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/ac
 
 //Search
 $app->post('/search', \Search\controllers\SearchController::class . ':get');
-$app->get('/search/configuration', \Search\controllers\SearchAdministrationController::class . ':get');
-$app->put('/search/configuration', \Search\controllers\SearchAdministrationController::class . ':update');
+$app->get('/search/configuration', \Search\controllers\SearchController::class . ':getConfiguration');
 
 $app->get('/searchTemplates', \Search\controllers\SearchTemplateController::class . ':get');
 $app->post('/searchTemplates', \Search\controllers\SearchTemplateController::class . ':create');

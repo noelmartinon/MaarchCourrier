@@ -1,0 +1,7 @@
+{
+    "mapping": {
+        "cm:name": "subject",
+        "cm:title": "subject",
+        "cm:description": "alt_identifier"
+    }
+}
