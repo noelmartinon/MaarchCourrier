@@ -2271,7 +2271,7 @@ function add_criteria(elem_comp, id_form, ie_browser, error_txt_ie) {
                 loadAutocompletionScript(elem_comp);
             }
 
-            if (elem_comp.includes("indexingCustomField_") !== null) {
+            if (elem_comp.includes("indexingCustomField_") === true) {
                 initSenderRecipientAutocomplete(elem, 'contactsUsers', true);
             }
 

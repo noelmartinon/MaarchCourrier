@@ -49,6 +49,10 @@ function changeCycle(path_manage_script)
 }
 
 function initSenderRecipientAutocomplete(inputId, mode, alternateVersion, cardId) {
+    if (typeof $j("#" + inputId + "_id") == 'undefined') {
+        return false;
+    }
+    
     var route = '../../rest/autocomplete/correspondents';
 
     $j("#" + inputId).typeahead({
