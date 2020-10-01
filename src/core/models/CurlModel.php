@@ -133,6 +133,9 @@ class CurlModel
         if (!empty($aArgs['soapAction'])) {
             $opts[CURLOPT_HTTPHEADER][] = "SOAPAction: \"{$aArgs['soapAction']}\"";
         }
+        if (!empty($aArgs['Cookie'])) {
+            $opts[CURLOPT_HTTPHEADER][] = "Cookie:{$aArgs['Cookie']}";
+        }
         if (!empty($aArgs['options'])) {
             foreach ($aArgs['options'] as $key => $option) {
                 $opts[$key] = $option;
@@ -355,9 +358,13 @@ class CurlModel
         $postData = '';
         foreach ($args['body'] as $key => $value) {
             $postData .= "--{$delimiter}\r\n";
-            $postData .= "Content-Disposition: form-data; name=\"{$key}\"\r\n";
-            $postData .= "\r\n";
-            $postData .= "{$value}\r\n";
+            if (is_array($value) && $value['isFile']) {
+                $postData .= "Content-Disposition: form-data; name=\"{$key}\"; filename=\"{$value['filename']}\"\r\n";
+                $postData .= "\r\n{$value['content']}\r\n";
+            } else {
+                $postData .= "Content-Disposition: form-data; name=\"{$key}\"\r\n";
+                $postData .= "\r\n{$value}\r\n";
+            }
         }
         $postData .= "--{$delimiter}--\r\n";
 
