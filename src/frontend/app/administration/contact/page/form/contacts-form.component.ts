@@ -1023,7 +1023,7 @@ export class ContactsFormComponent implements OnInit {
             const test = target.control.value;
             if (['lastname'].indexOf(target.id) > -1) {
                 target.control.setValue(test.toUpperCase());
-            } else if (['firstname', 'company'].indexOf(target.id) > -1) {
+            } else if (['firstname'].indexOf(target.id) > -1) {
                 let splitStr = test.toLowerCase().split(' ');
                 for (let i = 0; i < splitStr.length; i++) {
                     splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
