@@ -203,6 +203,21 @@ if (!empty($_REQUEST['page']) && empty($_REQUEST['triggerAngular'])) {
         } else {
             header('location: index.php?display=true&page=logout&logout=true');
         }
+
+        $user = \User\models\UserModel::getByLogin(['login' => $cookie['userId'], 'select' => ['password_modification_date']]);
+        $loggingMethod = \SrcCore\models\CoreConfigModel::getLoggingMethod();
+        if (!in_array($loggingMethod['id'], ['sso', 'cas', 'ldap', 'keycloak', 'shibboleth'])) {
+            $passwordRules = \SrcCore\models\PasswordModel::getEnabledRules();
+            if (!empty($passwordRules['renewal'])) {
+                $currentDate = new \DateTime();
+                $lastModificationDate = new \DateTime($user['password_modification_date']);
+                $lastModificationDate->add(new DateInterval("P{$passwordRules['renewal']}D"));
+    
+                if ($currentDate > $lastModificationDate) {
+                    header('location: index.php?display=true&page=logout&logout=true');
+                }
+            }
+        }
     }
 
     //INSERT PART OF PAGE
