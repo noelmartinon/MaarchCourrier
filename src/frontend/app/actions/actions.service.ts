@@ -218,6 +218,10 @@ export class ActionsService {
             })
         ).subscribe();
 
+        if (!this.functions.empty(this.currentResourceLock)) {
+            clearInterval(this.currentResourceLock);
+        }
+        
         this.currentResourceLock = setInterval(() => {
             this.http.put(`../../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
                 catchError((err: any) => {
