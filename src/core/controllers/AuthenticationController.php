@@ -46,7 +46,7 @@ class AuthenticationController
         ValidatorModel::stringType($aArgs, ['userId', 'currentRoute']);
 
         if ($aArgs['currentRoute'] != '/initialize') {
-            $user = UserModel::getByLogin(['select' => ['status', 'change_password'], 'login' => $aArgs['userId']]);
+            $user = UserModel::getByLogin(['select' => ['status', 'change_password', 'password_modification_date'], 'login' => $aArgs['userId']]);
 
             if ($user['status'] == 'ABS' && !in_array($aArgs['currentRoute'], ['/users/{id}/status', '/currentUser/profile', '/header', '/passwordRules', '/users/{id}/password'])) {
                 return ['isRouteAvailable' => false, 'errors' => 'User is ABS and must be activated'];
@@ -56,7 +56,6 @@ class AuthenticationController
                 $loggingMethod = CoreConfigModel::getLoggingMethod();
 
                 if (!in_array($loggingMethod['id'], ['sso', 'cas', 'ldap', 'ozwillo', 'shibboleth'])) {
-
                     $passwordRules = PasswordModel::getEnabledRules();
                     if ($user['change_password'] == 'Y') {
                         return ['isRouteAvailable' => false, 'errors' => 'User must change his password'];
