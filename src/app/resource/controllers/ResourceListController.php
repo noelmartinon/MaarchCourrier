@@ -91,9 +91,9 @@ class ResourceListController
         $allResources = array_column($rawResources, 'res_id');
 
         $formattedResources = [];
-        $defaultAction = [];
-        $displayFolderTags = false;
-        $templateColumns = 0;
+        $defaultAction      = [];
+        $displayFolderTags  = false;
+        $templateColumns    = 0;
         if (!empty($resIds)) {
             $excludeAttachmentTypes = ['signed_response'];
             $attachments = AttachmentModel::get([
@@ -103,40 +103,12 @@ class ResourceListController
                 'groupBy'   => ['res_id_master']
             ]);
 
-            $groupBasket = GroupBasketModel::get(['select' => ['list_display', 'list_event', 'list_event_data'], 'where' => ['basket_id = ?', 'group_id = ?'], 'data' => [$basket['basket_id'], $group['group_id']]]);
-            $listDisplay = json_decode($groupBasket[0]['list_display'], true);
+            $groupBasket     = GroupBasketModel::get(['select' => ['list_display', 'list_event', 'list_event_data'], 'where' => ['basket_id = ?', 'group_id = ?'], 'data' => [$basket['basket_id'], $group['group_id']]]);
+            $listDisplay     = json_decode($groupBasket[0]['list_display'], true);
             $templateColumns = $listDisplay['templateColumns'];
-            $listDisplay = $listDisplay['subInfos'];
+            $listDisplay     = $listDisplay['subInfos'];
 
-            $select = [
-                'res_letterbox.res_id', 'res_letterbox.subject', 'res_letterbox.barcode', 'res_letterbox.alt_identifier',
-                'status.label_status AS "status.label_status"', 'status.img_filename AS "status.img_filename"', 'priorities.color AS "priorities.color"',
-                'res_letterbox.closing_date', 'res_letterbox.locker_user_id', 'res_letterbox.locker_time', 'res_letterbox.confidentiality',
-                'res_letterbox.filename as res_filename', 'res_letterbox.integrations'
-            ];
-            $tableFunction = ['status', 'priorities'];
-            $leftJoinFunction = ['res_letterbox.status = status.id', 'res_letterbox.priority = priorities.id'];
-            foreach ($listDisplay as $value) {
-                $value = (array)$value;
-                if ($value['value'] == 'getPriority') {
-                    $select[] = 'priorities.label AS "priorities.label"';
-                } elseif ($value['value'] == 'getCategory') {
-                    $select[] = 'res_letterbox.category_id';
-                } elseif ($value['value'] == 'getDoctype') {
-                    $select[] = 'doctypes.description AS "doctypes.description"';
-                    $tableFunction[] = 'doctypes';
-                    $leftJoinFunction[] = 'res_letterbox.type_id = doctypes.type_id';
-                } elseif ($value['value'] == 'getCreationAndProcessLimitDates') {
-                    $select[] = 'res_letterbox.creation_date';
-                    $select[] = 'res_letterbox.process_limit_date';
-                } elseif ($value['value'] == 'getModificationDate') {
-                    $select[] = 'res_letterbox.modification_date';
-                } elseif ($value['value'] == 'getOpinionLimitDate') {
-                    $select[] = 'res_letterbox.opinion_limit_date';
-                } elseif (strpos($value['value'], 'indexingCustomField_') !== false && !in_array('res_letterbox.custom_fields', $select)) {
-                    $select[] = 'res_letterbox.custom_fields';
-                }
-            }
+            $selectData = ResourceListController::getSelectData(['listDisplay' => $listDisplay]);
 
             $order = 'CASE res_letterbox.res_id ';
             foreach ($resIds as $key => $resId) {
@@ -145,9 +117,9 @@ class ResourceListController
             $order .= 'END';
 
             $resources = ResourceListModel::getOnResource([
-                'select'    => $select,
-                'table'     => $tableFunction,
-                'leftJoin'  => $leftJoinFunction,
+                'select'    => $selectData['select'],
+                'table'     => $selectData['tableFunction'],
+                'leftJoin'  => $selectData['leftJoinFunction'],
                 'where'     => ['res_letterbox.res_id in (?)'],
                 'data'      => [$resIds],
                 'orderBy'   => [$order]
@@ -180,6 +152,41 @@ class ResourceListController
             'displayFolderTags' => $displayFolderTags,
             'templateColumns'   => $templateColumns
         ]);
+    }
+
+    public static function getSelectData(array $args)
+    {
+        $select = [
+            'res_letterbox.res_id', 'res_letterbox.subject', 'res_letterbox.barcode', 'res_letterbox.alt_identifier',
+            'status.label_status AS "status.label_status"', 'status.img_filename AS "status.img_filename"', 'priorities.color AS "priorities.color"',
+            'res_letterbox.closing_date', 'res_letterbox.locker_user_id', 'res_letterbox.locker_time', 'res_letterbox.confidentiality',
+            'res_letterbox.filename as res_filename', 'res_letterbox.integrations'
+        ];
+        $tableFunction    = ['status', 'priorities'];
+        $leftJoinFunction = ['res_letterbox.status = status.id', 'res_letterbox.priority = priorities.id'];
+        foreach ($args['listDisplay'] as $value) {
+            $value = (array)$value;
+            if ($value['value'] == 'getPriority') {
+                $select[] = 'priorities.label AS "priorities.label"';
+            } elseif ($value['value'] == 'getCategory') {
+                $select[] = 'res_letterbox.category_id';
+            } elseif ($value['value'] == 'getDoctype') {
+                $select[] = 'doctypes.description AS "doctypes.description"';
+                $tableFunction[] = 'doctypes';
+                $leftJoinFunction[] = 'res_letterbox.type_id = doctypes.type_id';
+            } elseif ($value['value'] == 'getCreationAndProcessLimitDates') {
+                $select[] = 'res_letterbox.creation_date';
+                $select[] = 'res_letterbox.process_limit_date';
+            } elseif ($value['value'] == 'getModificationDate') {
+                $select[] = 'res_letterbox.modification_date';
+            } elseif ($value['value'] == 'getOpinionLimitDate') {
+                $select[] = 'res_letterbox.opinion_limit_date';
+            } elseif (strpos($value['value'], 'indexingCustomField_') !== false && !in_array('res_letterbox.custom_fields', $select)) {
+                $select[] = 'res_letterbox.custom_fields';
+            }
+        }
+
+        return ['select' => $select, 'tableFunction' => $tableFunction, 'leftJoinFunction' => $leftJoinFunction];
     }
 
     public function getFilters(Request $request, Response $response, array $aArgs)

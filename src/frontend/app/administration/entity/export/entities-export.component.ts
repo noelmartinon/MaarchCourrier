@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { catchError, tap, finalize } from 'rxjs/operators';
-import { of } from 'rxjs/internal/observable/of';
-import { LocalStorageService } from '../../../../service/local-storage.service';
-import { HeaderService } from '../../../../service/header.service';
+import { of } from 'rxjs';
+import { LocalStorageService } from '@service/local-storage.service';
+import { HeaderService } from '@service/header.service';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({

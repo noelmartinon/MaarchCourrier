@@ -1,15 +1,15 @@
 import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { Router } from '@angular/router';
 import { ActionsService } from './actions.service';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { exhaustMap, filter, tap } from 'rxjs/operators';
-import { HeaderService } from '../../service/header.service';
-import { FunctionsService } from '../../service/functions.service';
+import { HeaderService } from '@service/header.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     selector: 'app-actions-list',

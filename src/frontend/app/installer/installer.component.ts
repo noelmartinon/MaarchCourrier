@@ -1,23 +1,20 @@
 import { Component, OnInit, ViewChild, AfterViewInit, ViewChildren } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { HeaderService } from '../../service/header.service';
-import { NotificationService } from '../../service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
 import { MatStepper } from '@angular/material/stepper';
-import { AppService } from '../../service/app.service';
+import { AppService } from '@service/app.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SortPipe } from '../../plugins/sorting.pipe';
 import { StepAction } from './types';
 import { MatDialog } from '@angular/material/dialog';
 import { InstallActionComponent } from './install-action/install-action.component';
-import { filter } from 'rxjs/internal/operators/filter';
-import { tap } from 'rxjs/internal/operators/tap';
-import { finalize } from 'rxjs/internal/operators/finalize';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { of } from 'rxjs/internal/observable/of';
-import { FunctionsService } from '../../service/functions.service';
+import { of } from 'rxjs';
+import { FunctionsService } from '@service/functions.service';
 import { InstallerService } from './installer.service';
+import { catchError, filter, tap } from 'rxjs/operators';
 
 @Component({
     templateUrl: './installer.component.html',
@@ -30,8 +27,6 @@ import { InstallerService } from './installer.service';
     ]
 })
 export class InstallerComponent implements OnInit, AfterViewInit {
-
-    
 
     @ViewChildren('stepContent') stepContent: any;
     @ViewChild('stepper', { static: true }) stepper: MatStepper;

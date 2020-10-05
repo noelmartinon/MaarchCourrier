@@ -1,22 +1,22 @@
 import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { AppService } from '../../../service/app.service';
+import { AppService } from '@service/app.service';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { FormControl } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { debounceTime, filter, distinctUntilChanged, tap, switchMap, exhaustMap, catchError, map } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
-import { PrivilegeService } from '../../../service/privileges.service';
-import { FunctionsService } from '../../../service/functions.service';
+import { PrivilegeService } from '@service/privileges.service';
+import { FunctionsService } from '@service/functions.service';
 import { ThesaurusModalComponent } from './thesaurus/thesaurus-modal.component';
 
 @Component({
     selector: 'app-tag-input',
-    templateUrl: "tag-input.component.html",
+    templateUrl: 'tag-input.component.html',
     styleUrls: [
         'tag-input.component.scss',
         '../../indexation/indexing-form/indexing-form.component.scss'
@@ -42,11 +42,14 @@ export class TagInputComponent implements OnInit {
 
     tags: any[] = [];
 
+    tmpObject: any = null;
 
     /**
      * FormControl used when autocomplete is used in form and must be catched in a form control.
      */
     @Input('control') controlAutocomplete: FormControl;
+
+    @Input() returnValue: 'id' | 'object' = 'id';
 
     @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
@@ -65,9 +68,27 @@ export class TagInputComponent implements OnInit {
     }
 
     ngOnInit() {
+        this.controlAutocomplete.valueChanges
+            .pipe(
+                tap((data: any) => {
+                    if (this.returnValue === 'object') {
+                        this.valuesToDisplay = {};
+                        data.forEach((item: any) => {
+                            this.valuesToDisplay[item.id] = item.label;
+                        });
+                    } else {
+                        if (!this.functionsService.empty(this.tmpObject)) {
+                            this.valuesToDisplay[this.tmpObject['id']] = this.tmpObject[this.key];
+                            this.tmpObject = null;
+                        } else {
+                            this.initFormValue();
+                        }
+
+                    }
+                })
+            ).subscribe();
         this.controlAutocomplete.setValue(this.controlAutocomplete.value === null || this.controlAutocomplete.value === '' ? [] : this.controlAutocomplete.value);
         this.canAdd = this.privilegeService.hasCurrentUserPrivilege('manage_tags_application');
-        this.initFormValue();
         this.initAutocompleteRoute();
     }
 
@@ -76,7 +97,6 @@ export class TagInputComponent implements OnInit {
         this.options = [];
         this.myControl.valueChanges
             .pipe(
-                //tap((value) => this.canAdd = value.length === 0 ? false : true),
                 debounceTime(300),
                 filter(value => value.length > 2),
                 distinctUntilChanged(),
@@ -96,7 +116,7 @@ export class TagInputComponent implements OnInit {
     }
 
     getDatas(data: string) {
-        return this.http.get('../rest/autocomplete/tags', { params: { "search": data } });
+        return this.http.get('../rest/autocomplete/tags', { params: { 'search': data } });
     }
 
     selectOpt(ev: any) {
@@ -116,13 +136,20 @@ export class TagInputComponent implements OnInit {
     }
 
     setFormValue(item: any) {
-        if (this.controlAutocomplete.value.indexOf(item['id']) === -1) {
+        const isSelected = this.returnValue === 'id' ? this.controlAutocomplete.value.indexOf(item['id']) > -1 : this.controlAutocomplete.value.map((val: any) => val.id).indexOf(item['id']) > -1;
+        if (!isSelected) {
             let arrvalue = [];
             if (this.controlAutocomplete.value !== null) {
                 arrvalue = this.controlAutocomplete.value;
             }
-            arrvalue.push(item['id']);
-            this.valuesToDisplay[item['id']] = item[this.key];
+            if (this.returnValue === 'id') {
+                arrvalue.push(item['id']);
+            } else {
+                arrvalue.push({
+                    id: item['id'],
+                    label: item['idToDisplay']
+                });
+            }
             this.controlAutocomplete.setValue(arrvalue);
         }
     }
@@ -189,25 +216,25 @@ export class TagInputComponent implements OnInit {
         ).subscribe();
     }
 
-    openThesaurus(tagId: number = null) {
+    openThesaurus(tag: any = null) {
+        tag = this.returnValue === 'id' ? tag : tag.id;
         const dialogRef = this.dialog.open(ThesaurusModalComponent, {
             panelClass: 'maarch-modal',
             width: '600px',
             data: {
-                id : tagId
+                id: tag
             }
         });
         dialogRef.afterClosed().pipe(
             filter((data: any) => !this.functionsService.empty(data)),
             map((data: any) => {
                 return {
-                    id : data.id,
-                    idToDisplay : data.label
+                    id: data.id,
+                    idToDisplay: data.label
                 };
             }),
             tap((tagItem: any) => {
-                console.log(tagItem);
-
+                this.tmpObject = tagItem;
                 this.setFormValue(tagItem);
             }),
             catchError((err: any) => {
@@ -217,7 +244,7 @@ export class TagInputComponent implements OnInit {
         ).subscribe();
     }
 
-    getTagLabel(id: string) {
-        return this.valuesToDisplay[id];
+    getTagLabel(data: any) {
+        return this.returnValue === 'id' ? this.valuesToDisplay[data] : this.valuesToDisplay[data.id];
     }
 }

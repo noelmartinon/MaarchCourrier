@@ -294,7 +294,17 @@ export class PrivilegeService {
             'style': 'fas fa-dolly-flatbed',
             'angular': true,
             'hasParams': false
-        }
+        },
+        {
+            'id': 'admin_search',
+            'label': 'lang.search',
+            'comment': 'lang.searchAdministration',
+            'route': '/administration/search',
+            'unit': 'supervision',
+            'style': 'fas fa-search',
+            'angular': true,
+            'hasParams': false
+        },
     ];
 
     private privileges: privilege[] = [

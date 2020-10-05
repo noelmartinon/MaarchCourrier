@@ -2,18 +2,18 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { AppService } from '../../../service/app.service';
-import { PrivilegeService } from '../../../service/privileges.service';
+import { AppService } from '@service/app.service';
+import { PrivilegeService } from '@service/privileges.service';
 import { tap, catchError, exhaustMap, map, finalize, filter } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 
 @Component({
     templateUrl: 'group-administration.component.html',

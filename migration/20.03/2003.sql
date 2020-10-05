@@ -5,9 +5,18 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '20.03' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '20.03.11' WHERE id = 'database_version';
 
 UPDATE parameters SET description = 'Département par défaut sélectionné dans les autocomplétions de la Base Adresse Nationale' WHERE id = 'defaultDepartment';
+
+/*CLEAN DATA*/
+/*Exists in groupbasket_status but not in actions_groupbaskets*/
+DELETE FROM groupbasket_status WHERE system_id IN (
+	select system_id from groupbasket_status gbs
+	where not exists (
+		select 1 from actions_groupbaskets agb where gbs.action_id = agb.id_action and gbs.group_id = agb.group_id and gbs.basket_id = agb.basket_id
+	)
+)
 
 /* VIEWS */
 DROP VIEW IF EXISTS res_view_letterbox;

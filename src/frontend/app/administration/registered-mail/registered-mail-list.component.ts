@@ -3,15 +3,15 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
-import { AppService } from '../../../service/app.service';
-import { FunctionsService } from '../../../service/functions.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
+import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
 import { MatDialog } from '@angular/material/dialog';
 import { tap, catchError, filter, exhaustMap } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-registered-mail-list',

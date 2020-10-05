@@ -2,10 +2,10 @@ import { Component, OnInit, Inject, HostListener } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { map, tap, catchError, exhaustMap, finalize } from 'rxjs/operators';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { FunctionsService } from '../../../service/functions.service';
-import { of } from 'rxjs/internal/observable/of';
+import { FunctionsService } from '@service/functions.service';
+import { of } from 'rxjs';
 
 declare var $: any;
 

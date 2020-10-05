@@ -66,15 +66,14 @@ foreach ($customs as $custom) {
 
                     $actions[] = (string)$id;
                 }
-
             }
 
             // ACTIONS WITH STATUS
             $actionsToMigrate = \SrcCore\models\DatabaseModel::select([
                 'select'    => ['id_action'],
                 'table'     => ['actions_groupbaskets, actions'],
-                'where'     => ['group_id = ?', 'basket_id = ?', 'id_action = id', '(action_page = ? OR component = ? OR action_page = ?)'],
-                'data'      => [$value['group_id'], 'IndexingBasket', 'confirm_status', 'confirmAction', "''"]
+                'where'     => ['group_id = ?', 'basket_id = ?', 'id_action = id', '(action_page = ? OR action_page = ? OR component = ? OR action_page = ?)'],
+                'data'      => [$value['group_id'], 'IndexingBasket', 'index_mlb', 'confirm_status', 'confirmAction', "''"]
             ]);
 
             foreach ($actionsToMigrate as $item) {
@@ -159,7 +158,7 @@ foreach ($customs as $custom) {
     $migrated = 0;
     $actionsToDelete = [];
     foreach ($basketsWithStatuses as $value) {
-        if (!in_array($value['action_id'], $actionsToDelete)) {
+        if (!in_array($value['action_id'], $actionsToDelete) && !in_array($value['action_id'], $actions)) {
             $actionsToDelete[] = $value['action_id'];
         }
 
@@ -226,6 +225,13 @@ foreach ($customs as $custom) {
         'table' => 'actions',
         'where' => ['keyword = ?'],
         'data'  => ['indexing']
+    ]);
+
+    \SrcCore\models\DatabaseModel::update([
+        'set'   => ['action_page' => '', 'component' => 'confirmAction'],
+        'table' => 'actions',
+        'where' => ['action_page = ?'],
+        'data'  => ['index_mlb']
     ]);
 
     printf("Migration Indexing Basket (CUSTOM {$custom}) : " . $migrated . " action(s) avec des status (mot clé indexation) trouvé(s) et migré(s).\n");

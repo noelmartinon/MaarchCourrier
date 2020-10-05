@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, tap, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { PrivilegeService } from '../../../service/privileges.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { PrivilegeService } from '@service/privileges.service';
 
 
 @Component({

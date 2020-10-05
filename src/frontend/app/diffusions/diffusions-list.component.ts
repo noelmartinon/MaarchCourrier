@@ -1,15 +1,15 @@
 import { Component, EventEmitter, Input, OnInit, Output, Renderer2 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
 import { FormControl } from '@angular/forms';
 import { catchError, map, tap, elementAt } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AlertComponent } from '../../plugins/modal/alert.component';
 import { MatDialog } from '@angular/material/dialog';
-import { FunctionsService } from '../../service/functions.service';
-import { HeaderService } from '../../service/header.service';
+import { FunctionsService } from '@service/functions.service';
+import { HeaderService } from '@service/header.service';
 
 @Component({
     selector: 'app-diffusions-list',

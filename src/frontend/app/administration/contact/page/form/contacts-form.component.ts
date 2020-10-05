@@ -1,19 +1,18 @@
 import { Component, OnInit, ViewChild, EventEmitter, Input, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../../../service/notification/notification.service';
-import { HeaderService } from '../../../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
-import { AppService } from '../../../../../service/app.service';
+import { AppService } from '@service/app.service';
 import { MatDialog } from '@angular/material/dialog';
 import { switchMap, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize, map, startWith } from 'rxjs/operators';
 import { FormControl, Validators, ValidatorFn } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ContactService } from '../../../../../service/contact.service';
-import { FunctionsService } from '../../../../../service/functions.service';
+import { ContactService } from '@service/contact.service';
+import { FunctionsService } from '@service/functions.service';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { Observable } from 'rxjs/internal/Observable';
-import { of } from 'rxjs/internal/observable/of';
+import { Observable, of } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { LatinisePipe } from 'ngx-pipes';
 
@@ -1068,7 +1067,7 @@ export class ContactsFormComponent implements OnInit {
             const test = target.control.value;
             if (['lastname'].indexOf(target.id) > -1) {
                 target.control.setValue(test.toUpperCase());
-            } else if (['firstname', 'company'].indexOf(target.id) > -1) {
+            } else if (['firstname'].indexOf(target.id) > -1) {
                 let splitStr = test.toLowerCase().split(' ');
                 for (let i = 0; i < splitStr.length; i++) {
                     splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);

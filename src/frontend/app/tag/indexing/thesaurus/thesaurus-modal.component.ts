@@ -2,11 +2,10 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/internal/operators/tap';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { NotificationService } from '../../../../service/notification/notification.service';
-import { of } from 'rxjs/internal/observable/of';
-import { FunctionsService } from '../../../../service/functions.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { of } from 'rxjs';
+import { FunctionsService } from '@service/functions.service';
+import { catchError, tap } from 'rxjs/operators';
 
 @Component({
     templateUrl: 'thesaurus-modal.component.html',
@@ -14,7 +13,6 @@ import { FunctionsService } from '../../../../service/functions.service';
 })
 export class ThesaurusModalComponent implements OnInit {
 
-    
     loading: boolean = false;
 
     tags: any[] = [];
@@ -43,7 +41,7 @@ export class ThesaurusModalComponent implements OnInit {
                         return {
                             id: tag.id,
                             label: tag.label,
-                            parentId : tag.parentId,
+                            parentId: tag.parentId,
                             countResources: tag.countResources
                         };
                     });

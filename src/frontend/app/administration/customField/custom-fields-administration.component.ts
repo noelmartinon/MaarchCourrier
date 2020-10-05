@@ -1,16 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
-import { AppService } from '../../../service/app.service';
+import { AppService } from '@service/app.service';
 import { tap, catchError, filter, exhaustMap, map, finalize } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { SortPipe } from '../../../plugins/sorting.pipe';
-import { of } from 'rxjs/internal/observable/of';
-import { FunctionsService } from '../../../service/functions.service';
+import { of } from 'rxjs';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     templateUrl: 'custom-fields-administration.component.html',

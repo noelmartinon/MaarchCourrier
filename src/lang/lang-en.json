@@ -1340,6 +1340,7 @@
     "searchCommunicationMean": "Search a communication mean",
     "searchContact": "Search a contact",
     "searchDatas": "Search data",
+    "searchDoctypes": "Search doctypes",
     "searchEntities": "Search entity",
     "searchExternalIdM2M": "Search M2M Identifier",
     "searchFolder": "Search folder",
@@ -2031,6 +2032,7 @@
     "createSearchTemplate": "Save search template...",
     "searchInAttachmentsInfo" : "Indicates that the search is done on mails and attachments.",
     "fulltext": "Fulltext",
-    "searchFulltextInfo" : "*: To perform a wildcard search on several characters (motor* finds motorway and motorbike)<br>&nbsp;\" \": To search on a group of words (\"route nationale\" finds the entire expression route nationale)<br>&nbsp;~: To perform an approximate search (vite~ find vote, vite)",
-    "criteriaOverQuickSearch" : "The search criteria are cumulative on the quick search"
+    "searchFulltextInfo" : "\" \": To search on a group of words (\"route nationale\" finds the entire expression route nationale)<br>&nbsp;~: To perform an approximate search (vite~ find vote, vite)",
+    "criteriaOverQuickSearch" : "The search criteria are cumulative on the quick search",
+    "noAdminSearchConfiguration": "Non administration configuration found"
 }

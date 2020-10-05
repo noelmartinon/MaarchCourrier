@@ -1,5 +1,24 @@
 @import '../../../css/vars.scss';
 
+.criteria-content {
+    display: grid;
+    align-items: start;
+    grid-template-columns: repeat(2, 1fr);
+    max-height: 300px;
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+.criteria-content-mobile {
+    display: grid;
+    align-items: start;
+    grid-template-columns: repeat(1, 1fr);
+    max-height: 300px;
+    overflow: hidden;
+    overflow-y: auto;
+}
+
+
 .addCriteriaField {
     font-size: 10px;
 }
@@ -59,6 +78,7 @@
 
     .mat-expansion-panel-header-title {
         color: white;
+        align-items: center;
     }
 
     ::ng-deep .mat-expansion-panel-content {
@@ -72,6 +92,26 @@
 
     ::ng-deep .mat-expansion-indicator::after {
         color: white;
+    }
+}
+
+.criteria-container-secondary {
+    .mat-expansion-panel-header-title {
+        color: $primary;
+        align-items: center;
+    }
+
+    ::ng-deep .mat-expansion-panel-content {
+        background: white;
+        border-radius: 30px;
+    }
+
+    ::ng-deep .mat-expansion-panel-body {
+        padding-top: 5px;
+    }
+
+    ::ng-deep .mat-expansion-indicator::after {
+        // color: white;
     }
 }
 
@@ -108,8 +148,6 @@
     }
 }
 
-.hide {}
-
 .myCriterias {
     flex-grow: 0;
     margin-right: 0px;
@@ -117,6 +155,8 @@
 
 ::ng-deep.searchTemplateMenu.mat-menu-panel {
     max-width: 400px !important;
+    width: 400px !important;
+    max-height: 400px !important;
 }
 
 .menuTitle {

@@ -2,11 +2,11 @@ import { Component, ViewChild, OnInit, HostListener, AfterViewInit } from '@angu
 import { DomSanitizer } from '@angular/platform-browser';
 import { MatIconRegistry } from '@angular/material/icon';
 import { MAT_TOOLTIP_DEFAULT_OPTIONS, MatTooltipDefaultOptions } from '@angular/material/tooltip';
-import { HeaderService } from '../service/header.service';
-import { AppService } from '../service/app.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { HttpClient } from '@angular/common/http';
-import { AuthService } from '../service/auth.service';
+import { AuthService } from '@service/auth.service';
 import { environment } from '../environments/environment';
 import { TranslateService } from '@ngx-translate/core';
 

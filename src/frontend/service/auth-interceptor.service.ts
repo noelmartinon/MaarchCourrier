@@ -4,10 +4,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { catchError, switchMap } from 'rxjs/operators';
 import { NotificationService } from './notification/notification.service';
 import { AuthService } from './auth.service';
-import { Observable } from 'rxjs/internal/Observable';
-import { of } from 'rxjs/internal/observable/of';
 import { Router } from '@angular/router';
 import { FunctionsService } from './functions.service';
+import { Observable, of } from 'rxjs';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {

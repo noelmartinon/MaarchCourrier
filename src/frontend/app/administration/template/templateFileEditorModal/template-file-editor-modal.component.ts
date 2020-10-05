@@ -1,10 +1,9 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { take } from 'rxjs/internal/operators/take';
-import { tap } from 'rxjs/internal/operators/tap';
 import { EcplOnlyofficeViewerComponent } from '../../../../plugins/onlyoffice-api-js/onlyoffice-viewer.component';
-import {CollaboraOnlineViewerComponent} from '../../../../plugins/collabora-online/collabora-online-viewer.component';
+import { CollaboraOnlineViewerComponent } from '../../../../plugins/collabora-online/collabora-online-viewer.component';
+import { take, tap } from 'rxjs/operators';
 
 @Component({
     templateUrl: 'template-file-editor-modal.component.html',
@@ -12,7 +11,7 @@ import {CollaboraOnlineViewerComponent} from '../../../../plugins/collabora-onli
 })
 export class TemplateFileEditorModalComponent implements OnInit {
 
-    
+
     loading: boolean = false;
     editorOptions: any = null;
     file: any = null;

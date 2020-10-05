@@ -3,13 +3,12 @@ import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NotificationService } from '../../../../service/notification/notification.service';
-import { HeaderService } from '../../../../service/header.service';
-import { AppService } from '../../../../service/app.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
 import { MaarchFlatTreeComponent } from '../../../../plugins/tree/maarch-flat-tree.component';
 import { map, tap, catchError, debounceTime, filter, distinctUntilChanged, switchMap, startWith } from 'rxjs/operators';
-import { of } from 'rxjs/internal/observable/of';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable, of } from 'rxjs';
 import { LatinisePipe } from 'ngx-pipes';
 
 @Component({

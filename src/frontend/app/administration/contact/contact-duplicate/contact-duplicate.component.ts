@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../../../service/notification/notification.service';
-import { HeaderService } from '../../../../service/header.service';
-import { AppService } from '../../../../service/app.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
 import { MatDialog } from '@angular/material/dialog';
-import { FunctionsService } from '../../../../service/functions.service';
-import { of } from 'rxjs/internal/observable/of';
+import { FunctionsService } from '@service/functions.service';
+import { of } from 'rxjs';
 import { catchError, tap, map, exhaustMap, filter, finalize } from 'rxjs/operators';
 import { SortPipe } from '../../../../plugins/sorting.pipe';
 import { FormControl } from '@angular/forms';

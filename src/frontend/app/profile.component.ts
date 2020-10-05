@@ -1,8 +1,8 @@
 import { Component, OnInit, NgZone, ViewChild, QueryList, ViewChildren, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../service/notification/notification.service';
-import { HeaderService } from '../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { debounceTime, switchMap, distinctUntilChanged, filter, tap } from 'rxjs/operators';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatExpansionPanel } from '@angular/material/expansion';
@@ -12,9 +12,9 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 import { FormControl, FormGroup, Validators, AbstractControl, ValidationErrors, ValidatorFn, FormBuilder } from '@angular/forms';
-import { AppService } from '../service/app.service';
-import { FunctionsService } from '../service/functions.service';
-import { AuthService } from '../service/auth.service';
+import { AppService } from '@service/app.service';
+import { FunctionsService } from '@service/functions.service';
+import { AuthService } from '@service/auth.service';
 import { Router } from '@angular/router';
 
 declare var $: any;

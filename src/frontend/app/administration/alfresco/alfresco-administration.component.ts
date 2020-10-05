@@ -1,17 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { AppService } from '../../../service/app.service';
-import { HeaderService } from '../../../service/header.service';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { AppService } from '@service/app.service';
+import { HeaderService } from '@service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatSidenav } from '@angular/material/sidenav';
-import { FunctionsService } from '../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { tap } from 'rxjs/internal/operators/tap';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 import { MaarchFlatTreeComponent } from '../../../plugins/tree/maarch-flat-tree.component';
-import { map } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-alfresco',

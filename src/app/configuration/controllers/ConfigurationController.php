@@ -93,7 +93,6 @@ class ConfigurationController
             }
 
             $data = ['listDisplay' => $data['listDisplay'], 'listEvent' => $data['listEvent']];
-
         }
 
         $data = json_encode($data);

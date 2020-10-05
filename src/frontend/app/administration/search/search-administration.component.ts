@@ -1,15 +1,13 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { FormControl } from '@angular/forms';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { startWith, map, tap, catchError } from 'rxjs/operators';
-import { Observable } from 'rxjs/internal/Observable';
-import { of } from 'rxjs/internal/observable/of';
-import { AppService } from '../../../service/app.service';
-import { HeaderService } from '../../../service/header.service';
-import { data } from 'jquery';
+import { Observable, of } from 'rxjs';
+import { AppService } from '@service/app.service';
+import { HeaderService } from '@service/header.service';
 
 declare var $: any;
 
@@ -241,7 +239,7 @@ export class SearchAdministrationComponent implements OnInit {
     };
     selectedProcessToolClone: string = null;
 
-    searchAdv: any = { list_event: {}, list_display: {}, list_event_data: {} };
+    searchAdv: any = { listEvent: {}, listDisplay: {}, list_event_data: {} };
 
     constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, public appService: AppService, public headerService: HeaderService) { }
 
@@ -256,25 +254,17 @@ export class SearchAdministrationComponent implements OnInit {
             );
 
         this.availableDataClone = JSON.parse(JSON.stringify(this.availableData));
-        const indexData: number = 0;
-        this.selectedTemplateDisplayedSecondaryData = this.searchAdv.list_display.templateColumns;
+        let indexData: number;
         this.selectedTemplateDisplayedSecondaryDataClone = this.selectedTemplateDisplayedSecondaryData;
-        /*this.searchAdv.list_display.subInfos.forEach((element: any) => {
+        this.displayedSecondaryData.forEach((element: any) => {
             indexData = this.availableData.map((e: any) => e.value).indexOf(element.value);
-            this.availableData[indexData].cssClasses = element.cssClasses;
-            this.displayedSecondaryData.push(this.availableData[indexData]);
+            // à revoir !!
+            // this.availableData[indexData].cssClasses = element.cssClasses;
+            // this.displayedSecondaryData.push(this.availableData[indexData]);
             this.availableData.splice(indexData, 1);
-        });*/
-        this.selectedListEvent = this.searchAdv.list_event;
+        });
+        this.selectedListEvent = this.searchAdv.listEvent;
         this.selectedListEventClone = this.selectedListEvent;
-        if (this.searchAdv.list_event === 'processDocument') {
-            this.selectedProcessTool.defaultTab = this.searchAdv.list_event_data === null ? 'dashboard' : this.searchAdv.list_event_data.defaultTab;
-            this.selectedProcessTool.canUpdateData = this.searchAdv.list_event_data === null ? false : this.searchAdv.list_event_data.canUpdateData;
-            this.selectedProcessTool.canUpdateModel = this.searchAdv.list_event_data === null ? false : this.searchAdv.list_event_data.canUpdateModel;
-        } else if (this.searchAdv.list_event === 'signatureBookAction') {
-            this.selectedProcessTool.canUpdateDocuments = this.searchAdv.list_event_data === null ? false : this.searchAdv.list_event_data.canUpdateDocuments;
-        }
-
         this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));
         this.displayedSecondaryDataClone = JSON.parse(JSON.stringify(this.displayedSecondaryData));
     }
@@ -282,9 +272,8 @@ export class SearchAdministrationComponent implements OnInit {
     initCustomFields() {
         return new Promise((resolve, reject) => {
             this.http.get('../rest/customFields').pipe(
-                // tslint:disable-next-line: no-shadowed-variable
-                map((data: any) => {
-                    data.customFields = data.customFields.map((info: any) => {
+                map((customData: any) => {
+                    customData.customFields = customData.customFields.map((info: any) => {
                         return {
                             'value': 'indexingCustomField_' + info.id,
                             'label': info.label,
@@ -293,10 +282,9 @@ export class SearchAdministrationComponent implements OnInit {
                             'icon': 'fa-hashtag'
                         };
                     });
-                    return data.customFields;
+                    return customData.customFields;
                 }),
                 tap((customs) => {
-                    // console.log(customs);
                     this.availableData = this.availableData.concat(customs);
                     resolve(true);
 
@@ -348,9 +336,8 @@ export class SearchAdministrationComponent implements OnInit {
         this.dataControl.setValue('');
     }
 
-    // tslint:disable-next-line: no-shadowed-variable
-    removeData(data: any, i: number) {
-        this.availableData.push(data);
+    removeData(rmData: any, i: number) {
+        this.availableData.push(rmData);
         this.displayedSecondaryData.splice(i, 1);
         this.dataControl.setValue('');
     }
@@ -374,19 +361,19 @@ export class SearchAdministrationComponent implements OnInit {
                     const defaultTab = templateData.configuration.listEvent.defaultTab;
                     const subInfos = templateData.configuration.listDisplay.subInfos;
                     const displayData = JSON.parse(JSON.stringify(subInfos));
-
+                    this.selectedTemplateDisplayedSecondaryData = templateData.configuration.listDisplay.templateColumns;
                     this.selectedProcessTool.defaultTab = defaultTab;
-                     displayData.forEach((element: { value: any; cssClasses: any; icon: any; }) => {
-                         displayData.slice()
+                    displayData.forEach((element: { value: any; cssClasses: any; icon: any; }) => {
+                        const sampleValue = this.availableData.filter((t: { value: any; }) => t.value === element.value)[0].sample;
+                        const label = this.availableData.filter((t: { value: any; }) => t.value === element.value)[0].label;
                         this.displayedSecondaryData.push({
                             'value': element.value,
-                            'label': this.translate.instant('lang.' + element.value),
-                            'sample': this.translate.instant('lang.' + element.value + 'Sample'),
+                            'label': label,
+                            'sample': sampleValue,
                             'cssClasses': element.cssClasses,
                             'icon': element.icon
                         });
                     });
-                    // console.log(this.displayedSecondaryData);
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -398,7 +385,6 @@ export class SearchAdministrationComponent implements OnInit {
     }
 
     saveTemplate() {
-        let objToSend = {};
         const template: any = [];
         this.displayedSecondaryData.forEach((element: any) => {
             template.push(
@@ -409,16 +395,18 @@ export class SearchAdministrationComponent implements OnInit {
                 }
             );
         });
-        objToSend = {
+        const objToSend = {
             templateColumns: this.selectedTemplateDisplayedSecondaryData,
             subInfos: template
         };
-
-        this.http.put('../rest/search/configuration', { 'listDisplay': objToSend, 'list_event': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
+        this.selectedListEvent = JSON.parse(JSON.stringify({
+            'defaultTab' : this.selectedProcessTool.defaultTab
+        }));
+        this.http.put('../rest/configurations/admin_search ', { 'listDisplay': objToSend, 'listEvent': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
             .subscribe(() => {
                 this.displayedSecondaryDataClone = JSON.parse(JSON.stringify(this.displayedSecondaryData));
-                this.searchAdv.list_display = template;
-                this.searchAdv.list_event = this.selectedListEvent;
+                this.searchAdv.listDisplay = template;
+                this.searchAdv.listEvent = this.selectedListEvent;
                 this.selectedListEventClone = this.selectedListEvent;
                 this.searchAdv.list_event_data = this.selectedProcessTool;
                 this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));

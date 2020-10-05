@@ -1,15 +1,15 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { HeaderService } from '../../service/header.service';
+import { HeaderService } from '@service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatInput } from '@angular/material/input';
 import { IndexingGroupModalComponent } from '../menu/menu-shortcut.component';
 import { Router } from '@angular/router';
-import { AppService } from '../../service/app.service';
-import { PrivilegeService } from '../../service/privileges.service';
-import { FunctionsService } from '../../service/functions.service';
-import { AuthService } from '../../service/auth.service';
+import { AppService } from '@service/app.service';
+import { PrivilegeService } from '@service/privileges.service';
+import { FunctionsService } from '@service/functions.service';
+import { AuthService } from '@service/auth.service';
 import { RegisteredMailImportComponent } from '@appRoot/registeredMail/import/registered-mail-import.component';
 
 

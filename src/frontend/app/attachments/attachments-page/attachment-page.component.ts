@@ -2,17 +2,17 @@ import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, tap, finalize, exhaustMap, filter } from 'rxjs/operators';
-import { of } from 'rxjs/internal/observable/of';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { of } from 'rxjs';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { AppService } from '../../../service/app.service';
+import { AppService } from '@service/app.service';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { FormControl, Validators, FormGroup } from '@angular/forms';
 import { DocumentViewerComponent } from '../../viewer/document-viewer.component';
-import { PrivilegeService } from '../../../service/privileges.service';
-import { HeaderService } from '../../../service/header.service';
+import { PrivilegeService } from '@service/privileges.service';
+import { HeaderService } from '@service/header.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { FunctionsService } from '../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     selector: 'app-attachment-page',

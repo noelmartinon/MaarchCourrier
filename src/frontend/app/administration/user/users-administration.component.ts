@@ -4,16 +4,14 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
-import { AppService } from '../../../service/app.service';
-import { FunctionsService } from '../../../service/functions.service';
-import { of } from 'rxjs/internal/observable/of';
-import { catchError } from 'rxjs/internal/operators/catchError';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
+import { FunctionsService } from '@service/functions.service';
+import { of } from 'rxjs';
 import { UsersImportComponent } from './import/users-import.component';
 import { UsersExportComponent } from './export/users-export.component';
-import { tap } from 'rxjs/internal/operators/tap';
-import { filter, startWith, switchMap } from 'rxjs/operators';
+import { catchError, filter, tap } from 'rxjs/operators';
 import { AdministrationService } from '../administration.service';
 
 @Component({
@@ -26,7 +24,7 @@ export class UsersAdministrationComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
-    
+
     loading: boolean = true;
     updateListModel: boolean = true;
     updateListInstance: boolean = true;
@@ -437,7 +435,7 @@ export class UsersAdministrationComponent implements OnInit {
     styleUrls: ['users-administration-redirect-modal.scss'],
 })
 export class UsersAdministrationRedirectModalComponent implements OnInit {
-    
+
     loadModel: boolean = false;
     loadInstance: boolean = false;
     modalTitle: string = this.translate.instant('lang.confirmAction');

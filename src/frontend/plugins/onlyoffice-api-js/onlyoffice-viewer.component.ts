@@ -10,14 +10,13 @@ import {
 } from '@angular/core';
 import './onlyoffice-api.js';
 import { HttpClient } from '@angular/common/http';
-import { catchError, tap, filter, finalize } from 'rxjs/operators';
+import { catchError, tap, filter } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { ConfirmComponent } from '../modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { HeaderService } from '../../service/header.service';
-import { Subject } from 'rxjs/internal/Subject';
-import { of } from 'rxjs/internal/observable/of';
-import { NotificationService } from '../../service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { of, Subject } from 'rxjs';
+import { NotificationService } from '@service/notification/notification.service';
 
 declare var $: any;
 declare var DocsAPI: any;

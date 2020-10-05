@@ -2,10 +2,10 @@ import { Component, OnInit, Input, ViewChild, ElementRef, Output, EventEmitter }
 import { HttpClient } from '@angular/common/http';
 import { FormControl } from '@angular/forms';
 import { tap, catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs/internal/observable/of';
-import { NotificationService } from '../../../../../service/notification/notification.service';
-import { HeaderService } from '../../../../../service/header.service';
-import { FunctionsService } from '../../../../../service/functions.service';
+import { of } from 'rxjs';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     selector: 'app-issuing-site-input',

@@ -2,8 +2,8 @@ import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@an
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../../service/notification/notification.service';
-import { HeaderService } from '../../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { FormControl } from '@angular/forms';
 import { debounceTime, switchMap, distinctUntilChanged, filter } from 'rxjs/operators';
 import { MatPaginator } from '@angular/material/paginator';
@@ -11,7 +11,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
-import { AppService } from '../../../../service/app.service';
+import { AppService } from '@service/app.service';
 
 declare var $: any;
 

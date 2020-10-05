@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { HeaderService } from '../service/header.service';
-import { AppService } from '../service/app.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
 import { environment } from '../environments/environment';
-import {catchError, tap} from 'rxjs/operators';
-import {HttpClient} from '@angular/common/http';
-import {of} from 'rxjs/internal/observable/of';
-import {NotificationService} from '../service/notification/notification.service';
+import { catchError, tap } from 'rxjs/operators';
+import { HttpClient } from '@angular/common/http';
+import { NotificationService } from '@service/notification/notification.service';
+import { of } from 'rxjs';
 
 @Component({
     templateUrl: 'about-us.component.html',
@@ -15,7 +15,7 @@ import {NotificationService} from '../service/notification/notification.service'
 export class AboutUsComponent implements OnInit {
 
     applicationVersion: string;
-    
+
 
     loading: boolean = false;
 

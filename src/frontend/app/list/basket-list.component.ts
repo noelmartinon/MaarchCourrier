@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -9,21 +9,17 @@ import { MatSort } from '@angular/material/sort';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { startWith, switchMap, map, catchError, takeUntil, tap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HeaderService } from '../../service/header.service';
-import { FiltersListService } from '../../service/filtersList.service';
+import { HeaderService } from '@service/header.service';
+import { FiltersListService } from '@service/filtersList.service';
 import { FiltersToolComponent } from './filters/filters-tool.component';
 import { ActionsListComponent } from '../actions/actions-list.component';
 import { Overlay } from '@angular/cdk/overlay';
 import { PanelListComponent } from './panel/panel-list.component';
-import { AppService } from '../../service/app.service';
+import { AppService } from '@service/app.service';
 import { FoldersService } from '../folder/folders.service';
 import { ActionsService } from '../actions/actions.service';
 import { ContactResourceModalComponent } from '../contact/contact-resource/modal/contact-resource-modal.component';
-import { Subject } from 'rxjs/internal/Subject';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { of } from 'rxjs/internal/observable/of';
-import { Observable } from 'rxjs/internal/Observable';
-import { merge } from 'rxjs';
+import { merge, Observable, of, Subject, Subscription } from 'rxjs';
 
 declare var $: any;
 

@@ -1,18 +1,17 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { AppService } from '../../../service/app.service';
-import { tap } from 'rxjs/internal/operators/tap';
-import { catchError, map, finalize, filter, exhaustMap } from 'rxjs/operators';
+import { AppService } from '@service/app.service';
+import { catchError, map, finalize, filter, exhaustMap, tap } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { FunctionsService } from '../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 
 @Component({
     templateUrl: 'diffusionModels-administration.component.html'
@@ -21,7 +20,6 @@ export class DiffusionModelsAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
     loading: boolean = false;
 
     listTemplates: any[] = [];

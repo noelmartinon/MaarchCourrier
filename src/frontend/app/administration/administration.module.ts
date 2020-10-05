@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 
 import { SharedModule } from '../app-common.module';
 
-import { InternationalizationModule } from '../../service/translate/internationalization.module';
+import { InternationalizationModule } from '@service/translate/internationalization.module';
 
 import { AdministrationRoutingModule } from './administration-routing.module';
 // import { NgxChartsModule } from '@swimlane/ngx-charts';
@@ -10,7 +10,6 @@ import { JoyrideModule } from 'ngx-joyride';
 import { DocumentViewerModule } from '../viewer/document-viewer.module';
 
 import { AdministrationService } from './administration.service';
-
 
 import { AccountLinkComponent } from './user/account-link/account-link.component';
 import { ActionAdministrationComponent } from './action/action-administration.component';

@@ -9,7 +9,7 @@ import { ActionsListComponent } from './actions/actions-list.component';
 import { FollowedActionListComponent } from './home/followed-action-list/followed-action-list.component';
 import { NgPipesModule } from 'ngx-pipes';
 
-import { InternationalizationModule } from '../service/translate/internationalization.module';
+import { InternationalizationModule } from '@service/translate/internationalization.module';
 import { TranslateService } from '@ngx-translate/core';
 
 @NgModule({

@@ -8,12 +8,12 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FormGroup, Validators, AbstractControl, ValidationErrors, ValidatorFn, FormBuilder } from '@angular/forms';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { SelectionModel } from '@angular/cdk/collections';
 import { AccountLinkComponent } from './account-link/account-link.component';
-import { AppService } from '../../../service/app.service';
-import { PrivilegeService } from '../../../service/privileges.service';
+import { AppService } from '@service/app.service';
+import { PrivilegeService } from '@service/privileges.service';
 import { MaarchFlatTreeComponent } from '../../../plugins/tree/maarch-flat-tree.component';
 import { environment } from '../../../environments/environment';
 

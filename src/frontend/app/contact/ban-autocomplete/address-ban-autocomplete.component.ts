@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormControl } from '@angular/forms';
 import { Observable, of } from 'rxjs';
@@ -9,7 +9,7 @@ import { debounceTime, filter, distinctUntilChanged, tap, switchMap, exhaustMap,
 
 @Component({
     selector: 'app-address-ban-input',
-    templateUrl: "address-ban-autocomplete.component.html",
+    templateUrl: 'address-ban-autocomplete.component.html',
     styleUrls: [
         'address-ban-autocomplete.component.scss',
         '../../indexation/indexing-form/indexing-form.component.scss'
@@ -17,8 +17,6 @@ import { debounceTime, filter, distinctUntilChanged, tap, switchMap, exhaustMap,
 })
 
 export class AddressBanAutocompleteComponent implements OnInit {
-
-    
 
     loading: boolean = false;
 
@@ -63,7 +61,7 @@ export class AddressBanAutocompleteComponent implements OnInit {
     }
 
     initBanSearch() {
-        this.http.get("../rest/ban/availableDepartments").pipe(
+        this.http.get('../rest/ban/availableDepartments').pipe(
             tap((data: any) => {
                 if (data.default !== null && data.departments.indexOf(data.default.toString()) !== - 1) {
                     this.addressBANCurrentDepartment = data.default;
@@ -101,19 +99,20 @@ export class AddressBanAutocompleteComponent implements OnInit {
     }
 
     getDatas(data: string) {
-        return this.http.get('../rest/autocomplete/banAddresses', { params: { "address": data, 'department': this.addressBANCurrentDepartment } });
+        return this.http.get('../rest/autocomplete/banAddresses', { params: { 'address': data, 'department': this.addressBANCurrentDepartment } });
     }
 
     selectOpt(ev: any) {
         const objAddress = {
             id: ev.option.value.banId,
+            label : `${ev.option.value.number} ${ev.option.value.afnorName}, ${ev.option.value.city} (${ev.option.value.postalCode})`,
             addressNumber: ev.option.value.number,
             addressStreet: ev.option.value.afnorName,
-            addressPostcode : ev.option.value.postalCode,
+            addressPostcode: ev.option.value.postalCode,
             addressTown: ev.option.value.city,
             longitude: ev.option.value.lon,
-            latitude: ev.option.value.lat
-        }
+            latitude: ev.option.value.lat,
+        };
 
         this.setFormValue(objAddress);
 
@@ -126,7 +125,7 @@ export class AddressBanAutocompleteComponent implements OnInit {
         });
     }
 
-    setFormValue(item: any) {    
+    setFormValue(item: any) {
         this.valuesToDisplay[item['id']] = `${item.addressNumber} ${item.addressStreet}, ${item.addressTown} (${item.addressPostcode})`;
         this.controlAutocomplete.setValue([item]);
     }

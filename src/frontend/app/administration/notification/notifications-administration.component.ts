@@ -4,14 +4,12 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
-import { AppService } from '../../../service/app.service';
-import { FunctionsService } from '../../../service/functions.service';
-import { tap } from 'rxjs/internal/operators/tap';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { of } from 'rxjs/internal/observable/of';
-import { finalize } from 'rxjs/operators';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
+import { FunctionsService } from '@service/functions.service';
+import { of } from 'rxjs';
+import { catchError, finalize, tap } from 'rxjs/operators';
 import { AdministrationService } from '../administration.service';
 
 @Component({
@@ -24,7 +22,6 @@ export class NotificationsAdministrationComponent implements OnInit {
 
     notifications: any[] = [];
     loading: boolean = false;
-    
 
     hours: any;
     minutes: any;

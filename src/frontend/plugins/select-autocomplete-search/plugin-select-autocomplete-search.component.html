@@ -2,6 +2,12 @@
     <mat-label *ngIf="appService.getViewMode() || showLabel">{{label}}</mat-label>
     <mat-select [id]="id" [formControl]="formControlSelect" [placeholder]="placeholderLabel" #test
         (selectionChange)="launchEvent($event)" (openedChange)="resetACDatas()" [required]="required" [multiple]="multiple">
+        <mat-select-trigger *ngIf="multiple">
+            {{formControlSelect.value ? getFirstDataLabel() : ''}}
+            <span *ngIf="formControlSelect.value?.length > 1" class="multipleLabels">
+              (+{{formControlSelect.value.length - 1}} {{'lang.others' | translate | lowercase}})
+            </span>
+          </mat-select-trigger>
         <input matInput class="mat-select-search-input mat-select-search-hidden" />
 
         <div class="mat-select-search-inner"
@@ -20,11 +26,6 @@
         </div>
         <mat-option *ngIf="showResetOption" [value]="null"><i>({{'lang.emptyValue' | translate}})</i></mat-option>
         <mat-option *ngFor="let value of filteredDatas | async" [value]="returnValue === 'id' ? value.id : value"
-            [title]="value.title !== undefined ? value.title : value.label" [disabled]="value.disabled"
-            [class.opt-group]="value.isTitle" [style.color]="value.color">
-            <span [innerHTML]="value.label"></span>
-        </mat-option>
-        <mat-option *ngFor="let value of selecteded" [value]="returnValue === 'id' ? value.id : value"
             [title]="value.title !== undefined ? value.title : value.label" [disabled]="value.disabled"
             [class.opt-group]="value.isTitle" [style.color]="value.color">
             <span [innerHTML]="value.label"></span>

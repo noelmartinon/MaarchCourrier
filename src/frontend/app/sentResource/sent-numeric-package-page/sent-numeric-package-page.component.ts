@@ -1,19 +1,17 @@
 import { Component, OnInit, Inject, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { switchMap, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize, map } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
-import { FunctionsService } from '../../../service/functions.service';
-import { ContactService } from '../../../service/contact.service';
-import { AppService } from '../../../service/app.service';
+import { FunctionsService } from '@service/functions.service';
+import { ContactService } from '@service/contact.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { PrivilegeService } from '../../../service/privileges.service';
-import { HeaderService } from '../../../service/header.service';
+import { PrivilegeService } from '@service/privileges.service';
+import { HeaderService } from '@service/header.service';
 import { StripTagsPipe, ReversePipe } from 'ngx-pipes';
-import { Observable } from 'rxjs/internal/Observable';
-import { of } from 'rxjs/internal/observable/of';
+import { Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 @Component({
@@ -24,8 +22,6 @@ import { environment } from '../../../environments/environment';
 })
 export class SentNumericPackagePageComponent implements OnInit {
 
-
-    
     loading: boolean = true;
 
     availableEmailModels: any[] = [];

@@ -1,16 +1,16 @@
 import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu';
 
 import { Router } from '@angular/router';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { filter, exhaustMap, tap, map, catchError } from 'rxjs/operators';
-import { HeaderService } from '../../../service/header.service';
+import { HeaderService } from '@service/header.service';
 import { MenuShortcutComponent } from '../../menu/menu-shortcut.component';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-followed-action-list',

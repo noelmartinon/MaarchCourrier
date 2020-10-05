@@ -1,9 +1,9 @@
 import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { FunctionsService } from '../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { tap, exhaustMap, map, startWith, catchError, finalize, filter } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { LatinisePipe } from 'ngx-pipes';

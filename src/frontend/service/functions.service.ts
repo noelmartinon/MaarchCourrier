@@ -102,6 +102,10 @@ export class FunctionsService {
         }
     }
 
+    formatSerializedDateToDateString(date: string) {
+        return this.formatDateObjectToDateString(new Date(date));
+    }
+
     listSortingDataAccessor(data: any, sortHeaderId: any) {
         if (typeof data[sortHeaderId] === 'string') {
             return data[sortHeaderId].toLowerCase();

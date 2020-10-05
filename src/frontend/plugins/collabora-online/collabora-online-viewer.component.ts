@@ -1,14 +1,13 @@
-import {AfterViewInit, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {catchError, filter, tap} from 'rxjs/operators';
+import { AfterViewInit, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { catchError, filter, tap } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import {ConfirmComponent} from '../modal/confirm.component';
-import {MatDialog, MatDialogRef} from '@angular/material/dialog';
-import {HeaderService} from '../../service/header.service';
-import {Subject} from 'rxjs/internal/Subject';
-import {of} from 'rxjs/internal/observable/of';
-import {DomSanitizer} from '@angular/platform-browser';
-import { NotificationService } from '../../service/notification/notification.service';
+import { ConfirmComponent } from '../modal/confirm.component';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { HeaderService } from '@service/header.service';
+import { DomSanitizer } from '@angular/platform-browser';
+import { NotificationService } from '@service/notification/notification.service';
+import { of, Subject } from 'rxjs';
 
 declare var $: any;
 
@@ -82,7 +81,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
             this.isModified = true;
             this.triggerModifiedDocument.emit();
         } else if (response.MessageId === 'App_LoadingStatus' && response.Values.Status === 'Document_Loaded') {
-            const message = {'MessageId': 'Host_PostmessageReady'};
+            const message = { 'MessageId': 'Host_PostmessageReady' };
             this.collaboraFrame.nativeElement.contentWindow.postMessage(JSON.stringify(message), '*');
         }
     }
@@ -201,7 +200,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
 
     getTmpFile() {
         return new Promise((resolve) => {
-            this.http.post('../rest/collaboraOnline/file', {token: this.token}).pipe(
+            this.http.post('../rest/collaboraOnline/file', { token: this.token }).pipe(
                 tap((data: any) => {
                     this.file = {
                         name: this.key,
@@ -240,7 +239,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
 
     saveEncodedFile() {
         return new Promise((resolve) => {
-            this.http.post('../rest/collaboraOnline/encodedFile', {content: this.params.content, format: this.file.format, key: this.key}).pipe(
+            this.http.post('../rest/collaboraOnline/encodedFile', { content: this.params.content, format: this.file.format, key: this.key }).pipe(
                 tap(() => {
                     resolve(true);
                 }),

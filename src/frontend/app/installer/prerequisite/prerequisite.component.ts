@@ -1,13 +1,11 @@
-import { Component, OnInit, ViewChildren, QueryList, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChildren, QueryList } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/internal/operators/tap';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { of } from 'rxjs/internal/observable/of';
-import { catchError } from 'rxjs/internal/operators/catchError';
+import { NotificationService } from '@service/notification/notification.service';
+import { of } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from '../../../environments/environment';
-import { MatTooltip } from '@angular/material/tooltip';
+import { catchError, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-prerequisite',
@@ -15,8 +13,6 @@ import { MatTooltip } from '@angular/material/tooltip';
     styleUrls: ['./prerequisite.component.scss']
 })
 export class PrerequisiteComponent implements OnInit {
-
-    
 
     stepFormGroup: FormGroup;
 

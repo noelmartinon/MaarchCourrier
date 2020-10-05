@@ -3,15 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, tap, filter, distinctUntilChanged, take } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { AppService } from '../../../service/app.service';
+import { AppService } from '@service/app.service';
 import { DocumentViewerComponent } from '../../viewer/document-viewer.component';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { FunctionsService } from '../../../service/functions.service';
-import { ContactService } from '../../../service/contact.service';
+import { FunctionsService } from '@service/functions.service';
+import { ContactService } from '@service/contact.service';
 import { ContactAutocompleteComponent } from '../../contact/autocomplete/contact-autocomplete.component';
 
 @Component({

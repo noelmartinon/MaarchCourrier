@@ -4,8 +4,7 @@ import { Router } from '@angular/router';
 import { LocalStorageService } from './local-storage.service';
 import { NotificationService } from './notification/notification.service';
 import { HeaderService } from './header.service';
-import { Subject } from 'rxjs/internal/Subject';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable, Subject } from 'rxjs';
 
 @Injectable({
     providedIn: 'root'

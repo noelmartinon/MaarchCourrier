@@ -124,7 +124,7 @@ export class AppGuard implements CanActivate {
                         tokenInfo = this.authService.getToken();
 
                         if (tokenInfo !== null) {
-                            this.authService.setUrl(route.url.join('/'));
+                            // this.authService.setUrl(route.url.join('/'));
                             this.functionService.debug('', route.url.join('/'));
 
                             this.authService.setEvent('authenticationInformations');
@@ -158,6 +158,8 @@ export class AppGuard implements CanActivate {
                         this.privilegeService.resfreshUserShortcuts();
                         if (this.headerService.user.status === 'ABS') {
                             return this.router.navigate(['/activate-user']);
+                        } else if (this.localStorage.get('MaarchCourrierUrl_' + JSON.parse(atob(tokenInfo.split('.')[1])).user.id) !== route.url.join('/')) {
+                            return this.router.navigate(['/' + this.localStorage.get('MaarchCourrierUrl_' + JSON.parse(atob(tokenInfo.split('.')[1])).user.id)]);
                         } else {
                             if (urlArr.filter((url: any) => ['signatureBook', 'content'].indexOf(url) > -1).length > 0) {
                                 this.headerService.hideSideBar = true;

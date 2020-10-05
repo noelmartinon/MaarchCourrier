@@ -1,16 +1,16 @@
 import { Component, OnInit, ViewChild, ViewContainerRef, TemplateRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 
-import { ActivatedRoute, Router, ParamMap, RouterEvent, NavigationEnd } from '@angular/router';
-import { HeaderService } from '../../service/header.service';
-import { FiltersListService } from '../../service/filtersList.service';
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import { HeaderService } from '@service/header.service';
+import { FiltersListService } from '@service/filtersList.service';
 
 import { Overlay } from '@angular/cdk/overlay';
-import { AppService } from '../../service/app.service';
+import { AppService } from '@service/app.service';
 import { ActionsService } from '../actions/actions.service';
 import { tap, catchError, map, finalize, filter } from 'rxjs/operators';
 import { DocumentViewerComponent } from '../viewer/document-viewer.component';
@@ -19,14 +19,13 @@ import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { ContactResourceModalComponent } from '../contact/contact-resource/modal/contact-resource-modal.component';
 import { DiffusionsListComponent } from '../diffusions/diffusions-list.component';
 
-import { ContactService } from '../../service/contact.service';
+import { ContactService } from '@service/contact.service';
 import { VisaWorkflowComponent } from '../visa/visa-workflow.component';
-import { PrivilegeService } from '../../service/privileges.service';
+import { PrivilegeService } from '@service/privileges.service';
 import { AvisWorkflowComponent } from '../avis/avis-workflow.component';
-import { FunctionsService } from '../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { PrintedFolderModalComponent } from '../printedFolder/printed-folder-modal.component';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { of } from 'rxjs/internal/observable/of';
+import { of, Subscription } from 'rxjs';
 
 
 @Component({

@@ -1,11 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { TranslateService } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { tap } from 'rxjs/internal/operators/tap';
-import { of } from 'rxjs/internal/observable/of';
-import { catchError } from 'rxjs/internal/operators/catchError';
 import { environment } from '../../../environments/environment';
 
 
@@ -15,8 +12,6 @@ import { environment } from '../../../environments/environment';
     styleUrls: ['./welcome.component.scss']
 })
 export class WelcomeComponent implements OnInit {
-
-    
 
     stepFormGroup: FormGroup;
 

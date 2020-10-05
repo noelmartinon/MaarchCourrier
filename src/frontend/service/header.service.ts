@@ -151,4 +151,24 @@ export class HeaderService {
         // Attach portal to host
         this.portalHost.attach(templatePortal);
     }
+
+    initTemplate(template: TemplateRef<any>, viewContainerRef: ViewContainerRef, id: string = 'adminMenu', mode: string = '') {
+
+        // Create a portalHost from a DOM element
+        this.portalHost = new DomPortalHost(
+            document.querySelector(`#${id}`),
+            this.componentFactoryResolver,
+            this.appRef,
+            this.injector
+        );
+
+        // Create a template portal
+        const templatePortal = new TemplatePortal(
+            template,
+            viewContainerRef
+        );
+
+        // Attach portal to host
+        this.portalHost.attach(templatePortal);
+    }
 }

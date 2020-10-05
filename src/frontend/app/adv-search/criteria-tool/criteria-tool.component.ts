@@ -1,18 +1,18 @@
 import { Component, OnInit, ViewChild, ElementRef, EventEmitter, Output, Input, QueryList, ViewChildren } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { AppService } from '../../../service/app.service';
-import { FunctionsService } from '../../../service/functions.service';
+import { AppService } from '@service/app.service';
+import { FunctionsService } from '@service/functions.service';
 import { Observable, of } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { startWith, map, tap, filter, exhaustMap, catchError } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
 import { MatExpansionPanel } from '@angular/material/expansion';
-import { IndexingFieldsService } from '../../../service/indexing-fields.service';
+import { IndexingFieldsService } from '@service/indexing-fields.service';
 import { ActivatedRoute } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { AddSearchTemplateModalComponent } from './search-template/search-template-modal.component';
 import { DatePipe } from '@angular/common';
 import { ContactAutocompleteComponent } from '@appRoot/contact/autocomplete/contact-autocomplete.component';
@@ -20,12 +20,13 @@ import { PluginSelectAutocompleteSearchComponent } from '@plugins/select-autocom
 import { FolderInputComponent } from '@appRoot/folder/indexing/folder-input.component';
 import { TagInputComponent } from '@appRoot/tag/indexing/tag-input.component';
 import { IssuingSiteInputComponent } from '@appRoot/administration/registered-mail/issuing-site/indexing/issuing-site-input.component';
+import { SortPipe } from '@plugins/sorting.pipe';
 
 @Component({
     selector: 'app-criteria-tool',
     templateUrl: 'criteria-tool.component.html',
     styleUrls: ['criteria-tool.component.scss', '../../indexation/indexing-form/indexing-form.component.scss'],
-    providers: [DatePipe]
+    providers: [DatePipe, SortPipe]
 })
 export class CriteriaToolComponent implements OnInit {
 
@@ -40,25 +41,26 @@ export class CriteriaToolComponent implements OnInit {
     searchTermControl = new FormControl();
     searchCriteria = new FormControl();
 
-    hideCriteriaList: boolean = true;
-
     infoFields: any = [
         {
-            id : 1,
-            desc : 'lang.searchInAttachmentsInfo'
+            id: 1,
+            desc: 'lang.searchInAttachmentsInfo'
         },
         {
-            id : 2,
-            desc : 'lang.searchFulltextInfo'
+            id: 2,
+            desc: 'lang.searchFulltextInfo'
         },
         {
-            id : 3,
-            desc : 'lang.manualSearchInfo'
+            id: 3,
+            desc: 'lang.manualSearchInfo'
         },
     ];
 
     @Input() searchTerm: string = 'Foo';
     @Input() defaultCriteria: any = [];
+    @Input() adminMode: boolean = false;
+    @Input() openedPanel: boolean = false;
+    @Input() class: 'main' | 'secondary' = 'main';
 
     @Output() searchUrlGenerated = new EventEmitter<any>();
     @Output() loaded = new EventEmitter<any>();
@@ -83,18 +85,19 @@ export class CriteriaToolComponent implements OnInit {
         private dialog: MatDialog,
         private notify: NotificationService,
         private datePipe: DatePipe,
-        private latinisePipe: LatinisePipe) {
-            _activatedRoute.queryParams.subscribe(
-                params => {
-                    this.searchTerm = params.value;
-                }
-            );
-        }
+        private latinisePipe: LatinisePipe,
+        private sortPipe: SortPipe) {
+        _activatedRoute.queryParams.subscribe(
+            params => {
+                this.searchTerm = params.value;
+            }
+        );
+    }
 
     async ngOnInit(): Promise<void> {
         this.searchTermControl.setValue(this.searchTerm);
 
-        this.criteria = await this.indexingFields.getAllFields();
+        this.criteria = await this.indexingFields.getAllSearchFields();
 
         this.criteria.forEach((element: any) => {
             if (this.defaultCriteria.indexOf(element.identifier) > -1) {
@@ -113,16 +116,19 @@ export class CriteriaToolComponent implements OnInit {
         this.loading = false;
         setTimeout(() => {
             this.searchTermControl.valueChanges
-            .pipe(
-                startWith(''),
-                map(value => {
-                    if (typeof value === 'string' && !this.functions.empty(value)) {
-                        this.searchTerm = value;
-                    }
-                })
-            ).subscribe();
+                .pipe(
+                    startWith(''),
+                    map(value => {
+                        if (typeof value === 'string' && !this.functions.empty(value)) {
+                            this.searchTerm = value;
+                        }
+                    })
+                ).subscribe();
         }, 500);
-        this.getSearchTemplates();
+
+        if (!this.adminMode) {
+            this.getSearchTemplates();
+        }
     }
 
     private _filter(value: string): string[] {
@@ -149,7 +155,9 @@ export class CriteriaToolComponent implements OnInit {
         }
         this.initField(criteria);
         this.currentCriteria.push(criteria);
-        this.searchTermControl.setValue(this.searchTerm);
+        if (this.adminMode) {
+            criteria.control.disable();
+        }
         this.searchCriteria.reset();
         // this.searchCriteriaInput.nativeElement.blur();
         if (openPanel) {
@@ -193,7 +201,6 @@ export class CriteriaToolComponent implements OnInit {
     }
 
     focusFilter() {
-        this.hideCriteriaList = false;
         setTimeout(() => {
             this.searchCriteriaInput.nativeElement.focus();
         }, 100);
@@ -207,10 +214,10 @@ export class CriteriaToolComponent implements OnInit {
             };
         }
         this.currentCriteria.forEach((field: any) => {
-
             if (field.type === 'date' || field.type === 'integer') {
                 if (!this.functions.empty(field.control.value.start) || !this.functions.empty(field.control.value.end)) {
                     objCriteria[field.identifier] = {
+                        type : field.type,
                         values: {
                             start: !this.functions.empty(field.control.value.start) ? field.control.value.start : field.control.value.end,
                             end: !this.functions.empty(field.control.value.end) ? field.control.value.end : field.control.value.start
@@ -220,13 +227,17 @@ export class CriteriaToolComponent implements OnInit {
             } else {
                 if (!this.functions.empty(field.control.value)) {
                     objCriteria[field.identifier] = {
+                        type : field.type,
                         values: field.control.value
                     };
                 } else {
                     if (['recipients', 'senders'].indexOf(field.identifier) > -1 || field.type === 'contact') {
-                        objCriteria[field.identifier] = {
-                            values: [this.appContactAutocomplete.toArray().filter((component: any) => component.id === field.identifier)[0].getInputValue()]
-                        };
+                        if (!this.functions.empty(this.appContactAutocomplete.toArray().filter((component: any) => component.id === field.identifier)[0].getInputValue())) {
+                            objCriteria[field.identifier] = {
+                                type : field.type,
+                                values: [this.appContactAutocomplete.toArray().filter((component: any) => component.id === field.identifier)[0].getInputValue()]
+                            };
+                        }
                     }
                 }
             }
@@ -246,34 +257,21 @@ export class CriteriaToolComponent implements OnInit {
     getLabelValue(identifier: string, value: any) {
         if (this.functions.empty(value)) {
             return this.translate.instant('lang.undefined');
-        } else  if (['doctype', 'destination'].indexOf(identifier) > -1) {
-            return this.criteria.filter((field: any) => field.identifier === identifier)[0].values.filter((val: any) => val.id === value)[0].title;
-        } else {
-            if (this.criteria.filter((field: any) => field.identifier === identifier)[0].type === 'contact' || ['registeredMail_recipient', 'senders', 'recipients'].indexOf(this.criteria.filter((field: any) => field.identifier === identifier)[0].identifier)  > -1 ) {
-                return this.appContactAutocomplete.toArray().filter((component: any) => component.id === identifier)[0].getFormatedContact(value.id);
-            } else
-            if (this.criteria.filter((field: any) => field.identifier === identifier)[0].identifier === 'folders') {
-                return this.appFolderInput.getFolderLabel(value);
-            } else
-            if (this.criteria.filter((field: any) => field.identifier === identifier)[0].identifier === 'tags') {
-                return this.appTagInput.getTagLabel(value);
-            } else
-            if (this.criteria.filter((field: any) => field.identifier === identifier)[0].type === 'banAutocomplete') {
-                return `${value.addressNumber} ${value.addressStreet}, ${value.addressTown} (${value.addressPostcode})`;
-            } else
-            if (this.criteria.filter((field: any) => field.identifier === identifier)[0].type === 'selectAutocomplete') {
-                return this.pluginSelectAutocompleteSearch.toArray().filter((component: any) => component.id === identifier)[0].getDataLabel(value);
-            } else {
-                return this.criteria.filter((field: any) => field.identifier === identifier)[0].values.filter((val: any) => val.id === value)[0].label;
-
+        } else if (typeof value === 'object') {
+            if (Object.keys(value).indexOf('title') > -1) {
+                return value.title;
+            } else if (Object.keys(value).indexOf('label') > -1) {
+                return value.label;
             }
+        } else {
+            return value;
         }
     }
 
     getFormatLabel(identifier: string, value: any) {
 
         if (this.criteria.filter((field: any) => field.identifier === identifier)[0].type === 'date') {
-            return `${this.datePipe.transform(value.start, 'dd/MM/y') } - ${this.datePipe.transform(value.end, 'dd/MM/y')}`;
+            return `${this.datePipe.transform(value.start, 'dd/MM/y')} - ${this.datePipe.transform(value.end, 'dd/MM/y')}`;
         } else if (this.criteria.filter((field: any) => field.identifier === identifier)[0].type === 'integer') {
             return `${value.start} - ${value.end}`;
         } else {
@@ -286,12 +284,17 @@ export class CriteriaToolComponent implements OnInit {
     }
 
     getLabelValues(identifier: string, values: string[]) {
+
         if (values.length === 0) {
             return this.translate.instant('lang.undefined');
-        } else  if (['doctype', 'destination'].indexOf(identifier) > -1) {
-            return this.criteria.filter((field: any) => field.identifier === identifier)[0].values.filter((val: any) => values.indexOf(val.id) > -1).map((val: any) => val.title);
+        } else if (typeof values[0] === 'object') {
+            if (Object.keys(values[0]).indexOf('title') > -1) {
+                return values.map((item: any) => item.title);
+            } else if (Object.keys(values[0]).indexOf('label') > -1) {
+                return values.map((item: any) => item.label);
+            }
         } else {
-            return this.criteria.filter((field: any) => field.identifier === identifier)[0].values.filter((val: any) => values.indexOf(val.id) > -1).map((val: any) => val.label);
+            return values;
         }
     }
 
@@ -324,7 +327,7 @@ export class CriteriaToolComponent implements OnInit {
             return true;
         } else if (infoSearchNumber === 2 && this.isCurrentCriteriaById(['fulltext'])) {
             return true;
-        } else if (infoSearchNumber === 3 && (this.isCurrentCriteriaById(['recipients', 'senders', 'registeredMail_recipient']) || this.isCurrentCriteriaByType(['contact']))) {
+        } else if (infoSearchNumber === 3 && (this.isCurrentCriteriaById(['recipients', 'senders', 'registeredMail_recipient']) || this.isCurrentCriteriaByType(['contact']))) {
             return true;
         }
         return false;
@@ -388,6 +391,10 @@ export class CriteriaToolComponent implements OnInit {
                     elem.values = arrValues;
                     elem.event = 'calcLimitDate';
                     resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
                 })
             ).subscribe();
         });
@@ -399,6 +406,10 @@ export class CriteriaToolComponent implements OnInit {
                 tap((data: any) => {
                     elem.values = data.priorities;
                     resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
                 })
             ).subscribe();
         });
@@ -415,6 +426,10 @@ export class CriteriaToolComponent implements OnInit {
                         };
                     });
                     resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
                 })
             ).subscribe();
         });
@@ -431,6 +446,52 @@ export class CriteriaToolComponent implements OnInit {
                         };
                     });
                     resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    set_attachment_type_field(elem: any) {
+        return new Promise((resolve, reject) => {
+            this.http.get('../rest/attachmentsTypes').pipe(
+                tap((data: any) => {
+                    Object.keys(data.attachmentsTypes).forEach(templateType => {
+                        elem.values.push({
+                            id: templateType,
+                            label: data.attachmentsTypes[templateType].label
+                        });
+                    });
+                    elem.values = this.sortPipe.transform(elem.values, 'label');
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    set_groupSign_field(elem: any) {
+        return new Promise((resolve, reject) => {
+            this.http.get('../rest/groups').pipe(
+                tap((data: any) => {
+                    elem.values = data.groups.map((group: any) => {
+                        return {
+                            id: group.id,
+                            label: group.group_desc
+                        };
+                    });
+                    elem.values = this.sortPipe.transform(elem.values, 'label');
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
                 })
             ).subscribe();
         });
@@ -440,21 +501,25 @@ export class CriteriaToolComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get(`../rest/indexingModels/entities`).pipe(
                 tap((data: any) => {
-                        let title = '';
-                        elem.values = elem.values.concat(data.entities.map((entity: any) => {
-                            title = entity.entity_label;
+                    let title = '';
+                    elem.values = elem.values.concat(data.entities.map((entity: any) => {
+                        title = entity.entity_label;
 
-                            for (let index = 0; index < entity.level; index++) {
-                                entity.entity_label = '&nbsp;&nbsp;&nbsp;&nbsp;' + entity.entity_label;
-                            }
-                            return {
-                                id: entity.id,
-                                title: title,
-                                label: entity.entity_label,
-                                disabled: false
-                            };
-                        }));
+                        for (let index = 0; index < entity.level; index++) {
+                            entity.entity_label = '&nbsp;&nbsp;&nbsp;&nbsp;' + entity.entity_label;
+                        }
+                        return {
+                            id: entity.id,
+                            title: title,
+                            label: entity.entity_label,
+                            disabled: false
+                        };
+                    }));
                     resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
                 })
             ).subscribe();
         });
@@ -464,21 +529,45 @@ export class CriteriaToolComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get(`../rest/indexingModels/entities`).pipe(
                 tap((data: any) => {
-                        let title = '';
-                        elem.values = elem.values.concat(data.entities.map((entity: any) => {
-                            title = entity.entity_label;
+                    let title = '';
+                    elem.values = elem.values.concat(data.entities.map((entity: any) => {
+                        title = entity.entity_label;
 
-                            for (let index = 0; index < entity.level; index++) {
-                                entity.entity_label = '&nbsp;&nbsp;&nbsp;&nbsp;' + entity.entity_label;
-                            }
-                            return {
-                                id: entity.id,
-                                title: title,
-                                label: entity.entity_label,
-                                disabled: false
-                            };
-                        }));
+                        for (let index = 0; index < entity.level; index++) {
+                            entity.entity_label = '&nbsp;&nbsp;&nbsp;&nbsp;' + entity.entity_label;
+                        }
+                        return {
+                            id: entity.id,
+                            title: title,
+                            label: entity.entity_label,
+                            disabled: false
+                        };
+                    }));
                     resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    set_registeredMail_issuingSite_field(elem: any) {
+        return new Promise((resolve, reject) => {
+            this.http.get(`../rest/registeredMail/sites`).pipe(
+                tap((data: any) => {
+                    elem.values = data['sites'].map((item: any) => {
+                        return {
+                            id: item.id,
+                            label: `${item.label} (${item.accountNumber})`
+                        };
+                    });
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
                 })
             ).subscribe();
         });
@@ -486,24 +575,9 @@ export class CriteriaToolComponent implements OnInit {
 
     set_role_field(elem: any) {
         elem.type = 'selectAutocomplete';
-        elem.routeDatas = elem.identifier === 'role_dest' ? ['/rest/autocomplete/users'] : ['/rest/autocomplete/users', '/rest/autocomplete/entities'];
-
-        /*return new Promise((resolve, reject) => {
-            this.http.get(`../rest/users`).pipe(
-                tap((data: any) => {
-                    const arrValues: any[] = [];
-                    data.users.forEach((user: any) => {
-                        arrValues.push({
-                            id: user.id,
-                            label: `${user.firstname} ${user.lastname}`,
-                            title: `${user.firstname} ${user.lastname}`,
-                        });
-                    });
-                    elem.values = arrValues;
-                    resolve(true);
-                })
-            ).subscribe();
-        });*/
+        elem.routeDatas = ['role_dest', 'role_visa', 'role_sign'].indexOf(elem.identifier) > -1 ? ['/rest/autocomplete/users?serial=serialId'] : ['/rest/autocomplete/users', '/rest/autocomplete/entities?serial=serialId'];
+        elem.extraModel = ['type'];
+        elem.returnValue = 'object';
     }
 
     getSearchTemplates() {
@@ -517,10 +591,10 @@ export class CriteriaToolComponent implements OnInit {
     saveSearchTemplate() {
         let query: any = [];
         this.currentCriteria.forEach((field: any, index: number) => {
-            query.push({'identifier': field.identifier, 'values': field.control.value});
+            query.push({ 'identifier': field.identifier, 'values': field.control.value });
         });
 
-        query.push({'identifier': 'searchTerm', 'values': this.searchTermControl.value});
+        query.push({ 'identifier': 'meta', 'values': this.searchTermControl.value });
 
         const dialogRef = this.dialog.open(
             AddSearchTemplateModalComponent,
@@ -529,7 +603,7 @@ export class CriteriaToolComponent implements OnInit {
                 autoFocus: true,
                 disableClose: true,
                 data: {
-                    searchTemplate: {query: query}
+                    searchTemplate: { query: query }
                 }
             }
         );
@@ -576,16 +650,27 @@ export class CriteriaToolComponent implements OnInit {
 
     selectSearchTemplate(searchTemplate: any, openPanel: boolean = true) {
         this.currentCriteria = [];
+        let index: number;
         this.criteria.forEach((element: any) => {
-            let index = searchTemplate.query.map((field: any) => field.identifier).indexOf(element.identifier);
+            index = searchTemplate.query.map((field: any) => field.identifier).indexOf(element.identifier);
             if (index > -1) {
-                element.control = new FormControl({ value: searchTemplate.query[index].values, disabled: false });
-                element.control.value = searchTemplate.query[index].values;
+                if (element.control === undefined) {
+                    element.control = new FormControl({ value: searchTemplate.query[index].values, disabled: false });
+                }
+                element.control.setValue(searchTemplate.query[index].values);
+
                 this.addCriteria(element, openPanel);
+
+                if (element.type === 'selectAutocomplete') {
+                    setTimeout(() => {
+                        this.pluginSelectAutocompleteSearch.toArray().filter((component: any) => component.id === element.identifier)[0].setDatas(element.control.value);
+                        this.pluginSelectAutocompleteSearch.toArray().filter((component: any) => component.id === element.identifier)[0].resetACDatas();
+                    }, 0);
+                }
             }
         });
 
-        let index = searchTemplate.query.map((field: any) => field.identifier).indexOf('searchTerm');
+        index = searchTemplate.query.map((field: any) => field.identifier).indexOf('meta');
         if (index > -1) {
             this.searchTermControl.setValue(searchTemplate.query[index].values);
         }

@@ -1,10 +1,10 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormGroup, FormBuilder, Validators, ValidatorFn } from '@angular/forms';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { TranslateService } from '@ngx-translate/core';
-import { tap } from 'rxjs/internal/operators/tap';
 import { InstallerService } from '../installer.service';
 import { StepAction } from '../types';
+import { tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-useradmin',
@@ -12,7 +12,7 @@ import { StepAction } from '../types';
     styleUrls: ['./useradmin.component.scss']
 })
 export class UseradminComponent implements OnInit {
-    
+
     stepFormGroup: FormGroup;
 
     hide: boolean = true;
@@ -82,17 +82,17 @@ export class UseradminComponent implements OnInit {
 
     getInfoToInstall(): StepAction[] {
         return [{
-            idStep : 'userAdmin',
-            body : {
+            idStep: 'userAdmin',
+            body: {
                 login: this.stepFormGroup.controls['login'].value,
                 firstname: this.stepFormGroup.controls['firstname'].value,
                 lastname: this.stepFormGroup.controls['lastname'].value,
                 password: this.stepFormGroup.controls['password'].value,
                 email: this.stepFormGroup.controls['email'].value,
             },
-            route : {
-                method : 'PUT',
-                url : '../rest/installer/administrator'
+            route: {
+                method: 'PUT',
+                url: '../rest/installer/administrator'
             },
             description: this.translate.instant('lang.stepUserAdminActionDesc'),
             installPriority: 3

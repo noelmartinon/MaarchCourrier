@@ -2,10 +2,10 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { StepAction } from '../types';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { tap, catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 import { MatDrawer } from '@angular/material/sidenav';
 import { InstallerService } from '../installer.service';
 

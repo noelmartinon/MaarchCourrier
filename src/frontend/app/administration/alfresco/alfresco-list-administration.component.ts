@@ -1,21 +1,18 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { AppService } from '../../../service/app.service';
-import { FunctionsService } from '../../../service/functions.service';
-import { tap } from 'rxjs/internal/operators/tap';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { of } from 'rxjs/internal/observable/of';
+import { AppService } from '@service/app.service';
+import { FunctionsService } from '@service/functions.service';
+import { of } from 'rxjs';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { MatDialogRef } from '@angular/material/dialog/dialog-ref';
-import { filter } from 'rxjs/internal/operators/filter';
 import { MatDialog } from '@angular/material/dialog';
 import { AdministrationService } from '../administration.service';
-import { exhaustMap } from 'rxjs/operators';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
 
 @Component({
     templateUrl: 'alfresco-list-administration.component.html',

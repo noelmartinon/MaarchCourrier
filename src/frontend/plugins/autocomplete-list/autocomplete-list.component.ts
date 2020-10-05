@@ -8,8 +8,8 @@ import { HttpClient } from '@angular/common/http';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatAutocomplete, MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { Observable } from 'rxjs/internal/Observable';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'app-autocomplete-list',
@@ -55,7 +55,7 @@ export class AutocompleteListComponent implements OnInit {
     /**
      * FormControl used when autocomplete is used in form and must be catched in a form control.
      */
-    @Input() datasFormControl: FormControl  = new FormControl({ value: [], disabled: false });
+    @Input() datasFormControl: FormControl = new FormControl({ value: [], disabled: false });
 
 
     /**
@@ -83,8 +83,8 @@ export class AutocompleteListComponent implements OnInit {
         // this.initAutocompleteData();
         console.log(Object.keys(this.options[0]));
 
-        if (this.datasFormControl.value.length > 0 ) {
-        
+        if (this.datasFormControl.value.length > 0) {
+
         }
     }
 
@@ -121,7 +121,7 @@ export class AutocompleteListComponent implements OnInit {
 
     remove(option: string): void {
         console.log(option);
-        
+
         const index = this.datasFormControl.value.indexOf(option);
 
         if (index >= 0) {

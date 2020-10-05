@@ -2,11 +2,11 @@ import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 import {catchError, debounceTime, tap} from 'rxjs/operators';
-import { of } from 'rxjs/internal/observable/of';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
-import { FunctionsService } from '../../../service/functions.service';
-import { AppService } from '../../../service/app.service';
+import { of } from 'rxjs';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { FunctionsService } from '@service/functions.service';
+import { AppService } from '@service/app.service';
 import { TranslateService } from '@ngx-translate/core';
 import { MatTableDataSource } from '@angular/material/table';
 

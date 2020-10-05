@@ -1,14 +1,14 @@
 import {Component, OnInit, ViewChild, EventEmitter, Input, Output} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../service/notification/notification.service';
-import { of } from 'rxjs/internal/observable/of';
+import { NotificationService } from '@service/notification/notification.service';
+import { of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { map, catchError, filter, tap } from 'rxjs/operators';
-import { FunctionsService } from '../../service/functions.service';
-import { PrivilegeService } from '../../service/privileges.service';
+import { FunctionsService } from '@service/functions.service';
+import { PrivilegeService } from '@service/privileges.service';
 import { SentResourcePageComponent } from './sent-resource-page/sent-resource-page.component';
 import { SentNumericPackagePageComponent } from './sent-numeric-package-page/sent-numeric-package-page.component';
 

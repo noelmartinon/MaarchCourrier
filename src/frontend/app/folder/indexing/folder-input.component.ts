@@ -1,15 +1,16 @@
 import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { AppService } from '../../../service/app.service';
+import { AppService } from '@service/app.service';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { FormControl } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { debounceTime, filter, distinctUntilChanged, tap, switchMap, exhaustMap, catchError } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     selector: 'app-folder-input',
@@ -39,10 +40,14 @@ export class FolderInputComponent implements OnInit {
     newIds: number[] = [];
 
 
+    tmpObject: any = null;
+
     /**
      * FormControl used when autocomplete is used in form and must be catched in a form control.
      */
     @Input('control') controlAutocomplete: FormControl;
+
+    @Input() returnValue: 'id' | 'object' = 'id';
 
     @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
@@ -53,14 +58,33 @@ export class FolderInputComponent implements OnInit {
         public dialog: MatDialog,
         private headerService: HeaderService,
         public appService: AppService,
-        private latinisePipe: LatinisePipe
+        private latinisePipe: LatinisePipe,
+        private functionsService: FunctionsService
     ) {
 
     }
 
     ngOnInit() {
+        this.controlAutocomplete.valueChanges
+            .pipe(
+                tap((data: any) => {
+                    if (this.returnValue === 'object') {
+                        this.valuesToDisplay = {};
+                        data.forEach((item: any) => {
+                            this.valuesToDisplay[item.id] = item.label;
+                        });
+                    } else {
+                        if (!this.functionsService.empty(this.tmpObject)) {
+                            this.valuesToDisplay[this.tmpObject['id']] = this.tmpObject[this.key];
+                            this.tmpObject = null;
+                        } else {
+                            this.initFormValue();
+                        }
+
+                    }
+                })
+            ).subscribe();
         this.controlAutocomplete.setValue(this.controlAutocomplete.value === null || this.controlAutocomplete.value === '' ? [] : this.controlAutocomplete.value);
-        this.initFormValue();
         this.initAutocompleteRoute();
     }
 
@@ -69,7 +93,6 @@ export class FolderInputComponent implements OnInit {
         this.options = [];
         this.myControl.valueChanges
             .pipe(
-                //tap((value) => this.canAdd = value.length === 0 ? false : true),
                 debounceTime(300),
                 filter(value => value.length > 2),
                 distinctUntilChanged(),
@@ -89,7 +112,7 @@ export class FolderInputComponent implements OnInit {
     }
 
     getDatas(data: string) {
-        return this.http.get('../rest/autocomplete/folders', { params: { "search": data } });
+        return this.http.get('../rest/autocomplete/folders', { params: { 'search': data } });
     }
 
     selectOpt(ev: any) {
@@ -99,7 +122,6 @@ export class FolderInputComponent implements OnInit {
     }
 
     initFormValue() {
-
         this.controlAutocomplete.value.forEach((ids: any) => {
             this.http.get('../rest/folders/' + ids).pipe(
                 tap((data) => {
@@ -112,13 +134,20 @@ export class FolderInputComponent implements OnInit {
     }
 
     setFormValue(item: any) {
-        if (this.controlAutocomplete.value.indexOf(item['id']) === -1) {
+        const isSelected = this.returnValue === 'id' ? this.controlAutocomplete.value.indexOf(item['id']) > -1 : this.controlAutocomplete.value.map((val: any) => val.id).indexOf(item['id']) > -1;
+        if (!isSelected) {
             let arrvalue = [];
             if (this.controlAutocomplete.value !== null) {
                 arrvalue = this.controlAutocomplete.value;
             }
-            arrvalue.push(item['id']);
-            this.valuesToDisplay[item['id']] = item[this.key];
+            if (this.returnValue === 'id') {
+                arrvalue.push(item['id']);
+            } else {
+                arrvalue.push({
+                    id: item['id'],
+                    label: item['idToDisplay']
+                });
+            }
             this.controlAutocomplete.setValue(arrvalue);
         }
     }
@@ -185,7 +214,7 @@ export class FolderInputComponent implements OnInit {
         ).subscribe();
     }
 
-    getFolderLabel(id: string) {
-        return this.valuesToDisplay[id];
+    getFolderLabel(data: any) {
+        return this.returnValue === 'id' ? this.valuesToDisplay[data] : this.valuesToDisplay[data.id];
     }
 }

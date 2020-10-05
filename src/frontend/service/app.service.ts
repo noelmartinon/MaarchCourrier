@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/internal/operators/tap';
-import { catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs/internal/observable/of';
+import { catchError, finalize, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { NotificationService } from './notification/notification.service';
 import { AuthService } from './auth.service';
 import { AlertComponent } from '../plugins/modal/alert.component';

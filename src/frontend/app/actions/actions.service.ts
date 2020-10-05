@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { tap, catchError, filter, finalize, exhaustMap } from 'rxjs/operators';
 import { of, Subject, Observable } from 'rxjs';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { ConfirmActionComponent } from './confirm-action/confirm-action.component';
 import { MatDialog } from '@angular/material/dialog';
 import { CloseMailActionComponent } from './close-mail-action/close-mail-action.component';
@@ -32,8 +32,8 @@ import { ContinueAvisCircuitActionComponent } from './avis-continue-circuit-acti
 import { SendAvisParallelComponent } from './avis-parallel-send-action/send-avis-parallel-action.component';
 import { GiveAvisParallelActionComponent } from './avis-give-parallel-action/give-avis-parallel-action.component';
 import { ValidateAvisParallelComponent } from './avis-parallel-validate-action/validate-avis-parallel-action.component';
-import { HeaderService } from '../../service/header.service';
-import { FunctionsService } from '../../service/functions.service';
+import { HeaderService } from '@service/header.service';
+import { FunctionsService } from '@service/functions.service';
 import { ReconcileActionComponent } from './reconciliation-action/reconcile-action.component';
 import { SendAlfrescoActionComponent } from './send-alfresco-action/send-alfresco-action.component';
 import { SaveRegisteredMailActionComponent } from './save-registered-mail-action/save-registered-mail-action.component';
@@ -230,6 +230,10 @@ export class ActionsService implements OnDestroy {
             })
         ).subscribe();
 
+        if (!this.functions.empty(this.currentResourceLock)) {
+            clearInterval(this.currentResourceLock);
+        }
+        
         this.currentResourceLock = setInterval(() => {
             this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
                 tap(() => console.debug(`Cycle lock : `, this.currentResourceLock)),

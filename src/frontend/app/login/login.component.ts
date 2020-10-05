@@ -4,16 +4,16 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Validators, FormGroup, FormBuilder } from '@angular/forms';
 import { tap, catchError, finalize } from 'rxjs/operators';
-import { AuthService } from '../../service/auth.service';
-import { NotificationService } from '../../service/notification/notification.service';
+import { AuthService } from '@service/auth.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { environment } from '../../environments/environment';
-import { of } from 'rxjs/internal/observable/of';
-import { HeaderService } from '../../service/header.service';
-import { FunctionsService } from '../../service/functions.service';
+import { of } from 'rxjs';
+import { HeaderService } from '@service/header.service';
+import { FunctionsService } from '@service/functions.service';
 import { TimeLimitPipe } from '../../plugins/timeLimit.pipe';
 import { AlertComponent } from '../../plugins/modal/alert.component';
 import { TranslateService } from '@ngx-translate/core';
-import { LocalStorageService } from '../../service/local-storage.service';
+import { LocalStorageService } from '@service/local-storage.service';
 
 @Component({
     templateUrl: 'login.component.html',

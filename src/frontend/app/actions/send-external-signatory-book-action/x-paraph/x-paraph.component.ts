@@ -1,11 +1,11 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { HttpClient } from '@angular/common/http';
 import { FormControl } from '@angular/forms';
 import { startWith, map } from 'rxjs/operators';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 
 declare var $: any;
 
@@ -16,7 +16,6 @@ declare var $: any;
 })
 export class XParaphComponent implements OnInit {
 
-    
     loading: boolean = false;
 
     newAccount: any = {};

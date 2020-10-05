@@ -1,16 +1,16 @@
 import { Component, ViewChild, OnInit, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { HeaderService } from '../../../service/header.service';
-import { AppService } from '../../../service/app.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
 import { tap, finalize, catchError, filter, exhaustMap, map } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { FunctionsService } from '../../../service/functions.service';
-import { of } from 'rxjs/internal/observable/of';
+import { FunctionsService } from '@service/functions.service';
+import { of } from 'rxjs';
 import {RedirectIndexingModelComponent} from './redirectIndexingModel/redirect-indexing-model.component';
 import { AdministrationService } from '../administration.service';
 

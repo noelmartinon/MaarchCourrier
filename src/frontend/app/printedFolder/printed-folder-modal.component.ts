@@ -2,13 +2,13 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { map, tap, catchError, finalize } from 'rxjs/operators';
-import { FunctionsService } from '../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { FormControl } from '@angular/forms';
 import { SortPipe } from '../../plugins/sorting.pipe';
 import { SummarySheetComponent } from '../list/summarySheet/summary-sheet.component';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 
 
 @Component({

@@ -1,15 +1,15 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../../service/notification/notification.service';
-import { HeaderService } from '../../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
-import { AppService } from '../../../../service/app.service';
+import { AppService } from '@service/app.service';
 import { tap, catchError, filter, exhaustMap, map, finalize } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../../plugins/modal/confirm.component';
 import { SortPipe } from '../../../../plugins/sorting.pipe';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 
 @Component({
     templateUrl: 'contacts-custom-fields-administration.component.html',

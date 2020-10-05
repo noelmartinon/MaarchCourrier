@@ -8,13 +8,13 @@ import {
 import { ControlValueAccessor, FormControl } from '@angular/forms';
 import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
-import { take, takeUntil, startWith, map } from 'rxjs/operators';
+import { take, takeUntil, startWith, map, tap } from 'rxjs/operators';
 import { Subject, ReplaySubject, Observable } from 'rxjs';
 import { LatinisePipe } from 'ngx-pipes';
 import { TranslateService } from '@ngx-translate/core';
-import { AppService } from '../../service/app.service';
+import { AppService } from '@service/app.service';
 import { SortPipe } from '../../plugins/sorting.pipe';
-import { FunctionsService } from '../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     selector: 'plugin-select-search',
@@ -93,6 +93,8 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
 
     formControlSearch = new FormControl();
 
+    selected: any[] = [];
+
     /** Current search value */
     get value(): string {
         return this._value;
@@ -112,6 +114,9 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         private sortPipe: SortPipe) { }
 
     ngOnInit() {
+        if (this.multiple) {
+            this.matSelect.compareWith = (item1: any, item2: any) => item1 && item2 ? item1.id === item2.id : item1 === item2;
+        }
         if (this.optGroupList !== null) {
             this.initOptGroups();
         }
@@ -183,7 +188,7 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
                     startWith(''),
                     map(value => this._filter(value))
                 );
-        }, 0);
+        }, 200);
 
 
         // this.initMultipleHandling();
@@ -360,7 +365,7 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
 
     private _filter(value: string, showSelectedValues: boolean = false): string[] {
         if (value === '__SELECTED') {
-            return this.datas.filter((option: any) => this.formControlSelect.value.indexOf(option['id']) > -1);
+            return this.returnValue === 'id' ? this.datas.filter((option: any) => this.formControlSelect.value.indexOf(option['id']) > -1) : this.datas.filter((option: any) => this.formControlSelect.value.map((val: any) => val.id).indexOf(option['id']) > -1);
         } else if (typeof value === 'string' && value !== '') {
             const filterValue = this.latinisePipe.transform(value.toLowerCase());
 
@@ -373,8 +378,24 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     }
 
     launchEvent(ev: any) {
+        if (this.selected.length > 0) {
+            const ids = new Set(this.formControlSelect.value.map(d => d.id));
+            const merged = [...this.formControlSelect.value, ...this.selected.filter(d => !ids.has(d.id))];
+            this.formControlSelect.setValue(merged);
+        }
+
         if (this.afterSelected !== undefined) {
             this.afterSelected.emit(ev.value);
+        }
+    }
+
+    selectChange(ev: any) {
+        if (this.multiple && ev.isUserInput) {
+            if (ev.source._selected) {
+                this.selected = this.formControlSelect.value;
+            } else {
+                this.selected = this.selected.filter((val: any) => val.id !== ev.source.value.id);
+            }
         }
     }
 
@@ -386,5 +407,14 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         } else {
             return 'unknow validator';
         }
+    }
+
+    getFirstDataLabel() {
+        return this.formControlSelect.value[0].label.replace(/&nbsp;/g, '');
+        // return this.returnValue === 'id' ? this.formControlSelect.value[0].label.replace(/\u00a0/g, '') : this.formControlSelect.value.map((item: any) => item !== null ? item.label : this.translate.instant('lang.emptyValue'))[0];
+    }
+
+    emptyData() {
+        return this.returnValue === 'id' ? null : {id: null, label : this.translate.instant('lang.emptyValue')};
     }
 }

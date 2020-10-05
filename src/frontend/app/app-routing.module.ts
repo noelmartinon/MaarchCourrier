@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes, PreloadAllModules } from '@angular/router';
-import { AppGuard, AfterProcessGuard } from '../service/app.guard';
+import { AppGuard, AfterProcessGuard } from '@service/app.guard';
 
 import { ActivateUserComponent } from './activate-user.component';
 import { PasswordModificationComponent } from './login/passwordModification/password-modification.component';
@@ -28,10 +28,6 @@ const routes: Routes = [
     {
         path: 'install',
         loadChildren: () => import('./installer/installer.module').then(m => m.InstallerModule)
-    },
-    {
-        path: 'administration',
-        loadChildren: () => import('./administration/administration.module').then(m => m.AdministrationModule)
     },
     { path: 'signatureBook/users/:userId/groups/:groupId/baskets/:basketId/resources/:resId', canActivate: [AppGuard], component: SignatureBookComponent },
     { path: 'followed', canActivate: [AppGuard], component: FollowedDocumentListComponent },

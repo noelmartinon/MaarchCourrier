@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { tap } from 'rxjs/internal/operators/tap';
 import { FunctionsService } from './functions.service';
 import { NotificationService } from './notification/notification.service';
-import { of } from 'rxjs/internal/observable/of';
-import { finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { catchError, finalize, tap } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
@@ -208,6 +206,7 @@ export class IndexingFieldsService {
             default_value: null,
             values: [{ 'id': '2D', 'label': this.translate.instant('lang.registeredMail_2D') }, { 'id': '2C', 'label': this.translate.instant('lang.registeredMail_2C') }, { 'id': 'RW', 'label': this.translate.instant('lang.registeredMail_RW') }],
             enabled: true,
+            searchHide: true
         },
         {
             identifier: 'registeredMail_issuingSite',
@@ -226,6 +225,7 @@ export class IndexingFieldsService {
             default_value: null,
             values: [],
             enabled: false,
+            searchHide: true
         },
         {
             identifier: 'registeredMail_warranty',
@@ -235,6 +235,7 @@ export class IndexingFieldsService {
             default_value: null,
             values: [{ 'id': 'R1', 'label': 'R1' }, { 'id': 'R2', 'label': 'R2' }, { 'id': 'R3', 'label': 'R3' }],
             enabled: true,
+            searchHide: true
         },
         {
             identifier: 'registeredMail_letter',
@@ -244,12 +245,13 @@ export class IndexingFieldsService {
             default_value: null,
             values: [{ 'id': true, 'label': this.translate.instant('lang.yes') }, { 'id': false, 'label': this.translate.instant('lang.no') }],
             enabled: true,
+            searchHide: true
         },
         {
             identifier: 'registeredMail_recipient',
             label: this.translate.instant('lang.registeredMailRecipient'),
             icon: 'fa-address-book',
-            type: 'registeredMailRecipient',
+            type: 'contact',
             default_value: null,
             values: [],
             enabled: true,
@@ -281,7 +283,66 @@ export class IndexingFieldsService {
             values: [],
             enabled: true,
             indexingHide: true
-        }
+        },
+        {
+            identifier: 'closingDate',
+            label: this.translate.instant('lang.closingDate'),
+            icon: 'fa-stopwatch',
+            type: 'date',
+            default_value: [],
+            values: [],
+            enabled: true
+        },
+        {
+            identifier: 'notes',
+            label: this.translate.instant('lang.note'),
+            icon: 'fa-comments',
+            type: 'string',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'barcode',
+            label: this.translate.instant('lang.barcode'),
+            icon: 'fa-barcode',
+            type: 'string',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'attachment_type',
+            label: this.translate.instant('lang.attachmentType'),
+            icon: 'fa-paperclip',
+            type: 'select',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'attachment_creationDate',
+            label: `${this.translate.instant('lang.creationDate')} (PJ)`,
+            icon: 'fa-calendar-day',
+            type: 'select',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'groupSign',
+            label: this.translate.instant('lang.groupSign'),
+            icon: 'fa-user-friends',
+            type: 'select',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
     ];
 
     customFields: any[] = [];
@@ -294,12 +355,12 @@ export class IndexingFieldsService {
         private notify: NotificationService,
         public functions: FunctionsService) { }
 
-    getCoreFields() {
-        return this.coreFields;
+    getCoreFields(exclude: string = '') {
+        return exclude === '' ? this.coreFields : this.coreFields.filter((field: any) => !field[exclude]);
     }
 
-    getFields() {
-        return this.fields;
+    getFields(exclude: string = '') {
+        return exclude === '' ? this.fields : this.fields.filter((field: any) => !field[exclude]);
     }
 
     getCustomFields() {
@@ -358,6 +419,17 @@ export class IndexingFieldsService {
         return mergedFields;
     }
 
+    async getAllSearchFields() {
+        const customFields = await this.getCustomFields();
+        const roleFields = await this.getRolesFields();
+
+        let mergedFields = this.getCoreFields('searchHide').concat(this.getFields('searchHide'));
+        mergedFields = mergedFields.concat(customFields);
+        mergedFields = mergedFields.concat(roleFields);
+
+        return mergedFields;
+    }
+
     getRolesFields() {
         return new Promise((resolve, reject) => {
             this.http.get(`../rest/roles`).pipe(
@@ -373,6 +445,24 @@ export class IndexingFieldsService {
                             values: [],
                             enabled: true,
                         });
+                    });
+                    fields.push({
+                        identifier: `role_visa`,
+                        label: this.translate.instant('lang.visaUser'),
+                        icon: 'fa-user-check',
+                        type: 'select',
+                        default_value: null,
+                        values: [],
+                        enabled: true,
+                    });
+                    fields.push({
+                        identifier: `role_sign`,
+                        label: this.translate.instant('lang.signUser'),
+                        icon: 'fa-user-tie',
+                        type: 'select',
+                        default_value: null,
+                        values: [],
+                        enabled: true,
                     });
                     this.roleFields = fields;
                 }),

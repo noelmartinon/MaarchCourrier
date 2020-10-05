@@ -1,4 +1,6 @@
+import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
+import { FunctionsService } from './functions.service';
 
 interface ListProperties {
     'page': number;
@@ -15,13 +17,16 @@ export class CriteriaSearchService {
     listsProperties: ListProperties = {
         page : 0,
         pageSize : 0,
-        order: 'creation_date',
+        order: 'creationDate',
         orderDir: 'DESC',
         criteria: [],
         filters: []
     };
 
-    constructor() { }
+    constructor(
+        private datePipe: DatePipe,
+        public functions: FunctionsService
+    ) { }
 
     initListsProperties(userId: number) {
 
@@ -62,4 +67,17 @@ export class CriteriaSearchService {
         return this.listsProperties.criteria;
     }
 
+    formatDatas(data: any) {
+        Object.keys(data).forEach(key => {
+            if (['folders', 'tags', 'registeredMail_issuingSite'].indexOf(key) > -1 || ['select', 'radio', 'checkbox'].indexOf(data[key].type) > -1) {
+                data[key].values = data[key].values.map((val: any) => val.id);
+            } else if (data[key].type === 'date') {
+                data[key].values.start = this.datePipe.transform(data[key].values.start, 'y-MM-dd');
+                data[key].values.end = this.datePipe.transform(data[key].values.end, 'y-MM-dd');
+            }
+            delete data[key].type;
+        });
+
+        return data;
+    }
 }

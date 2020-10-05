@@ -1,16 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import {MatDialog} from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
-import { AppService } from '../../../service/app.service';
+import { AppService } from '@service/app.service';
 import {tap, catchError, finalize, exhaustMap, filter} from 'rxjs/operators';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { IndexingFormComponent } from '../../indexation/indexing-form/indexing-form.component';
 import { ActivatedRoute, Router } from '@angular/router';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 
 @Component({
     templateUrl: 'indexing-model-administration.component.html',

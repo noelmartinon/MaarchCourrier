@@ -3,16 +3,16 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { MatSidenav } from '@angular/material/sidenav';
-import { HeaderService } from '../../../service/header.service';
-import { AppService } from '../../../service/app.service';
-import { PrivilegeService } from '../../../service/privileges.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
+import { PrivilegeService } from '@service/privileges.service';
 import { Observable, of } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { startWith, map, tap, catchError, exhaustMap } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { FunctionsService } from '../../../service/functions.service';
-import { FeatureTourService } from '../../../service/featureTour.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { FunctionsService } from '@service/functions.service';
+import { FeatureTourService } from '@service/featureTour.service';
 
 @Component({
     templateUrl: 'administration.component.html',

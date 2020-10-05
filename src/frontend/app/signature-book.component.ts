@@ -2,19 +2,18 @@ import { Component, OnInit, NgZone, ViewChild, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { tap, catchError, filter } from 'rxjs/operators';
-import { PrivilegeService } from '../service/privileges.service';
+import { PrivilegeService } from '@service/privileges.service';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AttachmentCreateComponent } from './attachments/attachment-create/attachment-create.component';
-import { FunctionsService } from '../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { AttachmentPageComponent } from './attachments/attachments-page/attachment-page.component';
 import { VisaWorkflowComponent } from './visa/visa-workflow.component';
 import { ActionsService } from './actions/actions.service';
-import { HeaderService } from '../service/header.service';
-import { AppService } from '../service/app.service';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { of } from 'rxjs/internal/observable/of';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
+import { of, Subscription } from 'rxjs';
 import { DocumentViewerComponent } from './viewer/document-viewer.component';
 
 declare var $: any;
@@ -29,7 +28,6 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     basketId: number;
     groupId: number;
     userId: number;
-    
 
     signatureBook: any = {
         consigne: '',

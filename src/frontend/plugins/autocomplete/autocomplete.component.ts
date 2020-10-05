@@ -8,7 +8,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { ConfirmComponent } from '../modal/confirm.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 
 @Component({
     selector: 'plugin-autocomplete',

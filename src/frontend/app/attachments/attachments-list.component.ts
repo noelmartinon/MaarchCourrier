@@ -1,7 +1,7 @@
 import { Component, OnInit, Output, Input, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { tap, finalize, catchError, filter, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -9,10 +9,10 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { AttachmentPageComponent } from './attachments-page/attachment-page.component';
 import { AttachmentCreateComponent } from './attachment-create/attachment-create.component';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
-import { PrivilegeService } from '../../service/privileges.service';
-import { HeaderService } from '../../service/header.service';
+import { PrivilegeService } from '@service/privileges.service';
+import { HeaderService } from '@service/header.service';
 import { VisaWorkflowModalComponent } from '../visa/modal/visa-workflow-modal.component';
-import { AppService } from '../../service/app.service';
+import { AppService } from '@service/app.service';
 
 @Component({
     selector: 'app-attachments-list',

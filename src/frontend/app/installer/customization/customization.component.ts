@@ -3,13 +3,13 @@ import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms'
 import { TranslateService } from '@ngx-translate/core';
 import { StepAction } from '../types';
 import { DomSanitizer } from '@angular/platform-browser';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { environment } from '../../../environments/environment';
 import { ScanPipe } from 'ngx-pipes';
 import { debounceTime, filter, tap, catchError } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { InstallerService } from '../installer.service';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 
 declare var tinymce: any;
 

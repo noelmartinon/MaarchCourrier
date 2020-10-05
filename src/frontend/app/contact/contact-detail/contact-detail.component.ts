@@ -1,11 +1,11 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { ContactService } from '../../../service/contact.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { ContactService } from '@service/contact.service';
 import { tap, catchError, finalize } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { FunctionsService } from '../../../service/functions.service';
-import { of } from 'rxjs/internal/observable/of';
+import { FunctionsService } from '@service/functions.service';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-contact-detail',

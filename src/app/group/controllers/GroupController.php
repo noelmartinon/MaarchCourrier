@@ -24,13 +24,15 @@ class GroupController
 
     public function get(Request $request, Response $response)
     {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_groups', 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
-        }
+        $hasPrivilege = PrivilegeController::hasPrivilege(['privilegeId' => 'admin_groups', 'userId' => $GLOBALS['id']]);
 
-        $groups = GroupModel::get(['orderBy' => ['group_desc']]);
-        foreach ($groups as $key => $value) {
-            $groups[$key]['users'] = GroupModel::getUsersById(['id' => $value['id'], 'select' => ['users.user_id', 'users.firstname', 'users.lastname']]);
+        $select = $hasPrivilege ? ['*'] : ['id', 'group_desc'];
+        $groups = GroupModel::get(['select' => $select, 'orderBy' => ['group_desc']]);
+
+        if ($hasPrivilege) {
+            foreach ($groups as $key => $value) {
+                $groups[$key]['users'] = GroupModel::getUsersById(['id' => $value['id'], 'select' => ['users.user_id', 'users.firstname', 'users.lastname']]);
+            }
         }
 
         return $response->withJson(['groups' => $groups]);

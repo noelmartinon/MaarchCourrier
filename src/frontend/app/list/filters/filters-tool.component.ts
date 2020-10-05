@@ -3,11 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { MatAutocompleteSelectedEvent, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
-import { FiltersListService } from '../../../service/filtersList.service';
+import { FiltersListService } from '@service/filtersList.service';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { startWith, map } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
-import { Observable } from 'rxjs/internal/Observable';
+import { Observable } from 'rxjs';
 
 declare var $: any;
 
@@ -23,8 +23,6 @@ export interface StateGroup {
     providers: [LatinisePipe],
 })
 export class FiltersToolComponent implements OnInit {
-
-    
 
     stateForm: FormGroup = this.fb.group({
         stateGroup: '',

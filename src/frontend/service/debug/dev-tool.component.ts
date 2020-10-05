@@ -2,12 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DevLangComponent } from './dev-lang.component';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/internal/operators/tap';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { NotificationService } from '../../service/notification/notification.service';
-import { of } from 'rxjs/internal/observable/of';
-import { FunctionsService } from '../../service/functions.service';
-import { filter } from 'rxjs/internal/operators/filter';
+import { NotificationService } from '@service/notification/notification.service';
+import { of } from 'rxjs';
+import { FunctionsService } from '@service/functions.service';
+import { catchError, filter, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-dev-tool',

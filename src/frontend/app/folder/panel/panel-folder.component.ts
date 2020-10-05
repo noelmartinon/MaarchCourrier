@@ -3,7 +3,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { FolderTreeComponent } from '../folder-tree.component';
 import { FoldersService } from '../folders.service';
 import { ActionsService } from '../../actions/actions.service';
-import { Subscription } from 'rxjs/internal/Subscription';
+import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'panel-folder',
@@ -12,7 +12,7 @@ import { Subscription } from 'rxjs/internal/Subscription';
 })
 export class PanelFolderComponent implements OnInit, OnDestroy {
 
-    
+
 
     @Input() selectedId: number;
 

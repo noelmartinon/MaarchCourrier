@@ -10,7 +10,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 
 /*PLUGINS IMPORTS*/
 import { AppServiceModule } from './app-service.module';
-import { NotificationModule } from '../service/notification/notification.module';
+import { NotificationModule } from '@service/notification/notification.module';
 
 import { MaarchTreeComponent } from '../plugins/tree/maarch-tree.component';
 import { MaarchFlatTreeComponent } from '../plugins/tree/maarch-flat-tree.component';
@@ -76,10 +76,11 @@ import { FolderActionListComponent } from './folder/folder-action-list/folder-ac
 
 import { LinkedResourceListComponent } from './linkedResource/linked-resource-list.component';
 
-import { InternationalizationModule } from '../service/translate/internationalization.module';
+import { InternationalizationModule } from '@service/translate/internationalization.module';
 import { TranslateService } from '@ngx-translate/core';
 
 import { RegisteredMailImportComponent } from '@appRoot/registeredMail/import/registered-mail-import.component';
+import { CriteriaToolComponent } from '@appRoot/adv-search/criteria-tool/criteria-tool.component';
 
 
 @NgModule({
@@ -137,6 +138,7 @@ import { RegisteredMailImportComponent } from '@appRoot/registeredMail/import/re
         LinkedResourceListComponent,
         NotesListComponent,
         NoteEditorComponent,
+        CriteriaToolComponent
 
     ],
     exports: [
@@ -186,6 +188,7 @@ import { RegisteredMailImportComponent } from '@appRoot/registeredMail/import/re
         FolderInputComponent,
         IssuingSiteInputComponent,
         RegisteredMailRecipientInputComponent,
+        CriteriaToolComponent
     ],
     providers: [],
     entryComponents: [

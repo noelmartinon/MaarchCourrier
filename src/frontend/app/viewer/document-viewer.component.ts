@@ -1,9 +1,9 @@
 import {Component, OnInit, Input, ViewChild, EventEmitter, Output, OnDestroy} from '@angular/core';
 import { HttpClient, HttpEventType } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../service/notification/notification.service';
-import { HeaderService } from '../../service/header.service';
-import { AppService } from '../../service/app.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
 import { tap, catchError, filter, map, exhaustMap, take, finalize } from 'rxjs/operators';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
@@ -12,11 +12,11 @@ import { SortPipe } from '../../plugins/sorting.pipe';
 import { PluginSelectSearchComponent } from '../../plugins/select-search/select-search.component';
 import { FormControl } from '@angular/forms';
 import { EcplOnlyofficeViewerComponent } from '../../plugins/onlyoffice-api-js/onlyoffice-viewer.component';
-import { FunctionsService } from '../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { DocumentViewerModalComponent } from './modal/document-viewer-modal.component';
-import { PrivilegeService } from '../../service/privileges.service';
+import { PrivilegeService } from '@service/privileges.service';
 import { VisaWorkflowModalComponent } from '../visa/modal/visa-workflow-modal.component';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 import { CollaboraOnlineViewerComponent } from '../../plugins/collabora-online/collabora-online-viewer.component';
 
 @Component({
