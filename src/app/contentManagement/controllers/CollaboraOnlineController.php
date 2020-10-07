@@ -171,18 +171,6 @@ class CollaboraOnlineController
 
     public function saveFile(Request $request, Response $response, array $args)
     {
-        $headers = $request->getHeaders();
-
-        // Collabora online saves automatically every X seconds, but we do not want to save the document yet
-        if (empty($headers['HTTP_X_LOOL_WOPI_EXTENDEDDATA'][0])) {
-            return $response->withStatus(200);
-        }
-        $extendedData = $headers['HTTP_X_LOOL_WOPI_EXTENDEDDATA'][0];
-        $extendedData = explode('=', $extendedData);
-        if (empty($extendedData) || $extendedData[0] != 'FinalSave' || $extendedData[1] != 'True') {
-            return $response->withStatus(200);
-        }
-
         $queryParams = $request->getQueryParams();
 
         if (!Validator::stringType()->notEmpty()->validate($queryParams['access_token'])) {
