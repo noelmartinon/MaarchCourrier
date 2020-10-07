@@ -317,7 +317,7 @@ class MergeController
                     if ($customFieldsTypes[$customId] == 'banAutocomplete') {
                         $resource['customField_' . $customId] = "{$custom[0]['addressNumber']} {$custom[0]['addressStreet']} {$custom[0]['addressTown']} ({$custom[0]['addressPostcode']})";
                     } elseif ($customFieldsTypes[$customId] == 'contact') {
-                        $customValues = ContactController::getContactCustomField(['contacts' => $customFieldsValues[$customId]]);
+                        $customValues = ContactController::getContactCustomField(['contacts' => $custom]);
                         $resource['customField_' . $customId] = implode("\n", $customValues);
                     } else {
                         $resource['customField_' . $customId] = implode("\n", $custom);
