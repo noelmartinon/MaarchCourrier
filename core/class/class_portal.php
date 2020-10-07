@@ -82,22 +82,30 @@ class portal extends functions
                     }
                 }
             }
-        } elseif (is_file("xml/config.xml")) {
-            if (is_dir('../../custom')) {
-                $customs =  scandir('../../custom');
-                if (count($customs) == 4) {
-                    foreach ($customs as $custom) {
-                        if ($custom == 'custom.xml' || $custom == '.' || $custom == '..') {
-                            continue;
-                        }
-                        if (is_file("../../custom/{$custom}/apps/maarch_entreprise/xml/config.xml")) {
-                            $xmlfile = simplexml_load_file("../../custom/{$custom}/apps/maarch_entreprise/xml/config.xml");
-                            if ($xmlfile) {
-                                $_SESSION['config']['default_timezone'] = (string) $xmlfile->CONFIG->timezone;
-                            }
+        } elseif (is_dir('../../custom')) {
+            $customs =  scandir('../../custom');
+            if (count($customs) == 4) {
+                foreach ($customs as $custom) {
+                    if ($custom == 'custom.xml' || $custom == '.' || $custom == '..') {
+                        continue;
+                    }
+                    if (is_file("../../custom/{$custom}/apps/maarch_entreprise/xml/config.xml")) {
+                        $xmlfile = simplexml_load_file("../../custom/{$custom}/apps/maarch_entreprise/xml/config.xml");
+                        if ($xmlfile) {
+                            $_SESSION['config']['default_timezone'] = (string) $xmlfile->CONFIG->timezone;
                         }
                     }
                 }
+            }
+        } elseif (is_file('apps/maarch_entreprise/xml/config.xml')) {
+            $xmlfile = simplexml_load_file("apps/maarch_entreprise/xml/config.xml");
+            if ($xmlfile) {
+                $_SESSION['config']['default_timezone'] = (string) $xmlfile->CONFIG->timezone;
+            }
+        } elseif (is_file('xml/config.xml')) {
+            $xmlfile = simplexml_load_file("xml/config.xml");
+            if ($xmlfile) {
+                $_SESSION['config']['default_timezone'] = (string) $xmlfile->CONFIG->timezone;
             }
         }
     }
