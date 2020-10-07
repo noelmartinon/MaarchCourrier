@@ -15,14 +15,14 @@ while ($state <> 'END') {
     /*                          LOAD_ALERTS_NOTIFS                               */
     /* Load parameters                                                    */
     /**********************************************************************/
-    case 'LOAD_ALERTS_NOTIFS' :
-        $query = "SELECT count(1) as count FROM " 
-            . _NOTIFICATIONS_TABLE_NAME 
+    case 'LOAD_ALERTS_NOTIFS':
+        $query = "SELECT count(1) as count FROM "
+            . _NOTIFICATIONS_TABLE_NAME
             . " WHERE event_id IN ('alert1', 'alert2') ";
         $stmt = Bt_doQuery($db, $query);
         $totalAlertsToProcess = $stmt->fetchObject()->count;
-        $query = "SELECT notification_sid, event_id FROM " 
-            . _NOTIFICATIONS_TABLE_NAME 
+        $query = "SELECT notification_sid, event_id FROM "
+            . _NOTIFICATIONS_TABLE_NAME
             . " WHERE event_id IN ('alert1', 'alert2') ";
         $stmt = Bt_doQuery($db, $query);
         if ($totalAlertsToProcess === 0) {
@@ -41,7 +41,7 @@ while ($state <> 'END') {
     /*                          LOAD_DOCTYPES                            */
     /* Load parameters                                                   */
     /**********************************************************************/
-    case 'LOAD_DOCTYPES' :
+    case 'LOAD_DOCTYPES':
         $query = "SELECT count(1) as count FROM doctypes";
         $stmt = Bt_doQuery($db, $query);
         $totalDocTypes = $stmt->fetchObject()->count;
@@ -58,8 +58,8 @@ while ($state <> 'END') {
     /*                          LIST_DOCS                                 */
     /* List the resources to proccess for alarms                          */
     /**********************************************************************/
-    case 'LIST_DOCS' :
-        $query = "SELECT count(1) as count" 
+    case 'LIST_DOCS':
+        $query = "SELECT count(1) as count"
             . " FROM " . $collView
             . " WHERE closing_date IS null"
             . " AND status NOT IN ('CLO', 'DEL', 'END')"
@@ -67,7 +67,7 @@ while ($state <> 'END') {
             . " AND process_limit_date IS NOT NULL";
         $stmt = Bt_doQuery($GLOBALS['db'], $query);
         $totalDocsToProcess = $stmt->fetchObject()->count;
-        $query = "SELECT res_id, type_id, process_limit_date, flag_alarm1, flag_alarm2" 
+        $query = "SELECT res_id, type_id, process_limit_date, flag_alarm1, flag_alarm2"
             . " FROM " . $collView
             . " WHERE closing_date IS null"
             . " AND status NOT IN ('CLO', 'DEL', 'END')"
@@ -90,36 +90,36 @@ while ($state <> 'END') {
     /*                          A_DOC                                     */
     /* Add notification to event_stack for each notif to be sent          */
     /**********************************************************************/
-    case 'A_DOC' :
-        if($currentDoc < $totalDocsToProcess) {
+    case 'A_DOC':
+        if ($currentDoc < $totalDocsToProcess) {
             $myDoc = $GLOBALS['docs'][$currentDoc];
             $myDoc->process_limit_date = str_replace("-", "/", $db->format_date($myDoc->process_limit_date));
             $logger->write("Processing document #" . $myDoc->res_id, 'INFO');
                 
             $myDoctype = $GLOBALS['doctypes'][$myDoc->type_id];
-            if(!$myDoctype) {
+            if (!$myDoctype) {
                 Bt_exitBatch(1, 'Unknown document type ' . $myDoc->type_id);
             }
             $logger->write("Document type id is #" . $myDoc->type_id, 'INFO');
             
             // Alert 1 = limit - n days
-            if($myDoc->flag_alarm1 != 'Y' && $myDoc->flag_alarm2 != 'Y') {
+            if ($myDoc->flag_alarm1 != 'Y' && $myDoc->flag_alarm2 != 'Y' && (integer)$myDoctype->delay1 > 0) {
                 $convertedDate = $alert_engine->dateFR2Time($myDoc->process_limit_date);
                 $date = $alert_engine->WhenOpenDay($convertedDate, (integer)$myDoctype->delay1, true);
                 $process_date = $db->dateformat($date, '-');
                 echo PHP_EOL . "$myDoc->process_limit_date - " . (integer)$myDoctype->delay1 . " days : " . $process_date;
                 $compare = $alert_engine->compare_date($process_date, date("d-m-Y"));
                 echo PHP_EOL . $compare;
-                if($compare == 'date2' || $compare == 'equal') {
+                if ($compare == 'date2' || $compare == 'equal') {
                     $logger->write("Alarm 1 will be sent", 'INFO');
-                    $info = 'Relance 1 pour traitement du document No' . $myDoc->res_id . ' avant date limite.';  
-                    if(count($GLOBALS['alert_notifs']['alert1']) > 0) {
-                        foreach($GLOBALS['alert_notifs']['alert1'] as $notification_sid) {
+                    $info = 'Relance 1 pour traitement du document No' . $myDoc->res_id . ' avant date limite.';
+                    if (count($GLOBALS['alert_notifs']['alert1']) > 0) {
+                        foreach ($GLOBALS['alert_notifs']['alert1'] as $notification_sid) {
                             $query = "INSERT INTO " . _NOTIF_EVENT_STACK_TABLE_NAME
                                 . " (notification_sid, table_name, record_id, user_id, event_info"
-                                . ", event_date)" 
-                                . " VALUES(" . $notification_sid . ", '" 
-                                . $collView . "', '" . $myDoc->res_id . "', 'superadmin', '" . $info . "', " 
+                                . ", event_date)"
+                                . " VALUES(" . $notification_sid . ", '"
+                                . $collView . "', '" . $myDoc->res_id . "', 'superadmin', '" . $info . "', "
                                 . $db->current_datetime() . ")";
                             Bt_doQuery($db, $query);
                         }
@@ -130,23 +130,23 @@ while ($state <> 'END') {
                 }
             }
             // Alert 2 = limit + n days
-            if($myDoc->flag_alarm2 != 'Y') {
+            if ($myDoc->flag_alarm2 != 'Y' && (integer)$myDoctype->delay2 > 0) {
                 $convertedDate = $alert_engine->dateFR2Time($myDoc->process_limit_date);
                 $date = $alert_engine->WhenOpenDay($convertedDate, (integer)$myDoctype->delay2);
                 $process_date = $db->dateformat($date, '-');
                 echo PHP_EOL . "$myDoc->process_limit_date + " . (integer)$myDoctype->delay2 . " days : " . $process_date;
                 $compare = $alert_engine->compare_date($process_date, date("d-m-Y"));
                 echo PHP_EOL . $compare;
-                if($compare == 'date2' || $compare == 'equal') {
+                if ($compare == 'date2' || $compare == 'equal') {
                     $logger->write("Alarm 2 will be sent", 'INFO');
-                    $info = 'Relance 2 pour traitement du document No' . $myDoc->res_id . ' apres date limite.';  
-                    if(count($GLOBALS['alert_notifs']['alert2']) > 0) {
-                        foreach($GLOBALS['alert_notifs']['alert2'] as $notification_sid) {
+                    $info = 'Relance 2 pour traitement du document No' . $myDoc->res_id . ' apres date limite.';
+                    if (count($GLOBALS['alert_notifs']['alert2']) > 0) {
+                        foreach ($GLOBALS['alert_notifs']['alert2'] as $notification_sid) {
                             $query = "INSERT INTO " . _NOTIF_EVENT_STACK_TABLE_NAME
                                 . " (notification_sid, table_name, record_id, user_id, event_info"
-                                . ", event_date)" 
-                                . " VALUES(" . $notification_sid . ", '" 
-                                . $collView . "', '" . $myDoc->res_id . "', 'superadmin', '" . $info . "', " 
+                                . ", event_date)"
+                                . " VALUES(" . $notification_sid . ", '"
+                                . $collView . "', '" . $myDoc->res_id . "', 'superadmin', '" . $info . "', "
                                 . $db->current_datetime() . ")";
                             Bt_doQuery($db, $query);
                         }
@@ -168,9 +168,10 @@ while ($state <> 'END') {
 
 $GLOBALS['logger']->write('End of process', 'INFO');
 Bt_logInDataBase(
-    $totalDocsToProcess, 0, 'process without error'
+    $totalDocsToProcess,
+    0,
+    'process without error'
 );
 //$GLOBALS['db']->disconnect();
 unlink($GLOBALS['lckFile']);
 exit($GLOBALS['exitCode']);
-?>

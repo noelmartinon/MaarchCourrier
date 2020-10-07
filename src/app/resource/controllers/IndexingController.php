@@ -233,10 +233,13 @@ class IndexingController
 
         if (!empty($queryParams['doctype'])) {
             $doctype = DoctypeModel::getById(['id' => $queryParams['doctype'], 'select' => ['process_delay']]);
-            $delay = $doctype['process_delay'];
+            $delay   = $doctype['process_delay'];
         } elseif (!empty($queryParams['priority'])) {
             $priority = PriorityModel::getById(['id' => $queryParams['priority'], 'select' => ['delays']]);
-            $delay = $priority['delays'];
+            $delay    = $priority['delays'];
+        }
+        if ($delay == 0) {
+            return $response->withJson(['processLimitDate' => null]);
         }
         if (!isset($delay) || !Validator::intVal()->validate($delay)) {
             return $response->withStatus(400)->withJson(['errors' => 'Delay is not a numeric value']);
