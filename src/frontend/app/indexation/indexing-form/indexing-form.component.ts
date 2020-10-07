@@ -991,14 +991,14 @@ export class IndexingFormComponent implements OnInit {
     }
 
     calcLimitDate(field: any, value: any) {
-        let limitDate: Date = null;
+        let limitDate: any = null;
         if (this.arrFormControl['processLimitDate'] !== undefined) {
             this.http.get('../../rest/indexing/processLimitDate', { params: { 'doctype': value } }).pipe(
                 tap((data: any) => {
-                    limitDate = new Date(data.processLimitDate);
+                    limitDate = data.processLimitDate !== null ? new Date(data.processLimitDate) : '';
                     this.arrFormControl['processLimitDate'].setValue(limitDate);
                 }),
-                filter(() => this.arrFormControl['priority'] !== undefined),
+                filter((data) => this.arrFormControl['priority'] !== undefined && data.processLimitDate !== null),
                 exhaustMap(() => this.http.get('../../rest/indexing/priority', { params: { 'processLimitDate': limitDate.toDateString() } })),
                 tap((data: any) => {
                     this.arrFormControl['priority'].setValue(data.priority);
@@ -1014,12 +1014,12 @@ export class IndexingFormComponent implements OnInit {
     }
 
     calcLimitDateByPriority(field: any, value: any) {
-        let limitDate: Date = null;
+        let limitDate: any = null;
 
         if (this.arrFormControl['processLimitDate'] !== undefined) {
             this.http.get('../../rest/indexing/processLimitDate', { params: { 'priority': value } }).pipe(
                 tap((data: any) => {
-                    limitDate = new Date(data.processLimitDate);
+                    limitDate = data.processLimitDate !== null ? new Date(data.processLimitDate) : '';
                     this.arrFormControl['processLimitDate'].setValue(limitDate);
                     this.setPriorityColor(field, value);
                 }),
