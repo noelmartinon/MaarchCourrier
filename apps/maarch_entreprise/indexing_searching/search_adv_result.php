@@ -218,7 +218,7 @@ if ($nbMeta > 0) {
             elseif ($tab_id_fields[$j] == 'doc_notes' && !empty($_REQUEST['doc_notes'])) {
                 $json_txt .= " 'doc_notes' : ['".addslashes(trim($_REQUEST['doc_notes']))."'],";
                 $s_doc_notes = $func->wash($_REQUEST['doc_notes'], "no", _NOTES, "no");
-                $where_request .= " res_id in(select identifier from ".$_SESSION['tablename']['not_notes']." where lower(note_text) LIKE lower(:noteText)) and ";
+                $where_request .= " res_id in(select identifier from notes where lower(note_text) LIKE lower(:noteText)) and ";
                 $arrayPDO = array_merge($arrayPDO, array(":noteText" => "%".$s_doc_notes."%"));
             }
             // Folder
