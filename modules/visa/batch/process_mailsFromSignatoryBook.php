@@ -319,7 +319,8 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
                 'status'          => 'TRA',
                 'encodedFile'     => $value->encodedFile,
                 'inSignatureBook' => true,
-                'originId'        => $resId
+                'originId'        => $resId,
+                'signatory_user_serial_id' => $value->signatory_user_serial_id ?? null
             ]);
         }
 
