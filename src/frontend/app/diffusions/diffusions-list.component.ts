@@ -102,7 +102,6 @@ export class DiffusionsListComponent implements OnInit {
     ) { }
 
     async ngOnInit(): Promise<void> {
-        await this.initParams();
         await this.initRoles();
         if (this.resId !== null && this.resId != 0 && this.target !== 'redirect') {
             this.loadListinstance(this.resId);
@@ -331,11 +330,12 @@ export class DiffusionsListComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get(`../../rest/roles?context=${this.target}`).pipe(
                 map((data: any) => {
+                    this.keepDiffusionRoleInOutgoingIndexation = data.parameters['keepDiffusionRoleInOutgoingIndexation'];
                     data.roles = data.roles.map((role: any) => {
                         return {
                             ...role,
                             id: role.id,
-                        }
+                        };
                     });
                     return data.roles;
                 }),
@@ -358,18 +358,6 @@ export class DiffusionsListComponent implements OnInit {
                     return of(false);
                 })
             ).subscribe();
-        });
-    }
-
-    initParams() {
-        return new Promise((resolve, reject) => {
-            this.http.get('../../rest/parameters/keepDiffusionRoleInOutgoingIndexation')
-                .subscribe((data: any) => {
-                    this.keepDiffusionRoleInOutgoingIndexation = data.parameter.param_value_int;
-                    resolve(true);
-                }, (err) => {
-                    this.notify.handleSoftErrors(err);
-                });
         });
     }
 
