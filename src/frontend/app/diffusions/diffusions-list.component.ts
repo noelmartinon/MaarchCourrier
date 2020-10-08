@@ -177,7 +177,7 @@ export class DiffusionsListComponent implements OnInit {
             }
         }
 
-        if (this.category === 'outgoing' && this.keepDiffusionRoleInOutgoingIndexation) {
+        if (this.category === 'outgoing' && !this.keepDiffusionRoleInOutgoingIndexation) {
             Object.keys(this.diffList).forEach(key => {
                 if (key !== 'dest') {
                     this.diffList[key].items = [];
