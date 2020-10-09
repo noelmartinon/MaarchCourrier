@@ -61,6 +61,9 @@ class EntityController
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         }
 
+        $entity['producerService'] = $entity['producer_service'];
+        unset($entity['producer_service']);
+
         $aEntities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]);
         foreach ($aEntities as $aEntity) {
             if ($aEntity['entity_id'] == $aArgs['id'] && $aEntity['allowed'] == false) {
@@ -235,10 +238,16 @@ class EntityController
             return $response->withStatus(400)->withJson(['errors' => _CAN_NOT_MOVE_IN_CHILD_ENTITY]);
         }
 
+        if (!empty($body['producerService'])) {
+            $body['producer_service'] = $body['producerService'];
+        } else {
+            $body['producer_service'] = $aArgs['id'];
+        }
+
         $neededData = [
             'entity_label', 'short_label', 'entity_type', 'adrs_1', 'adrs_2', 'adrs_3',
             'zipcode', 'city', 'country', 'email', 'business_id', 'parent_entity_id',
-            'ldap_id', 'archival_agreement', 'archival_agency', 'entity_full_name'
+            'ldap_id', 'entity_full_name', 'producer_service'
         ];
         foreach ($body as $key => $value) {
             if (!in_array($key, $neededData)) {
@@ -539,7 +548,7 @@ class EntityController
 
         $fields = [
             'id', 'entity_id', 'entity_label', 'short_label', 'entity_full_name', 'enabled', 'adrs_1', 'adrs_2', 'adrs_3', 'zipcode', 'city',
-            'country', 'email', 'parent_entity_id', 'entity_type', 'business_id', 'archival_agency', 'archival_agreement', 'folder_import'
+            'country', 'email', 'parent_entity_id', 'entity_type', 'business_id', 'folder_import', 'producer_service'
         ];
 
         $csvHead = array_merge($fields, [ 'diffusionList', 'visaCircuit', 'opinionCircuit', 'users', 'templates']);

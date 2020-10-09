@@ -20,6 +20,7 @@ use Entity\models\ListTemplateModel;
 use ExternalSignatoryBook\controllers\MaarchParapheurController;
 use Group\controllers\PrivilegeController;
 use History\controllers\HistoryController;
+use Parameter\models\ParameterModel;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
@@ -547,7 +548,12 @@ class ListTemplateController
             }
         }
 
-        return $response->withJson(['roles' => array_values($roles)]);
+        $parameters = [];
+
+        $parameter = ParameterModel::getById(['id' => 'keepDiffusionRoleInOutgoingIndexation', 'select' => ['param_value_int']]);
+        $parameters['keepDiffusionRoleInOutgoingIndexation'] = !empty($parameter['param_value_int']);
+
+        return $response->withJson(['roles' => array_values($roles), 'parameters' => $parameters]);
     }
 
     public function getAvailableCircuits(Request $request, Response $response)

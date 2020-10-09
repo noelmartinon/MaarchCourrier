@@ -22,6 +22,7 @@ import { CriteriaToolComponent } from '@appRoot/adv-search/criteria-tool/criteri
 import { IndexingFieldsService } from '@service/indexing-fields.service';
 import { CriteriaSearchService } from '@service/criteriaSearch.service';
 import { HighlightPipe } from '@plugins/highlight.pipe';
+import { FilterToolComponent } from '@appRoot/adv-search/filter-tool/filter-tool.component';
 
 declare var $: any;
 
@@ -81,6 +82,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     data: any = [];
     resultsLength = 0;
     isLoadingResults = true;
+    dataFilters: any = {};
     listProperties: any = {};
     currentChrono: string = '';
     currentMode: string = '';
@@ -120,9 +122,11 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
     @ViewChild('actionsListContext', { static: false }) actionsList: FolderActionListComponent;
     @ViewChild('appPanelList', { static: false }) appPanelList: PanelListComponent;
-    // @ViewChild('appCriteriaTool', { static: true }) appCriteriaTool: CriteriaToolComponent;
+    @ViewChild('appFilterToolAdvSearch', { static: false }) appFilterToolAdvSearch: FilterToolComponent;
+
 
     currentSelectedChrono: string = '';
+    templateColumns: number = 7;
 
     @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
     @ViewChild('tableBasketListSort', { static: true }) sort: MatSort;
@@ -230,7 +234,10 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
         }
     }
 
-    launchSearch(criteria: any) {
+    launchSearch(criteria: any = this.criteria, initSearch = false) {
+        if (initSearch) {
+            this.dataFilters = {};
+        }
         this.criteria = JSON.parse(JSON.stringify(criteria));
         if (!this.initSearch) {
             this.initResultList();
@@ -247,24 +254,26 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
         this.paginator.pageIndex = this.listProperties.page;
         this.paginator.pageSize = this.listProperties.pageSize;
         this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
-
         // When list is refresh (sort, page, filters)
         merge(this.sort.sortChange, this.paginator.page, this.filtersChange)
             .pipe(
                 takeUntil(this.destroy$),
                 startWith({}),
                 switchMap(() => {
-                    this.isLoadingResults = true;
-                    return this.resultListDatabase!.getRepoIssues(
-                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.searchUrl, this.listProperties, this.paginator.pageSize, this.criteria);
+                    if (!this.isLoadingResults) {
+                        this.isLoadingResults = true;
+                        return this.resultListDatabase!.getRepoIssues(
+                            this.sort.active, this.sort.direction, this.paginator.pageIndex, this.searchUrl, this.listProperties, this.paginator.pageSize, this.criteria, this.dataFilters);
+                    }
                 }),
                 map((data: any) => {
                     // Flip flag to show that loading has finished.
                     this.isLoadingResults = false;
                     data = this.processPostData(data);
+                    this.templateColumns = data.templateColumns;
+                    this.dataFilters = data.filters;
                     this.resultsLength = data.count;
                     this.allResInBasket = data.allResources;
-                    // this.headerService.setHeader('Dossier : ' + this.folderInfo.label);
                     return data.resources;
                 }),
                 catchError((err: any) => {
@@ -372,9 +381,6 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     }
 
     processPostData(data: any) {
-        console.log();
-
-
         data.resources.forEach((element: any) => {
             // Process main datas
             Object.keys(element).forEach((key) => {
@@ -385,11 +391,104 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
                 }
                 if (Object.keys(this.criteria).indexOf(key) > -1) {
                     element[key] = this.highlightPipe.transform(element[key], this.criteria[key].values);
+                } else if (['subject', 'chrono', 'resId'].indexOf(key) > -1 && Object.keys(this.criteria).indexOf('meta') > -1) {
+                    element[key] = this.highlightPipe.transform(element[key], this.criteria['meta'].values);
                 }
 
                 if (key === 'status' && !this.functions.empty(this.criteria[key])) {
                     element['inStatus'] = this.criteria[key].map((item: any) => item.label).indexOf(element[key]) > -1;
                 }
+            });
+            // Process secondary datas
+            element.display.forEach((key: any) => {
+                key.event = false;
+                key.displayTitle = key.displayValue;
+                if ((key.displayValue == null || key.displayValue === '') && ['getCreationAndProcessLimitDates', 'getParallelOpinionsNumber'].indexOf(key.value) === -1) {
+                    key.displayValue = this.translate.instant('lang.undefined');
+                    key.displayTitle = '';
+                } else if (['getSenders', 'getRecipients'].indexOf(key.value) > -1) {
+                    key.event = true;
+                    if (key.displayValue.length > 1) {
+                        key.displayTitle = key.displayValue.join(' - ');
+                        key.displayValue = '<b>' + key.displayValue.length + '</b> ' + this.translate.instant('lang.contactsAlt');
+                    } else if (key.displayValue.length === 1) {
+                        key.displayValue = key.displayValue[0];
+                    } else {
+                        key.displayValue = this.translate.instant('lang.undefined');
+                    }
+                } else if (key.value === 'getCreationAndProcessLimitDates') {
+                    key.icon = '';
+                } else if (key.value === 'getVisaWorkflow') {
+                    let formatWorkflow: any = [];
+                    let content = '';
+                    let user = '';
+                    const displayTitle: string[] = [];
+
+                    key.displayValue.forEach((visa: any, keyVis: number) => {
+                        content = '';
+                        user = visa.user;
+                        displayTitle.push(user);
+
+                        if (visa.mode === 'sign') {
+                            user = '<u>' + user + '</u>';
+                        }
+                        if (visa.date === '') {
+                            content = '<i class="fa fa-hourglass-half"></i> <span title="' + this.translate.instant('lang.' + visa.mode + 'User') + '">' + user + '</span>';
+                        } else {
+                            content = '<span color="accent" style=""><i class="fa fa-check"></i> <span title="' + this.translate.instant('lang.' + visa.mode + 'User') + '">' + user + '</span></span>';
+                        }
+
+                        if (visa.current && keyVis >= 0) {
+                            content = '<b color="primary">' + content + '</b>';
+                        }
+
+                        formatWorkflow.push(content);
+
+                    });
+
+                    // TRUNCATE DISPLAY LIST
+                    const index = key.displayValue.map((e: any) => e.current).indexOf(true);
+                    if (index > 0) {
+                        formatWorkflow = formatWorkflow.slice(index - 1);
+                        formatWorkflow = formatWorkflow.reverse();
+                        const indexReverse = key.displayValue.map((e: any) => e.current).reverse().indexOf(true);
+                        if (indexReverse > 1) {
+                            formatWorkflow = formatWorkflow.slice(indexReverse - 1);
+                        }
+                        formatWorkflow = formatWorkflow.reverse();
+                    } else if (index === 0) {
+                        formatWorkflow = formatWorkflow.reverse();
+                        formatWorkflow = formatWorkflow.slice(index - 2);
+                        formatWorkflow = formatWorkflow.reverse();
+                    } else if (index === -1) {
+                        formatWorkflow = formatWorkflow.slice(formatWorkflow.length - 2);
+                    }
+                    if (index >= 2 || (index === -1 && key.displayValue.length >= 3)) {
+                        formatWorkflow.unshift('...');
+                    }
+                    if (index !== -1 && index - 2 <= key.displayValue.length && index + 2 < key.displayValue.length && key.displayValue.length >= 3) {
+                        formatWorkflow.push('...');
+                    }
+
+                    key.displayValue = formatWorkflow.join(' <i class="fas fa-long-arrow-alt-right"></i> ');
+                    key.displayTitle = displayTitle.join(' - ');
+                } else if (key.value === 'getSignatories') {
+                    const userList: any[] = [];
+                    key.displayValue.forEach((visa: any) => {
+                        userList.push(visa.user);
+                    });
+                    key.displayValue = userList.join(', ');
+                    key.displayTitle = userList.join(', ');
+                } else if (key.value === 'getParallelOpinionsNumber') {
+                    key.displayTitle = key.displayValue + ' ' + this.translate.instant('lang.opinionsSent');
+
+                    if (key.displayValue > 0) {
+                        key.displayValue = '<b color="primary">' + key.displayValue + '</b> ' + this.translate.instant('lang.opinionsSent');
+                    } else {
+                        key.displayValue = key.displayValue + ' ' + this.translate.instant('lang.opinionsSent');
+                    }
+                }
+                key.label = key.displayLabel === undefined ? this.translate.instant('lang.' + key.value) : key.displayLabel;
             });
             // element['inNotes'] = true;
             // element['inNotes'] = true;
@@ -551,18 +650,20 @@ export interface BasketList {
     resources: any[];
     countResources: number;
     allResources: number[];
+    filter: any[];
 }
 
 export class ResultListHttpDao {
 
     constructor(private http: HttpClient, private criteriaSearchService: CriteriaSearchService) { }
 
-    getRepoIssues(sort: string, order: string, page: number, href: string, filters: any, pageSize: number, criteria: any): Observable<BasketList> {
+    getRepoIssues(sort: string, order: string, page: number, href: string, filters: any, pageSize: number, criteria: any, sideFilters: any): Observable<BasketList> {
         this.criteriaSearchService.updateListsPropertiesPage(page);
         this.criteriaSearchService.updateListsPropertiesPageSize(pageSize);
         this.criteriaSearchService.updateListsPropertiesCriteria(criteria);
         const offset = page * pageSize;
         const requestUrl = `${href}?limit=${pageSize}&offset=${offset}&order=${filters.order}&orderDir=${filters.orderDir}`;
-        return this.http.post<BasketList>(requestUrl, this.criteriaSearchService.formatDatas(JSON.parse(JSON.stringify(criteria))));
+        const dataToSend = Object.assign({}, this.criteriaSearchService.formatDatas(JSON.parse(JSON.stringify(criteria))), {filters: sideFilters});
+        return this.http.post<BasketList>(requestUrl, dataToSend);
     }
 }

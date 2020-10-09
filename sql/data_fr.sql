@@ -137,6 +137,9 @@ INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'm
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'adv_search_mlb');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_search');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_registered_mail');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_alfresco');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_users');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_groups');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_architecture');
@@ -1017,6 +1020,7 @@ INSERT INTO parameters (id, param_value_int) VALUES ('last_deposit_id', 0);
 INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailNotDistributedStatus', 'PND');
 INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailDistributedStatus', 'DSTRIBUTED');
 INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailImportedStatus', 'NEW');
+INSERT INTO parameters (id, param_value_int) VALUES ('keepDiffusionRoleInOutgoingIndexation', 1);
 
 ------------
 --DIFFLIST_TYPES
@@ -1621,11 +1625,11 @@ Select setval('templates_association_id_seq', (select max(id)+1 from templates_a
 UPDATE entities SET business_id = concat('45239273100025/',entity_id);
 
 UPDATE entities SET business_id = concat('45239273100025/',entity_id);
-UPDATE entities SET archival_agreement = 'MAARCH_LES_BAINS_ACTES_V2';
+-- UPDATE entities SET archival_agreement = 'MAARCH_LES_BAINS_ACTES_V2';
 
 UPDATE doctypes SET retention_final_disposition = 'destruction';
 UPDATE doctypes SET retention_rule = 'compta_3_03';
-UPDATE doctypes SET duration_current_use = 12;
+UPDATE doctypes SET duration_current_use = 365;
 
 -----
 -- Password management

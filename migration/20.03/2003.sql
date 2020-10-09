@@ -16,7 +16,7 @@ DELETE FROM groupbasket_status WHERE system_id IN (
 	where not exists (
 		select 1 from actions_groupbaskets agb where gbs.action_id = agb.id_action and gbs.group_id = agb.group_id and gbs.basket_id = agb.basket_id
 	)
-)
+);
 
 /* VIEWS */
 DROP VIEW IF EXISTS res_view_letterbox;

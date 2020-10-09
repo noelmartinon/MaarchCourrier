@@ -528,12 +528,13 @@ class MaarchParapheurController
                 }
                 if (!empty($state['signatoryUserId'])) {
                     $signatoryUser = UserModel::getByExternalId([
-                        'select'            => ['user_id'],
+                        'select'            => ['user_id', 'id'],
                         'externalId'        => $state['signatoryUserId'],
                         'externalName'      => 'maarchParapheur'
                     ]);
                     if (!empty($signatoryUser['user_id'])) {
                         $aArgs['idsToRetrieve'][$version][$resId]['typist'] = $signatoryUser['user_id'];
+                        $aArgs['idsToRetrieve'][$version][$resId]['signatory_user_serial_id'] = $signatoryUser['id'];
                     }
                 }
                 $aArgs['idsToRetrieve'][$version][$resId]['workflowInfo'] = implode(", ", $state['workflowInfo']);

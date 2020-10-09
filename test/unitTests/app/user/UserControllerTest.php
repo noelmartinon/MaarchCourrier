@@ -103,7 +103,8 @@ class UserControllerTest extends TestCase
         $aArgs = [
             'userId'    => 'test-ckent',
             'firstname' => 'TEST-CLARK',
-            'lastname'  => 'TEST-KENT'
+            'lastname'  => 'TEST-KENT',
+            'mail'      => 'clark@test.zh'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
@@ -126,7 +127,7 @@ class UserControllerTest extends TestCase
         $this->assertSame('TEST-KENT', $responseBody->lastname);
         $this->assertSame('OK', $responseBody->status);
         $this->assertSame(null, $responseBody->phone);
-        $this->assertSame(null, $responseBody->mail);
+        $this->assertSame('clark@test.zh', $responseBody->mail);
         $this->assertSame(null, $responseBody->initials);
 
         // Delete user then reactivate it
@@ -142,7 +143,8 @@ class UserControllerTest extends TestCase
         $aArgs = [
             'userId'    => 'test-ckent',
             'firstname' => 'TEST-CLARK',
-            'lastname'  => 'TEST-KENT'
+            'lastname'  => 'TEST-KENT',
+            'mail'      => 'clark@test.zh'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
@@ -155,7 +157,8 @@ class UserControllerTest extends TestCase
         $body = [
             'userId'    => 'test-ckent',
             'firstname' => 'TEST-CLARK',
-            'lastname'  => 'TEST-KENT'
+            'lastname'  => 'TEST-KENT',
+            'mail'      => 'clark@test.zh'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
 
@@ -168,7 +171,8 @@ class UserControllerTest extends TestCase
         $body = [
             'userId'    => 'test-ckent',
             'firstname' => 12, // wrong format
-            'lastname'  => 'TEST-KENT'
+            'lastname'  => 'TEST-KENT',
+            'mail'      => 'clark@test.zh'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
 
@@ -219,7 +223,6 @@ class UserControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody(), true);
 
         $this->assertSame('User does not exist', $responseBody['errors']);
-
     }
 
     public function testUpdate()
@@ -1743,7 +1746,6 @@ class UserControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertIsArray($responseBody['userBaskets']);
         $this->assertEmpty($responseBody['userBaskets']);
-
     }
 
     public function testGetDetailledById()

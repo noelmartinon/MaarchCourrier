@@ -217,7 +217,10 @@ export class TagInputComponent implements OnInit {
     }
 
     openThesaurus(tag: any = null) {
-        tag = this.returnValue === 'id' ? tag : tag.id;
+        if (tag !== null) {
+            tag = this.returnValue === 'id' ? tag : tag.id;
+        }
+
         const dialogRef = this.dialog.open(ThesaurusModalComponent, {
             panelClass: 'maarch-modal',
             width: '600px',

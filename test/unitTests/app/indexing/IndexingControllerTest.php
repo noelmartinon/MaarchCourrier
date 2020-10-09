@@ -155,7 +155,7 @@ class IndexingControllerTest extends TestCase
         $response     = $indexingController->getProcessLimitDate($fullRequest, new \Slim\Http\Response());
 
         $responseBody = json_decode((string)$response->getBody());
-        $this->assertSame('Delay is not a numeric value', $responseBody->errors);
+        $this->assertSame('Priority does not exists', $responseBody->errors);
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);

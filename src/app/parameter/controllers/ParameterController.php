@@ -29,6 +29,10 @@ class ParameterController
 {
     public function get(Request $request, Response $response)
     {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_parameters', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
         $parameters = ParameterModel::get();
 
         foreach ($parameters as $key => $parameter) {
@@ -46,6 +50,10 @@ class ParameterController
 
     public function getById(Request $request, Response $response, array $aArgs)
     {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_parameters', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
         $parameter = ParameterModel::getById(['id' => $aArgs['id']]);
 
         if (empty($parameter)) {

@@ -325,9 +325,9 @@ export class IndexingFieldsService {
         },
         {
             identifier: 'attachment_creationDate',
-            label: `${this.translate.instant('lang.creationDate')} (PJ)`,
+            label: `${this.translate.instant('lang.creationDate')} (${this.translate.instant('lang.attachmentShort')})`,
             icon: 'fa-calendar-day',
-            type: 'select',
+            type: 'date',
             default_value: [],
             values: [],
             enabled: true,
@@ -337,6 +337,16 @@ export class IndexingFieldsService {
             identifier: 'groupSign',
             label: this.translate.instant('lang.groupSign'),
             icon: 'fa-user-friends',
+            type: 'select',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'senderDepartment',
+            label: this.translate.instant('lang.sendersDepartment'),
+            icon: 'fa-map',
             type: 'select',
             default_value: [],
             values: [],

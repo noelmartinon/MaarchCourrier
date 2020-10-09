@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
 import { FormControl } from '@angular/forms';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { startWith, map, tap, catchError } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { AppService } from '@service/app.service';
@@ -172,7 +172,7 @@ export class SearchAdministrationComponent implements OnInit {
         }
     ];
 
-    templateDisplayedSecondaryData: number[] = [1, 2, 3, 4, 5, 6, 7];
+    templateDisplayedSecondaryData: number[] = [2, 3, 4, 5, 6, 7];
     selectedTemplateDisplayedSecondaryData: number = 7;
     selectedTemplateDisplayedSecondaryDataClone: number = 7;
 
@@ -256,13 +256,26 @@ export class SearchAdministrationComponent implements OnInit {
         this.availableDataClone = JSON.parse(JSON.stringify(this.availableData));
         let indexData: number;
         this.selectedTemplateDisplayedSecondaryDataClone = this.selectedTemplateDisplayedSecondaryData;
+        const tmpData = [];
         this.displayedSecondaryData.forEach((element: any) => {
             indexData = this.availableData.map((e: any) => e.value).indexOf(element.value);
             // à revoir !!
             // this.availableData[indexData].cssClasses = element.cssClasses;
             // this.displayedSecondaryData.push(this.availableData[indexData]);
+            tmpData.push(this.availableData[indexData]);
             this.availableData.splice(indexData, 1);
         });
+        let previousIndex = 0;
+        this.displayedSecondaryData = [];
+        tmpData.forEach((object: any, index: any) => {
+            if (index % this.selectedTemplateDisplayedSecondaryData === 0 && index !== 0) {
+                const tmp = tmpData.slice(previousIndex, index);
+                this.displayedSecondaryData.push(tmp);
+                previousIndex = index;
+            }
+        });
+        this.displayedSecondaryData.push(tmpData.slice(previousIndex));
+
         this.selectedListEvent = this.searchAdv.listEvent;
         this.selectedListEventClone = this.selectedListEvent;
         this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));
@@ -330,15 +343,18 @@ export class SearchAdministrationComponent implements OnInit {
 
     addData(event: any) {
         const i = this.availableData.map((e: any) => e.value).indexOf(event.option.value.value);
-        this.displayedSecondaryData.push(event.option.value);
+        if (this.displayedSecondaryData[this.displayedSecondaryData.length - 1].length >= this.selectedTemplateDisplayedSecondaryData) {
+            this.displayedSecondaryData.push([]);
+        }
+        this.displayedSecondaryData[this.displayedSecondaryData.length - 1].push(event.option.value);
         this.availableData.splice(i, 1);
         $('#availableData').blur();
         this.dataControl.setValue('');
     }
 
-    removeData(rmData: any, i: number) {
+    removeData(rmData: any, i: number, indexDisplayedData) {
         this.availableData.push(rmData);
-        this.displayedSecondaryData.splice(i, 1);
+        this.displayedSecondaryData[indexDisplayedData].splice(i, 1);
         this.dataControl.setValue('');
     }
 
@@ -351,7 +367,18 @@ export class SearchAdministrationComponent implements OnInit {
     drop(event: CdkDragDrop<string[]>) {
         if (event.previousContainer === event.container) {
             moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+        } else {
+            transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex - 1);
+
+            this.displayedSecondaryData.forEach((subArray: any, index) => {
+                if (subArray.length > this.selectedTemplateDisplayedSecondaryData) {
+                    transferArrayItem(subArray, this.displayedSecondaryData[index + 1], subArray.length, 0);
+                } else if (subArray.length < this.selectedTemplateDisplayedSecondaryData) {
+                    transferArrayItem(this.displayedSecondaryData[index + 1], subArray, 0, subArray.length);
+                }
+            });
         }
+
     }
 
     getTemplate() {
@@ -386,15 +413,18 @@ export class SearchAdministrationComponent implements OnInit {
 
     saveTemplate() {
         const template: any = [];
-        this.displayedSecondaryData.forEach((element: any) => {
-            template.push(
-                {
-                    'value': element.value,
-                    'cssClasses': element.cssClasses,
-                    'icon': element.icon,
-                }
-            );
+        this.displayedSecondaryData.forEach((subArray: any) => {
+            subArray.forEach((element: any) => {
+                template.push(
+                    {
+                        'value':      element.value,
+                        'cssClasses': element.cssClasses,
+                        'icon':       element.icon,
+                    }
+                );
+            });
         });
+
         const objToSend = {
             templateColumns: this.selectedTemplateDisplayedSecondaryData,
             subInfos: template
@@ -475,4 +505,23 @@ export class SearchAdministrationComponent implements OnInit {
             this.selectedProcessTool.canUpdateModel = state;
         }
     }
+
+    reorderDisplayedData() {
+        let mergedArray = [];
+        this.displayedSecondaryData.forEach((subArray: any) => {
+            mergedArray = mergedArray.concat(subArray);
+        });
+
+        let previousIndex = 0;
+        this.displayedSecondaryData = [];
+        mergedArray.forEach((object: any, index: any) => {
+            if (index % this.selectedTemplateDisplayedSecondaryData === 0 && index !== 0) {
+                const tmp = mergedArray.slice(previousIndex, index);
+                this.displayedSecondaryData.push(tmp);
+                previousIndex = index;
+            }
+        });
+        this.displayedSecondaryData.push(mergedArray.slice(previousIndex));
+    }
+
 }

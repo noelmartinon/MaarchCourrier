@@ -326,6 +326,9 @@ export class EntitiesAdministrationComponent implements OnInit {
 
         if (r) {
             if (this.creationMode) {
+                if (this.functions.empty(this.currentEntity.producerService)) {
+                    this.currentEntity.producerService = this.currentEntity.entity_id;
+                }
                 this.http.post('../rest/entities', this.currentEntity)
                     .subscribe((data: any) => {
                         this.currentEntity.listTemplate = [];

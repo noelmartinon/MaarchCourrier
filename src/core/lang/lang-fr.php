@@ -484,3 +484,5 @@ define('_REGISTERED_MAIL_DISTRIBUTED', 'Accusé de réception reçu : recommand�
 define('_REGISTERED_MAIL_NOT_DISTRIBUTED', 'Accusé de réception reçu : recommandé non distribué');
 
 define('_CONFIGURATION_UPDATED', 'Configuration modifiée');
+define('_SEND_TO_RECORD_MANAGEMENT', 'Envoyer dans un Système d\'Archivage Électronique');
+define('_SEND_TO_RECORD_MANAGEMENT_DESC', 'Envoyer dans un Système d\'Archivage Électronique');

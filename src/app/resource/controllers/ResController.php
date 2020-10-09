@@ -712,9 +712,10 @@ class ResController extends ResourceControlController
             }
         }
 
-        $fileContent = file_get_contents($pathToThumbnail);
+        $fileContent = @file_get_contents($pathToThumbnail);
         if ($fileContent === false) {
-            return $response->withStatus(404)->withJson(['errors' => 'Thumbnail not found on docserver']);
+            $pathToThumbnail = 'dist/assets/noThumbnail.png';
+            $fileContent = @file_get_contents($pathToThumbnail);
         }
 
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);

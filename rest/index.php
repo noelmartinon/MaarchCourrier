@@ -188,6 +188,9 @@ $app->put('/customFields/{id}', \CustomField\controllers\CustomFieldController::
 $app->delete('/customFields/{id}', \CustomField\controllers\CustomFieldController::class . ':delete');
 $app->get('/customFieldsWhiteList', \CustomField\controllers\CustomFieldController::class . ':getWhiteList');
 
+//Departments
+$app->get('/departments', \Resource\controllers\DepartmentController::class . ':getFrenchDepartments');
+
 //Docservers
 $app->get('/docservers', \Docserver\controllers\DocserverController::class . ':get');
 $app->post('/docservers', \Docserver\controllers\DocserverController::class . ':create');
@@ -619,6 +622,9 @@ $app->get('/collaboraOnline/available', \ContentManagement\controllers\Collabora
 $app->post('/collaboraOnline/file', \ContentManagement\controllers\CollaboraOnlineController::class . ':getTmpFile');
 $app->delete('/collaboraOnline/file', \ContentManagement\controllers\CollaboraOnlineController::class . ':deleteTmpFile');
 $app->post('/collaboraOnline/encodedFile', \ContentManagement\controllers\CollaboraOnlineController::class . ':saveTmpEncodedDocument');
+
+// Archival
+$app->get('/resources/{resId}/initSeda', \ExportSeda\controllers\SedaController::class . ':initSeda');
 
 // Registered mail
 $app->get('/registeredMail/sites', \RegisteredMail\controllers\IssuingSiteController::class . ':get');

@@ -393,7 +393,7 @@ foreach ($customs as $custom) {
 
     // Res attach
     $query = "update res_attachments as ra set
-        recipient_id = tmp.old_address_id, recipient_type = 'contact'
+        recipient_id = tmp.new_id, recipient_type = 'contact'
     from (values
            $valuesOld
         ) as tmp(new_id, old_address_id, old_contact_id) 

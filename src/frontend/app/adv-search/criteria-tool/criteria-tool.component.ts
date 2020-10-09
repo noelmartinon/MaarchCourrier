@@ -86,7 +86,8 @@ export class CriteriaToolComponent implements OnInit {
         private notify: NotificationService,
         private datePipe: DatePipe,
         private latinisePipe: LatinisePipe,
-        private sortPipe: SortPipe) {
+        private sortPipe: SortPipe
+    ) {
         _activatedRoute.queryParams.subscribe(
             params => {
                 this.searchTerm = params.value;
@@ -141,7 +142,7 @@ export class CriteriaToolComponent implements OnInit {
     }
 
     isCurrentCriteriaById(criteriaIds: string[]) {
-        return this.currentCriteria.filter((currCrit: any) => criteriaIds.indexOf(currCrit.identifier) > -1).length > 0;
+        return this.currentCriteria.filter((currCrit: any) => criteriaIds.indexOf(currCrit.identifier) === 0).length > 0;
     }
 
 
@@ -219,8 +220,8 @@ export class CriteriaToolComponent implements OnInit {
                     objCriteria[field.identifier] = {
                         type : field.type,
                         values: {
-                            start: !this.functions.empty(field.control.value.start) ? field.control.value.start : field.control.value.end,
-                            end: !this.functions.empty(field.control.value.end) ? field.control.value.end : field.control.value.start
+                            start: !this.functions.empty(field.control.value.start) ? field.control.value.start : null,
+                            end: !this.functions.empty(field.control.value.end) ? field.control.value.end : null
                         }
                     };
                 }
@@ -271,9 +272,9 @@ export class CriteriaToolComponent implements OnInit {
     getFormatLabel(identifier: string, value: any) {
 
         if (this.criteria.filter((field: any) => field.identifier === identifier)[0].type === 'date') {
-            return `${this.datePipe.transform(value.start, 'dd/MM/y')} - ${this.datePipe.transform(value.end, 'dd/MM/y')}`;
+            return `${value.start !== null ? this.datePipe.transform(value.start, 'dd/MM/y') : '∞'} - ${value.end !== null ? this.datePipe.transform(value.end, 'dd/MM/y') : '∞'}`;
         } else if (this.criteria.filter((field: any) => field.identifier === identifier)[0].type === 'integer') {
-            return `${value.start} - ${value.end}`;
+            return `${value.start !== null ? value.start : '∞'} - ${value.end !== null ? value.end : '∞'}`;
         } else {
             if (identifier === 'registeredMail_issuingSite') {
                 return this.appIssuingSiteInput.getSiteLabel(value);
@@ -575,10 +576,32 @@ export class CriteriaToolComponent implements OnInit {
 
     set_role_field(elem: any) {
         elem.type = 'selectAutocomplete';
-        elem.routeDatas = ['role_dest', 'role_visa', 'role_sign'].indexOf(elem.identifier) > -1 ? ['/rest/autocomplete/users?serial=serialId'] : ['/rest/autocomplete/users', '/rest/autocomplete/entities?serial=serialId'];
+        elem.routeDatas = ['role_dest', 'role_visa', 'role_sign'].indexOf(elem.identifier) > -1 ? ['/rest/autocomplete/users?serial=serialId'] : ['/rest/autocomplete/users?serial=serialId', '/rest/autocomplete/entities?serial=serialId'];
         elem.extraModel = ['type'];
         elem.returnValue = 'object';
     }
+
+    set_senderDepartment_field(elem: any) {
+        return new Promise((resolve, reject) => {
+            this.http.get(`../rest/departments`).pipe(
+                tap((data: any) => {
+                    Object.keys(data.departments).forEach(key => {
+                        elem.values.push({
+                            id: key,
+                            label: `${key} - ${data.departments[key]}`
+                        });
+                    });
+                    elem.values = this.sortPipe.transform(elem.values, 'label');
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
 
     getSearchTemplates() {
         this.http.get(`../rest/searchTemplates`).pipe(

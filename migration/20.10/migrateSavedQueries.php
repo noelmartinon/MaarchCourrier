@@ -12,8 +12,8 @@ foreach ($customs as $custom) {
     }
 
     $language = \SrcCore\models\CoreConfigModel::getLanguage();
-    if (file_exists("custom/{$customId}/src/core/lang/lang-{$language}.php")) {
-        require_once("custom/{$customId}/src/core/lang/lang-{$language}.php");
+    if (file_exists("custom/{$custom}/src/core/lang/lang-{$language}.php")) {
+        require_once("custom/{$custom}/src/core/lang/lang-{$language}.php");
     }
     require_once("src/core/lang/lang-{$language}.php");
 
@@ -40,29 +40,41 @@ foreach ($customs as $custom) {
         $savedQuery['query_txt'] = str_replace("'", '"', $savedQuery['query_txt']);
         $queryTxt = json_decode($savedQuery['query_txt'], true);
 
+        if (!is_array($queryTxt)) {
+            continue;
+        }
+
         foreach ($queryTxt as $key => $value) {
-            if ($key == 'subject' && !empty($value['fields']['subject'][0])) {
+            if ($key == 'subject') {
                 $query[] = ['identifier' => 'subject', 'values' => $value['fields']['subject'][0]];
-            } elseif ($key == 'chrono' && !empty($value['fields']['chrono'][0])) {
+            } elseif ($key == 'chrono') {
                 $query[] = ['identifier' => 'chrono', 'values' => $value['fields']['chrono'][0]];
-            } elseif ($key == 'barcode' && !empty($value['fields']['barcode'][0])) {
+            } elseif ($key == 'barcode') {
                 $query[] = ['identifier' => 'barcode', 'values' => $value['fields']['barcode'][0]];
             } elseif ($key == 'sender' && !empty($value['fields']['sender_id'][0])) {
                 $type = $value['fields']['sender_type'][0] == 'onlyContact' ? 'contact' : $value['fields']['sender_type'][0];
-                $query[] = ['identifier' => 'senders', 'values' => [['id' => $value['fields']['sender_id'][0], 'type' => $type, 'label' => '']]];
+                $label = getContactLabel($type, $value['fields']['sender_id'][0]);
+                if ($label == null) {
+                    continue;
+                }
+                $query[] = ['identifier' => 'senders', 'values' => [['id' => $value['fields']['sender_id'][0], 'type' => $type, 'label' => $label]]];
             } elseif ($key == 'recipient' && !empty($value['fields']['recipient_id'][0])) {
                 $type = $value['fields']['recipient_type'][0] == 'onlyContact' ? 'contact' : $value['fields']['recipient_type'][0];
-                $query[] = ['identifier' => 'recipients', 'values' => [['id' => $value['fields']['recipient_id'][0], 'type' => $type, 'label' => '']]];
+                $label = getContactLabel($type, $value['fields']['recipient_id'][0]);
+                if ($label == null) {
+                    continue;
+                }
+                $query[] = ['identifier' => 'recipients', 'values' => [['id' => $value['fields']['recipient_id'][0], 'type' => $type, 'label' => $label]]];
             } elseif ($key == 'signatory_name' && !empty($value['fields']['signatory_name_id'][0])) {
                 $user = \User\models\UserModel::getByLogin(['login' => $value['fields']['signatory_name_id'][0], 'select' => ['id', 'firstname', 'lastname']]);
                 if (!empty($user)) {
                     $query[] = ['identifier' => 'role_sign', 'values' => [['id' => $user['id'], 'type' => 'user', 'label' => "{$user['firstname']} {$user['lastname']}"]]];
                 }
-            } elseif ($key == 'fulltext' && !empty($value['fields']['fulltext'][0])) {
+            } elseif ($key == 'fulltext') {
                 $query[] = ['identifier' => 'fulltext', 'values' => $value['fields']['fulltext'][0]];
-            } elseif ($key == 'multifield' && !empty($value['fields']['multifield'][0])) {
+            } elseif ($key == 'multifield') {
                 $query[] = ['identifier' => 'searchTerm', 'values' => $value['fields']['multifield'][0]];
-            } elseif ($key == 'destinataire' && !empty($value['fields']['destinataire_chosen'])) {
+            } elseif ($key == 'destinataire') {
                 $allUsers = [];
                 foreach ($value['fields']['destinataire_chosen'] as $field) {
                     $user = \User\models\UserModel::getByLogin(['login' => $field, 'select' => ['id', 'firstname', 'lastname']]);
@@ -71,9 +83,9 @@ foreach ($customs as $custom) {
                     }
                 }
                 $query[] = ['identifier' => 'role_dest', 'values' => $allUsers];
-            } elseif ($key == 'category' && !empty($value['fields']['category'][0])) {
+            } elseif ($key == 'category') {
                 $query[] = ['identifier' => 'category', 'values' => [['id' => $value['fields']['category'][0], 'label' => \Resource\models\ResModel::getCategoryLabel(['categoryId' => $value['fields']['category'][0]])]]];
-            } elseif ($key == 'confidentiality' && !empty($value['fields']['confidentiality'][0])) {
+            } elseif ($key == 'confidentiality') {
                 $query[] = ['identifier' => 'confidentiality', 'values' => [['id' => $value['fields']['confidentiality'][0] == 'Y', 'label' => $value['fields']['confidentiality'][0] == 'Y' ? 'Oui' : 'Non']]];
             } elseif ($key == 'creation_date') {
                 $query[] = ['identifier' => 'creationDate', 'values' => ['start' => getFormattedDate($value['fields']['creation_date_from'][0]), 'end' => getFormattedDate($value['fields']['creation_date_to'][0])]];
@@ -85,21 +97,21 @@ foreach ($customs as $custom) {
                 $query[] = ['identifier' => 'departureDate', 'values' => ['start' => getFormattedDate($value['fields']['exp_date_from'][0]), 'end' => getFormattedDate($value['fields']['exp_date_to'][0])]];
             } elseif ($key == 'process_limit_date') {
                 $query[] = ['identifier' => 'processLimitDate', 'values' => ['start' => getFormattedDate($value['fields']['process_limit_date_from'][0]), 'end' => getFormattedDate($value['fields']['process_limit_date_to'][0])]];
-            } elseif ($key == 'destination_mu' && !empty($value['fields']['services_chosen'])) {
+            } elseif ($key == 'destination_mu') {
                 $allEntities = [];
                 foreach ($value['fields']['services_chosen'] as $field) {
-                    $entity = \Entity\models\EntityModel::getByEntityId(['entityId' => $field, 'select' => ['id']]);
-                    $allEntities[] = ['id' => $entity['id'], 'title' => '', 'label' => ''];
+                    $entity = \Entity\models\EntityModel::getByEntityId(['entityId' => $field, 'select' => ['id', 'entity_label']]);
+                    $allEntities[] = ['id' => $entity['id'], 'title' => $entity['entity_label'], 'label' => $entity['entity_label']];
                 }
                 $query[] = ['identifier' => 'destination', 'values' => $allEntities];
-            } elseif ($key == 'initiator_mu' && !empty($value['fields']['initiatorServices_chosen'])) {
+            } elseif ($key == 'initiator_mu') {
                 $allEntities = [];
                 foreach ($value['fields']['initiatorServices_chosen'] as $field) {
-                    $entity = \Entity\models\EntityModel::getByEntityId(['entityId' => $field, 'select' => ['id']]);
-                    $allEntities[] = ['id' => $entity['id'], 'title' => '', 'label' => ''];
+                    $entity = \Entity\models\EntityModel::getByEntityId(['entityId' => $field, 'select' => ['id', 'entity_label']]);
+                    $allEntities[] = ['id' => $entity['id'], 'title' => $entity['entity_label'], 'label' => $entity['entity_label']];
                 }
                 $query[] = ['identifier' => 'initiator', 'values' => $allEntities];
-            } elseif ($key == 'tag_mu' && !empty($value['fields']['tags_chosen'])) {
+            } elseif ($key == 'tag_mu') {
                 $allTags = [];
                 foreach ($value['fields']['tags_chosen'] as $field) {
                     $tag = \Tag\models\TagModel::getById(['id' => $field, 'select' => ['label', 'id']]);
@@ -108,7 +120,7 @@ foreach ($customs as $custom) {
                     }
                 }
                 $query[] = ['identifier' => 'tags', 'values' => $allTags];
-            } elseif ($key == 'status' && !empty($value['fields']['status_chosen'])) {
+            } elseif ($key == 'status') {
                 $allStatuses = [];
                 foreach ($value['fields']['status_chosen'] as $field) {
                     $status = \Status\models\StatusModel::getById(['select' => ['identifier', 'label_status'], 'id' => $field]);
@@ -117,30 +129,64 @@ foreach ($customs as $custom) {
                     }
                 }
                 $query[] = ['identifier' => 'status', 'values' => $allStatuses];
-            } elseif ($key == 'visa_user' && !empty($value['fields']['visa_user'][0])) {
-                $user = \User\models\UserModel::getByLogin(['login' => $value['fields']['visa_user'][0], 'select' => ['id', 'firstname', 'lastname']]);
+            } elseif ($key == 'visa_user' && !empty($value['fields']['user_visa'][0])) {
+                $user = \User\models\UserModel::getByLogin(['login' => $value['fields']['user_visa'][0], 'select' => ['id', 'firstname', 'lastname']]);
                 if (!empty($user)) {
                     $query[] = ['identifier' => 'role_visa', 'values' => [['id' => $user['id'], 'type' => 'user', 'label' => "{$user['firstname']} {$user['lastname']}"]]];
                 }
-            } elseif ($key == 'numged' && !empty($value['fields']['numged'][0])) {
+            } elseif ($key == 'numged') {
                 $query[] = ['identifier' => 'resId', 'values' => ['start' => $value['fields']['numged'][0], 'end' => $value['fields']['numged'][0]]];
+            } elseif ($key == 'doc_notes') {
+                $query[] = ['identifier' => 'notes', 'values' => $value['fields']['doc_notes'][0]];
+            } elseif ($key == 'signatory_group' && !empty($value['fields']['signatory_group'][0])) {
+                $group = \Group\models\GroupModel::getByGroupId(['groupId' => $value['fields']['signatory_group'][0], 'select' => ['id', 'group_desc']]);
+                if (!empty($group)) {
+                    $query[] = ['identifier' => 'groupSign', 'values' => ['id' => $group['id'], 'label' => $group['group_desc'],'group' => '']];
+                }
+            } elseif ($key == 'closing_date') {
+                $query[] = ['identifier' => 'closingDate', 'values' => ['start' => getFormattedDate($value['fields']['closing_date_from'][0]), 'end' => getFormattedDate($value['fields']['closing_date_to'][0])]];
+            } elseif ($key == 'creation_date_pj') {
+                $query[] = ['identifier' => 'attachment_creationDate', 'values' => ['start' => getFormattedDate($value['fields']['creation_date_pj_from'][0]), 'end' => getFormattedDate($value['fields']['creation_date_pj_to'][0])]];
+            } elseif ($key == 'attachment_types') {
+                $types = \Attachment\models\AttachmentModel::getAttachmentsTypesByXML();
+                if (in_array($value['fields']['attachment_types'][0], array_keys($types))) {
+                    $query[] = ['identifier' => 'attachment_type', 'values' => ['id' => $value['fields']['attachment_types'][0], 'label' => $types[$value['fields']['attachment_types'][0]],'group' => '']];
+                }
+            } elseif ($key == 'doctype') {
+                $types = [];
+                foreach ($value['fields']['doctypes_chosen'] as $docType) {
+                    $type = \Doctype\models\DoctypeModel::getById(['id' => (int)$docType]);
+                    if (!empty($type)) {
+                        $types[] = ['id' => 101, 'label' => $type['description'], 'title' => $type['description'], 'disabled' => false, 'isTitle' => false, 'group' => ''];
+                    }
+                }
+                $query[] = ['identifier' => 'doctype', 'values' => $types];
+            } elseif ($key == 'department_number_mu') {
+                $departments = [];
+                foreach ($value['fields']['department_number_chosen'] as $department) {
+                    $label = \Resource\controllers\DepartmentController::FRENCH_DEPARTMENTS[$department];
+                    $departments[] = ['id' => $department, 'label' => "{$department} - {$label}"];
+                }
+                $query[] = ['identifier' => 'senderDepartment', 'values' => $departments];
             }
         }
 
         if (!empty($query)) {
             $user = \User\models\UserModel::getByLogin(['login' => $savedQuery['user_id'], 'select' => ['id']]);
 
-            \Search\models\SearchTemplateModel::create([
-                'user_id'       => !empty($user['id']) ? $user['id'] : $masterOwnerId,
-                'label'         => $savedQuery['query_name'],
-                'query'         => json_encode($query)
-            ]);
+            if (!empty($user['id'])) {
+                \Search\models\SearchTemplateModel::create([
+                    'user_id'       => $user['id'],
+                    'label'         => $savedQuery['query_name'],
+                    'query'         => json_encode($query)
+                ]);
 
-            $migrated++;
+                $migrated++;
+            }
         }
     }
 
-    printf("Migration recherches sauvegardés (CUSTOM {$custom}) : {$migrated} sauvegarde(s) trouvée(s) et migrée(s).\n");
+    printf("Migration recherches sauvegardées (CUSTOM {$custom}) : {$migrated} sauvegarde(s) trouvée(s) et migrée(s).\n");
 }
 
 function getFormattedDate(string $date)
@@ -152,4 +198,34 @@ function getFormattedDate(string $date)
     $date->setTime(00, 00, 00);
 
     return $date->format('Y-m-d');
+}
+
+function getContactLabel(string $type, int $id) {
+    if ($type == 'contact') {
+        $contact = \Contact\models\ContactModel::getById(['id' => $id, 'select' => ['firstname', 'lastname', 'company']]);
+        if (empty($contact)) {
+            return null;
+        }
+        $formattedContact = \Contact\controllers\ContactController::getFormattedOnlyContact([
+            'contact' => [
+                'firstname' => $contact['firstname'],
+                'lastname'  => $contact['lastname'],
+                'company'   => $contact['company']
+            ]
+        ]);
+        return $formattedContact['idToDisplay'];
+    } elseif ($type == 'user') {
+        $user = \User\models\UserModel::getById(['id' => $id, 'select' => ['firstname', 'lastname']]);
+        if (empty($user)) {
+            return null;
+        }
+        return $user['firstname'] . ' ' . $user['lastname'];
+    } elseif ($type == 'entity') {
+        $entity = \Entity\models\EntityModel::getById(['id' => $id, 'select' => ['entity_label']]);
+        if (empty($entity)) {
+            return null;
+        }
+        return $entity['entity_label'];
+    }
+    return null;
 }

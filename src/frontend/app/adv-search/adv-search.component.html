@@ -13,8 +13,8 @@
                 </div>
             </div>
             <div class="bg-head-content" [class.fullContainer]="appService.getViewMode()">
-                <app-criteria-tool #appCriteriaTool (searchUrlGenerated)="appSearchResultList.launchSearch($event);"
-                    [defaultCriteria]="['doctype','subject']" style="width:100%;padding-bottom: 10px;" (loaded)="appSearchResultList.initSavedCriteria()"></app-criteria-tool>
+                <app-criteria-tool #appCriteriaTool (searchUrlGenerated)="appSearchResultList.launchSearch($event, true);"
+                   style="width:100%;padding-bottom: 10px;" (loaded)="appSearchResultList.initSavedCriteria()"></app-criteria-tool>
                 <div id="toolTemplate" style="width: 100%;"></div>
             </div>
         </div>

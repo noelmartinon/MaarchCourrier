@@ -564,7 +564,12 @@
     "draftUpdated": "Brouillon modifié",
     "dragAndDrop": "Glisser-déposer",
     "duplicate": "Dupliquer",
-    "durationCurrentUse": "Durée d'utilité courante (en mois)",
+    "durationCurrentUse": "Durée de conservation (en jours)",
+    "currentUseRule": "Règle d'utilité courante",
+    "finalAction": "Action finale",
+    "currentUseTransfer": "Envoi SAE (puis destruction)",
+    "currentUseCopy": "Envoi SAE (puis accès restreint)",
+    "currentUseCnservation": "Accès restreint",
     "eachDay": "Chaque jour",
     "eachHour": "Toutes les heures",
     "eachMinute": "Toutes les minutes",
@@ -2050,5 +2055,13 @@
     "criteriaOverQuickSearch" : "Les critères de recherche se cumulent sur la recherche rapide",
     "manualSearchInfo" : "Vous pouvez laisser le terme dans le champ sans sélectionner de valeur pour la recherche.",
     "groupSign" : "Groupe du signataire",
-    "noAdminSearchConfiguration": "Aucune configuration de recherche trouvée"
+    "noAdminSearchConfiguration": "Aucune configuration de recherche trouvée",
+    "producerService": "Service producteur",
+    "sendersDepartment": "Département des expéditeurs",
+    "recordManagement": "Archivage électronique",
+    "slipLabel": "Label du bordereau",
+    "slipId": "Identifiant du bordereau",
+    "transferEntity": "Entité de transfert",
+    "sirenNumber": "Numéro SIREN",
+    "sirenNumberArchiveEntity": "Numéro SIREN entité d'archive"
 }

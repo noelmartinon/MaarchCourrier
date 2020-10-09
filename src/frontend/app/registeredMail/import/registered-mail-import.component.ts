@@ -93,7 +93,7 @@ export class RegisteredMailImportComponent implements OnInit {
         lastname : '2',
         addressAdditional1 : '5',
         addressStreet : '4',
-        addressAdditional2 : '8',
+        addressAdditional2 : '6',
         addressPostcode : '7',
         addressTown : '8',
         registeredMail_reference : '9',

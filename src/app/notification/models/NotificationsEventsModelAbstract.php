@@ -43,6 +43,7 @@ abstract class NotificationsEventsModelAbstract
         ValidatorModel::intval($aArgs, ['notification_sid', 'user_id']);
 
         $aArgs['event_date'] = 'CURRENT_TIMESTAMP';
+        $aArgs['event_info'] = substr($aArgs['event_info'], 0, 255);
 
         $aReturn = DatabaseModel::insert([
             'table'         => 'notif_event_stack',

@@ -83,7 +83,7 @@
     </span>
 </mat-toolbar>
 <mat-card>
-    <div *ngIf="(displayedSecondaryData.length > 0 && displayMode=='sample') || displayMode=='label'" cdkDropListGroup style="border: solid 1px #F9983066;border-radius: 4px;">
+    <div *ngIf="displayedSecondaryData.length > 0" cdkDropListGroup style="border: solid 1px #F9983066;border-radius: 4px;">
         <mat-toolbar *ngFor="let displayedData of displayedSecondaryData;let indexDisplayedData=index" class="secondaryInformations example-list column-{{selectedTemplateDisplayedSecondaryData}}-list" cdkDropListOrientation="horizontal" cdkDropList
             [cdkDropListData]="displayedData" (cdkDropListDropped)="drop($event)">
             <ng-container *ngFor="let item of displayedData;let itData=index">

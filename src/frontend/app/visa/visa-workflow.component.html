@@ -89,7 +89,7 @@
                     </div>
                     <div class="workflowLineSubLabel" *ngIf="(showComment && ((!linkedToMaarchParapheur && adminMode && functions.empty(diffusion.process_date)) || (!linkedToMaarchParapheur && getCurrentVisaUserIndex() === i && !functions.empty(diffusion.process_comment)))) && diffusion.hasPrivilege">
                         <mat-form-field>
-                            <input matInput class="comment" [disabled]="!adminMode || diffusion.process_date != null || (target === 'signatureBook' && getCurrentVisaUserIndex() === i)" [placeholder]="this.translate.instant('lang.visaNote')" [(ngModel)]="diffusion.process_comment">
+                            <input matInput class="comment" maxlength="255" [disabled]="!adminMode || diffusion.process_date != null || (target === 'signatureBook' && getCurrentVisaUserIndex() === i)" [placeholder]="this.translate.instant('lang.visaNote')" [(ngModel)]="diffusion.process_comment">
                         </mat-form-field>
                     </div>
                     <div *ngIf="diffusion.process_date != null && [this.translate.instant('lang.visaWorkflowInterrupted'), this.translate.instant('lang.hasInterruptedWorkflow')].indexOf(diffusion.process_comment) === -1" class="workflowLineProcessDate"

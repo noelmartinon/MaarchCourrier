@@ -36,6 +36,8 @@ export class DoctypesAdministrationComponent implements OnInit {
     newSecondLevel: any = false;
     newFirstLevel: any = false;
 
+    listRules: any = {};
+
     displayedColumns = ['label', 'use', 'mandatory', 'column'];
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
@@ -52,7 +54,7 @@ export class DoctypesAdministrationComponent implements OnInit {
 
     ngOnInit(): void {
         this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.documentTypes'));
-
+        this.getRules();
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
@@ -140,6 +142,28 @@ export class DoctypesAdministrationComponent implements OnInit {
             }, (err) => {
                 this.notify.handleErrors(err);
             });
+    }
+
+    getRules() {
+        const rules: any = [
+            {
+                'id': '1',
+                'value': 'rule1',
+                'label': 'Règle 1'
+            },
+            {
+                'id': '2',
+                'value': 'rule2',
+                'label': 'Règle 2'
+            },
+            {
+                'id': '3',
+                'value': 'rule3',
+                'label': 'Règle 3'
+            },
+        ];
+        this.listRules = JSON.parse(JSON.stringify(rules));
+        console.log(this.listRules);
     }
 
     loadDoctype(data: any, move: boolean) {

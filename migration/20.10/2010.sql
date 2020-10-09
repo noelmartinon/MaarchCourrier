@@ -262,6 +262,9 @@ INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailImportedS
 DELETE FROM parameters WHERE id = 'traffic_record_summary_sheet';
 INSERT INTO parameters (id, description, param_value_string) VALUES ('traffic_record_summary_sheet', 'Module circulation pour la fiche de liaison', '');
 
+DELETE FROM parameters WHERE id = 'keepDiffusionRoleInOutgoingIndexation';
+INSERT INTO parameters (id, param_value_int) VALUES ('keepDiffusionRoleInOutgoingIndexation', 1);
+
 ALTER TABLE configurations RENAME COLUMN service TO privilege;
 DELETE FROM configurations WHERE privilege = 'admin_search';
 INSERT INTO configurations (privilege, value) VALUES ('admin_search', '{"listEvent": {"defaultTab": "dashboard"},"listDisplay":{"templateColumns":6,"subInfos":[{"value":"getPriority","cssClasses":["align_leftData"],"icon":"fa-traffic-light"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_leftData"],"icon":"fa-calendar"},{"value":"getAssignee","cssClasses":["align_leftData"],"icon":"fa-sitemap"},{"value":"getDoctype","cssClasses":["align_leftData"],"icon":"fa-suitcase"},{"value":"getRecipients","cssClasses":["align_leftData"],"icon":"fa-user"},{"value":"getSenders","cssClasses":["align_leftData"],"icon":"fa-book"}]}}');
@@ -275,6 +278,17 @@ CREATE TABLE search_templates (
   query json NOT NULL,
   CONSTRAINT search_templates_pkey PRIMARY KEY (id)
 ) WITH (OIDS=FALSE);
+
+/*ARCHIVAL*/
+ALTER TABLE doctypes DROP COLUMN IF EXISTS action_current_use;
+ALTER TABLE doctypes ADD COLUMN action_current_use character varying(255) DEFAULT NULL;
+UPDATE doctypes SET duration_current_use = duration_current_use * 30;
+
+ALTER TABLE entities DROP COLUMN IF EXISTS archival_agency;
+ALTER TABLE entities DROP COLUMN IF EXISTS archival_agreement;
+ALTER TABLE entities DROP COLUMN IF EXISTS producer_service;
+ALTER TABLE entities ADD COLUMN producer_service character varying(255);
+UPDATE entities SET producer_service = entity_id;
 
 /* RE CREATE VIEWS */
 CREATE OR REPLACE VIEW res_view_letterbox AS

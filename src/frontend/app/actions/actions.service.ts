@@ -40,7 +40,8 @@ import { SaveRegisteredMailActionComponent } from './save-registered-mail-action
 import { SaveAndPrintRegisteredMailActionComponent } from './save-and-print-registered-mail-action/save-and-print-registered-mail-action.component';
 import { SaveAndIndexRegisteredMailActionComponent } from './save-and-index-registered-mail-action/save-and-index-registered-mail-action.component';
 import { PrintRegisteredMailActionComponent } from './print-registered-mail-action/print-registered-mail-action.component';
-import {PrintDepositListActionComponent} from './print-deposit-list-action/print-deposit-list-action.component';
+import { PrintDepositListActionComponent } from './print-deposit-list-action/print-deposit-list-action.component';
+import { SendToRecordManagementComponent } from './send-to-record-management/send-to-record-management.component';
 
 @Injectable()
 export class ActionsService implements OnDestroy {
@@ -1088,6 +1089,29 @@ export class ActionsService implements OnDestroy {
             filter((resIds: any) => !this.functions.empty(resIds)),
             tap((resIds: any) => {
                 this.endAction(resIds);
+            }),
+            finalize(() => this.loading = false),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    sendToRecordManagementAction(options: any = null) {
+        const dialogRef = this.dialog.open(SendToRecordManagementComponent, {
+            panelClass: 'maarch-modal',
+            autoFocus: false,
+            disableClose: true,
+            data: this.setDatasActionToSend()
+        });
+        dialogRef.afterClosed().pipe(
+            tap((data: any) => {
+                this.unlockResourceAfterActionModal(data);
+            }),
+            filter((data: string) => data === 'success'),
+            tap((result: any) => {
+                this.endAction(result);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {

@@ -75,7 +75,7 @@ while ($state <> 'END') {
                 $user = $users[0];
 
                 // Alert 1 = limit - n days
-                if ($myDoc['flag_alarm1'] != 'Y' && $myDoc['flag_alarm2'] != 'Y') {
+                if ($myDoc['flag_alarm1'] != 'Y' && $myDoc['flag_alarm2'] != 'Y' && $myDoctype['delay1'] > 0) {
                     $processDate = \Resource\controllers\IndexingController::calculateProcessDate(['date' => $myDoc['process_limit_date'], 'delay' => $myDoctype['delay1'], 'sub' => true]);
                     if (strtotime($processDate) <= time()) {
                         Bt_writeLog(['level' => 'INFO', 'message' => "Alarm 1 will be sent"]);
@@ -96,7 +96,7 @@ while ($state <> 'END') {
                 }
 
                 // Alert 2 = limit + n days
-                if ($myDoc['flag_alarm2'] != 'Y') {
+                if ($myDoc['flag_alarm2'] != 'Y' && $myDoctype['delay2'] > 0) {
                     $processDate = \Resource\controllers\IndexingController::calculateProcessDate(['date' => $myDoc['process_limit_date'], 'delay' => $myDoctype['delay2']]);
                     if (strtotime($processDate) <= time()) {
                         Bt_writeLog(['level' => 'INFO', 'message' => "Alarm 2 will be sent"]);

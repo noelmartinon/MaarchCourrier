@@ -1,6 +1,7 @@
 import { DatePipe } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { FunctionsService } from './functions.service';
+import { HeaderService } from './header.service';
 
 interface ListProperties {
     'page': number;
@@ -25,7 +26,8 @@ export class CriteriaSearchService {
 
     constructor(
         private datePipe: DatePipe,
-        public functions: FunctionsService
+        public functions: FunctionsService,
+        private headerService: HeaderService,
     ) { }
 
     initListsProperties(userId: number) {
@@ -34,6 +36,15 @@ export class CriteriaSearchService {
 
         if (crit !== null) {
             this.listsProperties = JSON.parse(sessionStorage.getItem('criteriaSearch_' + userId));
+        } else {
+            this.listsProperties = {
+                page : 0,
+                pageSize : 0,
+                order: 'creationDate',
+                orderDir: 'DESC',
+                criteria: [],
+                filters: []
+            };
         }
 
         return this.listsProperties;
@@ -60,7 +71,7 @@ export class CriteriaSearchService {
     }
 
     saveListsProperties() {
-        sessionStorage.setItem('criteriaSearch', JSON.stringify(this.listsProperties));
+        sessionStorage.setItem('criteriaSearch_' + this.headerService.user.id, JSON.stringify(this.listsProperties));
     }
 
     getCriteria() {

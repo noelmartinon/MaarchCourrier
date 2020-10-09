@@ -78,7 +78,7 @@ export class SentResourcePageComponent implements OnInit {
             list: []
         },
         summarySheet: {
-            icon: 'fa fa-link',
+            icon: 'fas fa-scroll',
             title: this.translate.instant('lang.attachSummarySheet'),
             list: []
         },

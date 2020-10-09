@@ -466,4 +466,14 @@ An action page is described in a ACTIONPAGE tag :
         <MODULE>registeredMail</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>
     </ACTIONPAGE>
+    <ACTIONPAGE>
+        <ID>sendToRecordManagement</ID>
+        <LABEL>_SEND_TO_RECORD_MANAGEMENT</LABEL>
+        <NAME>sendToRecordManagement</NAME>
+        <DESC>_SEND_TO_RECORD_MANAGEMENT_DESC</DESC>
+        <component>sendToRecordManagementAction</component>
+        <ORIGIN>apps</ORIGIN>
+        <MODULE>recordManagement</MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+    </ACTIONPAGE>
 </ROOT>

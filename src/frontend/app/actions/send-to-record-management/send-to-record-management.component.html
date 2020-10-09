@@ -1,0 +1,92 @@
+<div class="mat-dialog-content-container">
+    <h1 mat-dialog-title>{{data.action.label}}</h1>
+    <div mat-dialog-content>
+        <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
+            <mat-spinner style="margin:auto;"></mat-spinner>
+        </div>
+        <form [formGroup]="actionFormGroup" style="display: contents;">
+            <mat-form-field appearance="outline">
+                <mat-label>{{'lang.slipLabel' | translate}}</mat-label>
+                <input type="text" matInput formControlName="packageName">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>{{'lang.slipId' | translate}}</mat-label>
+                <input type="text" matInput formControlName="slipId">
+            </mat-form-field>
+            <mat-divider></mat-divider>
+            <div class="form-group" style="display:flex;flex-direction: row; flex-wrap: wrap;">
+                <div class="formType ratio-2 col-sm-12">
+                    <div class="formType-title">
+                        {{'lang.transferEntity' | translate}}
+                    </div>
+                    <mat-form-field>
+                        <mat-label>{{'lang.label' | translate}}</mat-label>
+                        <input type="text" matInput formControlName="entityLabelTransferEntity">
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>{{'lang.sirenNumber' | translate}}</mat-label>
+                        <input type="text" matInput formControlName="entitySirenTransferEntity">
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>{{'lang.sirenNumberArchiveEntity' | translate}}</mat-label>
+                        <input type="text" matInput formControlName="sirenArchiveEntity">
+                    </mat-form-field>
+                </div>
+                <div class="formType ratio-2 col-sm-12">
+                    <div class="formType-title">
+                        {{'lang.doctype' | translate}}
+                    </div>
+                    <mat-form-field>
+                        <mat-label>{{'lang.label' | translate}}</mat-label>
+                        <input type="text" matInput formControlName="doctype">
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>{{'lang.retentionRule' | translate}}</mat-label>
+                        <input type="text" matInput formControlName="entityRetentionRule">
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>{{'lang.durationCurrentUse' | translate}}</mat-label>
+                        <input type="text" matInput formControlName="doctypeDurationCurrentUse">
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>{{'lang.finalAction' | translate}}</mat-label>
+                        <input type="text" matInput formControlName="doctypeActionCurrentUse">
+                    </mat-form-field>
+                    <mat-form-field>
+                        <mat-label>{{'lang.retentionFinalDisposition' | translate}}</mat-label>
+                        <input type="text" matInput formControlName="doctypeRetentionFinalDisposition">
+                    </mat-form-field>
+                </div>
+            </div>
+        </form>
+        <mat-tab-group>
+            <mat-tab *ngFor="let archive of archives; let i=index" label="Archive {{i + 1}}">
+                <mat-form-field>
+                    <mat-label>{{'lang.id' | translate}}</mat-label>
+                    <input type="text" matInput [(ngModel)]="archive.id" disabled>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>{{'lang.label' | translate}}</mat-label>
+                    <input type="text" matInput [(ngModel)]="archive.label" disabled>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>{{'lang.type' | translate}}</mat-label>
+                    <input type="text" matInput [(ngModel)]="archive.type" disabled>
+                </mat-form-field>
+                <mat-form-field>
+                    <mat-label>{{'lang.descService' | translate}}</mat-label>
+                    <input type="text" matInput [(ngModel)]="archive.descService" disabled>
+                </mat-form-field>
+            </mat-tab>
+        </mat-tab-group>
+    </div>
+    <span class="divider-modal"></span>
+    <div mat-dialog-actions class="actions">
+        <button mat-raised-button mat-button color="primary" [disabled]="loading || !isValidAction()"
+            (click)="onSubmit()">{{'lang.validate' | translate}}</button>
+        <button mat-raised-button mat-button color="primary" [disabled]="loading || !isValidAction()"
+            (click)="onSubmit()">{{'lang.download' | translate}}</button>
+        <button mat-raised-button mat-button [disabled]="loading"
+            [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
+    </div>
+</div>

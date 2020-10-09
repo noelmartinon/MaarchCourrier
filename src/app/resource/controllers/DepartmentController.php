@@ -15,6 +15,8 @@
 namespace Resource\controllers;
 
 
+use Slim\Http\Request;
+use Slim\Http\Response;
 use SrcCore\models\ValidatorModel;
 
 class DepartmentController
@@ -122,6 +124,11 @@ class DepartmentController
         "974"   => "La Réunion",
         "976"   => "Mayotte"
     ];
+
+    public function getFrenchDepartments(Request $request, Response $response)
+    {
+        return $response->withJson(['departments' => self::FRENCH_DEPARTMENTS]);
+    }
 
     public static function getById(array $aArgs)
     {

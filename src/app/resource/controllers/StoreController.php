@@ -267,10 +267,22 @@ class StoreController
         $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['version', 'alt_identifier', 'external_id', 'category_id', 'type_id', 'destination']]);
 
         if (!empty($args['modelId'])) {
-            $preparedData['model_id'] = $args['modelId'];
-            $indexingModel = IndexingModelModel::getById(['id' => $args['modelId'], 'select' => ['category']]);
+            $preparedData['model_id']    = $args['modelId'];
+            $indexingModel               = IndexingModelModel::getById(['id' => $args['modelId'], 'select' => ['category']]);
             $preparedData['category_id'] = $indexingModel['category'];
-            $resource['category_id'] = $indexingModel['category'];
+            $resource['category_id']     = $indexingModel['category'];
+
+            $indexingModelField = IndexingModelFieldModel::get(['select' => ['default_value'], 'where' => ['model_id = ?', 'identifier = ?'], 'data' => [$args['modelId'], 'destination']]);
+            $newDestination     = json_decode($indexingModelField[0]['default_value']);
+            if (empty($resource['destination']) && !empty($newDestination)) {
+                if ($newDestination == "#myPrimaryEntity") {
+                    $entity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => ['entities.entity_id']]);
+                    $preparedData['destination'] = $entity['entity_id'];
+                } else {
+                    $entity = EntityModel::getById(['id' => $newDestination, 'select' => ['entity_id']]);
+                    $preparedData['destination'] = $entity['entity_id'];
+                }
+            }
         }
         if (empty($resource['alt_identifier'])) {
             $chrono = ChronoModel::getChrono(['id' => $resource['category_id'], 'entityId' => $resource['destination'], 'typeId' => $resource['type_id'], 'resId' => $args['resId']]);

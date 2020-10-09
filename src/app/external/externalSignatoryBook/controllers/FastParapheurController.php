@@ -79,20 +79,15 @@ class FastParapheurController
                     $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'validated';
                     $aArgs['idsToRetrieve'][$version][$resId]['format'] = 'pdf';
                     $aArgs['idsToRetrieve'][$version][$resId]['encodedFile'] = $response['b64FileContent'];
+                    $signatoryInfo = FastParapheurController::getSignatoryUserInfo(['resId' => $aArgs['idsToRetrieve'][$version][$resId]['res_id_master']]);
+                    $aArgs['idsToRetrieve'][$version][$resId]['signatory_user_serial_id'] = $signatoryInfo['id'];
                     FastParapheurController::processVisaWorkflow(['res_id_master' => $value['res_id_master'], 'res_id' => $value['res_id'], 'processSignatory' => true]);
                     break;
                 } elseif ($state == $aArgs['config']['data']['refusedState']) {
-                    $res = DatabaseModel::select([
-                        'select'    => ['firstname', 'lastname'],
-                        'table'     => ['listinstance', 'users'],
-                        'left_join' => ['listinstance.item_id = users.id'],
-                        'where'     => ['res_id = ?', 'item_mode = ?'],
-                        'data'      => [$aArgs['idsToRetrieve'][$version][$resId]['res_id_master'], 'sign']
-                    ])[0];
-
+                    $signatoryInfo = FastParapheurController::getSignatoryUserInfo(['resId' => $aArgs['idsToRetrieve'][$version][$resId]['res_id_master']]);
                     $response = FastParapheurController::getRefusalMessage(['config' => $aArgs['config'], 'documentId' => $value['external_id']]);
                     $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'refused';
-                    $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = $res['lastname'] . ' ' . $res['firstname'] . ' : ' . $response;
+                    $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = $signatoryInfo['lastname'] . ' ' . $signatoryInfo['firstname'] . ' : ' . $response;
                     break;
                 } else {
                     $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'waiting';
@@ -101,6 +96,19 @@ class FastParapheurController
         }
         
         return $aArgs['idsToRetrieve'];
+    }
+
+    public static function getSignatoryUserInfo($args = [])
+    {
+        $res = DatabaseModel::select([
+            'select'    => ['firstname', 'lastname', 'users.id'],
+            'table'     => ['listinstance', 'users'],
+            'left_join' => ['listinstance.item_id = users.id'],
+            'where'     => ['res_id = ?', 'process_date is null', 'difflist_type = ?'],
+            'data'      => [$args['resId'], 'VISA_CIRCUIT']
+        ])[0];
+
+        return $res;
     }
 
     public static function processVisaWorkflow($aArgs = [])

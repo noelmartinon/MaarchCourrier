@@ -30,10 +30,12 @@ export class TemplateFileEditorModalComponent implements OnInit {
     }
 
     close() {
+        this.loading = true;
         if (this.editorType === 'onlyoffice') {
             this.onlyofficeViewer.getFile().pipe(
                 take(1),
                 tap((data: any) => {
+                    this.loading = false;
                     this.dialogRef.close(data);
                 })
             ).subscribe();
@@ -41,10 +43,12 @@ export class TemplateFileEditorModalComponent implements OnInit {
             this.collaboraOnlineViewer.getFile().pipe(
                 take(1),
                 tap((data: any) => {
+                    this.loading = false;
                     this.dialogRef.close(data);
                 })
             ).subscribe();
         } else {
+            this.loading = false;
             this.dialogRef.close();
         }
     }

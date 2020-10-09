@@ -101,7 +101,7 @@ export class AdministrationComponent implements OnInit, AfterViewInit {
     private _filter(value: string, type: string): string[] {
         if (typeof value === 'string') {
             const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this[type].filter((option: any) => this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue));
+            return this[type].filter((option: any) => this.latinisePipe.transform(this.translate.instant(option['label']).toLowerCase()).includes(filterValue));
         } else {
             return this[type];
         }
