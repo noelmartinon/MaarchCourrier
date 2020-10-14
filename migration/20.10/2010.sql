@@ -262,9 +262,6 @@ INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailImportedS
 DELETE FROM parameters WHERE id = 'traffic_record_summary_sheet';
 INSERT INTO parameters (id, description, param_value_string) VALUES ('traffic_record_summary_sheet', 'Module circulation pour la fiche de liaison', '');
 
-DELETE FROM parameters WHERE id = 'keepDiffusionRoleInOutgoingIndexation';
-INSERT INTO parameters (id, param_value_int) VALUES ('keepDiffusionRoleInOutgoingIndexation', 1);
-
 ALTER TABLE configurations RENAME COLUMN service TO privilege;
 DELETE FROM configurations WHERE privilege = 'admin_search';
 INSERT INTO configurations (privilege, value) VALUES ('admin_search', '{"listEvent": {"defaultTab": "dashboard"},"listDisplay":{"templateColumns":6,"subInfos":[{"value":"getPriority","cssClasses":["align_leftData"],"icon":"fa-traffic-light"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_leftData"],"icon":"fa-calendar"},{"value":"getAssignee","cssClasses":["align_leftData"],"icon":"fa-sitemap"},{"value":"getDoctype","cssClasses":["align_leftData"],"icon":"fa-suitcase"},{"value":"getRecipients","cssClasses":["align_leftData"],"icon":"fa-user"},{"value":"getSenders","cssClasses":["align_leftData"],"icon":"fa-book"}]}}');
@@ -289,6 +286,13 @@ ALTER TABLE entities DROP COLUMN IF EXISTS archival_agreement;
 ALTER TABLE entities DROP COLUMN IF EXISTS producer_service;
 ALTER TABLE entities ADD COLUMN producer_service character varying(255);
 UPDATE entities SET producer_service = entity_id;
+
+UPDATE actions SET component = 'sendToRecordManagementAction' where action_page = 'export_seda';
+UPDATE actions SET component = 'checkAcknowledgmentRecordManagementAction' where action_page = 'check_acknowledgement';
+UPDATE actions SET component = 'checkReplyRecordManagementAction' where action_page = 'check_reply';
+
+UPDATE res_attachments SET attachment_type = 'acknowledgement_record_management' WHERE attachment_type = 'simple_attachment' AND format = 'xml' AND title = 'Accusé de réception' AND relation = 1 AND status = 'TRA';
+UPDATE res_attachments SET attachment_type = 'reply_record_management' WHERE attachment_type = 'simple_attachment' AND format = 'xml' AND title = 'Réponse au transfert' AND relation = 1 AND status = 'TRA';
 
 /* RE CREATE VIEWS */
 CREATE OR REPLACE VIEW res_view_letterbox AS

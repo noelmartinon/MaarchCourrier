@@ -294,6 +294,8 @@ define('_PRINT_FOLDER', 'Dossier');
 define('_REDACTOR', 'Rédacteur');
 define('_ASSIGNEE', 'Attributaire');
 define('_DOCUMENT_WITH_NOTES', 'Document annoté');
+define("_ACKNOWLEDGEMENT_RECORD_MANAGEMENT", "Accusé de réception (Archivage)");
+define("_REPLY_RECORD_MANAGEMENT", "Réponse au transfert (Archivage)");
 
 define('_SUMMARY_SHEET', 'Fiche de liaison');
 define('_UNDEFINED', 'Non défini');
@@ -484,5 +486,11 @@ define('_REGISTERED_MAIL_DISTRIBUTED', 'Accusé de réception reçu : recommand�
 define('_REGISTERED_MAIL_NOT_DISTRIBUTED', 'Accusé de réception reçu : recommandé non distribué');
 
 define('_CONFIGURATION_UPDATED', 'Configuration modifiée');
-define('_SEND_TO_RECORD_MANAGEMENT', 'Envoyer dans un Système d\'Archivage Électronique');
-define('_SEND_TO_RECORD_MANAGEMENT_DESC', 'Envoyer dans un Système d\'Archivage Électronique');
+define('_SEND_TO_RECORD_MANAGEMENT', 'Envoyer dans un système d\'archivage électronique');
+define('_SEND_TO_RECORD_MANAGEMENT_DESC', 'Envoyer dans un système d\'archivage électronique');
+
+define('_CHECK_REPLY_RECORD_MANAGEMENT', 'Vérification de la réponse au transfert du système d\'archivage électronique');
+define('_CHECK_REPLY_RECORD_MANAGEMENT_DESC', 'Vérification de la réponse au transfert du système d\'archivage électronique');
+
+define('_CHECK_ACKNOWLEDGMENT_RECORD_MANAGEMENT', 'Vérification du transfert du paquet au système d\'archivage électronique');
+define('_CHECK_ACKNOWLEDGMENT_RECORD_MANAGEMENT_DESC', 'Vérification du transfert du paquet au système d\'archivage électronique');

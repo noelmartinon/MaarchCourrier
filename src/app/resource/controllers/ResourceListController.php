@@ -862,8 +862,6 @@ class ResourceListController
         $resources = $args['resources'];
         $attachments = $args['attachments'];
 
-        $currentUser = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
-
         $customFields = CustomFieldModel::get(['select' => ['id', 'type', 'label']]);
         $customFieldsLabels = array_column($customFields, 'label', 'id');
         $customFields = array_column($customFields, 'type', 'id');

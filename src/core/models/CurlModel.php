@@ -195,7 +195,7 @@ class CurlModel
     public static function execSimple(array $args)
     {
         ValidatorModel::notEmpty($args, ['url', 'method']);
-        ValidatorModel::stringType($args, ['url', 'method']);
+        ValidatorModel::stringType($args, ['url', 'method', 'cookie']);
         ValidatorModel::arrayType($args, ['headers', 'queryParams', 'basicAuth', 'bearerAuth']);
         ValidatorModel::boolType($args, ['isXml']);
 
@@ -213,6 +213,10 @@ class CurlModel
         }
         if (!empty($args['bearerAuth'])) {
             $opts[CURLOPT_HTTPHEADER][] = 'Authorization: Bearer ' . $args['bearerAuth']['token'];
+        }
+        //Cookie
+        if (!empty($args['cookie'])) {
+            $opts[CURLOPT_COOKIE] = $args['cookie'];
         }
 
         //QueryParams

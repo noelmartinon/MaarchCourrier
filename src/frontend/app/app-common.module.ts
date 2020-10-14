@@ -28,10 +28,6 @@ import { HeaderPanelComponent } from './header/header-panel.component';
 import { MenuNavComponent } from './menu/menu-nav.component';
 import { MenuShortcutComponent, IndexingGroupModalComponent } from './menu/menu-shortcut.component';
 
-/*SEARCH*/
-import { SearchHomeComponent } from './search/search-home.component';
-
-/*SEARCH*/
 import { BasketHomeComponent } from './basket/basket-home.component';
 
 import { FieldListComponent } from './indexation/field-list/field-list.component';
@@ -80,7 +76,7 @@ import { InternationalizationModule } from '@service/translate/internationalizat
 import { TranslateService } from '@ngx-translate/core';
 
 import { RegisteredMailImportComponent } from '@appRoot/registeredMail/import/registered-mail-import.component';
-import { CriteriaToolComponent } from '@appRoot/adv-search/criteria-tool/criteria-tool.component';
+import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-tool.component';
 
 
 @NgModule({
@@ -101,7 +97,6 @@ import { CriteriaToolComponent } from '@appRoot/adv-search/criteria-tool/criteri
         HeaderRightComponent,
         HeaderLeftComponent,
         HeaderPanelComponent,
-        SearchHomeComponent,
         BasketHomeComponent,
         IndexingGroupModalComponent,
         RegisteredMailImportComponent,
@@ -148,7 +143,6 @@ import { CriteriaToolComponent } from '@appRoot/adv-search/criteria-tool/criteri
         HeaderRightComponent,
         HeaderLeftComponent,
         HeaderPanelComponent,
-        SearchHomeComponent,
         BasketHomeComponent,
         FormsModule,
         ReactiveFormsModule,

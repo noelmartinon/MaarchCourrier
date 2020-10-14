@@ -18,40 +18,13 @@
 *   along with Maarch Framework.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 $status = 0;
 $error = $content = $res = '';
 
 if ($_REQUEST['reference']) {
-    $resIds = explode(',',$_REQUEST['reference']);
+    $resIds = explode(',', $_REQUEST['reference']);
     arsort($resIds);
-    if ($_REQUEST['type'] == 'acknowledgement') {
-        require_once __DIR__.'/CheckAcknowledgement.php';
-
-        $checkAcknowledgement = new CheckAcknowledgement();
-        foreach ($resIds as $id) {
-            $res = $checkAcknowledgement->checkAttachment($id);
-
-            if ($res === false) {
-                $status = 1;
-                $error = $_SESSION['error'];
-            }
-        }
-        $content = $res;
-    } else if ($_REQUEST['type'] == 'reply') {
-        require_once __DIR__.'/CheckReply.php';
-
-        $checkReply = new CheckReply();
-        foreach ($resIds as $id) {
-            $res = $checkReply->checkAttachment($id);
-
-            if ($res === false) {
-                $status = 1;
-                $error = $_SESSION['error'];
-            }
-        }
-        $content = $res;
-    } else if ($_REQUEST['type'] == 'purge') {
+    if ($_REQUEST['type'] == 'purge') {
         require_once __DIR__.'/Purge.php';
 
         $purge = new Purge();
@@ -64,7 +37,7 @@ if ($_REQUEST['reference']) {
             }
         }
         $content = $res;
-    } else if ($_REQUEST['type'] == 'reset') {
+    } elseif ($_REQUEST['type'] == 'reset') {
         require_once __DIR__.'/Reset.php';
 
         $reset = new Reset();
@@ -85,4 +58,4 @@ if ($_REQUEST['reference']) {
 }
 
 echo "{status : " . $status . ", content : '" . addslashes($content) . "', error : '" . addslashes($error) . "'}";
-exit ();
+exit();

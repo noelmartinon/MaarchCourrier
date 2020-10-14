@@ -394,7 +394,7 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
             if (ev.source._selected) {
                 this.selected = this.formControlSelect.value;
             } else {
-                this.selected = this.selected.filter((val: any) => val.id !== ev.source.value.id);
+                this.selected = this.selected.length > 0 ? this.selected.filter((val: any) => val.id !== ev.source.value.id) : [];
             }
         }
     }

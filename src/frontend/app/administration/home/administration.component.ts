@@ -8,7 +8,7 @@ import { AppService } from '@service/app.service';
 import { PrivilegeService } from '@service/privileges.service';
 import { Observable, of } from 'rxjs';
 import { FormControl } from '@angular/forms';
-import { startWith, map, tap, catchError, exhaustMap } from 'rxjs/operators';
+import { startWith, map, tap, catchError } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
 import { NotificationService } from '@service/notification/notification.service';
 import { FunctionsService } from '@service/functions.service';
@@ -20,7 +20,6 @@ import { FeatureTourService } from '@service/featureTour.service';
 })
 export class AdministrationComponent implements OnInit, AfterViewInit {
 
-    
     loading: boolean = false;
 
     shortcutsAdmin: any[] = [];
@@ -61,7 +60,12 @@ export class AdministrationComponent implements OnInit, AfterViewInit {
         this.supervisionServices = this.privilegeService.getCurrentUserAdministrationsByUnit('supervision');
 
         this.administrations = this.organisationServices.concat(this.productionServices).concat(this.classementServices).concat(this.supervisionServices);
-
+        this.administrations = this.administrations.map((admin: any) => {
+            return {
+                ...admin,
+                label : this.translate.instant(admin.label)
+            };
+        });
         this.shortcutsAdmin = this.administrations.filter(admin => ['admin_users', 'admin_groups', 'manage_entities'].indexOf(admin.id) > -1).map(admin => {
             return {
                 ...admin,

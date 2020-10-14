@@ -18,6 +18,7 @@ import { PrivilegeService } from '@service/privileges.service';
 import { VisaWorkflowModalComponent } from '../visa/modal/visa-workflow-modal.component';
 import { of } from 'rxjs';
 import { CollaboraOnlineViewerComponent } from '../../plugins/collabora-online/collabora-online-viewer.component';
+import { AuthService } from '@service/auth.service';
 
 @Component({
     selector: 'app-document-viewer',
@@ -150,6 +151,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         private sortPipe: SortPipe,
         public functions: FunctionsService,
         public privilegeService: PrivilegeService,
+        private authService: AuthService
     ) {
         (<any>window).pdfWorkerSrc = '../node_modules/pdfjs-dist/build/pdf.worker.min.js';
     }
@@ -753,6 +755,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                         objectType: 'attachmentCreation',
                         objectId: template.id,
                         cookie: document.cookie,
+                        authToken : this.authService.getToken(),
                         data: this.resourceDatas,
                     };
                     this.editInProgress = true;
@@ -809,6 +812,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 objectType: 'attachmentModification',
                 objectId: this.resId,
                 cookie: document.cookie,
+                authToken : this.authService.getToken(),
                 data: this.resourceDatas,
             };
             this.editInProgress = true;

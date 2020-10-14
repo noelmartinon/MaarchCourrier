@@ -50,9 +50,12 @@ use SrcCore\models\ValidatorModel;
 use Template\models\TemplateModel;
 use User\models\UserEntityModel;
 use User\models\UserModel;
+use ExportSeda\controllers\PreProcessActionSEDATrait;
 
 class PreProcessActionController
 {
+    use PreProcessActionSEDATrait;
+
     public static function getRedirectInformations(Request $request, Response $response, array $args)
     {
         $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $GLOBALS['id']]);

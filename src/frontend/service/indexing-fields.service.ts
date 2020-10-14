@@ -359,6 +359,25 @@ export class IndexingFieldsService {
 
     roleFields: any[] = [];
 
+    // TODO : UNIFY IDENTIFIER
+    mappingdata: any = {
+        getPriority: 'priority',
+        getCategory: 'category',
+        getDoctype: 'doctype',
+        getRecipients: 'recipients',
+        getSenders: 'senders',
+        getSignatories: 'role_sign',
+        getModificationDate: 'modificationDate',
+        getOpinionLimitDate: 'role_visa',
+        getFolders: 'folders',
+        getResId: 'resId',
+        getBarcode: 'barcode',
+        getRegisteredMailRecipient: 'registeredMail_recipient',
+        getRegisteredMailReference: 'registeredMail_reference',
+        getRegisteredMailIssuingSite: 'registeredMail_issuingSite',
+        chronoNumberShort: 'chrono'
+    };
+
     constructor(
         public http: HttpClient,
         public translate: TranslateService,
@@ -483,5 +502,9 @@ export class IndexingFieldsService {
                 })
             ).subscribe();
         });
+    }
+
+    formatData() {
+
     }
 }

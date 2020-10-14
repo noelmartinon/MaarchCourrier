@@ -7,7 +7,7 @@ import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FunctionsService } from '@service/functions.service';
-import { SearchResultListComponent } from '@appRoot/adv-search/result-list/search-result-list.component';
+import { SearchResultListComponent } from '@appRoot/search/result-list/search-result-list.component';
 
 @Component({
     templateUrl: 'reconcile-action.component.html',

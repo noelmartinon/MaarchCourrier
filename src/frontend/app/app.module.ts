@@ -64,7 +64,9 @@ import { SaveAndIndexRegisteredMailActionComponent } from './actions/save-and-in
 import { SaveAndPrintRegisteredMailActionComponent } from './actions/save-and-print-registered-mail-action/save-and-print-registered-mail-action.component';
 import { PrintRegisteredMailActionComponent } from './actions/print-registered-mail-action/print-registered-mail-action.component';
 import { PrintDepositListActionComponent } from './actions/print-deposit-list-action/print-deposit-list-action.component';
-import { SendToRecordManagementComponent } from './actions/send-to-record-management/send-to-record-management.component';
+import { SendToRecordManagementComponent } from './actions/send-to-record-management-action/send-to-record-management.component';
+import { CheckReplyRecordManagementComponent } from './actions/check-reply-record-management-action/check-reply-record-management.component';
+import { CheckAcknowledgmentRecordManagementComponent } from './actions/check-acknowledgment-record-management-action/check-acknowledgment-record-management.component';
 
 
 // PROCESS
@@ -80,15 +82,16 @@ import { SentResourcePageComponent } from './sentResource/sent-resource-page/sen
 import { SentNumericPackagePageComponent } from './sentResource/sent-numeric-package-page/sent-numeric-package-page.component';
 import { ThesaurusModalComponent } from './tag/indexing/thesaurus/thesaurus-modal.component';
 import { SelectIndexingModelComponent } from './indexation/select-indexing-model/select-indexing-model.component';
-import { FilterToolComponent } from './adv-search/filter-tool/filter-tool.component';
+import { FilterToolComponent } from './search/filter-tool/filter-tool.component';
+import { TechnicalInformationComponent } from './indexation/technical-information/technical-information.component';
 
-import { AdvSearchComponent } from './adv-search/adv-search.component';
-import { SearchResultListComponent } from './adv-search/result-list/search-result-list.component';
+import { SearchComponent } from './search/search.component';
+import { SearchResultListComponent } from './search/result-list/search-result-list.component';
 import { AboutUsComponent } from './about-us.component';
 import { ActivateUserComponent } from './activate-user.component';
 import { AddAvisModelModalComponent } from './avis/addAvisModel/add-avis-model-modal.component';
 import { AddPrivateIndexingModelModalComponent } from './indexation/private-indexing-model/add-private-indexing-model-modal.component';
-import { AddSearchTemplateModalComponent } from './adv-search/criteria-tool/search-template/search-template-modal.component';
+import { AddSearchTemplateModalComponent } from './search/criteria-tool/search-template/search-template-modal.component';
 import { AddVisaModelModalComponent } from './visa/addVisaModel/add-visa-model-modal.component';
 import { AttachmentCreateComponent } from './attachments/attachment-create/attachment-create.component';
 import { AttachmentPageComponent } from './attachments/attachments-page/attachment-page.component';
@@ -158,7 +161,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         SelectIndexingModelComponent,
         FilterToolComponent,
         PanelListComponent,
-        AdvSearchComponent,
+        SearchComponent,
         SearchResultListComponent,
         AboutUsComponent,
         ActivateUserComponent,
@@ -234,6 +237,9 @@ export class MyHammerConfig extends HammerGestureConfig {
         PrintDepositListActionComponent,
         ReconcileActionComponent,
         SendToRecordManagementComponent,
+        CheckReplyRecordManagementComponent,
+        CheckAcknowledgmentRecordManagementComponent,
+        TechnicalInformationComponent
     ],
     exports : [
         SharedModule
@@ -290,6 +296,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         PrintDepositListActionComponent,
         ViewDocActionComponent,
         ReconcileActionComponent,
+        TechnicalInformationComponent
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

@@ -3,24 +3,48 @@
     <CONFIG>
         <name>export_seda</name>
         <comment>_EXPORT_SEDA_COMMENT</comment>
-        <file_prefix>seda</file_prefix>
         <loaded>true</loaded>
         <sae>MaarchRM</sae>
-        <token>phdF9WkJuTKkDuPXoqDZuCFEQT7En7YqsVROsdD1HoNZV7jD5+XyCrrA61NWmmXVWU7AR5Sw+wq9eazIrIiGnLNDPB6BqMMum8fauclhcR2nklsEdTlveHjcGp/WIDlQ</token>
-        <urlSAEService>https://demo-ap.maarchrm.com</urlSAEService>
-        <urlSAE>https://demo-ap.maarchrm.com/transfer/sent</urlSAE>
-        <directoryMessage>/tmp/</directoryMessage>
+        <token>phdF9WkJuTKkDuPXoqDZuCFEQT7En7YqsVROsdD1HoNZV7jD5+XyCmlXwiQKoUdiii3QV4pIbPXC66kM8wxQUgL74LW6+dEf0buKoauGyVd8btoSWBK7M3Jx5T+SdRzp</token>
+        <urlSAEService>http://10.2.95.79:1506</urlSAEService>
         <senderOrgRegNumber>org_987654321_DGS_SA</senderOrgRegNumber>
         <accessRuleCode>AR039</accessRuleCode>
-        <deleteData>true</deleteData>
         <certificateSSL></certificateSSL>
+        <userAgent>service</userAgent>
     </CONFIG>
-    <TABLENAME/>
-    <HISTORY>
-        <sedaup>true</sedaup>
-        <sedaadd>true</sedaadd>
-        <sedadel>true</sedadel>
-    </HISTORY>
+    <externalSAE>
+        <id>otherSAE</id>
+        <retentionRules>
+            <retentionRule>
+                <id>id1</id>
+                <label>label1</label>
+            </retentionRule>
+            <retentionRule>
+                <id>id2</id>
+                <label>label2</label>
+            </retentionRule>
+        </retentionRules>
+        <archiveEntities>
+            <archiveEntity>
+                <id>id1</id>
+                <label>label1</label>
+            </archiveEntity>
+            <archiveEntity>
+                <id>id2</id>
+                <label>label2</label>
+            </archiveEntity>
+        </archiveEntities>
+        <archivalAgreements>
+            <archivalAgreement>
+                <id>id1</id>
+                <label>label1</label>
+            </archivalAgreement>
+            <archivalAgreement>
+                <id>id2</id>
+                <label>label2</label>
+            </archivalAgreement>
+        </archivalAgreements>
+    </externalSAE>
     <M2M>
         <gec>maarch_courrier</gec>
     </M2M>

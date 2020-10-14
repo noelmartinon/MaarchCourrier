@@ -80,46 +80,6 @@ class CheckReply
         return true;
     }
 
-    public function checkAttachment($resId)
-    {
-        $reply = $this->db->getReply($resId);
-        if (!$reply) {
-            $_SESSION['error'] = _ERROR_NO_REPLY . $resId;
-            return false;
-        }
-
-        $tabDir = explode('#', $reply->path);
-
-        $dir = '';
-        for ($i = 0; $i < count($tabDir); $i++) {
-            $dir .= $tabDir[$i] . DIRECTORY_SEPARATOR;
-        }
-
-        $docServer = $this->db->getDocServer($reply->docserver_id);
-        $fileName = $docServer->path_template. DIRECTORY_SEPARATOR . $dir . $reply->filename;
-        $xml = simplexml_load_file($fileName);
-
-        if (!$xml) {
-            $_SESSION['error'] = _ERROR_NO_XML_REPLY . $resId;
-            return false;
-        }
-
-        $message = $this->db->getMessageByReference($xml->MessageRequestIdentifier);
-        if (!$message) {
-            $_SESSION['error'] = _ERROR_NO_REFERENCE_MESSAGE_REPLY . $resId;
-            return false;
-        }
-
-        $unitIdentifier = $this->db->getUnitIdentifierByResId($resId);
-
-        if ($unitIdentifier->message_id != $message->message_id) {
-            $_SESSION['error'] = _ERROR_WRONG_REPLY . $resId;
-            return false;
-        }
-
-        return $resId;
-    }
-
     public function getReply($reference)
     {
         $header = [

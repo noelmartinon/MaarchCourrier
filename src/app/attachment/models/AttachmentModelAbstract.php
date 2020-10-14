@@ -65,15 +65,17 @@ abstract class AttachmentModelAbstract
         ValidatorModel::stringType($args, ['format', 'creation_date', 'docserver_id', 'path', 'filename', 'fingerprint', 'status']);
         ValidatorModel::intVal($args, ['filesize', 'relation', 'typist']);
 
-        $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'res_attachment_res_id_seq']);
-        $args['res_id'] = $nextSequenceId;
+        if (empty($args['res_id'])) {
+            $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'res_attachment_res_id_seq']);
+            $args['res_id'] = $nextSequenceId;
+        }
 
         DatabaseModel::insert([
             'table'         => 'res_attachments',
             'columnsValues' => $args
         ]);
 
-        return $nextSequenceId;
+        return $args['res_id'];
     }
 
     public static function update(array $args)

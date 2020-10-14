@@ -35,6 +35,7 @@ use MessageExchange\controllers\MessageExchangeReviewController;
 use Note\models\NoteEntityModel;
 use Note\models\NoteModel;
 use RegisteredMail\controllers\RegisteredMailTrait;
+use ExportSeda\controllers\ExportSEDATrait;
 use Resource\controllers\ResController;
 use Resource\controllers\StoreController;
 use Resource\models\ResModel;
@@ -52,6 +53,7 @@ class ActionMethodController
     use RegisteredMailTrait;
     use ShippingTrait;
     use ExternalSignatoryBookTrait;
+    use ExportSEDATrait;
 
     const COMPONENTS_ACTIONS = [
         'confirmAction'                             => null,
@@ -86,6 +88,9 @@ class ActionMethodController
         'saveAndIndexRegisteredMailAction'          => 'saveAndPrintRegisteredMail',
         'printRegisteredMailAction'                 => 'printRegisteredMail',
         'printDepositListAction'                    => 'printDepositList',
+        'sendToRecordManagementAction'              => 'sendToRecordManagement',
+        'checkAcknowledgmentRecordManagementAction' => 'checkAcknowledgmentRecordManagement',
+        'checkReplyRecordManagementAction'          => 'checkReplyRecordManagement',
         'noConfirmAction'                           => null
     ];
 

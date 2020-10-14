@@ -13,7 +13,6 @@ import { of } from 'rxjs';
 })
 export class SendExternalNoteBookActionComponent implements OnInit {
 
-    
     loading: boolean = false;
     additionalsInfos: any = {
         users: [],

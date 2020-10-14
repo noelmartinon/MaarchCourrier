@@ -259,9 +259,8 @@ export class SearchAdministrationComponent implements OnInit {
         const tmpData = [];
         this.displayedSecondaryData.forEach((element: any) => {
             indexData = this.availableData.map((e: any) => e.value).indexOf(element.value);
-            // à revoir !!
-            // this.availableData[indexData].cssClasses = element.cssClasses;
-            // this.displayedSecondaryData.push(this.availableData[indexData]);
+            this.availableData[indexData].cssClasses = element.cssClasses;
+            this.displayedSecondaryData.push(this.availableData[indexData]);
             tmpData.push(this.availableData[indexData]);
             this.availableData.splice(indexData, 1);
         });

@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '@service/notification/notification.service';
 import { of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
-import { SearchResultListComponent } from '@appRoot/adv-search/result-list/search-result-list.component';
+import { SearchResultListComponent } from '@appRoot/search/result-list/search-result-list.component';
 
 @Component({
     templateUrl: 'link-resource-modal.component.html',

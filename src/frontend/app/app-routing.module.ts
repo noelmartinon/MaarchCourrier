@@ -18,7 +18,7 @@ import { FollowedDocumentListComponent } from './home/followed-list/followed-doc
 import { FolderDocumentListComponent } from './folder/document-list/folder-document-list.component';
 import { BasketListComponent } from './list/basket-list.component';
 import { AcknowledgementReceptionComponent } from './registeredMail/acknowledgement-reception/acknowledgement-reception.component';
-import { AdvSearchComponent } from './adv-search/adv-search.component';
+import { SearchComponent } from './search/search.component';
 import { ProcessComponent } from './process/process.component';
 import { IndexationComponent } from './indexation/indexation.component';
 
@@ -44,7 +44,7 @@ const routes: Routes = [
     { path: 'basketList/users/:userSerialId/groups/:groupSerialId/baskets/:basketId', canActivate: [AppGuard], component: BasketListComponent },
     { path: 'login', component: LoginComponent },
     { path: 'registeredMail/acknowledgement', canActivate: [AppGuard], component: AcknowledgementReceptionComponent },
-    { path: 'search', canActivate: [AppGuard], component: AdvSearchComponent },
+    { path: 'search', canActivate: [AppGuard], component: SearchComponent },
     {
         path: 'process/users/:userSerialId/groups/:groupSerialId/baskets/:basketId/resId/:resId',
         canActivate: [AppGuard],

@@ -394,37 +394,6 @@ class RequestSeda
         return $attachments;
     }
 
-    public function getUseContact($orgIdentifier)
-    {
-        $queryParams = [];
-
-        $queryParams[] = $orgIdentifier;
-        $queryParams[] = $orgIdentifier;
-
-        $query = "SELECT COUNT(*) FROM message_exchange WHERE sender_org_identifier = ? OR recipient_org_identifier = ?";
-
-        $smtp = $this->db->query($query, $queryParams);
-
-        $res = $smtp->fetchObject();
-
-        return $res;
-    }
-
-    public function getAcknowledgement($resIdMaster)
-    {
-        $queryParams = [];
-
-        $queryParams[] = $resIdMaster;
-
-        $query = "SELECT * FROM res_attachments WHERE res_id_master = ? and type_id = 1 and status != 'DEL'";
-
-        $smtp = $this->db->query($query, $queryParams);
-
-        $res = $smtp->fetchObject();
-
-        return $res;
-    }
-
     public function getReply($resIdMaster)
     {
         $queryParams = [];

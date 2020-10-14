@@ -76,12 +76,15 @@ foreach ($customs as $custom) {
                 $query[] = ['identifier' => 'searchTerm', 'values' => $value['fields']['multifield'][0]];
             } elseif ($key == 'destinataire') {
                 $allUsers = [];
-                foreach ($value['fields']['destinataire_chosen'] as $field) {
-                    $user = \User\models\UserModel::getByLogin(['login' => $field, 'select' => ['id', 'firstname', 'lastname']]);
-                    if (!empty($user)) {
-                        $allUsers[] = ['id' => $user['id'], 'type' => 'user', 'label' => "{$user['firstname']} {$user['lastname']}"];
+                if (!empty($value['fields']['destinataire_chosen']) && is_array($value['fields']['destinataire_chosen'])) {
+                    foreach ($value['fields']['destinataire_chosen'] as $field) {
+                        $user = \User\models\UserModel::getByLogin(['login' => $field, 'select' => ['id', 'firstname', 'lastname']]);
+                        if (!empty($user)) {
+                            $allUsers[] = ['id' => $user['id'], 'type' => 'user', 'label' => "{$user['firstname']} {$user['lastname']}"];
+                        }
                     }
                 }
+
                 $query[] = ['identifier' => 'role_dest', 'values' => $allUsers];
             } elseif ($key == 'category') {
                 $query[] = ['identifier' => 'category', 'values' => [['id' => $value['fields']['category'][0], 'label' => \Resource\models\ResModel::getCategoryLabel(['categoryId' => $value['fields']['category'][0]])]]];
@@ -99,35 +102,44 @@ foreach ($customs as $custom) {
                 $query[] = ['identifier' => 'processLimitDate', 'values' => ['start' => getFormattedDate($value['fields']['process_limit_date_from'][0]), 'end' => getFormattedDate($value['fields']['process_limit_date_to'][0])]];
             } elseif ($key == 'destination_mu') {
                 $allEntities = [];
-                foreach ($value['fields']['services_chosen'] as $field) {
-                    $entity = \Entity\models\EntityModel::getByEntityId(['entityId' => $field, 'select' => ['id', 'entity_label']]);
-                    $allEntities[] = ['id' => $entity['id'], 'title' => $entity['entity_label'], 'label' => $entity['entity_label']];
+                if (!empty($value['fields']['services_chosen']) && is_array($value['fields']['services_chosen'])) {
+                    foreach ($value['fields']['services_chosen'] as $field) {
+                        $entity = \Entity\models\EntityModel::getByEntityId(['entityId' => $field, 'select' => ['id', 'entity_label']]);
+                        $allEntities[] = ['id' => $entity['id'], 'title' => $entity['entity_label'], 'label' => $entity['entity_label']];
+                    }
                 }
                 $query[] = ['identifier' => 'destination', 'values' => $allEntities];
             } elseif ($key == 'initiator_mu') {
                 $allEntities = [];
-                foreach ($value['fields']['initiatorServices_chosen'] as $field) {
-                    $entity = \Entity\models\EntityModel::getByEntityId(['entityId' => $field, 'select' => ['id', 'entity_label']]);
-                    $allEntities[] = ['id' => $entity['id'], 'title' => $entity['entity_label'], 'label' => $entity['entity_label']];
+                if (!empty($value['fields']['initiatorServices_chosen']) && is_array($value['fields']['initiatorServices_chosen'])) {
+                    foreach ($value['fields']['initiatorServices_chosen'] as $field) {
+                        $entity = \Entity\models\EntityModel::getByEntityId(['entityId' => $field, 'select' => ['id', 'entity_label']]);
+                        $allEntities[] = ['id' => $entity['id'], 'title' => $entity['entity_label'], 'label' => $entity['entity_label']];
+                    }
                 }
                 $query[] = ['identifier' => 'initiator', 'values' => $allEntities];
             } elseif ($key == 'tag_mu') {
                 $allTags = [];
-                foreach ($value['fields']['tags_chosen'] as $field) {
-                    $tag = \Tag\models\TagModel::getById(['id' => $field, 'select' => ['label', 'id']]);
-                    if (!empty($tag)) {
-                        $allTags[] = ['id' => $tag['id'], 'label' => $tag['label']];
+                if (!empty($value['fields']['tags_chosen']) && is_array($value['fields']['tags_chosen'])) {
+                    foreach ($value['fields']['tags_chosen'] as $field) {
+                        $tag = \Tag\models\TagModel::getById(['id' => $field, 'select' => ['label', 'id']]);
+                        if (!empty($tag)) {
+                            $allTags[] = ['id' => $tag['id'], 'label' => $tag['label']];
+                        }
                     }
                 }
                 $query[] = ['identifier' => 'tags', 'values' => $allTags];
             } elseif ($key == 'status') {
                 $allStatuses = [];
-                foreach ($value['fields']['status_chosen'] as $field) {
-                    $status = \Status\models\StatusModel::getById(['select' => ['identifier', 'label_status'], 'id' => $field]);
-                    if (!empty($status)) {
-                        $allStatuses[] = ['id' => $status['identifier'], 'label' => $status['label_status']];
+                if (!empty($value['fields']['status_chosen']) && is_array($value['fields']['status_chosen'])) {
+                    foreach ($value['fields']['status_chosen'] as $field) {
+                        $status = \Status\models\StatusModel::getById(['select' => ['identifier', 'label_status'], 'id' => $field]);
+                        if (!empty($status)) {
+                            $allStatuses[] = ['id' => $status['identifier'], 'label' => $status['label_status']];
+                        }
                     }
                 }
+
                 $query[] = ['identifier' => 'status', 'values' => $allStatuses];
             } elseif ($key == 'visa_user' && !empty($value['fields']['user_visa'][0])) {
                 $user = \User\models\UserModel::getByLogin(['login' => $value['fields']['user_visa'][0], 'select' => ['id', 'firstname', 'lastname']]);
@@ -154,18 +166,23 @@ foreach ($customs as $custom) {
                 }
             } elseif ($key == 'doctype') {
                 $types = [];
-                foreach ($value['fields']['doctypes_chosen'] as $docType) {
-                    $type = \Doctype\models\DoctypeModel::getById(['id' => (int)$docType]);
-                    if (!empty($type)) {
-                        $types[] = ['id' => 101, 'label' => $type['description'], 'title' => $type['description'], 'disabled' => false, 'isTitle' => false, 'group' => ''];
+                if (!empty($value['fields']['doctypes_chosen']) && is_array($value['fields']['doctypes_chosen'])) {
+                    foreach ($value['fields']['doctypes_chosen'] as $docType) {
+                        $type = \Doctype\models\DoctypeModel::getById(['id' => (int)$docType]);
+                        if (!empty($type)) {
+                            $types[] = ['id' => 101, 'label' => $type['description'], 'title' => $type['description'], 'disabled' => false, 'isTitle' => false, 'group' => ''];
+                        }
                     }
                 }
+
                 $query[] = ['identifier' => 'doctype', 'values' => $types];
             } elseif ($key == 'department_number_mu') {
                 $departments = [];
-                foreach ($value['fields']['department_number_chosen'] as $department) {
-                    $label = \Resource\controllers\DepartmentController::FRENCH_DEPARTMENTS[$department];
-                    $departments[] = ['id' => $department, 'label' => "{$department} - {$label}"];
+                if (!empty($value['fields']['department_number_chosen']) && is_array($value['fields']['department_number_chosen'])) {
+                    foreach ($value['fields']['department_number_chosen'] as $department) {
+                        $label = \Resource\controllers\DepartmentController::FRENCH_DEPARTMENTS[$department];
+                        $departments[] = ['id' => $department, 'label' => "{$department} - {$label}"];
+                    }
                 }
                 $query[] = ['identifier' => 'senderDepartment', 'values' => $departments];
             }

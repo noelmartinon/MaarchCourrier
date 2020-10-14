@@ -1020,7 +1020,7 @@ INSERT INTO parameters (id, param_value_int) VALUES ('last_deposit_id', 0);
 INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailNotDistributedStatus', 'PND');
 INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailDistributedStatus', 'DSTRIBUTED');
 INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailImportedStatus', 'NEW');
-INSERT INTO parameters (id, param_value_int) VALUES ('keepDiffusionRoleInOutgoingIndexation', 1);
+INSERT INTO parameters (id, description, param_value_int) VALUES ('keepDiffusionRoleInOutgoingIndexation', 'Si activé (1), prend en compte les roles du modèle de diffusion de l''entité.', 1);
 
 ------------
 --DIFFLIST_TYPES
@@ -1043,7 +1043,7 @@ INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_pag
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (6,  '', 'Supprimer le courrier', 'DEL', 'N', 'confirm_status', 'Y', 'confirmAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (18, 'redirect', 'Qualifier le courrier', 'NEW', 'N', 'redirect', 'Y', 'redirectAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (19, '', 'Traiter courrier', 'COU', 'N', 'confirm_status', 'N', 'confirmAction');
-INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (20, '', 'Cloturer', 'END', 'N', 'close_mail', 'Y', 'closeMailAction');
+INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component, parameters) VALUES (20, '', 'Cloturer', 'END', 'N', 'close_mail', 'Y', 'closeMailAction', '{"requiredFields": []}');
 INSERT INTO actions (id, label_action, id_status, is_system, history, component) VALUES (21, 'Envoyer le courrier en validation', 'VAL', 'N', 'Y', 'confirmAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (22, '', 'Attribuer au service', 'NEW', 'N', 'confirm_status', 'Y', 'confirmAction');
 --INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (23, 'indexing', 'Attribuer au(x) service(s)', 'NEW', 'N', 'confirm_status', 'Y', 'confirmAction');
@@ -1068,12 +1068,12 @@ INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_pag
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (420, '', 'Classer sans suite', 'SSUITE', 'N', 'confirm_status', 'Y', 'confirmAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (421, '', 'Retourner au Service Courrier', 'RET', 'N', 'confirm_status', 'Y', 'confirmAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (431, '', 'Envoyer en GRC', 'GRC', 'N', 'confirm_status', 'Y', 'confirmAction');
-INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (500, '', 'Transférer au système d''archivage', 'SEND_SEDA', 'N', 'export_seda', 'Y', 'v1Action');
-INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (501, '', 'Valider la réception du courrier par le système d''archivage', 'ACK_SEDA', 'N', 'check_acknowledgement', 'Y', 'v1Action');
-INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (502, '', 'Valider l''archivage du courrier', 'REPLY_SEDA', 'N', 'check_reply', 'Y', 'v1Action');
+INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (500, '', 'Transférer au système d''archivage', 'SEND_SEDA', 'N', 'export_seda', 'Y', 'sendToRecordManagementAction');
+INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (501, '', 'Valider la réception du courrier par le système d''archivage', 'ACK_SEDA', 'N', 'check_acknowledgment', 'Y', 'checkAcknowledgmentRecordManagementAction');
+INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (502, '', 'Valider l''archivage du courrier', 'REPLY_SEDA', 'N', 'check_reply', 'Y', 'checkReplyRecordManagementAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (503, '', 'Purger le courrier', 'DEL', 'N', 'purge_letter', 'Y', 'v1Action');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (504, '', 'Remise à zero du courrier', 'END', 'N', 'reset_letter', 'Y', 'v1Action');
-INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (505, '', 'Clôturer avec suivi', 'STDBY', 'N', 'close_mail', 'Y', 'closeMailAction');
+INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component, parameters) VALUES (505, '', 'Clôturer avec suivi', 'STDBY', 'N', 'close_mail', 'Y', 'closeMailAction', '{"requiredFields": []}');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (506, '', 'Terminer le suivi', 'END', 'N', 'confirm_status', 'Y', 'confirmAction');
 INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (507, '', 'Acter l’envoi', 'ENVDONE', 'N', 'confirm_status', 'Y', 'confirmAction');
 --INSERT INTO actions (id, keyword, label_action, id_status, is_system, action_page, history, component) VALUES (522, '', 'Envoyer en validation DGS', 'VAL', 'N', 'confirm_status', 'Y', 'confirmAction');
@@ -1766,6 +1766,6 @@ SELECT setval('registered_mail_issuing_sites_id_seq', (select max(id)+1 from reg
 INSERT INTO registered_mail_issuing_sites_entities (site_id, entity_id) VALUES (1, 6);
 INSERT INTO registered_mail_issuing_sites_entities (site_id, entity_id) VALUES (1, 13);
 
-INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, status) VALUES ('2C', 'SuiviNumber', 1, 10, 23, '2020-09-14 14:38:09.008644', 'OK');
-INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, status) VALUES ('RW', 'SuiviNumberInternational', 1, 10, 23, '2020-09-14 14:39:32.972626', 'OK');
-INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, status) VALUES ('2D', 'suiviNumber', 1, 10, 23, '2020-09-14 14:39:16.779322', 'OK');
+INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, status, current_number) VALUES ('2C', 'SuiviNumber', 1, 10, 23, '2020-09-14 14:38:09.008644', 'OK', 1);
+INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, status, current_number) VALUES ('RW', 'SuiviNumberInternational', 1, 10, 23, '2020-09-14 14:39:32.972626', 'OK', 1);
+INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, status, current_number) VALUES ('2D', 'suiviNumber', 1, 10, 23, '2020-09-14 14:39:16.779322', 'OK', 1);

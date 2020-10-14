@@ -18,10 +18,12 @@ use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
 use CustomField\models\CustomFieldModel;
 use Doctype\models\DoctypeModel;
+use Endroid\QrCode\QrCode;
 use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use IndexingModel\models\IndexingModelModel;
 use Note\models\NoteModel;
+use Parameter\models\ParameterModel;
 use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
 use SrcCore\models\CoreConfigModel;
@@ -374,7 +376,7 @@ class MergeController
             $args['path'] = null;
         }
 
-        $barcodeFile = CoreConfigModel::getTmpPath() . mt_rand() ."_{$args['userId']}_barcode.png";
+        $barcodeFile = CoreConfigModel::getTmpPath() . mt_rand() ."_{$GLOBALS['id']}_barcode.png";
         $generator = new \PiBarCode();
         $generator->setCode($args['chrono']);
         $generator->setType('C128');
@@ -383,6 +385,20 @@ class MergeController
         $generator->hideCodeType();
         $generator->setFiletype('PNG');
         $generator->writeBarcodeFile($barcodeFile);
+
+        // Generate QR Code
+        $qrcodeFile = CoreConfigModel::getTmpPath() . mt_rand() ."_{$GLOBALS['id']}_qrcode.png";
+        $parameter = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'QrCodePrefix']);
+        $prefix = '';
+        if ($parameter['param_value_int'] == 1) {
+            $prefix = 'MAARCH_';
+        }
+
+        $data = $prefix . $args['chrono'] . ';' . $args['resIdMaster'] . ';' . $args['originId'] . ';' . $args['title'];
+        $qrCode = new QrCode($data);
+        $qrCode->setSize(400);
+        $qrCode->setMargin(25);
+        $qrCode->writeFile($qrcodeFile);
 
         if (!empty($args['path'])) {
             if ($extension == 'odt') {
@@ -398,7 +414,7 @@ class MergeController
                         } elseif ($args['type'] == 'attachment') {
                             $tbs->MergeField('attachment', ['chrono' => $args['chrono']]);
                         }
-                        $tbs->MergeField('attachments', ['chronoBarCode' => $barcodeFile]);
+                        $tbs->MergeField('attachments', ['chronoBarCode' => $barcodeFile, 'chronoQrCode' => $qrcodeFile]);
                     }
                 }
                 $tbs->PlugIn(OPENTBS_SELECT_MAIN);
@@ -413,7 +429,7 @@ class MergeController
             $tbs->MergeField('attachment', ['chrono' => $args['chrono']]);
         }
 
-        $tbs->MergeField('attachments', ['chronoBarCode' => $barcodeFile]);
+        $tbs->MergeField('attachments', ['chronoBarCode' => $barcodeFile, 'chronoQrCode' => $qrcodeFile]);
 
         if (in_array($extension, MergeController::OFFICE_EXTENSIONS)) {
             $tbs->Show(OPENTBS_STRING);

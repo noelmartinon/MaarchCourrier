@@ -7,7 +7,7 @@ interface ListProperties {
     'page': number;
     'pageSize': number;
     'criteria': any[];
-    'filters': any[];
+    'filters': any;
     'order': string;
     'orderDir': string;
 }
@@ -43,7 +43,7 @@ export class CriteriaSearchService {
                 order: 'creationDate',
                 orderDir: 'DESC',
                 criteria: [],
-                filters: []
+                filters: {}
             };
         }
 
@@ -62,6 +62,11 @@ export class CriteriaSearchService {
 
     updateListsPropertiesCriteria(criteria: any) {
         this.listsProperties.criteria = criteria;
+        this.saveListsProperties();
+    }
+
+    updateListsPropertiesFilters(filters: any) {
+        this.listsProperties.filters = filters;
         this.saveListsProperties();
     }
 

@@ -14,6 +14,7 @@ import { TemplateFileEditorModalComponent } from './templateFileEditorModal/temp
 import { DomSanitizer } from '@angular/platform-browser';
 import { AlertComponent } from '../../../plugins/modal/alert.component';
 import { MaarchFlatTreeComponent } from '../../../plugins/tree/maarch-flat-tree.component';
+import { AuthService } from '@service/auth.service';
 
 declare var tinymce: any;
 
@@ -99,7 +100,8 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
         public appService: AppService,
         private viewContainerRef: ViewContainerRef,
         public functionsService: FunctionsService,
-        public translate: TranslateService
+        public translate: TranslateService,
+        private authService: AuthService
     ) { }
 
     ngOnInit(): void {
@@ -377,7 +379,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                 editorOptions.objectType = 'templateModification';
                 editorOptions.objectId = this.template.id;
             }
-
+            editorOptions.authToken = this.authService.getToken(),
             this.launchJavaEditor(editorOptions);
         } else if (this.headerService.user.preferences.documentEdition !== 'java') {
             this.launchIntegratedEditor(editorOptions, this.headerService.user.preferences.documentEdition);

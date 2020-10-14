@@ -288,6 +288,21 @@ abstract class MessageExchangeModelAbstract
         return $messages;
     }
 
+    public static function getUnitIdentifierByResId(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['resId']);
+        ValidatorModel::stringType($args, ['resId']);
+
+        $messages = DatabaseModel::select([
+                'select' => empty($args['select']) ? ['*'] : $args['select'],
+                'table'  => ['unit_identifier'],
+                'where'  => ['res_id = ?'],
+                'data'   => [$args['resId']]
+            ]);
+
+        return $messages;
+    }
+
     public static function insertUnitIdentifier(array $args)
     {
         ValidatorModel::notEmpty($args, ['messageId', 'tableName', 'resId', 'disposition']);

@@ -14,6 +14,9 @@
         </div>
         <div class="indexing-form-container">
             <div *ngIf="!isModalOpen() && currentTool !== 'dashboard'" style="display: flex;justify-content: flex-end;">
+                <button mat-icon-button (click)="openTechnicalInfo()" color="primary" [title]="this.translate.instant('lang.showTechnicalInfo')">
+                    <mat-icon class="far fa-file-code"></mat-icon>
+                </button>
                 <button mat-icon-button (click)="createModal()" color="primary" [title]="this.translate.instant('lang.openInExternalModal')">
                     <mat-icon class="fas fa-external-link-alt"></mat-icon>
                 </button>
