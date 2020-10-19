@@ -49,6 +49,24 @@ class FolderModelAbstract
         return $folder[0];
     }
 
+    public static function getFolderPath(array $aArgs)
+    {
+        ValidatorModel::notEmpty($aArgs, ['id']);
+        ValidatorModel::intVal($aArgs, ['id']);
+
+        if (empty($aArgs['folderPath'])) {
+            $aArgs['folderPath'] = [];
+        }
+
+        $currentFolder = FolderModel::getById(['select' => ['parent_id', 'label'], 'id' => $aArgs['id']]);
+        array_unshift($aArgs['folderPath'], $currentFolder['label']);
+        if (!empty($currentFolder['parent_id'])) {
+            return FolderModel::getFolderPath(['id' => $currentFolder['parent_id'], 'folderPath' => $aArgs['folderPath']]);
+        }
+
+        return $aArgs['folderPath'];
+    }
+
     public static function getChild(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['id']);

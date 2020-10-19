@@ -859,12 +859,12 @@ class ResourceListController
 
         $formattedResources = [];
 
-        $resources = $args['resources'];
+        $resources   = $args['resources'];
         $attachments = $args['attachments'];
 
-        $customFields = CustomFieldModel::get(['select' => ['id', 'type', 'label']]);
+        $customFields       = CustomFieldModel::get(['select' => ['id', 'type', 'label']]);
         $customFieldsLabels = array_column($customFields, 'label', 'id');
-        $customFields = array_column($customFields, 'type', 'id');
+        $customFields       = array_column($customFields, 'type', 'id');
 
         foreach ($resources as $key => $resource) {
             $formattedResources[$key]['resId']              = $resource['res_id'];

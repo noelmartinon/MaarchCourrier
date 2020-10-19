@@ -1,118 +1,90 @@
-<?php
-
-namespace Gitlab;
+<?php namespace Gitlab;
 
 use Gitlab\Api\AbstractApi;
 use Gitlab\Exception\InvalidArgumentException;
 use Gitlab\HttpClient\Builder;
 use Gitlab\HttpClient\Plugin\ApiVersion;
+use Gitlab\HttpClient\Plugin\History;
 use Gitlab\HttpClient\Plugin\Authentication;
 use Gitlab\HttpClient\Plugin\GitlabExceptionThrower;
-use Gitlab\HttpClient\Plugin\History;
 use Http\Client\Common\HttpMethodsClient;
 use Http\Client\Common\Plugin\AddHostPlugin;
 use Http\Client\Common\Plugin\HeaderDefaultsPlugin;
 use Http\Client\Common\Plugin\HistoryPlugin;
-use Http\Client\Common\Plugin\RedirectPlugin;
 use Http\Client\HttpClient;
-use Http\Message\StreamFactory;
-use Psr\Http\Message\ResponseInterface;
+use Http\Discovery\UriFactoryDiscovery;
 
 /**
- * Simple API wrapper for Gitlab.
+ * Simple API wrapper for Gitlab
  *
  * @author Matt Humphrey <matt@m4tt.co>
  *
- * @property-read \Gitlab\Api\DeployKeys $deploy_keys @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Deployments $deployments @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Environments $environments @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Groups $groups @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\GroupsBoards $groups_boards @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\GroupsMilestones $groups_milestones @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\IssueBoards $board @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\IssueBoards $issue_boards @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\IssueLinks $issue_links @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Issues $issues @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\IssuesStatistics $issues_statistics @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Jobs $jobs @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Keys $keys @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\MergeRequests $merge_requests @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\MergeRequests $mr @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Milestones $milestones @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Milestones $ms @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\ProjectNamespaces $namespaces @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\ProjectNamespaces $ns @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Projects $projects @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Repositories $repo @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Repositories $repositories @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\RepositoryFiles $repositoryFiles @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Schedules $schedules @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Snippets $snippets @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\SystemHooks $hooks @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\SystemHooks $system_hooks @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Users $users @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Tags $tags @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Version $version @deprecated since version 9.18 and will be removed in 10.0.
- * @property-read \Gitlab\Api\Wiki $wiki @deprecated since version 9.18 and will be removed in 10.0.
+ * @property-read \Gitlab\Api\Groups $groups
+ * @property-read \Gitlab\Api\Issues $issues
+ * @property-read \Gitlab\Api\Jobs $jobs
+ * @property-read \Gitlab\Api\MergeRequests $merge_requests
+ * @property-read \Gitlab\Api\MergeRequests $mr
+ * @property-read \Gitlab\Api\Milestones $milestones
+ * @property-read \Gitlab\Api\Milestones $ms
+ * @property-read \Gitlab\Api\ProjectNamespaces $namespaces
+ * @property-read \Gitlab\Api\ProjectNamespaces $ns
+ * @property-read \Gitlab\Api\Projects $projects
+ * @property-read \Gitlab\Api\Repositories $repositories
+ * @property-read \Gitlab\Api\Repositories $repo
+ * @property-read \Gitlab\Api\Snippets $snippets
+ * @property-read \Gitlab\Api\SystemHooks $hooks
+ * @property-read \Gitlab\Api\SystemHooks $system_hooks
+ * @property-read \Gitlab\Api\Users $users
+ * @property-read \Gitlab\Api\Keys $keys
+ * @property-read \Gitlab\Api\Tags $tags
+ * @property-read \Gitlab\Api\Version $version
  */
 class Client
 {
     /**
-     * The URL token authentication method.
-     *
-     * @var string
-     *
-     * @deprecated since version 9.18 and will be removed in 10.0.
+     * Constant for authentication method. Indicates the default, but deprecated
+     * login with username and token in URL.
      */
     const AUTH_URL_TOKEN = 'url_token';
 
     /**
-     * The private token authentication method.
-     *
-     * @var string
+     * Constant for authentication method. Indicates the new login method with
+     * with username and token via HTTP Authentication.
      */
     const AUTH_HTTP_TOKEN = 'http_token';
 
     /**
-     * The OAuth 2 token authentication method.
-     *
-     * @var string
+     * Constant for authentication method. Indicates the OAuth method with a key
+     * obtain using Gitlab's OAuth provider.
      */
     const AUTH_OAUTH_TOKEN = 'oauth_token';
 
     /**
-     * The HTTP client builder.
-     *
-     * @var Builder
-     */
-    private $httpClientBuilder;
-
-    /**
-     * The response history plugin.
-     *
      * @var History
      */
     private $responseHistory;
 
     /**
-     * Instantiate a new Gitlab client.
+     * @var Builder
+     */
+    private $httpClientBuilder;
+
+    /**
+     * Instantiate a new Gitlab client
      *
-     * @param Builder|null $httpClientBuilder
-     *
-     * @return void
+     * @param Builder $httpClientBuilder
      */
     public function __construct(Builder $httpClientBuilder = null)
     {
-        $this->httpClientBuilder = $builder = null === $httpClientBuilder ? new Builder() : $httpClientBuilder;
         $this->responseHistory = new History();
+        $this->httpClientBuilder = $httpClientBuilder ?: new Builder();
 
-        $builder->addPlugin(new GitlabExceptionThrower());
-        $builder->addPlugin(new HistoryPlugin($this->responseHistory));
-        $builder->addPlugin(new HeaderDefaultsPlugin([
-            'User-Agent' => 'php-gitlab-api (https://github.com/GitLabPHP/Client)',
+        $this->httpClientBuilder->addPlugin(new GitlabExceptionThrower());
+        $this->httpClientBuilder->addPlugin(new HistoryPlugin($this->responseHistory));
+        $this->httpClientBuilder->addPlugin(new ApiVersion());
+        $this->httpClientBuilder->addPlugin(new HeaderDefaultsPlugin([
+            'User-Agent' => 'php-gitlab-api (http://github.com/m4tthumphrey/php-gitlab-api)',
         ]));
-        $builder->addPlugin(new RedirectPlugin());
-        $builder->addPlugin(new ApiVersion());
 
         $this->setUrl('https://gitlab.com');
     }
@@ -123,13 +95,9 @@ class Client
      * @param string $url
      *
      * @return Client
-     *
-     * @deprecated since version 9.18 and will be removed in 10.0. Use the setUrl() method after instantiation instead.
      */
     public static function create($url)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 9.18 and will be removed in 10.0. Use the setUrl() method after instantiation instead.', __METHOD__), E_USER_DEPRECATED);
-
         $client = new self();
         $client->setUrl($url);
 
@@ -137,7 +105,7 @@ class Client
     }
 
     /**
-     * Create a Gitlab\Client using an HTTP client.
+     * Create a Gitlab\Client using an HttpClient.
      *
      * @param HttpClient $httpClient
      *
@@ -159,22 +127,6 @@ class Client
     }
 
     /**
-     * @return Api\Deployments
-     */
-    public function deployments()
-    {
-        return new Api\Deployments($this);
-    }
-
-    /**
-     * @return Api\Environments
-     */
-    public function environments()
-    {
-        return new Api\Environments($this);
-    }
-
-    /**
      * @return Api\Groups
      */
     public function groups()
@@ -183,19 +135,11 @@ class Client
     }
 
     /**
-     * @return Api\GroupsBoards
+     * @return Api\Issues
      */
-    public function groupsBoards()
+    public function issues()
     {
-        return new Api\GroupsBoards($this);
-    }
-
-    /**
-     * @return Api\GroupsMilestones
-     */
-    public function groupsMilestones()
-    {
-        return new Api\GroupsMilestones($this);
+        return new Api\Issues($this);
     }
 
     /**
@@ -215,35 +159,11 @@ class Client
     }
 
     /**
-     * @return Api\Issues
-     */
-    public function issues()
-    {
-        return new Api\Issues($this);
-    }
-
-    /**
-     * @return Api\IssuesStatistics
-     */
-    public function issuesStatistics()
-    {
-        return new Api\IssuesStatistics($this);
-    }
-
-    /**
      * @return Api\Jobs
      */
     public function jobs()
     {
         return new Api\Jobs($this);
-    }
-
-    /**
-     * @return Api\Keys
-     */
-    public function keys()
-    {
-        return new Api\Keys($this);
     }
 
     /**
@@ -295,14 +215,6 @@ class Client
     }
 
     /**
-     * @return Api\Schedules
-     */
-    public function schedules()
-    {
-        return new Api\Schedules($this);
-    }
-
-    /**
      * @return Api\Snippets
      */
     public function snippets()
@@ -327,6 +239,14 @@ class Client
     }
 
     /**
+     * @return Api\Keys
+     */
+    public function keys()
+    {
+        return new Api\Keys($this);
+    }
+
+    /**
      * @return Api\Tags
      */
     public function tags()
@@ -343,44 +263,39 @@ class Client
     }
 
     /**
-     * @return Api\Wiki
+     * @return Api\Deployments
      */
-    public function wiki()
+    public function deployments()
     {
-        return new Api\Wiki($this);
+        return new Api\Deployments($this);
+    }
+
+    /**
+     * @return Api\Environments
+     */
+    public function environments()
+    {
+        return new Api\Environments($this);
     }
 
     /**
      * @param string $name
      *
      * @return AbstractApi|mixed
-     *
      * @throws InvalidArgumentException
-     *
-     * @deprecated since version 9.18 and will be removed in 10.0. Use the direct methods instead.
      */
     public function api($name)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 9.18 and will be removed in 10.0. Use the direct methods instead.', __METHOD__), E_USER_DEPRECATED);
-
         switch ($name) {
+
             case 'deploy_keys':
                 return $this->deployKeys();
-
-            case 'deployments':
-                return $this->deployments();
-
-            case 'environments':
-                return $this->environments();
 
             case 'groups':
                 return $this->groups();
 
-            case 'groups_boards':
-                return $this->groupsBoards();
-
-            case 'groups_milestones':
-                return $this->groupsMilestones();
+            case 'issues':
+                return $this->issues();
 
             case 'board':
             case 'issue_boards':
@@ -389,20 +304,11 @@ class Client
             case 'issue_links':
                 return $this->issueLinks();
 
-            case 'issues':
-                return $this->issues();
-
-            case 'issues_statistics':
-                return $this->issuesStatistics();
-
             case 'jobs':
                 return $this->jobs();
 
-            case 'keys':
-                return $this->keys();
-
-            case 'merge_requests':
             case 'mr':
+            case 'merge_requests':
                 return $this->mergeRequests();
 
             case 'milestones':
@@ -422,10 +328,7 @@ class Client
 
             case 'repositoryFiles':
                 return $this->repositoryFiles();
-
-            case 'schedules':
-                return $this->schedules();
-
+                
             case 'snippets':
                 return $this->snippets();
 
@@ -436,14 +339,20 @@ class Client
             case 'users':
                 return $this->users();
 
+            case 'keys':
+                return $this->keys();
+
             case 'tags':
                 return $this->tags();
 
             case 'version':
                 return $this->version();
 
-            case 'wiki':
-                return $this->wiki();
+            case 'environments':
+                return $this->environments();
+
+            case 'deployments':
+                return $this->deployments();
 
             default:
                 throw new InvalidArgumentException('Invalid endpoint: "'.$name.'"');
@@ -451,27 +360,17 @@ class Client
     }
 
     /**
-     * Authenticate a user for all next requests.
+     * Authenticate a user for all next requests
      *
-     * @param string      $token      Gitlab private token
-     * @param string|null $authMethod One of the AUTH_* class constants
-     * @param string|null $sudo
-     *
+     * @param string $token Gitlab private token
+     * @param string $authMethod One of the AUTH_* class constants
+     * @param string $sudo
      * @return $this
      */
-    public function authenticate($token, $authMethod = null, $sudo = null)
+    public function authenticate($token, $authMethod = self::AUTH_URL_TOKEN, $sudo = null)
     {
-        if (null === $authMethod) {
-            @trigger_error(sprintf('The $authMethod will become required in version 10.0. Not providing an explicit authentication method is deprecated since version 9.18.'), E_USER_DEPRECATED);
-            $authMethod = self::AUTH_URL_TOKEN;
-        } elseif (self::AUTH_URL_TOKEN === $authMethod) {
-            @trigger_error(sprintf('The AUTH_URL_TOKEN authentivation method is deprecated since version 9.18 and will be removed in 10.0. Use AUTH_HTTP_TOKEN instead.'), E_USER_DEPRECATED);
-        } elseif (self::AUTH_HTTP_TOKEN !== $authMethod && self::AUTH_OAUTH_TOKEN !== $authMethod) {
-            @trigger_error(sprintf('Passing an invalid authentication method is deprecated since version 9.1 and will be banned in version 10.0.'), E_USER_DEPRECATED);
-        }
-
-        $this->getHttpClientBuilder()->removePlugin(Authentication::class);
-        $this->getHttpClientBuilder()->addPlugin(new Authentication($authMethod, $token, $sudo));
+        $this->httpClientBuilder->removePlugin(Authentication::class);
+        $this->httpClientBuilder->addPlugin(new Authentication($authMethod, $token, $sudo));
 
         return $this;
     }
@@ -483,77 +382,34 @@ class Client
      */
     public function setUrl($url)
     {
-        $uri = $this->getHttpClientBuilder()->getUriFactory()->createUri($url);
-
-        $this->getHttpClientBuilder()->removePlugin(AddHostPlugin::class);
-        $this->getHttpClientBuilder()->addPlugin(new AddHostPlugin($uri));
+        $this->httpClientBuilder->removePlugin(AddHostPlugin::class);
+        $this->httpClientBuilder->addPlugin(new AddHostPlugin(UriFactoryDiscovery::find()->createUri($url)));
 
         return $this;
     }
 
     /**
      * @param string $api
-     *
      * @return AbstractApi
-     *
-     * @deprecated since version 9.18 and will be removed in 10.0. Use the direct methods instead.
      */
     public function __get($api)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 9.18 and will be removed in 10.0. Use the direct methods instead.', __METHOD__), E_USER_DEPRECATED);
-
         return $this->api($api);
     }
 
     /**
-     * Get the last response.
-     *
-     * @return ResponseInterface|null
-     */
-    public function getLastResponse()
-    {
-        return $this->responseHistory->getLastResponse();
-    }
-
-    /**
-     * @return History
-     *
-     * @deprecated since version 9.18 and will be removed in 10.0. Use the getLastResponse() method instead.
-     */
-    public function getResponseHistory()
-    {
-        @trigger_error(sprintf('The %s() method is deprecated since version 9.18 and will be removed in 10.0. Use the getLastResponse() method instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->responseHistory;
-    }
-
-    /**
-     * Get the HTTP client.
-     *
      * @return HttpMethodsClient
      */
     public function getHttpClient()
     {
-        return $this->getHttpClientBuilder()->getHttpClient();
+        return $this->httpClientBuilder->getHttpClient();
     }
 
     /**
-     * Get the stream factory.
-     *
-     * @return StreamFactory
+     * @return History
      */
-    public function getStreamFactory()
+    public function getResponseHistory()
     {
-        return $this->getHttpClientBuilder()->getStreamFactory();
-    }
-
-    /**
-     * Get the HTTP client builder.
-     *
-     * @return Builder
-     */
-    protected function getHttpClientBuilder()
-    {
-        return $this->httpClientBuilder;
+        return $this->responseHistory;
     }
 }

@@ -21,7 +21,7 @@ export class CriteriaSearchService {
         order: 'creationDate',
         orderDir: 'DESC',
         criteria: [],
-        filters: []
+        filters: {}
     };
 
     constructor(

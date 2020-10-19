@@ -445,7 +445,6 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         );
     }
 
-
     onError(error: any) {
         console.log(error);
     }
@@ -1080,7 +1079,6 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         return new Promise((resolve, reject) => {
             this.http.post(`../rest/convertedFile/encodedFile`, { format: format, encodedFile: base64Content }).pipe(
                 tap((data: any) => {
-                    console.log(data);
                     this.file = {
                         name: 'maarch',
                         format: format,

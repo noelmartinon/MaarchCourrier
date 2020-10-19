@@ -134,6 +134,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
     @ViewChild('tableBasketListSort', { static: true }) sort: MatSort;
     @ViewChild('basketHome', { static: true }) basketHome: BasketHomeComponent;
+    paginatorLength: any;
 
     constructor(
         private _activatedRoute: ActivatedRoute,
@@ -300,6 +301,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
                     this.dataFilters = data.filters;
                     this.criteriaSearchService.updateListsPropertiesFilters(data.filters);
                     this.resultsLength = data.count;
+                    this.paginatorLength = data.count > 10000 ? 10000 : data.count;
                     this.allResInBasket = data.allResources;
                     return data.resources;
                 }),
@@ -308,6 +310,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
                     this.selectedRes = [];
                     this.data = [];
                     this.resultsLength = 0;
+                    this.paginatorLength = 0;
                     this.dataFilters = {};
                     this.allResInBasket = [];
                     this.isLoadingResults = false;
@@ -429,6 +432,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
             }
             // Process main datas
             Object.keys(element).forEach((key) => {
+                element[key + '_title'] = element[key];
                 if (key === 'statusImage' && element[key] == null) {
                     element[key] = 'fa-question undefined';
                 } else if ((element[key] == null || element[key] === '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'mailTracking', 'hasDocument'].indexOf(key) === -1) {
@@ -566,7 +570,9 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
         } else if (data.value === 'getAssignee') {
             if (Object.keys(this.criteria).indexOf('role_dest') > -1) {
                 this.criteria['role_dest'].values.forEach((val: any) => {
-                    data.displayValue = this.highlightPipe.transform(data.displayValue, val.label.replace(/&nbsp;/g, ''));
+                    if (val !== null) {
+                        data.displayValue = this.highlightPipe.transform(data.displayValue, val.label.replace(/&nbsp;/g, ''));
+                    }
                 });
             }
             if (Object.keys(this.criteria).indexOf('destination') > -1) {

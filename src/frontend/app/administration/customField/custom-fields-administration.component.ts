@@ -64,6 +64,16 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     ];
     customFields: any[] = [];
     customFieldsClone: any[] = [];
+    mode: any[] = [
+        {
+            'label' : 'displayInForm',
+            'value' : 'form'
+        },
+        {
+            'label' : 'displayAsTechnicalData',
+            'value' : 'technical'
+        }
+    ];
 
     incrementCreation: number = 1;
 
@@ -133,7 +143,8 @@ export class CustomFieldsAdministrationComponent implements OnInit {
                 newCustomField = {
                     label: this.translate.instant('lang.newField') + ' ' + this.incrementCreation,
                     type: customFieldType.type,
-                    values: []
+                    values: [],
+                    mode : 'form'
                 };
             }),
             exhaustMap((data) => this.http.post('../rest/customFields', newCustomField)),
@@ -180,12 +191,9 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     }
 
     updateCustomField(customField: any, indexCustom: number) {
-
         const customFieldToUpdate = { ...customField };
-
         if (!customField.SQLMode) {
             customField.values = customField.values.filter((x: any, i: any, a: any) => a.map((info: any) => info.label).indexOf(x.label) === i);
-
             // TO FIX DATA BINDING SIMPLE ARRAY VALUES
             customFieldToUpdate.values = customField.values.map((data: any) => data.label);
             const alreadyExists = this.customFields.filter(customFieldItem => customFieldItem.label === customFieldToUpdate.label);
@@ -202,7 +210,6 @@ export class CustomFieldsAdministrationComponent implements OnInit {
                 }];
             }
         }
-
         this.http.put('../rest/customFields/' + customField.id, customFieldToUpdate).pipe(
             tap(() => {
                 this.customFieldsClone[indexCustom] = JSON.parse(JSON.stringify(customField));
@@ -220,7 +227,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     }
 
     isModified(customField: any, indexCustomField: number) {
-        if (JSON.stringify(customField) === JSON.stringify(this.customFieldsClone[indexCustomField]) || customField.label === '' || this.SQLMode) {
+        if (JSON.stringify(customField) === JSON.stringify(this.customFieldsClone[indexCustomField]) || customField.label === '' || this.SQLMode || customField.mode === '') {
             return true;
         } else {
             return false;

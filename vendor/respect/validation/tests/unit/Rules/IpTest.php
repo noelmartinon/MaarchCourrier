@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Ip
  * @covers Respect\Validation\Exceptions\IpException
  */
-class IpTest extends TestCase
+class IpTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider providerForIp

@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: MN
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/MN/administrative-division-mongolia.html
  */
 class MnSubdivisionCode extends AbstractSearcher
 {
@@ -26,23 +26,23 @@ class MnSubdivisionCode extends AbstractSearcher
         '035', // Orhon
         '037', // Darhan uul
         '039', // Hentiy
-        '041', // Hövsgöl
+        '041', // Hovsgol
         '043', // Hovd
         '046', // Uvs
-        '047', // Töv
+        '047', // Tov
         '049', // Selenge
-        '051', // Sühbaatar
-        '053', // Ömnögovi
-        '055', // Övörhangay
+        '051', // Suhbaatar
+        '053', // Omnogovi
+        '055', // Ovorhangay
         '057', // Dzavhan
-        '059', // Dundgovi
+        '059', // DundgovL
         '061', // Dornod
-        '063', // Dornogovi
+        '063', // Dornogov
         '064', // Govi-Sumber
         '065', // Govi-Altay
         '067', // Bulgan
         '069', // Bayanhongor
-        '071', // Bayan-Ölgiy
+        '071', // Bayan-Olgiy
         '073', // Arhangay
         '1', // Ulanbaatar
     ];

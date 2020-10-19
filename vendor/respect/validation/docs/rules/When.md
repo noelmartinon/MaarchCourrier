@@ -20,6 +20,5 @@ When `$else` is not defined use [AlwaysInvalid](AlwaysInvalid.md)
 See also:
 
   * [AllOf](AllOf.md)
-  * [AlwaysInvalid](AlwaysInvalid.md)
-  * [NoneOf](NoneOf.md)
   * [OneOf](OneOf.md)
+  * [NoneOf](NoneOf.md)

@@ -42,7 +42,6 @@ export class AboutUsComponent implements OnInit {
             this.http.get('../rest/commitInformation').pipe(
                 tap((data: any) => {
                     this.commitHash = data.hash !== null ? data.hash : this.translate.instant('lang.undefined');
-                    console.log(data);
                     resolve(true);
                 }),
                 catchError((err: any) => {

@@ -18,17 +18,17 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: AE
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/AE/administrative-division-united-arab-emirates.html
  */
 class AeSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'AJ', // 'Ajmān
-        'AZ', // Abū Ȥaby [Abu Dhabi]
+        'AJ', // 'Ajman
+        'AZ', // Abu Zaby
         'DU', // Dubayy
         'FU', // Al Fujayrah
-        'RK', // Ra’s al Khaymah
-        'SH', // Ash Shāriqah
+        'RK', // R'as al Khaymah
+        'SH', // Ash Shariqah
         'UQ', // Umm al Qaywayn
     ];
 

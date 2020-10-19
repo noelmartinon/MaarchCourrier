@@ -14,41 +14,7 @@
         <accessRuleCode>AR039</accessRuleCode>
         <deleteData>true</deleteData>
         <certificateSSL></certificateSSL>
-        <userAgent>service</userAgent>
     </CONFIG>
-    <externalSAE>
-        <id>otherSAE</id>
-        <retentionRules>
-            <retentionRule>
-                <id>id1</id>
-                <label>label1</label>
-            </retentionRule>
-            <retentionRule>
-                <id>id2</id>
-                <label>label2</label>
-            </retentionRule>
-        </retentionRules>
-        <archiveEntities>
-            <archiveEntity>
-                <id>id1</id>
-                <label>label1</label>
-            </archiveEntity>
-            <archiveEntity>
-                <id>id2</id>
-                <label>label2</label>
-            </archiveEntity>
-        </archiveEntities>
-        <archivalAgreements>
-            <archivalAgreement>
-                <id>id1</id>
-                <label>label1</label>
-            </archivalAgreement>
-            <archivalAgreement>
-                <id>id2</id>
-                <label>label2</label>
-            </archivalAgreement>
-        </archivalAgreements>
-    </externalSAE>
     <TABLENAME/>
     <HISTORY>
         <sedaup>true</sedaup>

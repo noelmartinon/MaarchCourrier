@@ -202,7 +202,6 @@ export class NotificationsAdministrationComponent implements OnInit {
     /* FEATURE TOUR */
 
     onNext() {
-        console.log('next');
         this.sidenavRight.open();
         return false;
     }

@@ -18,4 +18,3 @@ See also:
 
   * [Bank](Bank.md)
   * [BankAccount](BankAccount.md)
-  * [CreditCard](CreditCard.md)

@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: YT
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/YT/administrative-division-mayotte.html
  */
 class YtSubdivisionCode extends AbstractSearcher
 {

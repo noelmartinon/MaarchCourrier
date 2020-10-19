@@ -24,6 +24,7 @@ class CustomFieldControllerTest extends TestCase
         $args = [
             'label'     => 'mon custom',
             'type'      => 'select',
+            'mode'      => 'form',
             'values'    => ['one', 'two']
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
@@ -43,6 +44,7 @@ class CustomFieldControllerTest extends TestCase
         $args = [
             'label'     => 'mon custom',
             'type'      => 'select',
+            'mode'      => 'form',
             'values'    => ['one', 'two']
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
@@ -76,6 +78,7 @@ class CustomFieldControllerTest extends TestCase
 
         $args = [
             'label'     => 'mon custom22',
+            'mode'      => 'form',
             'values'    => ['one', 'two', 'trois']
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($args, $request);

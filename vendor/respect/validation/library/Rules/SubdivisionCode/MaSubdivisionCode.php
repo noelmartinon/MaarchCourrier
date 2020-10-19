@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: MA
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/MA/administrative-division-morocco.html
  */
 class MaSubdivisionCode extends AbstractSearcher
 {
@@ -26,21 +26,21 @@ class MaSubdivisionCode extends AbstractSearcher
         '01', // Tanger-Tétouan
         '02', // Gharb-Chrarda-Beni Hssen
         '03', // Taza-Al Hoceima-Taounate
-        '04', // L'Oriental
+        '04', // Oriental
         '05', // Fès-Boulemane
         '06', // Meknès-Tafilalet
-        '07', // Rabat-Salé-Zemmour-Zaer
+        '07', // Rabat-Salé-Zemmour-Zaër
         '08', // Grand Casablanca
         '09', // Chaouia-Ouardigha
-        '10', // Doukhala-Abda
+        '10', // Doukkala-Abda
         '11', // Marrakech-Tensift-Al Haouz
         '12', // Tadla-Azilal
-        '13', // Sous-Massa-Draa
+        '13', // Souss-Massa-Drâa
         '14', // Guelmim-Es Smara
-        '15', // Laâyoune-Boujdour-Sakia el Hamra
+        '15', // Laâyoune-Boujdour-Sakia El Hamra
         '16', // Oued ed Dahab-Lagouira
         'AGD', // Agadir-Ida-Outanane
-        'AOU', // Aousserd
+        'AOU', // Aousserd (EH)
         'ASZ', // Assa-Zag
         'AZI', // Azilal
         'BEM', // Beni Mellal
@@ -68,10 +68,10 @@ class MaSubdivisionCode extends AbstractSearcher
         'JRA', // Jrada
         'KEN', // Kénitra
         'KES', // Kelaat es Sraghna
-        'KHE', // Khemisaet
-        'KHN', // Khenifra
+        'KHE', // Khémisset
+        'KHN', // Khénifra
         'KHO', // Khouribga
-        'LAA', // Laâyoune (EH)
+        'LAA', // Laâyoune
         'LAR', // Larache
         'MED', // Médiouna
         'MEK', // Meknès
@@ -89,7 +89,7 @@ class MaSubdivisionCode extends AbstractSearcher
         'SAL', // Salé
         'SEF', // Sefrou
         'SET', // Settat
-        'SIK', // Sidl Kacem
+        'SIK', // Sidi Kacem
         'SKH', // Skhirate-Témara
         'SYB', // Sidi Youssef Ben Ali
         'TAI', // Taourirt

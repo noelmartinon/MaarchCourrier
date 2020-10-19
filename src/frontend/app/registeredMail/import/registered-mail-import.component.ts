@@ -265,9 +265,6 @@ export class RegisteredMailImportComponent implements OnInit {
     changeColumn(coldb: any, colCsv: any) {
         this.contactData = [];
 
-        // console.log(this.associatedColumns);
-        // console.log(this.csvData);
-
         for (let index = this.hasHeader ? 1 : 0; index < this.csvData.length; index++) {
             const data = this.csvData[index];
 
@@ -308,8 +305,6 @@ export class RegisteredMailImportComponent implements OnInit {
             reader.onload = (value: any) => {
                 this.papa.parse(value.target.result, {
                     complete: (result) => {
-                        // console.log('Parsed: ', result);
-
                         rawCsv = result.data;
                         rawCsv = rawCsv.filter(data => data.length === rawCsv[0].length);
 

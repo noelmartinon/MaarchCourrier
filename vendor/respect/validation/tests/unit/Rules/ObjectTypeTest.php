@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\ObjectType
  * @covers Respect\Validation\Exceptions\ObjectTypeException
  */
-class ObjectTypeTest extends TestCase
+class ObjectTypeTest extends \PHPUnit_Framework_TestCase
 {
     protected $object;
 

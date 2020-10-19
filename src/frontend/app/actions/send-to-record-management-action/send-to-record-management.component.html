@@ -84,7 +84,27 @@
                         </mat-form-field>
                     </div>
                 </div>
-                <div class="row">
+                <mat-form-field *ngIf="folders.length > 0">
+                    <mat-label>{{'lang.folder' | translate}}</mat-label>
+                    <mat-select formControlName="folder">
+                        <mat-option *ngFor="let folder of folders" [value]="folder.id">
+                            {{folder.label}}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <mat-expansion-panel *ngIf="linkedResources.length > 0">
+                    <mat-expansion-panel-header>
+                        <mat-panel-title color="primary" style="font-size:14px;">
+                            {{'lang.linkedMails' | translate}}
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <mat-list style="max-height: 350px;overflow: auto;">
+                        <mat-list-item *ngFor="let res of linkedResources">
+                            <span style="font-size: 12px;color:#666">{{res.chrono}}</span>&nbsp;-&nbsp;<span
+                                color="primary" style="font-size: 12px;">{{res.object}}</span></mat-list-item>
+                    </mat-list>
+                </mat-expansion-panel>
+                <div class="row" style="padding-top: 10px;">
                     <div class="col-md-6">
                         <mat-form-field appearance="outline">
                             <mat-label>{{'lang.archiveId' | translate}}</mat-label>

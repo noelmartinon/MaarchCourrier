@@ -11,8 +11,6 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 $GLOBALS['is_uploaded_file'] = null;
 
 function is_uploaded_file($uploaded)
@@ -31,7 +29,7 @@ function is_uploaded_file($uploaded)
  * @covers Respect\Validation\Rules\Uploaded
  * @covers Respect\Validation\Exceptions\UploadedException
  */
-class UploadedTest extends TestCase
+class UploadedTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @covers Respect\Validation\Rules\Uploaded::validate

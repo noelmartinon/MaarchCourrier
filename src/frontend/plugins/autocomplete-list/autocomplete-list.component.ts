@@ -120,8 +120,6 @@ export class AutocompleteListComponent implements OnInit {
     }
 
     remove(option: string): void {
-        console.log(option);
-
         const index = this.datasFormControl.value.indexOf(option);
 
         if (index >= 0) {

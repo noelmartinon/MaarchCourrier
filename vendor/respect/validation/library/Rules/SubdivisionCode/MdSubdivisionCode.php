@@ -18,48 +18,48 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: MD
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/MD/administrative-division-moldova.html
  */
 class MdSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'AN', // Anenii Noi
-        'BA', // Bălți
+        'AN', // Raionul Anenii Noi
+        'BA', // Municipiul Bălţi
         'BD', // Tighina
-        'BR', // Briceni
-        'BS', // Basarabeasca
+        'BR', // Raionul Briceni
+        'BS', // Raionul Basarabeasca
         'CA', // Cahul
-        'CL', // Călărași
-        'CM', // Cimișlia
-        'CR', // Criuleni
-        'CS', // Căușeni
-        'CT', // Cantemir
-        'CU', // Chișinău
-        'DO', // Dondușeni
-        'DR', // Drochia
+        'CL', // Raionul Călăraşi
+        'CM', // Raionul Cimişlia
+        'CR', // Raionul Criuleni
+        'CS', // Raionul Căuşeni
+        'CT', // Raionul Cantemir
+        'CU', // Municipiul Chişinău
+        'DO', // Donduşeni
+        'DR', // Raionul Drochia
         'DU', // Dubăsari
-        'ED', // Edineț
-        'FA', // Fălești
-        'FL', // Florești
-        'GA', // Găgăuzia, Unitatea teritorială autonomă
-        'GL', // Glodeni
-        'HI', // Hîncești
+        'ED', // Raionul Edineţ
+        'FA', // Făleşti
+        'FL', // Floreşti
+        'GA', // U.T.A. Găgăuzia
+        'GL', // Raionul Glodeni
+        'HI', // Hînceşti
         'IA', // Ialoveni
         'LE', // Leova
         'NI', // Nisporeni
-        'OC', // Ocnița
-        'OR', // Orhei
+        'OC', // Raionul Ocniţa
+        'OR', // Raionul Orhei
         'RE', // Rezina
-        'RI', // Rîșcani
-        'SD', // Șoldănești
+        'RI', // Rîşcani
+        'SD', // Raionul Şoldăneşti
         'SI', // Sîngerei
-        'SN', // Stînga Nistrului, unitatea teritorială din
+        'SN', // Stînga Nistrului
         'SO', // Soroca
-        'ST', // Strășeni
-        'SV', // Ștefan Vodă
-        'TA', // Taraclia
-        'TE', // Telenești
-        'UN', // Ungheni
+        'ST', // Raionul Străşeni
+        'SV', // Raionul Ştefan Vodă
+        'TA', // Raionul Taraclia
+        'TE', // Teleneşti
+        'UN', // Raionul Ungheni
     ];
 
     public $compareIdentical = true;

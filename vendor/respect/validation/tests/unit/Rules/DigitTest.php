@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Digit
  * @covers Respect\Validation\Exceptions\DigitException
  */
-class DigitTest extends TestCase
+class DigitTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider providerForValidDigits

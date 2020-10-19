@@ -18,12 +18,12 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: TO
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/TO/administrative-division-tonga.html
  */
 class ToSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        '01', // 'Eua
+        '01', // Eua
         '02', // Ha'apai
         '03', // Niuas
         '04', // Tongatapu

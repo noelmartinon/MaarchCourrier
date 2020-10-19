@@ -21,6 +21,7 @@ use Contact\models\ContactModel;
 use Convert\controllers\ConvertPdfController;
 use Docserver\models\DocserverModel;
 use Doctype\models\DoctypeModel;
+use Doctype\models\SecondLevelModel;
 use Entity\models\EntityModel;
 use Group\controllers\PrivilegeController;
 use Priority\models\PriorityModel;
@@ -555,7 +556,7 @@ class AlfrescoController
 
         $document = ResModel::getById([
             'select'    => [
-                'filename', 'subject', 'alt_identifier', 'external_id', 'type_id', 'priority',
+                'filename', 'subject', 'alt_identifier', 'external_id', 'type_id', 'priority', 'fingerprint', 'custom_fields',
                 'creation_date', 'modification_date', 'doc_date', 'destination', 'process_limit_date', 'closing_date', 'docserver_id', 'path', 'filename'
             ],
             'resId'     => $args['resId']
@@ -652,6 +653,14 @@ class AlfrescoController
                 } elseif ($alfrescoParameter == 'senderAddress') {
                     $contactToDisplay = ContactController::getFormattedContactWithAddress(['contact' => $contactRaw]);
                     $properties[$key] = $contactToDisplay['contact']['address'];
+                } elseif ($alfrescoParameter == 'doctypeSecondLevelLabel') {
+                    $doctype = DoctypeModel::getById(['select' => ['doctypes_second_level_id'], 'id' => $document['type_id']]);
+                    $doctypeSecondLevel = SecondLevelModel::getById(['id' => $doctype['doctypes_second_level_id'], 'select' => ['doctypes_second_level_label']]);
+                    $properties[$key] = $doctypeSecondLevel['doctypes_second_level_label'];
+                } elseif (strpos($alfrescoParameter, 'customField_') !== false) {
+                    $customId = explode('_', $alfrescoParameter)[1];
+                    $customValue = json_decode($document['custom_fields'], true);
+                    $properties[$key] = (!empty($customValue[$customId]) && is_string($customValue[$customId])) ? $customValue[$customId] : '';
                 } else {
                     $properties[$key] = $document[$alfrescoParameter];
                 }

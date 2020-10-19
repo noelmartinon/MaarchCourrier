@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Xdigit
  * @covers Respect\Validation\Exceptions\XdigitException
  */
-class XdigitTest extends TestCase
+class XdigitTest extends \PHPUnit_Framework_TestCase
 {
     protected $xdigitsValidator;
 

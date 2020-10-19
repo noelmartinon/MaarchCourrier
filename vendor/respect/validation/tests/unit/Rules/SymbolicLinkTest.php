@@ -11,9 +11,6 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-use SplFileInfo;
-
 $GLOBALS['is_link'] = null;
 
 function is_link($link)
@@ -32,7 +29,7 @@ function is_link($link)
  * @covers Respect\Validation\Rules\SymbolicLink
  * @covers Respect\Validation\Exceptions\SymbolicLinkException
  */
-class SymbolicLinkTest extends TestCase
+class SymbolicLinkTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @covers Respect\Validation\Rules\SymbolicLink::validate
@@ -64,7 +61,10 @@ class SymbolicLinkTest extends TestCase
     public function testShouldValidateObjects()
     {
         $rule = new SymbolicLink();
-        $object = new SplFileInfo('tests/fixtures/symbolic-link');
+        $object = $this->getMock('SplFileInfo', ['isLink'], ['somelink.lnk']);
+        $object->expects($this->once())
+                ->method('isLink')
+                ->will($this->returnValue(true));
 
         $this->assertTrue($rule->validate($object));
     }

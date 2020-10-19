@@ -71,7 +71,6 @@ export class PrintDepositListActionComponent implements OnInit {
             tap((data: any) => {
                 if (data && data.errors != null) {
                     this.notify.error(data.errors);
-                    console.log(data.errors);
                 }
 
                 if (!this.functions.empty(data.data.encodedFile)) {

@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: SM
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/SM/administrative-division-san-marino.html
  */
 class SmSubdivisionCode extends AbstractSearcher
 {
@@ -29,7 +29,7 @@ class SmSubdivisionCode extends AbstractSearcher
         '04', // Faetano
         '05', // Fiorentino
         '06', // Borgo Maggiore
-        '07', // San Marino
+        '07', // Citta di San Marino
         '08', // Montegiardino
         '09', // Serravalle
     ];

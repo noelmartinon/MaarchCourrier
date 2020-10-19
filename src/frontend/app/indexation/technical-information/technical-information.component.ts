@@ -39,8 +39,8 @@ export class TechnicalInformationComponent implements OnInit {
             value: '',
             icon: 'fas fa-fingerprint'
         },
-        docserverPath: {
-            label: 'docserverPath',
+        docserverPathFile: {
+            label: 'docserverPathFile',
             value: '',
             icon: 'fas fa-terminal'
         },
@@ -80,8 +80,11 @@ export class TechnicalInformationComponent implements OnInit {
             tap((data: any) => {
                 this.techData.format.value = data.information.format,
                     this.techData.fingerprint.value = data.information.fingerprint,
-                    this.techData.size.value = data.information.filesize,
+                    this.techData.size.value = this.functions.formatBytes(data.information.filesize),
                     this.techData.fulltext.value = data.information.fulltext_result,
+                    this.techData.docserverPathFile.value = data.information.docserverPathFile,
+                    this.techData.filename.value = data.information.filename,
+                    this.techData.creationDate.value = this.datePipe.transform(data.information.creationDate, 'dd/MM/y HH:mm') ,
                     this.loading = false;
 
             }),
@@ -93,15 +96,20 @@ export class TechnicalInformationComponent implements OnInit {
                         type : info.type
                     };
                 });
+                this.customsData = data.customFields.filter((item: { mode: any; }) => item.mode === 'technical');
             }),
             exhaustMap(() => this.http.get(`../rest/resources/${this.data.resId}`)),
             tap((data: any) => {
-                Object.keys(data.customFields).forEach(key => {
-                    this.customsData[key] = {
-                        label: this.customs[key]['label'],
-                        value: data.customFields[key],
-                        icon: 'fas fa-hashtag'
-                    };
+                Object.keys(this.customsData).forEach(key => {
+                    const values = [];
+                    this.customsData[key].values.forEach(element => {
+                        values.push(element.label);
+                    });
+                        this.customsData[key] = {
+                            label: this.customsData[key].label,
+                            value: values,
+                            icon: 'fas fa-hashtag'
+                        };
                 });
             }),
             catchError((err: any) => {
@@ -109,5 +117,9 @@ export class TechnicalInformationComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    isEmptyCustom() {
+        return Object.keys(this.customsData).length === 0;
     }
 }

@@ -137,8 +137,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_priorities',
-            'label': 'lang.prioritiesAlt',
-            'comment': 'lang.prioritiesAlt',
+            'label': 'lang.priorities',
+            'comment': 'lang.priorities',
             'route': '/administration/priorities',
             'unit': 'production',
             'style': 'fa fa-clock',
@@ -302,6 +302,16 @@ export class PrivilegeService {
             'route': '/administration/search',
             'unit': 'supervision',
             'style': 'fas fa-search',
+            'angular': true,
+            'hasParams': false
+        },
+        {
+            'id': 'admin_connections',
+            'label': 'lang.connections',
+            'comment': 'lang.connectionsDesc',
+            'route': '/administration/connections',
+            'unit': 'supervision',
+            'style': 'fas fa-plug',
             'angular': true,
             'hasParams': false
         },

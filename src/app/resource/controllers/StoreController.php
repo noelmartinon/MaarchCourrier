@@ -268,7 +268,7 @@ class StoreController
             'modification_date' => 'CURRENT_TIMESTAMP'
         ];
 
-        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['version', 'alt_identifier', 'external_id', 'category_id', 'type_id', 'destination']]);
+        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['version', 'alt_identifier', 'external_id', 'category_id', 'type_id', 'destination', 'custom_fields']]);
 
         if (!empty($args['modelId'])) {
             $preparedData['model_id']    = $args['modelId'];
@@ -360,6 +360,14 @@ class StoreController
                         $value[$iKey] = (string)$sValue;
                     }
                     $args['customFields'][$key] = $value;
+                }
+            }
+            $customFields = json_decode($resource['custom_fields'], true);
+            $technicalCustoms = CustomFieldModel::get(['select' => ['id'], 'where' => ['mode = ?'], 'data' => ['technical']]);
+            $technicalCustoms = array_column($technicalCustoms, 'id');
+            foreach ($technicalCustoms as $technicalCustom) {
+                if (!empty($customFields[$technicalCustom])) {
+                    $args['customFields'][$technicalCustom] = $customFields[$technicalCustom];
                 }
             }
             $preparedData['custom_fields'] = json_encode($args['customFields']);

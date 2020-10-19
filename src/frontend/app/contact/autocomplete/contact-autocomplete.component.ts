@@ -257,7 +257,6 @@ export class ContactAutocompleteComponent implements OnInit {
                 }),
                 finalize(() => this.loadingValues = false),
                 catchError((err: any) => {
-                    console.log(err);
                     this.notify.error(err.error.errors);
                     return of(false);
                 })

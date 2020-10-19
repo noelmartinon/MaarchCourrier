@@ -18,16 +18,16 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: TG
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/TG/administrative-division-togo.html
  */
 class TgSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'C', // Région du Centre
-        'K', // Région de la Kara
-        'M', // Région Maritime
-        'P', // Région des Plateaux
-        'S', // Région des Savannes
+        'C', // Centrale
+        'K', // Kara
+        'M', // Maritime
+        'P', // Plateaux
+        'S', // Savanes
     ];
 
     public $compareIdentical = true;

@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: GE
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/GE/administrative-division-georgia.html
  */
 class GeSubdivisionCode extends AbstractSearcher
 {
@@ -26,15 +26,15 @@ class GeSubdivisionCode extends AbstractSearcher
         'AB', // Abkhazia
         'AJ', // Ajaria
         'GU', // Guria
-        'IM', // Imeret’i
-        'KA', // Kakhet’i
-        'KK', // K’vemo K’art’li
-        'MM', // Mts’khet’a-Mt’ianet’i
-        'RL', // Racha-Lech’khumi-K’vemo Svanet’i
-        'SJ', // Samts’khe-Javakhet’i
-        'SK', // Shida K’art’li
-        'SZ', // Samegrelo-Zemo Svanet’i
-        'TB', // T’bilisi
+        'IM', // Imereti
+        'KA', // Kakheti
+        'KK', // Kvemo Kartli
+        'MM', // Mtskheta-Mtianeti
+        'RL', // Racha Lechkhumi and Kvemo Svaneti
+        'SJ', // Samtskhe-Javakheti
+        'SK', // Shida Kartli
+        'SZ', // Samegrelo-Zemo Svaneti
+        'TB', // Tbilisi
     ];
 
     public $compareIdentical = true;

@@ -18,89 +18,90 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: AZ
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/AZ/administrative-division-azerbaijan.html
  */
 class AzSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'ABS', // Abşeron
-        'AGA', // Ağstafa
-        'AGC', // Ağcabədi
-        'AGM', // Ağdam
-        'AGS', // Ağdaş
-        'AGU', // Ağsu
+        'AB', // Şirvan
+        'ABS', // Abseron
+        'AGA', // Agstafa
+        'AGC', // AgcabAdi
+        'AGM', // Agdam
+        'AGS', // Agdas
+        'AGU', // Agsu
         'AST', // Astara
-        'BA', // Bakı
-        'BAB', // Babək
-        'BAL', // Balakən
-        'BAR', // Bərdə
-        'BEY', // Beyləqan
-        'BIL', // Biləsuvar
-        'CAB', // Cəbrayıl
-        'CAL', // Cəlilabab
-        'CUL', // Culfa
-        'DAS', // Daşkəsən
-        'FUZ', // Füzuli
-        'GA', // Gəncə
-        'GAD', // Gədəbəy
+        'BA', // Baki
+        'BAL', // BalakAn
+        'BAR', // Barda
+        'BEY', // Beylaqan
+        'BIL', // Bilasuvar
+        'CAB', // Cabrayil
+        'CAL', // Calilabab
+        'DAS', // Daskasan
+        'DAV', // Şabran
+        'FUZ', // Fuzuli
+        'GA', // Ganca
+        'GAD', // Gadabay
         'GOR', // Goranboy
-        'GOY', // Göyçay
-        'GYG', // Göygöl
-        'HAC', // Hacıqabul
-        'IMI', // İmişli
-        'ISM', // İsmayıllı
-        'KAL', // Kəlbəcər
-        'KAN', // Kǝngǝrli
-        'KUR', // Kürdəmir
-        'LA', // Lənkəran
-        'LAC', // Laçın
-        'LAN', // Lənkəran
+        'GOY', // Goycay
+        'HAC', // Haciqabul
+        'IMI', // Imisli
+        'ISM', // Ismayilli
+        'KAL', // Kalbacar
+        'KAN', // Kəngərli
+        'KUR', // Kurdamir
+        'LA', // Lankaran
+        'LAC', // Lacin
+        'LAN', // Lankaran Sahari
         'LER', // Lerik
-        'MAS', // Masallı
+        'MAS', // Masalli
         'MI', // Mingəçevir
         'NA', // Naftalan
-        'NEF', // Neftçala
-        'NV', // Naxçıvan
-        'NX', // Naxçıvan
-        'OGU', // Oğuz
-        'ORD', // Ordubad
-        'QAB', // Qəbələ
+        'NEF', // Neftcala
+        'NV', // Naxçivan
+        'NX', // Naxcivan
+        'OGU', // Oguz
+        'QAB', // Qabala
         'QAX', // Qax
         'QAZ', // Qazax
         'QBA', // Quba
-        'QBI', // Qubadlı
+        'QBI', // Qubadli
         'QOB', // Qobustan
         'QUS', // Qusar
-        'SA', // Şəki
+        'SA', // Saki
         'SAB', // Sabirabad
-        'SAD', // Sədərək
-        'SAH', // Şahbuz
-        'SAK', // Şəki
+        'SAK', // Saki Sahari
         'SAL', // Salyan
-        'SAR', // Şərur
-        'SAT', // Saatlı
-        'SBN', // Şabran
-        'SIY', // Siyəzən
-        'SKR', // Şəmkir
-        'SM', // Sumqayıt
-        'SMI', // Şamaxı
+        'SAT', // Saatli
+        'SIY', // Siyazan
+        'SKR', // Samkir
+        'SM', // Sumqayit
+        'SMI', // Samaxi
         'SMX', // Samux
-        'SR', // Şirvan
-        'SUS', // Şuşa
-        'TAR', // Tərtər
+        'SS', // Susa
+        'SUS', // Susa Sahari
+        'TAR', // Tartar
         'TOV', // Tovuz
         'UCA', // Ucar
-        'XA', // Xankəndi
-        'XAC', // Xaçmaz
-        'XCI', // Xocalı
-        'XIZ', // Xızı
-        'XVD', // Xocavənd
-        'YAR', // Yardımlı
-        'YE', // Yevlax
+        'XA', // Xankandi
+        'XAC', // Xacmaz
+        'XAN', // Göygöl
+        'XCI', // Xocali
+        'XIZ', // Xizi
+        'XVD', // Xocavand
+        'YAR', // Yardimli
+        'YE', // Yevlax Sahari
         'YEV', // Yevlax
-        'ZAN', // Zəngilan
+        'ZAN', // Zangilan
         'ZAQ', // Zaqatala
-        'ZAR', // Zərdab
+        'ZAR', // Zardab
+        'BAB', // Babek
+        'CUL', // Culfa
+        'ORD', // Ordubad
+        'SAD', // Sadarak
+        'SAH', // Sahbuz
+        'SAR', // Sarur
     ];
 
     public $compareIdentical = true;

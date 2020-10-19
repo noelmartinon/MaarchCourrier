@@ -35,6 +35,7 @@
         "accessRuleCode": "AR039",
         "certificateSSL": "",
         "userAgent": "service",
+        "statusReplyReceived": "REPLY_SEDA",
         "externalSAE": {
             "retentionRules": [
                 {

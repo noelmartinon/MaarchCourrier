@@ -17,7 +17,6 @@ declare var tinymce: any;
 })
 export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDestroy {
 
-    
     loading: boolean = false;
     loadingInit: boolean = false;
 
@@ -98,7 +97,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
                 subject : this.emailsubject,
                 content : tinymce.get('emailSignature').getContent(),
                 manual  : true
-            }
+            };
         }
         this.http.put(this.data.processActionRoute, { resources: this.realResSelected, note: this.noteEditor.getNote(), data }).pipe(
             tap((data: any) => {
@@ -107,7 +106,6 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
                 }
                 if (data && data.errors != null) {
                     this.notify.error(data.errors);
-                    console.log(data.errors); 
                 }
                 this.dialogRef.close(this.realResSelected);
             }),

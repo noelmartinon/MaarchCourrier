@@ -18,26 +18,26 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: NZ
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/NZ/administrative-division-new-zealand.html
  */
 class NzSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
+        'N', // North Island
+        'S', // South Island
         'AUK', // Auckland
         'BOP', // Bay of Plenty
         'CAN', // Canterbury
-        'CIT', // Chatham Islands Territory
-        'GIS', // Gisborne District
+        'CIT', // Chatham Islands
+        'GIS', // Gisborne
         'HKB', // Hawke's Bay
-        'MBH', // Marlborough District
+        'MBH', // Marlborough
         'MWT', // Manawatu-Wanganui
-        'N', // North Island
-        'NSN', // Nelson City
+        'NSN', // Nelson
         'NTL', // Northland
         'OTA', // Otago
-        'S', // South Island
         'STL', // Southland
-        'TAS', // Tasman District
+        'TAS', // Tasman
         'TKI', // Taranaki
         'WGN', // Wellington
         'WKO', // Waikato

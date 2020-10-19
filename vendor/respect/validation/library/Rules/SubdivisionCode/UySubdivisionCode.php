@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: UY
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/UY/administrative-division-uruguay.html
  */
 class UySubdivisionCode extends AbstractSearcher
 {
@@ -33,12 +33,12 @@ class UySubdivisionCode extends AbstractSearcher
         'LA', // Lavalleja
         'MA', // Maldonado
         'MO', // Montevideo
-        'PA', // Paysandú
-        'RN', // Río Negro
+        'PA', // Paysandu
+        'RN', // Rio Negro
         'RO', // Rocha
         'RV', // Rivera
         'SA', // Salto
-        'SJ', // San José
+        'SJ', // San Jose
         'SO', // Soriano
         'TA', // Tacuarembó
         'TT', // Treinta y Tres

@@ -62,6 +62,7 @@
         "tecnickcom/tc-lib-barcode": "^1.15",
         "firebase/php-jwt": "^5.0",
         "rafikhaceb/pi-barcode": "^1.0",
-        "sdaoudi/oauth2-keycloak": "^2.2"
+        "sdaoudi/oauth2-keycloak": "^2.2",
+        "jasig/phpcas": "^1.3"
     }
 }

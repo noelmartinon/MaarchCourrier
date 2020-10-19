@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Directory
  * @covers Respect\Validation\Exceptions\DirectoryException
  */
-class DirectoryTest extends TestCase
+class DirectoryTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider providerForValidDirectory

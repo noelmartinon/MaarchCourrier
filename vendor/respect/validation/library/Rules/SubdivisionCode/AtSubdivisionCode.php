@@ -18,15 +18,15 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: AT
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/AT/administrative-division-austria.html
  */
 class AtSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
         '1', // Burgenland
-        '2', // Kärnten
-        '3', // Niederösterreich
-        '4', // Oberösterreich
+        '2', // Karnten
+        '3', // Niederosterreich
+        '4', // Oberosterreich
         '5', // Salzburg
         '6', // Steiermark
         '7', // Tirol

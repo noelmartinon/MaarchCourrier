@@ -1,90 +1,67 @@
-<?php
-
-namespace Gitlab;
+<?php namespace Gitlab;
 
 use Gitlab\Api\ApiInterface;
 
 /**
- * This is the result pager interface.
- *
- * @author Ramon de la Fuente <ramon@future500.nl>
- * @author Mitchel Verschoof <mitchel@future500.nl>
- * @author Graham Campbell <graham@alt-three.com>
+ * Pager interface
  */
 interface ResultPagerInterface
 {
     /**
-     * Fetch a single result from an api call.
+     * Fetch a single result (page) from an api call
      *
-     * @param ApiInterface $api
-     * @param string       $method
-     * @param array        $parameters
+     * @param ApiInterface $api        the Api instance
+     * @param string       $method     the method name to call on the Api instance
+     * @param array        $parameters the method parameters in an array
      *
-     * @throws \Http\Client\Exception
-     *
-     * @return array
+     * @return array returns the result of the Api::$method() call
      */
-    public function fetch(ApiInterface $api, $method, array $parameters = []);
+    public function fetch(ApiInterface $api, $method, array $parameters = array());
 
     /**
-     * Fetch all results from an api call.
+     * Fetch all results (pages) from an api call
+     * Use with care - there is no maximum
      *
-     * @param ApiInterface $api
-     * @param string       $method
-     * @param array        $parameters
+     * @param ApiInterface $api        the Api instance
+     * @param string       $method     the method name to call on the Api instance
+     * @param array        $parameters the method parameters in an array
      *
-     * @throws \Http\Client\Exception
-     *
-     * @return array
+     * @return array returns a merge of the results of the Api::$method() call
      */
-    public function fetchAll(ApiInterface $api, $method, array $parameters = []);
+    public function fetchAll(ApiInterface $api, $method, array $parameters = array());
 
     /**
-     * Check to determine the availability of a next page.
-     *
+     * Check to determine the availability of a next page
      * @return bool
      */
     public function hasNext();
 
     /**
-     * Fetch the next page.
-     *
-     * @throws \Http\Client\Exception
-     *
-     * @return array
-     */
-    public function fetchNext();
-
-    /**
-     * Check to determine the availability of a previous page.
-     *
+     * Check to determine the availability of a previous page
      * @return bool
      */
     public function hasPrevious();
 
     /**
-     * Fetch the previous page.
-     *
-     * @throws \Http\Client\Exception
-     *
+     * Fetch the next page
+     * @return array
+     */
+    public function fetchNext();
+
+    /**
+     * Fetch the previous page
      * @return array
      */
     public function fetchPrevious();
 
     /**
-     * Fetch the first page.
-     *
-     * @throws \Http\Client\Exception
-     *
+     * Fetch the first page
      * @return array
      */
     public function fetchFirst();
 
     /**
-     * Fetch the last page.
-     *
-     * @throws \Http\Client\Exception
-     *
+     * Fetch the last page
      * @return array
      */
     public function fetchLast();

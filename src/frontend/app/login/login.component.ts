@@ -63,13 +63,20 @@ export class LoginComponent implements OnInit {
         }
     }
 
-    onSubmit() {
+    onSubmit(ssoToken = null) {
         this.loading = true;
+
+        let url = '../rest/authenticate';
+
+        if (ssoToken !== null) {
+            url += ssoToken;
+        }
+
         this.http.post(
-            '../rest/authenticate',
+            url,
             {
                 'login': this.loginForm.get('login').value,
-                'password': this.loginForm.get('password').value
+                'password': this.loginForm.get('password').value,
             },
             {
                 observe: 'response'
@@ -92,8 +99,6 @@ export class LoginComponent implements OnInit {
                 this.loading = false;
                 if (err.error.errors === 'Authentication Failed') {
                     this.notify.error(this.translate.instant('lang.wrongLoginPassword'));
-                } else if (err.error.errors === 'Account Suspended') {
-                    this.notify.error(this.translate.instant('lang.accountSuspended'));
                 } else if (err.error.errors === 'Account Locked') {
                     this.notify.error(this.translate.instant('lang.accountLocked') + ' ' + this.timeLimit.transform(err.error.date));
                 } else {
@@ -108,11 +113,14 @@ export class LoginComponent implements OnInit {
         this.http.get('../rest/authenticationInformations').pipe(
             tap((data: any) => {
                 this.authService.setAppSession(data.instanceId);
-                // this.authService.authMode = data.connection;
                 this.authService.changeKey = data.changeKey;
                 this.applicationName = data.applicationName;
                 this.loginMessage = data.loginMessage;
                 this.authService.setEvent('authenticationInformations');
+                this.authService.authMode = data.authMode;
+                this.authService.authUri = data.authUri;
+
+                this.initConnection();
             }),
             finalize(() => this.showForm = true),
             catchError((err: any) => {
@@ -132,5 +140,20 @@ export class LoginComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    initConnection() {
+        if (['cas', 'keycloak'].indexOf(this.authService.authMode) > -1) {
+            this.loginForm.disable();
+            this.loginForm.setValidators(null);
+            const regex = /ticket=[.]*/g;
+            if (window.location.search.match(regex) !== null) {
+                const ssoToken = window.location.search.substring(1, window.location.search.length);
+                window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+                this.onSubmit(`?${ssoToken}`);
+            } else {
+                window.location.href = this.authService.authUri;
+            }
+        }
     }
 }

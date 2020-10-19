@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: BF
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/BF/administrative-division-burkina-faso.html
  */
 class BfSubdivisionCode extends AbstractSearcher
 {
@@ -36,51 +36,51 @@ class BfSubdivisionCode extends AbstractSearcher
         '11', // Plateau-Central
         '12', // Sahel
         '13', // Sud-Ouest
-        'BAL', // Balé
+        'BAL', // Bale
         'BAM', // Bam
         'BAN', // Banwa
-        'BAZ', // Bazèga
+        'BAZ', // Bazega
         'BGR', // Bougouriba
         'BLG', // Boulgou
-        'BLK', // Boulkiemdé
-        'COM', // Comoé
+        'BLK', // Boulkiemde
+        'COM', // Comoe
         'GAN', // Ganzourgou
         'GNA', // Gnagna
         'GOU', // Gourma
         'HOU', // Houet
         'IOB', // Ioba
         'KAD', // Kadiogo
-        'KEN', // Kénédougou
+        'KEN', // Kenedougou
         'KMD', // Komondjari
         'KMP', // Kompienga
-        'KOP', // Koulpélogo
+        'KOP', // Koulpelogo
         'KOS', // Kossi
         'KOT', // Kouritenga
-        'KOW', // Kourwéogo
-        'LER', // Léraba
+        'KOW', // Kourweogo
+        'LER', // Leraba
         'LOR', // Loroum
         'MOU', // Mouhoun
         'NAM', // Namentenga
-        'NAO', // Naouri
+        'NAO', // Nahouri
         'NAY', // Nayala
         'NOU', // Noumbiel
         'OUB', // Oubritenga
         'OUD', // Oudalan
-        'PAS', // Passoré
+        'PAS', // Passore
         'PON', // Poni
-        'SEN', // Séno
+        'SEN', // Seno
         'SIS', // Sissili
         'SMT', // Sanmatenga
-        'SNG', // Sanguié
+        'SNG', // Sanguie
         'SOM', // Soum
         'SOR', // Sourou
         'TAP', // Tapoa
-        'TUI', // Tui
+        'TUI', // Tuy
         'YAG', // Yagha
         'YAT', // Yatenga
         'ZIR', // Ziro
         'ZON', // Zondoma
-        'ZOU', // Zoundwéogo
+        'ZOU', // Zoundweogo
     ];
 
     public $compareIdentical = true;

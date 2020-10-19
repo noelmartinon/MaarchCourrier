@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Positive
  * @covers Respect\Validation\Exceptions\PositiveException
  */
-class PositiveTest extends TestCase
+class PositiveTest extends \PHPUnit_Framework_TestCase
 {
     protected $object;
 

@@ -18,18 +18,18 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: BY
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/BY/administrative-division-belarus.html
  */
 class BySubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'BR', // Brèsckaja voblasc'
+        'BR', // Brest voblast
         'HM', // Horad Minsk
-        'HO', // Homel'skaja voblasc'
-        'HR', // Hrodzenskaja voblasc'
-        'MA', // Mahilëuskaja voblasc'
-        'MI', // Minskaja voblasc'
-        'VI', // Vicebskaja voblasc'
+        'HO', // Homyel voblast
+        'HR', // Hrodna voblast
+        'MA', // Mahilyow voblast
+        'MI', // Minsk voblast
+        'VI', // Vitsebsk voblast
     ];
 
     public $compareIdentical = true;

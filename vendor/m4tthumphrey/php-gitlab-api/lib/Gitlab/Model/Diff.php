@@ -1,11 +1,9 @@
-<?php
-
-namespace Gitlab\Model;
+<?php namespace Gitlab\Model;
 
 use Gitlab\Client;
 
 /**
- * @final
+ * Class Diff
  *
  * @property-read string $old_path
  * @property-read string $new_path
@@ -20,9 +18,9 @@ use Gitlab\Client;
 class Diff extends AbstractModel
 {
     /**
-     * @var string[]
+     * @var array
      */
-    protected static $properties = [
+    protected static $properties = array(
         'old_path',
         'new_path',
         'a_mode',
@@ -31,14 +29,13 @@ class Diff extends AbstractModel
         'new_file',
         'renamed_file',
         'deleted_file',
-        'project',
-    ];
+        'project'
+    );
 
     /**
-     * @param Client  $client
+     * @param Client $client
      * @param Project $project
-     * @param array   $data
-     *
+     * @param array $data
      * @return Diff
      */
     public static function fromArray(Client $client, Project $project, array $data)
@@ -49,10 +46,8 @@ class Diff extends AbstractModel
     }
 
     /**
-     * @param Project     $project
-     * @param Client|null $client
-     *
-     * @return void
+     * @param Project $project
+     * @param Client $client
      */
     public function __construct(Project $project, Client $client = null)
     {

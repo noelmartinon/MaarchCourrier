@@ -1,11 +1,9 @@
-<?php
-
-namespace Gitlab\Model;
+<?php namespace Gitlab\Model;
 
 use Gitlab\Client;
 
 /**
- * @final
+ * Class Snippet
  *
  * @property-read int $id
  * @property-read string $title
@@ -13,28 +11,27 @@ use Gitlab\Client;
  * @property-read string $updated_at
  * @property-read string $created_at
  * @property-read Project $project
- * @property-read User|null $author
+ * @property-read User $author
  */
-class Snippet extends AbstractModel implements Notable
+class Snippet extends AbstractModel
 {
     /**
-     * @var string[]
+     * @var array
      */
-    protected static $properties = [
+    protected static $properties = array(
         'id',
         'title',
         'file_name',
         'author',
         'updated_at',
         'created_at',
-        'project',
-    ];
+        'project'
+    );
 
     /**
      * @param Client  $client
      * @param Project $project
      * @param array   $data
-     *
      * @return Snippet
      */
     public static function fromArray(Client $client, Project $project, array $data)
@@ -49,11 +46,9 @@ class Snippet extends AbstractModel implements Notable
     }
 
     /**
-     * @param Project     $project
-     * @param int         $id
-     * @param Client|null $client
-     *
-     * @return void
+     * @param Project $project
+     * @param int $id
+     * @param Client $client
      */
     public function __construct(Project $project, $id = null, Client $client = null)
     {
@@ -74,7 +69,6 @@ class Snippet extends AbstractModel implements Notable
 
     /**
      * @param array $params
-     *
      * @return Snippet
      */
     public function update(array $params)
@@ -100,17 +94,5 @@ class Snippet extends AbstractModel implements Notable
         $this->client->snippets()->remove($this->project->id, $this->id);
 
         return true;
-    }
-
-    /**
-     * @param string $body
-     *
-     * @return Note
-     */
-    public function addNote($body)
-    {
-        $data = $this->client->snippets()->addNote($this->project->id, $this->id, $body);
-
-        return Note::fromArray($this->getClient(), $this, $data);
     }
 }

@@ -234,20 +234,20 @@ class UserModel
         return true;
     }
 
-    public static function updatePassword(array $aArgs)
+    public static function updatePassword(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['id', 'password']);
-        ValidatorModel::intVal($aArgs, ['id']);
-        ValidatorModel::stringType($aArgs, ['password']);
+        ValidatorModel::notEmpty($args, ['id', 'password']);
+        ValidatorModel::intVal($args, ['id']);
+        ValidatorModel::stringType($args, ['password']);
 
         DatabaseModel::update([
             'table'     => 'users',
             'set'       => [
-                'password'                      => AuthenticationModel::getPasswordHash($aArgs['password']),
+                'password'                      => AuthenticationModel::getPasswordHash($args['password']),
                 'password_modification_date'    => 'CURRENT_TIMESTAMP'
             ],
             'where'     => ['id = ?'],
-            'data'      => [$aArgs['id']]
+            'data'      => [$args['id']]
         ]);
 
         return true;

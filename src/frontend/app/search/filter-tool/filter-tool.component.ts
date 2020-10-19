@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, EventEmitter, Output, Input } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { AppService } from '@service/app.service';
@@ -25,12 +25,15 @@ export class FilterToolComponent implements OnInit {
     ngOnInit(): void { }
 
     setfilters(filters: any) {
-        console.log(filters);
         this.filters = filters;
     }
 
     toggleFilter(key: string, index: number) {
-        this.filters[key][index].selected = !this.filters[key][index].selected;
+        this.filters[key]['values'][index].selected = !this.filters[key]['values'][index].selected;
         this.filterChanged.emit();
+    }
+
+    toggleDisplay(key: string) {
+        this.filters[key]['expand'] = !this.filters[key]['expand'];
     }
 }

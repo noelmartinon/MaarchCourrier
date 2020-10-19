@@ -11,7 +11,7 @@
 
 namespace Respect\Validation;
 
-class ValidatorTest extends TestCase
+class ValidatorTest extends \PHPUnit_Framework_TestCase
 {
     public function testStaticCreateShouldReturnNewValidator()
     {

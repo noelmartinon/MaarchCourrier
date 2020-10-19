@@ -13,10 +13,8 @@ v::type('object')->validate(new stdClass()); // true
 ***
 See also:
 
-  * [ArrayType](ArrayType.md)
   * [ArrayVal](ArrayVal.md)
   * [BoolType](BoolType.md)
-  * [BoolVal](BoolVal.md)
   * [CallableType](CallableType.md)
   * [Finite](Finite.md)
   * [FloatType](FloatType.md)
@@ -30,3 +28,4 @@ See also:
   * [ResourceType](ResourceType.md)
   * [ScalarVal](ScalarVal.md)
   * [StringType](StringType.md)
+  * [Type](Type.md)

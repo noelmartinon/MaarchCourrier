@@ -1314,11 +1314,14 @@ CONSTRAINT acknowledgement_receipts_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);
 
+CREATE TYPE custom_fields_modes AS ENUM ('form', 'technical');
+
 CREATE TABLE custom_fields
 (
     id serial NOT NULL,
     label character varying(256) NOT NULL,
     type character varying(256) NOT NULL,
+    mode custom_fields_modes NOT NULL DEFAULT 'form',
     values jsonb,
     CONSTRAINT custom_fields_pkey PRIMARY KEY (id),
     CONSTRAINT custom_fields_unique_key UNIQUE (label)

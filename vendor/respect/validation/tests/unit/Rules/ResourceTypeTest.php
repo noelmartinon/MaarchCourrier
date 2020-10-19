@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\ResourceType
  * @covers Respect\Validation\Exceptions\ResourceTypeException
  */
-class ResourceTypeTest extends TestCase
+class ResourceTypeTest extends \PHPUnit_Framework_TestCase
 {
     protected $rule;
 
@@ -67,8 +65,7 @@ class ResourceTypeTest extends TestCase
             ['String'],
             [123],
             [[]],
-            [function () {
-            }],
+            [function () {}],
             [new \stdClass()],
             [null],
         ];

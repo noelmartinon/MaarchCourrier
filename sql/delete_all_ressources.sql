@@ -34,7 +34,6 @@ ALTER SEQUENCE adr_attachments_id_seq restart WITH 1;
 
 TRUNCATE TABLE res_mark_as_read;
 
-TRUNCATE TABLE saved_queries;
 TRUNCATE TABLE lc_stack;
 
 TRUNCATE TABLE tags;

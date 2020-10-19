@@ -11,17 +11,14 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Callback
  * @covers Respect\Validation\Exceptions\CallbackException
  */
-class CallbackTest extends TestCase
+class CallbackTest extends \PHPUnit_Framework_TestCase
 {
-    private $truthy;
-    private $falsy;
+    private $truthy, $falsy;
 
     public function setUp()
     {

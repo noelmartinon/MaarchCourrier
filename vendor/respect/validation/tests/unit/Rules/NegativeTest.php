@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Negative
  * @covers Respect\Validation\Exceptions\NegativeException
  */
-class NegativeTest extends TestCase
+class NegativeTest extends \PHPUnit_Framework_TestCase
 {
     protected $negativeValidator;
 

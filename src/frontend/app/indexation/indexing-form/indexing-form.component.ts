@@ -306,7 +306,8 @@ export class IndexingFormComponent implements OnInit {
 
             this.http.get('../rest/customFields').pipe(
                 tap((data: any) => {
-                    this.availableCustomFields = data.customFields.map((info: any) => {
+                    const withFormMode = data.customFields.filter((item: { mode: any; }) => item.mode === 'form');
+                    this.availableCustomFields = withFormMode.map((info: any) => {
                         info.identifier = 'indexingCustomField_' + info.id;
                         info.system = false;
                         info.enabled = true;
@@ -1048,9 +1049,6 @@ export class IndexingFormComponent implements OnInit {
                 const controlErrors: ValidationErrors = this.indexingFormGroup.get(key).errors;
                 if (controlErrors != null) {
                     this.indexingFormGroup.controls[key].markAsTouched();
-                    /*Object.keys(controlErrors).forEach(keyError => {
-                        console.log('Key control: ' + key + ', keyError: ' + keyError + ', err value: ', controlErrors[keyError]);
-                    });*/
                 }
             });
         }

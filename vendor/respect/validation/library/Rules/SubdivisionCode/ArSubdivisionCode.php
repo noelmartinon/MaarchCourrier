@@ -18,16 +18,17 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: AR
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/AR/administrative-division-argentina.html
  */
 class ArSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
         'A', // Salta
-        'B', // Buenos Aires
+        'B', // Buenos Aires Province
         'C', // Ciudad Autónoma de Buenos Aires
         'D', // San Luis
         'E', // Entre Rios
+        'F', // La Rioja
         'G', // Santiago del Estero
         'H', // Chaco
         'J', // San Juan

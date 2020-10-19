@@ -18,17 +18,17 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: BZ
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/BZ/administrative-division-belize.html
  */
 class BzSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'BZ', // Belize
-        'CY', // Cayo
-        'CZL', // Corozal
-        'OW', // Orange Walk
-        'SC', // Stann Creek
-        'TOL', // Toledo
+        'BZ', // Belize District
+        'CY', // Cayo District
+        'CZL', // Corozal District
+        'OW', // Orange Walk District
+        'SC', // Stann Creek District
+        'TOL', // Toledo District
     ];
 
     public $compareIdentical = true;

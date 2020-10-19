@@ -294,6 +294,12 @@ UPDATE actions SET component = 'checkReplyRecordManagementAction' where action_p
 UPDATE res_attachments SET attachment_type = 'acknowledgement_record_management' WHERE attachment_type = 'simple_attachment' AND format = 'xml' AND title = 'Accusé de réception' AND relation = 1 AND status = 'TRA';
 UPDATE res_attachments SET attachment_type = 'reply_record_management' WHERE attachment_type = 'simple_attachment' AND format = 'xml' AND title = 'Réponse au transfert' AND relation = 1 AND status = 'TRA';
 
+/* CUSTOM FIELDS */
+ALTER TABLE custom_fields DROP COLUMN IF EXISTS mode;
+DROP TYPE IF EXISTS custom_fields_modes;
+CREATE TYPE custom_fields_modes AS ENUM ('form', 'technical');
+ALTER TABLE custom_fields ADD COLUMN mode custom_fields_modes NOT NULL DEFAULT 'form';
+
 /* RE CREATE VIEWS */
 CREATE OR REPLACE VIEW res_view_letterbox AS
 SELECT r.res_id,

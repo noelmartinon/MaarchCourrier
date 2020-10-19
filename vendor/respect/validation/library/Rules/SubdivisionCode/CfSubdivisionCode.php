@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: CF
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/CF/administrative-division-central-african-republic.html
  */
 class CfSubdivisionCode extends AbstractSearcher
 {
@@ -29,15 +29,15 @@ class CfSubdivisionCode extends AbstractSearcher
         'BK', // Basse-Kotto
         'HK', // Haute-Kotto
         'HM', // Haut-Mbomou
-        'HS', // Haute-Sangha / Mambéré-Kadéï
-        'KB', // Gribingui
-        'KG', // Kémo-Gribingui
+        'HS', // Mambere-Kadeï
+        'KB', // Nana-Grebizi
+        'KG', // Kemo
         'LB', // Lobaye
         'MB', // Mbomou
-        'MP', // Ombella-M'poko
-        'NM', // Nana-Mambéré
-        'OP', // Ouham-Pendé
-        'SE', // Sangha
+        'MP', // Ombella-M'Poko
+        'NM', // Nana-Mambere
+        'OP', // Ouham-Pende
+        'SE', // Sangha-Mbaere
         'UK', // Ouaka
         'VK', // Vakaga
     ];

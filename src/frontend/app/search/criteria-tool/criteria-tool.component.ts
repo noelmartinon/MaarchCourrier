@@ -179,7 +179,6 @@ export class CriteriaToolComponent implements OnInit {
 
             }
         } catch (error) {
-            // console.log(error);
         }
     }
 

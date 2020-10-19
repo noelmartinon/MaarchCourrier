@@ -1,34 +1,32 @@
-<?php
-
-namespace Gitlab\Model;
+<?php namespace Gitlab\Model;
 
 use Gitlab\Client;
 
 /**
- * @final
+ * Class Commit
  *
- * @property-read Commit|null $commit
+ * @property-read Commit $commit
  * @property-read int $id
  * @property-read string $coverage
  * @property-read string $created_at
  * @property-read string $artifacts_file
  * @property-read string $finished_at
  * @property-read string $name
- * @property-read Pipeline|null $pipeline
+ * @property-read Pipeline $pipeline
  * @property-read string $ref
  * @property-read string $runner
  * @property-read string $stage
  * @property-read string $started_at
  * @property-read string $status
  * @property-read string|bool $tag
- * @property-read User|null $user
+ * @property-read User $user
  */
 class Job extends AbstractModel
 {
     /**
-     * @var string[]
+     * @var array
      */
-    protected static $properties = [
+    protected static $properties = array(
         'id',
         'commit',
         'coverage',
@@ -43,14 +41,13 @@ class Job extends AbstractModel
         'started_at',
         'status',
         'tag',
-        'user',
-    ];
+        'user'
+    );
 
     /**
      * @param Client  $client
      * @param Project $project
      * @param array   $data
-     *
      * @return Job
      */
     public static function fromArray(Client $client, Project $project, array $data)
@@ -73,11 +70,9 @@ class Job extends AbstractModel
     }
 
     /**
-     * @param Project     $project
-     * @param int|null    $id
-     * @param Client|null $client
-     *
-     * @return void
+     * @param Project $project
+     * @param int $id
+     * @param Client  $client
      */
     public function __construct(Project $project, $id = null, Client $client = null)
     {

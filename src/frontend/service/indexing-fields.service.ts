@@ -385,11 +385,13 @@ export class IndexingFieldsService {
         public functions: FunctionsService) { }
 
     getCoreFields(exclude: string = '') {
-        return exclude === '' ? this.coreFields : this.coreFields.filter((field: any) => !field[exclude]);
+        const coreFields = JSON.parse(JSON.stringify(this.coreFields));
+        return exclude === '' ? coreFields : coreFields.filter((field: any) => !field[exclude]);
     }
 
     getFields(exclude: string = '') {
-        return exclude === '' ? this.fields : this.fields.filter((field: any) => !field[exclude]);
+        const fields = JSON.parse(JSON.stringify(this.fields));
+        return exclude === '' ? fields : fields.filter((field: any) => !field[exclude]);
     }
 
     getCustomFields() {

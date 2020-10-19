@@ -39,7 +39,6 @@ use MessageExchange\models\MessageExchangeModel;
 use Note\models\NoteModel;
 use Priority\models\PriorityModel;
 use RegisteredMail\controllers\RegisteredMailController;
-use RegisteredMail\models\IssuingSiteModel;
 use RegisteredMail\models\RegisteredMailModel;
 use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
@@ -1359,8 +1358,17 @@ class ResController extends ResourceControlController
 
         $resource = ResModel::getById([
             'resId'  => $args['resId'],
-            'select' => ['format', 'fingerprint', 'filesize', 'fulltext_result']
+            'select' => ['format', 'fingerprint', 'filesize', 'fulltext_result', 'creation_date', 'filename', 'docserver_id', 'path']
         ]);
+
+        if (!empty($resource['docserver_id'])) {
+            $docserver = DocserverModel::getByDocserverId(['docserverId' => $resource['docserver_id'], 'select' => ['path_template']]);
+            $resource['docserverPathFile'] = $docserver['path_template'] . $resource['path'];
+            $resource['docserverPathFile'] = str_replace('//', '/', $resource['docserverPathFile']);
+        }
+
+        $resource['creationDate'] = $resource['creation_date'];
+        unset($resource['creation_date']);
 
         $allowedFiles = StoreController::getAllowedFiles();
         $allowedFiles = array_column($allowedFiles, 'canConvert', 'extension');
@@ -1402,39 +1410,17 @@ class ResController extends ResourceControlController
             }
         }
 
-        // Checking if model has a custom field. If yes, the customs are reset in the update, if not, we set it to an empty JSON object
-        $newModelHasCustomFields = false;
-        foreach ($newModelFields as $newModelField) {
-            if (strpos($newModelField, 'indexingCustomField_') !== false) {
-                $newModelHasCustomFields = true;
-                break;
-            }
-        }
+        $customFieldsToDelete = array_diff($oldFieldList, $newModelFields);
+        $customFieldsToDelete = array_filter($customFieldsToDelete, function ($field) {
+            return strpos($field, 'indexingCustomField_') !== false;
+        });
+        $customFieldsToDelete = array_map(function ($field) {
+            return explode('_', $field)[1];
+        }, $customFieldsToDelete);
 
-        $oldModelHasCustomFields = false;
-        foreach ($oldFieldList as $oldModelField) {
-            if (strpos($oldModelField, 'indexingCustomField_') !== false) {
-                $oldModelHasCustomFields = true;
-                break;
-            }
-        }
-
-        $postSet = [];
-        if ($oldModelHasCustomFields && !$newModelHasCustomFields) {
-            $set['custom_fields'] = '{}';
-        } else {
-            $customFieldsToDelete = array_diff($oldFieldList, $newModelFields);
-            $customFieldsToDelete = array_filter($customFieldsToDelete, function ($field) {
-                return strpos($field, 'indexingCustomField_') !== false;
-            });
-            $customFieldsToDelete = array_map(function ($field) {
-                return explode('_', $field)[1];
-            }, $customFieldsToDelete);
-
-            $postSet['custom_fields'] = 'custom_fields ';
-            foreach ($customFieldsToDelete as $item) {
-                $postSet['custom_fields'] .= " - '$item'";
-            }
+        $postSet = ['custom_fields' => 'custom_fields '];
+        foreach ($customFieldsToDelete as $item) {
+            $postSet['custom_fields'] .= " - '$item'";
         }
 
         if (!empty($set) || !empty($postSet)) {

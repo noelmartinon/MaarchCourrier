@@ -1,11 +1,9 @@
-<?php
-
-namespace Gitlab\Api;
+<?php namespace Gitlab\Api;
 
 use Gitlab\Client;
 
 /**
- * Api interface.
+ * Api interface
  */
 interface ApiInterface
 {

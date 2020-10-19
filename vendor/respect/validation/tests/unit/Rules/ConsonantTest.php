@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Consonant
  * @covers Respect\Validation\Exceptions\ConsonantException
  */
-class ConsonantTest extends TestCase
+class ConsonantTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider providerForValidConsonants

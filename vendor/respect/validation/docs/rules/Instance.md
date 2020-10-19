@@ -14,7 +14,4 @@ Message template for this validator includes `{{instanceName}}`.
 ***
 See also:
 
-  * [Countable](Countable.md)
-  * [IterableType](IterableType.md)
   * [ObjectType](ObjectType.md)
-  * [Type](Type.md)

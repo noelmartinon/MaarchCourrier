@@ -32,7 +32,7 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
     subMenus: any[] = [
         {
             icon: 'fa fa-book',
-            route: '/administration/contacts/list',
+            route: '/administration/contacts',
             label: this.translate.instant('lang.contactsList'),
             current: false
         },

@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: UZ
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/UZ/administrative-division-uzbekistan.html
  */
 class UzSubdivisionCode extends AbstractSearcher
 {
@@ -30,12 +30,12 @@ class UzSubdivisionCode extends AbstractSearcher
         'NG', // Namangan
         'NW', // Navoiy
         'QA', // Qashqadaryo
-        'QR', // Qoraqalpog'iston Respublikasi
+        'QR', // Qoraqalpog'iston Republikasi
         'SA', // Samarqand
         'SI', // Sirdaryo
         'SU', // Surxondaryo
-        'TK', // Toshkent
-        'TO', // Toshkent
+        'TK', // Toshkent city
+        'TO', // Toshkent region
         'XO', // Xorazm
     ];
 

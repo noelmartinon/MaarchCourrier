@@ -67,6 +67,8 @@ export class SendToRecordManagementComponent implements OnInit {
 
     actionFormGroup: FormGroup;
     archives: any[] = [];
+    folders: any = [];
+    linkedResources: any = [];
 
     constructor(
         public translate: TranslateService,
@@ -78,6 +80,7 @@ export class SendToRecordManagementComponent implements OnInit {
         public functions: FunctionsService
     ) {
         this.actionFormGroup = this._formBuilder.group({
+            folder :  [''],
             packageName: ['', Validators.required],
             slipId: [{value: '', disabled: true}, Validators.required],
             slipDate: [new Date(), Validators.required],
@@ -110,9 +113,14 @@ export class SendToRecordManagementComponent implements OnInit {
                 this.archives.forEach((element: any) => {
                     element.type = this.translate.instant('lang.' + element.type);
                 });
+
+                this.linkedResources = data.additionalData.linkedResources;
+                this.folders = data.additionalData.folders;
+
                 this.recipientArchiveEntities = data.recipientArchiveEntities;
                 this.archivalAgreements = data.archivalAgreements;
                 this.actionFormGroup = this._formBuilder.group({
+                    folder : [this.folders.length > 0 ? this.folders[0].id : null],
                     packageName: ['', Validators.required],
                     slipId: [{value: data.data.slipInfo.slipId, disabled: true}, Validators.required],
                     slipDate: [new Date(), Validators.required],

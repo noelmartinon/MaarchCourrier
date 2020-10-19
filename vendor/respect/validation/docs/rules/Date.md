@@ -34,8 +34,7 @@ Message template for this validator includes `{{format}}`.
 ***
 See also:
 
-  * [Age](Age.md)
   * [Between](Between.md)
+  * [MinimumAge](MinimumAge.md)
   * [LeapDate](LeapDate.md)
   * [LeapYear](LeapYear.md)
-  * [MinimumAge](MinimumAge.md)

@@ -394,7 +394,13 @@ class MergeController
             $prefix = 'MAARCH_';
         }
 
-        $data = $prefix . $args['chrono'] . ';' . $args['resIdMaster'] . ';' . $args['originId'] . ';' . $args['title'];
+        $data = [
+            'chrono'      => $prefix . $args['chrono'],
+            'resIdMaster' => $args['resIdMaster'],
+            'originId'    => $args['originId'],
+            'title'       => $args['title']
+        ];
+        $data = json_encode($data);
         $qrCode = new QrCode($data);
         $qrCode->setSize(400);
         $qrCode->setMargin(25);

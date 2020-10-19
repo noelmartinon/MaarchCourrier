@@ -1,23 +1,36 @@
-<?php
+<?php namespace Gitlab\Model;
 
-namespace Gitlab\Model;
-
-interface Noteable extends Stateful
+interface Noteable
 {
     /**
-     * @param string      $comment
-     * @param string|null $created_at
-     *
+     * @param string $comment
      * @return Note
-     *
-     * @deprecated addComment deprecated since version 9.18 and will be removed in 10.0. Use the addNote() method instead.
      */
-    public function addComment($comment, $created_at = null);
+    public function addComment($comment);
 
     /**
      * @return Note[]
-     *
-     * @deprecated addComments deprecated since version 9.18 and will be removed in 10.0. Use the showNotes() method instead.
      */
     public function showComments();
+
+    /**
+     * @param string $comment
+     * @return static
+     */
+    public function close($comment = null);
+
+    /**
+     * @return static
+     */
+    public function open();
+
+    /**
+     * @return static
+     */
+    public function reopen();
+
+    /**
+     * @return bool
+     */
+    public function isClosed();
 }

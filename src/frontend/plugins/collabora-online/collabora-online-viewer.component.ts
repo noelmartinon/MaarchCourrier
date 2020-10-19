@@ -62,7 +62,6 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
 
     @HostListener('window:message', ['$event'])
     onMessage(e: any) {
-        // console.log(e);
         const response = JSON.parse(e.data);
         // EVENT TO CONSTANTLY UPDATE CURRENT DOCUMENT
         if (response.MessageId === 'Doc_ModifiedStatus' && response.Values.Modified === false) {

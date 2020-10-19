@@ -11,14 +11,14 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
+use PHPUnit_Framework_TestCase;
 
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Bsn
  * @covers Respect\Validation\Exceptions\BsnException
  */
-class BsnTest extends TestCase
+class BsnTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @var Bsn

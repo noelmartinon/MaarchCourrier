@@ -132,7 +132,6 @@ export class PrerequisiteComponent implements OnInit {
                                     install_phpVersionValid_desc: this.translate.instant('lang.currentVersion') + ' : ' + this.prerequisites['phpVersion']
                                 }
                             }, true);
-                            console.log(this.translate);
                         }
                     });
                 });

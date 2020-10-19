@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\VideoUrl
  * @covers Respect\Validation\Exceptions\VideoUrlException
  */
-class VideoUrlTest extends TestCase
+class VideoUrlTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException Respect\Validation\Exceptions\ComponentException

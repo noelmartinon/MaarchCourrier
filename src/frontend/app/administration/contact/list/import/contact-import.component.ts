@@ -209,8 +209,6 @@ export class ContactImportComponent implements OnInit {
             reader.onload = (value: any) => {
                 this.papa.parse(value.target.result, {
                     complete: (result) => {
-                        // console.log('Parsed: ', result);
-
                         rawCsv = result.data;
                         rawCsv = rawCsv.filter(data => data.length === rawCsv[0].length);
 

@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: MZ
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/MZ/administrative-division-mozambique.html
  */
 class MzSubdivisionCode extends AbstractSearcher
 {
@@ -29,7 +29,7 @@ class MzSubdivisionCode extends AbstractSearcher
         'I', // Inhambane
         'L', // Maputo
         'MPM', // Maputo (city)
-        'N', // Numpula
+        'N', // Nampula
         'P', // Cabo Delgado
         'Q', // Zambezia
         'S', // Sofala

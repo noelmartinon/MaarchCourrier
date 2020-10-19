@@ -32,7 +32,6 @@ export class EntitiesAdministrationComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
-    
     loading: boolean = false;
 
     entities: any[] = [];
@@ -794,7 +793,6 @@ export class EntitiesAdministrationComponent implements OnInit {
     ]
 })
 export class EntitiesAdministrationRedirectModalComponent {
-    
 
     constructor(public translate: TranslateService, public http: HttpClient, @Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<EntitiesAdministrationRedirectModalComponent>) {
         console.log(this.data.entity.redirectEntity);

@@ -11,7 +11,6 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
 use Respect\Validation\Validator;
 
 /**
@@ -19,7 +18,7 @@ use Respect\Validation\Validator;
  * @covers Respect\Validation\Rules\Not
  * @covers Respect\Validation\Exceptions\NotException
  */
-class NotTest extends TestCase
+class NotTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider providerForValidNot

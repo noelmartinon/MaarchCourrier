@@ -11,14 +11,13 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
 use stdClass;
 
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\NotOptional
  */
-class NotOptionalTest extends TestCase
+class NotOptionalTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider providerForNotOptional

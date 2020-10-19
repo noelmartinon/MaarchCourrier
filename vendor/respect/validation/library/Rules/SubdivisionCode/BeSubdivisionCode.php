@@ -18,22 +18,23 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: BE
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/BE/administrative-division-belgium.html
  */
 class BeSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'BRU', // Bruxelles-Capitale, Région de;Brussels Hoofdstedelijk Gewest
+        'BRU', // Brussels
+        'VLG', // Flanders
+        'WAL', // Wallonia
+        'BRU', // Brussels
         'VAN', // Antwerpen
-        'VBR', // Vlaams-Brabant
-        'VLG', // Vlaams Gewest
+        'VBR', // Vlaams Brabant
         'VLI', // Limburg
         'VOV', // Oost-Vlaanderen
         'VWV', // West-Vlaanderen
-        'WAL', // wallonne, Région
-        'WBR', // Brabant wallon
+        'WBR', // Brabant Wallon
         'WHT', // Hainaut
-        'WLG', // Liège
+        'WLG', // Liege
         'WLX', // Luxembourg
         'WNA', // Namur
     ];

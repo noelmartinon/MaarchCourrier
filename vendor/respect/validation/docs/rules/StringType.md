@@ -12,9 +12,7 @@ v::stringType()->validate('hi'); // true
 See also:
 
   * [Alnum](Alnum.md)
-  * [ArrayType](ArrayType.md)
   * [BoolType](BoolType.md)
-  * [BoolVal](BoolVal.md)
   * [CallableType](CallableType.md)
   * [FloatType](FloatType.md)
   * [IntType](IntType.md)

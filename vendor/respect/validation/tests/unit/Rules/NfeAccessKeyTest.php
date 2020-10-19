@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\NfeAccessKey
  * @covers Respect\Validation\Exceptions\NfeAccessKeyException
  */
-class NfeAccessKeyTest extends TestCase
+class NfeAccessKeyTest extends \PHPUnit_Framework_TestCase
 {
     protected $nfeValidator;
 

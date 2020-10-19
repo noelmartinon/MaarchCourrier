@@ -72,9 +72,6 @@ CREATE INDEX user_id_idx ON history (user_id);
 CREATE INDEX identifier_idx ON notes (identifier);
 CREATE INDEX notes_user_id_idx ON notes (user_id);
 
--- saved_queries
-CREATE INDEX user_id_queries_idx ON saved_queries (user_id);
-
 -- users
 CREATE INDEX lastname_users_idx ON users (lastname);
 

@@ -13,9 +13,7 @@ v::floatType()->validate(0e5); // true
 ***
 See also:
 
-  * [ArrayType](ArrayType.md)
   * [BoolType](BoolType.md)
-  * [BoolVal](BoolVal.md)
   * [CallableType](CallableType.md)
   * [FloatVal](FloatVal.md)
   * [IntType](IntType.md)

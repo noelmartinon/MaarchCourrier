@@ -18,19 +18,23 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: GB
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/GB/administrative-division-united-kingdom.html
  */
 class GbSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'ABC', // Armagh, Banbridge and Craigavon
+        'ENG', // England
+        'NIR', // Northern Ireland
+        'SCT', // Scotland
+        'WLS', // Wales
         'ABD', // Aberdeenshire
-        'ABE', // Aberdeen City
+        'ABE', // Aberdeen
         'AGB', // Argyll and Bute
-        'AGY', // Isle of Anglesey; Sir Ynys Môn
-        'AND', // Ards and North Down
-        'ANN', // Antrim and Newtownabbey
+        'AGY', // Isle of Anglesey
         'ANS', // Angus
+        'ANT', // Antrim
+        'ARD', // Ards
+        'ARM', // Armagh
         'BAS', // Bath and North East Somerset
         'BBD', // Blackburn with Darwen
         'BDF', // Bedford
@@ -38,11 +42,14 @@ class GbSubdivisionCode extends AbstractSearcher
         'BEN', // Brent
         'BEX', // Bexley
         'BFS', // Belfast
-        'BGE', // Bridgend; Pen-y-bont ar Ogwr
+        'BGE', // Bridgend
         'BGW', // Blaenau Gwent
         'BIR', // Birmingham
         'BKM', // Buckinghamshire
+        'BLA', // Ballymena
+        'BLY', // Ballymoney
         'BMH', // Bournemouth
+        'BNB', // Banbridge
         'BNE', // Barnet
         'BNH', // Brighton and Hove
         'BNS', // Barnsley
@@ -51,57 +58,60 @@ class GbSubdivisionCode extends AbstractSearcher
         'BRC', // Bracknell Forest
         'BRD', // Bradford
         'BRY', // Bromley
-        'BST', // Bristol, City of
+        'BST', // Bristol City of
         'BUR', // Bury
         'CAM', // Cambridgeshire
-        'CAY', // Caerphilly; Caerffili
+        'CAY', // Caerphilly
         'CBF', // Central Bedfordshire
-        'CCG', // Causeway Coast and Glens
-        'CGN', // Ceredigion; Sir Ceredigion
+        'CGN', // Ceredigion
+        'CGV', // Craigavon
         'CHE', // Cheshire East
         'CHW', // Cheshire West and Chester
+        'CKF', // Carrickfergus
+        'CKT', // Cookstown
         'CLD', // Calderdale
         'CLK', // Clackmannanshire
+        'CLR', // Coleraine
         'CMA', // Cumbria
         'CMD', // Camden
-        'CMN', // Carmarthenshire; Sir Gaerfyrddin
+        'CMN', // Carmarthenshire
         'CON', // Cornwall
-        'COV', // Coventry
-        'CRF', // Cardiff; Caerdydd
+        'COV', // Coventry (West Midlands district)
+        'CRF', // Cardiff
         'CRY', // Croydon
+        'CSR', // Castlereagh
         'CWY', // Conwy
         'DAL', // Darlington
         'DBY', // Derbyshire
-        'DEN', // Denbighshire; Sir Ddinbych
+        'DEN', // Denbighshire
         'DER', // Derby
         'DEV', // Devon
+        'DGN', // Dungannon and South Tyrone
         'DGY', // Dumfries and Galloway
         'DNC', // Doncaster
-        'DND', // Dundee City
+        'DND', // Dundee
         'DOR', // Dorset
-        'DRS', // Derry and Strabane
-        'DUD', // Dudley
-        'DUR', // Durham County
+        'DOW', // Down
+        'DRY', // Derry
+        'DUD', // Dudley (West Midlands district)
+        'DUR', // Durham
         'EAL', // Ealing
-        'EAW', // England and Wales
         'EAY', // East Ayrshire
-        'EDH', // Edinburgh, City of
+        'EDH', // Edinburgh
         'EDU', // East Dunbartonshire
         'ELN', // East Lothian
         'ELS', // Eilean Siar
         'ENF', // Enfield
-        'ENG', // England
         'ERW', // East Renfrewshire
         'ERY', // East Riding of Yorkshire
         'ESS', // Essex
         'ESX', // East Sussex
         'FAL', // Falkirk
+        'FER', // Fermanagh
         'FIF', // Fife
-        'FLN', // Flintshire; Sir y Fflint
-        'FMO', // Fermanagh and Omagh
-        'GAT', // Gateshead
-        'GBN', // Great Britain
-        'GLG', // Glasgow City
+        'FLN', // Flintshire
+        'GAT', // Gateshead (Tyne
+        'GLG', // Glasgow
         'GLS', // Gloucestershire
         'GRE', // Greenwich
         'GWN', // Gwynedd
@@ -109,7 +119,7 @@ class GbSubdivisionCode extends AbstractSearcher
         'HAM', // Hampshire
         'HAV', // Havering
         'HCK', // Hackney
-        'HEF', // Herefordshire
+        'HEF', // Herefordshire County of
         'HIL', // Hillingdon
         'HLD', // Highland
         'HMF', // Hammersmith and Fulham
@@ -118,18 +128,16 @@ class GbSubdivisionCode extends AbstractSearcher
         'HRT', // Hertfordshire
         'HRW', // Harrow
         'HRY', // Haringey
-        'IOS', // Isles of Scilly
         'IOW', // Isle of Wight
         'ISL', // Islington
         'IVC', // Inverclyde
         'KEC', // Kensington and Chelsea
         'KEN', // Kent
-        'KHL', // Kingston upon Hull
+        'KHL', // Kingston upon Hull City of
         'KIR', // Kirklees
         'KTT', // Kingston upon Thames
         'KWL', // Knowsley
         'LAN', // Lancashire
-        'LBC', // Lisburn and Castlereagh
         'LBH', // Lambeth
         'LCE', // Leicester
         'LDS', // Leeds
@@ -137,41 +145,46 @@ class GbSubdivisionCode extends AbstractSearcher
         'LEW', // Lewisham
         'LIN', // Lincolnshire
         'LIV', // Liverpool
-        'LND', // London, City of
+        'LMV', // Limavady
+        'LND', // London City of
+        'LRN', // Larne
+        'LSB', // Lisburn
         'LUT', // Luton
         'MAN', // Manchester
         'MDB', // Middlesbrough
         'MDW', // Medway
-        'MEA', // Mid and East Antrim
+        'MFT', // Magherafelt
         'MIK', // Milton Keynes
         'MLN', // Midlothian
-        'MON', // Monmouthshire; Sir Fynwy
+        'MON', // Monmouthshire
         'MRT', // Merton
         'MRY', // Moray
-        'MTY', // Merthyr Tydfil; Merthyr Tudful
-        'MUL', // Mid Ulster
+        'MTY', // Merthyr Tydfil
+        'MYL', // Moyle
         'NAY', // North Ayrshire
         'NBL', // Northumberland
+        'NDN', // North Down
         'NEL', // North East Lincolnshire
         'NET', // Newcastle upon Tyne
         'NFK', // Norfolk
         'NGM', // Nottingham
-        'NIR', // Northern Ireland
         'NLK', // North Lanarkshire
         'NLN', // North Lincolnshire
-        'NMD', // Newry, Mourne and Down
         'NSM', // North Somerset
+        'NTA', // Newtownabbey
         'NTH', // Northamptonshire
-        'NTL', // Neath Port Talbot; Castell-nedd Port Talbot
+        'NTL', // Neath Port Talbot
         'NTT', // Nottinghamshire
         'NTY', // North Tyneside
         'NWM', // Newham
-        'NWP', // Newport; Casnewydd
+        'NWP', // Newport
         'NYK', // North Yorkshire
+        'NYM', // Newry and Mourne
         'OLD', // Oldham
+        'OMH', // Omagh
         'ORK', // Orkney Islands
         'OXF', // Oxfordshire
-        'PEM', // Pembrokeshire; Sir Benfro
+        'PEM', // Pembrokeshire
         'PKN', // Perth and Kinross
         'PLY', // Plymouth
         'POL', // Poole
@@ -180,7 +193,7 @@ class GbSubdivisionCode extends AbstractSearcher
         'PTE', // Peterborough
         'RCC', // Redcar and Cleveland
         'RCH', // Rochdale
-        'RCT', // Rhondda, Cynon, Taff; Rhondda, Cynon, Taf
+        'RCT', // Rhondda Cynon Taf
         'RDB', // Redbridge
         'RDG', // Reading
         'RFW', // Renfrewshire
@@ -189,13 +202,12 @@ class GbSubdivisionCode extends AbstractSearcher
         'RUT', // Rutland
         'SAW', // Sandwell
         'SAY', // South Ayrshire
-        'SCB', // Scottish Borders, The
-        'SCT', // Scotland
+        'SCB', // Scottish Borders The
         'SFK', // Suffolk
         'SFT', // Sefton
         'SGC', // South Gloucestershire
         'SHF', // Sheffield
-        'SHN', // St. Helens
+        'SHN', // St Helens
         'SHR', // Shropshire
         'SKP', // Stockport
         'SLF', // Salford
@@ -206,6 +218,7 @@ class GbSubdivisionCode extends AbstractSearcher
         'SOM', // Somerset
         'SOS', // Southend-on-Sea
         'SRY', // Surrey
+        'STB', // Strabane
         'STE', // Stoke-on-Trent
         'STG', // Stirling
         'STH', // Southampton
@@ -213,18 +226,17 @@ class GbSubdivisionCode extends AbstractSearcher
         'STS', // Staffordshire
         'STT', // Stockton-on-Tees
         'STY', // South Tyneside
-        'SWA', // Swansea; Abertawe
+        'SWA', // Swansea
         'SWD', // Swindon
         'SWK', // Southwark
         'TAM', // Tameside
         'TFW', // Telford and Wrekin
         'THR', // Thurrock
         'TOB', // Torbay
-        'TOF', // Torfaen; Tor-faen
+        'TOF', // Torfaen
         'TRF', // Trafford
         'TWH', // Tower Hamlets
-        'UKM', // United Kingdom
-        'VGL', // Vale of Glamorgan, The; Bro Morgannwg
+        'VGL', // Vale of Glamorgan
         'WAR', // Warwickshire
         'WBK', // West Berkshire
         'WDU', // West Dunbartonshire
@@ -234,7 +246,6 @@ class GbSubdivisionCode extends AbstractSearcher
         'WKF', // Wakefield
         'WLL', // Walsall
         'WLN', // West Lothian
-        'WLS', // Wales; Cymru
         'WLV', // Wolverhampton
         'WND', // Wandsworth
         'WNM', // Windsor and Maidenhead
@@ -242,11 +253,13 @@ class GbSubdivisionCode extends AbstractSearcher
         'WOR', // Worcestershire
         'WRL', // Wirral
         'WRT', // Warrington
-        'WRX', // Wrexham; Wrecsam
+        'WRX', // Wrexham
         'WSM', // Westminster
         'WSX', // West Sussex
         'YOR', // York
         'ZET', // Shetland Islands
+        'BDF', // Bedfordshire
+        'CHS', // Cheshire
     ];
 
     public $compareIdentical = true;

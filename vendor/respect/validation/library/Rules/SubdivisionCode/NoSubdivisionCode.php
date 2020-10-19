@@ -18,12 +18,12 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: NO
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/NO/administrative-division-norway.html
  */
 class NoSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        '01', // Østfold
+        '01', // Ostfold
         '02', // Akershus
         '03', // Oslo
         '04', // Hedmark
@@ -36,14 +36,14 @@ class NoSubdivisionCode extends AbstractSearcher
         '11', // Rogaland
         '12', // Hordaland
         '14', // Sogn og Fjordane
-        '15', // Møre og Romsdal
-        '16', // Sør-Trøndelag
-        '17', // Nord-Trøndelag
+        '15', // More og Romdal
+        '16', // Sor-Trondelag
+        '17', // Nord-Trondelag
         '18', // Nordland
         '19', // Troms
         '20', // Finnmark
-        '21', // Svalbard (Arctic Region)
-        '22', // Jan Mayen (Arctic Region)
+        '21', // Svalbard
+        '22', // Jan Mayen
     ];
 
     public $compareIdentical = true;

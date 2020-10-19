@@ -4,10 +4,10 @@
         <ldap>
             <!-- Appel la class_<type_ldap> en fonction du type d'annuaire -->
             <type_ldap>adLDAP</type_ldap>
-            <!-- Prefixe les group_id de letterbox par -->
-            <group_prefix_ldap>LDAP</group_prefix_ldap>
             <!-- nom / ip du serveur ldap -->
             <domain>192.168.1.1</domain>
+            <!-- base DN (que pour openLDAP, ne pas remplir si adLDAP) -->
+            <baseDN>DC=maarch,DC=com</baseDN>
             <!-- prefixe les logins si saisi -->
             <prefix_login>MAARCH</prefix_login>
             <!-- suffix les logins si saisi -->
@@ -22,8 +22,6 @@
             <purge_log>1</purge_log>
             <!-- Import des users qui n'appartiennent a aucun groupe -->
             <lost_users>false</lost_users>
-            <!-- Si LDAP est desactive alors le pass de chaque utilisateur est son login -->
-            <pass_is_login>true</pass_is_login>
             <standardConnect>false</standardConnect>
         </ldap>
     </config>

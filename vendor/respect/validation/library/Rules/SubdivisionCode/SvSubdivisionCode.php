@@ -18,25 +18,25 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: SV
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/SV/administrative-division-el-salvador.html
  */
 class SvSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'AH', // Ahuachapán
-        'CA', // Cabañas
+        'AH', // Ahuachapan
+        'CA', // Cabanas
         'CH', // Chalatenango
-        'CU', // Cuscatlán
+        'CU', // Cuscatlan
         'LI', // La Libertad
-        'MO', // Morazán
+        'MO', // Morazan
         'PA', // La Paz
         'SA', // Santa Ana
         'SM', // San Miguel
         'SO', // Sonsonate
         'SS', // San Salvador
         'SV', // San Vicente
-        'UN', // La Unión
-        'US', // Usulután
+        'UN', // La Union
+        'US', // Usulutan
     ];
 
     public $compareIdentical = true;

@@ -11,13 +11,11 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\IntType
  */
-class IntTypeTest extends TestCase
+class IntTypeTest extends \PHPUnit_Framework_TestCase
 {
     public function providerForValidIntType()
     {

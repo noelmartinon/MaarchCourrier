@@ -24,8 +24,5 @@ v::digit()->cpf()->validate('44455566820'); // true
 ***
 See also:
 
-  * [Bsn](Bsn.md)
-  * [Cnh](Cnh.md)
   * [Cnpj](Cnpj.md)
-  * [Imei](Imei.md)
-  * [NfeAccessKey](NfeAccessKey.md)
+  * [Cnh](Cnh.md)

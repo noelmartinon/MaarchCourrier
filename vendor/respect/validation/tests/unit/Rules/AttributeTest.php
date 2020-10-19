@@ -11,8 +11,6 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 class PrivClass
 {
     private $bar = 'foo';
@@ -23,7 +21,7 @@ class PrivClass
  * @covers Respect\Validation\Rules\Attribute
  * @covers Respect\Validation\Exceptions\AttributeException
  */
-class AttributeTest extends TestCase
+class AttributeTest extends \PHPUnit_Framework_TestCase
 {
     public function testAttributeWithNoExtraValidationShouldCheckItsPresence()
     {

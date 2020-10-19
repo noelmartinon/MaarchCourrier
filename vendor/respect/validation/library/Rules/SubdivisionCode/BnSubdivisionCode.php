@@ -18,13 +18,13 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: BN
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/BN/administrative-division-brunei.html
  */
 class BnSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
         'BE', // Belait
-        'BM', // Brunei-Muara
+        'BM', // Brunei and Muara
         'TE', // Temburong
         'TU', // Tutong
     ];

@@ -2,48 +2,50 @@
 
 namespace Gitlab\HttpClient\Plugin;
 
-use Gitlab\Exception\ApiLimitExceededException;
 use Gitlab\Exception\ErrorException;
 use Gitlab\Exception\RuntimeException;
-use Gitlab\Exception\ValidationFailedException;
 use Gitlab\HttpClient\Message\ResponseMediator;
 use Http\Client\Common\Plugin;
-use Http\Promise\Promise;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
  * A plugin to remember the last response.
  *
- * @internal
- *
- * @final
- *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  * @author Fabien Bourigault <bourigaultfabien@gmail.com>
  */
 class GitlabExceptionThrower implements Plugin
 {
-    use Plugin\VersionBridgePlugin;
-
     /**
-     * Handle the request and return the response coming from the next callable.
-     *
-     * @param RequestInterface $request
-     * @param callable         $next
-     * @param callable         $first
-     *
-     * @return Promise
+     * {@inheritdoc}
      */
-    public function doHandleRequest(RequestInterface $request, callable $next, callable $first)
+    public function handleRequest(RequestInterface $request, callable $next, callable $first)
     {
         return $next($request)->then(function (ResponseInterface $response) {
-            $status = $response->getStatusCode();
+            if ($response->getStatusCode() >= 400 && $response->getStatusCode() < 600) {
+                $content = ResponseMediator::getContent($response);
+                if (is_array($content) && isset($content['message'])) {
+                    if (400 == $response->getStatusCode()) {
+                        $message = $this->parseMessage($content['message']);
 
-            if ($status >= 400 && $status < 600) {
-                $message = ResponseMediator::getErrorMessage($response);
+                        throw new ErrorException($message, 400);
+                    }
+                }
 
-                throw self::createException($status, null === $message ? $response->getReasonPhrase() : $message);
+                $errorMessage = null;
+                if (isset($content['error'])) {
+                    $errorMessage = $content['error'];
+                    if (is_array($content['error'])) {
+                        $errorMessage = implode("\n", $content['error']);
+                    }
+                } elseif (isset($content['message'])) {
+                    $errorMessage = $this->parseMessage($content['message']);
+                } else {
+                    $errorMessage = $content;
+                }
+
+                throw new RuntimeException($errorMessage, $response->getStatusCode());
             }
 
             return $response;
@@ -51,23 +53,34 @@ class GitlabExceptionThrower implements Plugin
     }
 
     /**
-     * Create an exception from a status code and error message.
+     * @param mixed $message
      *
-     * @param int    $status
-     * @param string $message
-     *
-     * @return ErrorException|RuntimeException
+     * @return string
      */
-    private static function createException($status, $message)
+    private function parseMessage($message)
     {
-        if (400 === $status || 422 === $status) {
-            return new ValidationFailedException($message, $status);
+        $string = $message;
+
+        if (is_array($message)) {
+            $format = '"%s" %s';
+            $errors = array();
+
+            foreach ($message as $field => $messages) {
+                if (is_array($messages)) {
+                    $messages = array_unique($messages);
+                    foreach ($messages as $error) {
+                        $errors[] = sprintf($format, $field, $error);
+                    }
+                } elseif (is_integer($field)) {
+                    $errors[] = $messages;
+                } else {
+                    $errors[] = sprintf($format, $field, $messages);
+                }
+            }
+
+            $string = implode(', ', $errors);
         }
 
-        if (429 === $status) {
-            return new ApiLimitExceededException($message, $status);
-        }
-
-        return new RuntimeException($message, $status);
+        return $string;
     }
 }

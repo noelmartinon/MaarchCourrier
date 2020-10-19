@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: BR
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/BR/administrative-division-brazil.html
  */
 class BrSubdivisionCode extends AbstractSearcher
 {
@@ -26,30 +26,29 @@ class BrSubdivisionCode extends AbstractSearcher
         'AC', // Acre
         'AL', // Alagoas
         'AM', // Amazonas
-        'AP', // Amapá
+        'AP', // Amapa
         'BA', // Bahia
-        'CE', // Ceará
+        'CE', // Ceara
         'DF', // Distrito Federal
-        'ES', // Espírito Santo
-        'FN', // Fernando de Noronha
-        'GO', // Goiás
-        'MA', // Maranhão
+        'ES', // Espirito Santo
+        'GO', // Goias
+        'MA', // Maranhao
         'MG', // Minas Gerais
         'MS', // Mato Grosso do Sul
         'MT', // Mato Grosso
-        'PA', // Pará
-        'PB', // Paraíba
+        'PA', // Para
+        'PB', // Paraiba
         'PE', // Pernambuco
-        'PI', // Piauí
-        'PR', // Paraná
+        'PI', // Piaui
+        'PR', // Parana
         'RJ', // Rio de Janeiro
         'RN', // Rio Grande do Norte
-        'RO', // Rondônia
+        'RO', // Rondonia
         'RR', // Roraima
         'RS', // Rio Grande do Sul
         'SC', // Santa Catarina
         'SE', // Sergipe
-        'SP', // São Paulo
+        'SP', // Sao Paulo
         'TO', // Tocantins
     ];
 

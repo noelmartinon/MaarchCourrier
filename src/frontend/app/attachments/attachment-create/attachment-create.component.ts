@@ -404,14 +404,12 @@ export class AttachmentCreateComponent implements OnInit {
     }
 
     updateFile(index: number) {
-        if (this.functions.empty(this.attachments[this.asyncIndexTab].encodedFile.value)) {
-            console.log('ca passe!');
-            
+        if (this.functions.empty(this.attachments[this.asyncIndexTab].encodedFile.value)) {            
             this.appDocumentViewer.toArray()[this.asyncIndexTab].getFile().pipe(
                 take(1),
                 tap((data) => {
                     console.log(data);
-                    
+
                     this.attachments[this.asyncIndexTab].encodedFile.setValue(data.content);
                     this.attachments[this.asyncIndexTab].format.setValue(data.format);
                     this.asyncIndexTab = index;

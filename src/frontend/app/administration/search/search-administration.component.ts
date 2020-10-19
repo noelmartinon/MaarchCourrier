@@ -8,6 +8,7 @@ import { startWith, map, tap, catchError } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { AppService } from '@service/app.service';
 import { HeaderService } from '@service/header.service';
+import { FunctionsService } from '@service/functions.service';
 
 declare var $: any;
 
@@ -241,7 +242,7 @@ export class SearchAdministrationComponent implements OnInit {
 
     searchAdv: any = { listEvent: {}, listDisplay: {}, list_event_data: {} };
 
-    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, public appService: AppService, public headerService: HeaderService) { }
+    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, public appService: AppService, public headerService: HeaderService, private functions: FunctionsService) { }
 
     async ngOnInit(): Promise<void> {
         this.headerService.setHeader(this.translate.instant('lang.searchAdministration'));
@@ -342,7 +343,7 @@ export class SearchAdministrationComponent implements OnInit {
 
     addData(event: any) {
         const i = this.availableData.map((e: any) => e.value).indexOf(event.option.value.value);
-        if (this.displayedSecondaryData[this.displayedSecondaryData.length - 1].length >= this.selectedTemplateDisplayedSecondaryData) {
+        if ((this.displayedSecondaryData.length === 0) || (this.displayedSecondaryData[this.displayedSecondaryData.length - 1].length >= this.selectedTemplateDisplayedSecondaryData)) {
             this.displayedSecondaryData.push([]);
         }
         this.displayedSecondaryData[this.displayedSecondaryData.length - 1].push(event.option.value);
@@ -353,14 +354,16 @@ export class SearchAdministrationComponent implements OnInit {
 
     removeData(rmData: any, i: number, indexDisplayedData) {
         this.availableData.push(rmData);
-        this.displayedSecondaryData[indexDisplayedData].splice(i, 1);
+        this.displayedSecondaryData[indexDisplayedData].splice(i);
         this.dataControl.setValue('');
     }
 
     removeAllData() {
-        this.availableData = this.availableData.concat(this.displayedSecondaryData);
-        this.displayedSecondaryData = [];
+        this.displayedSecondaryData.forEach(element => {
+            this.availableData = this.availableData.concat(element);
+        });
         this.dataControl.setValue('');
+        this.displayedSecondaryData = [];
     }
 
     drop(event: CdkDragDrop<string[]>) {
@@ -369,10 +372,10 @@ export class SearchAdministrationComponent implements OnInit {
         } else {
             transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex - 1);
 
-            this.displayedSecondaryData.forEach((subArray: any, index) => {
+            this.displayedSecondaryData.forEach((subArray: any, index: any) => {
                 if (subArray.length > this.selectedTemplateDisplayedSecondaryData) {
                     transferArrayItem(subArray, this.displayedSecondaryData[index + 1], subArray.length, 0);
-                } else if (subArray.length < this.selectedTemplateDisplayedSecondaryData) {
+                } else if (subArray.length < this.selectedTemplateDisplayedSecondaryData && !this.functions.empty(this.displayedSecondaryData[index + 1])) {
                     transferArrayItem(this.displayedSecondaryData[index + 1], subArray, 0, subArray.length);
                 }
             });

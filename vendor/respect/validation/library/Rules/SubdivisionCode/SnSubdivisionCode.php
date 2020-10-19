@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: SN
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/SN/administrative-division-senegal.html
  */
 class SnSubdivisionCode extends AbstractSearcher
 {
@@ -35,7 +35,7 @@ class SnSubdivisionCode extends AbstractSearcher
         'SE', // Sédhiou
         'SL', // Saint-Louis
         'TC', // Tambacounda
-        'TH', // Thiès
+        'TH', // Thies
         'ZG', // Ziguinchor
     ];
 

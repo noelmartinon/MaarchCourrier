@@ -22,7 +22,7 @@ export class ContactsPageAdministrationComponent implements OnInit {
     subMenus: any[] = [
         {
             icon: 'fa fa-book',
-            route: '/administration/contacts/list',
+            route: '/administration/contacts',
             label: this.translate.instant('lang.contactsList'),
             current: false
         },
@@ -91,6 +91,6 @@ export class ContactsPageAdministrationComponent implements OnInit {
     }
 
     goToList() {
-        this.router.navigate(['/administration/contacts/list']);
+        this.router.navigate(['/administration/contacts']);
     }
 }

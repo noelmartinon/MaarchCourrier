@@ -52,7 +52,7 @@ foreach ($customs as $custom) {
                 $file['config']['maarchUrl'] = (string)$loadedVisaXml->CONFIG->applicationUrl;
             }
 
-            $fp = fopen($configPath, 'a+');
+            $fp = fopen($configPath, 'w+');
             fwrite($fp, json_encode($file, JSON_PRETTY_PRINT));
             fclose($fp);
 

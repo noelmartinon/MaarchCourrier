@@ -11,13 +11,11 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Slug
  */
-class SlugTest extends TestCase
+class SlugTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider providerValidSlug

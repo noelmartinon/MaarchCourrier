@@ -189,7 +189,10 @@ class IndexingModelController
             }
             if (strpos($field['identifier'], 'indexingCustomField_') !== false && !empty($field['default_value']) && $field['default_value'] != '_TODAY') {
                 $customFieldId = explode('_', $field['identifier'])[1];
-                $customField = CustomFieldModel::getById(['id' => $customFieldId, 'select' => ['type']]);
+                $customField = CustomFieldModel::getById(['id' => $customFieldId, 'select' => ['type'], 'where' => ['mode = ?'], 'data' => ['form']]);
+                if (empty($customField)) {
+                    continue;
+                }
                 if ($customField['type'] == 'date') {
                     $date = new \DateTime($field['default_value']);
                     $field['default_value'] = $date->format('Y-m-d');
@@ -316,7 +319,10 @@ class IndexingModelController
                     }
                     if (strpos($field['identifier'], 'indexingCustomField_') !== false && !empty($field['default_value']) && $field['default_value'] != '_TODAY') {
                         $customFieldId = explode('_', $field['identifier'])[1];
-                        $customField = CustomFieldModel::getById(['id' => $customFieldId, 'select' => ['type']]);
+                        $customField = CustomFieldModel::getById(['id' => $customFieldId, 'select' => ['type'], 'where' => ['mode = ?'], 'data' => ['form']]);
+                        if (empty($customField)) {
+                            continue;
+                        }
                         if ($customField['type'] == 'date') {
                             $date = new \DateTime($field['default_value']);
                             $field['default_value'] = $date->format('Y-m-d');

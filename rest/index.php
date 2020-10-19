@@ -55,6 +55,7 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
 $app->get('/authenticationInformations', \SrcCore\controllers\AuthenticationController::class . ':getInformations');
 $app->get('/validUrl', \SrcCore\controllers\AuthenticationController::class . ':getValidUrl');
 $app->post('/authenticate', \SrcCore\controllers\AuthenticationController::class . ':authenticate');
+$app->get('/authenticate/logout', \SrcCore\controllers\AuthenticationController::class . ':logout');
 $app->get('/authenticate/token', \SrcCore\controllers\AuthenticationController::class . ':getRefreshedToken');
 
 //Initialize

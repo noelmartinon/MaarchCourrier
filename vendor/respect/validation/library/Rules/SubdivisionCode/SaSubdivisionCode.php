@@ -18,24 +18,24 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: SA
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/SA/administrative-division-saudi-arabia.html
  */
 class SaSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        '01', // Ar Riyāḍ
+        '01', // Ar Riyad
         '02', // Makkah
-        '03', // Al Madīnah
-        '04', // Ash Sharqīyah
-        '05', // Al Qaşīm
-        '06', // Ḥā'il
-        '07', // Tabūk
-        '08', // Al Ḥudūd ash Shamāliyah
-        '09', // Jīzan
-        '10', // Najrān
-        '11', // Al Bāhah
+        '03', // Al Madinah
+        '04', // Ash Sharqiyah (Eastern Province)
+        '05', // Al Qasim
+        '06', // Ha'il
+        '07', // Tabuk
+        '08', // Al Hudud ash Shamaliyah
+        '09', // Jizan
+        '10', // Najran
+        '11', // Al Bahah
         '12', // Al Jawf
-        '14', // `Asīr
+        '14', // 'Asir
     ];
 
     public $compareIdentical = true;

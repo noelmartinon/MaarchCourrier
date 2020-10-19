@@ -18,28 +18,28 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: IQ
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/IQ/administrative-division-iraq.html
  */
 class IqSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
         'AN', // Al Anbar
-        'AR', // Arbil
+        'AR', // Arbīl
         'BA', // Al Basrah
         'BB', // Babil
         'BG', // Baghdad
-        'DA', // Dahuk
+        'DA', // Dahūk
         'DI', // Diyala
         'DQ', // Dhi Qar
-        'KA', // Karbala'
+        'KA', // Al Karbala
         'MA', // Maysan
         'MU', // Al Muthanna
-        'NA', // An Najef
+        'NA', // An Najaf
         'NI', // Ninawa
-        'QA', // Al Qadisiyah
+        'QA', // Al Qadisyah
         'SD', // Salah ad Din
-        'SW', // As Sulaymaniyah
-        'TS', // At Ta'mim
+        'SU', // As Sulaymānīyah
+        'TS', // Kirkūk
         'WA', // Wasit
     ];
 

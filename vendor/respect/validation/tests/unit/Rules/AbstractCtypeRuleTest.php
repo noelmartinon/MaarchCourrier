@@ -11,9 +11,7 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
-class AbstractCtypeRuleTest extends TestCase
+class AbstractCtypeRuleTest extends \PHPUnit_Framework_TestCase
 {
     public function testValidateCleanShouldReturnTrueWhenCtypeFunctionReturnsTrue()
     {

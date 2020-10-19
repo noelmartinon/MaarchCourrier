@@ -18,16 +18,16 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: DK
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/DK/administrative-division-denmark.html
  */
 class DkSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        '81', // Nordjylland
-        '82', // Midtjylland
-        '83', // Syddanmark
-        '84', // Hovedstaden
-        '85', // Sjælland
+        '81', // Region Nordjylland
+        '82', // Region Midtjylland
+        '83', // Region Syddanmark
+        '84', // Region Hovedstaden
+        '85', // Region Sjæland
     ];
 
     public $compareIdentical = true;

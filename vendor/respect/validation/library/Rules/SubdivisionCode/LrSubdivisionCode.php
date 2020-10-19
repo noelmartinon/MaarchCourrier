@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: LR
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/LR/administrative-division-liberia.html
  */
 class LrSubdivisionCode extends AbstractSearcher
 {
@@ -34,7 +34,7 @@ class LrSubdivisionCode extends AbstractSearcher
         'MO', // Montserrado
         'MY', // Maryland
         'NI', // Nimba
-        'RI', // Rivercess
+        'RI', // River Cess
         'SI', // Sinoe
     ];
 

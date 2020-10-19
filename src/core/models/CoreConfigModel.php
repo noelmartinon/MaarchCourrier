@@ -212,9 +212,7 @@ class CoreConfigModel
         if ($loadedXml) {
             foreach ($loadedXml->METHOD as $value) {
                 if ((string)$value->ENABLED == 'true') {
-                    $loggingMethod['id']        = (string)$value->ID;
-                    $loggingMethod['name']      = (string)$value->NAME;
-                    $loggingMethod['script']    = (string)$value->SCRIPT;
+                    $loggingMethod['id'] = (string)$value->ID;
                 }
             }
         }

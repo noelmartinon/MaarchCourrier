@@ -54,6 +54,7 @@ import { IssuingSiteComponent } from './registered-mail/issuing-site/issuing-sit
 import { RegisteredMailListComponent } from './registered-mail/registered-mail-list.component';
 import { RegisteredMailComponent } from './registered-mail/registered-mail.component';
 import { SearchAdministrationComponent } from './search/search-administration.component';
+import { ConnectionsAdministrationComponent } from './connection/connections-administration.component';
 
 
 @NgModule({
@@ -129,7 +130,8 @@ import { SearchAdministrationComponent } from './search/search-administration.co
             { path: 'administration/issuingSites', canActivate: [AppGuard], component: IssuingSiteListComponent },
             { path: 'administration/issuingSites/new', canActivate: [AppGuard], component: IssuingSiteComponent },
             { path: 'administration/issuingSites/:id', canActivate: [AppGuard], component: IssuingSiteComponent },
-            { path: 'administration/search', canActivate : [AppGuard], component : SearchAdministrationComponent}
+            { path: 'administration/search', canActivate : [AppGuard], component : SearchAdministrationComponent},
+            { path: 'administration/connections', canActivate : [AppGuard], component : ConnectionsAdministrationComponent}
         ]),
     ],
     exports: [

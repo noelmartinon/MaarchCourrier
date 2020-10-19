@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\StringType
  * @covers Respect\Validation\Exceptions\StringTypeException
  */
-class StringTypeTest extends TestCase
+class StringTypeTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider providerForString
