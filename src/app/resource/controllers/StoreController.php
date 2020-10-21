@@ -35,8 +35,8 @@ class StoreController
             if (empty($args['resId'])) {
                 $resId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'res_id_mlb_seq']);
 
-                $data = ['resId' => $resId];
-                $data = array_merge($args, $data);
+                $data = $args;
+                $data['resId'] = $resId;
                 $data = StoreController::prepareResourceStorage($data);
             } else {
                 $resId = $args['resId'];
@@ -51,7 +51,7 @@ class StoreController
                     $uniqueId = CoreConfigModel::uniqueId();
                     $tmpFilename = "storeTmp_{$GLOBALS['id']}_{$uniqueId}.{$args['format']}";
                     file_put_contents($tmpPath . $tmpFilename, $fileContent);
-                    $fileContent = MergeController::mergeChronoDocument(['chrono' => $data['alt_identifier'], 'path' => $tmpPath . $tmpFilename, 'type' => 'resource']);
+                    $fileContent = MergeController::mergeChronoDocument(['chrono' => $data['alt_identifier'], 'path' => $tmpPath . $tmpFilename, 'type' => 'resource', 'resIdMaster' => $resId, 'resId' => null, 'title' => $data['subject']]);
                     $fileContent = base64_decode($fileContent['encodedDocument']);
                     unlink($tmpPath . $tmpFilename);
                 }
@@ -90,8 +90,12 @@ class StoreController
     {
         try {
             if (empty($args['id'])) {
-                $data = StoreController::prepareAttachmentStorage($args);
+                $resId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'res_attachment_res_id_seq']);
+                $data = $args;
+                $data['resId'] = $resId;
+                $data = StoreController::prepareAttachmentStorage($data);
             } else {
+                $resId = $args['id'];
                 $data = StoreController::prepareUpdateAttachmentStorage($args);
             }
 
@@ -103,7 +107,7 @@ class StoreController
                     $uniqueId = CoreConfigModel::uniqueId();
                     $tmpFilename = "storeTmp_{$GLOBALS['id']}_{$uniqueId}.{$args['format']}";
                     file_put_contents($tmpPath . $tmpFilename, $fileContent);
-                    $fileContent = MergeController::mergeChronoDocument(['chrono' => $data['identifier'], 'path' => $tmpPath . $tmpFilename, 'type' => 'attachment']);
+                    $fileContent = MergeController::mergeChronoDocument(['chrono' => $data['identifier'], 'path' => $tmpPath . $tmpFilename, 'type' => 'attachment', 'resIdMaster' => $data['res_id_master'], 'resId' => $resId, 'title' => $data['title']]);
                     $fileContent = base64_decode($fileContent['encodedDocument']);
                     unlink($tmpPath . $tmpFilename);
                 }
@@ -357,6 +361,7 @@ class StoreController
 
         $inSignatureBook = isset($args['inSignatureBook']) ? $args['inSignatureBook'] : $shouldBeInSignatureBook;
         $preparedData = [
+            'res_id'                => $args['resId'] ?? null,
             'title'                 => $args['title'] ?? null,
             'identifier'            => $args['chrono'] ?? null,
             'typist'                => $typist,
