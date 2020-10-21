@@ -197,7 +197,7 @@
                                         *ngIf="adminMode || (arrFormControl['diffusionList'].hasError('required') && arrFormControl['diffusionList'].untouched)"
                                         [class.noMandatory]="!field.mandatory"></i>
                                     <i class="fas fa-exclamation-triangle fieldError"
-                                        *ngIf="!adminMode && arrFormControl['diffusionList'].touched && arrFormControl['diffusionList'].hasError('required')"></i>
+                                        *ngIf="!adminMode && arrFormControl['diffusionList'].touched && arrFormControl['diffusionList'].status === 'INVALID'"></i>
                                     <i class="fas fa-check fieldFull"
                                         *ngIf="!adminMode && arrFormControl['diffusionList'].valid && !isEmptyField(field)"></i>
                                 </div>
