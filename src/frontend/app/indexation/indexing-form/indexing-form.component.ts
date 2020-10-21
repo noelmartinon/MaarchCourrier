@@ -27,14 +27,14 @@ export class IndexingFormComponent implements OnInit {
 
     loading: boolean = true;
 
-    @Input('indexingFormId') indexingFormId: number;
-    @Input('resId') resId: number = null;
-    @Input('groupId') groupId: number;
+    @Input() indexingFormId: number;
+    @Input() resId: number = null;
+    @Input() groupId: number;
     @Input('admin') adminMode: boolean;
-    @Input('canEdit') canEdit: boolean = true;
-    @Input('mode') mode: string = 'indexation';
+    @Input() canEdit: boolean = true;
+    @Input() mode: string = 'indexation';
 
-    @Input('hideDiffusionList') hideDiffusionList: boolean = false;
+    @Input() hideDiffusionList: boolean = false;
 
     @Output() retrieveDocumentEvent = new EventEmitter<string>();
     @Output() loadingFormEndEvent = new EventEmitter<string>();
@@ -181,6 +181,7 @@ export class IndexingFormComponent implements OnInit {
     currentResourceValues: any = null;
 
     selfDest: boolean = false;
+    customDiffusion: any = [];
 
     dialogRef: MatDialogRef<any>;
 
@@ -275,7 +276,6 @@ export class IndexingFormComponent implements OnInit {
             if (['destination', 'priority'].indexOf(event.item.data.identifier) > -1) {
                 this.initElemForm();
             }
-
         }
     }
 
@@ -516,7 +516,7 @@ export class IndexingFormComponent implements OnInit {
                                 title: title,
                                 label: entity.entity_label,
                                 disabled: !entity.enabled
-                            }
+                            };
                         });
                         elem.event = 'loadDiffusionList';
                         elem.allowedEntities = elem.values.filter((val: any) => val.disabled === false).map((entities: any) => entities.id);
@@ -835,10 +835,14 @@ export class IndexingFormComponent implements OnInit {
                             }
                         }
 
+                        if (field.identifier === 'diffusionList') {
+                            this.customDiffusion = field.default_value;
+                        }
+
                         if (fieldExist) {
                             this['indexingModels_' + field.unit].push(field);
                             this.initValidator(field);
-                        } else {
+                        } else if (field.identifier !== 'diffusionList') {
                             this.notify.error(this.lang.fieldNotExist + ': ' + field.identifier);
                         }
 
@@ -883,6 +887,7 @@ export class IndexingFormComponent implements OnInit {
             let valArr: ValidatorFn[] = [];
             if (field.mandatory) {
                 valArr.push(Validators.required);
+                valArr.push(this.requireDestValidator({ 'isDest': '' }));
             }
 
             this.arrFormControl['diffusionList'] = new FormControl({ value: null, disabled: false });
@@ -892,6 +897,15 @@ export class IndexingFormComponent implements OnInit {
             this.arrFormControl['diffusionList'].setValue([]);
 
         }
+    }
+
+    requireDestValidator(error: ValidationErrors): ValidatorFn {
+        return (control: AbstractControl): { [key: string]: any } => {
+            if (!control.value) {
+                return null;
+            }
+            return control.value.filter((item: any) => item.mode === 'dest').length > 0 ? null : error;
+        };
     }
 
     regexValidator(regex: RegExp, error: ValidationErrors): ValidatorFn {

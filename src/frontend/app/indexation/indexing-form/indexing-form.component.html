@@ -48,15 +48,16 @@
                                     </button>
                                 </mat-menu>
                             </div>
-                            <div class="fieldInput" [class.textareaInput]="field.type === 'string'" [class.checkboxInput]="field.type === 'checkbox'">
+                            <div class="fieldInput" [class.textareaInput]="field.type === 'string'"
+                                [class.checkboxInput]="field.type === 'checkbox'">
                                 <ng-container *ngIf="field.type === 'string'">
                                     <mat-form-field class="input-form"
                                         [floatLabel]="appService.getViewMode() ? '' : 'never'">
                                         <mat-label *ngIf="appService.getViewMode()">{{field.label}}</mat-label>
                                         <textarea matInput matTextareaAutosize
-                                             [formControl]="arrFormControl[field.identifier]"
+                                            [formControl]="arrFormControl[field.identifier]"
                                             [placeholder]="!adminMode ? lang.typeValue : lang.defaultValue"
-                                             class="subject"></textarea>
+                                            class="subject"></textarea>
                                     </mat-form-field>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'integer'">
@@ -69,7 +70,8 @@
                                     </mat-form-field>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'select'">
-                                    <plugin-select-search [showResetOption]="adminMode || !field.mandatory" [label]="field.label"
+                                    <plugin-select-search [showResetOption]="adminMode || !field.mandatory"
+                                        [label]="field.label"
                                         [placeholderLabel]="!adminMode ? lang.chooseValue : lang.defaultValue"
                                         [formControlSelect]="arrFormControl[field.identifier]" [datas]="field.values"
                                         (afterSelected)="launchEvent($event, field)" style="width:100%;">
@@ -143,7 +145,8 @@
                                     </plugin-autocomplete>
                                 </ng-container>-->
                                 <ng-container *ngIf="['senders','recipients'].indexOf(field.identifier) > -1">
-                                    <app-contact-autocomplete [control]="arrFormControl[field.identifier]" style="width:100%;" (retrieveDocumentEvent)="retrieveDocumentEvent.emit()">
+                                    <app-contact-autocomplete [control]="arrFormControl[field.identifier]"
+                                        style="width:100%;" (retrieveDocumentEvent)="retrieveDocumentEvent.emit()">
                                     </app-contact-autocomplete>
                                 </ng-container>
                                 <ng-container *ngIf="field.identifier === 'folders'">
@@ -155,11 +158,14 @@
                                     </app-tag-input>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'banAutocomplete'">
-                                    <app-address-ban-input [control]="arrFormControl[field.identifier]" [admin]="adminMode" style="width:100%;">
+                                    <app-address-ban-input [control]="arrFormControl[field.identifier]"
+                                        [admin]="adminMode" style="width:100%;">
                                     </app-address-ban-input>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'contact'">
-                                    <app-contact-autocomplete [id]="field.identifier" [control]="arrFormControl[field.identifier]" style="width:100%;" (retrieveDocumentEvent)="retrieveDocumentEvent.emit()">
+                                    <app-contact-autocomplete [id]="field.identifier"
+                                        [control]="arrFormControl[field.identifier]" style="width:100%;"
+                                        (retrieveDocumentEvent)="retrieveDocumentEvent.emit()">
                                     </app-contact-autocomplete>
                                 </ng-container>
                             </div>
@@ -169,28 +175,39 @@
                                     [class.noMandatory]="!field.mandatory"></i>
                                 <i class="fas fa-exclamation-triangle fieldError"
                                     *ngIf="!adminMode && arrFormControl[field.identifier].touched && arrFormControl[field.identifier].hasError('required')"></i>
-                                <i class="fas fa-check fieldFull"  *ngIf="!adminMode && arrFormControl[field.identifier].valid && !isEmptyField(field)"></i>
+                                <i class="fas fa-check fieldFull"
+                                    *ngIf="!adminMode && arrFormControl[field.identifier].valid && !isEmptyField(field)"></i>
                             </div>
                         </div>
-                        <div *ngIf="field.identifier === 'destination' && !adminMode && arrFormControl['destination'].value > 0 && !hideDiffusionList">
+                        <div
+                            *ngIf="field.identifier === 'destination' && !adminMode && arrFormControl['destination'].value > 0 && !hideDiffusionList">
                             <mat-divider></mat-divider>
                             <div style="padding: 10px;font-size: 16px;color: #135F7F;letter-spacing: 2px;font-weight: bold;display: flex;
                                 align-items: center;">
                                 <div style="display: flex;flex: 1;align-items: center;">
-                                    {{lang.diffusionList}} <button mat-icon-button  *ngIf="appDiffusionsList.canUpdateRoles() && canEdit && mode !== 'process'" color="primary"
-                                            (click)="appDiffusionsList.switchMode()" [title]="lang.modifyDiffusionList">
-                                            <mat-icon class="fa fa-edit"></mat-icon>
-                                        </button>
+                                    {{lang.diffusionList}} <button mat-icon-button
+                                        *ngIf="appDiffusionsList.canUpdateRoles() && canEdit && mode !== 'process'"
+                                        color="primary" (click)="appDiffusionsList.switchMode()"
+                                        [title]="lang.modifyDiffusionList">
+                                        <mat-icon class="fa fa-edit"></mat-icon>
+                                    </button>
                                 </div>
                                 <div class="fieldState" style="width: 20px;padding: 0px;">
                                     <i class="fas fa-asterisk fieldRequired"
                                         *ngIf="adminMode || (arrFormControl['diffusionList'].hasError('required') && arrFormControl['diffusionList'].untouched)"
                                         [class.noMandatory]="!field.mandatory"></i>
-                                    <i class="fas fa-exclamation-triangle fieldError" *ngIf="!adminMode && arrFormControl['diffusionList'].touched && arrFormControl['diffusionList'].hasError('required')"></i>
-                                    <i class="fas fa-check fieldFull" *ngIf="!adminMode && arrFormControl['diffusionList'].valid && !isEmptyField(field)"></i>
+                                    <i class="fas fa-exclamation-triangle fieldError"
+                                        *ngIf="!adminMode && arrFormControl['diffusionList'].touched && arrFormControl['diffusionList'].hasError('required')"></i>
+                                    <i class="fas fa-check fieldFull"
+                                        *ngIf="!adminMode && arrFormControl['diffusionList'].valid && !isEmptyField(field)"></i>
                                 </div>
                             </div>
-                            <app-diffusions-list #appDiffusionsList [resId]="resId" [entityId]="arrFormControl[field.identifier].value" [diffFormControl]="arrFormControl['diffusionList']" [allowedEntities]="field.allowedEntities" [category]="currentCategory" [target]="'indexation'" [selfDest]="selfDest" (triggerEvent)="changeDestination($event,field.allowedEntities)">
+                            <app-diffusions-list #appDiffusionsList [resId]="resId"
+                                [entityId]="arrFormControl[field.identifier].value"
+                                [diffFormControl]="arrFormControl['diffusionList']"
+                                [allowedEntities]="field.allowedEntities" [category]="currentCategory"
+                                [target]="'indexation'" [selfDest]="selfDest" [customDiffusion]="customDiffusion"
+                                (triggerEvent)="changeDestination($event,field.allowedEntities)">
                             </app-diffusions-list>
                             <mat-divider></mat-divider>
                         </div>
