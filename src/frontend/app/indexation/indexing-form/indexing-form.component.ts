@@ -888,6 +888,8 @@ export class IndexingFormComponent implements OnInit {
             if (field.mandatory) {
                 valArr.push(Validators.required);
                 valArr.push(this.requireDestValidator({ 'isDest': '' }));
+            } else {
+                valArr.push(this.requireDestValidatorOrEmpty({ 'isDest': '' }));
             }
 
             this.arrFormControl['diffusionList'] = new FormControl({ value: null, disabled: false });
@@ -905,6 +907,15 @@ export class IndexingFormComponent implements OnInit {
                 return null;
             }
             return control.value.filter((item: any) => item.mode === 'dest').length > 0 ? null : error;
+        };
+    }
+
+    requireDestValidatorOrEmpty(error: ValidationErrors): ValidatorFn {
+        return (control: AbstractControl): { [key: string]: any } => {
+            if (!control.value) {
+                return null;
+            }
+            return control.value.filter((item: any) => item.mode === 'dest').length > 0 || this.functions.empty(this.arrFormControl['destination'].value) ? null : error;
         };
     }
 
