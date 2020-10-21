@@ -839,7 +839,7 @@ export class DocumentViewerComponent implements OnInit {
                         this.editInProgress = false;
                         clearInterval(this.intervalLockFile);
                         await this.loadTmpFile(`${data.fileTrunk}.${extension}`);
-                        if (this.mode === 'mainDocument') {
+                        if (this.mode === 'mainDocument' && this.resId !== null) {
                             this.saveMainDocument();
                         }
                     }
