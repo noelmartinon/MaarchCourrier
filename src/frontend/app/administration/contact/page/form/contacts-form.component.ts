@@ -162,6 +162,17 @@ export class ContactsFormComponent implements OnInit {
             values: []
         },
         {
+            id: 'notes',
+            unit: 'mainInfo',
+            label: this.translate.instant('lang.note'),
+            type: 'string',
+            control: new FormControl(),
+            required: false,
+            display: false,
+            filling: false,
+            values: []
+        },
+        {
             id: 'addressAdditional1',
             unit: 'address',
             label: this.lang.contactsParameters_addressAdditional1,
