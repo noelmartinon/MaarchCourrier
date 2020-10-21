@@ -275,7 +275,7 @@ foreach ($customs as $custom) {
             $timeCustoms = $afterCustomFields - $beforeCustomFields;
             echo "Temps migrate custom fields = $timeCustoms\n";
 
-            pg_copy_from($databaseConnection, 'resource_contacts (res_id, item_id, type, mode)', $aValues, "\t", 	"\\\\N");
+            pg_copy_from($databaseConnection, 'resource_contacts (res_id, item_id, type, mode)', $aValues, "\t", "\\\\N");
             $finMigrateInProgress = microtime(true);
             $delaiInProgress = $finMigrateInProgress - $debutMigrateInProgress;
             echo "Migration En cours : ".$delaiInProgress." secondes.\n";
@@ -669,6 +669,7 @@ function migrateContactParameters()
         ['oldIdentifier' => 'address_country',      'identifier' => 'addressCountry',       'mandatory' => 'false', 'filling' => 'false', 'searchable' => 'false', 'displayable' => 'false'],
         ['oldIdentifier' => 'email',                'identifier' => 'email',                'mandatory' => 'false', 'filling' => 'false', 'searchable' => 'false', 'displayable' => 'false'],
         ['oldIdentifier' => 'phone',                'identifier' => 'phone',                'mandatory' => 'false', 'filling' => 'false', 'searchable' => 'false', 'displayable' => 'false'],
+        ['oldIdentifier' => 'contact_other_data',   'identifier' => 'notes',                'mandatory' => 'false', 'filling' => 'false', 'searchable' => 'false', 'displayable' => 'false'],
     ];
     
     foreach ($contactParameters as $value) {

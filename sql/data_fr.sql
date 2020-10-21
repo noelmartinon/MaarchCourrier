@@ -934,6 +934,7 @@ INSERT INTO contacts_parameters (id, identifier, mandatory, filling, searchable,
 INSERT INTO contacts_parameters (id, identifier, mandatory, filling, searchable, displayable) VALUES (13, 'addressCountry', false, false, false, false);
 INSERT INTO contacts_parameters (id, identifier, mandatory, filling, searchable, displayable) VALUES (14, 'email', false, true, false, false);
 INSERT INTO contacts_parameters (id, identifier, mandatory, filling, searchable, displayable) VALUES (15, 'phone', false, true, false, false);
+INSERT INTO contacts_parameters (id, identifier, mandatory, filling, searchable, displayable) VALUES (16, 'notes', false, false, false, false);
 
 select setval('contacts_parameters_id_seq', (select max(id)+1 from contacts_parameters), false);
 

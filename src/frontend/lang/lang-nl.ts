@@ -209,6 +209,7 @@ export const LANG_NL = {
     "contactsParameters_lastname"              : "Naam",
     "contactsParameters_addressAdditional2"   : "Additional Line",//_TO_TRANSLATE
     "contactsParameters_phone"                 : "Telefoon",
+    "contactsParameters_notes":                    "Notes", //_TO_TRANSLATE
     "contactsParameters_company"               : "Structuur",
     "contactsParameters_civility"              : "Aanspreking",
     "contactsFillingAdministration"         : "Volledigheid van de contactinformatie",

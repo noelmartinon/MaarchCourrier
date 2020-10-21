@@ -393,6 +393,7 @@ export const LANG_FR = {
     "contactsParameters_function":                 "Fonction",
     "contactsParameters_lastname":                 "Nom",
     "contactsParameters_phone":                    "Téléphone",
+    "contactsParameters_notes":                    "Annotation",
     "contactsParameters":                          "Paramétrage des contacts",
     "contactsReassign":                            "Réaffectation de contacts",
     "contactUpdated":                              "Contact mis à jour",

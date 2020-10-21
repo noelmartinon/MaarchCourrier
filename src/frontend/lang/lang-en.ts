@@ -391,6 +391,7 @@ export const LANG_EN = {
     "contactsParameters_function":                 "Function",
     "contactsParameters_lastname":                 "Last name",
     "contactsParameters_phone":                    "Phone",
+    "contactsParameters_notes":                    "Notes",
     "contactsParameters":                          "Contacts settings",
     "contactsReassign":                            "Contacts reassign",
     "contactUpdated":                              "Contact updated",
