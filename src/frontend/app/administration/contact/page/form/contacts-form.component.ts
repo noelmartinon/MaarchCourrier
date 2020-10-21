@@ -164,7 +164,7 @@ export class ContactsFormComponent implements OnInit {
         {
             id: 'notes',
             unit: 'mainInfo',
-            label: this.translate.instant('lang.note'),
+            label: this.lang.note,
             type: 'string',
             control: new FormControl(),
             required: false,
