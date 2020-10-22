@@ -16,11 +16,16 @@ namespace Alfresco\controllers;
 
 use Attachment\models\AttachmentModel;
 use Configuration\models\ConfigurationModel;
-use Convert\controllers\ConvertPdfController;
+use Contact\controllers\ContactController;
+use Contact\models\ContactModel;
 use Docserver\models\DocserverModel;
+use Doctype\models\DoctypeModel;
+use Doctype\models\SecondLevelModel;
 use Entity\models\EntityModel;
 use Group\controllers\PrivilegeController;
+use Priority\models\PriorityModel;
 use Resource\models\ResModel;
+use Resource\models\ResourceContactModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -548,24 +553,27 @@ class AlfrescoController
         }
         $entityInformations['alfresco']['password'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfresco']['password']]);
 
-        $document = ResModel::getById(['select' => ['filename', 'subject', 'alt_identifier', 'external_id'], 'resId' => $args['resId']]);
+        $document = ResModel::getById([
+            'select'    => [
+                'filename', 'subject', 'alt_identifier', 'external_id', 'type_id', 'priority', 'fingerprint', 'custom_fields', 'dest_user',
+                'creation_date', 'modification_date', 'doc_date', 'destination', 'initiator', 'process_limit_date', 'closing_date', 'docserver_id', 'path', 'filename'
+            ],
+            'resId'     => $args['resId']
+        ]);
         if (empty($document)) {
             return ['errors' => 'Document does not exist'];
         } elseif (empty($document['filename'])) {
             return ['errors' => 'Document has no file'];
+        } elseif (empty($document['alt_identifier'])) {
+            return ['errors' => 'Document has no chrono'];
         }
 
-        $convertedDocument = ConvertPdfController::getConvertedPdfById(['resId' => $args['resId'], 'collId' => 'letterbox_coll']);
-        if (!empty($convertedDocument['errors'])) {
-            return ['errors' => 'Conversion error : ' . $convertedDocument['errors']];
-        }
-
-        $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+        $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
         if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
             return ['errors' => 'Docserver does not exist'];
         }
 
-        $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedDocument['path']) . $convertedDocument['filename'];
+        $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $document['path']) . $document['filename'];
         if (!is_file($pathToDocument)) {
             return ['errors' => 'Document not found on docserver'];
         }
@@ -602,10 +610,86 @@ class AlfrescoController
         }
         $documentId = $curlResponse['response']['entry']['id'];
 
+        $properties = [];
+        $alfrescoParameters = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/alfresco.json']);
+        if (!empty($alfrescoParameters['mapping']['document'])) {
+            $resourceContacts = ResourceContactModel::get([
+                'where'     => ['res_id = ?', 'mode = ?'],
+                'data'      => [$args['resId'], 'sender']
+            ]);
+            $rawContacts = [];
+            foreach ($resourceContacts as $resourceContact) {
+                if ($resourceContact['type'] == 'contact') {
+                    $rawContacts[] = ContactModel::getById([
+                        'select'    => ['*'],
+                        'id'        => $resourceContact['item_id']
+                    ]);
+                }
+            }
+
+            foreach ($alfrescoParameters['mapping']['document'] as $key => $alfrescoParameter) {
+                if ($alfrescoParameter == 'alfrescoLogin') {
+                    $properties[$key] = $entityInformations['alfresco']['login'];
+                } elseif ($alfrescoParameter == 'doctypeLabel') {
+                    $doctype = DoctypeModel::getById(['select' => ['description'], 'id' => $document['type_id']]);
+                    $properties[$key] = $doctype['description'];
+                } elseif ($alfrescoParameter == 'priorityLabel') {
+                    if (!empty($document['priority'])) {
+                        $priority = PriorityModel::getById(['select' => ['label'], 'id' => $document['priority']]);
+                        $properties[$key] = $priority['label'];
+                    }
+                } elseif ($alfrescoParameter == 'destinationLabel') {
+                    if (!empty($document['destination'])) {
+                        $destination = EntityModel::getByEntityId(['entityId' => $document['destination'], 'select' => ['entity_label']]);
+                        $properties[$key] = $destination['entity_label'];
+                    }
+                } elseif ($alfrescoParameter == 'initiatorLabel') {
+                    if (!empty($document['initiator'])) {
+                        $initiator = EntityModel::getByEntityId(['entityId' => $document['initiator'], 'select' => ['entity_label']]);
+                        $properties[$key] = $initiator['entity_label'];
+                    }
+                } elseif ($alfrescoParameter == 'destUserLabel') {
+                    if (!empty($document['dest_user'])) {
+                        $properties[$key] = UserModel::getLabelledUserById(['login' => $document['dest_user']]);
+                    }
+                } elseif (strpos($alfrescoParameter, 'senderCompany_') !== false) {
+                    $contactNb = explode('_', $alfrescoParameter)[1];
+                    $properties[$key] = $rawContacts[$contactNb]['company'];
+                } elseif (strpos($alfrescoParameter, 'senderCivility_') !== false) {
+                    $contactNb = explode('_', $alfrescoParameter)[1];
+                    $properties[$key] = ContactModel::getCivilityLabel(['civilityId' => $rawContacts[$contactNb]['civility']]);
+                } elseif (strpos($alfrescoParameter, 'senderFirstname_') !== false) {
+                    $contactNb = explode('_', $alfrescoParameter)[1];
+                    $properties[$key] = $rawContacts[$contactNb]['firstname'];
+                } elseif (strpos($alfrescoParameter, 'senderLastname_') !== false) {
+                    $contactNb = explode('_', $alfrescoParameter)[1];
+                    $properties[$key] = $rawContacts[$contactNb]['lastname'];
+                } elseif (strpos($alfrescoParameter, 'senderFunction_') !== false) {
+                    $contactNb = explode('_', $alfrescoParameter)[1];
+                    $properties[$key] = $rawContacts[$contactNb]['function'];
+                } elseif (strpos($alfrescoParameter, 'senderAddress_') !== false) {
+                    $contactNb = explode('_', $alfrescoParameter)[1];
+                    $contactToDisplay = ContactController::getFormattedContactWithAddress(['contact' => $rawContacts[$contactNb]]);
+                    $properties[$key] = $contactToDisplay['contact']['address'];
+                } elseif ($alfrescoParameter == 'doctypeSecondLevelLabel') {
+                    $doctype = DoctypeModel::getById(['select' => ['doctypes_second_level_id'], 'id' => $document['type_id']]);
+                    $doctypeSecondLevel = SecondLevelModel::getById(['id' => $doctype['doctypes_second_level_id'], 'select' => ['doctypes_second_level_label']]);
+                    $properties[$key] = $doctypeSecondLevel['doctypes_second_level_label'];
+                } elseif (strpos($alfrescoParameter, 'customField_') !== false) {
+                    $customId = explode('_', $alfrescoParameter)[1];
+                    $customValue = json_decode($document['custom_fields'], true);
+                    $properties[$key] = (!empty($customValue[$customId]) && is_string($customValue[$customId])) ? $customValue[$customId] : '';
+                } elseif ($alfrescoParameter == 'currentDate') {
+                    $date = new \DateTime();
+                    $properties[$key] = $date->format('d-m-Y H:i');
+                } else {
+                    $properties[$key] = $document[$alfrescoParameter];
+                }
+            }
+        }
+
         $body = [
-            'properties' => [
-                'cm:description'    => $document['alt_identifier'],
-            ],
+            'properties' => $properties,
         ];
         $curlResponse = CurlModel::execSimple([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$documentId}",
@@ -623,22 +707,18 @@ class AlfrescoController
         ResModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
 
         $attachments = AttachmentModel::get([
-            'select'    => ['res_id', 'title', 'identifier', 'external_id', 'docserver_id', 'path', 'filename', 'format'],
+            'select'    => ['res_id', 'title', 'identifier', 'external_id', 'docserver_id', 'path', 'filename', 'format', 'attachment_type'],
             'where'     => ['res_id_master = ?', 'attachment_type not in (?)', 'status not in (?)'],
             'data'      => [$args['resId'], ['signed_response'], ['DEL', 'OBS']]
         ]);
         $firstAttachment = true;
         $attachmentsTitlesSent = [];
         foreach ($attachments as $attachment) {
-            if ($attachment['format'] == 'xml') {
-                $adrInfo = [
-                    'docserver_id'  => $attachment['docserver_id'],
-                    'path'          => $attachment['path'],
-                    'filename'      => $attachment['filename']
-                ];
-            } else {
-                $adrInfo = ConvertPdfController::getConvertedPdfById(['resId' => $attachment['res_id'], 'collId' => 'attachments_coll']);
-            }
+            $adrInfo = [
+                'docserver_id'  => $attachment['docserver_id'],
+                'path'          => $attachment['path'],
+                'filename'      => $attachment['filename']
+            ];
             if (empty($adrInfo['docserver_id'])) {
                 continue;
             }
@@ -697,10 +777,20 @@ class AlfrescoController
 
             $attachmentId = $curlResponse['response']['entry']['id'];
 
+            $properties = [];
+            if (!empty($alfrescoParameters['mapping']['attachment'])) {
+                foreach ($alfrescoParameters['mapping']['attachment'] as $key => $alfrescoParameter) {
+                    if ($alfrescoParameter == 'typeLabel') {
+                        $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
+                        $properties[$key] = $attachmentsTypes[$attachment['attachment_type']]['label'];
+                    } else {
+                        $properties[$key] = $attachment[$alfrescoParameter];
+                    }
+                }
+            }
+
             $body = [
-                'properties' => [
-                    'cm:description'    => $attachment['identifier'],
-                ],
+                'properties' => $properties,
             ];
             $curlResponse = CurlModel::execSimple([
                 'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$attachmentId}",
