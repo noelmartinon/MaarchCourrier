@@ -124,6 +124,10 @@ class ExportController
                     $leftJoinFunction[] = 'res_view_letterbox.priority = priorities.id';
                 } elseif ($value['value'] == 'getCategory') {
                     $select[] = 'res_view_letterbox.category_id';
+                } elseif ($value['value'] == 'getRetentionFrozen') {
+                    $select[] = 'res_view_letterbox.retention_frozen';
+                } elseif ($value['value'] == 'getBinding') {
+                    $select[] = 'res_view_letterbox.binding';
                 } elseif ($value['value'] == 'getInitiatorEntity') {
                     $select[] = 'enone.short_label AS "enone.short_label"';
                     $tableFunction[] = 'entities enone';
@@ -220,6 +224,16 @@ class ExportController
                         $csvContent[] = ExportController::getFolderLabel(['res_id' => $resource['res_id']]);
                     } elseif ($value['value'] == 'getCategory') {
                         $csvContent[] = ResModel::getCategoryLabel(['categoryId' => $resource['category_id']]);
+                    } elseif ($value['value'] == 'getRetentionFrozen') {
+                        $csvContent[] = $resource['retention_frozen'] === true ? 'Y' : 'N';
+                    } elseif ($value['value'] == 'getBinding') {
+                        if ($resource['binding'] === true) {
+                            $csvContent[] = 'Y';
+                        } elseif ($resource['binding'] === false) {
+                            $csvContent[] = 'N';
+                        } else {
+                            $csvContent[] = '';
+                        }
                     } elseif ($value['value'] == 'getInitiatorEntity') {
                         $csvContent[] = $resource['enone.short_label'];
                     } elseif ($value['value'] == 'getDestinationEntity') {
@@ -336,6 +350,16 @@ class ExportController
                         $content[] = ExportController::getFolderLabel(['res_id' => $resource['res_id']]);
                     } elseif ($value['value'] == 'getCategory') {
                         $content[] = ResModel::getCategoryLabel(['categoryId' => $resource['category_id']]);
+                    } elseif ($value['value'] == 'getRetentionFrozen') {
+                        $content[] = $resource['retention_frozen'] === true ? 'Y' : 'N';
+                    } elseif ($value['value'] == 'getBinding') {
+                        if ($resource['binding'] === true) {
+                            $content[] = 'Y';
+                        } elseif ($resource['binding'] === false) {
+                            $content[] = 'N';
+                        } else {
+                            $content[] = '';
+                        }
                     } elseif ($value['value'] == 'getInitiatorEntity') {
                         $content[] = $resource['enone.short_label'];
                     } elseif ($value['value'] == 'getDestinationEntity') {

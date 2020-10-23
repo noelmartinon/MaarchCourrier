@@ -137,7 +137,7 @@ class AttachmentController
                 if (!empty($signedResponse[0]['signatory_user_serial_id'])) {
                     $attachment['signatory'] = UserModel::getLabelledUserById(['id' => $signedResponse[0]['signatory_user_serial_id']]);
                 } else {
-                    $attachment['signatory'] = UserModel::getLabelledUserById(['login' => $signedResponse[0]['typist']]);
+                    $attachment['signatory'] = UserModel::getLabelledUserById(['id' => $signedResponse[0]['typist']]);
                 }
                 $attachment['signDate'] = $signedResponse[0]['creation_date'];
             }

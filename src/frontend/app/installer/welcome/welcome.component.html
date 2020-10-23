@@ -14,6 +14,17 @@
         </mat-form-field>
     </form>
     <mat-divider></mat-divider>
+    <ng-container *ngIf="customs.length > 0">
+        <mat-list>
+            <div mat-subheader>{{'lang.instancesList' | translate}} :
+            </div>
+            <mat-list-item *ngFor="let custom of customs">
+                <mat-icon mat-list-icon color="primary" class="fas fa-box-open"></mat-icon>
+                <div mat-line>{{custom.label}} <small style="color: #666">{{custom.id}}</small></div>
+            </mat-list-item>
+        </mat-list>
+        <mat-divider></mat-divider>
+    </ng-container>
     <mat-list>
         <div mat-subheader>{{'lang.installDescription' | translate}} :
         </div>

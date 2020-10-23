@@ -459,7 +459,8 @@ export class AvisWorkflowComponent implements OnInit {
                     labelToDisplay: item.label,
                     externalId: !this.functions.empty(item.externalId) ? item.externalId : null,
                     difflist_type: this.mode === 'circuit' ? 'AVIS_CIRCUIT' : 'entity_id',
-                    hasPrivilege : true
+                    hasPrivilege : true,
+                    isValid : true
                 });
                 this.searchAvisUser.reset();
                 this.searchAvisUserInput.nativeElement.blur();
@@ -476,7 +477,8 @@ export class AvisWorkflowComponent implements OnInit {
                                     item_entity: itemTemplate.descriptionToDisplay,
                                     item_mode: 'avis',
                                     difflist_type: this.mode === 'circuit' ? 'AVIS_CIRCUIT' : 'entity_id',
-                                    hasPrivilege : itemTemplate.hasPrivilege
+                                    hasPrivilege : itemTemplate.hasPrivilege,
+                                    isValid : itemTemplate.isValid
                                 }
                             })
                         );
@@ -494,7 +496,7 @@ export class AvisWorkflowComponent implements OnInit {
     }
 
     isValidWorkflow() {
-        if (this.avisWorkflow.items.filter((item: any) => !item.hasPrivilege).length === 0 && this.avisWorkflow.items.length > 0) {
+        if (this.avisWorkflow.items.filter((item: any) => !item.hasPrivilege || !item.isValid).length === 0 && this.avisWorkflow.items.length > 0) {
             return true;
         } else {
             return false;
@@ -502,7 +504,11 @@ export class AvisWorkflowComponent implements OnInit {
     }
 
     getError() {
-        return this.translate.instant('lang.mustDeleteUsersWithNoPrivileges');
+        if (this.avisWorkflow.items.filter((item: any) => !item.hasPrivilege).length > 0) {
+            return this.translate.instant('lang.mustDeleteUsersWithNoPrivileges');
+        } else if (this.avisWorkflow.items.filter((item: any) => !item.isValid).length > 0) {
+            return this.translate.instant('lang.mustDeleteInvalidUsers');
+        }
     }
 
     emptyWorkflow() {

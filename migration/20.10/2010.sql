@@ -294,6 +294,16 @@ UPDATE actions SET component = 'checkReplyRecordManagementAction' where action_p
 UPDATE res_attachments SET attachment_type = 'acknowledgement_record_management' WHERE attachment_type = 'simple_attachment' AND format = 'xml' AND title = 'Accusé de réception' AND relation = 1 AND status = 'TRA';
 UPDATE res_attachments SET attachment_type = 'reply_record_management' WHERE attachment_type = 'simple_attachment' AND format = 'xml' AND title = 'Réponse au transfert' AND relation = 1 AND status = 'TRA';
 
+ALTER TABLE res_letterbox DROP COLUMN IF EXISTS retention_frozen;
+ALTER TABLE res_letterbox ADD COLUMN retention_frozen boolean DEFAULT FALSE NOT NULL;
+ALTER TABLE res_letterbox DROP COLUMN IF EXISTS binding;
+ALTER TABLE res_letterbox ADD COLUMN binding boolean;
+
+DELETE FROM parameters WHERE id = 'bindingDocumentFinalAction';
+INSERT INTO parameters (id, param_value_string) VALUES ('bindingDocumentFinalAction', 'copy');
+DELETE FROM parameters WHERE id = 'nonBindingDocumentFinalAction';
+INSERT INTO parameters (id, param_value_string) VALUES ('nonBindingDocumentFinalAction', 'delete');
+
 /* CUSTOM FIELDS */
 ALTER TABLE custom_fields DROP COLUMN IF EXISTS mode;
 DROP TYPE IF EXISTS custom_fields_modes;
@@ -347,6 +357,8 @@ SELECT r.res_id,
        r.locker_user_id,
        r.locker_time,
        r.custom_fields,
+       r.retention_frozen,
+       r.binding,
        en.entity_label,
        en.entity_type AS entitytype
 FROM doctypes d,

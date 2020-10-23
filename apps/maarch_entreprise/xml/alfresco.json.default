@@ -1,7 +1,11 @@
 {
     "mapping": {
-        "cm:name": "subject",
-        "cm:title": "subject",
-        "cm:description": "alt_identifier"
+        "document" : {
+            "cm:title": "subject",
+            "cm:description": "alt_identifier"
+        },
+        "attachment" : {
+            "cm:name": "title"
+        }
     }
 }

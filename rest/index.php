@@ -33,18 +33,20 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
     $currentMethod = empty($route) ? '' : $route->getMethods()[0];
     $currentRoute = empty($route) ? '' : $route->getPattern();
     if (!in_array($currentMethod.$currentRoute, \SrcCore\controllers\AuthenticationController::ROUTES_WITHOUT_AUTHENTICATION)) {
-        $authorizationHeaders = $request->getHeader('Authorization');
-        $userId = \SrcCore\controllers\AuthenticationController::authentication($authorizationHeaders);
-        if (!empty($userId)) {
-            \SrcCore\controllers\CoreController::setGlobals(['userId' => $userId]);
-            if (!empty($currentRoute)) {
-                $r = \SrcCore\controllers\AuthenticationController::isRouteAvailable(['userId' => $userId, 'currentRoute' => $currentRoute, 'currentMethod' => $currentMethod]);
-                if (!$r['isRouteAvailable']) {
-                    return $response->withStatus(403)->withJson(['errors' => $r['errors']]);
+        if (!\SrcCore\controllers\AuthenticationController::canAccessInstallerWhitoutAuthentication(['route' => $currentMethod.$currentRoute])) {
+            $authorizationHeaders = $request->getHeader('Authorization');
+            $userId = \SrcCore\controllers\AuthenticationController::authentication($authorizationHeaders);
+            if (!empty($userId)) {
+                \SrcCore\controllers\CoreController::setGlobals(['userId' => $userId]);
+                if (!empty($currentRoute)) {
+                    $r = \SrcCore\controllers\AuthenticationController::isRouteAvailable(['userId' => $userId, 'currentRoute' => $currentRoute, 'currentMethod' => $currentMethod]);
+                    if (!$r['isRouteAvailable']) {
+                        return $response->withStatus(403)->withJson(['errors' => $r['errors']]);
+                    }
                 }
+            } else {
+                return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
             }
-        } else {
-            return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
         }
     }
     $response = $next($request, $response);
@@ -320,6 +322,7 @@ $app->get('/installer/databaseConnection', \SrcCore\controllers\InstallerControl
 $app->get('/installer/sqlDataFiles', \SrcCore\controllers\InstallerController::class . ':getSQLDataFiles');
 $app->get('/installer/docservers', \SrcCore\controllers\InstallerController::class . ':checkDocservers');
 $app->get('/installer/custom', \SrcCore\controllers\InstallerController::class . ':checkCustomName');
+$app->get('/installer/customs', \SrcCore\controllers\InstallerController::class . ':getCustoms');
 $app->post('/installer/custom', \SrcCore\controllers\InstallerController::class . ':createCustom');
 $app->post('/installer/database', \SrcCore\controllers\InstallerController::class . ':createDatabase');
 $app->post('/installer/docservers', \SrcCore\controllers\InstallerController::class . ':createDocservers');
@@ -629,6 +632,8 @@ $app->post('/collaboraOnline/encodedFile', \ContentManagement\controllers\Collab
 // Archival
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkSendToRecordManagement', \ExportSeda\controllers\SedaController::class . ':checkSendToRecordManagement');
 $app->get('/archival/retentionRules', \ExportSeda\controllers\SedaController::class . ':getRetentionRules');
+$app->put('/archival/binding', \ExportSeda\controllers\SedaController::class . ':setBindingDocument');
+$app->put('/archival/freezeRetentionRule', \ExportSeda\controllers\SedaController::class . ':freezeRetentionRule');
 
 // Registered mail
 $app->get('/registeredMail/sites', \RegisteredMail\controllers\IssuingSiteController::class . ':get');

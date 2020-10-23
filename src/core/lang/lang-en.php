@@ -465,6 +465,18 @@ define("_DOC_ADD_TO_SIGNATORY_BOOK", "Mail added to signatory book");
 define("_DOC_REMOVE_FROM_SIGNATORY_BOOK", "Mail removed from signatory book");
 define("_DOC_ADD_TO_MAILEVA", "Mail added to Maileva shippings");
 define("_DOC_REMOVE_FROM_MAILEVA", "Mail removed from Maileva shippings");
+define("_RESET_BINDING_DOCUMENT", "Reset document binding");
+define("_SET_BINDING_DOCUMENT", "Set document as binging");
+define("_SET_NON_BINDING_DOCUMENT", "Set document as non binding");
+define("_RETENTION_RULE_FROZEN", "Retention rule frozen");
+define("_BINDING_DOCUMENT", "Binding document");
+define("_YES", "Yes");
+define("_NO", "No");
+define("_RESET_BINDING_DOCUMENT", "Reset binding document");
+define("_SET_BINDING_DOCUMENT", "Mail was set as binding");
+define("_SET_NON_BINDING_DOCUMENT", "Mail was set as non binding");
+define("_FREEZE_RETENTION_RULE", "Retention rule frozen");
+define("_UNFREEZE_RETENTION_RULE", "Retention rule unfrozen");
 
 define("_ISSUING_SITE_CREATED", "Issuing site created");
 define("_ISSUING_SITE_UPDATED", "Issuing site updated");

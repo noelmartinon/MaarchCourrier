@@ -36,6 +36,7 @@
         "certificateSSL": "",
         "userAgent": "service",
         "statusReplyReceived": "REPLY_SEDA",
+        "statusMailToPurge": "REPLY_SEDA",
         "externalSAE": {
             "retentionRules": [
                 {

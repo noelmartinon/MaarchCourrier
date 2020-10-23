@@ -26,7 +26,11 @@ class ConfigurationController
 {
     public function getByPrivilege(Request $request, Response $response, array $args)
     {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => $args['privilege'], 'userId' => $GLOBALS['id']])) {
+        if (in_array($args['privilege'], ['admin_sso'])) {
+            if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_connections', 'userId' => $GLOBALS['id']])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+            }
+        } elseif (!PrivilegeController::hasPrivilege(['privilegeId' => $args['privilege'], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
@@ -44,7 +48,11 @@ class ConfigurationController
 
     public function update(Request $request, Response $response, array $args)
     {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => $args['privilege'], 'userId' => $GLOBALS['id']])) {
+        if (in_array($args['privilege'], ['admin_sso'])) {
+            if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_connections', 'userId' => $GLOBALS['id']])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+            }
+        } elseif (!PrivilegeController::hasPrivilege(['privilegeId' => $args['privilege'], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
@@ -93,6 +101,21 @@ class ConfigurationController
             }
 
             $data = ['listDisplay' => $data['listDisplay'], 'listEvent' => $data['listEvent']];
+        } elseif ($args['privilege'] == 'admin_sso') {
+            if (!empty($data['url']) && !Validator::stringType()->validate($data['url'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body url is empty or not a string']);
+            }
+            if (!Validator::notEmpty()->arrayType()->validate($data['mapping'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body mapping is empty or not an array']);
+            }
+            foreach ($data['mapping'] as $key => $mapping) {
+                if (!Validator::notEmpty()->stringType()->validate($mapping['ssoId'])) {
+                    return $response->withStatus(400)->withJson(['errors' => "Body mapping[$key]['ssoId'] is empty or not a string"]);
+                }
+                if (!Validator::notEmpty()->stringType()->validate($mapping['maarchId'])) {
+                    return $response->withStatus(400)->withJson(['errors' => "Body mapping[$key]['maarchId'] is empty or not a string"]);
+                }
+            }
         }
 
         $data = json_encode($data);

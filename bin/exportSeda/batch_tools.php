@@ -140,39 +140,6 @@ function Bt_writeLog($args = [])
     ]);
 }
 
-function Bt_createAttachment($args = [])
-{
-    $opts = [
-        CURLOPT_URL => rtrim($GLOBALS['applicationUrl'], "/") . '/rest/attachments',
-        CURLOPT_HTTPHEADER => [
-            'accept:application/json',
-            'content-type:application/json',
-            'Authorization: Basic ' . base64_encode($GLOBALS['userWS']. ':' .$GLOBALS['passwordWS']),
-        ],
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_SSL_VERIFYPEER => false,
-        CURLOPT_POSTFIELDS => json_encode($args),
-        CURLOPT_POST => true
-    ];
-
-    $curl = curl_init();
-    curl_setopt_array($curl, $opts);
-    $rawResponse = curl_exec($curl);
-    $error       = curl_error($curl);
-    if (!empty($error)) {
-        Bt_writeLog(['level' => 'ERROR', 'message' => $error]);
-        exit;
-    }
-
-    $return = json_decode($rawResponse, true);
-    if (!empty($return['errors'])) {
-        Bt_writeLog(['level' => 'ERROR', 'message' => $return['errors']]);
-        exit;
-    }
-
-    return $return;
-}
-
 function Bt_getReply($args = [])
 {
     $refEncode = str_replace('.', '%2E', urlencode($args['reference']));
@@ -194,4 +161,166 @@ function Bt_getReply($args = [])
     }
 
     return ['response' => $curlResponse['response']];
+}
+
+function Bt_purgeAll($args = [])
+{
+    if (!empty($args['resources'])) {
+        $resources = \SrcCore\models\DatabaseModel::select([
+            'select'    => ['d.path_template', 'r.path', 'r.filename'],
+            'table'     => ['res_letterbox r', 'docservers d'],
+            'left_join' => ['r.docserver_id = d.docserver_id'],
+            'where'     => ['res_id in (?)'],
+            'data'      => [$args['resources']]
+        ]);
+        foreach ($resources as $resource) {
+            $pathToDocument = $resource['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $resource['path']) . $resource['filename'];
+            if (is_file($pathToDocument)) {
+                unlink($pathToDocument);
+            }
+        }
+    
+        $resources = \SrcCore\models\DatabaseModel::select([
+            'select'    => ['d.path_template', 'r.path', 'r.filename'],
+            'table'     => ['res_attachments r', 'docservers d'],
+            'left_join' => ['r.docserver_id = d.docserver_id'],
+            'where'     => ['res_id in (?)'],
+            'data'      => [$args['resources']]
+        ]);
+        foreach ($resources as $resource) {
+            $pathToDocument = $resource['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $resource['path']) . $resource['filename'];
+            if (is_file($pathToDocument)) {
+                unlink($pathToDocument);
+            }
+        }
+    
+        $resources = \SrcCore\models\DatabaseModel::select([
+            'select'    => ['d.path_template', 'adrpath', 'adrfilename'],
+            'table'     => ['adr_letterbox adr', 'docservers d'],
+            'left_join' => ['adrdocserver_id = d.docserver_id'],
+            'where'     => ['res_id in (?)'],
+            'data'      => [$args['resources']]
+        ]);
+        foreach ($resources as $resource) {
+            $pathToDocument = $resource['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $resource['path']) . $resource['filename'];
+            if (is_file($pathToDocument)) {
+                unlink($pathToDocument);
+            }
+        }
+    
+        $resources = \SrcCore\models\DatabaseModel::select([
+            'select'    => ['d.path_template', 'adrpath', 'adrfilename'],
+            'table'     => ['adr_attachments', 'docservers d'],
+            'left_join' => ['adrdocserver_id = d.docserver_id'],
+            'where'     => ['res_id in (?)'],
+            'data'      => [$args['resources']]
+        ]);
+        foreach ($resources as $resource) {
+            $pathToDocument = $resource['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $resource['path']) . $resource['filename'];
+            if (is_file($pathToDocument)) {
+                unlink($pathToDocument);
+            }
+        }
+    
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'adr_letterbox',
+            'where' => ['res_id in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'acknowledgement_receipts',
+            'where' => ['res_id in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'listinstance',
+            'where' => ['res_id in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'listinstance_history',
+            'where' => ['res_id in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'listinstance_history_details',
+            'where' => ['res_id in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'registered_mail_resources',
+            'where' => ['res_id in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'res_letterbox',
+            'where' => ['res_id in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'res_mark_as_read',
+            'where' => ['res_id in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'resource_contacts',
+            'where' => ['res_id in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'resources_folders',
+            'where' => ['res_id in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'resources_tags',
+            'where' => ['res_id in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'unit_identifier',
+            'where' => ['res_id in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'users_followed_resources',
+            'where' => ['res_id in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'message_exchange',
+            'where' => ['res_id_master in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'res_attachments',
+            'where' => ['res_id_master in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'shippings',
+            'where' => ['document_id in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'notes',
+            'where' => ['identifier in (?)'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'note_entities',
+            'where' => ['note_id in (select id from notes where identifier in (?))'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'adr_attachments',
+            'where' => ['res_id in (select res_id from res_attachments where res_id_master in (?))'],
+            'data'  => [$args['resources']]
+        ]);
+        \SrcCore\models\DatabaseModel::delete([
+            'table' => 'emails',
+            'where' => ['document->>\''.$args['resources'].'\''],
+            'data'  => []
+        ]);
+    }
 }

@@ -154,6 +154,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
     hasContact: boolean = false;
 
     resourceFollowed: boolean = false;
+    resourceFreezed: boolean = false;
+    resourceBinded: boolean = false;
 
     constructor(
         public translate: TranslateService,
@@ -238,7 +240,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
         this.currentResourceInformations = {
             resId: params['resId'],
-            mailtracking: false
+            mailtracking: false,
         };
 
         this.headerService.sideBarButton = {
@@ -291,7 +293,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
         this.detailMode = true;
         this.currentResourceInformations = {
             resId: params['detailResId'],
-            mailtracking: false
+            mailtracking: false,
+            retentionFrozen : false
         };
         this.headerService.sideBarButton = {
             icon: 'fas fa-arrow-left',
@@ -320,6 +323,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
             tap((data: any) => {
                 this.currentResourceInformations = data;
                 this.resourceFollowed = data.followed;
+                this.resourceBinded = data.binding;
+                this.resourceFreezed = data.retentionFrozen;
                 if (this.currentResourceInformations.categoryId !== 'outgoing') {
                     this.loadSenders();
                 } else {
@@ -831,6 +836,44 @@ export class ProcessComponent implements OnInit, OnDestroy {
                 })
             ).subscribe();
         }
+    }
+
+    toggleFreezing() {
+        this.resourceFreezed = !this.resourceFreezed;
+            this.http.put('../rest/archival/freezeRetentionRule', { resources: [this.currentResourceInformations.resId], freeze : this.resourceFreezed }).pipe(
+                tap(() => {
+                    if (this.resourceFreezed) {
+                        this.notify.success(this.translate.instant('lang.retentionRuleFrozen'));
+                    } else {
+                        this.notify.success(this.translate.instant('lang.retentionRuleThawed'));
+                    }
+                }
+                ),
+                catchError((err: any) => {
+                    this.resourceFreezed = !this.resourceFreezed;
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+    }
+
+    toggleBinding() {
+        this.resourceBinded = !this.resourceBinded;
+        this.http.put('../rest/archival/binding', { resources: [this.currentResourceInformations.resId], binding : this.resourceBinded }).pipe(
+            tap(() => {
+                if (this.resourceBinded) {
+                    this.notify.success(this.translate.instant('lang.bindingMail'));
+                } else {
+                    this.notify.success(this.translate.instant('lang.noBindingMal'));
+                }
+            }
+            ),
+            catchError((err: any) => {
+                this.resourceBinded = !this.resourceBinded;
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     isToolEnabled(id: string) {

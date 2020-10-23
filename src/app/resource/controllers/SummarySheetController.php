@@ -91,9 +91,7 @@ class SummarySheetController
                         'arrivalDate'  => 'admission_date',
                         'initiator'    => 'initiator'
                     ];
-                    $select[]    = 'type_label';
-                    $select[]    = 'creation_date';
-                    $select[]    = 'typist';
+                    $select = array_merge($select, ['type_label', 'creation_date', 'typist']);
 
                     foreach ($information as $key => $item) {
                         if (in_array($key, $fieldsIdentifier)) {
@@ -105,8 +103,7 @@ class SummarySheetController
                         'priority'         => 'priority',
                         'processLimitDate' => 'process_limit_date',
                     ];
-                    $select[] = 'category_id';
-                    $select[] = 'status';
+                    $select = array_merge($select, ['category_id', 'status', 'retention_frozen', 'binding']);
 
                     foreach ($information as $key => $item) {
                         if (in_array($key, $fieldsIdentifier)) {
@@ -272,6 +269,14 @@ class SummarySheetController
                 $status = StatusModel::getById(['id' => $resource['status'], 'select' => ['label_status']]);
                 $status = empty($status['label_status']) ? '<i>' . _UNDEFINED . '</i>' : "<b>{$status['label_status']}</b>";
 
+                $retentionRuleFrozen = empty($resource['retention_frozen']) ? '<b>' . _NO . '</b>' : '<b>' . _YES . '</b>';
+
+                if (!isset($resource['binding'])) {
+                    $binding = '<i>' . _UNDEFINED . '</i>';
+                } else {
+                    $binding = empty($resource['binding']) ? '<b>' . _NO . '</b>' : '<b>' . _YES . '</b>';
+                }
+
                 $priority = null;
                 if (in_array('priority', $fieldsIdentifier)) {
                     $priority = '';
@@ -329,6 +334,9 @@ class SummarySheetController
                 $pdf->MultiCell($widthNotes, 30, _CATEGORY . " : {$category}", 1, 'L', false, 0, '', '', true, 0, true);
 
                 $pdf->MultiCell($widthNotes, 30, _STATUS . " : {$status}", 1, 'L', false, 1, '', '', true, 0, true);
+
+                $pdf->MultiCell($widthNotes, 30, _RETENTION_RULE_FROZEN . " : {$retentionRuleFrozen}", 1, 'L', false, 0, '', '', true, 0, true);
+                $pdf->MultiCell($widthNotes, 30, _BINDING_DOCUMENT . " : {$binding}", 1, 'L', false, 1, '', '', true, 0, true);
 
                 $nextLine = 1;
                 if (isset($priority)) {

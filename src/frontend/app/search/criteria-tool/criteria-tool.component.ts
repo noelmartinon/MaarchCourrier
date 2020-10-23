@@ -143,7 +143,7 @@ export class CriteriaToolComponent implements OnInit {
     }
 
     isCurrentCriteriaById(criteriaIds: string[]) {
-        return this.currentCriteria.filter((currCrit: any) => criteriaIds.indexOf(currCrit.identifier) === 0).length > 0;
+        return this.currentCriteria.filter((currCrit: any) => criteriaIds.indexOf(currCrit.identifier) > -1).length > 0;
     }
 
 
@@ -310,6 +310,10 @@ export class CriteriaToolComponent implements OnInit {
                 } else {
                     field.control.setValue(criteria[field.identifier].values);
                 }
+            }
+
+            if ((['recipients', 'senders'].indexOf(field.identifier) > -1 || field.type === 'contact') &&  this.functions.empty(criteria[field.identifier].values)) {
+                this.appContactAutocomplete.toArray().filter((component: any) => component.id === field.identifier)[0].resetInputValue();
             }
         });
 

@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
 import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
 import { FormControl } from '@angular/forms';
-import { catchError, map, tap, elementAt } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AlertComponent } from '../../plugins/modal/alert.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -36,17 +36,17 @@ export class DiffusionsListComponent implements OnInit {
     /**
      * Ressource identifier to load listinstance (Incompatible with templateId)
      */
-    @Input('resId') resId: number = null;
+    @Input() resId: number = null;
 
     /**
      * Add previous dest in copy (Only compatible with resId)
      */
-    @Input('keepDestForRedirection') keepDestForRedirection: boolean = false;
+    @Input() keepDestForRedirection: boolean = false;
 
     /**
      * Entity identifier to load listModel of entity (Incompatible with resId)
      */
-    @Input('entityId') entityId: any = null;
+    @Input() entityId: any = null;
 
     /**
      * To specify the context to load listModel
@@ -61,17 +61,22 @@ export class DiffusionsListComponent implements OnInit {
     /**
      * For manage current loaded list
      */
-    @Input('adminMode') adminMode: boolean = false;
+    @Input() adminMode: boolean = false;
 
     /**
      * Ids of related allowed entities perimeters
      */
-    @Input('allowedEntities') allowedEntities: number[] = [];
+    @Input() allowedEntities: number[] = [];
 
     /**
      * Expand all roles
      */
-    @Input('expanded') expanded: boolean = false;
+    @Input() expanded: boolean = false;
+
+    /**
+     * Custom diffusion to display
+     */
+    @Input() customDiffusion: any[] = [false];
 
     /**
      * To load privilege of current list management
@@ -80,17 +85,17 @@ export class DiffusionsListComponent implements OnInit {
      * @param process
      * @param redirect
      */
-    @Input('target') target: string = '';
+    @Input() target: string = '';
 
     /**
      * FormControl to use this component in form
      */
-    @Input('diffFormControl') diffFormControl: FormControl;
+    @Input() diffFormControl: FormControl;
 
     /**
      * Catch external event after select an element in autocomplete
      */
-    @Output('triggerEvent') triggerEvent = new EventEmitter();
+    @Output() triggerEvent = new EventEmitter();
 
     constructor(
         public translate: TranslateService,
@@ -106,8 +111,10 @@ export class DiffusionsListComponent implements OnInit {
         await this.initRoles();
         if (this.resId !== null && this.resId != 0 && this.target !== 'redirect') {
             this.loadListinstance(this.resId);
-        } else if ((this.resId === null || this.resId == 0) && !this.functions.empty(this.entityId)) {
+        } else if (((this.resId === null || this.resId == 0) && !this.functions.empty(this.entityId)) && this.customDiffusion.length === 0) {
             this.loadListModel(this.entityId, false, this.selfDest);
+        } else if (this.customDiffusion.length > 0) {
+            this.loadCustomDiffusion();
         }
         this.loading = false;
     }
@@ -129,6 +136,30 @@ export class DiffusionsListComponent implements OnInit {
 
     allPredicate() {
         return true;
+    }
+
+    loadCustomDiffusion() {
+        const roles = [...new Set(this.customDiffusion.map(item => item.mode))];
+
+        roles.forEach(role => {
+            this.diffList[role].items = this.customDiffusion.filter((item: any) => item.mode === role).map((item: any) => {
+                return {
+                    item_mode: role,
+                    item_type: item.type,
+                    itemSerialId: item.id,
+                    itemId: '',
+                    itemLabel: item.labelToDisplay,
+                    itemSubLabel: item.descriptionToDisplay,
+                    difflist_type: 'entity_id',
+                    process_date: null,
+                    process_comment: null,
+                };
+            });
+        });
+
+        if (this.diffFormControl !== undefined) {
+            this.setFormValues();
+        }
     }
 
     async loadListModel(entityId: number, destResource: boolean = false, destCurrentUser: boolean = false) {

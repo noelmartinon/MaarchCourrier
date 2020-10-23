@@ -353,6 +353,26 @@ export class IndexingFieldsService {
             enabled: true,
             indexingHide: true
         },
+        {
+            identifier: 'retentionFrozen',
+            label: this.translate.instant('lang.retentionRuleFrozen'),
+            icon: 'fa-snowflake',
+            type: 'select',
+            default_value: [],
+            values: [{ 'id': true, 'label': this.translate.instant('lang.yes') }, { 'id': false, 'label': this.translate.instant('lang.no') }],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'binding',
+            label: this.translate.instant('lang.bindingMail'),
+            icon: 'fa-exclamation',
+            type: 'select',
+            default_value: [],
+            values: [{ 'id': true, 'label': this.translate.instant('lang.yes') }, { 'id': false, 'label': this.translate.instant('lang.no') }],
+            enabled: true,
+            indexingHide: true
+        }
     ];
 
     customFields: any[] = [];

@@ -918,6 +918,8 @@ CREATE TABLE res_letterbox
   integrations jsonb DEFAULT '{}' NOT NULL,
   custom_fields jsonb,
   linked_resources jsonb NOT NULL DEFAULT '[]',
+  retention_frozen boolean DEFAULT FALSE NOT NULL,
+  binding boolean,
   CONSTRAINT res_letterbox_pkey PRIMARY KEY  (res_id)
 )
 WITH (OIDS=FALSE);
@@ -1106,6 +1108,8 @@ SELECT r.res_id,
        r.locker_user_id,
        r.locker_time,
        r.custom_fields,
+       r.retention_frozen,
+       r.binding,
        en.entity_label,
        en.entity_type AS entitytype
 FROM doctypes d,

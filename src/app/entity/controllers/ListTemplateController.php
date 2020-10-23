@@ -54,11 +54,16 @@ class ListTemplateController
 
         $listTemplateItems = ListTemplateItemModel::get(['select' => ['*'], 'where' => ['list_template_id = ?'], 'data' => [$args['id']]]);
         foreach ($listTemplateItems as $key => $value) {
+            $listTemplateItems[$key]['isValid'] = true;
             if ($value['item_type'] == 'entity') {
                 $listTemplateItems[$key]['idToDisplay'] = EntityModel::getById(['id' => $value['item_id'], 'select' => ['entity_label']])['entity_label'];
                 $listTemplateItems[$key]['descriptionToDisplay'] = '';
             } else {
-                $listTemplateItems[$key]['idToDisplay'] = UserModel::getLabelledUserById(['id' => $value['item_id']]);
+                $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['firstname', 'lastname', 'status']]);
+                if (empty($user) || in_array($user['status'], ['SPD', 'DEL'])) {
+                    $listTemplateItems[$key]['isValid'] = false;
+                }
+                $listTemplateItems[$key]['idToDisplay'] = "{$user['firstname']} {$user['lastname']}";
                 $listTemplateItems[$key]['descriptionToDisplay'] = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entity_label']])['entity_label'];
             }
             $listTemplateItems[$key]['hasPrivilege'] = true;
@@ -320,10 +325,14 @@ class ListTemplateController
             $listTemplateItems = ListTemplateItemModel::get(['select' => ['*'], 'where' => ['list_template_id = ?'], 'data' => [$listTemplate['id']]]);
             foreach ($listTemplateItems as $itemKey => $value) {
                 if ($value['item_type'] == 'entity') {
-                    $listTemplateItems[$itemKey]['labelToDisplay'] = Entitymodel::getById(['id' => $value['item_id'], 'select' => ['entity_label']])['entity_label'];
+                    $listTemplateItems[$itemKey]['labelToDisplay'] = EntityModel::getById(['id' => $value['item_id'], 'select' => ['entity_label']])['entity_label'];
                     $listTemplateItems[$itemKey]['descriptionToDisplay'] = '';
                 } else {
-                    $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['firstname', 'lastname', 'external_id']]);
+                    $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['firstname', 'lastname', 'external_id', 'status']]);
+                    $listTemplateItems[$itemKey]['isValid'] = true;
+                    if (empty($user) || in_array($user['status'], ['SPD', 'DEL'])) {
+                        $listTemplateItems[$itemKey]['isValid'] = false;
+                    }
 
                     $listTemplateItems[$itemKey]['labelToDisplay'] = "{$user['firstname']} {$user['lastname']}";
                     if (empty($queryParams['maarchParapheur'])) {
@@ -421,7 +430,7 @@ class ListTemplateController
             $type = $aArgs['typeId'] == 'entity_id' ? 'diffusionList' : ($aArgs['typeId'] == 'VISA_CIRCUIT' ? 'visaCircuit' : 'opinionCircuit');
             $listTemplates = ListTemplateModel::getWithItems(['select' => ['DISTINCT entity_id'], 'where' => ['type = ?', 'item_mode = ?', 'entity_id is not null'], 'data' => [$type, $roles[$key]['id']]]);
             foreach ($listTemplates as $listTemplate) {
-                $entity = Entitymodel::getById(['select' => ['short_label'], 'id' => $listTemplate['entity_id']]);
+                $entity = EntityModel::getById(['select' => ['short_label'], 'id' => $listTemplate['entity_id']]);
                 $roles[$key]['usedIn'][] = $entity['short_label'];
             }
         }
@@ -606,7 +615,13 @@ class ListTemplateController
 
         $listTemplateItems = ListTemplateItemModel::get(['select' => ['*'], 'where' => ['list_template_id = ?'], 'data' => [$circuit['id']]]);
         foreach ($listTemplateItems as $key => $value) {
-            $listTemplateItems[$key]['labelToDisplay'] = UserModel::getLabelledUserById(['id' => $value['item_id']]);
+            $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['firstname', 'lastname', 'status']]);
+            $listTemplateItems[$key]['isValid'] = true;
+            if (empty($user) || in_array($user['status'], ['SPD', 'DEL'])) {
+                $listTemplateItems[$key]['isValid'] = false;
+            }
+
+            $listTemplateItems[$key]['labelToDisplay'] = "{$user['firstname']} {$user['lastname']}";
             $listTemplateItems[$key]['descriptionToDisplay'] = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entity_label']])['entity_label'];
 
             $listTemplateItems[$key]['hasPrivilege'] = true;
@@ -646,6 +661,12 @@ class ListTemplateController
                 $entities = array_column($entities, 'id');
                 if (!in_array($args['entityId'], $entities)) {
                     return ['errors' => 'Dest user is not present in this entity'];
+                }
+            }
+            if ($item['type'] == 'user') {
+                $user = UserModel::getById(['id' => $item['id'], 'select' => ['status']]);
+                if ($user == 'SPD' || $user == 'DEL') {
+                    return ['errors' => 'Item user is not valid'];
                 }
             }
             if ($args['type'] == 'visaCircuit' && !PrivilegeController::hasPrivilege(['privilegeId' => 'visa_documents', 'userId' => $item['id']]) && !PrivilegeController::hasPrivilege(['privilegeId' => 'sign_document', 'userId' => $item['id']])) {

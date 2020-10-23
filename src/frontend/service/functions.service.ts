@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { LatinisePipe } from 'ngx-pipes';
-import { AuthService } from './auth.service';
 import { HeaderService } from './header.service';
 import { TimeLimitPipe } from '../plugins/timeLimit.pipe';
 
@@ -12,7 +11,6 @@ export class FunctionsService {
 
     constructor(
         public translate: TranslateService,
-        private authService: AuthService,
         private headerService: HeaderService,
         private latinisePipe: LatinisePipe,
     ) { }
@@ -126,44 +124,19 @@ export class FunctionsService {
         return filterReturn;
     }
 
-    debug(msg: string, route: string) {
-        let info: any = {
-            route : route,
-            session : 'No user logged !',
-            refreshSession : 'No user logged !',
-            user : 'No user logged !'
-        };
-        if (this.authService.getToken() != null) {
-            info = {
-                route : route,
-                session : {
-                    id : this.authService.getAppSession(),
-                    expireIn : new Date((JSON.parse(atob(this.authService.getToken().split('.')[1])).exp) * 1000)
-                },
-                refreshSession : {
-                    id : this.authService.getAppSession(),
-                    expireIn : new Date((JSON.parse(atob(this.authService.getRefreshToken().split('.')[1])).exp) * 1000)
-                },
-                user : this.headerService.user,
-            };
-        }
-
-        if (msg !== '') {
-            console.log(msg, info);
-        } else {
-            console.log(info);
-        }
-    }
-
     formatBytes(bytes: number, decimals = 2) {
-        if (bytes === 0) { return '0 Octet'; }
+        if (typeof bytes === 'number') {
+            if (bytes === 0) { return '0 Octet'; }
 
-        const k = 1024;
-        const dm = decimals < 0 ? 0 : decimals;
-        const sizes = ['Octets', 'KO', 'MO', 'GO', 'TO', 'PO', 'EO', 'ZO', 'YO'];
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Octets', 'KO', 'MO', 'GO', 'TO', 'PO', 'EO', 'ZO', 'YO'];
 
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        } else {
+            return bytes;
+        }
     }
 }

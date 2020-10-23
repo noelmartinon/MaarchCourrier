@@ -26,7 +26,7 @@ class IncludeFileError extends Exception
 }
 
 // Globals variables definition
-$GLOBALS['batchName']    = 'checkAllRepliesFromArchivingSystem';
+$GLOBALS['batchName']    = 'checkRepliesFromArchivingSystem';
 $GLOBALS['wb']           = '';
 $totalProcessedResources = 0;
 
@@ -114,20 +114,21 @@ Bt_writeLog(['level' => 'INFO', 'message' => 'Retrieve mail sent to archiving sy
 
 $acknowledgements = \Attachment\models\AttachmentModel::get([
     'select' => ['res_id_master'],
-    'where'  => ['attachment_type = ?'],
-    'data'   => ['acknowledgement_record_management']
+    'where'  => ['attachment_type = ?', 'status = ?'],
+    'data'   => ['acknowledgement_record_management', 'TRA']
 ]);
 $acknowledgements = array_column($acknowledgements, 'res_id_master');
 
 $replies = \Attachment\models\AttachmentModel::get([
     'select' => ['res_id_master'],
-    'where'  => ['attachment_type = ?'],
-    'data'   => ['reply_record_management']
+    'where'  => ['attachment_type = ?', 'status = ?'],
+    'data'   => ['reply_record_management', 'TRA']
 ]);
 $replies = array_column($replies, 'res_id_master');
 $pendingResources = array_diff($acknowledgements, $replies);
 
 $unitIdentifiers = [];
+$nbMailsRetrieved = 0;
 foreach ($pendingResources as $resId) {
     $unitIdentifier = \MessageExchange\models\MessageExchangeModel::getUnitIdentifierByResId(['select' => ['message_id', 'res_id'], 'resId' => (string)$resId]);
     if (empty($unitIdentifier[0]['message_id'])) {
@@ -151,19 +152,30 @@ foreach ($pendingResources as $resId) {
             continue;
         }
 
-        //créer message reply & sauvegarder xml
         $resIds = explode(',', $value);
         $data   = json_decode($messages->replyMessage->data);
 
-        // TODO save reply
-        // $archiveTransferReply = new ArchiveTransferReply();
-        // $archiveTransferReply->receive($data, $resIds);
+        // TODO GET XML
+        $pathToDocument = 'xmlFile';
+
         foreach ($resIds as $resId) {
+            $id = Resource\controllers\StoreController::storeAttachment([
+                'encodedFile'   => base64_encode(file_get_contents($pathToDocument)),
+                'type'          => 'reply_record_management',
+                'resIdMaster'   => $resId,
+                'title'         => 'Réponse au transfert',
+                'format'        => 'xml',
+                'status'        => 'TRA'
+            ]);
+            if (empty($id) || !empty($id['errors'])) {
+                return ['errors' => ['[storeAttachment] ' . $id['errors']]];
+            }
             \Resource\models\ResModel::update([
                 'set'   => ['status' => $GLOBALS['statusReplyReceived']],
                 'where' => ['res_id = ?'],
                 'data'  => [$resId]
             ]);
+            $nbMailsRetrieved++;
         }
     }
 }

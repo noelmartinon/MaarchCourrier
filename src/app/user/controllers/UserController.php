@@ -372,13 +372,13 @@ class UserController
             $formattedLIEntities = [];
             $listInstanceEntities = array_unique($listInstanceEntities);
             foreach ($listInstanceEntities as $listInstanceEntity) {
-                $entity = Entitymodel::getByEntityId(['select' => ['short_label'], 'entityId' => $listInstanceEntity]);
+                $entity = EntityModel::getByEntityId(['select' => ['short_label'], 'entityId' => $listInstanceEntity]);
                 $formattedLIEntities[] = $entity['short_label'];
             }
             $formattedLTEntities = [];
             $listTemplateEntities = array_unique($listTemplateEntities);
             foreach ($listTemplateEntities as $listTemplateEntity) {
-                $entity = Entitymodel::getById(['select' => ['short_label'], 'id' => $listTemplateEntity]);
+                $entity = EntityModel::getById(['select' => ['short_label'], 'id' => $listTemplateEntity]);
                 $formattedLTEntities[] = $entity['short_label'];
             }
 

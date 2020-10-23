@@ -6,6 +6,7 @@ import { of } from 'rxjs';
 import { InstallerService } from '../installer.service';
 import { NotificationService } from '@service/notification/notification.service';
 import { catchError, tap } from 'rxjs/operators';
+import { AuthService } from '@service/auth.service';
 
 @Component({
     selector: 'app-install-action',
@@ -25,7 +26,8 @@ export class InstallActionComponent implements OnInit, AfterViewInit {
         public dialogRef: MatDialogRef<InstallActionComponent>,
         public http: HttpClient,
         private installerService: InstallerService,
-        private notify: NotificationService
+        private notify: NotificationService,
+        private authService: AuthService,
     ) { }
 
     async ngOnInit(): Promise<void> {
@@ -108,6 +110,7 @@ export class InstallActionComponent implements OnInit, AfterViewInit {
     goToInstance() {
         this.http.request('DELETE', '../rest/installer/lock', { body: { customId: this.customId } }).pipe(
             tap((res: any) => {
+                this.authService.noInstall = false;
                 window.location.href = res.url;
                 this.dialogRef.close('ok');
             }),

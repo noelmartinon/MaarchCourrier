@@ -380,4 +380,9 @@ export class ContactAutocompleteComponent implements OnInit {
     getInputValue() {
         return this.myControl.value;
     }
+
+
+    resetInputValue() {
+        this.myControl.setValue('');
+    }
 }

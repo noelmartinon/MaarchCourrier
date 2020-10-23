@@ -62,7 +62,7 @@
             <mat-icon
                 [ngClass]="{'fa fa-user fa-2x': functions.empty(diffusion.picture),'avatar': !functions.empty(diffusion.picture)}"
                 mat-list-icon color="primary"
-                [class.invalid]="!diffusion.hasPrivilege"
+                [class.invalid]="!diffusion.hasPrivilege || !diffusion.isValid"
                 [style.background-image]="!functions.empty(diffusion.picture) ? 'url('+diffusion.picture+')' : ''" style="position: relative;">
                 <i *ngIf="!functions.empty(diffusion.process_comment)" class="far fa-comment-dots commentBubble" [matTooltip]="diffusion.process_comment"></i>
             </mat-icon>
@@ -81,10 +81,10 @@
             </ng-container>
             <div mat-line class="workflowLine">
                 <div class="workflowLineContainer">
-                    <div class="workflowLineLabel" [class.unauthorized]="!diffusion.hasPrivilege">
+                    <div class="workflowLineLabel" [class.unauthorized]="!diffusion.hasPrivilege || !diffusion.isValid">
                         {{diffusion.labelToDisplay}}
                     </div>
-                    <div class="workflowLineSubLabel" [class.unauthorized]="!diffusion.hasPrivilege">
+                    <div class="workflowLineSubLabel" [class.unauthorized]="!diffusion.hasPrivilege || !diffusion.isValid">
                         {{diffusion.item_entity}}
                     </div>
                     <div class="workflowLineSubLabel" *ngIf="(showComment && ((!linkedToMaarchParapheur && adminMode && functions.empty(diffusion.process_date)) || (!linkedToMaarchParapheur && getCurrentVisaUserIndex() === i && !functions.empty(diffusion.process_comment)))) && diffusion.hasPrivilege">
@@ -100,7 +100,7 @@
                             title='{{diffusion.process_date | fullDate}}'
                             color="warn">{{'lang.interrupted' | translate}} {{diffusion.process_date | timeAgo : 'full'}}</div>
                 </div>
-                <div *ngIf="diffusion.hasPrivilege">
+                <div *ngIf="diffusion.hasPrivilege && diffusion.isValid">
                     <button class="currentRoleButton" [color]="diffusion.requested_signature ? 'primary': '' "
                         [disabled]="!canManageUser(diffusion, i)" mat-raised-button
                         title="{{'lang.' + diffusion.currentRole + 'User' | translate}}"
@@ -108,6 +108,9 @@
                 </div>
                 <div *ngIf="!diffusion.hasPrivilege" class="invalid">
                     {{'lang.noPrivileges' | translate}}
+                </div>
+                <div *ngIf="!diffusion.isValid" class="invalid">
+                    {{'lang.userNotValid' | translate}}
                 </div>
             </div>
             <button mat-icon-button *ngIf="canManageUser(diffusion, i)"

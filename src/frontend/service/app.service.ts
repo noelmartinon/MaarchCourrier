@@ -36,44 +36,4 @@ export class AppService {
     setScreenWidth(width: number) {
         this.screenWidth = width;
     }
-
-    applyMinorUpdate() {
-        const loader = '<div id="updateLoading" style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width: 200px;text-align: center;"><img src="assets/spinner.gif"></div>';
-        $('body').append(loader);
-        return new Promise((resolve) => {
-            this.http.put('../rest/versionsUpdateSQL', {}).pipe(
-                tap((data: any) => {
-                    resolve(true);
-                    $('#updateLoading').remove();
-                }),
-                finalize(() => $('#updateLoading').remove()),
-                catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
-                    resolve(true);
-                    return of(false);
-                })
-            ).subscribe();
-        });
-    }
-
-    checkAppSecurity() {
-        this.authService.catchEvent().subscribe((result: any) => {
-            if (result === 'authenticationInformations') {
-                if (this.authService.changeKey) {
-                    setTimeout(() => {
-                        this.dialog.open(AlertComponent, {
-                            panelClass: 'maarch-modal',
-                            autoFocus: false,
-                            disableClose: true,
-                            data: {
-                                mode: 'danger',
-                                title: this.translate.instant('lang.warnPrivateKeyTitle'),
-                                msg: this.translate.instant('lang.warnPrivateKey')
-                            }
-                        });
-                    }, 1000);
-                }
-            }
-        });
-    }
 }

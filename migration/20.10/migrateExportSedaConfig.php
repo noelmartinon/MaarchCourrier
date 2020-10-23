@@ -48,12 +48,16 @@ foreach ($customs as $custom) {
             $exportSeda['certificateSSL']      = (string)$loadedExportSedaXml->CONFIG->certificateSSL;
             $exportSeda['userAgent']           = (string)$loadedExportSedaXml->CONFIG->userAgent;
             $exportSeda['statusReplyReceived'] = 'REPLY_SEDA';
+            $exportSeda['statusMailToPurge']   = 'REPLY_SEDA';
             $exportSeda['M2M']['gec']          = 'maarch_courrier';
             $file['exportSeda'] = $exportSeda;
 
             $fp = fopen($configPath, 'w+');
             fwrite($fp, json_encode($file, JSON_PRETTY_PRINT));
             fclose($fp);
+
+            createScriptGetAllReplies();
+            createScriptPurge();
 
             $migrated++;
         }
@@ -65,3 +69,63 @@ foreach ($nonReadableFiles as $file) {
 }
 
 printf($migrated . " custom(s) avec config.xml (export seda) trouvé(s) et migré(s).\n");
+
+function createScriptGetAllReplies()
+{
+    $corePath = str_replace('migration/20.10', '', __DIR__);
+    $config   = $corePath . \SrcCore\models\CoreConfigModel::getConfigPath();
+
+    if (!empty($GLOBALS['customId'])) {
+        $folderScript = $corePath.'custom/'.$GLOBALS['customId'].'/bin/exportSeda/scripts/';
+        if (!file_exists($folderScript)) {
+            mkdir($folderScript, 0777, true);
+        }
+        $scriptPath = $folderScript . 'checkAllReplies.sh';
+    } else {
+        $scriptPath = $corePath.'bin/exportSeda/scripts/checkAllReplies.sh';
+    }
+    $fileToOpen = fopen($scriptPath, 'w+');
+
+    fwrite($fileToOpen, '#!/bin/sh');
+    fwrite($fileToOpen, "\n");
+    fwrite($fileToOpen, 'cd ' . $corePath . 'bin/exportSeda/');
+    fwrite($fileToOpen, "\n");
+    fwrite($fileToOpen, 'filePath=\''.$corePath.'bin/exportSeda/checkAllReplies.php\'');
+    fwrite($fileToOpen, "\n");
+    fwrite($fileToOpen, 'php $filePath -c ' . $config);
+    fwrite($fileToOpen, "\n");
+    fclose($fileToOpen);
+    shell_exec('chmod +x '. $scriptPath);
+
+    printf("Si le script checkAllReply.php est lancé dans la crontab, il faut modifier le chemin comme ceci : " . $scriptPath . "\n");
+}
+
+function createScriptPurge()
+{
+    $corePath = str_replace('migration/20.10', '', __DIR__);
+    $config   = $corePath . \SrcCore\models\CoreConfigModel::getConfigPath();
+
+    if (!empty($GLOBALS['customId'])) {
+        $folderScript = $corePath.'custom/'.$GLOBALS['customId'].'/bin/exportSeda/scripts/';
+        if (!file_exists($folderScript)) {
+            mkdir($folderScript, 0777, true);
+        }
+        $scriptPath = $folderScript . 'purge.sh';
+    } else {
+        $scriptPath = $corePath.'bin/exportSeda/scripts/purge.sh';
+    }
+    $fileToOpen = fopen($scriptPath, 'w+');
+
+    fwrite($fileToOpen, '#!/bin/sh');
+    fwrite($fileToOpen, "\n");
+    fwrite($fileToOpen, 'cd ' . $corePath . 'bin/exportSeda/');
+    fwrite($fileToOpen, "\n");
+    fwrite($fileToOpen, 'filePath=\''.$corePath.'bin/exportSeda/purge.php\'');
+    fwrite($fileToOpen, "\n");
+    fwrite($fileToOpen, 'php $filePath -c ' . $config);
+    fwrite($fileToOpen, "\n");
+    fclose($fileToOpen);
+    shell_exec('chmod +x '. $scriptPath);
+
+    printf("Si le script Purge.php est lancé dans la crontab, il faut modifier le chemin comme ceci : " . $scriptPath . "\n");
+}

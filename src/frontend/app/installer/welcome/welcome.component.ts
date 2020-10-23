@@ -4,6 +4,9 @@ import { NotificationService } from '@service/notification/notification.service'
 import { TranslateService } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { environment } from '../../../environments/environment';
+import { catchError, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { AuthService } from '@service/auth.service';
 
 
 @Component({
@@ -21,36 +24,39 @@ export class WelcomeComponent implements OnInit {
 
     steps: any[] = [
         {
-            icon : 'fas fa-check-square',
+            icon: 'fas fa-check-square',
             desc: this.translate.instant('lang.prerequisiteCheck')
         },
         {
-            icon : 'fa fa-database',
+            icon: 'fa fa-database',
             desc: this.translate.instant('lang.databaseCreation')
         },
         {
-            icon : 'fa fa-database',
+            icon: 'fa fa-database',
             desc: this.translate.instant('lang.dataSampleCreation')
         },
         {
-            icon : 'fa fa-hdd',
+            icon: 'fa fa-hdd',
             desc: this.translate.instant('lang.docserverCreation')
         },
         {
-            icon : 'fas fa-tools',
+            icon: 'fas fa-tools',
             desc: this.translate.instant('lang.stepCustomizationActionDesc')
         },
         {
-            icon : 'fa fa-user',
+            icon: 'fa fa-user',
             desc: this.translate.instant('lang.adminUserCreation')
         },
     ];
+
+    customs: any = [];
 
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
-        private _formBuilder: FormBuilder
+        private _formBuilder: FormBuilder,
+        private authService: AuthService
     ) { }
 
     ngOnInit(): void {
@@ -59,6 +65,9 @@ export class WelcomeComponent implements OnInit {
         });
 
         this.getLang();
+        if (!this.authService.noInstall) {
+            this.getCustoms();
+        }
     }
 
     getLang() {
@@ -74,6 +83,18 @@ export class WelcomeComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();*/
+    }
+
+    getCustoms() {
+        this.http.get('../rest/installer/customs').pipe(
+            tap((data: any) => {
+                this.customs = data.customs;
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     initStep() {

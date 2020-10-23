@@ -27,14 +27,14 @@ export class IndexingFormComponent implements OnInit {
 
     loading: boolean = true;
 
-    @Input('indexingFormId') indexingFormId: number;
-    @Input('resId') resId: number = null;
-    @Input('groupId') groupId: number;
+    @Input() indexingFormId: number;
+    @Input() resId: number = null;
+    @Input() groupId: number;
     @Input('admin') adminMode: boolean;
-    @Input('canEdit') canEdit: boolean = true;
-    @Input('mode') mode: string = 'indexation';
+    @Input() canEdit: boolean = true;
+    @Input() mode: string = 'indexation';
 
-    @Input('hideDiffusionList') hideDiffusionList: boolean = false;
+    @Input() hideDiffusionList: boolean = false;
 
     @Output() retrieveDocumentEvent = new EventEmitter<string>();
     @Output() loadingFormEndEvent = new EventEmitter<string>();
@@ -254,6 +254,7 @@ export class IndexingFormComponent implements OnInit {
     currentResourceValues: any = null;
 
     selfDest: boolean = false;
+    customDiffusion: any = [];
 
     dialogRef: MatDialogRef<any>;
 
@@ -453,12 +454,12 @@ export class IndexingFormComponent implements OnInit {
                     tap(() => {
                         if (this.currentCategory === 'registeredMail') {
                             this.http.put(`../rest/registeredMails/${this.resId}`, {
-                                    type: formatdatas.registeredMail_type,
-                                    warranty: formatdatas.registeredMail_warranty,
-                                    issuingSiteId: formatdatas.registeredMail_issuingSite,
-                                    letter: formatdatas.registeredMail_letter,
-                                    recipient: formatdatas.registeredMail_recipient,
-                                    reference: formatdatas.registeredMail_reference
+                                type: formatdatas.registeredMail_type,
+                                warranty: formatdatas.registeredMail_warranty,
+                                issuingSiteId: formatdatas.registeredMail_issuingSite,
+                                letter: formatdatas.registeredMail_letter,
+                                recipient: formatdatas.registeredMail_recipient,
+                                reference: formatdatas.registeredMail_reference
                             }).pipe(
                                 tap(() => {
                                     this.loadForm(this.indexingFormId);
@@ -502,8 +503,8 @@ export class IndexingFormComponent implements OnInit {
 
                 formatData['customFields'][element.identifier.split('_')[1]] = element.default_value;
 
-            // } else if (element.identifier === 'registeredMail_recipient') {
-            //     formatData[element.identifier] = this.appRegisteredMailRecipientInput.getFormatedAdress();
+                // } else if (element.identifier === 'registeredMail_recipient') {
+                //     formatData[element.identifier] = this.appRegisteredMailRecipientInput.getFormatedAdress();
             } else {
                 formatData[element.identifier] = element.default_value;
             }
@@ -625,7 +626,7 @@ export class IndexingFormComponent implements OnInit {
                                 title: title,
                                 label: entity.entity_label,
                                 disabled: !entity.enabled
-                            }
+                            };
                         });
                         elem.event = 'loadDiffusionList';
                         elem.allowedEntities = elem.values.filter((val: any) => val.disabled === false).map((entities: any) => entities.id);
@@ -951,10 +952,14 @@ export class IndexingFormComponent implements OnInit {
                             }
                         }
 
+                        if (field.identifier === 'diffusionList') {
+                            this.customDiffusion = field.default_value;
+                        }
+
                         if (fieldExist) {
                             this['indexingModels_' + field.unit].push(field);
                             this.initValidator(field);
-                        } else {
+                        } else if (field.identifier !== 'diffusionList') {
                             this.notify.error(this.translate.instant('lang.fieldNotExist') + ': ' + field.identifier);
                         }
 
@@ -1021,6 +1026,9 @@ export class IndexingFormComponent implements OnInit {
             let valArr: ValidatorFn[] = [];
             if (field.mandatory) {
                 valArr.push(Validators.required);
+                valArr.push(this.requireDestValidator({ 'isDest': '' }));
+            } else {
+                valArr.push(this.requireDestValidatorOrEmpty({ 'isDest': '' }));
             }
 
             this.arrFormControl['diffusionList'] = new FormControl({ value: null, disabled: false });
@@ -1030,6 +1038,24 @@ export class IndexingFormComponent implements OnInit {
             this.arrFormControl['diffusionList'].setValue([]);
 
         }
+    }
+
+    requireDestValidator(error: ValidationErrors): ValidatorFn {
+        return (control: AbstractControl): { [key: string]: any } => {
+            if (!control.value) {
+                return null;
+            }
+            return control.value.filter((item: any) => item.mode === 'dest').length > 0 ? null : error;
+        };
+    }
+
+    requireDestValidatorOrEmpty(error: ValidationErrors): ValidatorFn {
+        return (control: AbstractControl): { [key: string]: any } => {
+            if (!control.value) {
+                return null;
+            }
+            return control.value.filter((item: any) => item.mode === 'dest').length > 0 || this.functions.empty(this.arrFormControl['destination'].value) ? null : error;
+        };
     }
 
     regexValidator(regex: RegExp, error: ValidationErrors): ValidatorFn {

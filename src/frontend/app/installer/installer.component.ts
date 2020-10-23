@@ -1,5 +1,4 @@
 import { Component, OnInit, ViewChild, AfterViewInit, ViewChildren } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { HeaderService } from '@service/header.service';
 import { NotificationService } from '@service/notification/notification.service';
@@ -13,8 +12,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { InstallActionComponent } from './install-action/install-action.component';
 import { of } from 'rxjs';
 import { FunctionsService } from '@service/functions.service';
-import { InstallerService } from './installer.service';
 import { catchError, filter, tap } from 'rxjs/operators';
+import { AuthService } from '@service/auth.service';
+import { PrivilegeService } from '@service/privileges.service';
 
 @Component({
     templateUrl: './installer.component.html',
@@ -28,12 +28,12 @@ import { catchError, filter, tap } from 'rxjs/operators';
 })
 export class InstallerComponent implements OnInit, AfterViewInit {
 
+    loading: boolean = true;
     @ViewChildren('stepContent') stepContent: any;
     @ViewChild('stepper', { static: true }) stepper: MatStepper;
 
     constructor(
         public translate: TranslateService,
-        private http: HttpClient,
         private router: Router,
         private headerService: HeaderService,
         private notify: NotificationService,
@@ -41,12 +41,24 @@ export class InstallerComponent implements OnInit, AfterViewInit {
         private sortPipe: SortPipe,
         public dialog: MatDialog,
         private functionService: FunctionsService,
-        private installerService: InstallerService
+        public privilegeService: PrivilegeService,
+        public authService: AuthService,
     ) { }
 
     ngOnInit(): void {
         this.headerService.hideSideBar = true;
+
+        if (!this.authService.isAuth() && !this.authService.noInstall) {
+            this.router.navigate(['/login']);
+            this.notify.error(this.translate.instant('lang.mustConnectToInstall'));
+        } else if (this.authService.getToken() !== null && !this.privilegeService.hasCurrentUserPrivilege('create_custom')) {
+            this.router.navigate(['/login']);
+            this.notify.error(this.translate.instant('lang.mustPrivilegeToInstall'));
+        } else {
+            this.loading = false;
+        }
     }
+
 
     ngAfterViewInit(): void {
         $('.mat-horizontal-stepper-header-container').insertBefore('.bg-head-content');
@@ -72,6 +84,10 @@ export class InstallerComponent implements OnInit, AfterViewInit {
         this.stepper.next();
     }
 
+    gotToLogin() {
+        this.router.navigate(['/login']);
+    }
+
     endInstall() {
         let installContent: StepAction[] = [];
         this.stepContent.toArray().forEach((component: any) => {
@@ -79,10 +95,6 @@ export class InstallerComponent implements OnInit, AfterViewInit {
         });
 
         installContent = this.sortPipe.transform(installContent, 'installPriority');
-
-        console.log(installContent);
-
-        // this.stepper.next();
 
         const dialogRef = this.dialog.open(InstallActionComponent, {
             panelClass: 'maarch-modal',

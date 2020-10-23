@@ -26,6 +26,7 @@ use SrcCore\models\AuthenticationModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\PasswordModel;
 use SrcCore\models\ValidatorModel;
+use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 use User\models\UserModel;
 
 class AuthenticationController
@@ -34,10 +35,7 @@ class AuthenticationController
     const ROUTES_WITHOUT_AUTHENTICATION = [
         'GET/authenticationInformations', 'PUT/versionsUpdateSQL', 'GET/validUrl', 'GET/authenticate/token', 'GET/images', 'POST/password', 'PUT/password', 'GET/passwordRules',
         'GET/jnlp/{jnlpUniqueId}', 'GET/onlyOffice/mergedFile', 'POST/onlyOfficeCallback', 'POST/authenticate',
-        'GET/installer/prerequisites', 'GET/installer/databaseConnection', 'GET/installer/sqlDataFiles', 'GET/installer/docservers', 'GET/installer/custom',
-        'POST/installer/custom', 'POST/installer/database', 'POST/installer/docservers', 'POST/installer/customization',
-        'PUT/installer/administrator', 'DELETE/installer/lock',
-        'GET/wopi/files/{id}', 'GET/wopi/files/{id}/contents', 'POST/wopi/files/{id}/contents','GET/onlyOffice/content','GET/languages/{lang}',
+        'GET/wopi/files/{id}', 'GET/wopi/files/{id}/contents', 'POST/wopi/files/{id}/contents','GET/onlyOffice/content','GET/languages/{lang}'
     ];
 
     public function getInformations(Request $request, Response $response)
@@ -58,16 +56,31 @@ class AuthenticationController
             $port = (string)$casConfiguration->WEB_CAS_PORT;
             $uri = (string)$casConfiguration->WEB_CAS_CONTEXT;
             $authUri = "https://{$hostname}:{$port}{$uri}/login?service=" . UrlController::getCoreUrl() . 'dist/index.html#/login';
+        } elseif ($loggingMethod['id'] == 'keycloak') {
+            $keycloakConfig = CoreConfigModel::getKeycloakConfiguration();
+            $provider = new Keycloak($keycloakConfig);
+            $authUri = $provider->getAuthorizationUrl(['scope' => $keycloakConfig['scope']]);
+            $keycloakState = $provider->getState();
+        } elseif ($loggingMethod['id'] == 'sso') {
+            $ssoConfiguration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_sso', 'select' => ['value']]);
+            $ssoConfiguration = !empty($ssoConfiguration['value']) ? json_decode($ssoConfiguration['value'], true) : null;
+            $authUri = $ssoConfiguration['value']['uri'] ?? null;
         }
 
-        return $response->withJson([
+        $return = [
             'instanceId'        => $hashedPath,
             'applicationName'   => $appName,
             'loginMessage'      => $parameter['param_value_string'] ?? null,
             'changeKey'         => $encryptKey == 'Security Key Maarch Courrier #2008',
             'authMode'          => $loggingMethod['id'],
             'authUri'           => $authUri
-        ]);
+        ];
+
+        if (!empty($keycloakState)) {
+            $return['keycloakState'] = $keycloakState;
+        }
+
+        return $response->withJson($return);
     }
 
     public function getValidUrl(Request $request, Response $response)
@@ -263,6 +276,25 @@ class AuthenticationController
             if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
                 return $response->withStatus(403)->withJson(['errors' => 'Authentication Failed']);
             }
+        } elseif ($loggingMethod['id'] == 'keycloak') {
+            $queryParams = $request->getQueryParams();
+            $authenticated = AuthenticationController::keycloakConnection(['code' => $queryParams['code']]);
+            if (!empty($authenticated['errors'])) {
+                return $response->withStatus(401)->withJson(['errors' => $authenticated['errors']]);
+            }
+            $login = strtolower($authenticated['login']);
+            if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Authentication unauthorized']);
+            }
+        } elseif ($loggingMethod['id'] == 'sso') {
+            $authenticated = AuthenticationController::ssoConnection();
+            if (!empty($authenticated['errors'])) {
+                return $response->withStatus(401)->withJson(['errors' => $authenticated['errors']]);
+            }
+            $login = strtolower($authenticated['login']);
+            if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Authentication unauthorized']);
+            }
         } else {
             return $response->withStatus(403)->withJson(['errors' => 'Logging method unauthorized']);
         }
@@ -312,10 +344,16 @@ class AuthenticationController
     {
         $loggingMethod = CoreConfigModel::getLoggingMethod();
 
+        $logoutUrl = null;
         if ($loggingMethod['id'] == 'cas') {
-            $res = AuthenticationController::casDisconnection();
+            $disconnection = AuthenticationController::casDisconnection();
+            $logoutUrl = $disconnection['logoutUrl'];
+        } elseif ($loggingMethod['id'] == 'keycloak') {
+            $disconnection = AuthenticationController::keycloakDisconnection();
+            $logoutUrl = $disconnection['logoutUrl'];
         }
-        return $response->withJson(['logoutUrl' => $res['logoutUrl'], 'redirectUrl' => $res['redirectUrl']]);
+
+        return $response->withJson(['logoutUrl' => $logoutUrl]);
     }
 
     private static function standardConnection(array $args)
@@ -461,7 +499,90 @@ class AuthenticationController
         \phpCAS::setFixedServiceURL(UrlController::getCoreUrl() . 'dist/index.html');
         \phpCAS::setNoClearTicketsFromUrl();
         $logoutUrl = \phpCAS::getServerLogoutURL();
-        return ['logoutUrl' => $logoutUrl, 'redirectUrl' => UrlController::getCoreUrl() . 'dist/index.html'];
+
+        return ['logoutUrl' => $logoutUrl];
+    }
+
+    private static function ssoConnection()
+    {
+        $ssoConfiguration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_sso', 'select' => ['value']]);
+        if (empty($ssoConfiguration['value'])) {
+            return ['errors' => 'Sso configuration missing'];
+        }
+
+        $ssoConfiguration = json_decode($ssoConfiguration['value'], true);
+        $mapping = array_column($ssoConfiguration['mapping'], 'ssoId', 'maarchId');
+        if (empty($mapping['login'])) {
+            return ['errors' => 'Sso configuration missing : no login mapping'];
+        }
+
+        $login = $_SERVER[$mapping['login']];
+        if (empty($login)) {
+            return ['errors' => 'Authentication Failed : login not present in header'];
+        }
+
+        return ['login' => $login];
+    }
+
+    private static function keycloakConnection(array $args)
+    {
+        $keycloakConfig = CoreConfigModel::getKeycloakConfiguration();
+
+        if (empty($keycloakConfig) || empty($keycloakConfig['authServerUrl']) || empty($keycloakConfig['realm']) || empty($keycloakConfig['clientId']) || empty($keycloakConfig['clientSecret']) || empty($keycloakConfig['redirectUri'])) {
+            return ['errors' => 'Keycloak not configured'];
+        }
+
+        $provider = new Keycloak($keycloakConfig);
+
+        try {
+            $token = $provider->getAccessToken('authorization_code', ['code' => $args['code']]);
+        } catch (\Exception $e) {
+            return ['errors' => 'Authentication Failed'];
+        }
+
+        try {
+            $user = $provider->getResourceOwner($token);
+
+            $login = $user->getId();
+            $keycloakAccessToken = $token->getToken();
+
+            $userMaarch = UserModel::getByLogin(['login' => $login, 'select' => ['id', 'external_id']]);
+
+            if (empty($userMaarch)) {
+                return ['errors' => 'Authentication Failed'];
+            }
+
+            $userMaarch['external_id'] = json_decode($userMaarch['external_id'], true);
+            $userMaarch['external_id']['keycloakAccessToken'] = $keycloakAccessToken;
+            $userMaarch['external_id'] = json_encode($userMaarch['external_id']);
+
+            UserModel::updateExternalId(['id' => $userMaarch['id'], 'externalId' => $userMaarch['external_id']]);
+
+            return ['login' => $login];
+        } catch (\Exception $e) {
+            return ['errors' => 'Authentication Failed'];
+        }
+    }
+
+    private static function keycloakDisconnection()
+    {
+        $keycloakConfig = CoreConfigModel::getKeycloakConfiguration();
+
+        $provider = new Keycloak($keycloakConfig);
+
+        $externalId = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['external_id']]);
+        $externalId = json_decode($externalId['external_id'], true);
+        $accessToken = $externalId['keycloakAccessToken'];
+        unset($externalId['keycloakAccessToken']);
+        UserModel::update([
+            'set'   => ['external_id' => json_encode($externalId)],
+            'where' => ['id = ?'],
+            'data'  => [$GLOBALS['id']]
+        ]);
+
+        $url = $provider->getLogoutUrl(['client_id' => $keycloakConfig['clientId'], 'refresh_token' => $accessToken]);
+
+        return ['logoutUrl' => $url];
     }
 
     public function getRefreshedToken(Request $request, Response $response)
@@ -586,6 +707,23 @@ class AuthenticationController
     {
         $user = UserModel::getByLogin(['login' => $args['login'], 'select' => ['mode', 'status']]);
         if (empty($user) || $user['mode'] == 'rest' || $user['status'] == 'SPD') {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function canAccessInstallerWhitoutAuthentication(array $args)
+    {
+        $installerRoutes = [
+            'GET/installer/prerequisites', 'GET/installer/databaseConnection', 'GET/installer/sqlDataFiles', 'GET/installer/docservers', 'GET/installer/custom',
+            'GET/installer/customs', 'POST/installer/custom', 'POST/installer/database', 'POST/installer/docservers', 'POST/installer/customization',
+            'PUT/installer/administrator', 'DELETE/installer/lock'
+        ];
+
+        if (is_file("custom/custom.json")) {
+            return false;
+        } elseif (!in_array($args['route'], $installerRoutes)) {
             return false;
         }
 

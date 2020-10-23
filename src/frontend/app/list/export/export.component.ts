@@ -114,6 +114,16 @@ export class ExportComponent implements OnInit {
             isFunction: false
         },
         {
+            value: 'getRetentionFrozen',
+            label: this.translate.instant('lang.retentionRuleFrozen'),
+            isFunction: true
+        },
+        {
+            value: 'getBinding',
+            label: this.translate.instant('lang.bindingMail'),
+            isFunction: true
+        },
+        {
             value: 'getStatus',
             label: this.translate.instant('lang.status'),
             isFunction: true

@@ -90,26 +90,23 @@ export class TechnicalInformationComponent implements OnInit {
             }),
             exhaustMap(() => this.http.get('../rest/customFields')),
             tap((data: any) => {
-                data.customFields.map((info: any) => {
+                data.customFields.filter((item: { mode: any; }) => item.mode === 'technical').map((info: any) => {
                     this.customs[info.id] = {
                         label : info.label,
                         type : info.type
                     };
                 });
-                this.customsData = data.customFields.filter((item: { mode: any; }) => item.mode === 'technical');
             }),
             exhaustMap(() => this.http.get(`../rest/resources/${this.data.resId}`)),
             tap((data: any) => {
-                Object.keys(this.customsData).forEach(key => {
-                    const values = [];
-                    this.customsData[key].values.forEach(element => {
-                        values.push(element.label);
-                    });
+                Object.keys(data.customFields).forEach(key => {
+                    if (!this.functions.empty(this.customs[key])) {
                         this.customsData[key] = {
-                            label: this.customsData[key].label,
-                            value: values,
+                            label: this.customs[key].label,
+                            value: data.customFields[key],
                             icon: 'fas fa-hashtag'
                         };
+                    }
                 });
             }),
             catchError((err: any) => {

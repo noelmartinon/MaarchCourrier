@@ -4,8 +4,9 @@
     <REALM></REALM>
     <CLIENT_ID></CLIENT_ID>
     <CLIENT_SECRET></CLIENT_SECRET>
-    <REDIRECT_URI>http://demo.maarchcourrier.com/apps/maarch_entreprise/index.php?display=true&amp;page=login</REDIRECT_URI> <!-- Should be the url of Maarch Courrier's login page -->
+    <REDIRECT_URI>http://demo.maarchcourrier.com/dist/index.html#/login</REDIRECT_URI> <!-- Should be the url of Maarch Courrier's login page -->
     <ENCRYPTION_ALGORITHM></ENCRYPTION_ALGORITHM>
     <ENCRYPTION_KEY_PATH></ENCRYPTION_KEY_PATH>
     <ENCRYPTION_KEY></ENCRYPTION_KEY>
+    <SCOPE></SCOPE>
 </ROOT>

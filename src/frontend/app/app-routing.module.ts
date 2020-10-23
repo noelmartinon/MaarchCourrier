@@ -21,12 +21,14 @@ import { AcknowledgementReceptionComponent } from './registeredMail/acknowledgem
 import { SearchComponent } from './search/search.component';
 import { ProcessComponent } from './process/process.component';
 import { IndexationComponent } from './indexation/indexation.component';
+import { AppLightGuard } from '@service/app-light.guard';
 
 
 const routes: Routes = [
     { path: 'resources/:resId/content', canActivate: [AppGuard], component: DocumentViewerPageComponent },
     {
         path: 'install',
+        canActivate: [AppLightGuard],
         loadChildren: () => import('./installer/installer.module').then(m => m.InstallerModule)
     },
     { path: 'signatureBook/users/:userId/groups/:groupId/baskets/:basketId/resources/:resId', canActivate: [AppGuard], component: SignatureBookComponent },
@@ -42,7 +44,7 @@ const routes: Routes = [
     { path: 'about-us', canActivate: [AppGuard], component: AboutUsComponent },
     { path: 'home', canActivate: [AppGuard], component: HomeComponent },
     { path: 'basketList/users/:userSerialId/groups/:groupSerialId/baskets/:basketId', canActivate: [AppGuard], component: BasketListComponent },
-    { path: 'login', component: LoginComponent },
+    { path: 'login', canActivate: [AppLightGuard], component: LoginComponent },
     { path: 'registeredMail/acknowledgement', canActivate: [AppGuard], component: AcknowledgementReceptionComponent },
     { path: 'search', canActivate: [AppGuard], component: SearchComponent },
     {

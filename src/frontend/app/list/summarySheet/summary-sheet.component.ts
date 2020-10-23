@@ -55,6 +55,8 @@ export class SummarySheetComponent implements OnInit {
                 this.translate.instant('lang.status'),
                 this.translate.instant('lang.priority'),
                 this.translate.instant('lang.processLimitDate'),
+                this.translate.instant('lang.retentionRuleFrozen'),
+                this.translate.instant('lang.bindingMail'),
                 this.translate.instant('lang.customFieldsAdmin')
             ],
             enabled: true

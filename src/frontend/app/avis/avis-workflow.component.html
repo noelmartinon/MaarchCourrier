@@ -56,7 +56,7 @@
             <mat-icon
                 [ngClass]="{'fa fa-user fa-2x': functions.empty(diffusion.picture),'avatar': !functions.empty(diffusion.picture)}"
                 mat-list-icon color="primary"
-                [class.invalid]="!diffusion.hasPrivilege"
+                [class.invalid]="!diffusion.hasPrivilege || !diffusion.isValid"
                 [style.background-image]="!functions.empty(diffusion.picture) ? 'url('+diffusion.picture+')' : ''">
             </mat-icon>
             <ng-container *ngIf="!adminMode || diffusion.process_date != null">
@@ -66,10 +66,10 @@
             </ng-container>
             <div mat-line class="workflowLine">
                 <div class="workflowLineContainer">
-                    <div class="workflowLineLabel" [class.unauthorized]="!diffusion.hasPrivilege">
+                    <div class="workflowLineLabel" [class.unauthorized]="!diffusion.hasPrivilege || !diffusion.isValid">
                         {{diffusion.labelToDisplay}}
                     </div>
-                    <div class="workflowLineSubLabel" [class.unauthorized]="!diffusion.hasPrivilege">
+                    <div class="workflowLineSubLabel" [class.unauthorized]="!diffusion.hasPrivilege || !diffusion.isValid">
                         {{diffusion.item_entity}}
                     </div>
                     <div *ngIf="diffusion.process_date != null" class="workflowLineProcessDate"
@@ -85,6 +85,9 @@
                 </div>
                 <div *ngIf="!diffusion.hasPrivilege" class="invalid">
                     {{'lang.noPrivileges' | translate}}
+                </div>
+                <div *ngIf="!diffusion.isValid" class="invalid">
+                    {{'lang.userNotValid' | translate}}
                 </div>
             </div>
             <button mat-icon-button *ngIf="adminMode && functions.empty(diffusion.process_date)"

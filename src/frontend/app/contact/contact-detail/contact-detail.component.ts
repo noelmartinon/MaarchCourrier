@@ -151,7 +151,7 @@ export class ContactDetailComponent implements OnInit {
 
     emptyOtherInfo(contact: any) {
 
-        if (contact.type === 'contact' && (!this.functionsService.empty(contact.communicationMeans) || !this.functionsService.empty(contact.customFields))) {
+        if (contact.type === 'contact' && (!this.functionsService.empty(contact.notes) || !this.functionsService.empty(contact.communicationMeans) || !this.functionsService.empty(contact.customFields))) {
             return false;
         } else {
             return true;

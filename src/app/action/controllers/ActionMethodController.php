@@ -41,6 +41,7 @@ use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
 use Respect\Validation\Validator;
+use SrcCore\controllers\LogsController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\ValidatorModel;
@@ -903,6 +904,16 @@ class ActionMethodController
 
         $sent = AlfrescoController::sendResource(['resId' => $args['resId'], 'userId' => $GLOBALS['id'], 'folderId' => $args['data']['folderId'], 'folderName' => $args['data']['folderName']]);
         if (!empty($sent['errors'])) {
+            LogsController::add([
+                'isTech'    => true,
+                'moduleId'  => 'alfresco',
+                'level'     => 'ERROR',
+                'tableName' => '',
+                'recordId'  => '',
+                'eventType' => 'Error Exec Curl : ' . $sent['errors'],
+                'eventId'   => 'Alfresco Error'
+            ]);
+
             return ['errors' => [$sent['errors']]];
         }
 

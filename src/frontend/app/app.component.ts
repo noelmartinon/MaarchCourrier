@@ -10,6 +10,7 @@ import { AuthService } from '@service/auth.service';
 import { environment } from '../environments/environment';
 import { TranslateService } from '@ngx-translate/core';
 import { DateAdapter } from '@angular/material/core';
+import { MatDialog } from '@angular/material/dialog';
 
 /** Custom options the configure the tooltip's default show/hide delays. */
 export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
@@ -44,7 +45,8 @@ export class AppComponent implements OnInit, AfterViewInit {
         public appService: AppService,
         public headerService: HeaderService,
         public authService: AuthService,
-        private adapter: DateAdapter<any>
+        private adapter: DateAdapter<any>,
+        public dialog: MatDialog,
     ) {
 
         translate.setDefaultLang('fr');
@@ -60,8 +62,6 @@ export class AppComponent implements OnInit, AfterViewInit {
     }
 
     async ngOnInit() {
-        this.appService.checkAppSecurity();
-        await this.appService.applyMinorUpdate();
         this.loading = false;
         this.headerService.hideSideBar = true;
         setTimeout(() => {

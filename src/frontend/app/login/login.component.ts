@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Validators, FormGroup, FormBuilder } from '@angular/forms';
-import { tap, catchError, finalize } from 'rxjs/operators';
+import { tap, catchError } from 'rxjs/operators';
 import { AuthService } from '@service/auth.service';
 import { NotificationService } from '@service/notification/notification.service';
 import { environment } from '../../environments/environment';
@@ -11,7 +11,6 @@ import { of } from 'rxjs';
 import { HeaderService } from '@service/header.service';
 import { FunctionsService } from '@service/functions.service';
 import { TimeLimitPipe } from '../../plugins/timeLimit.pipe';
-import { AlertComponent } from '../../plugins/modal/alert.component';
 import { TranslateService } from '@ngx-translate/core';
 import { LocalStorageService } from '@service/local-storage.service';
 
@@ -24,7 +23,7 @@ export class LoginComponent implements OnInit {
     loginForm: FormGroup;
 
     loading: boolean = false;
-    showForm: boolean = false;
+    showForm: boolean = true;
     environment: any;
     applicationName: string = '';
     loginMessage: string = '';
@@ -59,7 +58,7 @@ export class LoginComponent implements OnInit {
                 this.router.navigate(['/home']);
             }
         } else {
-            this.getLoginInformations();
+            this.initConnection();
         }
     }
 
@@ -109,46 +108,29 @@ export class LoginComponent implements OnInit {
         ).subscribe();
     }
 
-    getLoginInformations() {
-        this.http.get('../rest/authenticationInformations').pipe(
-            tap((data: any) => {
-                this.authService.setAppSession(data.instanceId);
-                this.authService.changeKey = data.changeKey;
-                this.applicationName = data.applicationName;
-                this.loginMessage = data.loginMessage;
-                this.authService.setEvent('authenticationInformations');
-                this.authService.authMode = data.authMode;
-                this.authService.authUri = data.authUri;
-
-                this.initConnection();
-            }),
-            finalize(() => this.showForm = true),
-            catchError((err: any) => {
-                this.http.get('../rest/validUrl').pipe(
-                    tap((data: any) => {
-                        if (!this.functionsService.empty(data.url)) {
-                            window.location.href = data.url;
-                        } else if (data.lang === 'moreOneCustom') {
-                            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.accessNotFound'), msg: this.translate.instant('lang.moreOneCustom'), hideButton: true } });
-                        } else if (data.lang === 'noConfiguration') {
-                            this.router.navigate(['/install']);
-                        } else {
-                            this.notify.handleSoftErrors(err);
-                        }
-                    })
-                ).subscribe();
-                return of(false);
-            })
-        ).subscribe();
-    }
-
     initConnection() {
         if (['cas', 'keycloak'].indexOf(this.authService.authMode) > -1) {
             this.loginForm.disable();
             this.loginForm.setValidators(null);
-            const regex = /ticket=[.]*/g;
-            if (window.location.search.match(regex) !== null) {
+            const regexCas = /ticket=[.]*/g;
+            const regexKeycloak = /code=[.]*/g;
+            if (window.location.search.match(regexCas) !== null || window.location.search.match(regexKeycloak) !== null) {
                 const ssoToken = window.location.search.substring(1, window.location.search.length);
+
+                const regexKeycloakState = /state=[.]*/g;
+                if (ssoToken.match(regexKeycloakState) !== null) {
+                    const params = new URLSearchParams(window.location.search.substring(1));
+                    const keycloakState = this.localStorage.get('keycloakState');
+                    const paramState = params.get('state');
+
+                    this.localStorage.save('keycloakState', null);
+
+                    if (keycloakState !== paramState && keycloakState !== null) {
+                        window.location.href = this.authService.authUri;
+                        return;
+                    }
+                }
+
                 window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
                 this.onSubmit(`?${ssoToken}`);
             } else {

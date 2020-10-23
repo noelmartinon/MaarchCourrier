@@ -46,7 +46,7 @@ class ListInstanceController
         $listInstances = ListInstanceModel::get(['select' => ['*'], 'where' => ['res_id = ?', 'difflist_type = ?'], 'data' => [$args['resId'], 'entity_id']]);
         foreach ($listInstances as $key => $value) {
             if ($value['item_type'] == 'entity_id') {
-                $entity = Entitymodel::getById(['id' => $value['item_id'], 'select' => ['entity_label', 'entity_id']]);
+                $entity = EntityModel::getById(['id' => $value['item_id'], 'select' => ['entity_label', 'entity_id']]);
                 $listInstances[$key]['item_id'] = $entity['entity_id'];
                 $listInstances[$key]['itemSerialId'] = $value['item_id'];
                 $listInstances[$key]['labelToDisplay'] = $entity['entity_label'];

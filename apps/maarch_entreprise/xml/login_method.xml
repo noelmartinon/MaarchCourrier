@@ -14,20 +14,10 @@
     </METHOD>
     <METHOD>
         <ID>sso</ID>
-        <NAME>_SSO_LOGIN</NAME>
-        <SCRIPT>sso_connect.php</SCRIPT>
         <ENABLED>false</ENABLED>
     </METHOD>
     <METHOD>
         <ID>keycloak</ID>
-        <NAME>Keycloak</NAME>
-        <SCRIPT>keycloakConnect.php</SCRIPT>
-        <ENABLED>false</ENABLED>
-    </METHOD>
-    <METHOD>
-        <ID>shibboleth</ID>
-        <NAME>Shibboleth</NAME>
-        <SCRIPT>shibbolethConnect.php</SCRIPT>
         <ENABLED>false</ENABLED>
     </METHOD>
 </ROOT>

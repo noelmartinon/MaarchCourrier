@@ -104,7 +104,7 @@ class ParameterController
 
         $body = $request->getParsedBody();
 
-        if (in_array($args['id'], ['logo', 'bodyImage', 'applicationName'])) {
+        if (in_array($args['id'], ['logo', 'bodyImage', 'applicationName', 'bindingDocumentFinalAction', 'nonBindingDocumentFinalAction'])) {
             $customId = CoreConfigModel::getCustomId();
             if (empty($customId)) {
                 return $response->withStatus(400)->withJson(['errors' => 'A custom is needed for this operation']);
@@ -118,9 +118,9 @@ class ParameterController
                 if (strpos($body['image'], 'data:image/svg+xml;base64,') === false) {
                     return $response->withStatus(400)->withJson(['errors' => 'Body image is not a base64 image']);
                 }
-                $tmpFileName = $tmpPath . 'parameter_logo_' . rand() . '_file.svg';
+                $tmpFileName  = $tmpPath . 'parameter_logo_' . rand() . '_file.svg';
                 $body['logo'] = str_replace('data:image/svg+xml;base64,', '', $body['image']);
-                $file = base64_decode($body['logo']);
+                $file         = base64_decode($body['logo']);
                 file_put_contents($tmpFileName, $file);
 
                 $size = strlen($file);
@@ -135,12 +135,12 @@ class ParameterController
                     }
                     copy("dist/{$body['image']}", "custom/{$customId}/img/bodylogin.jpg");
                 } else {
-                    $tmpFileName = $tmpPath . 'parameter_body_' . rand() . '_file.jpg';
+                    $tmpFileName   = $tmpPath . 'parameter_body_' . rand() . '_file.jpg';
                     $body['image'] = str_replace('data:image/jpeg;base64,', '', $body['image']);
-                    $file = base64_decode($body['image']);
+                    $file          = base64_decode($body['image']);
                     file_put_contents($tmpFileName, $file);
 
-                    $size = strlen($file);
+                    $size       = strlen($file);
                     $imageSizes = getimagesize($tmpFileName);
                     if ($imageSizes[0] < 1920 || $imageSizes[1] < 1080) {
                         return $response->withStatus(400)->withJson(['errors' => 'Body image is not wide enough']);
@@ -155,26 +155,39 @@ class ParameterController
                 $fp = fopen("custom/{$customId}/apps/maarch_entreprise/xml/config.json", 'w');
                 fwrite($fp, json_encode($config, JSON_PRETTY_PRINT));
                 fclose($fp);
+            } elseif (in_array($args['id'] == ['bindingDocumentFinalAction', 'nonBindingDocumentFinalAction'])) {
+                $parameter = ParameterModel::getById(['id' => $args['id']]);
+                if (empty($parameter)) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Parameter not found']);
+                }
+                if (!in_array($body['param_value_string'], ['restrictAccess', 'transfer', 'copy', 'delete'])) {
+                    return $response->withStatus(400)->withJson(['errors' => 'param_value_string must be between : restrictAccess, transfer, copy, delete']);
+                }
+                ParameterModel::update([
+                    'description'        => '',
+                    'param_value_string' => $body['param_value_string'],
+                    'id'                 => $args['id']
+                ]);
             }
             if (!empty($tmpFileName) && is_file($tmpFileName)) {
                 unset($tmpFileName);
             }
-            return $response->withStatus(204);
+        } else {
+            $parameter = ParameterModel::getById(['id' => $args['id']]);
+            if (empty($parameter)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Parameter not found']);
+            }
+    
+            $check = (empty($body['param_value_int']) || Validator::intVal()->validate($body['param_value_int']));
+            $check = $check && (empty($body['param_value_string']) || Validator::stringType()->validate($body['param_value_string']));
+            if (!$check) {
+                return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+            }
+    
+            $body['id'] = $args['id'];
+            ParameterModel::update($body);
         }
 
-        $parameter = ParameterModel::getById(['id' => $args['id']]);
-        if (empty($parameter)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Parameter not found']);
-        }
-
-        $check = (empty($body['param_value_int']) || Validator::intVal()->validate($body['param_value_int']));
-        $check = $check && (empty($body['param_value_string']) || Validator::stringType()->validate($body['param_value_string']));
-        if (!$check) {
-            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
-        }
-
-        $body['id'] = $args['id'];
-        ParameterModel::update($body);
         HistoryController::add([
             'tableName' => 'parameters',
             'recordId'  => $args['id'],

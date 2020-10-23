@@ -10,12 +10,14 @@
         <div *ngIf="loading" class="loading" color="primary">
             <mat-spinner></mat-spinner>
         </div>
-        <mat-form-field class="data-item" *ngFor="let data of techData | keyvalue">
-            <mat-icon matPrefix [class]="data.value.icon" color="primary" style="width: 35px;text-align: center;"></mat-icon>
-            <mat-label>{{'lang.'+data.key | translate}}</mat-label>
-            <input matInput [value]="data.value.value" readonly>
-        </mat-form-field>
-
+        <ng-container *ngFor="let data of techData | keyvalue">
+            <mat-form-field *ngIf="!functions.empty(data.value.value)" class="data-item">
+                <mat-icon matPrefix [class]="data.value.icon" color="primary" style="width: 35px;text-align: center;">
+                </mat-icon>
+                <mat-label>{{'lang.'+data.key | translate}}</mat-label>
+                <input matInput [value]="data.value.value" readonly>
+            </mat-form-field>
+        </ng-container>
         <mat-accordion *ngIf="!isEmptyCustom()">
             <mat-expansion-panel expanded>
                 <mat-expansion-panel-header>
@@ -24,7 +26,8 @@
                     </mat-panel-title>
                 </mat-expansion-panel-header>
                 <mat-form-field *ngFor="let custom of customsData | keyvalue" class="data-item">
-                    <mat-icon matPrefix [class]="custom.value.icon" color="primary" style="width: 35px;text-align: center;"></mat-icon>
+                    <mat-icon matPrefix [class]="custom.value.icon" color="primary"
+                        style="width: 35px;text-align: center;"></mat-icon>
                     <mat-label>{{custom.value.label}}</mat-label>
                     <input matInput [value]="custom.value.value" readonly>
                 </mat-form-field>

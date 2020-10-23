@@ -57,6 +57,8 @@ INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'upda
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'entities_print_sep_mlb');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'sendmail');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'use_mail_services');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'admin_registered_mail');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'manage_attachments');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'view_documents_with_notes');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'add_new_version');
@@ -67,7 +69,6 @@ INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'priv
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', '_print_sep');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'physical_archive_print_sep_mlb');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'manage_numeric_package');
-INSERT INTO usergroups_services (group_id, service_id) VALUES ('COURRIER', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'adv_search_mlb');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'create_contacts');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'update_contacts');
@@ -77,6 +78,7 @@ INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'update_
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'update_diffusion_details');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'sendmail');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'use_mail_services');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'manage_attachments');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'view_documents_with_notes');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'add_new_version');
@@ -88,7 +90,6 @@ INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'config_
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'config_avis_workflow_in_detail');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'private_tag');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'manage_numeric_package');
-INSERT INTO usergroups_services (group_id, service_id) VALUES ('AGENT', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 'adv_search_mlb');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 'create_contacts');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 'update_contacts');
@@ -101,6 +102,8 @@ INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 'update_diffusion_process');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 'sendmail');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 'use_mail_services');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 'admin_registered_mail');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 'view_documents_with_notes');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 'add_new_version');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 'view_version_letterbox');
@@ -109,7 +112,6 @@ INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 'print_folder_doc');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 'private_tag');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 'manage_numeric_package');
-INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESP_COURRIER', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'adv_search_mlb');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'create_contacts');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'update_contacts');
@@ -119,6 +121,7 @@ INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'u
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'update_diffusion_details');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'sendmail');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'use_mail_services');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'manage_attachments');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'view_documents_with_notes');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'add_new_version');
@@ -134,12 +137,8 @@ INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'c
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'avis_documents');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'private_tag');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'manage_numeric_package');
-INSERT INTO usergroups_services (group_id, service_id) VALUES ('RESPONSABLE', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'adv_search_mlb');
-INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_search');
-INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_registered_mail');
-INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_alfresco');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_users');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_groups');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_architecture');
@@ -172,6 +171,10 @@ INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'entities_print_sep_mlb');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'sendmail');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'use_mail_services');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_registered_mail');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'include_folders_and_followed_resources_perimeter');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_alfresco');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_search');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'manage_attachments');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'view_documents_with_notes');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'add_new_version');
@@ -189,18 +192,17 @@ INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'physical_archive_print_sep_mlb');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'physical_archive_batch_manage');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'admin_life_cycle');
-INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N1', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N2', 'admin');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N2', 'view_doc_history');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N2', 'view_full_history');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N2', 'edit_resource');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N2', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N2', 'admin_templates');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N2', 'admin_tag');
-INSERT INTO usergroups_services (group_id, service_id) VALUES ('ADMINISTRATEUR_N2', 'include_folders_and_followed_resources_perimeter');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('ELU', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ELU', 'sign_document');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ELU', 'visa_documents');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ELU', 'avis_documents');
-INSERT INTO usergroups_services (group_id, service_id) VALUES ('ELU', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'adv_search_mlb');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'create_contacts');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'update_contacts');
@@ -208,12 +210,12 @@ INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'vi
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'view_doc_history');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'view_full_history');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'sendmail');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'avis_documents');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'export_seda_view');
-INSERT INTO usergroups_services (group_id, service_id) VALUES ('ARCHIVISTE', 'include_folders_and_followed_resources_perimeter');
-INSERT INTO usergroups_services (group_id, service_id) VALUES ('WEBSERVICE', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('MAARCHTOGEC', 'include_folders_and_followed_resources_perimeter');
 INSERT INTO usergroups_services (group_id, service_id) VALUES ('MAARCHTOGEC', 'manage_numeric_package');
+INSERT INTO usergroups_services (group_id, service_id) VALUES ('WEBSERVICE', 'include_folders_and_followed_resources_perimeter');
 
 -- Create DOCTYPES
 TRUNCATE TABLE DOCTYPES_FIRST_LEVEL;
@@ -912,6 +914,7 @@ INSERT INTO contacts_parameters (id, identifier, mandatory, filling, searchable,
 INSERT INTO contacts_parameters (id, identifier, mandatory, filling, searchable, displayable) VALUES (13, 'addressCountry', false, false, false, false);
 INSERT INTO contacts_parameters (id, identifier, mandatory, filling, searchable, displayable) VALUES (14, 'email', false, true, false, false);
 INSERT INTO contacts_parameters (id, identifier, mandatory, filling, searchable, displayable) VALUES (15, 'phone', false, true, false, false);
+INSERT INTO contacts_parameters (id, identifier, mandatory, filling, searchable, displayable) VALUES (16, 'notes', false, false, false, false);
 
 select setval('contacts_parameters_id_seq', (select max(id)+1 from contacts_parameters), false);
 
@@ -1021,6 +1024,8 @@ INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailNotDistri
 INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailDistributedStatus', 'DSTRIBUTED');
 INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailImportedStatus', 'NEW');
 INSERT INTO parameters (id, description, param_value_int) VALUES ('keepDiffusionRoleInOutgoingIndexation', 'Si activé (1), prend en compte les roles du modèle de diffusion de l''entité.', 1);
+INSERT INTO parameters (id, param_value_string) VALUES ('bindingDocumentFinalAction', 'copy');
+INSERT INTO parameters (id, param_value_string) VALUES ('nonBindingDocumentFinalAction', 'delete');
 
 ------------
 --DIFFLIST_TYPES
@@ -1625,7 +1630,7 @@ Select setval('templates_association_id_seq', (select max(id)+1 from templates_a
 UPDATE entities SET business_id = concat('45239273100025/',entity_id);
 
 UPDATE entities SET business_id = concat('45239273100025/',entity_id);
--- UPDATE entities SET archival_agreement = 'MAARCH_LES_BAINS_ACTES_V2';
+--UPDATE entities SET archival_agreement = 'MAARCH_LES_BAINS_ACTES_V2';
 
 UPDATE doctypes SET retention_final_disposition = 'destruction';
 UPDATE doctypes SET retention_rule = 'compta_3_03';
@@ -1654,6 +1659,7 @@ INSERT INTO contacts_filling (enable, first_threshold, second_threshold) VALUES 
 TRUNCATE TABLE configurations;
 INSERT INTO configurations (privilege, value) VALUES ('admin_email_server', '{"type":"smtp","host":"smtp.gmail.com","port":465,"user":"notifications.maarch@gmail.com","password":"1OkrZQPFNJmI7uY8::7e870f0f61ecc7e9fb6e7065dd31aea5","auth":true,"secure":"ssl","from":"notifications.maarch@gmail.com","charset":"utf-8"}');
 INSERT INTO configurations (privilege, value) VALUES ('admin_search', '{"listEvent": {"defaultTab": "dashboard"},"listDisplay":{"templateColumns":6,"subInfos":[{"value":"getPriority","cssClasses":["align_leftData"],"icon":"fa-traffic-light"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_leftData"],"icon":"fa-calendar"},{"value":"getAssignee","cssClasses":["align_leftData"],"icon":"fa-sitemap"},{"value":"getDoctype","cssClasses":["align_leftData"],"icon":"fa-suitcase"},{"value":"getRecipients","cssClasses":["align_leftData"],"icon":"fa-user"},{"value":"getSenders","cssClasses":["align_leftData"],"icon":"fa-book"}]}}');
+INSERT INTO configurations (privilege, value) VALUES ('admin_sso', '{}');
 
 /* Modèle d’envois postaux */
 TRUNCATE TABLE shipping_templates;

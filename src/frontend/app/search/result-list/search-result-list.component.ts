@@ -562,7 +562,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
         if (Object.keys(this.criteria).indexOf(this.indexingFieldService.mappingdata[data.value]) > -1) {
             if (Array.isArray(this.criteria[this.indexingFieldService.mappingdata[data.value]].values)) {
                 this.criteria[this.indexingFieldService.mappingdata[data.value]].values.forEach((val: any) => {
-                    data.displayValue = this.highlightPipe.transform(data.displayValue, val.label.replace(/&nbsp;/g, ''));
+                    data.displayValue = this.highlightPipe.transform(data.displayValue, !this.functions.empty(val.label) ? val.label.replace(/&nbsp;/g, '') : val);
                 });
             } else {
                 data.displayValue = this.highlightPipe.transform(data.displayValue, this.criteria[this.indexingFieldService.mappingdata[data.value]].values);

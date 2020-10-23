@@ -14,9 +14,11 @@
 
 namespace SrcCore\controllers;
 
+use Group\controllers\PrivilegeController;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\models\AuthenticationModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\DatabasePDO;
@@ -26,6 +28,10 @@ class InstallerController
 {
     public function getPrerequisites(Request $request, Response $response)
     {
+        if (!empty($GLOBALS['id']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'create_custom', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Route forbidden']);
+        }
+
         $phpVersion = phpversion();
         $phpVersionValid = (version_compare(PHP_VERSION, '7.2') >= 0);
 
@@ -89,6 +95,10 @@ class InstallerController
 
     public function checkDatabaseConnection(Request $request, Response $response)
     {
+        if (!empty($GLOBALS['id']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'create_custom', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Route forbidden']);
+        }
+
         $queryParams = $request->getQueryParams();
 
         if (!Validator::stringType()->notEmpty()->validate($queryParams['server'])) {
@@ -140,6 +150,10 @@ class InstallerController
 
     public function getSQLDataFiles(Request $request, Response $response)
     {
+        if (!empty($GLOBALS['id']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'create_custom', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Route forbidden']);
+        }
+
         $dataFiles = [];
 
         $sqlFiles =  scandir('sql');
@@ -157,6 +171,10 @@ class InstallerController
 
     public function checkDocservers(Request $request, Response $response)
     {
+        if (!empty($GLOBALS['id']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'create_custom', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Route forbidden']);
+        }
+
         $queryParams = $request->getQueryParams();
 
         if (!Validator::stringType()->notEmpty()->validate($queryParams['path'])) {
@@ -190,6 +208,10 @@ class InstallerController
 
     public function checkCustomName(Request $request, Response $response)
     {
+        if (!empty($GLOBALS['id']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'create_custom', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Route forbidden']);
+        }
+
         $queryParams = $request->getQueryParams();
 
         if (!Validator::stringType()->notEmpty()->validate($queryParams['customId'])) {
@@ -214,8 +236,46 @@ class InstallerController
         return $response->withStatus(204);
     }
 
+    public function getCustoms(Request $request, Response $response)
+    {
+        if (!empty($GLOBALS['id']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'create_custom', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Route forbidden']);
+        }
+
+        if (!is_dir('custom')) {
+            return $response->withJson(['customs' => []]);
+        }
+
+        $customs = [];
+        $customsDirectories = scandir('custom');
+        foreach ($customsDirectories as $custom) {
+            if (in_array($custom, ['custom.json', '.', '..'])) {
+                continue;
+            }
+
+            $path = "custom/{$custom}/apps/maarch_entreprise/xml/config.json";
+            if (!file_exists($path)) {
+                continue;
+            }
+
+            $file = file_get_contents($path);
+            $file = json_decode($file, true);
+
+            $customs[] = [
+                'id'    => $custom,
+                'label' => $file['config']['applicationName']
+            ];
+        }
+
+        return $response->withJson(['customs' => $customs]);
+    }
+
     public function createCustom(Request $request, Response $response)
     {
+        if (!empty($GLOBALS['id']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'create_custom', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Route forbidden']);
+        }
+
         $body = $request->getParsedBody();
 
         if (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
@@ -272,6 +332,10 @@ class InstallerController
 
     public function createDatabase(Request $request, Response $response)
     {
+        if (!empty($GLOBALS['id']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'create_custom', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Route forbidden']);
+        }
+
         $body = $request->getParsedBody();
 
         if (!Validator::stringType()->notEmpty()->validate($body['server'])) {
@@ -369,6 +433,10 @@ class InstallerController
 
     public function createDocservers(Request $request, Response $response)
     {
+        if (!empty($GLOBALS['id']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'create_custom', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Route forbidden']);
+        }
+
         $body = $request->getParsedBody();
 
         if (!Validator::stringType()->notEmpty()->validate($body['path'])) {
@@ -450,6 +518,10 @@ class InstallerController
 
     public function createCustomization(Request $request, Response $response)
     {
+        if (!empty($GLOBALS['id']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'create_custom', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Route forbidden']);
+        }
+
         $body = $request->getParsedBody();
 
         if (!Validator::stringType()->notEmpty()->validate($body['bodyLoginBackground'])) {
@@ -523,6 +595,10 @@ class InstallerController
 
     public function updateAdministrator(Request $request, Response $response)
     {
+        if (!empty($GLOBALS['id']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'create_custom', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Route forbidden']);
+        }
+
         $body = $request->getParsedBody();
 
         if (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
@@ -546,28 +622,37 @@ class InstallerController
         DatabasePDO::reset();
         new DatabasePDO(['customId' => $body['customId']]);
 
-        $userAlreadyExists = UserModel::getByLogin(['login' => strtolower($body['login']), 'select' => [1]]);
-        if (!empty($userAlreadyExists)) {
-            return $response->withStatus(400)->withJson(['errors' => 'User already exists', 'lang' => 'alreadyExist']);
+        $body['login'] = strtolower($body['login']);
+        $user = UserModel::getByLogin(['login' => $body['login'], 'select' => ['id']]);
+
+        if (!empty($user)) {
+            UserModel::update([
+                'set'   => [
+                    'firstname'     => $body['firstname'],
+                    'lastname'      => $body['lastname'],
+                    'mail'          => $body['email'],
+                    'password'      => AuthenticationModel::getPasswordHash($body['password']),
+                    'mode'          => 'root_invisible'
+                ],
+                'where' => ['id = ?'],
+                'data'  => [$user['id']]
+            ]);
+        } else {
+            UserModel::create([
+                'user' => [
+                    'userId'        => $body['login'],
+                    'firstname'     => $body['firstname'],
+                    'lastname'      => $body['lastname'],
+                    'mail'          => $body['email'],
+                    'preferences'   => json_encode(['documentEdition' => 'java']),
+                    'password'      => $body['password'],
+                    'mode'          => 'root_invisible'
+                ]
+            ]);
         }
 
-        UserModel::create([
-            'user' => [
-                'userId'        => $body['login'],
-                'firstname'     => $body['firstname'],
-                'lastname'      => $body['lastname'],
-                'mail'          => $body['email'],
-                'preferences'   => json_encode(['documentEdition' => 'java']),
-                'password'      => $body['password'],
-                'mode'          => 'root_invisible'
-            ]
-        ]);
-
-        DatabaseModel::update([
-            'table'     => 'users',
-            'set'       => [
-                'mail'      => $body['email']
-            ],
+        UserModel::update([
+            'set'       => ['mail' => $body['email']],
             'where'     => ['mail = ?'],
             'data'      => ['support@maarch.fr']
         ]);
@@ -577,6 +662,10 @@ class InstallerController
 
     public function terminateInstaller(Request $request, Response $response)
     {
+        if (!empty($GLOBALS['id']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'create_custom', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Route forbidden']);
+        }
+
         $body = $request->getParsedBody();
 
         if (!Validator::stringType()->notEmpty()->validate($body['customId'])) {

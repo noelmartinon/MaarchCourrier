@@ -309,7 +309,7 @@ export class PrivilegeService {
             'id': 'admin_connections',
             'label': 'lang.connections',
             'comment': 'lang.connectionsDesc',
-            'route': '/administration/connections',
+            'route': '/administration/connections/sso',
             'unit': 'supervision',
             'style': 'fas fa-plug',
             'angular': true,
@@ -416,8 +416,8 @@ export class PrivilegeService {
         },
         {
             'id': 'view_technical_infos',
-            'label': 'lang.viewTechnicalInformation',
-            'comment': 'lang.viewTechnicalInformation',
+            'label': 'lang.showTechnicalInformations',
+            'comment': 'lang.showTechnicalInformations',
             'unit': 'application'
         },
         {
@@ -498,6 +498,18 @@ export class PrivilegeService {
             'comment': 'lang.includeFolderPerimeter',
             'unit': 'application'
         },
+        {
+            'id': 'set_binding_document',
+            'label': 'lang.setBindingDocument',
+            'comment': 'lang.setBindingDocument',
+            'unit': 'lifeCycle'
+        },
+        {
+            'id': 'freeze_retention_rule',
+            'label': 'lang.freezeRetentionRule',
+            'comment': 'lang.freezeRetentionRule',
+            'unit': 'lifeCycle'
+        }
     ];
 
     private menus: menu[] = [
@@ -558,6 +570,16 @@ export class PrivilegeService {
             'route': 'RegisteredMailImportComponent__modal',
             'style': 'fas fa-dolly-flatbed',
             'unit': 'registeredMails',
+            'angular': true,
+            'shortcut': false
+        },
+        {
+            'id': 'create_custom',
+            'label': 'lang.installNewCustom',
+            'comment': 'lang.installNewCustom',
+            'route': '/install',
+            'style': 'far fa-window-restore',
+            'unit': 'application',
             'angular': true,
             'shortcut': false
         }

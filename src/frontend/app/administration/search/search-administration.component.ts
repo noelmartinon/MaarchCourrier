@@ -354,7 +354,7 @@ export class SearchAdministrationComponent implements OnInit {
 
     removeData(rmData: any, i: number, indexDisplayedData) {
         this.availableData.push(rmData);
-        this.displayedSecondaryData[indexDisplayedData].splice(i);
+        this.displayedSecondaryData[indexDisplayedData].splice(i, 1);
         this.dataControl.setValue('');
     }
 

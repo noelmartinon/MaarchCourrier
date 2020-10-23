@@ -314,7 +314,7 @@ class SearchController
             if ($body['meta']['values'][0] == '"' && $body['meta']['values'][strlen($body['meta']['values']) - 1] == '"') {
                 $quick = trim($body['meta']['values'], '"');
                 $quickWhere = "subject = ? OR alt_identifier = ? OR barcode = ?";
-                $quickWhere .= " OR res_id in (select res_id_master from res_attachments where (title = ? OR identifier = ?) and status in ('TRA', 'A_TRA'))";
+                $quickWhere .= " OR res_id in (select res_id_master from res_attachments where (title = ? OR identifier = ?) and status in ('TRA', 'A_TRA', 'FRZ'))";
                 if (ctype_digit($quick)) {
                     $quickWhere .= ' OR res_id = ?';
                     $args['searchData'][] = $quick;
@@ -348,7 +348,7 @@ class SearchController
                     $args['searchData'] = array_merge($args['searchData'], $requestDataDocument['data']);
                 }
                 if (!empty($requestDataAttachment['where'])) {
-                    $whereClause[]      = 'res_id in (select res_id_master from res_attachments where (' . implode(' OR ', $requestDataAttachment['where']) . ') and status in (\'TRA\', \'A_TRA\'))';
+                    $whereClause[]      = 'res_id in (select res_id_master from res_attachments where (' . implode(' OR ', $requestDataAttachment['where']) . ') and status in (\'TRA\', \'A_TRA\', \'FRZ\'))';
                     $args['searchData'] = array_merge($args['searchData'], $requestDataAttachment['data']);
                 }
 
@@ -375,7 +375,7 @@ class SearchController
 
         if (!empty($body['subject']) && !empty($body['subject']['values']) && is_string($body['subject']['values'])) {
             if ($body['subject']['values'][0] == '"' && $body['subject']['values'][strlen($body['subject']['values']) - 1] == '"') {
-                $args['searchWhere'][] = "(subject = ? OR res_id in (select res_id_master from res_attachments where title = ? and status in ('TRA', 'A_TRA')))";
+                $args['searchWhere'][] = "(subject = ? OR res_id in (select res_id_master from res_attachments where title = ? and status in ('TRA', 'A_TRA', 'FRZ')))";
                 $subject = trim($body['subject']['values'], '"');
                 $args['searchData'][] = $subject;
                 $args['searchData'][] = $subject;
@@ -391,7 +391,7 @@ class SearchController
                 ]);
                 $subjectGlue = implode(' AND ', $requestData['where']);
                 $attachmentField = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['title']]);
-                $subjectGlue = "(($subjectGlue) OR res_id in (select res_id_master from res_attachments where {$attachmentField} and status in ('TRA', 'A_TRA')))";
+                $subjectGlue = "(($subjectGlue) OR res_id in (select res_id_master from res_attachments where {$attachmentField} and status in ('TRA', 'A_TRA', 'FRZ')))";
                 $args['searchWhere'][] = $subjectGlue;
                 $args['searchData'] = array_merge($args['searchData'], $requestData['data']);
 
@@ -399,7 +399,7 @@ class SearchController
             }
         }
         if (!empty($body['chrono']) && !empty($body['chrono']['values']) && is_string($body['chrono']['values'])) {
-            $args['searchWhere'][] = '(alt_identifier ilike ? OR res_id in (select res_id_master from res_attachments where identifier ilike ? and status in (\'TRA\', \'A_TRA\')))';
+            $args['searchWhere'][] = '(alt_identifier ilike ? OR res_id in (select res_id_master from res_attachments where identifier ilike ? and status in (\'TRA\', \'A_TRA\', \'FRZ\')))';
             $args['searchData'][] = "%{$body['chrono']['values']}%";
             $args['searchData'][] = "%{$body['chrono']['values']}%";
         }
@@ -451,6 +451,42 @@ class SearchController
                 $args['searchWhere'][] = 'confidentiality in (?)';
             }
             $args['searchData'][] = $confidentialityData;
+        }
+        if (!empty($body['binding']) && !empty($body['binding']['values']) && is_array($body['binding']['values'])) {
+            $bindingData  = [];
+            $bindingWhere = [];
+            if (in_array(true, $body['binding']['values'], true)) {
+                $bindingData[] = 'true';
+            }
+            if (in_array(false, $body['binding']['values'], true)) {
+                $bindingData[] = 'false';
+            }
+            if (count($bindingData) > 0) {
+                $args['searchData'][] = $bindingData;
+                $bindingWhere[]       = 'binding in (?)';
+            }
+            if (in_array(null, $body['binding']['values'], true)) {
+                $bindingWhere[] = 'binding is NULL';
+            }
+            $args['searchWhere'][] = '(' . implode(' OR ', $bindingWhere) . ')';
+        }
+        if (!empty($body['retentionFrozen']) && !empty($body['retentionFrozen']['values']) && is_array($body['retentionFrozen']['values'])) {
+            $retentionFrozenData  = [];
+            $retentionFrozenWhere = [];
+            if (in_array(true, $body['retentionFrozen']['values'], true)) {
+                $retentionFrozenData[] = 'true';
+            }
+            if (in_array(false, $body['retentionFrozen']['values'], true)) {
+                $retentionFrozenData[] = 'false';
+            }
+            if (count($retentionFrozenData) > 0) {
+                $args['searchData'][]   = $retentionFrozenData;
+                $retentionFrozenWhere[] = 'retention_frozen in (?)';
+            }
+            if (in_array(null, $body['retentionFrozen']['values'], true)) {
+                $retentionFrozenWhere[] = 'retention_frozen is NULL';
+            }
+            $args['searchWhere'][] = '(' . implode(' OR ', $retentionFrozenWhere) . ')';
         }
         if (!empty($body['initiator']) && !empty($body['initiator']['values']) && is_array($body['initiator']['values'])) {
             if (in_array(null, $body['initiator']['values'])) {
@@ -726,16 +762,16 @@ class SearchController
         }
 
         if (!empty($body['attachment_type']) && !empty($body['attachment_type']['values']) && is_array($body['attachment_type']['values'])) {
-            $args['searchWhere'][] = 'res_id in (select DISTINCT res_id_master from res_attachments where attachment_type in (?) and status in (\'TRA\', \'A_TRA\'))';
+            $args['searchWhere'][] = 'res_id in (select DISTINCT res_id_master from res_attachments where attachment_type in (?) and status in (\'TRA\', \'A_TRA\', \'FRZ\'))';
             $args['searchData'][]  = $body['attachment_type']['values'];
         }
         if (!empty($body['attachment_creationDate']) && !empty($body['attachment_creationDate']['values']) && is_array($body['attachment_creationDate']['values'])) {
             if (Validator::date()->notEmpty()->validate($body['attachment_creationDate']['values']['start'])) {
-                $args['searchWhere'][] = 'res_id in (select DISTINCT res_id_master from res_attachments where creation_date >= ? and status in (\'TRA\', \'A_TRA\'))';
+                $args['searchWhere'][] = 'res_id in (select DISTINCT res_id_master from res_attachments where creation_date >= ? and status in (\'TRA\', \'A_TRA\', \'FRZ\'))';
                 $args['searchData'][]  = $body['attachment_creationDate']['values']['start'];
             }
             if (Validator::date()->notEmpty()->validate($body['attachment_creationDate']['values']['end'])) {
-                $args['searchWhere'][] = 'res_id in (select DISTINCT res_id_master from res_attachments where creation_date <= ? and status in (\'TRA\', \'A_TRA\'))';
+                $args['searchWhere'][] = 'res_id in (select DISTINCT res_id_master from res_attachments where creation_date <= ? and status in (\'TRA\', \'A_TRA\', \'FRZ\'))';
                 $args['searchData'][]  = TextFormatModel::getEndDayDate(['date' => $body['attachment_creationDate']['values']['end']]);
             }
         }
@@ -1150,7 +1186,7 @@ class SearchController
                         $idMasterDatas = AttachmentModel::get([
                             'select' => ['DISTINCT res_id_master'],
                             'where'  => ['res_id in (?)', 'status in (?)'],
-                            'data'   => [$listIds, ['A_TRA', 'TRA']]
+                            'data'   => [$listIds, ['A_TRA', 'FRZ', 'TRA']]
                         ]);
 
                         $listIds = array_column($idMasterDatas, 'res_id_master');
@@ -1747,6 +1783,25 @@ class SearchController
             ];
         }
 
+        if (empty($priorities['values'])) {
+            $priorities['values'] = [];
+        }
+        if (empty($categories['values'])) {
+            $categories['values'] = [];
+        }
+        if (empty($statuses['values'])) {
+            $statuses['values'] = [];
+        }
+        if (empty($docTypes['values'])) {
+            $docTypes['values'] = [];
+        }
+        if (empty($entities['values'])) {
+            $entities['values'] = [];
+        }
+        if (empty($folders['values'])) {
+            $folders['values'] = [];
+        }
+
         usort($priorities['values'], ['Resource\controllers\ResourceListController', 'compareSortOnLabel']);
         usort($categories['values'], ['Resource\controllers\ResourceListController', 'compareSortOnLabel']);
         usort($statuses['values'], ['Resource\controllers\ResourceListController', 'compareSortOnLabel']);
@@ -1770,12 +1825,12 @@ class SearchController
 
         if (!empty($body['subject']) && !empty($body['subject']['values']) && is_string($body['subject']['values'])) {
             if ($body['subject']['values'][0] == '"' && $body['subject']['values'][strlen($body['subject']['values']) - 1] == '"') {
-                $wherePlus = 'res_id in (select res_id_master from res_attachments where title = ? and status in (\'TRA\', \'A_TRA\'))';
+                $wherePlus = 'res_id in (select res_id_master from res_attachments where title = ? and status in (\'TRA\', \'A_TRA\', \'FRZ\'))';
                 $subject   = trim($body['subject']['values'], '"');
                 $data[]    = $subject;
             } else {
                 $attachmentField = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['title']]);
-                $wherePlus = "res_id in (select res_id_master from res_attachments where {$attachmentField} and status in ('TRA', 'A_TRA'))";
+                $wherePlus = "res_id in (select res_id_master from res_attachments where {$attachmentField} and status in ('TRA', 'A_TRA', 'FRZ'))";
                 $data[]    = "%{$body['subject']['values']}%";
             }
         }
@@ -1783,7 +1838,7 @@ class SearchController
             if (!empty($wherePlus)) {
                 $wherePlus .= ' OR ';
             }
-            $wherePlus .= 'res_id in (select res_id_master from res_attachments where identifier ilike ? and status in (\'TRA\', \'A_TRA\'))';
+            $wherePlus .= 'res_id in (select res_id_master from res_attachments where identifier ilike ? and status in (\'TRA\', \'A_TRA\', \'FRZ\'))';
             $data[] = "%{$body['chrono']['values']}%";
         }
         if (!empty($body['meta']) && !empty($body['meta']['values']) && is_string($body['meta']['values'])) {
@@ -1792,7 +1847,7 @@ class SearchController
                     $wherePlus .= ' OR ';
                 }
                 $quick = trim($body['meta']['values'], '"');
-                $wherePlus .= "res_id in (select res_id_master from res_attachments where (title = ? OR identifier = ?) and status in ('TRA', 'A_TRA'))";
+                $wherePlus .= "res_id in (select res_id_master from res_attachments where (title = ? OR identifier = ?) and status in ('TRA', 'A_TRA', 'FRZ'))";
                 $data[] = $quick;
                 $data[] = $quick;
             } else {
@@ -1811,7 +1866,7 @@ class SearchController
                         $wherePlus .= ' OR ';
                     }
 
-                    $wherePlus .= 'res_id in (select res_id_master from res_attachments where (' . implode(' OR ', $requestDataAttachment['where']) . ') and status in (\'TRA\', \'A_TRA\'))';
+                    $wherePlus .= 'res_id in (select res_id_master from res_attachments where (' . implode(' OR ', $requestDataAttachment['where']) . ') and status in (\'TRA\', \'A_TRA\', \'FRZ\'))';
                     $data = array_merge($data, $requestDataAttachment['data']);
                 }
             }

@@ -465,6 +465,18 @@ define("_DOC_ADD_TO_SIGNATORY_BOOK", "Courrier intégré au parapheur électroni
 define("_DOC_REMOVE_FROM_SIGNATORY_BOOK", "Courrier retiré du parapheur électronique");
 define("_DOC_ADD_TO_MAILEVA", "Courrier intégré aux envois Maileva");
 define("_DOC_REMOVE_FROM_MAILEVA", "Courrier retiré des envois Maileva");
+define("_RESET_BINDING_DOCUMENT", "Suppression de l'engagement du courrier");
+define("_SET_BINDING_DOCUMENT", "Courrier défini comme engageant");
+define("_SET_NON_BINDING_DOCUMENT", "Courrier défini comme non engageant");
+define("_RETENTION_RULE_FROZEN", "Durée d'utilitée courante gelée");
+define("_BINDING_DOCUMENT", "Document engageant");
+define("_YES", "Oui");
+define("_NO", "Non");
+define("_RESET_BINDING_DOCUMENT", "Paramètre Document engageant supprimé");
+define("_SET_BINDING_DOCUMENT", "Le document a été défini comme engageant");
+define("_SET_NON_BINDING_DOCUMENT", "Le document a été défini comme non engageant");
+define("_FREEZE_RETENTION_RULE", "La durée d'utilité courante a été gelée");
+define("_UNFREEZE_RETENTION_RULE", "La durée d'utilité courante a été dégelée");
 
 define("_ISSUING_SITE_CREATED", "Site émetteur créé");
 define("_ISSUING_SITE_UPDATED", "Site émetteur modifié");

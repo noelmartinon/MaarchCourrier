@@ -109,8 +109,8 @@ abstract class AttachmentModelAbstract
             $attachmentTypesXML = $loadedXml->attachment_types;
             if (count($attachmentTypesXML) > 0) {
                 foreach ($attachmentTypesXML->type as $value) {
-                    $label = defined((string) $value->label) ? constant((string) $value->label) : (string) $value->label;
-                    $types[(string) $value->id] = [
+                    $label = defined((string)$value->label) ? constant((string)$value->label) : (string)$value->label;
+                    $types[(string)$value->id] = [
                         'label'         => $label,
                         'icon'          => (string)$value['icon'],
                         'sign'          => (empty($value['sign']) || (string)$value['sign'] == 'true') ? true : false,

@@ -41,11 +41,13 @@ trait ExportSEDATrait
         ValidatorModel::notEmpty($args, ['resId']);
         ValidatorModel::intVal($args, ['resId']);
 
-        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['res_id', 'destination', 'type_id', 'subject', 'linked_resources', 'alt_identifier', 'admission_date', 'creation_date', 'modification_date']]);
+        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['res_id', 'destination', 'type_id', 'subject', 'linked_resources', 'alt_identifier', 'admission_date', 'creation_date', 'modification_date', 'doc_date', 'retention_frozen']]);
         if (empty($resource)) {
             return ['errors' => ['resource does not exists']];
         } elseif (empty($resource['destination'])) {
             return ['errors' => ['resource has no destination']];
+        } elseif ($resource['retention_frozen']) {
+            return ['errors' => ['retention rule is frozen']];
         }
 
         $doctype = DoctypeModel::getById(['id' => $resource['type_id'], 'select' => ['description', 'retention_rule', 'retention_final_disposition']]);
@@ -128,6 +130,7 @@ trait ExportSEDATrait
             ],
             'descriptionLevel'          => $args['data']['archiveDescriptionLevel'],
             'receivedDate'              => $resource['admission_date'],
+            'documentDate'              => $resource['doc_date'],
             'creationDate'              => $resource['creation_date'],
             'modificationDate'          => $resource['modification_date'],
             'retentionRule'             => $initData['data']['doctype']['retentionRule'],
@@ -218,25 +221,25 @@ trait ExportSEDATrait
         return [];
     }
 
-    private static function saveMessage($args = [])
+    public static function saveMessage($args = [])
     {
-        $data = new stdClass();
+        $data = new \stdClass();
 
         $data->messageId                             = $args['messageObject']->MessageIdentifier->value;
         $data->date                                  = $args['messageObject']->Date;
 
-        $data->MessageIdentifier                     = new stdClass();
+        $data->MessageIdentifier                     = new \stdClass();
         $data->MessageIdentifier->value              = $args['messageObject']->MessageIdentifier->value;
 
-        $data->TransferringAgency                    = new stdClass();
-        $data->TransferringAgency->Identifier        = new stdClass();
+        $data->TransferringAgency                    = new \stdClass();
+        $data->TransferringAgency->Identifier        = new \stdClass();
         $data->TransferringAgency->Identifier->value = $args['messageObject']->TransferringAgency->Identifier->value;
 
-        $data->ArchivalAgency                        = new stdClass();
-        $data->ArchivalAgency->Identifier            = new stdClass();
+        $data->ArchivalAgency                        = new \stdClass();
+        $data->ArchivalAgency->Identifier            = new \stdClass();
         $data->ArchivalAgency->Identifier->value     = $args['messageObject']->ArchivalAgency->Identifier->value;
 
-        $data->ArchivalAgreement                     = new stdClass();
+        $data->ArchivalAgreement                     = new \stdClass();
         $data->ArchivalAgreement->value              = $args['messageObject']->ArchivalAgreement->value;
 
         $data->ReplyCode                             = $args['messageObject']->ReplyCode;

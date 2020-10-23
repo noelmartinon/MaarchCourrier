@@ -98,7 +98,7 @@ class NoteController
             if (!Validator::arrayType()->validate($body['entities'])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Body entities is not an array']);
             }
-            $entities = Entitymodel::get(['select' => ['count(1)'], 'where' => ['entity_id in (?)'], 'data' => [$body['entities']]]);
+            $entities = EntityModel::get(['select' => ['count(1)'], 'where' => ['entity_id in (?)'], 'data' => [$body['entities']]]);
             if ($entities[0]['count'] != count($body['entities'])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Body entities : one or more entities do not exist']);
             }
@@ -158,7 +158,7 @@ class NoteController
             if (!Validator::arrayType()->validate($body['entities'])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Body entities is not an array']);
             }
-            $entities = Entitymodel::get(['select' => ['count(1)'], 'where' => ['entity_id in (?)'], 'data' => [$body['entities']]]);
+            $entities = EntityModel::get(['select' => ['count(1)'], 'where' => ['entity_id in (?)'], 'data' => [$body['entities']]]);
             if ($entities[0]['count'] != count($body['entities'])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Body entities : one or more entities do not exist']);
             }

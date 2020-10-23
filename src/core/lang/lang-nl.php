@@ -465,6 +465,18 @@ define("_DOC_ADD_TO_SIGNATORY_BOOK", "Mail added to signatory book"); //TO TRANS
 define("_DOC_REMOVE_FROM_SIGNATORY_BOOK", "Mail removed from signatory book"); //TO TRANSLATE
 define("_DOC_ADD_TO_MAILEVA", "Mail added to Maileva shippings"); //TO TRANSLATE
 define("_DOC_REMOVE_FROM_MAILEVA", "Mail removed from Maileva shippings"); //TO TRANSLATE
+define("_RESET_BINDING_DOCUMENT", "Reset document binding"); //TO TRANSLATE
+define("_SET_BINDING_DOCUMENT", "Set document as binging"); //TO TRANSLATE
+define("_SET_NON_BINDING_DOCUMENT", "Set document as non binding"); //TO TRANSLATE
+define("_RETENTION_RULE_FROZEN", "Retention rule frozen"); //TO TRANSLATE
+define("_BINDING_DOCUMENT", "Binding document"); //TO TRANSLATE
+define("_YES", "Yes");
+define("_NO", "No"); //TO TRANSLATE
+define("_RESET_BINDING_DOCUMENT", "Reset binding document"); //TO TRANSLATE
+define("_SET_BINDING_DOCUMENT", "Mail was set as binding"); //TO TRANSLATE
+define("_SET_NON_BINDING_DOCUMENT", "Mail was set as non binding"); //TO TRANSLATE
+define("_FREEZE_RETENTION_RULE", "Retention rule frozen"); //TO TRANSLATE
+define("_UNFREEZE_RETENTION_RULE", "Retention rule unfrozen"); //TO TRANSLATE
 
 define("_ISSUING_SITE_CREATED", "Issuing site created"); //TO TRANSLATE
 define("_ISSUING_SITE_UPDATED", "Issuing site updated"); //TO TRANSLATE

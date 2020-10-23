@@ -343,7 +343,8 @@ export class VisaWorkflowComponent implements OnInit {
                         'requested_signature': element.mode !== 'visa',
                         'process_date': this.functions.formatFrenchDateToTechnicalDate(element.processDate),
                         'picture': '',
-                        'hasPrivilege': true
+                        'hasPrivilege': true,
+                        'isValid': true
                     };
                     this.visaWorkflow.items.push(user);
                     this.http.get("../rest/maarchParapheur/user/" + element.userId + "/picture")
@@ -463,7 +464,8 @@ export class VisaWorkflowComponent implements OnInit {
                     difflist_type: 'VISA_CIRCUIT',
                     signatory: !this.functions.empty(item.signatory) ? item.signatory : false,
                     requested_signature: !this.functions.empty(item.requested_signature) ? item.requested_signature : false,
-                    hasPrivilege: true
+                    hasPrivilege: true,
+                    isValid: true
                 });
                 if (this.linkedToMaarchParapheur) {
                     this.getMaarchParapheurUserAvatar(item.externalId.maarchParapheur, this.visaWorkflow.items.length - 1);
@@ -480,7 +482,8 @@ export class VisaWorkflowComponent implements OnInit {
                     difflist_type: 'VISA_CIRCUIT',
                     signatory: !this.functions.empty(item.signatory) ? item.signatory : false,
                     requested_signature: !this.functions.empty(item.requested_signature) ? item.requested_signature : false,
-                    hasPrivilege: item.hasPrivilege
+                    hasPrivilege: item.hasPrivilege,
+                    isValid: item.isValid
                 });
 
                 if (this.linkedToMaarchParapheur) {
@@ -503,7 +506,8 @@ export class VisaWorkflowComponent implements OnInit {
                                     difflist_type: 'VISA_CIRCUIT',
                                     signatory: false,
                                     requested_signature: itemTemplate.item_mode === 'sign',
-                                    hasPrivilege: itemTemplate.hasPrivilege
+                                    hasPrivilege: itemTemplate.hasPrivilege,
+                                    isValid: itemTemplate.isValid
                                 }
                             })
                         );
@@ -521,7 +525,7 @@ export class VisaWorkflowComponent implements OnInit {
     }
 
     isValidWorkflow() {
-        if ((this.visaWorkflow.items.filter((item: any) => item.requested_signature).length > 0 && this.visaWorkflow.items.filter((item: any) => !item.hasPrivilege).length === 0) && this.visaWorkflow.items.length > 0) {
+        if ((this.visaWorkflow.items.filter((item: any) => item.requested_signature).length > 0 && this.visaWorkflow.items.filter((item: any) => !item.hasPrivilege || !item.isValid).length === 0) && this.visaWorkflow.items.length > 0) {
             return true;
         } else {
             return false;
@@ -533,6 +537,8 @@ export class VisaWorkflowComponent implements OnInit {
             return this.translate.instant('lang.signUserRequired');
         } else if (this.visaWorkflow.items.filter((item: any) => !item.hasPrivilege).length > 0) {
             return this.translate.instant('lang.mustDeleteUsersWithNoPrivileges');
+        } else if (this.visaWorkflow.items.filter((item: any) => !item.isValid).length > 0) {
+            return this.translate.instant('lang.mustDeleteInvalidUsers');
         }
     }
 

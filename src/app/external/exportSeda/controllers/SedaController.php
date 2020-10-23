@@ -24,6 +24,7 @@ use Entity\models\EntityModel;
 use ExportSeda\controllers\ExportSEDATrait;
 use Folder\models\FolderModel;
 use Group\controllers\PrivilegeController;
+use History\controllers\HistoryController;
 use MessageExchange\models\MessageExchangeModel;
 use Note\models\NoteModel;
 use Resource\controllers\ResController;
@@ -59,11 +60,13 @@ class SedaController
 
         $firstResource = $body['resources'][0];
 
-        $resource = ResModel::getById(['resId' => $firstResource, 'select' => ['res_id', 'destination', 'type_id', 'subject', 'linked_resources']]);
+        $resource = ResModel::getById(['resId' => $firstResource, 'select' => ['res_id', 'destination', 'type_id', 'subject', 'linked_resources', 'retention_frozen']]);
         if (empty($resource)) {
             return $response->withStatus(400)->withJson(['errors' => 'resource does not exists']);
         } elseif (empty($resource['destination'])) {
             return $response->withStatus(400)->withJson(['errors' => 'resource has no destination', 'lang' => 'noDestination']);
+        } elseif ($resource['retention_frozen'] === true) {
+            return $response->withStatus(400)->withJson(['errors' => 'retention rule is frozen', 'lang' => 'retentionRuleFrozen']);
         }
 
         $doctype = DoctypeModel::getById(['id' => $resource['type_id'], 'select' => ['description', 'retention_rule', 'retention_final_disposition']]);
@@ -477,5 +480,114 @@ class SedaController
         }
 
         return $response->withJson(['retentionRules' => $retentionRules]);
+    }
+
+    public function setBindingDocument(Request $request, Response $response)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'set_binding_document', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $body = $request->getParsedBody();
+
+        if (!Validator::arrayType()->notEmpty()->validate($body['resources'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body resources is empty or not an array']);
+        }
+        if ($body['binding'] !== null && !Validator::boolType()->validate($body['binding'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body binding is not a boolean']);
+        }
+
+        $body['resources'] = array_slice($body['resources'], 0, 500);
+        if (!ResController::hasRightByResId(['resId' => $body['resources'], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
+        $documents = ResModel::get([
+            'select' => ['alt_identifier', 'res_id'],
+            'where'  => ['res_id in (?)'],
+            'data'   => [$body['resources']]
+        ]);
+        $documents = array_column($documents, 'alt_identifier', 'res_id');
+
+        if ($body['binding'] === null) {
+            $binding = null;
+            $info    = _RESET_BINDING_DOCUMENT;
+        } else {
+            $binding = $body['binding'] ? 'true' : 'false';
+            $info    = $body['binding'] ? _SET_BINDING_DOCUMENT : _SET_NON_BINDING_DOCUMENT;
+        }
+
+        ResModel::update([
+            'set'   => [
+                'binding' => $binding,
+            ],
+            'where' => ['res_id in (?)'],
+            'data'  => [$body['resources']]
+        ]);
+
+        foreach ($body['resources'] as $resId) {
+            HistoryController::add([
+                'tableName' => 'res_letterbox',
+                'recordId'  => $resId,
+                'eventType' => 'UP',
+                'info'      => $info . " : " . $documents[$resId],
+                'moduleId'  => 'resource',
+                'eventId'   => 'resourceModification',
+            ]);
+        }
+        
+        return $response->withStatus(204);
+    }
+
+    public function freezeRetentionRule(Request $request, Response $response)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'freeze_retention_rule', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $body = $request->getParsedBody();
+
+        if (!Validator::arrayType()->notEmpty()->validate($body['resources'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body resources is empty or not an array']);
+        }
+        if (!Validator::boolType()->validate($body['freeze'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body freeze is not a boolean']);
+        }
+
+        $body['resources'] = array_slice($body['resources'], 0, 500);
+        if (!ResController::hasRightByResId(['resId' => $body['resources'], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
+        $documents = ResModel::get([
+            'select' => ['alt_identifier', 'res_id'],
+            'where'  => ['res_id in (?)'],
+            'data'   => [$body['resources']]
+        ]);
+        $documents = array_column($documents, 'alt_identifier', 'res_id');
+
+        $freeze = $body['freeze'] ? 'true' : 'false';
+        $info   = $body['freeze'] ? _FREEZE_RETENTION_RULE : _UNFREEZE_RETENTION_RULE;
+        
+        ResModel::update([
+            'set'   => [
+                'retention_frozen' => $freeze,
+            ],
+            'where' => ['res_id in (?)'],
+            'data'  => [$body['resources']]
+        ]);
+
+        foreach ($body['resources'] as $resId) {
+            HistoryController::add([
+                'tableName' => 'res_letterbox',
+                'recordId'  => $resId,
+                'eventType' => 'UP',
+                'info'      => $info . " : " . $documents[$resId],
+                'moduleId'  => 'resource',
+                'eventId'   => 'resourceModification',
+            ]);
+        }
+        
+        return $response->withStatus(204);
     }
 }

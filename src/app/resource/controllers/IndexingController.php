@@ -111,7 +111,11 @@ class IndexingController
             $methodResponse = ActionMethodController::$method(['resId' => $body['resource'], 'data' => $body['data'], 'note' => $body['note'], 'parameters' => $parameters]);
         }
         if (!empty($methodResponse['errors'])) {
-            return $response->withStatus(400)->withJson(['errors' => $methodResponse['errors'][0]]);
+            $return = ['errors' => $methodResponse['errors'][0]];
+            if (!empty($methodResponse['lang'])) {
+                $return['lang'] = $methodResponse['lang'];
+            }
+            return $response->withStatus(400)->withJson($return);
         }
 
         $historic = empty($methodResponse['history']) ? '' : $methodResponse['history'];

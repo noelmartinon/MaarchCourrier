@@ -564,7 +564,7 @@ class ContactController
             'select' => ['*'],
             'orderBy' => ['identifier=\'civility\' desc, identifier=\'firstname\' desc, identifier=\'lastname\' desc, identifier=\'company\' desc, identifier=\'department\' desc, 
             identifier=\'function\' desc, identifier=\'address_number\' desc, identifier=\'address_street\' desc, identifier=\'address_additional1\' desc, identifier=\'address_additional2\' desc, 
-            identifier=\'address_postcode\' desc, identifier=\'address_town\' desc, identifier=\'address_country\' desc, identifier=\'email\' desc, identifier=\'phone\' desc']
+            identifier=\'address_postcode\' desc, identifier=\'address_town\' desc, identifier=\'address_country\' desc, identifier=\'email\' desc, identifier=\'phone\' desc, identifier=\'notes\' desc']
         ]);
         foreach ($contactParameters as $key => $parameter) {
             if (strpos($parameter['identifier'], 'contactCustomField_') !== false) {
@@ -695,7 +695,7 @@ class ContactController
                 'select'    => [
                     'civility', 'firstname', 'lastname', 'company', 'department', 'function', 'address_number as "addressNumber"', 'address_street as "addressStreet"',
                     'address_additional1 as "addressAdditional1"', 'address_additional2 as "addressAdditional2"', 'address_postcode as "addressPostcode"',
-                    'address_town as "addressTown"', 'address_country as "addressCountry"', 'email', 'phone', 'custom_fields'
+                    'address_town as "addressTown"', 'address_country as "addressCountry"', 'email', 'phone', 'notes', 'custom_fields'
                 ],
                 'id'        => $aArgs['contactId']
             ]);

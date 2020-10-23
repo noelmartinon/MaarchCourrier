@@ -14,7 +14,7 @@
         </div>
         <div class="indexing-form-container">
             <div *ngIf="!isModalOpen() && currentTool !== 'dashboard'" style="display: flex;justify-content: flex-end;">
-                <button mat-icon-button (click)="openTechnicalInfo()" color="primary" [title]="this.translate.instant('lang.showTechnicalInfo')">
+                <button *ngIf="privilegeService.hasCurrentUserPrivilege('view_technical_infos')" mat-icon-button (click)="openTechnicalInfo()" color="primary" [title]="this.translate.instant('lang.showTechnicalInfo')">
                     <mat-icon class="far fa-file-code"></mat-icon>
                 </button>
                 <button mat-icon-button (click)="createModal()" color="primary" [title]="this.translate.instant('lang.openInExternalModal')">
@@ -191,6 +191,14 @@
                                 class="categoryLabel" (click)="toggleFollow()">
                                 <mat-icon class="followIcon {{this.resourceFollowed ? 'fas':'far'}} fa-star"
                                     style="font-size: 20px;"></mat-icon>
+                            </button>
+                            <button mat-icon-button [title]="this.translate.instant('lang.freezeRetentionRule')"
+                            class="categoryLabel" (click)="toggleFreezing()">
+                                <mat-icon class="freezeThawIcon {{this.resourceFreezed ? 'fas':'far'}} fa-pause-circle" style="font-size: 20px;"></mat-icon>
+                            </button>
+                            <button mat-icon-button [title]="this.translate.instant('lang.setBindingDocument')"
+                            class="categoryLabel" (click)="toggleBinding()">
+                                <mat-icon class=" {{this.resourceBinded ? 'bindIcon' : 'noBindIcn'}} fas fa-paperclip" style="font-size: 20px;"></mat-icon>
                             </button>
                             <div class="content-item" *ngIf="this.currentResourceInformations.priority !== undefined">
                                 <b><i class="fas fa-flag" [style.color]="this.currentResourceInformations.priorityColor"
