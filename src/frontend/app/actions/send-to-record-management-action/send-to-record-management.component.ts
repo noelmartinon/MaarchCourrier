@@ -143,26 +143,48 @@ export class SendToRecordManagementComponent implements OnInit {
                 } else {
                     this.resourcesErrors.push(err.error.errors);
                 }
-                // this.notify.handleErrors(err);
                 return of(false);
             })
         ).subscribe();
     }
 
-    onSubmit() {
+    onSubmit(mode: string) {
         this.loading = true;
-        this.formatData();
         if (this.data.resIds.length > 0) {
-            this.executeAction();
+            this.executeAction(mode);
         }
     }
 
-    executeAction() {
+    executeAction(mode: string) {
         const realResSelected: number[] = this.data.resIds;
 
-        this.http.put(this.data.processActionRoute, { resources: realResSelected, data: this.formatData() }).pipe(
+        this.http.put(this.data.processActionRoute, { resources: realResSelected, data: this.formatData(mode) }).pipe(
             tap((data: any) => {
-                if (!data) {
+                if (mode === 'download' && !this.functions.empty(data.data.encodedFile)) {
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = `data:application/zip;base64,${data.data.encodedFile}`;
+                    let today: any;
+                    let dd: any;
+                    let mm: any;
+                    let yyyy: any;
+
+                    today = new Date();
+                    dd = today.getDate();
+                    mm = today.getMonth() + 1;
+                    yyyy = today.getFullYear();
+
+                    if (dd < 10) {
+                        dd = '0' + dd;
+                    }
+                    if (mm < 10) {
+                        mm = '0' + mm;
+                    }
+                    today = dd + '-' + mm + '-' + yyyy;
+                    downloadLink.setAttribute('download', 'seda_package_' + today + '.zip');
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    this.dialogRef.close('success');
+                } else if (!data) {
                     this.dialogRef.close('success');
                 }
                 if (data && data.errors != null) {
@@ -177,7 +199,7 @@ export class SendToRecordManagementComponent implements OnInit {
         ).subscribe();
     }
 
-    formatData() {
+    formatData(mode: string) {
         const dataToSend = {};
         Object.keys(this.actionFormGroup.controls).forEach(element => {
             dataToSend[element] = this.actionFormGroup.controls[element].value;
@@ -188,6 +210,7 @@ export class SendToRecordManagementComponent implements OnInit {
                 descriptionLevel : archive.descriptionLevel
             };
         });
+        dataToSend['actionMode'] = mode;
         return dataToSend;
     }
 

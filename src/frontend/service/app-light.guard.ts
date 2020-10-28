@@ -35,7 +35,7 @@ export class AppLightGuard implements CanActivate {
         this.headerService.resetSideNavSelection();
 
         return this.authService.getLoginInformations(state.url).pipe(
-            exhaustMap(() => this.authService.getToken() !== null ? this.authService.getCurrentUserInfo() : of(false)),
+            exhaustMap(() => this.authService.getToken() !== null && state.url !== '/login' ? this.authService.getCurrentUserInfo() : of(false)),
             map(() => true),
             catchError((err: any) => {
                 return of(true);

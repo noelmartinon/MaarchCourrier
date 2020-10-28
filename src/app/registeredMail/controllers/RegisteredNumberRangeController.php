@@ -28,7 +28,7 @@ class RegisteredNumberRangeController
 
         foreach ($ranges as $key => $range) {
             $fullness = $range['current_number'] - $range['range_start'];
-            $rangeSize = $range['range_end'] - $range['range_start'];
+            $rangeSize = $range['range_end'] - $range['range_start'] + 1;
             $fullness = ($fullness / $rangeSize) * 100;
             $fullness = $fullness < 0 ? 0 : $fullness;
             $fullness = round($fullness, 2);
@@ -63,7 +63,7 @@ class RegisteredNumberRangeController
         }
 
         $fullness = $range['current_number'] - $range['range_start'];
-        $rangeSize = $range['range_end'] - $range['range_start'];
+        $rangeSize = $range['range_end'] - $range['range_start'] + 1;
         $fullness = ($fullness / $rangeSize) * 100;
         $fullness = $fullness < 0 ? 0 : $fullness;
         $fullness = round($fullness, 2);

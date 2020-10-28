@@ -51,7 +51,7 @@ export class LoginComponent implements OnInit {
         });
 
         this.environment = environment;
-        if (this.authService.isAuth()) {
+        if (this.authService.getToken() !== null) {
             if (!this.functionsService.empty(this.authService.getUrl(JSON.parse(atob(this.authService.getToken().split('.')[1])).user.id))) {
                 this.router.navigate([this.authService.getUrl(JSON.parse(atob(this.authService.getToken().split('.')[1])).user.id)]);
             } else {
@@ -109,7 +109,11 @@ export class LoginComponent implements OnInit {
     }
 
     initConnection() {
-        if (['cas', 'keycloak'].indexOf(this.authService.authMode) > -1) {
+        if (['sso'].indexOf(this.authService.authMode) > -1) {
+            this.loginForm.disable();
+            this.loginForm.setValidators(null);
+            this.onSubmit();
+        } else if (['cas', 'keycloak'].indexOf(this.authService.authMode) > -1) {
             this.loginForm.disable();
             this.loginForm.setValidators(null);
             const regexCas = /ticket=[.]*/g;

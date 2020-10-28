@@ -48,7 +48,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         private adapter: DateAdapter<any>,
         public dialog: MatDialog,
     ) {
-
         translate.setDefaultLang('fr');
         iconReg.addSvgIcon('maarchLogo', sanitizer.bypassSecurityTrustResourceUrl('../rest/images?image=onlyLogo'));
         iconReg.addSvgIcon('maarchLogoFull', sanitizer.bypassSecurityTrustResourceUrl('../rest/images?image=logo'));
@@ -66,8 +65,10 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.headerService.hideSideBar = true;
         setTimeout(() => {
             this.headerService.sideNavLeft = this.snavLeft;
-            this.adapter.setLocale(this.translate.instant('lang.langISO'));
         }, 0);
+        this.translate.get('lang.langISO').subscribe((res: string) => {
+            this.adapter.setLocale(res);
+        });
     }
 
     ngAfterViewInit(): void {

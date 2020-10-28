@@ -23,3 +23,20 @@
         color: $warn;
     }
 }
+
+.freezeIcon {
+    color: $primary;
+}
+
+.bindidngIcon {
+    color: $primary;
+    margin-left: 5px;
+}
+
+.isSelectedMenu {
+    background: $secondary;
+  }
+
+.notSelectedMenu {
+    background: white;
+}

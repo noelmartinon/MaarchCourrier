@@ -270,28 +270,13 @@ export class ListAdministrationComponent implements OnInit {
 
         this.availableDataClone = JSON.parse(JSON.stringify(this.availableData));
         this.displayedSecondaryData = [];
-        let indexData: number = 0;
         this.selectedTemplateDisplayedSecondaryData = this.basketGroup.list_display.templateColumns;
         this.selectedTemplateDisplayedSecondaryDataClone = this.selectedTemplateDisplayedSecondaryData;
 
-        const tmpData = [];
         this.basketGroup.list_display.subInfos.forEach((element: any) => {
-            indexData = this.availableData.map((e: any) => e.value).indexOf(element.value);
-            this.availableData[indexData].cssClasses = element.cssClasses;
-            tmpData.push(this.availableData[indexData]);
-            this.availableData.splice(indexData, 1);
+            this.addData(element.value);
+            this.displayedSecondaryData[this.displayedSecondaryData.length - 1].cssClasses = element.cssClasses;
         });
-
-        let previousIndex = 0;
-        this.displayedSecondaryData = [];
-        tmpData.forEach((object: any, index: any) => {
-            if (index % this.selectedTemplateDisplayedSecondaryData === 0 && index !== 0) {
-                const tmp = tmpData.slice(previousIndex, index);
-                this.displayedSecondaryData.push(tmp);
-                previousIndex = index;
-            }
-        });
-        this.displayedSecondaryData.push(tmpData.slice(previousIndex));
 
         this.selectedListEvent = this.basketGroup.list_event;
         this.selectedListEventClone = this.selectedListEvent;
@@ -368,29 +353,28 @@ export class ListAdministrationComponent implements OnInit {
         }
     }
 
-    addData(event: any) {
-        const i = this.availableData.map((e: any) => e.value).indexOf(event.option.value.value);
-        if ((this.displayedSecondaryData.length === 0) || (this.displayedSecondaryData[this.displayedSecondaryData.length - 1].length >= this.selectedTemplateDisplayedSecondaryData)) {
-            this.displayedSecondaryData.push([]);
-        }
-        this.displayedSecondaryData[this.displayedSecondaryData.length - 1].push(event.option.value);
+    addData(id: any) {
+        const i = this.availableData.map((e: any) => e.value).indexOf(id);
+
+        this.displayedSecondaryData.push(this.availableData.filter((item: any) => item.value === id)[0]);
+
         this.availableData.splice(i, 1);
+
         $('#availableData').blur();
         this.dataControl.setValue('');
     }
 
-    removeData(data: any, i: number, indexDisplayedData) {
+    removeData(data: any, i: number) {
         this.availableData.push(data);
-        this.displayedSecondaryData[indexDisplayedData].splice(i, 1);
+        this.displayedSecondaryData.splice(i, 1);
         this.dataControl.setValue('');
     }
 
     removeAllData() {
-        this.displayedSecondaryData.forEach(element => {
-            this.availableData = this.availableData.concat(element);
-        });
-        this.displayedSecondaryData = [];
+        this.displayedSecondaryData = this.displayedSecondaryData.concat();
+        this.availableData = this.availableData.concat(this.displayedSecondaryData);
         this.dataControl.setValue('');
+        this.displayedSecondaryData = [];
     }
 
     drop(event: CdkDragDrop<string[]>) {
@@ -410,28 +394,15 @@ export class ListAdministrationComponent implements OnInit {
     }
 
     saveTemplate() {
-        const template: any = [];
-        this.displayedSecondaryData.forEach((subArray: any) => {
-            subArray.forEach((element: any) => {
-                template.push(
-                    {
-                        'value':      element.value,
-                        'cssClasses': element.cssClasses,
-                        'icon':       element.icon,
-                    }
-                );
-            });
-        });
-
         const objToSend = {
             templateColumns: this.selectedTemplateDisplayedSecondaryData,
-            subInfos: template
+            subInfos: this.displayedSecondaryData
         };
 
         this.http.put('../rest/baskets/' + this.basketGroup.basket_id + '/groups/' + this.basketGroup.group_id, { 'list_display': objToSend, 'list_event': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
             .subscribe(() => {
                 this.displayedSecondaryDataClone = JSON.parse(JSON.stringify(this.displayedSecondaryData));
-                this.basketGroup.list_display = template;
+                this.basketGroup.list_display = this.displayedSecondaryData;
                 this.basketGroup.list_event = this.selectedListEvent;
                 this.selectedListEventClone = this.selectedListEvent;
                 this.basketGroup.list_event_data = this.selectedProcessTool;
@@ -469,12 +440,6 @@ export class ListAdministrationComponent implements OnInit {
         this.selectedProcessTool = JSON.parse(JSON.stringify(this.selectedProcessToolClone));
         this.availableData = JSON.parse(JSON.stringify(this.availableDataClone));
         this.selectedTemplateDisplayedSecondaryData = JSON.parse(JSON.stringify(this.selectedTemplateDisplayedSecondaryDataClone));
-
-        let indexData: number = 0;
-        this.displayedSecondaryData.forEach((element: any) => {
-            indexData = this.availableData.map((e: any) => e.value).indexOf(element.value);
-            this.availableData.splice(indexData, 1);
-        });
         this.dataControl.setValue('');
     }
 
@@ -500,23 +465,5 @@ export class ListAdministrationComponent implements OnInit {
         if (!state) {
             this.selectedProcessTool.canUpdateModel = state;
         }
-    }
-
-    reorderDisplayedData() {
-        let mergedArray = [];
-        this.displayedSecondaryData.forEach((subArray: any) => {
-            mergedArray = mergedArray.concat(subArray);
-        });
-
-        let previousIndex = 0;
-        this.displayedSecondaryData = [];
-        mergedArray.forEach((object: any, index: any) => {
-            if (index % this.selectedTemplateDisplayedSecondaryData === 0 && index !== 0) {
-                const tmp = mergedArray.slice(previousIndex, index);
-                this.displayedSecondaryData.push(tmp);
-                previousIndex = index;
-            }
-        });
-        this.displayedSecondaryData.push(mergedArray.slice(previousIndex));
     }
 }

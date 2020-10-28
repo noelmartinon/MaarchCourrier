@@ -49,7 +49,7 @@ class AutoCompleteController
         }
 
         $fields = ['firstname', 'lastname'];
-        $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+        $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
 
         $requestData = AutoCompleteController::getDataForRequest([
             'search'        => $queryParams['search'],
@@ -174,7 +174,7 @@ class AutoCompleteController
             }
 
             $fieldsNumber = count($fields);
-            $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
 
             $requestData = AutoCompleteController::getDataForRequest([
                 'search'        => $queryParams['search'],
@@ -214,7 +214,7 @@ class AutoCompleteController
 
             $nbFields = count($fields);
 
-            $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
             $requestData = AutoCompleteController::getDataForRequest([
                 'search'        => $queryParams['search'],
                 'fields'        => $fields,
@@ -258,7 +258,7 @@ class AutoCompleteController
 
             $nbFields = count($fields);
 
-            $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
             $requestData = AutoCompleteController::getDataForRequest([
                 'search'        => $queryParams['search'],
                 'fields'        => $fields,
@@ -295,7 +295,7 @@ class AutoCompleteController
         $autocompleteContactsGroups = [];
         if (empty($queryParams['noContactsGroups'])) {
             $fields = ['label'];
-            $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
             $requestData = AutoCompleteController::getDataForRequest([
                 'search'        => $queryParams['search'],
                 'fields'        => $fields,
@@ -347,7 +347,7 @@ class AutoCompleteController
             $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['id']]);
 
             $fields = ['users.firstname', 'users.lastname'];
-            $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
 
             $requestData = AutoCompleteController::getDataForRequest([
                 'search'        => $data['search'],
@@ -371,7 +371,7 @@ class AutoCompleteController
 
             if (count($users) < self::LIMIT) {
                 $fields = ['users.firstname', 'users.lastname'];
-                $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+                $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
 
                 $requestData = AutoCompleteController::getDataForRequest([
                     'search'        => $data['search'],
@@ -448,7 +448,7 @@ class AutoCompleteController
 
         if (!empty($queryParams['search'])) {
             $fields = ['users.firstname', 'users.lastname'];
-            $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
 
             $requestData = AutoCompleteController::getDataForRequest([
                 'search'        => $queryParams['search'],
@@ -489,7 +489,7 @@ class AutoCompleteController
         }
 
         $fields = ['entity_label'];
-        $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+        $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
 
         $requestData = AutoCompleteController::getDataForRequest([
             'search'        => $queryParams['search'],
@@ -560,7 +560,7 @@ class AutoCompleteController
         }
 
         $fieldsNumber = count($fields);
-        $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+        $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
 
         $requestData = AutoCompleteController::getDataForRequest([
             'search'        => $data['search'],
@@ -594,7 +594,7 @@ class AutoCompleteController
             return $response->withStatus(400)->withJson(['errors' => 'Query params search is empty']);
         }
 
-        $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['company']]);
+        $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['company']]);
         $contacts = ContactModel::get([
             'select'    => [
                 'id', 'company', 'address_number as "addressNumber"', 'address_street as "addressStreet"',
@@ -754,7 +754,7 @@ class AutoCompleteController
         }
 
         $fieldsNumber = count($fields);
-        $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+        $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
 
         $requestData = AutoCompleteController::getDataForRequest([
             'search'        => $queryParams['search'],
@@ -863,7 +863,7 @@ class AutoCompleteController
 
         $arrScopedFoldersIds = array_column($scopedFolders, 'id');
 
-        $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['label']]);
+        $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['label']]);
 
         $selectedFolders = FolderModel::get([
             'where'    => ["{$fields} AND id in (?)"],
@@ -893,7 +893,7 @@ class AutoCompleteController
         }
 
         $fields = ['label'];
-        $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+        $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
 
         $requestData = AutoCompleteController::getDataForRequest([
             'search'        => $data['search'],
@@ -953,15 +953,15 @@ class AutoCompleteController
         return ['where' => $args['where'], 'data' => $args['data']];
     }
 
-    public static function getUnsensitiveFieldsForRequest(array $args)
+    public static function getInsensitiveFieldsForRequest(array $args)
     {
         ValidatorModel::notEmpty($args, ['fields']);
         ValidatorModel::arrayType($args, ['fields']);
 
         $fields = [];
         foreach ($args['fields'] as $key => $field) {
-            $fields[$key] = "translate({$field}, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ', 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')";
-            $fields[$key] .= "ilike translate(?, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ', 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')";
+            $fields[$key] = "unaccent({$field}::text)";
+            $fields[$key] .= " ilike unaccent(?::text)";
         }
         $fields = implode(' OR ', $fields);
         $fields = "({$fields})";

@@ -36,12 +36,12 @@ foreach ($customs as $custom) {
                     'maarchId' => 'login'
                 ];
             }
-            $configuration = !empty($configuration) ? json_encode($configuration, JSON_UNESCAPED_SLASHES) : '{}';
+            $configuration = !empty($configuration) ? json_encode($configuration, JSON_UNESCAPED_SLASHES) : '{"url":"","mapping":[{"ssoId":"","maarchId":"login"}]}';
             \Configuration\models\ConfigurationModel::create(['privilege' => 'admin_sso', 'value' => $configuration]);
             printf("Migration mapping SSO (CUSTOM {$custom}) : fichier de configuration mapping_sso.xml trouvé et migré.\n");
             continue;
         }
     }
 
-    \Configuration\models\ConfigurationModel::create(['privilege' => 'admin_sso', 'value' => '{}']);
+    \Configuration\models\ConfigurationModel::create(['privilege' => 'admin_sso', 'value' => '{"url":"","mapping":[{"ssoId":"","maarchId":"login"}]}']);
 }

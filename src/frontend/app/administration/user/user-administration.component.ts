@@ -930,7 +930,7 @@ export class UserAdministrationComponent implements OnInit {
                                 }
                                 this.router.navigate(['/administration/users/' + result.id]);
                             }, (err: any) => {
-                                this.notify.error(err.error.errors);
+                                this.notify.handleSoftErrors(err);
                             });
                     }
                 }, (err: any) => {
@@ -950,7 +950,7 @@ export class UserAdministrationComponent implements OnInit {
                     }
                     this.notify.success(this.translate.instant('lang.userUpdated'));
                 }, (err: any) => {
-                    this.notify.error(err.error.errors);
+                    this.notify.handleSoftErrors(err);
                 });
         }
     }

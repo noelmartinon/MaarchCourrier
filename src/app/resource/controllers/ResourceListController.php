@@ -160,7 +160,7 @@ class ResourceListController
             'res_letterbox.res_id', 'res_letterbox.subject', 'res_letterbox.barcode', 'res_letterbox.alt_identifier',
             'status.label_status AS "status.label_status"', 'status.img_filename AS "status.img_filename"', 'priorities.color AS "priorities.color"',
             'res_letterbox.closing_date', 'res_letterbox.locker_user_id', 'res_letterbox.locker_time', 'res_letterbox.confidentiality',
-            'res_letterbox.filename as res_filename', 'res_letterbox.integrations'
+            'res_letterbox.filename as res_filename', 'res_letterbox.integrations', 'res_letterbox.retention_frozen', 'res_letterbox.binding'
         ];
         $tableFunction    = ['status', 'priorities'];
         $leftJoinFunction = ['res_letterbox.status = status.id', 'res_letterbox.priority = priorities.id'];
@@ -233,7 +233,7 @@ class ResourceListController
                 $queryData[] = "{$cleanSearch[1]}";
                 $queryData[] = "{$cleanSearch[1]}";
             } else {
-                $where[] = '(alt_identifier ilike ? OR translate(subject, \'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ\', \'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyrr\') ilike translate(?, \'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ\', \'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyrr\'))';
+                $where[] = '(alt_identifier ilike ? OR unaccent(subject) ilike unaccent(?::text))';
                 $queryData[] = "%{$args['data']['search']}%";
                 $queryData[] = "%{$args['data']['search']}%";
             }
@@ -880,6 +880,8 @@ class ResourceListController
             $formattedResources[$key]['hasDocument']        = $resource['res_filename'] != null;
             $formattedResources[$key]['mailTracking']       = in_array($resource['res_id'], $args['trackedMails']);
             $formattedResources[$key]['integrations']       = json_decode($resource['integrations'], true);
+            $formattedResources[$key]['retentionFrozen']    = $resource['retention_frozen'];
+            $formattedResources[$key]['binding']            = $resource['binding'];
             foreach ($attachments as $attachment) {
                 if ($attachment['res_id_master'] == $resource['res_id']) {
                     $formattedResources[$key]['countAttachments'] = $attachment['count'];
@@ -1024,7 +1026,7 @@ class ResourceListController
             $where[] = 'process_limit_date < CURRENT_TIMESTAMP';
         }
         if (!empty($data['search']) && mb_strlen($data['search']) >= 2) {
-            $where[] = '(alt_identifier ilike ? OR translate(subject, \'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ\', \'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyrr\') ilike translate(?, \'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ\', \'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyrr\'))';
+            $where[] = '(alt_identifier ilike ? OR unaccent(subject) ilike unaccent(?::text))';
             $queryData[] = "%{$data['search']}%";
             $queryData[] = "%{$data['search']}%";
         }

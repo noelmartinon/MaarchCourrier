@@ -20,7 +20,7 @@ declare var $: any;
 
 export class SearchAdministrationComponent implements OnInit {
 
-    loading: boolean = false;
+    loading: boolean = true;
     customFieldsFormControl = new FormControl({ value: '', disabled: false });
 
 
@@ -147,13 +147,13 @@ export class SearchAdministrationComponent implements OnInit {
             'icon': 'fa-barcode'
         }
     ];
-    availableDataClone: any = [];
-    displayedSecondaryData: any = [];
-    displayedSecondaryDataClone: any = [];
+    availableDataClone: any[] = [];
+    displayedSecondaryData: any[] = [];
+    displayedSecondaryDataClone: any[] = [];
 
     displayMode: string = 'label';
     dataControl = new FormControl();
-    filteredDataOptions: Observable<string[]>;
+    filteredDataOptions: Observable<any[]>;
     listEvent: any[] = [
         {
             id: 'detailDoc',
@@ -248,38 +248,22 @@ export class SearchAdministrationComponent implements OnInit {
         this.headerService.setHeader(this.translate.instant('lang.searchAdministration'));
         await this.initCustomFields();
         await this.getTemplate();
-        this.filteredDataOptions = this.dataControl.valueChanges
-            .pipe(
-                startWith(''),
-                map(value => this._filterData(value))
-            );
 
         this.availableDataClone = JSON.parse(JSON.stringify(this.availableData));
-        let indexData: number;
         this.selectedTemplateDisplayedSecondaryDataClone = this.selectedTemplateDisplayedSecondaryData;
-        const tmpData = [];
-        this.displayedSecondaryData.forEach((element: any) => {
-            indexData = this.availableData.map((e: any) => e.value).indexOf(element.value);
-            this.availableData[indexData].cssClasses = element.cssClasses;
-            this.displayedSecondaryData.push(this.availableData[indexData]);
-            tmpData.push(this.availableData[indexData]);
-            this.availableData.splice(indexData, 1);
-        });
-        let previousIndex = 0;
-        this.displayedSecondaryData = [];
-        tmpData.forEach((object: any, index: any) => {
-            if (index % this.selectedTemplateDisplayedSecondaryData === 0 && index !== 0) {
-                const tmp = tmpData.slice(previousIndex, index);
-                this.displayedSecondaryData.push(tmp);
-                previousIndex = index;
-            }
-        });
-        this.displayedSecondaryData.push(tmpData.slice(previousIndex));
-
         this.selectedListEvent = this.searchAdv.listEvent;
         this.selectedListEventClone = this.selectedListEvent;
         this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));
         this.displayedSecondaryDataClone = JSON.parse(JSON.stringify(this.displayedSecondaryData));
+
+        setTimeout(() => {
+            this.filteredDataOptions = this.dataControl.valueChanges
+                .pipe(
+                    startWith(''),
+                    map(value => this._filterData(value))
+                );
+        }, 0);
+        this.loading = false;
     }
 
     initCustomFields() {
@@ -341,27 +325,26 @@ export class SearchAdministrationComponent implements OnInit {
         }
     }
 
-    addData(event: any) {
-        const i = this.availableData.map((e: any) => e.value).indexOf(event.option.value.value);
-        if ((this.displayedSecondaryData.length === 0) || (this.displayedSecondaryData[this.displayedSecondaryData.length - 1].length >= this.selectedTemplateDisplayedSecondaryData)) {
-            this.displayedSecondaryData.push([]);
-        }
-        this.displayedSecondaryData[this.displayedSecondaryData.length - 1].push(event.option.value);
+    addData(id: any) {
+        const i = this.availableData.map((e: any) => e.value).indexOf(id);
+
+        this.displayedSecondaryData.push(this.availableData.filter((item: any) => item.value === id)[0]);
+
         this.availableData.splice(i, 1);
+
         $('#availableData').blur();
         this.dataControl.setValue('');
     }
 
-    removeData(rmData: any, i: number, indexDisplayedData) {
+    removeData(rmData: any, i: number) {
         this.availableData.push(rmData);
-        this.displayedSecondaryData[indexDisplayedData].splice(i, 1);
+        this.displayedSecondaryData.splice(i, 1);
         this.dataControl.setValue('');
     }
 
     removeAllData() {
-        this.displayedSecondaryData.forEach(element => {
-            this.availableData = this.availableData.concat(element);
-        });
+        this.displayedSecondaryData = this.displayedSecondaryData.concat();
+        this.availableData = this.availableData.concat(this.displayedSecondaryData);
         this.dataControl.setValue('');
         this.displayedSecondaryData = [];
     }
@@ -384,24 +367,17 @@ export class SearchAdministrationComponent implements OnInit {
     }
 
     getTemplate() {
+        this.displayedSecondaryData = [];
+
         return new Promise((resolve, reject) => {
             this.http.get('../rest/search/configuration').pipe(
                 tap((templateData: any) => {
-                    const defaultTab = templateData.configuration.listEvent.defaultTab;
-                    const subInfos = templateData.configuration.listDisplay.subInfos;
-                    const displayData = JSON.parse(JSON.stringify(subInfos));
                     this.selectedTemplateDisplayedSecondaryData = templateData.configuration.listDisplay.templateColumns;
-                    this.selectedProcessTool.defaultTab = defaultTab;
-                    displayData.forEach((element: { value: any; cssClasses: any; icon: any; }) => {
-                        const sampleValue = this.availableData.filter((t: { value: any; }) => t.value === element.value)[0].sample;
-                        const label = this.availableData.filter((t: { value: any; }) => t.value === element.value)[0].label;
-                        this.displayedSecondaryData.push({
-                            'value': element.value,
-                            'label': label,
-                            'sample': sampleValue,
-                            'cssClasses': element.cssClasses,
-                            'icon': element.icon
-                        });
+                    this.selectedProcessTool.defaultTab = templateData.configuration.listEvent.defaultTab;
+
+                    templateData.configuration.listDisplay.subInfos.forEach((element: any) => {
+                        this.addData(element.value);
+                        this.displayedSecondaryData[this.displayedSecondaryData.length - 1].cssClasses = element.cssClasses;
                     });
                     resolve(true);
                 }),
@@ -414,30 +390,17 @@ export class SearchAdministrationComponent implements OnInit {
     }
 
     saveTemplate() {
-        const template: any = [];
-        this.displayedSecondaryData.forEach((subArray: any) => {
-            subArray.forEach((element: any) => {
-                template.push(
-                    {
-                        'value':      element.value,
-                        'cssClasses': element.cssClasses,
-                        'icon':       element.icon,
-                    }
-                );
-            });
-        });
-
         const objToSend = {
             templateColumns: this.selectedTemplateDisplayedSecondaryData,
-            subInfos: template
+            subInfos: this.displayedSecondaryData
         };
         this.selectedListEvent = JSON.parse(JSON.stringify({
-            'defaultTab' : this.selectedProcessTool.defaultTab
+            'defaultTab': this.selectedProcessTool.defaultTab
         }));
         this.http.put('../rest/configurations/admin_search ', { 'listDisplay': objToSend, 'listEvent': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
             .subscribe(() => {
                 this.displayedSecondaryDataClone = JSON.parse(JSON.stringify(this.displayedSecondaryData));
-                this.searchAdv.listDisplay = template;
+                this.searchAdv.listDisplay = this.displayedSecondaryData;
                 this.searchAdv.listEvent = this.selectedListEvent;
                 this.selectedListEventClone = this.selectedListEvent;
                 this.searchAdv.list_event_data = this.selectedProcessTool;
@@ -474,17 +437,10 @@ export class SearchAdministrationComponent implements OnInit {
         this.selectedProcessTool = JSON.parse(JSON.stringify(this.selectedProcessToolClone));
         this.availableData = JSON.parse(JSON.stringify(this.availableDataClone));
         this.selectedTemplateDisplayedSecondaryData = JSON.parse(JSON.stringify(this.selectedTemplateDisplayedSecondaryDataClone));
-
-        let indexData: number = 0;
-        this.displayedSecondaryData.forEach((element: any) => {
-            indexData = this.availableData.map((e: any) => e.value).indexOf(element.value);
-            this.availableData.splice(indexData, 1);
-        });
         this.dataControl.setValue('');
     }
 
     hasFolder() {
-        // tslint:disable-next-line: no-shadowed-variable
         if (this.displayedSecondaryData.map((data: any) => data.value).indexOf('getFolders') > -1) {
             return true;
         } else {
@@ -507,23 +463,4 @@ export class SearchAdministrationComponent implements OnInit {
             this.selectedProcessTool.canUpdateModel = state;
         }
     }
-
-    reorderDisplayedData() {
-        let mergedArray = [];
-        this.displayedSecondaryData.forEach((subArray: any) => {
-            mergedArray = mergedArray.concat(subArray);
-        });
-
-        let previousIndex = 0;
-        this.displayedSecondaryData = [];
-        mergedArray.forEach((object: any, index: any) => {
-            if (index % this.selectedTemplateDisplayedSecondaryData === 0 && index !== 0) {
-                const tmp = mergedArray.slice(previousIndex, index);
-                this.displayedSecondaryData.push(tmp);
-                previousIndex = index;
-            }
-        });
-        this.displayedSecondaryData.push(mergedArray.slice(previousIndex));
-    }
-
 }

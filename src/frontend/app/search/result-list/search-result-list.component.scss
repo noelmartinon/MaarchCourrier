@@ -173,3 +173,27 @@
     height: 100%;
     width: 120px;
 }
+
+.freezeIcon {
+    color: $secondary;
+}
+
+.thawIcon {
+    color: $primary;
+}
+
+.bindIcon {
+    color: $secondary;
+}
+
+.noBindIcon {
+    color: $primary;
+}
+.watermark {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%) rotate(-20deg);
+    color: red;
+    font-weight: bold;
+    opacity: 0.6;
+}

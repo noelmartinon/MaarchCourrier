@@ -8,9 +8,11 @@
         <div class="catGroupTitle">{{'lang.'+filterKey.key | translate}} ({{filters[filterKey.key]['values'].length}})</div>
         <mat-divider style="width: 80%;"></mat-divider>
         <ng-container *ngFor="let cat of filters[filterKey.key]['values'];let i=index">
-            <mat-list-option color="primary" class="catContent" *ngIf="i < 5 || filters[filterKey.key]['expand']" (click)="toggleFilter(filterKey.key,i)" [selected]="cat.selected" checkboxPosition="before" [disabled]="isLoadingResults">
-                <span class="catLabel" [title]="cat.label">{{cat.id !== null ? cat.label : 'lang.undefined' | translate}}</span><span class="catBadge">{{cat.count}}</span>
-            </mat-list-option>
+            <ng-container *ngIf="cat.count > 0 || (cat.count === 0 && cat.selected)">
+                <mat-list-option color="primary" class="catContent" *ngIf="i < 5 || filters[filterKey.key]['expand']" (click)="toggleFilter(filterKey.key,i)" [selected]="cat.selected" checkboxPosition="before" [disabled]="isLoadingResults">
+                    <span class="catLabel" [title]="cat.label">{{cat.id !== null ? cat.label : 'lang.undefined' | translate}}</span><span class="catBadge" [class.noRes]="cat.count === 0">{{cat.count}}</span>
+                </mat-list-option>
+            </ng-container>
         </ng-container>
         <button mat-button *ngIf="filters[filterKey.key]['values'].length > 5" style="width:100%;" color="primary" (click)="toggleDisplay(filterKey.key)">{{filters[filterKey.key]['expand'] ?  ('lang.less' | translate) : ('lang.more' | translate) }}<mat-icon style="height:auto;" class="fas" [class.fa-chevron-down]="!filters[filterKey.key]['expand']" [class.fa-chevron-up]="filters[filterKey.key]['expand']"></mat-icon></button>
     </mat-selection-list>

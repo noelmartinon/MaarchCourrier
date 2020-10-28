@@ -146,7 +146,8 @@ export class VisaWorkflowComponent implements OnInit {
                             label: user.idToDisplay,
                             entity: user.otherInfo,
                             type: 'user',
-                            hasPrivilege: true
+                            hasPrivilege: true,
+                            isValid: true
                         }
                     });
                     return data;

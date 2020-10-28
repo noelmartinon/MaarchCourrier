@@ -98,7 +98,7 @@
                 <app-tools-list #actionsList [selectedRes]="selectedRes"></app-tools-list>
             </span>
             <span *ngIf="actionMode">
-                <app-followed-action-list #actionsList [contextMode]="false" [currentFolderInfo]="folderInfo"
+                <app-followed-action-list #actionsList [contextMode]="false"  [currentFolderInfo]="folderInfo"
                     [totalRes]="resultsLength" [selectedRes]="selectedRes"
                     (refreshEvent)="refreshDaoAfterAction()">
                 </app-followed-action-list>
@@ -123,7 +123,12 @@
                         (click)="launchEventSubData(data, row)">
                         <ng-container *ngIf="data.value == 'getCreationAndProcessLimitDates'">
                             <ng-container *ngIf="row.closing_date != this.translate.instant('lang.undefined')">
-                                <i class="fa fa-lock" title="{{'lang.closingDate' | translate}}"></i>&nbsp;<span
+                                <i class="fa fa-calendar" title="{{'lang.creationDate' | translate}}"></i>&nbsp;<span
+                                    [class.highlightResult]="data.displayValue.creationDateHighlighted"
+                                    [innerHTML]="data.displayValue.creationDate | timeAgo"
+                                    title='{{data.displayValue.creationDate | fullDate}}'></span>
+                                - <i class="fa fa-lock" title="{{'lang.closingDate' | translate}}"></i>&nbsp;<span
+                                    [class.highlightResult]="data.displayValue.closingDateHighlighted"
                                     [innerHTML]="row.closing_date | timeAgo"
                                     title='{{row.closing_date | fullDate}}'></span>
                             </ng-container>

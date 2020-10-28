@@ -58,7 +58,7 @@
                     <span class="badge" style="background:white;" color="primary">{{'lang.myProfile' | translate}}</span>
                 </a>
             </div>
-            <div style="text-align:right;flex:2;">
+            <div *ngIf="showLogout()" style="text-align:right;flex:2;">
                 <a (click)="authService.logout()" style="cursor:pointer; color: white;padding-right: 10px;">
                     <span class="badge" style="background:white;" color="primary">{{'lang.logout' | translate}}</span>
                 </a>

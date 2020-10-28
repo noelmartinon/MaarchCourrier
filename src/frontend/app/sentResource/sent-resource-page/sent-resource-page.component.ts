@@ -452,12 +452,16 @@ export class SentResourcePageComponent implements OnInit {
     setDefaultInfo() {
         this.emailsubject = `[${this.resourceData.chrono}] ${this.resourceData.subject}`;
         this.emailsubject = this.emailsubject.substring(0, 70);
-        this.currentSender = this.availableSenders.filter(sender => sender.entityId === this.headerService.user.entities[0].id).length > 0 ? this.availableSenders.filter(sender => sender.entityId === this.headerService.user.entities[0].id)[0] : this.availableSenders[0];
-        if (!this.functions.empty(this.resourceData.senders)) {
-            this.resourceData.senders.forEach((sender: any) => {
-                this.setSender(sender.id);
-            });
+        if (this.headerService.user.entities.length === 0) {
+            this.currentSender = this.availableSenders[0];
+        } else {
+            this.currentSender = this.availableSenders.filter(sender => sender.entityId === this.headerService.user.entities[0].id).length > 0 ? this.availableSenders.filter(sender => sender.entityId === this.headerService.user.entities[0].id)[0] : this.availableSenders[0];
         }
+            if (!this.functions.empty(this.resourceData.senders)) {
+                this.resourceData.senders.forEach((sender: any) => {
+                    this.setSender(sender.id);
+                });
+            }
     }
 
     setSender(id: number) {

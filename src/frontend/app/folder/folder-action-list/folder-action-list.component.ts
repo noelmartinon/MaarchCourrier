@@ -11,6 +11,7 @@ import { filter, exhaustMap, tap, map, catchError } from 'rxjs/operators';
 import { HeaderService } from '@service/header.service';
 import { FoldersService } from '../folders.service';
 import { of } from 'rxjs';
+import { PrivilegeService } from '@service/privileges.service';
 
 @Component({
     selector: 'app-folder-action-list',
@@ -33,6 +34,9 @@ export class FolderActionListComponent implements OnInit {
     currentLock: any = null;
     arrRes: any[] = [];
 
+    isSelectedFreeze: any;
+    isSelectedBinding: any;
+
     actionsList: any[] = [];
     basketList: any = {
         groups: [],
@@ -43,6 +47,8 @@ export class FolderActionListComponent implements OnInit {
     @Input() totalRes: number;
     @Input() contextMode: boolean;
     @Input() currentFolderInfo: any;
+    @Input() currentResource: any;
+
 
     @Output() refreshEvent = new EventEmitter<string>();
     @Output() refreshPanelFolders = new EventEmitter<string>();
@@ -54,7 +60,8 @@ export class FolderActionListComponent implements OnInit {
         public dialog: MatDialog,
         private router: Router,
         private headerService: HeaderService,
-        private foldersService: FoldersService
+        private foldersService: FoldersService,
+        public privilegeService: PrivilegeService,
     ) { }
 
     dialogRef: MatDialogRef<any>;
@@ -69,6 +76,8 @@ export class FolderActionListComponent implements OnInit {
 
         this.contextMenuTitle = row.chrono;
         this.contextResId = row.resId;
+
+        this.getFreezeBindingValue(this.contextResId);
 
         // Opens the menu
         this.contextMenu.openMenu();
@@ -142,5 +151,56 @@ export class FolderActionListComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    toggleFreezing(value) {
+        this.http.put('../rest/archival/freezeRetentionRule', { resources: this.selectedRes, freeze : value }).pipe(
+            tap(() => {
+                if (value) {
+                    this.notify.success(this.translate.instant('lang.retentionRuleFrozen'));
+                } else {
+                    this.notify.success(this.translate.instant('lang.retentionRuleThawed'));
+
+                }
+            }
+            ),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    toogleBinding(value) {
+        this.http.put('../rest/archival/binding', { resources: this.selectedRes, binding : value }).pipe(
+            tap(() => {
+                if (value) {
+                    this.notify.success(this.translate.instant('lang.bindingMail'));
+                } else if (value === false) {
+                    this.notify.success(this.translate.instant('lang.noBindingMail'));
+                } else {
+                    this.notify.success(this.translate.instant('lang.bindingUndefined'));
+                }
+            }
+            ),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    getFreezeBindingValue(id) {
+        this.http.get(`../rest/resources/${id}?light=true`).pipe(
+            tap((infos: any) => {
+                this.isSelectedFreeze = infos.retentionFrozen;
+                this.isSelectedBinding = infos.binding;
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+
     }
 }

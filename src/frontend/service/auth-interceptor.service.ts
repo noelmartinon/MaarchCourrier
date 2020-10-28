@@ -12,33 +12,33 @@ export class AuthInterceptor implements HttpInterceptor {
     byPassToken: any[] = [
         {
             route: '../rest/prerequisites',
-            method : ['GET']
+            method: ['GET']
         },
         {
             route: '../rest/authenticate',
-            method : ['POST']
+            method: ['POST']
         },
         {
             route: '../rest/authenticate/token',
-            method : ['GET']
+            method: ['GET']
         },
         {
             route: '../rest/authenticationInformation',
-            method : ['GET']
+            method: ['GET']
         },
         {
             route: '../rest/passwordRules',
-            method : ['GET']
+            method: ['GET']
         },
         {
             route: '../rest/languages',
-            method : ['GET']
+            method: ['GET']
         }
     ];
     byPassHandleErrors: any[] = [
         {
             route: '/password',
-            method : ['PUT']
+            method: ['PUT']
         }
     ];
     constructor(
@@ -61,7 +61,7 @@ export class AuthInterceptor implements HttpInterceptor {
     }
 
     logout() {
-        this.authService.logout(false);
+        this.authService.logout(false, true);
         this.notificationService.error(this.translate.instant('lang.sessionExpired'));
     }
 
@@ -105,12 +105,7 @@ export class AuthInterceptor implements HttpInterceptor {
                                     catchError(err => {
                                         // Disconnect user if bad token process
                                         if (err.status === 401) {
-                                            if (this.router.url !== '/login' && this.router.url !== '/') {
-                                                this.logout();
-                                            } else {
-                                                return next.handle(request);
-                                            }
-
+                                            this.logout();
                                             return of(false);
                                         }
                                     })
@@ -120,12 +115,8 @@ export class AuthInterceptor implements HttpInterceptor {
                             catchError(err => {
                                 // Disconnect user if bad token process
                                 if (err.status === 401) {
-                                    console.debug('Refresh token failed !', request.url);
-                                    if (this.router.url !== '/login' && this.router.url !== '/') {
-                                        this.logout();
-                                    } else {
-                                        return next.handle(request);
-                                    }
+                                    console.debug('Refresh token failed !', request.url, this.router.url);
+                                    this.logout();
                                 }
                                 return of(false);
                             })

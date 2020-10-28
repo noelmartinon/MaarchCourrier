@@ -79,6 +79,10 @@ export class HeaderRightComponent implements OnInit {
         return this.router.url.split('?')[0] !== '/search';
     }
 
+    showLogout() {
+        return ['sso'].indexOf(this.authService.authMode) > -1 && this.functions.empty(this.authService.authUri) ? false : true;
+    }
+
     goTo() {
         this.router.navigate([`/search`], { queryParams: { value: this.searchTarget } });
     }

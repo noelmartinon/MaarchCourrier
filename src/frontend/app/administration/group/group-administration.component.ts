@@ -23,7 +23,6 @@ export class GroupAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
 
-    
     loading: boolean = false;
     paramsLoading: boolean = false;
 

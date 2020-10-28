@@ -153,9 +153,9 @@
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
         <button mat-raised-button mat-button color="primary" [disabled]="loading || !this.actionFormGroup.valid"
-            (click)="onSubmit()">{{'lang.validate' | translate}}</button>
+            (click)="onSubmit('send')">{{'lang.send' | translate}}</button>
         <button mat-raised-button mat-button color="primary" [disabled]="loading || !this.actionFormGroup.valid"
-            (click)="onSubmit()">{{'lang.download' | translate}}</button>
+            (click)="onSubmit('download')">{{'lang.download' | translate}}</button>
         <button mat-raised-button mat-button [disabled]="loading"
             [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
     </div>

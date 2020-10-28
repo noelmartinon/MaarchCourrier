@@ -83,7 +83,7 @@ class CollaboraOnlineController
             if (empty($convertedDocument) && empty($document['fingerprint']) && $tokenCheckResult['type'] == 'resourceModification') {
                 ResModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$args['id']]]);
                 $document['fingerprint'] = $fingerprint;
-            } else if (empty($convertedDocument) && empty($document['fingerprint']) && $tokenCheckResult['type'] == 'attachmentModification') {
+            } elseif (empty($convertedDocument) && empty($document['fingerprint']) && $tokenCheckResult['type'] == 'attachmentModification') {
                 AttachmentModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$args['id']]]);
                 $document['fingerprint'] = $fingerprint;
             }
@@ -347,7 +347,7 @@ class CollaboraOnlineController
 
         $url = (string)$loadedXml->collaboraonline->server_uri . ':' . (string)$loadedXml->collaboraonline->server_port;
 
-        $coreUrl = str_replace('rest/', '', UrlController::getCoreUrl());
+        $coreUrl   = str_replace('rest/', '', UrlController::getCoreUrl());
         $serverSsl = filter_var((string)$loadedXml->collaboraonline->server_ssl, FILTER_VALIDATE_BOOLEAN);
         if (!empty($serverSsl)) {
             if (strpos($coreUrl, 'https') === false) {
@@ -521,7 +521,7 @@ class CollaboraOnlineController
 
             $document['modification_date'] = new \DateTime('now');
             $document['modification_date'] = $document['modification_date']->format(\DateTime::ISO8601);
-        } else if ($args['type'] == 'resourceModification') {
+        } elseif ($args['type'] == 'resourceModification') {
             if (!ResController::hasRightByResId(['resId' => [$args['id']], 'userId' => $GLOBALS['id']])) {
                 return ['code' => 403, 'errors' => 'Document out of perimeter'];
             }
@@ -538,7 +538,7 @@ class CollaboraOnlineController
             if (!empty($convertedDocument[0])) {
                 return ['code' => 400, 'errors' => 'Document was signed : it cannot be edited'];
             }
-        } else if ($args['type'] == 'attachmentModification') {
+        } elseif ($args['type'] == 'attachmentModification') {
             $document = AttachmentModel::getById([
                 'select' => ['res_id_master', 'filename', 'filesize', 'modification_date', 'docserver_id', 'path', 'fingerprint', 'status'],
                 'id' => $args['id']
@@ -554,7 +554,7 @@ class CollaboraOnlineController
             if ($document['status'] == 'SIGN') {
                 return ['code' => 400, 'errors' => 'Document was signed : it cannot be edited'];
             }
-        } else if ($args['type'] == 'templateModification') {
+        } elseif ($args['type'] == 'templateModification') {
             if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_templates', 'userId' => $GLOBALS['id']])) {
                 return ['code' => 403, 'errors' => 'Service forbidden'];
             }
@@ -570,7 +570,7 @@ class CollaboraOnlineController
 
             $document['modification_date'] = new \DateTime('now');
             $document['modification_date'] = $document['modification_date']->format(\DateTime::ISO8601);
-        } else if ($args['type'] == 'templateEncoded') {
+        } elseif ($args['type'] == 'templateEncoded') {
             if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_templates', 'userId' => $GLOBALS['id']])) {
                 return ['code' => 403, 'errors' => 'Service forbidden'];
             }
@@ -581,7 +581,7 @@ class CollaboraOnlineController
 
             $document['modification_date'] = new \DateTime('now');
             $document['modification_date'] = $document['modification_date']->format(\DateTime::ISO8601);
-        } else if ($args['type'] == 'templateCreation') {
+        } elseif ($args['type'] == 'templateCreation') {
             if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_templates', 'userId' => $GLOBALS['id']])) {
                 return ['code' => 403, 'errors' => 'Service forbidden'];
             }

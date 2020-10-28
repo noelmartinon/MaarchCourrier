@@ -105,12 +105,7 @@ export class ContactImportComponent implements OnInit {
         },
     ];
 
-    csvColumns: string[] = [
-
-    ];
-
-    delimiters = [';', ',', '\t'];
-    currentDelimiter = ';';
+    csvColumns: string[] = [];
 
     associatedColmuns: any = {};
     dataSource = new MatTableDataSource(null);
@@ -138,7 +133,6 @@ export class ContactImportComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.setConfiguration();
         this.initCustomFields();
     }
 
@@ -229,7 +223,6 @@ export class ContactImportComponent implements OnInit {
                         this.initData();
                         this.countAdd = this.csvData.filter((data: any, index: number) => index > 0 && this.functionsService.empty(data[this.associatedColmuns['id']])).length;
                         this.countUp = this.csvData.filter((data: any, index: number) => index > 0 && !this.functionsService.empty(data[this.associatedColmuns['id']])).length;
-                        this.localStorage.save(`importContactFields_${this.headerService.user.id}`, this.currentDelimiter);
 
                         this.loading = false;
                     }
@@ -349,11 +342,5 @@ export class ContactImportComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
-    }
-
-    setConfiguration() {
-        if (this.localStorage.get(`importContactFields_${this.headerService.user.id}`) !== null) {
-            this.currentDelimiter = this.localStorage.get(`importContactFields_${this.headerService.user.id}`);
-        }
     }
 }

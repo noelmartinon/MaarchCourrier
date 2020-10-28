@@ -113,11 +113,12 @@ Bt_getWorkBatch();
 Bt_writeLog(['level' => 'INFO', 'message' => 'Retrieve mail sent to archiving system']);
 
 $acknowledgements = \Attachment\models\AttachmentModel::get([
-    'select' => ['res_id_master'],
+    'select' => ['res_id_master', 'typist'],
     'where'  => ['attachment_type = ?', 'status = ?'],
     'data'   => ['acknowledgement_record_management', 'TRA']
 ]);
-$acknowledgements = array_column($acknowledgements, 'res_id_master');
+$acknowledgementsTypist = array_column($acknowledgements, 'typist', 'res_id_master');
+$acknowledgements       = array_column($acknowledgements, 'res_id_master');
 
 $replies = \Attachment\models\AttachmentModel::get([
     'select' => ['res_id_master'],
@@ -141,42 +142,40 @@ foreach ($pendingResources as $resId) {
     } else {
         $unitIdentifiers[$message['reference']] = $unitIdentifier[0]['res_id'];
     }
+}
 
-    foreach ($unitIdentifiers as $reference => $value) {
-        $messages = Bt_getReply(['reference' => $reference]);
-        if (!empty($messages['errors'])) {
-            Bt_writeLog(['level' => 'ERROR', 'message' => $messages['errors']]);
-        }
+foreach ($unitIdentifiers as $reference => $value) {
+    $messages = Bt_getReply(['reference' => $reference]);
+    if (!empty($messages['errors'])) {
+        Bt_writeLog(['level' => 'ERROR', 'message' => $messages['errors']]);
+        continue;
+    } elseif (empty($messages['encodedReply'])) {
+        Bt_writeLog(['level' => 'INFO', 'message' => 'Le bordereau avec la référence ' . $reference . ' est toujours en cours de traitement dans le SAE Maarch RM.']);
+        continue;
+    }
 
-        if (!isset($messages['response']['replyMessage'])) {
+    $resIds = explode(',', $value);
+
+    foreach ($resIds as $resId) {
+        $id = Resource\controllers\StoreController::storeAttachment([
+            'encodedFile'   => $messages['encodedReply'],
+            'type'          => 'reply_record_management',
+            'resIdMaster'   => $resId,
+            'title'         => 'Réponse au transfert',
+            'format'        => 'xml',
+            'status'        => 'TRA',
+            'typist'        => $acknowledgementsTypist[$resId]
+        ]);
+        if (empty($id) || !empty($id['errors'])) {
+            Bt_writeLog(['level' => 'ERROR', 'message' => '[storeAttachment] ' . $id['errors']]);
             continue;
         }
-
-        $resIds = explode(',', $value);
-        $data   = json_decode($messages->replyMessage->data);
-
-        // TODO GET XML
-        $pathToDocument = 'xmlFile';
-
-        foreach ($resIds as $resId) {
-            $id = Resource\controllers\StoreController::storeAttachment([
-                'encodedFile'   => base64_encode(file_get_contents($pathToDocument)),
-                'type'          => 'reply_record_management',
-                'resIdMaster'   => $resId,
-                'title'         => 'Réponse au transfert',
-                'format'        => 'xml',
-                'status'        => 'TRA'
-            ]);
-            if (empty($id) || !empty($id['errors'])) {
-                return ['errors' => ['[storeAttachment] ' . $id['errors']]];
-            }
-            \Resource\models\ResModel::update([
-                'set'   => ['status' => $GLOBALS['statusReplyReceived']],
-                'where' => ['res_id = ?'],
-                'data'  => [$resId]
-            ]);
-            $nbMailsRetrieved++;
-        }
+        \Resource\models\ResModel::update([
+            'set'   => ['status' => $GLOBALS['statusReplyReceived']],
+            'where' => ['res_id = ?'],
+            'data'  => [$resId]
+        ]);
+        $nbMailsRetrieved++;
     }
 }
 

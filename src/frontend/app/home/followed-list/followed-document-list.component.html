@@ -44,7 +44,8 @@
                         <span>
                             <app-followed-action-list #actionsList [contextMode]="false" [currentFolderInfo]="folderInfo"
                                 [totalRes]="allResInBasket.length" [selectedRes]="selectedRes" [menuShortcut]="menuShortcut"
-                                (refreshEvent)="refreshDaoAfterAction()">
+                                (refreshEvent)="refreshDaoAfterAction()"
+                                [currentResource]="currentResource">
                             </app-followed-action-list>
                         </span>
                     </div>
@@ -178,5 +179,5 @@
 </mat-sidenav-container>
 <app-followed-action-list #actionsListContext [contextMode]="true" [currentFolderInfo]="folderInfo"
     [totalRes]="allResInBasket.length" [selectedRes]="selectedRes" (refreshEvent)="refreshDaoAfterAction()"
-    [menuShortcut]="menuShortcut" (refreshPanelFolders)="foldersService.getFolders()">
+    [menuShortcut]="menuShortcut" (refreshPanelFolders)="foldersService.getFolders()" [currentResource]="currentResource">
 </app-followed-action-list>

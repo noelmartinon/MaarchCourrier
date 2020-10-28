@@ -1896,7 +1896,6 @@
     "importedUsers": "imported users",
     "import": "Import",
     "confirmImportUsers": "Do you want to import <b>{{0}}</b> users",
-    "mustAtLeastMinValues": "The data must have at least <b>6</b> values",
     "enableField": "Enable field",
     "disableField": "Disable field",
     "emailSubject": "E-mail's subject",
@@ -1911,7 +1910,8 @@
     "userLoginAlreadyExists": "User with this login already exists.",
     "userDeletedNowActivated": "User was deleted and is now reactivated.",
     "phoneModificationNotAllowed": "Phone is not allowed to be modified.",
-    "userModificationNotAllowed": "User is not allowed to be modified.",
+    "userModificationNotAllowed": "User is not allowed to be modified or does not exists.",
+    "contactDoesNotExists": "Contact does not exists.",
     "argumentUserIdEmpty": "Argument user_id is empty for a user.",
     "argumentFirstnameEmpty": "Argument firstname is empty for a user.",
     "argumentLastnameEmpty": "Argument lastname is empty for a user.",
@@ -2078,5 +2078,7 @@
     "displayCriteria": "Show search criteria",
     "displaySelectedValues": "Show selected values",
     "quickSearch": "Quick search",
-    "contactInput": "Contact input"
+    "contactInput": "Contact input",
+    "insteadOf": "Instead of",
+    "infoImportNoIdToCreate": "The column <b>id</b> must be empty for creation"
 }

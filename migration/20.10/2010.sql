@@ -9,6 +9,8 @@ UPDATE parameters SET param_value_string = '20.10.1' WHERE id = 'database_versio
 
 DROP VIEW IF EXISTS res_view_letterbox;
 
+CREATE EXTENSION IF NOT EXISTS unaccent;
+
 /* SENDMAIL */
 DROP TABLE IF EXISTS sendmail;
 
@@ -262,9 +264,13 @@ INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailImportedS
 DELETE FROM parameters WHERE id = 'traffic_record_summary_sheet';
 INSERT INTO parameters (id, description, param_value_string) VALUES ('traffic_record_summary_sheet', 'Module circulation pour la fiche de liaison', '');
 
-ALTER TABLE configurations RENAME COLUMN service TO privilege;
-DELETE FROM configurations WHERE privilege = 'admin_search';
-INSERT INTO configurations (privilege, value) VALUES ('admin_search', '{"listEvent": {"defaultTab": "dashboard"},"listDisplay":{"templateColumns":6,"subInfos":[{"value":"getPriority","cssClasses":["align_leftData"],"icon":"fa-traffic-light"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_leftData"],"icon":"fa-calendar"},{"value":"getAssignee","cssClasses":["align_leftData"],"icon":"fa-sitemap"},{"value":"getDoctype","cssClasses":["align_leftData"],"icon":"fa-suitcase"},{"value":"getRecipients","cssClasses":["align_leftData"],"icon":"fa-user"},{"value":"getSenders","cssClasses":["align_leftData"],"icon":"fa-book"}]}}');
+DO $$ BEGIN
+    IF (SELECT count(column_name) from information_schema.columns where table_name = 'configurations' and column_name = 'service') THEN
+        ALTER TABLE configurations RENAME COLUMN service TO privilege;
+        DELETE FROM configurations WHERE privilege = 'admin_search';
+        INSERT INTO configurations (privilege, value) VALUES ('admin_search', '{"listEvent": {"defaultTab": "dashboard"},"listDisplay":{"templateColumns":6,"subInfos":[{"value":"getPriority","cssClasses":["align_leftData"],"icon":"fa-traffic-light"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_leftData"],"icon":"fa-calendar"},{"value":"getAssignee","cssClasses":["align_leftData"],"icon":"fa-sitemap"},{"value":"getDoctype","cssClasses":["align_leftData"],"icon":"fa-suitcase"},{"value":"getRecipients","cssClasses":["align_leftData"],"icon":"fa-user"},{"value":"getSenders","cssClasses":["align_leftData"],"icon":"fa-book"}]}}');
+    END IF;
+END$$;
 
 DROP TABLE IF EXISTS search_templates;
 CREATE TABLE search_templates (
@@ -309,6 +315,9 @@ ALTER TABLE custom_fields DROP COLUMN IF EXISTS mode;
 DROP TYPE IF EXISTS custom_fields_modes;
 CREATE TYPE custom_fields_modes AS ENUM ('form', 'technical');
 ALTER TABLE custom_fields ADD COLUMN mode custom_fields_modes NOT NULL DEFAULT 'form';
+
+ALTER TABLE listinstance DROP COLUMN IF EXISTS delegate;
+ALTER TABLE listinstance ADD COLUMN delegate INTEGER;
 
 /* RE CREATE VIEWS */
 CREATE OR REPLACE VIEW res_view_letterbox AS

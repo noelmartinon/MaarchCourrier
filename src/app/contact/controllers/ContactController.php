@@ -75,7 +75,7 @@ class ContactController
         if (!empty($queryParams['search'])) {
             $fields = ['firstname', 'lastname', 'company', 'address_number', 'address_street', 'address_additional1', 'address_additional2', 'address_postcode', 'address_town', 'address_country'];
             $fieldsNumber = count($fields);
-            $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
 
             $requestData = AutoCompleteController::getDataForRequest([
                 'search'        => $queryParams['search'],
@@ -103,7 +103,7 @@ class ContactController
             return $response->withJson(['contacts' => $contacts, 'count' => $count]);
         }
 
-        $contactIds = array_column($contacts, 'id');
+        $contactIds   = array_column($contacts, 'id');
         $contactsUsed = ContactController::isContactUsed(['ids' => $contactIds]);
 
         foreach ($contacts as $key => $contact) {
@@ -896,12 +896,10 @@ class ContactController
                     $order[] = 'custom_fields';
                 }
                 $customId = explode('_', $criterion)[1];
-                $criteria[] = "replace(lower(translate(custom_fields->>'" . $customId . "', 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ',
-                           'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr') ), ' ', '')";
+                $criteria[] = "replace(lower(unaccent(custom_fields->>'" . $customId . "') ), ' ', '')";
             } else {
                 $order[] = $allowedFields[$criterion];
-                $criteria[] = "replace(lower(translate(" . $allowedFields[$criterion] . ", 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ',
-                           'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr') ), ' ', '')";
+                $criteria[] = "replace(lower(unaccent(" . $allowedFields[$criterion] . ") ), ' ', '')";
             }
         }
 
@@ -942,7 +940,7 @@ class ContactController
             return $response->withJson(['returnedCount' => 0, 'realCount' => 0, 'contacts' => []]);
         }
 
-        $contactIds = array_column($duplicates, 'id');
+        $contactIds   = array_column($duplicates, 'id');
         $contactsUsed = ContactController::isContactUsed(['ids' => $contactIds]);
 
 
@@ -1215,8 +1213,8 @@ class ContactController
         }
 
         $contactCustoms = ContactCustomFieldListModel::get(['select' => ['id', 'type', 'label']]);
-        $customTypes = array_column($contactCustoms, 'type', 'id');
-        $customLabels = array_column($contactCustoms, 'label', 'id');
+        $customTypes    = array_column($contactCustoms, 'type', 'id');
+        $customLabels   = array_column($contactCustoms, 'label', 'id');
 
         $contactCustoms = array_column($contactCustoms, 'id');
 
@@ -1229,6 +1227,17 @@ class ContactController
         $contactFields = array_merge($contactFields, $contactCustoms);
 
         $errors = [];
+
+        $contactIds = array_column($body['contacts'], 'id');
+        $contactIds = array_filter($contactIds, function ($id) {
+            return !empty($id);
+        });
+        $oldContact = [];
+        if (!empty($contactIds)) {
+            $oldContact = ContactModel::get(['select' => ['custom_fields', 'id'], 'where' => ['id in (?)'], 'data' => [$contactIds]]);
+            $oldContact = array_column($oldContact, 'custom_fields', 'id');
+        }
+
         foreach ($body['contacts'] as $key => $contact) {
             if (!empty($contact['email']) && (!filter_var($contact['email'], FILTER_VALIDATE_EMAIL) || !Validator::length(1, 255)->validate($contact['email']))) {
                 $errors[] = ['error' => "Argument email is not correct for contact {$key}", 'index' => $key, 'lang' => 'argumentMailNotCorrect'];
@@ -1306,6 +1315,11 @@ class ContactController
 
                 ContactModel::create($contactToCreate);
             } else {
+                if (!isset($oldContact[$contact['id']])) {
+                    $errors[] = ['error' => "Contact does not exists {$contact['id']}", 'index' => $key, 'lang' => 'contactDoesNotExists'];
+                    continue;
+                }
+
                 // If id, then we update the contact
                 $set = ['modification_date' => 'CURRENT_TIMESTAMP', 'custom_fields' => []];
                 $customsToRemove = [];
@@ -1323,11 +1337,9 @@ class ContactController
                     }
                 }
 
-
-                $oldContact = ContactModel::getById(['id' => $contact['id'], 'select' => ['custom_fields']]);
-                $oldContact['custom_fields'] = json_decode($oldContact['custom_fields'], true);
-                if (!empty($oldContact['custom_fields'])) {
-                    $set['custom_fields'] = $set['custom_fields'] + $oldContact['custom_fields'];
+                $oldContact[$contact['id']] = json_decode($oldContact[$contact['id']], true);
+                if (!empty($oldContact[$contact['id']])) {
+                    $set['custom_fields'] = $set['custom_fields'] + $oldContact[$contact['id']];
                 }
                 if (!empty($customsToRemove)) {
                     foreach ($customsToRemove as $item) {

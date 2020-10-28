@@ -217,7 +217,7 @@ class ExportController
                         $copies       = ExportController::getCopies(['chunkedResIds' => $aArgs['chunkedResIds']]);
                         $csvContent[] = empty($copies[$resource['res_id']]) ? '' : $copies[$resource['res_id']];
                     } elseif ($value['value'] == 'getDetailLink') {
-                        $csvContent[] = str_replace('rest/', "apps/maarch_entreprise/index.php#/resources/{$resource['res_id']}", UrlController::getCoreUrl());
+                        $csvContent[] = trim(UrlController::getCoreUrl(), '/') . '/dist/index.html#/resources/'.$resource['res_id'];
                     } elseif ($value['value'] == 'getParentFolder') {
                         $csvContent[] = ExportController::getParentFolderLabel(['res_id' => $resource['res_id']]);
                     } elseif ($value['value'] == 'getFolder') {
@@ -276,7 +276,7 @@ class ExportController
                     $allDates = ['doc_date', 'departure_date', 'admission_date', 'process_limit_date', 'opinion_limit_date', 'closing_date'];
                     if (in_array($value['value'], $allDates)) {
                         $csvContent[] = TextFormatModel::formatDate($resource[$value['value']]);
-                    } else {
+                    } elseif (in_array($value['value'], ['res_id', 'type_label', 'doctypes_first_level_label', 'doctypes_second_level_label', 'format', 'barcode', 'confidentiality', 'alt_identifier', 'subject'])) {
                         $csvContent[] = $resource[$value['value']];
                     }
                 }
@@ -343,7 +343,7 @@ class ExportController
                         $copies    = ExportController::getCopies(['chunkedResIds' => $aArgs['chunkedResIds']]);
                         $content[] = empty($copies[$resource['res_id']]) ? '' : $copies[$resource['res_id']];
                     } elseif ($value['value'] == 'getDetailLink') {
-                        $content[] = str_replace('rest/', "apps/maarch_entreprise/index.php#/resources/{$resource['res_id']}", UrlController::getCoreUrl());
+                        $content[] = trim(UrlController::getCoreUrl(), '/') . '/dist/index.html#/resources/'.$resource['res_id'];
                     } elseif ($value['value'] == 'getParentFolder') {
                         $content[] = ExportController::getParentFolderLabel(['res_id' => $resource['res_id']]);
                     } elseif ($value['value'] == 'getFolder') {
@@ -607,13 +607,17 @@ class ExportController
             ]);
 
             foreach ($listInstances as $listInstance) {
-                $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['firstname', 'lastname']]);
-                if (!empty($aSignatories[$listInstance['res_id']])) {
-                    $aSignatories[$listInstance['res_id']] .= "\n";
+                if (!empty($listInstance['item_id'])) {
+                    $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['firstname', 'lastname']]);
+                    if (!empty($aSignatories[$listInstance['res_id']])) {
+                        $aSignatories[$listInstance['res_id']] .= "\n";
+                    } else {
+                        $aSignatories[$listInstance['res_id']] = '';
+                    }
+                    $aSignatories[$listInstance['res_id']] .= "{$user['firstname']} {$user['lastname']}";
                 } else {
-                    $aSignatories[$listInstance['res_id']] = '';
+                    $aSignatories[$listInstance['res_id']] .= _USER_DELETED;
                 }
-                $aSignatories[$listInstance['res_id']] .= "{$user['firstname']} {$user['lastname']}";
             }
         }
 
@@ -798,17 +802,21 @@ class ExportController
         ]);
 
         foreach ($listInstances as $listInstance) {
-            $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['firstname', 'lastname']]);
+            if (!empty($listInstance['item_id'])) {
+                $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['firstname', 'lastname']]);
 
-            if ($args['listType'] == 'VISA_CIRCUIT') {
-                if ($listInstance['item_mode'] == 'cc') {
-                    $listInstance['item_mode'] = 'copy';
+                if ($args['listType'] == 'VISA_CIRCUIT') {
+                    if ($listInstance['item_mode'] == 'cc') {
+                        $listInstance['item_mode'] = 'copy';
+                    }
+                    $roleLabel = $roles[$listInstance['item_mode']];
+    
+                    $list[] = "{$user['firstname']} {$user['lastname']} ({$roleLabel})";
+                } else {
+                    $list[] = "{$user['firstname']} {$user['lastname']}";
                 }
-                $roleLabel = $roles[$listInstance['item_mode']];
-
-                $list[] = "{$user['firstname']} {$user['lastname']} ({$roleLabel})";
             } else {
-                $list[] = "{$user['firstname']} {$user['lastname']}";
+                $list[] = _USER_DELETED;
             }
         }
 

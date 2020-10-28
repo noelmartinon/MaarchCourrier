@@ -31,7 +31,7 @@ export class SsoAdministrationComponent implements OnInit {
     subMenus: any[] = [
         {
             icon: 'fas fa-users-cog',
-            route: '/administration/sso',
+            route: '/administration/connections/sso',
             label: this.translate.instant('lang.sso'),
             current: true
         }

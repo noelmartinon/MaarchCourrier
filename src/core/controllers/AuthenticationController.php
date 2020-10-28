@@ -40,10 +40,10 @@ class AuthenticationController
 
     public function getInformations(Request $request, Response $response)
     {
-        $path = CoreConfigModel::getConfigPath();
+        $path       = CoreConfigModel::getConfigPath();
         $hashedPath = md5($path);
 
-        $appName = CoreConfigModel::getApplicationName();
+        $appName   = CoreConfigModel::getApplicationName();
         $parameter = ParameterModel::getById(['id' => 'loginpage_message', 'select' => ['param_value_string']]);
 
         $encryptKey = CoreConfigModel::getEncryptKey();
@@ -52,19 +52,19 @@ class AuthenticationController
         $authUri = null;
         if ($loggingMethod['id'] == 'cas') {
             $casConfiguration = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/cas_config.xml']);
-            $hostname = (string)$casConfiguration->WEB_CAS_URL;
-            $port = (string)$casConfiguration->WEB_CAS_PORT;
-            $uri = (string)$casConfiguration->WEB_CAS_CONTEXT;
-            $authUri = "https://{$hostname}:{$port}{$uri}/login?service=" . UrlController::getCoreUrl() . 'dist/index.html#/login';
+            $hostname         = (string)$casConfiguration->WEB_CAS_URL;
+            $port             = (string)$casConfiguration->WEB_CAS_PORT;
+            $uri              = (string)$casConfiguration->WEB_CAS_CONTEXT;
+            $authUri          = "https://{$hostname}:{$port}{$uri}/login?service=" . UrlController::getCoreUrl() . 'dist/index.html#/login';
         } elseif ($loggingMethod['id'] == 'keycloak') {
             $keycloakConfig = CoreConfigModel::getKeycloakConfiguration();
-            $provider = new Keycloak($keycloakConfig);
-            $authUri = $provider->getAuthorizationUrl(['scope' => $keycloakConfig['scope']]);
-            $keycloakState = $provider->getState();
+            $provider       = new Keycloak($keycloakConfig);
+            $authUri        = $provider->getAuthorizationUrl(['scope' => $keycloakConfig['scope']]);
+            $keycloakState  = $provider->getState();
         } elseif ($loggingMethod['id'] == 'sso') {
             $ssoConfiguration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_sso', 'select' => ['value']]);
             $ssoConfiguration = !empty($ssoConfiguration['value']) ? json_decode($ssoConfiguration['value'], true) : null;
-            $authUri = $ssoConfiguration['value']['uri'] ?? null;
+            $authUri          = $ssoConfiguration['url'] ?? null;
         }
 
         $return = [
@@ -380,7 +380,7 @@ class AuthenticationController
         $password = $args['password'];
 
         $ldapConfigurations = CoreConfigModel::getXmlLoaded(['path' => 'modules/ldap/xml/config.xml']);
-        if (empty($ldapConfigurations)) {
+        if (empty($ldapConfigurations) || empty($ldapConfigurations->config->ldap)) {
             return ['errors' => 'No ldap configurations'];
         }
 
@@ -430,7 +430,7 @@ class AuthenticationController
 
         if (empty($authenticated) && !empty($error) && $error != 'Invalid credentials') {
             return ['errors' => $error];
-        } elseif (empty($authenticated) && !empty($error) && $error == 'Invalid credentials') {
+        } elseif (empty($authenticated)) {
             return ['errors' => 'Authentication Failed'];
         }
 
@@ -516,7 +516,11 @@ class AuthenticationController
             return ['errors' => 'Sso configuration missing : no login mapping'];
         }
 
-        $login = $_SERVER[$mapping['login']];
+        if (in_array(strtoupper($mapping['login']), ['REMOTE_USER', 'PHP_AUTH_USER'])) {
+            $login = $_SERVER[strtoupper($mapping['login'])] ?? null;
+        } else {
+            $login = $_SERVER['HTTP_' . strtoupper($mapping['login'])] ?? null;
+        }
         if (empty($login)) {
             return ['errors' => 'Authentication Failed : login not present in header'];
         }
@@ -721,10 +725,21 @@ class AuthenticationController
             'PUT/installer/administrator', 'DELETE/installer/lock'
         ];
 
-        if (is_file("custom/custom.json")) {
+        if (!in_array($args['route'], $installerRoutes)) {
             return false;
-        } elseif (!in_array($args['route'], $installerRoutes)) {
-            return false;
+        } elseif (is_file("custom/custom.json")) {
+            $customs = scandir('custom');
+            if (count($customs) > 4) {
+                return false;
+            }
+            foreach ($customs as $custom) {
+                if (in_array($custom, ['custom.json', '.', '..'])) {
+                    continue;
+                }
+                if (!is_file("custom/{$custom}/initializing.lck")) {
+                    return false;
+                }
+            }
         }
 
         return true;

@@ -52,8 +52,6 @@ export class AdministrationComponent implements OnInit, AfterViewInit {
     ngOnInit(): void {
         this.headerService.setHeader(this.translate.instant('lang.administration'));
 
-        // this.loading = true;
-
         this.organisationServices = this.privilegeService.getCurrentUserAdministrationsByUnit('organisation');
         this.productionServices = this.privilegeService.getCurrentUserAdministrationsByUnit('production');
         this.classementServices = this.privilegeService.getCurrentUserAdministrationsByUnit('classement');

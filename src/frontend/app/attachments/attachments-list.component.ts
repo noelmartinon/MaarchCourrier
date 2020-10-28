@@ -57,7 +57,7 @@ export class AttachmentsListComponent implements OnInit {
     @Input() resId: number = null;
     @Input() target: string = 'panel';
     @Input() autoOpenCreation: boolean = false;
-    @Input() canModify: boolean = false;
+    @Input() canModify: boolean = null;
     @Output() reloadBadgeAttachments = new EventEmitter<string>();
 
     @Output() afterActionAttachment = new EventEmitter<string>();

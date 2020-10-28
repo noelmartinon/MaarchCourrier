@@ -67,7 +67,7 @@
                         <ng-template matStepLabel>{{'lang.customization' | translate}}</ng-template>
                         <div class="stepContainer">
                             <div class="stepContent">
-                                <app-customization #appCustomization #stepContent></app-customization>
+                                <app-customization #appCustomization #stepContent [appDatabase]="appDatabase"></app-customization>
                             </div>
                             <button mat-fab matStepperPrevious [title]="this.translate.instant('lang.previous')" class="previousStepButton" color="primary">
                                 <mat-icon class="fa fa-arrow-left"></mat-icon>

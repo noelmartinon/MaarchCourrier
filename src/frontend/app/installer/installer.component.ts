@@ -30,7 +30,7 @@ export class InstallerComponent implements OnInit, AfterViewInit {
 
     loading: boolean = true;
     @ViewChildren('stepContent') stepContent: any;
-    @ViewChild('stepper', { static: true }) stepper: MatStepper;
+    @ViewChild('stepper', { static: false }) stepper: MatStepper;
 
     constructor(
         public translate: TranslateService,

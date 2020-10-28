@@ -69,10 +69,20 @@ class ListInstanceController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $listInstances = ListInstanceModel::getVisaCircuitByResId(['select' => ['listinstance_id', 'sequence', 'item_id', 'item_type', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment', 'signatory', 'requested_signature'], 'id' => $aArgs['resId']]);
+        $listInstances = ListInstanceModel::getVisaCircuitByResId(['select' => ['listinstance_id', 'sequence', 'item_id', 'item_type', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment', 'signatory', 'requested_signature', 'delegate'], 'id' => $aArgs['resId']]);
         foreach ($listInstances as $key => $value) {
+            $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['status']]);
+            $listInstances[$key]['isValid'] = !empty($user) && !in_array($user['status'], ['SPD', 'DEL']);
+
             $listInstances[$key]['item_type'] = 'user';
-            $listInstances[$key]['labelToDisplay'] = $listInstances[$key]['item_firstname'].' '.$listInstances[$key]['item_lastname'];
+            $itemLabel = $listInstances[$key]['item_firstname'].' '.$listInstances[$key]['item_lastname'];
+
+            $listInstances[$key]['labelToDisplay'] = $itemLabel;
+            $listInstances[$key]['delegatedBy'] = null;
+            if (!empty($listInstances[$key]['delegate'])) {
+                $listInstances[$key]['labelToDisplay'] = UserModel::getLabelledUserById(['id' => $listInstances[$key]['delegate']]);
+                $listInstances[$key]['delegatedBy'] = $itemLabel;
+            }
 
             $listInstances[$key]['hasPrivilege'] = true;
             if (empty($value['process_date']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'visa_documents', 'userId' => $value['item_id']]) && !PrivilegeController::hasPrivilege(['privilegeId' => 'sign_document', 'userId' => $value['item_id']])) {
@@ -89,10 +99,20 @@ class ListInstanceController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $listInstances = ListInstanceModel::getAvisCircuitByResId(['select' => ['listinstance_id', 'sequence', 'item_id', 'item_type', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment'], 'id' => $aArgs['resId']]);
+        $listInstances = ListInstanceModel::getAvisCircuitByResId(['select' => ['listinstance_id', 'sequence', 'item_id', 'item_type', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment', 'delegate'], 'id' => $aArgs['resId']]);
         foreach ($listInstances as $key => $value) {
+            $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['status']]);
+            $listInstances[$key]['isValid'] = !empty($user) && !in_array($user['status'], ['SPD', 'DEL']);
+
             $listInstances[$key]['item_type'] = 'user';
-            $listInstances[$key]['labelToDisplay'] = $listInstances[$key]['item_firstname'].' '.$listInstances[$key]['item_lastname'];
+            $itemLabel = $listInstances[$key]['item_firstname'].' '.$listInstances[$key]['item_lastname'];
+
+            $listInstances[$key]['labelToDisplay'] = $itemLabel;
+            $listInstances[$key]['delegatedBy'] = null;
+            if (!empty($listInstances[$key]['delegate'])) {
+                $listInstances[$key]['labelToDisplay'] = UserModel::getLabelledUserById(['id' => $listInstances[$key]['delegate']]);
+                $listInstances[$key]['delegatedBy'] = $itemLabel;
+            }
 
             $listInstances[$key]['hasPrivilege'] = true;
             if (empty($value['process_date']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'avis_documents', 'userId' => $value['item_id']])) {
@@ -109,10 +129,20 @@ class ListInstanceController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $listInstances = ListInstanceModel::getParallelOpinionByResId(['select' => ['listinstance_id', 'sequence', 'item_mode', 'item_id', 'item_type', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment'], 'id' => $aArgs['resId']]);
+        $listInstances = ListInstanceModel::getParallelOpinionByResId(['select' => ['listinstance_id', 'sequence', 'item_mode', 'item_id', 'item_type', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment', 'delegate'], 'id' => $aArgs['resId']]);
         foreach ($listInstances as $key => $value) {
+            $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['status']]);
+            $listInstances[$key]['isValid'] = !empty($user) && !in_array($user['status'], ['SPD', 'DEL']);
+
             $listInstances[$key]['item_type'] = 'user';
-            $listInstances[$key]['labelToDisplay'] = $listInstances[$key]['item_firstname'].' '.$listInstances[$key]['item_lastname'];
+            $itemLabel = $listInstances[$key]['item_firstname'].' '.$listInstances[$key]['item_lastname'];
+
+            $listInstances[$key]['labelToDisplay'] = $itemLabel;
+            $listInstances[$key]['delegatedBy'] = null;
+            if (!empty($listInstances[$key]['delegate'])) {
+                $listInstances[$key]['labelToDisplay'] = UserModel::getLabelledUserById(['id' => $listInstances[$key]['delegate']]);
+                $listInstances[$key]['delegatedBy'] = $itemLabel;
+            }
 
             $listInstances[$key]['hasPrivilege'] = true;
             if (empty($value['process_date']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'avis_documents', 'userId' => $value['item_id']])) {
@@ -272,7 +302,8 @@ class ListInstanceController
                     'process_date'          => null,
                     'process_comment'       => null,
                     'requested_signature'   => false,
-                    'viewed'                => empty($instance['viewed']) ? 0 : $instance['viewed']
+                    'viewed'                => empty($instance['viewed']) ? 0 : $instance['viewed'],
+                    'delegate'              => $instance['delegate'] ?? null
                 ]);
 
                 if ($instance['item_mode'] == 'dest') {
@@ -417,7 +448,8 @@ class ListInstanceController
                     'item_mode'             => $listInstance['item_mode'],
                     'process_date'          => null,
                     'process_comment'       => $listInstance['process_comment'] ?? null,
-                    'requested_signature'   => $listInstance['requested_signature'] ?? false
+                    'requested_signature'   => $listInstance['requested_signature'] ?? false,
+                    'delegate'              => $listInstance['delegate'] ?? null
                 ];
             }
 
@@ -432,7 +464,8 @@ class ListInstanceController
                     'difflist_type'         => $args['type'] == 'visaCircuit' ? 'VISA_CIRCUIT' : 'AVIS_CIRCUIT',
                     'process_date'          => $listInstance['process_date'],
                     'process_comment'       => $listInstance['process_comment'],
-                    'requested_signature'   => $listInstance['requested_signature']
+                    'requested_signature'   => $listInstance['requested_signature'],
+                    'delegate'              => $listInstance['delegate']
                 ]);
             }
         }

@@ -600,12 +600,14 @@ export class PrivilegeService {
 
     constructor(public translate: TranslateService, public headerService: HeaderService) { }
 
-    getAllPrivileges() {
+    getAllPrivileges(getLockedPrivilege: boolean) {
         let priv: any[] = [];
 
         priv = priv.concat(this.privileges.map(elem => elem.id));
         priv = priv.concat(this.administrations.map(elem => elem.id));
         priv = priv.concat(this.menus.map(elem => elem.id));
+
+        priv = priv.filter(elem => (getLockedPrivilege || (!getLockedPrivilege && ['create_custom', 'admin_update_control'].indexOf(elem) === -1)));
 
         return priv;
     }

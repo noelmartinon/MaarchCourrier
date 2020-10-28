@@ -6,41 +6,13 @@
             <mat-icon class="fas fa-search"></mat-icon>
         </button>
     </mat-form-field>
-    <mat-accordion [class.criteria-container]="class==='main'" [class.criteria-container-secondary]="class==='secondary'">
+    <mat-accordion [class.criteria-container]="class==='main'"
+        [class.criteria-container-secondary]="class==='secondary'">
         <mat-expansion-panel #criteriaTool [expanded]="openedPanel" togglePosition="before">
             <mat-expansion-panel-header>
                 <mat-panel-title>
                     <span>
                         {{'lang.criteriaSearch' | translate}}
-                        <button type="button" mat-icon-button [matMenuTriggerFor]="menu" (menuOpened)="focusFilter()"
-                            (click)="$event.stopPropagation()" [title]="'lang.displayCriteria' | translate">
-                            <mat-icon class="fa fa-plus"></mat-icon>
-                        </button>
-                        <mat-menu #menu="matMenu" class="searchTemplateMenu">
-                            <div class="menuTitle"
-                                style="position: sticky;top: 0px;background: white;z-index: 1;display: flex;justify-content: center;">
-                                <span>
-                                    {{'lang.criteria' | translate}}
-                                </span>
-                                <mat-form-field floatLabel="never" appearance="outline" class="smallInput"
-                                    (click)="$event.stopPropagation();"
-                                    style="width: 220px !important; padding-top: 10px;">
-                                    <input matInput id="searchTerm" #searchCriteriaInput
-                                        [formControl]="getFilterControl()" placeholder="{{'lang.filterBy' | translate}}"
-                                        autocomplete="off" (click)="$event.stopPropagation();"
-                                        (keydown)="$event.stopPropagation()">
-                                </mat-form-field>
-                            </div>
-                            <button mat-menu-item *ngIf="(getFilteredCriterias() | async)?.length===0"
-                                disabled>{{'lang.noResult' | translate}}</button>
-                            <button mat-menu-item
-                                *ngFor="let item of getFilteredCriterias()  | async | sortBy : 'label'"
-                                (click)="addCriteria(item);$event.stopPropagation()"
-                                [disabled]="isCurrentCriteriaById(item.identifier)">
-                                <i class="fa {{item.icon}}" color="primary"
-                                    style="font-size:14px;width:50px;text-align:center;"></i> {{item.label}}
-                            </button>
-                        </mat-menu>
                     </span>
                     <span style="background: white;height: 1px;flex: 1;margin-left: 10px;"></span>
                 </mat-panel-title>
@@ -77,7 +49,8 @@
                         </ng-container>
                         <div class="saveSearchTemplate">
                             <mat-divider></mat-divider>
-                            <button mat-menu-item (click)="saveSearchTemplate()" style="display: flex;align-items: center;"
+                            <button mat-menu-item (click)="saveSearchTemplate()"
+                                style="display: flex;align-items: center;"
                                 [disabled]="functions.empty(currentCriteria) && functions.empty(searchTermControl.value)">
                                 <mat-icon class="fa fa-copy" color="primary" style="line-height: 21px;"></mat-icon>
                                 <div style="flex:1;">
@@ -88,8 +61,35 @@
                     </mat-menu>
                 </mat-panel-description>
             </mat-expansion-panel-header>
+            <button type="button" mat-stroked-button [matMenuTriggerFor]="menu" (menuOpened)="focusFilter()"
+                (click)="$event.stopPropagation()" [title]="'lang.displayCriteria' | translate" class="addCriteriaButton">
+                <mat-icon class="fa fa-plus" style="height:auto;"></mat-icon> {{'lang.addCriteria' | translate}}
+            </button>
+            <mat-menu #menu="matMenu" class="searchTemplateMenu">
+                <div class="menuTitle"
+                    style="position: sticky;top: 0px;background: white;z-index: 1;display: flex;justify-content: center;">
+                    <span>
+                        {{'lang.criteria' | translate}}
+                    </span>
+                    <mat-form-field floatLabel="never" appearance="outline" class="smallInput"
+                        (click)="$event.stopPropagation();" style="width: 220px !important; padding-top: 10px;">
+                        <input matInput id="searchTerm" #searchCriteriaInput [formControl]="getFilterControl()"
+                            placeholder="{{'lang.filterBy' | translate}}" autocomplete="off"
+                            (click)="$event.stopPropagation();" (keydown)="$event.stopPropagation()">
+                    </mat-form-field>
+                </div>
+                <button mat-menu-item *ngIf="(getFilteredCriterias() | async)?.length===0"
+                    disabled>{{'lang.noResult' | translate}}</button>
+                <button mat-menu-item *ngFor="let item of getFilteredCriterias()  | async | sortBy : 'label'"
+                    (click)="addCriteria(item);$event.stopPropagation()"
+                    [disabled]="isCurrentCriteriaById(item.identifier)">
+                    <i class="fa {{item.icon}}" color="primary"
+                        style="font-size:14px;width:50px;text-align:center;"></i> {{item.label}}
+                </button>
+            </mat-menu>
             <ng-container *ngIf="!loading; else loadingTemplate">
-                <div [class.criteria-content]="!appService.getViewMode()" [class.criteria-content-mobile]="appService.getViewMode()">
+                <div [class.criteria-content]="!appService.getViewMode()"
+                    [class.criteria-content-mobile]="appService.getViewMode()">
                     <div style="display: grid;align-items: baseline;grid-template-columns: 35% 60% 5%;padding:5px;"
                         *ngFor="let field of currentCriteria;let i=index">
                         <ng-container *ngIf="field.type === 'string'">
@@ -147,10 +147,10 @@
                                 </ng-container>&nbsp;:&nbsp;
                             </span>
                             <plugin-select-autocomplete-search #pluginSelectAutocompleteSearch [id]="field.identifier"
-                                [showResetOption]="true"
-                                [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="field.control"
-                                [datas]="field.values" [routeDatas]="field.routeDatas" [extraModel]="['type']"
-                                [multiple]="true" [returnValue]="field.returnValue" style="width:100%;">
+                                [showResetOption]="true" [placeholderLabel]="'lang.chooseValue' | translate"
+                                [formControlSelect]="field.control" [datas]="field.values"
+                                [routeDatas]="field.routeDatas" [extraModel]="['type']" [multiple]="true"
+                                [returnValue]="field.returnValue" style="width:100%;">
                             </plugin-select-autocomplete-search>
                         </ng-container>
                         <ng-container *ngIf="field.type === 'date'">
@@ -239,7 +239,8 @@
             </ng-template>
             <div *ngIf="!adminMode" class="col-md-12" style="text-align: center;">
                 <button mat-raised-button matSuffix color="primary" type="submit" [disabled]="isLoadingResult">
-                    <mat-icon class="fa fa-search" style="height: auto;font-size: 24px;"></mat-icon> {{'lang.searchMails' | translate}}
+                    <mat-icon class="fa fa-search" style="height: auto;font-size: 24px;"></mat-icon>
+                    {{'lang.searchMails' | translate}}
                 </button>
             </div>
         </mat-expansion-panel>

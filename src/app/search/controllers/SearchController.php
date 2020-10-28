@@ -324,7 +324,7 @@ class SearchController
                 $args['searchData'] = array_merge($args['searchData'], [$quick, $quick, $quick, $quick, $quick]);
             } else {
                 $fields = ['subject', 'alt_identifier', 'barcode'];
-                $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+                $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
                 $requestDataDocument = AutoCompleteController::getDataForRequest([
                     'search'        => $body['meta']['values'],
                     'fields'        => $fields,
@@ -334,7 +334,7 @@ class SearchController
                 ]);
 
                 $fields = ['title', 'identifier'];
-                $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+                $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
                 $requestDataAttachment = AutoCompleteController::getDataForRequest([
                     'search'        => $body['meta']['values'],
                     'fields'        => $fields,
@@ -381,7 +381,7 @@ class SearchController
                 $args['searchData'][] = $subject;
             } else {
                 $fields = ['subject'];
-                $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+                $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
                 $requestData = AutoCompleteController::getDataForRequest([
                     'search'        => $body['subject']['values'],
                     'fields'        => $fields,
@@ -390,7 +390,7 @@ class SearchController
                     'fieldsNumber'  => 1
                 ]);
                 $subjectGlue = implode(' AND ', $requestData['where']);
-                $attachmentField = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['title']]);
+                $attachmentField = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['title']]);
                 $subjectGlue = "(($subjectGlue) OR res_id in (select res_id_master from res_attachments where {$attachmentField} and status in ('TRA', 'A_TRA', 'FRZ')))";
                 $args['searchWhere'][] = $subjectGlue;
                 $args['searchData'] = array_merge($args['searchData'], $requestData['data']);
@@ -589,7 +589,7 @@ class SearchController
             $args['searchData'][] = $sendersMatch;
         }
         if (!empty($body['senders']) && !empty($body['senders']['values']) && is_array($body['senders']['values']) && is_string($body['senders']['values'][0])) {
-            $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['company']]);
+            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['company']]);
 
             $requestData = AutoCompleteController::getDataForRequest([
                 'search'       => $body['senders']['values'][0],
@@ -645,7 +645,7 @@ class SearchController
             $args['searchData'][] = $recipientsMatch;
         }
         if (!empty($body['recipients']) && !empty($body['recipients']['values']) && is_array($body['recipients']['values']) && is_string($body['recipients']['values'][0])) {
-            $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['company']]);
+            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['company']]);
 
             $requestData = AutoCompleteController::getDataForRequest([
                 'search'       => $body['recipients']['values'][0],
@@ -856,9 +856,15 @@ class SearchController
                         if (!empty($where)) {
                             $where .= ' OR ';
                         }
-                        $where .= '(item_id = ? AND item_type = ?)';
+                        $where .= '((item_id = ? AND item_type = ?)';
                         $data[] = $itemValue['id'];
                         $data[] = $itemValue['type'] == 'user' ? 'user_id' : 'entity_id';
+
+                        if ($itemValue['type'] == 'user') {
+                            $where .= ' OR delegate = ?';
+                            $data[] = $itemValue['id'];
+                        }
+                        $where .= ')';
                     }
                     if ($roleId == 'sign') {
                         $data[] = 'true';
@@ -914,7 +920,7 @@ class SearchController
                             $args['searchData'][] = $subject;
                         } else {
                             $fields = ["custom_fields->>'{$customFieldId}'"];
-                            $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+                            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
                             $requestData = AutoCompleteController::getDataForRequest([
                                 'search'        => $value['values'],
                                 'fields'        => $fields,
@@ -989,7 +995,7 @@ class SearchController
                         }
                         $args['searchWhere'][] = '(' . implode(' or ', $contactSearchWhere) . ')';
                     } elseif (!empty($value['values']) && is_array($value['values']) && is_string($value['values'][0])) {
-                        $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['company']]);
+                        $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['company']]);
 
                         $requestData = AutoCompleteController::getDataForRequest([
                             'search'       => $value['values'],
@@ -1114,7 +1120,7 @@ class SearchController
             $args['searchData'][] = $registeredMailsMatch;
         }
         if (!empty($body['registeredMail_recipient']) && !empty($body['registeredMail_recipient']['values']) && is_array($body['registeredMail_recipient']['values']) && is_string($body['registeredMail_recipient']['values'][0])) {
-            $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ["recipient->>'company'"]]);
+            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ["recipient->>'company'"]]);
             $requestData = AutoCompleteController::getDataForRequest([
                 'search'       => $body['registeredMail_recipient']['values'][0],
                 'fields'       => $fields,
@@ -1829,7 +1835,7 @@ class SearchController
                 $subject   = trim($body['subject']['values'], '"');
                 $data[]    = $subject;
             } else {
-                $attachmentField = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['title']]);
+                $attachmentField = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['title']]);
                 $wherePlus = "res_id in (select res_id_master from res_attachments where {$attachmentField} and status in ('TRA', 'A_TRA', 'FRZ'))";
                 $data[]    = "%{$body['subject']['values']}%";
             }
@@ -1852,7 +1858,7 @@ class SearchController
                 $data[] = $quick;
             } else {
                 $fields = ['title', 'identifier'];
-                $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
+                $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
                 $requestDataAttachment = AutoCompleteController::getDataForRequest([
                     'search'        => $body['meta']['values'],
                     'fields'        => $fields,

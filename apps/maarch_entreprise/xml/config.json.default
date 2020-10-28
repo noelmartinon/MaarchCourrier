@@ -6,7 +6,8 @@
         "timezone": "Europe/Paris",
         "maarchDirectory" : "/var/www/html/MaarchCourrier/",
         "customID" : "",
-        "maarchUrl" : "http://preview.maarchcourrier.com/"
+        "maarchUrl" : "http://preview.maarchcourrier.com/",
+        "lockAdvancedPrivileges" : false
     },
     "database": [
         {

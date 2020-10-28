@@ -59,7 +59,7 @@ export class CriteriaToolComponent implements OnInit {
     @Input() searchTerm: string = 'Foo';
     @Input() defaultCriteria: any = [];
     @Input() adminMode: boolean = false;
-    @Input() openedPanel: boolean = false;
+    @Input() openedPanel: boolean = true;
     @Input() isLoadingResult: boolean = false;
     @Input() class: 'main' | 'secondary' = 'main';
 
@@ -184,9 +184,6 @@ export class CriteriaToolComponent implements OnInit {
 
     removeCriteria(index: number) {
         this.currentCriteria.splice(index, 1);
-        if (this.currentCriteria.length === 0) {
-            this.criteriaTool.close();
-        }
     }
 
     getFilterControl() {
@@ -218,7 +215,7 @@ export class CriteriaToolComponent implements OnInit {
             if (field.type === 'date' || field.type === 'integer') {
                 if (!this.functions.empty(field.control.value.start) || !this.functions.empty(field.control.value.end)) {
                     objCriteria[field.identifier] = {
-                        type : field.type,
+                        type: field.type,
                         values: {
                             start: !this.functions.empty(field.control.value.start) ? field.control.value.start : null,
                             end: !this.functions.empty(field.control.value.end) ? field.control.value.end : null
@@ -228,14 +225,14 @@ export class CriteriaToolComponent implements OnInit {
             } else {
                 if (!this.functions.empty(field.control.value)) {
                     objCriteria[field.identifier] = {
-                        type : field.type,
+                        type: field.type,
                         values: field.control.value
                     };
                 } else {
                     if (['recipients', 'senders'].indexOf(field.identifier) > -1 || field.type === 'contact') {
                         if (!this.functions.empty(this.appContactAutocomplete.toArray().filter((component: any) => component.id === field.identifier)[0].getInputValue())) {
                             objCriteria[field.identifier] = {
-                                type : field.type,
+                                type: field.type,
                                 values: [this.appContactAutocomplete.toArray().filter((component: any) => component.id === field.identifier)[0].getInputValue()]
                             };
                         }
@@ -252,7 +249,6 @@ export class CriteriaToolComponent implements OnInit {
         } else {
             this.criteriaTool.close();
         }
-
     }
 
     getLabelValue(identifier: string, value: any) {
@@ -299,28 +295,40 @@ export class CriteriaToolComponent implements OnInit {
         }
     }
 
-    refreshCriteria(criteria: any) {
+    resetAllCriteria() {
         this.currentCriteria.forEach((field: any, index: number) => {
-            if (criteria[field.identifier] !== undefined) {
-                if (this.currentCriteria[index].type === 'date' && this.functions.empty(criteria[field.identifier].values)) {
-                    field.control.setValue({
+            this.resetCriteria(field.identifier, false);
+        });
+
+        this.resetCriteria('meta', false);
+
+        this.getCurrentCriteriaValues();
+    }
+
+    resetCriteria(criteriaId: string, refresh: boolean = true) {
+        if (criteriaId !== 'meta') {
+            const criteria = this.currentCriteria.filter((item: any) => item.identifier === criteriaId)[0];
+
+            if (criteria !== undefined) {
+                if (criteria.type === 'date' && this.functions.empty(criteria.values)) {
+                    criteria.control.setValue({
                         start: null,
                         end: null
                     });
                 } else {
-                    field.control.setValue(criteria[field.identifier].values);
+                    criteria.control.setValue([]);
+                }
+
+                if ((['recipients', 'senders'].indexOf(criteria.identifier) > -1 || criteria.type === 'contact') && this.functions.empty(criteria.values)) {
+                    this.appContactAutocomplete.toArray().filter((component: any) => component.id === criteria.identifier)[0].resetInputValue();
                 }
             }
-
-            if ((['recipients', 'senders'].indexOf(field.identifier) > -1 || field.type === 'contact') &&  this.functions.empty(criteria[field.identifier].values)) {
-                this.appContactAutocomplete.toArray().filter((component: any) => component.id === field.identifier)[0].resetInputValue();
-            }
-        });
-
-        if (Object.keys(criteria)[0] === 'meta') {
-            this.searchTermControl.setValue(criteria['meta'].values);
+        } else {
+            this.searchTermControl.setValue('');
         }
-        this.getCurrentCriteriaValues();
+        if (refresh) {
+            this.getCurrentCriteriaValues();
+        }
     }
 
     searchInAttachments(identifier: string) {

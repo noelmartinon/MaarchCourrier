@@ -33,10 +33,10 @@ class JnlpController
     {
         $body = $request->getParsedBody();
 
-        $coreUrl = str_replace('rest/', '', UrlController::getCoreUrl());
-        $tmpPath = CoreConfigModel::getTmpPath();
-        $jnlpUniqueId = CoreConfigModel::uniqueId();
-        $jnlpFileName = $GLOBALS['id'] . '_maarchCM_' . $jnlpUniqueId;
+        $coreUrl         = str_replace('rest/', '', UrlController::getCoreUrl());
+        $tmpPath         = CoreConfigModel::getTmpPath();
+        $jnlpUniqueId    = CoreConfigModel::uniqueId();
+        $jnlpFileName    = $GLOBALS['id'] . '_maarchCM_' . $jnlpUniqueId;
         $jnlpFileNameExt = $jnlpFileName . '.jnlp';
 
         $allCookies = '';

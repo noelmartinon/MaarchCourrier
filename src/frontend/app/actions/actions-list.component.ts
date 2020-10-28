@@ -7,9 +7,11 @@ import { MatMenuTrigger } from '@angular/material/menu';
 import { Router } from '@angular/router';
 import { ActionsService } from './actions.service';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
-import { exhaustMap, filter, tap } from 'rxjs/operators';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
 import { HeaderService } from '@service/header.service';
 import { FunctionsService } from '@service/functions.service';
+import { PrivilegeService } from '@service/privileges.service';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-actions-list',
@@ -33,6 +35,9 @@ export class ActionsListComponent implements OnInit {
     arrRes: any[] = [];
     folderList: any[] = [];
 
+    isSelectedFreeze: any;
+    isSelectedBinding: any;
+
     actionsList: any[] = [];
 
     @Input('selectedRes') selectedRes: any;
@@ -53,7 +58,8 @@ export class ActionsListComponent implements OnInit {
         private router: Router,
         private actionService: ActionsService,
         private headerService: HeaderService,
-        private functionService: FunctionsService
+        private functionService: FunctionsService,
+        public privilegeService: PrivilegeService,
     ) { }
 
     dialogRef: MatDialogRef<any>;
@@ -72,6 +78,8 @@ export class ActionsListComponent implements OnInit {
         this.contextResId = row.resId;
 
         this.folderList = row.folders !== undefined ? row.folders : [];
+
+        this.getFreezeBindingValue(this.contextResId);
 
         // Opens the menu
         this.contextMenu.openMenu();
@@ -145,5 +153,56 @@ export class ActionsListComponent implements OnInit {
                 this.refreshList();
             })
         ).subscribe();
+    }
+
+    toggleFreezing(value) {
+        this.http.put('../rest/archival/freezeRetentionRule', { resources: this.selectedRes, freeze : value }).pipe(
+            tap(() => {
+                if (value) {
+                    this.notify.success(this.translate.instant('lang.retentionRuleFrozen'));
+                } else {
+                    this.notify.success(this.translate.instant('lang.retentionRuleThawed'));
+
+                }
+            }
+            ),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    toogleBinding(value) {
+        this.http.put('../rest/archival/binding', { resources: this.selectedRes, binding : value }).pipe(
+            tap(() => {
+                if (value) {
+                    this.notify.success(this.translate.instant('lang.bindingMail'));
+                } else if (value === false) {
+                    this.notify.success(this.translate.instant('lang.noBindingMail'));
+                } else {
+                    this.notify.success(this.translate.instant('lang.bindingUndefined'));
+                }
+            }
+            ),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    getFreezeBindingValue(id) {
+        this.http.get(`../rest/resources/${id}?light=true`).pipe(
+            tap((infos: any) => {
+                this.isSelectedFreeze = infos.retentionFrozen;
+                this.isSelectedBinding = infos.binding;
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+
     }
 }

@@ -69,7 +69,8 @@
                             <app-folder-action-list #actionsList [contextMode]="false" [currentFolderInfo]="folderInfo"
                                 [totalRes]="allResInBasket.length" [selectedRes]="selectedRes"
                                 (refreshEvent)="refreshDaoAfterAction()"
-                                (refreshPanelFolders)="foldersService.getFolders()">
+                                (refreshPanelFolders)="foldersService.getFolders()"
+                                [currentResource]="currentResource">
                             </app-folder-action-list>
                         </span>
                     </div>
@@ -203,5 +204,5 @@
 </mat-sidenav-container>
 <app-folder-action-list #actionsListContext [contextMode]="true" [currentFolderInfo]="folderInfo"
     [totalRes]="allResInBasket.length" [selectedRes]="selectedRes" (refreshEvent)="refreshDaoAfterAction()"
-    (refreshPanelFolders)="foldersService.getFolders()">
+    (refreshPanelFolders)="foldersService.getFolders()" [currentResource]="currentResource">
 </app-folder-action-list>

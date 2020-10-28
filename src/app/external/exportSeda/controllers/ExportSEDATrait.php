@@ -21,8 +21,10 @@ use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use ExportSeda\controllers\ExportSEDATrait;
 use ExportSeda\controllers\SedaController;
+use ExportSeda\models\AbstractMessage;
 use Folder\models\FolderModel;
 use History\models\HistoryModel;
+use IndexingModel\models\IndexingModelFieldModel;
 use MessageExchange\models\MessageExchangeModel;
 use Note\controllers\NoteController;
 use Resource\controllers\StoreController;
@@ -31,6 +33,7 @@ use Resource\models\ResModel;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
+
 use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
 
@@ -164,21 +167,31 @@ trait ExportSEDATrait
         }
 
         $messageSaved = ExportSEDATrait::saveMessage(['messageObject' => $sedaPackage['messageObject']]);
-        $elementSend  = ExportSEDATrait::sendSedaPackage([
-            'messageId'       => $messageSaved['messageId'],
-            'config'          => $config,
-            'encodedFilePath' => $sedaPackage['encodedFilePath'],
-            'messageFilename' => $sedaPackage['messageFilename'],
-            'resId'           => $resource['res_id']
+        MessageExchangeModel::insertUnitIdentifier([
+            'messageId' => $messageSaved['messageId'],
+            'tableName' => 'res_letterbox',
+            'resId'     => $resource['res_id']
         ]);
-        if (!empty($elementSend['errors'])) {
-            return ['errors' => [$elementSend['errors']]];
+        if ($args['data']['actionMode'] == 'download') {
+            return ['data' => ['encodedFile' => base64_encode(file_get_contents($sedaPackage['encodedFilePath']))]];
+        } else {
+            $elementSend  = ExportSEDATrait::sendSedaPackage([
+                'messageId'       => $messageSaved['messageId'],
+                'config'          => $config,
+                'encodedFilePath' => $sedaPackage['encodedFilePath'],
+                'messageFilename' => $sedaPackage['messageFilename'],
+                'resId'           => $resource['res_id'],
+                'reference'       => $data['messageObject']['messageIdentifier']
+            ]);
+            if (!empty($elementSend['errors'])) {
+                return ['errors' => [$elementSend['errors']]];
+            }
+    
+            return true;
         }
-
-        return true;
     }
 
-    private static function sendSedaPackage()
+    public static function sendSedaPackage($args = [])
     {
         $bodyData = [
             'messageFile' => base64_encode(file_get_contents($args['encodedFilePath'])),
@@ -203,11 +216,16 @@ trait ExportSEDATrait
             return ['errors' => 'Error returned by the route /medona/create : ' . $curlResponse['response']['message']];
         }
 
-        // TODO GET XML
-        $pathToDocument = 'xmlFile';
+        $acknowledgement = ExportSEDATrait::getAcknowledgement([
+            'config'    => $args['config'],
+            'reference' => $args['reference']
+        ]);
+        if (!empty($acknowledgement['errors'])) {
+            return ['errors' => 'Error returned in getAcknowledgement process : ' . $acknowledgement['errors']];
+        }
 
         $id = StoreController::storeAttachment([
-            'encodedFile'   => base64_encode(file_get_contents($pathToDocument)),
+            'encodedFile'   => $acknowledgement['encodedAcknowledgement'],
             'type'          => 'acknowledgement_record_management',
             'resIdMaster'   => $args['resId'],
             'title'         => 'Accusé de réception',
@@ -366,7 +384,6 @@ trait ExportSEDATrait
         $units[] = ['unit' => 'diffusionList',               'label' => _DIFFUSION_LIST];
         $units[] = ['unit' => 'visaWorkflow',                'label' => _VISA_WORKFLOW];
         $units[] = ['unit' => 'opinionWorkflow',             'label' => _AVIS_WORKFLOW];
-        $units[] = ['unit' => 'notes',                       'label' => _NOTES_COMMENT];
         
         $tmpIds = [$args['resId']];
         $data   = [];
@@ -401,22 +418,128 @@ trait ExportSEDATrait
             'data'   => [$args['resId']]
         ]);
 
+        $modelId = ResModel::getById([
+            'select' => ['model_id'],
+            'resId'  => $args['resId']
+        ]);
+        $indexingFields = IndexingModelFieldModel::get([
+            'select' => ['identifier', 'unit'],
+            'where'  => ['model_id = ?'],
+            'data'   => [$modelId['model_id']]
+        ]);
+        $fieldsIdentifier = array_column($indexingFields, 'identifier');
+
         $pdf = new Fpdi('P', 'pt');
         $pdf->setPrintHeader(false);
-        SummarySheetController::createSummarySheet($pdf, ['resource' => $mainResource[0], 'units' => $units, 'login' => $GLOBALS['login'], 'data' => $data]);
+
+        SummarySheetController::createSummarySheet($pdf, [
+            'resource'         => $mainResource[0],
+            'units'            => $units,
+            'login'            => $GLOBALS['login'],
+            'data'             => $data,
+            'fieldsIdentifier' => $fieldsIdentifier
+        ]);
 
         $tmpPath = CoreConfigModel::getTmpPath();
-        $summarySheetFilePath = $tmpPath . "summarySheet_".$args['resId'] . "_" . $aArgs['userId'] . "_" . rand() . ".pdf";
+        $summarySheetFilePath = $tmpPath . "summarySheet_".$args['resId'] . "_" . $GLOBALS['id'] . "_" . rand() . ".pdf";
         $pdf->Output($summarySheetFilePath, 'F');
 
         return ['filePath' => $summarySheetFilePath];
     }
 
+    public static function array2object($data)
+    {
+        if (!is_array($data)) {
+            return $data;
+        }
+        $object = new \stdClass();
+        foreach ($data as $name => $value) {
+            if (isset($name)) {
+                $object->{$name} = self::array2object($value);
+            }
+        }
+        return $object;
+    }
+
     public static function generateSEDAPackage(array $args)
     {
-        $encodedFile = '';
+        $data = [];
+        $data['messageObject'] = self::array2object($args["data"]["messageObject"]);
+        $data['type'] = $args["data"]["type"];
         
-        return ['encodedFile' => $encodedFile];
+        $informationsToSend = SendMessageController::generateMessageFile($data);
+        return $informationsToSend;
+    }
+
+    public static function getAcknowledgement($args = [])
+    {
+        $curlResponse = CurlModel::execSimple([
+            'url'     => rtrim($args['config']['exportSeda']['urlSAEService'], '/') . '/medona/message/reference?reference='.urlencode($args['reference']."_Ack"),
+            'method'  => 'GET',
+            'cookie'  => 'LAABS-AUTH=' . urlencode($args['config']['exportSeda']['token']),
+            'headers' => [
+                'Accept: application/json',
+                'Content-Type: application/json',
+                'User-Agent: ' . $args['config']['exportSeda']['userAgent']
+            ]
+        ]);
+
+        if (!empty($curlResponse['errors'])) {
+            return ['errors' => 'Error returned by the route /medona/message/reference : ' . $curlResponse['errors']];
+        } elseif ($curlResponse['code'] != 200) {
+            return ['errors' => 'Error returned by the route /medona/message/reference : ' . $curlResponse['response']['message']];
+        }
+
+        $messageId = $curlResponse['response']['messageId'];
+
+        $curlResponse = CurlModel::execSimple([
+            'url'     => rtrim($args['config']['exportSeda']['urlSAEService'], '/') . '/medona/message/'.urlencode($messageId).'/Export',
+            'method'  => 'GET',
+            'cookie'  => 'LAABS-AUTH=' . urlencode($args['config']['exportSeda']['token']),
+            'headers' => [
+                'Accept: application/zip',
+                'Content-Type: application/json',
+                'User-Agent: ' . $args['config']['exportSeda']['userAgent']
+            ]
+        ]);
+
+        if (!empty($curlResponse['errors'])) {
+            return ['errors' => 'Error returned by the route /medona/message/{messageId}/Export : ' . $curlResponse['errors']];
+        } elseif ($curlResponse['code'] != 200) {
+            return ['errors' => 'Error returned by the route /medona/message/{messageId}/Export : ' . $curlResponse['response']['message']];
+        }
+
+        $encodedAcknowledgement = ExportSEDATrait::getXmlFromZipMessage([
+            'encodedZipDocument' => base64_encode($curlResponse['response']),
+            'messageId'          => $messageId
+        ]);
+        if (!empty($encodedAcknowledgement['errors'])) {
+            return ['errors' => 'Error during getXmlFromZipMessage process : ' . $encodedAcknowledgement['errors']];
+        }
+
+        return ['encodedAcknowledgement' => $encodedAcknowledgement['encodedDocument']];
+    }
+
+    public function getXmlFromZipMessage(array $args)
+    {
+        $tmpPath = CoreConfigModel::getTmpPath();
+
+        $zipDocumentOnTmp = $tmpPath . mt_rand() .'_' . $GLOBALS['id'] . '_acknowledgement.7z';
+        file_put_contents($zipDocumentOnTmp, base64_decode($args['encodedZipDocument']));
+
+        $path = $tmpPath. mt_rand() .'_' . $GLOBALS['id'];
+        shell_exec("7z x $zipDocumentOnTmp -o$path");
+
+        $fullFilePath = $path."/".$args['messageId'].".xml";
+        if (!file_exists($fullFilePath)) {
+            return ['errors' => "getDocumentFromEncodedZip : No document was found in Zip"];
+        }
+        
+        $content = file_get_contents($fullFilePath);
+        unlink($zipDocumentOnTmp);
+        unlink($fullFilePath);
+
+        return ['encodedDocument' => base64_encode($content)];
     }
 
     public static function checkAcknowledgmentRecordManagement(array $args)

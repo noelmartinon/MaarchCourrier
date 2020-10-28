@@ -11,6 +11,7 @@ use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\PreparedClauseController;
+use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
 use User\controllers\UserController;
 use User\models\UserEntityModel;
@@ -154,12 +155,13 @@ class GroupController
             return $response->withStatus(400)->withJson(['errors' => 'Group not found']);
         }
 
-        $group['security']          = GroupModel::getSecurityByGroupId(['groupId' => $group['group_id']]);
-        $group['users']             = GroupModel::getUsersById(['id' => $args['id'], 'select' => ['users.id', 'users.user_id', 'users.firstname', 'users.lastname', 'users.status']]);
-        $group['baskets']           = GroupBasketModel::getBasketsByGroupId(['select' => ['baskets.basket_id', 'baskets.basket_name', 'baskets.basket_desc'], 'groupId' => $group['group_id']]);
-        $group['canAdminUsers']     = PrivilegeController::hasPrivilege(['privilegeId' => 'admin_users', 'userId' => $GLOBALS['id']]);
-        $group['canAdminBaskets']   = PrivilegeController::hasPrivilege(['privilegeId' => 'admin_baskets', 'userId' => $GLOBALS['id']]);
-        $group['privileges']        = PrivilegeModel::getPrivilegesByGroupId(['groupId' => $args['id']]);
+        $group['security']                  = GroupModel::getSecurityByGroupId(['groupId' => $group['group_id']]);
+        $group['users']                     = GroupModel::getUsersById(['id' => $args['id'], 'select' => ['users.id', 'users.user_id', 'users.firstname', 'users.lastname', 'users.status']]);
+        $group['baskets']                   = GroupBasketModel::getBasketsByGroupId(['select' => ['baskets.basket_id', 'baskets.basket_name', 'baskets.basket_desc'], 'groupId' => $group['group_id']]);
+        $group['canAdminUsers']             = PrivilegeController::hasPrivilege(['privilegeId' => 'admin_users', 'userId' => $GLOBALS['id']]);
+        $group['canAdminBaskets']           = PrivilegeController::hasPrivilege(['privilegeId' => 'admin_baskets', 'userId' => $GLOBALS['id']]);
+        $group['privileges']                = PrivilegeModel::getPrivilegesByGroupId(['groupId' => $args['id']]);
+        $group['lockAdvancedPrivileges']    = PrivilegeController::isAdvancedPrivilegesLocked();
 
         $allowedUsers = [];
         $isRoot = UserController::isRoot(['id' => $GLOBALS['id']]);

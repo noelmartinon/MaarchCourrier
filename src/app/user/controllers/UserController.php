@@ -293,7 +293,7 @@ class UserController
         if ($body['mode'] == 'rest' && isset($body['authorizedApi']) && is_array($body['authorizedApi'])) {
             foreach ($body['authorizedApi'] as $value) {
                 if (strpos($value, 'GET/') !== 0 && strpos($value, 'POST/') !== 0 && strpos($value, 'PUT/') !== 0 && strpos($value, 'DELETE/') !== 0) {
-                    return $response->withStatus(400)->withJson(['errors' => 'Body authorizedApi is not well formatted']);
+                    return $response->withStatus(400)->withJson(['errors' => 'Body authorizedApi is not well formatted', 'lang' => 'authorizedRoutesNotWellFormatted']);
                 }
             }
             $set['authorized_api'] = json_encode($body['authorizedApi']);
@@ -541,6 +541,7 @@ class UserController
         $user['passwordRules']      = PasswordModel::getEnabledRules();
         $user['canModifyPassword']  = true;
         $user['privileges']         = PrivilegeController::getPrivilegesByUser(['userId' => $user['id']]);
+        $user['lockAdvancedPrivileges'] = PrivilegeController::isAdvancedPrivilegesLocked();
         $userFollowed = UserFollowedResourceModel::get(['select' => ['count(1) as nb'], 'where' => ['user_id = ?'], 'data' => [$GLOBALS['id']]]);
         $user['nbFollowedResources'] = $userFollowed[0]['nb'];
 

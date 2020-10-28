@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms';
 import { TranslateService } from '@ngx-translate/core';
 import { StepAction } from '../types';
@@ -6,10 +6,11 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { NotificationService } from '@service/notification/notification.service';
 import { environment } from '../../../environments/environment';
 import { ScanPipe } from 'ngx-pipes';
-import { debounceTime, filter, tap, catchError } from 'rxjs/operators';
+import { debounceTime, filter, tap, catchError, startWith } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { InstallerService } from '../installer.service';
 import { of } from 'rxjs';
+import { DatabaseComponent } from '../database/database.component';
 
 declare var tinymce: any;
 
@@ -20,6 +21,8 @@ declare var tinymce: any;
     providers: [ScanPipe]
 })
 export class CustomizationComponent implements OnInit {
+
+    @Input() appDatabase: DatabaseComponent;
 
     stepFormGroup: FormGroup;
     readonlyState: boolean = false;
@@ -39,7 +42,7 @@ export class CustomizationComponent implements OnInit {
 
         this.stepFormGroup = this._formBuilder.group({
             firstCtrl: ['success', Validators.required],
-            customId: ['cs_maarchcourrier', valIdentifier],
+            customId: [null, valIdentifier],
             appName: [`Maarch Courrier ${environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1]}`, Validators.required],
             loginMessage: [`<span style="color:#24b0ed"><strong>Découvrez votre application via</strong></span>&nbsp;<a title="le guide de visite" href="https://docs.maarch.org/gitbook/html/MaarchCourrier/${environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1]}/guu/home.html" target="_blank"><span style="color:#f99830;"><strong>le guide de visite en ligne</strong></span></a>`],
             homeMessage: ['<p>D&eacute;couvrez <strong>Maarch Courrier 20.10</strong> avec <a title="notre guide de visite" href="https://docs.maarch.org/" target="_blank"><span style="color:#f99830;"><strong>notre guide de visite en ligne</strong></span></a>.</p>'],
@@ -57,6 +60,7 @@ export class CustomizationComponent implements OnInit {
     ngOnInit(): void {
         this.checkCustomExist();
         this.stepFormGroup.controls['customId'].valueChanges.pipe(
+            startWith(''),
             tap(() => {
                 this.stepFormGroup.controls['firstCtrl'].setValue('');
             }),
@@ -70,6 +74,9 @@ export class CustomizationComponent implements OnInit {
     }
 
     initStep() {
+        if (this.stepFormGroup.controls['customId'].value === null) {
+            this.stepFormGroup.controls['customId'].setValue(this.appDatabase.getInfoToInstall()[0].body.name);
+        }
         if (this.installerService.isStepAlreadyLaunched('createCustom') && this.installerService.isStepAlreadyLaunched('customization')) {
             this.stepFormGroup.disable();
             this.readonlyState = true;

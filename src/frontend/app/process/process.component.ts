@@ -857,14 +857,17 @@ export class ProcessComponent implements OnInit, OnDestroy {
             ).subscribe();
     }
 
-    toggleBinding() {
-        this.resourceBinded = !this.resourceBinded;
-        this.http.put('../rest/archival/binding', { resources: [this.currentResourceInformations.resId], binding : this.resourceBinded }).pipe(
+    toggleBinding(value) {
+        this.resourceBinded = value;
+        this.http.put('../rest/archival/binding', { resources: [this.currentResourceInformations.resId], binding : value }).pipe(
             tap(() => {
-                if (this.resourceBinded) {
+                if (value) {
                     this.notify.success(this.translate.instant('lang.bindingMail'));
+                } else if (value === false) {
+                    this.notify.success(this.translate.instant('lang.noBindingMail'));
                 } else {
-                    this.notify.success(this.translate.instant('lang.noBindingMal'));
+                    this.notify.success(this.translate.instant('lang.bindingUndefined'));
+
                 }
             }
             ),

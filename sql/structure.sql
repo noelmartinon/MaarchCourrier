@@ -13,6 +13,8 @@ SET search_path = public, pg_catalog;
 SET default_tablespace = '';
 SET default_with_oids = false;
 
+CREATE EXTENSION unaccent;
+
 CREATE TABLE actions
 (
   id serial NOT NULL,
@@ -427,6 +429,7 @@ CREATE TABLE listinstance
   process_comment character varying(255),
   signatory boolean default false,
   requested_signature boolean default false,
+  delegate INTEGER,
   CONSTRAINT listinstance_pkey PRIMARY KEY (listinstance_id)
 )
 WITH (OIDS=FALSE);

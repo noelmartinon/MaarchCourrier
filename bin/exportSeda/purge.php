@@ -114,16 +114,16 @@ if (!empty($GLOBALS['statusMailToPurge'])) {
     $dataPurge[]  = $GLOBALS['statusMailToPurge'];
 }
 
-$tmpWhere = ['binding = null and action_current_use = ?'];
-$tmpData  = ['delete'];
+$tmpWhere = ['binding is null and action_current_use = ?'];
+$tmpData  = ['destruction'];
 
 $bindingDocument = \Parameter\models\ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'bindingDocumentFinalAction']);
-if ($bindingDocument == 'delete') {
+if ($bindingDocument['param_value_string'] == 'delete') {
     $tmpWhere[] = 'binding = ?';
     $tmpData[]  = 'true';
 }
 $nonBindingDocument = \Parameter\models\ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'nonBindingDocumentFinalAction']);
-if ($nonBindingDocument == 'delete') {
+if ($nonBindingDocument['param_value_string'] == 'delete') {
     $tmpWhere[] = 'binding = ?';
     $tmpData[]  = 'false';
 }
@@ -174,7 +174,7 @@ if (!empty($resIdMaster)) {
     $tmpData[]  = $resIdMaster;
 }
 
-$wherePurge[] = '(' . implode(") or (", $tmpWhere) . ')';
+$wherePurge[] = '((' . implode(") or (", $tmpWhere) . '))';
 $dataPurge    = array_merge($dataPurge, $tmpData);
 
 $resources = \SrcCore\models\DatabaseModel::select([
@@ -189,9 +189,18 @@ $resources = array_column($resources, 'res_id');
 Bt_purgeAll(['resources' => $resources]);
 
 Bt_writeLog(['level' => 'INFO', 'message' => 'End of process']);
+
+$nbMailsPurge = count($resources);
 Bt_writeLog(['level' => 'INFO', 'message' => $nbMailsPurge.' document(s) retrieved']);
 
-Bt_logInDataBase($nbMailsPurge, $err, $nbMailsPurge.' mail(s) purge');
+if ($nbMailsPurge == 0) {
+    Bt_logInDataBase($nbMailsPurge, $err, $nbMailsPurge.' mail(s) purge');
+} else {
+    $resources = array_chunk($resources, 100);
+    foreach ($resources as $chunk) {
+        Bt_logInDataBase($nbMailsPurge, $err, $nbMailsPurge.' mail(s) purge : ' . implode(", ", $chunk));
+    }
+}
 Bt_updateWorkBatch();
 
 exit($GLOBALS['exitCode']);

@@ -104,8 +104,8 @@ class ParameterController
 
         $body = $request->getParsedBody();
 
-        if (in_array($args['id'], ['logo', 'bodyImage', 'applicationName', 'bindingDocumentFinalAction', 'nonBindingDocumentFinalAction'])) {
-            $customId = CoreConfigModel::getCustomId();
+        $customId = CoreConfigModel::getCustomId();
+        if (in_array($args['id'], ['logo', 'bodyImage'])) {
             if (empty($customId)) {
                 return $response->withStatus(400)->withJson(['errors' => 'A custom is needed for this operation']);
             }
@@ -149,29 +149,33 @@ class ParameterController
                     }
                     copy($tmpFileName, "custom/{$customId}/img/bodylogin.jpg");
                 }
-            } elseif ($args['id'] == 'applicationName') {
-                $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
-                $config['config']['applicationName'] = $body['applicationName'];
-                $fp = fopen("custom/{$customId}/apps/maarch_entreprise/xml/config.json", 'w');
-                fwrite($fp, json_encode($config, JSON_PRETTY_PRINT));
-                fclose($fp);
-            } elseif (in_array($args['id'] == ['bindingDocumentFinalAction', 'nonBindingDocumentFinalAction'])) {
-                $parameter = ParameterModel::getById(['id' => $args['id']]);
-                if (empty($parameter)) {
-                    return $response->withStatus(400)->withJson(['errors' => 'Parameter not found']);
-                }
-                if (!in_array($body['param_value_string'], ['restrictAccess', 'transfer', 'copy', 'delete'])) {
-                    return $response->withStatus(400)->withJson(['errors' => 'param_value_string must be between : restrictAccess, transfer, copy, delete']);
-                }
-                ParameterModel::update([
-                    'description'        => '',
-                    'param_value_string' => $body['param_value_string'],
-                    'id'                 => $args['id']
-                ]);
             }
             if (!empty($tmpFileName) && is_file($tmpFileName)) {
                 unset($tmpFileName);
             }
+        } elseif ($args['id'] == 'applicationName') {
+            $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+            $config['config']['applicationName'] = $body['applicationName'];
+            if (file_exists("custom/{$customId}/apps/maarch_entreprise/xml/config.json")) {
+                $fp = fopen("custom/{$customId}/apps/maarch_entreprise/xml/config.json", 'w');
+            } else {
+                $fp = fopen("apps/maarch_entreprise/xml/config.json", 'w');
+            }
+            fwrite($fp, json_encode($config, JSON_PRETTY_PRINT));
+            fclose($fp);
+        } elseif (in_array($args['id'], ['bindingDocumentFinalAction', 'nonBindingDocumentFinalAction'])) {
+            $parameter = ParameterModel::getById(['id' => $args['id']]);
+            if (empty($parameter)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Parameter not found']);
+            }
+            if (!in_array($body['param_value_string'], ['restrictAccess', 'transfer', 'copy', 'delete'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'param_value_string must be between : restrictAccess, transfer, copy, delete']);
+            }
+            ParameterModel::update([
+                'description'        => '',
+                'param_value_string' => $body['param_value_string'],
+                'id'                 => $args['id']
+            ]);
         } else {
             $parameter = ParameterModel::getById(['id' => $args['id']]);
             if (empty($parameter)) {

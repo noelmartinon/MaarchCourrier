@@ -1659,7 +1659,7 @@ INSERT INTO contacts_filling (enable, first_threshold, second_threshold) VALUES 
 TRUNCATE TABLE configurations;
 INSERT INTO configurations (privilege, value) VALUES ('admin_email_server', '{"type":"smtp","host":"smtp.gmail.com","port":465,"user":"notifications.maarch@gmail.com","password":"1OkrZQPFNJmI7uY8::7e870f0f61ecc7e9fb6e7065dd31aea5","auth":true,"secure":"ssl","from":"notifications.maarch@gmail.com","charset":"utf-8"}');
 INSERT INTO configurations (privilege, value) VALUES ('admin_search', '{"listEvent": {"defaultTab": "dashboard"},"listDisplay":{"templateColumns":6,"subInfos":[{"value":"getPriority","cssClasses":["align_leftData"],"icon":"fa-traffic-light"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_leftData"],"icon":"fa-calendar"},{"value":"getAssignee","cssClasses":["align_leftData"],"icon":"fa-sitemap"},{"value":"getDoctype","cssClasses":["align_leftData"],"icon":"fa-suitcase"},{"value":"getRecipients","cssClasses":["align_leftData"],"icon":"fa-user"},{"value":"getSenders","cssClasses":["align_leftData"],"icon":"fa-book"}]}}');
-INSERT INTO configurations (privilege, value) VALUES ('admin_sso', '{}');
+INSERT INTO configurations (privilege, value) VALUES ('admin_sso', '{"url":"","mapping":[{"ssoId":"","maarchId":"login"}]}');
 
 /* Modèle d’envois postaux */
 TRUNCATE TABLE shipping_templates;

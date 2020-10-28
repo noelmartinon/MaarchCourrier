@@ -192,14 +192,26 @@
                                 <mat-icon class="followIcon {{this.resourceFollowed ? 'fas':'far'}} fa-star"
                                     style="font-size: 20px;"></mat-icon>
                             </button>
-                            <button mat-icon-button [title]="this.translate.instant('lang.freezeRetentionRule')"
+                            <button *ngIf="privilegeService.hasCurrentUserPrivilege('freeze_retention_rule')"
+                            mat-icon-button [title]="this.translate.instant('lang.freezeRetentionRule')"
                             class="categoryLabel" (click)="toggleFreezing()">
-                                <mat-icon class="freezeThawIcon {{this.resourceFreezed ? 'fas':'far'}} fa-pause-circle" style="font-size: 20px;"></mat-icon>
+                                <mat-icon class="{{this.resourceFreezed ? 'freezeThawIcon':'nonFreeze'}} fas fa-snowflake" style="font-size: 20px;"></mat-icon>
                             </button>
-                            <button mat-icon-button [title]="this.translate.instant('lang.setBindingDocument')"
-                            class="categoryLabel" (click)="toggleBinding()">
-                                <mat-icon class=" {{this.resourceBinded ? 'bindIcon' : 'noBindIcn'}} fas fa-paperclip" style="font-size: 20px;"></mat-icon>
+                            <button mat-icon-button *ngIf="privilegeService.hasCurrentUserPrivilege('set_binding_document')" [matMenuTriggerFor]="bindingRentalRule"
+                                    [title]="this.translate.instant('lang.setBindingDocument')" class="categoryLabel">
+                                <mat-icon class="bindIcon fas fa-exclamation" style="font-size: 20px;"></mat-icon>
                             </button>
+                            <mat-menu #bindingRentalRule="matMenu">
+                                <buton mat-menu-item [class.isSelectedMenu]="this.resourceBinded === true" (click)="toggleBinding(true)" 
+                                    [title]="this.translate.instant('lang.bindingMail')">{{ 'lang.bindingMail' | translate}}</buton>
+                                <mat-divider></mat-divider>
+                                <buton mat-menu-item [class.isSelectedMenu]="this.resourceBinded === false" (click)="toggleBinding(false)" 
+                                    [title]="this.translate.instant('lang.noBindingMail')">{{ 'lang.noBindingMail' | translate}}</buton>
+                                <mat-divider></mat-divider>
+                                <buton mat-menu-item [class.isSelectedMenu]="this.resourceBinded === null" (click)="toggleBinding(null)" 
+                                    [title]="this.translate.instant('lang.doNotDefine')">{{ 'lang.doNotDefine' | translate}}</buton>
+                                <mat-divider></mat-divider>
+                            </mat-menu>
                             <div class="content-item" *ngIf="this.currentResourceInformations.priority !== undefined">
                                 <b><i class="fas fa-flag" [style.color]="this.currentResourceInformations.priorityColor"
                                         style="font-size: 25px;padding-right: 20px;"></i>

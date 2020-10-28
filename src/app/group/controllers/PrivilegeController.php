@@ -14,6 +14,7 @@ use SignatureBook\controllers\SignatureBookController;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\PreparedClauseController;
+use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\ValidatorModel;
 use User\controllers\UserController;
@@ -33,6 +34,13 @@ class PrivilegeController
         }
         if (!Validator::stringType()->notEmpty()->validate($args['privilegeId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Route privilegeId is empty or not an integer']);
+        }
+
+        if (in_array($args['privilegeId'], ['create_custom', 'admin_update_control'])) {
+            $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+            if (!empty($config['config']['lockAdvancedPrivileges'])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Privilege forbidden']);
+            }
         }
 
         $group = GroupModel::getById(['id' => $args['id']]);
@@ -151,8 +159,14 @@ class PrivilegeController
         ValidatorModel::stringType($args, ['privilegeId']);
         ValidatorModel::intVal($args, ['userId']);
 
+        $isLock = false;
+        if (in_array($args['privilegeId'], ['create_custom', 'admin_update_control'])) {
+            $file   = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+            $isLock = !empty($file['config']['lockAdvancedPrivileges']);
+        }
+
         if (UserController::isRoot(['id' => $args['userId']])) {
-            return true;
+            return !$isLock;
         }
 
         $hasPrivilege = DatabaseModel::select([
@@ -167,7 +181,7 @@ class PrivilegeController
             'data'      => [$args['userId'], $args['privilegeId']]
         ]);
 
-        return !empty($hasPrivilege);
+        return !empty($hasPrivilege) && !$isLock;
     }
 
     public static function getPrivilegesByUser(array $args)
@@ -182,6 +196,16 @@ class PrivilegeController
         $privilegesStoredInDB = PrivilegeModel::getByUser(['id' => $args['userId']]);
         $privilegesStoredInDB = array_column($privilegesStoredInDB, 'service_id');
 
+        $file   = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $isLock = !empty($file['config']['lockAdvancedPrivileges']);
+        foreach (['create_custom', 'admin_update_control'] as $advancedPrivilege) {
+            $key = array_search($advancedPrivilege, $privilegesStoredInDB);
+            if ($isLock && $key !== false) {
+                unset($privilegesStoredInDB[$key]);
+            }
+        }
+
+        $privilegesStoredInDB = array_values($privilegesStoredInDB);
         return $privilegesStoredInDB;
     }
 
@@ -343,5 +367,12 @@ class PrivilegeController
         }
 
         return true;
+    }
+
+    public static function isAdvancedPrivilegesLocked()
+    {
+        $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+
+        return !empty($file['config']['lockAdvancedPrivileges']);
     }
 }

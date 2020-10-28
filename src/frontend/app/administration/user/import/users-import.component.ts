@@ -12,6 +12,7 @@ import { AlertComponent } from '../../../../plugins/modal/alert.component';
 import { LocalStorageService } from '@service/local-storage.service';
 import { HeaderService } from '@service/header.service';
 import { MatPaginator } from '@angular/material/paginator';
+import { Papa } from 'ngx-papaparse';
 
 @Component({
     templateUrl: 'users-import.component.html',
@@ -29,12 +30,7 @@ export class UsersImportComponent implements OnInit {
         'phone',
     ];
 
-    csvColumns: string[] = [
-
-    ];
-
-    delimiters = [';', ',', '\t'];
-    currentDelimiter = ';';
+    csvColumns: string[] = [];
 
     associatedColmuns: any = {};
     dataSource = new MatTableDataSource(null);
@@ -56,12 +52,12 @@ export class UsersImportComponent implements OnInit {
         private headerService: HeaderService,
         public dialog: MatDialog,
         public dialogRef: MatDialogRef<UsersImportComponent>,
+        private papa: Papa,
         @Inject(MAT_DIALOG_DATA) public data: any,
     ) {
     }
 
     ngOnInit(): void {
-        this.setConfiguration();
     }
 
     changeColumn(coldb: string, colCsv: string) {
@@ -97,33 +93,33 @@ export class UsersImportComponent implements OnInit {
             reader.readAsText(fileInput.target.files[0], 'ISO-8859-1');
 
             reader.onload = (value: any) => {
-                rawCsv = value.target.result.split('\n');
-                rawCsv = rawCsv.filter(data => data !== '');
+                this.papa.parse(value.target.result, {
+                    complete: (result) => {
+                        rawCsv = result.data;
+                        rawCsv = rawCsv.filter(data => data.length === rawCsv[0].length);
 
-                if (rawCsv[0].split(this.currentDelimiter).map(s => s.replace(/"/gi, '').trim()).length >= this.userColmuns.length - 1) {
-                    let dataCol = [];
-                    let objData = {};
-                    this.setCsvColumns(rawCsv[0].split(this.currentDelimiter).map(s => s.replace(/"/gi, '').trim()));
+                        let dataCol = [];
+                        let objData = {};
+                        this.setCsvColumns(rawCsv[0]);
 
-                    this.countAll = this.hasHeader ? rawCsv.length - 1 : rawCsv.length;
+                        this.countAll = this.hasHeader ? rawCsv.length - 1 : rawCsv.length;
 
-                    for (let index = 0; index < rawCsv.length; index++) {
-                        objData = {};
-                        dataCol = rawCsv[index].split(this.currentDelimiter).map(s => s.replace(/"/gi, '').trim());
+                        for (let index = 0; index < rawCsv.length; index++) {
+                            objData = {};
+                            dataCol = rawCsv[index];
 
-                        dataCol.forEach((element: any, index2: number) => {
-                            objData[this.csvColumns[index2]] = element;
-                        });
-                        this.csvData.push(objData);
+                            dataCol.forEach((element: any, index2: number) => {
+                                objData[this.csvColumns[index2]] = element;
+                            });
+                            this.csvData.push(objData);
+                        }
+                        this.initData();
+                        this.countAdd = this.csvData.filter((data: any, index: number) => index > 0 && this.functionsService.empty(data[this.associatedColmuns['id']])).length;
+                        this.countUp = this.csvData.filter((data: any, index: number) => index > 0 && !this.functionsService.empty(data[this.associatedColmuns['id']])).length;
+
+                        this.loading = false;
                     }
-                    this.initData();
-                    this.countAdd = this.csvData.filter((data: any, index: number) => index > 0 && this.functionsService.empty(data[this.associatedColmuns['id']])).length;
-                    this.countUp = this.csvData.filter((data: any, index: number) => index > 0 && !this.functionsService.empty(data[this.associatedColmuns['id']])).length;
-                    this.localStorage.save(`importUsersFields_${this.headerService.user.id}`, this.currentDelimiter);
-                } else {
-                    this.notify.error(this.translate.instant('lang.mustAtLeastMinValues'));
-                }
-                this.loading = false;
+                });
             };
         } else {
             this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.notAllowedExtension') + ' !', msg: this.translate.instant('lang.file') + ' : <b>' + fileInput.target.files[0].name + '</b>, ' + this.translate.instant('lang.type') + ' : <b>' + fileInput.target.files[0].type + '</b><br/><br/><u>' + this.translate.instant('lang.allowedExtensions') + '</u> : <br/>' + 'text/csv' } });
@@ -244,11 +240,5 @@ export class UsersImportComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
-    }
-
-    setConfiguration() {
-        if (this.localStorage.get(`importUsersFields_${this.headerService.user.id}`) !== null) {
-            this.currentDelimiter = this.localStorage.get(`importUsersFields_${this.headerService.user.id}`);
-        }
     }
 }

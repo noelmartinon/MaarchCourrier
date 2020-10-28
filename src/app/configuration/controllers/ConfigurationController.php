@@ -36,11 +36,13 @@ class ConfigurationController
 
         $configuration = ConfigurationModel::getByPrivilege(['privilege' => $args['privilege']]);
         $configuration['value'] = json_decode($configuration['value'], true);
-        if (!empty($configuration['value']['password'])) {
-            $configuration['value']['password'] = '';
-            $configuration['value']['passwordAlreadyExists'] = true;
-        } else {
-            $configuration['value']['passwordAlreadyExists'] = false;
+        if ($args['privilege'] == 'admin_email_server') {
+            if (!empty($configuration['value']['password'])) {
+                $configuration['value']['password'] = '';
+                $configuration['value']['passwordAlreadyExists'] = true;
+            } else {
+                $configuration['value']['passwordAlreadyExists'] = false;
+            }
         }
 
         return $response->withJson(['configuration' => $configuration]);
@@ -118,7 +120,7 @@ class ConfigurationController
             }
         }
 
-        $data = json_encode($data);
+        $data = json_encode($data, JSON_UNESCAPED_SLASHES);
         ConfigurationModel::update(['set' => ['value' => $data], 'where' => ['privilege = ?'], 'data' => [$args['privilege']]]);
 
         HistoryController::add([

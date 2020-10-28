@@ -416,38 +416,34 @@ export class IndexingFieldsService {
 
     getCustomFields() {
         return new Promise((resolve, reject) => {
-            if (this.customFields.length > 0) {
-                resolve(this.customFields);
-            } else {
-                this.http.get('../rest/customFields').pipe(
-                    tap((data: any) => {
-                        this.customFields = data.customFields.map((info: any) => {
-                            info.identifier = 'indexingCustomField_' + info.id;
-                            info.icon = 'fa-hashtag';
-                            info.system = false;
-                            info.enabled = true;
-                            info.SQLMode = info.SQLMode;
-                            if (['integer', 'string', 'date'].indexOf(info.type) > -1 && !this.functions.empty(info.values)) {
-                                info.default_value = info.values[0].key;
-                            } else {
-                                info.default_value = info.type === 'banAutocomplete' ? [] : null;
-                            }
-                            info.values = info.values.length > 0 ? info.values.map((custVal: any) => {
-                                return {
-                                    id: custVal.key,
-                                    label: custVal.label
-                                };
-                            }) : info.values;
-                            return info;
-                        });
-                    }),
-                    finalize(() => resolve(this.customFields)),
-                    catchError((err: any) => {
-                        this.notify.handleSoftErrors(err);
-                        return of(false);
-                    })
-                ).subscribe();
-            }
+            this.http.get('../rest/customFields').pipe(
+                tap((data: any) => {
+                    this.customFields = data.customFields.map((info: any) => {
+                        info.identifier = 'indexingCustomField_' + info.id;
+                        info.icon = 'fa-hashtag';
+                        info.system = false;
+                        info.enabled = true;
+                        info.SQLMode = info.SQLMode;
+                        if (['integer', 'string', 'date'].indexOf(info.type) > -1 && !this.functions.empty(info.values)) {
+                            info.default_value = info.values[0].key;
+                        } else {
+                            info.default_value = info.type === 'banAutocomplete' ? [] : null;
+                        }
+                        info.values = info.values.length > 0 ? info.values.map((custVal: any) => {
+                            return {
+                                id: custVal.key,
+                                label: custVal.label
+                            };
+                        }) : info.values;
+                        return info;
+                    });
+                }),
+                finalize(() => resolve(this.customFields)),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
         });
     }
 

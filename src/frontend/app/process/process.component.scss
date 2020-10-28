@@ -414,12 +414,13 @@
     color: $secondary;
 }
 
-.bindIcon {
-    color: $secondary;
+.nonFreeze {
+    color: $primary;
 }
 
-.noBindIcon {
-    color: $primary;
+.bindIcon {
+    color: $secondary;
+    margin-left: 5px;
 }
 
 .tool-disabled {
@@ -443,3 +444,7 @@
 .subSubject {
     color: $secondary;
 }
+
+.isSelectedMenu {
+    background: $secondary;
+  }

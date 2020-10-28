@@ -1897,7 +1897,6 @@
     "importedUsers": "utilisateurs importés__TO_TRANSLATE",
     "import": "Importer__TO_TRANSLATE",
     "confirmImportUsers": "Voulez-vous importer <b>{{0}}</b> utilisateurs__TO_TRANSLATE",
-    "mustAtLeastMinValues": "Les données doivent avoir au mimimum <b>6</b> valeurs__TO_TRANSLATE",
     "emailSubject": "E-mail's subject__TO_TRANSLATE",
     "enableField": "Activer le champ__TO_TRANSLATE",
     "disableField": "Désactiver le champ__TO_TRANSLATE",

@@ -73,12 +73,16 @@ $multiple-check-width: 33px;
 
 .opt-group {
     position: sticky;
-    top: 50px;
+    top: 0px;
     background: white;
     z-index: 1;
     ::ng-deep.mat-pseudo-checkbox {
         display: none;
     }
+}
+
+.fixPos {
+    top: 50px !important;
 }
 
 .multipleLabels {

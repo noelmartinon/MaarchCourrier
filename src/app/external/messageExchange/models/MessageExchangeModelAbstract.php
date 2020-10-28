@@ -305,7 +305,7 @@ abstract class MessageExchangeModelAbstract
 
     public static function insertUnitIdentifier(array $args)
     {
-        ValidatorModel::notEmpty($args, ['messageId', 'tableName', 'resId', 'disposition']);
+        ValidatorModel::notEmpty($args, ['messageId', 'tableName', 'resId']);
         ValidatorModel::stringType($args, ['messageId', 'tableName', 'disposition']);
         ValidatorModel::intVal($args, ['resId']);
 

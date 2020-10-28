@@ -494,16 +494,16 @@ class SummarySheetController
                 $assignee    = '';
                 $destination = '';
                 $found       = false;
-                $roles = EntityModel::getRoles();
-                $rolesItems = [];
-                $nbItems = 0;
+                $roles       = EntityModel::getRoles();
+                $rolesItems  = [];
+                $nbItems     = 0;
                 foreach ($args['data']['listInstances'] as $listKey => $listInstance) {
                     if ($found && $listInstance['res_id'] != $resource['res_id']) {
                         break;
                     } elseif ($listInstance['res_id'] == $resource['res_id']) {
                         $item = '';
                         if ($listInstance['item_type'] == 'user_id') {
-                            $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['id', 'firstname', 'lastname']]);
+                            $user   = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['id', 'firstname', 'lastname']]);
                             $entity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']]);
 
                             if ($listInstance['item_mode'] == 'dest') {
@@ -512,10 +512,10 @@ class SummarySheetController
                                 $item = "{$user['firstname']} {$user['lastname']} ({$entity['entity_label']})";
                             }
                         } elseif ($listInstance['item_type'] == 'entity_id') {
-                            $item = $listInstance['item_id'];
-                            $entity = EntityModel::getById(['id' => $listInstance['item_id'], 'select' => ['short_label']]);
+                            $item   = $listInstance['item_id'];
+                            $entity = EntityModel::getById(['id' => $listInstance['item_id'], 'select' => ['short_label', 'entity_id']]);
                             if (!empty($entity)) {
-                                $item = "{$entity['short_label']} ({$item})";
+                                $item = "{$entity['short_label']} ({$entity['entity_id']})";
                             }
                         }
                         if ($listInstance['item_mode'] == 'dest') {
@@ -537,7 +537,7 @@ class SummarySheetController
 
                 // Sort keys to be in the same order defined in the roles.xml file
                 $rolesIDs = array_column($roles, 'id');
-                $tmp = [];
+                $tmp      = [];
                 foreach ($rolesIDs as $key) {
                     if (!empty($rolesItems[$key])) {
                         $tmp[$key] = $rolesItems[$key];
@@ -585,8 +585,16 @@ class SummarySheetController
                     if ($found && $listInstance['res_id'] != $resource['res_id']) {
                         break;
                     } elseif ($listInstance['res_id'] == $resource['res_id']) {
+                        $mode = $listInstance['requested_signature'] ? 'Signataire' : 'Viseur';
+                        $userLabel = UserModel::getLabelledUserById(['id' => $listInstance['item_id']]) . " ({$mode}) ";
+
+                        $delegate = !empty($listInstance['delegate']) ? UserModel::getLabelledUserById(['id' => $listInstance['delegate']]) : '';
+                        if (!empty($delegate)) {
+                            $userLabel = $delegate . ' ' . _INSTEAD_OF . ' ' . $userLabel;
+                        }
+
                         $users[] = [
-                            'user'  => UserModel::getLabelledUserById(['id' => $listInstance['item_id']]),
+                            'user'  => $userLabel,
                             'mode'  => $listInstance['requested_signature'] ? 'Signataire' : 'Viseur',
                             'date'  => TextFormatModel::formatDate($listInstance['process_date']),
                         ];
@@ -608,7 +616,7 @@ class SummarySheetController
                     $pdf->Cell($specialWidth * 3, 20, _USERS, 1, 0, 'L', false);
                     $pdf->Cell($specialWidth, 20, _ACTION_DATE, 1, 1, 'L', false);
                     foreach ($users as $keyUser => $user) {
-                        $pdf->Cell($specialWidth * 3, 20, $keyUser + 1 . ". {$user['user']} ({$user['mode']})", 1, 0, 'L', false);
+                        $pdf->Cell($specialWidth * 3, 20, $keyUser + 1 . ". {$user['user']}", 1, 0, 'L', false);
                         $pdf->Cell($specialWidth, 20, $user['date'], 1, 1, 'L', false);
                     }
                 }
@@ -619,13 +627,19 @@ class SummarySheetController
                     if ($found && $listInstance['res_id'] != $resource['res_id']) {
                         break;
                     } elseif ($listInstance['res_id'] == $resource['res_id']) {
-                        $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['id', 'firstname', 'lastname']]);
-                        $entity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']]);
+                        $user = UserModel::getLabelledUserById(['id' => $listInstance['item_id']]);
+                        $entity = UserModel::getPrimaryEntityById(['id' => $listInstance['item_id'], 'select' => ['entities.entity_label']]);
 
-                        $userLabel = $user['firstname'] . ' ' .$user['lastname'] . " (" . $entity['entity_label'] . ")";
+                        $userLabel = $user . " (" . $entity['entity_label'] . ")";
+                        $delegate = !empty($listInstance['delegate']) ? UserModel::getLabelledUserById(['id' => $listInstance['delegate']]) : '';
+
+                        if (!empty($delegate)) {
+                            $userLabel = $delegate . ' ' .  _INSTEAD_OF . ' ' . $userLabel;
+                        }
+
                         $users[] = [
                             'user'  => $userLabel,
-                            'date'  => TextFormatModel::formatDate($listInstance['process_date']),
+                            'date'  => TextFormatModel::formatDate($listInstance['process_date'])
                         ];
                         unset($args['data']['listInstancesOpinion'][$listKey]);
                         $found = true;
@@ -763,14 +777,14 @@ class SummarySheetController
                 }
             } elseif ($unit['unit'] == 'opinionWorkflow') {
                 $data['listInstancesOpinion'] = ListInstanceModel::get([
-                    'select'    => ['item_id', 'process_date', 'res_id'],
+                    'select'    => ['item_id', 'process_date', 'res_id', 'delegate'],
                     'where'     => ['difflist_type = ?', 'res_id in (?)'],
                     'data'      => ['AVIS_CIRCUIT', $tmpIds],
                     'orderBy'   => ['listinstance_id']
                 ]);
             } elseif ($unit['unit'] == 'visaWorkflow') {
                 $data['listInstancesVisa'] = ListInstanceModel::get([
-                    'select'    => ['item_id', 'requested_signature', 'process_date', 'res_id'],
+                    'select'    => ['item_id', 'requested_signature', 'process_date', 'res_id', 'delegate'],
                     'where'     => ['difflist_type = ?', 'res_id in (?)'],
                     'data'      => ['VISA_CIRCUIT', $tmpIds],
                     'orderBy'   => ['listinstance_id']

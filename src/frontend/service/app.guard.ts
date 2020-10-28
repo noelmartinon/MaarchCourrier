@@ -38,7 +38,7 @@ export class AppGuard implements CanActivate {
                     } else if (this.authService.getToken() === null) {
                         this.authService.setCachedUrl(state.url.replace(/^\//g, ''));
                         console.debug('Aucun token trouvé ! Redirection sur login ...');
-                        this.authService.logout(false);
+                        this.authService.logout(false, true);
                         return false;
                     }
                 }),

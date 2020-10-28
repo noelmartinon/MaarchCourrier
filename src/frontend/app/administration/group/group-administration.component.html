@@ -57,6 +57,7 @@
                                         <mat-list-item *ngFor="let menu of privilegeService.getMenus() | sortBy: 'label'">
                                             <mat-slide-toggle color="primary" name="{{menu.label}}"
                                                               [checked]="group.privileges.indexOf(menu.id) > -1"
+                                                              [disabled]="menu.id == 'create_custom' && group.lockAdvancedPrivileges"
                                                               (change)="toggleService($event,menu)" matTooltip="{{menu.comment | translate}}">
                                                 {{menu.label | translate}}</mat-slide-toggle>
                                         </mat-list-item>
@@ -73,6 +74,7 @@
                                         <mat-slide-toggle color="primary" name="{{administration.label}}" [(ngModel)]="administration.checked"
                                                           [checked]="administration.checked"
                                                           (change)="toggleService($event,administration)"
+                                                          [disabled]="administration.id == 'admin_update_control' && group.lockAdvancedPrivileges"
                                                           matTooltip="{{administration.comment | translate}}">{{administration.label | translate}}
                                         </mat-slide-toggle>
                                         <button mat-icon-button [class.active]="panelMode === administration.id"

@@ -21,7 +21,6 @@ export class GroupsAdministrationComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
-    
     loading: boolean = false;
 
     config: any = {};
@@ -120,7 +119,6 @@ export class GroupsAdministrationComponent implements OnInit {
     templateUrl: 'groups-administration-redirect-modal.component.html'
 })
 export class GroupsAdministrationRedirectModalComponent {
-    
 
     constructor(public http: HttpClient, @Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<GroupsAdministrationRedirectModalComponent>) {
     }

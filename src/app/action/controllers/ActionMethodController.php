@@ -381,7 +381,7 @@ class ActionMethodController
         ValidatorModel::intVal($args, ['resId']);
 
         $listInstance = ListInstanceModel::get([
-            'select'    => ['listinstance_id'],
+            'select'    => ['listinstance_id', 'item_id'],
             'where'     => ['res_id = ?', 'difflist_type = ?', 'process_date is null'],
             'data'      => [$args['resId'], 'VISA_CIRCUIT'],
             'orderBy'   => ['listinstance_id'],
@@ -391,10 +391,13 @@ class ActionMethodController
             return ['errors' => ['No available circuit']];
         }
 
+        $set = ['process_date' => 'CURRENT_TIMESTAMP'];
+        if ($listInstance[0]['item_id'] != $GLOBALS['id']) {
+            $set['delegate'] = $GLOBALS['id'];
+        }
+
         ListInstanceModel::update([
-            'set'   => [
-                'process_date' => 'CURRENT_TIMESTAMP'
-            ],
+            'set'   => $set,
             'where' => ['listinstance_id = ?'],
             'data'  => [$listInstance[0]['listinstance_id']]
         ]);
@@ -724,6 +727,8 @@ class ActionMethodController
         }
         $currentStep = $currentStep[0];
 
+        $set = ['process_date' => 'CURRENT_TIMESTAMP'];
+
         $message = null;
         if ($currentStep['item_id'] != $GLOBALS['id']) {
             $currentUser = UserModel::getById(['select' => ['firstname', 'lastname'], 'id' => $GLOBALS['id']]);
@@ -738,12 +743,12 @@ class ActionMethodController
                 . $currentUser['firstname'] . ' ' . $currentUser['lastname']
                 . " " . _INSTEAD_OF . " "
                 . $stepUser['firstname'] . ' ' . $stepUser['lastname'];
+
+            $set['delegate'] = $GLOBALS['id'];
         }
 
         ListInstanceModel::update([
-            'set'   => [
-                'process_date' => 'CURRENT_TIMESTAMP'
-            ],
+            'set'   => $set,
             'where' => ['listinstance_id = ?'],
             'data'  => [$currentStep['listinstance_id']]
         ]);
@@ -761,7 +766,7 @@ class ActionMethodController
         ValidatorModel::intVal($args, ['resId']);
 
         $currentStep = ListInstanceModel::get([
-            'select'  => ['listinstance_id'],
+            'select'  => ['listinstance_id', 'item_id'],
             'where'   => ['res_id = ?', 'difflist_type = ?', 'item_id = ?', 'item_mode in (?)'],
             'data'    => [$args['resId'], 'entity_id', $GLOBALS['id'], ['avis', 'avis_copy', 'avis_info']],
             'limit'   => 1
@@ -772,10 +777,13 @@ class ActionMethodController
         }
         $currentStep = $currentStep[0];
 
+        $set = ['process_date' => 'CURRENT_TIMESTAMP'];
+        if ($currentStep['item_id'] != $GLOBALS['id']) {
+            $set['delegate'] = $GLOBALS['id'];
+        }
+
         ListInstanceModel::update([
-            'set'   => [
-                'process_date' => 'CURRENT_TIMESTAMP'
-            ],
+            'set'   => $set,
             'where' => ['listinstance_id = ?'],
             'data'  => [$currentStep['listinstance_id']]
         ]);

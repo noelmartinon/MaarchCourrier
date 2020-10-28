@@ -30,7 +30,7 @@
         <mat-option *ngIf="showResetOption" (onSelectionChange)="selectChange($event)" [value]="emptyData()">({{'lang.emptyValue' | translate}})</mat-option>
         <mat-option *ngFor="let value of filteredDatas | async" (onSelectionChange)="selectChange($event)" [value]="returnValue === 'id' ? value.id : value"
             [title]="value.title !== undefined ? value.title : value.label" [disabled]="value.disabled"
-            [class.opt-group]="value.isTitle" [style.color]="value.color">
+            [class.opt-group]="value.isTitle" [class.fixPos]="value.isTitle && datas.length > 5" [style.color]="value.color">
             <span [innerHTML]="value.label"></span>
         </mat-option>
     </mat-select>
