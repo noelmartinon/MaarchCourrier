@@ -942,7 +942,7 @@ class FolderController
         $foldersResources = array_column($foldersResources, 'res_id');
 
         if (empty($foldersResources)) {
-            return $response->withJson(['entities' => [], 'priorities' => [], 'categories' => [], 'statuses' => [], 'entitiesChildren' => []]);
+            $foldersResources = [0];
         }
 
         $where = ['(res_id in (?))'];

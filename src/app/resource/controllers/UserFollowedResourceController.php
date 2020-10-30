@@ -215,7 +215,7 @@ class UserFollowedResourceController
         $followedResources = array_column($followedResources, 'res_id');
 
         if (empty($followedResources)) {
-            return $response->withJson(['entities' => [], 'priorities' => [], 'categories' => [], 'statuses' => [], 'entitiesChildren' => []]);
+            $followedResources = [0];
         }
 
         $where = ['(res_id in (?))'];
