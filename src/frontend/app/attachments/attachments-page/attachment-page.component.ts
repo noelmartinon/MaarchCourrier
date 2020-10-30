@@ -16,7 +16,7 @@ import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
     selector: 'app-attachment-page',
-    templateUrl: "attachment-page.component.html",
+    templateUrl: 'attachment-page.component.html',
     styleUrls: [
         'attachment-page.component.scss',
         '../../indexation/indexing-form/indexing-form.component.scss'
@@ -68,19 +68,19 @@ export class AttachmentPageComponent implements OnInit {
     }
 
     loadAttachmentTypes() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.get('../../rest/attachmentsTypes').pipe(
                 tap((data: any) => {
                     Object.keys(data.attachmentsTypes).forEach(templateType => {
                         if (data.attachmentsTypes[templateType].show) {
-                            this.attachmentsTypes.push({
-                                id: templateType,
-                                ...data.attachmentsTypes[templateType]
-                            });
-                        }
+                        this.attachmentsTypes.push({
+                            id: templateType,
+                            ...data.attachmentsTypes[templateType]
+                        });
+                       }
                     });
                     this.attachmentsTypes = this.sortPipe.transform(this.attachmentsTypes, 'label');
-                    resolve(true)
+                    resolve(true);
                 }),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);
@@ -92,7 +92,7 @@ export class AttachmentPageComponent implements OnInit {
     }
 
     loadAttachment() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.get(`../../rest/attachments/${this.data.resId}`).pipe(
                 tap((data: any) => {
                     let contact: any = null;
@@ -117,6 +117,7 @@ export class AttachmentPageComponent implements OnInit {
                         modificationDate: new FormControl({ value: data.modificationDate, disabled: true }),
                         modifiedBy: new FormControl({ value: data.modifiedBy, disabled: true }),
                         signatory: new FormControl({ value: data.signatory, disabled: true }),
+                        signatoryId: new FormControl({ value: data.signatoryId, disabled: true }),
                         signDate: new FormControl({ value: data.signDate, disabled: true }),
                         resId: new FormControl({ value: this.data.resId, disabled: true }, [Validators.required]),
                         chrono: new FormControl({ value: data.chrono, disabled: true }),
@@ -206,7 +207,7 @@ export class AttachmentPageComponent implements OnInit {
     }
 
     generateMailling(resId: number) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.post(`../../rest/attachments/${resId}/mailing`, {}).pipe(
                 tap(() => {
                     resolve(true);
@@ -235,13 +236,13 @@ export class AttachmentPageComponent implements OnInit {
     }
 
     getAttachmentValues(newAttachment: boolean = false, mode: string) {
-        let attachmentValues = {};
+        const attachmentValues = {};
         Object.keys(this.attachment).forEach(element => {
             if (this.attachment[element] !== undefined && (this.attachment[element].value !== null && this.attachment[element].value !== undefined)) {
                 if (element === 'validationDate') {
-                    let day = this.attachment[element].value.getDate();
-                    let month = this.attachment[element].value.getMonth() + 1;
-                    let year = this.attachment[element].value.getFullYear();
+                    const day = this.attachment[element].value.getDate();
+                    const month = this.attachment[element].value.getMonth() + 1;
+                    const year = this.attachment[element].value.getFullYear();
                     attachmentValues[element] = ('00' + day).slice(-2) + '-' + ('00' + month).slice(-2) + '-' + year + ' 23:59:59';
                 } else if (element === 'recipient') {
                     attachmentValues['recipientId'] = this.attachment[element].value.length > 0 ? this.attachment[element].value[0].id : null;
@@ -253,7 +254,7 @@ export class AttachmentPageComponent implements OnInit {
                     if (this.attachment[element].value === '_CURRENT_FILE') {
                         attachmentValues['encodedFile'] = null;
                     }
-                    //attachmentValues['format'] = this.appAttachmentViewer.getFile().format;
+                    // attachmentValues['format'] = this.appAttachmentViewer.getFile().format;
                 }
                 if (mode === 'mailing') {
                     attachmentValues['inMailing'] = true;
@@ -272,7 +273,7 @@ export class AttachmentPageComponent implements OnInit {
     }
 
     setDatasViewer(ev: any) {
-        let datas: any = {};
+        const datas: any = {};
         Object.keys(this.attachment).forEach(element => {
             if (['title', 'validationDate', 'effectiveDate'].indexOf(element) > -1) {
                 datas['attachment_' + element] = this.attachment[element].value;
@@ -284,9 +285,9 @@ export class AttachmentPageComponent implements OnInit {
             this.attachment['encodedFile'].setValue(null);
         } else {
             datas['resId'] = this.attachment['resIdMaster'].value;
-            //this.attachment.encodedFile.setValue(this.appAttachmentViewer.getFile().content);
+            // this.attachment.encodedFile.setValue(this.appAttachmentViewer.getFile().content);
             this.appAttachmentViewer.setDatas(datas);
-            //this.setNewVersion();
+            // this.setNewVersion();
         }
     }
 
