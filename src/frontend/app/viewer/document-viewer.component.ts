@@ -574,6 +574,7 @@ export class DocumentViewerComponent implements OnInit {
                         this.file.contentMode = 'route';
                         this.file.format = data.originalFormat;
                         this.file.creatorId = data.originalCreatorId;
+                        this.file.signatoryId = data.signatoryId;
                         this.file.content = `../../rest/attachments/${resId}/originalContent`;
                         this.file.contentView = `../../rest/attachments/${resId}/content?mode=view`;
                         this.file.src = this.base64ToArrayBuffer(data.encodedDocument);
@@ -613,6 +614,7 @@ export class DocumentViewerComponent implements OnInit {
                         if (data.encodedDocument) {
                             this.file.contentMode = 'route';
                             this.file.format = data.originalFormat;
+                            this.file.signatoryId = data.signatoryId;
                             this.file.content = `../../rest/resources/${resId}/originalContent`;
                             this.file.contentView = `../../rest/resources/${resId}/content?mode=view`;
                             this.file.src = this.base64ToArrayBuffer(data.encodedDocument);
