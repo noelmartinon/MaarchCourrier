@@ -481,7 +481,27 @@ class ResController extends ResourceControlController
 
         $data = $request->getQueryParams();
         if ($data['mode'] == 'base64') {
-            return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'originalFormat' => $originalFormat, 'originalCreatorId' => $creatorId]);
+            $listInstance = ListInstanceModel::get([
+                'select'    => ['item_id'],
+                'where'     => ['res_id = ?', 'signatory = ?'],
+                'data'      => [$aArgs['resId'], 'true'],
+                'orderBy'   => ['listinstance_id desc'],
+                'limit'     => 1
+            ]);
+
+            if (!empty($listInstance[0]['item_id'])) {
+                $item = UserModel::getByLogin(['login' => $listInstance[0]['item_id'], 'select' => ['id']]);
+                $signatoryId = $item['id'];
+            } else {
+                $signatoryId = $creatorId;
+            }
+    
+            return $response->withJson([
+                'encodedDocument'   => base64_encode($fileContent),
+                'originalFormat'    => $originalFormat,
+                'originalCreatorId' => $creatorId,
+                'signatoryId'       => $signatoryId
+            ]);
         } else {
             $finfo    = new \finfo(FILEINFO_MIME_TYPE);
             $mimeType = $finfo->buffer($fileContent);
