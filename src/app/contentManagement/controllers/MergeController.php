@@ -182,6 +182,7 @@ class MergeController
             $initiator['path'] = EntityModel::getEntityPathByEntityId(['entityId' => $resource['initiator'], 'path' => '']);
             if (!empty($initiator['parent_entity_id'])) {
                 $parentInitiator = EntityModel::getByEntityId(['entityId' => $initiator['parent_entity_id'], 'select' => ['*']]);
+                $parentInitiator['path'] = EntityModel::getEntityPathByEntityId(['entityId' => $initiator['parent_entity_id'], 'path' => '']);
             }
         }
         if (!empty($resource['destination'])) {
@@ -189,6 +190,7 @@ class MergeController
             $destination['path'] = EntityModel::getEntityPathByEntityId(['entityId' => $resource['destination'], 'path' => '']);
             if (!empty($destination['parent_entity_id'])) {
                 $parentDestination = EntityModel::getByEntityId(['entityId' => $destination['parent_entity_id'], 'select' => ['*']]);
+                $parentDestination['path'] = EntityModel::getEntityPathByEntityId(['entityId' => $destination['parent_entity_id'], 'path' => '']);
             }
         }
 
