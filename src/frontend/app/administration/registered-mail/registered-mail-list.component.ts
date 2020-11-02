@@ -98,7 +98,7 @@ export class RegisteredMailListComponent implements OnInit {
         const dataTosend = JSON.parse(JSON.stringify(row));
         dataTosend.status = 'OK';
 
-        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.activate'), msg: 'En activant cette plage, cela clôturera la plage actuelle utilisée pour ce type de recommandé.' } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.activateRegisteredMailNumberRange'), msg: 'En activant cette plage, cela clôturera la plage actuelle utilisée pour ce type de recommandé.' } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),

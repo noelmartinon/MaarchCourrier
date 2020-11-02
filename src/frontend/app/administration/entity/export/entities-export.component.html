@@ -5,7 +5,7 @@
             <mat-spinner></mat-spinner>
         </div>
         <div class="row">
-            <div [class.col-md-12]="exportModel.format != 'csv'" [class.col-md-3]="exportModel.format == 'csv'">
+            <div class="col-md-6">
                 <mat-form-field appearance="outline">
                     <mat-label>{{'lang.format' | translate}}</mat-label>
                     <mat-select placeholder="{{'lang.format' | translate}}" [(ngModel)]="exportModel.format">
@@ -15,7 +15,7 @@
                     </mat-select>
                 </mat-form-field>
             </div>
-            <div class="col-md-9" *ngIf="exportModel.format == 'csv'">
+            <div class="col-md-6" *ngIf="exportModel.format == 'csv'">
                 <mat-form-field appearance="outline">
                     <mat-label>{{'lang.delimiter' | translate}}</mat-label>
                     <mat-select placeholder="{{'lang.delimiter' | translate}}" [(ngModel)]="exportModel.delimiter"

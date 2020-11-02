@@ -66,6 +66,7 @@ import { PrintRegisteredMailActionComponent } from './actions/print-registered-m
 import { PrintDepositListActionComponent } from './actions/print-deposit-list-action/print-deposit-list-action.component';
 import { SendToRecordManagementComponent } from './actions/send-to-record-management-action/send-to-record-management.component';
 import { CheckReplyRecordManagementComponent } from './actions/check-reply-record-management-action/check-reply-record-management.component';
+import { ResetRecordManagementComponent } from './actions/reset-record-management-action/reset-record-management.component';
 import { CheckAcknowledgmentRecordManagementComponent } from './actions/check-acknowledgment-record-management-action/check-acknowledgment-record-management.component';
 
 
@@ -238,6 +239,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         ReconcileActionComponent,
         SendToRecordManagementComponent,
         CheckReplyRecordManagementComponent,
+        ResetRecordManagementComponent,
         CheckAcknowledgmentRecordManagementComponent,
         TechnicalInformationComponent
     ],

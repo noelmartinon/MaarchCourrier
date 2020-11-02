@@ -178,7 +178,7 @@ class SummarySheetController
 
         $appName = CoreConfigModel::getApplicationName();
         $pdf->SetFont('', '', 8);
-        $pdf->Cell(0, 20, "$appName / " . date('d-m-Y'), 0, 2, 'L', false);
+        $pdf->Cell(0, 20, mb_strimwidth($appName, 0, 40, '...', 'utf8') . " / " . date('d-m-Y'), 0, 2, 'L', false);
         $pdf->SetY($pdf->GetY() - 20);
 
         $pdf->SetFont('', 'B', 12);
@@ -266,7 +266,9 @@ class SummarySheetController
                 $category = ResModel::getCategoryLabel(['categoryId' => $resource['category_id']]);
                 $category = empty($category) ? '<i>'._UNDEFINED.'</i>' : "<b>{$category}</b>";
 
-                $status = StatusModel::getById(['id' => $resource['status'], 'select' => ['label_status']]);
+                if (!empty($resource['status'])) {
+                    $status = StatusModel::getById(['id' => $resource['status'], 'select' => ['label_status']]);
+                }
                 $status = empty($status['label_status']) ? '<i>' . _UNDEFINED . '</i>' : "<b>{$status['label_status']}</b>";
 
                 $retentionRuleFrozen = empty($resource['retention_frozen']) ? '<b>' . _NO . '</b>' : '<b>' . _YES . '</b>';
@@ -586,16 +588,18 @@ class SummarySheetController
                         break;
                     } elseif ($listInstance['res_id'] == $resource['res_id']) {
                         $mode = $listInstance['requested_signature'] ? 'Signataire' : 'Viseur';
-                        $userLabel = UserModel::getLabelledUserById(['id' => $listInstance['item_id']]) . " ({$mode}) ";
+                        $userLabel = UserModel::getLabelledUserById(['id' => $listInstance['item_id']]);
 
                         $delegate = !empty($listInstance['delegate']) ? UserModel::getLabelledUserById(['id' => $listInstance['delegate']]) : '';
                         if (!empty($delegate)) {
-                            $userLabel = $delegate . ' ' . _INSTEAD_OF . ' ' . $userLabel;
+                            $mode .= ', ' . _INSTEAD_OF . ' ' . $userLabel;
+                            $userLabel = $delegate . " ({$mode}) ";
+                        } else {
+                            $userLabel .= " ({$mode}) ";
                         }
 
                         $users[] = [
                             'user'  => $userLabel,
-                            'mode'  => $listInstance['requested_signature'] ? 'Signataire' : 'Viseur',
                             'date'  => TextFormatModel::formatDate($listInstance['process_date']),
                         ];
                         unset($args['data']['listInstancesVisa'][$listKey]);
@@ -630,11 +634,15 @@ class SummarySheetController
                         $user = UserModel::getLabelledUserById(['id' => $listInstance['item_id']]);
                         $entity = UserModel::getPrimaryEntityById(['id' => $listInstance['item_id'], 'select' => ['entities.entity_label']]);
 
-                        $userLabel = $user . " (" . $entity['entity_label'] . ")";
+                        $entityLabel = $entity['entity_label'];
+                        $userLabel = $user;
                         $delegate = !empty($listInstance['delegate']) ? UserModel::getLabelledUserById(['id' => $listInstance['delegate']]) : '';
 
                         if (!empty($delegate)) {
-                            $userLabel = $delegate . ' ' .  _INSTEAD_OF . ' ' . $userLabel;
+                            $entityLabel .= ', ' .  _INSTEAD_OF . ' ' . $userLabel;
+                            $userLabel = $delegate . " (" . $entityLabel . ")";
+                        } else {
+                            $userLabel .= " (" . $entityLabel . ")";
                         }
 
                         $users[] = [

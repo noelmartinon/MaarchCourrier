@@ -11,7 +11,7 @@
                         <ng-template matStepLabel>Installation</ng-template>
                         <div class="stepContainer">
                             <div class="stepContent">
-                                <app-welcome #stepContent></app-welcome>
+                                <app-welcome #stepContent #appWelcome></app-welcome>
                             </div>
                             <button *ngIf="!authService.noInstall" mat-fab [title]="'lang.home' | translate" class="previousStepButton" color="primary" (click)="gotToLogin()">
                                 <mat-icon class="fas fa-home"></mat-icon>
@@ -67,7 +67,7 @@
                         <ng-template matStepLabel>{{'lang.customization' | translate}}</ng-template>
                         <div class="stepContainer">
                             <div class="stepContent">
-                                <app-customization #appCustomization #stepContent [appDatabase]="appDatabase"></app-customization>
+                                <app-customization #appCustomization #stepContent [appDatabase]="appDatabase" [appWelcome]="appWelcome"></app-customization>
                             </div>
                             <button mat-fab matStepperPrevious [title]="this.translate.instant('lang.previous')" class="previousStepButton" color="primary">
                                 <mat-icon class="fa fa-arrow-left"></mat-icon>

@@ -36,9 +36,15 @@ class PrivilegeController
             return $response->withStatus(400)->withJson(['errors' => 'Route privilegeId is empty or not an integer']);
         }
 
+
         if (in_array($args['privilegeId'], ['create_custom', 'admin_update_control'])) {
             $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
             if (!empty($config['config']['lockAdvancedPrivileges'])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Privilege forbidden']);
+            }
+        } elseif ($args['privilegeId'] == 'admin_password_rules') {
+            $loginMethod = CoreConfigModel::getLoggingMethod();
+            if ($loginMethod['id'] != 'standard') {
                 return $response->withStatus(403)->withJson(['errors' => 'Privilege forbidden']);
             }
         }
@@ -159,14 +165,20 @@ class PrivilegeController
         ValidatorModel::stringType($args, ['privilegeId']);
         ValidatorModel::intVal($args, ['userId']);
 
-        $isLock = false;
         if (in_array($args['privilegeId'], ['create_custom', 'admin_update_control'])) {
-            $file   = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
-            $isLock = !empty($file['config']['lockAdvancedPrivileges']);
+            $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+            if (!empty($file['config']['lockAdvancedPrivileges'])) {
+                return false;
+            }
+        } elseif ($args['privilegeId'] == 'admin_password_rules') {
+            $loginMethod = CoreConfigModel::getLoggingMethod();
+            if ($loginMethod['id'] != 'standard') {
+                return false;
+            }
         }
 
         if (UserController::isRoot(['id' => $args['userId']])) {
-            return !$isLock;
+            return true;
         }
 
         $hasPrivilege = DatabaseModel::select([
@@ -181,7 +193,7 @@ class PrivilegeController
             'data'      => [$args['userId'], $args['privilegeId']]
         ]);
 
-        return !empty($hasPrivilege) && !$isLock;
+        return !empty($hasPrivilege);
     }
 
     public static function getPrivilegesByUser(array $args)
@@ -201,6 +213,13 @@ class PrivilegeController
         foreach (['create_custom', 'admin_update_control'] as $advancedPrivilege) {
             $key = array_search($advancedPrivilege, $privilegesStoredInDB);
             if ($isLock && $key !== false) {
+                unset($privilegesStoredInDB[$key]);
+            }
+        }
+        $loginMethod = CoreConfigModel::getLoggingMethod();
+        if ($loginMethod['id'] != 'standard') {
+            $key = array_search('admin_password_rules', $privilegesStoredInDB);
+            if ($key !== false) {
                 unset($privilegesStoredInDB[$key]);
             }
         }

@@ -56,8 +56,13 @@ export class CheckReplyRecordManagementComponent implements OnInit {
 
     executeAction() {
         this.http.put(this.data.processActionRoute, { resources: this.selectedRes, note: this.noteEditor.getNote() }).pipe(
-            tap(() => {
-                this.dialogRef.close(this.selectedRes);
+            tap((data: any) => {
+                if (!data) {
+                    this.dialogRef.close(this.selectedRes);
+                }
+                if (data && data.errors != null) {
+                    this.notify.error(data.errors);
+                }
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {

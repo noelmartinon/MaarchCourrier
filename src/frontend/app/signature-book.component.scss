@@ -1111,3 +1111,11 @@ img:hover.panelSelectedThumbnail {
     color: black;
     font-weight: normal;
 }
+
+.tool-disabled {
+    cursor: not-allowed !important;
+
+    i {
+        opacity: 0.3;
+    }
+}

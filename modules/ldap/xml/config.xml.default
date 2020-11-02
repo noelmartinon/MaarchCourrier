@@ -12,57 +12,42 @@
             <prefix_login>MAARCH</prefix_login>
             <!-- suffix les logins si saisi -->
             <suffix_login>@maarch-les-bains.com</suffix_login>
-            <!-- login admnistrateur du domaine -->
-            <login_admin>Administrateur</login_admin>
-            <!-- mot de passe administrateur annuaire ldap -->
-            <pass>ThePassword</pass>
             <!-- cryptage de la communication ( true or false) -->
             <ssl>false</ssl>
-            <!--Nombre de logs avant purge (si purge_log == 0 alors les logs ne sont jamais purges)  -->
-            <purge_log>1</purge_log>
-            <!-- Import des users qui n'appartiennent a aucun groupe -->
-            <lost_users>false</lost_users>
             <standardConnect>false</standardConnect>
+            <!-- login admnistrateur du domaine (uniquement pour la synchro) -->
+            <login_admin>Administrateur</login_admin>
+            <!-- mot de passe administrateur annuaire ldap (uniquement pour la synchro) -->
+            <pass>ThePassword</pass>
         </ldap>
     </config>
-    
-   <!-- Est utile uniquement pour la synchroniqation des donnees -->
-    <config_base>
-        <databaseserver>localhost</databaseserver>
-        <databaseserverport>5432</databaseserverport>
-        <databasetype>POSTGRESQL</databasetype>
-        <databasename>maarch_entreprise</databasename>
-        <databaseuser>postgres</databaseuser>
-        <databasepassword>maarch</databasepassword>
-    </config_base>
+    <!-- Synchronisation Ldap -->
+    <user>superadmin</user>
+    <password>superadmin</password>
+    <synchronizeUsers>true</synchronizeUsers>
+    <synchronizeEntities>true</synchronizeEntities>
     <mapping>
-        <user ext_id="objectguid">
+        <user>
             <user_id>samaccountname</user_id>
             <firstname>givenname</firstname>
             <lastname>sn</lastname>
             <phone>telephonenumber</phone>
             <mail>mail</mail>
-            <fonction>title</fonction>
-            <enabled>useraccountcontrol</enabled><!--Depend du type d'annuaire-->
-            <user_entity role="">memberof</user_entity>
+            <user_entity>memberof</user_entity>
+            <defaultEntity>PJS</defaultEntity>
         </user>
         <entity>
-            <ldap_id>objectguid</ldap_id>
+            <entity_id>objectguid</ldap_id>
             <entity_label>samaccountname</entity_label>
-            <parent_entity>memberof</parent_entity>
+            <parent_entity_id>memberof</parent_entity>
         </entity>
     </mapping>
     <filter>
         <!-- Chemin ou se trouve les utilisateurs de l'application -->
          <dn id="OU=Utilisateurs,DC=maarch,DC=com" type="users">
-            <user>(cn=*)</user>
-            <group>(cn=*)</group>
         </dn>
-
         <!-- Chemin ou se trouve les entités de l'application -->
         <dn id="OU=Services,DC=maarch,DC=com" type="entities">
-            <user>(cn=*)</user>
-            <group>(cn=*)</group>
         </dn>
     </filter>
 </root>

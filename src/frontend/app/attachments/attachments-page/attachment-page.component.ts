@@ -102,6 +102,10 @@ export class AttachmentPageComponent implements OnInit {
                         this.editMode = true;
                     }
 
+                    if (data.type === 'acknowledgement_record_management' || data.type === 'reply_record_management') {
+                        this.editMode = false;
+                    }
+
                     if (data.recipientId !== null && data.status !== 'SEND_MASS') {
                         contact = [{
                             id: data.recipientId,
@@ -118,12 +122,13 @@ export class AttachmentPageComponent implements OnInit {
                         modificationDate: new FormControl({ value: data.modificationDate, disabled: true }),
                         modifiedBy: new FormControl({ value: data.modifiedBy, disabled: true }),
                         signatory: new FormControl({ value: data.signatory, disabled: true }),
+                        signatoryId: new FormControl({ value: data.signatoryId, disabled: true }),
                         signDate: new FormControl({ value: data.signDate, disabled: true }),
                         resId: new FormControl({ value: this.data.resId, disabled: true }, [Validators.required]),
                         chrono: new FormControl({ value: data.chrono, disabled: true }),
                         originId: new FormControl({ value: data.originId, disabled: true }),
                         resIdMaster: new FormControl({ value: data.resIdMaster, disabled: true }, [Validators.required]),
-                        status: new FormControl({ value: data.status, disabled: true }, [Validators.required]),
+                        status: new FormControl({ value: this.translate.instant('lang.attachment_' + data.status), disabled: true }, [Validators.required]),
                         relation: new FormControl({ value: data.relation, disabled: true }, [Validators.required]),
                         title: new FormControl({ value: data.title, disabled: !this.editMode }, [Validators.required]),
                         recipient: new FormControl({ value: contact, disabled: !this.editMode }),

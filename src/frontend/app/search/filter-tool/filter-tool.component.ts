@@ -36,4 +36,8 @@ export class FilterToolComponent implements OnInit {
     toggleDisplay(key: string) {
         this.filters[key]['expand'] = !this.filters[key]['expand'];
     }
+
+    getRealCount(key: string) {
+        return this.filters[key]['values'].filter((item: any) => item.count > 0 || (item.count === 0 && item.selected)).length;
+    }
 }

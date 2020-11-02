@@ -111,17 +111,20 @@ class AuthenticationController
     public static function authentication($authorizationHeaders = [])
     {
         $userId = null;
-        if (!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
+
+        $canBasicAuth = true;
+        $loginMethod = CoreConfigModel::getLoggingMethod();
+        if ($loginMethod['id'] != 'standard' && !empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
+            $rawUser = UserModel::getByLogin(['select' => ['mode'], 'login' => $_SERVER['PHP_AUTH_USER']]);
+            if (!empty($rawUser) && $rawUser['mode'] != 'rest') {
+                $canBasicAuth = false;
+            }
+        }
+
+        if (!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW']) && $canBasicAuth) {
             if (AuthenticationModel::authentication(['login' => $_SERVER['PHP_AUTH_USER'], 'password' => $_SERVER['PHP_AUTH_PW']])) {
-                $loginMethod = CoreConfigModel::getLoggingMethod();
                 $user = UserModel::getByLogin(['select' => ['id', 'mode'], 'login' => $_SERVER['PHP_AUTH_USER']]);
-                if ($loginMethod['id'] != 'standard') {
-                    if ($user['mode'] == 'rest') {
-                        $userId = $user['id'];
-                    }
-                } else {
-                    $userId = $user['id'];
-                }
+                $userId = $user['id'];
             }
         } else {
             if (!empty($authorizationHeaders)) {

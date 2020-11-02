@@ -3,7 +3,8 @@ import {
     Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, QueryList,
     ViewChild,
     Renderer2,
-    Output
+    Output,
+    DoCheck
 } from '@angular/core';
 import { ControlValueAccessor, FormControl } from '@angular/forms';
 import { MatOption } from '@angular/material/core';
@@ -22,7 +23,7 @@ import { FunctionsService } from '@service/functions.service';
     styleUrls: ['select-search.component.scss', '../../app/indexation/indexing-form/indexing-form.component.scss'],
     providers: [SortPipe]
 })
-export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterViewInit, ControlValueAccessor {
+export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterViewInit, ControlValueAccessor, DoCheck {
     /** Label of the search placeholder */
     @Input() placeholderLabel = this.translate.instant('lang.chooseValue');
 
@@ -75,6 +76,9 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     public filteredDatas: Observable<string[]>;
 
     public filteredDatasMulti: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
+
+    datasClone: any = [];
+    isModelModified: boolean = false;
 
     /** Reference to the MatSelect options */
     public _options: QueryList<MatOption>;
@@ -169,30 +173,57 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
                         }
                     });
             });
-        setTimeout(() => {
-            let group = '';
-            let index = 1;
-            this.datas = JSON.parse(JSON.stringify(this.datas));
-            this.datas.forEach((element: any) => {
-                if (element.isTitle) {
-                    group = `group_${index}`;
-                    element.id = group;
-                    index++;
-                } else {
-                    element.group = group;
-                }
-            });
 
+        let group = '';
+        let index = 1;
+        this.datasClone = JSON.parse(JSON.stringify(this.datas));
+        this.datasClone.forEach((element: any) => {
+            if (element.isTitle) {
+                group = `group_${index}`;
+                element.id = group;
+                index++;
+            } else {
+                element.group = group;
+            }
+        });
+
+        this.filteredDatas = this.formControlSearch.valueChanges
+            .pipe(
+                startWith(''),
+                map(value => this._filter(value))
+            );
+        // this.initMultipleHandling();
+
+    }
+
+    // To resfresh filteredDatas if data is modfied
+    ngDoCheck(): void {
+        if (JSON.stringify(this.datas) !== JSON.stringify(this.datasClone) && !this.isModelModified) {
+            this.isModelModified = true;
+
+            this.datasClone = JSON.parse(JSON.stringify(this.datas));
+
+            // if more data => contruct title again
+            if (this.datasClone.length !== this.datas.length) {
+                let group = '';
+                let index = 1;
+                this.datasClone.forEach((element: any) => {
+                    if (element.isTitle) {
+                        group = `group_${index}`;
+                        element.id = group;
+                        index++;
+                    } else {
+                        element.group = group;
+                    }
+                });
+            }
             this.filteredDatas = this.formControlSearch.valueChanges
                 .pipe(
                     startWith(''),
                     map(value => this._filter(value))
                 );
-        }, 200);
-
-
-        // this.initMultipleHandling();
-
+            this.isModelModified = false;
+        }
     }
 
     initOptGroups() {
@@ -415,6 +446,6 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     }
 
     emptyData() {
-        return this.returnValue === 'id' ? null : {id: null, label : this.translate.instant('lang.emptyValue')};
+        return this.returnValue === 'id' ? null : { id: null, label: this.translate.instant('lang.emptyValue') };
     }
 }

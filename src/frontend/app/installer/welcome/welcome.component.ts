@@ -25,27 +25,27 @@ export class WelcomeComponent implements OnInit {
     steps: any[] = [
         {
             icon: 'fas fa-check-square',
-            desc: this.translate.instant('lang.prerequisiteCheck')
+            desc: 'lang.prerequisiteCheck'
         },
         {
             icon: 'fa fa-database',
-            desc: this.translate.instant('lang.databaseCreation')
+            desc: 'lang.databaseCreation'
         },
         {
             icon: 'fa fa-database',
-            desc: this.translate.instant('lang.dataSampleCreation')
+            desc: 'lang.dataSampleCreation'
         },
         {
             icon: 'fa fa-hdd',
-            desc: this.translate.instant('lang.docserverCreation')
+            desc: 'lang.docserverCreation'
         },
         {
             icon: 'fas fa-tools',
-            desc: this.translate.instant('lang.stepCustomizationActionDesc')
+            desc: 'lang.stepCustomizationActionDesc'
         },
         {
             icon: 'fa fa-user',
-            desc: this.translate.instant('lang.adminUserCreation')
+            desc: 'lang.adminUserCreation'
         },
     ];
 
@@ -71,18 +71,19 @@ export class WelcomeComponent implements OnInit {
     }
 
     getLang() {
-        this.langs = [
-            'fr',
-            'en',
-        ];
-        /*this.http.get('../rest/dev/lang').pipe(
+        this.http.get('../rest/dev/lang').pipe(
             tap((data: any) => {
+                this.langs = Object.keys(data.langs);
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
                 return of(false);
             })
-        ).subscribe();*/
+        ).subscribe();
+    }
+
+    changeLang(id: string) {
+        this.translate.use(id);
     }
 
     getCustoms() {
@@ -103,18 +104,6 @@ export class WelcomeComponent implements OnInit {
 
     getInfoToInstall(): any[] {
         return [];
-        /*return [{
-            idStep : 'lang',
-            body: {
-                lang: this.stepFormGroup.controls['lang'].value,
-            },
-            route : {
-                method : 'POST',
-                url : '../rest/installer/lang'
-            },
-            description: this.translate.instant('lang.langSetting'),
-            installPriority: 3
-        }];*/
     }
 
 }

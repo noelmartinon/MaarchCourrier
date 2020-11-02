@@ -43,6 +43,7 @@ import { PrintRegisteredMailActionComponent } from './print-registered-mail-acti
 import { PrintDepositListActionComponent } from './print-deposit-list-action/print-deposit-list-action.component';
 import { SendToRecordManagementComponent } from './send-to-record-management-action/send-to-record-management.component';
 import { CheckReplyRecordManagementComponent } from './check-reply-record-management-action/check-reply-record-management.component';
+import { ResetRecordManagementComponent } from './reset-record-management-action/reset-record-management.component';
 import { CheckAcknowledgmentRecordManagementComponent } from './check-acknowledgment-record-management-action/check-acknowledgment-record-management.component';
 
 @Injectable()
@@ -1108,12 +1109,12 @@ export class ActionsService implements OnDestroy {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -1131,12 +1132,35 @@ export class ActionsService implements OnDestroy {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
+            }),
+            finalize(() => this.loading = false),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    resetRecordManagementAction(options: any = null) {
+        const dialogRef = this.dialog.open(ResetRecordManagementComponent, {
+            panelClass: 'maarch-modal',
+            autoFocus: false,
+            disableClose: true,
+            data: this.setDatasActionToSend()
+        });
+        dialogRef.afterClosed().pipe(
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
+            }),
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -1154,12 +1178,12 @@ export class ActionsService implements OnDestroy {
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(
-            tap((data: any) => {
-                this.unlockResourceAfterActionModal(data);
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
             }),
-            filter((data: string) => data === 'success'),
-            tap((result: any) => {
-                this.endAction(result);
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {

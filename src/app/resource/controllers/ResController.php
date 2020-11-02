@@ -438,7 +438,7 @@ class ResController extends ResourceControlController
             return $response->withStatus(400)->withJson(['errors' => 'Document has no file']);
         }
         $originalFormat = $document['format'];
-        $creatorId = $document['typist'];
+        $creatorId      = $document['typist'];
 
         $convertedDocument = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['resId'], 'collId' => 'letterbox_coll']);
         if (!empty($convertedDocument['errors'])) {
@@ -487,7 +487,23 @@ class ResController extends ResourceControlController
         $mimeType = $finfo->buffer($fileContent);
 
         if ($data['mode'] == 'base64') {
-            return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'originalFormat' => $originalFormat, 'mimeType' => $mimeType,'originalCreatorId' => $creatorId]);
+            $listInstance = ListInstanceModel::get([
+                'select'    => ['listinstance_id', 'item_id'],
+                'where'     => ['res_id = ?', 'signatory = ?'],
+                'data'      => [$aArgs['resId'], 'true'],
+                'orderBy'   => ['listinstance_id desc'],
+                'limit'     => 1
+            ]);
+
+            $signatoryId = $listInstance[0]['item_id'] ?? $creatorId;
+    
+            return $response->withJson([
+                'encodedDocument'   => base64_encode($fileContent),
+                'originalFormat'    => $originalFormat,
+                'mimeType'          => $mimeType,
+                'originalCreatorId' => $creatorId,
+                'signatoryId'       => $signatoryId
+            ]);
         } else {
             $pathInfo = pathinfo($pathToDocument);
 

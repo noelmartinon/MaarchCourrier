@@ -263,11 +263,6 @@ define("_PROCEED_WORKFLOW_AVIS", 'Issue an opinion (sequential)');
 define("_PROCEED_WORKFLOW_AVIS_DESC", "Updates the date of issuance of opinion from the current advisor of the opinion workflow ('process_date' of listinstance table).");
 define("_PROCEED_WORKFLOW_AVIS_SIMPLE", 'Issue an opinion (parallel)');
 define("_PROCEED_WORKFLOW_AVIS_SIMPLE_DESC", "Updates the notification date of the user present in the diffusion list of the mail ('process_date' of listinstance table).");
-define('_EXPORT_SEDA', 'Transfer your mails');
-define('_CHECK_ACKNOWLEDGEMENT', 'Check acknowledgement of receipt');
-define('_CHECK_REPLY', 'Check reply');
-define('_PURGE_LETTER', 'Purge the mail after archiving');
-define('_RESET_LETTER', 'Reset workflow');
 define('_SIMPLE_CONFIRM_WITH_UPDATE_DATE', 'Confirm and update departure date');
 define('_NOT_INCOMING_CATEGORY', 'Not incoming category');
 define('_NO_CONTACT', 'No associated contact');
@@ -417,6 +412,7 @@ define("_CANNOT_SYNCHRONIZE_M2M_ANNUARY", "Contact cannot be added in M2M annuar
 define("_DATE_LOCALE", "en_US.utf8");
 
 define("_USER_PREFERENCE_UPDATED", "User preferences updated");
+define("_USER_FEATURE_TOUR_UPDATED", "One or some steps done in the feature tour");
 
 define("_NO_SENDERS", "No sender linked to resource");
 
@@ -498,3 +494,6 @@ define('_REGISTERED_MAIL_DISTRIBUTED', 'Acknowledgement receipt received : regis
 define('_REGISTERED_MAIL_NOT_DISTRIBUTED', 'Acknowledgement receipt received : registered mail not distributed');
 
 define('_CONFIGURATION_UPDATED', 'Configuration updated');
+
+define('_RESET_RECORD_MANAGEMENT', 'Reset record management');
+define('_RESET_RECORD_MANAGEMENT_DESC', 'Reset record management');

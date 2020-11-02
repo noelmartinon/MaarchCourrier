@@ -187,7 +187,7 @@ class ContactController
             'notes'                 => $body['notes'] ?? null,
             'creator'               => $GLOBALS['id'],
             'enabled'               => 'true',
-            'custom_fields'         => !empty($body['customFields']) ? json_encode($body['customFields']) : null,
+            'custom_fields'         => !empty($body['customFields']) ? json_encode($body['customFields']) : '{}',
             'external_id'           => $externalId
         ]);
 
@@ -1233,9 +1233,11 @@ class ContactController
             return !empty($id);
         });
         $oldContact = [];
+        $oldContactCustom = [];
         if (!empty($contactIds)) {
-            $oldContact = ContactModel::get(['select' => ['custom_fields', 'id'], 'where' => ['id in (?)'], 'data' => [$contactIds]]);
-            $oldContact = array_column($oldContact, 'custom_fields', 'id');
+            $rawContact = ContactModel::get(['select' => ['custom_fields', 'id'], 'where' => ['id in (?)'], 'data' => [$contactIds]]);
+            $oldContact = array_column($rawContact, 'id');
+            $oldContactCustom = array_column($rawContact, 'custom_fields', 'id');
         }
 
         foreach ($body['contacts'] as $key => $contact) {
@@ -1315,7 +1317,7 @@ class ContactController
 
                 ContactModel::create($contactToCreate);
             } else {
-                if (!isset($oldContact[$contact['id']])) {
+                if (!in_array($contact['id'], $oldContact)) {
                     $errors[] = ['error' => "Contact does not exists {$contact['id']}", 'index' => $key, 'lang' => 'contactDoesNotExists'];
                     continue;
                 }
@@ -1337,9 +1339,9 @@ class ContactController
                     }
                 }
 
-                $oldContact[$contact['id']] = json_decode($oldContact[$contact['id']], true);
-                if (!empty($oldContact[$contact['id']])) {
-                    $set['custom_fields'] = $set['custom_fields'] + $oldContact[$contact['id']];
+                $oldContactCustom[$contact['id']] = json_decode($oldContactCustom[$contact['id']], true);
+                if (!empty($oldContactCustom[$contact['id']])) {
+                    $set['custom_fields'] = $set['custom_fields'] + $oldContactCustom[$contact['id']];
                 }
                 if (!empty($customsToRemove)) {
                     foreach ($customsToRemove as $item) {

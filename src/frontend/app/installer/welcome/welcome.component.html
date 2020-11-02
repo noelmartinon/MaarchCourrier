@@ -6,7 +6,7 @@
     <form [formGroup]="stepFormGroup" style="width: 850px;margin: auto;">
         <mat-form-field appearance="outline" floatLabel="never">
             <mat-label>{{'lang.chooseAppLanguage' | translate}} : </mat-label>
-            <mat-select formControlName="lang" required>
+            <mat-select formControlName="lang"  (selectionChange)="changeLang($event.value)" required>
                 <mat-option *ngFor="let language of langs" [value]="language">
                     {{'lang.' + language + 'Full' | translate}}
                 </mat-option>
@@ -30,7 +30,7 @@
         </div>
         <mat-list-item *ngFor="let step of steps">
             <mat-icon mat-list-icon color="primary" [class]="step.icon"></mat-icon>
-            <div mat-line>{{step.desc}}</div>
+            <div mat-line>{{step.desc | translate}}</div>
         </mat-list-item>
     </mat-list>
     <mat-divider></mat-divider>

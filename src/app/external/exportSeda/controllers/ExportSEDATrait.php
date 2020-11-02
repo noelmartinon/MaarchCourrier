@@ -27,13 +27,13 @@ use History\models\HistoryModel;
 use IndexingModel\models\IndexingModelFieldModel;
 use MessageExchange\models\MessageExchangeModel;
 use Note\controllers\NoteController;
+use Parameter\models\ParameterModel;
 use Resource\controllers\StoreController;
 use Resource\controllers\SummarySheetController;
 use Resource\models\ResModel;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
-
 use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
 
@@ -44,7 +44,16 @@ trait ExportSEDATrait
         ValidatorModel::notEmpty($args, ['resId']);
         ValidatorModel::intVal($args, ['resId']);
 
-        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['res_id', 'destination', 'type_id', 'subject', 'linked_resources', 'alt_identifier', 'admission_date', 'creation_date', 'modification_date', 'doc_date', 'retention_frozen']]);
+        $attachments = AttachmentModel::get([
+            'select' => ['res_id'],
+            'where'  => ['res_id_master = ?', 'attachment_type in (?)', 'status = ?'],
+            'data'   => [$args['resId'], ['acknowledgement_record_management', 'reply_record_management'], 'TRA']
+        ]);
+        if (!empty($attachments)) {
+            return ['errors' => ['acknowledgement or reply already exists']];
+        }
+
+        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['res_id', 'destination', 'type_id', 'subject', 'linked_resources', 'alt_identifier', 'admission_date', 'creation_date', 'modification_date', 'doc_date', 'retention_frozen', 'binding']]);
         if (empty($resource)) {
             return ['errors' => ['resource does not exists']];
         } elseif (empty($resource['destination'])) {
@@ -53,10 +62,26 @@ trait ExportSEDATrait
             return ['errors' => ['retention rule is frozen']];
         }
 
-        $doctype = DoctypeModel::getById(['id' => $resource['type_id'], 'select' => ['description', 'retention_rule', 'retention_final_disposition']]);
+        $doctype = DoctypeModel::getById(['id' => $resource['type_id'], 'select' => ['description', 'duration_current_use', 'action_current_use', 'retention_rule', 'retention_final_disposition']]);
         if (empty($doctype['retention_rule']) || empty($doctype['retention_final_disposition'])) {
             return ['errors' => ['retention_rule or retention_final_disposition is empty for doctype']];
+        } else {
+            $bindingDocument    = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'bindingDocumentFinalAction']);
+            $nonBindingDocument = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'nonBindingDocumentFinalAction']);
+            if ($resource['binding'] === null && !in_array($doctype['action_current_use'], ['transfer', 'copy'])) {
+                return ['errors' => 'action_current_use is not transfer or copy'];
+            } elseif ($resource['binding'] === true && !in_array($bindingDocument['param_value_string'], ['transfer', 'copy'])) {
+                return ['errors' => 'binding document is not transfer or copy'];
+            } elseif ($resource['binding'] === false && !in_array($nonBindingDocument['param_value_string'], ['transfer', 'copy'])) {
+                return ['errors' => 'no binding document is not transfer or copy'];
+            }
+            $date = new \DateTime($resource['creation_date']);
+            $date->add(new \DateInterval("P{$doctype['duration_current_use']}D"));
+            if (strtotime($date->format('Y-m-d')) >= time()) {
+                return ['errors' => 'duration current use is not exceeded'];
+            }
         }
+
         $entity = EntityModel::getByEntityId(['entityId' => $resource['destination'], 'select' => ['producer_service', 'entity_label']]);
         if (empty($entity['producer_service'])) {
             return ['errors' => ['producer_service is empty for this entity']];
@@ -67,20 +92,10 @@ trait ExportSEDATrait
             return ['errors' => ['No senderOrgRegNumber found in config.json']];
         }
 
-        if (empty($args['data']['packageName'])) {
-            return ['errors' => ['packageName is empty']];
-        }
-        if (empty($args['data']['archivalAgreement'])) {
-            return ['errors' => ['archivalAgreement is empty']];
-        }
-        if (empty($args['data']['slipId'])) {
-            return ['errors' => ['slipId is empty']];
-        }
-        if (empty($args['data']['entityArchiveRecipient'])) {
-            return ['errors' => ['entityArchiveRecipient is empty']];
-        }
-        if (empty($args['data']['archiveDescriptionLevel'])) {
-            return ['errors' => ['archiveDescriptionLevel is empty']];
+        foreach (['packageName', 'archivalAgreement', 'slipId', 'entityArchiveRecipient', 'archiveDescriptionLevel'] as $value) {
+            if (empty($args['data'][$value])) {
+                return ['errors' => [$value . ' is empty']];
+            }
         }
 
         foreach ($args['data']['archives'] as $archiveUnit) {
@@ -172,8 +187,13 @@ trait ExportSEDATrait
             'tableName' => 'res_letterbox',
             'resId'     => $resource['res_id']
         ]);
+
+        ExportSEDATrait::cleanTmpDocument(['archiveUnits' => $initData['archiveUnits']]);
+
         if ($args['data']['actionMode'] == 'download') {
-            return ['data' => ['encodedFile' => base64_encode(file_get_contents($sedaPackage['encodedFilePath']))]];
+            $encodedContent = base64_encode(file_get_contents($sedaPackage['encodedFilePath']));
+            unlink($sedaPackage['encodedFilePath']);
+            return ['data' => ['encodedFile' => $encodedContent]];
         } else {
             $elementSend  = ExportSEDATrait::sendSedaPackage([
                 'messageId'       => $messageSaved['messageId'],
@@ -183,6 +203,7 @@ trait ExportSEDATrait
                 'resId'           => $resource['res_id'],
                 'reference'       => $data['messageObject']['messageIdentifier']
             ]);
+            unlink($sedaPackage['encodedFilePath']);
             if (!empty($elementSend['errors'])) {
                 return ['errors' => [$elementSend['errors']]];
             }
@@ -447,6 +468,15 @@ trait ExportSEDATrait
         return ['filePath' => $summarySheetFilePath];
     }
 
+    public static function cleanTmpDocument(array $args)
+    {
+        foreach ($args['archiveUnits'] as $archiveUnit) {
+            if (in_array($archiveUnit['type'], ['note', 'email', 'summarySheet'])) {
+                unlink($archiveUnit['filePath']);
+            }
+        }
+    }
+
     public static function array2object($data)
     {
         if (!is_array($data)) {
@@ -467,7 +497,7 @@ trait ExportSEDATrait
         $data['messageObject'] = self::array2object($args["data"]["messageObject"]);
         $data['type'] = $args["data"]["type"];
         
-        $informationsToSend = SendMessageController::generateMessageFile($data);
+        $informationsToSend = SendMessageController::generateSedaFile($data);
         return $informationsToSend;
     }
 
@@ -536,10 +566,12 @@ trait ExportSEDATrait
         }
         
         $content = file_get_contents($fullFilePath);
+        $xmlfile = simplexml_load_file($fullFilePath);
         unlink($zipDocumentOnTmp);
         unlink($fullFilePath);
+        rmdir($path);
 
-        return ['encodedDocument' => base64_encode($content)];
+        return ['encodedDocument' => base64_encode($content), 'xmlContent' => $xmlfile];
     }
 
     public static function checkAcknowledgmentRecordManagement(array $args)
@@ -625,7 +657,7 @@ trait ExportSEDATrait
             return ['errors' => ['Reply is not readable']];
         }
 
-        $messageExchange = MessageExchangeModel::getMessageByReference(['select' => ['message_id'], 'reference' => (string)$replyXml->MessageReceivedIdentifier]);
+        $messageExchange = MessageExchangeModel::getMessageByReference(['select' => ['message_id'], 'reference' => (string)$replyXml->MessageRequestIdentifier]);
         if (empty($messageExchange)) {
             return ['errors' => ['No reply found with this reference']];
         }
@@ -633,6 +665,23 @@ trait ExportSEDATrait
         $unitIdentifier = MessageExchangeModel::getUnitIdentifierByResId(['select' => ['message_id'], 'resId' => $args['resId']]);
         if ($unitIdentifier['message_id'] != $messageExchange['message_id']) {
             return ['errors' => ['Wrong reply']];
+        }
+
+        if ($args['data']['resetAction']) {
+            if (strpos((string)$replyXml->ReplyCode, '000') !== false) {
+                return ['errors' => ['Mail already archived']];
+            }
+
+            AttachmentModel::update([
+                'set'   => ['status' => 'DEL'],
+                'where' => ['attachment_type in (?)', 'res_id_master = ?'],
+                'data'  => [['acknowledgement_record_management', 'reply_record_management'], $args['resId']]
+            ]);
+
+            MessageExchangeModel::deleteUnitIdentifier(['where' => ['res_id = ?'], 'data' => [$args['resId']]]);
+            MessageExchangeModel::delete(['where' => ['reference in (?)'], 'data' => [[(string) $replyXml->MessageRequestIdentifier, (string) $replyXml->MessageIdentifier]]]);
+        } elseif (strpos((string)$replyXml->ReplyCode, '000') === false) {
+            return ['errors' => ['Mail rejected from SAE']];
         }
 
         return true;

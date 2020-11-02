@@ -259,11 +259,6 @@ define('_PROCEED_WORKFLOW_AVIS', 'Een bericht uitzenden (sequentieel)');
 define('_PROCEED_WORKFLOW_AVIS_DESC', 'Werkt de uitgiftedatum bij van het bericht van de huidige consultant van het berichtencircuit (\'process_date\' van de tabel listinstance).');
 define('_PROCEED_WORKFLOW_AVIS_SIMPLE', 'Een bericht uitzenden (parallel)');
 define('_PROCEED_WORKFLOW_AVIS_SIMPLE_DESC', 'Werkt de uitgiftedatum bij van het bericht van de gebruiker die aanwezig is in het bericht in de verdelingslijst van het brief (\'process_date\' van de tabel listinstance).');
-define('_EXPORT_SEDA', 'Uw brieven doorsturen');
-define('_CHECK_ACKNOWLEDGEMENT', 'Controle van het ontvangstbewijs');
-define('_CHECK_REPLY', 'Controle van het antwoord op de transfer');
-define('_PURGE_LETTER', 'De brief vrijmaken na de archivering');
-define('_RESET_LETTER', 'Reset van het verwerkingscircuit');
 define('_SIMPLE_CONFIRM_WITH_UPDATE_DATE', 'Bevestiging en bijwerking van de vertrekdatum');
 define('_NOT_INCOMING_CATEGORY', 'Categorie verschillend van \'Inkomende post\''); //_TO_TRANSLATE
 define('_AR_ALREADY_GENERATED', 'Ontvangstbevestiging gegenereerd maar niet verzonden'); //_TO_TRANSLATE
@@ -418,6 +413,7 @@ define("_CANNOT_SYNCHRONIZE_M2M_ANNUARY", "Contact can not be added in M2M annua
 define("_DATE_LOCALE", "en_US.utf8");
 
 define("_USER_PREFERENCE_UPDATED", "User preferences updated"); //TO TRANSLATE
+define("_USER_FEATURE_TOUR_UPDATED", "One or some steps done in the feature tour"); //TO TRANSLATE
 
 define("_NO_SENDERS", "No sender linked to resource"); //TO TRANSLATE
 

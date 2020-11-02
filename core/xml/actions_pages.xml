@@ -317,66 +317,6 @@ An action page is described in a ACTIONPAGE tag :
             <COLL_ID>letterbox_coll</COLL_ID>
         </COLLECTIONS>
     </ACTIONPAGE>
-    <!-- <ACTIONPAGE>
-        <ID>export_seda</ID>
-        <LABEL>_EXPORT_SEDA</LABEL>
-        <NAME>export_seda</NAME>
-        <component>v1Action</component>
-        <ORIGIN>module</ORIGIN>
-        <MODULE>export_seda</MODULE>
-        <FLAG_CREATE>false</FLAG_CREATE>
-        <COLLECTIONS>
-            <COLL_ID>letterbox_coll</COLL_ID>
-        </COLLECTIONS>
-    </ACTIONPAGE>
-    <ACTIONPAGE>
-        <ID>check_acknowledgement</ID>
-        <LABEL>_CHECK_ACKNOWLEDGEMENT</LABEL>
-        <NAME>check_acknowledgement</NAME>
-        <component>v1Action</component>
-        <ORIGIN>module</ORIGIN>
-        <MODULE>export_seda</MODULE>
-        <FLAG_CREATE>false</FLAG_CREATE>
-        <COLLECTIONS>
-            <COLL_ID>letterbox_coll</COLL_ID>
-        </COLLECTIONS>
-    </ACTIONPAGE>
-    <ACTIONPAGE>
-        <ID>check_reply</ID>
-        <LABEL>_CHECK_REPLY</LABEL>
-        <NAME>check_reply</NAME>
-        <component>v1Action</component>
-        <ORIGIN>module</ORIGIN>
-        <MODULE>export_seda</MODULE>
-        <FLAG_CREATE>false</FLAG_CREATE>
-        <COLLECTIONS>
-            <COLL_ID>letterbox_coll</COLL_ID>
-        </COLLECTIONS>
-    </ACTIONPAGE>
-    <ACTIONPAGE>
-        <ID>purge_letter</ID>
-        <LABEL>_PURGE_LETTER</LABEL>
-        <NAME>purge_letter</NAME>
-        <component>v1Action</component>
-        <ORIGIN>module</ORIGIN>
-        <MODULE>export_seda</MODULE>
-        <FLAG_CREATE>false</FLAG_CREATE>
-        <COLLECTIONS>
-            <COLL_ID>letterbox_coll</COLL_ID>
-        </COLLECTIONS>
-    </ACTIONPAGE>
-    <ACTIONPAGE>
-        <ID>reset_letter</ID>
-        <LABEL>_RESET_LETTER</LABEL>
-        <NAME>reset_letter</NAME>
-        <component>v1Action</component>
-        <ORIGIN>module</ORIGIN>
-        <MODULE>export_seda</MODULE>
-        <FLAG_CREATE>false</FLAG_CREATE>
-        <COLLECTIONS>
-            <COLL_ID>letterbox_coll</COLL_ID>
-        </COLLECTIONS>
-    </ACTIONPAGE> -->
     <ACTIONPAGE>
         <ID>send_shipping</ID>
         <LABEL>_SEND_MAILEVA</LABEL>
@@ -492,6 +432,16 @@ An action page is described in a ACTIONPAGE tag :
         <NAME>checkAcknowledgmentRecordManagement</NAME>
         <DESC>_CHECK_ACKNOWLEDGMENT_RECORD_MANAGEMENT_DESC</DESC>
         <component>checkAcknowledgmentRecordManagementAction</component>
+        <ORIGIN>apps</ORIGIN>
+        <MODULE>recordManagement</MODULE>
+        <FLAG_CREATE>false</FLAG_CREATE>
+    </ACTIONPAGE>
+        <ACTIONPAGE>
+        <ID>resetRecordManagement</ID>
+        <LABEL>_RESET_RECORD_MANAGEMENT</LABEL>
+        <NAME>resetRecordManagement</NAME>
+        <DESC>_RESET_RECORD_MANAGEMENT_DESC</DESC>
+        <component>resetRecordManagementAction</component>
         <ORIGIN>apps</ORIGIN>
         <MODULE>recordManagement</MODULE>
         <FLAG_CREATE>false</FLAG_CREATE>

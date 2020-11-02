@@ -459,28 +459,54 @@ export class SentResourcePageComponent implements OnInit {
         }
             if (!this.functions.empty(this.resourceData.senders)) {
                 this.resourceData.senders.forEach((sender: any) => {
-                    this.setSender(sender.id);
+                    this.setSender(sender);
                 });
             }
     }
 
-    setSender(id: number) {
-        this.http.get(`../rest/contacts/${id}`).pipe(
-            tap((data: any) => {
-                if (!this.functions.empty(data.email)) {
-                    this.recipients.push(
-                        {
-                            label: this.contactService.formatContact(data),
-                            email: data.email
+    setSender(sender: any) {
+        switch (sender.type) {
+            case 'contact':
+                this.http.get(`../rest/contacts/${sender.id}`).pipe(
+                    tap((data: any) => {
+                        if (!this.functions.empty(data.email)) {
+                            this.recipients.push(
+                                {
+                                    label: this.contactService.formatContact(data),
+                                    email: data.email
+                                }
+                            );
                         }
-                    );
-                }
-            }),
-            catchError((err) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+                    }),
+                    catchError((err) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+                break;
+
+            case 'user':
+                this.http.get(`../rest/users/${sender.id}`).pipe(
+                    tap((data: any) => {
+                        if (!this.functions.empty(data.mail)) {
+                            this.recipients.push(
+                                {
+                                    label: this.contactService.formatContact(data),
+                                    email: data.mail
+                                }
+                            );
+                        }
+                    }),
+                    catchError((err) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+                break;
+
+            default:
+                break;
+        }
     }
 
     getUserEmails() {

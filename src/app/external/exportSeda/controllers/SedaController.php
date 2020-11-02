@@ -27,6 +27,7 @@ use Group\controllers\PrivilegeController;
 use History\controllers\HistoryController;
 use MessageExchange\models\MessageExchangeModel;
 use Note\models\NoteModel;
+use Parameter\models\ParameterModel;
 use Resource\controllers\ResController;
 use Resource\controllers\ResourceListController;
 use Resource\controllers\StoreController;
@@ -60,7 +61,7 @@ class SedaController
 
         $firstResource = $body['resources'][0];
 
-        $resource = ResModel::getById(['resId' => $firstResource, 'select' => ['res_id', 'destination', 'type_id', 'subject', 'linked_resources', 'retention_frozen']]);
+        $resource = ResModel::getById(['resId' => $firstResource, 'select' => ['res_id', 'destination', 'type_id', 'subject', 'linked_resources', 'retention_frozen', 'binding', 'creation_date']]);
         if (empty($resource)) {
             return $response->withStatus(400)->withJson(['errors' => 'resource does not exists']);
         } elseif (empty($resource['destination'])) {
@@ -69,9 +70,33 @@ class SedaController
             return $response->withStatus(400)->withJson(['errors' => 'retention rule is frozen', 'lang' => 'retentionRuleFrozen']);
         }
 
-        $doctype = DoctypeModel::getById(['id' => $resource['type_id'], 'select' => ['description', 'retention_rule', 'retention_final_disposition']]);
-        if (empty($doctype['retention_rule']) || empty($doctype['retention_final_disposition'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'retention_rule or retention_final_disposition is empty for doctype', 'lang' => 'noRetentionInfo']);
+        $attachments = AttachmentModel::get([
+            'select' => ['res_id'],
+            'where'  => ['res_id_master = ?', 'attachment_type in (?)', 'status = ?'],
+            'data'   => [$firstResource, ['acknowledgement_record_management', 'reply_record_management'], 'TRA']
+        ]);
+        if (!empty($attachments)) {
+            return $response->withStatus(400)->withJson(['errors' => 'acknowledgement or reply already exists', 'lang' => 'recordManagement_alreadySent']);
+        }
+
+        $doctype = DoctypeModel::getById(['id' => $resource['type_id'], 'select' => ['description', 'duration_current_use', 'retention_rule', 'action_current_use', 'retention_final_disposition']]);
+        if (empty($doctype['retention_rule']) || empty($doctype['retention_final_disposition']) || empty($doctype['duration_current_use'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'retention_rule, retention_final_disposition or duration_current_use is empty for doctype', 'lang' => 'noRetentionInfo']);
+        } else {
+            $bindingDocument    = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'bindingDocumentFinalAction']);
+            $nonBindingDocument = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'nonBindingDocumentFinalAction']);
+            if ($resource['binding'] === null && !in_array($doctype['action_current_use'], ['transfer', 'copy'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'action_current_use is not transfer or copy', 'lang' => 'noTransferCopyRecordManagement']);
+            } elseif ($resource['binding'] === true && !in_array($bindingDocument['param_value_string'], ['transfer', 'copy'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'binding document is not transfer or copy', 'lang' => 'noTransferCopyBindingRecordManagement']);
+            } elseif ($resource['binding'] === false && !in_array($nonBindingDocument['param_value_string'], ['transfer', 'copy'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'no binding document is not transfer or copy', 'lang' => 'noTransferCopyNoBindingRecordManagement']);
+            }
+            $date = new \DateTime($resource['creation_date']);
+            $date->add(new \DateInterval("P{$doctype['duration_current_use']}D"));
+            if (strtotime($date->format('Y-m-d')) >= time()) {
+                return $response->withStatus(400)->withJson(['errors' => 'duration current use is not exceeded', 'lang' => 'durationCurrentUseNotExceeded']);
+            }
         }
         $entity = EntityModel::getByEntityId(['entityId' => $resource['destination'], 'select' => ['producer_service', 'entity_label']]);
         if (empty($entity['producer_service'])) {

@@ -6,13 +6,13 @@
         *ngIf="!hideFilter"></app-filter-tool-adv-search>
 </ng-template>
 <ng-template #toolTemplate>
-    <div *ngIf="data.length > 0" class="filtersContent">
+    <div class="filtersContent">
         <div style="flex: 1"></div>
         <div class="orderTool">
             <mat-form-field class="basket-order">
                 <mat-icon matPrefix class="fa fa-list"></mat-icon>
                 <mat-select [(ngModel)]="this.listProperties.order" (selectionChange)="updateFilters()"
-                    [disabled]="isLoadingResults">
+                    [disabled]="isLoadingResults || data.length === 0">
                     <mat-option [value]="column.id" *ngFor="let column of displayColsOrder">
                         {{'lang.' + column.id | translate}}
                     </mat-option>
@@ -20,7 +20,7 @@
             </mat-form-field>
         </div>
         <div class="ascDescTool">
-            <button [disabled]="this.listProperties.order == '' || isLoadingResults"
+            <button [disabled]="this.listProperties.order == '' || isLoadingResults || data.length === 0"
                 [style.opacity]="this.listProperties.order == '' ? '0.2' : '1'" mat-fab
                 [title]="this.listProperties.orderDir == 'DESC' ? this.translate.instant('lang.descOrder') : this.translate.instant('lang.ascOrder')"
                 style="color: rgba(0,0,0,0.38);" (click)="changeOrderDir();">
@@ -203,7 +203,7 @@
                     </span>
                     <span class="main-info-data" (click)="launch(row);" style="font-weight:bold;flex:1;cursor:pointer;"
                         [class.undefined]="row.subject == this.translate.instant('lang.undefined')"
-                        title="{{row.subject_title}}" [innerHTML]="row.subject | shorten: 150: '...'"></span>
+                        title="{{row.subject_title}}" [innerHTML]="row.subject"></span>
                     <span *ngIf="sidenavRight !== undefined" class="main-info-action">
                         <button mat-icon-button [class.highlightResultIcon]="row.inNotes"
                             title="{{'lang.notes' | translate}}"

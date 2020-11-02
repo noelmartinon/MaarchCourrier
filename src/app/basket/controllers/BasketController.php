@@ -115,7 +115,7 @@ class BasketController
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
 
-        if (!PreparedClauseController::isRequestValid(['clause' => $data['clause'], 'userId' => $GLOBALS['login']])) {
+        if (!PreparedClauseController::isRequestValid(['clause' => $data['clause'], 'userId' => $GLOBALS['login'], 'limit' => 1])) {
             return $response->withStatus(400)->withJson(['errors' => _INVALID_CLAUSE]);
         }
 
@@ -591,7 +591,7 @@ class BasketController
                     return ['errors' => 'Action must be present in action page or in action list'];
                 }
                 if (!empty($aArgs['groupActions'][$key]['where_clause'])) {
-                    if (!PreparedClauseController::isRequestValid(['clause' => $aArgs['groupActions'][$key]['where_clause'], 'userId' => $aArgs['userId']])) {
+                    if (!PreparedClauseController::isRequestValid(['clause' => $aArgs['groupActions'][$key]['where_clause'], 'userId' => $aArgs['userId'], 'limit' => 1])) {
                         return ['errors' => _INVALID_CLAUSE];
                     }
                 }

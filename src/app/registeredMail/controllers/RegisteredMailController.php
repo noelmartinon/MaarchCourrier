@@ -1084,8 +1084,10 @@ class RegisteredMailController
             $registeredMail[0]['number']      = $registeredMail[0]['alt_identifier'];
             $registeredMail[0]['issuingSite'] = $registeredMail[0]['issuing_site'];
             unset($registeredMail[0]['issuing_site']);
+
+            return $registeredMail[0];
         }
 
-        return $registeredMail[0];
+        return [];
     }
 }

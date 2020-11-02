@@ -1,14 +1,12 @@
-import { Component, OnInit, ViewChild, Inject } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { catchError, map, tap, finalize, exhaustMap } from 'rxjs/operators';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { catchError, tap, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { LocalStorageService } from '@service/local-storage.service';
 import { HeaderService } from '@service/header.service';
-
-declare var $: any;
 
 @Component({
     templateUrl: 'users-export.component.html',
@@ -16,7 +14,6 @@ declare var $: any;
 })
 export class UsersExportComponent implements OnInit {
 
-    
     loading: boolean = false;
     loadingExport: boolean = false;
 
@@ -30,12 +27,11 @@ export class UsersExportComponent implements OnInit {
 
     exportModelList: any;
 
-    @ViewChild('listFilter', { static: true }) private listFilter: any;
-
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
+        public dialogRef: MatDialogRef<UsersExportComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         private localStorage: LocalStorageService,
         private headerService: HeaderService
@@ -73,6 +69,7 @@ export class UsersExportComponent implements OnInit {
                     downloadLink.setAttribute('download', 'export_users_maarch_' + today + '.' + this.exportModel.format.toLowerCase());
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
+                    this.dialogRef.close();
                 } else {
                     alert(this.translate.instant('lang.tooMuchDatas'));
                 }

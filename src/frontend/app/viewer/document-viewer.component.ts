@@ -605,6 +605,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                         this.file.name = `${resId}.${data.originalFormat}`;
                         this.file.format = data.originalFormat;
                         this.file.creatorId = data.originalCreatorId;
+                        this.file.signatoryId = data.signatoryId;
                         this.file.content = `../rest/attachments/${resId}/originalContent?mode=base64`;
                         this.file.contentView = `../rest/attachments/${resId}/content?mode=base64`;
                         this.file.src = this.base64ToArrayBuffer(data.encodedDocument);
@@ -645,6 +646,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                             this.file.contentMode = 'route';
                             this.file.name = `${resId}.${data.originalFormat}`;
                             this.file.format = data.originalFormat;
+                            this.file.signatoryId = data.signatoryId;
                             this.file.content = `../rest/resources/${resId}/originalContent?mode=base64`;
                             this.file.contentView = `../rest/resources/${resId}/content?mode=base64`;
                             this.file.src = this.base64ToArrayBuffer(data.encodedDocument);

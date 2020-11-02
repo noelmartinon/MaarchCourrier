@@ -183,15 +183,15 @@ function Bt_getReply($args = [])
         return ['errors' => 'Error returned by the route /medona/message/{messageId}/Export : ' . $curlResponse['response']['message']];
     }
 
-    $encodedReply = \ExportSeda\controllers\ExportSEDATrait::getXmlFromZipMessage([
+    $reply = \ExportSeda\controllers\ExportSEDATrait::getXmlFromZipMessage([
         'encodedZipDocument' => base64_encode($curlResponse['response']),
         'messageId'          => $messageId
     ]);
-    if (!empty($encodedReply['errors'])) {
-        return ['errors' => 'Error during getXmlFromZipMessage process : ' . $encodedReply['errors']];
+    if (!empty($reply['errors'])) {
+        return ['errors' => 'Error during getXmlFromZipMessage process : ' . $reply['errors']];
     }
 
-    return ['encodedReply' => $encodedReply['encodedDocument']];
+    return ['encodedReply' => $reply['encodedDocument'], 'xmlContent' => $reply['xmlContent']];
 }
 
 function Bt_purgeAll($args = [])

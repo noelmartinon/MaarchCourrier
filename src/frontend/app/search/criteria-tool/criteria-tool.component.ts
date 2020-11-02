@@ -297,15 +297,15 @@ export class CriteriaToolComponent implements OnInit {
 
     resetAllCriteria() {
         this.currentCriteria.forEach((field: any, index: number) => {
-            this.resetCriteria(field.identifier, false);
+            this.resetCriteria(field.identifier, null, false);
         });
 
-        this.resetCriteria('meta', false);
+        this.resetCriteria('meta', null, false);
 
         this.getCurrentCriteriaValues();
     }
 
-    resetCriteria(criteriaId: string, refresh: boolean = true) {
+    resetCriteria(criteriaId: string, value: any, refresh: boolean = true) {
         if (criteriaId !== 'meta') {
             const criteria = this.currentCriteria.filter((item: any) => item.identifier === criteriaId)[0];
 
@@ -316,10 +316,20 @@ export class CriteriaToolComponent implements OnInit {
                         end: null
                     });
                 } else {
-                    criteria.control.setValue([]);
+                    if (value !== null) {
+                        const index = criteria.control.value.map((item: any) => JSON.stringify(item)).indexOf(JSON.stringify(value));
+                        const tmpVal = criteria.control.value.slice();
+                        tmpVal.splice(index, 1);
+
+                        if (index > -1) {
+                            criteria.control.setValue(tmpVal);
+                        }
+                    } else {
+                        criteria.control.setValue([]);
+                    }
                 }
 
-                if ((['recipients', 'senders'].indexOf(criteria.identifier) > -1 || criteria.type === 'contact') && this.functions.empty(criteria.values)) {
+                if ((['recipients', 'senders'].indexOf(criteria.identifier) > -1 || criteria.type === 'contact') && this.functions.empty(criteria.control.value)) {
                     this.appContactAutocomplete.toArray().filter((component: any) => component.id === criteria.identifier)[0].resetInputValue();
                 }
             }
@@ -699,6 +709,13 @@ export class CriteriaToolComponent implements OnInit {
                 element.control.setValue(searchTemplate.query[index].values);
 
                 this.addCriteria(element, openPanel);
+
+                if ((['recipients', 'senders'].indexOf(element.identifier) > -1 || element.type === 'contact') && typeof searchTemplate.query[index].values[0] === 'string') {
+                    const val = searchTemplate.query[index].values[0];
+                    setTimeout(() => {
+                        this.appContactAutocomplete.toArray().filter((component: any) => component.id === element.identifier)[0].setInputValue(val);
+                    }, 0);
+                }
 
                 if (element.type === 'selectAutocomplete') {
                     setTimeout(() => {

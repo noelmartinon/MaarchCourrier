@@ -51,16 +51,16 @@ class InstallerController
         $netcatOrNmap = !empty($outputNetcat[1]) || !empty($outputNmap[1]);
 
         $pdoPgsql = @extension_loaded('pdo_pgsql');
-        $pgsql = @extension_loaded('pgsql');
+        $pgsql    = @extension_loaded('pgsql');
         $mbstring = @extension_loaded('mbstring');
         $fileinfo = @extension_loaded('fileinfo');
-        $gd = @extension_loaded('gd');
-        $imagick = @extension_loaded('imagick');
-        $gettext = @extension_loaded('gettext');
-        $curl = @extension_loaded('curl');
-        $zip = @extension_loaded('zip');
-        $json = @extension_loaded('json');
-        $xml = @extension_loaded('xml');
+        $gd       = @extension_loaded('gd');
+        $imagick  = @extension_loaded('imagick');
+        $gettext  = @extension_loaded('gettext');
+        $curl     = @extension_loaded('curl');
+        $zip      = @extension_loaded('zip');
+        $json     = @extension_loaded('json');
+        $xml      = @extension_loaded('xml');
 
         $writable = is_writable('.') && is_readable('.');
 
@@ -306,20 +306,18 @@ class InstallerController
         fwrite($fp, json_encode($customFile, JSON_PRETTY_PRINT));
         fclose($fp);
 
-        $jsonFile = [
-            'config'    => [
-                'lang'              => $body['lang'] ?? 'fr',
-                'applicationName'   => $body['applicationName'] ?? $body['customId'],
-                'cookieTime'        => 10080,
-                'timezone'          => 'Europe/Paris',
-                'maarchDirectory'   => realpath('.') . '/',
-                'customID'          => $body['customId'],
-                'maarchUrl'         => ''
-            ],
-            'database'  => []
-        ];
+        $config = file_get_contents('apps/maarch_entreprise/xml/config.json.default');
+        $config = json_decode($config, true);
+        $config['config']['lang']            = $body['lang'] ?? 'fr';
+        $config['config']['applicationName'] = $body['applicationName'] ?? $body['customId'];
+        $config['config']['cookieTime']      = 10080;
+        $config['config']['timezone']        = 'Europe/Paris';
+        $config['config']['maarchDirectory'] = realpath('.') . '/';
+        $config['config']['customID']        = $body['customId'];
+        $config['config']['maarchUrl']       = '';
+
         $fp = fopen("custom/{$body['customId']}/apps/maarch_entreprise/xml/config.json", 'w');
-        fwrite($fp, json_encode($jsonFile, JSON_PRETTY_PRINT));
+        fwrite($fp, json_encode($config, JSON_PRETTY_PRINT));
         fclose($fp);
 
         $cmd = 'ln -s ' . realpath('.') . "/ {$body['customId']}";

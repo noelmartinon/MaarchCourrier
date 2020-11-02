@@ -270,7 +270,7 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
             Object.keys(element).forEach((key) => {
                 if (key === 'statusImage' && element[key] == null) {
                     element[key] = 'fa-question undefined';
-                } else if ((element[key] == null || element[key] === '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'mailTracking', 'hasDocument', 'folders'].indexOf(key) === -1) {
+                } else if ((element[key] == null || element[key] === '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'mailTracking', 'hasDocument', 'folders', 'binding'].indexOf(key) === -1) {
                     element[key] = this.translate.instant('lang.undefined');
                 }
             });

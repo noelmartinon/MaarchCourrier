@@ -691,7 +691,7 @@ class SignatureBookControllerTest extends TestCase
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame('Route id is not an integer', $responseBody['errors']);
 
-        $response = $signatureBookController->unsignAttachment($request, new \Slim\Http\Response(), ['id' => self::$signedAttachmentId * 1000]);
+        $response = $signatureBookController->unsignAttachment($request, new \Slim\Http\Response(), ['id' => self::$attachmentId * 1000]);
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame('Document out of perimeter', $responseBody['errors']);
         $this->assertSame(403, $response->getStatusCode());
@@ -700,7 +700,7 @@ class SignatureBookControllerTest extends TestCase
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
-        $response = $signatureBookController->unsignAttachment($request, new \Slim\Http\Response(), ['id' => self::$signedAttachmentId]);
+        $response = $signatureBookController->unsignAttachment($request, new \Slim\Http\Response(), ['id' => self::$attachmentId]);
         $this->assertSame(403, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame('Privilege forbidden', $responseBody['errors']);
@@ -710,7 +710,7 @@ class SignatureBookControllerTest extends TestCase
         $GLOBALS['id'] = $userInfo['id'];
 
         // Success
-        $response = $signatureBookController->unsignAttachment($request, new \Slim\Http\Response(), ['id' => self::$signedAttachmentId]);
+        $response = $signatureBookController->unsignAttachment($request, new \Slim\Http\Response(), ['id' => self::$attachmentId]);
         $this->assertSame(204, $response->getStatusCode());
 
         $GLOBALS['login'] = 'superadmin';
@@ -729,9 +729,6 @@ class SignatureBookControllerTest extends TestCase
         $this->assertSame(204, $response->getStatusCode());
 
         $response     = $attachmentController->delete($request, new \Slim\Http\Response(), ['id' => self::$attachmentId2]);
-        $this->assertSame(204, $response->getStatusCode());
-
-        $response     = $attachmentController->delete($request, new \Slim\Http\Response(), ['id' => self::$signedAttachmentId]);
         $this->assertSame(204, $response->getStatusCode());
 
         $response     = $attachmentController->delete($request, new \Slim\Http\Response(), ['id' => self::$attachmentIdIncoming]);

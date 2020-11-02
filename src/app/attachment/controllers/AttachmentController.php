@@ -135,9 +135,11 @@ class AttachmentController
             if (!empty($signedResponse[0])) {
                 $attachment['signedResponse'] = $signedResponse[0]['res_id'];
                 if (!empty($signedResponse[0]['signatory_user_serial_id'])) {
-                    $attachment['signatory'] = UserModel::getLabelledUserById(['id' => $signedResponse[0]['signatory_user_serial_id']]);
+                    $attachment['signatory']   = UserModel::getLabelledUserById(['id' => $signedResponse[0]['signatory_user_serial_id']]);
+                    $attachment['signatoryId'] = $signedResponse[0]['signatory_user_serial_id'];
                 } else {
-                    $attachment['signatory'] = UserModel::getLabelledUserById(['id' => $signedResponse[0]['typist']]);
+                    $attachment['signatory']   = UserModel::getLabelledUserById(['id' => $signedResponse[0]['typist']]);
+                    $attachment['signatoryId'] = $signedResponse[0]['typist'];
                 }
                 $attachment['signDate'] = $signedResponse[0]['creation_date'];
             }
@@ -148,7 +150,7 @@ class AttachmentController
 
     public function update(Request $request, Response $response, array $args)
     {
-        $attachment = AttachmentModel::getById(['id' => $args['id'], 'select' => ['res_id_master', 'status', 'typist']]);
+        $attachment = AttachmentModel::getById(['id' => $args['id'], 'select' => ['res_id_master', 'status', 'typist', 'attachment_type']]);
         if (empty($attachment) || !in_array($attachment['status'], ['A_TRA', 'TRA', 'SEND_MASS'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Attachment does not exist']);
         }
@@ -165,6 +167,10 @@ class AttachmentController
             return $response->withStatus(400)->withJson(['errors' => 'Body is not set or empty']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['type'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body type is empty or not a string']);
+        }
+
+        if (in_array($attachment['attachment_type'], ['acknowledgement_record_management', 'reply_record_management'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Can not update attachment use for record_management']);
         }
 
         $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
@@ -232,6 +238,9 @@ class AttachmentController
         $attachment = AttachmentModel::getById(['id' => $args['id'], 'select' => ['origin_id', 'res_id_master', 'attachment_type', 'res_id', 'title', 'typist', 'status']]);
         if (empty($attachment) || $attachment['status'] == 'DEL') {
             return $response->withStatus(400)->withJson(['errors' => 'Attachment does not exist']);
+        }
+        if (in_array($attachment['attachment_type'], ['acknowledgement_record_management', 'reply_record_management'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Can not delete attachment use for record_management']);
         }
         if (!ResController::hasRightByResId(['resId' => [$attachment['res_id_master']], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
@@ -476,7 +485,7 @@ class AttachmentController
         }
 
         $attachment = AttachmentModel::get([
-            'select'    => ['res_id', 'docserver_id', 'res_id_master', 'format', 'title'],
+            'select'    => ['res_id', 'docserver_id', 'res_id_master', 'format', 'title', 'signatory_user_serial_id'],
             'where'     => ['res_id = ?', 'status not in (?)'],
             'data'      => [$args['id'], ['DEL']],
             'limit'     => 1
@@ -544,7 +553,12 @@ class AttachmentController
         $mimeType = $finfo->buffer($fileContent);
 
         if ($data['mode'] == 'base64') {
-            return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'originalFormat' => $attachment['format'], 'mimeType' => $mimeType]);
+            return $response->withJson([
+                'encodedDocument' => base64_encode($fileContent),
+                'originalFormat'  => $attachment['format'],
+                'mimeType'        => $mimeType,
+                'signatoryId'     => $attachment['signatory_user_serial_id']
+            ]);
         } else {
             $pathInfo = pathinfo($pathToDocument);
 

@@ -263,11 +263,6 @@ define('_PROCEED_WORKFLOW_AVIS', 'Emettre un avis (séquentiel)');
 define('_PROCEED_WORKFLOW_AVIS_DESC', 'Met à jour la date d\'émission d\'avis du conseiller actuel du circuit d\'avis ("process_date" de la table listinstance).');
 define('_PROCEED_WORKFLOW_AVIS_SIMPLE', 'Emettre un avis (parallèle)');
 define('_PROCEED_WORKFLOW_AVIS_SIMPLE_DESC', 'Met à jour la date d\'émission d\'avis de l\'utilisateur présent en avis dans la liste de diffusion du courrier ("process_date" de la table listinstance).');
-define('_EXPORT_SEDA', 'Transférer vos courriers');
-define('_CHECK_ACKNOWLEDGEMENT', 'Vérification de l\'accusé de reception');
-define('_CHECK_REPLY', 'Vérification de la réponse au transfert');
-define('_PURGE_LETTER', 'Purger le courrier apres l\'archivage');
-define('_RESET_LETTER', 'Remise à zéro du circuit de traitement');
 define('_SIMPLE_CONFIRM_WITH_UPDATE_DATE', 'Confirmation et mise à jour de la date de départ');
 define('_NOT_INCOMING_CATEGORY', 'Catégorie différente de \'Courrier arrivée\'');
 define('_NO_CONTACT', 'Pas de contact associé');
@@ -417,6 +412,7 @@ define("_CANNOT_SYNCHRONIZE_M2M_ANNUARY", "Le contact ne peut pas être ajouté 
 define("_DATE_LOCALE", "fr_FR.utf8");
 
 define("_USER_PREFERENCE_UPDATED", "Préférences utilisateur modifiées");
+define("_USER_FEATURE_TOUR_UPDATED", "Une ou plusieurs étapes du tutorial ont été faites");
 
 define("_NO_SENDERS", "Aucun expéditeur lié au courrier");
 
@@ -506,3 +502,5 @@ define('_CHECK_REPLY_RECORD_MANAGEMENT_DESC', 'Vérification de la réponse au t
 
 define('_CHECK_ACKNOWLEDGMENT_RECORD_MANAGEMENT', 'Vérification du transfert du paquet au système d\'archivage électronique');
 define('_CHECK_ACKNOWLEDGMENT_RECORD_MANAGEMENT_DESC', 'Vérification du transfert du paquet au système d\'archivage électronique');
+define('_RESET_RECORD_MANAGEMENT', 'Remise à zéro du circuit d\'archivage');
+define('_RESET_RECORD_MANAGEMENT_DESC', 'Remise à zéro du circuit d\'archivage');

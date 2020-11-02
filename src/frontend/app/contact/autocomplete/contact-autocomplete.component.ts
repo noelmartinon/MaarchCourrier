@@ -381,6 +381,9 @@ export class ContactAutocompleteComponent implements OnInit {
         return this.myControl.value;
     }
 
+    setInputValue(value: string) {
+        this.myControl.setValue(value);
+    }
 
     resetInputValue() {
         this.myControl.setValue('');

@@ -85,6 +85,7 @@ $GLOBALS['userAgent']           = $config['userAgent'];
 $GLOBALS['urlSAEService']       = $config['urlSAEService'];
 $GLOBALS['certificateSSL']      = $config['certificateSSL'];
 $GLOBALS['statusReplyReceived'] = $config['statusReplyReceived'];
+$GLOBALS['statusReplyRejected'] = $config['statusReplyRejected'];
 
 chdir($GLOBALS['MaarchDirectory']);
 
@@ -170,8 +171,9 @@ foreach ($unitIdentifiers as $reference => $value) {
             Bt_writeLog(['level' => 'ERROR', 'message' => '[storeAttachment] ' . $id['errors']]);
             continue;
         }
+        $status = (strpos((string)$messages['xmlContent']->ReplyCode, 'OOO')) === false ? $GLOBALS['statusReplyRejected'] : $GLOBALS['statusReplyReceived'];
         \Resource\models\ResModel::update([
-            'set'   => ['status' => $GLOBALS['statusReplyReceived']],
+            'set'   => ['status' => $status],
             'where' => ['res_id = ?'],
             'data'  => [$resId]
         ]);

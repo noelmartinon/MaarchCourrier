@@ -845,7 +845,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                     if (this.resourceFreezed) {
                         this.notify.success(this.translate.instant('lang.retentionRuleFrozen'));
                     } else {
-                        this.notify.success(this.translate.instant('lang.retentionRuleThawed'));
+                        this.notify.success(this.translate.instant('lang.retentionRuleUnfrozen'));
                     }
                 }
                 ),

@@ -92,6 +92,7 @@ class ActionMethodController
         'sendToRecordManagementAction'              => 'sendToRecordManagement',
         'checkAcknowledgmentRecordManagementAction' => 'checkAcknowledgmentRecordManagement',
         'checkReplyRecordManagementAction'          => 'checkReplyRecordManagement',
+        'resetRecordManagementAction'               => 'checkReplyRecordManagement',
         'noConfirmAction'                           => null
     ];
 

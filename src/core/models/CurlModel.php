@@ -206,6 +206,8 @@ class CurlModel
         //Headers
         if (!empty($args['headers'])) {
             $opts[CURLOPT_HTTPHEADER] = $args['headers'];
+        } else {
+            $args['headers'] = [];
         }
         //Auth
         if (!empty($args['basicAuth'])) {

@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '@service/notification/notification.service';
-import { MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { catchError, tap, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { LocalStorageService } from '@service/local-storage.service';
@@ -14,7 +14,6 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class EntitiesExportComponent implements OnInit {
 
-    
     loading: boolean = false;
     loadingExport: boolean = false;
 
@@ -28,12 +27,11 @@ export class EntitiesExportComponent implements OnInit {
 
     exportModelList: any;
 
-    @ViewChild('listFilter', { static: true }) private listFilter: any;
-
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
+        public dialogRef: MatDialogRef<EntitiesExportComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         private localStorage: LocalStorageService,
         private headerService: HeaderService
@@ -71,6 +69,7 @@ export class EntitiesExportComponent implements OnInit {
                     downloadLink.setAttribute('download', 'export_entities_maarch_' + today + '.' + this.exportModel.format.toLowerCase());
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
+                    this.dialogRef.close();
                 } else {
                     alert(this.translate.instant('lang.tooMuchDatas'));
                 }

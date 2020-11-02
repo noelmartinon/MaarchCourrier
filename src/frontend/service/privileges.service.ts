@@ -598,16 +598,20 @@ export class PrivilegeService {
         }
     ];
 
-    constructor(public translate: TranslateService, public headerService: HeaderService) { }
+    constructor(
+        public translate: TranslateService,
+        public headerService: HeaderService
+    ) { }
 
-    getAllPrivileges(getLockedPrivilege: boolean) {
+    getAllPrivileges(getLockedPrivilege: boolean, authMode: string = 'standard') {
+
         let priv: any[] = [];
 
         priv = priv.concat(this.privileges.map(elem => elem.id));
         priv = priv.concat(this.administrations.map(elem => elem.id));
         priv = priv.concat(this.menus.map(elem => elem.id));
 
-        priv = priv.filter(elem => (getLockedPrivilege || (!getLockedPrivilege && ['create_custom', 'admin_update_control'].indexOf(elem) === -1)));
+        priv = priv.filter(elem => this.getExcludePrivilege(getLockedPrivilege, authMode).indexOf(elem) === -1);
 
         return priv;
     }
@@ -729,5 +733,17 @@ export class PrivilegeService {
     hasCurrentUserPrivilege(privilegeId: string) {
 
         return this.headerService.user.privileges.indexOf(privilegeId) > -1;
+    }
+
+    private getExcludePrivilege(getLockedPrivilege: boolean, authMode: string) {
+        let excludePriv = [];
+
+        if (!getLockedPrivilege) {
+            excludePriv = ['create_custom', 'admin_update_control'];
+        }
+        if (authMode !== 'standard') {
+            excludePriv.push('admin_password_rules');
+        }
+        return excludePriv;
     }
 }

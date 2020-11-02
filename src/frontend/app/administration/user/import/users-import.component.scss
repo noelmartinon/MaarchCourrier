@@ -1,5 +1,10 @@
 @import '../../../../css/vars.scss';
 
+.mat-dialog-content {
+    display: flex;
+    flex-direction: column;
+}
+
 .loader {
     display: flex;
     height: 100%;
@@ -16,7 +21,7 @@
 }
 
 .dndFile {
-    height: 30%;
+    flex: 1;
     display: flex;
     align-items: center;
     margin: 0px;

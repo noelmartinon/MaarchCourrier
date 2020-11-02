@@ -48,6 +48,7 @@ foreach ($customs as $custom) {
             $exportSeda['certificateSSL']      = (string)$loadedExportSedaXml->CONFIG->certificateSSL;
             $exportSeda['userAgent']           = (string)$loadedExportSedaXml->CONFIG->userAgent;
             $exportSeda['statusReplyReceived'] = 'REPLY_SEDA';
+            $exportSeda['statusReplyRejected'] = 'REPLY_SEDA';
             $exportSeda['statusMailToPurge']   = 'REPLY_SEDA';
             $exportSeda['M2M']['gec']          = 'maarch_courrier';
             $file['exportSeda'] = $exportSeda;

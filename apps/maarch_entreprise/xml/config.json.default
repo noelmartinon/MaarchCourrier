@@ -7,7 +7,7 @@
         "maarchDirectory" : "/var/www/html/MaarchCourrier/",
         "customID" : "",
         "maarchUrl" : "http://preview.maarchcourrier.com/",
-        "lockAdvancedPrivileges" : false
+        "lockAdvancedPrivileges" : true
     },
     "database": [
         {
@@ -37,6 +37,7 @@
         "certificateSSL": "",
         "userAgent": "service",
         "statusReplyReceived": "REPLY_SEDA",
+        "statusReplyRejected": "REPLY_SEDA",
         "statusMailToPurge": "REPLY_SEDA",
         "externalSAE": {
             "retentionRules": [

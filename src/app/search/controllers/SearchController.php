@@ -145,8 +145,8 @@ class SearchController
             $offset = (int)$queryParams['offset'];
         }
         $order   = !in_array($queryParams['orderDir'], ['ASC', 'DESC']) ? '' : $queryParams['orderDir'];
-        $orderBy = str_replace(['chrono', 'typeLabel', 'creationDate', 'category', 'destUser', 'processLimitDate', 'entityLabel'], ['order_alphanum(alt_identifier)', 'type_label', 'creation_date', 'category_id', 'dest_user', 'process_limit_date', 'entity_label'], $queryParams['order']);
-        $orderBy = !in_array($orderBy, ['order_alphanum(alt_identifier)', 'status', 'subject', 'type_label', 'creation_date', 'category_id', 'dest_user', 'process_limit_date', 'entity_label', 'priority']) ? ['creation_date'] : ["{$orderBy} {$order}"];
+        $orderBy = str_replace(['chrono', 'typeLabel', 'creationDate', 'category', 'destUser', 'processLimitDate', 'entityLabel'], ['order_alphanum(alt_identifier)', 'type_label', 'creation_date', 'category_id', '(firstname, lastname)', 'process_limit_date', 'entity_label'], $queryParams['order']);
+        $orderBy = !in_array($orderBy, ['order_alphanum(alt_identifier)', 'status', 'subject', 'type_label', 'creation_date', 'category_id', '(firstname, lastname)', 'process_limit_date', 'entity_label', 'priority']) ? ['creation_date'] : ["{$orderBy} {$order}"];
 
         $allResources = SearchModel::getTemporarySearchData([
             'select'  => ['res_id'],
@@ -776,8 +776,9 @@ class SearchController
             }
         }
         if (!empty($body['groupSign']) && !empty($body['groupSign']['values']) && is_array($body['groupSign']['values'])) {
-            $where = 'res_id in (select DISTINCT res_id from listinstance where signatory = ? AND item_id in (select DISTINCT user_id from usergroup_content where group_id in (?)))';
+            $where = 'res_id in (select DISTINCT res_id from listinstance where signatory = ? AND (item_id in (select DISTINCT user_id from usergroup_content where group_id in (?)) or delegate in (select DISTINCT user_id from usergroup_content where group_id in (?))))';
             $args['searchData'][] = 'true';
+            $args['searchData'][] = $body['groupSign']['values'];
             $args['searchData'][] = $body['groupSign']['values'];
 
             if (in_array(null, $body['groupSign']['values'])) {
@@ -873,6 +874,13 @@ class SearchController
                             'where'     => ["({$where})", 'signatory = ?'],
                             'data'      => $data
                         ]);
+                    } elseif ($roleId == 'visa') {
+                        $data = array_merge($data, ['VISA_CIRCUIT', 'false', 'false', 'true']);
+                        $rolesMatch = ListInstanceModel::get([
+                            'select' => ['res_id'],
+                            'where'  => ["({$where})", 'difflist_type = ?', 'signatory = ?', '(requested_signature = ? or (requested_signature = ? and process_date is not null))'],
+                            'data'   => $data
+                        ]);
                     } else {
                         $data[] = $roleId;
                         $rolesMatch = ListInstanceModel::get([
@@ -884,13 +892,15 @@ class SearchController
                     if (in_array(null, $value['values'])) {
                         $args['searchWhere'][] = 'res_id not in (select res_id from listinstance where item_mode = ?)';
                         $args['searchData'][] = $roleId;
+                    } elseif (empty($rolesMatch)) {
+                        return null;
                     }
-                    if (empty($rolesMatch)) {
-                        continue;
+
+                    if (!empty($rolesMatch)) {
+                        $rolesMatch            = array_column($rolesMatch, 'res_id');
+                        $args['searchWhere'][] = 'res_id in (?)';
+                        $args['searchData'][]  = $rolesMatch;
                     }
-                    $rolesMatch = array_column($rolesMatch, 'res_id');
-                    $args['searchWhere'][] = 'res_id in (?)';
-                    $args['searchData'][] = $rolesMatch;
                 }
             }
         }

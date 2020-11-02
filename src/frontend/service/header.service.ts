@@ -30,7 +30,7 @@ export class HeaderService {
     headerMessageIcon: string = '';
     headerMessage: string = '';
     subHeaderMessage: string = '';
-    user: any = { firstname: '', lastname: '', groups: [], privileges: [], preferences: [] };
+    user: any = { firstname: '', lastname: '', groups: [], privileges: [], preferences: [], featureTour: [] };
     nbResourcesFollowed: number = 0;
     base64: string = null;
 
@@ -76,7 +76,8 @@ export class HeaderService {
                             entities: data.entities,
                             groups: data.groups,
                             preferences: data.preferences,
-                            privileges: data.privileges[0] === 'ALL_PRIVILEGES' ? this.user.privileges : data.privileges
+                            privileges: data.privileges[0] === 'ALL_PRIVILEGES' ? this.user.privileges : data.privileges,
+                            featureTour: data.featureTour
                         };
                         this.nbResourcesFollowed = data.nbFollowedResources;
                         resolve(true);

@@ -154,9 +154,9 @@ foreach ($replies as $reply) {
         continue;
     }
 
-    $messageExchange = \MessageExchange\models\MessageExchangeModel::getMessageByReference(['select' => ['message_id'], 'reference' => (string)$replyXml->MessageReceivedIdentifier]);
+    $messageExchange = \MessageExchange\models\MessageExchangeModel::getMessageByReference(['select' => ['message_id'], 'reference' => (string)$replyXml->MessageRequestIdentifier]);
     if (empty($messageExchange)) {
-        Bt_writeLog(['level' => 'WARNING', 'message' => 'Reply is not readable for this reference : ' . (string)$replyXml->MessageReceivedIdentifier]);
+        Bt_writeLog(['level' => 'WARNING', 'message' => 'Reply is not readable for this reference : ' . (string)$replyXml->MessageRequestIdentifier]);
         continue;
     }
 
@@ -165,13 +165,32 @@ foreach ($replies as $reply) {
         Bt_writeLog(['level' => 'WARNING', 'message' => 'Wrong reply for attachment res_id : ' . $reply['res_id']]);
         continue;
     }
+    if (strpos((string)$replyXml->ReplyCode, '000') === false) {
+        Bt_writeLog(['level' => 'WARNING', 'message' => 'Can not delete because rejected from SAE : ' . $reply['res_id']]);
+        continue;
+    }
 
     $resIdMaster[] = $reply['res_id_master'];
 }
 
 if (!empty($resIdMaster)) {
+    $resourceWithReplies = \SrcCore\models\DatabaseModel::select([
+        'select'    => ['res_id', 'binding', 'action_current_use'],
+        'table'     => ['res_letterbox r', 'doctypes d'],
+        'left_join' => ['r.type_id = d.type_id'],
+        'where'     => ['res_id in (?)'],
+        'data'      => [$resIdMaster]
+    ]);
+    $resIdToPurge = [];
+    foreach ($resourceWithReplies as $resource) {
+        if (($resource['binding'] === null && $resource['action_current_use'] == 'transfer')
+            || ($resource['binding'] === true && $bindingDocument['param_value_string'] == 'transfer')
+            || ($resource['binding'] === false && $nonBindingDocument['param_value_string'] == 'transfer')) {
+            $resIdToPurge[] = $resource['res_id'];
+        }
+    }
     $tmpWhere[] = 'res_id in (?)';
-    $tmpData[]  = $resIdMaster;
+    $tmpData[]  = $resIdToPurge;
 }
 
 $wherePurge[] = '((' . implode(") or (", $tmpWhere) . '))';

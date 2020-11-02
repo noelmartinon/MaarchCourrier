@@ -63,13 +63,12 @@
                 <mat-header-row *matHeaderRowDef="userColmuns"></mat-header-row>
                 <mat-row *matRowDef="let row; columns: userColmuns;"></mat-row>
             </mat-table>
-            <div class="alert-message alert-message-info"
-                    [innerHTML]="'lang.infoImportusers' | translate" style="min-width: 100%">
-                </div>
+            <div class="alert-message alert-message-info" [innerHTML]="'lang.infoImportNoIdToCreate' | translate"
+                style="min-width: 100%">
+            </div>
             <div class="alert-message alert-message-info"
                     [innerHTML]="'lang.infoImportusers2' | translate" style="min-width: 100%">
-                </div>
-            <div class="alert-message alert-message-info" [innerHTML]="'lang.infoImportNoIdToCreate' | translate" style="min-width: 100%"></div>
+            </div>
         </ng-template>
     </div>
     <span class="divider-modal"></span>

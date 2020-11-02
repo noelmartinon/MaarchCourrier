@@ -284,6 +284,8 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
                 startWith({}),
                 switchMap(() => {
                     if (!this.isLoadingResults) {
+                        // To Reset scroll
+                        this.data = [];
                         if (this.sidenavRight !== undefined) {
                             this.sidenavRight.close();
                         }
@@ -437,7 +439,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
                 element[key + '_title'] = element[key];
                 if (key === 'statusImage' && element[key] == null) {
                     element[key] = 'fa-question undefined';
-                } else if ((element[key] == null || element[key] === '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'mailTracking', 'hasDocument'].indexOf(key) === -1) {
+                } else if ((element[key] == null || element[key] === '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'mailTracking', 'hasDocument', 'binding'].indexOf(key) === -1) {
                     element[key] = this.translate.instant('lang.undefined');
                 }
 
@@ -723,7 +725,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
                     const indexArr = this.criteria[identifier].values.indexOf(value);
                     this.criteria[identifier].values.splice(indexArr, 1);
                 }
-                this.appCriteriaTool.resetCriteria(identifier);
+                this.appCriteriaTool.resetCriteria(identifier, value);
             } else {
                 Object.keys(this.criteria).forEach(key => {
                     this.criteria[key].values = [];

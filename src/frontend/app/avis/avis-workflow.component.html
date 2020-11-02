@@ -71,7 +71,7 @@
                         <ng-container *ngIf="diffusion.process_date != null && diffusion.delegatedBy !== null">
                             <mat-icon mat-list-icon class="fas fa-exclamation-circle"
                                       [title]="this.translate.instant('lang.insteadOf') + ' ' + diffusion.delegatedBy"
-                                      style="opacity:0.5;font-size: 125%;height: 15px"></mat-icon>
+                                      style="opacity:0.5;font-size: 125%;height: 15px;color: red"></mat-icon>
                         </ng-container>
                     </div>
                     <div class="workflowLineSubLabel" [class.unauthorized]="!diffusion.hasPrivilege || !diffusion.isValid">

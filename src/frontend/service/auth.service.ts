@@ -19,7 +19,7 @@ export class AuthService {
 
     applicationName: string = '';
     loginMessage: string = '';
-    authMode: string = 'default';
+    authMode: string = 'standard';
     authUri: string = '';
     changeKey: boolean = null;
     user: any = {};
@@ -106,8 +106,17 @@ export class AuthService {
         if (['cas', 'keycloak'].indexOf(this.authMode) > -1 && !forcePageLogin) {
             this.SsoLogout(cleanUrl);
         } else {
-            this.redirectAfterLogout(cleanUrl);
-            await this.router.navigate(['/login']);
+            // AVOID UNLOCK ON DESROY COMPONENT
+            if (['process', 'signatureBook'].indexOf(this.router.url.split('/')[1]) > -1) {
+                this.router.navigate(['/home']);
+                setTimeout(() => {
+                    this.redirectAfterLogout(cleanUrl);
+                    this.router.navigate(['/login']);
+                }, 500);
+            } else {
+                this.redirectAfterLogout(cleanUrl);
+                await this.router.navigate(['/login']);
+            }
         }
     }
 
@@ -278,7 +287,8 @@ export class AuthService {
                             entities: data.entities,
                             groups: data.groups,
                             preferences: data.preferences,
-                            privileges: data.privileges[0] === 'ALL_PRIVILEGES' ? this.privilegeService.getAllPrivileges(!data.lockAdvancedPrivileges) : data.privileges
+                            privileges: data.privileges[0] === 'ALL_PRIVILEGES' ? this.privilegeService.getAllPrivileges(!data.lockAdvancedPrivileges) : data.privileges,
+                            featureTour: data.featureTour
                         };
                         this.headerService.nbResourcesFollowed = data.nbFollowedResources;
                         this.privilegeService.resfreshUserShortcuts();

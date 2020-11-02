@@ -22,7 +22,6 @@ export class ContactDuplicateComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
     loading: boolean = true;
 
     subMenus: any[] = [

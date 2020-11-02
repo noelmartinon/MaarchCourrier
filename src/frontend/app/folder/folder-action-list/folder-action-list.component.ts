@@ -47,7 +47,7 @@ export class FolderActionListComponent implements OnInit {
     @Input() totalRes: number;
     @Input() contextMode: boolean;
     @Input() currentFolderInfo: any;
-    @Input() currentResource: any;
+    @Input() currentResource: any = {};
 
 
     @Output() refreshEvent = new EventEmitter<string>();
@@ -76,14 +76,18 @@ export class FolderActionListComponent implements OnInit {
 
         this.contextMenuTitle = row.chrono;
         this.contextResId = row.resId;
+        this.currentResource = row;
 
-        this.getFreezeBindingValue(this.contextResId);
+        this.getFreezeBindingValue();
 
         // Opens the menu
         this.contextMenu.openMenu();
 
         // prevents default
         return false;
+    }
+    refreshList() {
+        this.refreshEvent.emit();
     }
 
     refreshFolders() {
@@ -159,9 +163,10 @@ export class FolderActionListComponent implements OnInit {
                 if (value) {
                     this.notify.success(this.translate.instant('lang.retentionRuleFrozen'));
                 } else {
-                    this.notify.success(this.translate.instant('lang.retentionRuleThawed'));
+                    this.notify.success(this.translate.instant('lang.retentionRuleUnfrozen'));
 
                 }
+                this.refreshList();
             }
             ),
             catchError((err: any) => {
@@ -181,6 +186,7 @@ export class FolderActionListComponent implements OnInit {
                 } else {
                     this.notify.success(this.translate.instant('lang.bindingUndefined'));
                 }
+                this.refreshList();
             }
             ),
             catchError((err: any) => {
@@ -190,17 +196,8 @@ export class FolderActionListComponent implements OnInit {
         ).subscribe();
     }
 
-    getFreezeBindingValue(id) {
-        this.http.get(`../rest/resources/${id}?light=true`).pipe(
-            tap((infos: any) => {
-                this.isSelectedFreeze = infos.retentionFrozen;
-                this.isSelectedBinding = infos.binding;
-            }),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
-
+    getFreezeBindingValue() {
+        this.isSelectedFreeze = this.currentResource.retentionFrozen;
+        this.isSelectedBinding = this.currentResource.binding;
     }
 }

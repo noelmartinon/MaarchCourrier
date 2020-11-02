@@ -291,7 +291,6 @@ abstract class MessageExchangeModelAbstract
     public static function getUnitIdentifierByResId(array $args)
     {
         ValidatorModel::notEmpty($args, ['resId']);
-        ValidatorModel::stringType($args, ['resId']);
 
         $messages = DatabaseModel::select([
                 'select' => empty($args['select']) ? ['*'] : $args['select'],

@@ -11,6 +11,7 @@ import { HttpClient } from '@angular/common/http';
 import { InstallerService } from '../installer.service';
 import { of } from 'rxjs';
 import { DatabaseComponent } from '../database/database.component';
+import { WelcomeComponent } from '../welcome/welcome.component';
 
 declare var tinymce: any;
 
@@ -23,6 +24,7 @@ declare var tinymce: any;
 export class CustomizationComponent implements OnInit {
 
     @Input() appDatabase: DatabaseComponent;
+    @Input() appWelcome: WelcomeComponent;
 
     stepFormGroup: FormGroup;
     readonlyState: boolean = false;
@@ -165,6 +167,7 @@ export class CustomizationComponent implements OnInit {
             {
                 idStep: 'createCustom',
                 body: {
+                    lang: this.appWelcome.stepFormGroup.controls['lang'].value,
                     customId: this.stepFormGroup.controls['customId'].value,
                     applicationName: this.stepFormGroup.controls['appName'].value,
                 },

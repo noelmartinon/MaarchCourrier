@@ -14,6 +14,7 @@ import { tap, catchError, exhaustMap, map, finalize, filter } from 'rxjs/operato
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { of } from 'rxjs';
+import { AuthService } from '@service/auth.service';
 
 @Component({
     templateUrl: 'group-administration.component.html',
@@ -70,6 +71,7 @@ export class GroupAdministrationComponent implements OnInit {
         private headerService: HeaderService,
         public appService: AppService,
         public privilegeService: PrivilegeService,
+        public authService: AuthService,
         private dialog: MatDialog
     ) { }
 

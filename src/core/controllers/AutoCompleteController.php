@@ -639,11 +639,11 @@ class AutoCompleteController
         $data['address'] = str_replace(['*', '~', '-', '\''], ' ', $data['address']);
         $aAddress = explode(' ', $data['address']);
         foreach ($aAddress as $key => $value) {
-            if (strlen($value) <= 2 && !is_numeric($value)) {
+            if (mb_strlen($value) <= 2 && !is_numeric($value)) {
                 unset($aAddress[$key]);
                 continue;
             }
-            if (strlen($value) >= 3 && $value != 'rue' && $value != 'avenue' && $value != 'boulevard') {
+            if (mb_strlen($value) >= 3 && $value != 'rue' && $value != 'avenue' && $value != 'boulevard') {
                 $aAddress[$key] .= '*';
             }
         }

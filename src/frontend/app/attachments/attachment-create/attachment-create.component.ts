@@ -330,8 +330,6 @@ export class AttachmentCreateComponent implements OnInit {
             Object.keys(formgroup.controls).forEach(key => {
                 formgroup.controls[key].markAsTouched();
             });
-            console.log(formgroup.controls);
-
             if (formgroup.status === 'INVALID') {
                 state = false;
             }
@@ -408,8 +406,6 @@ export class AttachmentCreateComponent implements OnInit {
             this.appDocumentViewer.toArray()[this.asyncIndexTab].getFile().pipe(
                 take(1),
                 tap((data) => {
-                    console.log(data);
-
                     this.attachments[this.asyncIndexTab].encodedFile.setValue(data.content);
                     this.attachments[this.asyncIndexTab].format.setValue(data.format);
                     this.asyncIndexTab = index;

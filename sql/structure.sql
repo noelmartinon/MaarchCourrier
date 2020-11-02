@@ -229,8 +229,9 @@ CREATE TABLE users
   reset_token text,
   failed_authentication INTEGER DEFAULT 0,
   locked_until TIMESTAMP without time zone,
-    authorized_api jsonb NOT NULL DEFAULT '[]',
-    external_id jsonb DEFAULT '{}',
+  authorized_api jsonb NOT NULL DEFAULT '[]',
+  external_id jsonb DEFAULT '{}',
+  feature_tour jsonb NOT NULL DEFAULT '[]',
   CONSTRAINT users_pkey PRIMARY KEY (user_id),
   CONSTRAINT users_id_key UNIQUE (id)
 )
@@ -1122,13 +1123,43 @@ FROM doctypes d,
     LEFT JOIN entities en ON r.destination::text = en.entity_id::text
 WHERE r.type_id = d.type_id AND d.doctypes_first_level_id = dfl.doctypes_first_level_id AND d.doctypes_second_level_id = dsl.doctypes_second_level_id;
 
-CREATE FUNCTION order_alphanum(text) RETURNS text AS $$
-  SELECT regexp_replace(regexp_replace(regexp_replace(regexp_replace($1,
-    E'(^|\\D)(\\d{1,3}($|\\D))', E'\\1000\\2', 'g'),
-      E'(^|\\D)(\\d{4,6}($|\\D))', E'\\1000\\2', 'g'),
-        E'(^|\\D)(\\d{7}($|\\D))', E'\\100\\2', 'g'),
-          E'(^|\\D)(\\d{8}($|\\D))', E'\\10\\2', 'g');
-$$ LANGUAGE SQL;
+/* ORDER ON CHRONO */
+CREATE OR REPLACE FUNCTION order_alphanum(text) RETURNS text AS $$
+declare
+    tmp text;
+begin
+    tmp := $1;
+    tmp := tmp || 'Z';
+    tmp := regexp_replace(tmp, E'(\\D)', E'\\1/', 'g');
+
+    IF count(regexp_match(tmp, E'(\\D(\\d{8})\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{8}\\D)', E'\\10\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{7}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{7}\\D)', E'\\100\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{6}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{6}\\D)', E'\\1000\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{5}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{5}\\D)', E'\\10000\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{4}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{4}\\D)', E'\\100000\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{3}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{3}\\D)', E'\\1000000\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{2}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{2}\\D)', E'\\10000000\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{1}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{1}\\D)', E'\\100000000\\2', 'g');
+    END IF;
+
+    RETURN tmp;
+end;
+$$ LANGUAGE plpgsql;
 
 
 CREATE TABLE message_exchange

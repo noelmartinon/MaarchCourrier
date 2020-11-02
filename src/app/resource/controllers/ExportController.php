@@ -795,7 +795,7 @@ class ExportController
         $roles = array_column($roles, 'label', 'id');
 
         $listInstances = ListInstanceModel::get([
-            'select'    => ['item_id', 'item_mode'],
+            'select'    => ['item_id', 'item_mode', 'delegate'],
             'where'     => ['res_id in (?)', 'item_type = ?', 'difflist_type = ?'],
             'data'      => [$args['resId'], 'user_id', $args['listType']],
             'order_by'  => ['sequence']
@@ -803,18 +803,32 @@ class ExportController
 
         foreach ($listInstances as $listInstance) {
             if (!empty($listInstance['item_id'])) {
-                $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['firstname', 'lastname']]);
+                $user = UserModel::getLabelledUserById(['id' => $listInstance['item_id']]);
+
+                $delegate = null;
+                if (!empty($listInstance['delegate'])) {
+                    $delegate = UserModel::getLabelledUserById(['id' => $listInstance['delegate']]);
+                }
 
                 if ($args['listType'] == 'VISA_CIRCUIT') {
                     if ($listInstance['item_mode'] == 'cc') {
                         $listInstance['item_mode'] = 'copy';
                     }
                     $roleLabel = $roles[$listInstance['item_mode']];
-    
-                    $list[] = "{$user['firstname']} {$user['lastname']} ({$roleLabel})";
+
+                    if (!empty($delegate)) {
+                        $label = "{$delegate} ({$roleLabel}, " . _INSTEAD_OF . " {$user})";
+                    } else {
+                        $label = "{$user} ({$roleLabel})";
+                    }
                 } else {
-                    $list[] = "{$user['firstname']} {$user['lastname']}";
+                    if (!empty($delegate)) {
+                        $label = "{$delegate} (" . _INSTEAD_OF . " {$user})";
+                    } else {
+                        $label = "{$user}";
+                    }
                 }
+                $list[] = $label;
             } else {
                 $list[] = _USER_DELETED;
             }

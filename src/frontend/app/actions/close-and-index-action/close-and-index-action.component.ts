@@ -13,7 +13,6 @@ import { of } from 'rxjs';
 })
 export class CloseAndIndexActionComponent implements OnInit {
 
-    
     loading: boolean = false;
 
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
@@ -38,7 +37,6 @@ export class CloseAndIndexActionComponent implements OnInit {
     }
 
     indexDocumentAndExecuteAction() {
-        
         this.http.post('../rest/resources', this.data.resource).pipe(
             tap((data: any) => {
                 this.data.resIds = [data.resId];

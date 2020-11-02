@@ -36,7 +36,7 @@ export class ActionsListComponent implements OnInit {
     folderList: any[] = [];
 
     isSelectedFreeze: any;
-    isSelectedBinding: any;
+    isSelectedBinding: null;
 
     actionsList: any[] = [];
 
@@ -79,7 +79,7 @@ export class ActionsListComponent implements OnInit {
 
         this.folderList = row.folders !== undefined ? row.folders : [];
 
-        this.getFreezeBindingValue(this.contextResId);
+        this.getFreezeBindingValue();
 
         // Opens the menu
         this.contextMenu.openMenu();
@@ -161,9 +161,10 @@ export class ActionsListComponent implements OnInit {
                 if (value) {
                     this.notify.success(this.translate.instant('lang.retentionRuleFrozen'));
                 } else {
-                    this.notify.success(this.translate.instant('lang.retentionRuleThawed'));
+                    this.notify.success(this.translate.instant('lang.retentionRuleUnfrozen'));
 
                 }
+                this.refreshList();
             }
             ),
             catchError((err: any) => {
@@ -183,6 +184,7 @@ export class ActionsListComponent implements OnInit {
                 } else {
                     this.notify.success(this.translate.instant('lang.bindingUndefined'));
                 }
+                this.refreshList();
             }
             ),
             catchError((err: any) => {
@@ -192,17 +194,8 @@ export class ActionsListComponent implements OnInit {
         ).subscribe();
     }
 
-    getFreezeBindingValue(id) {
-        this.http.get(`../rest/resources/${id}?light=true`).pipe(
-            tap((infos: any) => {
-                this.isSelectedFreeze = infos.retentionFrozen;
-                this.isSelectedBinding = infos.binding;
-            }),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
-
+    getFreezeBindingValue() {
+        this.isSelectedFreeze = this.currentResource.retentionFrozen;
+        this.isSelectedBinding = this.currentResource.binding;
     }
 }
