@@ -690,15 +690,16 @@ class UserController
                 return $response->withStatus(400)->withJson(['errors' => 'Some data are empty']);
             }
 
-            $userBasketPreference = UserBasketPreferenceModel::get([
-                'select' => ['display'],
-                'where'  => ['basket_id =?', 'group_serial_id = ?', 'user_serial_id = ?'],
-                'data'   => [$value['basket_id'], $value['group_id'], $aArgs['id']]
-            ]);
-
-            if (empty($userBasketPreference)) {
-                unset($data[$key]);
-                continue;
+            if (empty($value['originalOwner'])) {
+                $userBasketPreference = UserBasketPreferenceModel::get([
+                    'select' => ['display'],
+                    'where'  => ['basket_id =?', 'group_serial_id = ?', 'user_serial_id = ?'],
+                    'data'   => [$value['basket_id'], $value['group_id'], $aArgs['id']]
+                ]);
+                if (empty($userBasketPreference[0]['display'])) {
+                    unset($data[$key]);
+                    continue;
+                }
             }
 
             $check = UserModel::getById(['id' => $value['actual_user_id'], 'select' => ['1']]);
