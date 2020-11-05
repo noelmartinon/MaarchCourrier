@@ -67,7 +67,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        this.http.get("../../rest/indexingModels?showDisabled=true").pipe(
+        this.http.get("../../rest/indexingModels?showDisabled=true&admin=true").pipe(
             map((data: any) => {
                 return data.indexingModels.filter((info: any) => info.private === false);
             }),
