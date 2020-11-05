@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { LatinisePipe } from 'ngx-pipes';
-import { AuthService } from './auth.service';
 import { HeaderService } from './header.service';
 import { TimeLimitPipe } from '../plugins/timeLimit.pipe';
 
@@ -12,7 +11,6 @@ export class FunctionsService {
 
     constructor(
         public translate: TranslateService,
-        private authService: AuthService,
         private headerService: HeaderService,
         private latinisePipe: LatinisePipe,
     ) { }
@@ -32,6 +30,10 @@ export class FunctionsService {
         } else {
             return true;
         }
+    }
+
+    isDate(value: any) {
+        return value instanceof Date && !isNaN(value.valueOf());
     }
 
     formatFrenchDateToTechnicalDate(date: string) {
@@ -98,6 +100,10 @@ export class FunctionsService {
         }
     }
 
+    formatSerializedDateToDateString(date: string) {
+        return this.formatDateObjectToDateString(new Date(date));
+    }
+
     listSortingDataAccessor(data: any, sortHeaderId: any) {
         if (typeof data[sortHeaderId] === 'string') {
             return data[sortHeaderId].toLowerCase();
@@ -118,32 +124,19 @@ export class FunctionsService {
         return filterReturn;
     }
 
-    debug(msg: string, route: string) {
-        let info: any = {
-            route : route,
-            session : 'No user logged !',
-            refreshSession : 'No user logged !',
-            user : 'No user logged !'
-        };
-        if (this.authService.getToken() != null) {
-            info = {
-                route : route,
-                session : {
-                    id : this.authService.getAppSession(),
-                    expireIn : new Date((JSON.parse(atob(this.authService.getToken().split('.')[1])).exp) * 1000)
-                },
-                refreshSession : {
-                    id : this.authService.getAppSession(),
-                    expireIn : new Date((JSON.parse(atob(this.authService.getRefreshToken().split('.')[1])).exp) * 1000)
-                },
-                user : this.headerService.user,
-            };
-        }
+    formatBytes(bytes: number, decimals = 2) {
+        if (typeof bytes === 'number') {
+            if (bytes === 0) { return '0 Octet'; }
 
-        if (msg !== '') {
-            console.log(msg, info);
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Octets', 'KO', 'MO', 'GO', 'TO', 'PO', 'EO', 'ZO', 'YO'];
+
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
         } else {
-            console.log(info);
+            return bytes;
         }
     }
 }

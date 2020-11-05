@@ -23,6 +23,7 @@ use Docserver\models\DocserverTypeModel;
 use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use History\controllers\HistoryController;
+use IndexingModel\models\IndexingModelFieldModel;
 use Note\models\NoteModel;
 use Priority\models\PriorityModel;
 use Resource\controllers\ResController;
@@ -142,9 +143,27 @@ class MaarchParapheurController
             }
         }
 
+        $modelId = ResModel::getById([
+            'select' => ['model_id'],
+            'resId'  => $aArgs['resIdMaster']
+        ]);
+        $indexingFields = IndexingModelFieldModel::get([
+            'select' => ['identifier', 'unit'],
+            'where'  => ['model_id = ?'],
+            'data'   => [$modelId['model_id']]
+        ]);
+        $fieldsIdentifier = array_column($indexingFields, 'identifier');
+
         $pdf = new Fpdi('P', 'pt');
         $pdf->setPrintHeader(false);
-        SummarySheetController::createSummarySheet($pdf, ['resource' => $mainResource[0], 'units' => $units, 'login' => $aArgs['userId'], 'data' => $data]);
+
+        SummarySheetController::createSummarySheet($pdf, [
+            'resource'         => $mainResource[0],
+            'units'            => $units,
+            'login'            => $aArgs['userId'],
+            'data'             => $data,
+            'fieldsIdentifier' => $fieldsIdentifier
+        ]);
 
         $tmpPath = CoreConfigModel::getTmpPath();
         $summarySheetFilePath = $tmpPath . "summarySheet_".$aArgs['resIdMaster'] . "_" . $aArgs['userId'] ."_".rand().".pdf";
@@ -528,12 +547,13 @@ class MaarchParapheurController
                 }
                 if (!empty($state['signatoryUserId'])) {
                     $signatoryUser = UserModel::getByExternalId([
-                        'select'            => ['user_id'],
+                        'select'            => ['user_id', 'id'],
                         'externalId'        => $state['signatoryUserId'],
                         'externalName'      => 'maarchParapheur'
                     ]);
                     if (!empty($signatoryUser['user_id'])) {
                         $aArgs['idsToRetrieve'][$version][$resId]['typist'] = $signatoryUser['user_id'];
+                        $aArgs['idsToRetrieve'][$version][$resId]['signatory_user_serial_id'] = $signatoryUser['id'];
                     }
                 }
                 $aArgs['idsToRetrieve'][$version][$resId]['workflowInfo'] = implode(", ", $state['workflowInfo']);

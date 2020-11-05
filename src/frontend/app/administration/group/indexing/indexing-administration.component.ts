@@ -1,13 +1,12 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../../service/notification/notification.service';
-import { tap } from 'rxjs/internal/operators/tap';
-import { map, catchError, filter, exhaustMap, finalize } from 'rxjs/operators';
+import { NotificationService } from '@service/notification/notification.service';
+import { map, catchError, filter, exhaustMap, finalize, tap } from 'rxjs/operators';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { ConfirmComponent } from '../../../../plugins/modal/confirm.component';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 
 declare var $: any;
 
@@ -20,7 +19,7 @@ export class IndexingAdministrationComponent implements OnInit {
 
     mobileQuery: MediaQueryList;
 
-    
+
     loading: boolean = true;
 
     @Input() groupId: number;

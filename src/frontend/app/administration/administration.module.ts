@@ -2,7 +2,7 @@ import { NgModule } from '@angular/core';
 
 import { SharedModule } from '../app-common.module';
 
-import { InternationalizationModule } from '../../service/translate/internationalization.module';
+import { InternationalizationModule } from '@service/translate/internationalization.module';
 
 import { AdministrationRoutingModule } from './administration-routing.module';
 // import { NgxChartsModule } from '@swimlane/ngx-charts';
@@ -10,7 +10,6 @@ import { JoyrideModule } from 'ngx-joyride';
 import { DocumentViewerModule } from '../viewer/document-viewer.module';
 
 import { AdministrationService } from './administration.service';
-
 
 import { AccountLinkComponent } from './user/account-link/account-link.component';
 import { ActionAdministrationComponent } from './action/action-administration.component';
@@ -66,7 +65,8 @@ import { UpdateStatusAdministrationComponent } from './updateStatus/update-statu
 import { UserAdministrationComponent, UserAdministrationRedirectModalComponent } from './user/user-administration.component';
 import { VersionsUpdateAdministrationComponent } from './versionUpdate/versions-update-administration.component';
 import { AdministrationComponent } from './home/administration.component';
-import { UsersAdministrationComponent, UsersAdministrationRedirectModalComponent } from './user/users-administration.component';
+import { UsersAdministrationComponent } from './user/users-administration.component';
+import { UsersAdministrationRedirectModalComponent } from './user/redirect-modal/users-administration-redirect-modal.component';
 import { UsersImportComponent } from './user/import/users-import.component';
 import { UsersExportComponent } from './user/export/users-export.component';
 import { TranslateService } from '@ngx-translate/core';
@@ -76,6 +76,8 @@ import { IssuingSiteListComponent } from './registered-mail/issuing-site/issuing
 import { IssuingSiteComponent } from './registered-mail/issuing-site/issuing-site.component';
 import { RegisteredMailListComponent } from './registered-mail/registered-mail-list.component';
 import { SearchAdministrationComponent } from './search/search-administration.component';
+import { SsoAdministrationComponent } from './connection/sso/sso-administration.component';
+import { LifeCycleComponent } from './parameter/lifeCycle/life-cycle.component';
 
 
 @NgModule({
@@ -159,7 +161,9 @@ import { SearchAdministrationComponent } from './search/search-administration.co
         IssuingSiteListComponent,
         IssuingSiteComponent,
         RegisteredMailListComponent,
-        SearchAdministrationComponent
+        SearchAdministrationComponent,
+        SsoAdministrationComponent,
+        LifeCycleComponent
     ],
     entryComponents: [
         AccountLinkComponent,

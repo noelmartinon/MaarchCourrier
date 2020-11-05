@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\ScalarVal
  * @covers Respect\Validation\Exceptions\ScalarValException
  */
-class ScalarValTest extends TestCase
+class ScalarValTest extends \PHPUnit_Framework_TestCase
 {
     protected $rule;
 
@@ -68,8 +66,7 @@ class ScalarValTest extends TestCase
     {
         return [
             [[]],
-            [function () {
-            }],
+            [function () {}],
             [new \stdClass()],
             [null],
             [tmpfile()],

@@ -18,15 +18,15 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: GL
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/GL/administrative-division-greenland.html
  */
 class GlSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'KU', // Kommune Kujalleq
-        'QA', // Qaasuitsup Kommunia
-        'QE', // Qeqqata Kommunia
-        'SM', // Kommuneqarfik Sermersooq
+        'KU', // Kujalleq
+        'QA', // Qaasuitsup
+        'QE', // Qeqqata
+        'SM', // Sermersooq
     ];
 
     public $compareIdentical = true;

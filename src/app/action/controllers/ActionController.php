@@ -78,7 +78,7 @@ class ActionController
         $action['keywordsList'] = ActionModel::getKeywords();
 
         foreach ($action['actionPages'] as $actionPage) {
-            if ($actionPage['id'] == $action['action']['action_page']) {
+            if ($actionPage['component'] == $action['action']['component']) {
                 $action['action']['actionPageId'] = $actionPage['id'];
             }
         }

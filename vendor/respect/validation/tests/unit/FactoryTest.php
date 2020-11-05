@@ -14,7 +14,7 @@ namespace Respect\Validation;
 /**
  * @covers Respect\Validation\Factory
  */
-class FactoryTest extends TestCase
+class FactoryTest extends \PHPUnit_Framework_TestCase
 {
     public function testShouldHaveRulePrefixesByDefault()
     {

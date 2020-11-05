@@ -1,20 +1,20 @@
 import { Component, OnInit, ViewChild, EventEmitter, Input, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../../../service/notification/notification.service';
-import { HeaderService } from '../../../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
-import { AppService } from '../../../../../service/app.service';
+import { AppService } from '@service/app.service';
 import { MatDialog } from '@angular/material/dialog';
-import { switchMap, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize, map } from 'rxjs/operators';
+import { switchMap, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize, map, startWith } from 'rxjs/operators';
 import { FormControl, Validators, ValidatorFn } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ContactService } from '../../../../../service/contact.service';
-import { FunctionsService } from '../../../../../service/functions.service';
+import { ContactService } from '@service/contact.service';
+import { FunctionsService } from '@service/functions.service';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { Observable } from 'rxjs/internal/Observable';
-import { of } from 'rxjs/internal/observable/of';
+import { Observable, of } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
+import { LatinisePipe } from 'ngx-pipes';
 
 @Component({
     selector: 'app-contact-form',
@@ -43,7 +43,10 @@ export class ContactsFormComponent implements OnInit {
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
 
 
-    
+    countries: any = [];
+    countriesFilteredResult: Observable<string[]>;
+    countryControl = new FormControl();
+
     loading: boolean = false;
 
     @Input() creationMode: boolean = true;
@@ -158,6 +161,17 @@ export class ContactsFormComponent implements OnInit {
             control: new FormControl(),
             required: false,
             display: true,
+            filling: false,
+            values: []
+        },
+        {
+            id: 'notes',
+            unit: 'mainInfo',
+            label: this.translate.instant('lang.note'),
+            type: 'string',
+            control: new FormControl(),
+            required: false,
+            display: false,
             filling: false,
             values: []
         },
@@ -304,7 +318,8 @@ export class ContactsFormComponent implements OnInit {
         public appService: AppService,
         public dialog: MatDialog,
         private contactService: ContactService,
-        public functions: FunctionsService
+        public functions: FunctionsService,
+        private latinisePipe: LatinisePipe
     ) { }
 
     ngOnInit(): void {
@@ -333,6 +348,8 @@ export class ContactsFormComponent implements OnInit {
                     this.initAutocompleteAddressBan();
                     this.initAutocompleteCommunicationMeans();
                     this.initAutocompleteExternalIdM2M();
+                    this.getCountries();
+                    this.initAutocompleteCountries();
                 }),
                 finalize(() => this.loading = false),
                 catchError((err: any) => {
@@ -363,6 +380,8 @@ export class ContactsFormComponent implements OnInit {
                     this.initAutocompleteAddressBan();
                     this.initAutocompleteCommunicationMeans();
                     this.initAutocompleteExternalIdM2M();
+                    this.getCountries();
+                    this.initAutocompleteCountries();
                 }),
                 exhaustMap(() => this.http.get('../rest/contacts/' + this.contactId)),
                 map((data: any) => {
@@ -449,6 +468,41 @@ export class ContactsFormComponent implements OnInit {
         });
 
         this.contactForm.filter(contact => contact.id === 'civility')[0].values = formatedCivilities;
+    }
+
+    getCountries() {
+        this.http.get(`../rest/registeredMail/countries`).pipe(
+            tap((data: any) => {
+                this.countries = data.countries.map(
+                    (item: any) => this.latinisePipe.transform(item.toUpperCase()));
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    initAutocompleteCountries() {
+        this.contactForm.map((field: any) => {
+            if (field.id === 'addressCountry') {
+                this.countriesFilteredResult = field.control.valueChanges
+                .pipe(
+                    startWith(''),
+                    map((value: any) => this._filter(value))
+                );
+            }
+        });
+    }
+
+    private _filter(value: string): string[] {
+        const filterValue = value.toLowerCase();
+        return this.countries.filter((option: any) => option.toLowerCase().includes(filterValue));
+    }
+
+    selectCountry(ev: any) {
+        const indexFieldAddressCountry = this.contactForm.map(field => field.id).indexOf('addressCountry');
+        this.contactForm[indexFieldAddressCountry].control.setValue(ev.option.value);
     }
 
     initCustomElementForm(data: any) {
@@ -1024,7 +1078,7 @@ export class ContactsFormComponent implements OnInit {
             const test = target.control.value;
             if (['lastname'].indexOf(target.id) > -1) {
                 target.control.setValue(test.toUpperCase());
-            } else if (['firstname', 'company'].indexOf(target.id) > -1) {
+            } else if (['firstname'].indexOf(target.id) > -1) {
                 let splitStr = test.toLowerCase().split(' ');
                 for (let i = 0; i < splitStr.length; i++) {
                     splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);

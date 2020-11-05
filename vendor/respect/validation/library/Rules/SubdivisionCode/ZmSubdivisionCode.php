@@ -18,20 +18,20 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: ZM
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/ZM/administrative-division-zambia.html
  */
 class ZmSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        '01', // Western
-        '02', // Central
-        '03', // Eastern
-        '04', // Luapula
-        '05', // Northern
-        '06', // North-Western
-        '07', // Southern (Zambia)
-        '08', // Copperbelt
-        '09', // Lusaka
+        '01', // Western Province
+        '02', // Central Province
+        '03', // Eastern Province
+        '04', // Luapula Province
+        '05', // Northern Province
+        '06', // North-Western Province
+        '07', // Southern Province
+        '08', // Copperbelt Province
+        '09', // Lusaka Province
     ];
 
     public $compareIdentical = true;

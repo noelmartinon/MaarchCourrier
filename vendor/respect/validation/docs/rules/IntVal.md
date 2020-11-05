@@ -14,9 +14,5 @@ See also:
 
   * [Digit](Digit.md)
   * [Finite](Finite.md)
-  * [FloatType](FloatType.md)
-  * [FloatVal](FloatVal.md)
   * [Infinite](Infinite.md)
-  * [IntType](IntType.md)
   * [Numeric](Numeric.md)
-  * [Type](Type.md)

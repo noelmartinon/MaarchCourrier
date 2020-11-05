@@ -1,11 +1,9 @@
-<?php
-
-namespace Gitlab\Model;
+<?php namespace Gitlab\Model;
 
 use Gitlab\Client;
 
 /**
- * @final
+ * Class Key
  *
  * @property-read int $id
  * @property-read string $title
@@ -15,19 +13,18 @@ use Gitlab\Client;
 class Key extends AbstractModel
 {
     /**
-     * @var string[]
+     * @var array
      */
-    protected static $properties = [
+    protected static $properties = array(
         'id',
         'title',
         'key',
-        'created_at',
-    ];
+        'created_at'
+    );
 
     /**
      * @param Client $client
-     * @param array  $data
-     *
+     * @param array $data
      * @return Key
      */
     public static function fromArray(Client $client, array $data)
@@ -38,9 +35,7 @@ class Key extends AbstractModel
     }
 
     /**
-     * @param Client|null $client
-     *
-     * @return void
+     * @param Client $client
      */
     public function __construct(Client $client = null)
     {

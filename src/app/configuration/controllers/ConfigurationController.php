@@ -16,6 +16,7 @@ namespace Configuration\controllers;
 
 use Configuration\models\ConfigurationModel;
 use Group\controllers\PrivilegeController;
+use History\controllers\HistoryController;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -25,17 +26,23 @@ class ConfigurationController
 {
     public function getByPrivilege(Request $request, Response $response, array $args)
     {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => $args['privilege'], 'userId' => $GLOBALS['id']])) {
+        if (in_array($args['privilege'], ['admin_sso'])) {
+            if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_connections', 'userId' => $GLOBALS['id']])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+            }
+        } elseif (!PrivilegeController::hasPrivilege(['privilegeId' => $args['privilege'], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
         $configuration = ConfigurationModel::getByPrivilege(['privilege' => $args['privilege']]);
         $configuration['value'] = json_decode($configuration['value'], true);
-        if (!empty($configuration['value']['password'])) {
-            $configuration['value']['password'] = '';
-            $configuration['value']['passwordAlreadyExists'] = true;
-        } else {
-            $configuration['value']['passwordAlreadyExists'] = false;
+        if ($args['privilege'] == 'admin_email_server') {
+            if (!empty($configuration['value']['password'])) {
+                $configuration['value']['password'] = '';
+                $configuration['value']['passwordAlreadyExists'] = true;
+            } else {
+                $configuration['value']['passwordAlreadyExists'] = false;
+            }
         }
 
         return $response->withJson(['configuration' => $configuration]);
@@ -43,7 +50,11 @@ class ConfigurationController
 
     public function update(Request $request, Response $response, array $args)
     {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => $args['privilege'], 'userId' => $GLOBALS['id']])) {
+        if (in_array($args['privilege'], ['admin_sso'])) {
+            if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_connections', 'userId' => $GLOBALS['id']])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+            }
+        } elseif (!PrivilegeController::hasPrivilege(['privilegeId' => $args['privilege'], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
@@ -69,10 +80,56 @@ class ConfigurationController
             }
             $data['charset'] = empty($data['charset']) ? 'utf-8' : $data['charset'];
             unset($data['passwordAlreadyExists']);
+        } elseif ($args['privilege'] == 'admin_search') {
+            if (!Validator::notEmpty()->arrayType()->validate($data['listDisplay'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body listDisplay is empty or not an array']);
+            }
+            if (isset($data['listDisplay']['subInfos']) && !Validator::arrayType()->validate($data['listDisplay']['subInfos'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body listDisplay[subInfos] is not set or not an array']);
+            }
+            if (!Validator::intVal()->validate($data['listDisplay']['templateColumns'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body listDisplay[templateColumns] is not set or not an array']);
+            }
+            foreach ($data['listDisplay']['subInfos'] as $value) {
+                if (!Validator::stringType()->notEmpty()->validate($value['value'])) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Body listDisplay[subInfos][value] is empty or not a string']);
+                } elseif (!isset($value['cssClasses']) || !is_array($value['cssClasses'])) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Body listDisplay[subInfos][cssClasses] is not set or not an array']);
+                }
+            }
+
+            if (empty($data['listEvent']['defaultTab'])) {
+                $data['listEvent']['defaultTab'] = 'dashboard';
+            }
+
+            $data = ['listDisplay' => $data['listDisplay'], 'listEvent' => $data['listEvent']];
+        } elseif ($args['privilege'] == 'admin_sso') {
+            if (!empty($data['url']) && !Validator::stringType()->validate($data['url'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body url is empty or not a string']);
+            }
+            if (!Validator::notEmpty()->arrayType()->validate($data['mapping'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body mapping is empty or not an array']);
+            }
+            foreach ($data['mapping'] as $key => $mapping) {
+                if (!Validator::notEmpty()->stringType()->validate($mapping['ssoId'])) {
+                    return $response->withStatus(400)->withJson(['errors' => "Body mapping[$key]['ssoId'] is empty or not a string"]);
+                }
+                if (!Validator::notEmpty()->stringType()->validate($mapping['maarchId'])) {
+                    return $response->withStatus(400)->withJson(['errors' => "Body mapping[$key]['maarchId'] is empty or not a string"]);
+                }
+            }
         }
 
-        $data = json_encode($data);
+        $data = json_encode($data, JSON_UNESCAPED_SLASHES);
         ConfigurationModel::update(['set' => ['value' => $data], 'where' => ['privilege = ?'], 'data' => [$args['privilege']]]);
+
+        HistoryController::add([
+            'tableName' => 'configurations',
+            'recordId'  => $args['privilege'],
+            'eventType' => 'UP',
+            'eventId'   => 'configurationUp',
+            'info'       => _CONFIGURATION_UPDATED . ' : ' . $args['privilege']
+        ]);
 
         return $response->withJson(['success' => 'success']);
     }

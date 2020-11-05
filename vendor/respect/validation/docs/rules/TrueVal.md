@@ -18,6 +18,4 @@ v::trueVal()->validate('2'); // false
 ***
 See also:
 
-  * [BoolType](BoolType.md)
-  * [BoolVal](BoolVal.md)
   * [FalseVal](FalseVal.md)

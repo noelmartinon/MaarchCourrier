@@ -11,9 +11,7 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
-class AbstractSearcherTest extends TestCase
+class AbstractSearcherTest extends \PHPUnit_Framework_TestCase
 {
     protected $searcherRuleMock;
 

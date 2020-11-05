@@ -14,7 +14,6 @@
 
 namespace Resource\controllers;
 
-use Basket\models\BasketModel;
 use Contact\controllers\ContactController;
 use CustomField\models\CustomFieldModel;
 use Endroid\QrCode\QrCode;
@@ -30,7 +29,6 @@ use Respect\Validation\Validator;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\controllers\PreparedClauseController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
@@ -93,9 +91,7 @@ class SummarySheetController
                         'arrivalDate'  => 'admission_date',
                         'initiator'    => 'initiator'
                     ];
-                    $select[]    = 'type_label';
-                    $select[]    = 'creation_date';
-                    $select[]    = 'typist';
+                    $select = array_merge($select, ['type_label', 'creation_date', 'typist']);
 
                     foreach ($information as $key => $item) {
                         if (in_array($key, $fieldsIdentifier)) {
@@ -107,8 +103,7 @@ class SummarySheetController
                         'priority'         => 'priority',
                         'processLimitDate' => 'process_limit_date',
                     ];
-                    $select[] = 'category_id';
-                    $select[] = 'status';
+                    $select = array_merge($select, ['category_id', 'status', 'retention_frozen', 'binding']);
 
                     foreach ($information as $key => $item) {
                         if (in_array($key, $fieldsIdentifier)) {
@@ -183,7 +178,7 @@ class SummarySheetController
 
         $appName = CoreConfigModel::getApplicationName();
         $pdf->SetFont('', '', 8);
-        $pdf->Cell(0, 20, "$appName / " . date('d-m-Y'), 0, 2, 'L', false);
+        $pdf->Cell(0, 20, mb_strimwidth($appName, 0, 40, '...', 'utf8') . " / " . date('d-m-Y'), 0, 2, 'L', false);
         $pdf->SetY($pdf->GetY() - 20);
 
         $pdf->SetFont('', 'B', 12);
@@ -271,8 +266,18 @@ class SummarySheetController
                 $category = ResModel::getCategoryLabel(['categoryId' => $resource['category_id']]);
                 $category = empty($category) ? '<i>'._UNDEFINED.'</i>' : "<b>{$category}</b>";
 
-                $status = StatusModel::getById(['id' => $resource['status'], 'select' => ['label_status']]);
+                if (!empty($resource['status'])) {
+                    $status = StatusModel::getById(['id' => $resource['status'], 'select' => ['label_status']]);
+                }
                 $status = empty($status['label_status']) ? '<i>' . _UNDEFINED . '</i>' : "<b>{$status['label_status']}</b>";
+
+                $retentionRuleFrozen = empty($resource['retention_frozen']) ? '<b>' . _NO . '</b>' : '<b>' . _YES . '</b>';
+
+                if (!isset($resource['binding'])) {
+                    $binding = '<i>' . _UNDEFINED . '</i>';
+                } else {
+                    $binding = empty($resource['binding']) ? '<b>' . _NO . '</b>' : '<b>' . _YES . '</b>';
+                }
 
                 $priority = null;
                 if (in_array('priority', $fieldsIdentifier)) {
@@ -332,6 +337,9 @@ class SummarySheetController
 
                 $pdf->MultiCell($widthNotes, 30, _STATUS . " : {$status}", 1, 'L', false, 1, '', '', true, 0, true);
 
+                $pdf->MultiCell($widthNotes, 30, _RETENTION_RULE_FROZEN . " : {$retentionRuleFrozen}", 1, 'L', false, 0, '', '', true, 0, true);
+                $pdf->MultiCell($widthNotes, 30, _BINDING_DOCUMENT . " : {$binding}", 1, 'L', false, 1, '', '', true, 0, true);
+
                 $nextLine = 1;
                 if (isset($priority)) {
                     $nextLine = isset($processLimitDate) || !empty($customFieldsIds) ? 0 : 1;
@@ -343,6 +351,9 @@ class SummarySheetController
                 }
 
                 if (!empty($customFieldsIds)) {
+                    $fieldsType = CustomFieldModel::get(['select' => ['type', 'id'], 'where' => ['id in (?)'], 'data' => [$customFieldsIds]]);
+                    $fieldsType = array_column($fieldsType, 'type', 'id');
+
                     foreach ($customFieldsIds as $customFieldsId) {
                         $label = $customFields[$customFieldsId];
                         $rawValues = json_decode($customFieldsRawValues[$customFieldsId], true);
@@ -359,9 +370,16 @@ class SummarySheetController
                             }
                         }
                         if (is_array($customFieldsValues[$customFieldsId])) {
+                            $customValue = "";
                             if (!empty($customFieldsValues[$customFieldsId])) {
-                                if (is_array($customFieldsValues[$customFieldsId][0])) { //Custom BAN
+                                if ($fieldsType[$customFieldsId] == 'banAutocomplete') {
                                     $customValue = "{$customFieldsValues[$customFieldsId][0]['addressNumber']} {$customFieldsValues[$customFieldsId][0]['addressStreet']} {$customFieldsValues[$customFieldsId][0]['addressTown']} ({$customFieldsValues[$customFieldsId][0]['addressPostcode']})";
+                                } elseif ($fieldsType[$customFieldsId] == 'contact') {
+                                    $customValues = ContactController::getContactCustomField(['contacts' => $customFieldsValues[$customFieldsId]]);
+                                    $customValue = count($customValues) > 2 ? count($customValues) . ' ' . _CONTACTS : implode(", ", $customValues);
+                                    if (count($customValues) < 3) {
+                                        $pdf->SetFont('', '', 8);
+                                    }
                                 } else {
                                     $customValue = implode(',', $customFieldsValues[$customFieldsId]);
                                 }
@@ -373,6 +391,7 @@ class SummarySheetController
 
                         $nextLine = ($nextLine + 1) % 2;
                         $pdf->MultiCell($widthNotes, 30, $label . " : {$value}", 1, 'L', false, $nextLine, '', '', true, 0, true);
+                        $pdf->SetFont('', '', 10);
                     }
                 }
             } elseif ($unit['unit'] == 'senderRecipientInformations') {
@@ -477,16 +496,16 @@ class SummarySheetController
                 $assignee    = '';
                 $destination = '';
                 $found       = false;
-                $roles = EntityModel::getRoles();
-                $rolesItems = [];
-                $nbItems = 0;
+                $roles       = EntityModel::getRoles();
+                $rolesItems  = [];
+                $nbItems     = 0;
                 foreach ($args['data']['listInstances'] as $listKey => $listInstance) {
                     if ($found && $listInstance['res_id'] != $resource['res_id']) {
                         break;
                     } elseif ($listInstance['res_id'] == $resource['res_id']) {
                         $item = '';
                         if ($listInstance['item_type'] == 'user_id') {
-                            $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['id', 'firstname', 'lastname']]);
+                            $user   = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['id', 'firstname', 'lastname']]);
                             $entity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']]);
 
                             if ($listInstance['item_mode'] == 'dest') {
@@ -495,10 +514,10 @@ class SummarySheetController
                                 $item = "{$user['firstname']} {$user['lastname']} ({$entity['entity_label']})";
                             }
                         } elseif ($listInstance['item_type'] == 'entity_id') {
-                            $item = $listInstance['item_id'];
-                            $entity = EntityModel::getById(['id' => $listInstance['item_id'], 'select' => ['short_label']]);
+                            $item   = $listInstance['item_id'];
+                            $entity = EntityModel::getById(['id' => $listInstance['item_id'], 'select' => ['short_label', 'entity_id']]);
                             if (!empty($entity)) {
-                                $item = "{$entity['short_label']} ({$item})";
+                                $item = "{$entity['short_label']} ({$entity['entity_id']})";
                             }
                         }
                         if ($listInstance['item_mode'] == 'dest') {
@@ -520,7 +539,7 @@ class SummarySheetController
 
                 // Sort keys to be in the same order defined in the roles.xml file
                 $rolesIDs = array_column($roles, 'id');
-                $tmp = [];
+                $tmp      = [];
                 foreach ($rolesIDs as $key) {
                     if (!empty($rolesItems[$key])) {
                         $tmp[$key] = $rolesItems[$key];
@@ -564,13 +583,27 @@ class SummarySheetController
             } elseif ($unit['unit'] == 'visaWorkflow') {
                 $users = [];
                 $found = false;
+
+                $roles = EntityModel::getRoles();
+                $roles = array_column($roles, 'label', 'id');
+
                 foreach ($args['data']['listInstancesVisa'] as $listKey => $listInstance) {
                     if ($found && $listInstance['res_id'] != $resource['res_id']) {
                         break;
                     } elseif ($listInstance['res_id'] == $resource['res_id']) {
+                        $mode = $roles[$listInstance['item_mode']];
+                        $userLabel = UserModel::getLabelledUserById(['id' => $listInstance['item_id']]);
+
+                        $delegate = !empty($listInstance['delegate']) ? UserModel::getLabelledUserById(['id' => $listInstance['delegate']]) : '';
+                        if (!empty($delegate)) {
+                            $mode .= ', ' . _INSTEAD_OF . ' ' . $userLabel;
+                            $userLabel = $delegate . " ({$mode}) ";
+                        } else {
+                            $userLabel .= " ({$mode}) ";
+                        }
+
                         $users[] = [
-                            'user'  => UserModel::getLabelledUserById(['id' => $listInstance['item_id']]),
-                            'mode'  => $listInstance['requested_signature'] ? 'Signataire' : 'Viseur',
+                            'user'  => $userLabel,
                             'date'  => TextFormatModel::formatDate($listInstance['process_date']),
                         ];
                         unset($args['data']['listInstancesVisa'][$listKey]);
@@ -591,7 +624,7 @@ class SummarySheetController
                     $pdf->Cell($specialWidth * 3, 20, _USERS, 1, 0, 'L', false);
                     $pdf->Cell($specialWidth, 20, _ACTION_DATE, 1, 1, 'L', false);
                     foreach ($users as $keyUser => $user) {
-                        $pdf->Cell($specialWidth * 3, 20, $keyUser + 1 . ". {$user['user']} ({$user['mode']})", 1, 0, 'L', false);
+                        $pdf->Cell($specialWidth * 3, 20, $keyUser + 1 . ". {$user['user']}", 1, 0, 'L', false);
                         $pdf->Cell($specialWidth, 20, $user['date'], 1, 1, 'L', false);
                     }
                 }
@@ -602,13 +635,23 @@ class SummarySheetController
                     if ($found && $listInstance['res_id'] != $resource['res_id']) {
                         break;
                     } elseif ($listInstance['res_id'] == $resource['res_id']) {
-                        $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['id', 'firstname', 'lastname']]);
-                        $entity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label']]);
+                        $user = UserModel::getLabelledUserById(['id' => $listInstance['item_id']]);
+                        $entity = UserModel::getPrimaryEntityById(['id' => $listInstance['item_id'], 'select' => ['entities.entity_label']]);
 
-                        $userLabel = $user['firstname'] . ' ' .$user['lastname'] . " (" . $entity['entity_label'] . ")";
+                        $entityLabel = $entity['entity_label'];
+                        $userLabel = $user;
+                        $delegate = !empty($listInstance['delegate']) ? UserModel::getLabelledUserById(['id' => $listInstance['delegate']]) : '';
+
+                        if (!empty($delegate)) {
+                            $entityLabel .= ', ' .  _INSTEAD_OF . ' ' . $userLabel;
+                            $userLabel = $delegate . " (" . $entityLabel . ")";
+                        } else {
+                            $userLabel .= " (" . $entityLabel . ")";
+                        }
+
                         $users[] = [
                             'user'  => $userLabel,
-                            'date'  => TextFormatModel::formatDate($listInstance['process_date']),
+                            'date'  => TextFormatModel::formatDate($listInstance['process_date'])
                         ];
                         unset($args['data']['listInstancesOpinion'][$listKey]);
                         $found = true;
@@ -703,16 +746,24 @@ class SummarySheetController
                 $pdf->SetY($pdf->GetY() + 2);
                 $pdf->Cell(0, 60, '', 1, 2, 'L', false);
             } elseif ($unit['unit'] == 'trafficRecords') {
-                $pdf->SetY($pdf->GetY() + 40);
-                if (($pdf->GetY() + 77) > $bottomHeight) {
+                $pdf->SetY($pdf->GetY() + 30);
+
+                $parameter = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'traffic_record_summary_sheet']);
+
+                $pdf2 = clone $pdf;
+                $pdf2->AddPage();
+                $pdf2->writeHTMLCell($widthNoMargins + $dimensions['lm'], 0, $widthNoMargins + $dimensions['lm'], 0, $parameter['param_value_string'], 0, 1, 0, true, 'C', true);
+                $height = 10 - ($pdf2->GetY());
+                if (($pdf->GetY() + abs($height)) > $bottomHeight) {
                     $pdf->AddPage();
                 }
+
                 $pdf->SetFont('', 'B', 11);
                 $pdf->Cell(0, 15, $unit['label'], 0, 2, 'L', false);
                 $pdf->SetFont('', '', 9);
 
-                $parameter = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'traffic_record_summary_sheet']);
                 $pdf->writeHTMLCell($widthNoMargins + $dimensions['lm'], 0, $dimensions['lm'] - 2, $pdf->GetY(), $parameter['param_value_string']);
+                $pdf->SetY($pdf->GetY() + abs($height));
             }
         }
     }
@@ -738,14 +789,14 @@ class SummarySheetController
                 }
             } elseif ($unit['unit'] == 'opinionWorkflow') {
                 $data['listInstancesOpinion'] = ListInstanceModel::get([
-                    'select'    => ['item_id', 'process_date', 'res_id'],
+                    'select'    => ['item_id', 'process_date', 'res_id', 'delegate'],
                     'where'     => ['difflist_type = ?', 'res_id in (?)'],
                     'data'      => ['AVIS_CIRCUIT', $tmpIds],
                     'orderBy'   => ['listinstance_id']
                 ]);
             } elseif ($unit['unit'] == 'visaWorkflow') {
                 $data['listInstancesVisa'] = ListInstanceModel::get([
-                    'select'    => ['item_id', 'requested_signature', 'process_date', 'res_id'],
+                    'select'    => ['item_id', 'requested_signature', 'process_date', 'res_id', 'delegate', 'item_mode'],
                     'where'     => ['difflist_type = ?', 'res_id in (?)'],
                     'data'      => ['VISA_CIRCUIT', $tmpIds],
                     'orderBy'   => ['listinstance_id']

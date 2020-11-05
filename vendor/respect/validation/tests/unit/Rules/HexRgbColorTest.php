@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\HexRgbColor
  * @covers Respect\Validation\Exceptions\HexRgbColorException
  */
-class HexRgbColorTest extends TestCase
+class HexRgbColorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider providerForValidHexRgbColor

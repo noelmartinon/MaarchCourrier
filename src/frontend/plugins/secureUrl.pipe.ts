@@ -1,7 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs/internal/Observable';
-import { AuthService } from '../service/auth.service';
+import { AuthService } from '@service/auth.service';
+import { Observable } from 'rxjs';
 
 @Pipe({
     name: 'secureUrl'

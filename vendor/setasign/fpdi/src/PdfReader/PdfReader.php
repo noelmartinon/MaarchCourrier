@@ -3,7 +3,7 @@
  * This file is part of FPDI
  *
  * @package   setasign\Fpdi
- * @copyright Copyright (c) 2020 Setasign GmbH & Co. KG (https://www.setasign.com)
+ * @copyright Copyright (c) 2019 Setasign - Jan Slabon (https://www.setasign.com)
  * @license   http://opensource.org/licenses/mit-license The MIT License
  */
 
@@ -14,7 +14,6 @@ use setasign\Fpdi\PdfParser\PdfParser;
 use setasign\Fpdi\PdfParser\PdfParserException;
 use setasign\Fpdi\PdfParser\Type\PdfArray;
 use setasign\Fpdi\PdfParser\Type\PdfDictionary;
-use setasign\Fpdi\PdfParser\Type\PdfIndirectObject;
 use setasign\Fpdi\PdfParser\Type\PdfIndirectObjectReference;
 use setasign\Fpdi\PdfParser\Type\PdfNumeric;
 use setasign\Fpdi\PdfParser\Type\PdfType;
@@ -40,7 +39,7 @@ class PdfReader
     /**
      * Indirect objects of resolved pages.
      *
-     * @var PdfIndirectObjectReference[]|PdfIndirectObject[]
+     * @var PdfIndirectObjectReference[]
      */
     protected $pages = [];
 
@@ -60,6 +59,7 @@ class PdfReader
     public function __destruct()
     {
         if ($this->parser !== null) {
+            /** @noinspection PhpInternalEntityUsedInspection */
             $this->parser->cleanUp();
         }
     }
@@ -165,21 +165,9 @@ class PdfReader
             $page = $this->parser->getIndirectObject($page->value);
             $dict = PdfType::resolve($page, $this->parser);
             $type = PdfDictionary::get($dict, 'Type');
-
             if ($type->value === 'Pages') {
                 $kids = PdfType::resolve(PdfDictionary::get($dict, 'Kids'), $this->parser);
-                try {
-                    $page = $this->pages[$pageNumber - 1] = $readPages($kids);
-                } catch (PdfReaderException $e) {
-                    if ($e->getCode() !== PdfReaderException::KIDS_EMPTY) {
-                        throw $e;
-                    }
-
-                    // let's reset the pages array and read all page objects
-                    $this->pages = [];
-                    $this->readPages(true);
-                    $page = $this->pages[$pageNumber - 1];
-                }
+                $page = $this->pages[$pageNumber - 1] = $readPages($kids);
             } else {
                 $this->pages[$pageNumber - 1] = $page;
             }
@@ -191,25 +179,24 @@ class PdfReader
     /**
      * Walk the page tree and resolve all indirect objects of all pages.
      *
-     * @param bool $readAll
+     * @throws PdfTypeException
      * @throws CrossReferenceException
      * @throws PdfParserException
-     * @throws PdfTypeException
      */
-    protected function readPages($readAll = false)
+    protected function readPages()
     {
         if (\count($this->pages) > 0) {
             return;
         }
 
-        $readPages = function ($kids, $count) use (&$readPages, $readAll) {
+        $readPages = function ($kids, $count) use (&$readPages) {
             $kids = PdfArray::ensure($kids);
-            $isLeaf = ($count->value === \count($kids->value));
+            $isLeaf = $count->value === \count($kids->value);
 
             foreach ($kids->value as $reference) {
                 $reference = PdfIndirectObjectReference::ensure($reference);
 
-                if (!$readAll && $isLeaf) {
+                if ($isLeaf) {
                     $this->pages[] = $reference;
                     continue;
                 }

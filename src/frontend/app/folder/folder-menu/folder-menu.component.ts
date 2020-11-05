@@ -3,13 +3,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { map, tap, catchError, filter, exhaustMap, debounceTime, switchMap, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { FormControl } from '@angular/forms';
 import { FoldersService } from '../folders.service';
 import { FolderCreateModalComponent } from '../folder-create-modal/folder-create-modal.component';
-import { FunctionsService } from '../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     selector: 'folder-menu',

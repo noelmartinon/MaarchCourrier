@@ -1,13 +1,13 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
-import { HeaderService } from '../../../service/header.service';
-import { AppService } from '../../../service/app.service';
-import { FunctionsService } from '../../../service/functions.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
+import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
 
 @Component({
@@ -42,7 +42,7 @@ export class PrioritiesAdministrationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.prioritiesAlt'));
+        this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.priorities'));
 
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 

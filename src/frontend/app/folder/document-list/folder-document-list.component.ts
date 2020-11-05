@@ -1,7 +1,7 @@
 import { Component, OnInit, ViewChild, EventEmitter, ViewContainerRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
@@ -9,20 +9,16 @@ import { MatSort } from '@angular/material/sort';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { startWith, switchMap, map, catchError, takeUntil, tap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
-import { HeaderService } from '../../../service/header.service';
+import { HeaderService } from '@service/header.service';
 import { Overlay } from '@angular/cdk/overlay';
 import { PanelListComponent } from '../../list/panel/panel-list.component';
-import { AppService } from '../../../service/app.service';
+import { AppService } from '@service/app.service';
 import { BasketHomeComponent } from '../../basket/basket-home.component';
 import { FolderActionListComponent } from '../folder-action-list/folder-action-list.component';
-import { FiltersListService } from '../../../service/filtersList.service';
+import { FiltersListService } from '@service/filtersList.service';
 import { FoldersService } from '../folders.service';
-import { FunctionsService } from '../../../service/functions.service';
-import { Subject } from 'rxjs/internal/Subject';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { merge } from 'rxjs/internal/observable/merge';
-import { of } from 'rxjs/internal/observable/of';
-import { Observable } from 'rxjs/internal/Observable';
+import { FunctionsService } from '@service/functions.service';
+import { merge, Observable, of, Subject, Subscription } from 'rxjs';
 
 declare var $: any;
 
@@ -31,8 +27,6 @@ declare var $: any;
     styleUrls: ['folder-document-list.component.scss']
 })
 export class FolderDocumentListComponent implements OnInit, OnDestroy {
-
-    
 
     loading: boolean = false;
     docUrl: string = '';
@@ -324,7 +318,7 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
             Object.keys(element).forEach((key) => {
                 if (key === 'statusImage' && element[key] == null) {
                     element[key] = 'fa-question undefined';
-                } else if ((element[key] == null || element[key] === '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'mailTracking', 'hasDocument'].indexOf(key) === -1) {
+                } else if ((element[key] == null || element[key] === '') && ['closingDate', 'countAttachments', 'countNotes', 'display', 'mailTracking', 'hasDocument', 'binding'].indexOf(key) === -1) {
                     element[key] = this.translate.instant('lang.undefined');
                 }
             });

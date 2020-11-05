@@ -18,29 +18,29 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: PY
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/PY/administrative-division-paraguay.html
  */
 class PySubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        '1', // Concepción
-        '10', // Alto Paraná
+        '1', // Concepcion
+        '10', // Alto Parana
         '11', // Central
-        '12', // Ñeembucú
+        '12', // Neembucu
         '13', // Amambay
-        '14', // Canindeyú
+        '14', // Canindeyu
         '15', // Presidente Hayes
         '16', // Alto Paraguay
-        '19', // Boquerón
+        '19', // Boqueron
         '2', // San Pedro
         '3', // Cordillera
-        '4', // Guairá
-        '5', // Caaguazú
-        '6', // Caazapá
-        '7', // Itapúa
+        '4', // Guaira
+        '5', // Caaguazu
+        '6', // Caazapa
+        '7', // Itapua
         '8', // Misiones
-        '9', // Paraguarí
-        'ASU', // Asunción
+        '9', // Paraguari
+        'ASU', // Asuncion
     ];
 
     public $compareIdentical = true;

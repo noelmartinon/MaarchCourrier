@@ -2,38 +2,22 @@
 <ROOT>
     <METHOD>
         <ID>standard</ID>
-        <NAME>_STANDARD_LOGIN</NAME>
-        <SCRIPT>standard_connect.php</SCRIPT>
         <ENABLED>true</ENABLED>
     </METHOD>
     <METHOD>
         <ID>ldap</ID>
-        <NAME>_STANDARD_LOGIN</NAME>
-        <SCRIPT>standard_connect.php</SCRIPT>
-        <ENABLED>false</ENABLED>
-    </METHOD>
-    <METHOD>
-        <ID>sso</ID>
-        <NAME>_SSO_LOGIN</NAME>
-        <SCRIPT>sso_connect.php</SCRIPT>
         <ENABLED>false</ENABLED>
     </METHOD>
     <METHOD>
         <ID>cas</ID>
-        <NAME>_CAS_LOGIN</NAME>
-        <SCRIPT>cas_connect.php</SCRIPT>
+        <ENABLED>false</ENABLED>
+    </METHOD>
+    <METHOD>
+        <ID>sso</ID>
         <ENABLED>false</ENABLED>
     </METHOD>
     <METHOD>
         <ID>keycloak</ID>
-        <NAME>Keycloak</NAME>
-        <SCRIPT>keycloakConnect.php</SCRIPT>
-        <ENABLED>false</ENABLED>
-    </METHOD>
-    <METHOD>
-        <ID>shibboleth</ID>
-        <NAME>Shibboleth</NAME>
-        <SCRIPT>shibbolethConnect.php</SCRIPT>
         <ENABLED>false</ENABLED>
     </METHOD>
 </ROOT>

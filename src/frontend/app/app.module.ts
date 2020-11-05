@@ -3,10 +3,12 @@ import { NgModule, Injectable } from '@angular/core';
 import { SharedModule } from './app-common.module';
 import { AppRoutingModule } from './app-routing.module';
 
+import { AdministrationModule } from './administration/administration.module';
+
 import { BrowserModule, HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { InternationalizationModule } from '../service/translate/internationalization.module';
+import { InternationalizationModule } from '@service/translate/internationalization.module';
 
 import { JoyrideModule } from 'ngx-joyride';
 
@@ -14,19 +16,16 @@ import { PanelListComponent } from './list/panel/panel-list.component';
 import { DocumentViewerModule } from './viewer/document-viewer.module';
 import { AppListModule } from './app-list.module';
 
-import { AuthInterceptor } from '../service/auth-interceptor.service';
-import { FiltersListService } from '../service/filtersList.service';
+import { AuthInterceptor } from '@service/auth-interceptor.service';
+import { FiltersListService } from '@service/filtersList.service';
+import { CriteriaSearchService } from '@service/criteriaSearch.service';
 import { FoldersService } from './folder/folders.service';
-import { PrivilegeService } from '../service/privileges.service';
+import { PrivilegeService } from '@service/privileges.service';
 import { ActionsService } from './actions/actions.service';
 
 import { AppComponent } from './app.component';
 
-import { CriteriaToolComponent } from './adv-search/criteria-tool/criteria-tool.component';
-
 // ACTIONS
-import { SearchAdvListComponent } from './adv-search/list/search-adv-list.component';
-
 import { ConfirmActionComponent } from './actions/confirm-action/confirm-action.component';
 import { DisabledBasketPersistenceActionComponent } from './actions/disabled-basket-persistence-action/disabled-basket-persistence-action.component';
 import { EnabledBasketPersistenceActionComponent } from './actions/enabled-basket-persistence-action/enabled-basket-persistence-action.component';
@@ -65,6 +64,10 @@ import { SaveAndIndexRegisteredMailActionComponent } from './actions/save-and-in
 import { SaveAndPrintRegisteredMailActionComponent } from './actions/save-and-print-registered-mail-action/save-and-print-registered-mail-action.component';
 import { PrintRegisteredMailActionComponent } from './actions/print-registered-mail-action/print-registered-mail-action.component';
 import { PrintDepositListActionComponent } from './actions/print-deposit-list-action/print-deposit-list-action.component';
+import { SendToRecordManagementComponent } from './actions/send-to-record-management-action/send-to-record-management.component';
+import { CheckReplyRecordManagementComponent } from './actions/check-reply-record-management-action/check-reply-record-management.component';
+import { ResetRecordManagementComponent } from './actions/reset-record-management-action/reset-record-management.component';
+import { CheckAcknowledgmentRecordManagementComponent } from './actions/check-acknowledgment-record-management-action/check-acknowledgment-record-management.component';
 
 
 // PROCESS
@@ -80,14 +83,16 @@ import { SentResourcePageComponent } from './sentResource/sent-resource-page/sen
 import { SentNumericPackagePageComponent } from './sentResource/sent-numeric-package-page/sent-numeric-package-page.component';
 import { ThesaurusModalComponent } from './tag/indexing/thesaurus/thesaurus-modal.component';
 import { SelectIndexingModelComponent } from './indexation/select-indexing-model/select-indexing-model.component';
-import { FilterToolComponent } from './adv-search/filter-tool/filter-tool.component';
+import { FilterToolComponent } from './search/filter-tool/filter-tool.component';
+import { TechnicalInformationComponent } from './indexation/technical-information/technical-information.component';
 
-import { AdvSearchComponent } from './adv-search/adv-search.component';
+import { SearchComponent } from './search/search.component';
+import { SearchResultListComponent } from './search/result-list/search-result-list.component';
 import { AboutUsComponent } from './about-us.component';
 import { ActivateUserComponent } from './activate-user.component';
 import { AddAvisModelModalComponent } from './avis/addAvisModel/add-avis-model-modal.component';
 import { AddPrivateIndexingModelModalComponent } from './indexation/private-indexing-model/add-private-indexing-model-modal.component';
-import { AddSearchTemplateModalComponent } from './adv-search/criteria-tool/search-template/search-template-modal.component';
+import { AddSearchTemplateModalComponent } from './search/criteria-tool/search-template/search-template-modal.component';
 import { AddVisaModelModalComponent } from './visa/addVisaModel/add-visa-model-modal.component';
 import { AttachmentCreateComponent } from './attachments/attachment-create/attachment-create.component';
 import { AttachmentPageComponent } from './attachments/attachments-page/attachment-page.component';
@@ -115,9 +120,10 @@ import { SaveNumericPackageComponent } from './save-numeric-package.component';
 import { SignatureBookComponent } from './signature-book.component';
 import { VisaWorkflowModalComponent } from './visa/modal/visa-workflow-modal.component';
 
-import { DevToolComponent } from '../service/debug/dev-tool.component';
-import { DevLangComponent } from '../service/debug/dev-lang.component';
+import { DevToolComponent } from '@service/debug/dev-tool.component';
+import { DevLangComponent } from '@service/debug/dev-lang.component';
 import { AcknowledgementReceptionComponent } from './registeredMail/acknowledgement-reception/acknowledgement-reception.component';
+import { DatePipe } from '@angular/common';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -136,6 +142,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         JoyrideModule.forRoot(),
         SharedModule,
         AppRoutingModule,
+        AdministrationModule,
         DocumentViewerModule,
         AppListModule,
     ],
@@ -155,7 +162,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         SelectIndexingModelComponent,
         FilterToolComponent,
         PanelListComponent,
-        AdvSearchComponent,
+        SearchComponent,
+        SearchResultListComponent,
         AboutUsComponent,
         ActivateUserComponent,
         AddAvisModelModalComponent,
@@ -191,8 +199,6 @@ export class MyHammerConfig extends HammerGestureConfig {
         DevLangComponent,
         DevToolComponent,
         AcknowledgementReceptionComponent,
-        CriteriaToolComponent,
-        SearchAdvListComponent,
         ConfirmActionComponent,
         ResMarkAsReadActionComponent,
         EnabledBasketPersistenceActionComponent,
@@ -231,6 +237,11 @@ export class MyHammerConfig extends HammerGestureConfig {
         PrintRegisteredMailActionComponent,
         PrintDepositListActionComponent,
         ReconcileActionComponent,
+        SendToRecordManagementComponent,
+        CheckReplyRecordManagementComponent,
+        ResetRecordManagementComponent,
+        CheckAcknowledgmentRecordManagementComponent,
+        TechnicalInformationComponent
     ],
     exports : [
         SharedModule
@@ -287,11 +298,21 @@ export class MyHammerConfig extends HammerGestureConfig {
         PrintDepositListActionComponent,
         ViewDocActionComponent,
         ReconcileActionComponent,
+        TechnicalInformationComponent
     ],
-    providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }, FiltersListService, FoldersService, ActionsService, PrivilegeService, {
-        provide: HAMMER_GESTURE_CONFIG,
-        useClass: MyHammerConfig
-    }],
+    providers: [
+        { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+        DatePipe,
+        FiltersListService,
+        CriteriaSearchService,
+        FoldersService,
+        ActionsService,
+        PrivilegeService,
+        {
+            provide: HAMMER_GESTURE_CONFIG,
+            useClass: MyHammerConfig
+        }
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule { }

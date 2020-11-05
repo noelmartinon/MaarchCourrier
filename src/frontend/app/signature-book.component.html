@@ -11,7 +11,8 @@
             </div>
             <div *ngFor="let module of processTool" title="{{module.label}}" class="item"
                 [ngClass]="{'activeTabSignatureBook': headerTab == module.id}"
-                (click)="changeSignatureBookLeftContent(module.id)">
+                [class.tool-disabled]="!isToolEnabled(module.id)"
+                (click)="isToolEnabled(module.id) ? changeSignatureBookLeftContent(module.id) : false">
                 <i [class]="module.icon"></i>
                 <i *ngIf="module.count > 0" class="fas fa-circle haveContent"></i>
             </div>

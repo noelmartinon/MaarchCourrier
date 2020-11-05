@@ -22,9 +22,8 @@
             <div class="layout" *ngIf="attachment.hideMainInfo" [@myAnimation] (click)="showAttachment(attachment)">
                 <button mat-raised-button color="primary"
                     (click)="$event.stopPropagation();showAttachment(attachment)">{{'lang.viewResource' | translate}}</button>
-                <button mat-raised-button color="warn" *ngIf="attachment.status!=='SIGN' && attachment.status!=='FRZ' && canModify"
-                    (click)="$event.stopPropagation();deleteAttachment(attachment)"
-                    [disabled]="!attachment.canDelete">{{'lang.deleteResource' | translate}}</button>
+                <button mat-raised-button color="warn" *ngIf="attachment.type !=='reply_record_management' && attachment.type !=='acknowledgement_record_management' && attachment.status!=='SIGN' && attachment.status!=='FRZ' && attachment.canDelete && (canModify || canModify === null)"
+                    (click)="$event.stopPropagation();deleteAttachment(attachment)">{{'lang.deleteResource' | translate}}</button>
             </div>
             <div class="pjToolsContent">
                 <span *ngIf="attachment.relation > 1" color="primary" class="versionButton">{{'lang.version' | translate}} <b

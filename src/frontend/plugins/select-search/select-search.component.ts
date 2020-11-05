@@ -3,18 +3,19 @@ import {
     Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, QueryList,
     ViewChild,
     Renderer2,
-    Output
+    Output,
+    DoCheck
 } from '@angular/core';
 import { ControlValueAccessor, FormControl } from '@angular/forms';
 import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
-import { take, takeUntil, startWith, map } from 'rxjs/operators';
+import { take, takeUntil, startWith, map, tap } from 'rxjs/operators';
 import { Subject, ReplaySubject, Observable } from 'rxjs';
 import { LatinisePipe } from 'ngx-pipes';
 import { TranslateService } from '@ngx-translate/core';
-import { AppService } from '../../service/app.service';
+import { AppService } from '@service/app.service';
 import { SortPipe } from '../../plugins/sorting.pipe';
-import { FunctionsService } from '../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     selector: 'plugin-select-search',
@@ -22,7 +23,7 @@ import { FunctionsService } from '../../service/functions.service';
     styleUrls: ['select-search.component.scss', '../../app/indexation/indexing-form/indexing-form.component.scss'],
     providers: [SortPipe]
 })
-export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterViewInit, ControlValueAccessor {
+export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterViewInit, ControlValueAccessor, DoCheck {
     /** Label of the search placeholder */
     @Input() placeholderLabel = this.translate.instant('lang.chooseValue');
 
@@ -76,6 +77,9 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
 
     public filteredDatasMulti: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
 
+    datasClone: any = [];
+    isModelModified: boolean = false;
+
     /** Reference to the MatSelect options */
     public _options: QueryList<MatOption>;
 
@@ -92,6 +96,8 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     private _onDestroy = new Subject<void>();
 
     formControlSearch = new FormControl();
+
+    selected: any[] = [];
 
     /** Current search value */
     get value(): string {
@@ -112,6 +118,9 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         private sortPipe: SortPipe) { }
 
     ngOnInit() {
+        if (this.multiple) {
+            this.matSelect.compareWith = (item1: any, item2: any) => item1 && item2 ? item1.id === item2.id : item1 === item2;
+        }
         if (this.optGroupList !== null) {
             this.initOptGroups();
         }
@@ -164,17 +173,57 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
                         }
                     });
             });
-        setTimeout(() => {
+
+        let group = '';
+        let index = 1;
+        this.datasClone = JSON.parse(JSON.stringify(this.datas));
+        this.datasClone.forEach((element: any) => {
+            if (element.isTitle) {
+                group = `group_${index}`;
+                element.id = group;
+                index++;
+            } else {
+                element.group = group;
+            }
+        });
+
+        this.filteredDatas = this.formControlSearch.valueChanges
+            .pipe(
+                startWith(''),
+                map(value => this._filter(value))
+            );
+        // this.initMultipleHandling();
+
+    }
+
+    // To resfresh filteredDatas if data is modfied
+    ngDoCheck(): void {
+        if (JSON.stringify(this.datas) !== JSON.stringify(this.datasClone) && !this.isModelModified) {
+            this.isModelModified = true;
+
+            this.datasClone = JSON.parse(JSON.stringify(this.datas));
+
+            // if more data => contruct title again
+            if (this.datasClone.length !== this.datas.length) {
+                let group = '';
+                let index = 1;
+                this.datasClone.forEach((element: any) => {
+                    if (element.isTitle) {
+                        group = `group_${index}`;
+                        element.id = group;
+                        index++;
+                    } else {
+                        element.group = group;
+                    }
+                });
+            }
             this.filteredDatas = this.formControlSearch.valueChanges
                 .pipe(
                     startWith(''),
                     map(value => this._filter(value))
                 );
-        }, 0);
-
-
-        // this.initMultipleHandling();
-
+            this.isModelModified = false;
+        }
     }
 
     initOptGroups() {
@@ -347,18 +396,37 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
 
     private _filter(value: string, showSelectedValues: boolean = false): string[] {
         if (value === '__SELECTED') {
-            return this.datas.filter((option: any) => this.formControlSelect.value.indexOf(option['id']) > -1);
+            return this.returnValue === 'id' ? this.datas.filter((option: any) => this.formControlSelect.value.indexOf(option['id']) > -1) : this.datas.filter((option: any) => this.formControlSelect.value.map((val: any) => val.id).indexOf(option['id']) > -1);
         } else if (typeof value === 'string' && value !== '') {
             const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.datas.filter((option: any) => !option['disabled'] && this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue));
+
+            const group = this.datas.filter((option: any) => option['isTitle'] && this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue)).map((opt: any) => opt.id);
+
+            return this.datas.filter((option: any) => (option['isTitle'] && group.indexOf(option['id']) > -1) || (group.indexOf(option['group']) > -1 || this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue)));
         } else {
             return this.datas;
         }
     }
 
     launchEvent(ev: any) {
+        if (this.selected.length > 0) {
+            const ids = new Set(this.formControlSelect.value.map(d => d.id));
+            const merged = [...this.formControlSelect.value, ...this.selected.filter(d => !ids.has(d.id))];
+            this.formControlSelect.setValue(merged);
+        }
+
         if (this.afterSelected !== undefined) {
             this.afterSelected.emit(ev.value);
+        }
+    }
+
+    selectChange(ev: any) {
+        if (this.multiple && ev.isUserInput) {
+            if (ev.source._selected) {
+                this.selected = this.formControlSelect.value;
+            } else {
+                this.selected = this.selected.length > 0 ? this.selected.filter((val: any) => val.id !== ev.source.value.id) : [];
+            }
         }
     }
 
@@ -370,5 +438,14 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         } else {
             return 'unknow validator';
         }
+    }
+
+    getFirstDataLabel() {
+        return this.formControlSelect.value[0].label.replace(/&nbsp;/g, '');
+        // return this.returnValue === 'id' ? this.formControlSelect.value[0].label.replace(/\u00a0/g, '') : this.formControlSelect.value.map((item: any) => item !== null ? item.label : this.translate.instant('lang.emptyValue'))[0];
+    }
+
+    emptyData() {
+        return this.returnValue === 'id' ? null : { id: null, label: this.translate.instant('lang.emptyValue') };
     }
 }

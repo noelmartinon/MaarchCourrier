@@ -18,14 +18,14 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: KM
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/KM/administrative-division-comoros.html
  */
 class KmSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'A', // Andjouân (Anjwān)
-        'G', // Andjazîdja (Anjazījah)
-        'M', // Moûhîlî (Mūhīlī)
+        'A', // Anjouan
+        'G', // Grande Comore
+        'M', // Moheli
     ];
 
     public $compareIdentical = true;

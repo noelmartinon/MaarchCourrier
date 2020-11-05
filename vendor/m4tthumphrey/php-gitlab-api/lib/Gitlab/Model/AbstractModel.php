@@ -1,23 +1,20 @@
-<?php
+<?php namespace Gitlab\Model;
 
-namespace Gitlab\Model;
-
-use Gitlab\Api\AbstractApi;
 use Gitlab\Client;
-use Gitlab\Exception\InvalidArgumentException;
 use Gitlab\Exception\RuntimeException;
+use Gitlab\Api\AbstractApi;
 
 abstract class AbstractModel
 {
     /**
-     * @var string[]
+     * @var array
      */
     protected static $properties;
 
     /**
-     * @var array<string,mixed>
+     * @var array
      */
-    protected $data = [];
+    protected $data = array();
 
     /**
      * @var Client
@@ -33,8 +30,7 @@ abstract class AbstractModel
     }
 
     /**
-     * @param Client|null $client
-     *
+     * @param Client $client
      * @return $this
      */
     public function setClient(Client $client = null)
@@ -47,30 +43,24 @@ abstract class AbstractModel
     }
 
     /**
-     * @param string $name
-     *
+     * @param string $api
      * @return AbstractApi|mixed
-     *
-     * @throws InvalidArgumentException
-     *
-     * @deprecated since version 9.18 and will be removed in 10.0. Use the direct methods instead.
      */
-    public function api($name)
+    public function api($api)
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 9.18 and will be removed in 10.0. Use the direct methods instead.', __METHOD__), E_USER_DEPRECATED);
-
-        return $this->getClient()->api($name);
+        return $this->getClient()->api($api);
     }
 
     /**
-     * @param array<string,mixed> $data
-     *
+     * @param array $data
      * @return $this
      */
-    protected function hydrate(array $data = [])
+    protected function hydrate(array $data = array())
     {
-        foreach ($data as $field => $value) {
-            $this->setData($field, $value);
+        if (!empty($data)) {
+            foreach ($data as $field => $value) {
+                $this->setData($field, $value);
+            }
         }
 
         return $this;
@@ -78,13 +68,12 @@ abstract class AbstractModel
 
     /**
      * @param string $field
-     * @param mixed  $value
-     *
+     * @param mixed $value
      * @return $this
      */
     protected function setData($field, $value)
     {
-        if (in_array($field, static::$properties, true)) {
+        if (in_array($field, static::$properties)) {
             $this->data[$field] = $value;
         }
 
@@ -101,10 +90,7 @@ abstract class AbstractModel
 
     /**
      * @param string $property
-     * @param mixed  $value
-     *
-     * @return void
-     *
+     * @param mixed $value
      * @throws RuntimeException
      */
     public function __set($property, $value)
@@ -114,15 +100,15 @@ abstract class AbstractModel
 
     /**
      * @param string $property
-     *
      * @return mixed
-     *
-     * @throws RuntimeException
      */
     public function __get($property)
     {
-        if (!in_array($property, static::$properties, true)) {
-            throw new RuntimeException(sprintf('Property "%s" does not exist for %s object', $property, get_called_class()));
+        if (!in_array($property, static::$properties)) {
+            throw new RuntimeException(sprintf(
+                'Property "%s" does not exist for %s object',
+                $property, get_called_class()
+            ));
         }
 
         if (isset($this->data[$property])) {
@@ -134,7 +120,6 @@ abstract class AbstractModel
 
     /**
      * @param string $property
-     *
      * @return bool
      */
     public function __isset($property)

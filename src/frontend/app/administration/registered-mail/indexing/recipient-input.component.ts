@@ -1,13 +1,12 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { FormControl, FormGroup, Validators, FormBuilder } from '@angular/forms';
-import { Observable } from 'rxjs/internal/Observable';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { tap, catchError, debounceTime, filter, distinctUntilChanged, switchMap, startWith, map } from 'rxjs/operators';
-import { of } from 'rxjs/internal/observable/of';
+import { Observable, of } from 'rxjs';
 import { LatinisePipe } from 'ngx-pipes';
-import { FunctionsService } from '../../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     selector: 'app-registered-mail-recipient-input',

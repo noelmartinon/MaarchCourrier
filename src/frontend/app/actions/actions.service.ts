@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { tap, catchError, filter, finalize, exhaustMap } from 'rxjs/operators';
 import { of, Subject, Observable } from 'rxjs';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { ConfirmActionComponent } from './confirm-action/confirm-action.component';
 import { MatDialog } from '@angular/material/dialog';
 import { CloseMailActionComponent } from './close-mail-action/close-mail-action.component';
@@ -32,15 +32,19 @@ import { ContinueAvisCircuitActionComponent } from './avis-continue-circuit-acti
 import { SendAvisParallelComponent } from './avis-parallel-send-action/send-avis-parallel-action.component';
 import { GiveAvisParallelActionComponent } from './avis-give-parallel-action/give-avis-parallel-action.component';
 import { ValidateAvisParallelComponent } from './avis-parallel-validate-action/validate-avis-parallel-action.component';
-import { HeaderService } from '../../service/header.service';
-import { FunctionsService } from '../../service/functions.service';
+import { HeaderService } from '@service/header.service';
+import { FunctionsService } from '@service/functions.service';
 import { ReconcileActionComponent } from './reconciliation-action/reconcile-action.component';
 import { SendAlfrescoActionComponent } from './send-alfresco-action/send-alfresco-action.component';
 import { SaveRegisteredMailActionComponent } from './save-registered-mail-action/save-registered-mail-action.component';
 import { SaveAndPrintRegisteredMailActionComponent } from './save-and-print-registered-mail-action/save-and-print-registered-mail-action.component';
 import { SaveAndIndexRegisteredMailActionComponent } from './save-and-index-registered-mail-action/save-and-index-registered-mail-action.component';
 import { PrintRegisteredMailActionComponent } from './print-registered-mail-action/print-registered-mail-action.component';
-import {PrintDepositListActionComponent} from './print-deposit-list-action/print-deposit-list-action.component';
+import { PrintDepositListActionComponent } from './print-deposit-list-action/print-deposit-list-action.component';
+import { SendToRecordManagementComponent } from './send-to-record-management-action/send-to-record-management.component';
+import { CheckReplyRecordManagementComponent } from './check-reply-record-management-action/check-reply-record-management.component';
+import { ResetRecordManagementComponent } from './reset-record-management-action/reset-record-management.component';
+import { CheckAcknowledgmentRecordManagementComponent } from './check-acknowledgment-record-management-action/check-acknowledgment-record-management.component';
 
 @Injectable()
 export class ActionsService implements OnDestroy {
@@ -230,6 +234,10 @@ export class ActionsService implements OnDestroy {
             })
         ).subscribe();
 
+        if (!this.functions.empty(this.currentResourceLock)) {
+            clearInterval(this.currentResourceLock);
+        }
+        
         this.currentResourceLock = setInterval(() => {
             this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
                 tap(() => console.debug(`Cycle lock : `, this.currentResourceLock)),
@@ -1077,6 +1085,98 @@ export class ActionsService implements OnDestroy {
             data: this.setDatasActionToSend()
         });
 
+        dialogRef.afterClosed().pipe(
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
+            }),
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
+            }),
+            finalize(() => this.loading = false),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    sendToRecordManagementAction(options: any = null) {
+        const dialogRef = this.dialog.open(SendToRecordManagementComponent, {
+            panelClass: 'maarch-modal',
+            autoFocus: false,
+            disableClose: true,
+            data: this.setDatasActionToSend()
+        });
+        dialogRef.afterClosed().pipe(
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
+            }),
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
+            }),
+            finalize(() => this.loading = false),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    checkReplyRecordManagementAction(options: any = null) {
+        const dialogRef = this.dialog.open(CheckReplyRecordManagementComponent, {
+            panelClass: 'maarch-modal',
+            autoFocus: false,
+            disableClose: true,
+            data: this.setDatasActionToSend()
+        });
+        dialogRef.afterClosed().pipe(
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
+            }),
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
+            }),
+            finalize(() => this.loading = false),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    resetRecordManagementAction(options: any = null) {
+        const dialogRef = this.dialog.open(ResetRecordManagementComponent, {
+            panelClass: 'maarch-modal',
+            autoFocus: false,
+            disableClose: true,
+            data: this.setDatasActionToSend()
+        });
+        dialogRef.afterClosed().pipe(
+            tap((resIds: any) => {
+                this.unlockResourceAfterActionModal(resIds);
+            }),
+            filter((resIds: any) => !this.functions.empty(resIds)),
+            tap((resIds: any) => {
+                this.endAction(resIds);
+            }),
+            finalize(() => this.loading = false),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    checkAcknowledgmentRecordManagementAction(options: any = null) {
+        const dialogRef = this.dialog.open(CheckAcknowledgmentRecordManagementComponent, {
+            panelClass: 'maarch-modal',
+            autoFocus: false,
+            disableClose: true,
+            data: this.setDatasActionToSend()
+        });
         dialogRef.afterClosed().pipe(
             tap((resIds: any) => {
                 this.unlockResourceAfterActionModal(resIds);

@@ -176,10 +176,6 @@ try {
         . DIRECTORY_SEPARATOR . 'class_core_tools.php'
     );
     Bt_myInclude(
-        $GLOBALS['maarchDirectory'] . 'apps' . DIRECTORY_SEPARATOR . 'maarch_entreprise'
-        . DIRECTORY_SEPARATOR . 'class' . DIRECTORY_SEPARATOR . 'class_users.php'
-    );
-    Bt_myInclude(
         $GLOBALS['maarchDirectory'] . "modules" . DIRECTORY_SEPARATOR . "sendmail"
         . DIRECTORY_SEPARATOR . "class". DIRECTORY_SEPARATOR . "class_modules_tools.php"
     );
@@ -257,7 +253,6 @@ $coreTools = new core_tools();
 $coreTools->load_lang($lang, $GLOBALS['maarchDirectory'], $_SESSION['config']['app_id']);
 
 $sendmail_tools = new sendmail();
-$users = new class_users();
 $GLOBALS['func'] = new functions();
 
 $GLOBALS['db'] = new Database($GLOBALS['configFile']);

@@ -1,11 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { tap, finalize, catchError } from 'rxjs/operators';
-import { ContactService } from '../../../service/contact.service';
-import { FunctionsService } from '../../../service/functions.service';
-import { of } from 'rxjs/internal/observable/of';
+import { ContactService } from '@service/contact.service';
+import { FunctionsService } from '@service/functions.service';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-contact-resource',

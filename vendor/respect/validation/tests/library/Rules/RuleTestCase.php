@@ -12,10 +12,9 @@
 namespace Respect\Validation\Rules;
 
 use Respect\Validation\Exceptions\ValidationException;
-use Respect\Validation\TestCase;
 use Respect\Validation\Validatable;
 
-abstract class RuleTestCase extends TestCase
+abstract class RuleTestCase extends \PHPUnit_Framework_TestCase
 {
     /**
      * It is to provide constructor arguments and.

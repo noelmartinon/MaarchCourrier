@@ -1,17 +1,17 @@
 import { Component, OnInit, Input, ViewChild, EventEmitter, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { AppService } from '../../../service/app.service';
+import { AppService } from '@service/app.service';
 import { tap, catchError, exhaustMap, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { FormControl, Validators, FormGroup, ValidationErrors, ValidatorFn, AbstractControl } from '@angular/forms';
 import { DiffusionsListComponent } from '../../diffusions/diffusions-list.component';
-import { FunctionsService } from '../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { IssuingSiteInputComponent } from '../../administration/registered-mail/issuing-site/indexing/issuing-site-input.component';
 import { RegisteredMailRecipientInputComponent } from '../../administration/registered-mail/indexing/recipient-input.component';
@@ -27,14 +27,14 @@ export class IndexingFormComponent implements OnInit {
 
     loading: boolean = true;
 
-    @Input('indexingFormId') indexingFormId: number;
-    @Input('resId') resId: number = null;
-    @Input('groupId') groupId: number;
+    @Input() indexingFormId: number;
+    @Input() resId: number = null;
+    @Input() groupId: number;
     @Input('admin') adminMode: boolean;
-    @Input('canEdit') canEdit: boolean = true;
-    @Input('mode') mode: string = 'indexation';
+    @Input() canEdit: boolean = true;
+    @Input() mode: string = 'indexation';
 
-    @Input('hideDiffusionList') hideDiffusionList: boolean = false;
+    @Input() hideDiffusionList: boolean = false;
 
     @Output() retrieveDocumentEvent = new EventEmitter<string>();
     @Output() loadingFormEndEvent = new EventEmitter<string>();
@@ -225,9 +225,9 @@ export class IndexingFormComponent implements OnInit {
         {
             identifier: 'registeredMail_recipient',
             label: this.translate.instant('lang.registeredMailRecipient'),
-            type: 'registeredMailRecipient',
+            type: 'autocomplete',
             default_value: null,
-            values: [],
+            values: ['/rest/autocomplete/correspondents'],
             enabled: true,
         },
         {
@@ -254,6 +254,7 @@ export class IndexingFormComponent implements OnInit {
     currentResourceValues: any = null;
 
     selfDest: boolean = false;
+    customDiffusion: any = [];
 
     dialogRef: MatDialogRef<any>;
 
@@ -306,7 +307,8 @@ export class IndexingFormComponent implements OnInit {
 
             this.http.get('../rest/customFields').pipe(
                 tap((data: any) => {
-                    this.availableCustomFields = data.customFields.map((info: any) => {
+                    const withFormMode = data.customFields.filter((item: { mode: any; }) => item.mode === 'form');
+                    this.availableCustomFields = withFormMode.map((info: any) => {
                         info.identifier = 'indexingCustomField_' + info.id;
                         info.system = false;
                         info.enabled = true;
@@ -315,7 +317,7 @@ export class IndexingFormComponent implements OnInit {
                         if (['integer', 'string', 'date'].indexOf(info.type) > -1 && !this.functions.empty(info.values)) {
                             info.default_value = info.values[0].key;
                         } else {
-                            info.default_value = info.type === 'banAutocomplete' ? [] : null;
+                            info.default_value = ['contact', 'banAutocomplete'].indexOf(info.type) > -1 ? [] : null;
                         }
                         info.values = info.values.length > 0 ? info.values.map((custVal: any) => {
                             return {
@@ -452,12 +454,12 @@ export class IndexingFormComponent implements OnInit {
                     tap(() => {
                         if (this.currentCategory === 'registeredMail') {
                             this.http.put(`../rest/registeredMails/${this.resId}`, {
-                                    type: formatdatas.registeredMail_type,
-                                    warranty: formatdatas.registeredMail_warranty,
-                                    issuingSiteId: formatdatas.registeredMail_issuingSite,
-                                    letter: formatdatas.registeredMail_letter,
-                                    recipient: formatdatas.registeredMail_recipient,
-                                    reference: formatdatas.registeredMail_reference
+                                type: formatdatas.registeredMail_type,
+                                warranty: formatdatas.registeredMail_warranty,
+                                issuingSiteId: formatdatas.registeredMail_issuingSite,
+                                letter: formatdatas.registeredMail_letter,
+                                recipient: formatdatas.registeredMail_recipient,
+                                reference: formatdatas.registeredMail_reference
                             }).pipe(
                                 tap(() => {
                                     this.loadForm(this.indexingFormId);
@@ -501,8 +503,8 @@ export class IndexingFormComponent implements OnInit {
 
                 formatData['customFields'][element.identifier.split('_')[1]] = element.default_value;
 
-            } else if (element.identifier === 'registeredMail_recipient') {
-                formatData[element.identifier] = this.appRegisteredMailRecipientInput.getFormatedAdress();
+                // } else if (element.identifier === 'registeredMail_recipient') {
+                //     formatData[element.identifier] = this.appRegisteredMailRecipientInput.getFormatedAdress();
             } else {
                 formatData[element.identifier] = element.default_value;
             }
@@ -605,7 +607,7 @@ export class IndexingFormComponent implements OnInit {
                         let title = '';
                         if (elem.default_value === '#myPrimaryEntity') {
                             this.selfDest = this.currentCategory === 'outgoing';
-                            elem.default_value = this.headerService.user.entities[0].id;
+                            elem.default_value = this.headerService.user.entities[0]?.id;
                             this.arrFormControl[elem.identifier].setValue(elem.default_value);
                         } else {
                             this.selfDest = false;
@@ -624,7 +626,7 @@ export class IndexingFormComponent implements OnInit {
                                 title: title,
                                 label: entity.entity_label,
                                 disabled: !entity.enabled
-                            }
+                            };
                         });
                         elem.event = 'loadDiffusionList';
                         elem.allowedEntities = elem.values.filter((val: any) => val.disabled === false).map((entities: any) => entities.id);
@@ -950,10 +952,14 @@ export class IndexingFormComponent implements OnInit {
                             }
                         }
 
+                        if (field.identifier === 'diffusionList') {
+                            this.customDiffusion = field.default_value;
+                        }
+
                         if (fieldExist) {
                             this['indexingModels_' + field.unit].push(field);
                             this.initValidator(field);
-                        } else {
+                        } else if (field.identifier !== 'diffusionList') {
                             this.notify.error(this.translate.instant('lang.fieldNotExist') + ': ' + field.identifier);
                         }
 
@@ -1020,6 +1026,9 @@ export class IndexingFormComponent implements OnInit {
             let valArr: ValidatorFn[] = [];
             if (field.mandatory) {
                 valArr.push(Validators.required);
+                valArr.push(this.requireDestValidator({ 'isDest': '' }));
+            } else {
+                valArr.push(this.requireDestValidatorOrEmpty({ 'isDest': '' }));
             }
 
             this.arrFormControl['diffusionList'] = new FormControl({ value: null, disabled: false });
@@ -1029,6 +1038,24 @@ export class IndexingFormComponent implements OnInit {
             this.arrFormControl['diffusionList'].setValue([]);
 
         }
+    }
+
+    requireDestValidator(error: ValidationErrors): ValidatorFn {
+        return (control: AbstractControl): { [key: string]: any } => {
+            if (!control.value) {
+                return null;
+            }
+            return control.value.filter((item: any) => item.mode === 'dest').length > 0 ? null : error;
+        };
+    }
+
+    requireDestValidatorOrEmpty(error: ValidationErrors): ValidatorFn {
+        return (control: AbstractControl): { [key: string]: any } => {
+            if (!control.value) {
+                return null;
+            }
+            return control.value.filter((item: any) => item.mode === 'dest').length > 0 || this.functions.empty(this.arrFormControl['destination'].value) ? null : error;
+        };
     }
 
     regexValidator(regex: RegExp, error: ValidationErrors): ValidatorFn {
@@ -1048,9 +1075,6 @@ export class IndexingFormComponent implements OnInit {
                 const controlErrors: ValidationErrors = this.indexingFormGroup.get(key).errors;
                 if (controlErrors != null) {
                     this.indexingFormGroup.controls[key].markAsTouched();
-                    /*Object.keys(controlErrors).forEach(keyError => {
-                        console.log('Key control: ' + key + ', keyError: ' + keyError + ', err value: ', controlErrors[keyError]);
-                    });*/
                 }
             });
         }
@@ -1129,14 +1153,14 @@ export class IndexingFormComponent implements OnInit {
     }
 
     calcLimitDate(field: any, value: any) {
-        let limitDate: Date = null;
+        let limitDate: any = null;
         if (this.arrFormControl['processLimitDate'] !== undefined) {
             this.http.get('../rest/indexing/processLimitDate', { params: { 'doctype': value } }).pipe(
                 tap((data: any) => {
-                    limitDate = new Date(data.processLimitDate);
+                    limitDate = data.processLimitDate !== null ? new Date(data.processLimitDate) : '';
                     this.arrFormControl['processLimitDate'].setValue(limitDate);
                 }),
-                filter(() => this.arrFormControl['priority'] !== undefined),
+                filter((data) => this.arrFormControl['priority'] !== undefined && data.processLimitDate !== null),
                 exhaustMap(() => this.http.get('../rest/indexing/priority', { params: { 'processLimitDate': limitDate.toDateString() } })),
                 tap((data: any) => {
                     this.arrFormControl['priority'].setValue(data.priority);
@@ -1152,12 +1176,12 @@ export class IndexingFormComponent implements OnInit {
     }
 
     calcLimitDateByPriority(field: any, value: any) {
-        let limitDate: Date = null;
+        let limitDate: any = null;
 
         if (this.arrFormControl['processLimitDate'] !== undefined) {
             this.http.get('../rest/indexing/processLimitDate', { params: { 'priority': value } }).pipe(
                 tap((data: any) => {
-                    limitDate = new Date(data.processLimitDate);
+                    limitDate = data.processLimitDate !== null ? new Date(data.processLimitDate) : '';
                     this.arrFormControl['processLimitDate'].setValue(limitDate);
                     this.setPriorityColor(field, value);
                 }),
@@ -1274,6 +1298,10 @@ export class IndexingFormComponent implements OnInit {
                     if (this.functions.empty(item.unit)) {
                         item.unit = 'mail';
                     }
+                    if (item.identifier !== 'registeredMail_number') {
+                        item.mandatory = true;
+                    }
+
                     this.initValidator(item);
                 }
             });

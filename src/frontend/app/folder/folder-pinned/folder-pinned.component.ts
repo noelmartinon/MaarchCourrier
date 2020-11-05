@@ -12,8 +12,6 @@ import { FoldersService } from '../folders.service';
 })
 export class FolderPinnedComponent implements OnInit {
 
-    
-
     subscription: Subscription;
 
     @Input('noInit') noInit: boolean = false;
@@ -25,7 +23,6 @@ export class FolderPinnedComponent implements OnInit {
     ) {
         // Event after process action
         this.subscription = this.foldersService.catchEvent().subscribe((result: any) => {
-            //console.log(result);
         });
     }
 

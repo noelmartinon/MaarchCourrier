@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\BoolType
  * @covers Respect\Validation\Exceptions\BoolTypeException
  */
-class BoolTypeTest extends TestCase
+class BoolTypeTest extends \PHPUnit_Framework_TestCase
 {
     public function testBooleanValuesONLYShouldReturnTrue()
     {

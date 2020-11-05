@@ -26,6 +26,7 @@ use SrcCore\models\AuthenticationModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\PasswordModel;
 use SrcCore\models\ValidatorModel;
+use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
 use User\models\UserModel;
 
 class AuthenticationController
@@ -34,28 +35,53 @@ class AuthenticationController
     const ROUTES_WITHOUT_AUTHENTICATION = [
         'GET/authenticationInformations', 'PUT/versionsUpdateSQL', 'GET/validUrl', 'GET/authenticate/token', 'GET/images', 'POST/password', 'PUT/password', 'GET/passwordRules',
         'GET/jnlp/{jnlpUniqueId}', 'GET/onlyOffice/mergedFile', 'POST/onlyOfficeCallback', 'POST/authenticate',
-        'GET/installer/prerequisites', 'GET/installer/databaseConnection', 'GET/installer/sqlDataFiles', 'GET/installer/docservers', 'GET/installer/custom',
-        'POST/installer/custom', 'POST/installer/database', 'POST/installer/docservers', 'POST/installer/customization',
-        'PUT/installer/administrator', 'DELETE/installer/lock',
-        'GET/wopi/files/{id}', 'GET/wopi/files/{id}/contents', 'POST/wopi/files/{id}/contents','GET/onlyOffice/content','GET/languages/{lang}',
+        'GET/wopi/files/{id}', 'GET/wopi/files/{id}/contents', 'POST/wopi/files/{id}/contents','GET/onlyOffice/content','GET/languages/{lang}'
     ];
 
     public function getInformations(Request $request, Response $response)
     {
-        $path = CoreConfigModel::getConfigPath();
+        $path       = CoreConfigModel::getConfigPath();
         $hashedPath = md5($path);
 
-        $appName = CoreConfigModel::getApplicationName();
+        $appName   = CoreConfigModel::getApplicationName();
         $parameter = ParameterModel::getById(['id' => 'loginpage_message', 'select' => ['param_value_string']]);
 
         $encryptKey = CoreConfigModel::getEncryptKey();
 
-        return $response->withJson([
-            'instanceId'      => $hashedPath,
-            'applicationName' => $appName,
-            'loginMessage'    => $parameter['param_value_string'] ?? null,
-            'changeKey'       => $encryptKey == 'Security Key Maarch Courrier #2008'
-        ]);
+        $loggingMethod = CoreConfigModel::getLoggingMethod();
+        $authUri = null;
+        if ($loggingMethod['id'] == 'cas') {
+            $casConfiguration = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/cas_config.xml']);
+            $hostname         = (string)$casConfiguration->WEB_CAS_URL;
+            $port             = (string)$casConfiguration->WEB_CAS_PORT;
+            $uri              = (string)$casConfiguration->WEB_CAS_CONTEXT;
+            $authUri          = "https://{$hostname}:{$port}{$uri}/login?service=" . UrlController::getCoreUrl() . 'dist/index.html#/login';
+        } elseif ($loggingMethod['id'] == 'keycloak') {
+            $keycloakConfig = CoreConfigModel::getKeycloakConfiguration();
+            $provider       = new Keycloak($keycloakConfig);
+            $authUri        = $provider->getAuthorizationUrl(['scope' => $keycloakConfig['scope']]);
+            $keycloakState  = $provider->getState();
+        } elseif ($loggingMethod['id'] == 'sso') {
+            $ssoConfiguration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_sso', 'select' => ['value']]);
+            $ssoConfiguration = !empty($ssoConfiguration['value']) ? json_decode($ssoConfiguration['value'], true) : null;
+            $authUri          = $ssoConfiguration['url'] ?? null;
+        }
+
+        $return = [
+            'instanceId'        => $hashedPath,
+            'applicationName'   => $appName,
+            'loginMessage'      => $parameter['param_value_string'] ?? null,
+            'changeKey'         => $encryptKey == 'Security Key Maarch Courrier #2008',
+            'authMode'          => $loggingMethod['id'],
+            'authUri'           => $authUri,
+            'lang'              => CoreConfigModel::getLanguage()
+        ];
+
+        if (!empty($keycloakState)) {
+            $return['keycloakState'] = $keycloakState;
+        }
+
+        return $response->withJson($return);
     }
 
     public function getValidUrl(Request $request, Response $response)
@@ -86,17 +112,20 @@ class AuthenticationController
     public static function authentication($authorizationHeaders = [])
     {
         $userId = null;
-        if (!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
+
+        $canBasicAuth = true;
+        $loginMethod = CoreConfigModel::getLoggingMethod();
+        if ($loginMethod['id'] != 'standard' && !empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
+            $rawUser = UserModel::getByLogin(['select' => ['mode'], 'login' => $_SERVER['PHP_AUTH_USER']]);
+            if (!empty($rawUser) && $rawUser['mode'] != 'rest') {
+                $canBasicAuth = false;
+            }
+        }
+
+        if (!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW']) && $canBasicAuth) {
             if (AuthenticationModel::authentication(['login' => $_SERVER['PHP_AUTH_USER'], 'password' => $_SERVER['PHP_AUTH_PW']])) {
-                $loginMethod = CoreConfigModel::getLoggingMethod();
                 $user = UserModel::getByLogin(['select' => ['id', 'mode'], 'login' => $_SERVER['PHP_AUTH_USER']]);
-                if ($loginMethod['id'] != 'standard') {
-                    if ($user['mode'] == 'rest') {
-                        $userId = $user['id'];
-                    }
-                } else {
-                    $userId = $user['id'];
-                }
+                $userId = $user['id'];
             }
         } else {
             if (!empty($authorizationHeaders)) {
@@ -215,33 +244,66 @@ class AuthenticationController
     {
         $body = $request->getParsedBody();
 
-        $check = Validator::stringType()->notEmpty()->validate($body['login']);
-        $check = $check && Validator::stringType()->notEmpty()->validate($body['password']);
-        if (!$check) {
-            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
-        }
-
-        $login = strtolower($body['login']);
-        $authenticated = AuthenticationModel::authentication(['login' => $login, 'password' => $body['password']]);
-        if (empty($authenticated)) {
-            $user = UserModel::getByLogin(['login' => $login, 'select' => ['id', 'status']]);
-            if (empty($user)) {
-                return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
-            } elseif ($user['status'] == 'SPD') {
-                return $response->withStatus(401)->withJson(['errors' => 'Account Suspended']);
-            } else {
-                $handle = AuthenticationController::handleFailedAuthentication(['userId' => $user['id']]);
-                if (!empty($handle['accountLocked'])) {
-                    return $response->withStatus(401)->withJson(['errors' => 'Account Locked', 'date' => $handle['lockedDate']]);
-                }
-                return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
+        $loggingMethod = CoreConfigModel::getLoggingMethod();
+        if (in_array($loggingMethod['id'], ['standard', 'ldap'])) {
+            if (!Validator::stringType()->notEmpty()->validate($body['login']) || !Validator::stringType()->notEmpty()->validate($body['password'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
             }
         }
 
-        $user = UserModel::getByLogin(['login' => $login, 'select' => ['id', 'mode', 'refresh_token', 'user_id']]);
-        if (empty($user) || $user['mode'] == 'rest') {
-            return $response->withStatus(403)->withJson(['errors' => 'Authentication unauthorized']);
+        if ($loggingMethod['id'] == 'standard') {
+            $login = strtolower($body['login']);
+            if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Authentication Failed']);
+            }
+            $authenticated = AuthenticationController::standardConnection(['login' => $login, 'password' => $body['password']]);
+            if (!empty($authenticated['date'])) {
+                return $response->withStatus(401)->withJson(['errors' => $authenticated['errors'], 'date' => $authenticated['date']]);
+            } elseif (!empty($authenticated['errors'])) {
+                return $response->withStatus(401)->withJson(['errors' => $authenticated['errors']]);
+            }
+        } elseif ($loggingMethod['id'] == 'ldap') {
+            $login = strtolower($body['login']);
+            if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Authentication Failed']);
+            }
+            $authenticated = AuthenticationController::ldapConnection(['login' => $login, 'password' => $body['password']]);
+            if (!empty($authenticated['errors'])) {
+                return $response->withStatus(401)->withJson(['errors' => $authenticated['errors']]);
+            }
+        } elseif ($loggingMethod['id'] == 'cas') {
+            $authenticated = AuthenticationController::casConnection();
+            if (!empty($authenticated['errors'])) {
+                return $response->withStatus(401)->withJson(['errors' => $authenticated['errors']]);
+            }
+            $login = strtolower($authenticated['login']);
+            if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Authentication Failed']);
+            }
+        } elseif ($loggingMethod['id'] == 'keycloak') {
+            $queryParams = $request->getQueryParams();
+            $authenticated = AuthenticationController::keycloakConnection(['code' => $queryParams['code']]);
+            if (!empty($authenticated['errors'])) {
+                return $response->withStatus(401)->withJson(['errors' => $authenticated['errors']]);
+            }
+            $login = strtolower($authenticated['login']);
+            if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Authentication unauthorized']);
+            }
+        } elseif ($loggingMethod['id'] == 'sso') {
+            $authenticated = AuthenticationController::ssoConnection();
+            if (!empty($authenticated['errors'])) {
+                return $response->withStatus(401)->withJson(['errors' => $authenticated['errors']]);
+            }
+            $login = strtolower($authenticated['login']);
+            if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Authentication unauthorized']);
+            }
+        } else {
+            return $response->withStatus(403)->withJson(['errors' => 'Logging method unauthorized']);
         }
+
+        $user = UserModel::getByLogin(['login' => $login, 'select' => ['id', 'refresh_token', 'user_id']]);
 
         $GLOBALS['id'] = $user['id'];
         $GLOBALS['login'] = $user['user_id'];
@@ -280,6 +342,255 @@ class AuthenticationController
         ]);
 
         return $response->withStatus(204);
+    }
+
+    public function logout(Request $request, Response $response)
+    {
+        $loggingMethod = CoreConfigModel::getLoggingMethod();
+
+        $logoutUrl = null;
+        if ($loggingMethod['id'] == 'cas') {
+            $disconnection = AuthenticationController::casDisconnection();
+            $logoutUrl = $disconnection['logoutUrl'];
+        } elseif ($loggingMethod['id'] == 'keycloak') {
+            $disconnection = AuthenticationController::keycloakDisconnection();
+            $logoutUrl = $disconnection['logoutUrl'];
+        }
+
+        return $response->withJson(['logoutUrl' => $logoutUrl]);
+    }
+
+    private static function standardConnection(array $args)
+    {
+        $login = $args['login'];
+        $password = $args['password'];
+
+        $authenticated = AuthenticationModel::authentication(['login' => $login, 'password' => $password]);
+        if (empty($authenticated)) {
+            $user = UserModel::getByLogin(['login' => $login, 'select' => ['id']]);
+            $handle = AuthenticationController::handleFailedAuthentication(['userId' => $user['id']]);
+            if (!empty($handle['accountLocked'])) {
+                return ['errors' => 'Account Locked', 'date' => $handle['lockedDate']];
+            }
+            return ['errors' => 'Authentication Failed'];
+        }
+
+        return true;
+    }
+
+    private static function ldapConnection(array $args)
+    {
+        $login = $args['login'];
+        $password = $args['password'];
+
+        $ldapConfigurations = CoreConfigModel::getXmlLoaded(['path' => 'modules/ldap/xml/config.xml']);
+        if (empty($ldapConfigurations) || empty($ldapConfigurations->config->ldap)) {
+            return ['errors' => 'No ldap configurations'];
+        }
+
+        foreach ($ldapConfigurations->config->ldap as $ldapConfiguration) {
+            $ssl = (string)$ldapConfiguration->ssl;
+            $domain = (string)$ldapConfiguration->domain;
+            $prefix = (string)$ldapConfiguration->prefix_login;
+            $suffix = (string)$ldapConfiguration->suffix_login;
+            $standardConnect = (string)$ldapConfiguration->standardConnect;
+
+            $uri = ($ssl == 'true' ? "LDAPS://{$domain}" : $domain);
+
+            $ldap = @ldap_connect($uri);
+            if ($ldap === false) {
+                $error = 'Ldap connect failed : uri is maybe wrong';
+                continue;
+            }
+            ldap_set_option($ldap, LDAP_OPT_PROTOCOL_VERSION, 3);
+            ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
+            ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 10);
+            $ldapLogin = (!empty($prefix) ? $prefix . '\\' . $login : $login);
+            $ldapLogin = (!empty($suffix) ? $ldapLogin . $suffix : $ldapLogin);
+            if (!empty((string)$ldapConfiguration->baseDN)) { //OpenLDAP
+                $search = @ldap_search($ldap, (string)$ldapConfiguration->baseDN, "(uid={$ldapLogin})", ['dn']);
+                if ($search === false) {
+                    $error = 'Ldap search failed : baseDN is maybe wrong => ' . ldap_error($ldap);
+                    continue;
+                }
+                $entries = ldap_get_entries($ldap, $search);
+                $ldapLogin = $entries[0]['dn'];
+            }
+            $authenticated = @ldap_bind($ldap, $ldapLogin, $password);
+            if ($authenticated) {
+                break;
+            }
+            $error = ldap_error($ldap);
+        }
+
+        if (!empty($standardConnect) && $standardConnect == 'true') {
+            if (empty($authenticated)) {
+                $authenticated = AuthenticationModel::authentication(['login' => $login, 'password' => $password]);
+            } else {
+                $user = UserModel::getByLogin(['login' => $login, 'select' => ['id']]);
+                UserModel::updatePassword(['id' => $user['id'], 'password' => $password]);
+            }
+        }
+
+        if (empty($authenticated) && !empty($error) && $error != 'Invalid credentials') {
+            return ['errors' => $error];
+        } elseif (empty($authenticated)) {
+            return ['errors' => 'Authentication Failed'];
+        }
+
+        return true;
+    }
+
+    private static function casConnection()
+    {
+        $casConfiguration = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/cas_config.xml']);
+
+        $version = (string)$casConfiguration->CAS_VERSION;
+        $hostname = (string)$casConfiguration->WEB_CAS_URL;
+        $port = (string)$casConfiguration->WEB_CAS_PORT;
+        $uri = (string)$casConfiguration->WEB_CAS_CONTEXT;
+        $certificate = (string)$casConfiguration->PATH_CERTIFICATE;
+        $separator = (string)$casConfiguration->ID_SEPARATOR;
+
+        if (!in_array($version, ['CAS_VERSION_2_0', 'CAS_VERSION_3_0'])) {
+            return ['errors' => 'Cas version not supported'];
+        }
+
+        \phpCAS::setDebug();
+        \phpCAS::setVerbose(true);
+        \phpCAS::client(constant($version), $hostname, (int)$port, $uri, $version != 'CAS_VERSION_3_0');
+
+        if (!empty($certificate)) {
+            \phpCAS::setCasServerCACert($certificate);
+        } else {
+            \phpCAS::setNoCasServerValidation();
+        }
+        \phpCAS::setFixedServiceURL(UrlController::getCoreUrl() . 'dist/index.html');
+        \phpCAS::setNoClearTicketsFromUrl();
+        if (!\phpCAS::isAuthenticated()) {
+            return ['errors' => 'Cas authentication failed'];
+        }
+
+        $casId = \phpCAS::getUser();
+        if (!empty($separator)) {
+            $login = explode($separator, $casId)[0];
+        } else {
+            $login = $casId;
+        }
+
+        return ['login' => $login];
+    }
+
+    private static function casDisconnection()
+    {
+        $casConfiguration = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/cas_config.xml']);
+
+        $version = (string)$casConfiguration->CAS_VERSION;
+        $hostname = (string)$casConfiguration->WEB_CAS_URL;
+        $port = (string)$casConfiguration->WEB_CAS_PORT;
+        $uri = (string)$casConfiguration->WEB_CAS_CONTEXT;
+        $certificate = (string)$casConfiguration->PATH_CERTIFICATE;
+
+        \phpCAS::setDebug();
+        \phpCAS::setVerbose(true);
+        \phpCAS::client(constant($version), $hostname, (int)$port, $uri, $version != 'CAS_VERSION_3_0');
+
+        if (!empty($certificate)) {
+            \phpCAS::setCasServerCACert($certificate);
+        } else {
+            \phpCAS::setNoCasServerValidation();
+        }
+        \phpCAS::setFixedServiceURL(UrlController::getCoreUrl() . 'dist/index.html');
+        \phpCAS::setNoClearTicketsFromUrl();
+        $logoutUrl = \phpCAS::getServerLogoutURL();
+
+        return ['logoutUrl' => $logoutUrl];
+    }
+
+    private static function ssoConnection()
+    {
+        $ssoConfiguration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_sso', 'select' => ['value']]);
+        if (empty($ssoConfiguration['value'])) {
+            return ['errors' => 'Sso configuration missing'];
+        }
+
+        $ssoConfiguration = json_decode($ssoConfiguration['value'], true);
+        $mapping = array_column($ssoConfiguration['mapping'], 'ssoId', 'maarchId');
+        if (empty($mapping['login'])) {
+            return ['errors' => 'Sso configuration missing : no login mapping'];
+        }
+
+        if (in_array(strtoupper($mapping['login']), ['REMOTE_USER', 'PHP_AUTH_USER'])) {
+            $login = $_SERVER[strtoupper($mapping['login'])] ?? null;
+        } else {
+            $login = $_SERVER['HTTP_' . strtoupper($mapping['login'])] ?? null;
+        }
+        if (empty($login)) {
+            return ['errors' => 'Authentication Failed : login not present in header'];
+        }
+
+        return ['login' => $login];
+    }
+
+    private static function keycloakConnection(array $args)
+    {
+        $keycloakConfig = CoreConfigModel::getKeycloakConfiguration();
+
+        if (empty($keycloakConfig) || empty($keycloakConfig['authServerUrl']) || empty($keycloakConfig['realm']) || empty($keycloakConfig['clientId']) || empty($keycloakConfig['clientSecret']) || empty($keycloakConfig['redirectUri'])) {
+            return ['errors' => 'Keycloak not configured'];
+        }
+
+        $provider = new Keycloak($keycloakConfig);
+
+        try {
+            $token = $provider->getAccessToken('authorization_code', ['code' => $args['code']]);
+        } catch (\Exception $e) {
+            return ['errors' => 'Authentication Failed'];
+        }
+
+        try {
+            $user = $provider->getResourceOwner($token);
+
+            $login = $user->getId();
+            $keycloakAccessToken = $token->getToken();
+
+            $userMaarch = UserModel::getByLogin(['login' => $login, 'select' => ['id', 'external_id']]);
+
+            if (empty($userMaarch)) {
+                return ['errors' => 'Authentication Failed'];
+            }
+
+            $userMaarch['external_id'] = json_decode($userMaarch['external_id'], true);
+            $userMaarch['external_id']['keycloakAccessToken'] = $keycloakAccessToken;
+            $userMaarch['external_id'] = json_encode($userMaarch['external_id']);
+
+            UserModel::updateExternalId(['id' => $userMaarch['id'], 'externalId' => $userMaarch['external_id']]);
+
+            return ['login' => $login];
+        } catch (\Exception $e) {
+            return ['errors' => 'Authentication Failed'];
+        }
+    }
+
+    private static function keycloakDisconnection()
+    {
+        $keycloakConfig = CoreConfigModel::getKeycloakConfiguration();
+
+        $provider = new Keycloak($keycloakConfig);
+
+        $externalId = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['external_id']]);
+        $externalId = json_decode($externalId['external_id'], true);
+        $accessToken = $externalId['keycloakAccessToken'];
+        unset($externalId['keycloakAccessToken']);
+        UserModel::update([
+            'set'   => ['external_id' => json_encode($externalId)],
+            'where' => ['id = ?'],
+            'data'  => [$GLOBALS['id']]
+        ]);
+
+        $url = $provider->getLogoutUrl(['client_id' => $keycloakConfig['clientId'], 'refresh_token' => $accessToken]);
+
+        return ['logoutUrl' => $url];
     }
 
     public function getRefreshedToken(Request $request, Response $response)
@@ -396,6 +707,44 @@ class AuthenticationController
                 'status'        => 'WAITING'
             ]
         ]);
+
+        return true;
+    }
+
+    private static function isUserAuthorized(array $args)
+    {
+        $user = UserModel::getByLogin(['login' => $args['login'], 'select' => ['mode', 'status']]);
+        if (empty($user) || $user['mode'] == 'rest' || $user['status'] == 'SPD') {
+            return false;
+        }
+
+        return true;
+    }
+
+    public static function canAccessInstallerWhitoutAuthentication(array $args)
+    {
+        $installerRoutes = [
+            'GET/installer/prerequisites', 'GET/installer/databaseConnection', 'GET/installer/sqlDataFiles', 'GET/installer/docservers', 'GET/installer/custom',
+            'GET/installer/customs', 'POST/installer/custom', 'POST/installer/database', 'POST/installer/docservers', 'POST/installer/customization',
+            'PUT/installer/administrator', 'DELETE/installer/lock'
+        ];
+
+        if (!in_array($args['route'], $installerRoutes)) {
+            return false;
+        } elseif (is_file("custom/custom.json")) {
+            $customs = scandir('custom');
+            if (count($customs) > 4) {
+                return false;
+            }
+            foreach ($customs as $custom) {
+                if (in_array($custom, ['custom.json', '.', '..'])) {
+                    continue;
+                }
+                if (!is_file("custom/{$custom}/initializing.lck")) {
+                    return false;
+                }
+            }
+        }
 
         return true;
     }

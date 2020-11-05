@@ -31,10 +31,11 @@ if (file_exists($path)) {
 
             $jsonFile = [
                 'config'    => [
-                    'lang'              => (string)$loadedXml->CONFIG->lang,
-                    'applicationName'   => (string)$loadedXml->CONFIG->applicationname,
-                    'cookieTime'        => 10080,
-                    'timezone'          => $timezone
+                    'lang'                      => (string)$loadedXml->CONFIG->lang,
+                    'applicationName'           => (string)$loadedXml->CONFIG->applicationname,
+                    'cookieTime'                => 10080,
+                    'timezone'                  => $timezone,
+                    'lockAdvancedPrivileges'    => false
                 ],
                 'database'  => $database
             ];
@@ -69,10 +70,11 @@ foreach ($customs as $custom) {
         if ($loadedXml) {
             $jsonFile = [
                 'config'    => [
-                    'lang'              => (string)$loadedXml->CONFIG->lang,
-                    'applicationName'   => (string)$loadedXml->CONFIG->applicationname,
-                    'cookieTime'        => 10080,
-                    'timezone'          => $timezone,
+                    'lang'                      => (string)$loadedXml->CONFIG->lang,
+                    'applicationName'           => (string)$loadedXml->CONFIG->applicationname,
+                    'cookieTime'                => 10080,
+                    'timezone'                  => $timezone,
+                    'lockAdvancedPrivileges'    => false
                 ],
                 'database'  => [
                     [

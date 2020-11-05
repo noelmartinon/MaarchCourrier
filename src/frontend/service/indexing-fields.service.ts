@@ -1,12 +1,10 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { tap } from 'rxjs/internal/operators/tap';
 import { FunctionsService } from './functions.service';
 import { NotificationService } from './notification/notification.service';
-import { of } from 'rxjs/internal/observable/of';
-import { finalize } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { catchError, finalize, tap } from 'rxjs/operators';
 
 @Injectable({
     providedIn: 'root',
@@ -29,7 +27,7 @@ export class IndexingFieldsService {
         {
             identifier: 'subject',
             label: this.translate.instant('lang.subject'),
-            icon: 'fa-question',
+            icon: 'fa-quote-left',
             unit: 'mail',
             type: 'string',
             system: true,
@@ -49,6 +47,46 @@ export class IndexingFieldsService {
             default_value: [],
             values: [],
             enabled: true,
+        },
+        {
+            identifier: 'chrono',
+            label: this.translate.instant('lang.chrono'),
+            icon: 'fa-compass',
+            type: 'string',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'status',
+            label: this.translate.instant('lang.status'),
+            icon: 'fa-mail-bulk',
+            type: 'select',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'category',
+            label: this.translate.instant('lang.category_id'),
+            icon: 'fa-map-signs',
+            type: 'select',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'creationDate',
+            label: this.translate.instant('lang.creationDate'),
+            icon: 'fa-calendar-day',
+            type: 'date',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
         },
         {
             identifier: 'recipients',
@@ -168,6 +206,7 @@ export class IndexingFieldsService {
             default_value: null,
             values: [{ 'id': '2D', 'label': this.translate.instant('lang.registeredMail_2D') }, { 'id': '2C', 'label': this.translate.instant('lang.registeredMail_2C') }, { 'id': 'RW', 'label': this.translate.instant('lang.registeredMail_RW') }],
             enabled: true,
+            searchHide: true
         },
         {
             identifier: 'registeredMail_issuingSite',
@@ -186,6 +225,7 @@ export class IndexingFieldsService {
             default_value: null,
             values: [],
             enabled: false,
+            searchHide: true
         },
         {
             identifier: 'registeredMail_warranty',
@@ -195,6 +235,7 @@ export class IndexingFieldsService {
             default_value: null,
             values: [{ 'id': 'R1', 'label': 'R1' }, { 'id': 'R2', 'label': 'R2' }, { 'id': 'R3', 'label': 'R3' }],
             enabled: true,
+            searchHide: true
         },
         {
             identifier: 'registeredMail_letter',
@@ -204,12 +245,13 @@ export class IndexingFieldsService {
             default_value: null,
             values: [{ 'id': true, 'label': this.translate.instant('lang.yes') }, { 'id': false, 'label': this.translate.instant('lang.no') }],
             enabled: true,
+            searchHide: true
         },
         {
             identifier: 'registeredMail_recipient',
             label: this.translate.instant('lang.registeredMailRecipient'),
             icon: 'fa-address-book',
-            type: 'registeredMailRecipient',
+            type: 'contact',
             default_value: null,
             values: [],
             enabled: true,
@@ -232,11 +274,129 @@ export class IndexingFieldsService {
             values: [],
             enabled: true,
         },
+        {
+            identifier: 'fulltext',
+            label: this.translate.instant('lang.fulltext'),
+            icon: 'fa-file-alt',
+            type: 'string',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'closingDate',
+            label: this.translate.instant('lang.closingDate'),
+            icon: 'fa-stopwatch',
+            type: 'date',
+            default_value: [],
+            values: [],
+            enabled: true
+        },
+        {
+            identifier: 'notes',
+            label: this.translate.instant('lang.note'),
+            icon: 'fa-comments',
+            type: 'string',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'barcode',
+            label: this.translate.instant('lang.barcode'),
+            icon: 'fa-barcode',
+            type: 'string',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'attachment_type',
+            label: this.translate.instant('lang.attachmentType'),
+            icon: 'fa-paperclip',
+            type: 'select',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'attachment_creationDate',
+            label: `${this.translate.instant('lang.creationDate')} (${this.translate.instant('lang.attachmentShort')})`,
+            icon: 'fa-calendar-day',
+            type: 'date',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'groupSign',
+            label: this.translate.instant('lang.groupSign'),
+            icon: 'fa-user-friends',
+            type: 'select',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'senderDepartment',
+            label: this.translate.instant('lang.sendersDepartment'),
+            icon: 'fa-map',
+            type: 'select',
+            default_value: [],
+            values: [],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'retentionFrozen',
+            label: this.translate.instant('lang.retentionRuleFrozen'),
+            icon: 'fa-snowflake',
+            type: 'select',
+            default_value: [],
+            values: [{ 'id': true, 'label': this.translate.instant('lang.yes') }, { 'id': false, 'label': this.translate.instant('lang.no') }],
+            enabled: true,
+            indexingHide: true
+        },
+        {
+            identifier: 'binding',
+            label: this.translate.instant('lang.bindingMail'),
+            icon: 'fa-exclamation',
+            type: 'select',
+            default_value: [],
+            values: [{ 'id': true, 'label': this.translate.instant('lang.yes') }, { 'id': false, 'label': this.translate.instant('lang.no') }],
+            enabled: true,
+            indexingHide: true
+        }
     ];
 
     customFields: any[] = [];
 
     roleFields: any[] = [];
+
+    // TODO : UNIFY IDENTIFIER
+    mappingdata: any = {
+        getPriority: 'priority',
+        getCategory: 'category',
+        getDoctype: 'doctype',
+        getRecipients: 'recipients',
+        getSenders: 'senders',
+        getSignatories: 'role_sign',
+        getModificationDate: 'modificationDate',
+        getOpinionLimitDate: 'role_visa',
+        getFolders: 'folders',
+        getResId: 'resId',
+        getBarcode: 'barcode',
+        getRegisteredMailRecipient: 'registeredMail_recipient',
+        getRegisteredMailReference: 'registeredMail_reference',
+        getRegisteredMailIssuingSite: 'registeredMail_issuingSite',
+        chronoNumberShort: 'chrono'
+    };
 
     constructor(
         public http: HttpClient,
@@ -244,48 +404,46 @@ export class IndexingFieldsService {
         private notify: NotificationService,
         public functions: FunctionsService) { }
 
-    getCoreFields() {
-        return this.coreFields;
+    getCoreFields(exclude: string = '') {
+        const coreFields = JSON.parse(JSON.stringify(this.coreFields));
+        return exclude === '' ? coreFields : coreFields.filter((field: any) => !field[exclude]);
     }
 
-    getFields() {
-        return this.fields;
+    getFields(exclude: string = '') {
+        const fields = JSON.parse(JSON.stringify(this.fields));
+        return exclude === '' ? fields : fields.filter((field: any) => !field[exclude]);
     }
 
     getCustomFields() {
         return new Promise((resolve, reject) => {
-            if (this.customFields.length > 0) {
-                resolve(this.customFields);
-            } else {
-                this.http.get('../rest/customFields').pipe(
-                    tap((data: any) => {
-                        this.customFields = data.customFields.map((info: any) => {
-                            info.identifier = 'indexingCustomField_' + info.id;
-                            info.icon = 'fa-hashtag';
-                            info.system = false;
-                            info.enabled = true;
-                            info.SQLMode = info.SQLMode;
-                            if (['integer', 'string', 'date'].indexOf(info.type) > -1 && !this.functions.empty(info.values)) {
-                                info.default_value = info.values[0].key;
-                            } else {
-                                info.default_value = info.type === 'banAutocomplete' ? [] : null;
-                            }
-                            info.values = info.values.length > 0 ? info.values.map((custVal: any) => {
-                                return {
-                                    id: custVal.key,
-                                    label: custVal.label
-                                };
-                            }) : info.values;
-                            return info;
-                        });
-                    }),
-                    finalize(() => resolve(this.customFields)),
-                    catchError((err: any) => {
-                        this.notify.handleSoftErrors(err);
-                        return of(false);
-                    })
-                ).subscribe();
-            }
+            this.http.get('../rest/customFields').pipe(
+                tap((data: any) => {
+                    this.customFields = data.customFields.map((info: any) => {
+                        info.identifier = 'indexingCustomField_' + info.id;
+                        info.icon = 'fa-hashtag';
+                        info.system = false;
+                        info.enabled = true;
+                        info.SQLMode = info.SQLMode;
+                        if (['integer', 'string', 'date'].indexOf(info.type) > -1 && !this.functions.empty(info.values)) {
+                            info.default_value = info.values[0].key;
+                        } else {
+                            info.default_value = info.type === 'banAutocomplete' ? [] : null;
+                        }
+                        info.values = info.values.length > 0 ? info.values.map((custVal: any) => {
+                            return {
+                                id: custVal.key,
+                                label: custVal.label
+                            };
+                        }) : info.values;
+                        return info;
+                    });
+                }),
+                finalize(() => resolve(this.customFields)),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
         });
     }
 
@@ -308,6 +466,17 @@ export class IndexingFieldsService {
         return mergedFields;
     }
 
+    async getAllSearchFields() {
+        const customFields = await this.getCustomFields();
+        const roleFields = await this.getRolesFields();
+
+        let mergedFields = this.getCoreFields('searchHide').concat(this.getFields('searchHide'));
+        mergedFields = mergedFields.concat(customFields);
+        mergedFields = mergedFields.concat(roleFields);
+
+        return mergedFields;
+    }
+
     getRolesFields() {
         return new Promise((resolve, reject) => {
             this.http.get(`../rest/roles`).pipe(
@@ -324,6 +493,24 @@ export class IndexingFieldsService {
                             enabled: true,
                         });
                     });
+                    fields.push({
+                        identifier: `role_visa`,
+                        label: this.translate.instant('lang.visaUser'),
+                        icon: 'fa-user-check',
+                        type: 'select',
+                        default_value: null,
+                        values: [],
+                        enabled: true,
+                    });
+                    fields.push({
+                        identifier: `role_sign`,
+                        label: this.translate.instant('lang.signUser'),
+                        icon: 'fa-user-tie',
+                        type: 'select',
+                        default_value: null,
+                        values: [],
+                        enabled: true,
+                    });
                     this.roleFields = fields;
                 }),
                 finalize(() => resolve(this.roleFields)),
@@ -333,5 +520,9 @@ export class IndexingFieldsService {
                 })
             ).subscribe();
         });
+    }
+
+    formatData() {
+
     }
 }

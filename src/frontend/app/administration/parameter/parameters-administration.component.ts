@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { AppService } from '../../../service/app.service';
-import { FunctionsService } from '../../../service/functions.service';
+import { AppService } from '@service/app.service';
+import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
 
 @Component({
@@ -46,7 +46,7 @@ export class ParametersAdministrationComponent implements OnInit {
 
         this.http.get('../rest/parameters')
             .subscribe((data: any) => {
-                this.parameters = data.parameters.filter((item: any) => ['homepage_message', 'loginpage_message', 'traffic_record_summary_sheet'].indexOf(item.id) === -1);
+                this.parameters = data.parameters.filter((item: any) => ['homepage_message', 'loginpage_message', 'traffic_record_summary_sheet', 'bindingDocumentFinalAction', 'nonBindingDocumentFinalAction'].indexOf(item.id) === -1);
                 this.loading = false;
                 setTimeout(() => {
                     this.adminService.setDataSource('admin_parameters', this.parameters, this.sort, this.paginator, this.filterColumns);
@@ -60,7 +60,7 @@ export class ParametersAdministrationComponent implements OnInit {
         if (r) {
             this.http.delete('../rest/parameters/' + paramId)
                 .subscribe((data: any) => {
-                    this.parameters = data.parameters.filter((item: any) => ['homepage_message', 'loginpage_message', 'traffic_record_summary_sheet'].indexOf(item.id) === -1);
+                    this.parameters = data.parameters.filter((item: any) => ['homepage_message', 'loginpage_message', 'traffic_record_summary_sheet', 'bindingDocumentFinalAction', 'nonBindingDocumentFinalAction'].indexOf(item.id) === -1);
                     this.adminService.setDataSource('admin_parameters', this.parameters, this.sort, this.paginator, this.filterColumns);
                     this.notify.success(this.translate.instant('lang.parameterDeleted'));
                 }, (err) => {

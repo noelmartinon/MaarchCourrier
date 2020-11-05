@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Finite
  * @covers Respect\Validation\Exceptions\FiniteException
  */
-class FiniteTest extends TestCase
+class FiniteTest extends \PHPUnit_Framework_TestCase
 {
     protected $rule;
 

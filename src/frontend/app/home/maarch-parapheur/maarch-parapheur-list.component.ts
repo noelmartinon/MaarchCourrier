@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { finalize } from 'rxjs/operators';
 
 export interface MPDocument {

@@ -2,12 +2,12 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { MatSidenav } from '@angular/material/sidenav';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AppService } from '../../../service/app.service';
+import { AppService } from '@service/app.service';
 import { catchError, tap } from 'rxjs/operators';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 import { MaarchFlatTreeComponent } from '../../../plugins/tree/maarch-flat-tree.component';
 
 declare var $: any;

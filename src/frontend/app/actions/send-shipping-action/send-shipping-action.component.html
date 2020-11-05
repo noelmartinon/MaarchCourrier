@@ -34,7 +34,7 @@
                     <div *ngIf="data.resIds.length > 0" style="padding:10px;display: flex;flex-direction: column;">
                         <mat-checkbox color="primary" *ngFor="let inteKey of integrationsInfo | keyvalue"
                             (click)="toggleIntegration(inteKey.key)"
-                            [checked]="data.resource.integrations[inteKey.key]">{{inteKey.key + '_doc' | translate}}
+                            [checked]="data.resource.integrations[inteKey.key]">{{'lang.' + inteKey.key + '_doc' | translate}}
                         </mat-checkbox>
                     </div>
                     <div class="col-md-12" style="padding-top: 10px;">

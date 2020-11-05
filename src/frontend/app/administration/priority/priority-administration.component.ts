@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
-import { AppService } from '../../../service/app.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
 
 @Component({
     templateUrl: 'priority-administration.component.html'

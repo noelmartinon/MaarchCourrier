@@ -24,7 +24,6 @@
     "forin": true,
     "import-blacklist": [
       true,
-      "rxjs",
       "rxjs/Rx"
     ],
     "import-spacing": true,
@@ -50,7 +49,6 @@
     "no-bitwise": true,
     "no-console": [
       true,
-      "debug",
       "info",
       "time",
       "timeEnd",

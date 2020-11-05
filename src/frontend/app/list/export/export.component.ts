@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { catchError, map, tap, finalize } from 'rxjs/operators';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 
 declare var $: any;
 
@@ -112,6 +112,16 @@ export class ExportComponent implements OnInit {
             value: 'subject',
             label: this.translate.instant('lang.subject'),
             isFunction: false
+        },
+        {
+            value: 'getRetentionFrozen',
+            label: this.translate.instant('lang.retentionRuleFrozen'),
+            isFunction: true
+        },
+        {
+            value: 'getBinding',
+            label: this.translate.instant('lang.bindingMail'),
+            isFunction: true
         },
         {
             value: 'getStatus',

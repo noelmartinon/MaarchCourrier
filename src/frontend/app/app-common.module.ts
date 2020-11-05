@@ -10,7 +10,7 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 
 /*PLUGINS IMPORTS*/
 import { AppServiceModule } from './app-service.module';
-import { NotificationModule } from '../service/notification/notification.module';
+import { NotificationModule } from '@service/notification/notification.module';
 
 import { MaarchTreeComponent } from '../plugins/tree/maarch-tree.component';
 import { MaarchFlatTreeComponent } from '../plugins/tree/maarch-flat-tree.component';
@@ -28,10 +28,6 @@ import { HeaderPanelComponent } from './header/header-panel.component';
 import { MenuNavComponent } from './menu/menu-nav.component';
 import { MenuShortcutComponent, IndexingGroupModalComponent } from './menu/menu-shortcut.component';
 
-/*SEARCH*/
-import { SearchHomeComponent } from './search/search-home.component';
-
-/*SEARCH*/
 import { BasketHomeComponent } from './basket/basket-home.component';
 
 import { FieldListComponent } from './indexation/field-list/field-list.component';
@@ -76,8 +72,12 @@ import { FolderActionListComponent } from './folder/folder-action-list/folder-ac
 
 import { LinkedResourceListComponent } from './linkedResource/linked-resource-list.component';
 
-import { InternationalizationModule } from '../service/translate/internationalization.module';
+import { InternationalizationModule } from '@service/translate/internationalization.module';
 import { TranslateService } from '@ngx-translate/core';
+
+import { RegisteredMailImportComponent } from '@appRoot/registeredMail/import/registered-mail-import.component';
+import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-tool.component';
+
 
 @NgModule({
     imports: [
@@ -97,9 +97,9 @@ import { TranslateService } from '@ngx-translate/core';
         HeaderRightComponent,
         HeaderLeftComponent,
         HeaderPanelComponent,
-        SearchHomeComponent,
         BasketHomeComponent,
         IndexingGroupModalComponent,
+        RegisteredMailImportComponent,
         SmdFabSpeedDialComponent,
         SmdFabSpeedDialTrigger,
         SmdFabSpeedDialActions,
@@ -133,6 +133,7 @@ import { TranslateService } from '@ngx-translate/core';
         LinkedResourceListComponent,
         NotesListComponent,
         NoteEditorComponent,
+        CriteriaToolComponent
 
     ],
     exports: [
@@ -142,7 +143,6 @@ import { TranslateService } from '@ngx-translate/core';
         HeaderRightComponent,
         HeaderLeftComponent,
         HeaderPanelComponent,
-        SearchHomeComponent,
         BasketHomeComponent,
         FormsModule,
         ReactiveFormsModule,
@@ -182,10 +182,12 @@ import { TranslateService } from '@ngx-translate/core';
         FolderInputComponent,
         IssuingSiteInputComponent,
         RegisteredMailRecipientInputComponent,
+        CriteriaToolComponent
     ],
     providers: [],
     entryComponents: [
         IndexingGroupModalComponent,
+        RegisteredMailImportComponent,
         AlertComponent,
         ConfirmComponent
     ],

@@ -1,10 +1,10 @@
-<?php
-
-namespace Gitlab\Exception;
+<?php namespace Gitlab\Exception;
 
 /**
- * @author Graham Campbell <graham@alt-three.com>
+ * ValidationFailedException
+ *
+ * @author Joseph Bielawski <stloyd@gmail.com>
  */
-class ValidationFailedException extends ErrorException
+class ValidationFailedException extends ErrorException implements ExceptionInterface
 {
 }

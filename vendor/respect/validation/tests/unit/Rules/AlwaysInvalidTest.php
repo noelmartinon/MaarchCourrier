@@ -11,13 +11,11 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\AlwaysInvalid
  */
-class AlwaysInvalidTest extends TestCase
+class AlwaysInvalidTest extends \PHPUnit_Framework_TestCase
 {
     public function providerForValidAlwaysInvalid()
     {

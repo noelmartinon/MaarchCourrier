@@ -6,7 +6,7 @@
     <form [formGroup]="stepFormGroup" style="width: 850px;margin: auto;">
         <mat-form-field appearance="outline" floatLabel="never">
             <mat-label>{{'lang.chooseAppLanguage' | translate}} : </mat-label>
-            <mat-select formControlName="lang" required>
+            <mat-select formControlName="lang"  (selectionChange)="changeLang($event.value)" required>
                 <mat-option *ngFor="let language of langs" [value]="language">
                     {{'lang.' + language + 'Full' | translate}}
                 </mat-option>
@@ -14,12 +14,23 @@
         </mat-form-field>
     </form>
     <mat-divider></mat-divider>
+    <ng-container *ngIf="customs.length > 0">
+        <mat-list>
+            <div mat-subheader>{{'lang.instancesList' | translate}} :
+            </div>
+            <mat-list-item *ngFor="let custom of customs">
+                <mat-icon mat-list-icon color="primary" class="fas fa-box-open"></mat-icon>
+                <div mat-line>{{custom.label}} <small style="color: #666">{{custom.id}}</small></div>
+            </mat-list-item>
+        </mat-list>
+        <mat-divider></mat-divider>
+    </ng-container>
     <mat-list>
         <div mat-subheader>{{'lang.installDescription' | translate}} :
         </div>
         <mat-list-item *ngFor="let step of steps">
             <mat-icon mat-list-icon color="primary" [class]="step.icon"></mat-icon>
-            <div mat-line>{{step.desc}}</div>
+            <div mat-line>{{step.desc | translate}}</div>
         </mat-list-item>
     </mat-list>
     <mat-divider></mat-divider>

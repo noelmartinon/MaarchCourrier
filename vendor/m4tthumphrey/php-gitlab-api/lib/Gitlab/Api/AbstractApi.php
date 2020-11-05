@@ -1,11 +1,10 @@
-<?php
-
-namespace Gitlab\Api;
+<?php namespace Gitlab\Api;
 
 use Gitlab\Client;
-use Gitlab\Exception\RuntimeException;
+use Gitlab\HttpClient\Message\QueryStringBuilder;
 use Gitlab\HttpClient\Message\ResponseMediator;
-use Gitlab\HttpClient\Util\QueryStringBuilder;
+use Gitlab\Tests\HttpClient\Message\QueryStringBuilderTest;
+use Http\Discovery\StreamFactoryDiscovery;
 use Http\Message\MultipartStream\MultipartStreamBuilder;
 use Http\Message\StreamFactory;
 use Psr\Http\Message\ResponseInterface;
@@ -13,7 +12,7 @@ use Psr\Http\Message\StreamInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Abstract class for Api classes.
+ * Abstract class for Api classes
  *
  * @author Joseph Bielawski <stloyd@gmail.com>
  * @author Matt Humphrey <matt@m4tt.co>
@@ -22,59 +21,45 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 abstract class AbstractApi implements ApiInterface
 {
     /**
-     * The client instance.
+     * The client
      *
      * @var Client
      */
     protected $client;
 
     /**
-     * The HTTP stream factory.
-     *
      * @var StreamFactory
      */
     private $streamFactory;
 
     /**
-     * @param Client             $client
-     * @param StreamFactory|null $streamFactory @deprecated since version 9.18 and will be removed in 10.0.
-     *
-     * @return void
+     * @param Client $client
+     * @param StreamFactory|null $streamFactory
      */
     public function __construct(Client $client, StreamFactory $streamFactory = null)
     {
         $this->client = $client;
-
-        if (null === $streamFactory) {
-            $this->streamFactory = $client->getStreamFactory();
-        } else {
-            @trigger_error(sprintf('The %s() method\'s $streamFactory parameter is deprecated since version 9.18 and will be removed in 10.0.', __METHOD__), E_USER_DEPRECATED);
-            $this->streamFactory = $streamFactory;
-        }
+        $this->streamFactory = $streamFactory ?: StreamFactoryDiscovery::find();
     }
 
     /**
      * @return $this
-     *
-     * @deprecated since version 9.18 and will be removed in 10.0.
+     * @codeCoverageIgnore
      */
     public function configure()
     {
-        @trigger_error(sprintf('The %s() method is deprecated since version 9.18 and will be removed in 10.0.', __METHOD__), E_USER_DEPRECATED);
-
         return $this;
     }
 
     /**
      * Performs a GET query and returns the response as a PSR-7 response object.
      *
-     * @param string               $path
-     * @param array<string,mixed>  $parameters
-     * @param array<string,string> $requestHeaders
-     *
+     * @param string $path
+     * @param array $parameters
+     * @param array $requestHeaders
      * @return ResponseInterface
      */
-    protected function getAsResponse($path, array $parameters = [], array $requestHeaders = [])
+    protected function getAsResponse($path, array $parameters = array(), $requestHeaders = array())
     {
         $path = $this->preparePath($path, $parameters);
 
@@ -82,34 +67,32 @@ abstract class AbstractApi implements ApiInterface
     }
 
     /**
-     * @param string               $path
-     * @param array<string,mixed>  $parameters
-     * @param array<string,string> $requestHeaders
-     *
+     * @param string $path
+     * @param array $parameters
+     * @param array $requestHeaders
      * @return mixed
      */
-    protected function get($path, array $parameters = [], array $requestHeaders = [])
+    protected function get($path, array $parameters = array(), $requestHeaders = array())
     {
         return ResponseMediator::getContent($this->getAsResponse($path, $parameters, $requestHeaders));
     }
 
     /**
-     * @param string               $path
-     * @param array<string,mixed>  $parameters
-     * @param array<string,string> $requestHeaders
-     * @param array<string,string> $files
-     *
+     * @param string $path
+     * @param array $parameters
+     * @param array $requestHeaders
+     * @param array $files
      * @return mixed
      */
-    protected function post($path, array $parameters = [], array $requestHeaders = [], array $files = [])
+    protected function post($path, array $parameters = array(), $requestHeaders = array(), array $files = array())
     {
         $path = $this->preparePath($path);
 
         $body = null;
-        if (0 === count($files) && 0 < count($parameters)) {
+        if (empty($files) && !empty($parameters)) {
             $body = $this->prepareBody($parameters);
             $requestHeaders['Content-Type'] = 'application/x-www-form-urlencoded';
-        } elseif (0 < count($files)) {
+        } elseif (!empty($files)) {
             $builder = new MultipartStreamBuilder($this->streamFactory);
 
             foreach ($parameters as $name => $value) {
@@ -117,7 +100,7 @@ abstract class AbstractApi implements ApiInterface
             }
 
             foreach ($files as $name => $file) {
-                $builder->addResource($name, self::tryFopen($file, 'r'), [
+                $builder->addResource($name, fopen($file, 'r'), [
                     'headers' => [
                         'Content-Type' => $this->guessContentType($file),
                     ],
@@ -135,39 +118,19 @@ abstract class AbstractApi implements ApiInterface
     }
 
     /**
-     * @param string               $path
-     * @param array<string,mixed>  $parameters
-     * @param array<string,string> $requestHeaders
-     * @param array<string,string> $files
-     *
+     * @param string $path
+     * @param array $parameters
+     * @param array $requestHeaders
      * @return mixed
      */
-    protected function put($path, array $parameters = [], array $requestHeaders = [], array $files = [])
+    protected function put($path, array $parameters = array(), $requestHeaders = array())
     {
         $path = $this->preparePath($path);
 
         $body = null;
-        if (0 === count($files) && 0 < count($parameters)) {
+        if (!empty($parameters)) {
             $body = $this->prepareBody($parameters);
             $requestHeaders['Content-Type'] = 'application/x-www-form-urlencoded';
-        } elseif (0 < count($files)) {
-            $builder = new MultipartStreamBuilder($this->streamFactory);
-
-            foreach ($parameters as $name => $value) {
-                $builder->addResource($name, $value);
-            }
-
-            foreach ($files as $name => $file) {
-                $builder->addResource($name, self::tryFopen($file, 'r'), [
-                    'headers' => [
-                        'Content-Type' => $this->guessContentType($file),
-                    ],
-                    'filename' => basename($file),
-                ]);
-            }
-
-            $body = $builder->build();
-            $requestHeaders['Content-Type'] = 'multipart/form-data; boundary='.$builder->getBoundary();
         }
 
         $response = $this->client->getHttpClient()->put($path, $requestHeaders, $body);
@@ -176,13 +139,12 @@ abstract class AbstractApi implements ApiInterface
     }
 
     /**
-     * @param string               $path
-     * @param array<string,mixed>  $parameters
-     * @param array<string,string> $requestHeaders
-     *
+     * @param string $path
+     * @param array $parameters
+     * @param array $requestHeaders
      * @return mixed
      */
-    protected function delete($path, array $parameters = [], array $requestHeaders = [])
+    protected function delete($path, array $parameters = array(), $requestHeaders = array())
     {
         $path = $this->preparePath($path, $parameters);
 
@@ -192,9 +154,8 @@ abstract class AbstractApi implements ApiInterface
     }
 
     /**
-     * @param int|string $id
-     * @param string     $path
-     *
+     * @param int $id
+     * @param string $path
      * @return string
      */
     protected function getProjectPath($id, $path)
@@ -203,24 +164,12 @@ abstract class AbstractApi implements ApiInterface
     }
 
     /**
-     * @param int    $id
      * @param string $path
-     *
-     * @return string
-     */
-    protected function getGroupPath($id, $path)
-    {
-        return 'groups/'.$this->encodePath($id).'/'.$path;
-    }
-
-    /**
-     * @param int|string $path
-     *
      * @return string
      */
     protected function encodePath($path)
     {
-        $path = rawurlencode((string) $path);
+        $path = rawurlencode($path);
 
         return str_replace('.', '%2E', $path);
     }
@@ -251,32 +200,18 @@ abstract class AbstractApi implements ApiInterface
 
     /**
      * @param array $parameters
-     *
      * @return StreamInterface
      */
     private function prepareBody(array $parameters = [])
     {
-        $parameters = array_filter($parameters, function ($value) {
-            return null !== $value;
-        });
-
         $raw = QueryStringBuilder::build($parameters);
+        $stream = $this->streamFactory->createStream($raw);
 
-        return $this->streamFactory->createStream($raw);
+        return $stream;
     }
 
-    /**
-     * @param string $path
-     * @param array  $parameters
-     *
-     * @return string
-     */
     private function preparePath($path, array $parameters = [])
     {
-        $parameters = array_filter($parameters, function ($value) {
-            return null !== $value;
-        });
-
         if (count($parameters) > 0) {
             $path .= '?'.QueryStringBuilder::build($parameters);
         }
@@ -285,7 +220,7 @@ abstract class AbstractApi implements ApiInterface
     }
 
     /**
-     * @param string $file
+     * @param $file
      *
      * @return string
      */
@@ -294,48 +229,8 @@ abstract class AbstractApi implements ApiInterface
         if (!class_exists(\finfo::class, false)) {
             return 'application/octet-stream';
         }
-
         $finfo = new \finfo(FILEINFO_MIME_TYPE);
-        $type = $finfo->file($file);
 
-        return false !== $type ? $type : 'application/octet-stream';
-    }
-
-    /**
-     * Safely opens a PHP stream resource using a filename.
-     *
-     * When fopen fails, PHP normally raises a warning. This function adds an
-     * error handler that checks for errors and throws an exception instead.
-     *
-     * @param string $filename File to open
-     * @param string $mode     Mode used to open the file
-     *
-     * @return resource
-     *
-     * @throws RuntimeException if the file cannot be opened
-     *
-     * @see https://github.com/guzzle/psr7/blob/1.6.1/src/functions.php#L287-L320
-     */
-    private static function tryFopen($filename, $mode)
-    {
-        $ex = null;
-        set_error_handler(function () use ($filename, $mode, &$ex) {
-            $ex = new RuntimeException(sprintf(
-                'Unable to open %s using mode %s: %s',
-                $filename,
-                $mode,
-                func_get_args()[1]
-            ));
-        });
-
-        $handle = fopen($filename, $mode);
-        restore_error_handler();
-
-        if (null !== $ex) {
-            throw $ex;
-        }
-
-        /** @var resource */
-        return $handle;
+        return $finfo->file($file);
     }
 }

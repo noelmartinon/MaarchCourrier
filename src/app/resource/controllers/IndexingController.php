@@ -111,7 +111,11 @@ class IndexingController
             $methodResponse = ActionMethodController::$method(['resId' => $body['resource'], 'data' => $body['data'], 'note' => $body['note'], 'parameters' => $parameters]);
         }
         if (!empty($methodResponse['errors'])) {
-            return $response->withStatus(400)->withJson(['errors' => $methodResponse['errors'][0]]);
+            $return = ['errors' => $methodResponse['errors'][0]];
+            if (!empty($methodResponse['lang'])) {
+                $return['lang'] = $methodResponse['lang'];
+            }
+            return $response->withStatus(400)->withJson($return);
         }
 
         $historic = empty($methodResponse['history']) ? '' : $methodResponse['history'];
@@ -233,12 +237,21 @@ class IndexingController
 
         if (!empty($queryParams['doctype'])) {
             $doctype = DoctypeModel::getById(['id' => $queryParams['doctype'], 'select' => ['process_delay']]);
+            if (empty($doctype)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Doctype does not exists']);
+            }
             $delay = $doctype['process_delay'];
         } elseif (!empty($queryParams['priority'])) {
             $priority = PriorityModel::getById(['id' => $queryParams['priority'], 'select' => ['delays']]);
+            if (empty($priority)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Priority does not exists']);
+            }
             $delay = $priority['delays'];
         }
-        if (!isset($delay) || !Validator::intVal()->validate($delay)) {
+        if ($delay == 0) {
+            return $response->withJson(['processLimitDate' => null]);
+        }
+        if (!Validator::intVal()->validate($delay)) {
             return $response->withStatus(400)->withJson(['errors' => 'Delay is not a numeric value']);
         }
 

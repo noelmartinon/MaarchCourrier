@@ -1,13 +1,15 @@
 import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
-import { AppService } from '../../../service/app.service';
+import { AppService } from '@service/app.service';
+import { catchError, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
     templateUrl: 'doctypes-administration.component.html'
@@ -20,7 +22,6 @@ export class DoctypesAdministrationComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
     config: any = {};
-    
 
     doctypes: any[] = [];
     currentType: any = false;
@@ -31,10 +32,14 @@ export class DoctypesAdministrationComponent implements OnInit {
     secondLevels: any = false;
     processModes: any = false;
 
+    state: any;
+
     loading: boolean = false;
     creationMode: any = false;
     newSecondLevel: any = false;
     newFirstLevel: any = false;
+
+    conservationRules: any = [];
 
     displayedColumns = ['label', 'use', 'mandatory', 'column'];
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
@@ -52,7 +57,6 @@ export class DoctypesAdministrationComponent implements OnInit {
 
     ngOnInit(): void {
         this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.documentTypes'));
-
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
@@ -142,6 +146,25 @@ export class DoctypesAdministrationComponent implements OnInit {
             });
     }
 
+    getRules() {
+        return new Promise((resolve, reject) => {
+            this.http.get('../rest/archival/retentionRules').pipe(
+                tap((data: any) => {
+                    if (data.retentionRules.length != 0) {
+                        this.conservationRules = data.retentionRules;
+                    } else {
+                        this.conservationRules = [];
+                    }
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
     loadDoctype(data: any, move: boolean) {
         this.creationMode = false;
 
@@ -154,6 +177,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                     this.currentType = dataValue['doctype'];
                     this.secondLevels = dataValue['secondLevel'];
                     this.processModes = ['NORMAL', 'SVA', 'SVR'];
+                    this.getRules();
 
                     if (move) {
                         if (this.currentType) {

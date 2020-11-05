@@ -18,53 +18,53 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: HU
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/HU/administrative-division-hungary.html
  */
 class HuSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'BA', // Baranya
+        'BA', // Baranya megye
         'BC', // Békéscsaba
-        'BE', // Békés
-        'BK', // Bács-Kiskun
-        'BU', // Budapest
-        'BZ', // Borsod-Abaúj-Zemplén
-        'CS', // Csongrád
+        'BE', // Békés megye
+        'BK', // Bács-Kiskun megye
+        'BU', // Budapest főváros
+        'BZ', // Borsod-Abaúj-Zemplén megye
+        'CS', // Csongrád megye
         'DE', // Debrecen
         'DU', // Dunaújváros
-        'EG', // Eger
-        'ER', // Érd
-        'FE', // Fejér
-        'GS', // Győr-Moson-Sopron
+        'EG', // Erd
+        'ER', // Eger
+        'FE', // Fejér megye
+        'GS', // Győr-Moson-Sopron megye
         'GY', // Győr
-        'HB', // Hajdú-Bihar
-        'HE', // Heves
+        'HB', // Hajdú-Bihar megye
+        'HE', // Heves megye
         'HV', // Hódmezővásárhely
-        'JN', // Jász-Nagykun-Szolnok
-        'KE', // Komárom-Esztergom
+        'JN', // Jász-Nagykun-Szolnok megye
+        'KE', // Komárom-Esztergom megye
         'KM', // Kecskemét
         'KV', // Kaposvár
         'MI', // Miskolc
         'NK', // Nagykanizsa
-        'NO', // Nógrád
+        'NO', // Nógrád megye
         'NY', // Nyíregyháza
-        'PE', // Pest
+        'PE', // Pest megye
         'PS', // Pécs
         'SD', // Szeged
         'SF', // Székesfehérvár
         'SH', // Szombathely
         'SK', // Szolnok
         'SN', // Sopron
-        'SO', // Somogy
+        'SO', // Somogy megye
         'SS', // Szekszárd
         'ST', // Salgótarján
-        'SZ', // Szabolcs-Szatmár-Bereg
+        'SZ', // Szabolcs-Szatmár-Bereg megye
         'TB', // Tatabánya
-        'TO', // Tolna
-        'VA', // Vas
-        'VE', // Veszprém (county)
+        'TO', // Tolna megye
+        'VA', // Vas megye
+        'VE', // Veszprém megye
         'VM', // Veszprém
-        'ZA', // Zala
+        'ZA', // Zala megye
         'ZE', // Zalaegerszeg
     ];
 

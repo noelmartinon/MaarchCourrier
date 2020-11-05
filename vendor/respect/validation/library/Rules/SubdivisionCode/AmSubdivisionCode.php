@@ -18,22 +18,22 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: AM
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/AM/administrative-division-armenia.html
  */
 class AmSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'AG', // Aragacotn
+        'AG', // Aragatsotn
         'AR', // Ararat
         'AV', // Armavir
-        'ER', // Erevan
-        'GR', // Gegarkunik'
+        'ER', // Yerevan
+        'GR', // Geghark'unik'
         'KT', // Kotayk'
-        'LO', // Lory
-        'SH', // Sirak
+        'LO', // Lorri
+        'SH', // Shirak
         'SU', // Syunik'
-        'TV', // Tavus
-        'VD', // Vayoc Jor
+        'TV', // Tavush
+        'VD', // Vayots' Dzor
     ];
 
     public $compareIdentical = true;

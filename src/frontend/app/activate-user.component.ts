@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { Router } from '@angular/router';
 import { SelectionModel } from '@angular/cdk/collections';
-import { AppService } from '../service/app.service';
-import { HeaderService } from '../service/header.service';
-import { AuthService } from '../service/auth.service';
+import { AppService } from '@service/app.service';
+import { HeaderService } from '@service/header.service';
+import { AuthService } from '@service/auth.service';
 
 declare var $: any;
 
@@ -15,8 +15,6 @@ declare var $: any;
 })
 
 export class ActivateUserComponent implements OnInit {
-
-    
 
     user: any = {
         baskets: []

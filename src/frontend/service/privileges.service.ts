@@ -137,8 +137,8 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_priorities',
-            'label': 'lang.prioritiesAlt',
-            'comment': 'lang.prioritiesAlt',
+            'label': 'lang.priorities',
+            'comment': 'lang.priorities',
             'route': '/administration/priorities',
             'unit': 'production',
             'style': 'fa fa-clock',
@@ -287,14 +287,34 @@ export class PrivilegeService {
         },
         {
             'id': 'admin_registered_mail',
-            'label': 'lang.registeredMail',
+            'label': 'lang.registeredMails',
             'comment': 'lang.adminRegisteredMailDesc',
             'route': '/administration/registeredMails',
             'unit': 'supervision',
             'style': 'fas fa-dolly-flatbed',
             'angular': true,
             'hasParams': false
-        }
+        },
+        {
+            'id': 'admin_search',
+            'label': 'lang.search',
+            'comment': 'lang.searchAdministration',
+            'route': '/administration/search',
+            'unit': 'supervision',
+            'style': 'fas fa-search',
+            'angular': true,
+            'hasParams': false
+        },
+        {
+            'id': 'admin_connections',
+            'label': 'lang.connections',
+            'comment': 'lang.connectionsDesc',
+            'route': '/administration/connections/sso',
+            'unit': 'supervision',
+            'style': 'fas fa-plug',
+            'angular': true,
+            'hasParams': false
+        },
     ];
 
     private privileges: privilege[] = [
@@ -396,8 +416,8 @@ export class PrivilegeService {
         },
         {
             'id': 'view_technical_infos',
-            'label': 'lang.viewTechnicalInformation',
-            'comment': 'lang.viewTechnicalInformation',
+            'label': 'lang.showTechnicalInformations',
+            'comment': 'lang.showTechnicalInformations',
             'unit': 'application'
         },
         {
@@ -478,6 +498,18 @@ export class PrivilegeService {
             'comment': 'lang.includeFolderPerimeter',
             'unit': 'application'
         },
+        {
+            'id': 'set_binding_document',
+            'label': 'lang.setBindingDocument',
+            'comment': 'lang.setBindingDocument',
+            'unit': 'lifeCycle'
+        },
+        {
+            'id': 'freeze_retention_rule',
+            'label': 'lang.freezeRetentionRule',
+            'comment': 'lang.freezeRetentionRule',
+            'unit': 'lifeCycle'
+        }
     ];
 
     private menus: menu[] = [
@@ -530,6 +562,26 @@ export class PrivilegeService {
             'unit': 'registeredMails',
             'angular': true,
             'shortcut': false
+        },
+        {
+            'id': 'registered_mail_mass_import',
+            'label': 'lang.importRegisteredMails',
+            'comment': 'lang.importRegisteredMails',
+            'route': 'RegisteredMailImportComponent__modal',
+            'style': 'fas fa-dolly-flatbed',
+            'unit': 'registeredMails',
+            'angular': true,
+            'shortcut': false
+        },
+        {
+            'id': 'create_custom',
+            'label': 'lang.installNewCustom',
+            'comment': 'lang.installNewCustom',
+            'route': '/install',
+            'style': 'far fa-window-restore',
+            'unit': 'application',
+            'angular': true,
+            'shortcut': false
         }
     ];
 
@@ -546,14 +598,20 @@ export class PrivilegeService {
         }
     ];
 
-    constructor(public translate: TranslateService, public headerService: HeaderService) { }
+    constructor(
+        public translate: TranslateService,
+        public headerService: HeaderService
+    ) { }
 
-    getAllPrivileges() {
+    getAllPrivileges(getLockedPrivilege: boolean, authMode: string = 'standard') {
+
         let priv: any[] = [];
 
         priv = priv.concat(this.privileges.map(elem => elem.id));
         priv = priv.concat(this.administrations.map(elem => elem.id));
         priv = priv.concat(this.menus.map(elem => elem.id));
+
+        priv = priv.filter(elem => this.getExcludePrivilege(getLockedPrivilege, authMode).indexOf(elem) === -1);
 
         return priv;
     }
@@ -675,5 +733,17 @@ export class PrivilegeService {
     hasCurrentUserPrivilege(privilegeId: string) {
 
         return this.headerService.user.privileges.indexOf(privilegeId) > -1;
+    }
+
+    private getExcludePrivilege(getLockedPrivilege: boolean, authMode: string) {
+        let excludePriv = [];
+
+        if (!getLockedPrivilege) {
+            excludePriv = ['create_custom', 'admin_update_control'];
+        }
+        if (authMode !== 'standard') {
+            excludePriv.push('admin_password_rules');
+        }
+        return excludePriv;
     }
 }

@@ -11,9 +11,6 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-use SplFileInfo;
-
 $GLOBALS['is_executable'] = null;
 
 function is_executable($executable)
@@ -32,7 +29,7 @@ function is_executable($executable)
  * @covers Respect\Validation\Rules\Executable
  * @covers Respect\Validation\Exceptions\ExecutableException
  */
-class ExecutableTest extends TestCase
+class ExecutableTest extends \PHPUnit_Framework_TestCase
 {
     public function testValidExecutableFileShouldReturnTrue()
     {
@@ -55,7 +52,10 @@ class ExecutableTest extends TestCase
     public function testShouldValidateObjects()
     {
         $rule = new Executable();
-        $object = new SplFileInfo('tests/fixtures/executable');
+        $object = $this->getMock('SplFileInfo', ['isExecutable'], ['somefile.txt']);
+        $object->expects($this->once())
+                ->method('isExecutable')
+                ->will($this->returnValue(true));
 
         $this->assertTrue($rule->validate($object));
     }

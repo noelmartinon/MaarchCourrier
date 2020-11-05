@@ -11,14 +11,14 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
+use PHPUnit_Framework_TestCase;
 
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\KeyValue
  * @covers Respect\Validation\Exceptions\KeyValueException
  */
-class KeyValueTest extends TestCase
+class KeyValueTest extends PHPUnit_Framework_TestCase
 {
     public function testShouldDefineValuesOnConstructor()
     {

@@ -11,7 +11,6 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
 use stdClass;
 
 /**
@@ -19,7 +18,7 @@ use stdClass;
  * @covers Respect\Validation\Rules\Type
  * @covers Respect\Validation\Exceptions\TypeException
  */
-class TypeTest extends TestCase
+class TypeTest extends \PHPUnit_Framework_TestCase
 {
     public function testShouldDefineTypeOnConstructor()
     {
@@ -81,8 +80,7 @@ class TypeTest extends TestCase
             ['array', []],
             ['bool', true],
             ['boolean', false],
-            ['callable', function () {
-            }],
+            ['callable', function () {}],
             ['double', 0.8],
             ['float', 1.0],
             ['int', 42],

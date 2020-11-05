@@ -1,13 +1,13 @@
 import { Component, OnInit, Inject, ViewChildren, QueryList } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { HeaderService } from '../../../../../service/header.service';
+import { HeaderService } from '@service/header.service';
 import { HttpClient } from '@angular/common/http';
-import { FunctionsService } from '../../../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { ContactDetailComponent } from '../../../../contact/contact-detail/contact-detail.component';
 import { TranslateService } from '@ngx-translate/core';
 import { tap, catchError, finalize } from 'rxjs/operators';
-import { of } from 'rxjs/internal/observable/of';
-import { NotificationService } from '../../../../../service/notification/notification.service';
+import { of } from 'rxjs';
+import { NotificationService } from '@service/notification/notification.service';
 
 @Component({
     selector: 'app-manage-duplicate',

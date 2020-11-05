@@ -18,51 +18,51 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: RO
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/RO/administrative-division-romania.html
  */
 class RoSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
         'AB', // Alba
-        'AG', // Argeș
+        'AG', // Arges
         'AR', // Arad
-        'B', // București
-        'BC', // Bacău
+        'B', // Bucuresti
+        'BC', // Bacau
         'BH', // Bihor
-        'BN', // Bistrița-Năsăud
-        'BR', // Brăila
-        'BT', // Botoșani
-        'BV', // Brașov
-        'BZ', // Buzău
+        'BN', // Bistrita-Nasaud
+        'BR', // Braila
+        'BT', // Botosani
+        'BV', // Brasov
+        'BZ', // Buzau
         'CJ', // Cluj
-        'CL', // Călărași
-        'CS', // Caraș-Severin
-        'CT', // Constanța
+        'CL', // Calarasi
+        'CS', // Caras-Severin
+        'CT', // Constanta
         'CV', // Covasna
-        'DB', // Dâmbovița
+        'DB', // Dimbovita
         'DJ', // Dolj
         'GJ', // Gorj
-        'GL', // Galați
+        'GL', // Galati
         'GR', // Giurgiu
         'HD', // Hunedoara
         'HR', // Harghita
         'IF', // Ilfov
-        'IL', // Ialomița
-        'IS', // Iași
-        'MH', // Mehedinți
-        'MM', // Maramureș
-        'MS', // Mureș
-        'NT', // Neamț
+        'IL', // Ialomita
+        'IS', // Iasi
+        'MH', // Mehedinti
+        'MM', // Maramures
+        'MS', // Mures
+        'NT', // Neamt
         'OT', // Olt
         'PH', // Prahova
         'SB', // Sibiu
-        'SJ', // Sălaj
+        'SJ', // Salaj
         'SM', // Satu Mare
         'SV', // Suceava
         'TL', // Tulcea
-        'TM', // Timiș
+        'TM', // Timis
         'TR', // Teleorman
-        'VL', // Vâlcea
+        'VL', // Vilcea
         'VN', // Vrancea
         'VS', // Vaslui
     ];

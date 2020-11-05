@@ -38,7 +38,6 @@ try {
     require_once 'core/class/class_history.php';
     require_once('core' . DIRECTORY_SEPARATOR . 'class'
         . DIRECTORY_SEPARATOR . 'class_security.php');
-    require_once 'modules/entities/class/class_users_entities.php';
 } catch (Exception $e) {
     functions::xecho($e->getMessage()) . ' // ';
 }

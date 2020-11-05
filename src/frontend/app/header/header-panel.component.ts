@@ -1,10 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { Location } from '@angular/common';
 import { TranslateService } from '@ngx-translate/core';
-import { HeaderService } from '../../service/header.service';
+import { HeaderService } from '@service/header.service';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
-import { AppService } from '../../service/app.service';
+import { AppService } from '@service/app.service';
 import { Router } from '@angular/router';
 
 @Component({

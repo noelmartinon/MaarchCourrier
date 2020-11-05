@@ -9,6 +9,8 @@ UPDATE parameters SET param_value_string = '20.10.1' WHERE id = 'database_versio
 
 DROP VIEW IF EXISTS res_view_letterbox;
 
+CREATE EXTENSION IF NOT EXISTS unaccent;
+
 /* SENDMAIL */
 DROP TABLE IF EXISTS sendmail;
 
@@ -34,6 +36,8 @@ ALTER TABLE users ADD COLUMN mode users_modes NOT NULL DEFAULT 'standard';
 UPDATE users set mode = 'root_invisible' WHERE user_id = 'superadmin';
 ALTER TABLE users DROP COLUMN IF EXISTS authorized_api;
 ALTER TABLE users ADD COLUMN authorized_api jsonb NOT NULL DEFAULT '[]';
+ALTER TABLE users DROP COLUMN IF EXISTS feature_tour;
+ALTER TABLE users ADD COLUMN feature_tour jsonb NOT NULL DEFAULT '[]';
 
 DO $$ BEGIN
     IF (SELECT count(column_name) from information_schema.columns where table_name = 'users' and column_name = 'loginmode') THEN
@@ -256,13 +260,19 @@ INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailDistribut
 DELETE FROM status WHERE id = 'PND' OR id = 'DSTRIBUTED';
 INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('PND', 'AR Non distribué', 'Y', 'fm-letter-status-rejected', 'apps', 'Y', 'Y');
 INSERT INTO status (id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES ('DSTRIBUTED', 'AR distribué', 'Y', 'fa-check', 'apps', 'Y', 'Y');
+DELETE FROM parameters WHERE id = 'registeredMailImportedStatus';
+INSERT INTO parameters (id, param_value_string) VALUES ('registeredMailImportedStatus', 'NEW');
 
 DELETE FROM parameters WHERE id = 'traffic_record_summary_sheet';
 INSERT INTO parameters (id, description, param_value_string) VALUES ('traffic_record_summary_sheet', 'Module circulation pour la fiche de liaison', '');
 
-ALTER TABLE configurations RENAME COLUMN service TO privilege;
-DELETE FROM configurations WHERE privilege = 'admin_search';
-INSERT INTO configurations (privilege, value) VALUES ('admin_search', '{"listEvent": {"defaultTab": "dashboard"},"listDisplay":{"templateColumns":6,"subInfos":[{"value":"getPriority","cssClasses":["align_leftData"],"icon":"fa-traffic-light"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_leftData"],"icon":"fa-calendar"},{"value":"getAssignee","cssClasses":["align_leftData"],"icon":"fa-sitemap"},{"value":"getDoctype","cssClasses":["align_leftData"],"icon":"fa-suitcase"},{"value":"getRecipients","cssClasses":["align_leftData"],"icon":"fa-user"},{"value":"getSenders","cssClasses":["align_leftData"],"icon":"fa-book"}]}}');
+DO $$ BEGIN
+    IF (SELECT count(column_name) from information_schema.columns where table_name = 'configurations' and column_name = 'service') THEN
+        ALTER TABLE configurations RENAME COLUMN service TO privilege;
+        DELETE FROM configurations WHERE privilege = 'admin_search';
+        INSERT INTO configurations (privilege, value) VALUES ('admin_search', '{"listEvent": {"defaultTab": "dashboard"},"listDisplay":{"templateColumns":6,"subInfos":[{"value":"getPriority","cssClasses":["align_leftData"],"icon":"fa-traffic-light"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_leftData"],"icon":"fa-calendar"},{"value":"getAssignee","cssClasses":["align_leftData"],"icon":"fa-sitemap"},{"value":"getDoctype","cssClasses":["align_leftData"],"icon":"fa-suitcase"},{"value":"getRecipients","cssClasses":["align_leftData"],"icon":"fa-user"},{"value":"getSenders","cssClasses":["align_leftData"],"icon":"fa-book"}]}}');
+    END IF;
+END$$;
 
 DROP TABLE IF EXISTS search_templates;
 CREATE TABLE search_templates (
@@ -273,6 +283,97 @@ CREATE TABLE search_templates (
   query json NOT NULL,
   CONSTRAINT search_templates_pkey PRIMARY KEY (id)
 ) WITH (OIDS=FALSE);
+
+/*ARCHIVAL*/
+ALTER TABLE doctypes DROP COLUMN IF EXISTS action_current_use;
+ALTER TABLE doctypes ADD COLUMN action_current_use character varying(255) DEFAULT NULL;
+UPDATE doctypes SET duration_current_use = duration_current_use * 30;
+
+ALTER TABLE entities DROP COLUMN IF EXISTS archival_agency;
+ALTER TABLE entities DROP COLUMN IF EXISTS archival_agreement;
+ALTER TABLE entities DROP COLUMN IF EXISTS producer_service;
+ALTER TABLE entities ADD COLUMN producer_service character varying(255);
+UPDATE entities SET producer_service = entity_id;
+
+UPDATE actions SET component = 'sendToRecordManagementAction' where action_page = 'export_seda';
+UPDATE actions SET component = 'checkAcknowledgmentRecordManagementAction' where action_page = 'check_acknowledgement';
+UPDATE actions SET component = 'checkReplyRecordManagementAction' where action_page = 'check_reply';
+UPDATE actions SET component = 'resetRecordManagementAction' where action_page = 'reset_letter';
+UPDATE actions SET component = 'confirmAction' where action_page = 'purge_letter';
+
+UPDATE res_attachments SET attachment_type = 'acknowledgement_record_management' WHERE attachment_type = 'simple_attachment' AND format = 'xml' AND title = 'Accusé de réception' AND relation = 1 AND status = 'TRA';
+UPDATE res_attachments SET attachment_type = 'reply_record_management' WHERE attachment_type = 'simple_attachment' AND format = 'xml' AND title = 'Réponse au transfert' AND relation = 1 AND status = 'TRA';
+
+ALTER TABLE res_letterbox DROP COLUMN IF EXISTS retention_frozen;
+ALTER TABLE res_letterbox ADD COLUMN retention_frozen boolean DEFAULT FALSE NOT NULL;
+ALTER TABLE res_letterbox DROP COLUMN IF EXISTS binding;
+ALTER TABLE res_letterbox ADD COLUMN binding boolean;
+
+DELETE FROM parameters WHERE id = 'bindingDocumentFinalAction';
+INSERT INTO parameters (id, param_value_string) VALUES ('bindingDocumentFinalAction', 'copy');
+DELETE FROM parameters WHERE id = 'nonBindingDocumentFinalAction';
+INSERT INTO parameters (id, param_value_string) VALUES ('nonBindingDocumentFinalAction', 'delete');
+
+/* CUSTOM FIELDS */
+ALTER TABLE custom_fields DROP COLUMN IF EXISTS mode;
+DROP TYPE IF EXISTS custom_fields_modes;
+CREATE TYPE custom_fields_modes AS ENUM ('form', 'technical');
+ALTER TABLE custom_fields ADD COLUMN mode custom_fields_modes NOT NULL DEFAULT 'form';
+
+ALTER TABLE listinstance DROP COLUMN IF EXISTS delegate;
+ALTER TABLE listinstance ADD COLUMN delegate INTEGER;
+
+/* Replace dest_user with the dest in listinstance, if the dests are differents */
+UPDATE res_letterbox
+SET dest_user = (
+    SELECT item_id FROM listinstance
+    WHERE item_mode = 'dest' AND item_type = 'user_id' AND listinstance.res_id = res_letterbox.res_id
+)
+WHERE res_id IN (
+    SELECT res_letterbox.res_id
+    FROM res_letterbox
+             JOIN listinstance l ON res_letterbox.res_id = l.res_id
+    WHERE dest_user != item_id AND item_type ='user_id' AND item_mode='dest'
+);
+
+
+/* ORDER ON CHRONO */
+CREATE OR REPLACE FUNCTION order_alphanum(text) RETURNS text AS $$
+declare
+    tmp text;
+begin
+    tmp := $1;
+    tmp := tmp || 'Z';
+    tmp := regexp_replace(tmp, E'(\\D)', E'\\1/', 'g');
+
+    IF count(regexp_match(tmp, E'(\\D(\\d{8})\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{8}\\D)', E'\\10\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{7}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{7}\\D)', E'\\100\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{6}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{6}\\D)', E'\\1000\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{5}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{5}\\D)', E'\\10000\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{4}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{4}\\D)', E'\\100000\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{3}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{3}\\D)', E'\\1000000\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{2}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{2}\\D)', E'\\10000000\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{1}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{1}\\D)', E'\\100000000\\2', 'g');
+    END IF;
+
+    RETURN tmp;
+end;
+$$ LANGUAGE plpgsql;
 
 /* RE CREATE VIEWS */
 CREATE OR REPLACE VIEW res_view_letterbox AS
@@ -321,6 +422,8 @@ SELECT r.res_id,
        r.locker_user_id,
        r.locker_time,
        r.custom_fields,
+       r.retention_frozen,
+       r.binding,
        en.entity_label,
        en.entity_type AS entitytype
 FROM doctypes d,

@@ -11,9 +11,6 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-use SplFileInfo;
-
 $GLOBALS['is_readable'] = null;
 
 function is_readable($readable)
@@ -32,7 +29,7 @@ function is_readable($readable)
  * @covers Respect\Validation\Rules\Readable
  * @covers Respect\Validation\Exceptions\ReadableException
  */
-class ReadableTest extends TestCase
+class ReadableTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @covers Respect\Validation\Rules\Readable::validate
@@ -64,7 +61,10 @@ class ReadableTest extends TestCase
     public function testShouldValidateObjects()
     {
         $rule = new Readable();
-        $object = new SplFileInfo('tests/fixtures/valid-image.gif');
+        $object = $this->getMock('SplFileInfo', ['isReadable'], ['somefile.txt']);
+        $object->expects($this->once())
+                ->method('isReadable')
+                ->will($this->returnValue(true));
 
         $this->assertTrue($rule->validate($object));
     }

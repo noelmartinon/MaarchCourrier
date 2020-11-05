@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { finalize } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { HeaderService } from '../../../service/header.service';
+import { HeaderService } from '@service/header.service';
 import { Router } from '@angular/router';
 
 @Component({

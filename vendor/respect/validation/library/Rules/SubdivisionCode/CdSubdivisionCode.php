@@ -18,14 +18,14 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: CD
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/CD/administrative-division-democratic-republic-of-the-congo.html
  */
 class CdSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
         'BC', // Bas-Congo
         'BN', // Bandundu
-        'EQ', // Équateur
+        'EQ', // Equateur
         'KA', // Katanga
         'KE', // Kasai-Oriental
         'KN', // Kinshasa

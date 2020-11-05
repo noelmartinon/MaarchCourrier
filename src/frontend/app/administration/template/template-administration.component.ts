@@ -2,18 +2,19 @@ import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef, On
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
-import { HeaderService } from '../../../service/header.service';
-import { AppService } from '../../../service/app.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
 import { filter, tap, catchError } from 'rxjs/operators';
-import { FunctionsService } from '../../../service/functions.service';
-import { of } from 'rxjs/internal/observable/of';
+import { FunctionsService } from '@service/functions.service';
+import { of } from 'rxjs';
 import { TemplateFileEditorModalComponent } from './templateFileEditorModal/template-file-editor-modal.component';
 import { DomSanitizer } from '@angular/platform-browser';
 import { AlertComponent } from '../../../plugins/modal/alert.component';
 import { MaarchFlatTreeComponent } from '../../../plugins/tree/maarch-flat-tree.component';
+import { AuthService } from '@service/auth.service';
 
 declare var tinymce: any;
 
@@ -99,7 +100,8 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
         public appService: AppService,
         private viewContainerRef: ViewContainerRef,
         public functionsService: FunctionsService,
-        public translate: TranslateService
+        public translate: TranslateService,
+        private authService: AuthService
     ) { }
 
     ngOnInit(): void {
@@ -377,7 +379,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                 editorOptions.objectType = 'templateModification';
                 editorOptions.objectId = this.template.id;
             }
-
+            editorOptions.authToken = this.authService.getToken(),
             this.launchJavaEditor(editorOptions);
         } else if (this.headerService.user.preferences.documentEdition !== 'java') {
             this.launchIntegratedEditor(editorOptions, this.headerService.user.preferences.documentEdition);

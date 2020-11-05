@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: US
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/US/administrative-division-united-states.html
  */
 class UsSubdivisionCode extends AbstractSearcher
 {
@@ -71,10 +71,10 @@ class UsSubdivisionCode extends AbstractSearcher
         'SD', // South Dakota
         'TN', // Tennessee
         'TX', // Texas
-        'UM', // United States Minor Outlying Islands
+        'UM', // U.S. Minor Outlying Islands
         'UT', // Utah
         'VA', // Virginia
-        'VI', // Virgin Islands
+        'VI', // Virgin Islands of the U.S.
         'VT', // Vermont
         'WA', // Washington
         'WI', // Wisconsin

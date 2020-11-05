@@ -1,14 +1,14 @@
 import { Component, OnInit, ViewChild, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
-import { HeaderService } from '../../../service/header.service';
-import { AppService } from '../../../service/app.service';
-import { FunctionsService } from '../../../service/functions.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
+import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
 
 @Component({
@@ -21,7 +21,6 @@ export class GroupsAdministrationComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
-    
     loading: boolean = false;
 
     config: any = {};
@@ -120,7 +119,6 @@ export class GroupsAdministrationComponent implements OnInit {
     templateUrl: 'groups-administration-redirect-modal.component.html'
 })
 export class GroupsAdministrationRedirectModalComponent {
-    
 
     constructor(public http: HttpClient, @Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<GroupsAdministrationRedirectModalComponent>) {
     }

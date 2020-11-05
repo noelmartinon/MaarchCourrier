@@ -18,27 +18,27 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: CH
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/CH/administrative-division-switzerland.html
  */
 class ChSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
         'AG', // Aargau
-        'AI', // Appenzell Innerrhoden
+        'AI', // Appenzell Innerhoden
         'AR', // Appenzell Ausserrhoden
         'BE', // Bern
         'BL', // Basel-Landschaft
         'BS', // Basel-Stadt
         'FR', // Fribourg
-        'GE', // Genève
+        'GE', // Geneva
         'GL', // Glarus
-        'GR', // Graubünden
+        'GR', // Graubunden
         'JU', // Jura
-        'LU', // Luzern
+        'LU', // Lucerne
         'NE', // Neuchâtel
         'NW', // Nidwalden
         'OW', // Obwalden
-        'SG', // Sankt Gallen
+        'SG', // St. Gallen
         'SH', // Schaffhausen
         'SO', // Solothurn
         'SZ', // Schwyz
@@ -48,7 +48,7 @@ class ChSubdivisionCode extends AbstractSearcher
         'VD', // Vaud
         'VS', // Valais
         'ZG', // Zug
-        'ZH', // Zürich
+        'ZH', // Zurich
     ];
 
     public $compareIdentical = true;

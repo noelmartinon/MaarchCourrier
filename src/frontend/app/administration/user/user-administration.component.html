@@ -159,7 +159,7 @@
                                             <mat-form-field>
                                                 <input matInput *ngIf="creationMode" type="text" title="{{'lang.id' | translate}}"
                                                     name="user_id" [(ngModel)]="user.userId" placeholder="{{'lang.id' | translate}}"
-                                                    pattern="^[\w.@-]*$" required (keyup)="setLowerUserId()">
+                                                    pattern="^[\w.@-]*$" required (keyup)="setLowerUserId()" maxlength="128">
                                                 <input matInput *ngIf="!creationMode" type="text" title="{{'lang.id' | translate}}"
                                                     value="{{user.user_id}}" placeholder="{{'lang.id' | translate}}" disabled>
                                             </mat-form-field>
@@ -169,21 +169,21 @@
                                 <div class="form-group">
                                     <div class="col-sm-5" style="font-weight:bold;">
                                         <mat-form-field>
-                                            <input matInput type="text" id="lastname" name="lastname"
+                                            <input matInput type="text" id="lastname" name="lastname" maxlength="255"
                                                 title="{{'lang.lastname' | translate}}" placeholder="{{'lang.lastname' | translate}}"
                                                 [(ngModel)]="user.lastname" required>
                                         </mat-form-field>
                                     </div>
                                     <div class="col-sm-5" style="font-weight:bold;">
                                         <mat-form-field>
-                                            <input matInput type="text" id="firstname" name="firstname"
+                                            <input matInput type="text" id="firstname" name="firstname" maxlength="255"
                                                 title="{{'lang.firstname' | translate}}" placeholder="{{'lang.firstname' | translate}}"
                                                 [(ngModel)]="user.firstname" required>
                                         </mat-form-field>
                                     </div>
                                     <div class="col-sm-2" style="font-style:italic;">
                                         <mat-form-field>
-                                            <input matInput type="text" id="initials" name="initials"
+                                            <input matInput type="text" id="initials" name="initials" maxlength="32"
                                                 title="{{'lang.initials' | translate}}" placeholder="{{'lang.initials' | translate}}"
                                                 [(ngModel)]="user.initials">
                                         </mat-form-field>
@@ -192,7 +192,7 @@
                                 <div class="form-group">
                                     <div class="col-sm-12">
                                         <mat-form-field>
-                                            <input matInput type="tel" id="phone" name="phone"
+                                            <input matInput type="tel" id="phone" name="phone" maxlength="32"
                                                 title="{{'lang.phoneNumber' | translate}}" placeholder="{{'lang.phoneNumber' | translate}}"
                                                 [(ngModel)]="user.phone" pattern="\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$"
                                                 [disabled]="(creationMode && !canManagePersonalDatas) || (!creationMode && (!canManagePersonalDatas || !canViewPersonalDatas))">
@@ -203,7 +203,7 @@
                                     <div class="col-sm-12">
                                         <mat-form-field>
                                             <input matInput type="email" id="mail" name="mail" title="{{'lang.email' | translate}}"
-                                                placeholder="{{'lang.email' | translate}}" [(ngModel)]="user.mail"
+                                                placeholder="{{'lang.email' | translate}}" [(ngModel)]="user.mail" maxlength="255"
                                                 pattern="(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)" required>
                                         </mat-form-field>
                                     </div>

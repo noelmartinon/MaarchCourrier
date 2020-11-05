@@ -1,7 +1,7 @@
 <mat-sidenav-container class="maarch-container">
     <mat-sidenav-content>
         <mat-card id="viewThumbnail" style="display:none;position: fixed;z-index: 2;margin-left: 1px;">
-            <img style="max-height: 100vh;" [src]="thumbnailUrl | secureUrl | async" />
+            <img style="max-height: 100vh;" *ngIf="thumbnailUrl !== ''" [src]="thumbnailUrl | secureUrl | async" />
         </mat-card>
         <div class="bg-head">
             <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
@@ -69,7 +69,8 @@
                             <app-folder-action-list #actionsList [contextMode]="false" [currentFolderInfo]="folderInfo"
                                 [totalRes]="allResInBasket.length" [selectedRes]="selectedRes"
                                 (refreshEvent)="refreshDaoAfterAction()"
-                                (refreshPanelFolders)="foldersService.getFolders()">
+                                (refreshPanelFolders)="foldersService.getFolders()"
+                                [currentResource]="currentResource">
                             </app-folder-action-list>
                         </span>
                     </div>
@@ -203,5 +204,5 @@
 </mat-sidenav-container>
 <app-folder-action-list #actionsListContext [contextMode]="true" [currentFolderInfo]="folderInfo"
     [totalRes]="allResInBasket.length" [selectedRes]="selectedRes" (refreshEvent)="refreshDaoAfterAction()"
-    (refreshPanelFolders)="foldersService.getFolders()">
+    (refreshPanelFolders)="foldersService.getFolders()" [currentResource]="currentResource">
 </app-folder-action-list>

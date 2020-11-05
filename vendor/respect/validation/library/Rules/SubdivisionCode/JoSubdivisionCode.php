@@ -18,23 +18,23 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: JO
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/JO/administrative-division-jordan.html
  */
 class JoSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'AJ', // ‘Ajlūn
-        'AM', // ‘Ammān (Al ‘Aşimah)
-        'AQ', // Al ‘Aqabah
-        'AT', // Aţ Ţafīlah
-        'AZ', // Az Zarqā'
-        'BA', // Al Balqā'
+        'AJ', // Ajlun
+        'AM', // 'Amman
+        'AQ', // Al 'Aqabah
+        'AT', // At Tafilah
+        'AZ', // Az Zarqa'
+        'BA', // Al Balqa'
         'IR', // Irbid
         'JA', // Jarash
         'KA', // Al Karak
         'MA', // Al Mafraq
-        'MD', // Mādabā
-        'MN', // Ma‘ān
+        'MD', // Madaba
+        'MN', // Ma'an
     ];
 
     public $compareIdentical = true;

@@ -230,20 +230,12 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <div class="col-sm-6">
+                                    <div class="col-sm-12">
                                         <mat-form-field>
-                                            <input matInput [(ngModel)]="currentEntity.archival_agency"
-                                                name="archival_agency" id="archival_agency"
-                                                title="{{'lang.archivalAgency' | translate}}" type="text"
-                                                placeholder="{{'lang.archivalAgency' | translate}}" maxlength="255">
-                                        </mat-form-field>
-                                    </div>
-                                    <div class="col-sm-6">
-                                        <mat-form-field>
-                                            <input matInput [(ngModel)]="currentEntity.archival_agreement"
-                                                name="archival_agreement" id="archival_agreement"
-                                                title="{{'lang.archivalAgreement' | translate}}" type="text"
-                                                placeholder="{{'lang.archivalAgreement' | translate}}" maxlength="255">
+                                            <input matInput [(ngModel)]="currentEntity.producerService"
+                                                name="producerService" id="producerService"
+                                                title="{{'lang.producerService' | translate}}" type="text"
+                                                placeholder="{{'lang.producerService' | translate}}" maxlength="255" pattern="^[\w-]*$">
                                         </mat-form-field>
                                     </div>
                                 </div>

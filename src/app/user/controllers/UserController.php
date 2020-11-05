@@ -99,12 +99,19 @@ class UserController
 
     public function getById(Request $request, Response $response, array $args)
     {
-        $user = UserModel::getById(['id' => $args['id'], 'select' => ['id', 'firstname', 'lastname', 'status']]);
+        $user = UserModel::getById(['id' => $args['id'], 'select' => ['id', 'firstname', 'lastname', 'status', 'mail', 'phone']]);
         if (empty($user)) {
             return $response->withStatus(400)->withJson(['errors' => 'User does not exist']);
         }
         $user['enabled'] = $user['status'] != 'SPD';
         unset($user['status']);
+
+        $primaryEntity = UserModel::getPrimaryEntityById(['id' => $args['id'], 'select' => ['entity_label']]);
+        $user['department'] = $primaryEntity['entity_label'];
+
+        if ($GLOBALS['id'] != $args['id'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']])) {
+            unset($user['phone']);
+        }
 
         return $response->withJson($user);
     }
@@ -166,12 +173,14 @@ class UserController
 
         $data = $request->getParams();
 
-        $check = Validator::stringType()->notEmpty()->validate($data['userId']) && preg_match("/^[\w.@-]*$/", $data['userId']);
-        $check = $check && Validator::stringType()->notEmpty()->validate($data['firstname']);
-        $check = $check && Validator::stringType()->notEmpty()->validate($data['lastname']);
-        $check = $check && (empty($data['mail']) || filter_var($data['mail'], FILTER_VALIDATE_EMAIL));
+        $check = Validator::stringType()->length(1, 128)->notEmpty()->validate($data['userId']) && preg_match("/^[\w.@-]*$/", $data['userId']);
+        $check = $check && Validator::stringType()->length(1, 255)->notEmpty()->validate($data['firstname']);
+        $check = $check && Validator::stringType()->length(1, 255)->notEmpty()->validate($data['lastname']);
+        $check = $check && Validator::stringType()->length(0, 32)->validate($data['initials'] ?? '');
+        $check = $check && Validator::stringType()->length(1, 255)->notEmpty()->validate($data['mail']);
+        $check = $check && filter_var($data['mail'], FILTER_VALIDATE_EMAIL);
         if (PrivilegeController::hasPrivilege(['privilegeId' => 'manage_personal_data', 'userId' => $GLOBALS['id']])) {
-            $check = $check && (empty($data['phone']) || preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $data['phone']));
+            $check = $check && (empty($data['phone']) || preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $data['phone'])) && Validator::stringType()->length(0, 32)->validate($data['phone'] ?? '');
         }
         if (!$check) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
@@ -253,13 +262,15 @@ class UserController
 
         $body = $request->getParsedBody();
 
-        if (!Validator::stringType()->notEmpty()->validate($body['firstname'])) {
+        if (!Validator::stringType()->length(1, 255)->notEmpty()->validate($body['firstname'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body firstname is empty or not a string']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['lastname'])) {
+        } elseif (!Validator::stringType()->length(1, 255)->notEmpty()->validate($body['lastname'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body lastname is empty or not a string']);
-        } elseif (!empty($body['mail']) && !filter_var($body['mail'], FILTER_VALIDATE_EMAIL)) {
+        } elseif (!Validator::stringType()->length(0, 32)->validate($body['initials'] ?? '')) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body initials is too long']);
+        } elseif (!empty($body['mail']) && !filter_var($body['mail'], FILTER_VALIDATE_EMAIL) && Validator::stringType()->length(1, 255)->notEmpty()->validate($body['mail'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body mail is not correct']);
-        } elseif (PrivilegeController::hasPrivilege(['privilegeId' => 'manage_personal_data', 'userId' => $GLOBALS['id']]) && !empty($body['phone']) && !preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $body['phone'])) {
+        } elseif (PrivilegeController::hasPrivilege(['privilegeId' => 'manage_personal_data', 'userId' => $GLOBALS['id']]) && !empty($body['phone']) && !preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $body['phone']) && Validator::stringType()->length(0, 32)->validate($body['phone'] ?? '')) {
             return $response->withStatus(400)->withJson(['errors' => 'Body phone is not correct']);
         }
 
@@ -289,7 +300,7 @@ class UserController
         if ($body['mode'] == 'rest' && isset($body['authorizedApi']) && is_array($body['authorizedApi'])) {
             foreach ($body['authorizedApi'] as $value) {
                 if (strpos($value, 'GET/') !== 0 && strpos($value, 'POST/') !== 0 && strpos($value, 'PUT/') !== 0 && strpos($value, 'DELETE/') !== 0) {
-                    return $response->withStatus(400)->withJson(['errors' => 'Body authorizedApi is not well formatted']);
+                    return $response->withStatus(400)->withJson(['errors' => 'Body authorizedApi is not well formatted', 'lang' => 'authorizedRoutesNotWellFormatted']);
                 }
             }
             $set['authorized_api'] = json_encode($body['authorizedApi']);
@@ -368,13 +379,13 @@ class UserController
             $formattedLIEntities = [];
             $listInstanceEntities = array_unique($listInstanceEntities);
             foreach ($listInstanceEntities as $listInstanceEntity) {
-                $entity = Entitymodel::getByEntityId(['select' => ['short_label'], 'entityId' => $listInstanceEntity]);
+                $entity = EntityModel::getByEntityId(['select' => ['short_label'], 'entityId' => $listInstanceEntity]);
                 $formattedLIEntities[] = $entity['short_label'];
             }
             $formattedLTEntities = [];
             $listTemplateEntities = array_unique($listTemplateEntities);
             foreach ($listTemplateEntities as $listTemplateEntity) {
-                $entity = Entitymodel::getById(['select' => ['short_label'], 'id' => $listTemplateEntity]);
+                $entity = EntityModel::getById(['select' => ['short_label'], 'id' => $listTemplateEntity]);
                 $formattedLTEntities[] = $entity['short_label'];
             }
 
@@ -523,9 +534,11 @@ class UserController
 
     public function getProfile(Request $request, Response $response)
     {
-        $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'initials', 'preferences', 'external_id', 'status', 'mode']]);
+        $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'initials', 'preferences', 'external_id', 'status', 'mode', 'feature_tour']]);
         $user['external_id']        = json_decode($user['external_id'], true);
         $user['preferences']        = json_decode($user['preferences'], true);
+        $user['featureTour']        = json_decode($user['feature_tour'], true);
+        unset($user['feature_tour']);
         $user['signatures']         = UserSignatureModel::getByUserSerialId(['userSerialid' => $user['id']]);
         $user['emailSignatures']    = UserEmailSignatureModel::getByUserId(['userId' => $GLOBALS['id']]);
         $user['groups']             = UserModel::getGroupsByLogin(['login' => $user['user_id']]);
@@ -537,6 +550,7 @@ class UserController
         $user['passwordRules']      = PasswordModel::getEnabledRules();
         $user['canModifyPassword']  = true;
         $user['privileges']         = PrivilegeController::getPrivilegesByUser(['userId' => $user['id']]);
+        $user['lockAdvancedPrivileges'] = PrivilegeController::isAdvancedPrivilegesLocked();
         $userFollowed = UserFollowedResourceModel::get(['select' => ['count(1) as nb'], 'where' => ['user_id = ?'], 'data' => [$GLOBALS['id']]]);
         $user['nbFollowedResources'] = $userFollowed[0]['nb'];
 
@@ -594,6 +608,34 @@ class UserController
             'eventType'    => 'UP',
             'eventId'      => 'userModification',
             'info'         => _USER_UPDATED . " {$body['firstname']} {$body['lastname']}"
+        ]);
+
+        return $response->withStatus(204);
+    }
+
+    public function updateCurrentUserFeatureTour(Request $request, Response $response)
+    {
+        $body = $request->getParsedBody();
+
+        if (!Validator::notEmpty()->validate($body['featureTour'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body featureTour is empty']);
+        }
+
+        UserModel::update([
+            'set'   => [
+                'feature_tour' => json_encode($body['featureTour'])
+            ],
+            'where' => ['id = ?'],
+            'data'  => [$GLOBALS['id']]
+        ]);
+
+        $userData = UserModel::getLabelledUserById(['id' => $GLOBALS['id'], 'select' => ['firstname', 'lastname']]);
+        HistoryController::add([
+            'tableName'    => 'users',
+            'recordId'     => $GLOBALS['id'],
+            'eventType'    => 'UP',
+            'eventId'      => 'userModification',
+            'info'         => _USER_FEATURE_TOUR_UPDATED . " " . $userData
         ]);
 
         return $response->withStatus(204);
@@ -696,15 +738,16 @@ class UserController
                 return $response->withStatus(400)->withJson(['errors' => 'Some data are empty']);
             }
 
-            $userBasketPreference = UserBasketPreferenceModel::get([
-                'select' => ['display'],
-                'where'  => ['basket_id =?', 'group_serial_id = ?', 'user_serial_id = ?'],
-                'data'   => [$value['basket_id'], $value['group_id'], $aArgs['id']]
-            ]);
-
-            if (empty($userBasketPreference)) {
-                unset($data[$key]);
-                continue;
+            if (empty($value['originalOwner'])) {
+                $userBasketPreference = UserBasketPreferenceModel::get([
+                    'select' => ['display'],
+                    'where'  => ['basket_id =?', 'group_serial_id = ?', 'user_serial_id = ?'],
+                    'data'   => [$value['basket_id'], $value['group_id'], $aArgs['id']]
+                ]);
+                if (empty($userBasketPreference[0]['display'])) {
+                    unset($data[$key]);
+                    continue;
+                }
             }
 
             $check = UserModel::getById(['id' => $value['actual_user_id'], 'select' => ['1']]);
@@ -1243,7 +1286,7 @@ class UserController
         if (!$this->checkNeededParameters(['data' => $data, 'needed' => ['entityId']])) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
-        if (empty(entitymodel::getByEntityId(['entityId' => $data['entityId']]))) {
+        if (empty(Entitymodel::getByEntityId(['entityId' => $data['entityId']]))) {
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         } elseif (UserModel::hasEntity(['id' => $aArgs['id'], 'entityId' => $data['entityId']])) {
             return $response->withStatus(400)->withJson(['errors' => _USER_ALREADY_LINK_ENTITY]);

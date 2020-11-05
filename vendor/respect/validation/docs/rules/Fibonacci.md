@@ -13,5 +13,5 @@ v::fibonacci()->validate(6); // false
 ***
 See also:
 
-  * [PerfectSquare](PerfectSquare.md)
   * [PrimeNumber](PrimeNumber.md)
+  * [PerfectSquare](PerfectSquare.md)

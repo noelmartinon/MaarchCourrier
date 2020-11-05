@@ -18,29 +18,29 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: LA
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/LA/administrative-division-laos.html
  */
 class LaSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
         'AT', // Attapu
-        'BK', // Bokèo
+        'BK', // Bokeo
         'BL', // Bolikhamxai
         'CH', // Champasak
         'HO', // Houaphan
         'KH', // Khammouan
         'LM', // Louang Namtha
         'LP', // Louangphabang
-        'OU', // Oudômxai
-        'PH', // Phôngsali
+        'OU', // Oudomxai
+        'PH', // Phongsali
         'SL', // Salavan
-        'SV', // Savannakhét
+        'SV', // Savannakhet
         'VI', // Vientiane
         'VT', // Vientiane
         'XA', // Xaignabouli
-        'XE', // Xékong
-        'XI', // Xiangkhouang
-        'XS', // Xaisômboun
+        'XE', // Xekong
+        'XI', // Xiangkhoang
+        'XN', // Xaisomboun
     ];
 
     public $compareIdentical = true;

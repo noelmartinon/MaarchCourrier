@@ -65,15 +65,17 @@ abstract class AttachmentModelAbstract
         ValidatorModel::stringType($args, ['format', 'creation_date', 'docserver_id', 'path', 'filename', 'fingerprint', 'status']);
         ValidatorModel::intVal($args, ['filesize', 'relation', 'typist']);
 
-        $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'res_attachment_res_id_seq']);
-        $args['res_id'] = $nextSequenceId;
+        if (empty($args['res_id'])) {
+            $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'res_attachment_res_id_seq']);
+            $args['res_id'] = $nextSequenceId;
+        }
 
         DatabaseModel::insert([
             'table'         => 'res_attachments',
             'columnsValues' => $args
         ]);
 
-        return $nextSequenceId;
+        return $args['res_id'];
     }
 
     public static function update(array $args)
@@ -107,8 +109,8 @@ abstract class AttachmentModelAbstract
             $attachmentTypesXML = $loadedXml->attachment_types;
             if (count($attachmentTypesXML) > 0) {
                 foreach ($attachmentTypesXML->type as $value) {
-                    $label = defined((string) $value->label) ? constant((string) $value->label) : (string) $value->label;
-                    $types[(string) $value->id] = [
+                    $label = defined((string)$value->label) ? constant((string)$value->label) : (string)$value->label;
+                    $types[(string)$value->id] = [
                         'label'         => $label,
                         'icon'          => (string)$value['icon'],
                         'sign'          => (empty($value['sign']) || (string)$value['sign'] == 'true') ? true : false,

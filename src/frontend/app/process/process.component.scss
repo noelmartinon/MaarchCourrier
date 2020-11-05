@@ -410,6 +410,19 @@
     color: $secondary;
 }
 
+.freezeUnfreezIcon {
+    color: $secondary;
+}
+
+.nonFreeze {
+    color: $primary;
+}
+
+.bindIcon {
+    color: $secondary;
+    margin-left: 5px;
+}
+
 .tool-disabled {
     cursor: not-allowed;
     opacity: 0.3;
@@ -431,3 +444,7 @@
 .subSubject {
     color: $secondary;
 }
+
+.isSelectedMenu {
+    background: $secondary;
+  }

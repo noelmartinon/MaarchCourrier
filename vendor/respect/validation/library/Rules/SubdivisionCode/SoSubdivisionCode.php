@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: SO
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/SO/administrative-division-somalia.html
  */
 class SoSubdivisionCode extends AbstractSearcher
 {
@@ -30,12 +30,12 @@ class SoSubdivisionCode extends AbstractSearcher
         'BY', // Bay
         'GA', // Galguduud
         'GE', // Gedo
-        'HI', // Hiirsan
+        'HI', // Hiiraan
         'JD', // Jubbada Dhexe
         'JH', // Jubbada Hoose
         'MU', // Mudug
         'NU', // Nugaal
-        'SA', // Saneag
+        'SA', // Sanaag
         'SD', // Shabeellaha Dhexe
         'SH', // Shabeellaha Hoose
         'SO', // Sool

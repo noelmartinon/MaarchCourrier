@@ -3,9 +3,9 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { AppService } from '../../service/app.service';
-import { PrivilegeService } from '../../service/privileges.service';
-import { HeaderService } from '../../service/header.service';
+import { AppService } from '@service/app.service';
+import { PrivilegeService } from '@service/privileges.service';
+import { HeaderService } from '@service/header.service';
 
 @Component({
     selector: 'menu-shortcut',

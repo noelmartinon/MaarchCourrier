@@ -27,19 +27,11 @@
                 (onFileDropped)="dndUploadFile($event)" class="dndFile">
                 <div>
                     {{'lang.dndFileCsvDesc' | translate}}
-                    <mat-form-field appearance="outline" style="font-size:14px;" (click)="$event.stopPropagation()">
-                        <mat-label>{{'lang.delimiter' | translate}}</mat-label>
-                        <mat-select [(ngModel)]="currentDelimiter" (click)="$event.stopPropagation()">
-                            <mat-option *ngFor="let delimiter of delimiters" [value]="delimiter">
-                                {{delimiter === '\t' ? 'TAB' : delimiter}}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
                 </div>
             </div>
-            <div class="row" style="margin: 0px;">
+            <div *ngIf="csvData.length !== 0"  class="row" style="margin: 0px;">
                 <div class="col-md-12">
-                    <mat-paginator #paginator [length]="100" [hidePageSize]="true" [pageSize]="10">
+                    <mat-paginator #paginator [length]="100" [hidePageSize]="true" [pageSize]="8">
                     </mat-paginator>
                 </div>
             </div>
@@ -71,12 +63,12 @@
                 <mat-header-row *matHeaderRowDef="userColmuns"></mat-header-row>
                 <mat-row *matRowDef="let row; columns: userColmuns;"></mat-row>
             </mat-table>
-            <div class="alert-message alert-message-info"
-                    [innerHTML]="'lang.infoImportusers' | translate" style="min-width: 100%">
-                </div>
+            <div class="alert-message alert-message-info" [innerHTML]="'lang.infoImportNoIdToCreate' | translate"
+                style="min-width: 100%">
+            </div>
             <div class="alert-message alert-message-info"
                     [innerHTML]="'lang.infoImportusers2' | translate" style="min-width: 100%">
-                </div>
+            </div>
         </ng-template>
     </div>
     <span class="divider-modal"></span>

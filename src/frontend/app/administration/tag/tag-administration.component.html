@@ -47,7 +47,7 @@
                         <div *ngIf="!creationMode && !tag.canMerge.value" class="alert-message alert-message-danger" style="min-width: 100%;">
                             {{'lang.cannotMergeTags' | translate}}
                         </div>
-                        <plugin-select-search *ngIf="!loadingTags && tag.canMerge.value"
+                        <plugin-select-search *ngIf="!loadingTags && tag.canMerge.value && !creationMode"
                             [label]="this.translate.instant('lang.mergeTagWith')" [placeholderLabel]="this.translate.instant('lang.mergeTagWith')"
                             [formControlSelect]="selectMergeTag" [datas]="tags" (afterOpened)="getTags()"
                             (afterSelected)="mergeTag($event)" style="width:100%;">

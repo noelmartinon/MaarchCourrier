@@ -18,7 +18,4 @@ See also:
   * [Contains](Contains.md)
   * [Digit](Digit.md)
   * [EndsWith](EndsWith.md)
-  * [PhpLabel](PhpLabel.md)
-  * [Roman](Roman.md)
   * [StartsWith](StartsWith.md)
-  * [Version](Version.md)

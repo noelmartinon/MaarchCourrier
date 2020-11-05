@@ -1,6 +1,6 @@
     <mat-sidenav-container class="maarch-container">
         <mat-sidenav-content>
-            <mat-card id="viewThumbnail" style="display:none;position: fixed;z-index: 2;margin-left: 1px;"><img style="max-height: 100vh;" [src]="thumbnailUrl | secureUrl | async" /></mat-card>
+            <mat-card id="viewThumbnail" style="display:none;position: fixed;z-index: 2;margin-left: 1px;"><img style="max-height: 100vh;" *ngIf="thumbnailUrl !== ''" [src]="thumbnailUrl | secureUrl | async" /></mat-card>
             <div class="bg-head">
                 <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
                     <div class="bg-head-title-label">
@@ -67,7 +67,11 @@
                                     padding-right: 5px;" [class.hasEvent]="data.event && data.displayValue !== this.translate.instant('lang.undefined')" (click)="launchEventSubData(data, row)">
                                             <ng-container *ngIf="data.value == 'getCreationAndProcessLimitDates'">
                                                 <ng-container *ngIf="row.closing_date != this.translate.instant('lang.undefined')">
-                                                    <i class="fa fa-lock" title="{{'lang.closingDate' | translate}}"></i>&nbsp;<span
+                                                    <i class="fa fa-calendar"
+                                                        title="{{'lang.creationDate' | translate}}"></i>&nbsp;<span
+                                                        [innerHTML]="data.displayValue.creationDate | timeAgo"
+                                                        title='{{data.displayValue.creationDate | fullDate}}'></span>
+                                                    - <i class="fa fa-lock" title="{{'lang.closingDate' | translate}}"></i>&nbsp;<span
                                                         [innerHTML]="row.closing_date | timeAgo"
                                                         title='{{row.closing_date | fullDate}}'></span>
                                                 </ng-container>

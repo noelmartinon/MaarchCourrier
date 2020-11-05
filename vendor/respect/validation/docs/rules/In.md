@@ -25,7 +25,6 @@ Message template for this validator includes `{{haystack}}`.
 ***
 See also:
 
-  * [Contains](Contains.md)
-  * [EndsWith](EndsWith.md)
-  * [Roman](Roman.md)
   * [StartsWith](StartsWith.md)
+  * [EndsWith](EndsWith.md)
+  * [Contains](Contains.md)

@@ -15,7 +15,6 @@ See also:
 
   * [ArrayType](ArrayType.md)
   * [BoolType](BoolType.md)
-  * [BoolVal](BoolVal.md)
   * [Callback](Callback.md)
   * [FloatType](FloatType.md)
   * [IntType](IntType.md)

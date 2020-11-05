@@ -1,15 +1,14 @@
 import { Component, OnInit, Input, ViewEncapsulation, EventEmitter, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/internal/operators/tap';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SortPipe } from '../../../plugins/sorting.pipe';
-import { finalize, catchError, exhaustMap, filter } from 'rxjs/operators';
-import { of } from 'rxjs/internal/observable/of';
+import { finalize, catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { AddPrivateIndexingModelModalComponent } from '../private-indexing-model/add-private-indexing-model-modal.component';
-import { HeaderService } from '../../../service/header.service';
+import { HeaderService } from '@service/header.service';
 import { IndexingFormComponent } from '../indexing-form/indexing-form.component';
 
 @Component({
@@ -20,7 +19,6 @@ import { IndexingFormComponent } from '../indexing-form/indexing-form.component'
 })
 export class SelectIndexingModelComponent implements OnInit {
 
-    
     loading: boolean = true;
 
     @Input() defaultIndexingModelId: number = null;

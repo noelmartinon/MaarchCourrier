@@ -2,12 +2,11 @@ import { Component, OnInit, Inject, AfterViewInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/internal/operators/tap';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 import { InstallerService } from '../installer.service';
-import { Router } from '@angular/router';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { catchError, tap } from 'rxjs/operators';
+import { AuthService } from '@service/auth.service';
 
 @Component({
     selector: 'app-install-action',
@@ -27,7 +26,8 @@ export class InstallActionComponent implements OnInit, AfterViewInit {
         public dialogRef: MatDialogRef<InstallActionComponent>,
         public http: HttpClient,
         private installerService: InstallerService,
-        private notify: NotificationService
+        private notify: NotificationService,
+        private authService: AuthService,
     ) { }
 
     async ngOnInit(): Promise<void> {
@@ -110,6 +110,7 @@ export class InstallActionComponent implements OnInit, AfterViewInit {
     goToInstance() {
         this.http.request('DELETE', '../rest/installer/lock', { body: { customId: this.customId } }).pipe(
             tap((res: any) => {
+                this.authService.noInstall = false;
                 window.location.href = res.url;
                 this.dialogRef.close('ok');
             }),

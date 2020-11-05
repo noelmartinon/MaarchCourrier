@@ -23,9 +23,6 @@ Message template for this validator includes `{{containsValue}}`.
 ***
 See also:
 
-  * [EndsWith](EndsWith.md)
-  * [Equals](Equals.md)
-  * [Identical](Identical.md)
-  * [In](In.md)
-  * [Regex](Regex.md)
   * [StartsWith](StartsWith.md)
+  * [EndsWith](EndsWith.md)
+  * [In](In.md)

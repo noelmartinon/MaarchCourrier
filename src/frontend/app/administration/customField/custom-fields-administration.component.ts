@@ -1,16 +1,16 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
-import { AppService } from '../../../service/app.service';
+import { AppService } from '@service/app.service';
 import { tap, catchError, filter, exhaustMap, map, finalize } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { SortPipe } from '../../../plugins/sorting.pipe';
-import { of } from 'rxjs/internal/observable/of';
-import { FunctionsService } from '../../../service/functions.service';
+import { of } from 'rxjs';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     templateUrl: 'custom-fields-administration.component.html',
@@ -27,6 +27,8 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
 
     loading: boolean = true;
+
+    idTable: any = [];
 
     customFieldsTypes: any[] = [
         {
@@ -64,6 +66,16 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     ];
     customFields: any[] = [];
     customFieldsClone: any[] = [];
+    mode: any[] = [
+        {
+            'label' : 'displayInForm',
+            'value' : 'form'
+        },
+        {
+            'label' : 'displayAsTechnicalData',
+            'value' : 'technical'
+        }
+    ];
 
     incrementCreation: number = 1;
 
@@ -106,6 +118,14 @@ export class CustomFieldsAdministrationComponent implements OnInit {
                     } else {
                         element.SQLMode = true;
                     }
+                    const label = element.label;
+                    if (label.includes(this.translate.instant('lang.newField'))) {
+                        let tmpField = label.substr(this.translate.instant('lang.newField').length + 1);
+                        if (!isNaN(Number(tmpField))) {
+                            this.idTable.push(tmpField);
+                            this.incrementCreation = Math.max( ... this.idTable) + 1;
+                        }
+                    }
                 });
                 return data;
             }),
@@ -126,14 +146,14 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         let newCustomField: any = {};
 
         this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.add'), msg: this.translate.instant('lang.confirmAction') } });
-
         this.dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             tap(() => {
                 newCustomField = {
                     label: this.translate.instant('lang.newField') + ' ' + this.incrementCreation,
                     type: customFieldType.type,
-                    values: []
+                    values: [],
+                    mode : 'form'
                 };
             }),
             exhaustMap((data) => this.http.post('../rest/customFields', newCustomField)),
@@ -180,12 +200,9 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     }
 
     updateCustomField(customField: any, indexCustom: number) {
-
         const customFieldToUpdate = { ...customField };
-
         if (!customField.SQLMode) {
             customField.values = customField.values.filter((x: any, i: any, a: any) => a.map((info: any) => info.label).indexOf(x.label) === i);
-
             // TO FIX DATA BINDING SIMPLE ARRAY VALUES
             customFieldToUpdate.values = customField.values.map((data: any) => data.label);
             const alreadyExists = this.customFields.filter(customFieldItem => customFieldItem.label === customFieldToUpdate.label);
@@ -202,7 +219,6 @@ export class CustomFieldsAdministrationComponent implements OnInit {
                 }];
             }
         }
-
         this.http.put('../rest/customFields/' + customField.id, customFieldToUpdate).pipe(
             tap(() => {
                 this.customFieldsClone[indexCustom] = JSON.parse(JSON.stringify(customField));
@@ -220,7 +236,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     }
 
     isModified(customField: any, indexCustomField: number) {
-        if (JSON.stringify(customField) === JSON.stringify(this.customFieldsClone[indexCustomField]) || customField.label === '' || this.SQLMode) {
+        if (JSON.stringify(customField) === JSON.stringify(this.customFieldsClone[indexCustomField]) || customField.label === '' || this.SQLMode || customField.mode === '') {
             return true;
         } else {
             return false;

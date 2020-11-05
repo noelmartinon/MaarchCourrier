@@ -11,6 +11,4 @@ v::intVal()->multiple(3)->validate(9); // true
 ***
 See also:
 
-  * [Even](Even.md)
-  * [Odd](Odd.md)
   * [PrimeNumber](PrimeNumber.md)

@@ -1,15 +1,15 @@
 import { Component, EventEmitter, Input, OnInit, Output, Renderer2 } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
 import { FormControl } from '@angular/forms';
-import { catchError, map, tap, elementAt } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { AlertComponent } from '../../plugins/modal/alert.component';
 import { MatDialog } from '@angular/material/dialog';
-import { FunctionsService } from '../../service/functions.service';
-import { HeaderService } from '../../service/header.service';
+import { FunctionsService } from '@service/functions.service';
+import { HeaderService } from '@service/header.service';
 
 @Component({
     selector: 'app-diffusions-list',
@@ -18,7 +18,7 @@ import { HeaderService } from '../../service/header.service';
 })
 export class DiffusionsListComponent implements OnInit {
 
-    
+
     roles: any = [];
     loading: boolean = true;
     availableRoles: any[] = [];
@@ -31,21 +31,22 @@ export class DiffusionsListComponent implements OnInit {
     listinstanceClone: any = [];
 
     hasNoDest: boolean = false;
+    keepDiffusionRoleInOutgoingIndexation: boolean = false;
 
     /**
      * Ressource identifier to load listinstance (Incompatible with templateId)
      */
-    @Input('resId') resId: number = null;
+    @Input() resId: number = null;
 
     /**
      * Add previous dest in copy (Only compatible with resId)
      */
-    @Input('keepDestForRedirection') keepDestForRedirection: boolean = false;
+    @Input() keepDestForRedirection: boolean = false;
 
     /**
      * Entity identifier to load listModel of entity (Incompatible with resId)
      */
-    @Input('entityId') entityId: any = null;
+    @Input() entityId: any = null;
 
     /**
      * To specify the context to load listModel
@@ -53,19 +54,29 @@ export class DiffusionsListComponent implements OnInit {
     @Input() selfDest: boolean = false;
 
     /**
+     * To specify the context to load listModel
+     */
+    @Input() category: string = '';
+
+    /**
      * For manage current loaded list
      */
-    @Input('adminMode') adminMode: boolean = false;
+    @Input() adminMode: boolean = false;
 
     /**
      * Ids of related allowed entities perimeters
      */
-    @Input('allowedEntities') allowedEntities: number[] = [];
+    @Input() allowedEntities: number[] = [];
 
     /**
      * Expand all roles
      */
-    @Input('expanded') expanded: boolean = false;
+    @Input() expanded: boolean = false;
+
+    /**
+     * Custom diffusion to display
+     */
+    @Input() customDiffusion: any[] = [];
 
     /**
      * To load privilege of current list management
@@ -74,17 +85,17 @@ export class DiffusionsListComponent implements OnInit {
      * @param process
      * @param redirect
      */
-    @Input('target') target: string = '';
+    @Input() target: string = '';
 
     /**
      * FormControl to use this component in form
      */
-    @Input('diffFormControl') diffFormControl: FormControl;
+    @Input() diffFormControl: FormControl;
 
     /**
      * Catch external event after select an element in autocomplete
      */
-    @Output('triggerEvent') triggerEvent = new EventEmitter();
+    @Output() triggerEvent = new EventEmitter();
 
     constructor(
         public translate: TranslateService,
@@ -97,12 +108,13 @@ export class DiffusionsListComponent implements OnInit {
     ) { }
 
     async ngOnInit(): Promise<void> {
-
         await this.initRoles();
         if (this.resId !== null && this.resId != 0 && this.target !== 'redirect') {
             this.loadListinstance(this.resId);
-        } else if ((this.resId === null || this.resId == 0) && !this.functions.empty(this.entityId)) {
+        } else if (((this.resId === null || this.resId == 0) && !this.functions.empty(this.entityId)) && this.customDiffusion.length === 0) {
             this.loadListModel(this.entityId, false, this.selfDest);
+        } else if (this.customDiffusion.length > 0) {
+            this.loadCustomDiffusion();
         }
         this.loading = false;
     }
@@ -124,6 +136,30 @@ export class DiffusionsListComponent implements OnInit {
 
     allPredicate() {
         return true;
+    }
+
+    loadCustomDiffusion() {
+        const roles = [...new Set(this.customDiffusion.map(item => item.mode))];
+
+        roles.forEach(role => {
+            this.diffList[role].items = this.customDiffusion.filter((item: any) => item.mode === role).map((item: any) => {
+                return {
+                    item_mode: role,
+                    item_type: item.type,
+                    itemSerialId: item.id,
+                    itemId: '',
+                    itemLabel: item.labelToDisplay,
+                    itemSubLabel: item.descriptionToDisplay,
+                    difflist_type: 'entity_id',
+                    process_date: null,
+                    process_comment: null,
+                };
+            });
+        });
+
+        if (this.diffFormControl !== undefined) {
+            this.setFormValues();
+        }
     }
 
     async loadListModel(entityId: number, destResource: boolean = false, destCurrentUser: boolean = false) {
@@ -173,6 +209,14 @@ export class DiffusionsListComponent implements OnInit {
             }
         }
 
+        if (this.category === 'outgoing' && !this.keepDiffusionRoleInOutgoingIndexation) {
+            Object.keys(this.diffList).forEach(key => {
+                if (key !== 'dest') {
+                    this.diffList[key].items = [];
+                }
+            });
+        }
+
         if (this.diffFormControl !== undefined) {
             this.setFormValues();
         }
@@ -220,7 +264,7 @@ export class DiffusionsListComponent implements OnInit {
                 this.http.get(`../rest/resources/${resId}/listInstance`).pipe(
                     map((data: any) => {
                         data.listInstance = data.listInstance.map((item: any) => {
-    
+
                             const obj: any = {
                                 listinstance_id: item.listinstance_id,
                                 item_mode: item.item_mode,
@@ -318,11 +362,12 @@ export class DiffusionsListComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get(`../rest/roles?context=${this.target}`).pipe(
                 map((data: any) => {
+                    this.keepDiffusionRoleInOutgoingIndexation = data.parameters['keepDiffusionRoleInOutgoingIndexation'];
                     data.roles = data.roles.map((role: any) => {
                         return {
                             ...role,
                             id: role.id,
-                        }
+                        };
                     });
                     return data.roles;
                 }),
@@ -357,7 +402,7 @@ export class DiffusionsListComponent implements OnInit {
 
     getCurrentListinstance() {
         let listInstanceFormatted: any = [];
-        
+
         if (this.diffList !== null) {
             Object.keys(this.diffList).forEach(role => {
                 if (this.diffList[role].items.length > 0) {
@@ -374,7 +419,7 @@ export class DiffusionsListComponent implements OnInit {
                 }
             });
         }
-        
+
 
         return listInstanceFormatted;
     }
@@ -456,11 +501,11 @@ export class DiffusionsListComponent implements OnInit {
 
     isItemInThisRole(element: any, roleId: string) {
         const result = this.diffList[roleId].items.map((item: any, index: number) => {
-                return {
-                    ...item,
-                    index: index
-                }
-            }).filter((item: any) => item.itemSerialId === element.itemSerialId && item.item_type === element.item_type);
+            return {
+                ...item,
+                index: index
+            };
+        }).filter((item: any) => item.itemSerialId === element.itemSerialId && item.item_type === element.item_type);
 
         return result.length > 0;
     }
@@ -555,13 +600,13 @@ export class DiffusionsListComponent implements OnInit {
                         return {
                             ...item,
                             index: index
-                        }
+                        };
                     }).filter((item: any) => item.itemSerialId === user.itemSerialId && item.item_type === user.item_type);
 
                     if (result.length > 0) {
                         this.diffList[oldRole.id].items.splice(result[0].index, 1);
                     }
-                    
+
                     user.item_mode = 'dest';
                     this.diffList['dest'].items[0] = user;
 

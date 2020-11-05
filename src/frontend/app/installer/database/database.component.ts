@@ -1,14 +1,13 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ValidationErrors, ValidatorFn } from '@angular/forms';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms';
+import { NotificationService } from '@service/notification/notification.service';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/internal/operators/tap';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
 import { StepAction } from '../types';
-import { FunctionsService } from '../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { InstallerService } from '../installer.service';
+import { catchError, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-database',
@@ -16,7 +15,7 @@ import { InstallerService } from '../installer.service';
     styleUrls: ['./database.component.scss']
 })
 export class DatabaseComponent implements OnInit {
-    
+
     stepFormGroup: FormGroup;
     hide: boolean = true;
 

@@ -20,4 +20,3 @@ See also:
   * [Key](Key.md)
   * [KeySet](KeySet.md)
   * [KeyValue](KeyValue.md)
-  * [Type](Type.md)

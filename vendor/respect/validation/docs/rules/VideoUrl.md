@@ -32,8 +32,4 @@ Message template for this validator includes `{{service}}`.
 ***
 See also:
 
-  * [Email](Email.md)
-  * [Json](Json.md)
-  * [Phone](Phone.md)
-  * [Slug](Slug.md)
   * [Url](Url.md)

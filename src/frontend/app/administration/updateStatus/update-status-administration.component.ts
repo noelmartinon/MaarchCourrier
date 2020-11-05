@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
-import { tap } from 'rxjs/internal/operators/tap';
-import { AppService } from '../../../service/app.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
     templateUrl: 'update-status-administration.component.html',
@@ -12,7 +12,7 @@ import { AppService } from '../../../service/app.service';
 })
 export class UpdateStatusAdministrationComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     statuses: any[] = [];

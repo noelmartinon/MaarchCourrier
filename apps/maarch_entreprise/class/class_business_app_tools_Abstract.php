@@ -514,39 +514,6 @@ abstract class business_app_tools_Abstract extends Database
         }
     }
 
-    public function compare_base_version($xmlVersionBase)
-    {
-        // Compare version value beetwen version base xml file and version base
-        // value in the database
-        $xmlBase = simplexml_load_file($xmlVersionBase);
-        //Find value in the xml database_version tag
-        if ($xmlBase) {
-            $versions = explode('.', (string)$xmlBase->version);
-            $_SESSION['maarch_entreprise']['xml_versionbase'] = "{$versions[0]}.{$versions[1]}";
-        } else {
-            $_SESSION['maarch_entreprise']['xml_versionbase'] = 'none';
-        }
-        $checkBase = new Database();
-        $query = "SELECT param_value_string FROM " . PARAM_TABLE
-               . " WHERE id = 'database_version'";
-
-        $stmt = $checkBase->query($query); //Find value in parameters table on database
-        if ($stmt->rowCount() == 0) {
-            $_SESSION['maarch_entreprise']['database_version'] = "none";
-        } else {
-            $vbg = $stmt->fetchObject();
-            $_SESSION['maarch_entreprise']['database_version'] = $vbg->param_value_string;
-        }
-        //If this two parameters is not find, this is the end of this function
-        if ($_SESSION['maarch_entreprise']['xml_versionbase'] <> 'none') {
-            if (($_SESSION['maarch_entreprise']['xml_versionbase'] <> $_SESSION['maarch_entreprise']['database_version'])
-                || ($_SESSION['maarch_entreprise']['database_version'] == 'none')
-            ) {
-                $_SESSION['error'] .= _VERSION_BASE_AND_XML_BASEVERSION_NOT_MATCH. "(".$_SESSION['maarch_entreprise']['xml_versionbase']."/".$_SESSION['maarch_entreprise']['database_version'].")";
-            }
-        }
-    }
-
     public function load_features($xmlFeatures)
     {
         $_SESSION['features'] = array();
@@ -700,7 +667,7 @@ abstract class business_app_tools_Abstract extends Database
                                 file_exists(
                                     'apps' . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
                                 . DIRECTORY_SEPARATOR . $listName.'.php'
-                            )
+                                )
                             ) {
                                 $pathToList = $_SESSION['config']['businessappurl']
                                             . 'index.php?display=true&page='. $listName;
@@ -721,14 +688,14 @@ abstract class business_app_tools_Abstract extends Database
                             } else {
                                 if (
                                     file_exists(
-                                    $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
+                                        $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
                                     . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
                                     . DIRECTORY_SEPARATOR . $listModule . DIRECTORY_SEPARATOR . $listName . '.php'
-                                ) ||
+                                    ) ||
                                     file_exists(
                                         'modules' . DIRECTORY_SEPARATOR . $listModule
                                         . DIRECTORY_SEPARATOR . $listName . '.php'
-                                )
+                                    )
                                 ) {
                                     $pathToList = $_SESSION['config']['businessappurl']
                                         . 'index.php?display=true&page=' . $listName

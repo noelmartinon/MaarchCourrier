@@ -1,16 +1,16 @@
 import { Component, OnInit, ViewChild, ViewContainerRef, TemplateRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 
-import { ActivatedRoute, Router, ParamMap, RouterEvent, NavigationEnd } from '@angular/router';
-import { HeaderService } from '../../service/header.service';
-import { FiltersListService } from '../../service/filtersList.service';
+import { ActivatedRoute, Router, ParamMap } from '@angular/router';
+import { HeaderService } from '@service/header.service';
+import { FiltersListService } from '@service/filtersList.service';
 
 import { Overlay } from '@angular/cdk/overlay';
-import { AppService } from '../../service/app.service';
+import { AppService } from '@service/app.service';
 import { ActionsService } from '../actions/actions.service';
 import { tap, catchError, map, finalize, filter } from 'rxjs/operators';
 import { DocumentViewerComponent } from '../viewer/document-viewer.component';
@@ -19,14 +19,14 @@ import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { ContactResourceModalComponent } from '../contact/contact-resource/modal/contact-resource-modal.component';
 import { DiffusionsListComponent } from '../diffusions/diffusions-list.component';
 
-import { ContactService } from '../../service/contact.service';
+import { ContactService } from '@service/contact.service';
 import { VisaWorkflowComponent } from '../visa/visa-workflow.component';
-import { PrivilegeService } from '../../service/privileges.service';
+import { PrivilegeService } from '@service/privileges.service';
 import { AvisWorkflowComponent } from '../avis/avis-workflow.component';
-import { FunctionsService } from '../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { PrintedFolderModalComponent } from '../printedFolder/printed-folder-modal.component';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { of } from 'rxjs/internal/observable/of';
+import { of, Subscription } from 'rxjs';
+import { TechnicalInformationComponent } from '@appRoot/indexation/technical-information/technical-information.component';
 
 
 @Component({
@@ -43,7 +43,6 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     detailMode: boolean = false;
     isMailing: boolean = false;
-
     actionsList: any[] = [];
     currentUserId: number = null;
     currentBasketId: number = null;
@@ -125,7 +124,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     modalModule: any[] = [];
 
-    currentTool: string = 'dashboard';
+    currentTool: string ;
 
     subscription: Subscription;
 
@@ -155,6 +154,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
     hasContact: boolean = false;
 
     resourceFollowed: boolean = false;
+    resourceFreezed: boolean = false;
+    resourceBinded: boolean = false;
 
     constructor(
         public translate: TranslateService,
@@ -239,7 +240,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
         this.currentResourceInformations = {
             resId: params['resId'],
-            mailtracking: false
+            mailtracking: false,
         };
 
         this.headerService.sideBarButton = {
@@ -292,7 +293,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
         this.detailMode = true;
         this.currentResourceInformations = {
             resId: params['detailResId'],
-            mailtracking: false
+            mailtracking: false,
+            retentionFrozen : false
         };
         this.headerService.sideBarButton = {
             icon: 'fas fa-arrow-left',
@@ -321,6 +323,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
             tap((data: any) => {
                 this.currentResourceInformations = data;
                 this.resourceFollowed = data.followed;
+                this.resourceBinded = data.binding;
+                this.resourceFreezed = data.retentionFrozen;
                 if (this.currentResourceInformations.categoryId !== 'outgoing') {
                     this.loadSenders();
                 } else {
@@ -343,6 +347,19 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     setEditDataPrivilege() {
         if (this.detailMode) {
+            this.http.get('../rest/search/configuration').pipe(
+                tap((myData: any) => {
+                    if (myData.configuration.listEvent.defaultTab == null) {
+                        this.currentTool = 'dashboard';
+                    } else {
+                        this.currentTool = myData.configuration.listEvent.defaultTab;
+                    }
+                }),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
             this.canEditData = this.privilegeService.hasCurrentUserPrivilege('edit_resource') && this.currentResourceInformations.statusAlterable && this.functions.empty(this.currentResourceInformations.registeredMail_deposit_id);
             if (this.isMailing && this.isToolEnabled('attachments')) {
                 this.currentTool = 'attachments';
@@ -622,6 +639,10 @@ export class ProcessComponent implements OnInit, OnDestroy {
         this.modalModule.push(this.processTool.filter(module => module.id === this.currentTool)[0]);
     }
 
+    openTechnicalInfo() {
+        this.dialog.open(TechnicalInformationComponent, { panelClass: 'maarch-modal', autoFocus: false, data: { resId : this.currentResourceInformations.resId} });
+    }
+
     removeModal(index: number) {
         if (this.modalModule[index].id === 'info' && this.indexingForm.isResourceModified()) {
             const dialogRef = this.openConfirmModification();
@@ -815,6 +836,47 @@ export class ProcessComponent implements OnInit, OnDestroy {
                 })
             ).subscribe();
         }
+    }
+
+    toggleFreezing() {
+        this.resourceFreezed = !this.resourceFreezed;
+            this.http.put('../rest/archival/freezeRetentionRule', { resources: [this.currentResourceInformations.resId], freeze : this.resourceFreezed }).pipe(
+                tap(() => {
+                    if (this.resourceFreezed) {
+                        this.notify.success(this.translate.instant('lang.retentionRuleFrozen'));
+                    } else {
+                        this.notify.success(this.translate.instant('lang.retentionRuleUnfrozen'));
+                    }
+                }
+                ),
+                catchError((err: any) => {
+                    this.resourceFreezed = !this.resourceFreezed;
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+    }
+
+    toggleBinding(value) {
+        this.resourceBinded = value;
+        this.http.put('../rest/archival/binding', { resources: [this.currentResourceInformations.resId], binding : value }).pipe(
+            tap(() => {
+                if (value) {
+                    this.notify.success(this.translate.instant('lang.bindingMail'));
+                } else if (value === false) {
+                    this.notify.success(this.translate.instant('lang.noBindingMail'));
+                } else {
+                    this.notify.success(this.translate.instant('lang.bindingUndefined'));
+
+                }
+            }
+            ),
+            catchError((err: any) => {
+                this.resourceBinded = !this.resourceBinded;
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     isToolEnabled(id: string) {

@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: NE
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/NE/administrative-division-niger.html
  */
 class NeSubdivisionCode extends AbstractSearcher
 {

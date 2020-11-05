@@ -1,0 +1,66 @@
+{
+    "config": {
+        "lang": "fr",
+        "applicationName": "Maarch Courrier 20.10",
+        "cookieTime": 10080,
+        "timezone": "Europe\/Paris",
+        "maarchDirectory": "\/home\/ludo\/Documents\/suivi_client\/SGAMI\/MaarchCourrier20.10\/",
+        "customID": "tartine2010",
+        "maarchUrl": "",
+        "lockAdvancedPrivileges": true
+    },
+    "database": [
+        {
+            "server": "localhost",
+            "port": "5432",
+            "type": "POSTGRESQL",
+            "name": "tartine2010",
+            "user": "maarch",
+            "password": "maarch"
+        }
+    ],
+    "signatureBook": {
+        "userWS": "superadmin",
+        "passwordWS": "superadmin",
+        "validatedStatus": "EENV",
+        "validatedStatusOnlyVisa": "EENV",
+        "refusedStatus": "REJ_SIGN",
+        "validatedStatusAnnot": "COU",
+        "refusedStatusAnnot": "RET"
+    },
+    "exportSeda": {
+        "sae": "MaarchRM",
+        "token": "phdF9WkJuTKkDuPXoqDZuCFEQT7En7YqsVROsdD1HoPlOsmSRZeZKpl6weZd+\/0momU9JodKUyZDzvLCWOZ1sw==",
+        "urlSAEService": "http:\/\/demo-ap.maarchrm.com:81",
+        "senderOrgRegNumber": "org_987654321_DGS_SA",
+        "accessRuleCode": "AR039",
+        "certificateSSL": "",
+        "userAgent": "service",
+        "statusReplyReceived": "REPLY_SEDA",
+        "statusReplyRejected": "REPLY_SEDA",
+        "statusMailToPurge": "REPLY_SEDA",
+        "externalSAE": {
+            "retentionRules": [
+                {
+                    "id": "id1",
+                    "label": "label1"
+                }
+            ],
+            "archiveEntities": [
+                {
+                    "id": "id1",
+                    "label": "label1"
+                }
+            ],
+            "archivalAgreements": [
+                {
+                    "id": "id1",
+                    "label": "label1"
+                }
+            ]
+        },
+        "M2M": {
+            "gec": "maarch_courrier"
+        }
+    }
+}

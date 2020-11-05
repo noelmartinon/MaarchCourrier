@@ -1,11 +1,9 @@
-<?php
-
-namespace Gitlab\Model;
+<?php namespace Gitlab\Model;
 
 use Gitlab\Client;
 
 /**
- * @final
+ * Class File
  *
  * @property-read string $file_path
  * @property-read string $branch_name
@@ -14,19 +12,18 @@ use Gitlab\Client;
 class File extends AbstractModel
 {
     /**
-     * @var string[]
+     * @var array
      */
-    protected static $properties = [
+    protected static $properties = array(
         'project',
         'file_path',
-        'branch_name',
-    ];
+        'branch_name'
+    );
 
     /**
-     * @param Client  $client
+     * @param Client $client
      * @param Project $project
-     * @param array   $data
-     *
+     * @param array $data
      * @return File
      */
     public static function fromArray(Client $client, Project $project, array $data)
@@ -37,11 +34,9 @@ class File extends AbstractModel
     }
 
     /**
-     * @param Project     $project
-     * @param string|null $file_path
-     * @param Client|null $client
-     *
-     * @return void
+     * @param Project $project
+     * @param string $file_path
+     * @param Client $client
      */
     public function __construct(Project $project, $file_path = null, Client $client = null)
     {

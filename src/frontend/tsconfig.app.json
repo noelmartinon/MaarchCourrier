@@ -3,6 +3,17 @@
   "compilerOptions": {
     "outDir": "../out-tsc/app",
     "baseUrl": "../../apps/maarch_entreprise/",
+    "paths": {
+      "@appRoot/*": [
+        "../../src/frontend/app/*"
+      ],
+      "@service/*": [
+        "../../src/frontend/service/*"
+      ],
+      "@plugins/*": [
+        "../../src/frontend/plugins/*"
+      ]
+    }
   },
   "files": [
     "main.ts",

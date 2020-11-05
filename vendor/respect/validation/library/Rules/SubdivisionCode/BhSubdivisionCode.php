@@ -18,16 +18,16 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: BH
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/BH/administrative-division-bahrain.html
  */
 class BhSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        '13', // Al Manāmah (Al ‘Āşimah)
-        '14', // Al Janūbīyah
-        '15', // Al Muḩarraq
-        '16', // Al Wusţá
-        '17', // Ash Shamālīyah
+        '13', // Capital
+        '14', // Southern
+        '15', // Muharraq
+        '16', // Central
+        '17', // Northern
     ];
 
     public $compareIdentical = true;

@@ -1,8 +1,0 @@
-<validationRules>
-    <validationRule name="update_AvisPage" extends="standardForm" mode="error">
-    	<parameter name="res_id" type="integer" />
-    	<parameter name="coll_id" type="collection_list" />
-    	<parameter name="action" type="string" />
-    </validationRule>
-</validationRules>
-

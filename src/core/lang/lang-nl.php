@@ -259,11 +259,6 @@ define('_PROCEED_WORKFLOW_AVIS', 'Een bericht uitzenden (sequentieel)');
 define('_PROCEED_WORKFLOW_AVIS_DESC', 'Werkt de uitgiftedatum bij van het bericht van de huidige consultant van het berichtencircuit (\'process_date\' van de tabel listinstance).');
 define('_PROCEED_WORKFLOW_AVIS_SIMPLE', 'Een bericht uitzenden (parallel)');
 define('_PROCEED_WORKFLOW_AVIS_SIMPLE_DESC', 'Werkt de uitgiftedatum bij van het bericht van de gebruiker die aanwezig is in het bericht in de verdelingslijst van het brief (\'process_date\' van de tabel listinstance).');
-define('_EXPORT_SEDA', 'Uw brieven doorsturen');
-define('_CHECK_ACKNOWLEDGEMENT', 'Controle van het ontvangstbewijs');
-define('_CHECK_REPLY', 'Controle van het antwoord op de transfer');
-define('_PURGE_LETTER', 'De brief vrijmaken na de archivering');
-define('_RESET_LETTER', 'Reset van het verwerkingscircuit');
 define('_SIMPLE_CONFIRM_WITH_UPDATE_DATE', 'Bevestiging en bijwerking van de vertrekdatum');
 define('_NOT_INCOMING_CATEGORY', 'Categorie verschillend van \'Inkomende post\''); //_TO_TRANSLATE
 define('_AR_ALREADY_GENERATED', 'Ontvangstbevestiging gegenereerd maar niet verzonden'); //_TO_TRANSLATE
@@ -418,6 +413,7 @@ define("_CANNOT_SYNCHRONIZE_M2M_ANNUARY", "Contact can not be added in M2M annua
 define("_DATE_LOCALE", "en_US.utf8");
 
 define("_USER_PREFERENCE_UPDATED", "User preferences updated"); //TO TRANSLATE
+define("_USER_FEATURE_TOUR_UPDATED", "One or some steps done in the feature tour"); //TO TRANSLATE
 
 define("_NO_SENDERS", "No sender linked to resource"); //TO TRANSLATE
 
@@ -465,6 +461,18 @@ define("_DOC_ADD_TO_SIGNATORY_BOOK", "Mail added to signatory book"); //TO TRANS
 define("_DOC_REMOVE_FROM_SIGNATORY_BOOK", "Mail removed from signatory book"); //TO TRANSLATE
 define("_DOC_ADD_TO_MAILEVA", "Mail added to Maileva shippings"); //TO TRANSLATE
 define("_DOC_REMOVE_FROM_MAILEVA", "Mail removed from Maileva shippings"); //TO TRANSLATE
+define("_RESET_BINDING_DOCUMENT", "Reset document binding"); //TO TRANSLATE
+define("_SET_BINDING_DOCUMENT", "Set document as binging"); //TO TRANSLATE
+define("_SET_NON_BINDING_DOCUMENT", "Set document as non binding"); //TO TRANSLATE
+define("_RETENTION_RULE_FROZEN", "Retention rule frozen"); //TO TRANSLATE
+define("_BINDING_DOCUMENT", "Binding document"); //TO TRANSLATE
+define("_YES", "Yes");
+define("_NO", "No"); //TO TRANSLATE
+define("_RESET_BINDING_DOCUMENT", "Reset binding document"); //TO TRANSLATE
+define("_SET_BINDING_DOCUMENT", "Mail was set as binding"); //TO TRANSLATE
+define("_SET_NON_BINDING_DOCUMENT", "Mail was set as non binding"); //TO TRANSLATE
+define("_FREEZE_RETENTION_RULE", "Retention rule frozen"); //TO TRANSLATE
+define("_UNFREEZE_RETENTION_RULE", "Retention rule unfrozen"); //TO TRANSLATE
 
 define("_ISSUING_SITE_CREATED", "Issuing site created"); //TO TRANSLATE
 define("_ISSUING_SITE_UPDATED", "Issuing site updated"); //TO TRANSLATE

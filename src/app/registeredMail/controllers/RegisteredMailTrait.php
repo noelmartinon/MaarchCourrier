@@ -12,6 +12,7 @@
 
 namespace RegisteredMail\controllers;
 
+use Contact\models\ContactModel;
 use Parameter\models\ParameterModel;
 use RegisteredMail\models\IssuingSiteModel;
 use RegisteredMail\models\RegisteredMailModel;
@@ -31,7 +32,7 @@ trait RegisteredMailTrait
 
         $resource = ResModel::getById(['select' => ['departure_date', 'category_id'], 'resId' => $args['resId']]);
         if ($resource['category_id'] != 'registeredMail') {
-            return ['errors' => ['This resource is not a registered mail']];
+            return ['errors' => ['This resource is not a registered mail'], 'lang' => 'registeredMailNotFound'];
         } elseif (empty($resource['departure_date'])) {
             return ['errors' => ['Departure date is empty']];
         } elseif (!in_array($args['data']['type'], ['2D', '2C', 'RW'])) {
@@ -42,8 +43,23 @@ trait RegisteredMailTrait
             return ['errors' => ['R3 warranty is not allowed for type RW']];
         } elseif (empty($args['data']['recipient']) || empty($args['data']['issuingSiteId'])) {
             return ['errors' => ['recipient or issuingSiteId is missing to print registered mail']];
-        } elseif ((empty($args['data']['recipient']['company']) && (empty($args['data']['recipient']['lastname']) || empty($args['data']['recipient']['firstname']))) || empty($args['data']['recipient']['addressStreet']) || empty($args['data']['recipient']['addressPostcode']) || empty($args['data']['recipient']['addressTown']) || empty($args['data']['recipient']['addressCountry'])) {
-            return ['errors' => ['company and firstname/lastname, or addressStreet, addressPostcode, addressTown or addressCountry is empty in Recipient']];
+        } elseif (empty($args['data']['recipient'][0]['id'])) {
+            return ['errors' => ['recipient is empty']];
+        }
+
+        $args['data']['recipient'] = ContactModel::getById(
+            [
+            'select' => ['company', 'lastname', 'firstname', 'address_town as "addressTown"', 'address_number as "addressNumber"', 'address_street as "addressStreet"', 'address_country as "addressCountry"', 'address_postcode as "addressPostcode"', 'address_additional1 as addressAdditional1', 'address_additional2 as addressAdditional2', 'department'],
+            'id' => $args['data']['recipient'][0]['id']]
+        );
+        
+        if (empty($args['data']['recipient']['lastname']) && !empty($args['data']['recipient']['department'])) {
+            $args['data']['recipient']['lastname'] = $args['data']['recipient']['department'];
+        }
+        unset($args['data']['recipient']['department']);
+
+        if ((empty($args['data']['recipient']['company']) && (empty($args['data']['recipient']['lastname']) || empty($args['data']['recipient']['firstname']))) || empty($args['data']['recipient']['addressStreet']) || empty($args['data']['recipient']['addressPostcode']) || empty($args['data']['recipient']['addressTown']) || empty($args['data']['recipient']['addressCountry'])) {
+            return ['errors' => ['company and firstname/lastname, or addressStreet, addressPostcode, addressTown or addressCountry is empty in Recipient'], 'lang' => 'argumentRegisteredMailRecipientEmpty'];
         }
 
         $issuingSite = IssuingSiteModel::getById([
@@ -51,7 +67,7 @@ trait RegisteredMailTrait
             'select'    => ['label', 'address_number', 'address_street', 'address_additional1', 'address_additional2', 'address_postcode', 'address_town', 'address_country']
         ]);
         if (empty($issuingSite)) {
-            return ['errors' => ['Issuing site does not exist']];
+            return ['errors' => ['Issuing site does not exist'], 'lang' => 'argumentRegisteredMailIssuingSiteEmpty'];
         }
 
         $range = RegisteredNumberRangeModel::get([
@@ -60,7 +76,7 @@ trait RegisteredMailTrait
             'data'      => [$args['data']['type'], 'OK']
         ]);
         if (empty($range)) {
-            return ['errors' => ['No range found']];
+            return ['errors' => ['No range found'], 'lang' => 'NoRangeAvailable'];
         }
 
         if ($range[0]['current_number'] + 1 > $range[0]['range_end']) {
@@ -139,11 +155,11 @@ trait RegisteredMailTrait
         $registeredMail = RegisteredMailModel::getByResId(['select' => ['issuing_site', 'type', 'number', 'warranty', 'letter', 'recipient', 'reference'], 'resId' => $args['resId']]);
         $recipient = json_decode($registeredMail['recipient'], true);
         if (empty($registeredMail)) {
-            return ['errors' => ['No registered mail for this resource']];
+            return ['errors' => ['No registered mail for this resource'], 'lang' => 'registeredMailNotFound'];
         } elseif (empty($recipient) || empty($registeredMail['issuing_site']) || empty($registeredMail['type']) || empty($registeredMail['number']) || empty($registeredMail['warranty'])) {
             return ['errors' => ['recipient, issuing_site, type, number or warranty is missing to print registered mail']];
         } elseif ((empty($recipient['company']) && (empty($recipient['lastname']) || empty($recipient['firstname']))) || empty($recipient['addressStreet']) || empty($recipient['addressPostcode']) || empty($recipient['addressTown']) || empty($recipient['addressCountry'])) {
-            return ['errors' => ['company and firstname/lastname, or addressStreet, addressPostcode, addressTown or addressCountry is empty in Recipient']];
+            return ['errors' => ['company and firstname/lastname, or addressStreet, addressPostcode, addressTown or addressCountry is empty in Recipient'], 'lang' => 'argumentRegisteredMailRecipientEmpty'];
         }
 
         $issuingSite = IssuingSiteModel::getById([

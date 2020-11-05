@@ -1,13 +1,13 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { FormBuilder, FormGroup, Validators, ValidationErrors, AbstractControl, ValidatorFn } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { AppService } from '../../../service/app.service';
+import { AppService } from '@service/app.service';
 import { Router } from '@angular/router';
-import { HeaderService } from '../../../service/header.service';
-import { AuthService } from '../../../service/auth.service';
+import { HeaderService } from '@service/header.service';
+import { AuthService } from '@service/auth.service';
 
 @Component({
     templateUrl: 'password-modification.component.html'

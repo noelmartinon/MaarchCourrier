@@ -14,11 +14,9 @@
  */
 
 require_once __DIR__ . DIRECTORY_SEPARATOR .'../RequestSeda.php';
-require_once __DIR__. DIRECTORY_SEPARATOR .'../Zip.php';
 
 class ReceiveMessage
 {
-
     private $db;
 
     public function __construct()

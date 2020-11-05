@@ -18,15 +18,18 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: IE
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/IE/administrative-division-ireland.html
  */
 class IeSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'C', // Connacht
+        'C', // Connaught
+        'L', // Leinster
+        'M', // Munster
+        'U', // Ulster
+        'C', // Cork
         'CE', // Clare
         'CN', // Cavan
-        'CO', // Cork
         'CW', // Carlow
         'D', // Dublin
         'DL', // Donegal
@@ -34,13 +37,11 @@ class IeSubdivisionCode extends AbstractSearcher
         'KE', // Kildare
         'KK', // Kilkenny
         'KY', // Kerry
-        'L', // Leinster
         'LD', // Longford
         'LH', // Louth
         'LK', // Limerick
         'LM', // Leitrim
         'LS', // Laois
-        'M', // Munster
         'MH', // Meath
         'MN', // Monaghan
         'MO', // Mayo
@@ -48,7 +49,6 @@ class IeSubdivisionCode extends AbstractSearcher
         'RN', // Roscommon
         'SO', // Sligo
         'TA', // Tipperary
-        'U', // Ulster
         'WD', // Waterford
         'WH', // Westmeath
         'WW', // Wicklow

@@ -1,5 +1,20 @@
 <mat-sidenav-container class="maarch-container">
     <ng-template #adminMenuTemplate>
+        <div *ngIf="resourceFreezed || resourceBinded !== null" class="alert-message alert-message-danger"
+            style="min-width: 100%; margin: 10px 0;">
+            <div *ngIf="resourceFreezed" style="display: flex;align-items: center;">
+                <i class="fas fa-snowflake" style="width: 25px;text-align: center;"></i>&nbsp;<span [innerHTML]="'lang.retentionRuleFrozenAlt' | translate"></span>
+            </div>
+            <div *ngIf="resourceBinded !== null" style="display: flex;align-items: center;">
+                <i class="fas fa-exclamation" style="width: 25px;text-align: center;"></i>&nbsp;
+                <span
+                    [innerHTML]="resourceBinded ? ('lang.bindingMailAlt' | translate) : ('lang.noBindingMailAlt' | translate)">
+                </span>
+                &nbsp;
+                <i class="fa fa-info-circle" style="cursor: help;opacity: 0.5;"
+                        [title]="resourceBinded ? ('lang.bindingMailDesc' | translate) : ('lang.noBindingMailDesc' | translate)"></i>
+            </div>
+        </div>
         <div class="listModels">
             <div class="processTool">
                 <div class="processTool-module jiggle" *ngFor="let module of processTool"
@@ -14,14 +29,21 @@
         </div>
         <div class="indexing-form-container">
             <div *ngIf="!isModalOpen() && currentTool !== 'dashboard'" style="display: flex;justify-content: flex-end;">
-                <button mat-icon-button (click)="createModal()" color="primary" [title]="this.translate.instant('lang.openInExternalModal')">
+                <button *ngIf="privilegeService.hasCurrentUserPrivilege('view_technical_infos')" mat-icon-button
+                    (click)="openTechnicalInfo()" color="primary"
+                    [title]="this.translate.instant('lang.showTechnicalInfo')">
+                    <mat-icon class="far fa-file-code"></mat-icon>
+                </button>
+                <button mat-icon-button (click)="createModal()" color="primary"
+                    [title]="this.translate.instant('lang.openInExternalModal')">
                     <mat-icon class="fas fa-external-link-alt"></mat-icon>
                 </button>
             </div>
             <ng-container *ngIf="currentTool === 'dashboard'">
                 <div
                     style="display: flex;align-items: center;justify-content: flex-end;margin-top: 10px;margin-bottom: -20px;">
-                    <button mat-button color="primary" [title]="this.translate.instant('lang.generateAndDownloadPrintedFolder')"
+                    <button mat-button color="primary"
+                        [title]="this.translate.instant('lang.generateAndDownloadPrintedFolder')"
                         (click)="openPrintedFolderPrompt()">
                         <mat-icon class="fa fa-print" style="height:auto"></mat-icon>
                         {{'lang.printedFolder' | translate}}
@@ -44,7 +66,8 @@
                         <div class="title-divider"></div>
                     </div>
                     <div class="content">
-                        <app-note-resume *ngIf="!loading" [resId]="currentResourceInformations.resId" (goTo)="currentTool = 'notes'">
+                        <app-note-resume *ngIf="!loading" [resId]="currentResourceInformations.resId"
+                            (goTo)="currentTool = 'notes'">
                         </app-note-resume>
                     </div>
                 </div>
@@ -65,7 +88,8 @@
                         <div class="title-divider"></div>
                     </div>
                     <div class="content">
-                        <app-mail-resume *ngIf="!loading" [resId]="currentResourceInformations.resId" (goTo)="currentTool = 'emails'">
+                        <app-mail-resume *ngIf="!loading" [resId]="currentResourceInformations.resId"
+                            (goTo)="currentTool = 'emails'">
                         </app-mail-resume>
                     </div>
                 </div>
@@ -86,7 +110,8 @@
                     [resId]="currentResourceInformations.resId" [expanded]="true">
                 </app-diffusions-list>
                 <app-sent-resource-list *ngIf="currentTool === 'emails' && !loading" #appSentResource
-                    [resId]="currentResourceInformations.resId" [currentUserId]="currentUserId" [currentGroupId]="currentGroupId" [currentBasketId]="currentBasketId"
+                    [resId]="currentResourceInformations.resId" [currentUserId]="currentUserId"
+                    [currentGroupId]="currentGroupId" [currentBasketId]="currentBasketId"
                     (reloadBadgeSentResource)="refreshBadge($event,'emails')">
                 </app-sent-resource-list>
                 <app-visa-workflow *ngIf="currentTool === 'visaCircuit' && !loading" #appVisaWorkflow
@@ -101,16 +126,22 @@
                     [resId]="currentResourceInformations.resId" [autoOpenCreation]="isMailing" [target]="'process'"
                     (reloadBadgeAttachments)="refreshBadge($event,'attachments')">
                 </app-attachments-list>
-                <app-select-indexing-model *ngIf="currentTool === 'info' && !loading" #appSelectIndexingModel [defaultIndexingModelId]="currentResourceInformations.modelId" [adminMode]="canChangeModel" [indexingForm]="indexingForm" (afterSelectedListModel)="indexingForm.loadForm($event.id, false)"></app-select-indexing-model>
-                <div *ngIf="currentTool === 'info' && !loading && !functions.empty(currentResourceInformations.registeredMail_deposit_id)" class="alert-message alert-message-info" style="min-width: 100%;" [innerHTML]="'lang.dispositListGeneratedMsg' | translate"></div>
+                <app-select-indexing-model *ngIf="currentTool === 'info' && !loading" #appSelectIndexingModel
+                    [defaultIndexingModelId]="currentResourceInformations.modelId" [adminMode]="canChangeModel"
+                    [indexingForm]="indexingForm" (afterSelectedListModel)="indexingForm.loadForm($event.id, false)">
+                </app-select-indexing-model>
+                <div *ngIf="currentTool === 'info' && !loading && !functions.empty(currentResourceInformations.registeredMail_deposit_id)"
+                    class="alert-message alert-message-info" style="min-width: 100%;"
+                    [innerHTML]="'lang.dispositListGeneratedMsg' | translate"></div>
                 <app-indexing-form *ngIf="currentTool === 'info' && !loading" #indexingForm [groupId]="currentGroupId"
                     [resId]="currentResourceInformations.resId" [indexingFormId]="currentResourceInformations.modelId"
                     [mode]="'process'" [canEdit]="canEditData" [hideDiffusionList]="true"
                     (loadingFormEndEvent)="triggerProcessAction()"
-                    (retrieveDocumentEvent)="appDocumentViewer.saveDocService()" (afterSaveEvent)="refreshData()"></app-indexing-form>
+                    (retrieveDocumentEvent)="appDocumentViewer.saveDocService()" (afterSaveEvent)="refreshData()">
+                </app-indexing-form>
                 <div style="position: sticky;bottom: 0px;text-align:right;">
-                    <button mat-fab [title]="this.translate.instant('lang.saveModifications')" *ngIf="isToolModified()" (click)="saveTool()"
-                        color="accent">
+                    <button mat-fab [title]="this.translate.instant('lang.saveModifications')" *ngIf="isToolModified()"
+                        (click)="saveTool()" color="accent">
                         <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
                     </button>
                 </div>
@@ -150,7 +181,8 @@
                     </ng-container>
                 </mat-menu>
                 <button mat-button *ngIf="!appService.getViewMode()"
-                    [disabled]="actionService.loading || selectedAction.id === 0 || (appDocumentViewer !== undefined && !appDocumentViewer.isEditorLoaded())" class="button-form-primary-filled"
+                    [disabled]="actionService.loading || selectedAction.id === 0 || (appDocumentViewer !== undefined && !appDocumentViewer.isEditorLoaded())"
+                    class="button-form-primary-filled"
                     style="width: 150px;align-items: center;justify-content: center;text-align: center;display: flex;"
                     (click)="onSubmit()">{{'lang.validate' | translate}}</button>
                 <button mat-icon-button *ngIf="appService.getViewMode()" class="button-form-primary"
@@ -158,7 +190,8 @@
                     <mat-icon class="fa fa-check"></mat-icon>
                 </button>
             </ng-container>
-            <div class="emptyAction" *ngIf="actionsList.length === 0" [innerHTML]="this.translate.instant('lang.noAvailableActionProcess')"></div>
+            <div class="emptyAction" *ngIf="actionsList.length === 0"
+                [innerHTML]="this.translate.instant('lang.noAvailableActionProcess')"></div>
         </div>
     </ng-template>
     <mat-sidenav-content class="process-content">
@@ -189,6 +222,35 @@
                                 <mat-icon class="followIcon {{this.resourceFollowed ? 'fas':'far'}} fa-star"
                                     style="font-size: 20px;"></mat-icon>
                             </button>
+                            <button *ngIf="privilegeService.hasCurrentUserPrivilege('freeze_retention_rule')"
+                                mat-icon-button
+                                [title]="resourceFreezed ? ('lang.unfreezeRetentionRule' | translate) :  ('lang.freezeRetentionRule' | translate)"
+                                class="categoryLabel" (click)="toggleFreezing()">
+                                <mat-icon
+                                    class="{{this.resourceFreezed ? 'freezeUnfreezIcon':'nonFreeze'}} fas fa-snowflake"
+                                    style="font-size: 20px;"></mat-icon>
+                            </button>
+                            <button mat-icon-button
+                                *ngIf="privilegeService.hasCurrentUserPrivilege('set_binding_document')"
+                                [matMenuTriggerFor]="bindingRentalRule"
+                                [title]="this.translate.instant('lang.setBindingDocument')" class="categoryLabel">
+                                <mat-icon class="bindIcon fas fa-exclamation" style="font-size: 20px;"></mat-icon>
+                            </button>
+                            <mat-menu #bindingRentalRule="matMenu">
+                                <buton mat-menu-item [class.isSelectedMenu]="this.resourceBinded === true"
+                                    (click)="toggleBinding(true)" [title]="'lang.bindingMail' | translate | stripTags"
+                                    [innerHTML]="'lang.bindingMail' | translate"></buton>
+                                <mat-divider></mat-divider>
+                                <buton mat-menu-item [class.isSelectedMenu]="this.resourceBinded === false"
+                                    (click)="toggleBinding(false)"
+                                    [title]="'lang.noBindingMail' | translate | stripTags"
+                                    [innerHTML]="'lang.noBindingMail' | translate"></buton>
+                                <mat-divider></mat-divider>
+                                <buton mat-menu-item [class.isSelectedMenu]="this.resourceBinded === null"
+                                    (click)="toggleBinding(null)" [title]="this.translate.instant('lang.doNotDefine')">
+                                    {{ 'lang.doNotDefine' | translate}}</buton>
+                                <mat-divider></mat-divider>
+                            </mat-menu>
                             <div class="content-item" *ngIf="this.currentResourceInformations.priority !== undefined">
                                 <b><i class="fas fa-flag" [style.color]="this.currentResourceInformations.priorityColor"
                                         style="font-size: 25px;padding-right: 20px;"></i>
@@ -200,19 +262,26 @@
                                     {{this.currentResourceInformations.chrono}}</div>
                             </div>
                             <div class="content-item" (click)="openContact()" style="cursor:pointer">
-                                <div>{{this.currentResourceInformations.categoryId !== 'outgoing' ? this.translate.instant('lang.senders') : this.translate.instant('lang.recipient')}} :</div>
+                                <div>
+                                    {{this.currentResourceInformations.categoryId !== 'outgoing' ? this.translate.instant('lang.senders') : this.translate.instant('lang.recipient')}}
+                                    :</div>
                                 <div class="content-item-value">{{senderLightInfo.displayName}} <i
                                         *ngIf="this.senderLightInfo.filling" class="fas fa-circle"
                                         style="font-size: 8px" [style.color]="this.senderLightInfo.filling"></i></div>
                             </div>
-                            <div class="content-item" *ngIf="!functions.empty(currentResourceInformations.registeredMail_returnDate)">
+                            <div class="content-item"
+                                *ngIf="!functions.empty(currentResourceInformations.registeredMail_returnDate)">
                                 <div>{{'lang.returnDate' | translate}} :</div>
-                                <div class="content-item-value" [title]="this.currentResourceInformations.registeredMail_returnDate | fullDate">
-                                    {{this.currentResourceInformations.registeredMail_returnDate | date: 'dd/MM/y'}}</div>
+                                <div class="content-item-value"
+                                    [title]="this.currentResourceInformations.registeredMail_returnDate | fullDate">
+                                    {{this.currentResourceInformations.registeredMail_returnDate | date: 'dd/MM/y'}}
+                                </div>
                             </div>
-                            <div class="content-item" *ngIf="!functions.empty(currentResourceInformations.registeredMail_returnReason)">
+                            <div class="content-item"
+                                *ngIf="!functions.empty(currentResourceInformations.registeredMail_returnReason)">
                                 <div>{{'lang.returnReason' | translate}} :</div>
-                                <div class="content-item-value" [title]="this.currentResourceInformations.registeredMail_returnReason">
+                                <div class="content-item-value"
+                                    [title]="this.currentResourceInformations.registeredMail_returnReason">
                                     {{this.currentResourceInformations.registeredMail_returnReason}}</div>
                             </div>
                             <div class="content-item"
@@ -236,7 +305,8 @@
                             <div
                                 style="position: absolute;right: 0px;top: 0px;height: 100%;display: flex;flex-direction: column;justify-content: center;">
                                 <button mat-icon-button *ngFor="let inteKey of integrationsInfo | keyvalue"
-                                    matTooltip="{{'lang.' + inteKey.key | translate}}" (click)="toggleIntegration(inteKey.key)">
+                                    matTooltip="{{'lang.' + inteKey.key | translate}}"
+                                    (click)="toggleIntegration(inteKey.key)">
                                     <mat-icon [class]="inteKey.value.icon"
                                         [class.checked]="currentResourceInformations.integrations[inteKey.key]"
                                         [class.unchecked]="!currentResourceInformations.integrations[inteKey.key]">
@@ -255,8 +325,8 @@
         </div>
         <div class="document-container" [class.fullContainer]="appService.getViewMode()">
             <div class="content">
-                <app-document-viewer #appDocumentViewer *ngIf="!loading" style="height:100%;width:100%;" [editMode]="canEditData"
-                    [resId]="currentResourceInformations.resId"
+                <app-document-viewer #appDocumentViewer *ngIf="!loading" style="height:100%;width:100%;"
+                    [editMode]="canEditData" [resId]="currentResourceInformations.resId"
                     [title]="currentResourceInformations.chrono + ' - ' + currentResourceInformations.subject">
                 </app-document-viewer>
             </div>
@@ -281,11 +351,13 @@
                 <app-linked-resource-list *ngIf="modal.id === 'linkedResources' && !loading" #appLinkedResourceList
                     [resId]="currentResourceInformations.resId"
                     (reloadBadgeLinkedResources)="refreshBadge($event,'linkedResources')"></app-linked-resource-list>
-                <app-diffusions-list *ngIf="modal.id === 'diffusionList' && !loading" #appDiffusionsList [adminMode]="true"
-                    [target]="detailMode ? 'details': 'process'" [resId]="currentResourceInformations.resId" [expanded]="true">
+                <app-diffusions-list *ngIf="modal.id === 'diffusionList' && !loading" #appDiffusionsList
+                    [adminMode]="true" [target]="detailMode ? 'details': 'process'"
+                    [resId]="currentResourceInformations.resId" [expanded]="true">
                 </app-diffusions-list>
                 <app-sent-resource-list *ngIf="modal.id === 'emails' && !loading" #appSentResource
-                    [resId]="currentResourceInformations.resId" (reloadBadgeSentResource)="refreshBadge($event,'emails')">
+                    [resId]="currentResourceInformations.resId"
+                    (reloadBadgeSentResource)="refreshBadge($event,'emails')">
                 </app-sent-resource-list>
                 <app-visa-workflow *ngIf="modal.id === 'visaCircuit' && !loading"
                     [adminMode]="detailMode ? privilegeService.hasCurrentUserPrivilege('config_visa_workflow_in_detail') : privilegeService.hasCurrentUserPrivilege('config_visa_workflow')"
@@ -296,19 +368,27 @@
                     [adminMode]="detailMode ? privilegeService.hasCurrentUserPrivilege('config_avis_workflow_in_detail') : privilegeService.hasCurrentUserPrivilege('config_avis_workflow')">
                 </app-avis-workflow>
                 <app-attachments-list *ngIf="modal.id === 'attachments'  && !loading" #appAttachmentsList
-                    [resId]="currentResourceInformations.resId" [autoOpenCreation]="isMailing" (reloadBadgeAttachments)="refreshBadge($event,'attachments')">
+                    [resId]="currentResourceInformations.resId" [autoOpenCreation]="isMailing"
+                    (reloadBadgeAttachments)="refreshBadge($event,'attachments')">
                 </app-attachments-list>
-                <app-select-indexing-model *ngIf="modal.id === 'info' && !loading" #appSelectIndexingModel [adminMode]="canChangeModel" [indexingForm]="indexingForm" [defaultIndexingModelId]="currentResourceInformations.modelId" (afterSelectedListModel)="indexingForm.loadForm($event.id, false)"></app-select-indexing-model>
-                <div *ngIf="modal.id === 'info' && !loading && !functions.empty(currentResourceInformations.registeredMail_deposit_id)" class="alert-message alert-message-info" style="min-width: 100%;" [innerHTML]="'lang.dispositListGeneratedMsg' | translate"></div>
+                <app-select-indexing-model *ngIf="modal.id === 'info' && !loading" #appSelectIndexingModel
+                    [adminMode]="canChangeModel" [indexingForm]="indexingForm"
+                    [defaultIndexingModelId]="currentResourceInformations.modelId"
+                    (afterSelectedListModel)="indexingForm.loadForm($event.id, false)"></app-select-indexing-model>
+                <div *ngIf="modal.id === 'info' && !loading && !functions.empty(currentResourceInformations.registeredMail_deposit_id)"
+                    class="alert-message alert-message-info" style="min-width: 100%;"
+                    [innerHTML]="'lang.dispositListGeneratedMsg' | translate"></div>
                 <app-indexing-form *ngIf="modal.id === 'info' && !loading" #indexingForm [groupId]="currentGroupId"
                     [indexingFormId]="currentResourceInformations.modelId" [resId]="currentResourceInformations.resId"
                     [mode]="'process'" [canEdit]="canEditData" [hideDiffusionList]="true"
-                    (loadingFormEndEvent)="triggerProcessAction()" (retrieveDocumentEvent)="appDocumentViewer.saveDocService()" (afterSaveEvent)="refreshData()">
+                    (loadingFormEndEvent)="triggerProcessAction()"
+                    (retrieveDocumentEvent)="appDocumentViewer.saveDocService()" (afterSaveEvent)="refreshData()">
                 </app-indexing-form>
                 <div style="position: sticky;bottom: 0px;text-align:right;padding:15px;">
                     <button mat-fab
                         *ngIf="indexingForm !== undefined && indexingForm.isResourceModified() && modal.id === 'info'"
-                        (click)="confirmModification()" color="accent" [title]="this.translate.instant('lang.saveModifications')">
+                        (click)="confirmModification()" color="accent"
+                        [title]="this.translate.instant('lang.saveModifications')">
                         <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
                     </button>
                     <button mat-fab [title]="this.translate.instant('lang.saveModifications')"

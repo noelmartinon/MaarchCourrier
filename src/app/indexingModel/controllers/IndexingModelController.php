@@ -31,6 +31,7 @@ use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use Tag\models\ResourceTagModel;
+use User\models\UserModel;
 
 class IndexingModelController
 {
@@ -77,8 +78,35 @@ class IndexingModelController
         }
 
         $fields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'default_value', 'unit', 'enabled'], 'where' => ['model_id = ?'], 'data' => [$args['id']]]);
+        $destination = '';
         foreach ($fields as $key => $value) {
             $fields[$key]['default_value'] = json_decode($value['default_value'], true);
+            if ($value['identifier'] == 'destination') {
+                $destination = $value['default_value'];
+            } elseif ($value['identifier'] == 'diffusionList') {
+                foreach ($fields[$key]['default_value'] as $itemKey => $item) {
+                    if ($item['type'] == 'entity') {
+                        $entity = EntityModel::getById(['id' => $item['id'], 'select' => ['entity_label', 'entity_id']]);
+                        $fields[$key]['default_value'][$itemKey]['labelToDisplay']       = $entity['entity_label'];
+                        $fields[$key]['default_value'][$itemKey]['descriptionToDisplay'] = null;
+                    } else {
+                        $user = UserModel::getById(['id' => $item['id'], 'select' => ['firstname', 'lastname', 'status']]);
+                        $userEntities = UserModel::getEntitiesById(['id' => $item['id'], 'select' => ['entities.id']]);
+                        $userEntities = array_column($userEntities, 'id');
+                        if ($item['mode'] == 'dest' && !empty($destination) && !in_array($destination, $userEntities)) {
+                            unset($fields[$key]['default_value'][$itemKey]);
+                            continue;
+                        }
+                        if (!empty($user) && !in_array($user['status'], ['SPD', 'DEL'])) {
+                            $fields[$key]['default_value'][$itemKey]['labelToDisplay']       = $user['firstname'] . ' ' . $user['lastname'];
+                            $fields[$key]['default_value'][$itemKey]['descriptionToDisplay'] = UserModel::getPrimaryEntityById(['id' => $item['id'], 'select' => ['entities.entity_label']])['entity_label'];
+                        } else {
+                            unset($fields[$key]['default_value'][$itemKey]);
+                        }
+                    }
+                }
+                $fields[$key]['default_value'] = array_values($fields[$key]['default_value']);
+            }
         }
         $model['fields'] = $fields;
 
@@ -139,7 +167,6 @@ class IndexingModelController
                 $fieldsMaster[$key]['default_value'] = json_decode($value['default_value'], true);
             }
 
-
             // Look for fields in master model
             // if field in master is not in child, return an error
             // if field is not in master but in child, is ignored
@@ -147,13 +174,20 @@ class IndexingModelController
             foreach ($fieldsMaster as $field) {
                 $found = false;
                 foreach ($body['fields'] as $value) {
-                    if ($value['identifier'] == $field['identifier'] && $value['mandatory'] == $field['mandatory'] && $value['unit'] == $field['unit']) {
+                    if (($field['identifier'] == 'destination' && $value['identifier'] == 'diffusionList')
+                            || ($value['identifier'] == $field['identifier'] && $value['mandatory'] == $field['mandatory'] && $value['unit'] == $field['unit'])) {
                         if (!$field['enabled']) {
                             $value = $field;
                         }
+                        if ($field['identifier'] == 'destination' && $value['identifier'] == 'diffusionList') {
+                            $value['unit'] = $field['unit'];
+                        }
+
                         array_push($arrayTmp, $value);
                         $found = true;
-                        break;
+                        if ($field['identifier'] != 'destination') {
+                            break;
+                        }
                     }
                 }
 
@@ -189,7 +223,10 @@ class IndexingModelController
             }
             if (strpos($field['identifier'], 'indexingCustomField_') !== false && !empty($field['default_value']) && $field['default_value'] != '_TODAY') {
                 $customFieldId = explode('_', $field['identifier'])[1];
-                $customField = CustomFieldModel::getById(['id' => $customFieldId, 'select' => ['type']]);
+                $customField = CustomFieldModel::getById(['id' => $customFieldId, 'select' => ['type'], 'where' => ['mode = ?'], 'data' => ['form']]);
+                if (empty($customField)) {
+                    continue;
+                }
                 if ($customField['type'] == 'date') {
                     $date = new \DateTime($field['default_value']);
                     $field['default_value'] = $date->format('Y-m-d');
@@ -297,9 +334,12 @@ class IndexingModelController
                 foreach ($body['fields'] as $field) {
                     $found = false;
                     foreach ($childFields as $value) {
-                        if ($value['identifier'] == $field['identifier'] && $value['mandatory'] == $field['mandatory'] && $value['unit'] == $field['unit'] && $value['enabled'] == $field['enabled']) {
+                        if (($field['identifier'] == 'destination' && $value['identifier'] == 'diffusionList')
+                                || ($value['identifier'] == $field['identifier'] && $value['mandatory'] == $field['mandatory'] && $value['unit'] == $field['unit'] && $value['enabled'] == $field['enabled'])) {
                             $fieldsToKeep[] = $value;
-                            $found = true;
+                            if ($value['identifier'] != 'diffusionList') {
+                                $found = true;
+                            }
                         }
                     }
                     if (!$found) {
@@ -316,7 +356,10 @@ class IndexingModelController
                     }
                     if (strpos($field['identifier'], 'indexingCustomField_') !== false && !empty($field['default_value']) && $field['default_value'] != '_TODAY') {
                         $customFieldId = explode('_', $field['identifier'])[1];
-                        $customField = CustomFieldModel::getById(['id' => $customFieldId, 'select' => ['type']]);
+                        $customField = CustomFieldModel::getById(['id' => $customFieldId, 'select' => ['type'], 'where' => ['mode = ?'], 'data' => ['form']]);
+                        if (empty($customField)) {
+                            continue;
+                        }
                         if ($customField['type'] == 'date') {
                             $date = new \DateTime($field['default_value']);
                             $field['default_value'] = $date->format('Y-m-d');

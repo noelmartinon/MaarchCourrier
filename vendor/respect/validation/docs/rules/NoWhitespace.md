@@ -19,4 +19,3 @@ See also:
   * [NotBlank](NotBlank.md)
   * [NotEmpty](NotEmpty.md)
   * [NotOptional](NotOptional.md)
-  * [Optional](Optional.md)

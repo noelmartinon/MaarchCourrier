@@ -18,18 +18,17 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: IS
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/IS/administrative-division-iceland.html
  */
 class IsSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        '0', // Reykjavík
-        '1', // Höfuðborgarsvæðið
+        '1', // Höfuðborgarsvæði
         '2', // Suðurnes
         '3', // Vesturland
         '4', // Vestfirðir
-        '5', // Norðurland vestra
-        '6', // Norðurland eystra
+        '5', // Norðurland Vestra
+        '6', // Norðurland Eystra
         '7', // Austurland
         '8', // Suðurland
     ];

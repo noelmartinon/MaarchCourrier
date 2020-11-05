@@ -1,10 +1,13 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { JoyrideService } from 'ngx-joyride';
-import { LocalStorageService } from './local-storage.service';
 import { HeaderService } from './header.service';
 import { FunctionsService } from './functions.service';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { NotificationService } from './notification/notification.service';
 
 @Injectable({
     providedIn: 'root'
@@ -93,10 +96,11 @@ export class FeatureTourService {
     constructor(
         public translate: TranslateService,
         private readonly joyrideService: JoyrideService,
-        private localStorage: LocalStorageService,
         private headerService: HeaderService,
         private functionService: FunctionsService,
-        private router: Router
+        private router: Router,
+        private http: HttpClient,
+        private notify: NotificationService,
     ) {
         this.getCurrentStepType();
     }
@@ -130,25 +134,30 @@ export class FeatureTourService {
                 () => {
                     if (this.currentTour.redirectToAdmin) {
                         this.router.navigate(['/administration']);
+                    } else {
+                        this.endTour();
                     }
-                    this.endTour();
                 }
             );
         }
     }
 
     getCurrentStepType() {
-        if (this.localStorage.get(`featureTourEnd_${this.headerService.user.id}`) !== null) {
-            this.featureTourEnd = JSON.parse(this.localStorage.get(`featureTourEnd_${this.headerService.user.id}`));
+        if (this.headerService.user.userId !== null) {
+            this.featureTourEnd = this.headerService.user.featureTour;
         }
         const unique = [...new Set(this.tour.map(item => item.type))];
-
         this.currentStepType = unique.filter(stepType => this.featureTourEnd.indexOf(stepType) === -1)[0];
     }
 
     endTour() {
         this.featureTourEnd.push(this.currentStepType);
-        this.localStorage.save(`featureTourEnd_${this.headerService.user.id}`, JSON.stringify(this.featureTourEnd));
+        this.http.put('../rest/currentUser/profile/featureTour', {featureTour : this.featureTourEnd}).pipe(
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
         this.getCurrentStepType();
     }
 

@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { TranslateService } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { tap } from 'rxjs/internal/operators/tap';
-import { of } from 'rxjs/internal/observable/of';
-import { catchError } from 'rxjs/internal/operators/catchError';
 import { environment } from '../../../environments/environment';
+import { catchError, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { AuthService } from '@service/auth.service';
 
 
 @Component({
@@ -16,8 +16,6 @@ import { environment } from '../../../environments/environment';
 })
 export class WelcomeComponent implements OnInit {
 
-    
-
     stepFormGroup: FormGroup;
 
     langs: string[] = [];
@@ -26,36 +24,39 @@ export class WelcomeComponent implements OnInit {
 
     steps: any[] = [
         {
-            icon : 'fas fa-check-square',
-            desc: this.translate.instant('lang.prerequisiteCheck')
+            icon: 'fas fa-check-square',
+            desc: 'lang.prerequisiteCheck'
         },
         {
-            icon : 'fa fa-database',
-            desc: this.translate.instant('lang.databaseCreation')
+            icon: 'fa fa-database',
+            desc: 'lang.databaseCreation'
         },
         {
-            icon : 'fa fa-database',
-            desc: this.translate.instant('lang.dataSampleCreation')
+            icon: 'fa fa-database',
+            desc: 'lang.dataSampleCreation'
         },
         {
-            icon : 'fa fa-hdd',
-            desc: this.translate.instant('lang.docserverCreation')
+            icon: 'fa fa-hdd',
+            desc: 'lang.docserverCreation'
         },
         {
-            icon : 'fas fa-tools',
-            desc: this.translate.instant('lang.stepCustomizationActionDesc')
+            icon: 'fas fa-tools',
+            desc: 'lang.stepCustomizationActionDesc'
         },
         {
-            icon : 'fa fa-user',
-            desc: this.translate.instant('lang.adminUserCreation')
+            icon: 'fa fa-user',
+            desc: 'lang.adminUserCreation'
         },
     ];
+
+    customs: any = [];
 
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
-        private _formBuilder: FormBuilder
+        private _formBuilder: FormBuilder,
+        private authService: AuthService
     ) { }
 
     ngOnInit(): void {
@@ -64,21 +65,37 @@ export class WelcomeComponent implements OnInit {
         });
 
         this.getLang();
+        if (!this.authService.noInstall) {
+            this.getCustoms();
+        }
     }
 
     getLang() {
-        this.langs = [
-            'fr',
-            'en',
-        ];
-        /*this.http.get('../rest/dev/lang').pipe(
+        this.http.get('../rest/dev/lang').pipe(
             tap((data: any) => {
+                this.langs = Object.keys(data.langs).filter(lang => lang !== 'nl');
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
                 return of(false);
             })
-        ).subscribe();*/
+        ).subscribe();
+    }
+
+    changeLang(id: string) {
+        this.translate.use(id);
+    }
+
+    getCustoms() {
+        this.http.get('../rest/installer/customs').pipe(
+            tap((data: any) => {
+                this.customs = data.customs;
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     initStep() {
@@ -87,18 +104,6 @@ export class WelcomeComponent implements OnInit {
 
     getInfoToInstall(): any[] {
         return [];
-        /*return [{
-            idStep : 'lang',
-            body: {
-                lang: this.stepFormGroup.controls['lang'].value,
-            },
-            route : {
-                method : 'POST',
-                url : '../rest/installer/lang'
-            },
-            description: this.translate.instant('lang.langSetting'),
-            installPriority: 3
-        }];*/
     }
 
 }

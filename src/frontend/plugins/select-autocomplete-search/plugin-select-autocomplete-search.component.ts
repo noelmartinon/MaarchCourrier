@@ -8,13 +8,13 @@ import {
 import { ControlValueAccessor, FormControl } from '@angular/forms';
 import { MatOption } from '@angular/material/core';
 import { MatSelect } from '@angular/material/select';
-import { take, takeUntil, startWith, map, debounceTime, filter, tap, switchMap } from 'rxjs/operators';
+import { take, takeUntil, startWith, map, debounceTime, filter, tap, switchMap, finalize } from 'rxjs/operators';
 import { Subject, ReplaySubject, Observable, forkJoin, of } from 'rxjs';
 import { LatinisePipe } from 'ngx-pipes';
 import { TranslateService } from '@ngx-translate/core';
-import { AppService } from '../../service/app.service';
+import { AppService } from '@service/app.service';
 import { SortPipe } from '../sorting.pipe';
-import { FunctionsService } from '../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
@@ -51,8 +51,15 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
 
     /**
      * Route datas used in async autocomplete. Incompatible with @datas
+     * ex : ['/rest/autocomplete/users']
      */
     @Input() routeDatas: string[];
+
+    /**
+     * Define extra structure to concatenate with id and label datas. Incompatible with @datas
+     * ex : ['type']
+     */
+    @Input() extraModel: string[];
 
     /**
      * ex : [ { id : 'group1' , label: 'Group 1'} ]
@@ -98,7 +105,8 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
     private _onDestroy = new Subject<void>();
 
     formControlSearch = new FormControl();
-    selecteded: any = [];
+    noResult: boolean = null;
+    loadingSearch: boolean = null;
 
     /** Current search value */
     get value(): string {
@@ -145,6 +153,7 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
                 if (opened) {
                     // focus the search field when opening
                     if (!this.appService.getViewMode()) {
+                        this.noResult = null;
                         this._focus();
                     }
                 } else {
@@ -177,32 +186,41 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
             .pipe(
                 debounceTime(300),
                 filter(value => value !== null && value.length > 2),
+                tap(() => this.loadingSearch = true),
                 // distinctUntilChanged(),
                 // tap(() => this.loading = true),
                 switchMap((data: any) => this.getDatas(data)),
                 tap((data: any) => {
-                    /*if (data.length === 0) {
-                        if (this.manageDatas !== undefined) {
-                            this.listInfo = this.translate.instant('lang.noAvailableValue') + ' <div>' + this.translate.instant('lang.typeEnterToCreate') + '</div>';
-                        } else {
-                            this.listInfo = this.translate.instant('lang.noAvailableValue');
-                        }
-                    } else {
-                        this.listInfo = '';
-                    }*/
-                    this.datas = this.datas.filter((val: any) =>  this.formControlSelect.value.indexOf(val.id) > -1).concat(data.filter((val: any) =>  this.formControlSelect.value.indexOf(val.id) === -1));
+                    let selectedDatas = [];
+                    let unselectedDatasSearch = [];
+                    let selectedDatasId = [];
+
+                    if (!this.functions.empty(this.formControlSelect.value)) {
+                        selectedDatasId = this.returnValue === 'id' ? this.formControlSelect.value : this.formControlSelect.value.map((item: any) => item !== null ? item.id : null);
+                    }
+
+                    selectedDatas = this.datas.filter((val: any) =>  selectedDatasId.indexOf(val.id) > -1);
+                    unselectedDatasSearch = data.filter((val: any) =>  selectedDatasId.indexOf(val.id) === -1);
+
+                    this.datas = selectedDatas.concat(unselectedDatasSearch);
                     this.filteredDatas = of(this.datas);
+                    this.noResult = this.datas.filter((val: any) =>  this.formControlSelect.value.indexOf(val.id) === -1).length === 0;
+                    this.loadingSearch = false;
                     // this.loading = false;
                 })
             ).subscribe();
 
 
         // this.initMultipleHandling();
-
     }
 
     resetACDatas() {
-        this.datas = this.datas.filter((val: any) =>  this.formControlSelect.value.indexOf(val.id) > -1);
+        if (this.returnValue === 'id') {
+            this.datas = this.datas.filter((val: any) =>  this.formControlSelect.value.indexOf(val.id) > -1);
+
+        } else {
+            this.datas = this.datas.filter((val: any) =>  this.formControlSelect.value.map((item: any) =>  item !== null ? item.id : null).indexOf(val.id) > -1);
+        }
         this.filteredDatas = of(this.datas);
     }
 
@@ -388,7 +406,7 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
 
     launchEvent(ev: any) {
         if (this.afterSelected !== undefined) {
-            this.afterSelected.emit(ev.value);
+            this.afterSelected.emit(this.datas.filter((val: any) =>  val.id === ev.value)[0]);
         }
     }
 
@@ -413,14 +431,41 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
             map(items => {
                 items.forEach((element: any) => {
                     element.forEach((element2: any) => {
-                        test.push({
+                        let obj = {
                             id: element2.id,
                             label: element2.idToDisplay
-                        });
+                        };
+                        if (this.extraModel.length > 0) {
+                            const extraObj = this.getExtraDatas(element2);
+                            obj = {...obj, ...extraObj};
+                        }
+                        test.push(obj);
                     });
                 });
                 return test;
             })
         );
+    }
+
+    getExtraDatas(element: any) {
+        const obj = {};
+        Object.keys(element).forEach(key => {
+            if (this.extraModel.indexOf(key) > -1) {
+                obj[key] = element[key];
+            }
+        });
+        return obj;
+    }
+
+    getFirstDataLabel() {
+        return this.returnValue === 'id' ? this.formControlSelect.value[0].label : this.formControlSelect.value.map((item: any) => item !== null ? item.label : this.translate.instant('lang.emptyValue'))[0];
+    }
+
+    getDataLabel(data: any) {
+        return this.returnValue === 'id' ? this.datas.filter((item: any) => item.id === data)[0].label : this.datas.filter((item: any) => item.id === data.id)[0].label;
+    }
+
+    setDatas(value: any) {
+        this.datas = value;
     }
 }

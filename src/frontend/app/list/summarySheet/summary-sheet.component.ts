@@ -1,10 +1,10 @@
 import { Component, OnInit, Inject, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { FunctionsService } from '../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { tap } from 'rxjs/operators';
 import { DomSanitizer } from '@angular/platform-browser';
 
@@ -55,6 +55,8 @@ export class SummarySheetComponent implements OnInit {
                 this.translate.instant('lang.status'),
                 this.translate.instant('lang.priority'),
                 this.translate.instant('lang.processLimitDate'),
+                this.translate.instant('lang.retentionRuleFrozen'),
+                this.translate.instant('lang.bindingMail'),
                 this.translate.instant('lang.customFieldsAdmin')
             ],
             enabled: true

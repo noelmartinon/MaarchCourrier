@@ -11,9 +11,7 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
-class AbstractFilterRuleTest extends TestCase
+class AbstractFilterRuleTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException Respect\Validation\Exceptions\ComponentException

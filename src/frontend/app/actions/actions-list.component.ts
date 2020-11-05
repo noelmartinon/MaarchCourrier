@@ -1,15 +1,17 @@
 import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu';
 import { Router } from '@angular/router';
 import { ActionsService } from './actions.service';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
-import { exhaustMap, filter, tap } from 'rxjs/operators';
-import { HeaderService } from '../../service/header.service';
-import { FunctionsService } from '../../service/functions.service';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { HeaderService } from '@service/header.service';
+import { FunctionsService } from '@service/functions.service';
+import { PrivilegeService } from '@service/privileges.service';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-actions-list',
@@ -33,6 +35,9 @@ export class ActionsListComponent implements OnInit {
     arrRes: any[] = [];
     folderList: any[] = [];
 
+    isSelectedFreeze: any;
+    isSelectedBinding: null;
+
     actionsList: any[] = [];
 
     @Input('selectedRes') selectedRes: any;
@@ -53,7 +58,8 @@ export class ActionsListComponent implements OnInit {
         private router: Router,
         private actionService: ActionsService,
         private headerService: HeaderService,
-        private functionService: FunctionsService
+        private functionService: FunctionsService,
+        public privilegeService: PrivilegeService,
     ) { }
 
     dialogRef: MatDialogRef<any>;
@@ -72,6 +78,8 @@ export class ActionsListComponent implements OnInit {
         this.contextResId = row.resId;
 
         this.folderList = row.folders !== undefined ? row.folders : [];
+
+        this.getFreezeBindingValue();
 
         // Opens the menu
         this.contextMenu.openMenu();
@@ -145,5 +153,49 @@ export class ActionsListComponent implements OnInit {
                 this.refreshList();
             })
         ).subscribe();
+    }
+
+    toggleFreezing(value) {
+        this.http.put('../rest/archival/freezeRetentionRule', { resources: this.selectedRes, freeze : value }).pipe(
+            tap(() => {
+                if (value) {
+                    this.notify.success(this.translate.instant('lang.retentionRuleFrozen'));
+                } else {
+                    this.notify.success(this.translate.instant('lang.retentionRuleUnfrozen'));
+
+                }
+                this.refreshList();
+            }
+            ),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    toogleBinding(value) {
+        this.http.put('../rest/archival/binding', { resources: this.selectedRes, binding : value }).pipe(
+            tap(() => {
+                if (value) {
+                    this.notify.success(this.translate.instant('lang.bindingMail'));
+                } else if (value === false) {
+                    this.notify.success(this.translate.instant('lang.noBindingMail'));
+                } else {
+                    this.notify.success(this.translate.instant('lang.bindingUndefined'));
+                }
+                this.refreshList();
+            }
+            ),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    getFreezeBindingValue() {
+        this.isSelectedFreeze = this.currentResource.retentionFrozen;
+        this.isSelectedBinding = this.currentResource.binding;
     }
 }

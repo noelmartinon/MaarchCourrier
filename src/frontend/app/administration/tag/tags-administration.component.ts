@@ -1,16 +1,16 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { HeaderService } from '../../../service/header.service';
-import { AppService } from '../../../service/app.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
 import { tap, finalize, filter, exhaustMap, catchError } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
-import {FunctionsService} from '../../../service/functions.service';
-import { of } from 'rxjs/internal/observable/of';
+import {FunctionsService} from '@service/functions.service';
+import { of } from 'rxjs';
 import { AdministrationService } from '../administration.service';
 
 declare var tinymce: any;

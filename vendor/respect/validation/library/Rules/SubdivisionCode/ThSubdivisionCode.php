@@ -18,12 +18,12 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: TH
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/TH/administrative-division-thailand.html
  */
 class ThSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        '10', // Krung Thep Maha Nakhon Bangkok
+        '10', // Bangkok
         '11', // Samut Prakan
         '12', // Nonthaburi
         '13', // Pathum Thani
@@ -49,6 +49,7 @@ class ThSubdivisionCode extends AbstractSearcher
         '35', // Yasothon
         '36', // Chaiyaphum
         '37', // Amnat Charoen
+        '38', // Bueng Kan
         '39', // Nong Bua Lam Phu
         '40', // Khon Kaen
         '41', // Udon Thani
@@ -79,7 +80,7 @@ class ThSubdivisionCode extends AbstractSearcher
         '67', // Phetchabun
         '70', // Ratchaburi
         '71', // Kanchanaburi
-        '72', // Suphan Buri
+        '72', // Suphanburi
         '73', // Nakhon Pathom
         '74', // Samut Sakhon
         '75', // Samut Songkhram
@@ -87,19 +88,18 @@ class ThSubdivisionCode extends AbstractSearcher
         '77', // Prachuap Khiri Khan
         '80', // Nakhon Si Thammarat
         '81', // Krabi
-        '82', // Phangnga
+        '82', // Phang Nga
         '83', // Phuket
         '84', // Surat Thani
         '85', // Ranong
-        '86', // Chumphon
+        '86', // Chumpon
         '90', // Songkhla
         '91', // Satun
         '92', // Trang
-        '93', // Phatthalung
+        '93', // Phattalung
         '94', // Pattani
         '95', // Yala
         '96', // Narathiwat
-        'S', // Phatthaya
     ];
 
     public $compareIdentical = true;

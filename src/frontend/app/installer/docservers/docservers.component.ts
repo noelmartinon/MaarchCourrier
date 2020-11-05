@@ -1,12 +1,11 @@
 import { Component, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ValidatorFn } from '@angular/forms';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { tap } from 'rxjs/internal/operators/tap';
+import { NotificationService } from '@service/notification/notification.service';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 import { InstallerService } from '../installer.service';
+import { catchError, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-docservers',
@@ -14,7 +13,7 @@ import { InstallerService } from '../installer.service';
     styleUrls: ['./docservers.component.scss']
 })
 export class DocserversComponent implements OnInit {
-    
+
     stepFormGroup: FormGroup;
 
     @Output() nextStep = new EventEmitter<string>();
@@ -81,13 +80,13 @@ export class DocserversComponent implements OnInit {
 
     getInfoToInstall(): any[] {
         return [{
-            idStep : 'docserver',
+            idStep: 'docserver',
             body: {
                 path: this.stepFormGroup.controls['docserversPath'].value,
             },
-            route : {
-                method : 'POST',
-                url : '../rest/installer/docservers'
+            route: {
+                method: 'POST',
+                url: '../rest/installer/docservers'
             },
             description: this.translate.instant('lang.stepDocserversActionDesc'),
             installPriority: 3

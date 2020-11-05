@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { HeaderService } from '../../../service/header.service';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatSidenav } from '@angular/material/sidenav';
-import { AppService } from '../../../service/app.service';
+import { AppService } from '@service/app.service';
 
 declare var $: any;
 

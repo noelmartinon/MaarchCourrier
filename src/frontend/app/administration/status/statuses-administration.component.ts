@@ -3,10 +3,10 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
-import { AppService } from '../../../service/app.service';
-import { FunctionsService } from '../../../service/functions.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
+import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
 
 @Component({

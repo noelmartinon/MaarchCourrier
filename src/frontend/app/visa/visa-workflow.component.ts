@@ -1,9 +1,9 @@
 import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { FunctionsService } from '../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { tap, exhaustMap, map, startWith, catchError, finalize, filter, debounceTime } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { LatinisePipe, ScanPipe } from 'ngx-pipes';
@@ -21,7 +21,6 @@ import {ActivatedRoute} from "@angular/router";
 })
 export class VisaWorkflowComponent implements OnInit {
 
-    
     visaWorkflow: any = {
         roles: ['sign', 'visa'],
         items: []
@@ -146,7 +145,8 @@ export class VisaWorkflowComponent implements OnInit {
                             label: user.idToDisplay,
                             entity: user.otherInfo,
                             type: 'user',
-                            hasPrivilege: true
+                            hasPrivilege: true,
+                            isValid: true
                         }
                     });
                     return data;
@@ -343,7 +343,8 @@ export class VisaWorkflowComponent implements OnInit {
                         'requested_signature': element.mode !== 'visa',
                         'process_date': this.functions.formatFrenchDateToTechnicalDate(element.processDate),
                         'picture': '',
-                        'hasPrivilege': true
+                        'hasPrivilege': true,
+                        'isValid': true
                     };
                     this.visaWorkflow.items.push(user);
                     this.http.get("../rest/maarchParapheur/user/" + element.userId + "/picture")
@@ -377,35 +378,47 @@ export class VisaWorkflowComponent implements OnInit {
 
     getCurrentVisaUserIndex() {
         if (this.getLastVisaUser().listinstance_id === undefined) {
-            return 0;
+            const index = 0;
+            return this.getRealIndex(index);
         } else {
-            const index = this.visaWorkflow.items.map((item: any) => item.listinstance_id).indexOf(this.getLastVisaUser().listinstance_id);
-            return (index + 1);
+            let index = this.visaWorkflow.items.map((item: any) => item.listinstance_id).indexOf(this.getLastVisaUser().listinstance_id);
+            index++;
+            console.log(index);
+
+            return this.getRealIndex(index);
         }
     }
 
     getFirstVisaUser() {
-        return !this.functions.empty(this.visaWorkflow.items[0]) ? this.visaWorkflow.items[0] : '';
+        return !this.functions.empty(this.visaWorkflow.items[0]) && this.visaWorkflow.items[0].isValid ? this.visaWorkflow.items[0] : '';
     }
 
-    getCurrentVisaUser() {
+    /* getCurrentVisaUser() {
 
         const index = this.visaWorkflow.items.map((item: any) => item.listinstance_id).indexOf(this.getLastVisaUser().listinstance_id);
 
         return !this.functions.empty(this.visaWorkflow.items[index + 1]) ? this.visaWorkflow.items[index + 1] : '';
-    }
+    }*/
 
     getNextVisaUser() {
+        let index =  this.getCurrentVisaUserIndex();
+        index = index + 1;
+        const realIndex = this.getRealIndex(index);
 
-        const index = this.visaWorkflow.items.map((item: any) => item.listinstance_id).indexOf(this.getLastVisaUser().listinstance_id);
-
-        return !this.functions.empty(this.visaWorkflow.items[index + 2]) ? this.visaWorkflow.items[index + 2] : '';
+        return !this.functions.empty(this.visaWorkflow.items[realIndex]) ? this.visaWorkflow.items[realIndex] : '';
     }
 
     getLastVisaUser() {
-        let arrOnlyProcess = this.visaWorkflow.items.filter((item: any) => !this.functions.empty(item.process_date));
+        let arrOnlyProcess = this.visaWorkflow.items.filter((item: any) => !this.functions.empty(item.process_date) && item.isValid);
 
         return !this.functions.empty(arrOnlyProcess[arrOnlyProcess.length - 1]) ? arrOnlyProcess[arrOnlyProcess.length - 1] : '';
+    }
+
+    getRealIndex(index: number) {
+        while (index < this.visaWorkflow.items.length && !this.visaWorkflow.items[index].isValid) {
+            index++;
+        }
+        return index;
     }
 
     checkExternalSignatoryBook() {
@@ -431,7 +444,7 @@ export class VisaWorkflowComponent implements OnInit {
                     return {
                         resId: resId,
                         listInstances: this.visaWorkflow.items
-                    }
+                    };
                 });
                 this.http.put(`../rest/circuits/visaCircuit`, { resources: arrVisa }).pipe(
                     tap((data: any) => {
@@ -463,7 +476,8 @@ export class VisaWorkflowComponent implements OnInit {
                     difflist_type: 'VISA_CIRCUIT',
                     signatory: !this.functions.empty(item.signatory) ? item.signatory : false,
                     requested_signature: !this.functions.empty(item.requested_signature) ? item.requested_signature : false,
-                    hasPrivilege: true
+                    hasPrivilege: true,
+                    isValid: true
                 });
                 if (this.linkedToMaarchParapheur) {
                     this.getMaarchParapheurUserAvatar(item.externalId.maarchParapheur, this.visaWorkflow.items.length - 1);
@@ -480,7 +494,8 @@ export class VisaWorkflowComponent implements OnInit {
                     difflist_type: 'VISA_CIRCUIT',
                     signatory: !this.functions.empty(item.signatory) ? item.signatory : false,
                     requested_signature: !this.functions.empty(item.requested_signature) ? item.requested_signature : false,
-                    hasPrivilege: item.hasPrivilege
+                    hasPrivilege: item.hasPrivilege,
+                    isValid: item.isValid
                 });
 
                 if (this.linkedToMaarchParapheur) {
@@ -503,7 +518,8 @@ export class VisaWorkflowComponent implements OnInit {
                                     difflist_type: 'VISA_CIRCUIT',
                                     signatory: false,
                                     requested_signature: itemTemplate.item_mode === 'sign',
-                                    hasPrivilege: itemTemplate.hasPrivilege
+                                    hasPrivilege: itemTemplate.hasPrivilege,
+                                    isValid: itemTemplate.isValid
                                 }
                             })
                         );
@@ -521,7 +537,7 @@ export class VisaWorkflowComponent implements OnInit {
     }
 
     isValidWorkflow() {
-        if ((this.visaWorkflow.items.filter((item: any) => item.requested_signature).length > 0 && this.visaWorkflow.items.filter((item: any) => !item.hasPrivilege).length === 0) && this.visaWorkflow.items.length > 0) {
+        if ((this.visaWorkflow.items.filter((item: any) => item.requested_signature).length > 0 && this.visaWorkflow.items.filter((item: any) => (!item.hasPrivilege || !item.isValid) && item.process_date === null).length === 0) && this.visaWorkflow.items.length > 0) {
             return true;
         } else {
             return false;
@@ -533,6 +549,8 @@ export class VisaWorkflowComponent implements OnInit {
             return this.translate.instant('lang.signUserRequired');
         } else if (this.visaWorkflow.items.filter((item: any) => !item.hasPrivilege).length > 0) {
             return this.translate.instant('lang.mustDeleteUsersWithNoPrivileges');
+        } else if (this.visaWorkflow.items.filter((item: any) => !item.isValid && item.process_date === null).length > 0) {
+            return this.translate.instant('lang.mustDeleteInvalidUsers');
         }
     }
 
@@ -605,7 +623,7 @@ export class VisaWorkflowComponent implements OnInit {
 
     canManageUser(item: any, i: number) {
         if (this.adminMode) {
-            if (!this.functions.empty(item.process_date) || (this.target === 'signatureBook' && this.getCurrentVisaUserIndex() === i)) {
+            if (!this.functions.empty(item.process_date) || (this.target === 'signatureBook' && this.getCurrentVisaUserIndex() === i) || !item.isValid) {
                 return false;
             } else {
                 return true;

@@ -1,6 +1,4 @@
-<?php
-
-namespace Gitlab\Api;
+<?php namespace Gitlab\Api;
 
 class DeployKeys extends AbstractApi
 {

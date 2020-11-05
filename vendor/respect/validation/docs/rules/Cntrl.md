@@ -14,5 +14,4 @@ See also:
 
   * [Alnum](Alnum.md)
   * [Prnt](Prnt.md)
-  * [Punct](Punct.md)
   * [Space](Space.md)

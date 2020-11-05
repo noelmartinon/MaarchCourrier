@@ -37,8 +37,8 @@ class StoreController
             if (empty($args['resId'])) {
                 $resId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'res_id_mlb_seq']);
 
-                $data = ['resId' => $resId];
-                $data = array_merge($args, $data);
+                $data = $args;
+                $data['resId'] = $resId;
                 $data = StoreController::prepareResourceStorage($data);
             } else {
                 $resId = $args['resId'];
@@ -53,7 +53,7 @@ class StoreController
                     $uniqueId    = CoreConfigModel::uniqueId();
                     $tmpFilename = "storeTmp_{$GLOBALS['id']}_{$uniqueId}.{$args['format']}";
                     file_put_contents($tmpPath . $tmpFilename, $fileContent);
-                    $fileContent = MergeController::mergeChronoDocument(['chrono' => $data['alt_identifier'], 'path' => $tmpPath . $tmpFilename, 'type' => 'resource']);
+                    $fileContent = MergeController::mergeChronoDocument(['chrono' => $data['alt_identifier'], 'path' => $tmpPath . $tmpFilename, 'type' => 'resource', 'resIdMaster' => $resId, 'resId' => null, 'title' => $data['subject']]);
                     $fileContent = base64_decode($fileContent['encodedDocument']);
                     unlink($tmpPath . $tmpFilename);
                 }
@@ -92,8 +92,12 @@ class StoreController
     {
         try {
             if (empty($args['id'])) {
-                $data = StoreController::prepareAttachmentStorage($args);
+                $resId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'res_attachment_res_id_seq']);
+                $data = $args;
+                $data['resId'] = $resId;
+                $data = StoreController::prepareAttachmentStorage($data);
             } else {
+                $resId = $args['id'];
                 $data = StoreController::prepareUpdateAttachmentStorage($args);
             }
 
@@ -105,7 +109,7 @@ class StoreController
                     $uniqueId = CoreConfigModel::uniqueId();
                     $tmpFilename = "storeTmp_{$GLOBALS['id']}_{$uniqueId}.{$args['format']}";
                     file_put_contents($tmpPath . $tmpFilename, $fileContent);
-                    $fileContent = MergeController::mergeChronoDocument(['chrono' => $data['identifier'], 'path' => $tmpPath . $tmpFilename, 'type' => 'attachment']);
+                    $fileContent = MergeController::mergeChronoDocument(['chrono' => $data['identifier'], 'path' => $tmpPath . $tmpFilename, 'type' => 'attachment', 'resIdMaster' => $data['res_id_master'], 'resId' => $resId, 'title' => $data['title']]);
                     $fileContent = base64_decode($fileContent['encodedDocument']);
                     unlink($tmpPath . $tmpFilename);
                 }
@@ -264,13 +268,25 @@ class StoreController
             'modification_date' => 'CURRENT_TIMESTAMP'
         ];
 
-        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['version', 'alt_identifier', 'external_id', 'category_id', 'type_id', 'destination']]);
+        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['version', 'alt_identifier', 'external_id', 'category_id', 'type_id', 'destination', 'custom_fields']]);
 
         if (!empty($args['modelId'])) {
-            $preparedData['model_id'] = $args['modelId'];
-            $indexingModel = IndexingModelModel::getById(['id' => $args['modelId'], 'select' => ['category']]);
+            $preparedData['model_id']    = $args['modelId'];
+            $indexingModel               = IndexingModelModel::getById(['id' => $args['modelId'], 'select' => ['category']]);
             $preparedData['category_id'] = $indexingModel['category'];
-            $resource['category_id'] = $indexingModel['category'];
+            $resource['category_id']     = $indexingModel['category'];
+
+            $indexingModelField = IndexingModelFieldModel::get(['select' => ['default_value'], 'where' => ['model_id = ?', 'identifier = ?'], 'data' => [$args['modelId'], 'destination']]);
+            $newDestination     = json_decode($indexingModelField[0]['default_value']);
+            if (empty($resource['destination']) && !empty($newDestination)) {
+                if ($newDestination == "#myPrimaryEntity") {
+                    $entity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => ['entities.entity_id']]);
+                    $preparedData['destination'] = $entity['entity_id'];
+                } else {
+                    $entity = EntityModel::getById(['id' => $newDestination, 'select' => ['entity_id']]);
+                    $preparedData['destination'] = $entity['entity_id'];
+                }
+            }
         }
         if (empty($resource['alt_identifier'])) {
             $chrono = ChronoModel::getChrono(['id' => $resource['category_id'], 'entityId' => $resource['destination'], 'typeId' => $resource['type_id'], 'resId' => $args['resId']]);
@@ -346,6 +362,14 @@ class StoreController
                     $args['customFields'][$key] = $value;
                 }
             }
+            $customFields = json_decode($resource['custom_fields'], true);
+            $technicalCustoms = CustomFieldModel::get(['select' => ['id'], 'where' => ['mode = ?'], 'data' => ['technical']]);
+            $technicalCustoms = array_column($technicalCustoms, 'id');
+            foreach ($technicalCustoms as $technicalCustom) {
+                if (!empty($customFields[$technicalCustom])) {
+                    $args['customFields'][$technicalCustom] = $customFields[$technicalCustom];
+                }
+            }
             $preparedData['custom_fields'] = json_encode($args['customFields']);
         }
 
@@ -385,6 +409,7 @@ class StoreController
 
         $inSignatureBook = isset($args['inSignatureBook']) ? $args['inSignatureBook'] : $shouldBeInSignatureBook;
         $preparedData = [
+            'res_id'                   => $args['resId'] ?? null,
             'title'                    => $args['title'] ?? null,
             'identifier'               => $args['chrono'] ?? null,
             'typist'                   => $typist,

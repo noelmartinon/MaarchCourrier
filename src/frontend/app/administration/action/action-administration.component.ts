@@ -2,14 +2,14 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatSidenav } from '@angular/material/sidenav';
-import { HeaderService } from '../../../service/header.service';
-import { AppService } from '../../../service/app.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
 import { tap, catchError } from 'rxjs/operators';
-import { FunctionsService } from '../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { FormControl } from '@angular/forms';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 
 
 @Component({

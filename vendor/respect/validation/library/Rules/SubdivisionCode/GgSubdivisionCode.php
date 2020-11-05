@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: GG
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/GG/administrative-division-guernsey.html
  */
 class GgSubdivisionCode extends AbstractSearcher
 {

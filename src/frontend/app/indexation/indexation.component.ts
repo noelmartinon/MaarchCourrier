@@ -1,24 +1,23 @@
 import { Component, OnInit, ViewChild, ViewContainerRef, TemplateRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 
 import { ActivatedRoute, Router } from '@angular/router';
-import { HeaderService } from '../../service/header.service';
-import { FiltersListService } from '../../service/filtersList.service';
+import { HeaderService } from '@service/header.service';
+import { FiltersListService } from '@service/filtersList.service';
 
 import { Overlay } from '@angular/cdk/overlay';
-import { AppService } from '../../service/app.service';
+import { AppService } from '@service/app.service';
 import { IndexingFormComponent } from './indexing-form/indexing-form.component';
 import { tap, finalize, catchError, map, filter, take } from 'rxjs/operators';
 import { DocumentViewerComponent } from '../viewer/document-viewer.component';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { ActionsService } from '../actions/actions.service';
 import { SortPipe } from '../../plugins/sorting.pipe';
-import { FunctionsService } from '../../service/functions.service';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { of } from 'rxjs/internal/observable/of';
+import { FunctionsService } from '@service/functions.service';
+import { of, Subscription } from 'rxjs';
 import { SelectIndexingModelComponent } from './select-indexing-model/select-indexing-model.component';
 
 @Component({
@@ -30,8 +29,6 @@ import { SelectIndexingModelComponent } from './select-indexing-model/select-ind
     providers: [ActionsService, SortPipe],
 })
 export class IndexationComponent implements OnInit {
-
-    
 
     loading: boolean = false;
 

@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Length
  * @covers Respect\Validation\Exceptions\LengthException
  */
-class LengthTest extends TestCase
+class LengthTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider providerForValidLengthInclusive

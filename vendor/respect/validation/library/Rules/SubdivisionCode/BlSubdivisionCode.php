@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: BL
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/BL/administrative-division-saint-barthelemy.html
  */
 class BlSubdivisionCode extends AbstractSearcher
 {

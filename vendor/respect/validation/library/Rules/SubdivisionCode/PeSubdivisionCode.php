@@ -18,23 +18,23 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: PE
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/PE/administrative-division-peru.html
  */
 class PeSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
         'AMA', // Amazonas
         'ANC', // Ancash
-        'APU', // Apurímac
+        'APU', // Apurimac
         'ARE', // Arequipa
         'AYA', // Ayacucho
         'CAJ', // Cajamarca
-        'CAL', // El Callao
-        'CUS', // Cusco [Cuzco]
-        'HUC', // Huánuco
+        'CAL', // Callao
+        'CUS', // Cusco
+        'HUC', // Huanuco
         'HUV', // Huancavelica
         'ICA', // Ica
-        'JUN', // Junín
+        'JUN', // Junin
         'LAL', // La Libertad
         'LAM', // Lambayeque
         'LIM', // Lima
@@ -45,7 +45,7 @@ class PeSubdivisionCode extends AbstractSearcher
         'PAS', // Pasco
         'PIU', // Piura
         'PUN', // Puno
-        'SAM', // San Martín
+        'SAM', // San Martin
         'TAC', // Tacna
         'TUM', // Tumbes
         'UCA', // Ucayali

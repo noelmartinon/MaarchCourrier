@@ -18,13 +18,13 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: MR
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/MR/administrative-division-mauritania.html
  */
 class MrSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        '01', // Hodh ech Chargui
-        '02', // Hodh el Charbi
+        '01', // Hodh Ech Chargui
+        '02', // Hodh El Gharbi
         '03', // Assaba
         '04', // Gorgol
         '05', // Brakna

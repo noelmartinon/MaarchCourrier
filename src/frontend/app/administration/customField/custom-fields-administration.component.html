@@ -42,6 +42,17 @@
                                             <input matInput name="label" [(ngModel)]="custom.label"
                                                 [placeholder]="this.translate.instant('lang.label')" [value]="custom.label">
                                         </mat-form-field>
+                                        <mat-form-field>
+                                            <mat-label>{{'lang.displayMode' | translate}}</mat-label>
+                                            <mat-select name="mode" title="{{'lang.displayMode' | translate}}" [(ngModel)] ="custom.mode">
+                                                <mat-option *ngFor="let item of mode" [value]="item.value">
+                                                    {{ 'lang.' + item.label | translate}}
+                                                </mat-option>
+                                            </mat-select>
+                                            <mat-hint>
+                                                {{'lang.' + custom.mode + 'Description' | translate}}
+                                            </mat-hint>
+                                        </mat-form-field>
                                     </div>
                                     <div class="col-md-12" style="display: flex;align-items: center;">
                                         <div>

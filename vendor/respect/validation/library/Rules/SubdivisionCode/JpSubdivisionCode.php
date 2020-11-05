@@ -18,57 +18,57 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: JP
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/JP/administrative-division-japan.html
  */
 class JpSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        '01', // Hokkaido
+        '01', // Hokkaidō
         '02', // Aomori
         '03', // Iwate
         '04', // Miyagi
         '05', // Akita
         '06', // Yamagata
-        '07', // Fukushima
+        '07', // Hukusima (Fukushima)
         '08', // Ibaraki
-        '09', // Tochigi
+        '09', // Totigi (Tochigi)
         '10', // Gunma
         '11', // Saitama
-        '12', // Chiba
+        '12', // Tiba (Chiba)
         '13', // Tokyo
         '14', // Kanagawa
         '15', // Niigata
         '16', // Toyama
-        '17', // Ishikawa
-        '18', // Fukui
-        '19', // Yamanashi
+        '17', // Isikawa (Ishikawa)
+        '18', // Hukui (Fukui)
+        '19', // Yamanasi (Yamanashi)
         '20', // Nagano
-        '21', // Gifu
-        '22', // Shizuoka
-        '23', // Aichi
+        '21', // Gihu  (Gifu)
+        '22', // Sizuoka (Shizuoka)
+        '23', // Aiti (Aichi)
         '24', // Mie
-        '25', // Shiga
+        '25', // Siga (Shiga)
         '26', // Kyoto
         '27', // Osaka
         '28', // Hyogo
         '29', // Nara
         '30', // Wakayama
         '31', // Tottori
-        '32', // Shimane
+        '32', // Simane (Shimane)
         '33', // Okayama
-        '34', // Hiroshima
-        '35', // Yamaguchi
-        '36', // Tokushima
+        '34', // Hirosima (Hiroshima)
+        '35', // Yamaguti (Yamaguchi)
+        '36', // Tokusima (Tokushima)
         '37', // Kagawa
         '38', // Ehime
-        '39', // Kochi
-        '40', // Fukuoka
+        '39', // Koti (Kochi)
+        '40', // Hukuoka (Fukuoka)
         '41', // Saga
         '42', // Nagasaki
         '43', // Kumamoto
         '44', // Oita
         '45', // Miyazaki
-        '46', // Kagoshima
+        '46', // Kagosima (Kagoshima)
         '47', // Okinawa
     ];
 

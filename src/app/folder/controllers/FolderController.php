@@ -15,7 +15,6 @@
 namespace Folder\controllers;
 
 use Attachment\models\AttachmentModel;
-use Basket\models\BasketModel;
 use Entity\models\EntityModel;
 use Folder\models\EntityFolderModel;
 use Folder\models\FolderModel;
@@ -31,7 +30,6 @@ use Resource\models\UserFollowedResourceModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\controllers\PreparedClauseController;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\ValidatorModel;
 use User\models\UserEntityModel;
@@ -715,7 +713,7 @@ class FolderController
                 $select = [
                     'res_letterbox.res_id', 'res_letterbox.subject', 'res_letterbox.barcode', 'res_letterbox.alt_identifier',
                     'status.label_status AS "status.label_status"', 'status.img_filename AS "status.img_filename"', 'priorities.color AS "priorities.color"',
-                    'res_letterbox.filename as res_filename'
+                    'res_letterbox.filename as res_filename', 'res_letterbox.retention_frozen', 'res_letterbox.binding'
                 ];
                 $tableFunction = ['status', 'priorities'];
                 $leftJoinFunction = ['res_letterbox.status = status.id', 'res_letterbox.priority = priorities.id'];

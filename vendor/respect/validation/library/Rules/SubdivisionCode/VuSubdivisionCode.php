@@ -18,16 +18,16 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: VU
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/VU/administrative-division-vanuatu.html
  */
 class VuSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
         'MAP', // Malampa
-        'PAM', // Pénama
+        'PAM', // Penama
         'SAM', // Sanma
-        'SEE', // Shéfa
-        'TAE', // Taféa
+        'SEE', // Shefa
+        'TAE', // Tafea
         'TOB', // Torba
     ];
 

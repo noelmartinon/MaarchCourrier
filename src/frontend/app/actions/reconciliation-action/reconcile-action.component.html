@@ -33,9 +33,12 @@
                     </div>
                 </div>
                 <div *ngIf="!noResourceToProcess" class="col-md-12">
-                    <app-criteria-tool (searchUrlGenerated)="launchSearch($event)"
-                        [defaultCriteria]="['resourceField','contactField']"></app-criteria-tool>
-                    <search-adv-list #appSearchAdvList [singleMode]="true" [excludeRes]="data.resIds"></search-adv-list>
+                    <div class="bg-primary">
+                        <app-criteria-tool #appCriteriaTool [openedPanel]="true" (searchUrlGenerated)="appSearchResultList.launchSearch($event)"
+                        [defaultCriteria]="['chrono', 'subject','recipients','senders']"></app-criteria-tool>
+                        <div id="toolTemplate" style="padding-top: 10px;"></div>
+                    </div>
+                    <app-search-result-list #appSearchResultList [actionMode]="false" [hideFilter]="true" [appCriteriaTool]="appCriteriaTool" [standalone]="true" [singleSelection]="true"></app-search-result-list>
                 </div>
             </ng-container>
         </div>
@@ -43,7 +46,7 @@
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
         <button mat-raised-button mat-button color="primary"
-            [disabled]="loading || (appSearchAdvList !== undefined && appSearchAdvList.getSelectedRessources().length === 0) || noResourceToProcess"
+            [disabled]="loading || !isSelectedResources() || noResourceToProcess"
             (click)="onSubmit()">{{'lang.validate' | translate}}</button>
         <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
     </div>

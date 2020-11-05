@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, tap, finalize, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AttachmentPageComponent } from '../attachments-page/attachment-page.component';
 

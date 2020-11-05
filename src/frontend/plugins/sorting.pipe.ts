@@ -1,6 +1,6 @@
 import { Pipe } from '@angular/core';
 import { LatinisePipe } from 'ngx-pipes';
-import { FunctionsService } from '../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Pipe({ name: 'sortBy' })
 export class SortPipe {

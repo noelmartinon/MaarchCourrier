@@ -11,7 +11,7 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
+use PHPUnit_Framework_TestCase;
 use SplFileInfo;
 
 /**
@@ -20,12 +20,16 @@ use SplFileInfo;
  * @covers Respect\Validation\Rules\Mimetype
  * @covers Respect\Validation\Exceptions\MimetypeException
  */
-class MimetypeTest extends TestCase
+class MimetypeTest extends PHPUnit_Framework_TestCase
 {
     private $filename;
 
     protected function setUp()
     {
+        if (defined('HHVM_VERSION')) {
+            return $this->markTestSkipped('If you are a HHVM user, and you are in the mood, please fix it');
+        }
+
         $this->filename = sprintf('%s/validation.txt', sys_get_temp_dir());
 
         file_put_contents($this->filename, 'File content');

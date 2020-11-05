@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: MU
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/MU/administrative-division-mauritius.html
  */
 class MuSubdivisionCode extends AbstractSearcher
 {
@@ -26,7 +26,7 @@ class MuSubdivisionCode extends AbstractSearcher
         'AG', // Agalega Islands
         'BL', // Black River
         'BR', // Beau Bassin-Rose Hill
-        'CC', // Cargados Carajos Shoals
+        'CC', // Cargados Carajos Shoals (Saint Brandon Islands)
         'CU', // Curepipe
         'FL', // Flacq
         'GP', // Grand Port
@@ -36,8 +36,8 @@ class MuSubdivisionCode extends AbstractSearcher
         'PU', // Port Louis
         'PW', // Plaines Wilhems
         'QB', // Quatre Bornes
-        'RO', // Rodrigues Island
-        'RP', // Rivière du Rempart
+        'RO', // Rodrigues
+        'RR', // Riviere du Rempart
         'SA', // Savanne
         'VP', // Vacoas-Phoenix
     ];

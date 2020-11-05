@@ -4,15 +4,14 @@ import { TranslateService } from '@ngx-translate/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { MatTableDataSource } from '@angular/material/table';
-import { NotificationService } from '../../service/notification/notification.service';
-import { HeaderService } from '../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { AppService } from '../../service/app.service';
+import { AppService } from '@service/app.service';
 import { Router } from '@angular/router';
-import { tap } from 'rxjs/internal/operators/tap';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { of } from 'rxjs/internal/observable/of';
-import { FeatureTourService } from '../../service/featureTour.service';
+import { of } from 'rxjs';
+import { FeatureTourService } from '@service/featureTour.service';
+import { catchError, tap } from 'rxjs/operators';
 
 declare var $: any;
 
@@ -22,7 +21,7 @@ declare var $: any;
 })
 export class HomeComponent implements OnInit, AfterViewInit {
 
-    
+
     loading: boolean = false;
 
     thumbnailUrl: string;

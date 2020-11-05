@@ -1,10 +1,10 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { HttpClient } from '@angular/common/http';
 import { FormControl } from '@angular/forms';
-import { LocalStorageService } from '../../../../service/local-storage.service';
-import { HeaderService } from '../../../../service/header.service';
+import { LocalStorageService } from '@service/local-storage.service';
+import { HeaderService } from '@service/header.service';
 
 @Component({
     selector: 'app-ixbus-paraph',

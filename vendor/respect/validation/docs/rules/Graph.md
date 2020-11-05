@@ -13,4 +13,3 @@ v::graph()->validate('LKM@#$%4;'); // true
 See also:
 
   * [Prnt](Prnt.md)
-  * [Punct](Punct.md)

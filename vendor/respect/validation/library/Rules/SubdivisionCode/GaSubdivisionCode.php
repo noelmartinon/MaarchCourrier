@@ -18,19 +18,19 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: GA
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/GA/administrative-division-gabon.html
  */
 class GaSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
         '1', // Estuaire
-        '2', // Haut-Ogooué
-        '3', // Moyen-Ogooué
-        '4', // Ngounié
+        '2', // Haut-Ogooue
+        '3', // Moyen-Ogooue
+        '4', // Ngounie
         '5', // Nyanga
-        '6', // Ogooué-Ivindo
-        '7', // Ogooué-Lolo
-        '8', // Ogooué-Maritime
+        '6', // Ogooue-Ivindo
+        '7', // Ogooue-Lolo
+        '8', // Ogooue-Maritime
         '9', // Woleu-Ntem
     ];
 

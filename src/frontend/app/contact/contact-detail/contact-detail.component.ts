@@ -1,11 +1,11 @@
 import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { ContactService } from '../../../service/contact.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { ContactService } from '@service/contact.service';
 import { tap, catchError, finalize } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
-import { FunctionsService } from '../../../service/functions.service';
-import { of } from 'rxjs/internal/observable/of';
+import { FunctionsService } from '@service/functions.service';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-contact-detail',
@@ -100,6 +100,9 @@ export class ContactDetailComponent implements OnInit {
                         customFields: [],
                         firstname: data.firstname,
                         lastname: data.lastname,
+                        email: data.mail,
+                        department: data.department,
+                        phone: data.phone,
                         enabled: data.enabled
                     };
                     this.contactClone = JSON.parse(JSON.stringify(this.contact));
@@ -119,6 +122,10 @@ export class ContactDetailComponent implements OnInit {
                         fillingRate: this.contactService.formatFillingObject(null),
                         customFields: [],
                         lastname: data.short_label,
+                        email: data.email,
+                        addressStreet: data.address,
+                        addressPostcode : data.addressPostcode,
+                        addressCountry : data.addressCountry,
                         enabled: data.enabled === 'Y'
                     };
                     this.contactClone = JSON.parse(JSON.stringify(this.contact));
@@ -151,7 +158,7 @@ export class ContactDetailComponent implements OnInit {
 
     emptyOtherInfo(contact: any) {
 
-        if (contact.type === 'contact' && (!this.functionsService.empty(contact.communicationMeans) || !this.functionsService.empty(contact.customFields))) {
+        if (contact.type === 'contact' && (!this.functionsService.empty(contact.notes) || !this.functionsService.empty(contact.communicationMeans) || !this.functionsService.empty(contact.customFields))) {
             return false;
         } else {
             return true;

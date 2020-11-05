@@ -12,9 +12,8 @@
 namespace Respect\Validation\Rules;
 
 use ReflectionObject;
-use Respect\Validation\TestCase;
 
-class AbstractWrapperTest extends TestCase
+class AbstractWrapperTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException Respect\Validation\Exceptions\ComponentException
@@ -36,7 +35,7 @@ class AbstractWrapperTest extends TestCase
 
     public function testShouldReturnDefinedValidatable()
     {
-        $validatable = $this->createMock('Respect\Validation\Validatable');
+        $validatable = $this->getMock('Respect\Validation\Validatable');
 
         $wrapper = $this->getMockForAbstractClass('Respect\Validation\Rules\AbstractWrapper');
         $this->bindValidatable($wrapper, $validatable);
@@ -48,7 +47,7 @@ class AbstractWrapperTest extends TestCase
     {
         $input = 'Whatever';
 
-        $validatable = $this->createMock('Respect\Validation\Validatable');
+        $validatable = $this->getMock('Respect\Validation\Validatable');
         $validatable
             ->expects($this->once())
             ->method('validate')
@@ -65,7 +64,7 @@ class AbstractWrapperTest extends TestCase
     {
         $input = 'Whatever';
 
-        $validatable = $this->createMock('Respect\Validation\Validatable');
+        $validatable = $this->getMock('Respect\Validation\Validatable');
         $validatable
             ->expects($this->once())
             ->method('assert')
@@ -82,7 +81,7 @@ class AbstractWrapperTest extends TestCase
     {
         $input = 'Whatever';
 
-        $validatable = $this->createMock('Respect\Validation\Validatable');
+        $validatable = $this->getMock('Respect\Validation\Validatable');
         $validatable
             ->expects($this->once())
             ->method('check')
@@ -99,7 +98,7 @@ class AbstractWrapperTest extends TestCase
     {
         $name = 'Whatever';
 
-        $validatable = $this->createMock('Respect\Validation\Validatable');
+        $validatable = $this->getMock('Respect\Validation\Validatable');
         $validatable
             ->expects($this->once())
             ->method('setName')

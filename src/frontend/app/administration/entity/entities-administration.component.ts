@@ -6,17 +6,17 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { Router } from '@angular/router';
-import { AppService } from '../../../service/app.service';
+import { AppService } from '@service/app.service';
 import { DiffusionsListComponent } from '../../diffusions/diffusions-list.component';
 import { tap, catchError, filter, exhaustMap } from 'rxjs/operators';
-import { FunctionsService } from '../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
 import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 import {EntitiesExportComponent} from './export/entities-export.component';
 
 declare var $: any;
@@ -32,7 +32,6 @@ export class EntitiesAdministrationComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
-    
     loading: boolean = false;
 
     entities: any[] = [];
@@ -326,6 +325,9 @@ export class EntitiesAdministrationComponent implements OnInit {
 
         if (r) {
             if (this.creationMode) {
+                if (this.functions.empty(this.currentEntity.producerService)) {
+                    this.currentEntity.producerService = this.currentEntity.entity_id;
+                }
                 this.http.post('../rest/entities', this.currentEntity)
                     .subscribe((data: any) => {
                         this.currentEntity.listTemplate = [];
@@ -780,7 +782,7 @@ export class EntitiesAdministrationComponent implements OnInit {
     }
 
     openExportModal() {
-        this.dialog.open(EntitiesExportComponent, { panelClass: 'maarch-modal', width: '800px', autoFocus: false });
+        this.dialog.open(EntitiesExportComponent, { panelClass: 'maarch-modal', width: '400px', autoFocus: false });
 
     }
 }
@@ -791,7 +793,6 @@ export class EntitiesAdministrationComponent implements OnInit {
     ]
 })
 export class EntitiesAdministrationRedirectModalComponent {
-    
 
     constructor(public translate: TranslateService, public http: HttpClient, @Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<EntitiesAdministrationRedirectModalComponent>) {
         console.log(this.data.entity.redirectEntity);

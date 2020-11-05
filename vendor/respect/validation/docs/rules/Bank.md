@@ -18,5 +18,3 @@ See also:
 
   * [BankAccount](BankAccount.md)
   * [Bic](Bic.md)
-  * [CreditCard](CreditCard.md)
-  * [IdentityCard](IdentityCard.md)

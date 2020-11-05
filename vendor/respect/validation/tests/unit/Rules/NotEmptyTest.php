@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\NotEmpty
  * @covers Respect\Validation\Exceptions\NotEmptyException
  */
-class NotEmptyTest extends TestCase
+class NotEmptyTest extends \PHPUnit_Framework_TestCase
 {
     protected $object;
 

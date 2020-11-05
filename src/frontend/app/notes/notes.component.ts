@@ -1,13 +1,13 @@
 import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { tap, finalize, catchError, exhaustMap, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { HeaderService } from '../../service/header.service';
+import { HeaderService } from '@service/header.service';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { FunctionsService } from '../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     selector: 'app-notes-list',

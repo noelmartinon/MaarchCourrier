@@ -18,14 +18,16 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: MW
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/MW/administrative-division-malawi.html
  */
 class MwSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
+        'C', // Central
+        'N', // Northern
+        'S', // Southern
         'BA', // Balaka
         'BL', // Blantyre
-        'C', // Central Region
         'CK', // Chikwawa
         'CR', // Chiradzulu
         'CT', // Chitipa
@@ -41,7 +43,6 @@ class MwSubdivisionCode extends AbstractSearcher
         'MU', // Mulanje
         'MW', // Mwanza
         'MZ', // Mzimba
-        'N', // Northern Region
         'NB', // Nkhata Bay
         'NE', // Neno
         'NI', // Ntchisi
@@ -50,7 +51,6 @@ class MwSubdivisionCode extends AbstractSearcher
         'NU', // Ntcheu
         'PH', // Phalombe
         'RU', // Rumphi
-        'S', // Southern Region
         'SA', // Salima
         'TH', // Thyolo
         'ZO', // Zomba

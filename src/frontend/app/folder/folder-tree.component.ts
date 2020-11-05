@@ -7,19 +7,17 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatInput } from '@angular/material/input';
 import { MatTreeFlatDataSource, MatTreeFlattener } from '@angular/material/tree';
-import { NotificationService } from '../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { Router } from '@angular/router';
 import { FolderUpdateComponent } from './folder-update/folder-update.component';
 import { FoldersService } from './folders.service';
 import { FormControl } from '@angular/forms';
 import { PluginAutocomplete } from '../../plugins/autocomplete/autocomplete.component';
-import { HeaderService } from '../../service/header.service';
+import { HeaderService } from '@service/header.service';
 import { FolderCreateModalComponent } from './folder-create-modal/folder-create-modal.component';
-import { FunctionsService } from '../../service/functions.service';
-import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
-import { Subscription } from 'rxjs/internal/Subscription';
-import { of } from 'rxjs/internal/observable/of';
+import { FunctionsService } from '@service/functions.service';
+import { BehaviorSubject, of, Subscription } from 'rxjs';
 
 /**
  * Node for to-do item
@@ -68,7 +66,6 @@ export class ItemFlatNode {
 })
 export class FolderTreeComponent implements OnInit, OnDestroy {
 
-    
     loading: boolean = true;
 
     searchTerm: FormControl = new FormControl();

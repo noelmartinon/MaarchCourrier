@@ -16,5 +16,3 @@ v::filterVar(FILTER_VALIDATE_URL, FILTER_FLAG_PATH_REQUIRED)->validate('http://e
 See also:
 
   * [Callback](Callback.md)
-  * [Json](Json.md)
-  * [Url](Url.md)

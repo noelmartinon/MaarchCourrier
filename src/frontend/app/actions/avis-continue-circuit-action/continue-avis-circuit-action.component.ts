@@ -1,12 +1,12 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { FunctionsService } from '../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 
 @Component({

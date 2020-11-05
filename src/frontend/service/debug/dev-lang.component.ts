@@ -1,9 +1,8 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs/internal/operators/tap';
-import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs/internal/observable/of';
+import { catchError, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { NotificationService } from '../notification/notification.service';
 
 @Component({

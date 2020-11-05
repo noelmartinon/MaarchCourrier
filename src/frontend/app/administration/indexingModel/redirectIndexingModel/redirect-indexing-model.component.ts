@@ -2,10 +2,10 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, finalize, map, tap } from 'rxjs/operators';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { SortPipe } from '../../../../plugins/sorting.pipe';
-import { NotificationService } from '../../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 
 @Component({
     templateUrl: 'redirect-indexing-model.component.html',

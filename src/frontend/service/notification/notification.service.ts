@@ -68,7 +68,11 @@ export class NotificationService {
                 } else if (err.error.exception !== undefined) {
                     this.error(err.error.exception[0].message, err.url);
                 } else if (err.error.error !== undefined) {
-                    this.error(err.error.error.message, err.url);
+                    if (err.error.error[0] !== undefined) {
+                        this.error(err.error.error[0].message, err.url);
+                    } else {
+                        this.error(err.error.error.message, err.url);
+                    }
                 } else {
                     this.error(`${err.status} : ${err.statusText}`, err.url);
                 }
@@ -94,7 +98,11 @@ export class NotificationService {
             } else if (err.error.exception !== undefined) {
                 this.error(err.error.exception[0].message, err.url);
             } else if (err.error.error !== undefined) {
-                this.error(err.error.error.message, err.url);
+                if (err.error.error[0] !== undefined) {
+                    this.error(err.error.error[0].message, err.url);
+                } else {
+                    this.error(err.error.error.message, err.url);
+                }
             } else {
                 this.error(`${err.status} : ${err.statusText}`, err.url);
             }

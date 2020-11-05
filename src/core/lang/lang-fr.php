@@ -263,11 +263,6 @@ define('_PROCEED_WORKFLOW_AVIS', 'Emettre un avis (séquentiel)');
 define('_PROCEED_WORKFLOW_AVIS_DESC', 'Met à jour la date d\'émission d\'avis du conseiller actuel du circuit d\'avis ("process_date" de la table listinstance).');
 define('_PROCEED_WORKFLOW_AVIS_SIMPLE', 'Emettre un avis (parallèle)');
 define('_PROCEED_WORKFLOW_AVIS_SIMPLE_DESC', 'Met à jour la date d\'émission d\'avis de l\'utilisateur présent en avis dans la liste de diffusion du courrier ("process_date" de la table listinstance).');
-define('_EXPORT_SEDA', 'Transférer vos courriers');
-define('_CHECK_ACKNOWLEDGEMENT', 'Vérification de l\'accusé de reception');
-define('_CHECK_REPLY', 'Vérification de la réponse au transfert');
-define('_PURGE_LETTER', 'Purger le courrier apres l\'archivage');
-define('_RESET_LETTER', 'Remise à zéro du circuit de traitement');
 define('_SIMPLE_CONFIRM_WITH_UPDATE_DATE', 'Confirmation et mise à jour de la date de départ');
 define('_NOT_INCOMING_CATEGORY', 'Catégorie différente de \'Courrier arrivée\'');
 define('_NO_CONTACT', 'Pas de contact associé');
@@ -294,6 +289,8 @@ define('_PRINT_FOLDER', 'Dossier');
 define('_REDACTOR', 'Rédacteur');
 define('_ASSIGNEE', 'Attributaire');
 define('_DOCUMENT_WITH_NOTES', 'Document annoté');
+define("_ACKNOWLEDGEMENT_RECORD_MANAGEMENT", "Accusé de réception (Archivage)");
+define("_REPLY_RECORD_MANAGEMENT", "Réponse au transfert (Archivage)");
 
 define('_SUMMARY_SHEET', 'Fiche de liaison');
 define('_UNDEFINED', 'Non défini');
@@ -415,6 +412,7 @@ define("_CANNOT_SYNCHRONIZE_M2M_ANNUARY", "Le contact ne peut pas être ajouté 
 define("_DATE_LOCALE", "fr_FR.utf8");
 
 define("_USER_PREFERENCE_UPDATED", "Préférences utilisateur modifiées");
+define("_USER_FEATURE_TOUR_UPDATED", "Une ou plusieurs étapes du didacticiel ont été faites");
 
 define("_NO_SENDERS", "Aucun expéditeur lié au courrier");
 
@@ -463,6 +461,18 @@ define("_DOC_ADD_TO_SIGNATORY_BOOK", "Courrier intégré au parapheur électroni
 define("_DOC_REMOVE_FROM_SIGNATORY_BOOK", "Courrier retiré du parapheur électronique");
 define("_DOC_ADD_TO_MAILEVA", "Courrier intégré aux envois Maileva");
 define("_DOC_REMOVE_FROM_MAILEVA", "Courrier retiré des envois Maileva");
+define("_RESET_BINDING_DOCUMENT", "Suppression de l'engagement du courrier");
+define("_SET_BINDING_DOCUMENT", "Courrier défini comme engageant");
+define("_SET_NON_BINDING_DOCUMENT", "Courrier défini comme non engageant");
+define("_RETENTION_RULE_FROZEN", "Durée d'utilitée courante gelée");
+define("_BINDING_DOCUMENT", "Document engageant");
+define("_YES", "Oui");
+define("_NO", "Non");
+define("_RESET_BINDING_DOCUMENT", "Paramètre Document engageant supprimé");
+define("_SET_BINDING_DOCUMENT", "Le document a été défini comme engageant");
+define("_SET_NON_BINDING_DOCUMENT", "Le document a été défini comme non engageant");
+define("_FREEZE_RETENTION_RULE", "La durée d'utilité courante a été gelée");
+define("_UNFREEZE_RETENTION_RULE", "La durée d'utilité courante a été dégelée");
 
 define("_ISSUING_SITE_CREATED", "Site émetteur créé");
 define("_ISSUING_SITE_UPDATED", "Site émetteur modifié");
@@ -482,3 +492,15 @@ define('_NOT_GENERATED', 'Non généré');
 
 define('_REGISTERED_MAIL_DISTRIBUTED', 'Accusé de réception reçu : recommandé distribué');
 define('_REGISTERED_MAIL_NOT_DISTRIBUTED', 'Accusé de réception reçu : recommandé non distribué');
+
+define('_CONFIGURATION_UPDATED', 'Configuration modifiée');
+define('_SEND_TO_RECORD_MANAGEMENT', 'Envoyer dans un système d\'archivage électronique');
+define('_SEND_TO_RECORD_MANAGEMENT_DESC', 'Envoyer dans un système d\'archivage électronique');
+
+define('_CHECK_REPLY_RECORD_MANAGEMENT', 'Vérification de la réponse au transfert du système d\'archivage électronique');
+define('_CHECK_REPLY_RECORD_MANAGEMENT_DESC', 'Vérification de la réponse au transfert du système d\'archivage électronique');
+
+define('_CHECK_ACKNOWLEDGMENT_RECORD_MANAGEMENT', 'Vérification du transfert du paquet au système d\'archivage électronique');
+define('_CHECK_ACKNOWLEDGMENT_RECORD_MANAGEMENT_DESC', 'Vérification du transfert du paquet au système d\'archivage électronique');
+define('_RESET_RECORD_MANAGEMENT', 'Remise à zéro du circuit d\'archivage');
+define('_RESET_RECORD_MANAGEMENT_DESC', 'Remise à zéro du circuit d\'archivage');

@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: IN
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/IN/administrative-division-india.html
  */
 class InSubdivisionCode extends AbstractSearcher
 {
@@ -48,16 +48,15 @@ class InSubdivisionCode extends AbstractSearcher
         'MP', // Madhya Pradesh
         'MZ', // Mizoram
         'NL', // Nagaland
-        'OR', // Odisha
+        'OR', // Orissa
         'PB', // Punjab
-        'PY', // Puducherry
+        'PY', // Pondicherry
         'RJ', // Rajasthan
         'SK', // Sikkim
-        'TG', // Telangana
         'TN', // Tamil Nadu
         'TR', // Tripura
+        'UL', // Uttaranchal
         'UP', // Uttar Pradesh
-        'UT', // Uttarakhand
         'WB', // West Bengal
     ];
 

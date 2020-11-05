@@ -30,23 +30,15 @@
                 (onFileDropped)="dndUploadFile($event)" class="dndFile">
                 <div>
                     {{'lang.dndFileCsvDesc' | translate}}
-                    <mat-form-field appearance="outline" style="font-size:14px;" (click)="$event.stopPropagation()">
-                        <mat-label>{{'lang.delimiter' | translate}}</mat-label>
-                        <mat-select [(ngModel)]="currentDelimiter" (click)="$event.stopPropagation()">
-                            <mat-option *ngFor="let delimiter of delimiters" [value]="delimiter">
-                                {{delimiter === '\t' ? 'TAB' : delimiter}}
-                            </mat-option>
-                        </mat-select>
-                    </mat-form-field>
                 </div>
             </div>
             <div class="row" style="margin: 0px;">
-                <div class="col-md-12">
-                    <mat-paginator #paginator [length]="100" [hidePageSize]="true" [pageSize]="10">
+                <div *ngIf="csvData.length !== 0" class="col-md-12">
+                    <mat-paginator #paginator [length]="100" [hidePageSize]="true" [pageSize]="8">
                     </mat-paginator>
                 </div>
             </div>
-            <div style="width:100%;box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.75);padding:10px;">
+            <div *ngIf="csvData.length !== 0" style="width:100%;box-shadow: inset 0px 0px 5px 0px rgba(0,0,0,0.75);padding:10px;">
                 <div style="overflow: auto;">
                     <mat-table *ngIf="csvData.length > 0" #table [dataSource]="dataSource" [style.width.px]="contactColumns.length * 300">
                         <ng-container *ngFor="let column of contactColumns;let i=index;">
@@ -86,12 +78,13 @@
                     </mat-table>
                 </div>
             </div>
-            <div class="alert-message alert-message-info" [innerHTML]="'lang.infoImportcontacts' | translate"
+            <div class="alert-message alert-message-info" [innerHTML]="'lang.infoImportNoIdToCreate' | translate"
                 style="min-width: 100%">
             </div>
             <div class="alert-message alert-message-info" [innerHTML]="'lang.infoImportcontacts2' | translate"
                 style="min-width: 100%">
             </div>
+            
         </ng-template>
     </div>
     <span class="divider-modal"></span>

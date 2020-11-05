@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Version
  * @covers Respect\Validation\Exceptions\VersionException
  */
-class VersionTest extends TestCase
+class VersionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider providerForValidVersion

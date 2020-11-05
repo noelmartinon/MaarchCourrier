@@ -3,15 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, tap, filter, distinctUntilChanged, take } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { AppService } from '../../../service/app.service';
+import { AppService } from '@service/app.service';
 import { DocumentViewerComponent } from '../../viewer/document-viewer.component';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { FunctionsService } from '../../../service/functions.service';
-import { ContactService } from '../../../service/contact.service';
+import { FunctionsService } from '@service/functions.service';
+import { ContactService } from '@service/contact.service';
 import { ContactAutocompleteComponent } from '../../contact/autocomplete/contact-autocomplete.component';
 
 @Component({
@@ -330,8 +330,6 @@ export class AttachmentCreateComponent implements OnInit {
             Object.keys(formgroup.controls).forEach(key => {
                 formgroup.controls[key].markAsTouched();
             });
-            console.log(formgroup.controls);
-
             if (formgroup.status === 'INVALID') {
                 state = false;
             }
@@ -404,14 +402,10 @@ export class AttachmentCreateComponent implements OnInit {
     }
 
     updateFile(index: number) {
-        if (this.functions.empty(this.attachments[this.asyncIndexTab].encodedFile.value)) {
-            console.log('ca passe!');
-            
+        if (this.functions.empty(this.attachments[this.asyncIndexTab].encodedFile.value)) {            
             this.appDocumentViewer.toArray()[this.asyncIndexTab].getFile().pipe(
                 take(1),
                 tap((data) => {
-                    console.log(data);
-                    
                     this.attachments[this.asyncIndexTab].encodedFile.setValue(data.content);
                     this.attachments[this.asyncIndexTab].format.setValue(data.format);
                     this.asyncIndexTab = index;

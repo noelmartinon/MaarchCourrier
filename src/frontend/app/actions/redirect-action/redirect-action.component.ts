@@ -1,16 +1,14 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { DiffusionsListComponent } from '../../diffusions/diffusions-list.component';
 import { FormControl } from '@angular/forms';
-import { startWith } from 'rxjs/internal/operators/startWith';
-import { map, tap, finalize, catchError } from 'rxjs/operators';
+import { map, tap, finalize, catchError, startWith } from 'rxjs/operators';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
-import { Observable } from 'rxjs/internal/Observable';
-import { of } from 'rxjs/internal/observable/of';
-import { FunctionsService } from '../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
+import { Observable, of } from 'rxjs';
 
 declare var $: any;
 
@@ -20,7 +18,6 @@ declare var $: any;
 })
 export class RedirectActionComponent implements OnInit {
 
-    
     loading: boolean = false;
 
     entities: any[] = [];
@@ -106,7 +103,8 @@ export class RedirectActionComponent implements OnInit {
                                     ...entity,
                                     state : {
                                         selected : false,
-                                        opened: false
+                                        opened: false,
+                                        disabled: entity.state.disabled
                                     }
                                 };
                             });

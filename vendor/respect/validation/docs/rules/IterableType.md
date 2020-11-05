@@ -15,8 +15,6 @@ v::iterableType()->validate('string'); // false
 ***
 See also:
 
-  * [ArrayType](ArrayType.md)
   * [ArrayVal](ArrayVal.md)
   * [Countable](Countable.md)
   * [Instance](Instance.md)
-  * [Iterable](Iterable.md)

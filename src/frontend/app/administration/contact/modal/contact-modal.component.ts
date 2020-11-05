@@ -2,8 +2,8 @@ import { Component, Inject, ViewChild, Renderer2, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
-import { PrivilegeService } from '../../../../service/privileges.service';
-import { HeaderService } from '../../../../service/header.service';
+import { PrivilegeService } from '@service/privileges.service';
+import { HeaderService } from '@service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
 
 declare var $: any;

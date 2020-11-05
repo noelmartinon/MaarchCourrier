@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Alpha
  * @covers Respect\Validation\Exceptions\AlphaException
  */
-class AlphaTest extends TestCase
+class AlphaTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider providerForValidAlpha

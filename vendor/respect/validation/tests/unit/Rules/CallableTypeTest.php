@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\CallableType
  * @covers Respect\Validation\Exceptions\CallableTypeException
  */
-class CallableTypeTest extends TestCase
+class CallableTypeTest extends \PHPUnit_Framework_TestCase
 {
     protected $rule;
 
@@ -55,8 +53,7 @@ class CallableTypeTest extends TestCase
     public function providerForCallable()
     {
         return [
-            [function () {
-            }],
+            [function () {}],
             ['trim'],
             [__METHOD__],
             [[$this, __FUNCTION__]],

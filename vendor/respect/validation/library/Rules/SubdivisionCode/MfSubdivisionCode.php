@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: MF
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/MF/administrative-division-saint-martin.html
  */
 class MfSubdivisionCode extends AbstractSearcher
 {

@@ -18,33 +18,33 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: VE
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/VE/administrative-division-venezuela.html
  */
 class VeSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'A', // Distrito Federal
-        'B', // Anzoátegui
+        'A', // Federal Capital
+        'B', // Anzoategui
         'C', // Apure
         'D', // Aragua
         'E', // Barinas
-        'F', // Bolívar
+        'F', // Bolivar
         'G', // Carabobo
         'H', // Cojedes
-        'I', // Falcón
-        'J', // Guárico
+        'I', // Falcon
+        'J', // Guarico
         'K', // Lara
-        'L', // Mérida
+        'L', // Merida
         'M', // Miranda
         'N', // Monagas
         'O', // Nueva Esparta
         'P', // Portuguesa
         'R', // Sucre
-        'S', // Táchira
+        'S', // Tachira
         'T', // Trujillo
         'U', // Yaracuy
         'V', // Zulia
-        'W', // Dependencias Federales
+        'W', // Federal Dependency
         'X', // Vargas
         'Y', // Delta Amacuro
         'Z', // Amazonas

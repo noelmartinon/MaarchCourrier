@@ -1,16 +1,16 @@
 import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { MatTableDataSource } from '@angular/material/table';
-import { FunctionsService } from '../../../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { ConfirmComponent } from '../../../../../plugins/modal/confirm.component';
 import { filter, exhaustMap, tap, catchError, map } from 'rxjs/operators';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 import { AlertComponent } from '../../../../../plugins/modal/alert.component';
-import { LocalStorageService } from '../../../../../service/local-storage.service';
-import { HeaderService } from '../../../../../service/header.service';
+import { LocalStorageService } from '@service/local-storage.service';
+import { HeaderService } from '@service/header.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { Papa } from 'ngx-papaparse';
 
@@ -105,12 +105,7 @@ export class ContactImportComponent implements OnInit {
         },
     ];
 
-    csvColumns: string[] = [
-
-    ];
-
-    delimiters = [';', ',', '\t'];
-    currentDelimiter = ';';
+    csvColumns: string[] = [];
 
     associatedColmuns: any = {};
     dataSource = new MatTableDataSource(null);
@@ -138,7 +133,6 @@ export class ContactImportComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.setConfiguration();
         this.initCustomFields();
     }
 
@@ -209,8 +203,6 @@ export class ContactImportComponent implements OnInit {
             reader.onload = (value: any) => {
                 this.papa.parse(value.target.result, {
                     complete: (result) => {
-                        // console.log('Parsed: ', result);
-
                         rawCsv = result.data;
                         rawCsv = rawCsv.filter(data => data.length === rawCsv[0].length);
 
@@ -231,7 +223,6 @@ export class ContactImportComponent implements OnInit {
                         this.initData();
                         this.countAdd = this.csvData.filter((data: any, index: number) => index > 0 && this.functionsService.empty(data[this.associatedColmuns['id']])).length;
                         this.countUp = this.csvData.filter((data: any, index: number) => index > 0 && !this.functionsService.empty(data[this.associatedColmuns['id']])).length;
-                        this.localStorage.save(`importContactFields_${this.headerService.user.id}`, this.currentDelimiter);
 
                         this.loading = false;
                     }
@@ -351,11 +342,5 @@ export class ContactImportComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
-    }
-
-    setConfiguration() {
-        if (this.localStorage.get(`importContactFields_${this.headerService.user.id}`) !== null) {
-            this.currentDelimiter = this.localStorage.get(`importContactFields_${this.headerService.user.id}`);
-        }
     }
 }

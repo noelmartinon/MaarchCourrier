@@ -13,6 +13,8 @@ SET search_path = public, pg_catalog;
 SET default_tablespace = '';
 SET default_with_oids = false;
 
+CREATE EXTENSION unaccent;
+
 CREATE TABLE actions
 (
   id serial NOT NULL,
@@ -73,6 +75,7 @@ CREATE TABLE doctypes
   doctypes_second_level_id integer,
   retention_final_disposition character varying(255) DEFAULT NULL,
   retention_rule character varying(15) DEFAULT NULL,
+  action_current_use character varying(255) DEFAULT NULL,
   duration_current_use integer,
   process_delay INTEGER NOT NULL,
   delay1 INTEGER NOT NULL,
@@ -226,8 +229,9 @@ CREATE TABLE users
   reset_token text,
   failed_authentication INTEGER DEFAULT 0,
   locked_until TIMESTAMP without time zone,
-    authorized_api jsonb NOT NULL DEFAULT '[]',
-    external_id jsonb DEFAULT '{}',
+  authorized_api jsonb NOT NULL DEFAULT '[]',
+  external_id jsonb DEFAULT '{}',
+  feature_tour jsonb NOT NULL DEFAULT '[]',
   CONSTRAINT users_pkey PRIMARY KEY (user_id),
   CONSTRAINT users_id_key UNIQUE (id)
 )
@@ -395,8 +399,7 @@ CREATE TABLE entities
   parent_entity_id character varying(32),
   entity_type character varying(64),
   ldap_id character varying(255),
-  archival_agency character varying(255),
-  archival_agreement character varying(255),
+  producer_service character varying(255),
   folder_import character varying(64),
   external_id jsonb DEFAULT '{}',
   CONSTRAINT entities_pkey PRIMARY KEY (entity_id),
@@ -427,6 +430,7 @@ CREATE TABLE listinstance
   process_comment character varying(255),
   signatory boolean default false,
   requested_signature boolean default false,
+  delegate INTEGER,
   CONSTRAINT listinstance_pkey PRIMARY KEY (listinstance_id)
 )
 WITH (OIDS=FALSE);
@@ -918,6 +922,8 @@ CREATE TABLE res_letterbox
   integrations jsonb DEFAULT '{}' NOT NULL,
   custom_fields jsonb,
   linked_resources jsonb NOT NULL DEFAULT '[]',
+  retention_frozen boolean DEFAULT FALSE NOT NULL,
+  binding boolean,
   CONSTRAINT res_letterbox_pkey PRIMARY KEY  (res_id)
 )
 WITH (OIDS=FALSE);
@@ -1106,6 +1112,8 @@ SELECT r.res_id,
        r.locker_user_id,
        r.locker_time,
        r.custom_fields,
+       r.retention_frozen,
+       r.binding,
        en.entity_label,
        en.entity_type AS entitytype
 FROM doctypes d,
@@ -1115,13 +1123,43 @@ FROM doctypes d,
     LEFT JOIN entities en ON r.destination::text = en.entity_id::text
 WHERE r.type_id = d.type_id AND d.doctypes_first_level_id = dfl.doctypes_first_level_id AND d.doctypes_second_level_id = dsl.doctypes_second_level_id;
 
-CREATE FUNCTION order_alphanum(text) RETURNS text AS $$
-  SELECT regexp_replace(regexp_replace(regexp_replace(regexp_replace($1,
-    E'(^|\\D)(\\d{1,3}($|\\D))', E'\\1000\\2', 'g'),
-      E'(^|\\D)(\\d{4,6}($|\\D))', E'\\1000\\2', 'g'),
-        E'(^|\\D)(\\d{7}($|\\D))', E'\\100\\2', 'g'),
-          E'(^|\\D)(\\d{8}($|\\D))', E'\\10\\2', 'g');
-$$ LANGUAGE SQL;
+/* ORDER ON CHRONO */
+CREATE OR REPLACE FUNCTION order_alphanum(text) RETURNS text AS $$
+declare
+    tmp text;
+begin
+    tmp := $1;
+    tmp := tmp || 'Z';
+    tmp := regexp_replace(tmp, E'(\\D)', E'\\1/', 'g');
+
+    IF count(regexp_match(tmp, E'(\\D(\\d{8})\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{8}\\D)', E'\\10\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{7}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{7}\\D)', E'\\100\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{6}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{6}\\D)', E'\\1000\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{5}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{5}\\D)', E'\\10000\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{4}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{4}\\D)', E'\\100000\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{3}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{3}\\D)', E'\\1000000\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{2}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{2}\\D)', E'\\10000000\\2', 'g');
+    END IF;
+    IF count(regexp_match(tmp, E'(\\D)(\\d{1}\\D)')) > 0 THEN
+        tmp := regexp_replace(tmp, E'(\\D)(\\d{1}\\D)', E'\\100000000\\2', 'g');
+    END IF;
+
+    RETURN tmp;
+end;
+$$ LANGUAGE plpgsql;
 
 
 CREATE TABLE message_exchange
@@ -1314,11 +1352,14 @@ CONSTRAINT acknowledgement_receipts_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);
 
+CREATE TYPE custom_fields_modes AS ENUM ('form', 'technical');
+
 CREATE TABLE custom_fields
 (
     id serial NOT NULL,
     label character varying(256) NOT NULL,
     type character varying(256) NOT NULL,
+    mode custom_fields_modes NOT NULL DEFAULT 'form',
     values jsonb,
     CONSTRAINT custom_fields_pkey PRIMARY KEY (id),
     CONSTRAINT custom_fields_unique_key UNIQUE (label)

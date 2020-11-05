@@ -104,7 +104,7 @@
                             *ngIf="(field.unit === unit.id && unit.id !== 'address') || (field.unit === unit.id && unit.id === 'address' && !addressBANMode)">
                             <p mat-line class="contact-content" *ngIf="field.display">
                                 <ng-container
-                                    *ngIf="field.type === 'string' && field.id !== 'communicationMeans' && field.id !== 'externalId_m2m'">
+                                    *ngIf="field.type === 'string' && field.id !== 'communicationMeans' && field.id !== 'externalId_m2m' && field.id != 'addressCountry'">
                                     <mat-form-field>
                                         <input matInput [formControl]="field.control" [placeholder]="field.label"
                                             (blur)="checkCompany(field);checkFilling();" (ngModelChange)="toUpperCase(field, $event)" [required]="field.required">
@@ -253,6 +253,16 @@
                                             [formControl]="field.control">
                                         <mat-hint *ngIf="!isEmptyValue(field.desc)" align="end"
                                                   [innerHTML]="field.desc"></mat-hint>
+                                    </mat-form-field>
+                                </ng-container>
+                                <ng-container *ngIf="field.id === 'addressCountry'">
+                                    <mat-form-field>
+                                        <input matInput #autoCompleteInput [formControl]="field.control" [placeholder]="field.label" [matAutocomplete]="matAutocompleteCountries">
+                                        <mat-autocomplete #matAutocompleteCountries="matAutocomplete" isOpen="true" (optionSelected)="selectCountry($event)">
+                                            <mat-option *ngFor="let country of countriesFilteredResult | async" [value]="country">
+                                                {{country}}
+                                            </mat-option>
+                                        </mat-autocomplete>
                                     </mat-form-field>
                                 </ng-container>
                             </p>

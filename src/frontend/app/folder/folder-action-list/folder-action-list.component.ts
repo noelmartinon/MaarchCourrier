@@ -1,16 +1,17 @@
 import { Component, OnInit, Input, ViewChild, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatMenuTrigger } from '@angular/material/menu';
 
 import { Router } from '@angular/router';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { filter, exhaustMap, tap, map, catchError } from 'rxjs/operators';
-import { HeaderService } from '../../../service/header.service';
+import { HeaderService } from '@service/header.service';
 import { FoldersService } from '../folders.service';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
+import { PrivilegeService } from '@service/privileges.service';
 
 @Component({
     selector: 'app-folder-action-list',
@@ -33,6 +34,9 @@ export class FolderActionListComponent implements OnInit {
     currentLock: any = null;
     arrRes: any[] = [];
 
+    isSelectedFreeze: any;
+    isSelectedBinding: any;
+
     actionsList: any[] = [];
     basketList: any = {
         groups: [],
@@ -43,6 +47,8 @@ export class FolderActionListComponent implements OnInit {
     @Input() totalRes: number;
     @Input() contextMode: boolean;
     @Input() currentFolderInfo: any;
+    @Input() currentResource: any = {};
+
 
     @Output() refreshEvent = new EventEmitter<string>();
     @Output() refreshPanelFolders = new EventEmitter<string>();
@@ -54,7 +60,8 @@ export class FolderActionListComponent implements OnInit {
         public dialog: MatDialog,
         private router: Router,
         private headerService: HeaderService,
-        private foldersService: FoldersService
+        private foldersService: FoldersService,
+        public privilegeService: PrivilegeService,
     ) { }
 
     dialogRef: MatDialogRef<any>;
@@ -69,12 +76,18 @@ export class FolderActionListComponent implements OnInit {
 
         this.contextMenuTitle = row.chrono;
         this.contextResId = row.resId;
+        this.currentResource = row;
+
+        this.getFreezeBindingValue();
 
         // Opens the menu
         this.contextMenu.openMenu();
 
         // prevents default
         return false;
+    }
+    refreshList() {
+        this.refreshEvent.emit();
     }
 
     refreshFolders() {
@@ -142,5 +155,49 @@ export class FolderActionListComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    toggleFreezing(value) {
+        this.http.put('../rest/archival/freezeRetentionRule', { resources: this.selectedRes, freeze : value }).pipe(
+            tap(() => {
+                if (value) {
+                    this.notify.success(this.translate.instant('lang.retentionRuleFrozen'));
+                } else {
+                    this.notify.success(this.translate.instant('lang.retentionRuleUnfrozen'));
+
+                }
+                this.refreshList();
+            }
+            ),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    toogleBinding(value) {
+        this.http.put('../rest/archival/binding', { resources: this.selectedRes, binding : value }).pipe(
+            tap(() => {
+                if (value) {
+                    this.notify.success(this.translate.instant('lang.bindingMail'));
+                } else if (value === false) {
+                    this.notify.success(this.translate.instant('lang.noBindingMail'));
+                } else {
+                    this.notify.success(this.translate.instant('lang.bindingUndefined'));
+                }
+                this.refreshList();
+            }
+            ),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    getFreezeBindingValue() {
+        this.isSelectedFreeze = this.currentResource.retentionFrozen;
+        this.isSelectedBinding = this.currentResource.binding;
     }
 }

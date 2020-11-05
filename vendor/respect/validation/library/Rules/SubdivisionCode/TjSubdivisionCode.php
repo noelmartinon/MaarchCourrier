@@ -18,12 +18,12 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: TJ
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/TJ/administrative-division-tajikistan.html
  */
 class TjSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'GB', // Gorno-Badakhshan
+        'GB', // Gorno-Badakhstan
         'KT', // Khatlon
         'SU', // Sughd
     ];

@@ -39,7 +39,6 @@ use MessageExchange\models\MessageExchangeModel;
 use Note\models\NoteModel;
 use Priority\models\PriorityModel;
 use RegisteredMail\controllers\RegisteredMailController;
-use RegisteredMail\models\IssuingSiteModel;
 use RegisteredMail\models\RegisteredMailModel;
 use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
@@ -118,7 +117,7 @@ class ResController extends ResourceControlController
 
         $queryParams = $request->getQueryParams();
 
-        $select = ['model_id', 'category_id', 'priority', 'status', 'subject', 'alt_identifier', 'process_limit_date', 'closing_date', 'creation_date', 'modification_date', 'integrations'];
+        $select = ['model_id', 'category_id', 'priority', 'status', 'subject', 'alt_identifier', 'process_limit_date', 'closing_date', 'creation_date', 'modification_date', 'integrations', 'retention_frozen', 'binding'];
         if (empty($queryParams['light'])) {
             $select = array_merge($select, ['type_id', 'typist', 'destination', 'initiator', 'confidentiality', 'doc_date', 'admission_date', 'departure_date', 'barcode', 'custom_fields']);
         }
@@ -140,6 +139,8 @@ class ResController extends ResourceControlController
             'closingDate'       => $document['closing_date'],
             'creationDate'      => $document['creation_date'],
             'modificationDate'  => $document['modification_date'],
+            'retentionFrozen'   => $document['retention_frozen'],
+            'binding'           => $document['binding'],
             'integrations'      => json_decode($document['integrations'], true)
         ];
         $formattedData = [
@@ -437,7 +438,7 @@ class ResController extends ResourceControlController
             return $response->withStatus(400)->withJson(['errors' => 'Document has no file']);
         }
         $originalFormat = $document['format'];
-        $creatorId = $document['typist'];
+        $creatorId      = $document['typist'];
 
         $convertedDocument = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['resId'], 'collId' => 'letterbox_coll']);
         if (!empty($convertedDocument['errors'])) {
@@ -486,7 +487,23 @@ class ResController extends ResourceControlController
         $mimeType = $finfo->buffer($fileContent);
 
         if ($data['mode'] == 'base64') {
-            return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'originalFormat' => $originalFormat, 'mimeType' => $mimeType,'originalCreatorId' => $creatorId]);
+            $listInstance = ListInstanceModel::get([
+                'select'    => ['listinstance_id', 'item_id'],
+                'where'     => ['res_id = ?', 'signatory = ?'],
+                'data'      => [$aArgs['resId'], 'true'],
+                'orderBy'   => ['listinstance_id desc'],
+                'limit'     => 1
+            ]);
+
+            $signatoryId = $listInstance[0]['item_id'] ?? $creatorId;
+    
+            return $response->withJson([
+                'encodedDocument'   => base64_encode($fileContent),
+                'originalFormat'    => $originalFormat,
+                'mimeType'          => $mimeType,
+                'originalCreatorId' => $creatorId,
+                'signatoryId'       => $signatoryId
+            ]);
         } else {
             $pathInfo = pathinfo($pathToDocument);
 
@@ -712,9 +729,10 @@ class ResController extends ResourceControlController
             }
         }
 
-        $fileContent = file_get_contents($pathToThumbnail);
+        $fileContent = @file_get_contents($pathToThumbnail);
         if ($fileContent === false) {
-            return $response->withStatus(404)->withJson(['errors' => 'Thumbnail not found on docserver']);
+            $pathToThumbnail = 'dist/assets/noThumbnail.png';
+            $fileContent = @file_get_contents($pathToThumbnail);
         }
 
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
@@ -1358,14 +1376,31 @@ class ResController extends ResourceControlController
 
         $resource = ResModel::getById([
             'resId'  => $args['resId'],
-            'select' => ['format', 'fingerprint', 'filesize', 'fulltext_result']
+            'select' => ['format', 'fingerprint', 'filesize', 'fulltext_result', 'creation_date', 'filename', 'docserver_id', 'path']
         ]);
+
+        if (!empty($resource['docserver_id'])) {
+            $docserver = DocserverModel::getByDocserverId(['docserverId' => $resource['docserver_id'], 'select' => ['path_template']]);
+            $resource['docserverPathFile'] = $docserver['path_template'] . $resource['path'];
+            $resource['docserverPathFile'] = str_replace('//', '/', $resource['docserverPathFile']);
+            $resource['docserverPathFile'] = str_replace('#', '/', $resource['docserverPathFile']);
+        }
+
+        $resource['creationDate'] = $resource['creation_date'];
+        unset($resource['creation_date']);
 
         $allowedFiles = StoreController::getAllowedFiles();
         $allowedFiles = array_column($allowedFiles, 'canConvert', 'extension');
 
         $format = strtoupper($resource['format']);
         $resource['canConvert'] = !empty($allowedFiles[$format]);
+
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'view_technical_infos', 'userId' => $GLOBALS['id']])) {
+            $resource = [
+                'canConvert' => $resource['canConvert'],
+                'format'     => $resource['format']
+            ];
+        }
 
         return $response->withJson(['information' => $resource]);
     }
@@ -1401,39 +1436,17 @@ class ResController extends ResourceControlController
             }
         }
 
-        // Checking if model has a custom field. If yes, the customs are reset in the update, if not, we set it to an empty JSON object
-        $newModelHasCustomFields = false;
-        foreach ($newModelFields as $newModelField) {
-            if (strpos($newModelField, 'indexingCustomField_') !== false) {
-                $newModelHasCustomFields = true;
-                break;
-            }
-        }
+        $customFieldsToDelete = array_diff($oldFieldList, $newModelFields);
+        $customFieldsToDelete = array_filter($customFieldsToDelete, function ($field) {
+            return strpos($field, 'indexingCustomField_') !== false;
+        });
+        $customFieldsToDelete = array_map(function ($field) {
+            return explode('_', $field)[1];
+        }, $customFieldsToDelete);
 
-        $oldModelHasCustomFields = false;
-        foreach ($oldFieldList as $oldModelField) {
-            if (strpos($oldModelField, 'indexingCustomField_') !== false) {
-                $oldModelHasCustomFields = true;
-                break;
-            }
-        }
-
-        $postSet = [];
-        if ($oldModelHasCustomFields && !$newModelHasCustomFields) {
-            $set['custom_fields'] = '{}';
-        } else {
-            $customFieldsToDelete = array_diff($oldFieldList, $newModelFields);
-            $customFieldsToDelete = array_filter($customFieldsToDelete, function ($field) {
-                return strpos($field, 'indexingCustomField_') !== false;
-            });
-            $customFieldsToDelete = array_map(function ($field) {
-                return explode('_', $field)[1];
-            }, $customFieldsToDelete);
-
-            $postSet['custom_fields'] = 'custom_fields ';
-            foreach ($customFieldsToDelete as $item) {
-                $postSet['custom_fields'] .= " - '$item'";
-            }
+        $postSet = ['custom_fields' => 'custom_fields '];
+        foreach ($customFieldsToDelete as $item) {
+            $postSet['custom_fields'] .= " - '$item'";
         }
 
         if (!empty($set) || !empty($postSet)) {

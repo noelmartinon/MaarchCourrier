@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Instance
  * @covers Respect\Validation\Exceptions\InstanceException
  */
-class InstanceTest extends TestCase
+class InstanceTest extends \PHPUnit_Framework_TestCase
 {
     protected $instanceValidator;
 

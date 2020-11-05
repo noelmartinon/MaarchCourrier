@@ -195,7 +195,7 @@ class CurlModel
     public static function execSimple(array $args)
     {
         ValidatorModel::notEmpty($args, ['url', 'method']);
-        ValidatorModel::stringType($args, ['url', 'method']);
+        ValidatorModel::stringType($args, ['url', 'method', 'cookie']);
         ValidatorModel::arrayType($args, ['headers', 'queryParams', 'basicAuth', 'bearerAuth']);
         ValidatorModel::boolType($args, ['isXml']);
 
@@ -206,6 +206,8 @@ class CurlModel
         //Headers
         if (!empty($args['headers'])) {
             $opts[CURLOPT_HTTPHEADER] = $args['headers'];
+        } else {
+            $args['headers'] = [];
         }
         //Auth
         if (!empty($args['basicAuth'])) {
@@ -213,6 +215,10 @@ class CurlModel
         }
         if (!empty($args['bearerAuth'])) {
             $opts[CURLOPT_HTTPHEADER][] = 'Authorization: Bearer ' . $args['bearerAuth']['token'];
+        }
+        //Cookie
+        if (!empty($args['cookie'])) {
+            $opts[CURLOPT_COOKIE] = $args['cookie'];
         }
 
         //QueryParams
@@ -252,16 +258,21 @@ class CurlModel
         $curl = curl_init();
         curl_setopt_array($curl, $opts);
         $rawResponse = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        $headerSize = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
-        $errors = curl_error($curl);
+        $code        = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $headerSize  = curl_getinfo($curl, CURLINFO_HEADER_SIZE);
+        $errors      = curl_error($curl);
         curl_close($curl);
 
-        $headers = substr($rawResponse, 0, $headerSize);
-        $headers = explode("\r\n", $headers);
+        $headers  = substr($rawResponse, 0, $headerSize);
+        $headers  = explode("\r\n", $headers);
         $response = substr($rawResponse, $headerSize);
 
         if (empty($args['noLogs'])) {
+            if (in_array('Accept: application/zip', $args['headers'])) {
+                $logResponse = 'Zip file content';
+            } else {
+                $logResponse = $response;
+            }
             LogsController::add([
                 'isTech'    => true,
                 'moduleId'  => 'curl',
@@ -269,12 +280,14 @@ class CurlModel
                 'tableName' => 'curl',
                 'recordId'  => 'execSimple',
                 'eventType' => "Url : {$args['url']} HttpCode : {$code} Errors : {$errors}",
-                'eventId'   => "Response : {$response}"
+                'eventId'   => "Response : {$logResponse}"
             ]);
         }
 
         if ($args['isXml']) {
             $response = simplexml_load_string($response);
+        } elseif (in_array('Accept: application/zip', $args['headers'])) {
+            $response = trim($response);
         } else {
             $response = json_decode($response, true);
         }

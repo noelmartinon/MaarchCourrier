@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { AppService } from '../../../service/app.service';
-import { FunctionsService } from '../../../service/functions.service';
+import { AppService } from '@service/app.service';
+import { FunctionsService } from '@service/functions.service';
 import { HistoryComponent } from '../../history/history.component';
-import { PrivilegeService } from '../../../service/privileges.service';
-import { HeaderService } from '../../../service/header.service';
+import { PrivilegeService } from '@service/privileges.service';
+import { HeaderService } from '@service/header.service';
 
 @Component({
     selector: 'admin-history',

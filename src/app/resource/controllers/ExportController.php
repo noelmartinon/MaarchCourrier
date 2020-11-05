@@ -16,7 +16,6 @@ namespace Resource\controllers;
 
 use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
 use Attachment\models\AttachmentModel;
-use Basket\models\BasketModel;
 use Contact\controllers\ContactController;
 use CustomField\models\CustomFieldModel;
 use Entity\models\EntityModel;
@@ -30,7 +29,6 @@ use Respect\Validation\Validator;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\controllers\PreparedClauseController;
 use SrcCore\controllers\UrlController;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\TextFormatModel;
@@ -126,6 +124,10 @@ class ExportController
                     $leftJoinFunction[] = 'res_view_letterbox.priority = priorities.id';
                 } elseif ($value['value'] == 'getCategory') {
                     $select[] = 'res_view_letterbox.category_id';
+                } elseif ($value['value'] == 'getRetentionFrozen') {
+                    $select[] = 'res_view_letterbox.retention_frozen';
+                } elseif ($value['value'] == 'getBinding') {
+                    $select[] = 'res_view_letterbox.binding';
                 } elseif ($value['value'] == 'getInitiatorEntity') {
                     $select[] = 'enone.short_label AS "enone.short_label"';
                     $tableFunction[] = 'entities enone';
@@ -215,13 +217,23 @@ class ExportController
                         $copies       = ExportController::getCopies(['chunkedResIds' => $aArgs['chunkedResIds']]);
                         $csvContent[] = empty($copies[$resource['res_id']]) ? '' : $copies[$resource['res_id']];
                     } elseif ($value['value'] == 'getDetailLink') {
-                        $csvContent[] = str_replace('rest/', "apps/maarch_entreprise/index.php#/resources/{$resource['res_id']}", UrlController::getCoreUrl());
+                        $csvContent[] = trim(UrlController::getCoreUrl(), '/') . '/dist/index.html#/resources/'.$resource['res_id'];
                     } elseif ($value['value'] == 'getParentFolder') {
                         $csvContent[] = ExportController::getParentFolderLabel(['res_id' => $resource['res_id']]);
                     } elseif ($value['value'] == 'getFolder') {
                         $csvContent[] = ExportController::getFolderLabel(['res_id' => $resource['res_id']]);
                     } elseif ($value['value'] == 'getCategory') {
                         $csvContent[] = ResModel::getCategoryLabel(['categoryId' => $resource['category_id']]);
+                    } elseif ($value['value'] == 'getRetentionFrozen') {
+                        $csvContent[] = $resource['retention_frozen'] === true ? 'Y' : 'N';
+                    } elseif ($value['value'] == 'getBinding') {
+                        if ($resource['binding'] === true) {
+                            $csvContent[] = 'Y';
+                        } elseif ($resource['binding'] === false) {
+                            $csvContent[] = 'N';
+                        } else {
+                            $csvContent[] = '';
+                        }
                     } elseif ($value['value'] == 'getInitiatorEntity') {
                         $csvContent[] = $resource['enone.short_label'];
                     } elseif ($value['value'] == 'getDestinationEntity') {
@@ -264,7 +276,7 @@ class ExportController
                     $allDates = ['doc_date', 'departure_date', 'admission_date', 'process_limit_date', 'opinion_limit_date', 'closing_date'];
                     if (in_array($value['value'], $allDates)) {
                         $csvContent[] = TextFormatModel::formatDate($resource[$value['value']]);
-                    } else {
+                    } elseif (in_array($value['value'], ['res_id', 'type_label', 'doctypes_first_level_label', 'doctypes_second_level_label', 'format', 'barcode', 'confidentiality', 'alt_identifier', 'subject'])) {
                         $csvContent[] = $resource[$value['value']];
                     }
                 }
@@ -331,13 +343,23 @@ class ExportController
                         $copies    = ExportController::getCopies(['chunkedResIds' => $aArgs['chunkedResIds']]);
                         $content[] = empty($copies[$resource['res_id']]) ? '' : $copies[$resource['res_id']];
                     } elseif ($value['value'] == 'getDetailLink') {
-                        $content[] = str_replace('rest/', "apps/maarch_entreprise/index.php#/resources/{$resource['res_id']}", UrlController::getCoreUrl());
+                        $content[] = trim(UrlController::getCoreUrl(), '/') . '/dist/index.html#/resources/'.$resource['res_id'];
                     } elseif ($value['value'] == 'getParentFolder') {
                         $content[] = ExportController::getParentFolderLabel(['res_id' => $resource['res_id']]);
                     } elseif ($value['value'] == 'getFolder') {
                         $content[] = ExportController::getFolderLabel(['res_id' => $resource['res_id']]);
                     } elseif ($value['value'] == 'getCategory') {
                         $content[] = ResModel::getCategoryLabel(['categoryId' => $resource['category_id']]);
+                    } elseif ($value['value'] == 'getRetentionFrozen') {
+                        $content[] = $resource['retention_frozen'] === true ? 'Y' : 'N';
+                    } elseif ($value['value'] == 'getBinding') {
+                        if ($resource['binding'] === true) {
+                            $content[] = 'Y';
+                        } elseif ($resource['binding'] === false) {
+                            $content[] = 'N';
+                        } else {
+                            $content[] = '';
+                        }
                     } elseif ($value['value'] == 'getInitiatorEntity') {
                         $content[] = $resource['enone.short_label'];
                     } elseif ($value['value'] == 'getDestinationEntity') {
@@ -585,13 +607,17 @@ class ExportController
             ]);
 
             foreach ($listInstances as $listInstance) {
-                $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['firstname', 'lastname']]);
-                if (!empty($aSignatories[$listInstance['res_id']])) {
-                    $aSignatories[$listInstance['res_id']] .= "\n";
+                if (!empty($listInstance['item_id'])) {
+                    $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['firstname', 'lastname']]);
+                    if (!empty($aSignatories[$listInstance['res_id']])) {
+                        $aSignatories[$listInstance['res_id']] .= "\n";
+                    } else {
+                        $aSignatories[$listInstance['res_id']] = '';
+                    }
+                    $aSignatories[$listInstance['res_id']] .= "{$user['firstname']} {$user['lastname']}";
                 } else {
-                    $aSignatories[$listInstance['res_id']] = '';
+                    $aSignatories[$listInstance['res_id']] .= _USER_DELETED;
                 }
-                $aSignatories[$listInstance['res_id']] .= "{$user['firstname']} {$user['lastname']}";
             }
         }
 
@@ -730,7 +756,10 @@ class ExportController
         $field = CustomFieldModel::getById(['select' => ['type', 'values'], 'id' => $customFieldId]);
         $values = json_decode($field['values'], true);
 
-        if ($field['type'] == 'banAutocomplete') {
+        if ($field['type'] == 'contact') {
+            $customValues = ContactController::getContactCustomField(['contacts' => $customValues]);
+            $customValues = implode("\n", $customValues);
+        } elseif ($field['type'] == 'banAutocomplete') {
             $line = "{$customValues[0]['addressNumber']} {$customValues[0]['addressStreet']} {$customValues[0]['addressTown']} ({$customValues[0]['addressPostcode']})";
             $line .= "\n";
             $line .= "{$customValues[0]['latitude']},{$customValues[0]['longitude']}";
@@ -766,24 +795,42 @@ class ExportController
         $roles = array_column($roles, 'label', 'id');
 
         $listInstances = ListInstanceModel::get([
-            'select'    => ['item_id', 'item_mode'],
+            'select'    => ['item_id', 'item_mode', 'delegate'],
             'where'     => ['res_id in (?)', 'item_type = ?', 'difflist_type = ?'],
             'data'      => [$args['resId'], 'user_id', $args['listType']],
             'order_by'  => ['sequence']
         ]);
 
         foreach ($listInstances as $listInstance) {
-            $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['firstname', 'lastname']]);
+            if (!empty($listInstance['item_id'])) {
+                $user = UserModel::getLabelledUserById(['id' => $listInstance['item_id']]);
 
-            if ($args['listType'] == 'VISA_CIRCUIT') {
-                if ($listInstance['item_mode'] == 'cc') {
-                    $listInstance['item_mode'] = 'copy';
+                $delegate = null;
+                if (!empty($listInstance['delegate'])) {
+                    $delegate = UserModel::getLabelledUserById(['id' => $listInstance['delegate']]);
                 }
-                $roleLabel = $roles[$listInstance['item_mode']];
 
-                $list[] = "{$user['firstname']} {$user['lastname']} ({$roleLabel})";
+                if ($args['listType'] == 'VISA_CIRCUIT') {
+                    if ($listInstance['item_mode'] == 'cc') {
+                        $listInstance['item_mode'] = 'copy';
+                    }
+                    $roleLabel = $roles[$listInstance['item_mode']];
+
+                    if (!empty($delegate)) {
+                        $label = "{$delegate} ({$roleLabel}, " . _INSTEAD_OF . " {$user})";
+                    } else {
+                        $label = "{$user} ({$roleLabel})";
+                    }
+                } else {
+                    if (!empty($delegate)) {
+                        $label = "{$delegate} (" . _INSTEAD_OF . " {$user})";
+                    } else {
+                        $label = "{$user}";
+                    }
+                }
+                $list[] = $label;
             } else {
-                $list[] = "{$user['firstname']} {$user['lastname']}";
+                $list[] = _USER_DELETED;
             }
         }
 

@@ -2,20 +2,19 @@ import { COMMA, SEMICOLON, FF_SEMICOLON } from '@angular/cdk/keycodes';
 import { Component, OnInit, Inject, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { switchMap, map, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
-import { FunctionsService } from '../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
-import { ContactService } from '../../../service/contact.service';
-import { AppService } from '../../../service/app.service';
+import { ContactService } from '@service/contact.service';
+import { AppService } from '@service/app.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { PrivilegeService } from '../../../service/privileges.service';
-import { HeaderService } from '../../../service/header.service';
-import { Observable } from 'rxjs/internal/Observable';
-import { of } from 'rxjs/internal/observable/of';
+import { PrivilegeService } from '@service/privileges.service';
+import { HeaderService } from '@service/header.service';
+import { Observable, of } from 'rxjs';
 import { SummarySheetComponent } from '../../list/summarySheet/summary-sheet.component';
 
 declare var $: any;
@@ -79,7 +78,7 @@ export class SentResourcePageComponent implements OnInit {
             list: []
         },
         summarySheet: {
-            icon: 'fa fa-link',
+            icon: 'fas fa-scroll',
             title: this.translate.instant('lang.attachSummarySheet'),
             list: []
         },
@@ -453,31 +452,61 @@ export class SentResourcePageComponent implements OnInit {
     setDefaultInfo() {
         this.emailsubject = `[${this.resourceData.chrono}] ${this.resourceData.subject}`;
         this.emailsubject = this.emailsubject.substring(0, 70);
-        this.currentSender = this.availableSenders.filter(sender => sender.entityId === this.headerService.user.entities[0].id).length > 0 ? this.availableSenders.filter(sender => sender.entityId === this.headerService.user.entities[0].id)[0] : this.availableSenders[0];
-        if (!this.functions.empty(this.resourceData.senders)) {
-            this.resourceData.senders.forEach((sender: any) => {
-                this.setSender(sender.id);
-            });
+        if (this.headerService.user.entities.length === 0) {
+            this.currentSender = this.availableSenders[0];
+        } else {
+            this.currentSender = this.availableSenders.filter(sender => sender.entityId === this.headerService.user.entities[0].id).length > 0 ? this.availableSenders.filter(sender => sender.entityId === this.headerService.user.entities[0].id)[0] : this.availableSenders[0];
         }
+            if (!this.functions.empty(this.resourceData.senders)) {
+                this.resourceData.senders.forEach((sender: any) => {
+                    this.setSender(sender);
+                });
+            }
     }
 
-    setSender(id: number) {
-        this.http.get(`../rest/contacts/${id}`).pipe(
-            tap((data: any) => {
-                if (!this.functions.empty(data.email)) {
-                    this.recipients.push(
-                        {
-                            label: this.contactService.formatContact(data),
-                            email: data.email
+    setSender(sender: any) {
+        switch (sender.type) {
+            case 'contact':
+                this.http.get(`../rest/contacts/${sender.id}`).pipe(
+                    tap((data: any) => {
+                        if (!this.functions.empty(data.email)) {
+                            this.recipients.push(
+                                {
+                                    label: this.contactService.formatContact(data),
+                                    email: data.email
+                                }
+                            );
                         }
-                    );
-                }
-            }),
-            catchError((err) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+                    }),
+                    catchError((err) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+                break;
+
+            case 'user':
+                this.http.get(`../rest/users/${sender.id}`).pipe(
+                    tap((data: any) => {
+                        if (!this.functions.empty(data.mail)) {
+                            this.recipients.push(
+                                {
+                                    label: this.contactService.formatContact(data),
+                                    email: data.mail
+                                }
+                            );
+                        }
+                    }),
+                    catchError((err) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+                break;
+
+            default:
+                break;
+        }
     }
 
     getUserEmails() {

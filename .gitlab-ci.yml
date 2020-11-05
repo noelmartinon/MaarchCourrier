@@ -38,6 +38,7 @@ before_script:
   - ln -s $CI_PROJECT_DIR /var/www/html/MaarchCourrier
   - cd /var/www/html/MaarchCourrier
   - sed 's/127.0.0.1/postgres/' apps/maarch_entreprise/xml/config.json.default > apps/maarch_entreprise/xml/config.json
+  - sed -i 's/\"lockAdvancedPrivileges\"\ \:\ true/\"lockAdvancedPrivileges\"\ \:\ false/' apps/maarch_entreprise/xml/config.json
   - cp modules/visa/xml/remoteSignatoryBooks.xml.default modules/visa/xml/remoteSignatoryBooks.xml
   - apt-get install -yqq openjdk-11-jdk > /dev/null
   - sed -i 's/rights="none" pattern="PDF"/rights="read | write" pattern="PDF"/' /etc/ImageMagick-6/policy.xml

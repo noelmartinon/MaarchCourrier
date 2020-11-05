@@ -18,28 +18,28 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: NI
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/NI/administrative-division-nicaragua.html
  */
 class NiSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'AN', // Atlántico Norte
-        'AS', // Atlántico Sur
+        'AN', // Region Autonoma del Atlantico Norte
+        'AS', // Region Autonoma del Atlantico Sur
         'BO', // Boaco
         'CA', // Carazo
         'CI', // Chinandega
         'CO', // Chontales
-        'ES', // Estelí
+        'ES', // Esteli
         'GR', // Granada
         'JI', // Jinotega
-        'LE', // León
+        'LE', // Leon
         'MD', // Madriz
         'MN', // Managua
         'MS', // Masaya
         'MT', // Matagalpa
         'NS', // Nueva Segovia
         'RI', // Rivas
-        'SJ', // Río San Juan
+        'SJ', // Rio San Juan
     ];
 
     public $compareIdentical = true;

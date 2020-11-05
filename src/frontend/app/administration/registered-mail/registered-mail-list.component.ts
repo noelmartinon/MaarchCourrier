@@ -3,15 +3,15 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../../service/notification/notification.service';
-import { HeaderService } from '../../../service/header.service';
-import { AppService } from '../../../service/app.service';
-import { FunctionsService } from '../../../service/functions.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
+import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
 import { MatDialog } from '@angular/material/dialog';
 import { tap, catchError, filter, exhaustMap } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-registered-mail-list',
@@ -98,7 +98,7 @@ export class RegisteredMailListComponent implements OnInit {
         const dataTosend = JSON.parse(JSON.stringify(row));
         dataTosend.status = 'OK';
 
-        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.activate'), msg: 'En activant cette plage, cela clôturera la plage actuelle utilisée pour ce type de recommandé.' } });
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.activateRegisteredMailNumberRange'), msg: this.translate.instant('lang.registeredMailMsgActivate')} });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),

@@ -3,16 +3,14 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
-import { NotificationService } from '../../../../service/notification/notification.service';
-import { HeaderService } from '../../../../service/header.service';
-import { AppService } from '../../../../service/app.service';
-import { FunctionsService } from '../../../../service/functions.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
+import { AppService } from '@service/app.service';
+import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../../administration.service';
-import { tap } from 'rxjs/internal/operators/tap';
-import { catchError } from 'rxjs/internal/operators/catchError';
-import { of } from 'rxjs/internal/observable/of';
+import { of } from 'rxjs';
 import { ConfirmComponent } from '../../../../plugins/modal/confirm.component';
-import { filter, exhaustMap } from 'rxjs/operators';
+import { filter, exhaustMap, catchError, tap } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 
 @Component({

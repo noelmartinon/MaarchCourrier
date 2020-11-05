@@ -1,12 +1,12 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { FormControl } from '@angular/forms';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
 import { startWith, map, tap, catchError } from 'rxjs/operators';
-import { Observable } from 'rxjs/internal/Observable';
-import { of } from 'rxjs/internal/observable/of';
+import { Observable, of } from 'rxjs';
+import { FunctionsService } from '@service/functions.service';
 
 declare var $: any;
 
@@ -188,7 +188,7 @@ export class ListAdministrationComponent implements OnInit {
         }
     ];
 
-    templateDisplayedSecondaryData: number[] = [1, 2, 3, 4, 5, 6, 7];
+    templateDisplayedSecondaryData: number[] = [2, 3, 4, 5, 6, 7];
     selectedTemplateDisplayedSecondaryData: number = 7;
     selectedTemplateDisplayedSecondaryDataClone: number = 7;
 
@@ -258,7 +258,7 @@ export class ListAdministrationComponent implements OnInit {
     @Input('currentBasketGroup') private basketGroup: any;
     @Output('refreshBasketGroup') refreshBasketGroup = new EventEmitter<any>();
 
-    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService) { }
+    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, private functions: FunctionsService) { }
 
     async ngOnInit(): Promise<void> {
         await this.initCustomFields();
@@ -270,15 +270,14 @@ export class ListAdministrationComponent implements OnInit {
 
         this.availableDataClone = JSON.parse(JSON.stringify(this.availableData));
         this.displayedSecondaryData = [];
-        let indexData: number = 0;
         this.selectedTemplateDisplayedSecondaryData = this.basketGroup.list_display.templateColumns;
         this.selectedTemplateDisplayedSecondaryDataClone = this.selectedTemplateDisplayedSecondaryData;
+
         this.basketGroup.list_display.subInfos.forEach((element: any) => {
-            indexData = this.availableData.map((e: any) => e.value).indexOf(element.value);
-            this.availableData[indexData].cssClasses = element.cssClasses;
-            this.displayedSecondaryData.push(this.availableData[indexData]);
-            this.availableData.splice(indexData, 1);
+            this.addData(element.value);
+            this.displayedSecondaryData[this.displayedSecondaryData.length - 1].cssClasses = element.cssClasses;
         });
+
         this.selectedListEvent = this.basketGroup.list_event;
         this.selectedListEventClone = this.selectedListEvent;
 
@@ -311,7 +310,6 @@ export class ListAdministrationComponent implements OnInit {
                     return data.customFields;
                 }),
                 tap((customs) => {
-                    console.log(customs);
                     this.availableData = this.availableData.concat(customs);
                     resolve(true);
 
@@ -355,10 +353,13 @@ export class ListAdministrationComponent implements OnInit {
         }
     }
 
-    addData(event: any) {
-        const i = this.availableData.map((e: any) => e.value).indexOf(event.option.value.value);
-        this.displayedSecondaryData.push(event.option.value);
+    addData(id: any) {
+        const i = this.availableData.map((e: any) => e.value).indexOf(id);
+
+        this.displayedSecondaryData.push(this.availableData.filter((item: any) => item.value === id)[0]);
+
         this.availableData.splice(i, 1);
+
         $('#availableData').blur();
         this.dataControl.setValue('');
     }
@@ -370,39 +371,38 @@ export class ListAdministrationComponent implements OnInit {
     }
 
     removeAllData() {
+        this.displayedSecondaryData = this.displayedSecondaryData.concat();
         this.availableData = this.availableData.concat(this.displayedSecondaryData);
-        this.displayedSecondaryData = [];
         this.dataControl.setValue('');
+        this.displayedSecondaryData = [];
     }
 
     drop(event: CdkDragDrop<string[]>) {
         if (event.previousContainer === event.container) {
             moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+        } else {
+            transferArrayItem(event.previousContainer.data, event.container.data, event.previousIndex, event.currentIndex - 1);
+
+            this.displayedSecondaryData.forEach((subArray: any, index) => {
+                if (subArray.length > this.selectedTemplateDisplayedSecondaryData) {
+                    transferArrayItem(subArray, this.displayedSecondaryData[index + 1], subArray.length, 0);
+                } else if (subArray.length < this.selectedTemplateDisplayedSecondaryData && !this.functions.empty(this.displayedSecondaryData[index + 1])) {
+                    transferArrayItem(this.displayedSecondaryData[index + 1], subArray, 0, subArray.length);
+                }
+            });
         }
     }
 
     saveTemplate() {
-        let objToSend = {};
-        const template: any = [];
-        this.displayedSecondaryData.forEach((element: any) => {
-            template.push(
-                {
-                    'value': element.value,
-                    'cssClasses': element.cssClasses,
-                    'icon': element.icon,
-                }
-            );
-        });
-
-        objToSend = {
+        const objToSend = {
             templateColumns: this.selectedTemplateDisplayedSecondaryData,
-            subInfos: template
+            subInfos: this.displayedSecondaryData
         };
 
         this.http.put('../rest/baskets/' + this.basketGroup.basket_id + '/groups/' + this.basketGroup.group_id, { 'list_display': objToSend, 'list_event': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
             .subscribe(() => {
                 this.displayedSecondaryDataClone = JSON.parse(JSON.stringify(this.displayedSecondaryData));
-                this.basketGroup.list_display = template;
+                this.basketGroup.list_display = this.displayedSecondaryData;
                 this.basketGroup.list_event = this.selectedListEvent;
                 this.selectedListEventClone = this.selectedListEvent;
                 this.basketGroup.list_event_data = this.selectedProcessTool;
@@ -440,12 +440,6 @@ export class ListAdministrationComponent implements OnInit {
         this.selectedProcessTool = JSON.parse(JSON.stringify(this.selectedProcessToolClone));
         this.availableData = JSON.parse(JSON.stringify(this.availableDataClone));
         this.selectedTemplateDisplayedSecondaryData = JSON.parse(JSON.stringify(this.selectedTemplateDisplayedSecondaryDataClone));
-
-        let indexData: number = 0;
-        this.displayedSecondaryData.forEach((element: any) => {
-            indexData = this.availableData.map((e: any) => e.value).indexOf(element.value);
-            this.availableData.splice(indexData, 1);
-        });
         this.dataControl.setValue('');
     }
 

@@ -91,9 +91,9 @@ class ResourceListController
         $allResources = array_column($rawResources, 'res_id');
 
         $formattedResources = [];
-        $defaultAction = [];
-        $displayFolderTags = false;
-        $templateColumns = 0;
+        $defaultAction      = [];
+        $displayFolderTags  = false;
+        $templateColumns    = 0;
         if (!empty($resIds)) {
             $excludeAttachmentTypes = ['signed_response'];
             $attachments = AttachmentModel::get([
@@ -103,40 +103,12 @@ class ResourceListController
                 'groupBy'   => ['res_id_master']
             ]);
 
-            $groupBasket = GroupBasketModel::get(['select' => ['list_display', 'list_event', 'list_event_data'], 'where' => ['basket_id = ?', 'group_id = ?'], 'data' => [$basket['basket_id'], $group['group_id']]]);
-            $listDisplay = json_decode($groupBasket[0]['list_display'], true);
+            $groupBasket     = GroupBasketModel::get(['select' => ['list_display', 'list_event', 'list_event_data'], 'where' => ['basket_id = ?', 'group_id = ?'], 'data' => [$basket['basket_id'], $group['group_id']]]);
+            $listDisplay     = json_decode($groupBasket[0]['list_display'], true);
             $templateColumns = $listDisplay['templateColumns'];
-            $listDisplay = $listDisplay['subInfos'];
+            $listDisplay     = $listDisplay['subInfos'];
 
-            $select = [
-                'res_letterbox.res_id', 'res_letterbox.subject', 'res_letterbox.barcode', 'res_letterbox.alt_identifier',
-                'status.label_status AS "status.label_status"', 'status.img_filename AS "status.img_filename"', 'priorities.color AS "priorities.color"',
-                'res_letterbox.closing_date', 'res_letterbox.locker_user_id', 'res_letterbox.locker_time', 'res_letterbox.confidentiality',
-                'res_letterbox.filename as res_filename', 'res_letterbox.integrations'
-            ];
-            $tableFunction = ['status', 'priorities'];
-            $leftJoinFunction = ['res_letterbox.status = status.id', 'res_letterbox.priority = priorities.id'];
-            foreach ($listDisplay as $value) {
-                $value = (array)$value;
-                if ($value['value'] == 'getPriority') {
-                    $select[] = 'priorities.label AS "priorities.label"';
-                } elseif ($value['value'] == 'getCategory') {
-                    $select[] = 'res_letterbox.category_id';
-                } elseif ($value['value'] == 'getDoctype') {
-                    $select[] = 'doctypes.description AS "doctypes.description"';
-                    $tableFunction[] = 'doctypes';
-                    $leftJoinFunction[] = 'res_letterbox.type_id = doctypes.type_id';
-                } elseif ($value['value'] == 'getCreationAndProcessLimitDates') {
-                    $select[] = 'res_letterbox.creation_date';
-                    $select[] = 'res_letterbox.process_limit_date';
-                } elseif ($value['value'] == 'getModificationDate') {
-                    $select[] = 'res_letterbox.modification_date';
-                } elseif ($value['value'] == 'getOpinionLimitDate') {
-                    $select[] = 'res_letterbox.opinion_limit_date';
-                } elseif (strpos($value['value'], 'indexingCustomField_') !== false && !in_array('res_letterbox.custom_fields', $select)) {
-                    $select[] = 'res_letterbox.custom_fields';
-                }
-            }
+            $selectData = ResourceListController::getSelectData(['listDisplay' => $listDisplay]);
 
             $order = 'CASE res_letterbox.res_id ';
             foreach ($resIds as $key => $resId) {
@@ -145,9 +117,9 @@ class ResourceListController
             $order .= 'END';
 
             $resources = ResourceListModel::getOnResource([
-                'select'    => $select,
-                'table'     => $tableFunction,
-                'leftJoin'  => $leftJoinFunction,
+                'select'    => $selectData['select'],
+                'table'     => $selectData['tableFunction'],
+                'leftJoin'  => $selectData['leftJoinFunction'],
                 'where'     => ['res_letterbox.res_id in (?)'],
                 'data'      => [$resIds],
                 'orderBy'   => [$order]
@@ -180,6 +152,41 @@ class ResourceListController
             'displayFolderTags' => $displayFolderTags,
             'templateColumns'   => $templateColumns
         ]);
+    }
+
+    public static function getSelectData(array $args)
+    {
+        $select = [
+            'res_letterbox.res_id', 'res_letterbox.subject', 'res_letterbox.barcode', 'res_letterbox.alt_identifier',
+            'status.label_status AS "status.label_status"', 'status.img_filename AS "status.img_filename"', 'priorities.color AS "priorities.color"',
+            'res_letterbox.closing_date', 'res_letterbox.locker_user_id', 'res_letterbox.locker_time', 'res_letterbox.confidentiality',
+            'res_letterbox.filename as res_filename', 'res_letterbox.integrations', 'res_letterbox.retention_frozen', 'res_letterbox.binding'
+        ];
+        $tableFunction    = ['status', 'priorities'];
+        $leftJoinFunction = ['res_letterbox.status = status.id', 'res_letterbox.priority = priorities.id'];
+        foreach ($args['listDisplay'] as $value) {
+            $value = (array)$value;
+            if ($value['value'] == 'getPriority') {
+                $select[] = 'priorities.label AS "priorities.label"';
+            } elseif ($value['value'] == 'getCategory') {
+                $select[] = 'res_letterbox.category_id';
+            } elseif ($value['value'] == 'getDoctype') {
+                $select[] = 'doctypes.description AS "doctypes.description"';
+                $tableFunction[] = 'doctypes';
+                $leftJoinFunction[] = 'res_letterbox.type_id = doctypes.type_id';
+            } elseif ($value['value'] == 'getCreationAndProcessLimitDates') {
+                $select[] = 'res_letterbox.creation_date';
+                $select[] = 'res_letterbox.process_limit_date';
+            } elseif ($value['value'] == 'getModificationDate') {
+                $select[] = 'res_letterbox.modification_date';
+            } elseif ($value['value'] == 'getOpinionLimitDate') {
+                $select[] = 'res_letterbox.opinion_limit_date';
+            } elseif (strpos($value['value'], 'indexingCustomField_') !== false && !in_array('res_letterbox.custom_fields', $select)) {
+                $select[] = 'res_letterbox.custom_fields';
+            }
+        }
+
+        return ['select' => $select, 'tableFunction' => $tableFunction, 'leftJoinFunction' => $leftJoinFunction];
     }
 
     public function getFilters(Request $request, Response $response, array $aArgs)
@@ -226,7 +233,7 @@ class ResourceListController
                 $queryData[] = "{$cleanSearch[1]}";
                 $queryData[] = "{$cleanSearch[1]}";
             } else {
-                $where[] = '(alt_identifier ilike ? OR translate(subject, \'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ\', \'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyrr\') ilike translate(?, \'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ\', \'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyrr\'))';
+                $where[] = '(alt_identifier ilike ? OR unaccent(subject) ilike unaccent(?::text))';
                 $queryData[] = "%{$args['data']['search']}%";
                 $queryData[] = "%{$args['data']['search']}%";
             }
@@ -309,6 +316,11 @@ class ResourceListController
 
         if (!empty($args['data']['order']) && strpos($args['data']['order'], 'alt_identifier') !== false) {
             $order = 'order_alphanum(alt_identifier) ' . explode(' ', $args['data']['order'])[1];
+        }
+        if (!empty($args['data']['order']) && strpos($args['data']['order'], 'dest_user') !== false) {
+            $order = '(us.lastname, us.firstname) ' . explode(' ', $args['data']['order'])[1];
+            $table[] = '(SELECT firstname, lastname, id from users) AS us';
+            $leftJoin[] = 'us.id = res_view_letterbox.dest_user';
         }
         if (!empty($args['data']['order']) && strpos($args['data']['order'], 'priority') !== false) {
             $order = 'priorities.order ' . explode(' ', $args['data']['order'])[1];
@@ -852,14 +864,12 @@ class ResourceListController
 
         $formattedResources = [];
 
-        $resources = $args['resources'];
+        $resources   = $args['resources'];
         $attachments = $args['attachments'];
 
-        $currentUser = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
-
-        $customFields = CustomFieldModel::get(['select' => ['id', 'type', 'label']]);
+        $customFields       = CustomFieldModel::get(['select' => ['id', 'type', 'label']]);
         $customFieldsLabels = array_column($customFields, 'label', 'id');
-        $customFields = array_column($customFields, 'type', 'id');
+        $customFields       = array_column($customFields, 'type', 'id');
 
         foreach ($resources as $key => $resource) {
             $formattedResources[$key]['resId']              = $resource['res_id'];
@@ -875,6 +885,8 @@ class ResourceListController
             $formattedResources[$key]['hasDocument']        = $resource['res_filename'] != null;
             $formattedResources[$key]['mailTracking']       = in_array($resource['res_id'], $args['trackedMails']);
             $formattedResources[$key]['integrations']       = json_decode($resource['integrations'], true);
+            $formattedResources[$key]['retentionFrozen']    = $resource['retention_frozen'];
+            $formattedResources[$key]['binding']            = $resource['binding'];
             foreach ($attachments as $attachment) {
                 if ($attachment['res_id_master'] == $resource['res_id']) {
                     $formattedResources[$key]['countAttachments'] = $attachment['count'];
@@ -952,16 +964,22 @@ class ResourceListController
                     } elseif ($value['value'] == 'getRegisteredMailRecipient') {
                         if (!empty($registeredMail)) {
                             $recipient = json_decode($registeredMail['recipient'], true);
-                            $recipient = $recipient['company'] . ' ' . $recipient['firstname'] . ' ' . $recipient['lastname'];
+                            if (!empty($recipient['company']) && (!empty($recipient['firstname']) || !empty($recipient['lastname']))) {
+                                $recipient = $recipient['firstname'] . ' ' . $recipient['lastname'] . ' (' . $recipient['company'] . ')';
+                            } elseif (empty($recipient['company']) && (!empty($recipient['firstname']) || !empty($recipient['lastname']))) {
+                                $recipient = $recipient['firstname'] . ' ' . $recipient['lastname'];
+                            } elseif (!empty($recipient['company']) && empty($recipient['firstname']) && empty($recipient['lastname'])) {
+                                $recipient = $recipient['company'];
+                            }
                             $value['displayValue'] = $recipient;
                         } else {
                             $value['displayValue'] = '';
                         }
                         $display[] = $value;
-                    }  elseif ($value['value'] == 'getRegisteredMailReference') {
+                    } elseif ($value['value'] == 'getRegisteredMailReference') {
                         $value['displayValue'] = !empty($registeredMail) ? $registeredMail['reference'] : '';
                         $display[] = $value;
-                    }  elseif ($value['value'] == 'getRegisteredMailIssuingSite') {
+                    } elseif ($value['value'] == 'getRegisteredMailIssuingSite') {
                         if (!empty($registeredMail)) {
                             $site = IssuingSiteModel::getById(['id' => $registeredMail['issuing_site'], 'select' => ['label']]);
                             $value['displayValue'] = $site['label'];
@@ -974,7 +992,9 @@ class ResourceListController
                         $customValue = json_decode($resource['custom_fields'], true);
 
                         $value['displayLabel'] = $customFieldsLabels[$customId] ?? '';
-                        if ($customFields[$customId] == 'banAutocomplete' && !empty($customValue[$customId])) {
+                        if ($customFields[$customId] == 'contact' && !empty($customValue[$customId])) {
+                            $value['displayValue'] = ContactController::getContactCustomField(['contacts' => $customValue[$customId], 'onlyContact' => true]);
+                        } elseif ($customFields[$customId] == 'banAutocomplete' && !empty($customValue[$customId])) {
                             $value['displayValue'] = $customValue[$customId][0]['addressNumber'] ?? '';
                             $value['displayValue'] .= ' ';
                             $value['displayValue'] .= $customValue[$customId][0]['addressStreet'] ?? '';
@@ -1011,7 +1031,7 @@ class ResourceListController
             $where[] = 'process_limit_date < CURRENT_TIMESTAMP';
         }
         if (!empty($data['search']) && mb_strlen($data['search']) >= 2) {
-            $where[] = '(alt_identifier ilike ? OR translate(subject, \'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ\', \'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyrr\') ilike translate(?, \'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ\', \'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyrr\'))';
+            $where[] = '(alt_identifier ilike ? OR unaccent(subject) ilike unaccent(?::text))';
             $queryData[] = "%{$data['search']}%";
             $queryData[] = "%{$data['search']}%";
         }
@@ -1354,7 +1374,7 @@ class ResourceListController
         ];
     }
 
-    private static function compareSortOnLabel($a, $b)
+    public static function compareSortOnLabel($a, $b)
     {
         if (strtolower($a['label']) < strtolower($b['label'])) {
             return -1;

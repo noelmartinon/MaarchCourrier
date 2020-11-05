@@ -13,8 +13,5 @@ v::tld()->validate('org'); // true
 ***
 See also:
 
-  * [CountryCode](CountryCode.md)
-  * [Domain](Domain.md)
-  * [Ip](Ip.md)
-  * [MacAddress](MacAddress.md)
-  * [SubdivisionCode](SubdivisionCode.md)
+ * [Domain](Domain.md)
+ * [CountryCode](CountryCode.md)

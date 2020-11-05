@@ -20,7 +20,7 @@ class TransferController
 {
     public static function transfer($target, $messageId, $type = null)
     {
-        $xml            = CoreConfigModel::getXmlLoaded(['path' => 'modules/export_seda/xml/config.xml']);
+        $config         = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
         $adapter        = '';
         $res['status']  = 0;
         $res['content'] = '';
@@ -53,13 +53,13 @@ class TransferController
             curl_setopt($curl, CURLOPT_POSTFIELDS, $param[3]);
             curl_setopt($curl, CURLOPT_FAILONERROR, false);
 
-            if (empty($xml->CONFIG->certificateSSL)) {
+            if (empty($config['exportSeda']['certificateSSL'])) {
                 curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
             } else {
                 curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, true);
                 curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);
 
-                $certificateSSL = $xml->CONFIG->certificateSSL;
+                $certificateSSL = $config['exportSeda']['certificateSSL'];
                 if (is_file($certificateSSL)) {
                     $ext = ['.crt','.pem'];
 

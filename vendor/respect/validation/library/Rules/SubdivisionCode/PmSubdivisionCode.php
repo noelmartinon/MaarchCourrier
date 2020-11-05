@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: PM
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/PM/administrative-division-saint-pierre-and-miquelon.html
  */
 class PmSubdivisionCode extends AbstractSearcher
 {

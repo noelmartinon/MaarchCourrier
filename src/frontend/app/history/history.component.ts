@@ -1,17 +1,17 @@
 import { Component, OnInit, ViewChild, EventEmitter, ElementRef, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '../../service/notification/notification.service';
-import { HeaderService } from '../../service/header.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { HeaderService } from '@service/header.service';
 import { Observable, merge, Subject, of as observableOf, of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { takeUntil, startWith, switchMap, map, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
-import { FunctionsService } from '../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { LatinisePipe } from 'ngx-pipes';
-import { PrivilegeService } from '../../service/privileges.service';
+import { PrivilegeService } from '@service/privileges.service';
 
 @Component({
     selector: 'app-history-list',

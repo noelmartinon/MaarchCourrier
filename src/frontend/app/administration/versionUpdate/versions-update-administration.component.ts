@@ -3,13 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
-import { HeaderService } from '../../../service/header.service';
+import { HeaderService } from '@service/header.service';
 import { tap, catchError, exhaustMap, filter } from 'rxjs/operators';
-import { NotificationService } from '../../../service/notification/notification.service';
+import { NotificationService } from '@service/notification/notification.service';
 import { AlertComponent } from '../../../plugins/modal/alert.component';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { AppService } from '../../../service/app.service';
-import { of } from 'rxjs/internal/observable/of';
+import { AppService } from '@service/app.service';
+import { of } from 'rxjs';
 
 @Component({
     templateUrl: 'versions-update-administration.component.html',

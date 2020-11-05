@@ -18,26 +18,26 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: CL
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/CL/administrative-division-chile.html
  */
 class ClSubdivisionCode extends AbstractSearcher
 {
     public $haystack = [
-        'AI', // Aisén del General Carlos Ibáñez del Campo
-        'AN', // Antofagasta
+        'AI', // Aisen del General Carlos Ibanez del Campo (XI)
+        'AN', // Antofagasta (II)
         'AP', // Arica y Parinacota
-        'AR', // Araucanía
-        'AT', // Atacama
-        'BI', // Bío-Bío
-        'CO', // Coquimbo
-        'LI', // Libertador General Bernardo O'Higgins
-        'LL', // Los Lagos
+        'AR', // Araucania (IX)
+        'AT', // Atacama (III)
+        'BI', // Bio-Bio (VIII)
+        'CO', // Coquimbo (IV)
+        'LI', // Libertador General Bernardo O'Higgins (VI)
+        'LL', // Los Lagos (X)
         'LR', // Los Ríos
-        'MA', // Magallanes y Antártica Chilena
-        'ML', // Maule
-        'RM', // Región Metropolitana de Santiago
-        'TA', // Tarapacá
-        'VS', // Valparaíso
+        'MA', // Magallanes (XII)
+        'ML', // Maule (VII)
+        'RM', // Region Metropolitana (RM)
+        'TA', // Tarapaca (I)
+        'VS', // Valparaiso (V)
     ];
 
     public $compareIdentical = true;

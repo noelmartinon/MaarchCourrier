@@ -263,11 +263,6 @@ define("_PROCEED_WORKFLOW_AVIS", 'Issue an opinion (sequential)');
 define("_PROCEED_WORKFLOW_AVIS_DESC", "Updates the date of issuance of opinion from the current advisor of the opinion workflow ('process_date' of listinstance table).");
 define("_PROCEED_WORKFLOW_AVIS_SIMPLE", 'Issue an opinion (parallel)');
 define("_PROCEED_WORKFLOW_AVIS_SIMPLE_DESC", "Updates the notification date of the user present in the diffusion list of the mail ('process_date' of listinstance table).");
-define('_EXPORT_SEDA', 'Transfer your mails');
-define('_CHECK_ACKNOWLEDGEMENT', 'Check acknowledgement of receipt');
-define('_CHECK_REPLY', 'Check reply');
-define('_PURGE_LETTER', 'Purge the mail after archiving');
-define('_RESET_LETTER', 'Reset workflow');
 define('_SIMPLE_CONFIRM_WITH_UPDATE_DATE', 'Confirm and update departure date');
 define('_NOT_INCOMING_CATEGORY', 'Not incoming category');
 define('_NO_CONTACT', 'No associated contact');
@@ -294,6 +289,8 @@ define('_PRINT_FOLDER', 'Folder');
 define('_REDACTOR', 'Redactor');
 define('_ASSIGNEE', 'Assignee');
 define('_DOCUMENT_WITH_NOTES', 'Document with notes');
+define("_ACKNOWLEDGEMENT_RECORD_MANAGEMENT", "Acknowledgement receipt (Record management)");
+define("_REPLY_RECORD_MANAGEMENT", "Transfer reply (Record management)");
 
 define('_SUMMARY_SHEET', 'Summary sheet');
 define('_UNDEFINED', 'Undefined');
@@ -415,6 +412,7 @@ define("_CANNOT_SYNCHRONIZE_M2M_ANNUARY", "Contact cannot be added in M2M annuar
 define("_DATE_LOCALE", "en_US.utf8");
 
 define("_USER_PREFERENCE_UPDATED", "User preferences updated");
+define("_USER_FEATURE_TOUR_UPDATED", "One or some steps done in the feature tour");
 
 define("_NO_SENDERS", "No sender linked to resource");
 
@@ -463,6 +461,18 @@ define("_DOC_ADD_TO_SIGNATORY_BOOK", "Mail added to signatory book");
 define("_DOC_REMOVE_FROM_SIGNATORY_BOOK", "Mail removed from signatory book");
 define("_DOC_ADD_TO_MAILEVA", "Mail added to Maileva shippings");
 define("_DOC_REMOVE_FROM_MAILEVA", "Mail removed from Maileva shippings");
+define("_RESET_BINDING_DOCUMENT", "Reset document binding");
+define("_SET_BINDING_DOCUMENT", "Set document as binging");
+define("_SET_NON_BINDING_DOCUMENT", "Set document as non binding");
+define("_RETENTION_RULE_FROZEN", "Retention rule frozen");
+define("_BINDING_DOCUMENT", "Binding document");
+define("_YES", "Yes");
+define("_NO", "No");
+define("_RESET_BINDING_DOCUMENT", "Reset binding document");
+define("_SET_BINDING_DOCUMENT", "Mail was set as binding");
+define("_SET_NON_BINDING_DOCUMENT", "Mail was set as non binding");
+define("_FREEZE_RETENTION_RULE", "Retention rule frozen");
+define("_UNFREEZE_RETENTION_RULE", "Retention rule unfrozen");
 
 define("_ISSUING_SITE_CREATED", "Issuing site created");
 define("_ISSUING_SITE_UPDATED", "Issuing site updated");
@@ -482,3 +492,8 @@ define('_NOT_GENERATED', 'Not generated');
 
 define('_REGISTERED_MAIL_DISTRIBUTED', 'Acknowledgement receipt received : registered mail distributed');
 define('_REGISTERED_MAIL_NOT_DISTRIBUTED', 'Acknowledgement receipt received : registered mail not distributed');
+
+define('_CONFIGURATION_UPDATED', 'Configuration updated');
+
+define('_RESET_RECORD_MANAGEMENT', 'Reset record management');
+define('_RESET_RECORD_MANAGEMENT_DESC', 'Reset record management');

@@ -25,8 +25,7 @@
                         </div>
                         <div class="attachment-form-item">
                             <mat-form-field class="input-form">
-                                <input matInput placeholder="{{'lang.status' | translate}}" [formControl]="attachment['status']"
-                                    [value]="this.translate.instant('lang.attachment_' + attachment['status'].value)">
+                                <input matInput placeholder="{{'lang.status' | translate}}" [formControl]="attachment['status']">
                             </mat-form-field>
                             <div class="fieldState">
                                 <i class="fas fa-asterisk noMandatory"></i>
@@ -71,8 +70,8 @@
                         </div>
                         <div class="attachment-form-item" *ngIf="attachment['signedResponse'].value !== undefined">
                             <mat-form-field class="input-form">
-                                <input matInput placeholder="{{'lang.signedAlt' | translate}}" [formControl]="attachment['signDate']"
-                                    [value]="attachment['signDate'].value | timeAgo : 'full'">
+                                <input matInput placeholder="{{'lang.signedAlt' | translate}}" [title]="attachment['signDate'].value | fullDate"
+                                    [value]="attachment['signDate'].value | timeAgo : 'full' | ucfirst" disabled>
                             </mat-form-field>
                             <div class="fieldState">
                                 <i class="fas fa-asterisk noMandatory"></i>
@@ -96,8 +95,8 @@
                             <div class="attachment-form-item">
                                 <mat-form-field class="input-form">
                                     <input matInput placeholder="{{'lang.created' | translate}}"
-                                        [formControl]="attachment['creationDate']"
-                                        [value]="attachment['creationDate'].value | timeAgo : 'full'">
+                                        [title]="attachment['creationDate'].value | fullDate"
+                                        [value]="attachment['creationDate'].value | timeAgo : 'full'" disabled>
                                 </mat-form-field>
                                 <div class="fieldState">
                                     <i class="fas fa-asterisk noMandatory"></i>
@@ -217,7 +216,7 @@
             [disabled]="!editMode || !isEditing()">{{'lang.createNewVersion' | translate}}</button>
         <button mat-raised-button color="primary" *ngIf="newVersion && sendMassMode && !loading" (click)="createNewVersion('mailing')"
             [disabled]="!editMode || !isEditing()">{{'lang.mailing' | translate}}</button>
-        <button mat-raised-button color="warn" *ngIf=" !loading && attachment.status.value === 'SIGN' && (privilegeService.hasCurrentUserPrivilege('sign_document') || this.headerService.user.id == attachment.typist.value)"
+        <button mat-raised-button color="warn" *ngIf="!loading && attachment.status.value === 'SIGN' && this.headerService.user.id == attachment.signatoryId.value"
             (click)="deleteSignedVersion()">{{'lang.deleteSignedVersion' | translate}}</button>
         <button mat-raised-button mat-button [disabled]="loading" (click)="closeModal()">{{'lang.close' | translate}}</button>
     </div>

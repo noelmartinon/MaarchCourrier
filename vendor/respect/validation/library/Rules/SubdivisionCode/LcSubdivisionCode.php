@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: LC
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/LC/administrative-division-saint-lucia.html
  */
 class LcSubdivisionCode extends AbstractSearcher
 {

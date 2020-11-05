@@ -11,14 +11,12 @@
 
 namespace Respect\Validation\Rules;
 
-use Respect\Validation\TestCase;
-
 /**
  * @group  rule
  * @covers Respect\Validation\Rules\Alnum
  * @covers Respect\Validation\Exceptions\AlnumException
  */
-class AlnumTest extends TestCase
+class AlnumTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @dataProvider providerForValidAlnum

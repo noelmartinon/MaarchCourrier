@@ -18,7 +18,7 @@ use Respect\Validation\Rules\AbstractSearcher;
  *
  * ISO 3166-1 alpha-2: LS
  *
- * @link https://salsa.debian.org/iso-codes-team/iso-codes
+ * @link http://www.geonames.org/LS/administrative-division-lesotho.html
  */
 class LsSubdivisionCode extends AbstractSearcher
 {

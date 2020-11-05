@@ -33,18 +33,20 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
     $currentMethod = empty($route) ? '' : $route->getMethods()[0];
     $currentRoute = empty($route) ? '' : $route->getPattern();
     if (!in_array($currentMethod.$currentRoute, \SrcCore\controllers\AuthenticationController::ROUTES_WITHOUT_AUTHENTICATION)) {
-        $authorizationHeaders = $request->getHeader('Authorization');
-        $userId = \SrcCore\controllers\AuthenticationController::authentication($authorizationHeaders);
-        if (!empty($userId)) {
-            \SrcCore\controllers\CoreController::setGlobals(['userId' => $userId]);
-            if (!empty($currentRoute)) {
-                $r = \SrcCore\controllers\AuthenticationController::isRouteAvailable(['userId' => $userId, 'currentRoute' => $currentRoute, 'currentMethod' => $currentMethod]);
-                if (!$r['isRouteAvailable']) {
-                    return $response->withStatus(403)->withJson(['errors' => $r['errors']]);
+        if (!\SrcCore\controllers\AuthenticationController::canAccessInstallerWhitoutAuthentication(['route' => $currentMethod.$currentRoute])) {
+            $authorizationHeaders = $request->getHeader('Authorization');
+            $userId = \SrcCore\controllers\AuthenticationController::authentication($authorizationHeaders);
+            if (!empty($userId)) {
+                \SrcCore\controllers\CoreController::setGlobals(['userId' => $userId]);
+                if (!empty($currentRoute)) {
+                    $r = \SrcCore\controllers\AuthenticationController::isRouteAvailable(['userId' => $userId, 'currentRoute' => $currentRoute, 'currentMethod' => $currentMethod]);
+                    if (!$r['isRouteAvailable']) {
+                        return $response->withStatus(403)->withJson(['errors' => $r['errors']]);
+                    }
                 }
+            } else {
+                return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
             }
-        } else {
-            return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
         }
     }
     $response = $next($request, $response);
@@ -55,6 +57,7 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
 $app->get('/authenticationInformations', \SrcCore\controllers\AuthenticationController::class . ':getInformations');
 $app->get('/validUrl', \SrcCore\controllers\AuthenticationController::class . ':getValidUrl');
 $app->post('/authenticate', \SrcCore\controllers\AuthenticationController::class . ':authenticate');
+$app->get('/authenticate/logout', \SrcCore\controllers\AuthenticationController::class . ':logout');
 $app->get('/authenticate/token', \SrcCore\controllers\AuthenticationController::class . ':getRefreshedToken');
 
 //Initialize
@@ -188,6 +191,9 @@ $app->put('/customFields/{id}', \CustomField\controllers\CustomFieldController::
 $app->delete('/customFields/{id}', \CustomField\controllers\CustomFieldController::class . ':delete');
 $app->get('/customFieldsWhiteList', \CustomField\controllers\CustomFieldController::class . ':getWhiteList');
 
+//Departments
+$app->get('/departments', \Resource\controllers\DepartmentController::class . ':getFrenchDepartments');
+
 //Docservers
 $app->get('/docservers', \Docserver\controllers\DocserverController::class . ':get');
 $app->post('/docservers', \Docserver\controllers\DocserverController::class . ':create');
@@ -316,6 +322,7 @@ $app->get('/installer/databaseConnection', \SrcCore\controllers\InstallerControl
 $app->get('/installer/sqlDataFiles', \SrcCore\controllers\InstallerController::class . ':getSQLDataFiles');
 $app->get('/installer/docservers', \SrcCore\controllers\InstallerController::class . ':checkDocservers');
 $app->get('/installer/custom', \SrcCore\controllers\InstallerController::class . ':checkCustomName');
+$app->get('/installer/customs', \SrcCore\controllers\InstallerController::class . ':getCustoms');
 $app->post('/installer/custom', \SrcCore\controllers\InstallerController::class . ':createCustom');
 $app->post('/installer/database', \SrcCore\controllers\InstallerController::class . ':createDatabase');
 $app->post('/installer/docservers', \SrcCore\controllers\InstallerController::class . ':createDocservers');
@@ -452,11 +459,12 @@ $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/ac
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkReconcile', \Action\controllers\PreProcessActionController::class . ':checkReconcile');
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkSendAlfresco', \Action\controllers\PreProcessActionController::class . ':checkSendAlfresco');
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkPrintDepositList', \Action\controllers\PreProcessActionController::class . ':checkPrintDepositList');
+$app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/checkAcknowledgementRecordManagement', \Action\controllers\PreProcessActionController::class . ':checkAcknowledgementRecordManagement');
+$app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/checkReplyRecordManagement', \Action\controllers\PreProcessActionController::class . ':checkReplyRecordManagement');
 
 //Search
 $app->post('/search', \Search\controllers\SearchController::class . ':get');
-$app->get('/search/configuration', \Search\controllers\SearchAdministrationController::class . ':get');
-$app->put('/search/configuration', \Search\controllers\SearchAdministrationController::class . ':update');
+$app->get('/search/configuration', \Search\controllers\SearchController::class . ':getConfiguration');
 
 $app->get('/searchTemplates', \Search\controllers\SearchTemplateController::class . ':get');
 $app->post('/searchTemplates', \Search\controllers\SearchTemplateController::class . ':create');
@@ -559,6 +567,7 @@ $app->put('/versionsUpdateSQL', \VersionUpdate\controllers\VersionUpdateControll
 $app->get('/currentUser/profile', \User\controllers\UserController::class . ':getProfile');
 $app->put('/currentUser/profile', \User\controllers\UserController::class . ':updateProfile');
 $app->put('/currentUser/profile/preferences', \User\controllers\UserController::class . ':updateCurrentUserPreferences');
+$app->put('/currentUser/profile/featureTour', \User\controllers\UserController::class . ':updateCurrentUserFeatureTour');
 $app->post('/currentUser/emailSignature', \User\controllers\UserController::class . ':createCurrentUserEmailSignature');
 $app->put('/currentUser/emailSignature/{id}', \User\controllers\UserController::class . ':updateCurrentUserEmailSignature');
 $app->delete('/currentUser/emailSignature/{id}', \User\controllers\UserController::class . ':deleteCurrentUserEmailSignature');
@@ -621,6 +630,12 @@ $app->post('/collaboraOnline/file', \ContentManagement\controllers\CollaboraOnli
 $app->delete('/collaboraOnline/file', \ContentManagement\controllers\CollaboraOnlineController::class . ':deleteTmpFile');
 $app->post('/collaboraOnline/encodedFile', \ContentManagement\controllers\CollaboraOnlineController::class . ':saveTmpEncodedDocument');
 
+// Archival
+$app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkSendToRecordManagement', \ExportSeda\controllers\SedaController::class . ':checkSendToRecordManagement');
+$app->get('/archival/retentionRules', \ExportSeda\controllers\SedaController::class . ':getRetentionRules');
+$app->put('/archival/binding', \ExportSeda\controllers\SedaController::class . ':setBindingDocument');
+$app->put('/archival/freezeRetentionRule', \ExportSeda\controllers\SedaController::class . ':freezeRetentionRule');
+
 // Registered mail
 $app->get('/registeredMail/sites', \RegisteredMail\controllers\IssuingSiteController::class . ':get');
 $app->get('/registeredMail/sites/{id}', \RegisteredMail\controllers\IssuingSiteController::class . ':getById');
@@ -638,6 +653,7 @@ $app->get('/registeredMail/ranges/type/{type}/last', \RegisteredMail\controllers
 $app->get('/registeredMail/countries', \RegisteredMail\controllers\RegisteredMailController::class . ':getCountries');
 
 $app->put('/registeredMails/acknowledgement', \RegisteredMail\controllers\RegisteredMailController::class . ':receiveAcknowledgement');
+$app->put('/registeredMails/import', \RegisteredMail\controllers\RegisteredMailController::class . ':setImport');
 $app->put('/registeredMails/{resId}', \RegisteredMail\controllers\RegisteredMailController::class . ':update');
 
 $app->run();
