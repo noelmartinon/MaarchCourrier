@@ -182,14 +182,14 @@ export class DiffusionModelAdministrationComponent implements OnInit {
                 }
             });
             return this.diffusionModel;
-        }   
+        }
     }
 
-    checkPrivileges(items: any) {
-        var isValid = true;
+    checkValidUsers(items: any) {
+        let isValid = true;
 
         items.forEach((item: any) => {
-            if (!item.hasPrivilege) {
+            if (!item.hasPrivilege || !item.isValid) {
                 isValid = false;
             }
         });
@@ -198,9 +198,9 @@ export class DiffusionModelAdministrationComponent implements OnInit {
 
     isValidForm() {
         if (this.diffusionModel.type === 'visaCircuit') {
-            return this.appVisaWorkflow !== undefined && this.appVisaWorkflow.getWorkflow().length > 0 && this.diffusionModel.title !== '' && this.checkPrivileges(this.appVisaWorkflow.getWorkflow());
+            return this.appVisaWorkflow !== undefined && this.appVisaWorkflow.getWorkflow().length > 0 && this.diffusionModel.title !== '' && this.checkValidUsers(this.appVisaWorkflow.getWorkflow());
         } else {
-            return this.appAvisWorkflow !== undefined && this.appAvisWorkflow.getWorkflow().length > 0 && this.diffusionModel.title !== '' && this.checkPrivileges(this.appAvisWorkflow.getWorkflow());
+            return this.appAvisWorkflow !== undefined && this.appAvisWorkflow.getWorkflow().length > 0 && this.diffusionModel.title !== '' && this.checkValidUsers(this.appAvisWorkflow.getWorkflow());
         }
     }
 

@@ -332,7 +332,8 @@ class SearchController
                     'fields'        => $fields,
                     'where'         => [],
                     'data'          => [],
-                    'fieldsNumber'  => 3
+                    'fieldsNumber'  => 3,
+                    'longField'     => true
                 ]);
 
                 $fields = ['title', 'identifier'];
@@ -342,7 +343,8 @@ class SearchController
                     'fields'        => $fields,
                     'where'         => [],
                     'data'          => [],
-                    'fieldsNumber'  => 2
+                    'fieldsNumber'  => 2,
+                    'longField'     => true
                 ]);
 
                 if (!empty($requestDataDocument['where'])) {
@@ -389,7 +391,8 @@ class SearchController
                     'fields'        => $fields,
                     'where'         => [],
                     'data'          => [],
-                    'fieldsNumber'  => 1
+                    'fieldsNumber'  => 1,
+                    'longField'     => true
                 ]);
                 $subjectGlue = implode(' AND ', $requestData['where']);
                 $attachmentField = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['title']]);

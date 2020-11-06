@@ -102,10 +102,11 @@ export class FeatureTourService {
         private http: HttpClient,
         private notify: NotificationService,
     ) {
-        this.getCurrentStepType();
     }
 
     init() {
+        this.getCurrentStepType();
+
         if (!this.functionService.empty(this.currentStepType)) {
             const steps = this.tour.filter(step => step.type === this.currentStepType).map(step => step.stepId);
             this.joyrideService.startTour(
@@ -132,7 +133,9 @@ export class FeatureTourService {
                     /*handle error*/
                 },
                 () => {
-                    if (this.currentTour.redirectToAdmin) {
+                    if (this.currentTour === null) {
+                        this.router.navigate(['/home']);
+                    } else if (this.currentTour.redirectToAdmin) {
                         this.router.navigate(['/administration']);
                     } else {
                         this.endTour();
@@ -143,22 +146,32 @@ export class FeatureTourService {
     }
 
     getCurrentStepType() {
-        if (this.headerService.user.userId !== null) {
-            this.featureTourEnd = this.headerService.user.featureTour;
-        }
-        const unique = [...new Set(this.tour.map(item => item.type))];
-        this.currentStepType = unique.filter(stepType => this.featureTourEnd.indexOf(stepType) === -1)[0];
+        this.featureTourEnd = this.headerService.user.featureTour;
+        this.currentStepType = this.getFeatureTourTypes().filter(stepType => this.featureTourEnd.indexOf(stepType) === -1)[0];
     }
 
     endTour() {
-        this.featureTourEnd.push(this.currentStepType);
-        this.http.put('../rest/currentUser/profile/featureTour', {featureTour : this.featureTourEnd}).pipe(
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
-        this.getCurrentStepType();
+        if (this.currentStepType !== undefined) {
+            this.featureTourEnd.push(this.currentStepType);
+            this.http.put('../rest/currentUser/profile/featureTour', {featureTour : this.featureTourEnd}).pipe(
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+            this.getCurrentStepType();
+        }
     }
 
+    getFeatureTourTypes() {
+        return [...new Set(this.tour.map(item => item.type))];
+    }
+
+    isComplete() {
+        if (this.headerService.user.mode === 'root_visible' || this.headerService.user.mode === 'root_invisible') {
+            return this.headerService.user.featureTour.length === this.getFeatureTourTypes().length;
+        } else {
+            return true;
+        }
+    }
 }

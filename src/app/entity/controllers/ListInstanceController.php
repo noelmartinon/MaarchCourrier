@@ -259,13 +259,8 @@ class ListInstanceController
                         return ['errors' => 'User not found', 'code' => 400];
                     }
                 } elseif (in_array($instance['item_type'], ['entity_id', 'entity'])) {
-                    if ($instance['item_type'] == 'entity_id') {
-                        $entity = EntityModel::getByEntityId(['entityId' => $instance['item_id'], 'select' => ['id', 'enabled']]);
-                        $instance['item_id'] = $entity['id'] ?? null;
-                    } else {
-                        $entity = EntityModel::getById(['id' => $instance['item_id'], 'select' => ['enabled']]);
-                        $instance['item_type'] = 'entity_id';
-                    }
+                    $entity = EntityModel::getById(['id' => $instance['item_id'], 'select' => ['enabled']]);
+                    $instance['item_type'] = 'entity_id';
                     if (empty($entity) || $entity['enabled'] != 'Y') {
                         DatabaseModel::rollbackTransaction();
                         return ['errors' => 'Entity not found or not active', 'code' => 400];
@@ -307,10 +302,10 @@ class ListInstanceController
                 ]);
 
                 if ($instance['item_mode'] == 'dest') {
-                    $set = ['dest_user' => $instance['item_id']];
+                    $set               = ['dest_user' => $instance['item_id']];
                     $changeDestination = true;
-                    $entities = UserEntityModel::get(['select' => ['entity_id', 'primary_entity'], 'where' => ['user_id = ?'], 'data' => [$instance['item_id']]]);
-                    $resource = ResModel::getById(['select' => ['destination'], 'resId' => $ListInstanceByRes['resId']]);
+                    $entities          = UserEntityModel::get(['select' => ['entity_id', 'primary_entity'], 'where' => ['user_id = ?'], 'data' => [$instance['item_id']]]);
+                    $resource          = ResModel::getById(['select' => ['destination'], 'resId' => $ListInstanceByRes['resId']]);
                     foreach ($entities as $entity) {
                         if ($entity['entity_id'] == $resource['destination']) {
                             $changeDestination = false;

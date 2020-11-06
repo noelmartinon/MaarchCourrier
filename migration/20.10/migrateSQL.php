@@ -16,6 +16,8 @@ if (is_file("apps/maarch_entreprise/xml/config.json")) {
     foreach ($REQUESTS as $query) {
         $db->query($query);
     }
+
+    printf("Exécution du dernier script sql pour le socle.\n");
 }
 
 
@@ -32,5 +34,7 @@ foreach ($customs as $custom) {
         foreach ($REQUESTS as $query) {
             $db->query($query);
         }
+
+        printf("Exécution du dernier script sql pour le custom {$custom}.\n");
     }
 }

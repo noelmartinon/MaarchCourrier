@@ -122,6 +122,11 @@ export class UsersAdministrationRedirectModalComponent implements OnInit {
                 valid = false;
             }
         }
+        if (this.userVisaWorkflowResources.length > 0) {
+            if (!this.userVisaWorkflowResourcesRedirectUserId) {
+                valid = false;
+            }
+        }
         return valid;
     }
 

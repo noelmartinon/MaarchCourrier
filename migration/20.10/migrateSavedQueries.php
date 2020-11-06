@@ -156,9 +156,9 @@ foreach ($customs as $custom) {
                     $query[] = ['identifier' => 'groupSign', 'values' => ['id' => $group['id'], 'label' => $group['group_desc'],'group' => '']];
                 }
             } elseif ($key == 'closing_date') {
-                $query[] = ['identifier' => 'closingDate', 'values' => ['start' => getFormattedDate($value['fields']['closing_date_from'][0]), 'end' => getFormattedDate($value['fields']['closing_date_to'][0])]];
+                $query[] = ['identifier' => 'closingDate', 'values' => ['start' => getFormattedDate(['date' => $value['fields']['closing_date_from'][0]]), 'end' => getFormattedDate(['date' => $value['fields']['closing_date_to'][0]])]];
             } elseif ($key == 'creation_date_pj') {
-                $query[] = ['identifier' => 'attachment_creationDate', 'values' => ['start' => getFormattedDate($value['fields']['creation_date_pj_from'][0]), 'end' => getFormattedDate($value['fields']['creation_date_pj_to'][0])]];
+                $query[] = ['identifier' => 'attachment_creationDate', 'values' => ['start' => getFormattedDate(['date' => $value['fields']['creation_date_pj_from'][0]]), 'end' => getFormattedDate(['date' => $value['fields']['creation_date_pj_to'][0]])]];
             } elseif ($key == 'attachment_types') {
                 $types = \Attachment\models\AttachmentModel::getAttachmentsTypesByXML();
                 if (in_array($value['fields']['attachment_types'][0], array_keys($types))) {

@@ -945,7 +945,11 @@ class AutoCompleteController
                     }
                 }
                 for ($i = 0; $i < $args['fieldsNumber']; $i++) {
-                    $args['data'][] = ($isIncluded ? "%{$item}" : "%{$item}%");
+                    if (!empty($args['longField'])) {
+                        $args['data'][] = ($isIncluded ? "%{$item} %" : "%{$item}%");
+                    } else {
+                        $args['data'][] = ($isIncluded ? "%{$item}" : "%{$item}%");
+                    }
                 }
             }
         }
