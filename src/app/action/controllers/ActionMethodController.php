@@ -550,7 +550,7 @@ class ActionMethodController
 
         if (!empty($listInstancesIdsToReset)) {
             ListInstanceModel::update([
-                'set'   => ['process_date' => null, 'process_comment' => null],
+                'set'   => ['process_date' => null, 'process_comment' => null, 'delegate' => null],
                 'where' => ['listinstance_id in (?)'],
                 'data'  => [$listInstancesIdsToReset]
             ]);

@@ -19,9 +19,6 @@ use Docserver\models\DocserverTypeModel;
 use Doctype\models\DoctypeModel;
 use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
-use ExportSeda\controllers\ExportSEDATrait;
-use ExportSeda\controllers\SedaController;
-use ExportSeda\models\AbstractMessage;
 use Folder\models\FolderModel;
 use History\models\HistoryModel;
 use IndexingModel\models\IndexingModelFieldModel;
@@ -550,7 +547,7 @@ trait ExportSEDATrait
         return ['encodedAcknowledgement' => $encodedAcknowledgement['encodedDocument']];
     }
 
-    public function getXmlFromZipMessage(array $args)
+    public static function getXmlFromZipMessage(array $args)
     {
         $tmpPath = CoreConfigModel::getTmpPath();
 

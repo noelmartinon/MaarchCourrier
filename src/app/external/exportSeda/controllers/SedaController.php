@@ -149,7 +149,7 @@ class SedaController
         return $response->withJson($return);
     }
 
-    public function initArchivalData($args = [])
+    public static function initArchivalData($args = [])
     {
         $date = new \DateTime();
 
