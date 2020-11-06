@@ -11,7 +11,7 @@ import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { FunctionsService } from '@service/functions.service';
 import { of } from 'rxjs';
-import {RedirectIndexingModelComponent} from './redirectIndexingModel/redirect-indexing-model.component';
+import { RedirectIndexingModelComponent } from './redirectIndexingModel/redirect-indexing-model.component';
 import { AdministrationService } from '../administration.service';
 
 @Component({
@@ -23,7 +23,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
+
     search: string = null;
 
     indexingModels: any[] = [];
@@ -76,46 +76,23 @@ export class IndexingModelsAdministrationComponent implements OnInit {
     }
 
     delete(indexingModel: any) {
+        this.dialogRef = this.dialog.open(RedirectIndexingModelComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { indexingModel: indexingModel } });
 
-        if (indexingModel.used.length === 0) {
-            this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
-
-            this.dialogRef.afterClosed().pipe(
-                filter((data: string) => data === 'ok'),
-                exhaustMap(() => this.http.delete('../rest/indexingModels/' + indexingModel.id)),
-                tap(() => {
-                    for (const i in this.indexingModels) {
-                        if (this.indexingModels[i].id === indexingModel.id) {
-                            this.indexingModels.splice(Number(i), 1);
-                        }
+        this.dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            tap(() => {
+                for (const i in this.indexingModels) {
+                    if (this.indexingModels[i].id === indexingModel.id) {
+                        this.indexingModels.splice(Number(i), 1);
                     }
-                    this.adminService.setDataSource('admin_indexing_models', this.indexingModels, this.sort, this.paginator, this.filterColumns);
-                    this.notify.success(this.translate.instant('lang.indexingModelDeleted'));
-                }),
-                catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
-        } else {
-            this.dialogRef = this.dialog.open(RedirectIndexingModelComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction'), indexingModel: indexingModel } });
-
-            this.dialogRef.afterClosed().pipe(
-                filter((data: string) => data === 'ok'),
-                tap(() => {
-                    for (const i in this.indexingModels) {
-                        if (this.indexingModels[i].id === indexingModel.id) {
-                            this.indexingModels.splice(Number(i), 1);
-                        }
-                    }
-                    this.adminService.setDataSource('admin_indexing_models', this.indexingModels, this.sort, this.paginator, this.filterColumns);
-                }),
-                catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
-        }
+                }
+                this.adminService.setDataSource('admin_indexing_models', this.indexingModels, this.sort, this.paginator, this.filterColumns);
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     disableIndexingModel(indexingModel: any) {

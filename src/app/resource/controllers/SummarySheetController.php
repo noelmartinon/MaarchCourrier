@@ -583,11 +583,15 @@ class SummarySheetController
             } elseif ($unit['unit'] == 'visaWorkflow') {
                 $users = [];
                 $found = false;
+
+                $roles = EntityModel::getRoles();
+                $roles = array_column($roles, 'label', 'id');
+
                 foreach ($args['data']['listInstancesVisa'] as $listKey => $listInstance) {
                     if ($found && $listInstance['res_id'] != $resource['res_id']) {
                         break;
                     } elseif ($listInstance['res_id'] == $resource['res_id']) {
-                        $mode = $listInstance['requested_signature'] ? 'Signataire' : 'Viseur';
+                        $mode = $roles[$listInstance['item_mode']];
                         $userLabel = UserModel::getLabelledUserById(['id' => $listInstance['item_id']]);
 
                         $delegate = !empty($listInstance['delegate']) ? UserModel::getLabelledUserById(['id' => $listInstance['delegate']]) : '';
@@ -792,7 +796,7 @@ class SummarySheetController
                 ]);
             } elseif ($unit['unit'] == 'visaWorkflow') {
                 $data['listInstancesVisa'] = ListInstanceModel::get([
-                    'select'    => ['item_id', 'requested_signature', 'process_date', 'res_id', 'delegate'],
+                    'select'    => ['item_id', 'requested_signature', 'process_date', 'res_id', 'delegate', 'item_mode'],
                     'where'     => ['difflist_type = ?', 'res_id in (?)'],
                     'data'      => ['VISA_CIRCUIT', $tmpIds],
                     'orderBy'   => ['listinstance_id']

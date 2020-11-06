@@ -9,13 +9,13 @@
                     <mat-spinner diameter="35"></mat-spinner>
                 </div>
             </mat-option>
-            <mat-optgroup [label]="this.translate.instant('lang.publicModel')" *ngIf="(filteredPublicModels | async)?.length > 0"
+            <mat-optgroup [label]="'lang.publicModel' | translate" *ngIf="(filteredPublicModels | async)?.length > 0"
                 class="visaSignList">
                 <mat-option *ngFor="let model of filteredPublicModels | async | sortBy : 'label'" [value]="model">
                     {{model.label}}
                 </mat-option>
             </mat-optgroup>
-            <mat-optgroup [label]="this.translate.instant('lang.privateModel')" *ngIf="(filteredPrivateModels | async)?.length > 0"
+            <mat-optgroup [label]="'lang.privateModel' | translate" *ngIf="(filteredPrivateModels | async)?.length > 0"
                 class="visaSignList">
                 <mat-option *ngFor="let model of filteredPrivateModels | async | sortBy : 'label'" [value]="model">
                     <div style="display: flex;align-items: center;">
@@ -29,7 +29,7 @@
                     </div>
                 </mat-option>
             </mat-optgroup>
-            <mat-optgroup [label]="this.translate.instant('lang.visaUser') + ' / ' + this.translate.instant('lang.signUser')" *ngIf="(filteredSignVisaUsers | async)?.length > 0"
+            <mat-optgroup [label]="('lang.visaUser' | translate) + ' / ' + ('lang.signUser' | translate)" *ngIf="(filteredSignVisaUsers | async)?.length > 0"
                 class="visaSignList">
                 <mat-option *ngFor="let user of filteredSignVisaUsers | async | sortBy : 'label'" [value]="user">
                     {{user.label}}&nbsp;<small>({{user.entity}})</small>
@@ -41,11 +41,11 @@
             <mat-icon class="fa fa-plus"></mat-icon>
         </button>
     </mat-form-field>
-    <plugin-autocomplete *ngIf="linkedToMaarchParapheur && adminMode" [labelPlaceholder]="this.translate.instant('lang.addPerson')"
+    <plugin-autocomplete *ngIf="linkedToMaarchParapheur && adminMode" [labelPlaceholder]="'lang.addPerson' | translate"
         [routeDatas]="['/rest/autocomplete/maarchParapheurUsers']" [targetSearchKey]="'idToDisplay'"
         [subInfoKey]="'email'" (triggerEvent)="addItemToWorkflow($event, true)" appearance="outline">
     </plugin-autocomplete>
-    <!--<div class="alert alert-danger" *ngIf="visaWorkflow.itemRemovedFromVisaTemplate.length > 0" [innerHTML]="this.translate.instant('lang.itemRemovedFromVisaTemplate') + ' : ' + visaWorkflow.itemRemovedFromVisaTemplate.join(', ')"></div>-->
+    <!--<div class="alert alert-danger" *ngIf="visaWorkflow.itemRemovedFromVisaTemplate.length > 0" [innerHTML]="('lang.itemRemovedFromVisaTemplate' | translate) + ' : ' + visaWorkflow.itemRemovedFromVisaTemplate.join(', ')"></div>-->
     <div cdkDropList #dataAvailableList="cdkDropList" [cdkDropListData]="visaWorkflow.items" class="cdk-list"
         (cdkDropListDropped)="drop($event)" [cdkDropListDisabled]="!adminMode">
         <div class="emptyContent" *ngIf="visaWorkflow.items.length === 0">
@@ -55,8 +55,8 @@
             [cdkDragDisabled]="!canManageUser(diffusion, i)"
             [class.notDraggable]="!canManageUser(diffusion, i)"
             [class.notEditable]="!adminMode"
-            [class.processed]="diffusion.process_date != null && [this.translate.instant('lang.visaWorkflowInterrupted'), this.translate.instant('lang.hasInterruptedWorkflow')].indexOf(diffusion.process_comment) === -1"
-            [class.interrupt]="diffusion.process_date != null && [this.translate.instant('lang.visaWorkflowInterrupted'), this.translate.instant('lang.hasInterruptedWorkflow')].indexOf(diffusion.process_comment) > -1">
+            [class.processed]="diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) === -1"
+            [class.interrupt]="diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) > -1">
             <mat-icon *ngIf="getCurrentVisaUserIndex() === i && (!adminMode || target === 'signatureBook')" class="fa fa-chevron-right fa-2x" mat-list-icon color="accent">
             </mat-icon>
             <mat-icon
@@ -75,12 +75,12 @@
                 <mat-icon mat-list-icon class="fa-2x fa"
                 [title]="diffusion.process_comment !== null ? diffusion.process_comment : ''"
                 [class.fa-hourglass]="diffusion.process_date == null"
-                [class.fa-thumbs-up]="diffusion.process_date != null && [this.translate.instant('lang.visaWorkflowInterrupted'), this.translate.instant('lang.hasInterruptedWorkflow')].indexOf(diffusion.process_comment) === -1"
-                [class.fa-hand-paper]="diffusion.process_date != null && diffusion.process_comment === this.translate.instant('lang.hasInterruptedWorkflow')"
-                [class.fa-times]="diffusion.process_date != null && diffusion.process_comment === this.translate.instant('lang.visaWorkflowInterrupted')"
+                [class.fa-thumbs-up]="diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) === -1"
+                [class.fa-hand-paper]="diffusion.process_date != null && diffusion.process_comment === ('lang.hasInterruptedWorkflow' | translate)"
+                [class.fa-times]="diffusion.process_date != null && diffusion.process_comment === ('lang.visaWorkflowInterrupted' | translate)"
                 
-                [class.valid]="diffusion.process_date != null && [this.translate.instant('lang.visaWorkflowInterrupted'), this.translate.instant('lang.hasInterruptedWorkflow')].indexOf(diffusion.process_comment) === -1"
-                [class.invalid]="diffusion.process_date != null && [this.translate.instant('lang.visaWorkflowInterrupted'), this.translate.instant('lang.hasInterruptedWorkflow')].indexOf(diffusion.process_comment) > -1"
+                [class.valid]="diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) === -1"
+                [class.invalid]="diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) > -1"
 
                     style="opacity:0.5;"></mat-icon>
             </ng-container>
@@ -90,7 +90,7 @@
                         {{diffusion.labelToDisplay}}
                         <ng-container *ngIf="diffusion.process_date != null && diffusion.delegatedBy !== null">
                             <mat-icon mat-list-icon class="fas fa-exclamation-circle"
-                                      [title]="this.translate.instant('lang.insteadOf') + ' ' + diffusion.delegatedBy"
+                                      [title]="('lang.insteadOf' | translate) + ' ' + diffusion.delegatedBy"
                                       style="opacity:0.5;font-size: 125%;height: 15px;color: red;cursor: help;"></mat-icon>
                         </ng-container>
                     </div>
@@ -99,12 +99,12 @@
                     </div>
                     <div class="workflowLineSubLabel" *ngIf="(showComment && ((!linkedToMaarchParapheur && adminMode && functions.empty(diffusion.process_date)) || (!linkedToMaarchParapheur && getCurrentVisaUserIndex() === i && !functions.empty(diffusion.process_comment)))) && diffusion.hasPrivilege && diffusion.isValid">
                         <mat-form-field>
-                            <input matInput class="comment" maxlength="255" [disabled]="!adminMode || diffusion.process_date != null || (target === 'signatureBook' && getCurrentVisaUserIndex() === i)" [placeholder]="this.translate.instant('lang.visaNote')" [(ngModel)]="diffusion.process_comment">
+                            <input matInput class="comment" maxlength="255" [disabled]="!adminMode || diffusion.process_date != null || (target === 'signatureBook' && getCurrentVisaUserIndex() === i)" [placeholder]="'lang.visaNote' | translate" [(ngModel)]="diffusion.process_comment">
                         </mat-form-field>
                     </div>
-                    <div *ngIf="diffusion.process_date != null && [this.translate.instant('lang.visaWorkflowInterrupted'), this.translate.instant('lang.hasInterruptedWorkflow')].indexOf(diffusion.process_comment) === -1" class="workflowLineProcessDate"
+                    <div *ngIf="diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) === -1" class="workflowLineProcessDate"
                         title='{{diffusion.process_date | fullDate}}'
-                        color="accent">{{((functions.empty(diffusion.process_date) && diffusion.requested_signature) || diffusion.signatory) ? this.translate.instant('lang.signedUserDate') : this.translate.instant('lang.approvedUserDate')}} {{diffusion.process_date
+                        color="accent">{{((functions.empty(diffusion.process_date) && diffusion.requested_signature) || diffusion.signatory) ? ('lang.signedUserDate' | translate) : ('lang.approvedUserDate' | translate)}} {{diffusion.process_date
                                                 | timeAgo : 'full'}}</div>
                     <div *ngIf="diffusion.process_date != null && ['A terminé le circuit'].indexOf(diffusion.process_comment) > -1" class="workflowLineProcessDate"
                             title='{{diffusion.process_date | fullDate}}'
@@ -114,7 +114,7 @@
                     <button class="currentRoleButton" [color]="((functions.empty(diffusion.process_date) && diffusion.requested_signature) || diffusion.signatory) ? 'primary': '' "
                         [disabled]="!canManageUser(diffusion, i)" mat-raised-button
                         title="{{'lang.' + diffusion.currentRole + 'User' | translate}}"
-                        (click)="changeRole(i)">{{((functions.empty(diffusion.process_date) && diffusion.requested_signature) || diffusion.signatory) ? this.translate.instant('lang.signUser') : this.translate.instant('lang.visaUser')}}</button>
+                        (click)="changeRole(i)">{{((functions.empty(diffusion.process_date) && diffusion.requested_signature) || diffusion.signatory) ? ('lang.signUser' | translate) : ('lang.visaUser' | translate)}}</button>
                 </div>
                 <div *ngIf="!diffusion.hasPrivilege" class="invalid">
                     {{'lang.noPrivileges' | translate}}

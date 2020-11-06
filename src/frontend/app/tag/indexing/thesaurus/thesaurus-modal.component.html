@@ -12,14 +12,14 @@
         <div class="col-md-6" *ngIf="!functionsService.empty(tag)">
             <div class="alert-message alert-message-info" role="alert">
                 <b>{{'lang.description' | translate}} :</b><br />
-                {{!functionsService.empty(tag.description) ? tag.description : this.translate.instant('lang.undefined')}}
+                {{!functionsService.empty(tag.description) ? tag.description : 'lang.undefined' | translate}}
                 <br /><br />
                 <b>{{'lang.usage' | translate}} :</b><br />
-                {{!functionsService.empty(tag.usage) ? tag.usage : this.translate.instant('lang.undefined')}}
+                {{!functionsService.empty(tag.usage) ? tag.usage : 'lang.undefined' | translate}}
                 <ng-container *ngIf="tag.links.length > 0">
                     <br />
                     <hr />
-                    <span class="badge" [title]="this.translate.instant('lang.linkedTags')" style="cursor: pointer;"
+                    <span class="badge" [title]="'lang.linkedTags' | translate" style="cursor: pointer;"
                         *ngFor="let link of tag.links" (click)="selectTag(link)">{{getTagLabel(link)}}</span>
                 </ng-container>
             </div>

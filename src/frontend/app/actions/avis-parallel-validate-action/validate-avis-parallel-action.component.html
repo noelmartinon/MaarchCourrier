@@ -16,11 +16,11 @@
                 </div>
                 <div class="alert-message alert-message-info" *ngIf="data.resIds.length == 1  && !noResourceToProcess"
                     role="alert" style="margin-top: 30px;"
-                    [innerHTML]="this.translate.instant('lang.validateAvisParallelSingle') + ' <b>' + ownerOpinion + '</b>'">
+                    [innerHTML]="('lang.validateAvisParallelSingle' | translate) + ' <b>' + ownerOpinion + '</b>'">
                 </div>
 
                 <div class="alert-message alert-message-info" *ngIf="data.resIds.length > 1 && !noResourceToProcess"
-                    role="alert" style="margin-top: 30px;" [innerHTML]="this.translate.instant('lang.validateAvisParallel')"></div>
+                    role="alert" style="margin-top: 30px;" [innerHTML]="'lang.validateAvisParallel' | translate"></div>
 
                 <div *ngIf="resourcesErrors.length > 0" class="alert-message alert-message-danger mailList"
                     role="alert">
@@ -37,18 +37,18 @@
                     appearance="outline" style="cursor:pointer;margin-top: 10px;">
                     <mat-label>{{'lang.opinionLimitDate' | translate}}</mat-label>
                     <input matInput [(ngModel)]="opinionLimitDate" [matDatepicker]="picker"
-                        [placeholder]="this.translate.instant('lang.chooseDate')" [min]="today" readonly style="cursor:pointer;" required>
+                        [placeholder]="'lang.chooseDate' | translate" [min]="today" readonly style="cursor:pointer;" required>
                     <mat-datepicker-toggle matSuffix [for]="picker" *ngIf="!opinionLimitDate">
                     </mat-datepicker-toggle>
                     <mat-datepicker #picker></mat-datepicker>
                     <button mat-button color="warn" matSuffix mat-icon-button *ngIf="opinionLimitDate"
-                        (click)="$event.stopPropagation();opinionLimitDate = null;" [title]="this.translate.instant('lang.eraseValue')">
+                        (click)="$event.stopPropagation();opinionLimitDate = null;" [title]="'lang.eraseValue' | translate">
                         <mat-icon color="warn" class="fa fa-calendar-times">
                         </mat-icon>
                     </button>
                 </mat-form-field>
                 <app-note-editor *ngIf="data.resIds.length === 1 && !noResourceToProcess" #noteEditor
-                    [title]="this.translate.instant('lang.addOpinionReason')" [content]="opinionContent" [resIds]="data.resIds"
+                    [title]="'lang.addOpinionReason' | translate" [content]="opinionContent" [resIds]="data.resIds"
                     [disableRestriction]="true"></app-note-editor>
                 <app-avis-workflow *ngIf="data.resIds.length === 1  && !noResourceToProcess" [adminMode]="true"
                     [mode]="'parallel'" #appAvisWorkflow>

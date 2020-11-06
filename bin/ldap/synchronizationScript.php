@@ -93,12 +93,12 @@ function initialize($customId)
         writeLog(['message' => "[ERROR] No ldap configurations"]);
         exit();
     }
-    if (empty((string)$xmlfile->user) || empty((string)$xmlfile->password)) {
+    if (empty((string)$xmlfile->userWS) || empty((string)$xmlfile->passwordWS)) {
         writeLog(['message' => "[ERROR] Rest user informations are missing"]);
         exit();
     }
-    $GLOBALS['user'] = (string)$xmlfile->user;
-    $GLOBALS['password'] = (string)$xmlfile->password;
+    $GLOBALS['user'] = (string)$xmlfile->userWS;
+    $GLOBALS['password'] = (string)$xmlfile->passwordWS;
 
     $path = 'apps/maarch_entreprise/xml/config.json';
     if (!empty($customId)) {
@@ -140,6 +140,7 @@ function getUsersEntries($xmlfile)
     foreach ($xmlfile->filter->dn as $valueDN) {
         if ((string)$valueDN['type'] == 'users') {
             $dn = (string)$valueDN['id'];
+            $filters = empty((string)$valueDN->user) ? null : (string)$valueDN->user;
         }
     }
     if (empty($dn)) {
@@ -159,7 +160,7 @@ function getUsersEntries($xmlfile)
         return ['errors' => 'Ldap bind failed : Authentication failed'];
     }
 
-    $search = @ldap_search($ldap, $dn, 'cn=*');
+    $search = @ldap_search($ldap, $dn, ($filters ?? 'cn=*'));
     if ($search === false) {
         return ['errors' => 'Ldap search failed : ' . ldap_error($ldap)];
     }
@@ -217,6 +218,7 @@ function getEntitiesEntries($xmlfile)
     foreach ($xmlfile->filter->dn as $valueDN) {
         if ((string)$valueDN['type'] == 'entities') {
             $dn = (string)$valueDN['id'];
+            $filters = empty((string)$valueDN->user) ? null : (string)$valueDN->user;
         }
     }
     if (empty($dn)) {
@@ -236,7 +238,7 @@ function getEntitiesEntries($xmlfile)
         return ['errors' => 'Ldap bind failed : Authentication failed'];
     }
 
-    $search = ldap_search($ldap, $dn, 'cn=*');
+    $search = ldap_search($ldap, $dn, ($filters ?? 'cn=*'));
     $entries = mb_convert_encoding(ldap_get_entries($ldap, $search), 'utf-8');
 
     $ldapEntries = [];

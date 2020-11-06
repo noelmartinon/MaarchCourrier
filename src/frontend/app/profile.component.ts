@@ -28,7 +28,6 @@ declare var tinymce: any;
 export class ProfileComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
-    
 
     highlightMe: boolean = false;
     user: any = {
@@ -169,7 +168,7 @@ export class ProfileComponent implements OnInit {
         public dialog: MatDialog,
         private _formBuilder: FormBuilder,
         private authService: AuthService,
-        private headerService: HeaderService,
+        public headerService: HeaderService,
         public appService: AppService,
         private viewContainerRef: ViewContainerRef,
         private functions: FunctionsService

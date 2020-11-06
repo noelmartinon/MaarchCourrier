@@ -2,7 +2,7 @@
     <h1 mat-dialog-title>{{'lang.addFolder' | translate}}</h1>
     <div mat-dialog-content>
         <mat-form-field appearance="outline">
-            <input type="text" matInput [(ngModel)]="folderName" [placeholder]="this.translate.instant('lang.folderName')">
+            <input type="text" matInput [(ngModel)]="folderName" [placeholder]="'lang.folderName' | translate">
         </mat-form-field>
     </div>
     <span class="divider-modal"></span>

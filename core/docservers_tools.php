@@ -1,22 +1,9 @@
 <?php
 
 /*
-*   Copyright 2008-2011 Maarch
-*
-*   This file is part of Maarch Framework.
-*
-*   Maarch Framework is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   Maarch Framework is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with Maarch Framework. If not, see <http://www.gnu.org/licenses/>.
+* Copyright Maarch since 2008 under licence GPLv3.
+* See LICENCE.txt file at the root folder for more details.
+* This file is part of Maarch software.
 */
 
 /**
@@ -49,7 +36,7 @@ try {
 function Ds_copyOnDocserver(
     $sourceFilePath,
     $infoFileNameInTargetDocserver,
-    $docserverSourceFingerprint='NONE'
+    $docserverSourceFingerprint = 'NONE'
 ) {
     error_reporting(0);
     $destinationDir = $infoFileNameInTargetDocserver['destinationDir'];
@@ -81,13 +68,6 @@ function Ds_copyOnDocserver(
         return $storeInfos;
     }
 
-    /*$ofile = fopen($destinationDir.$fileDestinationName, 'r');
-    if (Ds_isCompleteFile($ofile)) {
-        fclose($ofile);
-    } else {
-        $storeInfos = array('error' => _COPY_OF_DOC_NOT_COMPLETE);
-        return $storeInfos;
-    }*/
     if (isset($GLOBALS['currentStep'])) {
         $destinationDir = str_replace(
             $GLOBALS['docservers'][$GLOBALS['currentStep']]['docserver']
@@ -142,7 +122,7 @@ function Ds_createPathOnDocServer($docServer)
     }
     if (isset($GLOBALS['wb']) && $GLOBALS['wb'] <> '') {
         $path = $docServer . date('Y') . DIRECTORY_SEPARATOR.date('m')
-              . DIRECTORY_SEPARATOR . 'BATCH' . DIRECTORY_SEPARATOR 
+              . DIRECTORY_SEPARATOR . 'BATCH' . DIRECTORY_SEPARATOR
               . $GLOBALS['wb'] . DIRECTORY_SEPARATOR;
         if (!is_dir($path)) {
             mkdir($path, 0770, true);
@@ -189,7 +169,7 @@ function Ds_doFingerprint($path, $fingerprintMode)
 function Ds_controlFingerprint(
     $pathInit,
     $pathTarget,
-    $fingerprintMode='NONE'
+    $fingerprintMode = 'NONE'
 ) {
     $result = array();
     if (Ds_doFingerprint(
@@ -218,13 +198,13 @@ function Ds_controlFingerprint(
  */
 function Ds_setRights($dest)
 {
-    if (
-        DIRECTORY_SEPARATOR == '/'
+    if (DIRECTORY_SEPARATOR == '/'
         && (isset($GLOBALS['apacheUserAndGroup'])
         && $GLOBALS['apacheUserAndGroup'] <> '')
     ) {
-        exec('chown ' 
-            . escapeshellarg($GLOBALS['apacheUserAndGroup']) . ' ' 
+        exec(
+            'chown '
+            . escapeshellarg($GLOBALS['apacheUserAndGroup']) . ' '
             . escapeshellarg($dest)
         );
     }
@@ -239,20 +219,7 @@ function Ds_setRights($dest)
 */
 function Ds_getMimeType($filePath)
 {
-    //require_once 'MIME/Type.php';
-    //return MIME_Type::autoDetect($filePath);
     return mime_content_type($filePath);
-}
-
-/**
-* get the mime type of a file with a buffer
-* @param $fileBuffer buffer of the file
-* @return string of the mime type
-*/
-function Ds_getMimeTypeWithBuffer($fileBuffer)
-{
-    $finfo = new finfo(FILEINFO_MIME);
-    return $finfo->buffer($fileBuffer);
 }
 
 /**
@@ -261,7 +228,7 @@ function Ds_getMimeTypeWithBuffer($fileBuffer)
  * @param   $contentOnly boolean true if only the content
  * @return  boolean
  */
-function Ds_washTmp($dir, $contentOnly=false)
+function Ds_washTmp($dir, $contentOnly = false)
 {
     if (is_dir($dir)) {
         $objects = scandir($dir);
@@ -284,32 +251,6 @@ function Ds_washTmp($dir, $contentOnly=false)
 }
 
 /**
-* Return true when the file is completed
-* @param  $file
-* @param  $delay
-* @param  $pointer position in the file
-*/
-function Ds_isCompleteFile($file, $delay=500, $pointer=0)
-{
-    if ($file == null) {
-        return false;
-    }
-    fseek($file, $pointer);
-    $currentLine = fgets($file);
-    while (!feof($file)) {
-        $currentLine = fgets($file);
-    }
-    $currentPos = ftell($file);
-    //Wait $delay ms
-    usleep($delay * 1000);
-    if ($currentPos == $pointer) {
-        return true;
-    } else {
-        return Ds_isCompleteFile($file, $delay, $currentPos);
-    }
-}
-
-/**
  * Check the mime type of a file with the extension config file
 * Return array with the status of the check and the mime type of the file
 * @param  string $filePath
@@ -317,7 +258,6 @@ function Ds_isCompleteFile($file, $delay=500, $pointer=0)
 */
 function Ds_isFileTypeAllowed($filePath, $extDefault = '')
 {
-    
     $mimeType = Ds_getMimeType(
         $filePath
     );
@@ -345,8 +285,8 @@ function Ds_isFileTypeAllowed($filePath, $extDefault = '')
         . $_SESSION['config']['app_id'] . DIRECTORY_SEPARATOR . 'xml'
         . DIRECTORY_SEPARATOR . 'extensions.xml';
     } else {
-        $path = $_SESSION['config']['corepath'] . 'apps' 
-		. DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
+        $path = $_SESSION['config']['corepath'] . 'apps'
+        . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
         . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'extensions.xml';
     }
     $xmlconfig = simplexml_load_file($path);
@@ -360,12 +300,10 @@ function Ds_isFileTypeAllowed($filePath, $extDefault = '')
         $i++;
     }
     $type_state = false;
-    for ($i=0;$i<count($ext_list);$i++) {
-        if (
-            $ext_list[$i]['mime'] == $mimeType 
+    for ($i=0; $i<count($ext_list); $i++) {
+        if ($ext_list[$i]['mime'] == $mimeType
             && strtolower($ext_list[$i]['name']) == $ext
         ) {
-
             $type_state = true;
             break;
         }

@@ -99,12 +99,19 @@ class UserController
 
     public function getById(Request $request, Response $response, array $args)
     {
-        $user = UserModel::getById(['id' => $args['id'], 'select' => ['id', 'firstname', 'lastname', 'status', 'mail']]);
+        $user = UserModel::getById(['id' => $args['id'], 'select' => ['id', 'firstname', 'lastname', 'status', 'mail', 'phone']]);
         if (empty($user)) {
             return $response->withStatus(400)->withJson(['errors' => 'User does not exist']);
         }
         $user['enabled'] = $user['status'] != 'SPD';
         unset($user['status']);
+
+        $primaryEntity = UserModel::getPrimaryEntityById(['id' => $args['id'], 'select' => ['entity_label']]);
+        $user['department'] = $primaryEntity['entity_label'];
+
+        if ($GLOBALS['id'] != $args['id'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']])) {
+            unset($user['phone']);
+        }
 
         return $response->withJson($user);
     }
@@ -399,7 +406,27 @@ class UserController
             ];
         }
 
-        return $response->withJson(['isDeletable' => true, 'listTemplates' => $listTemplates, 'listInstances' => $listInstances]);
+        $rawWorkflowListInstances = ListInstanceModel::get([
+            'select'    => ['res_id'],
+            'where'     => ['item_id = ?', 'difflist_type = ?', 'process_date is null'],
+            'data'      => [$aArgs['id'], 'VISA_CIRCUIT'],
+            'groupBy'   => ['res_id']
+        ]);
+        $workflowListInstances = [];
+        foreach ($rawWorkflowListInstances as $rawWorkflowListInstance) {
+            $rawListInstances = ListInstanceModel::get([
+                'select'    => ['*'],
+                'where'     => ['res_id = ?', 'difflist_type = ?'],
+                'data'      => [$rawWorkflowListInstance['res_id'], 'VISA_CIRCUIT'],
+                'orderBy'   => ['listinstance_id']
+            ]);
+            $workflowListInstances[] = [
+                'resId'         => $rawWorkflowListInstance['res_id'],
+                'listInstances' => $rawListInstances
+            ];
+        }
+
+        return $response->withJson(['isDeletable' => true, 'listTemplates' => $listTemplates, 'listInstances' => $listInstances, 'workflowListInstances' => $workflowListInstances]);
     }
 
     public function suspend(Request $request, Response $response, array $aArgs)
@@ -622,13 +649,13 @@ class UserController
             'data'  => [$GLOBALS['id']]
         ]);
 
-        $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['firstname', 'lastname']]);
+        $userData = UserModel::getLabelledUserById(['id' => $GLOBALS['id'], 'select' => ['firstname', 'lastname']]);
         HistoryController::add([
             'tableName'    => 'users',
             'recordId'     => $GLOBALS['id'],
             'eventType'    => 'UP',
             'eventId'      => 'userModification',
-            'info'         => _USER_FEATURE_TOUR_UPDATED . " {$user['firstname']} {$user['lastname']}"
+            'info'         => _USER_FEATURE_TOUR_UPDATED . " " . $userData
         ]);
 
         return $response->withStatus(204);
@@ -731,15 +758,16 @@ class UserController
                 return $response->withStatus(400)->withJson(['errors' => 'Some data are empty']);
             }
 
-            $userBasketPreference = UserBasketPreferenceModel::get([
-                'select' => ['display'],
-                'where'  => ['basket_id =?', 'group_serial_id = ?', 'user_serial_id = ?'],
-                'data'   => [$value['basket_id'], $value['group_id'], $aArgs['id']]
-            ]);
-
-            if (empty($userBasketPreference)) {
-                unset($data[$key]);
-                continue;
+            if (empty($value['originalOwner'])) {
+                $userBasketPreference = UserBasketPreferenceModel::get([
+                    'select' => ['display'],
+                    'where'  => ['basket_id =?', 'group_serial_id = ?', 'user_serial_id = ?'],
+                    'data'   => [$value['basket_id'], $value['group_id'], $aArgs['id']]
+                ]);
+                if (empty($userBasketPreference[0]['display'])) {
+                    unset($data[$key]);
+                    continue;
+                }
             }
 
             $check = UserModel::getById(['id' => $value['actual_user_id'], 'select' => ['1']]);
@@ -1278,7 +1306,7 @@ class UserController
         if (!$this->checkNeededParameters(['data' => $data, 'needed' => ['entityId']])) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
         }
-        if (empty(Entitymodel::getByEntityId(['entityId' => $data['entityId']]))) {
+        if (empty(EntityModel::getByEntityId(['entityId' => $data['entityId']]))) {
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         } elseif (UserModel::hasEntity(['id' => $aArgs['id'], 'entityId' => $data['entityId']])) {
             return $response->withStatus(400)->withJson(['errors' => _USER_ALREADY_LINK_ENTITY]);

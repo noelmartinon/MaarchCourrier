@@ -11,4 +11,5 @@ php ./migrateTemplates.php
 php ./migrateSavedQueries.php
 php ./migrateSsoMapping.php
 php ./migrateOpenLdapConfig.php
-php ./migrateCustomXml.php # mettre en dernier
+php ./migrateCustomXml.php # mettre en avant dernier
+php ./migrateSQL.php # mettre en dernier

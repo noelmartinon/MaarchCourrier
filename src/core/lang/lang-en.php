@@ -497,3 +497,5 @@ define('_CONFIGURATION_UPDATED', 'Configuration updated');
 
 define('_RESET_RECORD_MANAGEMENT', 'Reset record management');
 define('_RESET_RECORD_MANAGEMENT_DESC', 'Reset record management');
+
+define('_USER_SKIPPED', 'User skipped');

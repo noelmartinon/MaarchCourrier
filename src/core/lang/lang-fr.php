@@ -412,7 +412,7 @@ define("_CANNOT_SYNCHRONIZE_M2M_ANNUARY", "Le contact ne peut pas être ajouté 
 define("_DATE_LOCALE", "fr_FR.utf8");
 
 define("_USER_PREFERENCE_UPDATED", "Préférences utilisateur modifiées");
-define("_USER_FEATURE_TOUR_UPDATED", "Une ou plusieurs étapes du tutorial ont été faites");
+define("_USER_FEATURE_TOUR_UPDATED", "Une ou plusieurs étapes du didacticiel ont été faites");
 
 define("_NO_SENDERS", "Aucun expéditeur lié au courrier");
 
@@ -504,3 +504,5 @@ define('_CHECK_ACKNOWLEDGMENT_RECORD_MANAGEMENT', 'Vérification du transfert du
 define('_CHECK_ACKNOWLEDGMENT_RECORD_MANAGEMENT_DESC', 'Vérification du transfert du paquet au système d\'archivage électronique');
 define('_RESET_RECORD_MANAGEMENT', 'Remise à zéro du circuit d\'archivage');
 define('_RESET_RECORD_MANAGEMENT_DESC', 'Remise à zéro du circuit d\'archivage');
+
+define('_USER_SKIPPED', 'Utilisateur passé');

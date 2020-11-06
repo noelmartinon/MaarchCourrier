@@ -91,15 +91,15 @@ foreach ($customs as $custom) {
             } elseif ($key == 'confidentiality') {
                 $query[] = ['identifier' => 'confidentiality', 'values' => [['id' => $value['fields']['confidentiality'][0] == 'Y', 'label' => $value['fields']['confidentiality'][0] == 'Y' ? 'Oui' : 'Non']]];
             } elseif ($key == 'creation_date') {
-                $query[] = ['identifier' => 'creationDate', 'values' => ['start' => getFormattedDate($value['fields']['creation_date_from'][0]), 'end' => getFormattedDate($value['fields']['creation_date_to'][0])]];
+                $query[] = ['identifier' => 'creationDate', 'values' => ['start' => getFormattedDate(['date' => $value['fields']['creation_date_from'][0]]), 'end' => getFormattedDate(['date' => $value['fields']['creation_date_to'][0]])]];
             } elseif ($key == 'doc_date') {
-                $query[] = ['identifier' => 'documentDate', 'values' => ['start' => getFormattedDate($value['fields']['doc_date_from'][0]), 'end' => getFormattedDate($value['fields']['doc_date_to'][0])]];
+                $query[] = ['identifier' => 'documentDate', 'values' => ['start' => getFormattedDate(['date' => $value['fields']['doc_date_from'][0]]), 'end' => getFormattedDate(['date' => $value['fields']['doc_date_to'][0]])]];
             } elseif ($key == 'admission_date') {
-                $query[] = ['identifier' => 'arrivalDate', 'values' => ['start' => getFormattedDate($value['fields']['admission_date_from'][0]), 'end' => getFormattedDate($value['fields']['admission_date_to'][0])]];
+                $query[] = ['identifier' => 'arrivalDate', 'values' => ['start' => getFormattedDate(['date' => $value['fields']['admission_date_from'][0]]), 'end' => getFormattedDate(['date' => $value['fields']['admission_date_to'][0]])]];
             } elseif ($key == 'exp_date') {
-                $query[] = ['identifier' => 'departureDate', 'values' => ['start' => getFormattedDate($value['fields']['exp_date_from'][0]), 'end' => getFormattedDate($value['fields']['exp_date_to'][0])]];
+                $query[] = ['identifier' => 'departureDate', 'values' => ['start' => getFormattedDate(['date' => $value['fields']['exp_date_from'][0]]), 'end' => getFormattedDate(['date' => $value['fields']['exp_date_to'][0]])]];
             } elseif ($key == 'process_limit_date') {
-                $query[] = ['identifier' => 'processLimitDate', 'values' => ['start' => getFormattedDate($value['fields']['process_limit_date_from'][0]), 'end' => getFormattedDate($value['fields']['process_limit_date_to'][0])]];
+                $query[] = ['identifier' => 'processLimitDate', 'values' => ['start' => getFormattedDate(['date' => $value['fields']['process_limit_date_from'][0]]), 'end' => getFormattedDate(['date' => $value['fields']['process_limit_date_to'][0]])]];
             } elseif ($key == 'destination_mu') {
                 $allEntities = [];
                 if (!empty($value['fields']['services_chosen']) && is_array($value['fields']['services_chosen'])) {
@@ -206,12 +206,14 @@ foreach ($customs as $custom) {
     printf("Migration recherches sauvegardées (CUSTOM {$custom}) : {$migrated} sauvegarde(s) trouvée(s) et migrée(s).\n");
 }
 
-function getFormattedDate(string $date)
+function getFormattedDate(array $args)
 {
-    if (empty($date)) {
+    \SrcCore\models\ValidatorModel::stringType($args, ['date']);
+
+    if (empty($args['date'])) {
         return null;
     }
-    $date = new \DateTime($date);
+    $date = new \DateTime($args['date']);
     $date->setTime(00, 00, 00);
 
     return $date->format('Y-m-d');

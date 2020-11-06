@@ -15,9 +15,9 @@
             <div class="formType-title">
                 {{'lang.availableIndexingActions' | translate}}
             </div>
-            <mat-hint class="infoActions" [innerHTML]="this.translate.instant('lang.actionsInfo')">
+            <mat-hint class="infoActions" [innerHTML]="'lang.actionsInfo' | translate">
             </mat-hint>
-            <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.linkNewAction')"  [datas]="actionList" [targetSearchKey]="'label_action'"
+            <plugin-autocomplete [labelPlaceholder]="'lang.linkNewAction' | translate"  [datas]="actionList" [targetSearchKey]="'label_action'"
                 (triggerEvent)="addAction($event)" appearance="outline"></plugin-autocomplete>
             <mat-list cdkDropList [cdkDropListData]="indexingInfo.actions" (cdkDropListDropped)="drop($event)"
                 class="selectedActionList" role="list">

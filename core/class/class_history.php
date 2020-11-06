@@ -190,29 +190,6 @@ class history
     }
 
     /**
-    * Gets the label of an history keyword
-    *
-    * @param  $id
-    *
-    * @return  string => Label of the key word or empty string
-    */
-    public function get_label_history_keyword(
-        $id
-    ) {
-        if (empty($id)) {
-            return '';
-        } else {
-            for ($i=0; $i<count($_SESSION['history_keywords']); $i++) {
-                if ($id == $_SESSION['history_keywords'][$i]['id']) {
-                    return $_SESSION['history_keywords'][$i]['label'];
-                }
-            }
-        }
-
-        return '';
-    }
-
-    /**
     * Delete accents
     *
     * @param  $str string

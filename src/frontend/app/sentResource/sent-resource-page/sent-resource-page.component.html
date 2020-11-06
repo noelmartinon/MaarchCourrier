@@ -3,7 +3,7 @@
         <span style="flex: 1;">
             {{data.title}}
         </span>
-        <button [title]="this.translate.instant('lang.saveAndClose')" mat-icon-button (click)="saveDraft()">
+        <button [title]="'lang.saveAndClose' | translate" mat-icon-button (click)="saveDraft()">
             <mat-icon class="fa fa-times"></mat-icon>
         </button></h1>
     <mat-dialog-content class="modal-container">
@@ -99,7 +99,7 @@
             </mat-autocomplete>
         </mat-form-field>
         <mat-form-field floatLabel="never">
-            <input matInput [placeholder]="this.translate.instant('lang.object')" [readonly]="!canManageMail()" [(ngModel)]="emailsubject"
+            <input matInput [placeholder]="'lang.object' | translate" [readonly]="!canManageMail()" [(ngModel)]="emailsubject"
                 maxlength="255">
             <button mat-icon-button matSuffix *ngFor="let keyVal of emailAttachTool | keyvalue"
                 [disabled]="!canManageMail() ||(keyVal.key !== 'summarySheet' && (emailAttachTool[keyVal.key].list.length === 0) || (keyVal.key === 'summarySheet' && !functions.empty(emailAttach['summarySheet'])))"
@@ -174,13 +174,13 @@
             </ng-container>
         </mat-chip-list>
         <div class="models" *ngIf="canManageMail()">
-            <plugin-select-search *ngIf="availableEmailModels.length > 0" [label]="this.translate.instant('lang.emailModel')"
-                [placeholderLabel]="this.translate.instant('lang.emailModel')" [datas]="availableEmailModels"
+            <plugin-select-search *ngIf="availableEmailModels.length > 0" [label]="'lang.emailModel' | translate"
+                [placeholderLabel]="'lang.emailModel' | translate" [datas]="availableEmailModels"
                 [formControlSelect]="templateEmailListForm" (afterSelected)="mergeEmailTemplate($event)">
             </plugin-select-search>
 
             <plugin-select-search #templateList *ngIf="availableSignEmailModels.length > 0"
-                [label]="this.translate.instant('lang.emailSignatures')" [placeholderLabel]="this.translate.instant('lang.emailSignatures')"
+                [label]="'lang.emailSignatures' | translate" [placeholderLabel]="'lang.emailSignatures' | translate"
                 [datas]="availableSignEmailModels" [formControlSelect]="emailSignListForm"
                 (afterSelected)="mergeSignEmailTemplate($event)">
             </plugin-select-search>

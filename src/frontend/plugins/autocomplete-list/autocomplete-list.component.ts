@@ -81,7 +81,6 @@ export class AutocompleteListComponent implements OnInit {
 
     ngOnInit() {
         // this.initAutocompleteData();
-        console.log(Object.keys(this.options[0]));
 
         if (this.datasFormControl.value.length > 0) {
 

@@ -65,7 +65,7 @@
                                 <mat-divider></mat-divider>
                             </mat-tab>
                         </mat-tab-group>
-                        <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.availableStatuses')" [labelList]="this.translate.instant('lang.availableStatuses')" [datas]="statuses" [targetSearchKey]="'idToDisplay'" [subInfoKey]="'id'" (triggerEvent)="setStatus($event)" singleMode required></plugin-autocomplete>
+                        <plugin-autocomplete [labelPlaceholder]="'lang.availableStatuses' | translate" [labelList]="'lang.availableStatuses' | translate" [datas]="statuses" [targetSearchKey]="'idToDisplay'" [subInfoKey]="'id'" (triggerEvent)="setStatus($event)" singleMode required></plugin-autocomplete>
                         <div class="form-group">
                             <div class="col-md-12 text-center" style="padding:10px;">
                                 <button mat-raised-button [disabled]="(resIdList.length == 0 && chronoList.length == 0) || (resIdList.length > 0 && chronoList.length > 0) || !statusId" color="primary">{{'lang.save' | translate}}</button>

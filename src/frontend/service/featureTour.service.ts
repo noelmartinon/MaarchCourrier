@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { JoyrideService } from 'ngx-joyride';
-import { LocalStorageService } from './local-storage.service';
 import { HeaderService } from './header.service';
 import { FunctionsService } from './functions.service';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { NotificationService } from './notification/notification.service';
 
@@ -97,7 +96,6 @@ export class FeatureTourService {
     constructor(
         public translate: TranslateService,
         private readonly joyrideService: JoyrideService,
-        private localStorage: LocalStorageService,
         private headerService: HeaderService,
         private functionService: FunctionsService,
         private router: Router,
@@ -136,8 +134,9 @@ export class FeatureTourService {
                 () => {
                     if (this.currentTour.redirectToAdmin) {
                         this.router.navigate(['/administration']);
+                    } else {
+                        this.endTour();
                     }
-                    this.endTour();
                 }
             );
         }
@@ -148,7 +147,6 @@ export class FeatureTourService {
             this.featureTourEnd = this.headerService.user.featureTour;
         }
         const unique = [...new Set(this.tour.map(item => item.type))];
-
         this.currentStepType = unique.filter(stepType => this.featureTourEnd.indexOf(stepType) === -1)[0];
     }
 

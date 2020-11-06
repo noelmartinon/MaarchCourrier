@@ -27,17 +27,17 @@
                 <mat-form-field (click)="picker.open()" appearance="outline" style="cursor:pointer;margin-top: 10px;">
                     <mat-label>{{'lang.opinionLimitDate' | translate}}</mat-label>
                     <input matInput [(ngModel)]="opinionLimitDate" [matDatepicker]="picker"
-                        [placeholder]="this.translate.instant('lang.chooseDate')" [min]="today" readonly style="cursor:pointer;" required>
+                        [placeholder]="'lang.chooseDate' | translate" [min]="today" readonly style="cursor:pointer;" required>
                     <mat-datepicker-toggle matSuffix [for]="picker" *ngIf="!opinionLimitDate">
                     </mat-datepicker-toggle>
                     <mat-datepicker #picker></mat-datepicker>
                     <button mat-button color="warn" matSuffix mat-icon-button *ngIf="opinionLimitDate"
-                        (click)="$event.stopPropagation();opinionLimitDate = null;" [title]="this.translate.instant('lang.eraseValue')">
+                        (click)="$event.stopPropagation();opinionLimitDate = null;" [title]="'lang.eraseValue' | translate">
                         <mat-icon color="warn" class="fa fa-calendar-times">
                         </mat-icon>
                     </button>
                 </mat-form-field>
-                <app-note-editor #noteEditor [title]="this.translate.instant('lang.addOpinionReason')" [resIds]="data.resIds"
+                <app-note-editor #noteEditor [title]="'lang.addOpinionReason' | translate" [resIds]="data.resIds"
                     [disableRestriction]="true"></app-note-editor>
                 <app-avis-workflow *ngIf="data.resIds.length == 1 || (!noResourceToProcess && data.resIds.length > 1)"
                     [adminMode]="true" [mode]="'parallel'" #appAvisWorkflow>

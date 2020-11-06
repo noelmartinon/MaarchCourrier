@@ -42,7 +42,24 @@ class EntityController
 
     public function getById(Request $request, Response $response, array $args)
     {
-        $entity = EntityModel::getById(['id' => $args['id'], 'select' => ['id', 'entity_label', 'short_label', 'entity_full_name', 'entity_type', 'entity_id', 'enabled', 'parent_entity_id']]);
+        $entity = EntityModel::getById([
+            'id' => $args['id'],
+            'select' => [
+                'id',
+                'entity_label',
+                'short_label',
+                'entity_full_name',
+                'entity_type',
+                'entity_id',
+                'enabled',
+                'parent_entity_id',
+                'adrs_1 as "address"',
+                'zipcode as "addressPostcode"',
+                'city as "addressTown"',
+                'country as "addressCountry"',
+                'email'
+            ]
+        ]);
         if (empty($entity)) {
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         }

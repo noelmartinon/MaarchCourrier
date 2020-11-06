@@ -1,21 +1,8 @@
 <?php
 /*
- * Copyright (C) 2015 Maarch
- *
- * This file is part of Maarch.
- *
- * Maarch is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Maarch is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Maarch.  If not, see <http://www.gnu.org/licenses/>.
+* Copyright Maarch since 2008 under licence GPLv3.
+* See LICENCE.txt file at the root folder for more details.
+* This file is part of Maarch software.
  */
 /**
  * Class for database queries
@@ -223,37 +210,6 @@ class Database extends functions
     }
 
     /**
-     * Retrieve last record id
-     *
-     * @return PDOStatement
-     */
-    public function lastInsertId($sequenceName=null)
-    {
-        switch ($_SESSION['config']['databasetype']) {
-            case 'MYSQL': return @mysqli_insert_id($this->_sqlLink);
-            case 'POSTGRESQL':
-                $stmt_last_insert = $this->query("SELECT last_value as lastinsertid FROM " . $sequenceName);
-                $resultat_last = $stmt_last_insert->fetchObject();
-                return $resultat_last->lastinsertid;
-            case 'SQLSERVER': return '';
-            case 'ORACLE':
-                //$sequenceName = strtoupper($sequenceName);
-                $stmt_last_insert = $this->query("SELECT " . $sequenceName . ".currval as lastinsertid FROM dual");
-                $resultat_last = $stmt_last_insert->fetchObject();
-
-                if (empty($resultat_last->lastinsertid)) {
-                    $stmt_last_insert = $this->query("SELECT to_char(Last_number) as lastinsertid FROM user_sequences where upper(sequence_name) = upper('" . $sequenceName . "')");
-                    $resultat_last = $stmt_last_insert->fetchObject();
-                }
-
-                return $resultat_last->lastinsertid;
-            default: return false;
-        }
-    }
-
-
-
-    /**
      * Commit a transaction
      *
      * @return bool
@@ -318,7 +274,6 @@ class Database extends functions
             $originalData = $parameters;
             foreach ($parameters as $key => $value) {
                 if (is_array($value)) {
-                    //echo $key . $value. '<br />';
                     if (is_int($key)) {
                         $placeholders = implode(',', array_fill(0, count($value), '?'));
                         preg_match_all("/\?/", $queryString, $matches, PREG_OFFSET_CAPTURE);
@@ -338,24 +293,6 @@ class Database extends functions
                         $placeholders = implode(',', $placeholdersArr);
                         $queryString = str_replace($key, $placeholders, $queryString);
                         unset($parameters[$key]);
-                    }
-                    // var_dump($queryString);
-                    // var_dump($parameters);
-                } else {
-                    //echo $key . $value. '<br />';
-                    /*if (empty($parameters[$value])) {
-
-                    }*/
-                    if (
-                        $_SESSION['config']['databasetype'] == 'ORACLE'
-                        /*&&
-                        (
-                            stripos($queryString, 'insert') !== false ||
-                            stripos($queryString, 'update') !== false
-                        )*/
-                    ) {
-                        //$parameters[$key] = $this->normalizeAccent($value);
-                        //echo $parameters[$key] . '<br/>';
                     }
                 }
             }
@@ -380,7 +317,6 @@ class Database extends functions
                 preg_match_all("/\?|\:/", $queryString, $matches, PREG_OFFSET_CAPTURE);
                 $withParams = false;
                 if (empty($matches[0])) {
-                    //echo $queryString;
                     $executed = $this->stmt->execute();
                 } else {
                     $withParams = true;
@@ -392,10 +328,9 @@ class Database extends functions
 
                     return false;
                 } else {
-                    if (strpos($PDOException->getMessage(), 'Admin shutdown: 7') !== false || 
+                    if (strpos($PDOException->getMessage(), 'Admin shutdown: 7') !== false ||
                         strpos($PDOException->getMessage(), 'General error: 7') !== false
                     ) {
-                        //echo 'catch error:' . $PDOException->getMessage() .  '<br />';
                         $db = new Database();
                         if ($originalData) {
                             $db->query($originalQuery, $originalData);
@@ -456,8 +391,6 @@ class Database extends functions
                     break;
                     
                 case 'ORACLE':
-                    //if($where_def) $where_def .= ' AND ';
-                    //$where_def .= ' ROWNUM <= ' . $count;
                     $limit_clause = ' ROWNUM <= ' . $count;
                     break;
                     
@@ -481,21 +414,12 @@ class Database extends functions
             ' ' . $limit_clause;
 
         if ($_SESSION['config']['databasetype'] == 'ORACLE') {
-            /*$query = 'SELECT' .
-                ' ' . $select_opts .
-                ' ' . $select_expr .
-                ' FROM ' . $table_refs .
-                ' WHERE ' . $where_def .
-                ' ' . $other_clauses .
-                ' ' . $limit_clause .
-                ' ' . $order_by;*/
             $query = 'SELECT * FROM (SELECT' .
                 ' ' . $select_opts .
                 ' ' . $select_expr .
                 ' FROM ' . $table_refs .
                 ' WHERE ' . $where_def .
                 ' ' . $other_clauses .
-                // ' ' . $limit_clause .
                 ' ' . $order_by .
                 ') WHERE ' . $limit_clause;
         } else {
@@ -525,45 +449,6 @@ class Database extends functions
             case 'pgsql': return 'CURRENT_TIMESTAMP';
             case 'oci': return 'SYSDATE';
             default: return ' ';
-        }
-    }
-
-    /**
-    * Test if the specified column exists in the database
-    *
-    * @param  $table : Name of searched table
-    * @param  $field : Name of searched field in table
-    *  ==Return : true is field is founed, false is not
-    */
-    public function test_column($table, $field)
-    {
-        switch ($this->driver) {
-            case 'pgsql':
-                $stmt = $this->query(
-                    "select column_name from information_schema.columns where table_name = ? and column_name = ?",
-                    array($table, $field)
-                );
-                $res = $stmt->rowCount();
-                if ($res > 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-                // no break
-            case 'oci':
-                $stmt = $this->query(
-                    "SELECT * from USER_TAB_COLUMNS where TABLE_NAME = ? AND COLUMN_NAME = ?",
-                    array($table, $field)
-                );
-                $res = $stmt->rowCount();
-                if ($res > 0) {
-                    return true;
-                } else {
-                    return false;
-                }
-                // no break
-            case 'mysql': return true; // TO DO
-            default: return false;
         }
     }
 }

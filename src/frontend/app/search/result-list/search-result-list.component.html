@@ -22,7 +22,7 @@
         <div class="ascDescTool">
             <button [disabled]="this.listProperties.order == '' || isLoadingResults || data.length === 0"
                 [style.opacity]="this.listProperties.order == '' ? '0.2' : '1'" mat-fab
-                [title]="this.listProperties.orderDir == 'DESC' ? this.translate.instant('lang.descOrder') : this.translate.instant('lang.ascOrder')"
+                [title]="this.listProperties.orderDir == 'DESC' ? ('lang.descOrder' | translate) : ('lang.ascOrder' | translate)"
                 style="color: rgba(0,0,0,0.38);" (click)="changeOrderDir();">
                 <mat-icon *ngIf="this.listProperties.orderDir == 'DESC'" fontSet="fas"
                     fontIcon="fa-sort-amount-down fa-2x">
@@ -119,10 +119,10 @@
                         style="flex:1;white-space: pre;overflow: hidden;text-overflow: ellipsis;
                                 padding-left: 5px;
                                 padding-right: 5px;"
-                        [class.hasEvent]="data.event && data.displayValue !== this.translate.instant('lang.undefined')"
+                        [class.hasEvent]="data.event && data.displayValue !== ('lang.undefined' | translate)"
                         (click)="launchEventSubData(data, row)">
                         <ng-container *ngIf="data.value == 'getCreationAndProcessLimitDates'">
-                            <ng-container *ngIf="row.closing_date != this.translate.instant('lang.undefined')">
+                            <ng-container *ngIf="row.closing_date != ('lang.undefined' | translate)">
                                 <i class="fa fa-calendar" title="{{'lang.creationDate' | translate}}"></i>&nbsp;<span
                                     [class.highlightResult]="data.displayValue.creationDateHighlighted"
                                     [innerHTML]="data.displayValue.creationDate | timeAgo"
@@ -132,7 +132,7 @@
                                     [innerHTML]="row.closing_date | timeAgo"
                                     title='{{row.closing_date | fullDate}}'></span>
                             </ng-container>
-                            <ng-container *ngIf="row.closing_date == this.translate.instant('lang.undefined')">
+                            <ng-container *ngIf="row.closing_date == ('lang.undefined' | translate)">
                                 <i class="fa fa-calendar" title="{{'lang.creationDate' | translate}}"></i>&nbsp;<span
                                     [class.highlightResult]="data.displayValue.creationDateHighlighted"
                                     [innerHTML]="data.displayValue.creationDate | timeAgo"
@@ -149,9 +149,9 @@
                             &nbsp;
                         </ng-container>
                         <ng-container *ngIf="data.value == 'getCategory'">
-                            <span *ngIf="!this.translate.instant('lang.' + data.displayValue)" style="opacity: 0.5"
+                            <span *ngIf="!('lang.' + data.displayValue | translate)" style="opacity: 0.5"
                                 title="id: {{data.displayValue}}">{{'lang.undefined' | translate}}</span>
-                            <span *ngIf="this.translate.instant('lang.' + data.displayValue)"
+                            <span *ngIf="('lang.' + data.displayValue | translate)"
                                 title="{{'lang.' + data.displayValue | translate}}">{{'lang.' + data.displayValue | translate}}</span>
                         </ng-container>
                         <ng-container
@@ -170,7 +170,7 @@
                     </span>
                     <button mat-icon-button (click)="$event.stopPropagation();toggleMailTracking(row)"
                         style="margin-left: -25px;" class="followIcon"
-                        [title]="row.mailTracking === true ? this.translate.instant('lang.untrackThisMail') : this.translate.instant('lang.trackThisMail')">
+                        [title]="row.mailTracking === true ? ('lang.untrackThisMail' | translate) : ('lang.trackThisMail' | translate)">
                         <mat-icon [ngClass]="[row.mailTracking === true ? 'fas fa-star' : 'far fa-star']"
                             style="margin-bottom: 5px;"></mat-icon>
                     </button>
@@ -190,19 +190,19 @@
                     <span *ngIf="!appService.getViewMode()" (click)="launch(row);" class="main-info-data"
                         style="width:200px;text-align:center;cursor:pointer;">
                         <ng-container
-                            *ngIf="row.chrono == this.translate.instant('lang.undefined') && row.barcode != this.translate.instant('lang.undefined')">
+                            *ngIf="row.chrono == ('lang.undefined' | translate) && row.barcode != ('lang.undefined' | translate)">
                             <span style="color: rgba(0,0,0,0.4);font-size: 90%;">
                                 <i title="{{'lang.barcode' | translate}}" class="fas fa-barcode"></i>&nbsp;<span
                                     title="{{row.barcode_title}}"
                                     [innerHTML]="row.barcode"></span>
                             </span>
                         </ng-container>
-                        <ng-container *ngIf="row.chrono != this.translate.instant('lang.undefined')">
+                        <ng-container *ngIf="row.chrono != ('lang.undefined' | translate)">
                             <span title="{{row.chrono_title}}" [innerHTML]="row.chrono"></span>
                         </ng-container>
                     </span>
                     <span class="main-info-data" (click)="launch(row);" style="font-weight:bold;flex:1;cursor:pointer;"
-                        [class.undefined]="row.subject == this.translate.instant('lang.undefined')"
+                        [class.undefined]="row.subject == ('lang.undefined' | translate)"
                         title="{{row.subject_title}}" [innerHTML]="row.subject"></span>
                     <span *ngIf="sidenavRight !== undefined" class="main-info-action">
                         <button mat-icon-button [class.highlightResultIcon]="row.inNotes"
@@ -231,7 +231,7 @@
                             </mat-icon>
                         </button>
                         <button mat-icon-button *ngIf="!appService.getViewMode()"
-                            title="{{row.hasDocument ? this.translate.instant('lang.viewResource') : this.translate.instant('lang.noDocument')}}"
+                            title="{{row.hasDocument ? ('lang.viewResource' | translate) : ('lang.noDocument' | translate)}}"
                             (click)="$event.stopPropagation();viewDocument(row)" (mouseenter)="viewThumbnail(row);"
                             (mouseleave)="closeThumbnail();" [disabled]="!row.hasDocument">
                             <mat-icon class="fa" [ngClass]="[row.hasDocument ? 'fa-eye' : 'fa-eye-slash']">

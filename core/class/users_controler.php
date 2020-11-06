@@ -1,21 +1,8 @@
 <?php
 /*
-*   Copyright 2008-2015 Maarch
-*
-*   This file is part of Maarch Framework.
-*
-*   Maarch Framework is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   Maarch Framework is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with Maarch Framework.  If not, see <http://www.gnu.org/licenses/>.
+* Copyright Maarch since 2008 under licence GPLv3.
+* See LICENCE.txt file at the root folder for more details.
+* This file is part of Maarch software.
 */
 
 /**
@@ -38,7 +25,6 @@ try {
     require_once 'core/class/class_history.php';
     require_once('core' . DIRECTORY_SEPARATOR . 'class'
         . DIRECTORY_SEPARATOR . 'class_security.php');
-    require_once 'modules/entities/class/class_users_entities.php';
 } catch (Exception $e) {
     functions::xecho($e->getMessage()) . ' // ';
 }
@@ -548,42 +534,5 @@ class users_controler extends ObjectControler implements ObjectControlerIF
         }
 
         return $entities;
-    }
-    
-    /**
-    * Returns in an array all the parent entities associated with a specific entitiy type
-    *
-    * @param  $userId string  $entityType string
-    * @return Array or null
-    */
-    public function getParentEntitiesWithType($userId, $entityType)
-    {
-        $userEntities = self::getEntities($userId);
-        $parentEntitiesWithType = array();
-
-        foreach ($userEntities as $entity) {
-            $entity = $entity['ENTITY_ID'];
-            $isRightEntityType = false;
-            while (!$isRightEntityType) {
-                $query = "SELECT parent_entity_id, entity_type"
-                        . " FROM entities"
-                        . " WHERE entity_id = ?";
-                $stmt = self::$db->query($query, array($entity));
-
-                $res = $stmt->fetchObject();
-                if (!$res) {
-                    $isRightEntityType = true;
-                } elseif ($res->entity_type == $entityType) {
-                    if (!in_array($entity, $parentEntitiesWithType)) {
-                        $parentEntitiesWithType[] = $entity;
-                    }
-                    $isRightEntityType = true;
-                } else {
-                    $entity = $res->parent_entity_id;
-                }
-            }
-        }
-
-        return $parentEntitiesWithType;
     }
 }

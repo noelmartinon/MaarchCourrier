@@ -3618,13 +3618,6 @@ if (!defined('_DOC_NOT_CLOSED')) {
     define('_DOC_NOT_CLOSED', 'This mail is not closed');
 }
 
-if (!defined('_SECURITY_MESSAGE')) {
-    define('_SECURITY_MESSAGE', 'Security message');
-}
-if (!defined('_SECURITY_MESSAGE_DETAILS')) {
-    define('_SECURITY_MESSAGE_DETAILS', 'XSS type resquest is not allowed');
-}
-
 if (!defined('_CHOOSE_ENTITY_SUBENTITIES')) {
     define('_CHOOSE_ENTITY_SUBENTITIES', 'Choose a department (+ sub-department(s))');
 }
@@ -3727,30 +3720,6 @@ if (!defined('_SEND_TO_VISA')) {
 
 if (!defined('_MAIL_WILL_DISAPPEAR')) {
     define('_MAIL_WILL_DISAPPEAR', "This mail is out your area. You won't be able to access it then.");
-}
-
-//maarchIVS translate
-
-if (!defined('_IVS_LENGTH_ID_BELOW_MIN_LENGTH')) {
-    define('_IVS_LENGTH_ID_BELOW_MIN_LENGTH', 'the length is inferior than the minimum length');
-}
-if (!defined('_IVS_LENGTH_EXCEEDS_MAX_LENGTH')) {
-    define('_IVS_LENGTH_EXCEEDS_MAX_LENGTH', 'the length is superior to the maximum length');
-}
-if (!defined('_IVS_LENGTH_NOT_ALLOWED')) {
-    define('_IVS_LENGTH_NOT_ALLOWED', 'The lenght is not allowed');
-}
-if (!defined('_IVS_VALUE_NOT_ALLOWED')) {
-    define('_IVS_VALUE_NOT_ALLOWED', 'the value is not allowed');
-}
-if (!defined('_IVS_FORMAT_NOT_ALLOWED')) {
-    define('_IVS_FORMAT_NOT_ALLOWED', 'The format is not allowed');
-}
-if (!defined('_IVS_TOO_MANY_DIGITS')) {
-    define('_IVS_TOO_MANY_DIGITS', 'Too many characters');
-}
-if (!defined('_IVS_TOO_MANY_DECIMAL_DIGITS')) {
-    define('_IVS_TOO_MANY_DECIMAL_DIGITS', 'Too many decimal characters');
 }
 
 //control technical params

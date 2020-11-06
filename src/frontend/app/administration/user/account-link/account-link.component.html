@@ -1,7 +1,7 @@
 <div class="mat-dialog-content-container">
   <h1 mat-dialog-title>{{'lang.linkAccount' | translate}}</h1>
   <mat-dialog-content>
-    <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.searchUserInMaarchParapheur')"
+    <plugin-autocomplete [labelPlaceholder]="'lang.searchUserInMaarchParapheur' | translate"
       [routeDatas]="['/rest/autocomplete/maarchParapheurUsers?exludeAlreadyConnected=true']"
       [targetSearchKey]="'idToDisplay'" [subInfoKey]="'email'" (triggerEvent)="selectUser($event)" appearance="outline">
     </plugin-autocomplete>
@@ -11,7 +11,7 @@
           [style.background-image]="'url('+externalUser.picture+')'"></mat-icon>
         <h4 mat-line>{{externalUser.firstname}} {{externalUser.lastname}}</h4>
         <p mat-line style="color:#666">{{externalUser.email}}</p>
-        <button mat-icon-button color="warn" [title]="this.translate.instant('lang.unlinkAccount')" (click)="unlinkMaarchParapheurAccount()">
+        <button mat-icon-button color="warn" [title]="'lang.unlinkAccount' | translate" (click)="unlinkMaarchParapheurAccount()">
           <mat-icon class="fas fa-unlink"></mat-icon>
         </button>
       </mat-list-item>
@@ -21,7 +21,7 @@
     </mat-form-field>
     <div *ngIf="!externalUser.inMaarchParapheur" class="alert-message alert-message-danger" role="alert"
       style="margin-top: 30px;"
-      [innerHTML]="this.translate.instant('lang.maarchParapheurAccountMsg') + ' <b>' + externalUser.login + '</b> ' + this.translate.instant('lang.maarchParapheurAccountMsg2')">
+      [innerHTML]="('lang.maarchParapheurAccountMsg' | translate) + ' <b>' + externalUser.login + '</b> ' + ('lang.maarchParapheurAccountMsg2' | translate)">
     </div>
   </mat-dialog-content>
   <span class="divider-modal"></span>

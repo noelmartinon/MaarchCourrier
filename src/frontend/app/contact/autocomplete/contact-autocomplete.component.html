@@ -3,7 +3,7 @@
     <mat-form-field floatLabel="never" class="input-form"
         *ngIf="(!controlAutocomplete.disabled && !singleMode) || (singleMode && controlAutocomplete.value.length === 0 && !controlAutocomplete.disabled)">
         <mat-icon color="primary" class="fa fa-search" matPrefix style="padding-left: 20px;font-size: 15px;"></mat-icon>
-        <input [id]="id" type="text" #autoCompleteInput [placeholder]="this.translate.instant('lang.searchContact')" matInput [formControl]="myControl"
+        <input [id]="id" type="text" #autoCompleteInput [placeholder]="'lang.searchContact' | translate" matInput [formControl]="myControl"
             [matAutocomplete]="auto" (click)="$event.stopPropagation();noResultFound = null;" maxlength="128">
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectOpt($event)">
             <ng-container *ngIf="options.length > 0 && !loading">
@@ -14,7 +14,7 @@
                                 [class.fa-address-card]="option.type === 'contact'"
                                 [class.fa-users]="option.type ==='contactGroup'"
                                 [class.fa-sitemap]="option.type ==='entity'" [class.fa-user]="option.type ==='user'"
-                                [title]="this.translate.instant('lang.contact_' + option.type)">
+                                [title]="'lang.contact_' + option.type | translate">
                             </div>
                             <mat-card-title *ngIf="!empty(option.firstname) || !empty(option.lastname)"
                                 [title]="option.civility.label + ' ' + option.firstname + ' ' + option.lastname">
@@ -27,37 +27,37 @@
                             </mat-card-subtitle>
                             <i class="contact-filling fa fa-circle"
                                 *ngIf="option.type === 'contact' && !empty(option.fillingRate.rate)"
-                                [title]="this.translate.instant('lang.contactsFillingRate') + ' : ' + option.fillingRate.rate + '%'" [style.color]="option.fillingRate.color"></i>
+                                [title]="('lang.contactsFillingRate' | translate) + ' : ' + option.fillingRate.rate + '%'" [style.color]="option.fillingRate.color"></i>
                         </mat-card-header>
                         <mat-card-content>
                             <mat-list>
                                 <mat-list-item class="contact-item"
                                     *ngIf="(!empty(option.firstname) || !empty(option.lastname)) && !empty(option.company)">
                                     <mat-icon mat-list-icon class="contact-group far fa-building"
-                                        [title]="this.translate.instant('lang.contactsParameters_company')"></mat-icon>
+                                        [title]="'lang.contactsParameters_company' | translate"></mat-icon>
                                     <p mat-line class="contact-content" [title]="option.company"> {{option.company}}
                                     </p>
                                 </mat-list-item>
                                 <mat-list-item class="contact-item" *ngIf="!empty(option.department)">
                                     <mat-icon mat-list-icon class="contact-group fa fa-sitemap"
-                                        [title]="this.translate.instant('lang.contactsParameters_department')"></mat-icon>
+                                        [title]="'lang.contactsParameters_department' | translate"></mat-icon>
                                     <p mat-line class="contact-content" [title]="option.department">
                                         {{option.department}} </p>
                                     <p mat-line class="contact-content" *ngIf="!empty(option.addressAdditional1)"
                                         [title]="option.addressAdditional1"> ({{option.addressAdditional1}}) </p>
                                 </mat-list-item>
                                 <mat-list-item class="contact-item" *ngIf="!empty(option.email)">
-                                    <mat-icon mat-list-icon class="contact-group far fa-envelope" [title]="this.translate.instant('lang.email')">
+                                    <mat-icon mat-list-icon class="contact-group far fa-envelope" [title]="'lang.email' | translate">
                                     </mat-icon>
                                     <p mat-line class="contact-content" [title]="option.email"> {{option.email}} </p>
                                 </mat-list-item>
                                 <mat-list-item class="contact-item" *ngIf="!empty(option.phone)">
                                     <mat-icon mat-list-icon class="contact-group fas fa-phone"
-                                        [title]="this.translate.instant('lang.phoneNumber')">
+                                        [title]="'lang.phoneNumber' | translate">
                                     </mat-icon>
                                     <p mat-line class="contact-content" [title]="option.phone"> {{option.phone}} </p>
                                 </mat-list-item>
-                                <mat-list-item class="contact-address" [title]="this.translate.instant('lang.address')"
+                                <mat-list-item class="contact-address" [title]="'lang.address' | translate"
                                     *ngIf="!empty(option.addressNumber) || !empty(option.addressStreet) || !empty(option.addressAdditional2) || !empty(option.addressPostcode) || !empty(option.addressTown) || !empty(option.addressCountry)">
                                     <mat-icon mat-list-icon class="contact-group fas fa-map-marker-alt"></mat-icon>
                                     <p mat-line class="contact-content"
@@ -117,7 +117,7 @@
                         <i class="fa" [class.fa-address-card]="this.valuesToDisplay[item.id].type === 'contact'"
                             [class.fa-sitemap]="this.valuesToDisplay[item.id].type ==='entity'"
                             [class.fa-user]="this.valuesToDisplay[item.id].type ==='user'"
-                            [title]="this.translate.instant('lang.' + this.valuesToDisplay[item.id].type)" style="padding-right:5px;"></i>
+                            [title]="'lang.' + this.valuesToDisplay[item.id].type | translate" style="padding-right:5px;"></i>
                         <ng-container *ngIf="!empty(this.valuesToDisplay[item.id].firstname)">
                             {{this.valuesToDisplay[item.id].firstname}}
                         </ng-container>

@@ -404,14 +404,41 @@ class ActionMethodController
         ]);
 
         $circuit = ListInstanceModel::get([
-            'select'    => ['requested_signature'],
+            'select'    => ['requested_signature', 'item_id', 'listinstance_id'],
             'where'     => ['res_id = ?', 'difflist_type = ?', 'process_date is null'],
             'data'      => [$args['resId'], 'VISA_CIRCUIT'],
-            'orderBy'   => ['listinstance_id'],
-            'limit'     => 1
+            'orderBy'   => ['listinstance_id']
         ]);
 
-        if ($circuit[0]['requested_signature'] == true) {
+        $skipList = [];
+        $nextValid = null;
+        foreach ($circuit as $item) {
+            $user = UserModel::getById(['id' => $item['item_id'], 'select' => ['status']]);
+            $isValid = !empty($user) && !in_array($user['status'], ['SPD', 'DEL']);
+            if (!$isValid) {
+                $skipList[] = $item['listinstance_id'];
+            } else {
+                $nextValid = $item;
+                break;
+            }
+        }
+
+        if (!empty($skipList)) {
+            ListInstanceModel::update([
+                'set'   => [
+                    'process_date' => 'CURRENT_TIMESTAMP',
+                    'process_comment' => _USER_SKIPPED
+                ],
+                'where' => ['listinstance_id in (?)'],
+                'data'  => [$skipList]
+            ]);
+        }
+
+        if (empty($nextValid)) {
+            return true;
+        }
+
+        if ($nextValid['requested_signature'] == true) {
             $attachments = AttachmentModel::get([
                 'select'  => ['res_id'],
                 'where'   => ['res_id_master = ?', 'in_signature_book = ?', 'status = ?'],
@@ -489,6 +516,7 @@ class ActionMethodController
             'limit'   => 1
         ]);
 
+        $listInstancesIdsToReset = [];
         if (empty($listInstances[0])) {
             $hasCircuit = ListInstanceModel::get(['select' => [1], 'where' => ['res_id = ?', 'difflist_type = ?'], 'data' => [$args['resId'], 'VISA_CIRCUIT']]);
             if (!empty($hasCircuit)) {
@@ -498,22 +526,35 @@ class ActionMethodController
             }
         } else {
             $hasPrevious = ListInstanceModel::get([
-                'select'  => [1],
+                'select'  => ['listinstance_id', 'item_id'],
                 'where'   => ['res_id = ?', 'difflist_type = ?', 'process_date is not null'],
                 'data'    => [$args['resId'], 'VISA_CIRCUIT'],
-                'orderBy' => ['listinstance_id'],
-                'limit'   => 1
+                'orderBy' => ['listinstance_id desc'],
             ]);
             if (empty($hasPrevious)) {
                 return ['errors' => ['Workflow not yet started']];
             }
+            $validFound = false;
+            foreach ($hasPrevious as $previous) {
+                $user = UserModel::getById(['id' => $previous['item_id'], 'select' => ['status']]);
+                $listInstancesIdsToReset[] = $previous['listinstance_id'];
+                if (!empty($user) && !in_array($user['status'], ['SPD', 'DEL'])) {
+                    $validFound = true;
+                    break;
+                }
+            }
+            if (!$validFound) {
+                return ['errors' => ['No available previous user to return to']];
+            }
         }
 
-        ListInstanceModel::update([
-            'set'   => ['process_date' => null],
-            'where' => ['listinstance_id = ?'],
-            'data'  => [$listInstances[0]['listinstance_id']]
-        ]);
+        if (!empty($listInstancesIdsToReset)) {
+            ListInstanceModel::update([
+                'set'   => ['process_date' => null, 'process_comment' => null],
+                'where' => ['listinstance_id in (?)'],
+                'data'  => [$listInstancesIdsToReset]
+            ]);
+        }
 
         return true;
     }
@@ -753,6 +794,41 @@ class ActionMethodController
             'where' => ['listinstance_id = ?'],
             'data'  => [$currentStep['listinstance_id']]
         ]);
+
+        $circuit = ListInstanceModel::get([
+            'select'    => ['requested_signature', 'item_id', 'listinstance_id'],
+            'where'     => ['res_id = ?', 'difflist_type = ?', 'process_date is null'],
+            'data'      => [$args['resId'], 'AVIS_CIRCUIT'],
+            'orderBy'   => ['listinstance_id']
+        ]);
+
+        $skipList = [];
+        $nextValid = null;
+        foreach ($circuit as $item) {
+            $user = UserModel::getById(['id' => $item['item_id'], 'select' => ['status']]);
+            $isValid = !empty($user) && !in_array($user['status'], ['SPD', 'DEL']);
+            if (!$isValid) {
+                $skipList[] = $item['listinstance_id'];
+            } else {
+                $nextValid = $item;
+                break;
+            }
+        }
+
+        if (!empty($skipList)) {
+            ListInstanceModel::update([
+                'set'   => [
+                    'process_date' => 'CURRENT_TIMESTAMP',
+                    'process_comment' => _USER_SKIPPED
+                ],
+                'where' => ['listinstance_id in (?)'],
+                'data'  => [$skipList]
+            ]);
+        }
+
+        if (empty($nextValid)) {
+            return true;
+        }
 
         if ($message == null) {
             return true;

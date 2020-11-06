@@ -18,16 +18,6 @@ if (isset($_REQUEST['dir']) && !empty($_REQUEST['dir'])) {
     $_REQUEST['dir'] = str_replace("..", "", $_REQUEST['dir']);
 }
 
-//reset orders in previous basket list
-if (empty($_SESSION['current_basket'])) {
-    $_SESSION['save_list']['start'] = 0;
-    $_SESSION['save_list']['lines'] = "";
-    $_SESSION['save_list']['order'] = "";
-    $_SESSION['save_list']['order_field'] = "";
-    $_SESSION['save_list']['template'] = "";
-    $_SESSION['save_list']['full_count'] = 0;
-}
-
 // Useless ???
 if (isset($_GET['show'])) {
     $show = $_GET['show'];
@@ -55,11 +45,6 @@ if (isset($_SESSION['user']['UserId'])
 include_once '../../core/class/class_functions.php';
 include_once '../../core/class/class_db_pdo.php';
 include_once '../../core/init.php';
-include 'apps/maarch_entreprise/tools/maarchIVS/MaarchIVS.php';
-
-if ($_SESSION['config']['usePHPIDS'] == 'true') {
-    include 'apps/maarch_entreprise/phpids_control.php';
-}
 
 //SET custom path
 if (isset($_SESSION['config']['corepath'])) {
@@ -112,71 +97,6 @@ if (!isset($_SESSION['user']['UserId'])
 }
 
 if (!empty($_REQUEST['page']) && empty($_REQUEST['triggerAngular'])) {
-    //V1
-    $started = MaarchIVS::start(__DIR__ . '/xml/IVS/requests_definitions.xml', 'xml');
-    $valid = MaarchIVS::run('silent');
-    if (!$valid) {
-        $validOutpout = MaarchIVS::debug();
-        $cptValid = count($validOutpout['validationErrors']);
-        $error = '';
-        for ($cptV=0; $cptV<=$cptValid; $cptV++) {
-            $message = $validOutpout['validationErrors'][$cptV]->message;
-            if ($message == "Length id below the minimal length") {
-                $message = _IVS_LENGTH_ID_BELOW_MIN_LENGTH;
-            } elseif ($message == "Length exceeds the maximal length") {
-                $message = _IVS_LENGTH_EXCEEDS_MAX_LENGTH;
-            } elseif ($message == "Length is not allowed") {
-                $message = _IVS_LENGTH_NOT_ALLOWED;
-            } elseif ($message == "Value is not allowed") {
-                $message = _IVS_VALUE_NOT_ALLOWED;
-            } elseif ($message == "Format is not allowed") {
-                $message = _IVS_FORMAT_NOT_ALLOWED;
-            } elseif ($message == "Value is below the minimal value") {
-                $message = _IVS_VALUE_BELOW_MIN_VALUE;
-            } elseif ($message == "Value exceeds the maximal value") {
-                $message = _IVS_LENGTH_EXCEEDS_MAX_LENGTH;
-            } elseif ($message == "Too many digits") {
-                $message = _IVS_TOO_MANY_DIGITS;
-            } elseif ($message == "Too many decimal digits") {
-                $message = _IVS_TOO_MANY_DECIMAL_DIGITS;
-            }
-            $error .= $message . PHP_EOL;
-            $error .= $validOutpout['validationErrors'][$cptV]->parameter . PHP_EOL;
-            $error .= $validOutpout['validationErrors'][$cptV]->value . PHP_EOL;
-        }
-        foreach ($_REQUEST as $name => $value) {
-            if (is_string($value) && strpos($value, "<") !== false) {
-                $value = preg_replace('/(<\/?script[^>]*>|<\?php|<\?[\s|\n|\r])/i', "", $value);
-                $_REQUEST[$name] = $value;
-                if (isset($_GET[$name]) && $_GET[$name] <> '') {
-                    $_GET[$name] = $value;
-                }
-                if (isset($_POST[$name]) && $_POST[$name] <> '') {
-                    $_POST[$name] = $value;
-                }
-            }
-            $value = str_replace("\\", "", $value);
-            $value = str_replace("/", "", $value);
-            $value = str_replace("..", "", $value);
-            $_REQUEST[$name] = $value;
-            if (isset($_GET[$name]) && $_GET[$name] <> '') {
-                $_GET[$name] = $value;
-            }
-            if (isset($_POST[$name]) && $_POST[$name] <> '') {
-                $_POST[$name] = $value;
-            }
-        }
-        //process error for ajax request
-        if (array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER)
-            && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
-        ) {
-            echo $error;
-            exit;
-        } else {
-            //process error for standard request
-            $_SESSION['error'] = $error;
-        }
-    }
     if (!isset($_SESSION['user']['UserId'])
         && $_REQUEST['page'] <> 'login'
         && $_REQUEST['page'] <> 'log'
@@ -251,23 +171,21 @@ if (!empty($_REQUEST['page']) && empty($_REQUEST['triggerAngular'])) {
 
     //GET COOKIE CLIENT SIDE
     if (empty($_SESSION['clientSideCookies'])) { ?>
-        <script type="text/javascript">
-            var path_manage_script = '<?php echo $_SESSION["config"]["businessappurl"]; ?>' + 'index.php?display=true&page=setProxyCookies';
-            $j.ajax(
-            {
-                url: path_manage_script,
-                type:'POST',
-                dataType:'json',
-                data: {
-                    cookies : document.cookie
-                },
-                success: function(answer)
-                {
+<script type="text/javascript">
+    var path_manage_script = '<?php echo $_SESSION["config"]["businessappurl"]; ?>' + 'index.php?display=true&page=setProxyCookies';
+    $j.ajax({
+        url: path_manage_script,
+        type: 'POST',
+        dataType: 'json',
+        data: {
+            cookies: document.cookie
+        },
+        success: function(answer) {
 
-                }
-            });
-        </script>
-    <?php
+        }
+    });
+</script>
+<?php
     }
 
     $path = $_SESSION['config']['corepath'] . 'custom/'
@@ -297,35 +215,36 @@ if (!empty($_REQUEST['page']) && empty($_REQUEST['triggerAngular'])) {
 
     if (isset($_SESSION['error']) && $_SESSION['error'] <> '') {
         ?>
-        <script>
-            var main_error = $j('#main_error_popup');
-            if (main_error != null) {
-                main_error.css({"display":"table-cell"});
-                Element.hide.delay(10, 'main_error_popup');
-            }
-        </script>
-    <?php
+<script>
+    var main_error = $j('#main_error_popup');
+    if (main_error != null) {
+        main_error.css({
+            "display": "table-cell"
+        });
+        Element.hide.delay(10, 'main_error_popup');
+    }
+</script>
+<?php
     }
 
     if (isset($_SESSION['info']) && $_SESSION['info'] <> '') {
         ?>
-        <script>
-            var main_info = $j('#main_info');
-            if (main_info != null) {
-                main_info.css({"display":"table-cell"});
-                Element.hide.delay(10, 'main_info');
-            }
-        </script>
-        <?php
+<script>
+    var main_info = $j('#main_info');
+    if (main_info != null) {
+        main_info.css({
+            "display": "table-cell"
+        });
+        Element.hide.delay(10, 'main_info');
+    }
+</script>
+<?php
     }
 
     $core->insert_page();
 
     //FOOTER
     echo '<p id="footer">';
-    if (isset($_SESSION['config']['showfooter']) && $_SESSION['config']['showfooter'] == 'true') {
-        $core->load_footer();
-    }
     echo '</p>';
 
     $_SESSION['error'] = '';
@@ -334,7 +253,6 @@ if (!empty($_REQUEST['page']) && empty($_REQUEST['triggerAngular'])) {
     echo '</div>';
     echo '</div>';
     
-    $core->view_debug();
     echo '</body>';
     echo '</html>';
     exit();
@@ -393,13 +311,13 @@ if (!empty($_REQUEST['page']) && empty($_REQUEST['triggerAngular'])) {
 </script><?php
     } elseif (empty($_REQUEST['page'])) {
         ?>
-            <script>
-                var route = '#/home';
-                if(localStorage.getItem('PreviousV2Route') != null) {
-                    route = '#' + localStorage.getItem('PreviousV2Route');
-                }
-                triggerAngular(route);
-            </script>
-        <?php
+<script>
+    var route = '#/home';
+    if (localStorage.getItem('PreviousV2Route') != null) {
+        route = '#' + localStorage.getItem('PreviousV2Route');
+    }
+    triggerAngular(route);
+</script>
+<?php
     }
 }

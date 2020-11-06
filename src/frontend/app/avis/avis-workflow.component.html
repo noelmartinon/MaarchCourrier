@@ -9,13 +9,13 @@
                     <mat-spinner diameter="35"></mat-spinner>
                 </div>
             </mat-option>
-            <mat-optgroup [label]="this.translate.instant('lang.publicModel')" *ngIf="(filteredPublicModels | async)?.length > 0"
+            <mat-optgroup [label]="'lang.publicModel' | translate" *ngIf="(filteredPublicModels | async)?.length > 0"
                 class="avisSignList">
                 <mat-option *ngFor="let model of filteredPublicModels | async | sortBy : 'label'" [value]="model">
                     {{model.label}}
                 </mat-option>
             </mat-optgroup>
-            <mat-optgroup [label]="this.translate.instant('lang.privateModel')" *ngIf="(filteredPrivateModels | async)?.length > 0"
+            <mat-optgroup [label]="'lang.privateModel' | translate" *ngIf="(filteredPrivateModels | async)?.length > 0"
                 class="avisSignList">
                 <mat-option *ngFor="let model of filteredPrivateModels | async | sortBy : 'label'" [value]="model">
                     <div style="display: flex;align-items: center;">
@@ -70,7 +70,7 @@
                         {{diffusion.labelToDisplay}}
                         <ng-container *ngIf="diffusion.process_date != null && diffusion.delegatedBy !== null">
                             <mat-icon mat-list-icon class="fas fa-exclamation-circle"
-                                      [title]="this.translate.instant('lang.insteadOf') + ' ' + diffusion.delegatedBy"
+                                      [title]="('lang.insteadOf' | translate) + ' ' + diffusion.delegatedBy"
                                       style="opacity:0.5;font-size: 125%;height: 15px;color: red"></mat-icon>
                         </ng-container>
                     </div>

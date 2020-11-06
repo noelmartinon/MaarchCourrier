@@ -75,7 +75,6 @@ if (empty($file)) {
 $config = $file['config'];
 $GLOBALS['MaarchDirectory'] = $config['maarchDirectory'];
 $GLOBALS['customId']        = $config['customID'];
-$GLOBALS['applicationUrl']  = $config['maarchUrl'];
 $GLOBALS['batchDirectory']  = $GLOBALS['MaarchDirectory'] . 'bin/exportSeda';
 
 $config = $file['exportSeda'];
@@ -171,6 +170,10 @@ foreach ($unitIdentifiers as $reference => $value) {
             Bt_writeLog(['level' => 'ERROR', 'message' => '[storeAttachment] ' . $id['errors']]);
             continue;
         }
+        \Convert\controllers\ConvertPdfController::convert([
+            'resId'  => $id,
+            'collId' => 'attachments_coll'
+        ]);
         $status = (strpos((string)$messages['xmlContent']->ReplyCode, 'OOO')) === false ? $GLOBALS['statusReplyRejected'] : $GLOBALS['statusReplyReceived'];
         \Resource\models\ResModel::update([
             'set'   => ['status' => $status],

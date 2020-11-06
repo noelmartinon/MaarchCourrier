@@ -46,7 +46,7 @@
     <div class="ascDescTool">
         <button [disabled]="this.listProperties.order == ''"
             [style.opacity]="this.listProperties.order == '' ? '0.2' : '1'" mat-fab
-            [title]="this.listProperties.orderDir == 'DESC' ? this.translate.instant('lang.descOrder') : this.translate.instant('lang.ascOrder')"
+            [title]="this.listProperties.orderDir == 'DESC' ? ('lang.descOrder' | translate) : ('lang.ascOrder' | translate)"
             style="color: rgba(0,0,0,0.38);" (click)="changeOrderDir();">
             <mat-icon *ngIf="this.listProperties.orderDir == 'DESC'" fontSet="fas" fontIcon="fa-sort-amount-down fa-2x">
             </mat-icon>

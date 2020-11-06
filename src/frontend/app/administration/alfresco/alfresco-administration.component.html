@@ -36,9 +36,9 @@
                                     <mat-form-field>
                                         <input matInput [(ngModel)]="alfresco.account.password"
                                             [required]="creationMode" name="password" id="password"
-                                            [title]="creationMode ? this.translate.instant('lang.password') : this.translate.instant('lang.changePassword')"
+                                            [title]="creationMode ? ('lang.password' | translate) : ('lang.changePassword' | translate)"
                                             [type]="hidePassword ? 'password' : 'text'"
-                                            [placeholder]="creationMode ? this.translate.instant('lang.password') : this.translate.instant('lang.changePassword')">
+                                            [placeholder]="creationMode ? ('lang.password' | translate) : ('lang.changePassword' | translate)">
                                         <mat-icon color="primary" style="cursor: pointer;" matSuffix
                                             (click)="hidePassword = !hidePassword" class="fa fa-2x"
                                             [ngClass]="[hidePassword ? 'fa-eye-slash' : 'fa-eye']"></mat-icon>
@@ -67,7 +67,7 @@
                                 <!--<div *ngIf="!functionsService.empty(alfresco.rootFolder)" style="width: 100%;"> -->
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="alfresco.rootFolder" required name="rootFolder"
-                                        id="rootFolder" [title]="this.translate.instant('lang.id')" type="text" placeholder="Dépôt racine">
+                                        id="rootFolder" [title]="'lang.id' | translate" type="text" placeholder="Dépôt racine">
                                     <!--<button mat-icon-button matSuffix color="warn"
                                             (click)="alfresco.rootFolder=null">
                                             <mat-icon class="fa fa-trash"></mat-icon>

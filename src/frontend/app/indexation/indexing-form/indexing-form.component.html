@@ -5,8 +5,8 @@
     <div *ngIf="!adminMode && mode == 'indexation'"
         style="display: flex;align-items: center;justify-content: flex-end;margin-top: 10px;margin-bottom: -20px;">
         <button mat-button class="categoryLabel" (click)="toggleMailTracking()"
-            [title]="arrFormControl['mail­tracking'].value ? this.translate.instant('lang.untrackThisMail') : this.translate.instant('lang.trackThisMail')">
-            {{arrFormControl['mail­tracking'].value ? this.translate.instant('lang.untrackThisMail') : this.translate.instant('lang.trackThisMail')}}
+            [title]="arrFormControl['mail­tracking'].value ? ('lang.untrackThisMail' | translate) : ('lang.trackThisMail' | translate)">
+            {{arrFormControl['mail­tracking'].value ? ('lang.untrackThisMail' | translate) : ('lang.trackThisMail' | translate)}}
             <mat-icon color="primary" class="{{this.arrFormControl['mail­tracking'].value ? 'fas':'far'}} fa-star"
                 style="font-size: 20px;"></mat-icon>
         </button>
@@ -16,7 +16,7 @@
             [style.borderColor]="currentPriorityColor">
             <div class="title" [style.color]="currentPriorityColor">
                 {{'lang.' + category| translate | uppercase }} <small *ngIf="category === 'mail'"
-                    [title]="this.translate.instant('lang.category_id')">{{'lang.indexing_' + currentCategory | translate | titlecase}}</small>
+                    [title]="'lang.category_id' | translate">{{'lang.indexing_' + currentCategory | translate | titlecase}}</small>
                 <div class="title-divider"></div>
             </div>
             <div class="content">
@@ -29,7 +29,7 @@
                         <div class="fieldRow" *ngIf="field.unit === category" cdkDrag cdkDragLockAxis="y"
                             [cdkDragData]="field">
                             <div class="fieldLabel" *ngIf="(!adminMode && !appService.getViewMode()) || adminMode">
-                                <i *ngIf="adminMode" [title]="this.translate.instant('lang.move')"
+                                <i *ngIf="adminMode" [title]="'lang.move' | translate"
                                     class="fas fa-bars fa-2x" color="primary" style="cursor: move"
                                     cdkDragHandle></i>&nbsp;
                                 {{field.label}}
@@ -63,7 +63,7 @@
                                 <ng-container *ngIf="field.type === 'string'">
                                     <button mat-button color="primary" *ngIf="field.SQLMode && adminMode" matPrefix
                                         mat-icon-button disabled style="position: absolute;left: -40px;"
-                                        [title]="this.translate.instant('lang.bddModeCustomFieldMsg')">
+                                        [title]="'lang.bddModeCustomFieldMsg' | translate">
                                         <mat-icon color="primary" class="fas fa-database">
                                         </mat-icon>
                                     </button>
@@ -72,14 +72,14 @@
                                         <mat-label *ngIf="appService.getViewMode()">{{field.label}}</mat-label>
                                         <textarea [id]="field.identifier" matInput matTextareaAutosize
                                             [formControl]="arrFormControl[field.identifier]"
-                                            [placeholder]="!adminMode ? this.translate.instant('lang.typeValue') : this.translate.instant('lang.defaultValue')"
+                                            [placeholder]="!adminMode ? ('lang.typeValue' | translate) : ('lang.defaultValue' | translate)"
                                             class="subject"></textarea>
                                     </mat-form-field>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'integer'">
                                     <button mat-button color="primary" *ngIf="field.SQLMode && adminMode" matPrefix
                                         mat-icon-button disabled style="position: absolute;left: -40px;"
-                                        [title]="this.translate.instant('lang.bddModeCustomFieldMsg')">
+                                        [title]="'lang.bddModeCustomFieldMsg' | translate">
                                         <mat-icon color="primary" class="fas fa-database">
                                         </mat-icon>
                                     </button>
@@ -88,20 +88,20 @@
                                         <mat-label *ngIf="appService.getViewMode()">{{field.label}}</mat-label>
                                         <input [id]="field.identifier" type="number" matInput
                                             [formControl]="arrFormControl[field.identifier]"
-                                            [placeholder]="!adminMode ? this.translate.instant('lang.typeValue') : this.translate.instant('lang.defaultValue')"
+                                            [placeholder]="!adminMode ? ('lang.typeValue' | translate) : ('lang.defaultValue' | translate)"
                                             min="0" step="0.1">
                                     </mat-form-field>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'select'">
                                     <button mat-button color="primary" *ngIf="field.SQLMode && adminMode" matPrefix
                                         mat-icon-button disabled style="position: absolute;left: -40px;"
-                                        [title]="this.translate.instant('lang.bddModeCustomFieldMsg')">
+                                        [title]="'lang.bddModeCustomFieldMsg' | translate">
                                         <mat-icon color="primary" class="fas fa-database">
                                         </mat-icon>
                                     </button>
                                     <plugin-select-search [id]="field.identifier"
                                         [showResetOption]="adminMode || !field.mandatory" [label]="field.label"
-                                        [placeholderLabel]="!adminMode ? this.translate.instant('lang.chooseValue') : this.translate.instant('lang.defaultValue')"
+                                        [placeholderLabel]="!adminMode ? ('lang.chooseValue' | translate) : ('lang.defaultValue' | translate)"
                                         [formControlSelect]="arrFormControl[field.identifier]" [datas]="field.values"
                                         (afterSelected)="launchEvent($event, field)" style="width:100%;">
                                     </plugin-select-search>
@@ -109,13 +109,13 @@
                                 <ng-container *ngIf="field.type === 'date'">
                                     <button mat-button color="primary" *ngIf="field.SQLMode && adminMode" matPrefix
                                         mat-icon-button disabled style="position: absolute;left: -40px;"
-                                        [title]="this.translate.instant('lang.bddModeCustomFieldMsg')">
+                                        [title]="'lang.bddModeCustomFieldMsg' | translate">
                                         <mat-icon color="primary" class="fas fa-database">
                                         </mat-icon>
                                     </button>
                                     <button mat-button color="primary" *ngIf="adminMode && !field.SQLMode" matPrefix
                                         mat-icon-button (click)="$event.stopPropagation();toggleTodayDate(field);"
-                                        [matTooltip]="this.translate.instant('lang.todayDate')"
+                                        [matTooltip]="'lang.todayDate' | translate"
                                         style="position: absolute;left: -40px;">
                                         <mat-icon color="primary"
                                             class="{{field.today ? 'far fa-bell-slash' : 'far fa-bell'}}">
@@ -127,7 +127,7 @@
                                         <mat-label *ngIf="appService.getViewMode()">{{field.label}}</mat-label>
                                         <input [id]="field.identifier" [formControl]="arrFormControl[field.identifier]"
                                             matInput [matDatepicker]="picker"
-                                            [placeholder]="!adminMode ? this.translate.instant('lang.chooseDate') : this.translate.instant('lang.defaultValue')"
+                                            [placeholder]="!adminMode ? ('lang.chooseDate' | translate) : ('lang.defaultValue' | translate)"
                                             [min]="getMinDate(field.startDate)" [max]="getMaxDate(field.endDate)"
                                             readonly style="cursor:pointer;" (dateChange)="launchEvent($event, field)">
                                         <mat-datepicker-toggle matSuffix [for]="picker"
@@ -137,7 +137,7 @@
                                         <button mat-button color="warn" matSuffix mat-icon-button
                                             *ngIf="arrFormControl[field.identifier].value && !arrFormControl[field.identifier].disabled"
                                             (click)="$event.stopPropagation();arrFormControl[field.identifier].reset();"
-                                            [title]="this.translate.instant('lang.eraseValue')">
+                                            [title]="'lang.eraseValue' | translate">
                                             <mat-icon color="warn" class="fa fa-calendar-times">
                                             </mat-icon>
                                         </button>
@@ -146,7 +146,7 @@
                                 <ng-container *ngIf="field.type === 'radio'">
                                     <button mat-button color="primary" *ngIf="field.SQLMode && adminMode" matPrefix
                                         mat-icon-button disabled style="position: absolute;left: -40px;"
-                                        [title]="this.translate.instant('lang.bddModeCustomFieldMsg')">
+                                        [title]="'lang.bddModeCustomFieldMsg' | translate">
                                         <mat-icon color="primary" class="fas fa-database">
                                         </mat-icon>
                                     </button>
@@ -166,7 +166,7 @@
                                 <ng-container *ngIf="field.type === 'checkbox'">
                                     <button mat-button color="primary" *ngIf="field.SQLMode && adminMode" matPrefix
                                         mat-icon-button disabled style="position: absolute;left: -40px;"
-                                        [title]="this.translate.instant('lang.bddModeCustomFieldMsg')">
+                                        [title]="'lang.bddModeCustomFieldMsg' | translate">
                                         <mat-icon color="primary" class="fas fa-database">
                                         </mat-icon>
                                     </button>
@@ -187,7 +187,7 @@
                                     </mat-chip-list>
                                 </ng-container>
                                 <!--<ng-container *ngIf="field.type === 'autocomplete'">
-                                    <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.searchValue')"
+                                    <plugin-autocomplete [labelPlaceholder]="'lang.searchValue' | translate"
                                         [routeDatas]="[field.values[0]]" [targetSearchKey]="'idToDisplay'"
                                         [size]="'small'" [control]="arrFormControl[field.identifier]"
                                         [manageDatas]="!adminMode ? field.values[1] : undefined" style="width:100%;">
@@ -260,7 +260,7 @@
                                     {{'lang.diffusionList' | translate}} <button mat-icon-button
                                         *ngIf="appDiffusionsList.canUpdateRoles() && canEdit && mode !== 'process' && field.enabled"
                                         color="primary" (click)="appDiffusionsList.switchMode()"
-                                        [title]="this.translate.instant('lang.modifyDiffusionList')">
+                                        [title]="'lang.modifyDiffusionList' | translate">
                                         <mat-icon class="fa fa-edit"></mat-icon>
                                     </button>
                                 </div>

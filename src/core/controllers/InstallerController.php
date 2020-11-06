@@ -308,13 +308,14 @@ class InstallerController
 
         $config = file_get_contents('apps/maarch_entreprise/xml/config.json.default');
         $config = json_decode($config, true);
-        $config['config']['lang']            = $body['lang'] ?? 'fr';
-        $config['config']['applicationName'] = $body['applicationName'] ?? $body['customId'];
-        $config['config']['cookieTime']      = 10080;
-        $config['config']['timezone']        = 'Europe/Paris';
-        $config['config']['maarchDirectory'] = realpath('.') . '/';
-        $config['config']['customID']        = $body['customId'];
-        $config['config']['maarchUrl']       = '';
+        $config['config']['lang']                   = $body['lang'] ?? 'fr';
+        $config['config']['applicationName']        = $body['applicationName'] ?? $body['customId'];
+        $config['config']['cookieTime']             = 10080;
+        $config['config']['timezone']               = 'Europe/Paris';
+        $config['config']['maarchDirectory']        = realpath('.') . '/';
+        $config['config']['customID']               = $body['customId'];
+        $config['config']['maarchUrl']              = '';
+        $config['config']['lockAdvancedPrivileges'] = true;
 
         $fp = fopen("custom/{$body['customId']}/apps/maarch_entreprise/xml/config.json", 'w');
         fwrite($fp, json_encode($config, JSON_PRETTY_PRINT));

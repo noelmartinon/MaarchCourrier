@@ -78,7 +78,7 @@
                                 </div>
                                 <div class="col-md-6 col-xs-6">
                                     <div class="alert alert-danger" *ngIf="dataSource && dataSource.data.length == 1000"
-                                        [innerHTML]="this.translate.instant('lang.limitDataReached_1000')"></div>
+                                        [innerHTML]="'lang.limitDataReached_1000' | translate"></div>
                                 </div>
                                 <div class="col-md-6 col-xs-6">
                                     <mat-paginator #paginatorContactList [length]="0" [hidePageSize]="true"

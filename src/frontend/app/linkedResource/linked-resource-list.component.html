@@ -56,10 +56,10 @@
                         {{row.chrono}}
                     </span>
                     <span class="main-info-data" style="font-weight:bold;flex:1;"
-                        [class.undefined]="row.subject == this.translate.instant('lang.undefined')"
+                        [class.undefined]="row.subject == ('lang.undefined' | translate)"
                         title="{{row.subject}}">{{row.subject | shorten: 150: '...'}}</span>
                     <span class="main-info-data">
-                        <button *ngIf="privilegeService.hasCurrentUserPrivilege('add_links')" mat-icon-button color="warn" [title]="this.translate.instant('lang.unlink')"
+                        <button *ngIf="privilegeService.hasCurrentUserPrivilege('add_links')" mat-icon-button color="warn" [title]="'lang.unlink' | translate"
                             (click)="$event.stopPropagation();unlinkResource(row)">
                             <mat-icon class="fa fa-unlink fa-2x" aria-hidden="true"></mat-icon>
                         </button>
@@ -70,7 +70,7 @@
         <mat-row *matRowDef="let row; columns: displayedColumns;" routerLink="/resources/{{row.resId}}" (mouseenter)="viewThumbnail(row);"
             (mouseleave)="closeThumbnail();" style="cursor: pointer;"></mat-row>
     </mat-table>
-    <button *ngIf="privilegeService.hasCurrentUserPrivilege('add_links')" mat-fab class="linkRes" color="primary" [title]="this.translate.instant('lang.linkResource')" (click)="openSearchResourceModal()">
+    <button *ngIf="privilegeService.hasCurrentUserPrivilege('add_links')" mat-fab class="linkRes" color="primary" [title]="'lang.linkResource' | translate" (click)="openSearchResourceModal()">
         <mat-icon class="fa fa-link" style="height:auto;"></mat-icon>
     </button>
 </ng-template>

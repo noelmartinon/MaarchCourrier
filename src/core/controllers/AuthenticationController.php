@@ -73,7 +73,8 @@ class AuthenticationController
             'loginMessage'      => $parameter['param_value_string'] ?? null,
             'changeKey'         => $encryptKey == 'Security Key Maarch Courrier #2008',
             'authMode'          => $loggingMethod['id'],
-            'authUri'           => $authUri
+            'authUri'           => $authUri,
+            'lang'              => CoreConfigModel::getLanguage()
         ];
 
         if (!empty($keycloakState)) {

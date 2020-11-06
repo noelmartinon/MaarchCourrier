@@ -257,7 +257,9 @@ export class SentNumericPackagePageComponent implements OnInit {
     setDefaultInfo() {
         if (!this.functions.empty(this.resourceData.senders)) {
             this.resourceData.senders.forEach((sender: any) => {
-                this.setSender(sender.id);
+                if (sender.type === 'contact') {
+                    this.setSender(sender.id);
+                }
             });
         }
     }

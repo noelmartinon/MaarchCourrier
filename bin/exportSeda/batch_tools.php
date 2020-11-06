@@ -212,12 +212,13 @@ function Bt_purgeAll($args = [])
         }
     
         $resources = \SrcCore\models\DatabaseModel::select([
-            'select'    => ['d.path_template', 'r.path', 'r.filename'],
+            'select'    => ['d.path_template', 'r.path', 'r.filename', 'r.res_id'],
             'table'     => ['res_attachments r', 'docservers d'],
             'left_join' => ['r.docserver_id = d.docserver_id'],
-            'where'     => ['res_id in (?)', 'filename is not null'],
+            'where'     => ['res_id_master in (?)', 'filename is not null'],
             'data'      => [$args['resources']]
         ]);
+        $attachmentIds = array_column($resources, 'res_id');
         foreach ($resources as $resource) {
             $pathToDocument = $resource['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $resource['path']) . $resource['filename'];
             if (is_file($pathToDocument)) {
@@ -239,17 +240,19 @@ function Bt_purgeAll($args = [])
             }
         }
     
-        $resources = \SrcCore\models\DatabaseModel::select([
-            'select'    => ['d.path_template', 'adr.path', 'adr.filename'],
-            'table'     => ['adr_attachments adr', 'docservers d'],
-            'left_join' => ['adr.docserver_id = d.docserver_id'],
-            'where'     => ['res_id in (?)'],
-            'data'      => [$args['resources']]
-        ]);
-        foreach ($resources as $resource) {
-            $pathToDocument = $resource['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $resource['path']) . $resource['filename'];
-            if (is_file($pathToDocument)) {
-                unlink($pathToDocument);
+        if (!empty($attachmentIds)) {
+            $resources = \SrcCore\models\DatabaseModel::select([
+                'select'    => ['d.path_template', 'adr.path', 'adr.filename'],
+                'table'     => ['adr_attachments adr', 'docservers d'],
+                'left_join' => ['adr.docserver_id = d.docserver_id'],
+                'where'     => ['res_id in (?)'],
+                'data'      => [$attachmentIds]
+            ]);
+            foreach ($resources as $resource) {
+                $pathToDocument = $resource['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $resource['path']) . $resource['filename'];
+                if (is_file($pathToDocument)) {
+                    unlink($pathToDocument);
+                }
             }
         }
     
@@ -348,6 +351,15 @@ function Bt_purgeAll($args = [])
             'where' => ['note_id in (select id from notes where identifier in (?))'],
             'data'  => [$args['resources']]
         ]);
+
+        $linkedResources = implode("' - '", $args['resources']);
+        \SrcCore\models\DatabaseModel::update([
+            'table'     => 'res_letterbox',
+            'postSet'   => ['linked_resources' => "linked_resources - '{$linkedResources}'"],
+            'where'     => ['linked_resources != ?'],
+            'data'      => ['[]']
+        ]);
+
         \SrcCore\models\DatabaseModel::delete([
             'table' => 'adr_attachments',
             'where' => ['res_id in (select res_id from res_attachments where res_id_master in (?))'],

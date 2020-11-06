@@ -52,7 +52,7 @@
                 <div class="table-head">
                     <div class="table-head-result">
                         <mat-form-field floatLabel="never" style="font-size: 13px;">
-                            <input type="text" #autoCompleteInput [placeholder]="this.translate.instant('lang.filterBy')" matInput
+                            <input type="text" #autoCompleteInput [placeholder]="'lang.filterBy' | translate" matInput
                                 [formControl]="searchContact" (click)="$event.stopPropagation()" maxlength="128">
                         </mat-form-field>
                     </div>
@@ -70,7 +70,7 @@
                             <mat-cell mat-cell *matCellDef="let element" style="flex: initial;width: 60px;"
                                 [class.hide-for-mobile]="appService.getViewMode()">
                                 <i class="fas fa-circle threshold_{{element.filling.thresholdLevel}}"
-                                    [title]="this.translate.instant('lang.contactFilledTo') + ' ' + element.filling.rate + '%'"></i>
+                                    [title]="('lang.contactFilledTo' | translate) + ' ' + element.filling.rate + '%'"></i>
                             </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="firstname">
@@ -101,15 +101,15 @@
                             <mat-header-cell *matHeaderCellDef>
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" style="justify-content: flex-end;">
-                                <button mat-icon-button color="primary" *ngIf="element.enabled" [title]="this.translate.instant('lang.suspend')"
+                                <button mat-icon-button color="primary" *ngIf="element.enabled" [title]="'lang.suspend' | translate"
                                     (click)="$event.stopPropagation();toggleContact(element)">
                                     <mat-icon class="fa fa-pause fa-2x" aria-hidden="true"></mat-icon>
                                 </button>
-                                <button mat-icon-button color="accent" *ngIf="!element.enabled" [title]="this.translate.instant('lang.authorize')"
+                                <button mat-icon-button color="accent" *ngIf="!element.enabled" [title]="'lang.authorize' | translate"
                                     (click)="$event.stopPropagation();toggleContact(element)">
                                     <mat-icon class="fa fa-check fa-2x" aria-hidden="true"></mat-icon>
                                 </button>
-                                <button mat-icon-button color="warn" [title]="this.translate.instant('lang.delete')" data-toggle="modal"
+                                <button mat-icon-button color="warn" [title]="'lang.delete' | translate" data-toggle="modal"
                                     data-target="#changeDiffListDest"
                                     (click)="$event.stopPropagation();deleteContact(element)">
                                     <mat-icon class="fa fa-trash-alt fa-2x"></mat-icon>

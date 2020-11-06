@@ -17,7 +17,7 @@
                     </li>
                 </ul>
             </div>
-            <span [innerHTML]="this.translate.instant('lang.doShippingParameter')"></span>
+            <span [innerHTML]="'lang.doShippingParameter' | translate"></span>
         </div>
         <mat-sidenav-container *ngIf="shippings.length > 0" autosize style="height:100%;">
             <mat-sidenav-content style="background: white;">

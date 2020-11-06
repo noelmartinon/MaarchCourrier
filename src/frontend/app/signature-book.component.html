@@ -126,7 +126,7 @@
                     [adminMode]="privilegeService.hasCurrentUserPrivilege('config_visa_workflow')"
                     [target]="'signatureBook'"></app-visa-workflow>
                 <div style="position: sticky;bottom: 0px;text-align:right;">
-                    <button mat-fab [title]="this.translate.instant('lang.saveModifications')"
+                    <button mat-fab [title]="'lang.saveModifications' | translate"
                         *ngIf="appVisaWorkflow !== undefined && appVisaWorkflow.isModified()"
                         (click)="saveVisaWorkflow()" color="accent">
                         <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
@@ -243,7 +243,7 @@
                     </div>
                     <div *ngIf="signatureBook.attachments[rightSelectedThumbnail].status == 'TMP' && !signatureBook.attachments[rightSelectedThumbnail].isConverted"
                         [ngStyle]="{'height': showTopRightPanel ? '79%' : '96%'}" class="visaNoPdfWarning">
-                        <div style="padding-top: 25%;" [innerHTML]="this.translate.instant('lang.editingAttachmentInterrupted')"></div>
+                        <div style="padding-top: 25%;" [innerHTML]="'lang.editingAttachmentInterrupted' | translate"></div>
                         <div>
                             <a title="{{'lang.editAttachment' | translate}}"
                                 (click)="showAttachment(signatureBook.attachments[rightSelectedThumbnail])">
@@ -281,10 +281,10 @@
                 </app-attachments-list>
             </div>
             <div class="visaNoWorkflowWarning">
-                <div style="margin-top:200px;" [innerHTML]="this.translate.instant('lang.noVisaWorkflowNoSignature')"></div>
+                <div style="margin-top:200px;" [innerHTML]="'lang.noVisaWorkflowNoSignature' | translate"></div>
             </div>
             <div *ngIf="!signatureBook.attachments[rightSelectedThumbnail]" class="visaNoPjWarning">
-                <div style="margin-top:200px;" [innerHTML]="this.translate.instant('lang.noAttachmentClickToAddOne')"></div>
+                <div style="margin-top:200px;" [innerHTML]="'lang.noAttachmentClickToAddOne' | translate"></div>
             </div>
         </div>
         <div class="panelRight">

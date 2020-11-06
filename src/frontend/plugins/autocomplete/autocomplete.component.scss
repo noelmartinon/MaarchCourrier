@@ -12,6 +12,13 @@
     top: 0px !important;
 }
 
+.no-margin {
+    ::ng-deep.mat-form-field-wrapper {
+        margin: 0px;
+        padding: 0px;
+    }
+}
+
 .mat-option {
     ::ng-deep.mat-option-text {
         align-items: center;
@@ -22,6 +29,10 @@
         font-size: 110%;
         font-weight: bold;
     }
+}
+
+.mat-option-disabled {
+    opacity: 0.3 !important;
 }
 
 .autcompleteIcon {

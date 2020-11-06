@@ -1,6 +1,0 @@
-<requestDefinitions>
-    <requestDefinition method="POST" path="/apps/maarch_entreprise/index.php" validationRule="cm_applet_controller" >
-        <parameter name="page" value="applet_controller"/>
-        <parameter name="module" value="content_management"/>
-    </requestDefinition>
-</requestDefinitions>

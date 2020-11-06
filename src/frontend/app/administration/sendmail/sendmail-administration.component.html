@@ -96,7 +96,7 @@
                                                 [(ngModel)]="sendmail.password"
                                                 [disabled]="!sendmail.auth || ['smtp', 'mail'].indexOf(sendmail.type) == -1"
                                                 matInput
-                                                [placeholder]="sendmail.passwordAlreadyExists === true ? this.translate.instant('lang.passwordModification') : this.translate.instant('lang.password')"
+                                                [placeholder]="sendmail.passwordAlreadyExists === true ? ('lang.passwordModification' | translate) : ('lang.password' | translate)"
                                                 [required]="!sendmail.passwordAlreadyExists">
                                             <mat-icon color="primary" style="cursor: pointer;" matSuffix
                                                 (click)="hidePassword = !hidePassword" class="fa fa-2x"
@@ -150,7 +150,7 @@
                 <p mat-line> {{emailSendResult.msg}} </p>
             </mat-list-item>
         </mat-nav-list>
-        <div class="bash" *ngIf="this.emailSendResult.msg === this.translate.instant('lang.emailSendFailed')">
+        <div class="bash" *ngIf="this.emailSendResult.msg === ('lang.emailSendFailed' | translate)">
             {{this.emailSendResult.debug}}
         </div>
     </mat-sidenav>

@@ -29,7 +29,7 @@
                 </mat-list-item>
             </mat-list>
         </div>
-        <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.chooseEntity')" [labelList]="this.translate.instant('lang.availableEntities')"
+        <plugin-autocomplete [labelPlaceholder]="'lang.chooseEntity' | translate" [labelList]="'lang.availableEntities' | translate"
             [routeDatas]="['/rest/autocomplete/entities']" [targetSearchKey]="'idToDisplay'"
             [subInfoKey]="'descriptionToDisplay'" (triggerEvent)="setRedirectEntity($event)" singleMode required>
         </plugin-autocomplete>

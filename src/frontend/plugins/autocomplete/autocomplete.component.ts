@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { Input, EventEmitter, Output, ViewChild, ElementRef } from '@angular/core';
 import { Observable, of, forkJoin } from 'rxjs';
-import { map, startWith, debounceTime, filter, distinctUntilChanged, switchMap, tap, exhaustMap, catchError } from 'rxjs/operators';
+import { map, startWith, debounceTime, filter, switchMap, tap, exhaustMap, catchError } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
@@ -58,7 +58,7 @@ export class PluginAutocomplete implements OnInit {
     /**
      * Route datas used in async autocomplete. Incompatible with @datas
      */
-    @Input('routeDatas') routeDatas: string[];
+    @Input() routeDatas: string[];
 
     /**
      * Placeholder used in input
@@ -89,6 +89,16 @@ export class PluginAutocomplete implements OnInit {
      * Route used for set values / adding / deleting item in BDD (DataModel must return id and label)
      */
     @Input() manageDatas: string;
+
+    /**
+     * Identifier of disabled items
+     */
+    @Input() disableItems: any = [];
+
+    /**
+     * List of classes uses
+     */
+    @Input() styles: any = [];
 
     /**
      * Catch external event after select an element in autocomplete
@@ -187,7 +197,7 @@ export class PluginAutocomplete implements OnInit {
 
     selectOpt(ev: any) {
         if (this.singleMode) {
-            this.myControl.setValue(ev.option.value[this.key]);
+           // this.myControl.setValue(ev.option.value[this.key]);
         } else if (this.controlAutocomplete !== undefined) {
             this.setFormValue(ev.option.value);
         }
@@ -288,4 +298,13 @@ export class PluginAutocomplete implements OnInit {
     resetValue() {
         return this.myControl.setValue('');
     }
+
+    displayFn(option: any): string {
+        return option ? option[this.key] : option;
+    }
+
+    // workaround to use var in scope componenent
+    displayFnWrapper() {
+        return (offer: any) => this.displayFn(offer);
+     }
 }

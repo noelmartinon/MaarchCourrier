@@ -1,21 +1,8 @@
 <?php
 /*
-*    Copyright 2008-2015 Maarch
-*
-*  This file is part of Maarch Framework.
-*
-*   Maarch Framework is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   Maarch Framework is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*    along with Maarch Framework.  If not, see <http://www.gnu.org/licenses/>.
+* Copyright Maarch since 2008 under licence GPLv3.
+* See LICENCE.txt file at the root folder for more details.
+* This file is part of Maarch software.
 */
 
 /**
@@ -88,36 +75,6 @@ class SecurityControler
     }
 
     /**
-    * Returns all security object for a given usergroup
-    *
-    * @param  $groupId string  Usergroup identifier
-    * @return Array of security objects or null
-    */
-    public function getAccessForGroup($groupId)
-    {
-        if (empty($groupId)) {
-            return null;
-        }
-        $db = new Database();
-        
-        $query = "select * from " . SECURITY_TABLE . " where group_id = ?";
-
-        $stmt = $db->query($query, array($groupId));
-
-        $security = array();
-        if ($stmt->rowCount() > 0) {
-            while ($queryResult = $stmt->fetchObject()) {
-                $access = new SecurityObj();
-                foreach ($queryResult as $key => $value) {
-                    $access->{$key} = $value;
-                }
-                array_push($security, $access);
-            }
-        }
-        return $security;
-    }
-
-    /**
     * Saves in the database a security object
     *
     * @param  $security Security object to be saved
@@ -132,7 +89,7 @@ class SecurityControler
 
         if ($mode == "up") {
             return $this->_update($security);
-        } else if ($mode == "add") {
+        } elseif ($mode == "add") {
             return $this->_insert($security);
         }
 
@@ -252,7 +209,7 @@ class SecurityControler
             }
         }
         return array(
-            'QUERY' => implode(",",$result), 
+            'QUERY' => implode(",", $result),
             'VALUES' => $arrayValues,
         );
     }
@@ -286,9 +243,12 @@ class SecurityControler
         );
     }
 
-    public function check_where_clause($collId, $whereClause,
-       $view, $userId)
-    {
+    public function check_where_clause(
+        $collId,
+        $whereClause,
+        $view,
+        $userId
+    ) {
         $res = array(
             'RESULT' => false,
             'TXT' => '',
@@ -365,11 +325,13 @@ class SecurityControler
                     if (class_exists($key)) {
                         $object = new $key;
                         if (method_exists(
-                            $object, 'process_where_clause'
+                            $object,
+                            'process_where_clause'
                         ) == true
                         ) {
                             $where = $object->process_where_clause(
-                                $where, $userId
+                                $where,
+                                $userId
                             );
                         }
                     }
@@ -409,98 +371,20 @@ class SecurityControler
         }
         if (preg_match('/@user/', $whereClause)) {
             $whereClause = str_replace(
-                "@user", "'" . trim($userId) . "'", $whereClause
+                "@user",
+                "'" . trim($userId) . "'",
+                $whereClause
             );
         }
         if (preg_match('/@email/', $whereClause)) {
             $user = \User\models\UserModel::getByLogin(['login' => $userId, 'select' => ['mail']]);
             $whereClause = str_replace(
-                "@email", "'" . trim($user['mail']) . "'", $whereClause
+                "@email",
+                "'" . trim($user['mail']) . "'",
+                $whereClause
             );
         }
         return $whereClause;
-    }
-
-    /**
-    * Loads into session, the security parameters corresponding to the user
-    * groups.
-    *
-    * @param  $userId string User Identifier
-    */
-    public function load_security($userId)
-    {
-        $tab['collections'] = array();
-        $tab['security'] = array();
-        $func = new functions();
-
-        if ($userId == "superadmin") {
-            for ($i = 0; $i < count($_SESSION['collections']); $i ++) {
-                $tab['security'][$_SESSION['collections'][$i]['id']] = array();
-                $tab['security'][$_SESSION['collections'][$i]['id']]['DOC'] = array(
-                    'table'  => $_SESSION['collections'][$i]['table'],
-                    'label_coll' => $_SESSION['collections'][$i]['label'],
-                    'view'  => $_SESSION['collections'][$i]['view'],
-                    'where' => " (1=1) ",
-                );
-                array_push(
-                    $tab['collections'], $_SESSION['collections'][$i]['id']
-                );
-            }
-        } else {
-            $uc = new users_controler();
-            $groups = $uc->getGroups($userId);
-
-            $access = array();
-            for ($i = 0; $i < count($groups); $i ++) {
-                $tmp = $this->getAccessForGroup($groups[$i]['GROUP_ID']);
-                for ($j = 0; $j < count($tmp);$j ++) {
-                    array_push($access, $tmp[$j]);
-                }
-            }
-            for ($i = 0; $i < count($access); $i ++) {
-                // TO DO : vérifier les dates
-                $collId = $access[$i]->__get('coll_id');
-                $whereClause = $access[$i]->__get('where_clause');
-                $whereClause = $this->process_security_where_clause(
-                    $whereClause, $userId
-                );
-                $whereClause = str_replace('where', '', $whereClause);
-
-                $ind = $this->get_ind_collection($collId);
-
-                if (trim($whereClause) == "") {
-                    $where = "-1";
-                } else {
-                    $where = "( " . $func->show_string($whereClause) . " )";
-                }
-                if (! in_array($collId, $tab['collections'])) {
-                    $tab['security'][$collId] = array();
-
-                    $tab['security'][$collId]['DOC'] = array(
-                        'table'  => $_SESSION['collections'][$ind]['table'],
-                        'label_coll'  => $_SESSION['collections'][$ind]['label'],
-                        'view'  => $_SESSION['collections'][$ind]['view'],
-                        'where'  => $where,
-                    );
-                    array_push($tab['collections'], $collId);
-                } else {
-                    if (isset($tab['security'][$collId]['DOC'])
-                        && count($tab['security'][$collId]['DOC']) > 0
-                    ) {
-                        $tab['security'][ $collId]['DOC']['where'] .= " or "
-                            . $where;
-                    } else {
-                        $tab['security'][$collId]['DOC'] = array(
-                            'table'  => $_SESSION['collections'][$ind]['table'],
-                            'label_coll'  => $_SESSION['collections'][$ind]['label'],
-                            'view'  => $_SESSION['collections'][$ind]['view'],
-                            'where'  => $where,
-                        );
-                    }
-                }
-            }
-        }
-        return $tab;
     }
 
     /**
@@ -519,7 +403,6 @@ class SecurityControler
         }
         return -1;
     }
-
 
     /**
     * Check the where clause syntax

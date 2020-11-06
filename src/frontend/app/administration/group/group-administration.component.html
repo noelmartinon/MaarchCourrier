@@ -87,7 +87,7 @@
                                         <button mat-icon-button [class.active]="panelMode === administration.id"
                                             *ngIf="administration.hasParams"
                                             (click)="$event.stopPropagation();openUserParams(administration.id)"
-                                            color="primary" [title]="this.translate.instant('lang.goToAdminParams')"
+                                            color="primary" [title]="'lang.goToAdminParams' | translate"
                                             [disabled]="group.privileges.indexOf(administration.id) === -1">
                                             <mat-icon class="fa fa-cogs"></mat-icon>
                                         </button>
@@ -167,8 +167,8 @@
                         <mat-tab label="{{'lang.relatedUsers' | translate}}" *ngIf="!creationMode">
                             <div class="row" style="margin:0px;">
                                 <div class="col-md-12" *ngIf="group.canAdminUsers" style="padding:5px;">
-                                    <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.linkUser')"
-                                        [labelList]="this.translate.instant('lang.availableUsers')"
+                                    <plugin-autocomplete [labelPlaceholder]="'lang.linkUser' | translate"
+                                        [labelList]="'lang.availableUsers' | translate"
                                         [routeDatas]="['/rest/autocomplete/users/administration']"
                                         [targetSearchKey]="'idToDisplay'" (triggerEvent)="linkUser($event)">
                                     </plugin-autocomplete>

@@ -58,6 +58,22 @@ ALTER SEQUENCE acknowledgement_receipts_id_seq restart WITH 1;
 TRUNCATE TABLE emails;
 ALTER SEQUENCE emails_id_seq restart WITH 1;
 
+TRUNCATE TABLE registered_mail_resources;
+ALTER SEQUENCE registered_mail_resources_id_seq restart WITH 1;
+
+TRUNCATE TABLE resource_contacts;
+ALTER SEQUENCE resource_contacts_id_seq restart WITH 1;
+
+TRUNCATE TABLE resources_folders;
+ALTER SEQUENCE resources_folders_id_seq restart WITH 1;
+
+TRUNCATE TABLE unit_identifier;
+
+TRUNCATE TABLE users_followed_resources;
+ALTER SEQUENCE users_followed_resources_id_seq restart WITH 1;
+
+TRUNCATE TABLE message_exchange;
+
 TRUNCATE TABLE shippings;
 ALTER SEQUENCE shippings_id_seq restart WITH 1;
 

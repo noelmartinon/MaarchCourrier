@@ -11,7 +11,7 @@
                     <mat-icon mat-list-icon class="fa iconCheckPackage icon_{{package.state}}"></mat-icon>
                     <div mat-line class="packageName">
                         {{'lang.install_' + package.label | translate}} <i #packageItem="matTooltip" [id]="package.label" class="fa fa-info-circle" 
-                        [matTooltip]="this.translate.instant('lang.install_'+package.label+'_desc')"
+                        [matTooltip]="'lang.install_'+package.label+'_desc' | translate"
                         [matTooltipClass]="package.state !== 'ok' ? 'tooltip-red' : ''" matTooltipPosition="right"></i>
                     </div>
                 </mat-list-item>  

@@ -57,14 +57,14 @@
                             <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.perimeter' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element">
                             <span [ngClass]="{'dataLabelWarn': element.private, 'dataLabelPrimary': !element.private}"
-                                  class="label">{{element.private ? this.translate.instant('lang.private') : this.translate.instant('lang.public')}}</span>
+                                  class="label">{{element.private ? ('lang.private' | translate) : ('lang.public' | translate)}}</span>
                             </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="default">
                             <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.default' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element">
                             <span [ngClass]="{'dataLabelWarn': !element.default, 'dataLabelPrimary': element.default}"
-                                  class="label">{{element.default ? this.translate.instant('lang.yes') : this.translate.instant('lang.no')}}</span>
+                                  class="label">{{element.default ? ('lang.yes' | translate) : ('lang.no' | translate)}}</span>
                             </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="enabled">

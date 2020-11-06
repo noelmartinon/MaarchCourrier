@@ -17,12 +17,12 @@
                 <div class="alert-message alert-message-info"
                     *ngIf="data.resIds.length == 1 && appVisaWorkflow !== undefined && appVisaWorkflow.getNextVisaUser() !== ''"
                     role="alert" style="margin-top: 30px;"
-                    [innerHTML]="this.translate.instant('lang.sendToDocTo') + ' <b>' + appVisaWorkflow.getNextVisaUser().labelToDisplay + '</b>'">
+                    [innerHTML]="('lang.sendToDocTo' | translate) + ' <b>' + appVisaWorkflow.getNextVisaUser().labelToDisplay + '</b>'">
                 </div>
 
                 <div class="alert-message alert-message-info"
                     *ngIf="data.resIds.length == 1 && appVisaWorkflow !== undefined && appVisaWorkflow.getNextVisaUser() === '' && !noResourceToProcess"
-                    role="alert" style="margin-top: 30px;" [innerHTML]="this.translate.instant('lang.endWorkflow')"></div>
+                    role="alert" style="margin-top: 30px;" [innerHTML]="'lang.endWorkflow' | translate"></div>
 
                 <div *ngIf="resourcesErrors.length > 0" class="alert-message alert-message-danger mailList"
                     role="alert">

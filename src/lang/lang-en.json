@@ -2124,11 +2124,15 @@
     "freezeRetentionRule": "Freeze the current useful life of a document",
     "unfreezeRetentionRule": "Unfreeze the current useful life of a document",
     "retentionRuleFrozen": "The current useful life is frozen",
+    "retentionRuleFrozenAlt": "The current useful life is <b>frozen</b>",
     "retentionRuleUnfrozen": "The current useful life is unfrozen",
+    "retentionRuleUnfrozenAlt": "The current useful life is <b>unfrozen</b>",
     "freezeTheCurrentUsefulLife": "Freeze the current useful life",
     "unfreezeTheCurrentUsefulLife": "Unfreeze the current useful life",
     "bindingMail": "Binding document",
+    "bindingMailAlt": "<b>Binding</b> document",
     "noBindingMail": "Non-binding document",
+    "noBindingMailAlt": "<b>Non-binding</b> document",
     "bindingUndefined": "Undefined commitment",
     "warningConnectionMsg": "You can make the app <b> unavailable </b> if the information is wrong!",
     "mappingHeaders": "Header interfacing",
@@ -2158,5 +2162,8 @@
     "noTransferCopyBindingRecordManagement": "Binding documents should not be sent to EAS",
     "noTransferCopyNoBindingRecordManagement": "Non-binding documents should not be sent to EAS",
     "bindingMailDesc": "A binding document involves a specific final action defined in the settings administration and is no longer linked to the document type.",
-    "noBindingMailDesc": "A non-binding document involves a specific final action defined in the settings administration and is no longer linked to the document type."
+    "noBindingMailDesc": "A non-binding document involves a specific final action defined in the settings administration and is no longer linked to the document type.",
+    "registeredMailMsgActivate": "Activating this range will close the current range used for that type of recommended.",
+    "redirectUserVisaWorkflow": "Change of viewfinder / signatory for letters in the process of visa / signature",
+    "chooseNewVisaUser": "is in <b>visa / signature</b> of some mails, please choose a <b>user replacement</b>"
 }

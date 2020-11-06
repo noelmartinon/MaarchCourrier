@@ -102,7 +102,7 @@ trait PreProcessActionSEDATrait
             }
 
             $unitIdentifier = MessageExchangeModel::getUnitIdentifierByResId(['select' => ['message_id'], 'resId' => $resId]);
-            if ($unitIdentifier['message_id'] != $messageExchange['message_id']) {
+            if ($unitIdentifier[0]['message_id'] != $messageExchange['message_id']) {
                 $resourcesInformations['errors'][] = ['alt_identifier' => $altIdentifiers[$resId], 'res_id' => $resId, 'reason' => 'recordManagement_wrongAcknowledgement'];
                 continue;
             }
@@ -188,7 +188,7 @@ trait PreProcessActionSEDATrait
             }
 
             $unitIdentifier = MessageExchangeModel::getUnitIdentifierByResId(['select' => ['message_id'], 'resId' => $resId]);
-            if ($unitIdentifier['message_id'] != $messageExchange['message_id']) {
+            if ($unitIdentifier[0]['message_id'] != $messageExchange['message_id']) {
                 $resourcesInformations['errors'][] = ['alt_identifier' => $altIdentifiers[$resId], 'res_id' => $resId, 'reason' => 'recordManagement_wrongReply'];
                 continue;
             }

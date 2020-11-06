@@ -2169,5 +2169,12 @@
     "insteadOf": "À la place de__TO_TRANSLATE",
     "doNotDefine": "Ne pas définir__TO_TRANSLATE",
     "infoImportNoIdToCreate": "La colonne <b>id</b> doit être vide pour la création__TO_TRANSLATE",
-    "almostThere": "Vous y êtes presque !__TO_TRANSLATE"
+    "almostThere": "Vous y êtes presque !__TO_TRANSLATE",
+    "registeredMailMsgActivate": "En activant cette plage, cela clôturera la plage actuelle utilisée pour ce type de recommandé.__TO_TRANSLATE",
+    "retentionRuleFrozenAlt": "Durée d'utilité courante (DUC) <b>gelée</b>__TO_TRANSLATE",
+    "retentionRuleUnfrozenAlt": "Durée d'utilité courante (DUC) <b>dégelée</b>__TO_TRANSLATE",
+    "bindingMailAlt": "Document <b>engageant</b>__TO_TRANSLATE",
+    "noBindingMailAlt": "Document <b>non engageant</b>__TO_TRANSLATE",
+    "redirectUserVisaWorkflow": "Changement de viseur / signataire pour les courriers en cours de visa / signature__TO_TRANSLATE",
+    "chooseNewVisaUser": "est en <b>visa / signature</b> de certains courriers, veuillez choisir un utilisateur de <b>remplacement</b>__TO_TRANSLATE"
 }

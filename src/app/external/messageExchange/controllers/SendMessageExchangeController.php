@@ -294,7 +294,7 @@ class SendMessageExchangeController
         return $response->withStatus(200);
     }
 
-    protected static function control($aArgs = [])
+    protected static function control($aArgs)
     {
         $errors = [];
 
@@ -310,8 +310,14 @@ class SendMessageExchangeController
             array_push($errors, 'no attachment');
         }
 
-        if (empty($aArgs['contacts'])) {
-            array_push($errors, 'body contacts is empty');
+        if (empty($aArgs['contacts']) || !is_array($aArgs['contacts'])) {
+            $errors[] = 'Body contacts is empty or not an array';
+        }
+        foreach ($aArgs['contacts'] as $key => $contact) {
+            if (empty($contact)) {
+                $errors[] = "Body contacts[{$key}] is empty";
+                break;
+            }
         }
 
         if (empty($aArgs['senderEmail'])) {

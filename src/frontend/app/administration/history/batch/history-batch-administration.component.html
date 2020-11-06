@@ -25,7 +25,7 @@
                         <mat-label style="color:white;">{{'lang.since' | translate}}
                         </mat-label>
                         <input [(ngModel)]="startDateFilter" matInput [matDatepicker]="startPicker"
-                            [placeholder]="this.translate.instant('lang.since')" [max]="endDateFilter" readonly style="cursor:pointer;"
+                            [placeholder]="'lang.since' | translate" [max]="endDateFilter" readonly style="cursor:pointer;"
                             (dateChange)="filterStartDate()">
                         <mat-datepicker-toggle matSuffix [for]="startPicker" *ngIf="!startDateFilter">
                         </mat-datepicker-toggle>
@@ -33,7 +33,7 @@
                         </mat-datepicker>
                         <button mat-button color="warn" matSuffix mat-icon-button *ngIf="startDateFilter"
                             (click)="$event.stopPropagation();startDateFilter = '';filterStartDate()"
-                            [title]="this.translate.instant('lang.eraseValue')">
+                            [title]="'lang.eraseValue' | translate">
                             <mat-icon color="warn" class="fa fa-calendar-times">
                             </mat-icon>
                         </button>
@@ -42,7 +42,7 @@
                         <mat-label style="color:white;">{{'lang.until' | translate}}
                         </mat-label>
                         <input [(ngModel)]="endDateFilter" matInput [matDatepicker]="endPicker"
-                            [placeholder]="this.translate.instant('lang.until')" [min]="startDateFilter" readonly style="cursor:pointer;"
+                            [placeholder]="'lang.until' | translate" [min]="startDateFilter" readonly style="cursor:pointer;"
                             (dateChange)="filterEndDate()">
                         <mat-datepicker-toggle matSuffix [for]="endPicker" *ngIf="!endDateFilter">
                         </mat-datepicker-toggle>
@@ -50,7 +50,7 @@
                         </mat-datepicker>
                         <button mat-button color="warn" matSuffix mat-icon-button *ngIf="endDateFilter"
                             (click)="$event.stopPropagation();endDateFilter = '';filterEndDate()"
-                            [title]="this.translate.instant('lang.eraseValue')">
+                            [title]="'lang.eraseValue' | translate">
                             <mat-icon color="warn" class="fa fa-calendar-times">
                             </mat-icon>
                         </button>
@@ -66,7 +66,7 @@
                 <div class="table-head">
                     <div class="table-head-result">
                         <mat-form-field floatLabel="never" style="font-size: 13px;">
-                            <input type="text" #autoCompleteInput [matAutocomplete]="auto" [placeholder]="this.translate.instant('lang.filterBy')"
+                            <input type="text" #autoCompleteInput [matAutocomplete]="auto" [placeholder]="'lang.filterBy' | translate"
                                 matInput [formControl]="searchHistory" (click)="$event.stopPropagation()"
                                 maxlength="128">
                             <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addItemFilter($event.option)"
@@ -79,7 +79,7 @@
                                 <ng-container *ngIf="filterList!==null && !loadingFilters">
                                     <ng-container *ngFor="let keyVal of filterList | keyvalue">
                                         <mat-optgroup *ngIf="(filteredList[keyVal.key] | async)?.length > 0"
-                                            [label]="this.translate.instant('lang.' + keyVal.key)" class="filterList">
+                                            [label]="'lang.' + keyVal.key | translate" class="filterList">
                                             <mat-option [id]="keyVal.key"
                                                 [style.color]="!filter.used ? filterColor[keyVal.key] : ''"
                                                 *ngFor="let filter of filteredList[keyVal.key] | async | sortBy : 'label'"
@@ -103,7 +103,7 @@
                         <ng-container *ngFor="let keyVal of filterUsed | keyvalue">
                             <ng-container *ngIf="['startDate','endDate'].indexOf(keyVal.key) === -1">
                                 <span *ngFor="let filter of filterUsed[keyVal.key]; let i=index;" class="label"
-                                    [style.background]="filterColor[keyVal.key]" [title]="this.translate.instant('lang.' + keyVal.key)"
+                                    [style.background]="filterColor[keyVal.key]" [title]="'lang.' + keyVal.key | translate"
                                     (click)="removeItemFilter(filter,keyVal.key,i)">{{filter.label}}
                                     <i class="fa fa-times-circle"></i></span>
                             </ng-container>

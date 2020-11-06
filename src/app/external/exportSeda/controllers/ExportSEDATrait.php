@@ -615,7 +615,7 @@ trait ExportSEDATrait
         }
 
         $unitIdentifier = MessageExchangeModel::getUnitIdentifierByResId(['select' => ['message_id'], 'resId' => $args['resId']]);
-        if ($unitIdentifier['message_id'] != $messageExchange['message_id']) {
+        if ($unitIdentifier[0]['message_id'] != $messageExchange['message_id']) {
             return ['errors' => ['Wrong acknowledgement']];
         }
 
@@ -663,7 +663,7 @@ trait ExportSEDATrait
         }
 
         $unitIdentifier = MessageExchangeModel::getUnitIdentifierByResId(['select' => ['message_id'], 'resId' => $args['resId']]);
-        if ($unitIdentifier['message_id'] != $messageExchange['message_id']) {
+        if ($unitIdentifier[0]['message_id'] != $messageExchange['message_id']) {
             return ['errors' => ['Wrong reply']];
         }
 

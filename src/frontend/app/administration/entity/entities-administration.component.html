@@ -70,7 +70,7 @@
         fixedTopGap="56" position='end' [opened]="false" class="col-md-5 col-xs-11">
         <mat-nav-list>
             <mat-tab-group>
-                <mat-tab [label]="creationMode ? this.translate.instant('lang.createNewEntity') : this.translate.instant('lang.informations')">
+                <mat-tab [label]="creationMode ? ('lang.createNewEntity' | translate) : ('lang.informations' | translate)">
                     <form class="form-horizontal" #entityForm="ngForm" style="overflow:hidden;">
                         <div class="form-group">
                             <div class="col-sm-12">
@@ -310,7 +310,7 @@
                 <mat-tab label="{{'lang.users' | translate}}" *ngIf="!creationMode">
                     <div class="row" style="margin:0px;">
                         <div class="col-md-12" *ngIf="currentEntity.canAdminUsers" style="padding:5px;">
-                            <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.linkUser')" [labelList]="this.translate.instant('lang.availableUsers')"
+                            <plugin-autocomplete [labelPlaceholder]="'lang.linkUser' | translate" [labelList]="'lang.availableUsers' | translate"
                                 [routeDatas]="['/rest/autocomplete/users/administration']"
                                 [targetSearchKey]="'idToDisplay'" [subInfoKey]="'descriptionToDisplay'"
                                 (triggerEvent)="linkUser($event)"></plugin-autocomplete>

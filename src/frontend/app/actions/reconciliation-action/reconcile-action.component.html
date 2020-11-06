@@ -29,7 +29,7 @@
                 </div>
                 <div *ngIf="!noResourceToProcess" class="col-md-12">
                     <div class="alert-message alert-message-info" role="alert" style="max-width: 100%;"
-                        [innerHTML]="data.resIds.length === 1 ? this.translate.instant('lang.reconcileMsg') : this.translate.instant('lang.reconcileMsg') + '<br/>' + this.translate.instant('lang.reconcileMsg2')">
+                        [innerHTML]="data.resIds.length === 1 ? ('lang.reconcileMsg' | translate) : ('lang.reconcileMsg' | translate) + '<br/>' + ('lang.reconcileMsg2' | translate)">
                     </div>
                 </div>
                 <div *ngIf="!noResourceToProcess" class="col-md-12">

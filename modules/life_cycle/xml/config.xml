@@ -12,9 +12,4 @@
 		<lc_cycle_steps>lc_cycle_steps</lc_cycle_steps>
 		<lc_stack>lc_stack</lc_stack>
 	</TABLENAME>
-	<HISTORY>
-		<lcadd>true</lcadd>
-		<lcup>true</lcup>
-		<lcdel>true</lcdel>
-	</HISTORY>
 </root>

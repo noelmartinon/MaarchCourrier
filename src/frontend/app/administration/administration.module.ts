@@ -65,7 +65,8 @@ import { UpdateStatusAdministrationComponent } from './updateStatus/update-statu
 import { UserAdministrationComponent, UserAdministrationRedirectModalComponent } from './user/user-administration.component';
 import { VersionsUpdateAdministrationComponent } from './versionUpdate/versions-update-administration.component';
 import { AdministrationComponent } from './home/administration.component';
-import { UsersAdministrationComponent, UsersAdministrationRedirectModalComponent } from './user/users-administration.component';
+import { UsersAdministrationComponent } from './user/users-administration.component';
+import { UsersAdministrationRedirectModalComponent } from './user/redirect-modal/users-administration-redirect-modal.component';
 import { UsersImportComponent } from './user/import/users-import.component';
 import { UsersExportComponent } from './user/export/users-export.component';
 import { TranslateService } from '@ngx-translate/core';

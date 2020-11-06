@@ -1,6 +1,6 @@
 <mat-form-field *ngIf="this.control.status !== 'DISABLED'" appearance='outline' class="smallInput">
     <button mat-button matSuffix [matMenuTriggerFor]="menuDep" (click)="$event.stopPropagation();"
-        [title]="this.translate.instant('lang.targetDepartment')">
+        [title]="'lang.targetDepartment' | translate">
         {{addressBANCurrentDepartment}}&nbsp;<i class="fa fa-chevron-down"></i>
     </button>
     <mat-menu #menuDep="matMenu">
@@ -9,7 +9,7 @@
     </mat-menu>
     <mat-icon color="primary" class="fa fa-search" matPrefix style="font-size: 15px;">
     </mat-icon>
-    <input type="text" #autoCompleteInput [placeholder]="this.translate.instant('lang.searchAddressBan')" matInput
+    <input type="text" #autoCompleteInput [placeholder]="'lang.searchAddressBan' | translate" matInput
         [formControl]="addressBANControl" [matAutocomplete]="auto" (click)="$event.stopPropagation()"
         (focus)="resetAutocompleteAddressBan()" maxlength="128">
     <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selectAddressBan($event)">

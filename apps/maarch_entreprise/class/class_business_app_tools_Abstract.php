@@ -1,21 +1,8 @@
 <?php
 /*
-*    Copyright 2008-2017 Maarch
-*
-*   This file is part of Maarch Framework.
-*
-*   Maarch Framework is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   Maarch Framework is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with Maarch Framework.  If not, see <http://www.gnu.org/licenses/>.
+* Copyright Maarch since 2008 under licence GPLv3.
+* See LICENCE.txt file at the root folder for more details.
+* This file is part of Maarch software.
 */
 
 /**
@@ -111,19 +98,16 @@ abstract class business_app_tools_Abstract extends Database
             $_SESSION['config']['defaultPage']         = (string) $config->defaultPage;
             $_SESSION['config']['cookietime']          = (string) $config->cookieTime;
             $_SESSION['config']['userdefaultpassword'] = (string) $config->userdefaultpassword;
-            $_SESSION['config']['usePHPIDS']           = (string) $config->usePHPIDS;
             if (isset($config->showfooter)) {
                 $_SESSION['config']['showfooter'] = (string) $config->showfooter;
             } else {
                 $_SESSION['config']['showfooter'] = 'true';
             }
-            //$_SESSION['config']['databaseworkspace'] = (string) $config->databaseworkspace;
 
             $tablename = $xmlconfig->TABLENAME;
             $_SESSION['tablename']['doctypes_first_level']  = (string) $tablename->doctypes_first_level;
             $_SESSION['tablename']['doctypes_second_level'] = (string) $tablename->doctypes_second_level;
             $_SESSION['tablename']['doctypes_indexes']      = (string) $tablename->doctypes_indexes;
-            $_SESSION['tablename']['saved_queries']         = (string) $tablename->saved_queries;
             $_SESSION['tablename']['tags']                  = (string) $tablename->tags;
             
             $_SESSION['config']['tmppath'] = \SrcCore\models\CoreConfigModel::getTmpPath();
@@ -229,7 +213,6 @@ abstract class business_app_tools_Abstract extends Database
             $_SESSION['history']['docserversdel']   = (string) $history->docserversdel;
             $_SESSION['history']['docserversallow'] = (string) $history->docserversallow;
             $_SESSION['history']['docserversban']   = (string) $history->docserversban;
-            //$_SESSION['history']['docserversclose'] = (string) $history->docserversclose;
             $_SESSION['history']['docserverslocationsadd']   = (string) $history->docserverslocationsadd;
             $_SESSION['history']['docserverslocationsdel']   = (string) $history->docserverslocationsdel;
             $_SESSION['history']['docserverslocationsallow'] = (string) $history->docserverslocationsallow;
@@ -258,15 +241,10 @@ abstract class business_app_tools_Abstract extends Database
             foreach ($xmlconfig->MODULES as $modules) {
                 $_SESSION['modules'][$i] = array(
                     'moduleid' => (string) $modules->moduleid,
-                    //,"comment" => (string) $MODULES->comment
                 );
                 $i ++;
             }
             $this->_loadActionsPages();
-        }
-
-        if ($_SESSION['config']['usePHPIDS'] == 'true') {
-            $this->_loadPHPIDSExludes();
         }
     }
 
@@ -401,439 +379,6 @@ abstract class business_app_tools_Abstract extends Database
                 );
                     $i++;
                 }
-            }
-        }
-    }
-
-    public static function _loadEntrepriseVar()
-    {
-        $core = new core_tools();
-        if (file_exists(
-            $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
-            . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR
-            . 'apps'.DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
-            . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR
-            . 'entreprise.xml'
-        )
-        ) {
-            $path = $_SESSION['config']['corepath'] . 'custom'
-                . DIRECTORY_SEPARATOR . $_SESSION['custom_override_id']
-                . DIRECTORY_SEPARATOR . 'apps' . DIRECTORY_SEPARATOR
-                . $_SESSION['config']['app_id'] . DIRECTORY_SEPARATOR . 'xml'
-                . DIRECTORY_SEPARATOR . 'entreprise.xml';
-        } else {
-            $path = 'apps' . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
-                . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR
-                . 'entreprise.xml';
-        }
-        $xmlfile = simplexml_load_file($path);
-        $langPath = 'apps' . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
-            . DIRECTORY_SEPARATOR . 'lang' . DIRECTORY_SEPARATOR
-            . $_SESSION['config']['lang'] . '.php';
-
-        $_SESSION['attachment_types'] = array();
-        $_SESSION['attachment_types_with_chrono'] = array();
-        $_SESSION['attachment_types_show'] = array();
-        $_SESSION['attachment_types_with_process'] = array();
-        $_SESSION['attachment_types_with_delay'] = array();
-        $_SESSION['attachment_types_reconciliation'] = array(); //NCH01
-        $attachmentTypes = $xmlfile->attachment_types;
-        if (count($attachmentTypes) > 0) {
-            foreach ($attachmentTypes->type as $type) {
-                $label = (string) $type->label;
-                $with_chrono = (string) $type['with_chrono'];
-                $get_chrono = (string) $type['get_chrono'];
-                $attach_in_mail = (string) $type['attach_in_mail'];
-                $show_attachment_type = (string) $type['show'];
-                $delay = (string) $type['with_delay'];
-                $select_in_reconciliation = (string) $type['select_in_reconciliation']; //NCH01
-                $process = (string) $type->process_mode;
-                if (!empty($label) && defined($label)
-                    && constant($label) <> null
-                ) {
-                    $label = constant($label);
-                }
-
-                $array_get_chrono = explode(',', $get_chrono);
-                $_SESSION['attachment_types'][(string) $type->id] = $label;
-                $_SESSION['attachment_types_with_chrono'][(string) $type->id] = $with_chrono;
-                $_SESSION['attachment_types_show'][(string) $type->id] = $show_attachment_type;
-                $_SESSION['attachment_types_get_chrono'][(string) $type->id] = $array_get_chrono;
-                $_SESSION['attachment_types_attach_in_mail'][(string) $type->id] = $attach_in_mail;
-                $_SESSION['attachment_types_with_process'][(string) $type->id] = $process;
-                $_SESSION['attachment_types_with_delay'][(string) $type->id] = $delay;
-                $_SESSION['attachment_types_reconciliation'][(string) $type->id] = $select_in_reconciliation; //NCH01
-            }
-        }
-
-        $_SESSION['mail_priorities']            = [];
-        $_SESSION['mail_priorities_id']         = [];
-        $_SESSION['mail_priorities_attribute']  = [];
-        $_SESSION['mail_priorities_wdays']      = [];
-        $_SESSION['mail_priorities_color']      = [];
-        $_SESSION['default_mail_priority']      = 0;
-
-        $priorities = \Priority\models\PriorityModel::get(['orderBy' => ['"order" NULLS LAST']]);
-        $i = 0;
-        foreach ($priorities as $priority) {
-            $_SESSION['mail_priorities'][$i] = $priority['label'];
-            $_SESSION['mail_priorities_id'][$i] = $priority['id'];
-            $_SESSION['mail_priorities_attribute'][$i] = ($priority['delays'] == null ? 'false' : $priority['delays']);
-            $_SESSION['mail_priorities_wdays'][$i] = ($priority['working_days'] ? 'true' : 'false');
-            $_SESSION['mail_priorities_color'][$i] = $priority['color'];
-            if ($priority['default_priority']) {
-                $_SESSION['default_mail_priority'] = $i;
-            }
-            $i++;
-        }
-
-        $mailPriorities = $xmlfile->priorities;
-        if (count($mailPriorities) > 0) {
-            $_SESSION['default_sve_priority'] = (string) $mailPriorities->default_sve_priority;
-        }
-
-        $contact_check = $xmlfile->contact_check;
-        if (count($contact_check) > 0) {
-            $_SESSION['check_days_before'] = (string) $contact_check->check_days_before;
-        }
-
-        $_SESSION['mail_titles'] = array();
-        $mailTitles = $xmlfile->titles;
-        if (count($mailTitles) > 0) {
-            $i = 0;
-            foreach ($mailTitles->title as $title) {
-                $label = (string) $title->label;
-                if (!empty($label) && defined($label)
-                    && constant($label) <> null
-                ) {
-                    $label = constant($label);
-                }
-                $_SESSION['mail_titles'][(string)$title->id] = $label;
-            }
-            $_SESSION['default_mail_title'] = (string) $mailTitles->default_title;
-        }
-    }
-
-    public function compare_base_version($xmlVersionBase)
-    {
-        // Compare version value beetwen version base xml file and version base
-        // value in the database
-        $xmlBase = simplexml_load_file($xmlVersionBase);
-        //Find value in the xml database_version tag
-        if ($xmlBase) {
-            $versions = explode('.', (string)$xmlBase->version);
-            $_SESSION['maarch_entreprise']['xml_versionbase'] = "{$versions[0]}.{$versions[1]}";
-        } else {
-            $_SESSION['maarch_entreprise']['xml_versionbase'] = 'none';
-        }
-        $checkBase = new Database();
-        $query = "SELECT param_value_string FROM " . PARAM_TABLE
-               . " WHERE id = 'database_version'";
-
-        $stmt = $checkBase->query($query); //Find value in parameters table on database
-        if ($stmt->rowCount() == 0) {
-            $_SESSION['maarch_entreprise']['database_version'] = "none";
-        } else {
-            $vbg = $stmt->fetchObject();
-            $_SESSION['maarch_entreprise']['database_version'] = $vbg->param_value_string;
-        }
-        //If this two parameters is not find, this is the end of this function
-        if ($_SESSION['maarch_entreprise']['xml_versionbase'] <> 'none') {
-            if (($_SESSION['maarch_entreprise']['xml_versionbase'] <> $_SESSION['maarch_entreprise']['database_version'])
-                || ($_SESSION['maarch_entreprise']['database_version'] == 'none')
-            ) {
-                $_SESSION['error'] .= _VERSION_BASE_AND_XML_BASEVERSION_NOT_MATCH. "(".$_SESSION['maarch_entreprise']['xml_versionbase']."/".$_SESSION['maarch_entreprise']['database_version'].")";
-            }
-        }
-    }
-
-    public function load_features($xmlFeatures)
-    {
-        $_SESSION['features'] = array();
-        //Defines all features by  default at 'false'
-        $_SESSION['features']['search_notes']                    = "false";
-        $_SESSION['features']['show_types_tree']                 = "false";
-        $_SESSION['features']['watermark']                       = array();
-        $_SESSION['features']['watermark']['enabled']            = "false";
-        if (file_exists(
-            $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
-            . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR
-            . $xmlFeatures
-        )
-        ) {
-            $path = $_SESSION['config']['corepath'] . 'custom'
-                  . DIRECTORY_SEPARATOR . $_SESSION['custom_override_id']
-                  . DIRECTORY_SEPARATOR . $xmlFeatures;
-        } else {
-            $path = $xmlFeatures;
-        }
-
-        $xmlfeatures = simplexml_load_file($path);
-        if ($xmlfeatures) {
-            $feats = $xmlfeatures->FEATURES;
-            $_SESSION['features']['search_notes']                    = (string) $feats->search_notes;
-            $_SESSION['features']['show_types_tree']                 = (string) $feats->show_types_tree;
-            $watermark = $feats->watermark;
-            $_SESSION['features']['watermark']['enabled']    = (string) $watermark->enabled;
-            $_SESSION['features']['watermark']['text']       = (string) $watermark->text;
-            $_SESSION['features']['watermark']['position']   = (string) $watermark->position;
-            $_SESSION['features']['watermark']['font']       = (string) $watermark->font;
-            $_SESSION['features']['watermark']['text_color'] = (string) $watermark->text_color;
-            $_SESSION['features']['type_calendar']           = (string) $feats->type_calendar;
-            $send_to_contact_with_mandatory_attachment       = (string) $feats->send_to_contact_with_mandatory_attachment;
-            if (strtoupper($send_to_contact_with_mandatory_attachment) == 'TRUE') {
-                $_SESSION['features']['send_to_contact_with_mandatory_attachment'] = true;
-            } elseif (strtoupper($send_to_contact_with_mandatory_attachment) == 'FALSE') {
-                $_SESSION['features']['send_to_contact_with_mandatory_attachment'] = false;
-            }
-            if (!empty($feats->notes_in_print_page->label)) {
-                foreach ($feats->notes_in_print_page->label as $value) {
-                    $_SESSION['features']['notes_in_print_page'][] = (string) $value;
-                }
-            }
-        }
-    }
-
-    /**
-    * Loads app specific vars in session
-    *
-    */
-    public function load_app_var_session($userData = '')
-    {
-        $this->_loadEntrepriseVar();
-        $this->load_features(
-            'apps' . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
-            . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR . 'features.xml'
-        );
-        
-        $this->_loadListsConfig();
-    }
-
-    protected function _loadListsConfig()
-    {
-        if (file_exists(
-            $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
-            . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'apps'
-            . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
-            . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR
-            . 'lists_parameters.xml'
-        )
-        ) {
-            $path = $_SESSION['config']['corepath'] . 'custom'
-                  . DIRECTORY_SEPARATOR . $_SESSION['custom_override_id']
-                  . DIRECTORY_SEPARATOR . 'apps' . DIRECTORY_SEPARATOR
-                  . $_SESSION['config']['app_id'] . DIRECTORY_SEPARATOR .'xml'
-                  . DIRECTORY_SEPARATOR . 'lists_parameters.xml';
-        } else {
-            $path = 'apps' . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
-            . DIRECTORY_SEPARATOR . 'xml' . DIRECTORY_SEPARATOR
-            . 'lists_parameters.xml';
-        }
-        $xmlfile = simplexml_load_file($path);
-        
-        //Load filters
-        $_SESSION['filters'] = array();
-        foreach ($xmlfile->FILTERS as $filtersObject) {
-            foreach ($filtersObject as $filter) {
-                $desc = (string) $filter->LABEL;
-                if (!empty($desc) && defined($desc) && constant($desc) <> null) {
-                    $desc = constant($desc);
-                }
-                $id = (string) $filter->ID;
-                $enabled = (string) $filter->ENABLED;
-                if (trim($enabled) == 'true') {
-                    $_SESSION['filters'][$id] = array(
-                        'ID'      => $id,
-                        'LABEL'   => $desc,
-                        'ENABLED' => $enabled,
-                        'VALUE'   => '',
-                        'CLAUSE'  => ''
-                    );
-                }
-            }
-        }
-        
-        //Init
-        $_SESSION['html_templates'] = array();
-        
-        //Default list (no template)
-        $_SESSION['html_templates']['none'] = array(
-            'ID'        =>  'none',
-            'LABEL'     =>  _DOCUMENTS_LIST,
-            'IMG'       =>  'fa fa-list-alt fa-2x',
-            'ENABLED'   =>  'true',
-            'PATH'      =>  '',
-            'GOTOLIST'  =>  ''
-        );
-        
-        //Load templates
-        foreach ($xmlfile->TEMPLATES as $templatesObject) {
-            foreach ($templatesObject as $template) {
-                $desc = (string) $template->LABEL;
-                if (!empty($desc) && defined($desc) && constant($desc) <> null) {
-                    $desc = constant($desc);
-                }
-                $id         = (string) $template->ID;
-                $enabled    = (string) $template->ENABLED;
-                $name       = (string) $template->NAME;
-                $origin     = (string) $template->ORIGIN;
-                $module     = (string) $template->MODULE;
-                $listObject = $template->GOTOLIST;
-
-                $pathToList = '';
-                if (!empty($listObject)) {
-                    foreach ($listObject as $list) {
-                        $listId = (string) $list->ID;
-                        $listName = (string) $list->NAME;
-                        $listOrigin = (string) $list->ORIGIN;
-                        $listModule = (string) $list->MODULE;
-                        
-                        // The page is in the apps
-                        if (strtoupper($listOrigin) == 'APPS'
-                        ) {
-                            if (file_exists(
-                                $_SESSION['config']['corepath'].'custom' . DIRECTORY_SEPARATOR
-                                . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'apps'
-                                . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
-                                . DIRECTORY_SEPARATOR . $listName . '.php'
-                            ) ||
-                                file_exists(
-                                    'apps' . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
-                                . DIRECTORY_SEPARATOR . $listName.'.php'
-                            )
-                            ) {
-                                $pathToList = $_SESSION['config']['businessappurl']
-                                            . 'index.php?display=true&page='. $listName;
-                            }
-                        } elseif (strtoupper(
-                            $listOrigin
-                        ) == "MODULE"
-                        ) {
-                            // The page is in a module
-                            $core = new core_tools();
-                            // Error : The module name is empty or the module is not loaded
-                            if (empty($listModule)
-                                || ! $core->is_module_loaded(
-                                    $listModule
-                                )
-                            ) {
-                                $pathToList = '';
-                            } else {
-                                if (
-                                    file_exists(
-                                    $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
-                                    . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
-                                    . DIRECTORY_SEPARATOR . $listModule . DIRECTORY_SEPARATOR . $listName . '.php'
-                                ) ||
-                                    file_exists(
-                                        'modules' . DIRECTORY_SEPARATOR . $listModule
-                                        . DIRECTORY_SEPARATOR . $listName . '.php'
-                                )
-                                ) {
-                                    $pathToList = $_SESSION['config']['businessappurl']
-                                        . 'index.php?display=true&page=' . $listName
-                                        . '&module=' . $listModule;
-                                }
-                            }
-                        }
-                    }
-                }
-                
-                //Path to template
-                if ($origin == "apps") { //Origin apps
-                    if (file_exists(
-                        $_SESSION['config']['corepath'].'custom' . DIRECTORY_SEPARATOR
-                        . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'apps'
-                        . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
-                        . DIRECTORY_SEPARATOR . "template" . DIRECTORY_SEPARATOR
-                        . $name . '.html'
-                    )
-                    ) {
-                        $path = $_SESSION['config']['corepath'] . 'custom'
-                        . DIRECTORY_SEPARATOR . $_SESSION['custom_override_id']
-                        . DIRECTORY_SEPARATOR . 'apps' . DIRECTORY_SEPARATOR
-                        . $_SESSION['config']['app_id'] . DIRECTORY_SEPARATOR
-                        . "template" . DIRECTORY_SEPARATOR . $name . '.html';
-                    } else {
-                        $path = 'apps' . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id']
-                        . DIRECTORY_SEPARATOR . "template" . DIRECTORY_SEPARATOR . $name.'.html';
-                    }
-                } elseif ($origin == "module") { //Origin module
-                    if (file_exists(
-                        $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
-                        . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'modules'
-                        . DIRECTORY_SEPARATOR . $module . DIRECTORY_SEPARATOR . 'template'
-                        . DIRECTORY_SEPARATOR .  $name . '.html'
-                    )
-                    ) {
-                        $path = $_SESSION['config']['corepath'] . 'custom'
-                        . DIRECTORY_SEPARATOR . $_SESSION['custom_override_id']
-                        . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR
-                        . $module . DIRECTORY_SEPARATOR . 'template' . DIRECTORY_SEPARATOR
-                        .  $name . '.html';
-                    } else {
-                        $path = 'modules' . DIRECTORY_SEPARATOR . $module
-                        . DIRECTORY_SEPARATOR . 'template' . DIRECTORY_SEPARATOR
-                        .  $name . '.html';
-                    }
-                }
-                
-                //Values of html_templates array
-                if (trim($enabled) == 'true') {
-                    $_SESSION['html_templates'][$id] = array(
-                        'ID'       => $id,
-                        'LABEL'    => $desc,
-                        'IMG'      => (string) $template->IMG,
-                        'ENABLED'  => $enabled,
-                        'PATH'     => $path,
-                        'GOTOLIST' => $pathToList
-                    );
-                }
-            }
-        }
-    }
-
-    /**
-    * Load phpids excludes in session
-    */
-    public function _loadPHPIDSExludes()
-    {
-        if (isset($_SESSION['config']['corepath'])
-            && isset($_SESSION['config']['app_id'])
-        ) {
-            $core = new core_tools();
-            if (file_exists(
-                $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
-                . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'apps'
-                . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id'] . DIRECTORY_SEPARATOR
-                . 'tools' . DIRECTORY_SEPARATOR . 'phpids' . DIRECTORY_SEPARATOR
-                . 'lib' . DIRECTORY_SEPARATOR . 'IDS' . DIRECTORY_SEPARATOR
-                . 'maarch_exclude.xml'
-            )
-            ) {
-                $path = $_SESSION['config']['corepath'] . 'custom' . DIRECTORY_SEPARATOR
-                        . $_SESSION['custom_override_id'] . DIRECTORY_SEPARATOR . 'apps'
-                        . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id'] . DIRECTORY_SEPARATOR
-                        . 'tools' . DIRECTORY_SEPARATOR . 'phpids' . DIRECTORY_SEPARATOR
-                        . 'lib' . DIRECTORY_SEPARATOR . 'IDS' . DIRECTORY_SEPARATOR
-                        . 'maarch_exclude.xml';
-            } else {
-                $path = 'apps'
-                        . DIRECTORY_SEPARATOR . $_SESSION['config']['app_id'] . DIRECTORY_SEPARATOR
-                        . 'tools' . DIRECTORY_SEPARATOR . 'phpids' . DIRECTORY_SEPARATOR
-                        . 'lib' . DIRECTORY_SEPARATOR . 'IDS' . DIRECTORY_SEPARATOR
-                        . 'maarch_exclude.xml';
-            }
-            $xmlfile = simplexml_load_file($path);
-            $_SESSION['PHPIDS_EXCLUDES'] = array();
-            foreach ($xmlfile->exclude as $exclude) {
-                array_push(
-                    $_SESSION['PHPIDS_EXCLUDES'],
-                    array(
-                        'TARGET' => (string) $exclude->target,
-                        'PAGE'   => (string) $exclude->page,
-                    )
-                );
             }
         }
     }

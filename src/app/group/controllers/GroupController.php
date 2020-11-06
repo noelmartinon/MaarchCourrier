@@ -11,7 +11,6 @@ use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\PreparedClauseController;
-use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
 use User\controllers\UserController;
 use User\models\UserEntityModel;

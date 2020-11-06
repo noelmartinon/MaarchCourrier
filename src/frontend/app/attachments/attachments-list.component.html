@@ -87,7 +87,7 @@
             </div>
         </mat-card>
     </div>
-    <button mat-fab class="addPj" [class.addPjPanel]="target === 'panel'" [class.addPjProcess]="target === 'process'" color="primary" [title]="this.translate.instant('lang.addAttachment')" (click)="createAttachment()">
+    <button mat-fab class="addPj" [class.addPjPanel]="target === 'panel'" [class.addPjProcess]="target === 'process'" color="primary" [title]="'lang.addAttachment' | translate" (click)="createAttachment()">
         <mat-icon class="fa fa-plus"></mat-icon>
     </button>
 </ng-template>

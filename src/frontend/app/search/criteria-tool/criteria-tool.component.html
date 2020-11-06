@@ -42,7 +42,7 @@
                                     {{searchTemplate.label | shorten: 45: '...'}}
                                 </div>
                                 <mat-icon class="fa fa-trash" color="warn"
-                                    [title]="this.translate.instant('lang.delete')"
+                                    [title]="'lang.delete' | translate"
                                     (click)="$event.stopPropagation();deleteSearchTemplate(searchTemplate.id, i)">
                                 </mat-icon>
                             </button>

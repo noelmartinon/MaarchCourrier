@@ -3645,13 +3645,6 @@ if (!defined('_DOC_NOT_CLOSED')) {
     define('_DOC_NOT_CLOSED', "Ce courrier n'est pas clôturé");
 }
 
-if (!defined('_SECURITY_MESSAGE')) {
-    define('_SECURITY_MESSAGE', 'Message de sécurité');
-}
-if (!defined('_SECURITY_MESSAGE_DETAILS')) {
-    define('_SECURITY_MESSAGE_DETAILS', 'Requête de type XSS non permise');
-}
-
 if (!defined('_CHOOSE_ENTITY_SUBENTITIES')) {
     define('_CHOOSE_ENTITY_SUBENTITIES', 'Choisissez une entité (+ sous-entité(s))');
 }
@@ -3778,30 +3771,6 @@ if (!defined('_SEND_TO_VISA_DESC')) {
 
 if (!defined('_MAIL_WILL_DISAPPEAR')) {
     define('_MAIL_WILL_DISAPPEAR', 'Ce courrier sort de votre périmètre. Vous ne pourrez plus y accéder ensuite.');
-}
-
-//maarchIVS translate
-
-if (!defined('_IVS_LENGTH_ID_BELOW_MIN_LENGTH')) {
-    define('_IVS_LENGTH_ID_BELOW_MIN_LENGTH', 'La longueur est infèrieure à la longueur minimale');
-}
-if (!defined('_IVS_LENGTH_EXCEEDS_MAX_LENGTH')) {
-    define('_IVS_LENGTH_EXCEEDS_MAX_LENGTH', 'La longueur est supérieure à la longueur maximale');
-}
-if (!defined('_IVS_LENGTH_NOT_ALLOWED')) {
-    define('_IVS_LENGTH_NOT_ALLOWED', "La longueur n'est pas autorisée");
-}
-if (!defined('_IVS_VALUE_NOT_ALLOWED')) {
-    define('_IVS_VALUE_NOT_ALLOWED', "La valeur n'est pas autorisée");
-}
-if (!defined('_IVS_FORMAT_NOT_ALLOWED')) {
-    define('_IVS_FORMAT_NOT_ALLOWED', "Le format n'est pas autorisé");
-}
-if (!defined('_IVS_TOO_MANY_DIGITS')) {
-    define('_IVS_TOO_MANY_DIGITS', 'Trop de caractères');
-}
-if (!defined('_IVS_TOO_MANY_DECIMAL_DIGITS')) {
-    define('_IVS_TOO_MANY_DECIMAL_DIGITS', 'Trop de caractères décimaux');
 }
 
 //control technical params

@@ -30,7 +30,7 @@
                             <mat-form-field  *ngIf="type === 'notDistributed' || type === 'distributed'" (click)="picker.open()" appearance="outline" style="cursor:pointer;margin-top: 10px;">
                                 <mat-label>{{'lang.registeredMailReceivedDate' | translate}}</mat-label>
                                 <input matInput [(ngModel)]="receivedDate" [matDatepicker]="picker"
-                                       [placeholder]="this.translate.instant('lang.chooseDate')" [max]="today" readonly style="cursor:pointer;" formControlName="receivedDate" required>
+                                       [placeholder]="'lang.chooseDate' | translate" [max]="today" readonly style="cursor:pointer;" formControlName="receivedDate" required>
                                 <mat-datepicker-toggle matSuffix [for]="picker" *ngIf="!receivedDate">
                                 </mat-datepicker-toggle>
                                 <mat-datepicker #picker></mat-datepicker>
@@ -42,7 +42,7 @@
                                     <mat-option value="{{'lang.others' | translate}}">{{'lang.others' | translate}}</mat-option>
                                 </mat-select>
                             </mat-form-field>
-                            <mat-form-field *ngIf="type === 'notDistributed' && reason === this.translate.instant('lang.others')">
+                            <mat-form-field *ngIf="type === 'notDistributed' && reason === ('lang.others' | translate)">
                                 <mat-label>{{'lang.precise' | translate}}</mat-label>
                                 <input matInput name="returnReasonOther" formControlName="returnReasonOther" [(ngModel)]="reasonOther">
                             </mat-form-field>

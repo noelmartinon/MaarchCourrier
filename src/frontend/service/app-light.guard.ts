@@ -29,8 +29,8 @@ export class AppLightGuard implements CanActivate {
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
         const urlArr = state.url.replace(/^\/+|\/+$/g, '').split('/');
 
-        console.log('== ROUTE LIGHT GUARD ==');
-        console.log(state.url);
+        console.debug('== ROUTE LIGHT GUARD ==');
+        console.debug(state.url);
 
         this.headerService.resetSideNavSelection();
 

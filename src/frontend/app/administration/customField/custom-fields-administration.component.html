@@ -19,9 +19,9 @@
                 </div>
                 <mat-card *ngIf="!loading" class="card-app-content">
                     <mat-tab-group>
-                        <mat-tab [label]="this.translate.instant('lang.usableFields')">
+                        <mat-tab [label]="'lang.usableFields' | translate">
                             <div class="alert-message alert-message-info" role="alert" *ngIf="customFields.length === 0"
-                                [innerHTML]="this.translate.instant('lang.noCustomFieldInfo')">
+                                [innerHTML]="'lang.noCustomFieldInfo' | translate">
                             </div>
                             <mat-accordion>
                                 <mat-expansion-panel *ngFor="let custom of customFields;index as indexCustom">
@@ -36,11 +36,11 @@
                                     <div class="col-md-12">
                                         <mat-form-field>
                                             <input matInput name="id" [(ngModel)]="custom.id" disabled
-                                                [placeholder]="this.translate.instant('lang.technicalId')" [value]="custom.id">
+                                                [placeholder]="'lang.technicalId' | translate" [value]="custom.id">
                                         </mat-form-field>
                                         <mat-form-field>
                                             <input matInput name="label" [(ngModel)]="custom.label"
-                                                [placeholder]="this.translate.instant('lang.label')" [value]="custom.label">
+                                                [placeholder]="'lang.label' | translate" [value]="custom.label">
                                         </mat-form-field>
                                         <mat-form-field>
                                             <mat-label>{{'lang.displayMode' | translate}}</mat-label>
@@ -80,7 +80,7 @@
                                                     <div>
                                                         <button mat-mini-fab color="default"
                                                             *ngIf="custom.values.length > 0"
-                                                            (click)="sortValues(custom)" [title]="this.translate.instant('lang.orderValues')">
+                                                            (click)="sortValues(custom)" [title]="'lang.orderValues' | translate">
                                                             <mat-icon color="primary" class="fas fa-sort-alpha-down"
                                                                 style="height:auto;"></mat-icon>
                                                         </button>
@@ -90,9 +90,9 @@
                                                     <mat-form-field *ngFor="let value of custom.values;let i=index;"
                                                         floatLabel="never">
                                                         <input matInput [(ngModel)]="value.label"
-                                                            [placeholder]="this.translate.instant('lang.newValue')">
+                                                            [placeholder]="'lang.newValue' | translate">
                                                         <button color="warn" mat-icon-button matSuffix
-                                                            [title]="this.translate.instant('lang.delete')" (click)="removeValue(custom, i)">
+                                                            [title]="'lang.delete' | translate" (click)="removeValue(custom, i)">
                                                             <mat-icon class="fa fa-trash"></mat-icon>
                                                         </button>
                                                     </mat-form-field>
@@ -123,7 +123,7 @@
                                                                 <mat-option *ngFor="let table of availaibleTables | keyvalue"
                                                                     [value]="table.key">
                                                                     {{table.key}} 
-                                                                    <ng-container *ngIf="!functionsService.empty(this.translate.instant('lang.' + table.key))">
+                                                                    <ng-container *ngIf="!functionsService.empty('lang.' + table.key | translate)">
                                                                         ({{'lang.' + table.key | translate}})
                                                                     </ng-container>
                                                                 </mat-option>
@@ -193,11 +193,11 @@
     <mat-sidenav #snav2 [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()"
         fixedTopGap="56" position='end' opened class="col-md-4 col-sm-12 customFielsdPanel">
         <mat-tab-group>
-            <mat-tab [label]="this.translate.instant('lang.customFieldsTypesAvailable')">
+            <mat-tab [label]="'lang.customFieldsTypesAvailable' | translate">
                 <div class="customFieldsTypesItem" *ngFor="let customField of customFieldsTypes">
                     <div class="addCustomFieldTypeContainer">
                         <button mat-icon-button color="primary" (click)="addCustomField(customField)"
-                            [title]="this.translate.instant('lang.add')">
+                            [title]="'lang.add' | translate">
                             <mat-icon class="fas fa-plus-circle fa-2x"></mat-icon>
                         </button>
                     </div>
@@ -205,18 +205,18 @@
                         <div style="color: rgba(0,0,0,0.54);">{{customField.label}} :</div>
                         <ng-container *ngIf="['string','banAutocomplete','contact'].indexOf(customField.type) > -1">
                             <mat-form-field class="input-form" floatLabel="never">
-                                <textarea matInput [placeholder]="this.translate.instant('lang.' + customField.type + 'Input')" matTextareaAutosize
+                                <textarea matInput [placeholder]="'lang.' + customField.type + 'Input' | translate" matTextareaAutosize
                                     matAutosizeMinRows="1" cdkAutosizeMaxRows="6" disabled></textarea>
                             </mat-form-field>
                         </ng-container>
                         <ng-container *ngIf="customField.type === 'integer'">
                             <mat-form-field class="input-form" floatLabel="never">
-                                <input type="number" matInput [placeholder]="this.translate.instant('lang.' + customField.type + 'Input')" disabled>
+                                <input type="number" matInput [placeholder]="'lang.' + customField.type + 'Input' | translate" disabled>
                             </mat-form-field>
                         </ng-container>
                         <ng-container *ngIf="customField.type === 'select'">
                             <mat-form-field class="input-form" floatLabel="never">
-                                <mat-select [placeholder]="this.translate.instant('lang.' + customField.type + 'Input')" disabled>
+                                <mat-select [placeholder]="'lang.' + customField.type + 'Input' | translate" disabled>
                                     <mat-option *ngFor="let sample of sampleIncrement" [value]="sample">
                                         {{'lang.choice' | translate}} {{sample}}
                                     </mat-option>
@@ -226,7 +226,7 @@
                         <ng-container *ngIf="customField.type === 'date'">
                             <mat-form-field class="input-form" floatLabel="never">
                                 <input matInput [matDatepicker]="picker"
-                                    [placeholder]="this.translate.instant('lang.' + customField.type + 'Input')" (click)="picker.open()" disabled>
+                                    [placeholder]="'lang.' + customField.type + 'Input' | translate" (click)="picker.open()" disabled>
                                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                                 <mat-datepicker #picker></mat-datepicker>
                             </mat-form-field>

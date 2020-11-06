@@ -55,21 +55,13 @@ class IndexingModelController
 
         $models = IndexingModelModel::get(['where' => $where, 'data' => [$GLOBALS['id'], 'false']]);
 
-        foreach ($models as $key => $value) {
-            $resources = ResModel::get([
-                'select'  => ['status', 'count(1)'],
-                'where'   => ['model_id = ?'],
-                'data'    => [$value['id']],
-                'groupBy' => ['status']
-            ]);
-            $models[$key]['used'] = $resources;
-        }
-
         return $response->withJson(['indexingModels' => $models]);
     }
 
     public function getById(Request $request, Response $response, array $args)
     {
+        $queryParams = $request->getQueryParams();
+
         $model = IndexingModelModel::getById(['id' => $args['id']]);
         if (empty($model)) {
             return $response->withStatus(400)->withJson(['errors' => 'Model not found']);
@@ -109,6 +101,16 @@ class IndexingModelController
             }
         }
         $model['fields'] = $fields;
+
+        if (!empty($queryParams['used']) && $queryParams['used'] == 'true') {
+            $resources = ResModel::get([
+                'select'  => ['status', 'count(1)'],
+                'where'   => ['model_id = ?'],
+                'data'    => [$args['id']],
+                'groupBy' => ['status']
+            ]);
+            $model['used'] = $resources;
+        }
 
         return $response->withJson(['indexingModel' => $model]);
     }

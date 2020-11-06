@@ -383,8 +383,6 @@ export class VisaWorkflowComponent implements OnInit {
         } else {
             let index = this.visaWorkflow.items.map((item: any) => item.listinstance_id).indexOf(this.getLastVisaUser().listinstance_id);
             index++;
-            console.log(index);
-
             return this.getRealIndex(index);
         }
     }
@@ -537,7 +535,7 @@ export class VisaWorkflowComponent implements OnInit {
     }
 
     isValidWorkflow() {
-        if ((this.visaWorkflow.items.filter((item: any) => item.requested_signature).length > 0 && this.visaWorkflow.items.filter((item: any) => (!item.hasPrivilege || !item.isValid) && item.process_date === null).length === 0) && this.visaWorkflow.items.length > 0) {
+        if ((this.visaWorkflow.items.filter((item: any) => item.requested_signature).length > 0 && this.visaWorkflow.items.filter((item: any) => (!item.hasPrivilege || !item.isValid) && (item.process_date === null || this.functions.empty(item.process_date))).length === 0) && this.visaWorkflow.items.length > 0) {
             return true;
         } else {
             return false;
@@ -549,7 +547,7 @@ export class VisaWorkflowComponent implements OnInit {
             return this.translate.instant('lang.signUserRequired');
         } else if (this.visaWorkflow.items.filter((item: any) => !item.hasPrivilege).length > 0) {
             return this.translate.instant('lang.mustDeleteUsersWithNoPrivileges');
-        } else if (this.visaWorkflow.items.filter((item: any) => !item.isValid && item.process_date === null).length > 0) {
+        } else if (this.visaWorkflow.items.filter((item: any) => !item.isValid && (item.process_date === null || this.functions.empty(item.process_date))).length > 0) {
             return this.translate.instant('lang.mustDeleteInvalidUsers');
         }
     }
@@ -623,7 +621,7 @@ export class VisaWorkflowComponent implements OnInit {
 
     canManageUser(item: any, i: number) {
         if (this.adminMode) {
-            if (!this.functions.empty(item.process_date) || (this.target === 'signatureBook' && this.getCurrentVisaUserIndex() === i) || !item.isValid) {
+            if (!this.functions.empty(item.process_date) || (this.target === 'signatureBook' && this.getCurrentVisaUserIndex() === i)) {
                 return false;
             } else {
                 return true;

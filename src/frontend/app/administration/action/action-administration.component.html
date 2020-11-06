@@ -34,8 +34,8 @@
                         <div class="form-group">
                             <div class="col-sm-12">
                                 <plugin-select-search [showLabel]="true" [class]="''"
-                                    [label]="this.translate.instant('lang.actionCarriedOut')"
-                                    [placeholderLabel]="this.translate.instant('lang.actionCarriedOut')"
+                                    [label]="'lang.actionCarriedOut' | translate"
+                                    [placeholderLabel]="'lang.actionCarriedOut' | translate"
                                     [formControlSelect]="selectActionPageId" [datas]="actionPages"
                                     [optGroupList]="group" [optGroupTarget]="'category'" (afterSelected)="getCustomFields()" style="width:100%;">
                                 </plugin-select-search>
@@ -45,8 +45,8 @@
                             *ngIf="!this.functions.empty(availableCustomFields) && action.actionPageId=='close_mail'">
                             <div class="col-sm-12">
                                 <plugin-select-search [showLabel]="true" [class]="''"
-                                    [label]="this.translate.instant('lang.checkEmptyFields')"
-                                    [placeholderLabel]="this.translate.instant('lang.checkEmptyFields')"
+                                    [label]="'lang.checkEmptyFields' | translate"
+                                    [placeholderLabel]="'lang.checkEmptyFields' | translate"
                                     [formControlSelect]="customFieldsFormControl" [datas]="availableCustomFields"
                                     (afterSelected)="getSelectedFields()" style="width:100%;">
                                 </plugin-select-search>
@@ -76,8 +76,8 @@
                         <div class="form-group" *ngIf="action.actionPageId!='reconcile'">
                             <div class="col-sm-12">
                                 <plugin-select-search [showLabel]="true" [class]="''"
-                                    [label]="this.translate.instant('lang.associatedStatus')"
-                                    [placeholderLabel]="this.translate.instant('lang.associatedStatus')"
+                                    [label]="'lang.associatedStatus' | translate"
+                                    [placeholderLabel]="'lang.associatedStatus' | translate"
                                     [formControlSelect]="selectStatusId" [datas]="statuses"
                                     (afterSelected)="action.id_status = selectStatusId.value" style="width:100%;">
                                 </plugin-select-search>

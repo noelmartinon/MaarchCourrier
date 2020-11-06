@@ -1,14 +1,14 @@
 <mat-sidenav-container class="maarch-container">
     <ng-template #adminMenuTemplate>
-        <div *ngIf="resourceFreezed || resourceBinded !== null" class="alert-message alert-message-danger"
+        <div *ngIf="(resourceFreezed || resourceBinded !== null) && !loading" class="alert-message alert-message-danger"
             style="min-width: 100%; margin: 10px 0;">
             <div *ngIf="resourceFreezed" style="display: flex;align-items: center;">
-                <i class="fas fa-snowflake" style="width: 25px;text-align: center;"></i>&nbsp;<span [innerHTML]="'lang.retentionRuleFrozen' | translate"></span>
+                <i class="fas fa-snowflake" style="width: 25px;text-align: center;"></i>&nbsp;<span [innerHTML]="'lang.retentionRuleFrozenAlt' | translate"></span>
             </div>
             <div *ngIf="resourceBinded !== null" style="display: flex;align-items: center;">
                 <i class="fas fa-exclamation" style="width: 25px;text-align: center;"></i>&nbsp;
                 <span
-                    [innerHTML]="resourceBinded ? ('lang.bindingMail' | translate) : ('lang.noBindingMail' | translate)">
+                    [innerHTML]="resourceBinded ? ('lang.bindingMailAlt' | translate) : ('lang.noBindingMailAlt' | translate)">
                 </span>
                 &nbsp;
                 <i class="fa fa-info-circle" style="cursor: help;opacity: 0.5;"
@@ -31,11 +31,11 @@
             <div *ngIf="!isModalOpen() && currentTool !== 'dashboard'" style="display: flex;justify-content: flex-end;">
                 <button *ngIf="privilegeService.hasCurrentUserPrivilege('view_technical_infos')" mat-icon-button
                     (click)="openTechnicalInfo()" color="primary"
-                    [title]="this.translate.instant('lang.showTechnicalInfo')">
+                    [title]="'lang.showTechnicalInfo' | translate">
                     <mat-icon class="far fa-file-code"></mat-icon>
                 </button>
                 <button mat-icon-button (click)="createModal()" color="primary"
-                    [title]="this.translate.instant('lang.openInExternalModal')">
+                    [title]="'lang.openInExternalModal' | translate">
                     <mat-icon class="fas fa-external-link-alt"></mat-icon>
                 </button>
             </div>
@@ -43,7 +43,7 @@
                 <div
                     style="display: flex;align-items: center;justify-content: flex-end;margin-top: 10px;margin-bottom: -20px;">
                     <button mat-button color="primary"
-                        [title]="this.translate.instant('lang.generateAndDownloadPrintedFolder')"
+                        [title]="'lang.generateAndDownloadPrintedFolder' | translate"
                         (click)="openPrintedFolderPrompt()">
                         <mat-icon class="fa fa-print" style="height:auto"></mat-icon>
                         {{'lang.printedFolder' | translate}}
@@ -140,7 +140,7 @@
                     (retrieveDocumentEvent)="appDocumentViewer.saveDocService()" (afterSaveEvent)="refreshData()">
                 </app-indexing-form>
                 <div style="position: sticky;bottom: 0px;text-align:right;">
-                    <button mat-fab [title]="this.translate.instant('lang.saveModifications')" *ngIf="isToolModified()"
+                    <button mat-fab [title]="'lang.saveModifications' | translate" *ngIf="isToolModified()"
                         (click)="saveTool()" color="accent">
                         <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
                     </button>
@@ -191,7 +191,7 @@
                 </button>
             </ng-container>
             <div class="emptyAction" *ngIf="actionsList.length === 0"
-                [innerHTML]="this.translate.instant('lang.noAvailableActionProcess')"></div>
+                [innerHTML]="'lang.noAvailableActionProcess' | translate"></div>
         </div>
     </ng-template>
     <mat-sidenav-content class="process-content">
@@ -217,7 +217,7 @@
                         </div>
                         <div class="content">
                             <button mat-icon-button
-                                [title]="this.resourceFollowed ? this.translate.instant('lang.untrackThisMail') : this.translate.instant('lang.trackThisMail')"
+                                [title]="this.resourceFollowed ? ('lang.untrackThisMail' | translate) : ('lang.trackThisMail' | translate)"
                                 class="categoryLabel" (click)="toggleFollow()">
                                 <mat-icon class="followIcon {{this.resourceFollowed ? 'fas':'far'}} fa-star"
                                     style="font-size: 20px;"></mat-icon>
@@ -233,7 +233,7 @@
                             <button mat-icon-button
                                 *ngIf="privilegeService.hasCurrentUserPrivilege('set_binding_document')"
                                 [matMenuTriggerFor]="bindingRentalRule"
-                                [title]="this.translate.instant('lang.setBindingDocument')" class="categoryLabel">
+                                [title]="'lang.setBindingDocument' | translate" class="categoryLabel">
                                 <mat-icon class="bindIcon fas fa-exclamation" style="font-size: 20px;"></mat-icon>
                             </button>
                             <mat-menu #bindingRentalRule="matMenu">
@@ -247,7 +247,7 @@
                                     [innerHTML]="'lang.noBindingMail' | translate"></buton>
                                 <mat-divider></mat-divider>
                                 <buton mat-menu-item [class.isSelectedMenu]="this.resourceBinded === null"
-                                    (click)="toggleBinding(null)" [title]="this.translate.instant('lang.doNotDefine')">
+                                    (click)="toggleBinding(null)" [title]="'lang.doNotDefine' | translate">
                                     {{ 'lang.doNotDefine' | translate}}</buton>
                                 <mat-divider></mat-divider>
                             </mat-menu>
@@ -263,7 +263,7 @@
                             </div>
                             <div class="content-item" (click)="openContact()" style="cursor:pointer">
                                 <div>
-                                    {{this.currentResourceInformations.categoryId !== 'outgoing' ? this.translate.instant('lang.senders') : this.translate.instant('lang.recipient')}}
+                                    {{this.currentResourceInformations.categoryId !== 'outgoing' ? ('lang.senders' | translate) : ('lang.recipient' | translate)}}
                                     :</div>
                                 <div class="content-item-value">{{senderLightInfo.displayName}} <i
                                         *ngIf="this.senderLightInfo.filling" class="fas fa-circle"
@@ -388,15 +388,15 @@
                     <button mat-fab
                         *ngIf="indexingForm !== undefined && indexingForm.isResourceModified() && modal.id === 'info'"
                         (click)="confirmModification()" color="accent"
-                        [title]="this.translate.instant('lang.saveModifications')">
+                        [title]="'lang.saveModifications' | translate">
                         <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
                     </button>
-                    <button mat-fab [title]="this.translate.instant('lang.saveModifications')"
+                    <button mat-fab [title]="'lang.saveModifications' | translate"
                         *ngIf="appDiffusionsList !== undefined && appDiffusionsList.isModified() && modal.id === 'diffusionList'"
                         (click)="saveListinstance()" color="accent">
                         <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
                     </button>
-                    <button mat-fab [title]="this.translate.instant('lang.saveModifications')"
+                    <button mat-fab [title]="'lang.saveModifications' | translate"
                         *ngIf="appVisaWorkflow !== undefined && appVisaWorkflow.isModified() && modal.id === 'visaCircuit'"
                         (click)="saveVisaWorkflow()" color="accent">
                         <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>

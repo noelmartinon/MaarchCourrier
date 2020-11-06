@@ -20,8 +20,8 @@
     <ng-container *ngIf="natures.length != 0 && messagesModel.length != 0">
         <div class="form-group" style="margin-top: 10px">
             <div class="col-sm-12">
-                <plugin-select-search [showLabel]="true" [class]="''" [label]="this.translate.instant('lang.natureIxbusParapheur')"
-                                      [placeholderLabel]="this.translate.instant('lang.natureIxbusParapheur')" [formControlSelect]="selectNature"
+                <plugin-select-search [showLabel]="true" [class]="''" [label]="'lang.natureIxbusParapheur' | translate"
+                                      [placeholderLabel]="'lang.natureIxbusParapheur' | translate" [formControlSelect]="selectNature"
                                       [datas]="natures" (afterSelected)="ixbusDatas.nature = selectNature.value"
                                       style="width:100%;" [required]="true">
                 </plugin-select-search>
@@ -29,8 +29,8 @@
         </div>
         <div class="form-group" style="margin-top: 10px">
             <div class="col-sm-12">
-                <plugin-select-search [showLabel]="true" [class]="''" [label]="this.translate.instant('lang.workflowModelIxbus')"
-                                      [placeholderLabel]="this.translate.instant('lang.workflowModelIxbus')" [formControlSelect]="selectWorkflow"
+                <plugin-select-search [showLabel]="true" [class]="''" [label]="'lang.workflowModelIxbus' | translate"
+                                      [placeholderLabel]="'lang.workflowModelIxbus' | translate" [formControlSelect]="selectWorkflow"
                                       [datas]="messagesModel" (afterSelected)="ixbusDatas.messageModel = selectWorkflow.value"
                                       style="width:100%;" [required]="true">
                 </plugin-select-search>

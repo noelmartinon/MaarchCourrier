@@ -95,7 +95,8 @@
                                             {{this.ruleText}}</div>
                                         <div class="col-sm-6" style="padding-left:0px;padding-right: 0px;">
                                             <mat-form-field style="padding:10px;">
-                                                <input matInput #inputPasswd placeholder="{{'lang.typeNewPassword' | translate}}"
+                                                <input matInput #inputPasswd
+                                                    placeholder="{{'lang.typeNewPassword' | translate}}"
                                                     formControlName="newPasswordCtrl" required
                                                     [type]="hidePassword ? 'password' : 'text'">
                                                 <mat-icon matSuffix (click)="hidePassword = !hidePassword"
@@ -110,8 +111,9 @@
                                         </div>
                                         <div class="col-sm-6" style="padding-left:0px;padding-right:0px;">
                                             <mat-form-field style="padding:10px;">
-                                                <input matInput #inputPasswd2 placeholder="{{'lang.retypeNewPassword' | translate}}"
-                                                    required [type]="hidePassword ? 'password' : 'text'"
+                                                <input matInput #inputPasswd2
+                                                    placeholder="{{'lang.retypeNewPassword' | translate}}" required
+                                                    [type]="hidePassword ? 'password' : 'text'"
                                                     formControlName="retypePasswordCtrl">
                                                 <mat-icon matSuffix (click)="hidePassword = !hidePassword"
                                                     class="fa fa-2x"
@@ -157,11 +159,14 @@
                                         </div>
                                         <div class="input-group">
                                             <mat-form-field>
-                                                <input matInput *ngIf="creationMode" type="text" title="{{'lang.id' | translate}}"
-                                                    name="user_id" [(ngModel)]="user.userId" placeholder="{{'lang.id' | translate}}"
-                                                    pattern="^[\w.@-]*$" required (keyup)="setLowerUserId()" maxlength="128">
-                                                <input matInput *ngIf="!creationMode" type="text" title="{{'lang.id' | translate}}"
-                                                    value="{{user.user_id}}" placeholder="{{'lang.id' | translate}}" disabled>
+                                                <input matInput *ngIf="creationMode" type="text"
+                                                    title="{{'lang.id' | translate}}" name="user_id"
+                                                    [(ngModel)]="user.userId" placeholder="{{'lang.id' | translate}}"
+                                                    pattern="^[\w.@-]*$" required (keyup)="setLowerUserId()"
+                                                    maxlength="128">
+                                                <input matInput *ngIf="!creationMode" type="text"
+                                                    title="{{'lang.id' | translate}}" value="{{user.user_id}}"
+                                                    placeholder="{{'lang.id' | translate}}" disabled>
                                             </mat-form-field>
                                         </div>
                                     </div>
@@ -170,21 +175,24 @@
                                     <div class="col-sm-5" style="font-weight:bold;">
                                         <mat-form-field>
                                             <input matInput type="text" id="lastname" name="lastname" maxlength="255"
-                                                title="{{'lang.lastname' | translate}}" placeholder="{{'lang.lastname' | translate}}"
+                                                title="{{'lang.lastname' | translate}}"
+                                                placeholder="{{'lang.lastname' | translate}}"
                                                 [(ngModel)]="user.lastname" required>
                                         </mat-form-field>
                                     </div>
                                     <div class="col-sm-5" style="font-weight:bold;">
                                         <mat-form-field>
                                             <input matInput type="text" id="firstname" name="firstname" maxlength="255"
-                                                title="{{'lang.firstname' | translate}}" placeholder="{{'lang.firstname' | translate}}"
+                                                title="{{'lang.firstname' | translate}}"
+                                                placeholder="{{'lang.firstname' | translate}}"
                                                 [(ngModel)]="user.firstname" required>
                                         </mat-form-field>
                                     </div>
                                     <div class="col-sm-2" style="font-style:italic;">
                                         <mat-form-field>
                                             <input matInput type="text" id="initials" name="initials" maxlength="32"
-                                                title="{{'lang.initials' | translate}}" placeholder="{{'lang.initials' | translate}}"
+                                                title="{{'lang.initials' | translate}}"
+                                                placeholder="{{'lang.initials' | translate}}"
                                                 [(ngModel)]="user.initials">
                                         </mat-form-field>
                                     </div>
@@ -193,7 +201,8 @@
                                     <div class="col-sm-12">
                                         <mat-form-field>
                                             <input matInput type="tel" id="phone" name="phone" maxlength="32"
-                                                title="{{'lang.phoneNumber' | translate}}" placeholder="{{'lang.phoneNumber' | translate}}"
+                                                title="{{'lang.phoneNumber' | translate}}"
+                                                placeholder="{{'lang.phoneNumber' | translate}}"
                                                 [(ngModel)]="user.phone" pattern="\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$"
                                                 [disabled]="(creationMode && !canManagePersonalDatas) || (!creationMode && (!canManagePersonalDatas || !canViewPersonalDatas))">
                                         </mat-form-field>
@@ -202,8 +211,10 @@
                                 <div class="form-group">
                                     <div class="col-sm-12">
                                         <mat-form-field>
-                                            <input matInput type="email" id="mail" name="mail" title="{{'lang.email' | translate}}"
-                                                placeholder="{{'lang.email' | translate}}" [(ngModel)]="user.mail" maxlength="255"
+                                            <input matInput type="email" id="mail" name="mail"
+                                                title="{{'lang.email' | translate}}"
+                                                placeholder="{{'lang.email' | translate}}" [(ngModel)]="user.mail"
+                                                maxlength="255"
                                                 pattern="(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)" required>
                                         </mat-form-field>
                                     </div>
@@ -219,11 +230,12 @@
                                             <mat-form-field>
                                                 <mat-label>{{'lang.accountType' | translate}}</mat-label>
                                                 <mat-select [(ngModel)]="user.mode" id="accountType" name="accountType"
-                                                    required [disabled]="headerService.user.mode === 'standard' && ['root_visible','root_invisible'].indexOf(user.mode) > -1">
+                                                    required
+                                                    [disabled]="headerService.user.mode === 'standard' && ['root_visible','root_invisible'].indexOf(user.mode) > -1">
                                                     <ng-container *ngFor="let mode of adminModes | sortBy : 'label'">
                                                         <mat-option [value]="mode.id"
                                                             [disabled]="headerService.user.mode === 'standard' && ['root_visible','root_invisible'].indexOf(mode.id) > -1"
-                                                            [title]="headerService.user.mode === 'standard' && ['root_visible','root_invisible'].indexOf(mode.id) > -1 ? this.translate.instant('lang.mustSuperadmin') : ''">
+                                                            [title]="headerService.user.mode === 'standard' && ['root_visible','root_invisible'].indexOf(mode.id) > -1 ? ('lang.mustSuperadmin' | translate) : ''">
                                                             {{mode.label}}
                                                         </mat-option>
                                                     </ng-container>
@@ -233,8 +245,11 @@
                                         <div *ngIf="user.mode === 'rest'">
                                             <mat-form-field>
                                                 <mat-label>{{'lang.authorizedRoutes' | translate}}</mat-label>
-                                                <textarea matInput name="authorizedApi" [(ngModel)]="user.authorizedApi" placeholder="Ex : PUT/attachments/{id}"></textarea>
-                                                <mat-hint>{{'lang.authorizedRoutesInformations' | translate}} <a href="https://docs.maarch.org/gitbook/html/MaarchCourrier/{{appVersion}}/guat/guat_architecture/API_REST/home.html" target="_blank">{{'lang.here' | translate}}</a></mat-hint>
+                                                <textarea matInput name="authorizedApi" [(ngModel)]="user.authorizedApi"
+                                                    placeholder="Ex : PUT/attachments/{id}"></textarea>
+                                                <mat-hint>{{'lang.authorizedRoutesInformations' | translate}} <a
+                                                        href="https://docs.maarch.org/gitbook/html/MaarchCourrier/{{appVersion}}/guat/guat_architecture/API_REST/home.html"
+                                                        target="_blank">{{'lang.here' | translate}}</a></mat-hint>
                                             </mat-form-field>
                                         </div>
                                     </mat-expansion-panel>
@@ -260,7 +275,9 @@
                             </mat-nav-list>
                         </mat-tab>
                         <mat-tab *ngIf="!creationMode" label="{{'lang.entities' | translate}}">
-                            <app-maarch-flat-tree #maarchTree (afterSelectNode)="addEntity($event)" [selectionPropagation]="false" [openState]="'all'" (afterDeselectNode)="deleteEntity($event)"></app-maarch-flat-tree>
+                            <app-maarch-flat-tree #maarchTree (afterSelectNode)="addEntity($event)"
+                                [selectionPropagation]="false"  [openState]="'all'"
+                                (afterDeselectNode)="deleteEntity($event)"></app-maarch-flat-tree>
                         </mat-tab>
                         <mat-tab *ngIf="!creationMode" label="{{'lang.baskets' | translate}}">
                             <div class="col-sm-6" style="overflow:hidden;">
@@ -269,7 +286,8 @@
                                         <mat-icon mat-list-icon color="primary">
                                             <mat-checkbox color="primary"
                                                 (change)="$event ? masterToggleBaskets($event) : null"
-                                                [checked]="selectionBaskets.hasValue()" matTooltip="{{'lang.selectAll' | translate}}">
+                                                [checked]="selectionBaskets.hasValue()"
+                                                matTooltip="{{'lang.selectAll' | translate}}">
                                             </mat-checkbox>
                                         </mat-icon>
                                         <p mat-line *ngIf="!selectionBaskets.hasValue()"
@@ -282,19 +300,23 @@
                                                 <mat-icon class="fa fa-reply"></mat-icon>
                                                 <mat-divider [vertical]="true" class="vertical-divider"></mat-divider>
                                             </button>
-                                            <button color="warn" mat-icon-button matTooltip="{{'lang.disableBasket' | translate}}"
+                                            <button color="warn" mat-icon-button
+                                                matTooltip="{{'lang.disableBasket' | translate}}"
                                                 (click)="toggleBasket(false)">
                                                 <mat-icon class="fa fa-ban"></mat-icon>
                                             </button>
-                                            <button color="accent" mat-icon-button matTooltip="{{'lang.enableBasket' | translate}}"
+                                            <button color="accent" mat-icon-button
+                                                matTooltip="{{'lang.enableBasket' | translate}}"
                                                 (click)="toggleBasket(true)">
                                                 <mat-icon class="fa fa-check"></mat-icon>
                                             </button>
                                             <mat-menu #menu="matMenu" style="width:200px !important;">
-                                                <plugin-autocomplete [labelPlaceholder]="this.translate.instant('lang.redirectBaskets')"
+                                                <plugin-autocomplete [labelPlaceholder]="'lang.redirectBaskets' | translate"
                                                     [routeDatas]="['/rest/autocomplete/users']"
                                                     [targetSearchKey]="'idToDisplay'"
                                                     [subInfoKey]="'descriptionToDisplay'"
+                                                    [disableItems]="[user.id]"
+                                                    [styles]="['no-margin']"
                                                     (triggerEvent)="addBasketRedirection($event)" appearance="outline">
                                                 </plugin-autocomplete>
                                             </mat-menu>
@@ -369,7 +391,7 @@
                                                     </h4>
                                                     <p mat-line>
                                                         <plugin-autocomplete *ngIf="basket.userToDisplay == null"
-                                                            [labelPlaceholder]="this.translate.instant('lang.redirectBaskets')"
+                                                            [labelPlaceholder]="'lang.redirectBaskets' | translate"
                                                             [routeDatas]="['/rest/autocomplete/users']"
                                                             [targetSearchKey]="'idToDisplay'"
                                                             [subInfoKey]="'descriptionToDisplay'"
@@ -399,8 +421,10 @@
                                 </mat-tab-group>
                             </div>
                         </mat-tab>
-                        <mat-tab *ngIf="!creationMode" label="{{'lang.signatures' | translate}}" [disabled]="!canViewPersonalDatas">
-                            <div *ngIf="canManagePersonalDatas" dnd-droppable matTooltip="{{'lang.uploadSignFileInfo' | translate}}"
+                        <mat-tab *ngIf="!creationMode" label="{{'lang.signatures' | translate}}"
+                            [disabled]="!canViewPersonalDatas">
+                            <div *ngIf="canManagePersonalDatas" dnd-droppable
+                                matTooltip="{{'lang.uploadSignFileInfo' | translate}}"
                                 (click)="clickOnUploader('uploadSignFile')" [class.dndFileHighlighted]="highlightMe"
                                 (dragover)="highlightMe=true" (dragleave)="highlightMe=false"
                                 (onDropSuccess)="test($event);highlightMe=false;" class="dndFile">
@@ -414,7 +438,8 @@
                                             <mat-card-content style="text-align:center;">
                                                 <mat-form-field floatLabel="never">
                                                     <input matInput type="text" [(ngModel)]="signature.signature_label"
-                                                        name="selectedSignatureLabel" placeholder="{{'lang.label' | translate}}"
+                                                        name="selectedSignatureLabel"
+                                                        placeholder="{{'lang.label' | translate}}"
                                                         (change)="updateSignature(i)"
                                                         [disabled]="!canManagePersonalDatas">
                                                     <button mat-button matSuffix mat-icon-button
@@ -493,7 +518,8 @@
                                                 {{element.event_date | date : "dd/MM/y HH:mm"}}</mat-cell>
                                         </ng-container>
                                         <ng-container matColumnDef="record_id">
-                                            <mat-header-cell *matHeaderCellDef style="flex:1;">{{'lang.technicalId' | translate}}
+                                            <mat-header-cell *matHeaderCellDef style="flex:1;">
+                                                {{'lang.technicalId' | translate}}
                                             </mat-header-cell>
                                             <mat-cell *matCellDef="let element" style="flex:1;">{{element.record_id}}
                                             </mat-cell>
@@ -545,7 +571,8 @@
                 <p mat-line>
                     <mat-form-field style="font-size:10px;">
                         <input matInput type="text" id="role" name="role" title="{{'lang.role' | translate}}"
-                            placeholder="{{'lang.role' | translate}}" [(ngModel)]="userGroup.role" (change)="updateGroup(userGroup)">
+                            placeholder="{{'lang.role' | translate}}" [(ngModel)]="userGroup.role"
+                            (change)="updateGroup(userGroup)">
                         <mat-hint matTooltip="{{'lang.perimeter' | translate}}">{{userGroup.maarch_comment}}</mat-hint>
                     </mat-form-field>
                 </p>
@@ -559,7 +586,8 @@
                     style="position:relative;">
                     <button mat-icon-button
                         style="cursor:pointer;position: absolute;right: -20px;top: -20px;font-size:10px;"
-                        (click)="updatePrimaryEntity(userEntity)" matTooltip="{{'lang.entityTooglePrimary' | translate}}">
+                        (click)="updatePrimaryEntity(userEntity)"
+                        matTooltip="{{'lang.entityTooglePrimary' | translate}}">
                         <mat-icon class="fa fa-arrow-up"></mat-icon>
                     </button>
                 </mat-icon>

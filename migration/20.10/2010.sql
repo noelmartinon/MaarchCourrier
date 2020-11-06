@@ -120,6 +120,13 @@ DO $$ BEGIN
     IF (SELECT count(column_name) from information_schema.columns where table_name = 'res_attachments' and column_name = 'typist' and data_type != 'integer') THEN
         ALTER TABLE res_attachments ADD COLUMN typist_tmp INTEGER;
         UPDATE res_attachments set typist_tmp = (select id FROM users where users.user_id = res_attachments.typist);
+        UPDATE res_attachments set typist_tmp = (SELECT
+                                                     CASE
+                                                         WHEN (SELECT count(id) FROM users WHERE user_id = 'superadmin') > 0 THEN
+                                                             (SELECT id FROM users WHERE user_id = 'superadmin')
+                                                         ELSE
+                                                             (SELECT id FROM users WHERE status = 'OK' ORDER BY id LIMIT 1)
+                                                         END) WHERE typist_tmp IS NULL;
         ALTER TABLE res_attachments DROP COLUMN IF EXISTS typist;
         ALTER TABLE res_attachments RENAME COLUMN typist_tmp TO typist;
     END IF;
@@ -146,6 +153,14 @@ DO $$ BEGIN
         ALTER TABLE listinstance ADD COLUMN item_id_tmp INTEGER;
         UPDATE listinstance set item_id_tmp = (select id FROM users where users.user_id = listinstance.item_id) WHERE item_type = 'user_id';
         UPDATE listinstance set item_id_tmp = (select id FROM entities where entities.entity_id = listinstance.item_id) WHERE item_type = 'entity_id';
+        UPDATE listinstance set item_id_tmp = (SELECT
+                                                     CASE
+                                                         WHEN (SELECT count(id) FROM users WHERE user_id = 'superadmin') > 0 THEN
+                                                             (SELECT id FROM users WHERE user_id = 'superadmin')
+                                                         ELSE
+                                                             (SELECT id FROM users WHERE status = 'OK' ORDER BY id LIMIT 1)
+                                                         END) WHERE item_id_tmp IS NULL AND item_type = 'user_id';
+        UPDATE listinstance set item_id_tmp = (SELECT id FROM entities WHERE enabled = 'Y' ORDER BY id LIMIT 1) WHERE item_id_tmp IS NULL AND item_type = 'entity_id';
         ALTER TABLE listinstance DROP COLUMN IF EXISTS item_id;
         ALTER TABLE listinstance RENAME COLUMN item_id_tmp TO item_id;
         UPDATE baskets SET basket_clause = REGEXP_REPLACE(basket_clause, 'item_id(\s*)=(\s*)@user ', 'item_id = @user_id ', 'gmi');
@@ -159,6 +174,13 @@ DO $$ BEGIN
     IF (SELECT count(column_name) from information_schema.columns where table_name = 'listinstance' and column_name = 'added_by_user' and data_type != 'integer') THEN
         ALTER TABLE listinstance ADD COLUMN added_by_user_tmp INTEGER;
         UPDATE listinstance set added_by_user_tmp = (select id FROM users where users.user_id = listinstance.added_by_user);
+        UPDATE listinstance set added_by_user_tmp = (SELECT
+                                                   CASE
+                                                       WHEN (SELECT count(id) FROM users WHERE user_id = 'superadmin') > 0 THEN
+                                                           (SELECT id FROM users WHERE user_id = 'superadmin')
+                                                       ELSE
+                                                           (SELECT id FROM users WHERE status = 'OK' ORDER BY id LIMIT 1)
+                                                       END) WHERE added_by_user_tmp IS NULL;
         ALTER TABLE listinstance DROP COLUMN IF EXISTS added_by_user;
         ALTER TABLE listinstance RENAME COLUMN added_by_user_tmp TO added_by_user;
     END IF;
@@ -166,7 +188,7 @@ END$$;
 DO $$ BEGIN
     IF (SELECT count(column_name) from information_schema.columns where table_name = 'history' and column_name = 'user_id' and data_type != 'integer') THEN
         ALTER TABLE history ADD COLUMN user_id_tmp INTEGER;
-        UPDATE history set user_id_tmp = (select id FROM users where users.user_id = history.user_id);
+        UPDATE history set user_id_tmp = (select id FROM users where lower(users.user_id) = lower(history.user_id));
         ALTER TABLE history DROP COLUMN IF EXISTS user_id;
         ALTER TABLE history RENAME COLUMN user_id_tmp TO user_id;
         UPDATE history set record_id = (select id FROM users where users.user_id = history.record_id) WHERE table_name = 'users';
@@ -322,6 +344,20 @@ ALTER TABLE custom_fields ADD COLUMN mode custom_fields_modes NOT NULL DEFAULT '
 
 ALTER TABLE listinstance DROP COLUMN IF EXISTS delegate;
 ALTER TABLE listinstance ADD COLUMN delegate INTEGER;
+
+/* Replace dest_user with the dest in listinstance, if the dests are differents */
+UPDATE res_letterbox
+SET dest_user = (
+    SELECT item_id FROM listinstance
+    WHERE item_mode = 'dest' AND item_type = 'user_id' AND listinstance.res_id = res_letterbox.res_id
+)
+WHERE res_id IN (
+    SELECT res_letterbox.res_id
+    FROM res_letterbox
+             JOIN listinstance l ON res_letterbox.res_id = l.res_id
+    WHERE dest_user != item_id AND item_type ='user_id' AND item_mode='dest'
+);
+
 
 /* ORDER ON CHRONO */
 CREATE OR REPLACE FUNCTION order_alphanum(text) RETURNS text AS $$

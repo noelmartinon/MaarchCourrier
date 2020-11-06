@@ -1,9 +1,9 @@
 <div class="mat-dialog-content-container">
     <h1 mat-dialog-title>
         <span style="flex: 1;">
-            {{functions.empty(reference) ? this.translate.instant('lang.sendNumericPackage') : reference}}
+            {{functions.empty(reference) ? ('lang.sendNumericPackage' | translate) : reference}}
         </span>
-        <button [title]="this.translate.instant('lang.close')" mat-icon-button (click)="closeModal()">
+        <button [title]="'lang.close' | translate" mat-icon-button (click)="closeModal()">
             <mat-icon class="fa fa-times"></mat-icon>
         </button></h1>
     <mat-dialog-content class="modal-container">
@@ -92,7 +92,7 @@
         </div>
         <div style="overflow: auto;max-height: 300px;">
             <mat-list *ngIf="numericPackage.mainExchangeDoc !== null">
-                <h3 mat-subheader class="attachLabel">{{canManageMail() ? this.translate.instant('lang.mainDocNumericPackageToSend') : this.translate.instant('lang.mainDocNumericPackage')}}</h3>
+                <h3 mat-subheader class="attachLabel">{{canManageMail() ? ('lang.mainDocNumericPackageToSend' | translate) : ('lang.mainDocNumericPackage' | translate)}}</h3>
                 <mat-list-item class="numericPackageAttach" *ngIf="numericPackage.mainExchangeDoc !== null">
                     <p mat-line class="numericPackageAttachItem">
                         <span
@@ -107,7 +107,7 @@
             </mat-list>
             <mat-divider *ngIf="numericPackageAttach.length > 0"></mat-divider>
             <mat-list *ngIf="numericPackageAttach.length > 0">
-                <h3 mat-subheader class="attachLabel">{{canManageMail() ? this.translate.instant('lang.attachmentsNumericPackageToSend') : this.translate.instant('lang.attachmentsNumericPackage')}}</h3>
+                <h3 mat-subheader class="attachLabel">{{canManageMail() ? ('lang.attachmentsNumericPackageToSend' | translate) : ('lang.attachmentsNumericPackage' | translate)}}</h3>
                 <mat-list-item class="numericPackageAttach" *ngFor="let attach of numericPackageAttach; let i=index">
                     <p mat-line class="numericPackageAttachItem">
                         <span style="overflow: hidden;text-overflow: ellipsis;"
@@ -122,13 +122,13 @@
             </mat-list>
         </div>
         <div class="models" *ngIf="canManageMail()">
-            <plugin-select-search *ngIf="availableEmailModels.length > 0" [label]="this.translate.instant('lang.emailModel')"
-                [placeholderLabel]="this.translate.instant('lang.emailModel')" [datas]="availableEmailModels"
+            <plugin-select-search *ngIf="availableEmailModels.length > 0" [label]="'lang.emailModel' | translate"
+                [placeholderLabel]="'lang.emailModel' | translate" [datas]="availableEmailModels"
                 [formControlSelect]="templateEmailListForm" (afterSelected)="mergeEmailTemplate($event)">
             </plugin-select-search>
 
             <plugin-select-search #templateList *ngIf="availableSignEmailModels.length > 0"
-                [label]="this.translate.instant('lang.emailSignatures')" [placeholderLabel]="this.translate.instant('lang.emailSignatures')"
+                [label]="'lang.emailSignatures' | translate" [placeholderLabel]="'lang.emailSignatures' | translate"
                 [datas]="availableSignEmailModels" [formControlSelect]="emailSignListForm"
                 (afterSelected)="mergeSignEmailTemplate($event)">
             </plugin-select-search>
@@ -161,7 +161,7 @@
         <div style="padding-top: 10px;">
             <mat-form-field appearance="outline">
                 <mat-label class="attachLabel">{{'lang.note' | translate}}</mat-label>
-                <textarea matInput [placeholder]="this.translate.instant('lang.addNoteToNumericPackage')" [(ngModel)]="numericPackage.content"
+                <textarea matInput [placeholder]="'lang.addNoteToNumericPackage' | translate" [(ngModel)]="numericPackage.content"
                     matTextareaAutosize style="padding:0" [readonly]="!canManageMail()"></textarea>
             </mat-form-field>
         </div>

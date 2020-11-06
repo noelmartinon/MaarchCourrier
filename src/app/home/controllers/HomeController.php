@@ -72,7 +72,7 @@ class HomeController
 
                 $baskets[$kBasket]['redirected'] = false;
                 foreach ($redirectedBaskets as $redirectedBasket) {
-                    if ($redirectedBasket['basket_id'] == $basket['basket_id']) {
+                    if ($redirectedBasket['basket_id'] == $basket['basket_id'] && $redirectedBasket['group_id'] == $group['id']) {
                         $baskets[$kBasket]['redirected'] = true;
                         $baskets[$kBasket]['redirectedUser'] = $redirectedBasket['userToDisplay'];
                     }

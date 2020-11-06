@@ -14,15 +14,16 @@ import { NotificationService } from '@service/notification/notification.service'
 })
 export class RedirectIndexingModelComponent implements OnInit {
 
-    
-
+    title: string = 'lang.delete';
     indexingModels: any[] = [];
     modelIds: any[] = [];
 
     selectedModelId: any;
     selectedModelFields: any[];
 
-    mainIndexingModel: any;
+    mainIndexingModel: any = {
+        used: []
+    };
     mainIndexingModelFields: any[];
 
     resetFields: any[] = [];
@@ -89,7 +90,7 @@ export class RedirectIndexingModelComponent implements OnInit {
         },
     ];
 
-    loading: boolean = false;
+    loading: boolean = true;
 
     constructor(
         public translate: TranslateService,
@@ -99,98 +100,117 @@ export class RedirectIndexingModelComponent implements OnInit {
         private notify: NotificationService,
         private sortPipe: SortPipe,
     ) {
-        this.mainIndexingModel = data.indexingModel;
+        this.mainIndexingModel.id = data.indexingModel.id;
     }
 
     async ngOnInit() {
-        this.loadIndexingModels();
+        await this.loadIndexingModelFields();
 
-        this.loadStatuses();
+        if (this.mainIndexingModel.used.length > 0) {
+            this.title = 'lang.indexingModelReassign';
+            await this.loadIndexingModels();
 
-        this.loadCustomFields();
+            await this.loadStatuses();
 
-        this.loadIndexingModelFields();
+            await this.loadCustomFields();
+
+            this.formatFields();
+        }
+
+        this.loading = false;
     }
 
     loadIndexingModels() {
-        this.http.get('../rest/indexingModels').pipe(
-            map((data: any) => {
-                return data.indexingModels.filter((info: any) => info.private === false);
-            }),
-            tap((data: any) => {
-                this.indexingModels = data;
+        return new Promise((resolve) => {
+            this.http.get('../rest/indexingModels').pipe(
+                map((data: any) => {
+                    return data.indexingModels.filter((info: any) => info.private === false);
+                }),
+                tap((data: any) => {
+                    this.indexingModels = data;
 
-                this.sortPipe.transform(this.indexingModels, 'label');
+                    this.sortPipe.transform(this.indexingModels, 'label');
 
-                this.modelIds = this.indexingModels.map(model => model.id);
-            }),
-            finalize(() => this.loading = false),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+                    this.modelIds = this.indexingModels.map(model => model.id);
+                }),
+                finalize(() => resolve(true)),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     loadIndexingModelFields() {
-        this.http.get('../rest/indexingModels/' + this.mainIndexingModel.id).pipe(
-            tap((data: any) => {
-                this.mainIndexingModelFields = data.indexingModel.fields;
-                this.mainIndexingModelFields = this.mainIndexingModelFields.map(field => {
-                    const availableField = this.availableFields.find(elem => elem.identifier === field.identifier);
+        return new Promise((resolve) => {
+            this.http.get('../rest/indexingModels/' + this.mainIndexingModel.id + '?used=true').pipe(
+                tap((data: any) => {
+                    this.mainIndexingModel.used = data.indexingModel.used;
 
-                    field.label = availableField === undefined ? this.translate.instant('lang.undefined') : availableField.label;
-                    return field;
-                });
-            }),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+                    this.mainIndexingModelFields = data.indexingModel.fields;
+                }),
+                tap(() => resolve(true)),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    formatFields() {
+        this.mainIndexingModelFields = this.mainIndexingModelFields.map(field => {
+            const availableField = this.availableFields.find(elem => elem.identifier === field.identifier);
+            field.label = availableField === undefined ? this.translate.instant('lang.undefined') : availableField.label;
+            return field;
+        });
     }
 
     loadStatuses() {
-        this.http.get('../rest/statuses').pipe(
-            tap((data: any) => {
-                this.statuses = data.statuses;
+        return new Promise((resolve) => {
+            this.http.get('../rest/statuses').pipe(
+                tap((data: any) => {
+                    this.statuses = data.statuses;
 
-                this.mainIndexingModel.used.forEach((element: any) => {
-                    const elementStatus = this.statuses.find(status => status.id === element.status);
-                    if (elementStatus !== undefined) {
-                        element.status = elementStatus.label_status;
-                    }
-                });
-            }),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+                    this.mainIndexingModel.used.forEach((element: any) => {
+                        const elementStatus = this.statuses.find(status => status.id === element.status);
+                        if (elementStatus !== undefined) {
+                            element.status = elementStatus.label_status;
+                        }
+                    });
+                }),
+                finalize(() => resolve(true)),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     loadCustomFields() {
-        this.http.get('../rest/customFields').pipe(
-            tap((data: any) => {
-                data.customFields = data.customFields.map((custom: any) => {
-                    return {
-                        identifier: 'indexingCustomField_' + custom.id,
-                        label: custom.label
-                    };
-                });
-                data.customFields.forEach((custom: any) => {
-                    this.availableFields.push(custom);
-                });
-
-                this.sortPipe.transform(this.availableFields, 'label');
-
-                this.loadIndexingModelFields();
-            }),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+        return new Promise((resolve) => {
+            this.http.get('../rest/customFields').pipe(
+                tap((data: any) => {
+                    data.customFields = data.customFields.map((custom: any) => {
+                        return {
+                            identifier: 'indexingCustomField_' + custom.id,
+                            label: custom.label
+                        };
+                    });
+                    data.customFields.forEach((custom: any) => {
+                        this.availableFields.push(custom);
+                    });
+                    this.sortPipe.transform(this.availableFields, 'label');
+                }),
+                finalize(() => resolve(true)),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     changeModel(event: any) {
@@ -210,16 +230,40 @@ export class RedirectIndexingModelComponent implements OnInit {
         ).subscribe();
     }
 
+    isValid() {
+        if (this.loading) {
+            return false;
+        } else if (this.mainIndexingModel.used.length === 0) {
+            return true;
+        } else {
+            return this.selectedModelId !== undefined;
+        }
+    }
+
     onSubmit() {
-        this.http.request('DELETE', '../rest/indexingModels/' + this.mainIndexingModel.id, { body: { targetId: this.selectedModelId } }).pipe(
-            tap(() => {
-                this.notify.success(this.translate.instant('lang.indexingModelDeleted'));
-                this.dialogRef.close('ok');
-            }),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+        if (this.mainIndexingModel.used.length === 0) {
+            this.http.delete('../rest/indexingModels/' + this.mainIndexingModel.id).pipe(
+                tap(() => {
+                    this.notify.success(this.translate.instant('lang.indexingModelDeleted'));
+                    this.dialogRef.close('ok');
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        } else {
+            this.http.request('DELETE', '../rest/indexingModels/' + this.mainIndexingModel.id, { body: { targetId: this.selectedModelId } }).pipe(
+                tap(() => {
+                    this.notify.success(this.translate.instant('lang.indexingModelDeleted'));
+                    this.dialogRef.close('ok');
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        }
+
     }
 }

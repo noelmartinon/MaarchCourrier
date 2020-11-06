@@ -10,8 +10,8 @@
                 <b *ngIf="data.resIds.length === 1" color="primary" class="highlight">{{data.resource.chrono}}</b>
                 <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{data.resIds.length}}
                     {{'lang.elements' | translate}}</b> ?
-                    <div *ngIf="data.resIds.length > 1" class="alert-message alert-message-info" role="alert" style="margin-top: 30px;" [innerHTML]="this.translate.instant('lang.rejectVisaBack')"></div>
-                    <div *ngIf="data.resIds.length == 1 && appVisaWorkflow !== undefined && appVisaWorkflow.getLastVisaUser() !== ''" class="alert-message alert-message-info" role="alert" style="margin-top: 30px;" [innerHTML]="this.translate.instant('lang.rejectVisaBackUser') + ' <b>' + appVisaWorkflow.getLastVisaUser().labelToDisplay + '</b>'"></div>
+                    <div *ngIf="data.resIds.length > 1" class="alert-message alert-message-info" role="alert" style="margin-top: 30px;" [innerHTML]="'lang.rejectVisaBack' | translate"></div>
+                    <div *ngIf="data.resIds.length == 1 && appVisaWorkflow !== undefined && appVisaWorkflow.getLastVisaUser() !== ''" class="alert-message alert-message-info" role="alert" style="margin-top: 30px;" [innerHTML]="('lang.rejectVisaBackUser' | translate) + ' <b>' + appVisaWorkflow.getLastVisaUser().labelToDisplay + '</b>'"></div>
     
                 <div *ngIf="resourcesErrors.length > 0" class="alert-message alert-message-danger mailList" role="alert">
                     <p>

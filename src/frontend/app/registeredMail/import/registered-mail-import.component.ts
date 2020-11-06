@@ -433,7 +433,6 @@ export class RegisteredMailImportComponent implements OnInit {
                         dataToSend.push(objContact);
                     }
                 });
-                console.log(dataToSend);
             }),
             exhaustMap(() => this.http.put(`../rest/registeredMails/import`, { registeredMails: dataToSend })),
             tap((data: any) => {

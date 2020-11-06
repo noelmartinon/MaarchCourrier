@@ -141,8 +141,8 @@ class SedaController
         $return['recipientArchiveEntities'] = $recipientArchiveEntities['archiveEntities'];
 
         $unitIdentifier = MessageExchangeModel::getUnitIdentifierByResId(['select' => ['message_id'], 'resId' => (string)$firstResource]);
-        if (!empty($unitIdentifier['message_id'])) {
-            MessageExchangeModel::delete(['where' => ['message_id = ?'], 'data' => [$unitIdentifier['message_id']]]);
+        if (!empty($unitIdentifier[0]['message_id'])) {
+            MessageExchangeModel::delete(['where' => ['message_id = ?'], 'data' => [$unitIdentifier[0]['message_id']]]);
         }
         MessageExchangeModel::deleteUnitIdentifier(['where' => ['res_id = ?'], 'data' => [$firstResource]]);
         

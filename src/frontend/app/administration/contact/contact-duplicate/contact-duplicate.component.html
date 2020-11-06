@@ -32,8 +32,8 @@
                                     {{'lang.criteriaSearch' | translate}}
                                 </mat-panel-title>
                             </mat-expansion-panel-header>
-                            <plugin-select-search [label]="this.translate.instant('lang.addCriteria')" [formControlSelect]="addCriteriaSelect"
-                                [placeholderLabel]="this.translate.instant('lang.addCriteria')" [datas]="contactFields"
+                            <plugin-select-search [label]="'lang.addCriteria' | translate" [formControlSelect]="addCriteriaSelect"
+                                [placeholderLabel]="'lang.addCriteria' | translate" [datas]="contactFields"
                                 (afterSelected)="addCriteria($event)">
                             </plugin-select-search>
                             <mat-divider style="margin-top:20px;margin-bottom:20px;"></mat-divider>

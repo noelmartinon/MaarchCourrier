@@ -29,8 +29,8 @@
             <div style="display: flex;">
                 <div
                     style="margin-right:20px;align-items: center;justify-content: center;text-align: center;display: flex;">
-                    <plugin-select-search #templateList *ngIf="listTemplates.length > 0" [label]="this.translate.instant('lang.chooseModel')"
-                        [placeholderLabel]="this.translate.instant('lang.chooseModel')" [datas]="listTemplates" [class]="'input-form-filled'"
+                    <plugin-select-search #templateList *ngIf="listTemplates.length > 0" [label]="'lang.chooseModel' | translate"
+                        [placeholderLabel]="'lang.chooseModel' | translate" [datas]="listTemplates" [class]="'input-form-filled'"
                         [formControlSelect]="templateListForm" (afterSelected)="editTemplate($event)"
                         style="width: 240px;text-align: left;font-weight:normal;font-size: 13px;">
                     </plugin-select-search>
@@ -43,11 +43,11 @@
         <div style="display: block;width:100%;" appUploadFileDragDrop (onFileDropped)="dndUploadFile($event)"
             [disabled]="!editMode">
             <div *ngIf="!loading && file.content !== null && !hideTools" class="viewer-tools">
-                <button mat-icon-button (click)="downloadOriginalFile()" [matTooltip]="this.translate.instant('lang.downloadOriginalFile')">
+                <button mat-icon-button (click)="downloadOriginalFile()" [matTooltip]="'lang.downloadOriginalFile' | translate">
                     <mat-icon class="fa fa-download"></mat-icon>
                 </button>
                 <button [disabled]="!functions.empty(file.subinfos) && file.subinfos.signedDocVersions" [class.disabledButton]="!functions.empty(file.subinfos) && file.subinfos.signedDocVersions" *ngIf="editMode && resId !== null && !noConvertedFound" mat-icon-button (click)="editResource()"
-                    [matTooltip]="functions.empty(file.subinfos) || (!functions.empty(file.subinfos) && !file.subinfos.signedDocVersions) ? this.translate.instant('lang.editDocument') : this.translate.instant('lang.documentSignedMsg')">
+                    [matTooltip]="functions.empty(file.subinfos) || (!functions.empty(file.subinfos) && !file.subinfos.signedDocVersions) ? ('lang.editDocument' | translate) : ('lang.documentSignedMsg' | translate)">
                     <mat-icon class="fa fa-edit"></mat-icon>
                 </button>
                 <button mat-icon-button [matMenuTriggerFor]="menuOptions">
@@ -122,19 +122,19 @@
     </div>
 </ng-container>
 <button mat-fab *ngIf="isDocModified && mode === 'mainDocument' && resId !== null" color="accent"
-    [title]="this.translate.instant('lang.saveModifications')" style="position: absolute;z-index: 3;bottom: 40px;right: 60px;"
+    [title]="'lang.saveModifications' | translate" style="position: absolute;z-index: 3;bottom: 40px;right: 60px;"
     (click)="saveMainDocument()">
     <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
 </button>
 <button mat-fab *ngIf="isDocModified && mode === 'attachment'" color="accent"
-    [title]="this.translate.instant('lang.saveModifications')" style="position: absolute;z-index: 3;bottom: 40px;right: 60px;"
+    [title]="'lang.saveModifications' | translate" style="position: absolute;z-index: 3;bottom: 40px;right: 60px;"
     (click)="saveTmpDocument()">
     <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
 </button>
 <button mat-raised-button 
     *ngIf="(!isDocModified && mode === 'mainDocument' && resId !== null && !functions.empty(file.subinfos) && file.subinfos.signedDocVersions && this.headerService.user.id == file.signatoryId) && !hideTools && editMode" 
     color="warn"
-    [title]="this.translate.instant('lang.unsign')" style="position: fixed;z-index: 1;bottom: 100px;right: 150px;"
+    [title]="'lang.unsign' | translate" style="position: fixed;z-index: 1;bottom: 100px;right: 150px;"
     (click)="unsignMainDocument()">
     {{'lang.removeSignature' | translate}}
 </button>

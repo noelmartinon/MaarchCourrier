@@ -1,6 +1,0 @@
-<requestDefinitions>
-    <requestDefinition method="GET" path="/apps/maarch_entreprise/index.php" validationRule="bk_view_baskets" >
-      <parameter name="module" value="basket"/>
-      <parameter name="page" value="view_baskets"/>
-    </requestDefinition>
-</requestDefinitions>

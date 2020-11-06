@@ -1,7 +1,7 @@
 <ng-container *ngIf="!loading; else elseTemplate">
     <div class="folderTools">
         <div class="filter">
-            <plugin-autocomplete #autocomplete [size]="'small'" [labelPlaceholder]="this.translate.instant('lang.searchFolder')"
+            <plugin-autocomplete #autocomplete [size]="'small'" [labelPlaceholder]="'lang.searchFolder' | translate"
                 [routeDatas]="['/rest/autocomplete/folders']" [targetSearchKey]="'idToDisplay'"
                 (triggerEvent)="goTo($event)" appearance="outline"></plugin-autocomplete>
         </div>
@@ -47,7 +47,7 @@
                                 [class.revertPinnedActionIcon]="node.pinned">
                                 <i class="fas fa-thumbtack"></i>
                             </mat-icon>
-                            <span>{{node.pinned ? this.translate.instant('lang.unpinFolder') : this.translate.instant('lang.pinFolder')}}</span>
+                            <span>{{node.pinned ? ('lang.unpinFolder' | translate) : ('lang.pinFolder' | translate)}}</span>
                         </button>
                         <button mat-menu-item [disabled]="createItemNode || !node.canAdd || node.level > 6"
                             (click)="addNewItem(node)">
@@ -84,10 +84,10 @@
                         <input matInput id="itemValue" #itemValue placeholder="{{'lang.addFolder' | translate}}...">
                         <button type="submit" matSuffix mat-icon-button (click)="saveNode(node, itemValue.value)"
                             [disabled]="itemValue.value === ''">
-                            <mat-icon class="fa fa-check" color="accent" [title]="this.translate.instant('lang.add')"></mat-icon>
+                            <mat-icon class="fa fa-check" color="accent" [title]="'lang.add' | translate"></mat-icon>
                         </button>
                         <button type="button" matSuffix mat-icon-button (click)="removeTemporaryNode(node)">
-                            <mat-icon class="fa fa-times" style="color:#8e3e52" [title]="this.translate.instant('lang.delete')"></mat-icon>
+                            <mat-icon class="fa fa-times" style="color:#8e3e52" [title]="'lang.delete' | translate"></mat-icon>
                         </button>
                     </mat-form-field>
                 </form>
@@ -127,7 +127,7 @@
                                 [class.revertPinnedActionIcon]="node.pinned">
                                 <i class="fas fa-thumbtack"></i>
                             </mat-icon>
-                            <span>{{node.pinned ? this.translate.instant('lang.unpinFolder') : this.translate.instant('lang.pinFolder')}}</span>
+                            <span>{{node.pinned ? ('lang.unpinFolder' | translate) : ('lang.pinFolder' | translate)}}</span>
                         </button>
 
                         <button mat-menu-item [disabled]="createItemNode || !node.canAdd || node.level > 6"

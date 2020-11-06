@@ -29,7 +29,7 @@ export class FilterToolComponent implements OnInit {
     }
 
     toggleFilter(key: string, index: number) {
-        this.filters[key]['values'][index].selected = !this.filters[key]['values'][index].selected;
+        this.getFiltersNotEmpty(key)[index].selected = !this.getFiltersNotEmpty(key)[index].selected;
         this.filterChanged.emit();
     }
 
@@ -39,5 +39,9 @@ export class FilterToolComponent implements OnInit {
 
     getRealCount(key: string) {
         return this.filters[key]['values'].filter((item: any) => item.count > 0 || (item.count === 0 && item.selected)).length;
+    }
+
+    getFiltersNotEmpty(key: string) {
+        return this.filters[key]['values'].filter((item: any) => item.count > 0 || (item.count === 0 && item.selected));
     }
 }

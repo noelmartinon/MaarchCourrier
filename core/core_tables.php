@@ -1,22 +1,9 @@
 <?php
 
 /*
-*    Copyright 2008 - 2011 Maarch
-*
-*  This file is part of Maarch Framework.
-*
-*   Maarch Framework is free software: you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation, either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   Maarch Framework is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*    along with Maarch Framework.  If not, see <http://www.gnu.org/licenses/>.
+* Copyright Maarch since 2008 under licence GPLv3.
+* See LICENCE.txt file at the root folder for more details.
+* This file is part of Maarch software.
 */
 
 /**
@@ -42,12 +29,6 @@ if (! defined('_LC_CYCLE_STEPS_TABLE_NAME')) {
 }
 if (! defined('HISTORY_TABLE')) {
     define('HISTORY_TABLE', 'history');
-}
-if (! defined('PARAM_TABLE')) {
-    define('PARAM_TABLE', 'parameters');
-}
-if (! defined('SAVED_QUERIES')) {
-    define('SAVED_QUERIES', 'saved_queries');
 }
 if (! defined('SECURITY_TABLE')) {
     define('SECURITY_TABLE', 'security');

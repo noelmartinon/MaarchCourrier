@@ -223,6 +223,10 @@ export class AuthService {
                     tap((data: any) => {
                         console.debug('getLoginInformations');
                         this.setAppSession(data.instanceId);
+
+                        this.localStorage.save('lang', data.lang);
+                        this.translate.use(data.lang);
+
                         this.changeKey = data.changeKey;
                         this.applicationName = data.applicationName;
                         this.loginMessage = data.loginMessage;
@@ -287,7 +291,7 @@ export class AuthService {
                             entities: data.entities,
                             groups: data.groups,
                             preferences: data.preferences,
-                            privileges: data.privileges[0] === 'ALL_PRIVILEGES' ? this.privilegeService.getAllPrivileges(!data.lockAdvancedPrivileges) : data.privileges,
+                            privileges: data.privileges[0] === 'ALL_PRIVILEGES' ? this.privilegeService.getAllPrivileges(!data.lockAdvancedPrivileges, this.authMode) : data.privileges,
                             featureTour: data.featureTour
                         };
                         this.headerService.nbResourcesFollowed = data.nbFollowedResources;

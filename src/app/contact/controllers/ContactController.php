@@ -1439,9 +1439,8 @@ class ContactController
             } elseif ($resourceContact['type'] == 'user') {
                 $user = UserModel::getById(['id' => $resourceContact['item_id']]);
 
-                $phone = '';
-                if (!empty($phone) && ($user['id'] == $GLOBALS['id']
-                        || PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']]))) {
+                $phone = null;
+                if (($user['id'] == $GLOBALS['id'] || PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']]))) {
                     $phone = $user['phone'];
                 }
 
@@ -1479,7 +1478,7 @@ class ContactController
                     'externalId'         => null
                 ];
             } elseif ($resourceContact['type'] == 'entity') {
-                $entity = EntityModel::getById(['id' => $resourceContact['item_id'], 'select' => ['entity_label', 'email', 'enabled']]);
+                $entity = EntityModel::getById(['id' => $resourceContact['item_id'], 'select' => ['entity_label', 'email', 'enabled', 'adrs_1', 'adrs_2', 'adrs_3', 'zipcode', 'city', 'country']]);
 
                 $contact = [
                     'type'               => 'entity',
@@ -1489,12 +1488,12 @@ class ContactController
                     'department'         => null,
                     'function'           => null,
                     'addressNumber'      => null,
-                    'addressStreet'      => null,
+                    'addressStreet'      => $entity['adrs_1'],
                     'addressAdditional1' => null,
                     'addressAdditional2' => null,
-                    'addressPostcode'    => null,
-                    'addressTown'        => null,
-                    'addressCountry'     => null,
+                    'addressPostcode'    => $entity['zipcode'],
+                    'addressTown'        => $entity['city'],
+                    'addressCountry'     => $entity['country'],
                     'email'              => $entity['email'],
                     'phone'              => null,
                     'communicationMeans' => null,

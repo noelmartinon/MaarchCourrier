@@ -1,17 +1,17 @@
 <div class="stepContent">
     <h2 class="stepContentTitle"><i class="fa fa-mail-bulk"></i> {{'lang.stepMailServer' | translate}}</h2>
     <div class="alert-message alert-message-info" role="alert" style="margin-top: 30px;min-width: 100%;"
-        [innerHTML]="this.translate.instant('lang.stepMailServer_desc')">
+        [innerHTML]="'lang.stepMailServer_desc' | translate">
     </div>
     <div class="alert-message alert-message-danger" role="alert" style="margin-top: 30px;min-width: 100%;"
-    [innerHTML]="this.translate.instant('lang.stepMailServer_warning')">
+    [innerHTML]="'lang.stepMailServer_warning' | translate">
 </div>
     <mat-drawer-container autosize>
         <mat-drawer-content>
             <div style="width: 99%;">
                 <form [formGroup]="stepFormGroup" style="display: contents;">
                     <mat-form-field>
-                        <mat-select #smtpType name="smtpType" [placeholder]="this.translate.instant('lang.configurationType')"
+                        <mat-select #smtpType name="smtpType" [placeholder]="'lang.configurationType' | translate"
                             formControlName="type" required>
                             <mat-option *ngFor="let type of smtpTypeList" [value]="type.id">
                                 {{type.label}}
@@ -21,7 +21,7 @@
                     <div class="row" style="margin:0px;">
                         <div class="col-md-2">
                             <mat-form-field>
-                                <mat-select name="SMTPSecure" [placeholder]="this.translate.instant('lang.smtpAuth')" formControlName="secure">
+                                <mat-select name="SMTPSecure" [placeholder]="'lang.smtpAuth' | translate" formControlName="secure">
                                     <mat-option *ngFor="let security of smtpSecList" [value]="security.id">
                                         {{security.label}}
                                     </mat-option>
@@ -30,13 +30,13 @@
                         </div>
                         <div class="col-md-9">
                             <mat-form-field>
-                                <input matInput name="host" formControlName="host" [placeholder]="this.translate.instant('lang.host')" required>
+                                <input matInput name="host" formControlName="host" [placeholder]="'lang.host' | translate" required>
                             </mat-form-field>
                         </div>
                         <div class="col-md-1">
                             <mat-form-field>
                                 <input name="port" type="number" matInput formControlName="port"
-                                    [placeholder]="this.translate.instant('lang.port')" required>
+                                    [placeholder]="'lang.port' | translate" required>
                             </mat-form-field>
                         </div>
                     </div>
@@ -48,13 +48,13 @@
                     </mat-form-field>
                     <mat-form-field>
                         <input name="password" [type]="hidePassword ? 'password' : 'text'" formControlName="password"
-                            matInput [placeholder]="this.translate.instant('lang.password')" required>
+                            matInput [placeholder]="'lang.password' | translate" required>
                         <mat-icon color="primary" style="cursor: pointer;" matSuffix
                             (click)="hidePassword = !hidePassword" class="fa fa-2x"
                             [ngClass]="[hidePassword ? 'fa-eye-slash' : 'fa-eye']"></mat-icon>
                     </mat-form-field>
                     <mat-form-field>
-                        <input name="mailFrom" formControlName="from" required matInput [placeholder]="this.translate.instant('lang.mailFrom')">
+                        <input name="mailFrom" formControlName="from" required matInput [placeholder]="'lang.mailFrom' | translate">
                     </mat-form-field>
                 </form>
             </div>
@@ -73,7 +73,7 @@
                     <p mat-line> {{emailSendResult.msg}} </p>
                 </mat-list-item>
             </mat-nav-list>
-            <div class="bash" *ngIf="this.emailSendResult.msg === this.translate.instant('lang.emailSendFailed')">
+            <div class="bash" *ngIf="this.emailSendResult.msg === ('lang.emailSendFailed' | translate)">
                 {{this.emailSendResult.debug}}
             </div>
         </mat-drawer>

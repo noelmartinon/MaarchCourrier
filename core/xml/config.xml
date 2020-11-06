@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ROOT>
     <CONFIG>
-        <defaultlanguage>fr</defaultlanguage>
         <default_timezone>Europe/Paris</default_timezone>
     </CONFIG>
     <BUSINESSAPPS>
@@ -10,7 +9,6 @@
     </BUSINESSAPPS>
     <TABLENAME>
         <actions>actions</actions>
-        <authors>authors</authors>
         <docservers>docservers</docservers>
         <doctypes>doctypes</doctypes>
         <history>history</history>

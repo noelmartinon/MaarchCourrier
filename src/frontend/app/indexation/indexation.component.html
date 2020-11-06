@@ -49,10 +49,10 @@
                         <mat-icon class="fa fa-check"></mat-icon>
                     </button>
                 </ng-container>
-                <div class="emptyAction" *ngIf="actionsList.length === 0" [innerHTML]="this.translate.instant('lang.noAvailableAction')"></div>
+                <div class="emptyAction" *ngIf="actionsList.length === 0" [innerHTML]="'lang.noAvailableAction' | translate"></div>
             </div>
         </ng-container>
-        <div *ngIf="isEmptyIndexingModels()" class="emptyModel" [innerHTML]="this.translate.instant('lang.noAvailableIndexingModel')"></div>
+        <div *ngIf="isEmptyIndexingModels()" class="emptyModel" [innerHTML]="'lang.noAvailableIndexingModel' | translate"></div>
     </ng-template>
     <mat-sidenav-content>
         <div class="bg-head">

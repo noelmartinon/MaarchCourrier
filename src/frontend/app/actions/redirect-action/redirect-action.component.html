@@ -90,7 +90,7 @@
                 <b>{{destUser.descriptionToDisplay}}</b></div>
             <div *ngIf="keepDestForRedirection && oldUser != null" class="alert-message alert-message-info" role="alert"
                 style="margin-top: 30px;"><b>{{oldUser.labelToDisplay}}</b>&nbsp;<span
-                    [innerHTML]="this.translate.instant('lang.willBeAutomaticallyInCopy')"></span></div>
+                    [innerHTML]="'lang.willBeAutomaticallyInCopy' | translate"></span></div>
         </div>
 
         <div class="row" *ngIf="redirectMode != '' && redirectMode != 'none'">

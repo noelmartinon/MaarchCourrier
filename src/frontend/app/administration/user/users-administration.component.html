@@ -108,7 +108,7 @@
                             <mat-cell *matCellDef="let element" style="justify-content: flex-end;">
                                 <button mat-icon-button color="primary" [disabled]="element.id===user.id || (['root_visible', 'root_invisible'].indexOf(element.mode) > -1 && headerService.user.mode === 'standard')"
                                     *ngIf="element.status != 'SPD'" matTooltip="{{'lang.suspend' | translate}}"
-                                    (click)="$event.stopPropagation();deleteUser(element, 'suspend')">
+                                    (click)="$event.stopPropagation();actionUserPrompt(element, 'suspend')">
                                     <mat-icon class="fa fa-pause fa-2x" aria-hidden="true"></mat-icon>
                                 </button>
                                 <button mat-icon-button color="accent" *ngIf="element.status == 'SPD'"
@@ -118,7 +118,7 @@
                                 </button>
                                 <button mat-icon-button color="warn" [disabled]="element.id===user.id || ['root_visible', 'root_invisible'].indexOf(element.mode) > -1"
                                     matTooltip="{{'lang.delete' | translate}}" data-toggle="modal" data-target="#changeDiffListDest"
-                                    (click)="$event.stopPropagation();deleteUser(element, 'delete')">
+                                    (click)="$event.stopPropagation();actionUserPrompt(element, 'delete')">
                                     <mat-icon class="fa fa-trash-alt fa-2x"></mat-icon>
                                 </button>
                             </mat-cell>

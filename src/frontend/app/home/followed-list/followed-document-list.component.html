@@ -17,7 +17,7 @@
                     [listProperties]="this.listProperties" [totalRes]="allResInBasket.length"
                     [selectedRes]="selectedRes" [routeDatas]="'/rest/followedResources/filters'"
                     (toggleAllRes)="toggleAllRes($event)" (refreshEventAfterAction)="refreshDaoAfterAction()"
-                    (refreshEvent)="refreshDao()" [title]="this.translate.instant('lang.searchTrackedMail')">
+                    (refreshEvent)="refreshDao()" [title]="'lang.searchTrackedMail' | translate">
                 </app-filters-tool>
             </div>
         </div>
@@ -87,17 +87,17 @@
                                     <span *ngIf="!appService.getViewMode()" class="main-info-data"
                                         style="width:200px;text-align:center;cursor:pointer;">
                                         <ng-container
-                                            *ngIf="row.chrono == this.translate.instant('lang.undefined') && row.barcode != this.translate.instant('lang.undefined')">
+                                            *ngIf="row.chrono == ('lang.undefined' | translate) && row.barcode != ('lang.undefined' | translate)">
                                             <span style="color: rgba(0,0,0,0.4);font-size: 90%;">
                                                 <i title="{{'lang.barcode' | translate}}" class="fas fa-barcode"></i>
                                                 {{row.barcode}}</span>
                                         </ng-container>
-                                        <ng-container *ngIf="row.chrono != this.translate.instant('lang.undefined')">
+                                        <ng-container *ngIf="row.chrono != ('lang.undefined' | translate)">
                                             {{row.chrono}}
                                         </ng-container>
                                     </span>
                                     <span class="main-info-data" style="font-weight:bold;flex:1;cursor:pointer;"
-                                        [class.undefined]="row.subject == this.translate.instant('lang.undefined')"
+                                        [class.undefined]="row.subject == ('lang.undefined' | translate)"
                                         title="{{row.subject}}">{{row.subject | shorten: 150: '...'}}</span>
                                     <span class="main-info-action">
                                         <div *ngIf="!row.allowed" color="warn">
@@ -126,7 +126,7 @@
                                                 [color]="snav2.opened && row.checked && currentMode == 'diffusion' ? 'primary' : ''">
                                             </mat-icon>
                                         </button>
-                                        <button mat-icon-button title="{{row.hasDocument ? this.translate.instant('lang.viewResource') : this.translate.instant('lang.noDocument')}}" (click)="$event.stopPropagation();viewDocument(row)"
+                                        <button mat-icon-button title="{{row.hasDocument ? ('lang.viewResource' | translate) : ('lang.noDocument' | translate)}}" (click)="$event.stopPropagation();viewDocument(row)"
                                             (mouseenter)="viewThumbnail(row);" (mouseleave)="closeThumbnail();"
                                             [disabled]="!row.hasDocument">
                                             <mat-icon class="fa" [ngClass]="[row.hasDocument ? 'fa-eye' : 'fa-eye-slash']"></mat-icon>

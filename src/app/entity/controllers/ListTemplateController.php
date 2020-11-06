@@ -665,7 +665,7 @@ class ListTemplateController
             }
             if ($item['type'] == 'user') {
                 $user = UserModel::getById(['id' => $item['id'], 'select' => ['status']]);
-                if ($user == 'SPD' || $user == 'DEL') {
+                if (empty($user) || $user['status'] == 'SPD' || $user['status'] == 'DEL') {
                     return ['errors' => 'Item user is not valid'];
                 }
             }

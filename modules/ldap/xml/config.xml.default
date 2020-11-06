@@ -22,8 +22,8 @@
         </ldap>
     </config>
     <!-- Synchronisation Ldap -->
-    <user>superadmin</user>
-    <password>superadmin</password>
+    <userWS>superadmin</userWS>
+    <passwordWS>superadmin</passwordWS>
     <synchronizeUsers>true</synchronizeUsers>
     <synchronizeEntities>true</synchronizeEntities>
     <mapping>
@@ -45,9 +45,11 @@
     <filter>
         <!-- Chemin ou se trouve les utilisateurs de l'application -->
          <dn id="OU=Utilisateurs,DC=maarch,DC=com" type="users">
+             <user>(cn=*)</user>
         </dn>
         <!-- Chemin ou se trouve les entités de l'application -->
         <dn id="OU=Services,DC=maarch,DC=com" type="entities">
+            <user>(cn=*)</user>
         </dn>
     </filter>
 </root>

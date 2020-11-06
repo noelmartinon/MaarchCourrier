@@ -12,18 +12,18 @@
             <div class="fieldInput" [class.advancedInput]="field.type === 'checkbox'">
                 <ng-container *ngIf="['string', 'autocomplete', 'banAutocomplete', 'contact'].indexOf(field.type) > -1">
                     <mat-form-field class="input-form" floatLabel="never">
-                        <textarea matInput [placeholder]="this.translate.instant('lang.' + field.type + 'Input')" matTextareaAutosize
+                        <textarea matInput [placeholder]="'lang.' + field.type + 'Input' | translate" matTextareaAutosize
                             matAutosizeMinRows="1" cdkAutosizeMaxRows="6" disabled></textarea>
                     </mat-form-field>
                 </ng-container>
                 <ng-container *ngIf="field.type === 'integer'">
                     <mat-form-field class="input-form" floatLabel="never">
-                        <input type="number" matInput [placeholder]="this.translate.instant('lang.' + field.type + 'Input')" disabled>
+                        <input type="number" matInput [placeholder]="'lang.' + field.type + 'Input' | translate" disabled>
                     </mat-form-field>
                 </ng-container>
                 <ng-container *ngIf="field.type === 'select'">
                     <mat-form-field class="input-form" floatLabel="never">
-                        <mat-select [placeholder]="this.translate.instant('lang.' + field.type + 'Input')" disabled>
+                        <mat-select [placeholder]="'lang.' + field.type + 'Input' | translate" disabled>
                             <mat-option *ngFor="let value of field.values" [value]="value">
                                 {{value}}
                             </mat-option>
@@ -32,7 +32,7 @@
                 </ng-container>
                 <ng-container *ngIf="field.type === 'date'">
                     <mat-form-field class="input-form" floatLabel="never">
-                        <input matInput [matDatepicker]="picker" [placeholder]="this.translate.instant('lang.' + field.type + 'Input')"
+                        <input matInput [matDatepicker]="picker" [placeholder]="'lang.' + field.type + 'Input' | translate"
                             (click)="picker.open()" disabled>
                         <mat-datepicker-toggle matSuffix [for]="picker">
                         </mat-datepicker-toggle>
@@ -83,18 +83,18 @@
                 <div class="fieldInput">
                     <ng-container *ngIf="field.type === 'string' || field.type === 'autocomplete'">
                         <mat-form-field class="input-form" floatLabel="never">
-                            <textarea matInput [placeholder]="this.translate.instant('lang.' + field.type + 'Input')" matTextareaAutosize
+                            <textarea matInput [placeholder]="'lang.' + field.type + 'Input' | translate" matTextareaAutosize
                                 matAutosizeMinRows="1" cdkAutosizeMaxRows="6" disabled></textarea>
                         </mat-form-field>
                     </ng-container>
                     <ng-container *ngIf="field.type === 'integer'">
                         <mat-form-field class="input-form" floatLabel="never">
-                            <input type="number" matInput [placeholder]="this.translate.instant('lang.' + field.type + 'Input')" disabled>
+                            <input type="number" matInput [placeholder]="'lang.' + field.type + 'Input' | translate" disabled>
                         </mat-form-field>
                     </ng-container>
                     <ng-container *ngIf="field.type === 'select'">
                         <mat-form-field class="input-form" floatLabel="never">
-                            <mat-select [placeholder]="this.translate.instant('lang.' + field.type + 'Input')" disabled>
+                            <mat-select [placeholder]="'lang.' + field.type + 'Input' | translate" disabled>
                                 <mat-option *ngFor="let value of field.values" [value]="value">
                                     {{value}}
                                 </mat-option>
@@ -103,7 +103,7 @@
                     </ng-container>
                     <ng-container *ngIf="field.type === 'date'">
                         <mat-form-field class="input-form" floatLabel="never">
-                            <input matInput [matDatepicker]="picker" [placeholder]="this.translate.instant('lang.' + field.type + 'Input')"
+                            <input matInput [matDatepicker]="picker" [placeholder]="'lang.' + field.type + 'Input' | translate"
                                 (click)="picker.open()" disabled>
                             <mat-datepicker-toggle matSuffix [for]="picker">
                             </mat-datepicker-toggle>

@@ -100,6 +100,8 @@ export class LoginComponent implements OnInit {
                     this.notify.error(this.translate.instant('lang.wrongLoginPassword'));
                 } else if (err.error.errors === 'Account Locked') {
                     this.notify.error(this.translate.instant('lang.accountLocked') + ' ' + this.timeLimit.transform(err.error.date));
+                } else if (this.authService.authMode === 'sso' && err.error.errors === 'Authentication Failed : login not present in header' && !this.functionsService.empty(this.authService.authUri)) {
+                    window.location.href = this.authService.authUri;
                 } else {
                     this.notify.handleSoftErrors(err);
                 }

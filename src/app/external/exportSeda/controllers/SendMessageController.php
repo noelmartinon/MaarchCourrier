@@ -43,7 +43,7 @@ class SendMessageController
         $type          = $aArgs['type'];
 
         $DOMTemplate = new \DOMDocument();
-        $DOMTemplate->load('modules/export_seda/resources/'.$type.'.xml');
+        $DOMTemplate->load('src/app/external/exportSeda/resources/'.$type.'.xml');
         $DOMTemplateProcessor = new DOMTemplateProcessorController($DOMTemplate);
         $DOMTemplateProcessor->setSource($type, $messageObject);
         $DOMTemplateProcessor->merge();

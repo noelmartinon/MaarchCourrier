@@ -25,14 +25,14 @@
                             <input matInput [(ngModel)]="emailsubject" maxlength="100">
                         </mat-form-field>
                         <div class="models">
-                            <plugin-select-search *ngIf="availableEmailModels.length > 0" [label]="this.translate.instant('lang.emailModel')"
-                                [placeholderLabel]="this.translate.instant('lang.emailModel')" [datas]="availableEmailModels"
+                            <plugin-select-search *ngIf="availableEmailModels.length > 0" [label]="'lang.emailModel' | translate"
+                                [placeholderLabel]="'lang.emailModel' | translate" [datas]="availableEmailModels"
                                 [formControlSelect]="templateEmailListForm"
                                 (afterSelected)="mergeEmailTemplate($event)">
                             </plugin-select-search>
 
                             <plugin-select-search #templateList *ngIf="availableSignEmailModels.length > 0"
-                                [label]="this.translate.instant('lang.emailSignatures')" [placeholderLabel]="this.translate.instant('lang.emailSignatures')"
+                                [label]="'lang.emailSignatures' | translate" [placeholderLabel]="'lang.emailSignatures' | translate"
                                 [datas]="availableSignEmailModels" [formControlSelect]="emailSignListForm"
                                 (afterSelected)="mergeSignEmailTemplate($event)">
                             </plugin-select-search>
@@ -69,7 +69,7 @@
                             <p><b>{{acknowledgement.noSendAR.number}}</b> {{'lang.canNotSendAr' | translate}} :</p>
                             <ul>
                                 <li *ngFor="let info of acknowledgement.noSendAR.list">
-                                    <b>{{info.alt_identifier != null ? info.alt_identifier : this.translate.instant('lang.undefined')}}</b> :
+                                    <b>{{info.alt_identifier != null ? info.alt_identifier : 'lang.undefined' | translate}}</b> :
                                     {{info.info}}
                                 </li>
                             </ul>
