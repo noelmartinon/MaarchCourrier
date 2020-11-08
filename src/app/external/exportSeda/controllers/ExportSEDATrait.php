@@ -14,6 +14,7 @@ namespace ExportSeda\controllers;
 
 use Attachment\models\AttachmentModel;
 use Contact\controllers\ContactController;
+use Convert\controllers\ConvertPdfController;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
 use Doctype\models\DoctypeModel;
@@ -249,6 +250,10 @@ trait ExportSEDATrait
             'title'         => 'Accusé de réception',
             'format'        => 'xml',
             'status'        => 'TRA'
+        ]);
+        ConvertPdfController::convert([
+            'resId'  => $id,
+            'collId' => 'attachments_coll'
         ]);
         if (empty($id) || !empty($id['errors'])) {
             return ['errors' => ['[storeAttachment] ' . $id['errors']]];

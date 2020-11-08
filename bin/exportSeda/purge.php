@@ -188,8 +188,10 @@ if (!empty($resIdMaster)) {
             $resIdToPurge[] = $resource['res_id'];
         }
     }
-    $tmpWhere[] = 'res_id in (?)';
-    $tmpData[]  = $resIdToPurge;
+    if (!empty($resIdToPurge)) {
+        $tmpWhere[] = 'res_id in (?)';
+        $tmpData[]  = $resIdToPurge;
+    }
 }
 
 $wherePurge[] = '((' . implode(") or (", $tmpWhere) . '))';
