@@ -140,7 +140,7 @@ class AttachmentController
                 } else {
                     $attachment['signatory'] = UserModel::getLabelledUserById(['login' => $signedResponse[0]['typist']]);
                     $typist = UserModel::getByLogin(['login' => $signedResponse[0]['typist'], 'select' => ['id']]);
-                    $attachment['signatoryId'] = $typist['typist'];
+                    $attachment['signatoryId'] = $typist['id'];
                 }
                 $attachment['signDate'] = $signedResponse[0]['creation_date'];
             }
@@ -477,7 +477,7 @@ class AttachmentController
         }
 
         $attachment = AttachmentModel::get([
-            'select'    => ['res_id', 'docserver_id', 'res_id_master', 'format', 'title', 'signatory_user_serial_id'],
+            'select'    => ['res_id', 'docserver_id', 'res_id_master', 'format', 'title', 'signatory_user_serial_id', 'typist', 'attachment_type'],
             'where'     => ['res_id = ?', 'status not in (?)'],
             'data'      => [$args['id'], ['DEL']],
             'limit'     => 1
@@ -542,10 +542,19 @@ class AttachmentController
         $data = $request->getQueryParams();
 
         if ($data['mode'] == 'base64') {
+            if ($attachment['attachment_type'] == 'signed_response') {
+                if (!empty($attachment['signatory_user_serial_id'])) {
+                    $signatoryId = $attachment['signatory_user_serial_id'];
+                } else {
+                    $typist      = UserModel::getByLogin(['login' => $attachment['typist'], 'select' => ['id']]);
+                    $signatoryId = $typist['id'];
+                }
+            }
+
             return $response->withJson([
                 'encodedDocument' => base64_encode($fileContent),
                 'originalFormat'  => $attachment['format'],
-                'signatoryId'     => $attachment['signatory_user_serial_id']
+                'signatoryId'     => $signatoryId
             ]);
         } else {
             $finfo    = new \finfo(FILEINFO_MIME_TYPE);

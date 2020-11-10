@@ -45,7 +45,8 @@
 * Before asking questions, please read the Documentation at
 * http://adldap.sourceforge.net/wiki/doku.php?id=api
 */
-class LDAP {
+class LDAP
+{
 
     /**
      * Define the different types of account in AD
@@ -59,7 +60,7 @@ class LDAP {
     const ADLDAP_DISTRIBUTION_LOCAL_GROUP = 536870913;
 
 
-    protected $_domain=NULL;
+    protected $_domain=null;
 
     /**
     * Optional account with higher privileges for searching
@@ -68,8 +69,8 @@ class LDAP {
     * @var string
     * @var string
     */
-    protected $_login=NULL;
-    protected $_password=NULL;
+    protected $_login=null;
+    protected $_password=null;
 
     /**
     * Use SSL, your server needs to be setup, please see
@@ -89,21 +90,18 @@ class LDAP {
     protected $_bind;
 
 
-    function __construct($domain,$login,$password,$ssl='false'){
-
+    public function __construct($domain, $login, $password, $ssl='false')
+    {
         $this->_domain = $domain;
         $this->_login = $login;
         $this->_password = $password;
         $this->_use_ssl = ($ssl == 'true');
 
         // Connect to the AD/LDAP server as the username/password
-        if ($this->_use_ssl)
-        {
+        if ($this->_use_ssl) {
             //echo "ldaps://".$this->_domain;
             $this->_conn = ldap_connect("ldaps://".$this->_domain);
-        }
-        else
-        {
+        } else {
             $this->_conn = ldap_connect($this->_domain);
         }
 
@@ -112,20 +110,17 @@ class LDAP {
         ldap_set_option($this->_conn, LDAP_OPT_REFERRALS, 0);
 
         // Bind as a domain admin if they've set it up
-        if ($this->_login!=NULL && $this->_password!=NULL){
+        if ($this->_login!=null && $this->_password!=null) {
             //$this->_bind = @ldap_bind($this->_conn,$this->_login."@".$this->_domain,$this->_password);
             //echo '<pre>';
             //var_dump($this);
             //echo '</pre>';
-            $this->_bind = @ldap_bind($this->_conn,$this->_login,$this->_password);
-            if (!$this->_bind){
-                if ($this->_use_ssl)
-                {
-                    throw new Exception ('FATAL: AD bind failed. Either the LDAPS connection failed or the login credentials are incorrect.');
-                }
-                else
-                {
-                    throw new Exception ("FATAL: AD bind failed. Check the login credentials.");
+            $this->_bind = @ldap_bind($this->_conn, $this->_login, $this->_password);
+            if (!$this->_bind) {
+                if ($this->_use_ssl) {
+                    throw new Exception('FATAL: AD bind failed. Either the LDAPS connection failed or the login credentials are incorrect.');
+                } else {
+                    throw new Exception("FATAL: AD bind failed. Check the login credentials.");
                 }
             }
         }
@@ -138,7 +133,10 @@ class LDAP {
     *
     * @return void
     */
-    function __destruct(){ ldap_close($this->_conn); }
+    public function __destruct()
+    {
+        ldap_close($this->_conn);
+    }
 
     /**
     * Validate a user's login credentials
@@ -148,25 +146,31 @@ class LDAP {
     * @param bool optional $prevent_rebind
     * @return bool
     */
-    public function authenticate($login,$password,$prevent_rebind=false){
+    public function authenticate($login, $password, $prevent_rebind=false)
+    {
 
         // Prevent null binding
-        echo 'ici1'.'<br />';
-        if ($login==NULL || $password==NULL){ return (false);}
+        if ($login==null || $password==null) {
+            return (false);
+        }
 
         // Bind as the user
-        echo 'ici2'.'<br />';
-        try{ $this->_bind = ldap_bind($this->_conn,$login,$password); }
-        catch(Exception $e){}
+        try {
+            $this->_bind = ldap_bind($this->_conn, $login, $password);
+        } catch (Exception $e) {
+        }
 
-        echo 'ici3'.'<br />';
-        if (!$this->_bind){ return (false);}
+        if (!$this->_bind) {
+            return (false);
+        }
 
-        // Cnce we've checked their details, kick back into admin mode if we have it
-        echo 'ici4'.'<br />';
-        if ($this->_login!=NULL && !$prevent_rebind){
-            $this->_bind = @ldap_bind($this->_conn,$this->_login,$this->_password);
-            if (!$this->_bind){ echo ("FATAL: AD rebind failed."); exit(); } // This should never happen in theory
+        // Once we've checked their details, kick back into admin mode if we have it
+        if ($this->_login!=null && !$prevent_rebind) {
+            $this->_bind = @ldap_bind($this->_conn, $this->_login, $this->_password);
+            if (!$this->_bind) {
+                echo("FATAL: AD rebind failed.");
+                exit();
+            } // This should never happen in theory
         }
         return (true);
     }
@@ -183,50 +187,48 @@ class LDAP {
     * @param array $fields Fields to retrieve
     * @return array
     */
-    public function group_info($group_dn,$fields=array(),$dn='',$filter=''){
-        if ($group_dn==NULL){ return (false); }
-        if (!$this->_bind){ return (false); }
+    public function group_info($group_dn, $fields=array(), $dn='', $filter='')
+    {
+        if ($group_dn==null) {
+            return (false);
+        }
+        if (!$this->_bind) {
+            return (false);
+        }
 
-        if(count($fields) < 1)
+        if (count($fields) < 1) {
             $fields[] = "distinguishedname";
+        }
 
-        if(empty($dn))
-            $dn="DC=".str_replace(".",",DC=",$this->_domain);
+        if (empty($dn)) {
+            $dn="DC=".str_replace(".", ",DC=", $this->_domain);
+        }
 
         $entries = array();
 
         $filter="(&(objectCategory=group)(distinguishedName=".$group_dn.")".$filter.")";
-        $sr=ldap_search($this->_conn,$dn,$filter,$fields);
+        $sr=ldap_search($this->_conn, $dn, $filter, $fields);
         $entries = ldap_get_entries($this->_conn, $sr);
 
-        if($entries['count'] != 1)
+        if ($entries['count'] != 1) {
             return array();
+        }
 
         $ad_info_group = array();
 
-        foreach($fields as $fd)
-        {
-            if( $fd == 'memberof')
-            {
+        foreach ($fields as $fd) {
+            if ($fd == 'memberof') {
                 unset($entries[0][$fd]['count']);
                 $ad_info_group[$fd] = $entries[0][$fd];
-            }
-            else if( $fd == 'objectguid' && !empty($entries[0][$fd][0]) )
-            {
+            } elseif ($fd == 'objectguid' && !empty($entries[0][$fd][0])) {
                 $ad_info_group[$fd] = bin2hex($entries[0][$fd][0]);
-            }
-            else if( $fd == 'objectguid' && empty($entries[0][$fd][0]) )
-            {
+            } elseif ($fd == 'objectguid' && empty($entries[0][$fd][0])) {
                 //Le groupe n'a pas de objectguid (pb sur l'annuaire)
                 return array();
-            }
-            else if( $fd == 'member')
-            {
+            } elseif ($fd == 'member') {
                 unset($entries[0][$fd]['count']);
                 $ad_info_group[$fd] = $entries[0][$fd];
-            }
-            else
-            {
+            } else {
                 $ad_info_group[$fd] = $entries[0][$fd][0];
             }
         }
@@ -242,29 +244,31 @@ class LDAP {
     * @param bool $sorted Sort the user accounts
     * @return array
     */
-    public function all_users($fields=array(),$dn='',$filter=''){
+    public function all_users($fields=array(), $dn='', $filter='')
+    {
+        if (empty($dn)) {
+            $dn="DC=".str_replace(".", ",DC=", $this->_domain);
+        }
 
-        if(empty($dn))
-            $dn="DC=".str_replace(".",",DC=",$this->_domain);
+        if (!$this->_bind) {
+            return (false);
+        }
 
-        if (!$this->_bind){ return (false); }
-
-        if(count($fields) < 1)
+        if (count($fields) < 1) {
             $fields[] = "distinguishedname";
+        }
 
         $entries = array();
 
         $filter = "(&(objectClass=user)(objectCategory=person)".$filter.")";
-        $sr=ldap_search($this->_conn,$dn,$filter,$fields);
+        $sr=ldap_search($this->_conn, $dn, $filter, $fields);
         
         /*Condition qui permet de  parcourir tout l'annuaire en prenant les utilisateurs par ordres alphabétiques. Ainsi, on peut surpasser les 1000 utilisateurs*/
-        $countResult=ldap_count_entries($this->_conn,$sr); 
+        $countResult=ldap_count_entries($this->_conn, $sr);
 
-        if($countResult == 1000)
-        {
+        if ($countResult == 1000) {
             // loop trough the number 97-122 (ASCII number for the characters a-z)
-            for($a=97;$a<=122;$a++)
-            {
+            for ($a=97;$a<=122;$a++) {
                 // translate the number to a character
                 $character = chr($a);
                 // the new search filter withs returns all users with a last name starting with $character
@@ -272,14 +276,12 @@ class LDAP {
                 $results = ldap_search($this->_conn, $dn, $filterNew);
 
                 $users = array();
-                $users = ldap_get_entries($this->_conn,$results);
-                $entries = array_merge($entries, $users);                
+                $users = ldap_get_entries($this->_conn, $results);
+                $entries = array_merge($entries, $users);
             }
-        }
-        else
-        {
-             $users = ldap_get_entries($this->_conn,$sr);
-             $entries = array_merge($entries, $users);
+        } else {
+            $users = ldap_get_entries($this->_conn, $sr);
+            $entries = array_merge($entries, $users);
         }
                 
         
@@ -288,34 +290,24 @@ class LDAP {
 
         $ad_users = array();
 
-        for ($i=0; $i < (count($entries)-1); $i++)
-        {
-            foreach($fields as $fd)
-            {
-                if( $fd == 'objectguid' && !empty($entries[$i][$fd][0]) )
-                {
+        for ($i=0; $i < (count($entries)-1); $i++) {
+            foreach ($fields as $fd) {
+                if ($fd == 'objectguid' && !empty($entries[$i][$fd][0])) {
                     $ad_users[$i][$fd] = bin2hex($entries[$i][$fd][0]);
-                }
-                else if( $fd == 'objectguid' && empty($entries[$i][$fd][0]) )
-                {
+                } elseif ($fd == 'objectguid' && empty($entries[$i][$fd][0])) {
                     //L'utilisateur n'a pas de objectguid (pb sur l'annuaire)
                     unset($ad_users[$i]);
                     break;
-                }
-                else if( $fd == 'memberof')
-                {
+                } elseif ($fd == 'memberof') {
                     unset($entries[$i][$fd]['count']);
                     $ad_users[$i][$fd] = $entries[$i][$fd];
-                }
-                else if( $fd == 'useraccountcontrol')
-                {
-                    if( ($entries[$i][$fd][0] & 2) == 0)
+                } elseif ($fd == 'useraccountcontrol') {
+                    if (($entries[$i][$fd][0] & 2) == 0) {
                         $ad_users[$i][$fd] = 'Y';
-                    else
+                    } else {
                         $ad_users[$i][$fd] = 'N';
-                }
-                else
-                {
+                    }
+                } else {
                     $ad_users[$i][$fd] = $entries[$i][$fd][0];
                 }
             }
@@ -323,49 +315,43 @@ class LDAP {
         return $ad_users;
     }
 
-    public function all_groups($fields=array(),$dn='',$filter=''){
+    public function all_groups($fields=array(), $dn='', $filter='')
+    {
+        if (empty($dn)) {
+            $dn="DC=".str_replace(".", ",DC=", $this->_domain);
+        }
 
-        if(empty($dn))
-            $dn="DC=".str_replace(".",",DC=",$this->_domain);
+        if (!$this->_bind) {
+            return (false);
+        }
 
-        if (!$this->_bind){ return (false); }
-
-        if(count($fields) < 1)
+        if (count($fields) < 1) {
             $fields[]="distinguishedname";
+        }
 
         $entries = array();
 
         //Search for each filter
         $filter = "(&(objectClass=group)".$filter.")";
 
-        $sr=ldap_search($this->_conn,$dn,$filter,$fields);
+        $sr=ldap_search($this->_conn, $dn, $filter, $fields);
         $entries = ldap_get_entries($this->_conn, $sr);
 
-        for ($i=0; $i< ( count($entries) -1); $i++)
-        {
-            foreach($fields as $fd)
-            {
-                if( $fd == 'objectguid' && !empty($entries[$i][$fd][0]) )
+        for ($i=0; $i< (count($entries) -1); $i++) {
+            foreach ($fields as $fd) {
+                if ($fd == 'objectguid' && !empty($entries[$i][$fd][0])) {
                     $ad_groups[$i][$fd] = bin2hex($entries[$i][$fd][0]);
-
-                else if( $fd == 'objectguid' && empty($entries[$i][$fd][0]) )
-                {
+                } elseif ($fd == 'objectguid' && empty($entries[$i][$fd][0])) {
                     //Le groupe n'a pas de objectguid (pb sur l'annuaire)
                     unset($ad_groups[$i]);
                     break;
-                }
-                else if( $fd == 'memberof')
-                {
+                } elseif ($fd == 'memberof') {
                     unset($entries[$i][$fd]['count']);
                     $ad_groups[$i][$fd] = $entries[$i][$fd];
-                }
-                else if( $fd == 'member')
-                {
+                } elseif ($fd == 'member') {
                     unset($entries[$i][$fd]['count']);
                     $ad_groups[$i][$fd] = $entries[$i][$fd];
-                }
-                else
-                {
+                } else {
                     $ad_groups[$i][$fd] = $entries[$i][$fd][0];
                 }
             }
@@ -373,7 +359,4 @@ class LDAP {
 
         return ($ad_groups);
     }
-
 }
-
-?>
