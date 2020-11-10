@@ -1736,5 +1736,10 @@ export const LANG_FR = {
     "showTool": "Afficher la barre d'outils",
     "contactInput" : "Champ contact",
     "emptyValue": "Valeur vide",
-    "hideModal": "Ne plus afficher cette fenêtre"
+    "hideModal": "Ne plus afficher cette fenêtre",
+    "indexingModelUsedBy": "Ce modèle est déjà utilisé par : ",
+    "mailsWithStatus": " courrier(s) avec le statut ",
+    "indexingModelReplaceToDelete": "Pour le supprimer vous devez le remplacer par un autre modèle.",
+    "indexingModelFieldsReset": "Les champs suivants ne sont pas dans le modèle sélectionné et seront réinitialisés pour tous les courriers : ",
+    "indexingModelReassign": "Réaffectation du modèle d'enregistrement",
 };

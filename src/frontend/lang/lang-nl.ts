@@ -1717,5 +1717,10 @@ export const LANG_NL = {
     "showTool": "Afficher la barre d'outils", // _TO_TRANSLATE
     "contactInput" : "Contact input__TO_TRANSLATE", // _TO_TRANSLATE
     "emptyValue": "Valeur vide__TO_TRANSLATE",
-    "hideModal": "Ne plus afficher cette fenêtre__TO_TRANSLATE"
+    "hideModal": "Ne plus afficher cette fenêtre__TO_TRANSLATE",
+    "indexingModelUsedBy": "Ce modèle est déjà utilisé par : __TO_TRANSLATE",
+    "mailsWithStatus": " courrier(s) avec le statut __TO_TRANSLATE",
+    "indexingModelReplaceToDelete": "Pour le supprimer vous devez le remplacer par un autre modèle.__TO_TRANSLATE",
+    "indexingModelFieldsReset": "Les champs suivants ne sont pas dans le modèle sélectionné et seront réinitialisés pour tous les courriers : __TO_TRANSLATE",
+    "indexingModelReassign": "Réaffectation du modèle d'enregistrement__TO_TRANSLATE",
 };

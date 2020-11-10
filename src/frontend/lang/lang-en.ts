@@ -1734,5 +1734,10 @@ export const LANG_EN = {
     "showTool": "Show toolbar",
     "contactInput" : "Contact input",
     "emptyValue": "Empty value",
-    "hideModal": "Hide this modal"
+    "hideModal": "Hide this modal",
+    "indexingModelUsedBy": "This model is already used by : ",
+    "mailsWithStatus": " mail(s) with the status ",
+    "indexingModelReplaceToDelete": "To delete this model you have to replace it by another.",
+    "indexingModelFieldsReset": "The following fields are not in the selected model and will be reset for all mails : ",
+    "indexingModelReassign": "Reassign indexing model",
 };

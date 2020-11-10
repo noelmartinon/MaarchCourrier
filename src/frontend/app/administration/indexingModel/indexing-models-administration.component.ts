@@ -11,8 +11,8 @@ import { tap, finalize, catchError, filter, exhaustMap, map } from 'rxjs/operato
 import { of } from 'rxjs';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { AlertComponent } from '../../../plugins/modal/alert.component';
-import {FunctionsService} from "../../../service/functions.service";
+import { FunctionsService } from "../../../service/functions.service";
+import { RedirectIndexingModelComponent } from './redirectIndexingModel/redirect-indexing-model.component';
 
 declare function $j(selector: any): any;
 
@@ -62,7 +62,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        
+
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
         this.loading = true;
@@ -92,32 +92,25 @@ export class IndexingModelsAdministrationComponent implements OnInit {
     }
 
     delete(indexingModel: any) {
+        this.dialogRef = this.dialog.open(RedirectIndexingModelComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { indexingModel: indexingModel } });
 
-        if (!indexingModel.used) {
-            this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.lang.delete, msg: this.lang.confirmAction } });
-
-            this.dialogRef.afterClosed().pipe(
-                filter((data: string) => data === 'ok'),
-                exhaustMap(() => this.http.delete('../../rest/indexingModels/' + indexingModel.id)),
-                tap(() => {
-                    for (const i in this.indexingModels) {
-                        if (this.indexingModels[i].id == indexingModel.id) {
-                            this.indexingModels.splice(Number(i), 1);
-                        }
+        this.dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            tap(() => {
+                for (const i in this.indexingModels) {
+                    if (this.indexingModels[i].id === indexingModel.id) {
+                        this.indexingModels.splice(Number(i), 1);
                     }
-                    this.dataSource = new MatTableDataSource(this.indexingModels);
-                    this.dataSource.paginator = this.paginator;
-                    this.dataSource.sort = this.sort;
-                    this.notify.success(this.lang.indexingModelDeleted);
-                }),
-                catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
-        } else {
-            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: indexingModel.label, msg: this.lang.canNotDeleteIndexingModel } });
-        }
+                }
+                this.dataSource = new MatTableDataSource(this.indexingModels);
+                this.dataSource.paginator = this.paginator;
+                this.dataSource.sort = this.sort;
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     disableIndexingModel(indexingModel: any) {
