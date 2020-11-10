@@ -261,7 +261,7 @@ class EntityController
             }
         }
 
-        $externalId = $entity['external_id'];
+        $externalId = json_decode($entity['external_id'], true);
         if (!empty($data['externalId'])) {
             $externalId = array_merge($externalId, $data['externalId']);
             if (!empty($data['externalId']['alfrescoPassword'])) {
