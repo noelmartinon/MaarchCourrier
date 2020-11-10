@@ -76,7 +76,7 @@ export class DiffusionsListComponent implements OnInit {
     /**
      * Custom diffusion to display
      */
-    @Input() customDiffusion: any[] = [false];
+    @Input() customDiffusion: any[] = [];
 
     /**
      * To load privilege of current list management
