@@ -535,7 +535,7 @@ class FolderPrintController
                 return ['errors' => 'Conversion error : ' . $document['errors'], 'code' => 400];
             }
 
-            if ($document['docserver_id'] == $resourceDocument['docserver_id']) {
+            if (strtolower(pathinfo($document['filename'], PATHINFO_EXTENSION)) != 'pdf') {
                 return ['errors' => 'Document can not be converted', 'code' => 400];
             }
         } else {
