@@ -1734,5 +1734,6 @@ export const LANG_FR = {
     "zipcode":                                     "Code postal",
     "hideTool": "Cacher la barre d'outils",
     "showTool": "Afficher la barre d'outils",
-    "contactInput" : "Champ contact"
+    "contactInput" : "Champ contact",
+    "emptyValue": "Valeur vide"
 };
