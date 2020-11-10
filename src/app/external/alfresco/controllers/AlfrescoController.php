@@ -242,6 +242,12 @@ class AlfrescoController
         $account = json_encode($account);
 
         EntityModel::update([
+            'set'   => ['external_id' => "{}"],
+            'where' => ['id in (?)', 'external_id = ?'],
+            'data'  => [$body['entities'], 'null']
+        ]);
+
+        EntityModel::update([
             'postSet'   => ['external_id' => "jsonb_set(external_id, '{alfresco}', '{$account}')"],
             'where'     => ['id in (?)'],
             'data'      => [$body['entities']]
@@ -582,6 +588,10 @@ class AlfrescoController
         if ($fileContent === false) {
             return ['errors' => 'Document not found on docserver'];
         }
+        $alfrescoParameters = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/alfresco.json']);
+        if (empty($alfrescoParameters)) {
+            return ['errors' => 'Alfresco mapping file does not exist'];
+        }
 
         $curlResponse = CurlModel::execSimple([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['folderId']}/children",
@@ -611,7 +621,6 @@ class AlfrescoController
         $documentId = $curlResponse['response']['entry']['id'];
 
         $properties = [];
-        $alfrescoParameters = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/alfresco.json']);
         if (!empty($alfrescoParameters['mapping']['document'])) {
             $resourceContacts = ResourceContactModel::get([
                 'where'     => ['res_id = ?', 'mode = ?'],
