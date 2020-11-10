@@ -268,7 +268,7 @@ class EntityController
                 $externalId['alfrescoPassword'] = PasswordModel::encrypt(['password' => $data['externalId']['alfrescoPassword']]);
             }
         }
-        $data['external_id'] = json_encode($externalId);
+        $data['external_id'] = !empty($externalId) ? json_encode($externalId) : '{}';
 
         EntityModel::update(['set' => $data, 'where' => ['entity_id = ?'], 'data' => [$aArgs['id']]]);
         HistoryController::add([
