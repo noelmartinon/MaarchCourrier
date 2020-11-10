@@ -216,15 +216,20 @@ class MergeController
         $visas = '';
         if (!empty($args['resId'])) {
             $visaWorkflow = ListInstanceModel::get([
-                'select'    => ['item_id'],
+                'select'    => ['item_id', 'process_date', 'requested_signature'],
                 'where'     => ['difflist_type = ?', 'res_id = ?'],
                 'data'      => ['VISA_CIRCUIT', $args['resId']],
                 'orderBy'   => ['listinstance_id']
             ]);
             foreach ($visaWorkflow as $value) {
-                $labelledUser = UserModel::getLabelledUserById(['login' => $value['item_id']]);
+                $labelledUser  = UserModel::getLabelledUserById(['login' => $value['item_id']]);
                 $primaryentity = UserModel::getPrimaryEntityByUserId(['userId' => $value['item_id']]);
-                $visas .= "{$labelledUser} ({$primaryentity})\n";
+
+                $mode = $value['requested_signature'] ? _SIGNATORY : _VISA_USER_MIN;
+                if (!empty($value['process_date'])) {
+                    $mode .= ', ' . TextFormatModel::formatDate($value['process_date']);
+                }
+                $visas .= "{$labelledUser} ({$primaryentity['entity_label']}) - {$mode}\n";
             }
         }
 
@@ -232,7 +237,7 @@ class MergeController
         $opinions = '';
         if (!empty($args['resId'])) {
             $opinionWorkflow = ListInstanceModel::get([
-                'select'    => ['item_id'],
+                'select'    => ['item_id', 'process_date'],
                 'where'     => ['difflist_type = ?', 'res_id = ?'],
                 'data'      => ['AVIS_CIRCUIT', $args['resId']],
                 'orderBy'   => ['listinstance_id']
@@ -240,7 +245,12 @@ class MergeController
             foreach ($opinionWorkflow as $value) {
                 $labelledUser = UserModel::getLabelledUserById(['login' => $value['item_id']]);
                 $primaryentity = UserModel::getPrimaryEntityByUserId(['userId' => $value['item_id']]);
-                $opinions .= "{$labelledUser} ({$primaryentity})\n";
+
+                $processDate = null;
+                if (!empty($value['process_date'])) {
+                    $processDate = ' - ' . TextFormatModel::formatDate($value['process_date']);
+                }
+                $opinions .= "{$labelledUser} ({$primaryentity['entity_label']}) {$processDate}\n";
             }
         }
 
@@ -257,7 +267,7 @@ class MergeController
                 if ($value['item_type'] == 'user_id') {
                     $labelledUser  = UserModel::getLabelledUserById(['login' => $value['item_id']]);
                     $primaryentity = UserModel::getPrimaryEntityByUserId(['userId' => $value['item_id']]);
-                    $label         = "{$labelledUser} ({$primaryentity})";
+                    $label         = "{$labelledUser} ({$primaryentity['entity_label']})";
                 } else {
                     $entity = EntityModel::getByEntityId(['entityId' => $value['item_id'], 'select' => ['entity_label']]);
                     $label = $entity['entity_label'];
