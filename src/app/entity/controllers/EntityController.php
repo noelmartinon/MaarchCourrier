@@ -224,7 +224,7 @@ class EntityController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $entity = EntityModel::getByEntityId(['entityId' => $aArgs['id'], 'select' => [1]]);
+        $entity = EntityModel::getByEntityId(['entityId' => $aArgs['id'], 'select' => ['external_id']]);
         if (empty($entity)) {
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         }

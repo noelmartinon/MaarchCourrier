@@ -582,6 +582,10 @@ class AlfrescoController
         if ($fileContent === false) {
             return ['errors' => 'Document not found on docserver'];
         }
+        $alfrescoParameters = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/alfresco.json']);
+        if (empty($alfrescoParameters)) {
+            return ['errors' => 'Alfresco mapping file does not exist'];
+        }
 
         $curlResponse = CurlModel::execSimple([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['folderId']}/children",
@@ -611,7 +615,6 @@ class AlfrescoController
         $documentId = $curlResponse['response']['entry']['id'];
 
         $properties = [];
-        $alfrescoParameters = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/alfresco.json']);
         if (!empty($alfrescoParameters['mapping']['document'])) {
             $resourceContacts = ResourceContactModel::get([
                 'where'     => ['res_id = ?', 'mode = ?'],
