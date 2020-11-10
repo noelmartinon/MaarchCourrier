@@ -366,7 +366,7 @@ class MergeController
         ValidatorModel::stringType($args, ['path', 'content', 'chrono', 'type']);
 
         $tbs = new \clsTinyButStrong();
-//        $tbs->NoErr = true;
+        $tbs->NoErr = true;
         $tbs->PlugIn(TBS_INSTALL, OPENTBS_PLUGIN);
 
         if (!empty($args['path'])) {
