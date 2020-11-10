@@ -1735,5 +1735,6 @@ export const LANG_FR = {
     "hideTool": "Cacher la barre d'outils",
     "showTool": "Afficher la barre d'outils",
     "contactInput" : "Champ contact",
-    "emptyValue": "Valeur vide"
+    "emptyValue": "Valeur vide",
+    "hideModal": "Ne plus afficher cette fenêtre"
 };

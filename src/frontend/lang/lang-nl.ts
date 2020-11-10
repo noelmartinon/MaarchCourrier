@@ -1716,5 +1716,6 @@ export const LANG_NL = {
     "hideTool": "Cacher la barre d'outils", // _TO_TRANSLATE
     "showTool": "Afficher la barre d'outils", // _TO_TRANSLATE
     "contactInput" : "Contact input__TO_TRANSLATE", // _TO_TRANSLATE
-    "emptyValue": "Valeur vide__TO_TRANSLATE"
+    "emptyValue": "Valeur vide__TO_TRANSLATE",
+    "hideModal": "Ne plus afficher cette fenêtre__TO_TRANSLATE"
 };

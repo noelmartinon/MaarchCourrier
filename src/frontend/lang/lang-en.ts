@@ -1734,4 +1734,5 @@ export const LANG_EN = {
     "showTool": "Show toolbar",
     "contactInput" : "Contact input",
     "emptyValue": "Empty value",
+    "hideModal": "Hide this modal"
 };
