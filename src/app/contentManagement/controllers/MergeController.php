@@ -216,7 +216,7 @@ class MergeController
         $visas = '';
         if (!empty($args['resId'])) {
             $visaWorkflow = ListInstanceModel::get([
-                'select'    => ['item_id'],
+                'select'    => ['item_id', 'process_date', 'requested_signature'],
                 'where'     => ['difflist_type = ?', 'res_id = ?'],
                 'data'      => ['VISA_CIRCUIT', $args['resId']],
                 'orderBy'   => ['listinstance_id']
@@ -224,7 +224,12 @@ class MergeController
             foreach ($visaWorkflow as $value) {
                 $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['firstname', 'lastname']]);
                 $primaryentity = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label']]);
-                $visas .= "{$user['firstname']} {$user['lastname']} ({$primaryentity['entity_label']})\n";
+
+                $mode = $value['requested_signature'] ? _SIGNATORY : _VISA_USER_MIN;
+                if (!empty($value['process_date'])) {
+                    $mode .= ', ' . TextFormatModel::formatDate($value['process_date']);
+                }
+                $visas .= "{$user['firstname']} {$user['lastname']} ({$primaryentity['entity_label']}) - {$mode}\n";
             }
         }
 
@@ -232,7 +237,7 @@ class MergeController
         $opinions = '';
         if (!empty($args['resId'])) {
             $opinionWorkflow = ListInstanceModel::get([
-                'select'    => ['item_id'],
+                'select'    => ['item_id', 'process_date'],
                 'where'     => ['difflist_type = ?', 'res_id = ?'],
                 'data'      => ['AVIS_CIRCUIT', $args['resId']],
                 'orderBy'   => ['listinstance_id']
@@ -240,7 +245,12 @@ class MergeController
             foreach ($opinionWorkflow as $value) {
                 $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['firstname', 'lastname']]);
                 $primaryentity = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label']]);
-                $opinions .= "{$user['firstname']} {$user['lastname']} ({$primaryentity['entity_label']})\n";
+
+                $processDate = null;
+                if (!empty($value['process_date'])) {
+                    $processDate = ' - ' . TextFormatModel::formatDate($value['process_date']);
+                }
+                $opinions .= "{$user['firstname']} {$user['lastname']} ({$primaryentity['entity_label']}) {$processDate}\n";
             }
         }
 
