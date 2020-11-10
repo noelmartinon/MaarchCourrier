@@ -1387,4 +1387,64 @@ class ResController extends ResourceControlController
 
         return $response->withJson(['information' => $resource]);
     }
+
+    public static function resetResourceFields(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['oldFieldList', 'newFieldList']);
+        ValidatorModel::arrayType($args, ['oldFieldList', 'newFieldList']);
+        ValidatorModel::intVal($args, ['resId', 'modelId']);
+
+        if (empty($args['resId']) && empty($args['modelId'])) {
+            return false;
+        }
+
+        $oldFieldList = $args['oldFieldList'];
+        $newModelFields = $args['newFieldList'];
+
+        // Set res_letterbox fields to null
+        $set = [];
+        $setToNull = [
+            'confidentiality'    => 'confidentiality',
+            'admission_date'     => 'arrivalDate',
+            'departure_date'     => 'departureDate',
+            'doc_date'           => 'documentDate',
+            'process_limit_date' => 'processLimitDate',
+            'initiator'          => 'initiator',
+            'destination'        => 'destination',
+            'priority'           => 'priority'
+        ];
+        foreach ($setToNull as $key => $field) {
+            if (in_array($field, $oldFieldList) && !in_array($field, $newModelFields)) {
+                $set[$key] = null;
+            }
+        }
+
+        $customFieldsToDelete = array_diff($oldFieldList, $newModelFields);
+        $customFieldsToDelete = array_filter($customFieldsToDelete, function ($field) {
+            return strpos($field, 'indexingCustomField_') !== false;
+        });
+        $customFieldsToDelete = array_map(function ($field) {
+            return explode('_', $field)[1];
+        }, $customFieldsToDelete);
+
+        $postSet = ['custom_fields' => 'custom_fields '];
+        foreach ($customFieldsToDelete as $item) {
+            $postSet['custom_fields'] .= " - '$item'";
+        }
+
+        if (!empty($set) || !empty($postSet)) {
+            $where = [];
+            $data = [];
+            if (!empty($args['resId'])) {
+                $where = ['res_id = ?'];
+                $data = [$args['resId']];
+            } elseif (!empty($args['modelId'])) {
+                $where = ['model_id = ?'];
+                $data = [$args['modelId']];
+            }
+            ResModel::update(['set' => $set, 'postSet' => $postSet, 'where' => $where, 'data' => $data]);
+        }
+
+        return true;
+    }
 }
