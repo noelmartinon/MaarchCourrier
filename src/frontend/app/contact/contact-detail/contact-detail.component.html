@@ -85,7 +85,7 @@
                 </mat-expansion-panel-header>
                 <mat-list>
                     <mat-list-item class="contact-item" *ngIf="!functionsService.empty(contact.notes)"
-                        [title]="this.translate.instant('lang.note')">
+                        [title]="lang.note">
                         <mat-icon mat-list-icon class="contact-group far fa-sticky-note"></mat-icon>
                         <p mat-line class="contact-content" [class.newData]="isNewValue('notes')" [title]="contact.notes">
                             {{contact.notes}} </p>
