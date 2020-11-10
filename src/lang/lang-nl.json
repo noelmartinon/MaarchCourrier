@@ -2176,5 +2176,6 @@
     "bindingMailAlt": "Document <b>engageant</b>__TO_TRANSLATE",
     "noBindingMailAlt": "Document <b>non engageant</b>__TO_TRANSLATE",
     "redirectUserVisaWorkflow": "Changement de viseur / signataire pour les courriers en cours de visa / signature__TO_TRANSLATE",
-    "chooseNewVisaUser": "est en <b>visa / signature</b> de certains courriers, veuillez choisir un utilisateur de <b>remplacement</b>__TO_TRANSLATE"
+    "chooseNewVisaUser": "est en <b>visa / signature</b> de certains courriers, veuillez choisir un utilisateur de <b>remplacement</b>__TO_TRANSLATE",
+    "hideModal": "Ne plus afficher cette fenêtre__TO_TRANSLATE"
 }

@@ -286,13 +286,14 @@ export class ContactImportComponent implements OnInit {
     }
 
     onSubmit() {
+        let dialogRef: any = null;
         const dataToSend: any[] = [];
         let confirmText = '';
         this.translate.get('lang.confirmImportContacts', { 0: this.countAll }).subscribe((res: string) => {
             confirmText = `${res} ?<br/><br/>`;
             confirmText += `<ul><li><b>${this.countAdd}</b> ${this.translate.instant('lang.additions')}</li><li><b>${this.countUp}</b> ${this.translate.instant('lang.modifications')}</li></ul>`;
         });
-        let dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.import'), msg: confirmText } });
+        dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.import'), msg: confirmText } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             tap(() => {
