@@ -863,7 +863,8 @@ class ContactController
             'department'         => 'department',
             'function'           => 'function',
             'email'              => 'email',
-            'phone'              => 'phone'
+            'phone'              => 'phone',
+            'notes'              => 'notes'
         ];
 
         if (!Validator::arrayType()->notEmpty()->validate($queryParams['criteria'])) {
@@ -968,6 +969,7 @@ class ContactController
                 'department'         => $contact['department'],
                 'email'              => $contact['email'],
                 'phone'              => $contact['phone'],
+                'notes'              => $contact['notes'],
                 'isUsed'             => $contactsUsed[$contact['id']],
                 'filling'            => $filling,
                 'customFields'       => !empty($contact['custom_fields']) ? json_decode($contact['custom_fields'], true) : null,
@@ -995,7 +997,7 @@ class ContactController
         }
 
         $fields = ['civility', 'firstname', 'lastname', 'company', 'address_number', 'address_street', 'address_additional1', 'address_additional2',
-                   'address_postcode', 'address_town', 'address_country', 'department', 'function', 'email', 'phone', 'custom_fields', 'external_id'];
+                   'address_postcode', 'address_town', 'address_country', 'department', 'function', 'email', 'phone', 'custom_fields', 'external_id', 'notes'];
 
         $master = ContactModel::getById([
             'select' => $fields,
