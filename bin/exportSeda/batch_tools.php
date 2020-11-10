@@ -160,7 +160,7 @@ function Bt_getReply($args = [])
         return ['errors' => 'Error returned by the route /organization/organization/Search : ' . $curlResponse['response']['message']];
     }
 
-    if ($curlResponse['response']['status'] != "processed") {
+    if (!in_array($curlResponse['response']['status'], ['rejected', 'processed'])) {
         return [];
     }
 

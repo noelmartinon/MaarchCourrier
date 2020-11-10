@@ -449,7 +449,13 @@ class SedaController
             return ['errors' => 'Error returned by the route /organization/organization/Search : ' . $curlResponse['response']['message']];
         }
 
-        return ['producerServiceInfo' => $curlResponse['response'][0]];
+        foreach ($curlResponse['response'] as $organization) {
+            if ($organization['registrationNumber'] == $args['producerServiceName']) {
+                return ['producerServiceInfo' => $organization];
+            }
+        }
+
+        return ['producerServiceInfo' => null];
     }
 
     public function getRetentionRules(Request $request, Response $response)
