@@ -6,6 +6,9 @@
         },
         "attachment" : {
             "cm:name": "title"
+        },
+        "folder" : {
+            "cm:description": "une description"
         }
     }
 }
