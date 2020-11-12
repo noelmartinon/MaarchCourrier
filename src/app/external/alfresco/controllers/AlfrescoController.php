@@ -819,6 +819,22 @@ class AlfrescoController
             AttachmentModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$attachment['res_id']]]);
         }
 
+        if (!empty($alfrescoParameters['mapping']['folder'])) {
+            $body = [
+                'properties' => $alfrescoParameters['mapping']['folder'],
+            ];
+            $curlResponse = CurlModel::execSimple([
+                'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$resourceFolderId}",
+                'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
+                'headers'       => ['content-type:application/json', 'Accept: application/json'],
+                'method'        => 'PUT',
+                'body'          => json_encode($body)
+            ]);
+            if ($curlResponse['code'] != 200) {
+                return ['errors' => "Update alfresco folder {$resourceFolderId} failed : " . json_encode($curlResponse['response'])];
+            }
+        }
+
         $message = empty($args['folderName']) ? " (envoyé au dossier {$args['folderId']})" : " (envoyé au dossier {$args['folderName']})";
         return ['history' => $message];
     }
