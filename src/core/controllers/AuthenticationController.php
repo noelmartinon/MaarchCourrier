@@ -427,7 +427,7 @@ class AuthenticationController
             if (empty($authenticated)) {
                 $authenticated = AuthenticationModel::authentication(['login' => $login, 'password' => $password]);
             } else {
-                $user = UserModel::getByLogin(['login' => $login, 'select' => ['id']]);
+                $user = UserModel::getByLowerLogin(['login' => $login, 'select' => ['id']]);
                 UserModel::updatePassword(['id' => $user['id'], 'password' => $password]);
             }
         }
