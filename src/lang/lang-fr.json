@@ -2158,5 +2158,6 @@
     "almostThere": "Vous y êtes presque !",
     "redirectUserVisaWorkflow": "Changement de viseur / signataire pour les courriers en cours de visa / signature",
     "chooseNewVisaUser": "est en <b>visa / signature</b> de certains courriers, veuillez choisir un utilisateur de <b>remplacement</b>",
-    "hideModal": "Ne plus afficher cette fenêtre"
+    "hideModal": "Ne plus afficher cette fenêtre",
+    "noPreviousValid": "Aucun utilisateur précédent valide"
 }

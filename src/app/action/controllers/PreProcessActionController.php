@@ -1121,16 +1121,27 @@ class PreProcessActionController
                 }
             } else {
                 $hasPrevious = ListInstanceModel::get([
-                    'select'  => [1],
+                    'select'  => ['listinstance_id', 'item_id'],
                     'where'   => ['res_id = ?', 'difflist_type = ?', 'process_date is not null'],
                     'data'    => [$resId, 'VISA_CIRCUIT'],
-                    'orderBy' => ['listinstance_id'],
-                    'limit'   => 1
+                    'orderBy' => ['listinstance_id desc'],
                 ]);
-                if (!empty($hasPrevious)) {
-                    $resourcesInformation['success'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId];
-                } else {
+                if (empty($hasPrevious)) {
                     $resourcesInformation['error'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'reason' => 'circuitNotStarted'];
+                } else {
+                    $validFound = false;
+                    foreach ($hasPrevious as $previous) {
+                        $user = UserModel::getById(['id' => $previous['item_id'], 'select' => ['status']]);
+                        if (!empty($user) && !in_array($user['status'], ['SPD', 'DEL'])) {
+                            $validFound = true;
+                            break;
+                        }
+                    }
+                    if (!$validFound) {
+                        $resourcesInformation['error'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'reason' => 'noPreviousValid'];
+                    } else {
+                        $resourcesInformation['success'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId];
+                    }
                 }
             }
         }

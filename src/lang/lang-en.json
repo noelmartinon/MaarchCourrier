@@ -2166,5 +2166,6 @@
     "registeredMailMsgActivate": "Activating this range will close the current range used for that type of recommended.",
     "redirectUserVisaWorkflow": "Change of approver / signatory for mails in the process of visa / signature",
     "chooseNewVisaUser": "is in <b>visa / signature</b> of some mails, please choose a <b>user replacement</b>",
-    "hideModal": "Hide this modal"
+    "hideModal": "Hide this modal",
+    "noPreviousValid": "No valid previous user"
 }
