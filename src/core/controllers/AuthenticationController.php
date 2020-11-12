@@ -252,7 +252,7 @@ class AuthenticationController
         }
 
         if ($loggingMethod['id'] == 'standard') {
-            $login = $body['login'];
+            $login = strtolower($body['login']);
             if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
                 return $response->withStatus(403)->withJson(['errors' => 'Authentication Failed']);
             }
@@ -303,7 +303,7 @@ class AuthenticationController
             return $response->withStatus(403)->withJson(['errors' => 'Logging method unauthorized']);
         }
 
-        $user = UserModel::getByLogin(['login' => $login, 'select' => ['id', 'refresh_token', 'user_id']]);
+        $user = UserModel::getByLowerLogin(['login' => $login, 'select' => ['id', 'refresh_token', 'user_id']]);
 
         $GLOBALS['id'] = $user['id'];
         $GLOBALS['login'] = $user['user_id'];
@@ -367,7 +367,7 @@ class AuthenticationController
 
         $authenticated = AuthenticationModel::authentication(['login' => $login, 'password' => $password]);
         if (empty($authenticated)) {
-            $user = UserModel::getByLogin(['login' => $login, 'select' => ['id']]);
+            $user = UserModel::getByLowerLogin(['login' => $login, 'select' => ['id']]);
             $handle = AuthenticationController::handleFailedAuthentication(['userId' => $user['id']]);
             if (!empty($handle['accountLocked'])) {
                 return ['errors' => 'Account Locked', 'date' => $handle['lockedDate']];
@@ -713,7 +713,7 @@ class AuthenticationController
 
     private static function isUserAuthorized(array $args)
     {
-        $user = UserModel::getByLogin(['login' => $args['login'], 'select' => ['mode', 'status']]);
+        $user = UserModel::getByLowerLogin(['login' => $args['login'], 'select' => ['mode', 'status']]);
         if (empty($user) || $user['mode'] == 'rest' || $user['status'] == 'SPD') {
             return false;
         }
