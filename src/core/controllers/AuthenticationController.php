@@ -252,7 +252,7 @@ class AuthenticationController
         }
 
         if ($loggingMethod['id'] == 'standard') {
-            $login = strtolower($body['login']);
+            $login = $body['login'];
             if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
                 return $response->withStatus(403)->withJson(['errors' => 'Authentication Failed']);
             }
@@ -286,7 +286,7 @@ class AuthenticationController
             if (!empty($authenticated['errors'])) {
                 return $response->withStatus(401)->withJson(['errors' => $authenticated['errors']]);
             }
-            $login = strtolower($authenticated['login']);
+            $login = $authenticated['login'];
             if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
                 return $response->withStatus(403)->withJson(['errors' => 'Authentication unauthorized']);
             }
