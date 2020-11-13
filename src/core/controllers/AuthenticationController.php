@@ -35,12 +35,15 @@ class AuthenticationController
     const ROUTES_WITHOUT_AUTHENTICATION = [
         'GET/authenticationInformations', 'PUT/versionsUpdateSQL', 'GET/validUrl', 'GET/authenticate/token', 'GET/images', 'POST/password', 'PUT/password', 'GET/passwordRules',
         'GET/jnlp/{jnlpUniqueId}', 'GET/onlyOffice/mergedFile', 'POST/onlyOfficeCallback', 'POST/authenticate',
-        'GET/wopi/files/{id}', 'GET/wopi/files/{id}/contents', 'POST/wopi/files/{id}/contents','GET/onlyOffice/content','GET/languages/{lang}'
+        'GET/wopi/files/{id}', 'GET/wopi/files/{id}/contents', 'POST/wopi/files/{id}/contents','GET/onlyOffice/content', 'GET/languages/{lang}', 'GET/dev/lang'
     ];
 
     public function getInformations(Request $request, Response $response)
     {
-        $path       = CoreConfigModel::getConfigPath();
+        $path = CoreConfigModel::getConfigPath();
+        if (!file_exists($path)) {
+            return $response->withStatus(403)->withJson(['errors' => 'No configuration file found']);
+        }
         $hashedPath = md5($path);
 
         $appName   = CoreConfigModel::getApplicationName();

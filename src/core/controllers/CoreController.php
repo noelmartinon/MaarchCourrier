@@ -184,13 +184,9 @@ class CoreController
     public static function getAvailableCoreLanguages(Request $request, Response $response)
     {
         $files = array_diff(scandir('src/lang'), ['..', '.']);
-        $languages = [];
         $arrLanguages = [];
         foreach ($files as $value) {
-            $languages[] = str_replace('.json', '', $value) ;
-        }
-
-        foreach ($languages as $file) {
+            $file        = str_replace('.json', '', $value) ;
             $langName    = explode('-', $file)[1];
             $path        = 'src/lang/' . $file . '.json';
             $fileContent = file_get_contents($path);
