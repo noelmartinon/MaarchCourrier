@@ -53,7 +53,7 @@ job_e2e:
    - chown -R www-data. /var/www/html/
    - chmod -R 775 /opt/maarch/
    - chmod -R 775 /var/www/html/
-   - curl -sL https://deb.nodesource.com/setup_13.x | bash - > /dev/null
+   - curl -sL https://deb.nodesource.com/setup_14.x | bash - > /dev/null
    - apt-get install -yqq nodejs > /dev/null
    - npm install npm@latest -g 
    - node -v

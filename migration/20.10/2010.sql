@@ -188,7 +188,7 @@ END$$;
 DO $$ BEGIN
     IF (SELECT count(column_name) from information_schema.columns where table_name = 'history' and column_name = 'user_id' and data_type != 'integer') THEN
         ALTER TABLE history ADD COLUMN user_id_tmp INTEGER;
-        UPDATE history set user_id_tmp = (select id FROM users where lower(users.user_id) = lower(history.user_id));
+        UPDATE history set user_id_tmp = (select id FROM users where lower(users.user_id) = lower(history.user_id) LIMIT 1);
         ALTER TABLE history DROP COLUMN IF EXISTS user_id;
         ALTER TABLE history RENAME COLUMN user_id_tmp TO user_id;
         UPDATE history set record_id = (select id FROM users where users.user_id = history.record_id) WHERE table_name = 'users';

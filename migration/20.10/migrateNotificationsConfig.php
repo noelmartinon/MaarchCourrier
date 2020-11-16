@@ -31,6 +31,13 @@ foreach ($customs as $custom) {
         } elseif (is_readable("custom/{$custom}/modules/notifications/batch/config/config_{$custom}.xml") && is_writable("custom/{$custom}/modules/notifications/batch/config/config_{$custom}.xml")) {
             $notificationFilePath = "custom/{$custom}/modules/notifications/batch/config/config_{$custom}.xml";
         } else {
+            $file = file_get_contents($configPath);
+            $file = json_decode($file, true);
+            $file['config']['maarchDirectory'] = realpath('.') . '/';
+            $file['config']['customID'] = $custom;
+            $fp = fopen($configPath, 'w+');
+            fwrite($fp, json_encode($file, JSON_PRETTY_PRINT));
+            fclose($fp);
             printf("Aucun fichier de configuration de notification trouvé pour le custom {$custom}\n");
             continue;
         }
@@ -46,7 +53,7 @@ foreach ($customs as $custom) {
                 $file['config']['maarchUrl'] = (string)$loadedNotificationXml->CONFIG->applicationUrl;
             }
 
-            $fp = fopen("apps/maarch_entreprise/xml/config.json", 'a+');
+            $fp = fopen($configPath, 'w+');
             fwrite($fp, json_encode($file, JSON_PRETTY_PRINT));
             fclose($fp);
 

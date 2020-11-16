@@ -35,12 +35,15 @@ class AuthenticationController
     const ROUTES_WITHOUT_AUTHENTICATION = [
         'GET/authenticationInformations', 'PUT/versionsUpdateSQL', 'GET/validUrl', 'GET/authenticate/token', 'GET/images', 'POST/password', 'PUT/password', 'GET/passwordRules',
         'GET/jnlp/{jnlpUniqueId}', 'GET/onlyOffice/mergedFile', 'POST/onlyOfficeCallback', 'POST/authenticate',
-        'GET/wopi/files/{id}', 'GET/wopi/files/{id}/contents', 'POST/wopi/files/{id}/contents','GET/onlyOffice/content','GET/languages/{lang}'
+        'GET/wopi/files/{id}', 'GET/wopi/files/{id}/contents', 'POST/wopi/files/{id}/contents','GET/onlyOffice/content', 'GET/languages/{lang}', 'GET/dev/lang'
     ];
 
     public function getInformations(Request $request, Response $response)
     {
-        $path       = CoreConfigModel::getConfigPath();
+        $path = CoreConfigModel::getConfigPath();
+        if (!file_exists($path)) {
+            return $response->withStatus(403)->withJson(['errors' => 'No configuration file found']);
+        }
         $hashedPath = md5($path);
 
         $appName   = CoreConfigModel::getApplicationName();
@@ -286,7 +289,7 @@ class AuthenticationController
             if (!empty($authenticated['errors'])) {
                 return $response->withStatus(401)->withJson(['errors' => $authenticated['errors']]);
             }
-            $login = strtolower($authenticated['login']);
+            $login = $authenticated['login'];
             if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
                 return $response->withStatus(403)->withJson(['errors' => 'Authentication unauthorized']);
             }
@@ -303,7 +306,7 @@ class AuthenticationController
             return $response->withStatus(403)->withJson(['errors' => 'Logging method unauthorized']);
         }
 
-        $user = UserModel::getByLogin(['login' => $login, 'select' => ['id', 'refresh_token', 'user_id']]);
+        $user = UserModel::getByLowerLogin(['login' => $login, 'select' => ['id', 'refresh_token', 'user_id']]);
 
         $GLOBALS['id'] = $user['id'];
         $GLOBALS['login'] = $user['user_id'];
@@ -367,7 +370,7 @@ class AuthenticationController
 
         $authenticated = AuthenticationModel::authentication(['login' => $login, 'password' => $password]);
         if (empty($authenticated)) {
-            $user = UserModel::getByLogin(['login' => $login, 'select' => ['id']]);
+            $user = UserModel::getByLowerLogin(['login' => $login, 'select' => ['id']]);
             $handle = AuthenticationController::handleFailedAuthentication(['userId' => $user['id']]);
             if (!empty($handle['accountLocked'])) {
                 return ['errors' => 'Account Locked', 'date' => $handle['lockedDate']];
@@ -427,7 +430,7 @@ class AuthenticationController
             if (empty($authenticated)) {
                 $authenticated = AuthenticationModel::authentication(['login' => $login, 'password' => $password]);
             } else {
-                $user = UserModel::getByLogin(['login' => $login, 'select' => ['id']]);
+                $user = UserModel::getByLowerLogin(['login' => $login, 'select' => ['id']]);
                 UserModel::updatePassword(['id' => $user['id'], 'password' => $password]);
             }
         }
@@ -713,7 +716,7 @@ class AuthenticationController
 
     private static function isUserAuthorized(array $args)
     {
-        $user = UserModel::getByLogin(['login' => $args['login'], 'select' => ['mode', 'status']]);
+        $user = UserModel::getByLowerLogin(['login' => $args['login'], 'select' => ['mode', 'status']]);
         if (empty($user) || $user['mode'] == 'rest' || $user['status'] == 'SPD') {
             return false;
         }

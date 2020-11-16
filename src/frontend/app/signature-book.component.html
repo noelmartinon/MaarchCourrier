@@ -268,13 +268,20 @@
                             </span>
                             <i *ngIf="loadingSign" class="fa fa-spinner fa-pulse fa-2x fa-fw"></i>
                         </span>
-                        <span *ngIf="signatureBook.attachments[rightSelectedThumbnail].status == 'SIGN'"
+                        <span *ngIf="(signatureBook.attachments[rightSelectedThumbnail].idTypist == this.userId) && (signatureBook.attachments[rightSelectedThumbnail].status === 'SIGN'); else elseBlock"
                             (click)="unsignFile(signatureBook.attachments[rightSelectedThumbnail])"
-                            style="cursor: pointer;color: green;">
+                            style="cursor: pointer;color: green;"> 
                             <i title="{{'lang.unsign' | translate}}" class="fa fa-check fa-2x" aria-hidden="true"></i>
                         </span>
+                        <ng-template  #elseBlock>
+                            <div *ngIf="signatureBook.attachments[rightSelectedThumbnail].signed" class="alert-message alert-message-danger"
+                                style="width: 100%; margin: 10px 0; font-size: 20px;">
+                                <i class="fas fa-exclamation" style="width: 25px;text-align: center;"></i>&nbsp;<span [innerHTML]="'lang.youCannotUnsign' | translate"></span>
+                            </div>
+                        </ng-template>
                     </div>
                 </div>
+                
                 <app-attachments-list *ngIf="showAttachmentPanel" #appAttachmentsList [resId]="resId"
                     [target]="'process'" [canModify]="canUpdateDocument" (reloadBadgeAttachments)="refreshAttachments()"
                     (afterActionAttachment)="refreshAttachments()">

@@ -885,6 +885,7 @@ export class IndexingFormComponent implements OnInit {
     async loadForm(indexModelId: number, saveResourceState: boolean = true) {
         this.loading = true;
 
+        this.customDiffusion = [];
         this.indexingFormId = indexModelId;
 
         await this.resetForm();

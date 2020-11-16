@@ -62,7 +62,7 @@
             <mat-icon
                 class="fa fa-2x"
                 [class.avatar]="!functions.empty(diffusion.picture)"
-                [class.fa-user]="functions.empty(diffusion.picture) && diffusion.isValid && (diffusion.process_date === null && diffusion.delegatedBy === null)"
+                [class.fa-user]="functions.empty(diffusion.picture) && diffusion.isValid || (diffusion.process_date === null && diffusion.delegatedBy === null)"
                 [class.fa-user-friends]="diffusion.process_date != null && diffusion.delegatedBy !== null"
                 [class.fa-user-slash]="!diffusion.isValid"
                 [title]="!diffusion.isValid ? ('lang.userNotValid' | translate) : ''"
@@ -102,7 +102,7 @@
                             <input matInput class="comment" maxlength="255" [disabled]="!adminMode || diffusion.process_date != null || (target === 'signatureBook' && getCurrentVisaUserIndex() === i)" [placeholder]="'lang.visaNote' | translate" [(ngModel)]="diffusion.process_comment">
                         </mat-form-field>
                     </div>
-                    <div *ngIf="diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) === -1" class="workflowLineProcessDate"
+                    <div *ngIf="diffusion.requested_signature && diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) === -1" class="workflowLineProcessDate"
                         title='{{diffusion.process_date | fullDate}}'
                         color="accent">{{((functions.empty(diffusion.process_date) && diffusion.requested_signature) || diffusion.signatory) ? ('lang.signedUserDate' | translate) : ('lang.approvedUserDate' | translate)}} {{diffusion.process_date
                                                 | timeAgo : 'full'}}</div>

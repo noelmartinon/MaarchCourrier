@@ -74,6 +74,11 @@
                                     <p mat-line class="contact-content" *ngIf="!empty(option.addressCountry)"
                                         [title]="option.addressCountry"> {{option.addressCountry}} </p>
                                 </mat-list-item>
+                                <mat-list-item class="contact-item" *ngIf="!empty(option.notes)">
+                                    <mat-icon mat-list-icon class="contact-group far fa-sticky-note" [title]="'lang.note' | translate">
+                                    </mat-icon>
+                                    <p mat-line class="contact-content" [title]="option.notes"> {{option.notes}} </p>
+                                </mat-list-item>
                                 <ng-container *ngFor="let customField of option.customFields">
                                     <mat-list-item class="contact-item" *ngIf="customField.value !== null">
                                         <mat-icon mat-list-icon class="contact-group fas fa-hashtag"

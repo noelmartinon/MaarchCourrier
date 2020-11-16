@@ -1,9 +1,10 @@
-/**
- * Copyright (c) Ascensio System SIA 2013. All rights reserved
+/*
+ * Copyright (c) Ascensio System SIA 2020. All rights reserved
  *
- * http://www.onlyoffice.com
+ * http://www.onlyoffice.com 
+ *
+ * Version: 6.0.2 (build:5)
  */
-var onlyofficetesturl = '';
 
 ;(function(DocsAPI, window, document, undefined) {
 
@@ -45,11 +46,12 @@ var onlyofficetesturl = '';
                     review: <can review>, // default = edit
                     print: <can print>, // default = true
                     rename: <can rename>, // default = false
-                    changeHistory: <can change history>, // default = false
+                    changeHistory: <can change history>, // default = false // must be deprecated, check onRequestRestore event instead
                     comment: <can comment in view mode> // default = edit,
                     modifyFilter: <can add, remove and save filter in the spreadsheet> // default = true
                     modifyContentControl: <can modify content controls in documenteditor> // default = true
-                   fillForms:  <can edit forms in view mode> // default = edit || review
+                    fillForms:  <can edit forms in view mode> // default = edit || review,
+                    copy: <can copy data> // default = true
                 }
             },
             editorConfig: {
@@ -76,14 +78,14 @@ var onlyofficetesturl = '';
                     {
                         title: 'document title',
                         url: 'document url',
-                        folder: 'path to document'
+                        folder: 'path to document',
                     },
                     ...
                 ],
                 templates: [
                     {
-                        name: 'template name',
-                        icon: 'template icon url',
+                        title: 'template name', // name - is deprecated
+                        image: 'template icon url',
                         url: 'http://...'
                     },
                     ...
@@ -110,7 +112,8 @@ var onlyofficetesturl = '';
                     goback: {
                         url: 'http://...',
                         text: 'Go to London',
-                        blank: true
+                        blank: true,
+                        requestClose: false // if true - goback send onRequestClose event instead opening url
                     },
                     chat: true,
                     comments: true,
@@ -129,7 +132,14 @@ var onlyofficetesturl = '';
                     compactHeader: false,
                     toolbarNoTabs: false,
                     toolbarHideFileName: false,
-                    reviewDisplay: 'original'
+                    reviewDisplay: 'original',
+                    spellcheck: true,
+                    compatibleFeatures: false,
+                    unit: 'cm' // cm, pt, inch,
+                    mentionShare : true // customize tooltip for mention,
+                    macros: true // can run macros in document
+                    plugins: true // can run plugins in document
+                    macrosMode: 'warn' // warn about automatic macros, 'enable', 'disable', 'warn'
                 },
                 plugins: {
                     autostart: ['asc.{FFE1F462-1EA2-4391-990D-4CC84940B754}'],
@@ -206,7 +216,11 @@ var onlyofficetesturl = '';
         _config.editorConfig.canRequestSaveAs = _config.events && !!_config.events.onRequestSaveAs;
         _config.editorConfig.canRequestInsertImage = _config.events && !!_config.events.onRequestInsertImage;
         _config.editorConfig.canRequestMailMergeRecipients = _config.events && !!_config.events.onRequestMailMergeRecipients;
+        _config.editorConfig.canRequestCompareFile = _config.events && !!_config.events.onRequestCompareFile;
+        _config.editorConfig.canRequestSharingSettings = _config.events && !!_config.events.onRequestSharingSettings;
+        _config.editorConfig.canRequestCreateNew = _config.events && !!_config.events.onRequestCreateNew;
         _config.frameEditorId = placeholderId;
+        _config.parentOrigin = window.location.origin;
         _config.onlyOfficeIp = onlyOfficeIp;
 
         var onMouseUp = function (evt) {
@@ -337,6 +351,7 @@ var onlyofficetesturl = '';
                 }
 
                 if (typeof _config.document.fileType === 'string' && _config.document.fileType != '') {
+                    _config.document.fileType = _config.document.fileType.toLowerCase();
                     var type = /^(?:(xls|xlsx|ods|csv|xlst|xlsy|gsheet|xlsm|xlt|xltm|xltx|fods|ots)|(pps|ppsx|ppt|pptx|odp|pptt|ppty|gslides|pot|potm|potx|ppsm|pptm|fodp|otp)|(doc|docx|doct|odt|gdoc|txt|rtf|pdf|mht|htm|html|epub|djvu|xps|docm|dot|dotm|dotx|fodt|ott))$/
                                     .exec(_config.document.fileType);
                     if (!type) {
@@ -379,8 +394,6 @@ var onlyofficetesturl = '';
                     if (!_config.editorConfig.customization) _config.editorConfig.customization = {};
                     _config.editorConfig.customization.about = false;
                     _config.editorConfig.customization.compactHeader = false;
-
-                    if ( window.AscDesktopEditor ) window.AscDesktopEditor.execCommand('webapps:events', 'loading');
                 }
             }
         })();
@@ -390,6 +403,10 @@ var onlyofficetesturl = '';
 
         if (target && _checkConfigParams()) {
             iframe = createIframe(_config);
+            if (iframe.src) {
+                var pathArray = iframe.src.split('/');
+                this.frameOrigin = pathArray[0] + '//' + pathArray[2];
+            }
             target.parentNode && target.parentNode.replaceChild(iframe, target);
             var _msgDispatcher = new MessageDispatcher(_onMessage, this);
         }
@@ -534,7 +551,7 @@ var onlyofficetesturl = '';
             });
         };
 
-        var _downloadAs = function (data) {
+        var _downloadAs = function(data) {
             _sendCommand({
                 command: 'downloadAs',
                 data: data
@@ -572,6 +589,13 @@ var onlyofficetesturl = '';
         var _setMailMergeRecipients = function(data) {
             _sendCommand({
                 command: 'setMailMergeRecipients',
+                data: data
+            });
+        };
+
+        var _setRevisedFile = function(data) {
+            _sendCommand({
+                command: 'setRevisedFile',
                 data: data
             });
         };
@@ -620,7 +644,8 @@ var onlyofficetesturl = '';
             showSharingSettings : _showSharingSettings,
             setSharingSettings  : _setSharingSettings,
             insertImage         : _insertImage,
-            setMailMergeRecipients: _setMailMergeRecipients
+            setMailMergeRecipients: _setMailMergeRecipients,
+            setRevisedFile      : _setRevisedFile
         }
     };
 
@@ -640,7 +665,7 @@ var onlyofficetesturl = '';
     };
 
     DocsAPI.DocEditor.version = function() {
-        return '5.4.2';
+        return '6.0.2';
     };
 
     var MessageDispatcher = function(fn, scope) {
@@ -670,7 +695,7 @@ var onlyofficetesturl = '';
 
         var _onMessage = function(msg) {
             // TODO: check message origin
-            if (msg && window.JSON) {
+            if (msg && window.JSON && _scope.frameOrigin==msg.origin ) {
 
                 try {
                     var msg = window.JSON.parse(msg.data);
@@ -733,19 +758,35 @@ var onlyofficetesturl = '';
             }
         }
 
+        var userAgent = navigator.userAgent.toLowerCase(),
+            check = function(regex){ return regex.test(userAgent); },
+            isIE = !check(/opera/) && (check(/msie/) || check(/trident/) || check(/edge/)),
+            isChrome = !isIE && check(/\bchrome\b/),
+            isSafari_mobile = !isIE && !isChrome && check(/safari/) && (navigator.maxTouchPoints>0);
+
         path += app + "/";
-        path += config.type === "mobile"
+        path += (config.type === "mobile" || isSafari_mobile)
             ? "mobile"
             : config.type === "embedded"
                 ? "embed"
                 : "main";
-        path += "/index.html";
 
+        var index = "/index.html";
+        if (config.editorConfig) {
+            var customization = config.editorConfig.customization;
+            if ( typeof(customization) == 'object' && ( customization.toolbarNoTabs ||
+                                                        (config.editorConfig.targetApp!=='desktop') && (customization.loaderName || customization.loaderLogo))) {
+                index = "/index_loader.html";
+            } else if (config.editorConfig.mode == 'editdiagram' || config.editorConfig.mode == 'editmerge')
+                index = "/index_internal.html";
+
+        }
+        path += index;
         return path;
     }
 
     function getAppParameters(config) {
-        var params = "?_dc=5.4.2-46";
+        var params = "?_dc=6.0.2-5";
 
         if (config.editorConfig && config.editorConfig.lang)
             params += "&lang=" + config.editorConfig.lang;
@@ -757,12 +798,33 @@ var onlyofficetesturl = '';
                 params += "&customer=ONLYOFFICE";
             if ( (typeof(config.editorConfig.customization) == 'object') && config.editorConfig.customization.loaderLogo) {
                 if (config.editorConfig.customization.loaderLogo !== '') params += "&logo=" + config.editorConfig.customization.loaderLogo;
+            } else if ( (typeof(config.editorConfig.customization) == 'object') && config.editorConfig.customization.logo) {
+                if (config.type=='embedded' && config.editorConfig.customization.logo.imageEmbedded)
+                    params += "&headerlogo=" + config.editorConfig.customization.logo.imageEmbedded;
+                else if (config.type!='embedded' && config.editorConfig.customization.logo.image)
+                    params += "&headerlogo=" + config.editorConfig.customization.logo.image;
             }
         }
 
+        if (config.editorConfig && (config.editorConfig.mode == 'editdiagram' || config.editorConfig.mode == 'editmerge'))
+            params += "&internal=true";
+
         if (config.frameEditorId)
             params += "&frameEditorId=" + config.frameEditorId;
-        
+
+        if (config.editorConfig && config.editorConfig.mode == 'view' ||
+            config.document && config.document.permissions && (config.document.permissions.edit === false && !config.document.permissions.review ))
+            params += "&mode=view";
+
+        if (config.editorConfig && config.editorConfig.customization && !!config.editorConfig.customization.compactHeader)
+            params += "&compact=true";
+
+        if (config.editorConfig && config.editorConfig.customization && (config.editorConfig.customization.toolbar===false))
+            params += "&toolbar=false";
+
+        if (config.parentOrigin)
+            params += "&parentOrigin=" + config.parentOrigin;
+
         return params;
     }
 
@@ -778,7 +840,8 @@ var onlyofficetesturl = '';
         iframe.allowFullscreen = true;
         iframe.setAttribute("allowfullscreen",""); // for IE11
         iframe.setAttribute("onmousewheel",""); // for Safari on Mac
-		
+        iframe.setAttribute("allow", "autoplay");
+        
 		if (config.type == "mobile")
 		{
 			iframe.style.position = "fixed";
@@ -812,4 +875,3 @@ var onlyofficetesturl = '';
     }
 
 })(window.DocsAPI = window.DocsAPI || {}, window, document);
-

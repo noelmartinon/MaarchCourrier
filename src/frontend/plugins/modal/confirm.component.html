@@ -2,6 +2,7 @@
   <h1 mat-dialog-title>{{data.title}}</h1>
   <div *ngIf="data.msg !== ''" mat-dialog-content>
     <div class="alert-message alert-message-info" [innerHTML]="data.msg"></div>
+    <mat-checkbox color="primary" *ngIf="idModal !== null" (change)="hideModal()">{{'lang.hideModal' | translate}}</mat-checkbox>
   </div>
   <span class="divider-modal"></span>
   <div mat-dialog-actions>

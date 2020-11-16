@@ -485,7 +485,7 @@ class AttachmentController
         }
 
         $attachment = AttachmentModel::get([
-            'select'    => ['res_id', 'docserver_id', 'res_id_master', 'format', 'title', 'signatory_user_serial_id'],
+            'select'    => ['res_id', 'docserver_id', 'res_id_master', 'format', 'title', 'signatory_user_serial_id', 'typist', 'attachment_type'],
             'where'     => ['res_id = ?', 'status not in (?)'],
             'data'      => [$args['id'], ['DEL']],
             'limit'     => 1
@@ -553,11 +553,19 @@ class AttachmentController
         $mimeType = $finfo->buffer($fileContent);
 
         if ($data['mode'] == 'base64') {
+            if ($attachment['attachment_type'] == 'signed_response') {
+                if (!empty($attachment['signatory_user_serial_id'])) {
+                    $signatoryId = $attachment['signatory_user_serial_id'];
+                } else {
+                    $signatoryId = $attachment['typist'];
+                }
+            }
+
             return $response->withJson([
                 'encodedDocument' => base64_encode($fileContent),
                 'originalFormat'  => $attachment['format'],
                 'mimeType'        => $mimeType,
-                'signatoryId'     => $attachment['signatory_user_serial_id']
+                'signatoryId'     => $signatoryId
             ]);
         } else {
             $pathInfo = pathinfo($pathToDocument);

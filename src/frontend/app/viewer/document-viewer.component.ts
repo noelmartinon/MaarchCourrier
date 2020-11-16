@@ -19,6 +19,7 @@ import { VisaWorkflowModalComponent } from '../visa/modal/visa-workflow-modal.co
 import { of } from 'rxjs';
 import { CollaboraOnlineViewerComponent } from '../../plugins/collabora-online/collabora-online-viewer.component';
 import { AuthService } from '@service/auth.service';
+import { LocalStorageService } from '@service/local-storage.service';
 
 @Component({
     selector: 'app-document-viewer',
@@ -151,7 +152,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         private sortPipe: SortPipe,
         public functions: FunctionsService,
         public privilegeService: PrivilegeService,
-        private authService: AuthService
+        private authService: AuthService,
+        private localStorage: LocalStorageService
     ) {
         (<any>window).pdfWorkerSrc = '../node_modules/pdfjs-dist/build/pdf.worker.min.js';
     }
@@ -709,13 +711,21 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     editTemplate(templateId: number) {
+        if (this.localStorage.get(`modal_confirmEditTemplate_${this.headerService.user.id}`) !== null) {
+            this.launchEditTemplate(templateId);
+        } else {
+            this.confirmEditTemplate(templateId);
+        }
+    }
+
+    confirmEditTemplate(templateId: number) {
         let confirmMsg = '';
         if (this.mode === 'attachment') {
             confirmMsg = this.translate.instant('lang.editionAttachmentConfirmFirst') + '<br><br>' + this.translate.instant('lang.editionAttachmentConfirmThird');
         } else {
             confirmMsg = this.translate.instant('lang.editionAttachmentConfirmFirst') + '<br><br>' + this.translate.instant('lang.editionAttachmentConfirmSecond');
         }
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.templateEdition'), msg: confirmMsg } });
+        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { idModal: 'confirmEditTemplate', title: this.translate.instant('lang.templateEdition'), msg: confirmMsg } });
 
         this.dialogRef.afterClosed().pipe(
             tap((data: string) => {
@@ -725,56 +735,58 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             }),
             filter((data: string) => data === 'ok'),
             tap(() => {
-
-                this.triggerEvent.emit();
-                const template = this.listTemplates.filter(templateItem => templateItem.id === templateId)[0];
-
-                this.file.format = template.extension;
-
-                if (this.editor.mode === 'onlyoffice') {
-
-                    this.editor.async = false;
-                    this.editor.options = {
-                        objectType: 'attachmentCreation',
-                        objectId: template.id,
-                        docUrl: `rest/onlyOffice/mergedFile`,
-                        dataToMerge: this.resourceDatas
-                    };
-                    this.editInProgress = true;
-
-                } else if (this.editor.mode === 'collaboraOnline') {
-                    this.editor.async = false;
-                    this.editInProgress = true;
-                    this.editor.options = {
-                        objectType: this.mode === 'attachment' ? 'attachmentCreation' : 'resourceCreation',
-                        objectId: template.id,
-                        dataToMerge: this.resourceDatas
-                    };
-                } else {
-                    this.editor.async = true;
-                    this.editor.options = {
-                        objectType: 'attachmentCreation',
-                        objectId: template.id,
-                        cookie: document.cookie,
-                        authToken : this.authService.getToken(),
-                        data: this.resourceDatas,
-                    };
-                    this.editInProgress = true;
-
-                    this.http.post('../rest/jnlp', this.editor.options).pipe(
-                        tap((data: any) => {
-                            window.location.href = '../rest/jnlp/' + data.generatedJnlp;
-                            this.checkLockFile(data.jnlpUniqueId, template.extension);
-                        })
-                    ).subscribe();
-                }
-
+                this.launchEditTemplate(templateId);
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
             })
         ).subscribe();
+    }
+
+    launchEditTemplate(templateId: number) {
+        this.triggerEvent.emit();
+        const template = this.listTemplates.filter(templateItem => templateItem.id === templateId)[0];
+
+        this.file.format = template.extension;
+
+        if (this.editor.mode === 'onlyoffice') {
+
+            this.editor.async = false;
+            this.editor.options = {
+                objectType: 'attachmentCreation',
+                objectId: template.id,
+                docUrl: `rest/onlyOffice/mergedFile`,
+                dataToMerge: this.resourceDatas
+            };
+            this.editInProgress = true;
+
+        } else if (this.editor.mode === 'collaboraOnline') {
+            this.editor.async = false;
+            this.editInProgress = true;
+            this.editor.options = {
+                objectType: this.mode === 'attachment' ? 'attachmentCreation' : 'resourceCreation',
+                objectId: template.id,
+                dataToMerge: this.resourceDatas
+            };
+        } else {
+            this.editor.async = true;
+            this.editor.options = {
+                objectType: 'attachmentCreation',
+                objectId: template.id,
+                cookie: document.cookie,
+                authToken : this.authService.getToken(),
+                data: this.resourceDatas,
+            };
+            this.editInProgress = true;
+
+            this.http.post('../rest/jnlp', this.editor.options).pipe(
+                tap((data: any) => {
+                    window.location.href = '../rest/jnlp/' + data.generatedJnlp;
+                    this.checkLockFile(data.jnlpUniqueId, template.extension);
+                })
+            ).subscribe();
+        }
     }
 
     editResource() {

@@ -96,7 +96,7 @@ class DOMTemplateProcessorController extends \DOMXPath
         if ($pis = $this->query("descendant-or-self::processing-instruction('xinclude')", $node)) {
             foreach ($pis as $pi) {
                 $includeFragment = $this->document->createDocumentFragment();
-                $source = file_get_contents('modules/export_seda' . trim($pi->data));
+                $source = file_get_contents('src/app/external/exportSeda' . trim($pi->data));
                 if (!$source) {
                     throw new \Exception("Error including Xml fragment: fragment '$pi->data' could not be parsed");
                 }

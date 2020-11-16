@@ -48,6 +48,7 @@ export class AttachmentCreateComponent implements OnInit {
     
     indexTab: number = 0;
 
+    resourceSubject: string = '';
     resourceContacts: any[] = [];
 
     selectedContact = new FormControl();
@@ -125,6 +126,7 @@ export class AttachmentCreateComponent implements OnInit {
                         }
                     }
 
+                    this.resourceSubject = data.subject;
                     this.attachments.push({
                         title: new FormControl({ value: data.subject, disabled: false }, [Validators.required]),
                         recipient: new FormControl({ value: contact, disabled: false }),
@@ -387,7 +389,7 @@ export class AttachmentCreateComponent implements OnInit {
 
     newPj() {
         this.attachments.push({
-            title: new FormControl({ value: '', disabled: false }, [Validators.required]),
+            title: new FormControl({ value: this.resourceSubject, disabled: false }, [Validators.required]),
             recipient: new FormControl({ value: !this.functions.empty(this.resourceContacts[this.attachments.length]) ? [{ id: this.resourceContacts[this.attachments.length].id, type: this.resourceContacts[this.attachments.length].type }] : null, disabled: false }),
             type: new FormControl({ value: 'response_project', disabled: false }, [Validators.required]),
             validationDate: new FormControl({ value: null, disabled: false }),
