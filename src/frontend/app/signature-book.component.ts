@@ -409,44 +409,69 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
     unsignFile(attachment: any) {
         if (attachment.isResource) {
-            this.http.put('../rest/resources/' + attachment.res_id + '/unsign', {})
-                .subscribe(() => {
-                    this.appDocumentViewer.loadRessource(attachment.res_id, 'maintDocument');
-                    this.rightViewerLink += '?tsp=' + Math.floor(Math.random() * 100);
-                    this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'A_TRA';
-
-                    if (this.signatureBook.resList.length > 0) {
-                        this.signatureBook.resList[this.signatureBook.resListIndex].allSigned = false;
-                    }
-                    if (this.headerTab === 'visaCircuit') {
-                        this.changeSignatureBookLeftContent('document');
-                        setTimeout(() => {
-                            this.changeSignatureBookLeftContent('visaCircuit');
-                        }, 0);
-                    }
-                });
+            this.unSignMainDocument(attachment);
         } else {
-            this.http.put('../rest/attachments/' + attachment.res_id + '/unsign', {})
-                .subscribe(() => {
-                    this.appDocumentViewer.loadRessource(attachment.res_id, 'attachment');
-                    this.rightViewerLink = '../rest/attachments/' + attachment.res_id + '/content';
-                    this.signatureBook.attachments[this.rightSelectedThumbnail].viewerLink = this.rightViewerLink;
-                    this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'A_TRA';
-                    this.signatureBook.attachments[this.rightSelectedThumbnail].idToDl = attachment.res_id;
-                    this.signatureBook.attachments[this.rightSelectedThumbnail].signed = false;
-                    this.signatureBook.attachments[this.rightSelectedThumbnail].viewerId = attachment.res_id;
-                    if (this.signatureBook.resList.length > 0) {
-                        this.signatureBook.resList[this.signatureBook.resListIndex].allSigned = false;
-                    }
-                    if (this.headerTab === 'visaCircuit') {
-                        this.changeSignatureBookLeftContent('document');
-                        setTimeout(() => {
-                            this.changeSignatureBookLeftContent('visaCircuit');
-                        }, 0);
-                    }
-
-                });
+            this.unSignAttachment(attachment);
         }
+    }
+
+    unSignMainDocument(attachment: any) {
+        this.http.put(`../rest/resources/${attachment.res_id}/unsign`, {}).pipe(
+            tap(() => {
+                this.appDocumentViewer.loadRessource(attachment.res_id, 'maintDocument');
+                this.rightViewerLink += '?tsp=' + Math.floor(Math.random() * 100);
+                this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'A_TRA';
+
+                if (this.signatureBook.resList.length > 0) {
+                    this.signatureBook.resList[this.signatureBook.resListIndex].allSigned = false;
+                }
+                if (this.headerTab === 'visaCircuit') {
+                    this.changeSignatureBookLeftContent('document');
+                    setTimeout(() => {
+                        this.changeSignatureBookLeftContent('visaCircuit');
+                    }, 0);
+                }
+            }),
+            catchError((err: any) => {
+                if (err.status === 403) {
+                    this.notify.error(this.translate.instant('lang.youCannotUnsign'));
+                } else {
+                    this.notify.handleSoftErrors(err);
+                }
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    unSignAttachment(attachment: any) {
+        this.http.put('../rest/attachments/' + attachment.res_id + '/unsign', {}).pipe(
+            tap(() => {
+                this.appDocumentViewer.loadRessource(attachment.res_id, 'attachment');
+                this.rightViewerLink = '../rest/attachments/' + attachment.res_id + '/content';
+                this.signatureBook.attachments[this.rightSelectedThumbnail].viewerLink = this.rightViewerLink;
+                this.signatureBook.attachments[this.rightSelectedThumbnail].status = 'A_TRA';
+                this.signatureBook.attachments[this.rightSelectedThumbnail].idToDl = attachment.res_id;
+                this.signatureBook.attachments[this.rightSelectedThumbnail].signed = false;
+                this.signatureBook.attachments[this.rightSelectedThumbnail].viewerId = attachment.res_id;
+                if (this.signatureBook.resList.length > 0) {
+                    this.signatureBook.resList[this.signatureBook.resListIndex].allSigned = false;
+                }
+                if (this.headerTab === 'visaCircuit') {
+                    this.changeSignatureBookLeftContent('document');
+                    setTimeout(() => {
+                        this.changeSignatureBookLeftContent('visaCircuit');
+                    }, 0);
+                }
+            }),
+            catchError((err: any) => {
+                if (err.status === 403) {
+                    this.notify.error(this.translate.instant('lang.youCannotUnsign'));
+                } else {
+                    this.notify.handleSoftErrors(err);
+                }
+                return of(false);
+            })
+        ).subscribe();
     }
 
     backToBasket() {

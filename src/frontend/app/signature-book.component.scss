@@ -364,10 +364,6 @@
     height: 100px;
 }
 
-.pjSign {
-    cursor: pointer;
-}
-
 .pjDetails label {
     font-weight: bold;
     cursor: inherit;
@@ -935,20 +931,22 @@ img:hover.panelSelectedThumbnail {
 }
 
 .pjSign img {
+    cursor: pointer;
     border: solid 2px white;
     height: 30px;
-    width: 50px;
-    -webkit-transition: height 0.5s;
+    width: auto;
+    min-width: 60px;
+    -webkit-transition: all 0.5s;
     /* Safari */
-    transition: height 0.5s;
+    transition: all 0.5s;
 }
 
 .pjSign:hover img {
     height: 60px;
     width: auto;
-    -webkit-transition: height 0.5s;
+    -webkit-transition: all 0.5s;
     /* Safari */
-    transition: height 0.5s;
+    transition: all 0.5s;
 }
 
 .pjSign:hover img:hover {
@@ -956,6 +954,9 @@ img:hover.panelSelectedThumbnail {
 }
 
 .pjSign:hover {
+    display: flex;
+    white-space: pre;
+    overflow: hidden !important;
     width: 95%;
     -webkit-transition: width 0.5s;
     /* Safari */

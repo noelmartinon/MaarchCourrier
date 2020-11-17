@@ -2167,5 +2167,6 @@
     "redirectUserVisaWorkflow": "Change of approver / signatory for mails in the process of visa / signature",
     "chooseNewVisaUser": "is in <b>visa / signature</b> of some mails, please choose a <b>user replacement</b>",
     "hideModal": "Hide this modal",
-    "noPreviousValid": "No valid previous user"
+    "noPreviousValid": "No valid previous user",
+    "youCannotUnsign": "You do not have the right to <b>unsign</b> this document. You must be the person who signed this document."
 }
