@@ -19,7 +19,7 @@
         <div>{{'lang.chooseLogo' | translate}} : </div>
         <div>
             <mat-card style="width: 350px;background-size: 100%;cursor: pointer;" matRipple>
-                <img [src]="logoURL()" (click)="clickLogoButton(uploadLogo)" style="width: 100%;" />
+                <mat-icon svgIcon="maarchLogoFull" class="maarchLogo" (click)="clickLogoButton(uploadLogo)"></mat-icon>
                 <input type="file" name="files[]" #uploadLogo (change)="uploadTrigger($event, 'logo')"
                     accept="image/svg+xml" style="display: none;">
             </mat-card>
