@@ -270,6 +270,7 @@ export class SentNumericPackagePageComponent implements OnInit {
                 if (!this.functions.empty(data.communicationMeans) && !this.functions.empty(data.externalId['m2m'])) {
                     this.recipients.push(
                         {
+                            id: id,
                             label: this.contactService.formatContact(data),
                             email: data.email,
                             m2m: data.externalId['m2m'],
@@ -550,7 +551,7 @@ export class SentNumericPackagePageComponent implements OnInit {
                     mm = '0' + mm;
                 }
                 today = dd + '-' + mm + '-' + yyyy;
-                downloadLink.setAttribute('download', this.translate.instant('lang.summarySheetsAlt') + '_' + today + '.pdf');
+                downloadLink.setAttribute('download', 'NumericPackage_' + today + '.zip');
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
             }),

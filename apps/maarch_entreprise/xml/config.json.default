@@ -31,7 +31,7 @@
     "exportSeda": {
         "sae": "MaarchRM",
         "token": "phdF9WkJuTKkDuPXoqDZuCFEQT7En7YqsVROsdD1HoPlOsmSRZeZKpl6weZd+/0momU9JodKUyZDzvLCWOZ1sw==",
-        "urlSAEService": "http://demo-ap.maarchrm.com:81",
+        "urlSAEService": "https://demo-ap.maarchrm.com",
         "senderOrgRegNumber": "org_987654321_DGS_SA",
         "accessRuleCode": "AR039",
         "certificateSSL": "",
