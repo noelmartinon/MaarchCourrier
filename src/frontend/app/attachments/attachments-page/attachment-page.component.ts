@@ -128,7 +128,7 @@ export class AttachmentPageComponent implements OnInit {
                         chrono: new FormControl({ value: data.chrono, disabled: true }),
                         originId: new FormControl({ value: data.originId, disabled: true }),
                         resIdMaster: new FormControl({ value: data.resIdMaster, disabled: true }, [Validators.required]),
-                        status: new FormControl({ value: this.translate.instant('lang.attachment_' + data.status), disabled: true }, [Validators.required]),
+                        status: new FormControl({ value: data.status, disabled: true }, [Validators.required]),
                         relation: new FormControl({ value: data.relation, disabled: true }, [Validators.required]),
                         title: new FormControl({ value: data.title, disabled: !this.editMode }, [Validators.required]),
                         recipient: new FormControl({ value: contact, disabled: !this.editMode }),

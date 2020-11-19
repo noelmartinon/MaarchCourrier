@@ -25,7 +25,7 @@
                         </div>
                         <div class="attachment-form-item">
                             <mat-form-field class="input-form">
-                                <input matInput placeholder="{{'lang.status' | translate}}" [formControl]="attachment['status']">
+                                <input matInput placeholder="{{'lang.status' | translate}}" [value]="'lang.attachment_' + attachment['status'].value | translate">
                             </mat-form-field>
                             <div class="fieldState">
                                 <i class="fas fa-asterisk noMandatory"></i>
@@ -168,10 +168,10 @@
                     </div>
                 </ng-container>
                 <mat-tab-group [selectedIndex]="1" class="pjList" *ngIf="!loading" animationDuration="0" style="height: 100%">
-                        <mat-tab label="Document principal" *ngIf="attachment.res_id_master !== null">
+                        <mat-tab label="{{'lang.mainDocument' | translate}}" *ngIf="attachment.res_id_master !== null">
                             <ng-template matTabContent>
                                 <app-document-viewer #appDocumentViewer style="display:block;height:100%;width:100%;overflow: auto;" [editMode]="false"
-                                    [resId]="attachment.resIdMaster.value" [title]="'Document principal'">
+                                    [resId]="attachment.resIdMaster.value" [title]="'lang.mainDocument' | translate">
                                 </app-document-viewer>
                             </ng-template>
                         </mat-tab>
