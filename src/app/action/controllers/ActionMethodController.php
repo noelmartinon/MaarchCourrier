@@ -34,6 +34,7 @@ use History\controllers\HistoryController;
 use MessageExchange\controllers\MessageExchangeReviewController;
 use Note\models\NoteEntityModel;
 use Note\models\NoteModel;
+use Parameter\models\ParameterModel;
 use RegisteredMail\controllers\RegisteredMailTrait;
 use ExportSeda\controllers\ExportSEDATrait;
 use Resource\controllers\ResController;
@@ -339,6 +340,28 @@ class ActionMethodController
         ]);
         if (empty($circuit)) {
             return ['errors' => ['No available circuit']];
+        }
+
+        $minimumVisaRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'minimumVisaRole']);
+        $maximumSignRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'maximumSignRole']);
+
+        $minimumVisaRole = !empty($minimumVisaRole['param_value_int']) ? $minimumVisaRole['param_value_int'] : 0;
+        $maximumSignRole = !empty($maximumSignRole['param_value_int']) ? $maximumSignRole['param_value_int'] : 0;
+
+        $nbVisaRole = 0;
+        $nbSignRole = 0;
+        foreach ($circuit as $listInstance) {
+            if ($listInstance['item_mode'] == 'visa') {
+                $nbVisaRole++;
+            } elseif ($listInstance['item_mode'] == 'sign') {
+                $nbSignRole++;
+            }
+        }
+        if ($minimumVisaRole != 0 && $nbVisaRole < $minimumVisaRole) {
+            return ['errors' => ['Circuit does not have enough visa users']];
+        }
+        if ($maximumSignRole != 0 && $nbSignRole > $maximumSignRole) {
+            return ['errors' => ['Circuit have too many sign users']];
         }
 
         $resource       = ResModel::getById(['select' => ['integrations'], 'resId' => $args['resId']]);

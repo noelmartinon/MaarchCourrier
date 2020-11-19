@@ -2168,5 +2168,7 @@
     "chooseNewVisaUser": "is in <b>visa / signature</b> of some mails, please choose a <b>user replacement</b>",
     "hideModal": "Hide this modal",
     "noPreviousValid": "No valid previous user",
-    "youCannotUnsign": "You do not have the right to <b>unsign</b> this document. You must be the person who signed this document."
+    "youCannotUnsign": "You do not have the right to <b>unsign</b> this document. You must be the person who signed this document.",
+    "notEnoughVisaUser": "Not enough approvers",
+    "tooManySignUser": "Too many signatories"
 }

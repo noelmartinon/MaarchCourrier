@@ -2160,5 +2160,7 @@
     "chooseNewVisaUser": "est en <b>visa / signature</b> de certains courriers, veuillez choisir un utilisateur de <b>remplacement</b>",
     "hideModal": "Ne plus afficher cette fenêtre",
     "noPreviousValid": "Aucun utilisateur précédent valide",
-    "youCannotUnsign" : "Vous n'avez pas le droit de <b>dé-signer</b> ce document. Vous devez ếtre la personne qui a signé ce document."
+    "youCannotUnsign" : "Vous n'avez pas le droit de <b>dé-signer</b> ce document. Vous devez ếtre la personne qui a signé ce document.",
+    "notEnoughVisaUser": "Nombre de viseur insuffisant",
+    "tooManySignUser": "Nombre de signataire maximum dépassé"
 }

@@ -19,6 +19,14 @@
                         (click)="toggleIntegration(inteKey.key)" [checked]="data.resource.integrations[inteKey.key]">
                         {{'lang.' + inteKey.key + '_doc' | translate}}</mat-checkbox>
                 </div>
+                <div *ngIf="!visaNumberCorrect || !signNumberCorrect" class="alert-message alert-message-danger" role="alert">
+                    <p *ngIf="!visaNumberCorrect">
+                        {{'lang.notEnoughVisaUser' | translate}}
+                    </p>
+                    <p *ngIf="!signNumberCorrect">
+                        {{'lang.tooManySignUser' | translate}}
+                    </p>
+                </div>
                 <div *ngIf="resourcesError.length > 0" class="alert-message alert-message-danger mailList" role="alert">
                     <p>
                         {{'lang.canNotMakeAction' | translate}} :
@@ -39,7 +47,7 @@
                     </ul>
                 </div>
                 <app-visa-workflow *ngIf="data.resIds.length <= 1 || (!noResourceToProcess && data.resIds.length > 1)"
-                    [adminMode]="true" #appVisaWorkflow>
+                    [adminMode]="true" (workflowUpdated)="checkMinMaxVisaSign($event)" #appVisaWorkflow>
                 </app-visa-workflow>
                 <div style="padding-top: 10px;">
                     <app-note-editor #noteEditor [resIds]="data.resIds"></app-note-editor>
