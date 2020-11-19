@@ -266,7 +266,7 @@ class AuthenticationController
                 return $response->withStatus(401)->withJson(['errors' => $authenticated['errors']]);
             }
         } elseif ($loggingMethod['id'] == 'ldap') {
-            $login = strtolower($body['login']);
+            $login = $body['login'];
             if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
                 return $response->withStatus(403)->withJson(['errors' => 'Authentication Failed']);
             }
