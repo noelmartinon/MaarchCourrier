@@ -13,15 +13,10 @@
  * @ingroup export_seda
  */
 
-require_once __DIR__ . DIRECTORY_SEPARATOR .'../RequestSeda.php';
-
 class ReceiveMessage
 {
-    private $db;
-
     public function __construct()
     {
-        $this->db = new RequestSeda();
     }
 
     /**
@@ -30,11 +25,10 @@ class ReceiveMessage
      */
     public function receive($tmpPath, $tmpName, $type)
     {
-        $res['status'] = 0;
+        $res['status']  = 0;
         $res['content'] = '';
 
-
-        $zipPathParts = pathinfo($tmpPath. DIRECTORY_SEPARATOR. $tmpName);
+        $zipPathParts     = pathinfo($tmpPath. DIRECTORY_SEPARATOR. $tmpName);
         $messageDirectory = $tmpPath . $zipPathParts['filename'];
 
         $zip = new ZipArchive();
@@ -53,7 +47,7 @@ class ReceiveMessage
         }
 
         if (!$messageFileName) {
-            $res['status'] = 1;
+            $res['status']  = 1;
             $res['content'] = _ERROR_MESSAGE_NOT_PRESENT;
 
             return $res;
@@ -63,17 +57,6 @@ class ReceiveMessage
 
         $xml = new DOMDocument();
         $xml->load($messageFileName);
-
-        // FORMAT MESSAGE XML
-        /*$xsd = __DIR__ . DIRECTORY_SEPARATOR. '..' . DIRECTORY_SEPARATOR . 'resources' . DIRECTORY_SEPARATOR . 'xsd' . DIRECTORY_SEPARATOR . 'seda-2.0-main.xsd';
-        if (!$xml->schemaValidate($xsd)){
-            $res['status'] = 1;
-            $res['content'] = _ERROR_MESSAGE_STRUCTURE_WRONG;
-
-            $this->libxmlDisplayErrors();
-
-            return $res;
-        }*/
 
         // TEST ATTACHMENT
         $listFiles = scandir($messageDirectory);
@@ -105,7 +88,8 @@ class ReceiveMessage
 
         // ARCHIVER AGENCY CONTACT
         if ($dataObject->ArchivalAgency) {
-            if (!$this->db->getEntitiesByBusinessId($dataObject->ArchivalAgency->Identifier)) {
+            $destination = \Entity\models\EntityModel::getByBusinessId(['businessId' => (string)$dataObject->ArchivalAgency->Identifier]);
+            if (empty($destination)) {
                 $res['status'] = 1;
                 $res['content'] = _ERROR_CONTACT_UNKNOW . ' : ' . $dataObject->ArchivalAgency->Identifier;
 
@@ -117,7 +101,6 @@ class ReceiveMessage
 
         return $res;
     }
-
 
     private function getMessageObject($dataObject, $type)
     {
@@ -244,11 +227,11 @@ class ReceiveMessage
                 $tmpArchiveUnit->Content->Title[] = (string) $title;
             }
 
-            $tmpArchiveUnit->Content->OriginatingSystemId = (string) $ArchiveUnit->Content->OriginatingSystemId;
+            $tmpArchiveUnit->Content->OriginatingSystemId                    = (string) $ArchiveUnit->Content->OriginatingSystemId;
             $tmpArchiveUnit->Content->OriginatingAgencyArchiveUnitIdentifier = (string) $ArchiveUnit->Content->OriginatingAgencyArchiveUnitIdentifier;
-            $tmpArchiveUnit->Content->DocumentType = (string) $ArchiveUnit->Content->DocumentType;
-            $tmpArchiveUnit->Content->Status = (string) $ArchiveUnit->Content->Status;
-            $tmpArchiveUnit->Content->CreatedDate = (string) $ArchiveUnit->Content->CreatedDate;
+            $tmpArchiveUnit->Content->DocumentType                           = (string) $ArchiveUnit->Content->DocumentType;
+            $tmpArchiveUnit->Content->Status                                 = (string) $ArchiveUnit->Content->Status;
+            $tmpArchiveUnit->Content->CreatedDate                            = (string) $ArchiveUnit->Content->CreatedDate;
 
             if ($ArchiveUnit->Content->Writer) {
                 $tmpArchiveUnit->Content->Writer = array();
@@ -314,7 +297,7 @@ class ReceiveMessage
         foreach ($dataObject as $Communication) {
             $tmpCommunication = new stdClass();
             $tmpCommunication->Channel = (string) $Communication->Channel;
-            $tmpCommunication->value = (string) $Communication->CompleteNumber;
+            $tmpCommunication->value   = (string) $Communication->CompleteNumber;
 
             $listCommunication[] = $tmpCommunication;
         }
@@ -327,11 +310,11 @@ class ReceiveMessage
         $listAddress = array();
         foreach ($dataObject as $Address) {
             $tmpAddress = new stdClass();
-            $tmpAddress->CityName = (string) $Address->CityName;
-            $tmpAddress->Country = (string) $Address->Country;
-            $tmpAddress->Postcode = (string) $Address->Postcode;
+            $tmpAddress->CityName      = (string) $Address->CityName;
+            $tmpAddress->Country       = (string) $Address->Country;
+            $tmpAddress->Postcode      = (string) $Address->Postcode;
             $tmpAddress->PostOfficeBox = (string) $Address->PostOfficeBox;
-            $tmpAddress->StreetName = (string) $Address->StreetName;
+            $tmpAddress->StreetName    = (string) $Address->StreetName;
 
             $listAddress[] = $tmpAddress;
         }
@@ -358,37 +341,5 @@ class ReceiveMessage
         }
 
         return $listContact;
-    }
-
-    private function libxmlDisplayError($error)
-    {
-        $return = "<br/>\n";
-        switch ($error->level) {
-            case LIBXML_ERR_WARNING:
-                $return .= "<b>Warning $error->code</b>: ";
-                break;
-            case LIBXML_ERR_ERROR:
-                $return .= "<b>Error $error->code</b>: ";
-                break;
-            case LIBXML_ERR_FATAL:
-                $return .= "<b>Fatal Error $error->code</b>: ";
-                break;
-        }
-        $return .= trim($error->message);
-        if ($error->file) {
-            $return .=    " in <b>$error->file</b>";
-        }
-        $return .= " on line <b>$error->line</b>\n";
-
-        return $return;
-    }
-
-    private function libxmlDisplayErrors()
-    {
-        $errors = libxml_get_errors();
-        foreach ($errors as $error) {
-            //var_dump($this->libxmlDisplayError($error));
-        }
-        libxmlDisplayErrors();
     }
 }
