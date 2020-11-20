@@ -646,12 +646,6 @@ class ListTemplateController
         ValidatorModel::stringType($args, ['type']);
         ValidatorModel::intVal($args, ['entityId']);
 
-        $minimumVisaRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'minimumVisaRole']);
-        $maximumSignRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'maximumSignRole']);
-
-        $minimumVisaRole = !empty($minimumVisaRole['param_value_int']) ? $minimumVisaRole['param_value_int'] : 0;
-        $maximumSignRole = !empty($maximumSignRole['param_value_int']) ? $maximumSignRole['param_value_int'] : 0;
-
         $nbVisaRole = 0;
         $nbSignRole = 0;
         $destFound = false;
@@ -690,15 +684,6 @@ class ListTemplateController
                 $nbVisaRole++;
             } elseif ($item['mode'] == 'sign') {
                 $nbSignRole++;
-            }
-        }
-
-        if ($args['type'] == 'visaCircuit') {
-            if ($minimumVisaRole != 0 && $nbVisaRole < $minimumVisaRole) {
-                return ['errors' => 'Template does not have enough visa users', 'lang' => 'notEnoughVisaUser'];
-            }
-            if ($maximumSignRole != 0 && $nbSignRole > $maximumSignRole) {
-                return ['errors' => 'Template have too many sign users', 'lang' => 'tooManySignUser'];
             }
         }
 
