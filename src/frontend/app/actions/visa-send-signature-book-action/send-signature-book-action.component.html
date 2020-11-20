@@ -21,10 +21,10 @@
                 </div>
                 <div *ngIf="!visaNumberCorrect || !signNumberCorrect" class="alert-message alert-message-danger" role="alert">
                     <p *ngIf="!visaNumberCorrect">
-                        {{'lang.notEnoughVisaUser' | translate}}
+                        {{'lang.notEnoughVisaUser' | translate}} ({{'lang.requiredVisaUser' | translate: {min: minimumVisaRole} }})
                     </p>
                     <p *ngIf="!signNumberCorrect">
-                        {{'lang.tooManySignUser' | translate}}
+                        {{'lang.tooManySignUser' | translate}} ({{'lang.authorizedSignUser' | translate: {max: maximumSignRole} }})
                     </p>
                 </div>
                 <div *ngIf="resourcesError.length > 0" class="alert-message alert-message-danger mailList" role="alert">

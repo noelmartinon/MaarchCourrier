@@ -129,11 +129,14 @@ class ListTemplateController
         }
 
         $allowedTypes = ['diffusionList', 'visaCircuit', 'opinionCircuit'];
-        $check = Validator::stringType()->notEmpty()->validate($body['type']) && in_array($body['type'], $allowedTypes);
-        $check = $check && Validator::arrayType()->notEmpty()->validate($body['items']);
-        $check = $check && (Validator::stringType()->notEmpty()->validate($body['title']) || Validator::stringType()->notEmpty()->validate($body['description']));
-        if (!$check) {
-            return $response->withStatus(400)->withJson(['errors' => 'Bad allowed types']);
+        if (!Validator::stringType()->notEmpty()->validate($body['type']) || !in_array($body['type'], $allowedTypes)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body type is empty or not an allowed types']);
+        }
+        if (!Validator::arrayType()->notEmpty()->validate($body['items'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body items is empty or not an array']);
+        }
+        if (!Validator::stringType()->notEmpty()->validate($body['title'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body title is empty or not a string', 'lang' => 'templateNameMandatory']);
         }
 
         if (!empty($body['entityId'])) {
@@ -151,7 +154,7 @@ class ListTemplateController
 
         $control = ListTemplateController::controlItems(['items' => $body['items'], 'type' => $body['type'], 'entityId' => $body['entityId']]);
         if (!empty($control['errors'])) {
-            return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
+            return $response->withStatus(400)->withJson(['errors' => $control['errors'], 'lang' => $control['lang']]);
         }
 
         $listTemplateId = ListTemplateModel::create([
@@ -217,7 +220,7 @@ class ListTemplateController
 
         $control = ListTemplateController::controlItems(['items' => $body['items'], 'type' => $listTemplate['type'], 'entityId' => $listTemplate['entity_id']]);
         if (!empty($control['errors'])) {
-            return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
+            return $response->withStatus(400)->withJson(['errors' => $control['errors'], 'lang' => $control['lang']]);
         }
 
         ListTemplateModel::update([
@@ -692,10 +695,10 @@ class ListTemplateController
 
         if ($args['type'] == 'visaCircuit') {
             if ($minimumVisaRole != 0 && $nbVisaRole < $minimumVisaRole) {
-                return ['errors' => 'Template does not have enough visa users'];
+                return ['errors' => 'Template does not have enough visa users', 'lang' => 'notEnoughVisaUser'];
             }
             if ($maximumSignRole != 0 && $nbSignRole > $maximumSignRole) {
-                return ['errors' => 'Template have too many sign users'];
+                return ['errors' => 'Template have too many sign users', 'lang' => 'tooManySignUser'];
             }
         }
 

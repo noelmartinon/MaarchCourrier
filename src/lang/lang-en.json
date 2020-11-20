@@ -2170,5 +2170,8 @@
     "noPreviousValid": "No valid previous user",
     "youCannotUnsign": "You do not have the right to <b>unsign</b> this document. You must be the person who signed this document.",
     "notEnoughVisaUser": "Not enough approvers",
-    "tooManySignUser": "Too many signatories"
+    "tooManySignUser": "Too many signatories",
+    "requiredVisaUser": "{{min}} approvers required",
+    "authorizedSignUser": "{{max}} signatories authorized",
+    "templateNameMandatory": "Template name mandatory"
 }

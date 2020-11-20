@@ -126,7 +126,7 @@ class ListTemplateControllerTest extends TestCase
         $response     = $listTemplateController->create($fullRequest, new \Slim\Http\Response());
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Bad allowed types', $responseBody['errors']);
+        $this->assertSame('Body type is empty or not an allowed types', $responseBody['errors']);
 
         $body = [
             'type'        => 'diffusionList',
