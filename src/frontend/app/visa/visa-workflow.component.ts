@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ElementRef, ViewChild } from '@angular/core';
+import {Component, Input, OnInit, ElementRef, ViewChild, Output, EventEmitter} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
@@ -50,6 +50,8 @@ export class VisaWorkflowComponent implements OnInit {
 
     @Input('linkedToMaarchParapheur') linkedToMaarchParapheur: boolean = false;
 
+    @Output() workflowUpdated = new EventEmitter<any>();
+
     @ViewChild('searchVisaSignUserInput', { static: false }) searchVisaSignUserInput: ElementRef;
 
     searchVisaSignUser = new FormControl();
@@ -97,6 +99,7 @@ export class VisaWorkflowComponent implements OnInit {
         if (event.previousContainer === event.container) {
             if (this.canManageUser(this.visaWorkflow.items[event.currentIndex], event.currentIndex)) {
                 moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+                this.workflowUpdated.emit(event.container);
             } else {
                 this.notify.error(this.translate.instant('lang.moveVisaUserErr', {value1: this.visaWorkflow.items[event.previousIndex].labelToDisplay}));
             }
@@ -370,6 +373,7 @@ export class VisaWorkflowComponent implements OnInit {
 
     changeRole(i: number) {
         this.visaWorkflow.items[i].requested_signature = !this.visaWorkflow.items[i].requested_signature;
+        this.workflowUpdated.emit(this.visaWorkflow.items);
     }
 
     getWorkflow() {

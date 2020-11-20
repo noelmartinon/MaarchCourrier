@@ -20,6 +20,7 @@ use Entity\models\ListInstanceHistoryModel;
 use Entity\models\ListInstanceModel;
 use Group\controllers\PrivilegeController;
 use History\controllers\HistoryController;
+use Parameter\models\ParameterModel;
 use Resource\controllers\ResController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
@@ -357,6 +358,14 @@ class ListInstanceController
             return $response->withStatus(400)->withJson(['errors' => 'Route params type is empty or not valid']);
         }
 
+        if ($args['type'] == 'visaCircuit') {
+            $minimumVisaRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'minimumVisaRole']);
+            $maximumSignRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'maximumSignRole']);
+
+            $minimumVisaRole = !empty($minimumVisaRole['param_value_int']) ? $minimumVisaRole['param_value_int'] : 0;
+            $maximumSignRole = !empty($maximumSignRole['param_value_int']) ? $maximumSignRole['param_value_int'] : 0;
+        }
+
         DatabaseModel::beginTransaction();
 
         foreach ($body['resources'] as $resourceKey => $resource) {
@@ -446,6 +455,26 @@ class ListInstanceController
                     'requested_signature'   => $listInstance['requested_signature'] ?? false,
                     'delegate'              => $listInstance['delegate'] ?? null
                 ];
+            }
+
+            if ($args['type'] == 'visaCircuit' && (!empty($minimumVisaRole) || !empty($maximumSignRole))) {
+                $nbVisaRole = 0;
+                $nbSignRole = 0;
+                foreach ($listInstances as $listInstance) {
+                    if ($listInstance['item_mode'] == 'visa') {
+                        $nbVisaRole++;
+                    } elseif ($listInstance['item_mode'] == 'sign') {
+                        $nbSignRole++;
+                    }
+                }
+                if ($minimumVisaRole != 0 && $nbVisaRole < $minimumVisaRole) {
+                    DatabaseModel::rollbackTransaction();
+                    return $response->withStatus(400)->withJson(['errors' => "Body resources[{$resourceKey}] listInstances does not have enough visa users", 'lang' => 'notEnoughVisaUser']);
+                }
+                if ($maximumSignRole != 0 && $nbSignRole > $maximumSignRole) {
+                    DatabaseModel::rollbackTransaction();
+                    return $response->withStatus(400)->withJson(['errors' => "Body resources[{$resourceKey}] listInstances have too many sign users", 'lang' => 'tooManySignUser']);
+                }
             }
 
             foreach ($listInstances as $key => $listInstance) {

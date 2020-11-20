@@ -284,16 +284,33 @@ class ResourceListController
                 $queryData[] = explode(',', $replace);
             }
         }
-        if (!empty($args['data']['entitiesChildren'])) {
-            $entities = explode(',', $args['data']['entitiesChildren']);
-            $entitiesChildren = [];
-            foreach ($entities as $entity) {
-                $children = EntityModel::getEntityChildren(['entityId' => $entity]);
-                $entitiesChildren = array_merge($entitiesChildren, $children);
-            }
-            if (!empty($entitiesChildren)) {
-                $where[] = 'destination in (?)';
-                $queryData[] = $entitiesChildren;
+        if (isset($args['data']['entitiesChildren'])) {
+            if (empty($args['data']['entitiesChildren'])) {
+                $where[] = 'destination is null';
+            } else {
+                $entities = explode(',', $args['data']['entitiesChildren']);
+                $entitiesChildren = [];
+                foreach ($entities as $entity) {
+                    if (!empty($entity)) {
+                        $children = EntityModel::getEntityChildren(['entityId' => $entity]);
+                        $entitiesChildren = array_merge($entitiesChildren, $children);
+                    }
+                }
+    
+                $tmpWhere = [];
+    
+                $replace = preg_replace('/(^,)|(,$)/', '', $args['data']['entitiesChildren']);
+                $replace = preg_replace('/(,,)/', ',', $replace);
+                if ($replace != $args['data']['entitiesChildren']) {
+                    $tmpWhere[] = 'destination is null';
+                }
+                if (!empty($entitiesChildren)) {
+                    $tmpWhere[] = 'destination in (?)';
+                    $queryData[] = $entitiesChildren;
+                }
+                if (!empty($tmpWhere)) {
+                    $where[] = '(' . implode(' or ', $tmpWhere) . ')';
+                }
             }
         }
         if (!empty($args['data']['doctypes'])) {

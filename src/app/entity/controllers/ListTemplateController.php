@@ -643,6 +643,14 @@ class ListTemplateController
         ValidatorModel::stringType($args, ['type']);
         ValidatorModel::intVal($args, ['entityId']);
 
+        $minimumVisaRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'minimumVisaRole']);
+        $maximumSignRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'maximumSignRole']);
+
+        $minimumVisaRole = !empty($minimumVisaRole['param_value_int']) ? $minimumVisaRole['param_value_int'] : 0;
+        $maximumSignRole = !empty($maximumSignRole['param_value_int']) ? $maximumSignRole['param_value_int'] : 0;
+
+        $nbVisaRole = 0;
+        $nbSignRole = 0;
         $destFound = false;
         foreach ($args['items'] as $item) {
             if ($destFound && $item['mode'] == 'dest') {
@@ -673,6 +681,20 @@ class ListTemplateController
                 return ['errors' => 'item has not enough privileges'];
             } elseif ($args['type'] == 'opinionCircuit' && !PrivilegeController::hasPrivilege(['privilegeId' => 'avis_documents', 'userId' => $item['id']])) {
                 return ['errors' => 'item has not enough privileges'];
+            }
+            if ($item['mode'] == 'visa') {
+                $nbVisaRole++;
+            } elseif ($item['mode'] == 'sign') {
+                $nbSignRole++;
+            }
+        }
+
+        if ($args['type'] == 'visaCircuit') {
+            if ($minimumVisaRole != 0 && $nbVisaRole < $minimumVisaRole) {
+                return ['errors' => 'Template does not have enough visa users'];
+            }
+            if ($maximumSignRole != 0 && $nbSignRole > $maximumSignRole) {
+                return ['errors' => 'Template have too many sign users'];
             }
         }
 

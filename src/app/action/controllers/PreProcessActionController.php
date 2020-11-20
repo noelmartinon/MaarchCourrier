@@ -568,7 +568,19 @@ class PreProcessActionController
             }
         }
 
-        return $response->withJson(['signatureBookEnabled' => $signatureBookEnabled, 'additionalsInfos' => $additionalsInfos, 'errors' => $errors]);
+        $minimumVisaRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'minimumVisaRole']);
+        $maximumSignRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'maximumSignRole']);
+
+        $minimumVisaRole = !empty($minimumVisaRole['param_value_int']) ? $minimumVisaRole['param_value_int'] : 0;
+        $maximumSignRole = !empty($maximumSignRole['param_value_int']) ? $maximumSignRole['param_value_int'] : 0;
+
+        return $response->withJson([
+            'signatureBookEnabled' => $signatureBookEnabled,
+            'additionalsInfos'     => $additionalsInfos,
+            'errors'               => $errors,
+            'minimumVisaRole'      => $minimumVisaRole,
+            'maximumSignRole'      => $maximumSignRole
+        ]);
     }
 
     public function checkExternalNoteBook(Request $request, Response $response, array $aArgs)
@@ -1011,7 +1023,13 @@ class PreProcessActionController
             }
         }
 
-        return $response->withJson(['resourcesInformations' => $resourcesInformations]);
+        $minimumVisaRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'minimumVisaRole']);
+        $maximumSignRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'maximumSignRole']);
+
+        $minimumVisaRole = !empty($minimumVisaRole['param_value_int']) ? $minimumVisaRole['param_value_int'] : 0;
+        $maximumSignRole = !empty($maximumSignRole['param_value_int']) ? $maximumSignRole['param_value_int'] : 0;
+
+        return $response->withJson(['resourcesInformations' => $resourcesInformations, 'minimumVisaRole' => $minimumVisaRole, 'maximumSignRole' => $maximumSignRole]);
     }
 
     public function checkContinueVisaCircuit(Request $request, Response $response, array $args)
