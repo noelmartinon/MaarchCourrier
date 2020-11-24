@@ -593,12 +593,16 @@ class AlfrescoController
             return ['errors' => 'Alfresco mapping file does not exist'];
         }
 
+        $body = ['name' => str_replace('/', '_', $document['alt_identifier']), 'nodeType' => 'cm:folder'];
+        if (!empty($alfrescoParameters['mapping']['folderCreation'])) {
+            $body['properties'] = $alfrescoParameters['mapping']['folderCreation'];
+        }
         $curlResponse = CurlModel::execSimple([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['folderId']}/children",
             'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
             'headers'       => ['content-type:application/json', 'Accept: application/json'],
             'method'        => 'POST',
-            'body'          => json_encode(['name' => str_replace('/', '_', $document['alt_identifier']), 'nodeType' => 'cm:folder'])
+            'body'          => json_encode($body)
         ]);
         if ($curlResponse['code'] != 201) {
             return ['errors' => "Create folder {$document['alt_identifier']} failed : " . json_encode($curlResponse['response'])];
@@ -819,9 +823,9 @@ class AlfrescoController
             AttachmentModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$attachment['res_id']]]);
         }
 
-        if (!empty($alfrescoParameters['mapping']['folder'])) {
+        if (!empty($alfrescoParameters['mapping']['folderModification'])) {
             $body = [
-                'properties' => $alfrescoParameters['mapping']['folder'],
+                'properties' => $alfrescoParameters['mapping']['folderModification'],
             ];
             $curlResponse = CurlModel::execSimple([
                 'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$resourceFolderId}",
