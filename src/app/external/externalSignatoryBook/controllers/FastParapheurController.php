@@ -87,7 +87,7 @@ class FastParapheurController
                     $signatoryInfo = FastParapheurController::getSignatoryUserInfo(['resId' => $aArgs['idsToRetrieve'][$version][$resId]['res_id_master']]);
                     $response = FastParapheurController::getRefusalMessage(['config' => $aArgs['config'], 'documentId' => $value['external_id']]);
                     $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'refused';
-                    $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = $signatoryInfo['lastname'] . ' ' . $signatoryInfo['firstname'] . ' : ' . $response;
+                    $aArgs['idsToRetrieve'][$version][$resId]['notes'][] = ['content' => $signatoryInfo['lastname'] . ' ' . $signatoryInfo['firstname'] . ' : ' . $response];
                     break;
                 } else {
                     $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'waiting';

@@ -93,7 +93,16 @@ $app->put('/attachments/{id}/sign', \SignatureBook\controllers\SignatureBookCont
 $app->put('/attachments/{id}/unsign', \SignatureBook\controllers\SignatureBookController::class . ':unsignAttachment');
 $app->post('/attachments/{id}/mailing', \Attachment\controllers\AttachmentController::class . ':getMailingById');
 $app->get('/attachmentsInformations', \Attachment\controllers\AttachmentController::class . ':getByChrono');
+
+
+//AttachmentsTypes
 $app->get('/attachmentsTypes', \Attachment\controllers\AttachmentController::class . ':getAttachmentsTypes');
+//$app->get('/attachmentsTypes', \Attachment\controllers\AttachmentTypeController::class . ':get');
+$app->post('/attachmentsTypes', \Attachment\controllers\AttachmentTypeController::class . ':create');
+$app->put('/attachmentsTypes/{id}', \Attachment\controllers\AttachmentTypeController::class . ':update');
+$app->delete('/attachmentsTypes/{id}', \Attachment\controllers\AttachmentTypeController::class . ':delete');
+
+
 
 //AutoComplete
 $app->get('/autocomplete/users', \SrcCore\controllers\AutoCompleteController::class . ':getUsers');

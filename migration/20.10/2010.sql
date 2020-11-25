@@ -352,6 +352,11 @@ SET dest_user = (
     WHERE item_mode = 'dest' AND item_type = 'user_id' AND listinstance.res_id = res_letterbox.res_id LIMIT 1
 );
 
+/* VISA CIRCUIT PARAMETERS */
+DELETE FROM parameters WHERE id = 'minimumVisaRole';
+INSERT INTO parameters (id, description, param_value_int) VALUES ('minimumVisaRole', 'Nombre minimum de viseur dans les circuits de visa (0 pour désactiver)', 0);
+DELETE FROM parameters WHERE id = 'maximumSignRole';
+INSERT INTO parameters (id, description, param_value_int) VALUES ('maximumSignRole', 'Nombre maximum de signataires dans les circuits de visa (0 pour désactiver)', 0);
 
 /* ORDER ON CHRONO */
 CREATE OR REPLACE FUNCTION order_alphanum(text) RETURNS text AS $$

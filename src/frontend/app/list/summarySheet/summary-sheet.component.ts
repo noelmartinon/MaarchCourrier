@@ -90,7 +90,19 @@ export class SummarySheetComponent implements OnInit {
             label: this.translate.instant('lang.visaWorkflow'),
             css: 'col-md-4 text-center',
             desc: [
-                this.translate.instant('lang.firstname') + ' ' + this.translate.instant('lang.lastname') + ' (' + this.translate.instant('lang.destination').toLowerCase() + ')',
+                this.translate.instant('lang.firstname') + ' ' + this.translate.instant('lang.lastname'),
+                this.translate.instant('lang.role'),
+                this.translate.instant('lang.processDate')
+            ],
+            enabled: true
+        },
+        {
+            id: 'visaWorkflowMaarchParapheur',
+            unit: 'visaWorkflowMaarchParapheur',
+            label: this.translate.instant('lang.externalVisaWorkflow'),
+            css: 'col-md-4 text-center',
+            desc: [
+                this.translate.instant('lang.firstname') + ' ' + this.translate.instant('lang.lastname'),
                 this.translate.instant('lang.role'),
                 this.translate.instant('lang.processDate')
             ],
@@ -112,6 +124,14 @@ export class SummarySheetComponent implements OnInit {
             id: 'trafficRecords',
             unit: 'trafficRecords',
             label: this.translate.instant('lang.trafficRecordSummarySheet'),
+            css: 'col-md-4 text-center',
+            desc: [],
+            enabled: true
+        },
+        {
+            id: 'workflowHistory',
+            unit: 'workflowHistory',
+            label: this.translate.instant('lang.history'),
             css: 'col-md-4 text-center',
             desc: [],
             enabled: true
@@ -141,6 +161,14 @@ export class SummarySheetComponent implements OnInit {
                         }
                         return item;
                     });
+                }
+            })
+        ).subscribe();
+
+        this.http.get('../rest/externalSignatureBooks/enabled').pipe(
+            tap((data: any) => {
+                if (data.enabledSignatureBook !== 'maarchParapheur') {
+                    this.dataAvailable = this.dataAvailable.filter((item: any) => item.id !== 'visaWorkflowMaarchParapheur');
                 }
             })
         ).subscribe();

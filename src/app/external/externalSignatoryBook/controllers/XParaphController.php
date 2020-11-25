@@ -421,7 +421,7 @@ class XParaphController
 
                 if ($state['id'] == 'refused') {
                     $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'refused';
-                    $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = $state['note'];
+                    $aArgs['idsToRetrieve'][$version][$resId]['notes'][] = ['content' => $state['note']];
 
                     $processedFile = XParaphController::getFile(['config' => $aArgs['config'], 'depotId' => $value['external_id'], 'userGeneric' => $userGeneric, 'depotLogin' => $xParaphDepot['login']]);
                     if (!empty($processedFile['errors'])) {
@@ -472,7 +472,7 @@ class XParaphController
                     unlink($tmpPath . $tmpName);
 
                     $aArgs['idsToRetrieve'][$version][$resId]['encodedFile'] = $encodedFile;
-                    $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = $state['note'];
+                    $aArgs['idsToRetrieve'][$version][$resId]['notes'][] = ['content' => $state['note']];
                     if ($state['id'] == 'validateOnlyVisa') {
                         $aArgs['idsToRetrieve'][$version][$resId]['onlyVisa'] = true;
                     }

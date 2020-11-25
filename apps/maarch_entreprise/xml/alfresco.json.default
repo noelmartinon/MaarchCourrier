@@ -7,7 +7,10 @@
         "attachment" : {
             "cm:name": "title"
         },
-        "folder" : {
+        "folderCreation" : {
+            "cm:title": "un titre"
+        },
+        "folderModification" : {
             "cm:description": "une description"
         }
     }

@@ -1492,3 +1492,18 @@ CREATE TABLE IF NOT EXISTS registered_mail_resources (
     CONSTRAINT registered_mail_resources_pkey PRIMARY KEY (id),
     CONSTRAINT registered_mail_resources_unique_key UNIQUE (res_id)
 );
+
+CREATE TABLE attachment_types
+(
+    id SERIAL NOT NULL,
+    type_id text NOT NULL,
+    label text NOT NULL,
+    visible BOOLEAN NOT NULL,
+    email_link BOOLEAN NOT NULL,
+    signable BOOLEAN NOT NULL,
+    icon text,
+    version_enabled BOOLEAN NOT NULL,
+    new_version_default BOOLEAN NOT NULL,
+    CONSTRAINT attachment_types_pkey PRIMARY KEY (id)
+)
+WITH (OIDS=FALSE);

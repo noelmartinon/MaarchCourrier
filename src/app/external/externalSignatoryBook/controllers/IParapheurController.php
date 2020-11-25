@@ -332,7 +332,7 @@ class IParapheurController
                             $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'validated';
                             $aArgs['idsToRetrieve'][$version][$resId]['format'] = 'pdf';
                             $aArgs['idsToRetrieve'][$version][$resId]['encodedFile'] = $response['b64FileContent'];
-                            $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = $noteContent;
+                            $aArgs['idsToRetrieve'][$version][$resId]['notes'][] = ['content' => $noteContent];
                             if ($status == $aArgs['config']['data']['signState']) {
                                 IParapheurController::processVisaWorkflow(['res_id_master' => $value['res_id_master'], 'res_id' => $value['res_id'], 'processSignatory' => true]);
                                 break;
@@ -340,7 +340,7 @@ class IParapheurController
                         } elseif ($status == $aArgs['config']['data']['refusedVisa'] || $status == $aArgs['config']['data']['refusedSign']) {
                             $noteContent .= $res->nom . ' : ' . $res->annotation . PHP_EOL;
                             $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'refused';
-                            $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = $noteContent;
+                            $aArgs['idsToRetrieve'][$version][$resId]['notes'][] = ['content' => $noteContent];
                             break;
                         } else {
                             $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'waiting';

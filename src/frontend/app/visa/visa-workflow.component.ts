@@ -365,6 +365,7 @@ export class VisaWorkflowComponent implements OnInit {
 
     deleteItem(index: number) {
         this.visaWorkflow.items.splice(index, 1);
+        this.workflowUpdated.emit(this.visaWorkflow.items);
     }
 
     getVisaCount() {
@@ -505,6 +506,7 @@ export class VisaWorkflowComponent implements OnInit {
                 }
                 this.searchVisaSignUser.reset();
                 this.searchVisaSignUserInput.nativeElement.blur();
+                this.workflowUpdated.emit(this.visaWorkflow.items);
                 resolve(true);
             } else if (item.type === 'entity') {
                 this.http.get(`../rest/listTemplates/${item.id}`).pipe(

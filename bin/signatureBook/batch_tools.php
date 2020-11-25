@@ -140,25 +140,28 @@ function Bt_writeLog($args = [])
     ]);
 }
 
-
 function Bt_createNote($aArgs = [])
 {
-    if (!empty($aArgs['content'])) {
-        $creatorName = '';
-        if (!empty($aArgs['creatorId'])) {
-            $creatorId = $aArgs['creatorId'];
-        } else {
-            $users = \User\models\UserModel::get(['select' => ['id'], 'orderBy' => ["user_id='superadmin' desc"], 'limit' => 1]);
-            $creatorId   = $users[0]['id'];
+    if (!empty($aArgs['notes'])) {
+        foreach ($aArgs['notes'] as $note) {
+            if (!empty(trim($note['content']))) {
+                $creatorName = '';
+                if (!empty($note['creatorId'])) {
+                    $creatorId = $note['creatorId'];
+                } else {
+                    $users = \User\models\UserModel::get(['select' => ['id'], 'orderBy' => ["user_id='superadmin' desc"], 'limit' => 1]);
+                    $creatorId = $users[0]['id'];
+                }
+                if (!empty($note['creatorName'])) {
+                    $creatorName = $note['creatorName'] . ' (Maarch Parapheur) : ';
+                }
+                \Note\models\NoteModel::create([
+                    'resId'     => $aArgs['resId'],
+                    'user_id'   => $creatorId,
+                    'note_text' => $creatorName . $note['content'],
+                ]);
+            }
         }
-        if (!empty($aArgs['creatorName'])) {
-            $creatorName = $aArgs['creatorName'] . ' (Maarch Parapheur) : ';
-        }
-        \Note\models\NoteModel::create([
-            'resId' => $aArgs['resId'],
-            'user_id' => $creatorId,
-            'note_text' => $creatorName . $aArgs['content'],
-        ]);
     }
 }
 

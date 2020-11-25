@@ -513,6 +513,9 @@ class MaarchParapheurController
     {
         $version = $aArgs['version'];
         foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
+            if (!is_numeric($value['external_id'])) {
+                continue;
+            }
             $documentWorkflow = MaarchParapheurController::getDocumentWorkflow(['config' => $aArgs['config'], 'documentId' => $value['external_id']]);
             if (!is_array($documentWorkflow)) {
                 unset($aArgs['idsToRetrieve'][$version][$resId]);
@@ -533,23 +536,25 @@ class MaarchParapheurController
                 } elseif ($state['status'] == 'refused' && $state['mode'] == 'note') {
                     $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'refusedNote';
                 }
-                if (!empty($state['note'])) {
-                    $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = $state['note'];
+                foreach ($state['notes'] as $note) {
+                    $tmpNote = [];
+                    $tmpNote['content'] = $note['content'];
                     $userInfos = UserModel::getByExternalId([
-                        'select'            => ['id', 'firstname', 'lastname'],
-                        'externalId'        => $state['noteCreatorId'],
-                        'externalName'      => 'maarchParapheur'
+                        'select'       => ['id', 'firstname', 'lastname'],
+                        'externalId'   => $note['creatorId'],
+                        'externalName' => 'maarchParapheur'
                     ]);
                     if (!empty($userInfos)) {
-                        $aArgs['idsToRetrieve'][$version][$resId]['noteCreatorId'] = $userInfos['id'];
+                        $tmpNote['creatorId'] = $userInfos['id'];
                     }
-                    $aArgs['idsToRetrieve'][$version][$resId]['noteCreatorName'] = $state['noteCreatorName'];
+                    $tmpNote['creatorName'] = $note['creatorName'];
+                    $aArgs['idsToRetrieve'][$version][$resId]['notes'][] = $tmpNote;
                 }
                 if (!empty($state['signatoryUserId'])) {
                     $signatoryUser = UserModel::getByExternalId([
-                        'select'            => ['user_id', 'id'],
-                        'externalId'        => $state['signatoryUserId'],
-                        'externalName'      => 'maarchParapheur'
+                        'select'       => ['user_id', 'id'],
+                        'externalId'   => $state['signatoryUserId'],
+                        'externalName' => 'maarchParapheur'
                     ]);
                     if (!empty($signatoryUser['user_id'])) {
                         $aArgs['idsToRetrieve'][$version][$resId]['typist'] = $signatoryUser['user_id'];
@@ -592,9 +597,17 @@ class MaarchParapheurController
 
     public static function getState($aArgs)
     {
-        $state['status'] = 'validated';
+        $state['status']       = 'validated';
         $state['workflowInfo'] = [];
+        $state['notes']        = [];
         foreach ($aArgs['workflow'] as $step) {
+            if (!empty($step['note'])) {
+                $state['notes'][] = [
+                    'content'     => $step['note'],
+                    'creatorId'   => $step['userId'],
+                    'creatorName' => $step['userDisplay']
+                ];
+            }
             if ($step['status'] == 'VAL' && $step['mode'] == 'sign') {
                 $state['workflowInfo'][] = $step['userDisplay'] . ' (Signé le ' . $step['processDate'] . ')';
                 $state['signatoryUserId'] = $step['userId'];
@@ -603,10 +616,11 @@ class MaarchParapheurController
             }
             if ($step['status'] == 'REF') {
                 $state['status']          = 'refused';
-                $state['note']            = $step['note'];
-                $state['noteCreatorId']   = $step['userId'];
-                $state['noteCreatorName'] = $step['userDisplay'];
                 $state['workflowInfo'][]  = $step['userDisplay'] . ' (Refusé le ' . $step['processDate'] . ')';
+                break;
+            } elseif ($step['status'] == 'STOP') {
+                $state['status']         = 'refused';
+                $state['workflowInfo'][] = $step['userDisplay'] . ' (Interrompu le ' . $step['processDate'] . ')';
                 break;
             } elseif (empty($step['status'])) {
                 $state['status'] = 'inProgress';

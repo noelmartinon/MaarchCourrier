@@ -2162,5 +2162,8 @@
     "noPreviousValid": "Aucun utilisateur précédent valide",
     "youCannotUnsign" : "Vous n'avez pas le droit de <b>dé-signer</b> ce document. Vous devez être la personne qui a signé ce document.",
     "notEnoughVisaUser": "Nombre de viseur insuffisant",
-    "tooManySignUser": "Nombre de signataire maximum dépassé"
+    "tooManySignUser": "Nombre de signataire maximum dépassé",
+    "templateNameMandatory": "Nom du modèle obligatoire",
+    "requiredVisaUser": "{{min}} viseur(s) requis",
+    "authorizedSignUser": "{{max}} signataire(s) autorisé(s)"
 }

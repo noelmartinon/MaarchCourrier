@@ -359,7 +359,7 @@ class IxbusController
             if ((string)$etatDossier == $aArgs['config']['data']['ixbusIdEtatRefused']) {
                 $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'refused';
                 $notes = IxbusController::getDossier(['config' => $aArgs['config'], 'sessionId' => $sessionId['cookie'], 'dossier_id' => $value['external_id']]);
-                $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = (string)$notes->MotifRefus;
+                $aArgs['idsToRetrieve'][$version][$resId]['notes'][] = ['content' => (string)$notes->MotifRefus];
             // Validated
             } elseif ((string)$etatDossier == $aArgs['config']['data']['ixbusIdEtatValidated']) {
                 $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'validated';
@@ -368,7 +368,7 @@ class IxbusController
                 $aArgs['idsToRetrieve'][$version][$resId]['encodedFile'] = (string)$signedDocument->Fichier;
 
                 $notes = IxbusController::getAnnotations(['config' => $aArgs['config'], 'sessionId' => $sessionId['cookie'], 'dossier_id' => $value['external_id']]);
-                $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = (string)$notes->Annotation->Texte;
+                $aArgs['idsToRetrieve'][$version][$resId]['notes'][] = ['content' => (string)$notes->Annotation->Texte];
             } else {
                 unset($aArgs['idsToRetrieve'][$version][$resId]);
             }
