@@ -12,7 +12,7 @@
                 <div *ngFor="let redirectModel of userDestTemplates; index as i" id="{{redirectModel.object_id}}"
                     class="form-group">
                     <plugin-autocomplete [labelPlaceholder]="('lang.newDest' | translate) + ' : ' + redirectModel.title"
-                        [labelList]="('lang.availableUsers' | translate)" [routeDatas]="['/rest/autocomplete/users']"
+                        [labelList]="('lang.availableUsers' | translate)" [routeDatas]="['/rest/autocomplete/users?inEntity=' + redirectModel.entity_id]"
                         [targetSearchKey]="'idToDisplay'" [subInfoKey]="'descriptionToDisplay'"
                         (triggerEvent)="setRedirectUserListModels(i, $event)" singleMode required></plugin-autocomplete>
                 </div>

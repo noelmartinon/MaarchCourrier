@@ -390,6 +390,12 @@ class ListTemplateController
                 return $response->withStatus(400)->withJson(['errors' => 'User not found or not active']);
             }
 
+            $entities = UserModel::getEntitiesById(['id' => $redirectUser['id'], 'select' => ['entities.id']]);
+            $entities = array_column($entities, 'id');
+            if (!empty(array_diff($allEntityIds, $entities))) {
+                return $response->withStatus(400)->withJson(['errors' => 'Dest user is not present in this entity']);
+            }
+
             ListTemplateItemModel::update([
                 'set'   => ['item_id' => $redirectUser['id']],
                 'where' => ['item_id = ?', 'item_type = ?', 'item_mode = ?', 'list_template_id in (?)'],
