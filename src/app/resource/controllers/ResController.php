@@ -1094,7 +1094,7 @@ class ResController extends ResourceControlController
         $baskets = BasketModel::getBasketsByLogin(['login' => $user['user_id']]);
         $basketsClause = '';
         foreach ($baskets as $basket) {
-            if (!empty($basket['basket_clause'])) {
+            if (!empty($basket['basket_clause']) && $basket['allowed']) {
                 $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $user['user_id']]);
                 if (!empty($basketsClause)) {
                     $basketsClause .= ' or ';
