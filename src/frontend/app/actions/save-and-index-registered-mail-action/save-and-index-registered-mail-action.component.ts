@@ -60,9 +60,10 @@ export class SaveAndIndexRegisteredMailActionComponent implements OnInit {
             finalize(() => this.loading = false),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
+                this.dialogRef.close();
                 return of(false);
             })
-        ).subscribe()
+        ).subscribe();
     }
 
     executeAction() {

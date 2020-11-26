@@ -13,7 +13,6 @@ import { of } from 'rxjs';
 })
 export class SaveRegisteredMailActionComponent implements OnInit {
 
-
     loading: boolean = false;
 
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
@@ -61,9 +60,10 @@ export class SaveRegisteredMailActionComponent implements OnInit {
             finalize(() => this.loading = false),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
+                this.dialogRef.close();
                 return of(false);
             })
-        ).subscribe()
+        ).subscribe();
     }
 
     executeAction() {
