@@ -264,7 +264,7 @@ class ResController
         $baskets = BasketModel::getBasketsByUserId(['userId' => $aArgs['userId'], 'unneededBasketId' => ['IndexingBasket']]);
         $basketsClause = '';
         foreach ($baskets as $key => $basket) {
-            if (!empty($basket['basket_clause'])) {
+            if (!empty($basket['basket_clause']) && $basket['allowed']) {
                 $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $basket['basket_owner']]);
                 if ($key > 0) {
                     $basketsClause .= ' or ';
