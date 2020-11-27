@@ -27,6 +27,7 @@ use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use Folder\models\FolderModel;
 use Folder\models\ResourceFolderModel;
+use Group\controllers\PrivilegeController;
 use Note\models\NoteEntityModel;
 use Note\models\NoteModel;
 use Priority\models\PriorityModel;
@@ -240,7 +241,7 @@ class SearchController
         return $response->withJson(['configuration' => $configuration]);
     }
 
-    private static function getUserDataClause(array $args)
+    public static function getUserDataClause(array $args)
     {
         ValidatorModel::notEmpty($args, ['userId', 'login']);
         ValidatorModel::intVal($args, ['userId']);
@@ -250,16 +251,27 @@ class SearchController
             $whereClause = '1=?';
             $dataClause = [1];
         } else {
-            $entities = UserModel::getEntitiesById(['id' => $args['userId'], 'select' => ['entities.id']]);
-            $entities = array_column($entities, 'id');
-            $entities = empty($entities) ? [0] : $entities;
-
-            $foldersClause = 'res_id in (select res_id from folders LEFT JOIN entities_folders ON folders.id = entities_folders.folder_id LEFT JOIN resources_folders ON folders.id = resources_folders.folder_id ';
-            $foldersClause .= 'WHERE entities_folders.entity_id in (?) OR folders.user_id = ? OR entities_folders.keyword = ?)';
-
-            $whereClause = "(res_id in (select res_id from users_followed_resources where user_id = ?)) OR ({$foldersClause})";
-            $dataClause = [$args['userId'], $entities, $args['userId'], 'ALL_ENTITIES'];
-
+            $folder = PrivilegeController::hasPrivilege(['privilegeId' => 'include_folders_and_followed_resources_perimeter', 'userId' => $args['userId']]);
+            if ($folder) {
+                $whereClause = '(res_id in (select res_id from users_followed_resources where user_id = ?))';
+                $dataClause[] = $args['userId'];
+    
+                $entities = UserModel::getEntitiesById(['id' => $args['userId'], 'select' => ['entities.id']]);
+                $entities = array_column($entities, 'id');
+                if (empty($entities)) {
+                    $entities = [0];
+                }
+    
+                $foldersClause = 'res_id in (select res_id from folders LEFT JOIN entities_folders ON folders.id = entities_folders.folder_id LEFT JOIN resources_folders ON folders.id = resources_folders.folder_id ';
+                $foldersClause .= "WHERE entities_folders.entity_id in (?) OR folders.user_id = ? OR keyword = 'ALL_ENTITIES')";
+                $whereClause .= " OR ({$foldersClause})";
+                $dataClause[] = $entities;
+                $dataClause[] = $args['userId'];
+            } else {
+                $whereClause = '1=?';
+                $dataClause = [0];
+            }
+    
             $groups = UserModel::getGroupsByLogin(['login' => $args['login'], 'select' => ['where_clause']]);
             $groupsClause = '';
             foreach ($groups as $key => $group) {
@@ -278,7 +290,7 @@ class SearchController
             $baskets = BasketModel::getBasketsByLogin(['login' => $args['login']]);
             $basketsClause = '';
             foreach ($baskets as $basket) {
-                if (!empty($basket['basket_clause'])) {
+                if (!empty($basket['basket_clause']) && $basket['allowed']) {
                     $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $args['login']]);
                     if (!empty($basketsClause)) {
                         $basketsClause .= ' or ';

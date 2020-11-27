@@ -44,6 +44,7 @@ use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
 use Resource\models\UserFollowedResourceModel;
 use Respect\Validation\Validator;
+use Search\controllers\SearchController;
 use Shipping\models\ShippingModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -1048,77 +1049,18 @@ class ResController extends ResourceControlController
         ValidatorModel::intVal($args, ['userId']);
         ValidatorModel::arrayType($args, ['resources']);
 
-
-        $user = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
         if (UserController::isRoot(['id' => $args['userId']])) {
             return $args['resources'];
         }
 
-        $folder = PrivilegeController::hasPrivilege(['privilegeId' => 'include_folders_and_followed_resources_perimeter', 'userId' => $args['userId']]);
+        $user = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
+        $userDataClause = SearchController::getUserDataClause(['userId' => $args['userId'], 'login' => $user['user_id']]);
 
         $data = [$args['resources']];
-        if ($folder) {
-            $whereClause = '(res_id in (select res_id from users_followed_resources where user_id = ?))';
-            $data[] = $args['userId'];
-
-            $entities = UserModel::getEntitiesById(['id' => $args['userId'], 'select' => ['entities.id']]);
-            $entities = array_column($entities, 'id');
-            if (empty($entities)) {
-                $entities = [0];
-            }
-
-            $foldersClause = 'res_id in (select res_id from folders LEFT JOIN entities_folders ON folders.id = entities_folders.folder_id LEFT JOIN resources_folders ON folders.id = resources_folders.folder_id ';
-            $foldersClause .= "WHERE entities_folders.entity_id in (?) OR folders.user_id = ? OR keyword = 'ALL_ENTITIES')";
-            $whereClause .= " OR ({$foldersClause})";
-            $data[] = $entities;
-            $data[] = $args['userId'];
-        } else {
-            $whereClause = '1=0';
-        }
-
-        $groups = UserModel::getGroupsByLogin(['login' => $user['user_id'], 'select' => ['where_clause']]);
-        $groupsClause = '';
-        foreach ($groups as $key => $group) {
-            if (!empty($group['where_clause'])) {
-                $groupClause = PreparedClauseController::getPreparedClause(['clause' => $group['where_clause'], 'login' => $user['user_id']]);
-                if ($key > 0) {
-                    $groupsClause .= ' or ';
-                }
-                $groupsClause .= "({$groupClause})";
-            }
-        }
-        if (!empty($groupsClause)) {
-            $whereClause .= " OR ({$groupsClause})";
-        }
-
-        $baskets = BasketModel::getBasketsByLogin(['login' => $user['user_id']]);
-        $basketsClause = '';
-        foreach ($baskets as $basket) {
-            if (!empty($basket['basket_clause']) && $basket['allowed']) {
-                $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $user['user_id']]);
-                if (!empty($basketsClause)) {
-                    $basketsClause .= ' or ';
-                }
-                $basketsClause .= "({$basketClause})";
-            }
-        }
-        $assignedBaskets = RedirectBasketModel::getAssignedBasketsByUserId(['userId' => $args['userId']]);
-        foreach ($assignedBaskets as $basket) {
-            if (!empty($basket['basket_clause'])) {
-                $basketOwner = UserModel::getById(['id' => $basket['owner_user_id'], 'select' => ['user_id']]);
-                $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $basketOwner['user_id']]);
-                if (!empty($basketsClause)) {
-                    $basketsClause .= ' or ';
-                }
-                $basketsClause .= "({$basketClause})";
-            }
-        }
-        if (!empty($basketsClause)) {
-            $whereClause .= " OR ({$basketsClause})";
-        }
+        $data = array_merge($data, $userDataClause['searchData']);
 
         try {
-            $res = ResModel::getOnView(['select' => ['res_id'], 'where' => ['res_id in (?)', "({$whereClause})"], 'data' => $data]);
+            $res = ResModel::getOnView(['select' => ['res_id'], 'where' => ['res_id in (?)', "({$userDataClause['searchWhere'][0]})"], 'data' => $data]);
             return array_column($res, 'res_id');
         } catch (\Exception $e) {
             return [];
