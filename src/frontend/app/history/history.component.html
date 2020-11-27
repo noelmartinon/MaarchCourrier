@@ -3,30 +3,36 @@
 </div>
 <div class="table-head">
     <div class="table-head-result">
-        <mat-form-field floatLabel="never" style="font-size: 13px;">
-            <input type="text" #autoCompleteInput [matAutocomplete]="auto" [placeholder]="lang.filterBy" matInput
-                [formControl]="searchHistory" (click)="$event.stopPropagation()" maxlength="128">
-            <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addItemFilter($event.option)"
-                (opened)="initFilterListHistory()">
-                <mat-option disabled *ngIf="loadingFilters">
-                    <div style="display: flex;justify-content: center;">
-                        <mat-spinner diameter="35"></mat-spinner>
-                    </div>
-                </mat-option>
-                <ng-container *ngIf="filterList!==null && !loadingFilters">
-                    <ng-container *ngFor="let keyVal of filterList | keyvalue">
-                        <mat-optgroup *ngIf="(filteredList[keyVal.key] | async)?.length > 0" [label]="lang[keyVal.key]"
-                            class="filterList">
-                            <mat-option [id]="keyVal.key" [style.color]="!filter.used ? filterColor[keyVal.key] : ''"
-                                *ngFor="let filter of filteredList[keyVal.key] | async | sortBy : 'label'"
-                                [value]="filter" [disabled]="filter.used">
-                                {{filter.label}}
-                            </mat-option>
-                        </mat-optgroup>
+        <form (ngSubmit)="directSearchHistory()">
+            <mat-form-field floatLabel="never" style="font-size: 13px;">
+                <input type="text" #autoCompleteInput [matAutocomplete]="auto" [placeholder]="lang.filterBy" matInput
+                    [formControl]="searchHistory" (click)="$event.stopPropagation()" maxlength="128">
+                <mat-autocomplete #auto="matAutocomplete" (optionSelected)="addItemFilter($event.option)"
+                    (opened)="initFilterListHistory()">
+                    <mat-option disabled *ngIf="loadingFilters">
+                        <div style="display: flex;justify-content: center;">
+                            <mat-spinner diameter="35"></mat-spinner>
+                        </div>
+                    </mat-option>
+                    <ng-container *ngIf="filterList!==null && !loadingFilters">
+                        <ng-container *ngFor="let keyVal of filterList | keyvalue">
+                            <mat-optgroup *ngIf="(filteredList[keyVal.key] | async)?.length > 0" [label]="lang[keyVal.key]"
+                                class="filterList">
+                                <mat-option [id]="keyVal.key" [style.color]="!filter.used ? filterColor[keyVal.key] : ''"
+                                    *ngFor="let filter of filteredList[keyVal.key] | async | sortBy : 'label'"
+                                    [value]="filter" [disabled]="filter.used">
+                                    {{filter.label}}
+                                </mat-option>
+                            </mat-optgroup>
+                        </ng-container>
                     </ng-container>
-                </ng-container>
-            </mat-autocomplete>
-        </mat-form-field>
+                </mat-autocomplete>
+                <button mat-button matSuffix mat-icon-button (click)="directSearchHistory()" [title]="lang.search" style="float: right">
+                    <mat-icon color="primary" class="fa fa-search">
+                    </mat-icon>
+                </button>
+            </mat-form-field>
+        </form>
     </div>
     <button *ngIf="privilegeService.hasCurrentUserPrivilege('view_full_history') && privilegeService.hasCurrentUserPrivilege('view_doc_history')" color="primary" mat-icon-button [title]="!fullHistoryMode ? lang.viewAllHistory : lang.viewActionsHistory" (click)="switchHistoryMode()">
         <mat-icon class="fas" [class.fa-exchange-alt]="fullHistoryMode" [class.fa-history]="!fullHistoryMode"></mat-icon>

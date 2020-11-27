@@ -122,8 +122,12 @@ export class HistoryComponent implements OnInit {
                 startWith({}),
                 switchMap(() => {
                     this.isLoadingResults = true;
+                    let searchValue = '';
+                    if (!this.functions.empty(this.searchHistory.value)) {
+                        searchValue = '&search=' + this.searchHistory.value;
+                    }
                     return this.resultListDatabase!.getRepoIssues(
-                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.routeUrl, this.filterUrl, this.extraParamUrl);
+                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.routeUrl, this.filterUrl, this.extraParamUrl, searchValue);
                 }),
                 map(data => {
                     this.isLoadingResults = false;
@@ -283,6 +287,10 @@ export class HistoryComponent implements OnInit {
         }
     }
 
+    directSearchHistory() {
+        this.refreshDao();
+    }
+
     private filter(value: string, type: string): any[] {
         if (typeof value === 'string') {
             const filterValue = this.latinisePipe.transform(value.toLowerCase());
@@ -301,10 +309,10 @@ export class HistoryListHttpDao {
 
     constructor(private http: HttpClient) { }
 
-    getRepoIssues(sort: string, order: string, page: number, href: string, search: string, extraParamUrl: string): Observable<HistoryList> {
+    getRepoIssues(sort: string, order: string, page: number, href: string, search: string, extraParamUrl: string, directSearchValue: string): Observable<HistoryList> {
 
         let offset = page * 10;
-        const requestUrl = `${href}?limit=10&offset=${offset}&order=${order}&orderBy=${sort}${search}${extraParamUrl}`;
+        const requestUrl = `${href}?limit=10&offset=${offset}&order=${order}&orderBy=${sort}${search}${extraParamUrl}${directSearchValue}`;
 
         return this.http.get<HistoryList>(requestUrl);
     }

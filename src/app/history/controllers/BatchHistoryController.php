@@ -18,6 +18,7 @@ use Group\controllers\PrivilegeController;
 use History\models\BatchHistoryModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\controllers\AutoCompleteController;
 
 class BatchHistoryController
 {
@@ -55,6 +56,22 @@ class BatchHistoryController
         }
         if (!empty($queryParams['totalErrors'])) {
             $where[] = 'total_errors > 0';
+        }
+
+        if (!empty($queryParams['search'])) {
+            $searchFields = ['info', 'module_name'];
+            $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $searchFields]);
+
+            $requestData = AutoCompleteController::getDataForRequest([
+                'search'        => $queryParams['search'],
+                'fields'        => $fields,
+                'where'         => $where,
+                'data'          => $data,
+                'fieldsNumber'  => 2
+            ]);
+
+            $where = $requestData['where'];
+            $data = $requestData['data'];
         }
 
         $order = !in_array($queryParams['order'], ['asc', 'desc']) ? '' : $queryParams['order'];
