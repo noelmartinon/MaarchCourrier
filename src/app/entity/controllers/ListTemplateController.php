@@ -652,8 +652,6 @@ class ListTemplateController
         ValidatorModel::stringType($args, ['type']);
         ValidatorModel::intVal($args, ['entityId']);
 
-        $nbVisaRole = 0;
-        $nbSignRole = 0;
         $destFound = false;
         foreach ($args['items'] as $item) {
             if ($destFound && $item['mode'] == 'dest') {
@@ -684,12 +682,6 @@ class ListTemplateController
                 return ['errors' => 'item has not enough privileges'];
             } elseif ($args['type'] == 'opinionCircuit' && !PrivilegeController::hasPrivilege(['privilegeId' => 'avis_documents', 'userId' => $item['id']])) {
                 return ['errors' => 'item has not enough privileges'];
-            }
-
-            if ($item['mode'] == 'visa') {
-                $nbVisaRole++;
-            } elseif ($item['mode'] == 'sign') {
-                $nbSignRole++;
             }
         }
 

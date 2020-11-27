@@ -18,6 +18,7 @@ use Action\models\ActionModel;
 use Group\controllers\PrivilegeController;
 use Resource\controllers\ResController;
 use Respect\Validation\Validator;
+use SrcCore\controllers\AutoCompleteController;
 use SrcCore\controllers\LogsController;
 use SrcCore\models\ValidatorModel;
 use History\models\HistoryModel;
@@ -108,6 +109,23 @@ class HistoryController
         if (!empty($eventTypes)) {
             $where[] = 'event_type in (?)';
             $data[] = $eventTypes;
+        }
+
+        if (!empty($queryParams['search'])) {
+            $searchFields = ['info', 'remote_ip', 'event_date'];
+            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $searchFields]);
+
+            $requestData = AutoCompleteController::getDataForRequest([
+                'search'        => $queryParams['search'],
+                'fields'        => $fields,
+                'where'         => $where,
+                'data'          => $data,
+                'fieldsNumber'  => 3,
+                'longField'     => true
+            ]);
+
+            $where = $requestData['where'];
+            $data = $requestData['data'];
         }
 
         $order = !in_array($queryParams['order'], ['asc', 'desc']) ? '' : $queryParams['order'];
