@@ -70,7 +70,7 @@ class SearchController
             $baskets = BasketModel::getBasketsByLogin(['login' => $GLOBALS['userId']]);
             $basketsClause = '';
             foreach ($baskets as $basket) {
-                if (!empty($basket['basket_clause'])) {
+                if (!empty($basket['basket_clause']) && $basket['allowed']) {
                     $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $GLOBALS['userId']]);
                     if (!empty($basketsClause)) {
                         $basketsClause .= ' or ';
