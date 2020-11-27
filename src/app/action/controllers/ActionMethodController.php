@@ -326,17 +326,16 @@ class ActionMethodController
         return true;
     }
 
-    public function sendSignatureBook(array $args)
+    public static function sendSignatureBook(array $args)
     {
         ValidatorModel::notEmpty($args, ['resId']);
         ValidatorModel::intVal($args, ['resId']);
 
         $circuit = ListInstanceModel::get([
-            'select'    => ['requested_signature'],
+            'select'    => ['requested_signature', 'item_mode'],
             'where'     => ['res_id = ?', 'difflist_type = ?', 'process_date is null'],
             'data'      => [$args['resId'], 'VISA_CIRCUIT'],
             'orderBy'   => ['listinstance_id'],
-            'limit'     => 1
         ]);
         if (empty($circuit)) {
             return ['errors' => ['No available circuit']];
@@ -399,7 +398,7 @@ class ActionMethodController
         return true;
     }
 
-    public function continueVisaCircuit(array $args)
+    public static function continueVisaCircuit(array $args)
     {
         ValidatorModel::notEmpty($args, ['resId']);
         ValidatorModel::intVal($args, ['resId']);
