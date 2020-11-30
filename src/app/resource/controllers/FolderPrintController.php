@@ -16,6 +16,7 @@ namespace Resource\controllers;
 
 use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
 use Attachment\models\AttachmentModel;
+use Attachment\models\AttachmentTypeModel;
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
 use Convert\controllers\ConvertPdfController;
@@ -748,8 +749,9 @@ class FolderPrintController
         $status = StatusModel::getById(['id' => $attachment['status'], 'select' => ['label_status']]);
         $status = $status['label_status'];
 
-        $attachmentTypes = AttachmentModel::getAttachmentsTypesByXML();
-        $attachmentType = $attachmentTypes[$attachment['attachment_type']]['label'];
+        $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id', 'signable']]);
+        $attachmentTypes = array_column($attachmentTypes, 'label', 'type_id');
+        $attachmentType = $attachmentTypes[$attachment['attachment_type']];
 
         $creationDate = new \DateTime($attachment['creation_date']);
         $creationDate = $creationDate->format('d-m-Y H:i');

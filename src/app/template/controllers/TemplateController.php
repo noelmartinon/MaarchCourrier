@@ -15,6 +15,7 @@
 namespace Template\controllers;
 
 use Attachment\models\AttachmentModel;
+use Attachment\models\AttachmentTypeModel;
 use ContentManagement\controllers\MergeController;
 use Convert\controllers\ConvertPdfController;
 use Docserver\controllers\DocserverController;
@@ -84,13 +85,13 @@ class TemplateController
             }
         }
 
-        $attachmentModelsTmp = AttachmentModel::getAttachmentsTypesByXML();
+        $attachmentModelsTmp = AttachmentTypeModel::get(['select' => ['type_id', 'label', 'visible']]);
         $attachmentTypes = [];
-        foreach ($attachmentModelsTmp as $key => $value) {
-            if ($value['show']) {
+        foreach ($attachmentModelsTmp as $value) {
+            if ($value['visible']) {
                 $attachmentTypes[] = [
                     'label' => $value['label'],
-                    'id'    => $key
+                    'id'    => $value['type_id']
                 ];
             }
         }
@@ -380,13 +381,13 @@ class TemplateController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $attachmentModelsTmp = AttachmentModel::getAttachmentsTypesByXML();
+        $attachmentModelsTmp = AttachmentTypeModel::get(['select' => ['type_id', 'label', 'visible']]);
         $attachmentTypes = [];
-        foreach ($attachmentModelsTmp as $key => $value) {
-            if ($value['show']) {
+        foreach ($attachmentModelsTmp as $value) {
+            if ($value['visible']) {
                 $attachmentTypes[] = [
                     'label' => $value['label'],
-                    'id'    => $key
+                    'id'    => $value['type_id']
                 ];
             }
         }

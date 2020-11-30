@@ -315,6 +315,16 @@ export class PrivilegeService {
             'angular': true,
             'hasParams': false
         },
+        {
+            'id': 'admin_attachments',
+            'label': 'lang.attachments',
+            'comment': 'lang.attachmentsDesc',
+            'route': '/administration/attachments/types',
+            'unit': 'supervision',
+            'style': 'fas fa-paperclip',
+            'angular': true,
+            'hasParams': false
+        },
     ];
 
     private privileges: privilege[] = [

@@ -21,6 +21,7 @@ use Endroid\QrCode\QrCode;
 use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use ExternalSignatoryBook\controllers\MaarchParapheurController;
+use Group\controllers\PrivilegeController;
 use History\models\HistoryModel;
 use IndexingModel\models\IndexingModelFieldModel;
 use Note\models\NoteEntityModel;
@@ -828,6 +829,13 @@ class SummarySheetController
                     $users = [];
                     foreach ($workflow as $item) {
                         $label = $item['userDisplay'] . ' (' . ($item['mode'] == 'visa' ? _VISA_USER_MIN : _SIGNATORY) . ')';
+                        if (!empty($item['status'])) {
+                            if ($item['status'] == 'VAL') {
+                                $label .= ', ' . _MAARCH_PARAPHEUR_STATUS_VAL;
+                            } elseif ($item['status'] == 'REF') {
+                                $label .= ', ' . _MAARCH_PARAPHEUR_STATUS_REF;
+                            }
+                        }
                         $users[] = ['user' => $label, 'date' => $item['processDate']];
                     }
 
@@ -850,6 +858,11 @@ class SummarySheetController
                     }
                 }
             } elseif ($unit['unit'] == 'workflowHistory') {
+                if (!PrivilegeController::hasPrivilege(['privilegeId' => 'view_doc_history', 'userId' => $GLOBALS['id']])
+                    && !PrivilegeController::hasPrivilege(['privilegeId' => 'view_full_history', 'userId' => $GLOBALS['id']])) {
+                    continue;
+                }
+
                 $historyList = HistoryModel::get([
                     'select'  => ['record_id', 'event_date', 'user_id', 'info', 'remote_ip', 'count(1) OVER()'],
                     'where'   => ['table_name in (?)', 'event_type like ?', 'record_id = ?'],

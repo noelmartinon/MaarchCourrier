@@ -78,6 +78,8 @@ import { RegisteredMailListComponent } from './registered-mail/registered-mail-l
 import { SearchAdministrationComponent } from './search/search-administration.component';
 import { SsoAdministrationComponent } from './connection/sso/sso-administration.component';
 import { LifeCycleComponent } from './parameter/lifeCycle/life-cycle.component';
+import { AttachmentTypesAdministrationComponent } from './attachment/attachment-types-administration.component';
+import { AttachmentTypeAdministrationComponent } from './attachment/attachment-type-administration.component';
 
 
 @NgModule({
@@ -163,7 +165,9 @@ import { LifeCycleComponent } from './parameter/lifeCycle/life-cycle.component';
         RegisteredMailListComponent,
         SearchAdministrationComponent,
         SsoAdministrationComponent,
-        LifeCycleComponent
+        LifeCycleComponent,
+        AttachmentTypeAdministrationComponent,
+        AttachmentTypesAdministrationComponent
     ],
     entryComponents: [
         AccountLinkComponent,

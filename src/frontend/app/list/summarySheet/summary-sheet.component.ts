@@ -7,6 +7,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FunctionsService } from '@service/functions.service';
 import { tap } from 'rxjs/operators';
 import { DomSanitizer } from '@angular/platform-browser';
+import {PrivilegeService} from '@service/privileges.service';
 
 @Component({
     templateUrl: 'summary-sheet.component.html',
@@ -121,17 +122,17 @@ export class SummarySheetComponent implements OnInit {
             enabled: true
         },
         {
-            id: 'trafficRecords',
-            unit: 'trafficRecords',
-            label: this.translate.instant('lang.trafficRecordSummarySheet'),
+            id: 'workflowHistory',
+            unit: 'workflowHistory',
+            label: this.translate.instant('lang.history'),
             css: 'col-md-4 text-center',
             desc: [],
             enabled: true
         },
         {
-            id: 'workflowHistory',
-            unit: 'workflowHistory',
-            label: this.translate.instant('lang.history'),
+            id: 'trafficRecords',
+            unit: 'trafficRecords',
+            label: this.translate.instant('lang.trafficRecordSummarySheet'),
             css: 'col-md-4 text-center',
             desc: [],
             enabled: true
@@ -145,6 +146,7 @@ export class SummarySheetComponent implements OnInit {
         public dialogRef: MatDialogRef<SummarySheetComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public functions: FunctionsService,
+        private privilegeService: PrivilegeService,
         private sanitizer: DomSanitizer) { }
 
     ngOnInit(): void {
@@ -172,6 +174,10 @@ export class SummarySheetComponent implements OnInit {
                 }
             })
         ).subscribe();
+
+        if (!this.privilegeService.hasCurrentUserPrivilege('view_doc_history') && !this.privilegeService.hasCurrentUserPrivilege('view_full_history')) {
+            this.dataAvailable = this.dataAvailable.filter((item: any) => item.id !== 'workflowHistory');
+        }
     }
 
     drop(event: CdkDragDrop<string[]>) {

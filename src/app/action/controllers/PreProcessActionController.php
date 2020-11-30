@@ -15,6 +15,7 @@ namespace Action\controllers;
 use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
 use Action\models\ActionModel;
 use Attachment\models\AttachmentModel;
+use Attachment\models\AttachmentTypeModel;
 use Basket\models\BasketModel;
 use Basket\models\GroupBasketRedirectModel;
 use Configuration\models\ConfigurationModel;
@@ -455,8 +456,9 @@ class PreProcessActionController
                         'data'   => [$resId]
                     ]);
 
-                    $attachmentTypes = AttachmentModel::getAttachmentsTypesByXML();
-                    
+                    $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id', 'signable']]);
+                    $attachmentTypes = array_column($attachmentTypes, 'signable', 'type_id');
+
                     if (empty($attachments) && empty($integratedResource)) {
                         $additionalsInfos['noAttachment'][] = ['alt_identifier' => $noAttachmentsResource['alt_identifier'], 'res_id' => $resId, 'reason' => 'noAttachmentInSignatoryBook'];
                     } else {
@@ -480,7 +482,7 @@ class PreProcessActionController
                                 $additionalsInfos['noAttachment'][] = ['alt_identifier' => $noAttachmentsResource['alt_identifier'], 'res_id' => $resIdAttachment, 'reason' => 'fileDoesNotExists'];
                                 break;
                             }
-                            if ($attachmentTypes[$value['attachment_type']]['sign']) {
+                            if ($attachmentTypes[$value['attachment_type']]) {
                                 $hasSignableAttachment = true;
                             }
                         }
@@ -987,10 +989,10 @@ class PreProcessActionController
         }
 
         $signableAttachmentsTypes = [];
-        $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
-        foreach ($attachmentsTypes as $key => $type) {
-            if ($type['sign']) {
-                $signableAttachmentsTypes[] = $key;
+        $attachmentsTypes = AttachmentTypeModel::get(['select' => ['type_id', 'signable']]);
+        foreach ($attachmentsTypes as $type) {
+            if ($type['signable']) {
+                $signableAttachmentsTypes[] = $type['type_id'];
             }
         }
 
@@ -1052,10 +1054,10 @@ class PreProcessActionController
         $body['resources'] = PreProcessActionController::getNonLockedResources(['resources' => $body['resources'], 'userId' => $GLOBALS['id']]);
 
         $signableAttachmentsTypes = [];
-        $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
-        foreach ($attachmentsTypes as $key => $type) {
-            if ($type['sign']) {
-                $signableAttachmentsTypes[] = $key;
+        $attachmentsTypes = AttachmentTypeModel::get(['select' => ['type_id', 'signable']]);
+        foreach ($attachmentsTypes as $type) {
+            if ($type['signable']) {
+                $signableAttachmentsTypes[] = $type['type_id'];
             }
         }
 
@@ -1115,10 +1117,10 @@ class PreProcessActionController
         $body['resources'] = PreProcessActionController::getNonLockedResources(['resources' => $body['resources'], 'userId' => $GLOBALS['id']]);
 
         $signableAttachmentsTypes = [];
-        $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
-        foreach ($attachmentsTypes as $key => $type) {
-            if ($type['sign']) {
-                $signableAttachmentsTypes[] = $key;
+        $attachmentsTypes = AttachmentTypeModel::get(['select' => ['type_id', 'signable']]);
+        foreach ($attachmentsTypes as $type) {
+            if ($type['signable']) {
+                $signableAttachmentsTypes[] = $type['type_id'];
             }
         }
 
@@ -1187,10 +1189,10 @@ class PreProcessActionController
         $body['resources'] = PreProcessActionController::getNonLockedResources(['resources' => $body['resources'], 'userId' => $GLOBALS['id']]);
 
         $signableAttachmentsTypes = [];
-        $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
-        foreach ($attachmentsTypes as $key => $type) {
-            if ($type['sign']) {
-                $signableAttachmentsTypes[] = $key;
+        $attachmentsTypes = AttachmentTypeModel::get(['select' => ['type_id', 'signable']]);
+        foreach ($attachmentsTypes as $type) {
+            if ($type['signable']) {
+                $signableAttachmentsTypes[] = $type['type_id'];
             }
         }
 

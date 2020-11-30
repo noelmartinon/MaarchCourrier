@@ -193,7 +193,7 @@ class StatusControllerTest extends TestCase
 
         $response = $status->delete($request, new \Slim\Http\Response(), ['identifier'=> self::$id]);
 
-        $this->assertRegexp('/statuses/', (string)$response->getBody());
+        $this->assertMatchesRegularExpression('/statuses/', (string)$response->getBody());
     }
 
     public function testGetNewInformations()

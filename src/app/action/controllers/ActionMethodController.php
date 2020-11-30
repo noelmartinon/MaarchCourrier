@@ -19,6 +19,7 @@ use Action\models\ResMarkAsReadModel;
 use Alfresco\controllers\AlfrescoController;
 use Attachment\controllers\AttachmentController;
 use Attachment\models\AttachmentModel;
+use Attachment\models\AttachmentTypeModel;
 use Convert\controllers\ConvertPdfController;
 use Convert\models\AdrModel;
 use Docserver\controllers\DocserverController;
@@ -369,10 +370,10 @@ class ActionMethodController
         $resourceIn     = !empty($integrations['inSignatureBook']);
 
         $signableAttachmentsTypes = [];
-        $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
-        foreach ($attachmentsTypes as $key => $type) {
-            if ($type['sign']) {
-                $signableAttachmentsTypes[] = $key;
+        $attachmentsTypes = AttachmentTypeModel::get(['select' => ['type_id', 'signable']]);
+        foreach ($attachmentsTypes as $type) {
+            if ($type['signable']) {
+                $signableAttachmentsTypes[] = $type['type_id'];
             }
         }
 

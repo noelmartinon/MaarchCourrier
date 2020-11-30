@@ -16,6 +16,7 @@
 namespace Resource\controllers;
 
 use Attachment\models\AttachmentModel;
+use Attachment\models\AttachmentTypeModel;
 use ContentManagement\controllers\MergeController;
 use CustomField\models\CustomFieldModel;
 use Docserver\controllers\DocserverController;
@@ -378,8 +379,9 @@ class StoreController
 
     public static function prepareAttachmentStorage(array $args)
     {
-        $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
-        if ($attachmentsTypes[$args['type']]['chrono'] && empty($args['chrono'])) {
+        $attachmentsTypes = AttachmentTypeModel::get(['select' => ['type_id', 'chrono']]);
+        $attachmentsTypes = array_column($attachmentsTypes, 'chrono', 'type_id');
+        if ($attachmentsTypes[$args['type']] && empty($args['chrono'])) {
             $resource = ResModel::getById(['select' => ['destination', 'type_id'], 'resId' => $args['resIdMaster']]);
             $args['chrono'] = ChronoModel::getChrono(['id' => 'outgoing', 'entityId' => $resource['destination'], 'typeId' => $resource['type_id'], 'resId' => $args['resIdMaster']]);
         }
@@ -435,8 +437,9 @@ class StoreController
     public static function prepareUpdateAttachmentStorage(array $args)
     {
         $attachment = AttachmentModel::getById(['id' => $args['id'], 'select' => ['identifier', 'res_id_master']]);
-        $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
-        if ($attachmentsTypes[$args['type']]['chrono'] && empty($attachment['identifier'])) {
+        $attachmentsTypes = AttachmentTypeModel::get(['select' => ['type_id', 'chrono']]);
+        $attachmentsTypes = array_column($attachmentsTypes, 'chrono', 'type_id');
+        if ($attachmentsTypes[$args['type']] && empty($attachment['identifier'])) {
             $resource = ResModel::getById(['select' => ['destination', 'type_id'], 'resId' => $attachment['res_id_master']]);
             $chrono = ChronoModel::getChrono(['id' => 'outgoing', 'entityId' => $resource['destination'], 'typeId' => $resource['type_id'], 'resId' => $attachment['res_id_master']]);
         }

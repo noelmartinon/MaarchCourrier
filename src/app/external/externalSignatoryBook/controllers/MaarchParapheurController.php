@@ -15,6 +15,7 @@
 namespace ExternalSignatoryBook\controllers;
 
 use Attachment\models\AttachmentModel;
+use Attachment\models\AttachmentTypeModel;
 use Contact\controllers\ContactController;
 use Convert\controllers\ConvertPdfController;
 use Convert\models\AdrModel;
@@ -212,11 +213,7 @@ class MaarchParapheurController
         $senderPrimaryEntity = UserModel::getPrimaryEntityById(['id' => $sender['id'], 'select' => ['entities.entity_label']]);
 
         if ($aArgs['objectSent'] == 'attachment') {
-            if (!empty($aArgs['steps'])) {
-                foreach ($aArgs['steps'] as $step) {
-                    $workflow[] = ['userId' => $step['externalId'], 'mode' => $step['action']];
-                }
-            } else {
+            if (empty($aArgs['steps'])) {
                 return ['error' => 'steps is empty'];
             }
 
@@ -242,9 +239,10 @@ class MaarchParapheurController
                 return ['error' => 'No attachment to send'];
             } else {
                 $nonSignableAttachments = [];
-                $attachmentTypes = AttachmentModel::getAttachmentsTypesByXML();
+                $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id', 'signable']]);
+                $attachmentTypes = array_column($attachmentTypes, 'signable', 'type_id');
                 foreach ($attachments as $key => $value) {
-                    if (!$attachmentTypes[$value['attachment_type']]['sign']) {
+                    if (!$attachmentTypes[$value['attachment_type']]) {
                         $adrInfo = ConvertPdfController::getConvertedPdfById(['resId' => $value['res_id'], 'collId' => 'attachments_coll']);
                         if (empty($adrInfo['docserver_id']) || strtolower(pathinfo($adrInfo['filename'], PATHINFO_EXTENSION)) != 'pdf') {
                             return ['error' => 'Attachment ' . $value['res_id'] . ' is not converted in pdf'];
@@ -322,6 +320,27 @@ class MaarchParapheurController
                     $attachmentsData = array_merge($nonSignableAttachments, $attachmentsData);
                     $metadata = MaarchParapheurController::setMetadata(['priority' => $priority['label'], 'primaryEntity' => $senderPrimaryEntity['entity_label'], 'recipient' => $recipients]);
 
+                    $workflow = [];
+                    foreach ($aArgs['steps'] as $step) {
+                        if ($step['resId'] == $resId && !$step['mainDocument']) {
+                            $signaturePositions = null;
+                            if (!empty($step['signaturePositions'])) {
+                                if (is_array($step['signaturePositions'])) {
+                                    $valid = true;
+                                    foreach ($step['signaturePositions'] as $keySP => $signaturePosition) {
+                                        if (empty($signaturePosition['positionX']) || empty($signaturePosition['positionY']) || empty($signaturePosition['page'])) {
+                                            $valid = false;
+                                        }
+                                    }
+                                    if ($valid) {
+                                        $signaturePositions = $step['signaturePositions'];
+                                    }
+                                }
+                            }
+                            $workflow[(int)$step['sequence']] = ['userId' => $step['externalId'], 'mode' => $step['action'], 'signaturePositions' => $signaturePositions];
+                        }
+                    }
+
                     $bodyData = [
                         'title'             => $value['title'],
                         'reference'         => $value['identifier'],
@@ -365,6 +384,27 @@ class MaarchParapheurController
 
                     $attachmentsData = array_merge($nonSignableAttachments, $attachmentsData);
                     $metadata = MaarchParapheurController::setMetadata(['priority' => $priority['label'], 'primaryEntity' => $senderPrimaryEntity['entity_label'], 'recipient' => $recipients]);
+
+                    $workflow = [];
+                    foreach ($aArgs['steps'] as $step) {
+                        if ($step['resId'] == $aArgs['resIdMaster'] && $step['mainDocument']) {
+                            $signaturePositions = null;
+                            if (!empty($step['signaturePositions'])) {
+                                if (is_array($step['signaturePositions'])) {
+                                    $valid = true;
+                                    foreach ($step['signaturePositions'] as $keySP => $signaturePosition) {
+                                        if (empty($signaturePosition['positionX']) || empty($signaturePosition['positionY']) || empty($signaturePosition['page'])) {
+                                            $valid = false;
+                                        }
+                                    }
+                                    if ($valid) {
+                                        $signaturePositions = $step['signaturePositions'];
+                                    }
+                                }
+                            }
+                            $workflow[(int)$step['sequence']] = ['userId' => $step['externalId'], 'mode' => $step['action'], 'signaturePositions' => $signaturePositions];
+                        }
+                    }
 
                     $bodyData = [
                         'title'             => $mainResource[0]['subject'],

@@ -15,6 +15,7 @@
 namespace MessageExchange\controllers;
 
 use Attachment\models\AttachmentModel;
+use Attachment\models\AttachmentTypeModel;
 use Contact\models\ContactModel;
 use Docserver\models\DocserverModel;
 use Doctype\models\DoctypeModel;
@@ -175,11 +176,12 @@ class SendMessageExchangeController
         $AttachmentsInfo = [];
         if (!empty($body['joinAttachment'])) {
             $AttachmentsInfo = AttachmentModel::get(['select' => ['*'], 'where' => ['res_id in (?)'], 'data' => [$body['joinAttachment']]]);
-            $attachmentTypes = AttachmentModel::getAttachmentsTypesByXML();
+            $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id', 'label']]);
+            $attachmentTypes = array_column($attachmentTypes, 'label', 'type_id');
             foreach ($AttachmentsInfo as $key => $value) {
                 $AttachmentsInfo[$key]['Title']                                  = $value['title'];
                 $AttachmentsInfo[$key]['OriginatingAgencyArchiveUnitIdentifier'] = $value['identifier'];
-                $AttachmentsInfo[$key]['DocumentType']                           = $attachmentTypes[$value['attachment_type']]['label'];
+                $AttachmentsInfo[$key]['DocumentType']                           = $attachmentTypes[$value['attachment_type']];
                 $AttachmentsInfo[$key]['tablenameExchangeMessage']               = 'res_attachments';
             }
         }

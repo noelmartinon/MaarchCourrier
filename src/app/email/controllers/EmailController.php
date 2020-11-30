@@ -16,6 +16,7 @@ namespace Email\controllers;
 
 use Attachment\controllers\AttachmentController;
 use Attachment\models\AttachmentModel;
+use Attachment\models\AttachmentTypeModel;
 use Configuration\models\ConfigurationModel;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
@@ -395,7 +396,8 @@ class EmailController
         }
 
         $attachments = [];
-        $attachmentTypes = AttachmentModel::getAttachmentsTypesByXML();
+        $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id', 'label', 'email_link']]);
+        $attachmentTypes = array_column($attachmentTypes, null, 'type_id');
         $rawAttachments = AttachmentModel::get([
             'select'    => ['res_id', 'title', 'identifier', 'attachment_type', 'typist', 'format', 'filesize', 'status'],
             'where'     => ['res_id_master = ?', 'attachment_type not in (?)', 'status not in (?)'],
@@ -433,7 +435,7 @@ class EmailController
                 'chrono'            => $attachment['identifier'],
                 'label'             => $attachment['title'],
                 'typeLabel'         => $attachmentTypes[$attachment['attachment_type']]['label'],
-                'attachInMail'      => $attachmentTypes[$attachment['attachment_type']]['attachInMail'],
+                'attachInMail'      => $attachmentTypes[$attachment['attachment_type']]['email_link'],
                 'convertedDocument' => $convertedDocument,
                 'creator'           => UserModel::getLabelledUserById(['id' => $attachment['typist']]),
                 'format'            => $attachment['format'],

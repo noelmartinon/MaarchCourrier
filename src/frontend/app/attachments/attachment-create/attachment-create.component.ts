@@ -88,10 +88,10 @@ export class AttachmentCreateComponent implements OnInit {
             this.http.get('../rest/attachmentsTypes').pipe(
                 tap((data: any) => {
                     Object.keys(data.attachmentsTypes).forEach(templateType => {
-                        if (data.attachmentsTypes[templateType].show) {
+                        if (data.attachmentsTypes[templateType].visible) {
                             this.attachmentsTypes.push({
-                                id: templateType,
-                                ...data.attachmentsTypes[templateType]
+                                ...data.attachmentsTypes[templateType],
+                                id: templateType
                             });
                         }
                     });

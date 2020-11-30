@@ -15,6 +15,7 @@
 namespace ExternalSignatoryBook\controllers;
 
 use Attachment\models\AttachmentModel;
+use Attachment\models\AttachmentTypeModel;
 use Convert\controllers\ConvertPdfController;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
@@ -197,9 +198,10 @@ class IxbusController
             'data'      => [$aArgs['resIdMaster'], ['incoming_mail_attachment', 'signed_response']]
         ]);
 
-        $attachmentTypes = AttachmentModel::getAttachmentsTypesByXML();
+        $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id', 'signable']]);
+        $attachmentTypes = array_column($attachmentTypes, 'signable', 'type_id');
         foreach ($attachments as $key => $value) {
-            if (!$attachmentTypes[$value['attachment_type']]['sign']) {
+            if (!$attachmentTypes[$value['attachment_type']]) {
                 unset($attachments[$key]);
             }
         }

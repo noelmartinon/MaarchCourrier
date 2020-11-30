@@ -74,8 +74,8 @@ export class AttachmentPageComponent implements OnInit {
                 tap((data: any) => {
                     Object.keys(data.attachmentsTypes).forEach(templateType => {
                         this.attachmentsTypes.push({
-                            id: templateType,
-                            ...data.attachmentsTypes[templateType]
+                            ...data.attachmentsTypes[templateType],
+                            id: templateType
                         });
                     });
                     this.attachmentsTypes = this.sortPipe.transform(this.attachmentsTypes, 'label');
@@ -141,6 +141,8 @@ export class AttachmentPageComponent implements OnInit {
 
                     this.versions = data.versions;
 
+                    this.newVersion = this.attachmentsTypes.filter((item: any) => item.typeId === data.type)[0].newVersionDefault;
+
                     this.attachFormGroup = new FormGroup(this.attachment);
                     resolve(true);
                 }),
@@ -151,6 +153,10 @@ export class AttachmentPageComponent implements OnInit {
                 })
             ).subscribe();
         });
+    }
+
+    isVersionEnabled() {
+        return this.attachmentsTypes.filter((item: any) => item.typeId === this.attachment.type.value)[0].versionEnabled;
     }
 
     createNewVersion(mode: string = 'default') {

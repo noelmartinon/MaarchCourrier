@@ -51,11 +51,21 @@ class AutoCompleteController
         $fields = ['firstname', 'lastname'];
         $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
 
+        $where = ['status not in (?)', 'mode not in (?)'];
+        $data = [['DEL', 'SPD'], ['root_invisible', 'rest']];
+        if (!empty($queryParams['inEntity'])) {
+            if (is_numeric($queryParams['inEntity'])) {
+                $entity = EntityModel::getById(['select' => ['entity_id'], 'id' => $queryParams['inEntity']]);
+                $queryParams['inEntity'] = $entity['entity_id'];
+            }
+            $where[] = 'id in (SELECT user_id FROM users_entities WHERE entity_id = ?)';
+            $data[] = $queryParams['inEntity'];
+        }
         $requestData = AutoCompleteController::getDataForRequest([
             'search'        => $queryParams['search'],
             'fields'        => $fields,
-            'where'         => ['status not in (?)', 'mode not in (?)'],
-            'data'          => [['DEL', 'SPD'], ['root_invisible', 'rest']],
+            'where'         => $where,
+            'data'          => $data,
             'fieldsNumber'  => 2,
         ]);
 

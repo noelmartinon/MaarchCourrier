@@ -317,12 +317,12 @@ class AttachmentControllerTest extends TestCase
 
     public function testGetAttachmentTypes()
     {
-        $attachmentController = new \Attachment\controllers\AttachmentController();
+        $attachmentController = new \Attachment\controllers\AttachmentTypeController();
 
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
-        $response = $attachmentController->getAttachmentsTypes($request, new \Slim\Http\Response());
+        $response = $attachmentController->get($request, new \Slim\Http\Response());
         $response = json_decode((string)$response->getBody(), true);
 
         $this->assertNotNull($response['attachmentsTypes']);
@@ -330,10 +330,10 @@ class AttachmentControllerTest extends TestCase
 
         foreach ($response['attachmentsTypes'] as $value) {
             $this->assertNotNull($value['label']);
-            $this->assertIsBool($value['sign']);
+            $this->assertIsBool($value['signable']);
             $this->assertIsBool($value['chrono']);
-            $this->assertIsBool($value['attachInMail']);
-            $this->assertIsBool($value['show']);
+            $this->assertIsBool($value['emailLink']);
+            $this->assertIsBool($value['visible']);
         }
     }
 

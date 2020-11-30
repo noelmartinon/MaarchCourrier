@@ -100,18 +100,6 @@ job_php-7.3:
  except:
    - schedules
 
-job_php-7.2:
-  image: php:7.2-apache
-  stage: test
-  script:
-    - curl --location -s --output /usr/local/bin/phpunit https://phar.phpunit.de/phpunit-8.phar
-    - chmod +x /usr/local/bin/phpunit
-    - phpunit --coverage-text --colors=never
-  only:
-    - develop
-  except:
-    - schedules
-
 #pages:
 #  stage: deploy
 #  dependencies:

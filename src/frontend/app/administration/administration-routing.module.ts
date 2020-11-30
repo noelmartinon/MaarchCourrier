@@ -55,6 +55,8 @@ import { RegisteredMailListComponent } from './registered-mail/registered-mail-l
 import { RegisteredMailComponent } from './registered-mail/registered-mail.component';
 import { SearchAdministrationComponent } from './search/search-administration.component';
 import { SsoAdministrationComponent } from './connection/sso/sso-administration.component';
+import { AttachmentTypeAdministrationComponent } from './attachment/attachment-type-administration.component';
+import { AttachmentTypesAdministrationComponent } from './attachment/attachment-types-administration.component';
 
 
 @NgModule({
@@ -132,6 +134,10 @@ import { SsoAdministrationComponent } from './connection/sso/sso-administration.
             { path: 'administration/issuingSites/:id', canActivate: [AppGuard], component: IssuingSiteComponent },
             { path: 'administration/search', canActivate: [AppGuard], component: SearchAdministrationComponent },
             { path: 'administration/connections/sso', canActivate: [AppGuard], component: SsoAdministrationComponent },
+            { path: 'administration/attachments/types', canActivate: [AppGuard], component: AttachmentTypesAdministrationComponent },
+            { path: 'administration/attachments/types/new', canActivate: [AppGuard], component: AttachmentTypeAdministrationComponent },
+            { path: 'administration/attachments/types/:id', canActivate: [AppGuard], component: AttachmentTypeAdministrationComponent },
+            { path: 'administration/attachments', redirectTo: 'attachments/types', pathMatch: 'full' },
         ]),
     ],
     exports: [

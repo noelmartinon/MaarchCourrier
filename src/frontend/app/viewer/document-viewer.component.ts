@@ -1,4 +1,4 @@
-import {Component, OnInit, Input, ViewChild, EventEmitter, Output, OnDestroy} from '@angular/core';
+import { Component, OnInit, Input, ViewChild, EventEmitter, Output, OnDestroy } from '@angular/core';
 import { HttpClient, HttpEventType } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
@@ -86,8 +86,6 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
      */
     @Output() triggerEvent = new EventEmitter<string>();
 
-    
-
     loading: boolean = true;
     noConvertedFound: boolean = false;
 
@@ -155,7 +153,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         private authService: AuthService,
         private localStorage: LocalStorageService
     ) {
-        (<any>window).pdfWorkerSrc = '../node_modules/pdfjs-dist/build/pdf.worker.min.js';
+        (<any>window).pdfWorkerSrc = 'pdfjs/pdf.worker.min.js';
     }
 
     ngOnInit() {
@@ -775,7 +773,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 objectType: 'attachmentCreation',
                 objectId: template.id,
                 cookie: document.cookie,
-                authToken : this.authService.getToken(),
+                authToken: this.authService.getToken(),
                 data: this.resourceDatas,
             };
             this.editInProgress = true;
@@ -825,7 +823,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 objectType: 'attachmentModification',
                 objectId: this.resId,
                 cookie: document.cookie,
-                authToken : this.authService.getToken(),
+                authToken: this.authService.getToken(),
                 data: this.resourceDatas,
             };
             this.editInProgress = true;

@@ -119,8 +119,12 @@ export class HistoryBatchAdministrationComponent implements OnInit {
                 startWith({}),
                 switchMap(() => {
                     this.isLoadingResults = true;
+                    let searchValue = '';
+                    if (!this.functions.empty(this.searchHistory.value)) {
+                        searchValue = '&search=' + this.searchHistory.value;
+                    }
                     return this.resultListDatabase!.getRepoIssues(
-                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.routeUrl, this.filterUrl);
+                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.routeUrl, this.filterUrl, searchValue);
                 }),
                 map(data => {
                     this.isLoadingResults = false;
@@ -273,6 +277,10 @@ export class HistoryBatchAdministrationComponent implements OnInit {
             return this.filterList[type];
         }
     }
+
+    directSearchHistory() {
+        this.refreshDao();
+    }
 }
 
 export interface HistoryList {
@@ -283,10 +291,10 @@ export class HistoryListHttpDao {
 
     constructor(private http: HttpClient) { }
 
-    getRepoIssues(sort: string, order: string, page: number, href: string, search: string): Observable<HistoryList> {
+    getRepoIssues(sort: string, order: string, page: number, href: string, search: string, directSearchValue: string): Observable<HistoryList> {
 
-        let offset = page * 10;
-        const requestUrl = `${href}?limit=10&offset=${offset}&order=${order}&orderBy=${sort}${search}`;
+        const offset = page * 10;
+        const requestUrl = `${href}?limit=10&offset=${offset}&order=${order}&orderBy=${sort}${search}${directSearchValue}`;
 
         return this.http.get<HistoryList>(requestUrl);
     }

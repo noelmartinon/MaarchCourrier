@@ -15,6 +15,7 @@
 namespace Attachment\controllers;
 
 use Attachment\models\AttachmentModel;
+use Attachment\models\AttachmentTypeModel;
 use Contact\models\ContactModel;
 use ContentManagement\controllers\MergeController;
 use Convert\controllers\ConvertPdfController;
@@ -110,9 +111,10 @@ class AttachmentController
         $attachment['typistLabel'] = $typist['firstname']. ' ' .$typist['lastname'];
         $attachment['modifiedBy'] = UserModel::getLabelledUserById(['id' => $attachment['modifiedBy']]);
 
-        $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
-        if (!empty($attachmentsTypes[$attachment['type']]['label'])) {
-            $attachment['typeLabel'] = $attachmentsTypes[$attachment['type']]['label'];
+        $attachmentsTypes = AttachmentTypeModel::get(['select' => ['type_id', 'label']]);
+        $attachmentsTypes = array_column($attachmentsTypes, 'label', 'type_id');
+        if (!empty($attachmentsTypes[$attachment['type']])) {
+            $attachment['typeLabel'] = $attachmentsTypes[$attachment['type']];
         }
 
         $oldVersions = [];
@@ -173,7 +175,8 @@ class AttachmentController
             return $response->withStatus(400)->withJson(['errors' => 'Can not update attachment use for record_management']);
         }
 
-        $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
+        $attachmentsTypes = AttachmentTypeModel::get(['select' => ['type_id']]);
+        $attachmentsTypes = array_column($attachmentsTypes, null, 'type_id');
         if (empty($attachmentsTypes[$body['type']])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body type does not exist']);
         }
@@ -303,7 +306,8 @@ class AttachmentController
             'limit'     => (int)$queryParams['limit'] ?? 0
         ]);
 
-        $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
+        $attachmentsTypes = AttachmentTypeModel::get(['select' => ['type_id', 'label']]);
+        $attachmentsTypes = array_column($attachmentsTypes, 'label', 'type_id');
         foreach ($attachments as $key => $attachment) {
             if ($attachment['modificationDate'] == $attachment['creationDate']) {
                 $attachments[$key]['modificationDate'] = null;
@@ -315,8 +319,8 @@ class AttachmentController
             }
             $attachments[$key]['modifiedBy'] = UserModel::getLabelledUserById(['id' => $attachment['modifiedBy']]);
 
-            if (!empty($attachmentsTypes[$attachment['type']]['label'])) {
-                $attachments[$key]['typeLabel'] = $attachmentsTypes[$attachment['type']]['label'];
+            if (!empty($attachmentsTypes[$attachment['type']])) {
+                $attachments[$key]['typeLabel'] = $attachmentsTypes[$attachment['type']];
             }
 
             if ($attachment['status'] == 'SIGN') {
@@ -689,13 +693,6 @@ class AttachmentController
         return $response->withJson($attachment);
     }
 
-    public function getAttachmentsTypes(Request $request, Response $response)
-    {
-        $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
-
-        return $response->withJson(['attachmentsTypes' => $attachmentsTypes]);
-    }
-
     public static function getEncodedDocument(array $args)
     {
         ValidatorModel::notEmpty($args, ['id']);
@@ -904,7 +901,8 @@ class AttachmentController
             return ['errors' => 'Body resIdMaster is out of perimeter'];
         }
 
-        $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
+        $attachmentsTypes = AttachmentTypeModel::get(['select' => ['type_id']]);
+        $attachmentsTypes = array_column($attachmentsTypes, 'type_id', 'type_id');
         if (empty($attachmentsTypes[$body['type']])) {
             return ['errors' => 'Body type does not exist'];
         }

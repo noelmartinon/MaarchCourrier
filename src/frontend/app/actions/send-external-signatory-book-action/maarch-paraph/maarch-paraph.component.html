@@ -2,12 +2,28 @@
     <div class="fieldsetdContainer" style="flex:2">
         <h2>{{'lang.visaWorkflow' | translate}} :</h2>
         <div class="fieldsetdContent">
-            <app-visa-workflow #appVisaWorkflow [adminMode]="true" [injectDatas]="injectDatasParam" [linkedToMaarchParapheur]="true"></app-visa-workflow>
-            <div *ngIf="appVisaWorkflow.checkExternalSignatoryBook().length > 0" class="alert-message alert-message-danger" role="alert">
-                <b>{{appVisaWorkflow.checkExternalSignatoryBook().join(', ')}}</b> {{'lang.usersMissingInSignatureBook' | translate}} !       
+            <app-visa-workflow #appVisaWorkflow [adminMode]="true" [injectDatas]="injectDatasParam"
+                [linkedToMaarchParapheur]="true"></app-visa-workflow>
+            <div *ngIf="appVisaWorkflow.checkExternalSignatoryBook().length > 0"
+                class="alert-message alert-message-danger" role="alert">
+                <b>{{appVisaWorkflow.checkExternalSignatoryBook().join(', ')}}</b>
+                {{'lang.usersMissingInSignatureBook' | translate}} !
             </div>
         </div>
     </div>
+</div>
+<div class="col-md-12" style="text-align: right;">
+    <button mat-button *ngIf="additionalsInfos.attachments.length === 1" color="primary" type="button"
+        [matMenuTriggerFor]="menu" [disabled]="!isValidParaph()">Gérer les positions de signature...</button>
+    <mat-menu #menu="matMenu" class="docToSignTemplateMenu">
+        <button mat-menu-item *ngFor="let resource of resourcesToSign" (click)="openSignaturePosition(resource)"
+            style="font-size:12px;">
+            <mat-icon style="height: auto;" class="fas fa-compress-arrows-alt"></mat-icon>
+            <span>
+                <span color="primary">{{resource.chrono}}</span>&nbsp;- {{resource.title}}
+            </span>
+        </button>
+    </mat-menu>
 </div>
 <div class="col-md-12" *ngIf="additionalsInfos.visaWorkflowError">
     <div>

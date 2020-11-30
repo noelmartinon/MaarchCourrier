@@ -237,7 +237,7 @@ export class ActionsService implements OnDestroy {
         if (!this.functions.empty(this.currentResourceLock)) {
             clearInterval(this.currentResourceLock);
         }
-        
+
         this.currentResourceLock = setInterval(() => {
             this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
                 tap(() => console.debug(`Cycle lock : `, this.currentResourceLock)),

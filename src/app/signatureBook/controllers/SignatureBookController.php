@@ -15,6 +15,7 @@
 namespace SignatureBook\controllers;
 
 use Attachment\models\AttachmentModel;
+use Attachment\models\AttachmentTypeModel;
 use Basket\models\BasketModel;
 use Basket\models\GroupBasketModel;
 use Basket\models\RedirectBasketModel;
@@ -169,13 +170,14 @@ class SignatureBookController
         ValidatorModel::notEmpty($args, ['resId', 'userId']);
         ValidatorModel::intVal($args, ['resId', 'userId']);
 
-        $attachmentTypes = AttachmentModel::getAttachmentsTypesByXML();
+        $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id', 'label', 'icon', 'signable']]);
+        $attachmentTypes = array_column($attachmentTypes, null, 'type_id');
 
         $orderBy = "CASE attachment_type WHEN 'response_project' THEN 1";
         $c = 2;
-        foreach ($attachmentTypes as $key => $value) {
-            if ($value['sign'] && $key != 'response_project') {
-                $orderBy .= " WHEN '{$key}' THEN {$c}";
+        foreach ($attachmentTypes as $value) {
+            if ($value['signable'] && $value['type_id'] != 'response_project') {
+                $orderBy .= " WHEN '{$value['type_id']}' THEN {$c}";
                 ++$c;
             }
         }
@@ -249,7 +251,7 @@ class SignatureBookController
             $attachments[$key]['viewerNoSignId']  = $viewerNoSignId;
             $attachments[$key]['attachment_type'] = $attachmentTypes[$value['attachment_type']]['label'];
             $attachments[$key]['icon']            = $attachmentTypes[$value['attachment_type']]['icon'];
-            $attachments[$key]['sign']            = $attachmentTypes[$value['attachment_type']]['sign'];
+            $attachments[$key]['sign']            = $attachmentTypes[$value['attachment_type']]['signable'];
             $attachments[$key]['signed']          = $value['status'] == 'SIGN';
             $attachments[$key]['viewerId']        = $viewerId;
 
@@ -352,12 +354,13 @@ class SignatureBookController
             'data'      => [$resIds]
         ]);
 
-        $attachmentTypes = AttachmentModel::getAttachmentsTypesByXML();
+        $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id', 'signable']]);
+        $attachmentTypes = array_column($attachmentTypes, 'signable', 'type_id');
         foreach ($attachmentsInResList as $value) {
             if ($resListForAttachments[$value['res_id_master']] === null) {
                 $resListForAttachments[$value['res_id_master']] = true;
             }
-            if ($attachmentTypes[$value['attachment_type']]['sign'] && ($value['status'] == 'TRA' || $value['status'] == 'A_TRA')) {
+            if ($attachmentTypes[$value['attachment_type']] && ($value['status'] == 'TRA' || $value['status'] == 'A_TRA')) {
                 $resListForAttachments[$value['res_id_master']] = false;
             }
         }

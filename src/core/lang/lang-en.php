@@ -126,7 +126,6 @@ define('_EMAIL', 'Email');
 define('_FAX', 'Fax');
 define('_CHRONOPOST', 'Chronopost');
 define('_FEDEX', 'Fedex');
-define('_REGISTERED_MAIL', 'Registered mail with acknowledgement of receipt');
 define('_COURIER', 'Courier');
 define('_NUMERIC_PACKAGE', 'Numeric package');
 define('_OTHER', 'Other');
@@ -468,9 +467,6 @@ define("_RETENTION_RULE_FROZEN", "Retention rule frozen");
 define("_BINDING_DOCUMENT", "Binding document");
 define("_YES", "Yes");
 define("_NO", "No");
-define("_RESET_BINDING_DOCUMENT", "Reset binding document");
-define("_SET_BINDING_DOCUMENT", "Mail was set as binding");
-define("_SET_NON_BINDING_DOCUMENT", "Mail was set as non binding");
 define("_FREEZE_RETENTION_RULE", "Retention rule frozen");
 define("_UNFREEZE_RETENTION_RULE", "Retention rule unfrozen");
 
@@ -499,3 +495,6 @@ define('_RESET_RECORD_MANAGEMENT', 'Reset record management');
 define('_RESET_RECORD_MANAGEMENT_DESC', 'Reset record management');
 
 define('_USER_SKIPPED', 'User skipped');
+
+define('_MAARCH_PARAPHEUR_STATUS_VAL', 'Validé');
+define('_MAARCH_PARAPHEUR_STATUS_REF', 'Refusé');

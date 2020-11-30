@@ -12,6 +12,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { AddVisaModelModalComponent } from './addVisaModel/add-visa-model-modal.component';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import {ActivatedRoute} from "@angular/router";
+import {PrivilegeService} from '@service/privileges.service';
 
 @Component({
     selector: 'app-visa-workflow',
@@ -66,7 +67,8 @@ export class VisaWorkflowComponent implements OnInit {
         private latinisePipe: LatinisePipe,
         public dialog: MatDialog,
         private scanPipe: ScanPipe,
-        private route: ActivatedRoute
+        private route: ActivatedRoute,
+        private privilegeService: PrivilegeService
     ) {
         // ngOnInit is not called if navigating in the same component : must be in constructor for this case
         this.route.params.subscribe(params => {
@@ -627,8 +629,10 @@ export class VisaWorkflowComponent implements OnInit {
 
     canManageUser(item: any, i: number) {
         if (this.adminMode) {
-            if (!this.functions.empty(item.process_date) || (this.target === 'signatureBook' && this.getCurrentVisaUserIndex() === i)) {
+            if (!this.functions.empty(item.process_date)) {
                 return false;
+            } else if (this.target === 'signatureBook' && this.getCurrentVisaUserIndex() === i) {
+                return this.privilegeService.hasCurrentUserPrivilege('modify_visa_in_signatureBook');
             } else {
                 return true;
             }

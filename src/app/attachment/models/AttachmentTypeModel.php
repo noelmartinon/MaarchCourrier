@@ -58,10 +58,30 @@ class AttachmentTypeModel
         return $type[0];
     }
 
+    public static function getByTypeId(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['typeId']);
+        ValidatorModel::stringType($args, ['typeId']);
+        ValidatorModel::arrayType($args, ['select']);
+
+        $type = DatabaseModel::select([
+            'select'    => empty($args['select']) ? ['*'] : $args['select'],
+            'table'     => ['attachment_types'],
+            'where'     => ['type_id = ?'],
+            'data'      => [$args['typeId']],
+        ]);
+
+        if (empty($type[0])) {
+            return [];
+        }
+
+        return $type[0];
+    }
+
     public static function create(array $args)
     {
-        ValidatorModel::notEmpty($args, ['type_id', 'label', 'visible', 'email_link', 'signable', 'version_enabled', 'new_version_default']);
-        ValidatorModel::stringType($args, ['type_id', 'label', 'visible', 'email_link', 'signable', 'version_enabled', 'new_version_default', 'icon']);
+        ValidatorModel::notEmpty($args, ['type_id', 'label', 'visible', 'email_link', 'signable', 'version_enabled', 'new_version_default', 'chrono']);
+        ValidatorModel::stringType($args, ['type_id', 'label', 'visible', 'email_link', 'signable', 'version_enabled', 'new_version_default', 'chrono', 'icon']);
 
         $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'attachment_types_id_seq']);
 
@@ -75,6 +95,7 @@ class AttachmentTypeModel
                 'email_link'            => $args['email_link'],
                 'signable'              => $args['signable'],
                 'icon'                  => $args['icon'],
+                'chrono'                => $args['chrono'],
                 'version_enabled'       => $args['version_enabled'],
                 'new_version_default'   => $args['new_version_default'],
             ]
@@ -86,7 +107,7 @@ class AttachmentTypeModel
     public static function update(array $args)
     {
         ValidatorModel::notEmpty($args, ['set', 'where', 'data']);
-        ValidatorModel::arrayType($args, ['set', 'where', 'data', 'postSet']);
+        ValidatorModel::arrayType($args, ['set', 'where', 'data']);
 
         DatabaseModel::update([
             'table'   => 'attachment_types',

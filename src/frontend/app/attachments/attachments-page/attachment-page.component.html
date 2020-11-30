@@ -15,7 +15,7 @@
     <mat-dialog-content class="attach-content">
             <ng-container *ngIf="!loading">
                     <div class="attachment-form col-md-3 col-sm-12">
-                        <div *ngIf="editMode" class="attachment-form-item">
+                        <div *ngIf="editMode && isVersionEnabled()" class="attachment-form-item">
                             <mat-slide-toggle [checked]="newVersion" color="primary"
                                 (change)="newVersion = !newVersion;">{{'lang.newVersion' | translate}}</mat-slide-toggle>
                         </div>

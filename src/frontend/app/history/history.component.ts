@@ -7,7 +7,7 @@ import { Observable, merge, Subject, of as observableOf, of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
-import { takeUntil, startWith, switchMap, map, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize } from 'rxjs/operators';
+import { takeUntil, startWith, switchMap, map, catchError, tap, finalize } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { FunctionsService } from '@service/functions.service';
 import { LatinisePipe } from 'ngx-pipes';
@@ -15,16 +15,15 @@ import { PrivilegeService } from '@service/privileges.service';
 
 @Component({
     selector: 'app-history-list',
-    templateUrl: "history.component.html",
+    templateUrl: 'history.component.html',
     styleUrls: ['history.component.scss'],
 })
 export class HistoryComponent implements OnInit {
 
-    
     loading: boolean = false;
 
-    fullHistoryMode : boolean = true;
-    
+    fullHistoryMode: boolean = true;
+
     filtersChange = new EventEmitter();
 
     data: any;
@@ -56,7 +55,7 @@ export class HistoryComponent implements OnInit {
 
     loadingFilters: boolean = true;
 
-    @Input('resId') resId: number = null;
+    @Input() resId: number = null;
 
     @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
     @ViewChild('tableHistoryListSort', { static: true }) sort: MatSort;
@@ -77,7 +76,7 @@ export class HistoryComponent implements OnInit {
     ngOnInit(): void {
         if (this.resId !== null) {
             this.displayedColumnsHistory = ['event_date', 'info'];
-            this.fullHistoryMode = !this.privilegeService.hasCurrentUserPrivilege('view_doc_history')
+            this.fullHistoryMode = !this.privilegeService.hasCurrentUserPrivilege('view_doc_history');
         } else {
             this.displayedColumnsHistory = ['event_date', 'record_id', 'userLabel', 'info', 'remote_ip'];
         }
@@ -125,8 +124,12 @@ export class HistoryComponent implements OnInit {
                 startWith({}),
                 switchMap(() => {
                     this.isLoadingResults = true;
+                    let searchValue = '';
+                    if (!this.functions.empty(this.searchHistory.value)) {
+                        searchValue = '&search=' + this.searchHistory.value;
+                    }
                     return this.resultListDatabase!.getRepoIssues(
-                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.routeUrl, this.filterUrl, this.extraParamUrl);
+                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.routeUrl, this.filterUrl, this.extraParamUrl, searchValue);
                 }),
                 map(data => {
                     this.isLoadingResults = false;
@@ -147,8 +150,8 @@ export class HistoryComponent implements OnInit {
             return {
                 ...item,
                 userLabel : !this.functions.empty(item.userLabel) ? item.userLabel : this.translate.instant('lang.userDeleted')
-            }
-        })
+            };
+        });
         return data;
     }
 
@@ -167,8 +170,8 @@ export class HistoryComponent implements OnInit {
             this.loadingFilters = true;
             this.http.get(this.filterListUrl).pipe(
                 map((data: any) => {
-                    let deletedActions = data.actions.filter((action: any) => action.label === null).map((action: any) => action.id);
-                    let deletedUser = data.users.filter((user: any) => user.label === null).map((user: any) => user.login);
+                    const deletedActions = data.actions.filter((action: any) => action.label === null).map((action: any) => action.id);
+                    const deletedUser = data.users.filter((user: any) => user.label === null).map((user: any) => user.login);
 
                     data.actions = data.actions.filter((action: any) => action.label !== null);
                     if (deletedActions.length > 0) {
@@ -191,7 +194,7 @@ export class HistoryComponent implements OnInit {
                         return {
                             id: syst.id,
                             label: !this.functions.empty(this.translate.instant('lang.' + syst.id)) ? this.translate.instant('lang.' + syst.id) : syst.id
-                        }
+                        };
                     });
                     return data;
                 }),
@@ -269,7 +272,7 @@ export class HistoryComponent implements OnInit {
 
     generateUrlFilter() {
         this.filterUrl = '';
-        let arrTmpUrl: any[] = [];
+        const arrTmpUrl: any[] = [];
         Object.keys(this.filterUsed).forEach((type: any) => {
             this.filterUsed[type].forEach((filter: any) => {
                 if (!this.functions.empty(filter.id)) {
@@ -294,6 +297,10 @@ export class HistoryComponent implements OnInit {
             return this.filterList[type];
         }
     }
+
+    directSearchHistory() {
+        this.refreshDao();
+    }
 }
 
 export interface HistoryList {
@@ -304,10 +311,10 @@ export class HistoryListHttpDao {
 
     constructor(private http: HttpClient) { }
 
-    getRepoIssues(sort: string, order: string, page: number, href: string, search: string, extraParamUrl: string): Observable<HistoryList> {
+    getRepoIssues(sort: string, order: string, page: number, href: string, search: string, extraParamUrl: string, directSearchValue: string): Observable<HistoryList> {
 
-        let offset = page * 10;
-        const requestUrl = `${href}?limit=10&offset=${offset}&order=${order}&orderBy=${sort}${search}${extraParamUrl}`;
+        const offset = page * 10;
+        const requestUrl = `${href}?limit=10&offset=${offset}&order=${order}&orderBy=${sort}${search}${extraParamUrl}${directSearchValue}`;
 
         return this.http.get<HistoryList>(requestUrl);
     }

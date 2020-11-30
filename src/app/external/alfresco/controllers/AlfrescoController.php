@@ -15,6 +15,7 @@
 namespace Alfresco\controllers;
 
 use Attachment\models\AttachmentModel;
+use Attachment\models\AttachmentTypeModel;
 use Configuration\models\ConfigurationModel;
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
@@ -794,8 +795,8 @@ class AlfrescoController
             if (!empty($alfrescoParameters['mapping']['attachment'])) {
                 foreach ($alfrescoParameters['mapping']['attachment'] as $key => $alfrescoParameter) {
                     if ($alfrescoParameter == 'typeLabel') {
-                        $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
-                        $properties[$key] = $attachmentsTypes[$attachment['attachment_type']]['label'];
+                        $attachmentType = AttachmentTypeModel::getByTypeId(['select' => ['label'], 'typeId' => $attachment['attachment_type']]);
+                        $properties[$key] = $attachmentType['label'] ?? '';
                     } else {
                         $properties[$key] = $attachment[$alfrescoParameter];
                     }

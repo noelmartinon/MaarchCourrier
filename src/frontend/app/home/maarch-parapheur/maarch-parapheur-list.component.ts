@@ -59,6 +59,6 @@ export class MaarchParapheurListComponent implements OnInit, AfterViewInit {
     }
 
     goTo(row: any) {
-        window.open(this.maarchParapheurUrl + '/dist/index.html#/documents/' + row.id, '_blank');
+        window.open(this.maarchParapheurUrl + '/dist/documents/' + row.id, '_blank');
     }
 }

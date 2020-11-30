@@ -71,7 +71,7 @@ class CoreControllerTest extends TestCase
         $this->assertStringNotEqualsFile("src/core/lang/lang-{$language}.php", '');
         include("src/core/lang/lang-{$language}.php");
         
-        $this->assertFileNotExists("src/core/lang/lang-zh.php");
+        $this->assertFileDoesNotExist("src/core/lang/lang-zh.php");
     }
 
     public function testGetExternalConnectionsEnabled()

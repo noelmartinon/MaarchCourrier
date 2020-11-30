@@ -16,6 +16,7 @@
 namespace ExternalSignatoryBook\controllers;
 
 use Attachment\models\AttachmentModel;
+use Attachment\models\AttachmentTypeModel;
 use Convert\controllers\ConvertPdfController;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
@@ -104,9 +105,10 @@ class IParapheurController
             'data'   => [$aArgs['resIdMaster'], ['signed_response']]
         ]);
 
-        $attachmentTypes = AttachmentModel::getAttachmentsTypesByXML();
+        $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id', 'signable']]);
+        $attachmentTypes = array_column($attachmentTypes, 'signable', 'type_id');
         foreach ($attachments as $key => $value) {
-            if (!$attachmentTypes[$value['attachment_type']]['sign']) {
+            if (!$attachmentTypes[$value['attachment_type']]) {
                 $adrInfo              = AdrModel::getConvertedDocumentById(['resId' => $value['res_id'], 'collId' => 'attachments_coll', 'type' => 'PDF']);
                 $annexeAttachmentPath = DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id'], 'select' => ['path_template']]);
                 $value['filePath']    = $annexeAttachmentPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $adrInfo['path']) . $adrInfo['filename'];

@@ -9,6 +9,7 @@ import { BrowserModule, HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angu
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { InternationalizationModule } from '@service/translate/internationalization.module';
+import { AngularDraggableModule } from 'angular2-draggable';
 
 import { JoyrideModule } from 'ngx-joyride';
 
@@ -42,6 +43,7 @@ import { SendExternalSignatoryBookActionComponent } from './actions/send-externa
 import { SendExternalNoteBookActionComponent } from './actions/send-external-note-book-action/send-external-note-book-action.component';
 import { XParaphComponent } from './actions/send-external-signatory-book-action/x-paraph/x-paraph.component';
 import { MaarchParaphComponent } from './actions/send-external-signatory-book-action/maarch-paraph/maarch-paraph.component';
+import { SignaturePositionComponent } from './actions/send-external-signatory-book-action/maarch-paraph/signature-position/signature-position.component';
 import { IParaphComponent } from './actions/send-external-signatory-book-action/i-paraph/i-paraph.component';
 import { IxbusParaphComponent } from './actions/send-external-signatory-book-action/ixbus-paraph/ixbus-paraph.component';
 import { FastParaphComponent } from './actions/send-external-signatory-book-action/fast-paraph/fast-paraph.component';
@@ -68,7 +70,6 @@ import { SendToRecordManagementComponent } from './actions/send-to-record-manage
 import { CheckReplyRecordManagementComponent } from './actions/check-reply-record-management-action/check-reply-record-management.component';
 import { ResetRecordManagementComponent } from './actions/reset-record-management-action/reset-record-management.component';
 import { CheckAcknowledgmentRecordManagementComponent } from './actions/check-acknowledgment-record-management-action/check-acknowledgment-record-management.component';
-
 
 // PROCESS
 import { ProcessComponent } from './process/process.component';
@@ -139,6 +140,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         BrowserAnimationsModule,
         HttpClientModule,
         InternationalizationModule,
+        AngularDraggableModule,
         JoyrideModule.forRoot(),
         SharedModule,
         AppRoutingModule,
@@ -215,6 +217,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         SendExternalNoteBookActionComponent,
         XParaphComponent,
         MaarchParaphComponent,
+        SignaturePositionComponent,
         FastParaphComponent,
         IxbusParaphComponent,
         IParaphComponent,
@@ -280,6 +283,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         SendAvisParallelComponent,
         UpdateDepartureDateActionComponent,
         SendExternalSignatoryBookActionComponent,
+        SignaturePositionComponent,
         SendExternalNoteBookActionComponent,
         ContinueVisaCircuitActionComponent,
         ContinueAvisCircuitActionComponent,

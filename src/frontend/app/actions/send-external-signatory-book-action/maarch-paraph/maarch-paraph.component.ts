@@ -2,6 +2,12 @@ import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { VisaWorkflowComponent } from '../../../visa/visa-workflow.component';
+import { SignaturePositionComponent } from './signature-position/signature-position.component';
+import { catchError, filter, finalize, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { FunctionsService } from '@service/functions.service';
+import { NotificationService } from '@service/notification/notification.service';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-maarch-paraph',
@@ -10,23 +16,31 @@ import { VisaWorkflowComponent } from '../../../visa/visa-workflow.component';
 })
 export class MaarchParaphComponent implements OnInit {
 
-    
     loading: boolean = false;
 
     currentAccount: any = null;
     usersWorkflowList: any[] = [];
+
+    signaturePositions: any = {};
 
     injectDatasParam = {
         resId: 0,
         editable: true
     };
 
-    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
+    @ViewChild('appVisaWorkflow', { static: true }) appVisaWorkflow: VisaWorkflowComponent;
 
+    @Input() resourcesToSign: any[] = [];
     @Input() additionalsInfos: any;
     @Input() externalSignatoryBookDatas: any;
 
-    constructor(public translate: TranslateService, public http: HttpClient) { }
+    constructor(
+        public translate: TranslateService,
+        private notify: NotificationService,
+        public http: HttpClient,
+        private functions: FunctionsService,
+        public dialog: MatDialog
+    ) { }
 
     ngOnInit(): void {
         if (typeof this.additionalsInfos.destinationId !== 'undefined' && this.additionalsInfos.destinationId !== '') {
@@ -61,5 +75,30 @@ export class MaarchParaphComponent implements OnInit {
         });
 
         return this.externalSignatoryBookDatas;
+    }
+
+    openSignaturePosition(resource: any) {
+        console.log('this.additionalsInfos', this.additionalsInfos);
+        const dialogRef = this.dialog.open(SignaturePositionComponent, {
+            height: '99vh',
+            panelClass: 'maarch-modal',
+            disableClose: true,
+            data: {
+                resource: resource,
+                workflow: this.appVisaWorkflow.getWorkflow()
+            }
+        });
+        dialogRef.afterClosed().pipe(
+            filter((res: any) => !this.functions.empty(res)),
+            tap((res: any) => {
+                this.resourcesToSign.filter((itemToSign: any) => itemToSign.resId === resource.resId && itemToSign.mainDocument === resource.mainDocument)[0]['signaturePositions'] = res;
+                console.log('result', this.resourcesToSign);
+            }),
+            finalize(() => this.loading = false),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 }

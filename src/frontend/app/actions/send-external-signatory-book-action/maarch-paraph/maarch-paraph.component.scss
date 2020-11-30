@@ -34,3 +34,7 @@
 .alert-message {
     margin: 0 ;
 }
+
+::ng-deep.docToSignTemplateMenu.mat-menu-panel {
+    max-width: 100% !important;
+}

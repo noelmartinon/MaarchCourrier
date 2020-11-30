@@ -1773,3 +1773,13 @@ INSERT INTO registered_mail_issuing_sites_entities (site_id, entity_id) VALUES (
 INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, status, current_number) VALUES ('2C', 'SuiviNumber', 1, 10, 23, '2020-09-14 14:38:09.008644', 'OK', 1);
 INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, status, current_number) VALUES ('RW', 'SuiviNumberInternational', 1, 10, 23, '2020-09-14 14:39:32.972626', 'OK', 1);
 INSERT INTO registered_mail_number_range (type, tracking_account_number, range_start, range_end, creator, creation_date, status, current_number) VALUES ('2D', 'suiviNumber', 1, 10, 23, '2020-09-14 14:39:16.779322', 'OK', 1);
+
+/* Attachment types */
+INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES (2, 'response_project', 'Projet de réponse', true, true, true, 'R', true, true, true);
+INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES (3, 'signed_response', 'Réponse signée', false, true, false, '', true, true, true);
+INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES (4, 'simple_attachment', 'Pièce jointe', true, false, false, 'PJ', false, true, true);
+INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES (5, 'incoming_mail_attachment', 'Pièce jointe capturée', true, false, false, '', false, true, true);
+INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES (6, 'outgoing_mail', 'Courrier départ spontané', true, false, true, 'DS', true, true, true);
+INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES (7, 'summary_sheet', 'Fiche de liaison', false, false, false, '', true, true, true);
+INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES (8, 'acknowledgement_record_management', 'Accusé de réception (Archivage)', false, false, false, '', true, true, true);
+INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES (9, 'reply_record_management', 'Réponse au transfert (Archivage)', false, false, false, '', true, true, true);

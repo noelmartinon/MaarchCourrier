@@ -1,0 +1,67 @@
+<div class="mat-dialog-content-container">
+    <h1 mat-dialog-title>Gérer les positions de signatures</h1>
+    <div mat-dialog-content>
+        <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
+            <mat-spinner style="margin:auto;"></mat-spinner>
+        </div>
+        <div style="display: flex;height: 100%;flex-direction:column">
+            <nav mat-tab-nav-bar *ngIf="!loading" class="workflowList">
+                <a mat-tab-link *ngFor="let user of data.workflow;let i=index" (click)="selectUser(i)"
+                    [active]="currentUser == i">
+                    <div>
+                        <i class="fas" [class.fa-pen-nib]="user.requested_signature"
+                            [class.fa-check-double]="!user.requested_signature"></i>&nbsp;{{user.labelToDisplay}}
+                    </div>
+                    <div>
+                        <mat-chip-list>
+                            <ng-container *ngFor="let sign of signList">
+                                <mat-chip *ngIf="sign.sequence === i" color="primary" style="font-size: 10px;
+                            padding-top: 0px;
+                            padding-bottom: 0px;
+                            min-height: 20px;cursor: pointer;" (click)="goToSignUserPage(i,sign.page)"
+                                    [selected]="currentUser == i && currentPage === sign.page">Page
+                                    {{sign.page}}</mat-chip>
+                            </ng-container>
+                        </mat-chip-list>
+                    </div>
+                </a>
+            </nav>
+            <div class="signatureContainer">
+                <div id="myBounds" #myBounds style="position: absolute;position: absolute;"
+                    [style.width.px]="workingAreaWidth" [style.height.px]="workingAreaHeight">
+                    <ng-container *ngFor="let sign of signList;let indexSign=index;">
+                        <div *ngIf="sign.page === currentPage" [class.signDisabled]="currentUser!==sign.sequence"
+                            [position]="{x: (sign.position.positionX*workingAreaWidth)/100, y:(sign.position.positionY*workingAreaHeight)/100}"
+                            [style.width.%]="25" [ngDraggable]="currentUser===sign.sequence"
+                            (endOffset)="moveSign($event);" [preventDefaultEvent]="false" [bounds]="myBounds"
+                            [inBounds]="true" class="signature" (click)="currentUser!=sign.sequence ? goToSignUserPage(sign.sequence, currentPage) : false">
+                            <button  style="position: absolute;top: -50px;right: 0px;" mat-icon-button color="warn" [title]="'lang.delete' | translate"
+                                (click)="deleteSign(indexSign)">
+                                <mat-icon class="fa fa-trash-alt fa-2x"></mat-icon>
+                            </button>
+                            <span class="signUserName">{{getUserName(sign.sequence)}}</span>
+                            SIGNATURE
+                        </div>
+                    </ng-container>
+                </div>
+                <mat-form-field *ngIf="!loading" class="pageList" style="position: fixed;">
+                    <span matPrefix>Page :&nbsp;</span>
+                    <mat-select [(ngModel)]="currentPage" (selectionChange)="false">
+                        <mat-option *ngFor="let page of pages" [value]="page">{{page}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <img class="img-content" [src]="imgContent" (load)="imgLoaded()" />
+                <button *ngIf="emptySign() && !loading" mat-raised-button color="primary" type="button"
+                    style="position: fixed;left: 50%;top: 50%;transform: translate(-50%,-50%);"
+                    (click)="initSign()">Positionner la
+                    signature</button>
+            </div>
+        </div>
+    </div>
+    <span class="divider-modal"></span>
+    <div mat-dialog-actions class="actions">
+        <button mat-raised-button mat-button color="primary" [disabled]="loading"
+            (click)="onSubmit()">{{'lang.validate' | translate}}</button>
+        <button mat-raised-button mat-button [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
+    </div>
+</div>
