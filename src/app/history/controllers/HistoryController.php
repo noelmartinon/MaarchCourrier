@@ -112,7 +112,7 @@ class HistoryController
         }
 
         if (!empty($queryParams['search'])) {
-            $searchFields = ['info', 'remote_ip', 'event_date'];
+            $searchFields = ['info', 'remote_ip'];
             $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $searchFields]);
 
             $requestData = AutoCompleteController::getDataForRequest([
@@ -120,7 +120,7 @@ class HistoryController
                 'fields'        => $fields,
                 'where'         => $where,
                 'data'          => $data,
-                'fieldsNumber'  => 3,
+                'fieldsNumber'  => 2,
                 'longField'     => true
             ]);
 

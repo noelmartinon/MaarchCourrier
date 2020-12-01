@@ -59,7 +59,7 @@ class BatchHistoryController
         }
 
         if (!empty($queryParams['search'])) {
-            $searchFields = ['info', 'module_name', 'event_date', 'total_processed', 'total_errors'];
+            $searchFields = ['info', 'module_name'];
             $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $searchFields]);
 
             $requestData = AutoCompleteController::getDataForRequest([
@@ -67,7 +67,7 @@ class BatchHistoryController
                 'fields'        => $fields,
                 'where'         => $where,
                 'data'          => $data,
-                'fieldsNumber'  => 5,
+                'fieldsNumber'  => 2,
                 'longField'     => true
             ]);
 
