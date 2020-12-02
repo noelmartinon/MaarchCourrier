@@ -29,6 +29,8 @@ abstract class ParameterModelAbstract
         $aReturn = DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
             'table'     => ['parameters'],
+            'where'     => empty($aArgs['where']) ? [] : $aArgs['where'],
+            'data'      => empty($aArgs['data']) ? [] : $aArgs['data'],
         ]);
 
         return $aReturn;

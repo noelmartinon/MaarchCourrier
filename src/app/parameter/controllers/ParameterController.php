@@ -29,11 +29,14 @@ class ParameterController
 {
     public function get(Request $request, Response $response)
     {
+        $where = [];
+        $data  = [];
         if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_parameters', 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+            $where = ['id = ?'];
+            $data  = ['traffic_record_summary_sheet'];
         }
 
-        $parameters = ParameterModel::get();
+        $parameters = ParameterModel::get(['where' => $where, 'data' => $data]);
 
         foreach ($parameters as $key => $parameter) {
             if (!empty($parameter['param_value_string'])) {
