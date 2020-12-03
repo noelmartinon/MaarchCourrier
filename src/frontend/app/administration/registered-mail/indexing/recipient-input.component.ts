@@ -202,4 +202,28 @@ export class RegisteredMailRecipientInputComponent implements OnInit {
     goTo() {
         window.open(`https://www.google.com/maps/search/${this.control.value.addressNumber}+${this.control.value.addressStreet},+${this.control.value.addressPostcode}+${this.control.value.addressTown},+${this.control.value.addressCountry}`, '_blank');
     }
+
+    getContact(contact: any) {
+        this.http.get('../rest/contacts/' + contact.id).pipe(
+            tap((data: any) => {
+                this.control.value.firstname = data.firstname;
+                this.control.value.lastname = data.lastname;
+                this.control.value.addressStreet = data.addressStreet;
+                this.control.value.addressPostcode = data.addressPostcode;
+                this.control.value.addressTown = data.addressTown;
+                this.control.value.addressCountry = data.addressCountry;
+                this.control.value.addressNumber = data.addressNumber;
+                this.control.value.company = data.company;
+                this.control.value.civility = data.civility.label.toUpperCase();
+                this.control.value.addressAdditional1 = data.addressAdditional1;
+                this.control.value.addressAdditional2 = data.addressAdditional2;
+                this.countryControl.setValue(data.addressCountry);
+                this.control.markAsTouched();
+            }),
+            catchError((err: any) => {
+                this.notify.error(err.error.errors);
+                return of(false);
+            })
+        ).subscribe();
+    }
 }

@@ -51,14 +51,16 @@ export class ContactAutocompleteComponent implements OnInit {
     /**
      * FormControl used when autocomplete is used in form and must be catched in a form control.
      */
-    @Input('control') controlAutocomplete: FormControl;
+    @Input('control') controlAutocomplete: FormControl = new FormControl();
 
     @Input() id: string = 'contact-autocomplete';
     @Input() exclusion: string = '';
 
     @Input() singleMode: boolean = false;
+    @Input() inputMode: boolean = false;
 
     @Output() retrieveDocumentEvent = new EventEmitter<string>();
+    @Output() afterSelected = new EventEmitter<any>();
 
     @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
@@ -160,6 +162,7 @@ export class ContactAutocompleteComponent implements OnInit {
 
     selectOpt(ev: any) {
         this.setFormValue(ev.option.value);
+        this.afterSelected.emit(ev.option.value);
         this.myControl.setValue('');
 
     }
