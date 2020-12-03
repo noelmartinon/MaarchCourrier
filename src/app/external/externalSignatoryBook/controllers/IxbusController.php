@@ -204,7 +204,7 @@ class IxbusController
             'select'    => [
                 'res_id', 'title', 'identifier', 'attachment_type',
                 'status', 'typist', 'docserver_id', 'path', 'filename', 'creation_date',
-                'validation_date', 'relation', 'origin_id', 'fingerprint'
+                'validation_date', 'relation', 'origin_id', 'fingerprint', 'format'
             ],
             'where'     => ["res_id_master = ?", "attachment_type not in (?)", "status not in ('DEL', 'OBS', 'FRZ', 'TMP', 'SEND_MASS')", "in_signature_book = 'true'"],
             'data'      => [$aArgs['resIdMaster'], ['incoming_mail_attachment', 'signed_response']]
