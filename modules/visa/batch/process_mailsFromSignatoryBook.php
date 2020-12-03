@@ -452,7 +452,7 @@ $GLOBALS['logger']->write($nbMailsRetrieved.' document(s) retrieved', 'INFO');
 
 Bt_logInDataBase(
     $nbMailsRetrieved,
-    $err,
+    0,
     $nbMailsRetrieved.' mail(s) retrieved from signatory book'
 );
 Bt_updateWorkBatch();

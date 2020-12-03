@@ -843,6 +843,7 @@ WHERE basket_clause ILIKE '%attachment_id%';
 
 
 UPDATE history SET user_id = (select user_id from users order by user_id='superadmin' desc limit 1) where user_id = '';
+UPDATE history_batch SET total_errors = 0 WHERE total_errors IS NULL;
 
 /* users followed resources */
 DROP TABLE IF EXISTS users_followed_resources;
