@@ -358,6 +358,8 @@ INSERT INTO parameters (id, description, param_value_int) VALUES ('minimumVisaRo
 DELETE FROM parameters WHERE id = 'maximumSignRole';
 INSERT INTO parameters (id, description, param_value_int) VALUES ('maximumSignRole', 'Nombre maximum de signataires dans les circuits de visa (0 pour désactiver)', 0);
 
+UPDATE history_batch SET total_errors = 0 WHERE total_errors IS NULL;
+
 /* ORDER ON CHRONO */
 CREATE OR REPLACE FUNCTION order_alphanum(text) RETURNS text AS $$
 declare
