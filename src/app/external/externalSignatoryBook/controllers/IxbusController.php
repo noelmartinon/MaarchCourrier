@@ -182,11 +182,24 @@ class IxbusController
         }
         $userInfo  = IxbusController::getInfoUtilisateur(['config' => $aArgs['config'], 'login' => $aArgs['loginIxbus'], 'password' => $aArgs['passwordIxbus']]);
 
+        $annexes = [];
+        $annexes['letterbox'] = ResModel::get([
+            'select' => ['res_id', 'path', 'filename', 'docserver_id', 'format', 'category_id', 'external_id', 'integrations'],
+            'where'  => ['res_id = ?'],
+            'data'   => [$aArgs['resIdMaster']]
+        ]);
+
+        if (!empty($annexes['letterbox'][0]['docserver_id'])) {
+            $adrMainInfo = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['resIdMaster'], 'collId' => 'letterbox_coll']);
+            $letterboxPath = DocserverModel::getByDocserverId(['docserverId' => $adrMainInfo['docserver_id'], 'select' => ['path_template']]);
+            $annexes['letterbox'][0]['filePath'] = $letterboxPath['path_template'] . str_replace('#', '/', $adrMainInfo['path']) . $adrMainInfo['filename'];
+        }
+
         $attachments = AttachmentModel::get([
             'select'    => [
                 'res_id', 'title', 'identifier', 'attachment_type',
                 'status', 'typist', 'docserver_id', 'path', 'filename', 'creation_date',
-                'validation_date', 'relation', 'origin_id'
+                'validation_date', 'relation', 'origin_id', 'fingerprint', 'format'
             ],
             'where'     => ["res_id_master = ?", "attachment_type not in (?)", "status not in ('DEL', 'OBS', 'FRZ', 'TMP', 'SEND_MASS')", "in_signature_book = 'true'"],
             'data'      => [$aArgs['resIdMaster'], ['incoming_mail_attachment', 'signed_response']]
@@ -195,7 +208,11 @@ class IxbusController
         $attachmentTypes = AttachmentModel::getAttachmentsTypesByXML();
         foreach ($attachments as $key => $value) {
             if (!$attachmentTypes[$value['attachment_type']]['sign']) {
+                $annexeAttachmentPath = DocserverModel::getByDocserverId(['docserverId' => $value['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+                $value['filePath']    = $annexeAttachmentPath['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $value['path']) . $value['filename'];
+
                 unset($attachments[$key]);
+                $annexes['attachments'][] = $value;
             }
         }
 
@@ -204,7 +221,7 @@ class IxbusController
 
         $mainResource = ResModel::getById([
           'resId'  => $aArgs['resIdMaster'],
-          'select' => ['res_id', 'subject', 'path', 'filename', 'docserver_id', 'format', 'category_id', 'external_id', 'integrations', 'process_limit_date']
+          'select' => ['res_id', 'subject', 'path', 'filename', 'docserver_id', 'format', 'category_id', 'external_id', 'integrations', 'process_limit_date', 'fingerprint']
         ]);
 
         if (empty($mainResource['process_limit_date'])) {
@@ -222,13 +239,16 @@ class IxbusController
             $docserverInfo = DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id']]);
             $filePath      = $docserverInfo['path_template'] . str_replace('#', '/', $adrInfo['path']) . $adrInfo['filename'];
 
-            $encodedZipFile = IxbusController::createZip(['filepath' => $filePath, 'filename' => $adrInfo['filename'], 'res_id_master' => $aArgs['resIdMaster']]);
+            $encodedZipFile = IxbusController::createZip(['resId' => $resId, 'filename' => $adrInfo['filename'], 'resIdMaster' => $aArgs['resIdMaster'], 'collId' => $collId, 'annexes' => $annexes]);
+            if (!empty($encodedZipFile['error'])) {
+                return ['error' => $encodedZipFile['error']];
+            }
 
             $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
             <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
               <soap:Body>
                 <SendDossier xmlns="http://www.srci.fr">
-                  <ContenuDocumentZip>'. $encodedZipFile .'</ContenuDocumentZip>
+                  <ContenuDocumentZip>'. $encodedZipFile['encodedFile'] .'</ContenuDocumentZip>
                   <NomDocumentPrincipal>'. $adrInfo['filename'] . '</NomDocumentPrincipal>
                   <NomDossier>'. $value['title'] .'</NomDossier>
                   <NomModele>'. $aArgs['messageModel'] .'</NomModele>
@@ -264,13 +284,18 @@ class IxbusController
             $adrInfo       = ConvertPdfController::getConvertedPdfById(['resId' => $resId, 'collId' => $collId]);
             $docserverInfo = DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id']]);
             $filePath      = $docserverInfo['path_template'] . str_replace('#', '/', $adrInfo['path']) . $adrInfo['filename'];
-            $encodedZipFile = IxbusController::createZip(['filepath' => $filePath, 'filename' => $adrInfo['filename'], 'res_id_master' => $resId]);
+
+            unset($annexes['letterbox']);
+            $encodedZipFile = IxbusController::createZip(['resId' => $resId, 'filename' => $adrInfo['filename'], 'resIdMaster' => $resId, 'collId' => $collId, 'annexes' => $annexes]);
+            if (!empty($encodedZipFile['error'])) {
+                return ['error' => $encodedZipFile['error']];
+            }
 
             $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
             <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
               <soap:Body>
                 <SendDossier xmlns="http://www.srci.fr">
-                  <ContenuDocumentZip>'. $encodedZipFile .'</ContenuDocumentZip>
+                  <ContenuDocumentZip>'. $encodedZipFile['encodedFile'] .'</ContenuDocumentZip>
                   <NomDocumentPrincipal>'. $adrInfo['filename'] . '</NomDocumentPrincipal>
                   <NomDossier>'. $mainResource['subject'] .'</NomDossier>
                   <NomModele>'. $aArgs['messageModel'] .'</NomModele>
@@ -301,30 +326,39 @@ class IxbusController
 
     public static function createZip($aArgs)
     {
-        $zip = new \ZipArchive();
-
-        $pathInfo    = pathinfo($aArgs['filepath'], PATHINFO_FILENAME);
-        $tmpPath     = CoreConfigModel::getTmpPath();
-        $zipFilename = $tmpPath . $pathInfo."_".rand().".zip";
-
-        if ($zip->open($zipFilename, \ZipArchive::CREATE) === true) {
-            $zip->addFile($aArgs['filepath'], $aArgs['filename']);
-            
-            $adrInfo             = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['res_id_master'], 'collId' => 'letterbox_coll']);
-            if (!empty($adrInfo['docserver_id'])) {
-                $docserverInfo       = DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id']]);
-                $arrivedMailfilePath = $docserverInfo['path_template'] . str_replace('#', '/', $adrInfo['path']) . $adrInfo['filename'];
-                $zip->addFile($arrivedMailfilePath, 'courrier_arrivee.pdf');
-            }
-
-            $zip->close();
-
-            $fileContent = file_get_contents($zipFilename);
-            $base64 =  base64_encode($fileContent);
-            return $base64;
-        } else {
-            echo 'Impossible de créer l\'archive;';
+        $adrInfo = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['resId'], 'collId' => $aArgs['collId']]);
+        if (empty($adrInfo['docserver_id']) || strtolower(pathinfo($adrInfo['filename'], PATHINFO_EXTENSION)) != 'pdf') {
+            return ['error' => 'Document ' . $aArgs['resIdMaster'] . ' is not converted in pdf'];
         }
+        $attachmentPath     =  DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id'], 'select' => ['path_template']]);
+        $attachmentFilePath = $attachmentPath['path_template'] . str_replace('#', '/', $adrInfo['path']) . $adrInfo['filename'];
+
+        $zip         = new \ZipArchive();
+        $tmpPath     = CoreConfigModel::getTmpPath();
+        $zipFilePath = $tmpPath . 'projet_courrier_' . $aArgs['resIdMaster'] . '_' . rand(0001, 9999) . '_' . rand(0001, 9999) . '.zip';
+
+        if ($zip->open($zipFilePath, \ZipArchive::CREATE)!==true) {
+            return ['error' => "Can not open file : <$zipFilePath>\n"];
+        }
+        $zip->addFile($attachmentFilePath, $aArgs['filename']);
+
+        if (!empty($aArgs['annexes']['letterbox'][0]['filePath'])) {
+            $zip->addFile($aArgs['annexes']['letterbox'][0]['filePath'], 'document_principal.' . $aArgs['annexes']['letterbox'][0]['format']);
+        }
+
+        if (isset($aArgs['annexes']['attachments'])) {
+            for ($j = 0; $j < count($aArgs['annexes']['attachments']); $j++) {
+                $zip->addFile(
+                    $aArgs['annexes']['attachments'][$j]['filePath'],
+                    'PJ_' . ($j + 1) . '.' . $aArgs['annexes']['attachments'][$j]['format']
+                );
+            }
+        }
+
+        $zip->close();
+        $b64Attachment = base64_encode(file_get_contents($zipFilePath));
+
+        return ['encodedFile' => $b64Attachment];
     }
 
     public static function retrieveSignedMails($aArgs)
