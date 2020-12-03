@@ -2021,7 +2021,7 @@
     "confirmImportContacts": "Voulez-vous importer <b>{{0}}</b> contacts",
     "importedContacts": "contacts importés",
     "registeredMailNotFound": "Ce recommandé n'existe pas",
-    "registeredMailNotInDepositList": "Ce recommandé n'est pas dans un descriptif de pli",
+    "registeredMailNotInDepositList": "Ce recommandé n'est pas dans un descriptif de pli et n'a donc pas été envoyé",
     "toggleEmptyValues": "Prendre en compte les valeurs vides",
     "emptyValue": "Valeur vide",
     "templateUsed": "Structure utilisée",
@@ -2165,5 +2165,9 @@
     "tooManySignUser": "Nombre de signataire maximum dépassé",
     "templateNameMandatory": "Nom du modèle obligatoire",
     "requiredVisaUser": "{{min}} viseur(s) requis",
-    "authorizedSignUser": "{{max}} signataire(s) autorisé(s)"
+    "authorizedSignUser": "{{max}} signataire(s) autorisé(s)",
+    "receptionCanceled": "Réception annulée",
+    "confirmRescanTitle": "Recommandé non distribué",
+    "confirmRescan": "Ce recommandé a déjà été scanné Non distribué. Voulez-vous le rescanner en distribué ?",
+    "selectReturnReason": "Veuillez sélectionner un motif de retour"
 }

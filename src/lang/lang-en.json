@@ -2019,7 +2019,7 @@
     "confirmImportContacts": "Do you want to import <b>{{0}}</b> contacts",
     "importedContacts": "imported contacts",
     "registeredMailNotFound": "This registered mail does not exist",
-    "registeredMailNotInDepositList": "This registered mail is not in a deposit list",
+    "registeredMailNotInDepositList": "This registered mail is not in a deposit list and so was not sent",
     "getResId": "Res ID",
     "getResIdSample": "420",
     "getBarcode": "Barcode",
@@ -2173,5 +2173,9 @@
     "tooManySignUser": "Too many signatories",
     "requiredVisaUser": "{{min}} approvers required",
     "authorizedSignUser": "{{max}} signatories authorized",
-    "templateNameMandatory": "Template name mandatory"
+    "templateNameMandatory": "Template name mandatory",
+    "receptionCanceled": "Reception canceled",
+    "confirmRescanTitle": "Registered mail not distributed",
+    "confirmRescan": "This registerde mail was already scanned Not distributed. Do you want to rescan it to distributed ?",
+    "selectReturnReason": "Please select a return reason"
 }
