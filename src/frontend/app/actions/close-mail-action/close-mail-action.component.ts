@@ -3,13 +3,13 @@ import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
-import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { tap, exhaustMap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FunctionsService } from '../../../service/functions.service';
+import { NoteEditorComponent } from '../../notes/note-editor.component';
 
 @Component({
-    templateUrl: "close-mail-action.component.html",
+    templateUrl: 'close-mail-action.component.html',
     styleUrls: ['close-mail-action.component.scss'],
 })
 export class CloseMailActionComponent implements OnInit {
@@ -24,14 +24,14 @@ export class CloseMailActionComponent implements OnInit {
     requiredFields: any;
 
     constructor(
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private notify: NotificationService,
         public dialogRef: MatDialogRef<CloseMailActionComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public functions: FunctionsService
     ) { }
 
-    ngOnInit(): void { 
+    ngOnInit(): void {
         if (this.data.resIds.length > 0) {
             this.loading = true;
             this.checkClose();
@@ -43,7 +43,7 @@ export class CloseMailActionComponent implements OnInit {
     checkIndexingClose() {
         this.http.get(`../../rest/actions/${this.data.action.id}`).pipe(
             tap((data: any) => {
-                this.requiredFields = data.action.parameters.requiredFields;
+                this.requiredFields = !this.functions.empty(data.action.parameters.requiredFields) ? data.action.parameters.requiredFields : [];
             }),
             exhaustMap(() => this.http.get(`../../rest/customFields`)),
             tap((data: any) => this.customFields = data.customFields),
@@ -51,13 +51,13 @@ export class CloseMailActionComponent implements OnInit {
                 let emptyFields: Array<any> = [];
                 this.requiredFields.forEach((element: any) => {
                     for (let key of Object.keys(this.data.resource.customFields)) {
-                        if (element == 'indexingCustomField_' + key && this.functions.empty(this.data.resource.customFields[key])) {
+                        if (element === 'indexingCustomField_' + key && this.functions.empty(this.data.resource.customFields[key])) {
                             emptyFields.push(this.customFields.filter(elem => elem.id == key)[0].label);
                         }
                     }
                 });
                 if (!this.functions.empty(emptyFields)) {
-                    this.emptyMandatoryFields.push({'fields': emptyFields.join(", ")});
+                    this.emptyMandatoryFields.push({ 'fields': emptyFields.join(', ') });
                     this.canCloseResIds = [];
                 } else {
                     this.canCloseResIds = [1];
@@ -67,7 +67,7 @@ export class CloseMailActionComponent implements OnInit {
                 this.notify.handleSoftErrors(err);
                 return of(false);
             })
-        ).subscribe()
+        ).subscribe();
     }
 
     checkClose() {
@@ -81,12 +81,12 @@ export class CloseMailActionComponent implements OnInit {
                 this.notify.handleSoftErrors(err);
                 return of(false);
             })
-        ).subscribe()
+        ).subscribe();
     }
 
     onSubmit() {
         this.loading = true;
-        if ( this.data.resIds.length === 0) {
+        if (this.data.resIds.length === 0) {
             this.indexDocumentAndExecuteAction();
         } else {
             this.executeAction();
@@ -98,20 +98,21 @@ export class CloseMailActionComponent implements OnInit {
             tap((data: any) => {
                 this.data.resIds = [data.resId];
             }),
-            exhaustMap(() => this.http.put(this.data.indexActionRoute, {resource : this.data.resIds[0], note : this.noteEditor.getNote()})),
+            exhaustMap(() => this.http.put(this.data.indexActionRoute, { resource: this.data.resIds[0], note: this.noteEditor.getNote() })),
             tap(() => {
                 this.dialogRef.close(this.data.resIds);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
+                this.dialogRef.close();
                 return of(false);
             })
-        ).subscribe()
+        ).subscribe();
     }
 
     executeAction() {
-        this.http.put(this.data.processActionRoute, {resources : this.canCloseResIds, note : this.noteEditor.getNote()}).pipe(
+        this.http.put(this.data.processActionRoute, { resources: this.canCloseResIds, note: this.noteEditor.getNote() }).pipe(
             tap(() => {
                 this.dialogRef.close(this.canCloseResIds);
             }),
