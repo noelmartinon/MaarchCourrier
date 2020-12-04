@@ -426,10 +426,13 @@ class ResourceControlController
                 return ['errors' => "Body documentDate is not a date"];
             }
 
-            $documentDate = new \DateTime($body['documentDate']);
-            $tmr = new \DateTime('tomorrow');
-            if ($documentDate > $tmr) {
-                return ['errors' => "Body documentDate is not a valid date"];
+            $model = IndexingModelModel::getById(['id' => $body['modelId'], 'select' => ['category']]);
+            if ($model['category'] != 'outgoing') {
+                $documentDate = new \DateTime($body['documentDate']);
+                $tmr = new \DateTime('tomorrow');
+                if ($documentDate > $tmr) {
+                    return ['errors' => "Body documentDate is not a valid date"];
+                }
             }
         }
         if (!empty($body['arrivalDate'])) {
