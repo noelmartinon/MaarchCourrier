@@ -115,7 +115,7 @@ export class AcknowledgementReceptionComponent implements OnInit {
                     data.status = resultData.previousStatus;
                     let message = this.translate.instant('lang.confirmRescanToNotDistributed');
                     if (data.type === 'distributed') {
-                        message = this.translate.instant('lang.confirmRescanToNotDistributed');
+                        message = this.translate.instant('lang.confirmRescanToDistributed');
                     }
                     const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirmRescanTitle'), msg: message } });
 
