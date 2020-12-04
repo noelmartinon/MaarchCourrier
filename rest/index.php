@@ -653,6 +653,7 @@ $app->get('/registeredMail/ranges/type/{type}/last', \RegisteredMail\controllers
 $app->get('/registeredMail/countries', \RegisteredMail\controllers\RegisteredMailController::class . ':getCountries');
 
 $app->put('/registeredMails/acknowledgement', \RegisteredMail\controllers\RegisteredMailController::class . ':receiveAcknowledgement');
+$app->put('/registeredMails/acknowledgement/rollback', \RegisteredMail\controllers\RegisteredMailController::class . ':rollbackAcknowledgementReception');
 $app->put('/registeredMails/import', \RegisteredMail\controllers\RegisteredMailController::class . ':setImport');
 $app->put('/registeredMails/{resId}', \RegisteredMail\controllers\RegisteredMailController::class . ':update');
 
