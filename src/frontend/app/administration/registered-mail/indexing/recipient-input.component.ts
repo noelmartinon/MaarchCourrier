@@ -151,7 +151,7 @@ export class RegisteredMailRecipientInputComponent implements OnInit {
         this.control.value.addressCountry = 'FRANCE';
         this.countryControl.setValue('FRANCE');
         this.addressBANControl.setValue('');
-        this.control.setErrors({ 'required': true });
+        this.checkRequiredFields();
         this.control.markAsTouched();
     }
 
