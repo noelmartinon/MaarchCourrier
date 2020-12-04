@@ -173,12 +173,11 @@ class RegisteredMailController
             return $response->withStatus(400)->withJson(['errors' => "Body type is empty or is not 'distributed' or 'notDistributed'"]);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['number'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body number is empty or not a string']);
-        } elseif (!preg_match("/(2C|2D|RW) ([0-9]{3} [0-9]{3} [0-9]{4}) ([0-9])/", $body['number'])) {
+        } elseif (!preg_match("/(2C|2D|RW) ?([0-9]{3} ?[0-9]{3} ?[0-9]{4}) ?([0-9])/", $body['number'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body number is not valid']);
         }
 
-        $number = trim($body['number'], ' ');
-
+        $number = RegisteredMailController::getFormattedRegisteredNumber(['number' => $body['number']]);
         $registeredMail = RegisteredMailModel::getWithResources([
             'select' => ['id', 'registered_mail_resources.res_id', 'received_date', 'deposit_id', 'status'],
             'where'  => ['alt_identifier = ?'],
@@ -264,12 +263,11 @@ class RegisteredMailController
             return $response->withStatus(400)->withJson(['errors' => "Body type is empty or is not 'distributed' or 'notDistributed'"]);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['number'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body number is empty or not a string']);
-        } elseif (!preg_match("/(2C|2D|RW) ([0-9]{3} [0-9]{3} [0-9]{4}) ([0-9])/", $body['number'])) {
+        } elseif (!preg_match("/(2C|2D|RW) ?([0-9]{3} ?[0-9]{3} ?[0-9]{4}) ?([0-9])/", $body['number'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body number is not valid']);
         }
 
-        $body['number'] = trim($body['number'], ' ');
-
+        $body['number'] = RegisteredMailController::getFormattedRegisteredNumber(['number' => $body['number']]);
         $registeredMail = RegisteredMailModel::getWithResources([
             'select' => ['id', 'registered_mail_resources.res_id', 'received_date', 'deposit_id'],
             'where'  => ['alt_identifier = ?'],
@@ -1144,5 +1142,27 @@ class RegisteredMailController
         }
 
         return [];
+    }
+
+    private static function getFormattedRegisteredNumber(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['number']);
+        ValidatorModel::stringType($args, ['number']);
+
+        $number = trim($args['number'], ' ');
+        if ($number[2] != ' ') {
+            $number = substr_replace($number, ' ', 2, 0);
+        }
+        if ($number[6] != ' ') {
+            $number = substr_replace($number, ' ', 6, 0);
+        }
+        if ($number[10] != ' ') {
+            $number = substr_replace($number, ' ', 10, 0);
+        }
+        if ($number[15] != ' ') {
+            $number = substr_replace($number, ' ', 15, 0);
+        }
+
+        return $number;
     }
 }
