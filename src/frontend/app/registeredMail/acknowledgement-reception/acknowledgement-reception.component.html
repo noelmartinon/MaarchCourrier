@@ -78,6 +78,14 @@
                             <mat-header-cell *matHeaderCellDef>{{'lang.returnReason' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element">{{element.returnReason}} </mat-cell>
                         </ng-container>
+                        <ng-container matColumnDef="rollback">
+                            <mat-header-cell *matHeaderCellDef>{{'lang.cancel' | translate}}</mat-header-cell>
+                            <mat-cell *matCellDef="let element">
+                                <button mat-icon-button (click)="rollbackReception(element)" color="primary" [title]="'lang.cancel' | translate">
+                                    <mat-icon class="fa fa-undo fa-2x"></mat-icon>
+                                </button>
+                            </mat-cell>
+                        </ng-container>
 
                         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                         <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>

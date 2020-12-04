@@ -31,6 +31,7 @@ use Resource\controllers\WatermarkController;
 use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
 use Respect\Validation\Validator;
+use setasign\Fpdi\Tcpdf\Fpdi;
 use SignatureBook\controllers\SignatureBookController;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -480,6 +481,72 @@ class AttachmentController
         $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.{$pathInfo['extension']}");
 
         return $response->withHeader('Content-Type', $mimeType);
+    }
+
+    public function getThumbnailContentByPage(Request $request, Response $response, array $args)
+    {
+        if (!Validator::intVal()->validate($args['id'])) {
+            return $response->withStatus(403)->withJson(['errors' => 'id param is not an integer']);
+        }
+
+        $document = AttachmentModel::getById(['select' => [1], 'id' => $args['id']]);
+        if (empty($document)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Document does not exist']);
+        }
+
+        $docserver = DocserverModel::getByDocserverId(['docserverId' => 'TNL_ATTACH', 'select' => ['path_template']]);
+        if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);
+        }
+
+        $adr = AdrModel::getAttachments([
+            'select'  => ['path', 'filename'],
+            'where'   => ['res_id = ?', 'type = ?'],
+            'data'    => [$args['id'], 'TNL' . $args['page']]
+        ]);
+
+        $pathToThumbnail = $docserver['path_template'] . $adr[0]['path'] . $adr[0]['filename'];
+        if (!is_file($pathToThumbnail) || !is_readable($pathToThumbnail)) {
+            $control = ConvertThumbnailController::convertOnePage(['type' => 'attachment', 'resId' => $args['id'], 'page' => $args['page']]);
+            if (!empty($control['errors'])) {
+                return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
+            }
+            $adr = AdrModel::getAttachments([
+                'select'  => ['path', 'filename'],
+                'where'   => ['res_id = ?', 'type = ?'],
+                'data'    => [$args['id'], 'TNL' . $args['page']]
+            ]);
+            $pathToThumbnail = $docserver['path_template'] . $adr[0]['path'] . $adr[0]['filename'];
+            if (!is_file($pathToThumbnail) || !is_readable($pathToThumbnail)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Thumbnail not found on docserver or not readable', 'lang' => 'thumbnailNotFound']);
+            }
+        }
+        $pathToThumbnail = str_replace('#', '/', $pathToThumbnail);
+
+        $fileContent = file_get_contents($pathToThumbnail);
+        if ($fileContent === false) {
+            return $response->withStatus(404)->withJson(['errors' => 'Page not found on docserver']);
+        }
+
+        $base64Content = base64_encode($fileContent);
+
+        $adrPdf = AdrModel::getAttachments([
+            'select'  => ['path', 'filename', 'docserver_id'],
+            'where'   => ['res_id = ?', 'type = ?'],
+            'data'    => [$args['id'], 'PDF']
+        ]);
+
+        $docserver = DocserverModel::getByDocserverId(['docserverId' => $adrPdf[0]['docserver_id'], 'select' => ['path_template']]);
+        if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);
+        }
+        $pathToPdf = $docserver['path_template'] . $adrPdf[0]['path'] . $adrPdf[0]['filename'];
+        $pathToPdf = str_replace('#', '/', $pathToPdf);
+
+        $pdf = new Fpdi('P', 'pt');
+        $pageCount = $pdf->setSourceFile($pathToPdf);
+
+        return $response->withJson(['fileContent' => $base64Content, 'pageCount' => $pageCount]);
     }
     
     public function getFileContent(Request $request, Response $response, array $args)

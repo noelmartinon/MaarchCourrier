@@ -419,6 +419,7 @@ class PreProcessActionController
             if ($signatureBookEnabled == 'ixbus') {
                 $additionalsInfos['ixbus'] = IxbusController::getInitializeDatas($config);
             }
+            $availableResources = [];
             if (in_array($signatureBookEnabled, ['maarchParapheur', 'fastParapheur', 'iParapheur', 'ixbus'])) {
                 if (is_array($data['resources']) && count($data['resources']) == 1) {
                     $resDestination = ResModel::getById([
@@ -432,7 +433,6 @@ class PreProcessActionController
                 } else {
                     $additionalsInfos['destinationId'] = '';
                 }
-
                 foreach ($data['resources'] as $resId) {
                     $noAttachmentsResource = ResModel::getById(['resId' => $resId, 'select' => ['alt_identifier']]);
                     if (empty($noAttachmentsResource['alt_identifier'])) {
@@ -451,7 +451,7 @@ class PreProcessActionController
                     ]);
 
                     $integratedResource = ResModel::get([
-                        'select' => [1],
+                        'select' => ['subject', 'alt_identifier'],
                         'where'  => ['integrations->>\'inSignatureBook\' = \'true\'', 'external_id->>\'signatureBookId\' is null', 'res_id = ?'],
                         'data'   => [$resId]
                     ]);
@@ -485,6 +485,7 @@ class PreProcessActionController
                             if ($attachmentTypes[$value['attachment_type']]) {
                                 $hasSignableAttachment = true;
                             }
+                            $availableResources[] = ['resId' => $resIdAttachment, 'subject' => $value['title'], 'chrono' => $value['identifier'], 'mainDocument' => false];
                         }
                         if (!empty($integratedResource)) {
                             $adrInfo = ConvertPdfController::getConvertedPdfById(['resId' => $resId, 'collId' => 'letterbox_coll']);
@@ -502,6 +503,7 @@ class PreProcessActionController
                                 $additionalsInfos['noAttachment'][] = ['alt_identifier' => $noAttachmentsResource['alt_identifier'], 'res_id' => $resId, 'reason' => 'fileDoesNotExists'];
                                 break;
                             }
+                            $availableResources[] = ['resId' => $resId, 'subject' => $integratedResource['subject'], 'chrono' => $integratedResource['alt_identifier'], 'mainDocument' => true];
                         }
                         if (!$hasSignableAttachment && empty($integratedResource)) {
                             $additionalsInfos['noAttachment'][] = ['alt_identifier' => $noAttachmentsResource['alt_identifier'], 'res_id' => $resId, 'reason' => 'noSignableAttachmentInSignatoryBook'];
@@ -577,11 +579,12 @@ class PreProcessActionController
         $maximumSignRole = !empty($maximumSignRole['param_value_int']) ? $maximumSignRole['param_value_int'] : 0;
 
         return $response->withJson([
-            'signatureBookEnabled' => $signatureBookEnabled,
-            'additionalsInfos'     => $additionalsInfos,
-            'errors'               => $errors,
-            'minimumVisaRole'      => $minimumVisaRole,
-            'maximumSignRole'      => $maximumSignRole
+            'signatureBookEnabled'  => $signatureBookEnabled,
+            'additionalsInfos'      => $additionalsInfos,
+            'errors'                => $errors,
+            'minimumVisaRole'       => $minimumVisaRole,
+            'maximumSignRole'       => $maximumSignRole,
+            'availableResources'    => $availableResources
         ]);
     }
 

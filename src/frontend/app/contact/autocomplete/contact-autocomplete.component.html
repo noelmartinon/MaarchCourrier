@@ -108,10 +108,10 @@
             </div>
         </mat-autocomplete>
     </mat-form-field>
-    <div style="text-align: right;" *ngIf="controlAutocomplete.value.length >= 2 && !controlAutocomplete.disabled">
+    <div style="text-align: right;" *ngIf="controlAutocomplete.value.length >= 2 && !controlAutocomplete.disabled && !inputMode">
         <button mat-button color="warn" (click)="resetAll()" style="font-size: 10px;">{{'lang.deleteAll' | translate}}</button>
     </div>
-    <div class="itemList">
+    <div class="itemList" *ngIf="!inputMode">
         <mat-chip-list *ngIf="controlAutocomplete.value.length > 0" class="mat-chip-list-stacked itemChip"
             color="default">
             <ng-container *ngIf="!loadingValues">

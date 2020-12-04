@@ -324,20 +324,32 @@ class MaarchParapheurController
                     foreach ($aArgs['steps'] as $step) {
                         if ($step['resId'] == $resId && !$step['mainDocument']) {
                             $signaturePositions = null;
-                            if (!empty($step['signaturePositions'])) {
-                                if (is_array($step['signaturePositions'])) {
-                                    $valid = true;
-                                    foreach ($step['signaturePositions'] as $keySP => $signaturePosition) {
-                                        if (empty($signaturePosition['positionX']) || empty($signaturePosition['positionY']) || empty($signaturePosition['page'])) {
-                                            $valid = false;
-                                        }
-                                    }
-                                    if ($valid) {
-                                        $signaturePositions = $step['signaturePositions'];
+                            if (!empty($step['signaturePositions']) && is_array($step['signaturePositions'])) {
+                                $valid = true;
+                                foreach ($step['signaturePositions'] as $keySP => $signaturePosition) {
+                                    if (empty($signaturePosition['positionX']) || empty($signaturePosition['positionY']) || empty($signaturePosition['page'])) {
+                                        $valid = false;
                                     }
                                 }
+                                if ($valid) {
+                                    $signaturePositions = $step['signaturePositions'];
+                                }
                             }
-                            $workflow[(int)$step['sequence']] = ['userId' => $step['externalId'], 'mode' => $step['action'], 'signaturePositions' => $signaturePositions];
+                            $datePositions = null;
+                            if (!empty($step['datePositions']) && is_array($step['datePositions'])) {
+                                $valid = true;
+                                foreach ($step['datePositions'] as $keyDP => $datePosition) {
+                                    if (empty($signaturePosition['positionX']) || empty($signaturePosition['positionY']) || empty($signaturePosition['page'])) {
+                                        $valid = false;
+                                    } elseif (empty($signaturePosition['color']) || empty($signaturePosition['font']) || empty($signaturePosition['format']) || empty($signaturePosition['size'])) {
+                                        $valid = false;
+                                    }
+                                }
+                                if ($valid) {
+                                    $datePositions = $step['datePositions'];
+                                }
+                            }
+                            $workflow[(int)$step['sequence']] = ['userId' => $step['externalId'], 'mode' => $step['action'], 'signaturePositions' => $signaturePositions, 'datePositions' => $datePositions];
                         }
                     }
 
@@ -389,20 +401,32 @@ class MaarchParapheurController
                     foreach ($aArgs['steps'] as $step) {
                         if ($step['resId'] == $aArgs['resIdMaster'] && $step['mainDocument']) {
                             $signaturePositions = null;
-                            if (!empty($step['signaturePositions'])) {
-                                if (is_array($step['signaturePositions'])) {
-                                    $valid = true;
-                                    foreach ($step['signaturePositions'] as $keySP => $signaturePosition) {
-                                        if (empty($signaturePosition['positionX']) || empty($signaturePosition['positionY']) || empty($signaturePosition['page'])) {
-                                            $valid = false;
-                                        }
-                                    }
-                                    if ($valid) {
-                                        $signaturePositions = $step['signaturePositions'];
+                            if (!empty($step['signaturePositions']) && is_array($step['signaturePositions'])) {
+                                $valid = true;
+                                foreach ($step['signaturePositions'] as $keySP => $signaturePosition) {
+                                    if (empty($signaturePosition['positionX']) || empty($signaturePosition['positionY']) || empty($signaturePosition['page'])) {
+                                        $valid = false;
                                     }
                                 }
+                                if ($valid) {
+                                    $signaturePositions = $step['signaturePositions'];
+                                }
                             }
-                            $workflow[(int)$step['sequence']] = ['userId' => $step['externalId'], 'mode' => $step['action'], 'signaturePositions' => $signaturePositions];
+                            $datePositions = null;
+                            if (!empty($step['datePositions']) && is_array($step['datePositions'])) {
+                                $valid = true;
+                                foreach ($step['datePositions'] as $keyDP => $datePosition) {
+                                    if (empty($datePosition['positionX']) || empty($datePosition['positionY']) || empty($datePosition['page'])) {
+                                        $valid = false;
+                                    } elseif (empty($datePosition['color']) || empty($datePosition['font']) || empty($datePosition['format']) || empty($datePosition['size'])) {
+                                        $valid = false;
+                                    }
+                                }
+                                if ($valid) {
+                                    $datePositions = $step['datePositions'];
+                                }
+                            }
+                            $workflow[(int)$step['sequence']] = ['userId' => $step['externalId'], 'mode' => $step['action'], 'signaturePositions' => $signaturePositions, 'datePositions' => $datePositions];
                         }
                     }
 

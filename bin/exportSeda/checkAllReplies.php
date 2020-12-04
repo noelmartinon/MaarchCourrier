@@ -187,7 +187,7 @@ foreach ($unitIdentifiers as $reference => $value) {
 Bt_writeLog(['level' => 'INFO', 'message' => 'End of process']);
 Bt_writeLog(['level' => 'INFO', 'message' => $nbMailsRetrieved.' document(s) retrieved']);
 
-Bt_logInDataBase($nbMailsRetrieved, $err, $nbMailsRetrieved.' replie(s) retrieved from archiving system');
+Bt_logInDataBase($nbMailsRetrieved, 0, $nbMailsRetrieved.' replie(s) retrieved from archiving system');
 Bt_updateWorkBatch();
 
 exit($GLOBALS['exitCode']);

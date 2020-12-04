@@ -18,7 +18,7 @@
     <mat-menu #menu="matMenu" class="docToSignTemplateMenu">
         <button mat-menu-item *ngFor="let resource of resourcesToSign" (click)="openSignaturePosition(resource)"
             style="font-size:12px;">
-            <mat-icon style="height: auto;" class="fas fa-compress-arrows-alt"></mat-icon>
+            <mat-icon style="height: auto;" class="fas fa-compress-arrows-alt" [class.position]="hasPositions(resource)" [class.noPosition]="!hasPositions(resource)"></mat-icon>
             <span>
                 <span color="primary">{{resource.chrono}}</span>&nbsp;- {{resource.title}}
             </span>

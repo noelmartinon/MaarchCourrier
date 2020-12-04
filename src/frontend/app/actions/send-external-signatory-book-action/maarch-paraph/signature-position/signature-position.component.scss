@@ -37,8 +37,9 @@
 
 .mat-tab-link {
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
 }
+
 .mat-tab-link:focus,
 .mat-tab-link:hover,
 .mat-tab-link:active {
@@ -87,8 +88,9 @@
 }
 
 .pageList {
-	position: fixed;
+    position: fixed;
     width: 100px !important;
+
     ::ng-deep.mat-form-field-flex {
         background: white;
     }
@@ -97,7 +99,20 @@
 .signUserName {
     position: absolute;
     font-size: 10px;
-    bottom: -25px;
+    bottom: 5px;
     font-weight: normal;
-    color: $primary;
+    color: white;
+}
+
+.dateBlock {
+    border: dashed 1px $warn;
+    position: absolute;
+    font-weight: normal;
+    white-space: pre;
+    width: auto;
+    padding: 10px;
+}
+
+.selected {
+    background: rgba($secondary, 0.3);
 }

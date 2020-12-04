@@ -214,11 +214,11 @@ $nbMailsPurge = count($resources);
 Bt_writeLog(['level' => 'INFO', 'message' => $nbMailsPurge.' document(s) retrieved']);
 
 if ($nbMailsPurge == 0) {
-    Bt_logInDataBase($nbMailsPurge, $err, $nbMailsPurge.' mail(s) purge');
+    Bt_logInDataBase($nbMailsPurge, 0, $nbMailsPurge.' mail(s) purge');
 } else {
     $resources = array_chunk($resources, 100);
     foreach ($resources as $chunk) {
-        Bt_logInDataBase($nbMailsPurge, $err, $nbMailsPurge.' mail(s) purge : ' . implode(", ", $chunk));
+        Bt_logInDataBase($nbMailsPurge, 0, $nbMailsPurge.' mail(s) purge : ' . implode(", ", $chunk));
     }
 }
 Bt_updateWorkBatch();

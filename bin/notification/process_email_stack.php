@@ -30,8 +30,8 @@ while ($state <> 'END') {
         /**********************************************************************/
         case 'SEND_AN_EMAIL':
             $configuration = \Configuration\models\ConfigurationModel::getByPrivilege(['privilege' => 'admin_email_server', 'select' => ['value']]);
+            $configuration = json_decode($configuration['value'], true);
             foreach ($emails as $key => $email) {
-                $configuration = json_decode($configuration['value'], true);
                 if (empty($configuration)) {
                     Bt_exitBatch(110, 'Configuration admin_email_server is missing');
                 }

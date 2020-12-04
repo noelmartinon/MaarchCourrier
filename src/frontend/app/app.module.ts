@@ -3,6 +3,9 @@ import { NgModule, Injectable } from '@angular/core';
 import { SharedModule } from './app-common.module';
 import { AppRoutingModule } from './app-routing.module';
 
+import localeFr from '@angular/common/locales/fr';
+import { registerLocaleData } from '@angular/common';
+
 import { AdministrationModule } from './administration/administration.module';
 
 import { BrowserModule, HammerGestureConfig, HAMMER_GESTURE_CONFIG } from '@angular/platform-browser';
@@ -126,6 +129,7 @@ import { DevLangComponent } from '@service/debug/dev-lang.component';
 import { AcknowledgementReceptionComponent } from './registeredMail/acknowledgement-reception/acknowledgement-reception.component';
 import { DatePipe } from '@angular/common';
 
+registerLocaleData(localeFr, 'fr-FR');
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
     overrides = <any>{

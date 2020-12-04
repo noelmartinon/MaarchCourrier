@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '20.10.1' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '20.10.2' WHERE id = 'database_version';
 
 DROP VIEW IF EXISTS res_view_letterbox;
 
@@ -357,6 +357,8 @@ DELETE FROM parameters WHERE id = 'minimumVisaRole';
 INSERT INTO parameters (id, description, param_value_int) VALUES ('minimumVisaRole', 'Nombre minimum de viseur dans les circuits de visa (0 pour désactiver)', 0);
 DELETE FROM parameters WHERE id = 'maximumSignRole';
 INSERT INTO parameters (id, description, param_value_int) VALUES ('maximumSignRole', 'Nombre maximum de signataires dans les circuits de visa (0 pour désactiver)', 0);
+
+UPDATE history_batch SET total_errors = 0 WHERE total_errors IS NULL;
 
 /* ORDER ON CHRONO */
 CREATE OR REPLACE FUNCTION order_alphanum(text) RETURNS text AS $$

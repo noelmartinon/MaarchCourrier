@@ -22,6 +22,14 @@
                                     [selected]="currentUser == i && currentPage === sign.page">Page
                                     {{sign.page}}</mat-chip>
                             </ng-container>
+                            <ng-container *ngFor="let date of dateList">
+                                <mat-chip *ngIf="!hasSign(i, date.page) && date.sequence === i" color="primary" style="font-size: 10px;
+                            padding-top: 0px;
+                            padding-bottom: 0px;
+                            min-height: 20px;cursor: pointer;" (click)="goToSignUserPage(i,date.page)"
+                                    [selected]="currentUser == i && currentPage === date.page">Page
+                                    {{date.page}}</mat-chip>
+                            </ng-container>
                         </mat-chip-list>
                     </div>
                 </a>
@@ -34,27 +42,68 @@
                             [position]="{x: (sign.position.positionX*workingAreaWidth)/100, y:(sign.position.positionY*workingAreaHeight)/100}"
                             [style.width.%]="25" [ngDraggable]="currentUser===sign.sequence"
                             (endOffset)="moveSign($event);" [preventDefaultEvent]="false" [bounds]="myBounds"
-                            [inBounds]="true" class="signature" (click)="currentUser!=sign.sequence ? goToSignUserPage(sign.sequence, currentPage) : false">
-                            <button  style="position: absolute;top: -50px;right: 0px;" mat-icon-button color="warn" [title]="'lang.delete' | translate"
-                                (click)="deleteSign(indexSign)">
+                            [inBounds]="true" class="signature"
+                            (click)="currentUser!=sign.sequence ? goToSignUserPage(sign.sequence, currentPage) : false">
+                            <button style="position: absolute;top: -50px;right: 0px;" mat-icon-button color="warn"
+                                [title]="'lang.delete' | translate" (click)="deleteSign(indexSign)">
                                 <mat-icon class="fa fa-trash-alt fa-2x"></mat-icon>
                             </button>
                             <span class="signUserName">{{getUserName(sign.sequence)}}</span>
                             SIGNATURE
                         </div>
                     </ng-container>
+                    <ng-container *ngFor="let date of dateList;let indexSign=index;">
+                        <div *ngIf="date.page === currentPage" [class.signDisabled]="currentUser!==date.sequence"
+                            [position]="{x: (date.position.positionX*workingAreaWidth)/100, y:(date.position.positionY*workingAreaHeight)/100}"
+                            [ngDraggable]="currentUser===date.sequence" (endOffset)="moveDate($event);"
+                            [preventDefaultEvent]="false" [bounds]="myBounds" [inBounds]="true" class="dateBlock"
+                            (click)="currentUser!=date.sequence ? goToSignUserPage(date.sequence, currentPage) : false">
+                            <div style="position: absolute;top: -50px;left: 50%;transform: translateX(-50%);">
+                                <button mat-icon-button (click)="colorPicker.click()">
+                                    <mat-icon class="fas fa-circle" [style.color]="date.color"></mat-icon>
+                                </button>
+                                <input type="color" #colorPicker [(ngModel)]="date.color" name="color" style="display: none;" (click)="$event.stopPropagation()">
+                                <button mat-icon-button color="primary" [matMenuTriggerFor]="dateMenu">
+                                    <mat-icon class="fas fa-spell-check"></mat-icon>
+                                </button>
+                                <mat-menu #dateMenu="matMenu">
+                                    <button mat-menu-item [matMenuTriggerFor]="dateListFormat">Format</button>
+                                    <button mat-menu-item [matMenuTriggerFor]="dateListSize">Taille</button>
+                                </mat-menu>
+                                <mat-menu #dateListFormat="matMenu">
+                                    <button mat-menu-item *ngFor="let format of formatList" (click)="date.format=format" [class.selected]="format === date.format">
+                                        {{today | date:format : undefined : localDate}}
+                                    </button>
+                                </mat-menu>
+                                <mat-menu #dateListSize="matMenu">
+                                    <button mat-menu-item *ngFor="let size of sizes" (click)="date.size=size" [class.selected]="size === date.size">
+                                        {{size}}
+                                    </button>
+                                </mat-menu>
+                                <button mat-icon-button color="warn" [title]="'lang.delete' | translate"
+                                    (click)="deleteDate(indexSign)">
+                                    <mat-icon class="fa fa-trash-alt"></mat-icon>
+                                </button>
+                            </div>
+                            <div [style.color]="date.color" [style.fontSize.px]="date.size">
+                                {{today | date:date.format : undefined : localDate}}</div>
+                        </div>
+                    </ng-container>
                 </div>
-                <mat-form-field *ngIf="!loading" class="pageList" style="position: fixed;">
+                <button mat-mini-fab color="primary" style="position: fixed;margin-top: 10px;margin-left: 10px;" [matMenuTriggerFor]="actionPosMenu" [disabled]="!emptySign() && !emptyDate()">
+                    <mat-icon class="fas fa-plus" style="height: auto"></mat-icon>
+                </button>
+                <mat-menu #actionPosMenu="matMenu">
+                    <button mat-menu-item [disabled]="!emptyDate()" (click)="initDateBlock()">Ajouter le bloc date</button>
+                    <button mat-menu-item [disabled]="!emptySign()" (click)="initSign()">Ajouter la position de signature</button>
+                </mat-menu>
+                <!--<mat-form-field *ngIf="!loading" class="pageList" style="position: fixed;">
                     <span matPrefix>Page :&nbsp;</span>
                     <mat-select [(ngModel)]="currentPage" (selectionChange)="false">
                         <mat-option *ngFor="let page of pages" [value]="page">{{page}}</mat-option>
                     </mat-select>
-                </mat-form-field>
+                </mat-form-field>-->
                 <img class="img-content" [src]="imgContent" (load)="imgLoaded()" />
-                <button *ngIf="emptySign() && !loading" mat-raised-button color="primary" type="button"
-                    style="position: fixed;left: 50%;top: 50%;transform: translate(-50%,-50%);"
-                    (click)="initSign()">Positionner la
-                    signature</button>
             </div>
         </div>
     </div>

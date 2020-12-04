@@ -24,6 +24,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\models\AuthenticationModel;
 use SrcCore\models\CoreConfigModel;
+use SrcCore\models\CurlModel;
 use SrcCore\models\PasswordModel;
 use SrcCore\models\ValidatorModel;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
@@ -68,6 +69,9 @@ class AuthenticationController
             $ssoConfiguration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_sso', 'select' => ['value']]);
             $ssoConfiguration = !empty($ssoConfiguration['value']) ? json_decode($ssoConfiguration['value'], true) : null;
             $authUri          = $ssoConfiguration['url'] ?? null;
+        } elseif ($loggingMethod['id'] == 'openam') {
+            $configuration  = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/openAM.json']);
+            $authUri        = $configuration['connectionUrl'] ?? null;
         }
 
         $return = [
@@ -295,6 +299,15 @@ class AuthenticationController
             }
         } elseif ($loggingMethod['id'] == 'sso') {
             $authenticated = AuthenticationController::ssoConnection();
+            if (!empty($authenticated['errors'])) {
+                return $response->withStatus(401)->withJson(['errors' => $authenticated['errors']]);
+            }
+            $login = strtolower($authenticated['login']);
+            if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Authentication unauthorized']);
+            }
+        } elseif ($loggingMethod['id'] == 'openam') {
+            $authenticated = AuthenticationController::openAMConnection();
             if (!empty($authenticated['errors'])) {
                 return $response->withStatus(401)->withJson(['errors' => $authenticated['errors']]);
             }
@@ -594,6 +607,32 @@ class AuthenticationController
         $url = $provider->getLogoutUrl(['client_id' => $keycloakConfig['clientId'], 'refresh_token' => $accessToken]);
 
         return ['logoutUrl' => $url];
+    }
+
+    private static function openAMConnection()
+    {
+        //TODO OpenAM 13
+        $configuration = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/openAM.json']);
+
+        if (empty($configuration['attributeUrl']) || empty($configuration['cookieName']) || empty($configuration['attributeName'])) {
+            return ['errors' => 'OpenAM configuration missing'];
+        }
+
+        if (empty($_COOKIE[$configuration['cookieName']])) {
+            return ['errors' => 'Authentication Failed : User cookie is not set'];
+        }
+        $curlResponse = CurlModel::execSimple([
+            'url'           => "{$configuration['attributeUrl']}?subjectid={$_COOKIE[$configuration['cookieName']]}&attributenames={$configuration['attributeName']}",
+            'method'        => 'GET',
+        ]);
+
+        $login = $curlResponse['response']['attributes'][0]['values'][0] ?? null;
+
+        if (empty($login)) {
+            return ['errors' => 'Authentication Failed : login not present in response'];
+        }
+
+        return ['login' => $login];
     }
 
     public function getRefreshedToken(Request $request, Response $response)

@@ -87,6 +87,7 @@ $app->delete('/attachments/{id}', \Attachment\controllers\AttachmentController::
 $app->get('/attachments/{id}/content', \Attachment\controllers\AttachmentController::class . ':getFileContent');
 $app->get('/attachments/{id}/originalContent', \Attachment\controllers\AttachmentController::class . ':getOriginalFileContent');
 $app->get('/attachments/{id}/thumbnail', \Attachment\controllers\AttachmentController::class . ':getThumbnailContent');
+$app->get('/attachments/{id}/thumbnail/{page}', \Attachment\controllers\AttachmentController::class . ':getThumbnailContentByPage');
 $app->put('/attachments/{id}/inSendAttachment', \Attachment\controllers\AttachmentController::class . ':setInSendAttachment');
 $app->put('/attachments/{id}/inSignatureBook', \Attachment\controllers\AttachmentController::class . ':setInSignatureBook');
 $app->put('/attachments/{id}/sign', \SignatureBook\controllers\SignatureBookController::class . ':signAttachment');
@@ -400,6 +401,7 @@ $app->get('/resources/{resId}/versionsInformations', \Resource\controllers\ResCo
 $app->get('/resources/{resId}/content/{version}', \Resource\controllers\ResController::class . ':getVersionFileContent');
 $app->get('/resources/{resId}/originalContent', \Resource\controllers\ResController::class . ':getOriginalFileContent');
 $app->get('/resources/{resId}/thumbnail', \Resource\controllers\ResController::class . ':getThumbnailContent');
+$app->get('/resources/{resId}/thumbnail/{page}', \Resource\controllers\ResController::class . ':getThumbnailContentByPage');
 $app->get('/resources/{resId}/isAllowed', \Resource\controllers\ResController::class . ':isAllowedForCurrentUser');
 $app->get('/resources/{resId}/items', \Resource\controllers\ResController::class . ':getItems');
 $app->get('/resources/{resId}/attachments', \Attachment\controllers\AttachmentController::class . ':getByResId');
@@ -661,6 +663,7 @@ $app->get('/registeredMail/ranges/type/{type}/last', \RegisteredMail\controllers
 $app->get('/registeredMail/countries', \RegisteredMail\controllers\RegisteredMailController::class . ':getCountries');
 
 $app->put('/registeredMails/acknowledgement', \RegisteredMail\controllers\RegisteredMailController::class . ':receiveAcknowledgement');
+$app->put('/registeredMails/acknowledgement/rollback', \RegisteredMail\controllers\RegisteredMailController::class . ':rollbackAcknowledgementReception');
 $app->put('/registeredMails/import', \RegisteredMail\controllers\RegisteredMailController::class . ':setImport');
 $app->put('/registeredMails/{resId}', \RegisteredMail\controllers\RegisteredMailController::class . ':update');
 

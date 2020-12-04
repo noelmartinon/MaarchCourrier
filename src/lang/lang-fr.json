@@ -2021,7 +2021,7 @@
     "confirmImportContacts": "Voulez-vous importer <b>{{0}}</b> contacts",
     "importedContacts": "contacts importés",
     "registeredMailNotFound": "Ce recommandé n'existe pas",
-    "registeredMailNotInDepositList": "Ce recommandé n'est pas dans un descriptif de pli",
+    "registeredMailNotInDepositList": "Ce recommandé n'est pas dans un descriptif de pli et n'a donc pas été envoyé",
     "toggleEmptyValues": "Prendre en compte les valeurs vides",
     "emptyValue": "Valeur vide",
     "templateUsed": "Structure utilisée",
@@ -2183,5 +2183,10 @@
     "attachmentsTypes": "Type(s) de pièce(s) jointe(s)",
     "attachmentTypeModification": "Modification d'un type de pièce jointe",
     "iconLetter": "Lettre icône",
-    "noneAlt": "Aucune"
+    "noneAlt": "Aucune",
+    "attachmentTypeUsed": "Ce type est utilisé pour certaines pièces jointes",
+    "receptionCanceled": "Réception annulée",
+    "confirmRescanTitle": "Recommandé non distribué",
+    "confirmRescan": "Ce recommandé a déjà été scanné Non distribué. Voulez-vous le rescanner en distribué ?",
+    "selectReturnReason": "Veuillez sélectionner un motif de retour"
 }

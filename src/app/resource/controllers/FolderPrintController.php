@@ -749,7 +749,7 @@ class FolderPrintController
         $status = StatusModel::getById(['id' => $attachment['status'], 'select' => ['label_status']]);
         $status = $status['label_status'];
 
-        $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id', 'signable']]);
+        $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id', 'label']]);
         $attachmentTypes = array_column($attachmentTypes, 'label', 'type_id');
         $attachmentType = $attachmentTypes[$attachment['attachment_type']];
 

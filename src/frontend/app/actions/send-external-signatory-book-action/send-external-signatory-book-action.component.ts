@@ -13,7 +13,7 @@ import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
-    templateUrl: "send-external-signatory-book-action.component.html",
+    templateUrl: 'send-external-signatory-book-action.component.html',
     styleUrls: ['send-external-signatory-book-action.component.scss'],
 })
 export class SendExternalSignatoryBookActionComponent implements OnInit {
@@ -81,22 +81,6 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.post(`../rest/resourcesList/users/${this.data.userId}/groups/${this.data.groupId}/baskets/${this.data.basketId}/checkExternalSignatoryBook`, { resources: this.data.resIds }).pipe(
                 tap((data: any) => {
-                    // FOR TEST
-                    const test  = [
-                        {
-                            resId: 103,
-                            chrono: 'MAARCH/2020A/2',
-                            subject: 'Réponse à signer',
-                        },
-                        {
-                            resId: 104,
-                            chrono: 'MAARCH/2020A/4',
-                            subject: 'Réponse à signer 2',
-                        }
-                    ];
-                    test.forEach((res: any) => {
-                        this.toggleDocToSign(true, res, false);
-                    });
                     this.additionalsInfos = data.additionalsInfos;
                     if (this.additionalsInfos.attachments.length > 0) {
                         this.signatoryBookEnabled = data.signatureBookEnabled;
@@ -104,6 +88,9 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
                             if (value.mailing) {
                                 this.resourcesMailing.push(value);
                             }
+                        });
+                        data.availableResources.forEach((element: any) => {
+                            this.toggleDocToSign(true, element, false);
                         });
                     }
                     this.errors = data.errors;

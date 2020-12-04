@@ -409,7 +409,7 @@ foreach ($retrievedMails['resLetterbox'] as $resId => $value) {
 Bt_writeLog(['level' => 'INFO', 'message' => 'End of process']);
 Bt_writeLog(['level' => 'INFO', 'message' => $nbMailsRetrieved.' document(s) retrieved']);
 
-Bt_logInDataBase($nbMailsRetrieved, $err, $nbMailsRetrieved.' mail(s) retrieved from signatory book');
+Bt_logInDataBase($nbMailsRetrieved, 0, $nbMailsRetrieved.' mail(s) retrieved from signatory book');
 Bt_updateWorkBatch();
 
 exit($GLOBALS['exitCode']);

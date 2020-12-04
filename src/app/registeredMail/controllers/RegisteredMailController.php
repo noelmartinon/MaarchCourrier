@@ -180,7 +180,7 @@ class RegisteredMailController
         $number = trim($body['number'], ' ');
 
         $registeredMail = RegisteredMailModel::getWithResources([
-            'select' => ['id', 'registered_mail_resources.res_id', 'received_date', 'deposit_id'],
+            'select' => ['id', 'registered_mail_resources.res_id', 'received_date', 'deposit_id', 'status'],
             'where'  => ['alt_identifier = ?'],
             'data'   => [$number]
         ]);
@@ -191,14 +191,23 @@ class RegisteredMailController
         if (empty($registeredMail['deposit_id'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Registered mail is not in a deposit list', 'lang' => 'registeredMailNotInDepositList']);
         }
+
+        $statusDistributed = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'registeredMailDistributedStatus']);
+        $statusDistributed = $statusDistributed['param_value_string'];
+
+        $statusNotDistributed = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'registeredMailNotDistributedStatus']);
+        $statusNotDistributed = $statusNotDistributed['param_value_string'];
+
         if (!empty($registeredMail['received_date'])) {
+            if ($registeredMail['status'] == $statusNotDistributed && $body['type'] == 'distributed') {
+                return $response->withJson(['previousStatus' => $registeredMail['status'], 'canRescan' => true]);
+            }
             return $response->withStatus(400)->withJson(['errors' => 'Registered mail was already received', 'lang' => 'arAlreadyReceived']);
         }
 
         if ($body['type'] == 'distributed') {
             $set = ['received_date' => 'CURRENT_TIMESTAMP'];
-            $status = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'registeredMailDistributedStatus']);
-            $status = $status['param_value_string'];
+            $status = $statusDistributed;
             $info = _REGISTERED_MAIL_DISTRIBUTED;
         } else {
             if (!Validator::stringType()->notEmpty()->validate($body['returnReason'])) {
@@ -214,8 +223,7 @@ class RegisteredMailController
             }
 
             $set = ['received_date' => $body['receivedDate'], 'return_reason' => $body['returnReason']];
-            $status = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'registeredMailNotDistributedStatus']);
-            $status = $status['param_value_string'];
+            $status = $statusNotDistributed;
             $info = _REGISTERED_MAIL_NOT_DISTRIBUTED;
         }
 
@@ -240,6 +248,53 @@ class RegisteredMailController
             'moduleId'  => 'resource',
             'eventId'   => 'registeredMailReceived'
         ]);
+
+        return $response->withJson(['previousStatus' => $registeredMail['status'], 'canRescan' => false]);
+    }
+
+    public function rollbackAcknowledgementReception(Request $request, Response $response, array $args)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'registered_mail_receive_ar', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $body = $request->getParsedBody();
+
+        if (!Validator::stringType()->notEmpty()->validate($body['type']) && !in_array($body['type'], ['distributed', 'notDistributed'])) {
+            return $response->withStatus(400)->withJson(['errors' => "Body type is empty or is not 'distributed' or 'notDistributed'"]);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['number'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body number is empty or not a string']);
+        } elseif (!preg_match("/(2C|2D|RW) ([0-9]{3} [0-9]{3} [0-9]{4}) ([0-9])/", $body['number'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body number is not valid']);
+        }
+
+        $body['number'] = trim($body['number'], ' ');
+
+        $registeredMail = RegisteredMailModel::getWithResources([
+            'select' => ['id', 'registered_mail_resources.res_id', 'received_date', 'deposit_id'],
+            'where'  => ['alt_identifier = ?'],
+            'data'   => [$body['number']]
+        ]);
+        if (empty($registeredMail)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Registered mail number not found', 'lang' => 'registeredMailNotFound']);
+        }
+        $registeredMail = $registeredMail[0];
+        if (empty($registeredMail['received_date'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Registered mail is not received', 'lang' => 'arAlreadyReceived']);
+        }
+
+        RegisteredMailModel::update([
+            'set'   => ['received_date' => null, 'return_reason' => null],
+            'where' => ['id = ?'],
+            'data'  => [$registeredMail['id']]
+        ]);
+        if (!empty($body['status'])) {
+            ResModel::update([
+                'set'   => ['status' => $body['status']],
+                'where' => ['res_id = ?'],
+                'data'  => [$registeredMail['res_id']]
+            ]);
+        }
 
         return $response->withStatus(204);
     }

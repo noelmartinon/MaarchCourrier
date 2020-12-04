@@ -154,4 +154,108 @@ class ConvertThumbnailController
 
         return true;
     }
+
+    public static function convertOnePage(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['resId', 'page', 'type']);
+        ValidatorModel::intVal($args, ['resId', 'page']);
+        ValidatorModel::stringType($args, ['type']);
+
+        if ($args['type'] == 'resource') {
+            $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['filename', 'version']]);
+        } elseif ($args['type'] == 'attachment') {
+            $resource = AttachmentModel::getById(['id' => $args['resId'], 'select' => ['filename']]);
+        }
+
+        if (empty($resource)) {
+            return ['errors' => '[ConvertThumbnail] Resource does not exist'];
+        }
+        if (empty($resource['filename'])) {
+            return true;
+        }
+
+        if ($args['type'] == 'resource') {
+            $convertedDocument = AdrModel::getDocuments([
+                'select'    => ['id', 'docserver_id', 'path', 'filename', 'fingerprint'],
+                'where'     => ['res_id = ?', 'type in (?)', 'version = ?'],
+                'data'      => [$args['resId'], ['PDF', 'SIGN'], $resource['version']],
+                'orderBy'   => ["type='SIGN' DESC"],
+                'limit'     => 1
+            ]);
+            $convertedDocument = $convertedDocument[0] ?? null;
+        } elseif ($args['type'] == 'attachment') {
+            $convertedDocument = AdrModel::getConvertedDocumentById([
+                'select'    => ['id', 'docserver_id','path', 'filename', 'fingerprint'],
+                'resId'     => $args['resId'],
+                'collId'    => 'attachment',
+                'type'      => 'PDF'
+            ]);
+        }
+
+        $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedDocument['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+        if (empty($docserver['path_template']) || !is_dir($docserver['path_template'])) {
+            return ['errors' => 'Docserver does not exist'];
+        }
+
+        $pathToDocument = $docserver['path_template'] . $convertedDocument['path'] . $convertedDocument['filename'];
+        if (!is_file($pathToDocument) || !is_readable($pathToDocument)) {
+            return ['errors' => 'Document not found on docserver or not readable'];
+        }
+
+        $filename = pathinfo($pathToDocument, PATHINFO_FILENAME);
+        $tmpPath = CoreConfigModel::getTmpPath();
+
+        $img = new \Imagick();
+        $img->pingImage($pathToDocument);
+        $pageCount = $img->getNumberImages();
+        if ($pageCount < $args['page']) {
+            return ['errors' => 'Page does not exist'];
+        }
+
+        $fileNameOnTmp = rand() . $filename;
+
+        $convertPage = $args['page'] - 1;
+        $command = "convert -density 500x500 -quality 100 -resize 1000x -background white -alpha remove "
+            . escapeshellarg($pathToDocument) . "[{$convertPage}] " . escapeshellarg("{$tmpPath}{$fileNameOnTmp}.png");
+        exec($command.' 2>&1', $output, $return);
+
+        if ($return !== 0) {
+            return ['errors' => "[ConvertThumbnail] Convert command failed for page {$args['page']} : ".implode(" ", $output)];
+        }
+
+        $content = file_get_contents("{$tmpPath}{$fileNameOnTmp}.png");
+
+        $storeResult = DocserverController::storeResourceOnDocServer([
+            'collId'            => $args['type'] == 'resource' ? 'letterbox_coll' : 'attachments_coll',
+            'docserverTypeId'   => 'TNL',
+            'encodedResource'   => base64_encode($content),
+            'format'            => 'png'
+        ]);
+        if (!empty($storeInfos['errors'])) {
+            return ['errors' => $storeInfos['errors']];
+        }
+
+        unlink("{$tmpPath}{$fileNameOnTmp}.png");
+
+        if ($args['type'] == 'resource') {
+            AdrModel::createDocumentAdr([
+                'resId'         => $args['resId'],
+                'type'          => 'TNL' . $args['page'],
+                'docserverId'   => $storeResult['docserver_id'],
+                'path'          => $storeResult['destination_dir'],
+                'filename'      => $storeResult['file_destination_name'],
+                'version'       => $resource['version']
+            ]);
+        } else {
+            AdrModel::createAttachAdr([
+                'resId'         => $args['resId'],
+                'type'          => 'TNL' . $args['page'],
+                'docserverId'   => $storeResult['docserver_id'],
+                'path'          => $storeResult['destination_dir'],
+                'filename'      => $storeResult['file_destination_name']
+            ]);
+        }
+
+        return true;
+    }
 }

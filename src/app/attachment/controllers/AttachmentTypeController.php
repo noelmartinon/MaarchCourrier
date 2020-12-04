@@ -162,9 +162,9 @@ class AttachmentTypeController
             return $response->withStatus(400)->withJson(['errors' => 'Attachment type does not exist']);
         }
 
-        $attachments = AttachmentModel::get(['select' => 1, 'where' => ['attachment_type = ?', 'status != ?'], 'data' => [$attachmentType['type_id'], 'DEL']]);
+        $attachments = AttachmentModel::get(['select' => [1], 'where' => ['attachment_type = ?', 'status != ?'], 'data' => [$attachmentType['type_id'], 'DEL']]);
         if (!empty($attachments)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Type is used in attachments']);
+            return $response->withStatus(400)->withJson(['errors' => 'Type is used in attachments', 'lang' => 'attachmentTypeUsed']);
         }
 
         AttachmentTypeModel::delete([

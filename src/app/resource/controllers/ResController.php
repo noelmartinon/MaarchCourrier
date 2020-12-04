@@ -19,7 +19,6 @@ use Action\models\ActionModel;
 use Attachment\models\AttachmentModel;
 use Basket\models\BasketModel;
 use Basket\models\GroupBasketModel;
-use Basket\models\RedirectBasketModel;
 use Convert\controllers\ConvertPdfController;
 use Convert\controllers\ConvertThumbnailController;
 use Convert\models\AdrModel;
@@ -45,6 +44,7 @@ use Resource\models\ResourceContactModel;
 use Resource\models\UserFollowedResourceModel;
 use Respect\Validation\Validator;
 use Search\controllers\SearchController;
+use setasign\Fpdi\Tcpdf\Fpdi;
 use Shipping\models\ShippingModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -744,6 +744,70 @@ class ResController extends ResourceControlController
         $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.{$pathInfo['extension']}");
 
         return $response->withHeader('Content-Type', $mimeType);
+    }
+
+    public function getThumbnailContentByPage(Request $request, Response $response, array $args)
+    {
+        if (!Validator::intVal()->validate($args['resId'])) {
+            return $response->withStatus(403)->withJson(['errors' => 'resId param is not an integer']);
+        }
+
+        $document = ResModel::getById(['select' => ['filename', 'version'], 'resId' => $args['resId']]);
+        if (empty($document)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Document does not exist']);
+        }
+
+        $docserver = DocserverModel::getByDocserverId(['docserverId' => 'TNL_MLB', 'select' => ['path_template']]);
+        if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);
+        }
+
+        $adr = AdrModel::getDocuments([
+            'select'  => ['path', 'filename'],
+            'where'   => ['res_id = ?', 'type = ?'],
+            'data'    => [$args['resId'], 'TNL' . $args['page']]
+        ]);
+
+        $pathToThumbnail = $docserver['path_template'] . $adr[0]['path'] . $adr[0]['filename'];
+        if (!is_file($pathToThumbnail) || !is_readable($pathToThumbnail)) {
+            $control = ConvertThumbnailController::convertOnePage(['type' => 'resource', 'resId' => $args['resId'], 'page' => $args['page']]);
+            if (!empty($control['errors'])) {
+                return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
+            }
+            $adr = AdrModel::getDocuments([
+                'select'  => ['path', 'filename'],
+                'where'   => ['res_id = ?', 'type = ?'],
+                'data'    => [$args['resId'], 'TNL' . $args['page']]
+            ]);
+            $pathToThumbnail = $docserver['path_template'] . $adr[0]['path'] . $adr[0]['filename'];
+            if (!is_file($pathToThumbnail) || !is_readable($pathToThumbnail)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Thumbnail not found on docserver or not readable', 'lang' => 'thumbnailNotFound']);
+            }
+        }
+
+        $fileContent = file_get_contents($pathToThumbnail);
+        if ($fileContent === false) {
+            return $response->withStatus(404)->withJson(['errors' => 'Page not found on docserver']);
+        }
+
+        $base64Content = base64_encode($fileContent);
+
+        $adrPdf = AdrModel::getDocuments([
+            'select'  => ['path', 'filename', 'docserver_id'],
+            'where'   => ['res_id = ?', 'type = ?'],
+            'data'    => [$args['resId'], 'PDF']
+        ]);
+        $docserver = DocserverModel::getByDocserverId(['docserverId' => $adrPdf[0]['docserver_id'], 'select' => ['path_template']]);
+        if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);
+        }
+        $pathToPdf = $docserver['path_template'] . $adrPdf[0]['path'] . $adrPdf[0]['filename'];
+        $pathToPdf = str_replace('#', '/', $pathToPdf);
+
+        $pdf = new Fpdi('P', 'pt');
+        $pageCount = $pdf->setSourceFile($pathToPdf);
+
+        return $response->withJson(['fileContent' => $base64Content, 'pageCount' => $pageCount]);
     }
 
     public function getItems(Request $request, Response $response, array $args)

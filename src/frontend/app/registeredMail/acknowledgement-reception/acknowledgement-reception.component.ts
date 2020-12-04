@@ -1,7 +1,7 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import {catchError, debounceTime, tap} from 'rxjs/operators';
+import {catchError, debounceTime, filter, tap} from 'rxjs/operators';
 import { of } from 'rxjs';
 import { NotificationService } from '@service/notification/notification.service';
 import { HeaderService } from '@service/header.service';
@@ -9,6 +9,8 @@ import { FunctionsService } from '@service/functions.service';
 import { AppService } from '@service/app.service';
 import { TranslateService } from '@ngx-translate/core';
 import { MatTableDataSource } from '@angular/material/table';
+import {ConfirmComponent} from '@plugins/modal/confirm.component';
+import {MatDialog} from '@angular/material/dialog';
 
 @Component({
     selector: 'app-acknowledgement-reception',
@@ -31,7 +33,7 @@ export class AcknowledgementReceptionComponent implements OnInit {
     adminFormGroup: FormGroup;
 
     dataSource: MatTableDataSource<any>;
-    displayedColumns = ['type', 'number', 'receivedDate', 'returnReason'];
+    displayedColumns = ['type', 'number', 'receivedDate', 'returnReason', 'rollback'];
 
     returnReasons = [
         this.translate.instant('lang.returnReasonCannotAccess'),
@@ -49,7 +51,8 @@ export class AcknowledgementReceptionComponent implements OnInit {
         public functions: FunctionsService,
         public appService: AppService,
         public translate: TranslateService,
-        private _formBuilder: FormBuilder
+        private _formBuilder: FormBuilder,
+        private dialog: MatDialog,
     ) {
 
     }
@@ -79,7 +82,8 @@ export class AcknowledgementReceptionComponent implements OnInit {
             type: this.type,
             number: this.number,
             receivedDate: this.functions.formatDateObjectToDateString(this.receivedDate),
-            returnReason: this.reason
+            returnReason: this.reason,
+            status: undefined
         };
 
         if (this.functions.empty(this.number)) {
@@ -89,8 +93,12 @@ export class AcknowledgementReceptionComponent implements OnInit {
             return;
         }
         if (this.type === 'notDistributed') {
-            if (!this.adminFormGroup.get('receivedDate').valid || !this.adminFormGroup.get('returnReason').valid) {
+            if (!this.adminFormGroup.get('receivedDate').valid) {
                 this.notify.error(this.translate.instant('lang.fieldsNotValid'));
+                return;
+            }
+            if (!this.adminFormGroup.get('returnReason').valid) {
+                this.notify.error(this.translate.instant('lang.selectReturnReason'));
                 return;
             }
             if (this.reason === this.translate.instant('lang.others') && this.functions.empty(this.reasonOther)) {
@@ -102,25 +110,60 @@ export class AcknowledgementReceptionComponent implements OnInit {
         }
 
         this.http.put('../rest/registeredMails/acknowledgement', data).pipe(
-            tap(() => {
-                this.notify.success(this.translate.instant('lang.arReceived'));
+            tap((resultData: any) => {
+                if (resultData.canRescan) {
+                    data['status'] = resultData.status;
+                    const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirmRescanTitle'), msg: this.translate.instant('lang.confirmRescan') } });
 
-                const receivedList = this.dataSource.data;
-                receivedList.unshift(data);
-                this.dataSource.data = receivedList;
+                    dialogRef.afterClosed().pipe(
+                        filter((dialogData: string) => dialogData === 'ok'),
+                        tap(async () => {
+                            await this.rollbackReception(data);
+                            this.receiveAcknowledgement();
+                        })
+                    ).subscribe();
+                } else {
+                    this.notify.success(this.translate.instant('lang.arReceived'));
 
-                this.number = '';
-                this.receivedDate = this.today;
-                this.reason = '';
-                this.reasonOther = '';
+                    data.status = resultData.status;
+                    const receivedList = this.dataSource.data;
+                    receivedList.unshift(data);
+                    this.dataSource.data = receivedList;
 
-                this.focusRegisteredMailNumber();
+                    this.number = '';
+                    this.receivedDate = this.today;
+                    this.reason = '';
+                    this.reasonOther = '';
+
+                    this.focusRegisteredMailNumber();
+                }
             }),
             catchError((err) => {
                 this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
+    }
+
+    async rollbackReception(data: any) {
+        return new Promise(resolve => {
+            this.http.put('../rest/registeredMails/acknowledgement/rollback', data).pipe(
+                tap(() => {
+                    this.notify.success(this.translate.instant('lang.receptionCanceled'));
+
+                    const receivedList = this.dataSource.data;
+                    receivedList.splice(receivedList.indexOf(data), 1);
+                    this.dataSource.data = receivedList;
+
+                    this.focusRegisteredMailNumber();
+                    resolve(true);
+                }),
+                catchError((err) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     focusRegisteredMailNumber() {
