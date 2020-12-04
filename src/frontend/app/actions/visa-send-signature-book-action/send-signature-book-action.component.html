@@ -46,10 +46,10 @@
                         </li>
                     </ul>
                 </div>
-                <app-visa-workflow *ngIf="data.resIds.length <= 1 || (!noResourceToProcess && data.resIds.length > 1)"
+                <app-visa-workflow *ngIf="!noResourceToProcess"
                     [adminMode]="true" (workflowUpdated)="checkMinMaxVisaSign($event)" #appVisaWorkflow>
                 </app-visa-workflow>
-                <div style="padding-top: 10px;">
+                <div *ngIf="!noResourceToProcess" style="padding-top: 10px;">
                     <app-note-editor #noteEditor [resIds]="data.resIds"></app-note-editor>
                 </div>
             </mat-sidenav-content>

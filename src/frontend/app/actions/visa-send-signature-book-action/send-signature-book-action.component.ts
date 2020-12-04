@@ -34,7 +34,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
     visaNumberCorrect: any = true;
     signNumberCorrect: any = true;
 
-    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
+    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
     @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
 
     constructor(
@@ -46,8 +46,19 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
         public functions: FunctionsService) { }
 
     async ngAfterViewInit(): Promise<void> {
-        if (this.data.resIds.length === 0 && !this.functions.empty(this.data.resource.destination)) {
-            await this.appVisaWorkflow.loadListModel(this.data.resource.destination);
+        if (this.data.resIds.length === 0) {
+            if (this.data.resource.encodedFile === null) {
+                this.noResourceToProcess = true;
+                this.resourcesError = [
+                    {
+                        alt_identifier : this.translate.instant('lang.currentIndexingMail'),
+                        reason : 'noDocumentToSend'
+                    }
+                ];
+            } else if (!this.functions.empty(this.data.resource.destination)) {
+                this.noResourceToProcess = false;
+                await this.appVisaWorkflow.loadListModel(this.data.resource.destination);
+            }
             this.loading = false;
         } else if (this.data.resIds.length > 0) {
             await this.checkSignatureBook();
@@ -167,7 +178,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
         this.http.put(this.data.indexActionRoute, { resource: resId, note: this.noteEditor.getNote() }).pipe(
             tap((data: any) => {
                 if (!data) {
-                    this.dialogRef.close('success');
+                    this.dialogRef.close(this.data.resIds);
                 }
                 if (data && data.errors != null) {
                     this.notify.error(data.errors);
