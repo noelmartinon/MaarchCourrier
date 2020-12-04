@@ -200,6 +200,8 @@ class RegisteredMailController
         if (!empty($registeredMail['received_date'])) {
             if ($registeredMail['status'] == $statusNotDistributed && $body['type'] == 'distributed') {
                 return $response->withJson(['previousStatus' => $registeredMail['status'], 'canRescan' => true]);
+            } elseif ($registeredMail['status'] == $statusDistributed && $body['type'] == 'notDistributed') {
+                return $response->withJson(['previousStatus' => $registeredMail['status'], 'canRescan' => true]);
             }
             return $response->withStatus(400)->withJson(['errors' => 'Registered mail was already received', 'lang' => 'arAlreadyReceived']);
         }

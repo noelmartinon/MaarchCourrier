@@ -2175,7 +2175,8 @@
     "authorizedSignUser": "{{max}} signatories authorized",
     "templateNameMandatory": "Template name mandatory",
     "receptionCanceled": "Reception canceled",
-    "confirmRescanTitle": "Registered mail not distributed",
-    "confirmRescan": "This registerde mail was already scanned Not distributed. Do you want to rescan it to distributed ?",
+    "confirmRescanTitle": "Registered mail already received",
+    "confirmRescanToDistributed": "This registered mail was already scanned Not distributed. Do you want to rescan it to distributed ?",
+    "confirmRescanToNotDistributed": "This registered mail was already scanned distributed. Do you want to rescan it to not distributed ?",
     "selectReturnReason": "Please select a return reason"
 }

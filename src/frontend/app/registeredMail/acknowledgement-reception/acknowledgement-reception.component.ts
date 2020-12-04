@@ -112,8 +112,12 @@ export class AcknowledgementReceptionComponent implements OnInit {
         this.http.put('../rest/registeredMails/acknowledgement', data).pipe(
             tap((resultData: any) => {
                 if (resultData.canRescan) {
-                    data['status'] = resultData.status;
-                    const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirmRescanTitle'), msg: this.translate.instant('lang.confirmRescan') } });
+                    data.status = resultData.previousStatus;
+                    let message = this.translate.instant('lang.confirmRescanToNotDistributed');
+                    if (data.type === 'distributed') {
+                        message = this.translate.instant('lang.confirmRescanToNotDistributed');
+                    }
+                    const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirmRescanTitle'), msg: message } });
 
                     dialogRef.afterClosed().pipe(
                         filter((dialogData: string) => dialogData === 'ok'),
@@ -125,7 +129,7 @@ export class AcknowledgementReceptionComponent implements OnInit {
                 } else {
                     this.notify.success(this.translate.instant('lang.arReceived'));
 
-                    data.status = resultData.status;
+                    data.status = resultData.previousStatus;
                     const receivedList = this.dataSource.data;
                     receivedList.unshift(data);
                     this.dataSource.data = receivedList;
