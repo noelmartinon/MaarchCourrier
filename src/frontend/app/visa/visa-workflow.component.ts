@@ -170,7 +170,7 @@ export class VisaWorkflowComponent implements OnInit {
     }
 
     async loadVisaModelList() {
-        if (this.resId !== null) {
+        if (!this.functions.empty(this.resId)) {
             await this.loadDefaultModel();
         }
 
@@ -424,6 +424,7 @@ export class VisaWorkflowComponent implements OnInit {
                     }),
                     catchError((err: any) => {
                         this.notify.handleSoftErrors(err);
+                        resolve(false);
                         return of(false);
                     })
                 ).subscribe();
@@ -442,6 +443,7 @@ export class VisaWorkflowComponent implements OnInit {
                     }),
                     catchError((err: any) => {
                         this.notify.handleSoftErrors(err);
+                        resolve(false);
                         return of(false);
                     })
                 ).subscribe();
