@@ -130,7 +130,7 @@ class HistoryController
 
         $order = !in_array($queryParams['order'], ['asc', 'desc']) ? '' : $queryParams['order'];
         $orderBy = str_replace(['userLabel'], ['user_id'], $queryParams['orderBy']);
-        $orderBy = !in_array($orderBy, ['event_date', 'user_id', 'info']) ? ['event_date DESC'] : ["{$orderBy} {$order}"];
+        $orderBy = !in_array($orderBy, ['event_date', 'user_id', 'info', 'remote_ip']) ? ['event_date DESC'] : ["{$orderBy} {$order}"];
 
         $history = HistoryModel::get([
             'select'    => ['record_id', 'event_date', 'user_id', 'info', 'remote_ip', 'count(1) OVER()'],
