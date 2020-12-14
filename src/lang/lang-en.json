@@ -2176,7 +2176,7 @@
     "templateNameMandatory": "Template name mandatory",
     "receptionCanceled": "Reception canceled",
     "confirmRescanTitle": "Registered mail already received",
-    "confirmRescanToDistributed": "This registered mail was already scanned Not distributed. Do you want to rescan it to distributed ?",
-    "confirmRescanToNotDistributed": "This registered mail was already scanned distributed. Do you want to rescan it to not distributed ?",
+    "confirmRescanToDistributed": "This registered mail was already scanned «Not distributed». Do you want to rescan it to «Distributed» ?",
+    "confirmRescanToNotDistributed": "This registered mail was already scanned «Distributed». Do you want to rescan it to «Not distributed» ?",
     "selectReturnReason": "Please select a return reason"
 }
