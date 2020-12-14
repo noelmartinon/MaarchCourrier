@@ -434,7 +434,7 @@ class ResourceControlController
                 $documentDate = new \DateTime($body['documentDate']);
                 $tmr = new \DateTime('tomorrow');
                 if ($documentDate > $tmr) {
-                    return ['errors' => "Body documentDate is not a valid date"];
+                    return ['errors' => "Body documentDate cannot be a date in the future"];
                 }
             }
         }
