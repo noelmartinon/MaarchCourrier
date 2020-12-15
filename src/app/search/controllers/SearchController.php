@@ -342,9 +342,12 @@ class SearchController
             } else {
                 $fields = ['subject', 'replace(alt_identifier, \' \', \'\')', 'barcode'];
 
+                $quick = $body['meta']['values'];
+                $quick = str_replace(' ', '', $quick);
+
                 $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
                 $requestDataDocument = AutoCompleteController::getDataForRequest([
-                    'search'        => $body['meta']['values'],
+                    'search'        => $quick,
                     'fields'        => $fields,
                     'where'         => [],
                     'data'          => [],
@@ -355,7 +358,7 @@ class SearchController
                 $fields = ['title', 'identifier'];
                 $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
                 $requestDataAttachment = AutoCompleteController::getDataForRequest([
-                    'search'        => $body['meta']['values'],
+                    'search'        => $quick,
                     'fields'        => $fields,
                     'where'         => [],
                     'data'          => [],

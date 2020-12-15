@@ -48,6 +48,28 @@ class ParameterController
             }
         }
 
+        $parameterIds = array_column($parameters, 'id');
+        if (!in_array('loginpage_message', $parameterIds)) {
+            $parameters[] = [
+                "description"        => null,
+                "id"                 => "loginpage_message",
+                "param_value_date"   => null,
+                "param_value_int"    => null,
+                "param_value_string" => "",
+                "value"              => ""
+            ];
+        }
+        if (!in_array('homepage_message', $parameterIds)) {
+            $parameters[] = [
+                "description"        => null,
+                "id"                 => "homepage_message",
+                "param_value_date"   => null,
+                "param_value_int"    => null,
+                "param_value_string" => "",
+                "value"              => ""
+            ];
+        }
+
         return $response->withJson(['parameters' => $parameters]);
     }
 
