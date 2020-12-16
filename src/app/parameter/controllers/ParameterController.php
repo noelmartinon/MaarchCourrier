@@ -204,7 +204,10 @@ class ParameterController
         } else {
             $parameter = ParameterModel::getById(['id' => $args['id']]);
             if (empty($parameter)) {
-                return $response->withStatus(400)->withJson(['errors' => 'Parameter not found']);
+                if (!in_array($args['id'], ['loginpage_message', 'homepage_message'])) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Parameter not found']);
+                }
+                ParameterModel::create(['id' => $args['id']]);
             }
     
             $check = (empty($body['param_value_int']) || Validator::intVal()->validate($body['param_value_int']));
