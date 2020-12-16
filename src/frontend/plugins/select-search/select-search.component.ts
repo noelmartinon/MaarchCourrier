@@ -177,7 +177,7 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         let group = '';
         let index = 1;
         this.datasClone = JSON.parse(JSON.stringify(this.datas));
-        this.datasClone.forEach((element: any) => {
+        this.datasClone.forEach((element: any, index: number) => {
             if (element.isTitle) {
                 group = `group_${index}`;
                 element.id = group;
@@ -198,30 +198,24 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
 
     // To resfresh filteredDatas if data is modfied
     ngDoCheck(): void {
-        if (JSON.stringify(this.datas) !== JSON.stringify(this.datasClone) && !this.isModelModified) {
-            this.isModelModified = true;
-
+        if (this.datasClone.length !== this.datas.length || this.datasClone.length === 0 && this.isModelModified) {
             this.datasClone = JSON.parse(JSON.stringify(this.datas));
-
-            // if more data => contruct title again
-            if (this.datasClone.length !== this.datas.length) {
-                let group = '';
-                let index = 1;
-                this.datasClone.forEach((element: any) => {
-                    if (element.isTitle) {
-                        group = `group_${index}`;
-                        element.id = group;
-                        index++;
-                    } else {
-                        element.group = group;
-                    }
-                });
-            }
+            let group = '';
+            let index = 1;
+            this.datasClone.forEach((element: any) => {
+                if (element.isTitle) {
+                    group = `group_${index}`;
+                    element.id = group;
+                    index++;
+                } else {
+                    element.group = group;
+                }
+            });
             this.filteredDatas = this.formControlSearch.valueChanges
-                .pipe(
-                    startWith(''),
-                    map(value => this._filter(value))
-                );
+            .pipe(
+                startWith(''),
+                map(value => this._filter(value))
+            );
             this.isModelModified = false;
         }
     }
@@ -400,9 +394,9 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         } else if (typeof value === 'string' && value !== '') {
             const filterValue = this.latinisePipe.transform(value.toLowerCase());
 
-            const group = this.datas.filter((option: any) => option['isTitle'] && this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue)).map((opt: any) => opt.id);
+            const group = this.datasClone.filter((option: any) => option['isTitle'] && this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue)).map((opt: any) => opt.id);
 
-            return this.datas.filter((option: any) => (option['isTitle'] && group.indexOf(option['id']) > -1) || (group.indexOf(option['group']) > -1 || this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue)));
+            return this.datasClone.filter((option: any) => (option['isTitle'] && group.indexOf(option['id']) > -1) || (group.indexOf(option['group']) > -1 || this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue)));
         } else {
             return this.datas;
         }
