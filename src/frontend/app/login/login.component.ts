@@ -102,6 +102,8 @@ export class LoginComponent implements OnInit {
                     this.notify.error(this.translate.instant('lang.accountLocked') + ' ' + this.timeLimit.transform(err.error.date));
                 } else if (this.authService.authMode === 'sso' && err.error.errors === 'Authentication Failed : login not present in header' && !this.functionsService.empty(this.authService.authUri)) {
                     window.location.href = this.authService.authUri;
+                } else if (this.authService.authMode === 'openam' && err.error.errors === 'Authentication Failed : User cookie is not set' && !this.functionsService.empty(this.authService.authUri)) {
+                    window.location.href = this.authService.authUri;
                 } else {
                     this.notify.handleSoftErrors(err);
                 }
@@ -111,7 +113,7 @@ export class LoginComponent implements OnInit {
     }
 
     initConnection() {
-        if (['sso'].indexOf(this.authService.authMode) > -1) {
+        if (['sso', 'openam'].indexOf(this.authService.authMode) > -1) {
             this.loginForm.disable();
             this.loginForm.setValidators(null);
             this.onSubmit();
