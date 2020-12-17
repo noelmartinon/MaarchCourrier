@@ -421,7 +421,7 @@ class ResControllerTest extends TestCase
         $response     = $resController->create($fullRequest, new \Slim\Http\Response());
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Body documentDate is not a valid date', $responseBody['errors']);
+        $this->assertSame('Body documentDate cannot be a date in the future', $responseBody['errors']);
 
         $body = [
             'doctype'     => 102,
