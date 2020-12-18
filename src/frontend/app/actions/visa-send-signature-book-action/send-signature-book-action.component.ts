@@ -4,7 +4,7 @@ import { NotificationService } from '@service/notification/notification.service'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
-import { tap, finalize, catchError } from 'rxjs/operators';
+import {tap, finalize, catchError, exhaustMap} from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FunctionsService } from '@service/functions.service';
 import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
@@ -33,7 +33,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
     visaNumberCorrect: any = true;
     signNumberCorrect: any = true;
 
-    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
+    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
     @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
 
     constructor(
@@ -45,8 +45,20 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
         public functions: FunctionsService) { }
 
     async ngAfterViewInit(): Promise<void> {
-        if (this.data.resIds.length === 0 && !this.functions.empty(this.data.resource.destination)) {
-            await this.appVisaWorkflow.loadListModel(this.data.resource.destination);
+        if (this.data.resIds.length === 0) {
+            if (this.data.resource.encodedFile === null) {
+                this.noResourceToProcess = true;
+                this.resourcesError = [
+                    {
+                        alt_identifier : this.translate.instant('lang.currentIndexingMail'),
+                        reason : 'noDocumentToSend'
+                    }
+                ];
+            } else if (!this.functions.empty(this.data.resource.destination)) {
+                this.noResourceToProcess = false;
+                await this.appVisaWorkflow.loadListModel(this.data.resource.destination);
+                await this.loadMinMaxVisaSignParameters();
+            }
             this.loading = false;
         } else if (this.data.resIds.length > 0) {
             await this.checkSignatureBook();
@@ -166,7 +178,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
         this.http.put(this.data.indexActionRoute, { resource: resId, note: this.noteEditor.getNote() }).pipe(
             tap((data: any) => {
                 if (!data) {
-                    this.dialogRef.close('success');
+                    this.dialogRef.close(this.data.resIds);
                 }
                 if (data && data.errors != null) {
                     this.notify.error(data.errors);
@@ -197,7 +209,27 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
             });
 
             this.visaNumberCorrect = this.minimumVisaRole === 0 || nbVisaRole >= this.minimumVisaRole;
-            this.signNumberCorrect = this.maximumSignRole === 0 || nbSignRole <= this.maximumSignRole;
+            this.signNumberCorrect = this.maximumSignRole === 0 || nbSignRole <= this.maximumSignRole && nbSignRole >= 1;
         }
+    }
+
+    async loadMinMaxVisaSignParameters() {
+        return new Promise((resolve) => {
+            this.http.get('../rest/parameters/minimumVisaRole').pipe(
+                tap((data: any) => {
+                    this.minimumVisaRole = data.parameter.param_value_int;
+                }),
+                exhaustMap(() => this.http.get('../rest/parameters/maximumSignRole')),
+                tap((data: any) => {
+                    this.maximumSignRole = data.parameter.param_value_int;
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    resolve(false);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 }

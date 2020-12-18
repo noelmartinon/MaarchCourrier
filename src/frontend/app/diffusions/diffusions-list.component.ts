@@ -10,6 +10,7 @@ import { AlertComponent } from '../../plugins/modal/alert.component';
 import { MatDialog } from '@angular/material/dialog';
 import { FunctionsService } from '@service/functions.service';
 import { HeaderService } from '@service/header.service';
+import { HistoryDiffusionsListModalComponent } from './history/modal/history-diffusions-list-modal.component';
 
 @Component({
     selector: 'app-diffusions-list',
@@ -326,6 +327,8 @@ export class DiffusionsListComponent implements OnInit {
         }
         this.loading = false;
         this.listinstanceClone = JSON.parse(JSON.stringify(this.getCurrentListinstance()));
+        console.log(this.diffList);
+        
     }
 
     saveListinstance() {
@@ -649,7 +652,7 @@ export class DiffusionsListComponent implements OnInit {
                         id: item.itemSerialId,
                         mode: role,
                         type: item.item_type === 'user' ? 'user' : 'entity'
-                    }
+                    };
                 })
             );
         });
@@ -663,5 +666,9 @@ export class DiffusionsListComponent implements OnInit {
 
     isModified() {
         return JSON.stringify(this.listinstanceClone) !== JSON.stringify(this.getCurrentListinstance());
+    }
+
+    openHistory() {
+        this.dialog.open(HistoryDiffusionsListModalComponent, { panelClass: 'maarch-modal', autoFocus: false, data: { resId: this.resId} });
     }
 }

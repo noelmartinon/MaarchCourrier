@@ -757,6 +757,10 @@ class ResController extends ResourceControlController
             return $response->withStatus(400)->withJson(['errors' => 'Document does not exist']);
         }
 
+        if (!ResController::hasRightByResId(['resId' => [$args['resId']], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
         $docserver = DocserverModel::getByDocserverId(['docserverId' => 'TNL_MLB', 'select' => ['path_template']]);
         if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);

@@ -815,6 +815,10 @@ class SummarySheetController
                     ];
                 }
 
+                if (empty($documents)) {
+                    continue;
+                }
+
                 $pdf->SetY($pdf->GetY() + 40);
                 if (($pdf->GetY() + 37) > $bottomHeight) {
                     $pdf->AddPage();

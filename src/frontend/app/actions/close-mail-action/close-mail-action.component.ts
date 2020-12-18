@@ -3,7 +3,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
-import { tap, exhaustMap, finalize, catchError } from 'rxjs/operators';
+import { tap, exhaustMap, finalize, catchError, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FunctionsService } from '@service/functions.service';
 import { NoteEditorComponent } from '@appRoot/notes/note-editor.component';
@@ -43,7 +43,7 @@ export class CloseMailActionComponent implements OnInit {
     checkIndexingClose() {
         this.http.get(`../rest/actions/${this.data.action.id}`).pipe(
             tap((data: any) => {
-                this.requiredFields = data.action.parameters.requiredFields;
+                this.requiredFields = !this.functions.empty(data.action.parameters.requiredFields) ? data.action.parameters.requiredFields : [];
             }),
             exhaustMap(() => this.http.get(`../rest/customFields`)),
             tap((data: any) => this.customFields = data.customFields),

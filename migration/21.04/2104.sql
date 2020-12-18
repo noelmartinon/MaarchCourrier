@@ -24,3 +24,5 @@ CREATE TABLE attachment_types
     CONSTRAINT attachment_types_unique_key UNIQUE (type_id)
 )
 WITH (OIDS=FALSE);
+
+UPDATE history_batch SET total_errors = 0 WHERE total_errors IS NULL;

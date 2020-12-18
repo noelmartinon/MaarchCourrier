@@ -1,0 +1,10 @@
+<div class="mat-dialog-content-container">
+    <h1 mat-dialog-title>{{'lang.diffusionHistory' | translate}}</h1>
+    <div mat-dialog-content style="padding-top: 0px;">
+        <app-history-diffusions-list [resId]="data.resId" style="display: contents;"></app-history-diffusions-list>
+    </div>
+    <span class="divider-modal"></span>
+    <div mat-dialog-actions class="actions">
+        <button mat-raised-button mat-button [mat-dialog-close]="">{{'lang.close' | translate}}</button>
+    </div>
+</div>

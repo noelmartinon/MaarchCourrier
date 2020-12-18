@@ -48,12 +48,34 @@ class ParameterController
             }
         }
 
+        $parameterIds = array_column($parameters, 'id');
+        if (!in_array('loginpage_message', $parameterIds)) {
+            $parameters[] = [
+                "description"        => null,
+                "id"                 => "loginpage_message",
+                "param_value_date"   => null,
+                "param_value_int"    => null,
+                "param_value_string" => "",
+                "value"              => ""
+            ];
+        }
+        if (!in_array('homepage_message', $parameterIds)) {
+            $parameters[] = [
+                "description"        => null,
+                "id"                 => "homepage_message",
+                "param_value_date"   => null,
+                "param_value_int"    => null,
+                "param_value_string" => "",
+                "value"              => ""
+            ];
+        }
+
         return $response->withJson(['parameters' => $parameters]);
     }
 
     public function getById(Request $request, Response $response, array $aArgs)
     {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_parameters', 'userId' => $GLOBALS['id']])) {
+        if (!in_array($aArgs['id'], ['minimumVisaRole', 'maximumSignRole']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_parameters', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
@@ -182,7 +204,10 @@ class ParameterController
         } else {
             $parameter = ParameterModel::getById(['id' => $args['id']]);
             if (empty($parameter)) {
-                return $response->withStatus(400)->withJson(['errors' => 'Parameter not found']);
+                if (!in_array($args['id'], ['loginpage_message', 'homepage_message'])) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Parameter not found']);
+                }
+                ParameterModel::create(['id' => $args['id']]);
             }
     
             $check = (empty($body['param_value_int']) || Validator::intVal()->validate($body['param_value_int']));

@@ -61,3 +61,8 @@
 <div *ngIf="loading" style="display:flex;">
     <mat-spinner style="margin:auto;"></mat-spinner>
 </div>
+<div style="text-align: right;">
+    <button mat-button color="primary" (click)="openHistory()">
+        {{'lang.showDiffusionHistory' | translate}}
+    </button>
+</div>

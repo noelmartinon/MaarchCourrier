@@ -60,7 +60,11 @@ import { ContactsFormComponent } from './administration/contact/page/form/contac
 import { HistoryComponent } from './history/history.component';
 
 import { DiffusionsListComponent } from './diffusions/diffusions-list.component';
+import { HistoryDiffusionsListComponent } from './diffusions/history/history-diffusions-list.component';
+import { HistoryDiffusionsListModalComponent } from './diffusions/history/modal/history-diffusions-list-modal.component';
 import { VisaWorkflowComponent } from './visa/visa-workflow.component';
+import { HistoryVisaWorkflowComponent } from './visa/history/history-visa-workflow.component';
+import { HistoryVisaWorkflowModalComponent } from './visa/history/modal/history-visa-workflow-modal.component';
 import { AvisWorkflowComponent } from './avis/avis-workflow.component';
 
 import { ContactResourceComponent } from './contact/contact-resource/contact-resource.component';
@@ -115,12 +119,16 @@ import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-to
         PluginSelectSearchComponent,
         PluginSelectAutocompleteSearchComponent,
         DiffusionsListComponent,
+        HistoryDiffusionsListComponent,
+        HistoryDiffusionsListModalComponent,
         DragDropDirective,
         ContactAutocompleteComponent,
         ContactsFormComponent,
         HistoryComponent,
         AddressBanAutocompleteComponent,
         VisaWorkflowComponent,
+        HistoryVisaWorkflowComponent,
+        HistoryVisaWorkflowModalComponent,
         AvisWorkflowComponent,
         MaarchTreeComponent,
         MaarchFlatTreeComponent,
@@ -159,12 +167,16 @@ import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-to
         PluginSelectSearchComponent,
         PluginSelectAutocompleteSearchComponent,
         DiffusionsListComponent,
+        HistoryDiffusionsListComponent,
+        HistoryDiffusionsListModalComponent,
         DragDropDirective,
         ContactAutocompleteComponent,
         ContactsFormComponent,
         HistoryComponent,
         AddressBanAutocompleteComponent,
         VisaWorkflowComponent,
+        HistoryVisaWorkflowComponent,
+        HistoryVisaWorkflowModalComponent,
         AvisWorkflowComponent,
         MaarchTreeComponent,
         MaarchFlatTreeComponent,
@@ -188,6 +200,8 @@ import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-to
     entryComponents: [
         IndexingGroupModalComponent,
         RegisteredMailImportComponent,
+        HistoryDiffusionsListModalComponent,
+        HistoryVisaWorkflowModalComponent,
         AlertComponent,
         ConfirmComponent
     ],

@@ -19,6 +19,25 @@ use SrcCore\models\DatabaseModel;
 
 class ListInstanceHistoryDetailModel
 {
+    public static function get(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['select']);
+        ValidatorModel::arrayType($args, ['select', 'where', 'data', 'orderBy', 'groupBy']);
+        ValidatorModel::intType($args, ['limit']);
+
+        $listInstances = DatabaseModel::select([
+            'select'    => $args['select'],
+            'table'     => ['listinstance_history_details'],
+            'where'     => empty($args['where']) ? [] : $args['where'],
+            'data'      => empty($args['data']) ? [] : $args['data'],
+            'order_by'  => empty($args['orderBy']) ? [] : $args['orderBy'],
+            'groupBy'   => empty($args['groupBy']) ? [] : $args['groupBy'],
+            'limit'     => empty($args['limit']) ? 0 : $args['limit']
+        ]);
+
+        return $listInstances;
+    }
+
     public static function create(array $args)
     {
         ValidatorModel::notEmpty($args, ['listinstance_history_id', 'res_id', 'item_id', 'item_type', 'item_mode', 'added_by_user', 'difflist_type']);

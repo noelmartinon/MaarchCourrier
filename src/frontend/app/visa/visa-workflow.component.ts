@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, ElementRef, ViewChild, Output, EventEmitter} from '@angular/core';
+import { Component, Input, OnInit, ElementRef, ViewChild, Output, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
@@ -11,8 +11,9 @@ import { Observable, of, Subject } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { AddVisaModelModalComponent } from './addVisaModel/add-visa-model-modal.component';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
-import {ActivatedRoute} from "@angular/router";
-import {PrivilegeService} from '@service/privileges.service';
+import { ActivatedRoute } from '@angular/router';
+import { PrivilegeService } from '@service/privileges.service';
+import { HistoryVisaWorkflowModalComponent } from './history/modal/history-visa-workflow-modal.component';
 
 @Component({
     selector: 'app-visa-workflow',
@@ -103,7 +104,7 @@ export class VisaWorkflowComponent implements OnInit {
                 moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
                 this.workflowUpdated.emit(event.container);
             } else {
-                this.notify.error(this.translate.instant('lang.moveVisaUserErr', {value1: this.visaWorkflow.items[event.previousIndex].labelToDisplay}));
+                this.notify.error(this.translate.instant('lang.moveVisaUserErr', { value1: this.visaWorkflow.items[event.previousIndex].labelToDisplay }));
             }
         }
     }
@@ -174,7 +175,7 @@ export class VisaWorkflowComponent implements OnInit {
     }
 
     async loadVisaModelList() {
-        if (this.resId !== null) {
+        if (!this.functions.empty(this.resId)) {
             await this.loadDefaultModel();
         }
 
@@ -297,6 +298,8 @@ export class VisaWorkflowComponent implements OnInit {
                                 difflist_type: 'VISA_CIRCUIT'
                             });
                     });
+                    console.log(this.visaWorkflow);
+
                     this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items))
                 }),
                 finalize(() => {
@@ -406,7 +409,7 @@ export class VisaWorkflowComponent implements OnInit {
     }*/
 
     getNextVisaUser() {
-        let index =  this.getCurrentVisaUserIndex();
+        let index = this.getCurrentVisaUserIndex();
         index = index + 1;
         const realIndex = this.getRealIndex(index);
 
@@ -441,6 +444,7 @@ export class VisaWorkflowComponent implements OnInit {
                     }),
                     catchError((err: any) => {
                         this.notify.handleSoftErrors(err);
+                        resolve(false);
                         return of(false);
                     })
                 ).subscribe();
@@ -459,6 +463,7 @@ export class VisaWorkflowComponent implements OnInit {
                     }),
                     catchError((err: any) => {
                         this.notify.handleSoftErrors(err);
+                        resolve(false);
                         return of(false);
                     })
                 ).subscribe();
@@ -639,5 +644,9 @@ export class VisaWorkflowComponent implements OnInit {
         } else {
             return false;
         }
+    }
+
+    openHistory() {
+        this.dialog.open(HistoryVisaWorkflowModalComponent, { panelClass: 'maarch-modal', autoFocus: false, data: { resId: this.resId } });
     }
 }

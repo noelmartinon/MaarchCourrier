@@ -163,11 +163,10 @@
                                     </mat-form-field>
                                     <button mat-raised-button color="default" type="button"
                                         (click)="$event.stopPropagation();editFile()"
-                                        *ngIf="((creationMode && selectedModelFile) || (!creationMode))"
+                                        *ngIf="((this.creationMode && this.selectedModelFile && this.headerService.user.preferences.documentEdition !== 'java') || (!this.creationMode))"
                                         [disabled]="lockFound">{{'lang.templateEdition' | translate}}</button>
                                     <button mat-raised-button color="default" type="button"
                                         (click)="$event.stopPropagation();uploadSignFileOffice.click()"
-                                        *ngIf="((creationMode && !selectedModelFile) || (!creationMode && !functionsService.empty(template.file.name)) && headerService.user.preferences.documentEdition !== 'java')"
                                         [disabled]="lockFound">{{'lang.importFile' | translate}}</button>
                                 </div>
                                 <iframe *ngIf="templateDocView !== null" [src]="templateDocView"
@@ -262,11 +261,10 @@
                                             </mat-form-field>
                                             <button mat-raised-button color="default" type="button"
                                                 (click)="$event.stopPropagation();editFile()"
-                                                *ngIf="((creationMode && selectedModelFile) || (!creationMode && !functionsService.empty(template.file.paper.name)))"
+                                                *ngIf="((this.creationMode && this.selectedModelFile && this.headerService.user.preferences.documentEdition !== 'java') || (!this.creationMode))"
                                                 [disabled]="lockFound">{{'lang.templateEdition' | translate}}</button>
                                             <button mat-raised-button color="default" type="button"
                                                 (click)="$event.stopPropagation();uploadSignFileOfficeHtml.click()"
-                                                *ngIf="!selectedModelFile || (!creationMode && headerService.user.preferences.documentEdition !== 'java')"
                                                 [disabled]="lockFound">{{'lang.importFile' | translate}}</button>
                                         </div>
                                         <iframe *ngIf="templateDocView !== null" [src]="templateDocView"

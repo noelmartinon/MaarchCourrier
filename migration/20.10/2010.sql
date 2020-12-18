@@ -360,6 +360,18 @@ INSERT INTO parameters (id, description, param_value_int) VALUES ('maximumSignRo
 
 UPDATE history_batch SET total_errors = 0 WHERE total_errors IS NULL;
 
+DO $$ BEGIN
+    IF (SELECT count(id) from parameters where id = 'homepage_message') = 0 THEN
+        INSERT INTO parameters (id, param_value_string) VALUES ('homepage_message', '');
+    END IF;
+END$$;
+DO $$ BEGIN
+    IF (SELECT count(id) from parameters where id = 'loginpage_message') = 0 THEN
+        INSERT INTO parameters (id, param_value_string) VALUES ('loginpage_message', '');
+    END IF;
+END$$;
+
+
 /* ORDER ON CHRONO */
 CREATE OR REPLACE FUNCTION order_alphanum(text) RETURNS text AS $$
 declare

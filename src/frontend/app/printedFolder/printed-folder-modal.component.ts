@@ -333,7 +333,11 @@ export class PrintedFolderModalComponent implements OnInit {
             document: this.mainDocument,
         };
         Object.keys(this.printedFolderElement).forEach(element => {
-            resource[element] = this.selectedPrintedFolderElement[element].value.length === this.printedFolderElement[element].length ? 'ALL' : this.selectedPrintedFolderElement[element].value;
+            if (this.selectedPrintedFolderElement[element].value.length !== this.printedFolderElement[element].length) {
+                resource[element] = this.selectedPrintedFolderElement[element].value;
+            } else {
+                resource[element] = this.selectedPrintedFolderElement[element].value.length > 0 ? 'ALL' : [];
+            }
         });
 
         printedFolder.resources.push(resource);

@@ -489,9 +489,13 @@ class AttachmentController
             return $response->withStatus(403)->withJson(['errors' => 'id param is not an integer']);
         }
 
-        $document = AttachmentModel::getById(['select' => [1], 'id' => $args['id']]);
+        $document = AttachmentModel::getById(['select' => ['res_id_master'], 'id' => $args['id']]);
         if (empty($document)) {
             return $response->withStatus(400)->withJson(['errors' => 'Document does not exist']);
+        }
+
+        if (!ResController::hasRightByResId(['resId' => [$document['res_id_master']], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
         $docserver = DocserverModel::getByDocserverId(['docserverId' => 'TNL_ATTACH', 'select' => ['path_template']]);

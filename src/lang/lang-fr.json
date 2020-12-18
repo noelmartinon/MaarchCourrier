@@ -2186,7 +2186,12 @@
     "noneAlt": "Aucune",
     "attachmentTypeUsed": "Ce type est utilisé pour certaines pièces jointes",
     "receptionCanceled": "Réception annulée",
-    "confirmRescanTitle": "Recommandé non distribué",
-    "confirmRescan": "Ce recommandé a déjà été scanné Non distribué. Voulez-vous le rescanner en distribué ?",
-    "selectReturnReason": "Veuillez sélectionner un motif de retour"
+    "confirmRescanTitle": "Recommandé déjà reçu",
+    "confirmRescanToDistributed": "Ce recommandé a déjà été scanné «Non distribué». Voulez-vous le rescanner en «Distribué» ?",
+    "confirmRescanToNotDistributed": "Ce recommandé a déjà été scanné «Distribué». Voulez-vous le rescanner en «Non distribué» ?",
+    "selectReturnReason": "Veuillez sélectionner un motif de retour",
+    "diffusionHistory": "Historique de diffusion",
+    "showDiffusionHistory": "Afficher l'historique de diffusion",
+    "visaWorkflowHistory": "Historique du circuit de visa",
+    "showVisaWorkflowHistory": "Afficher l'historique du circuit de visa"
 }

@@ -233,8 +233,9 @@ class ResourceListController
                 $queryData[] = "{$cleanSearch[1]}";
                 $queryData[] = "{$cleanSearch[1]}";
             } else {
-                $where[] = '(alt_identifier ilike ? OR unaccent(subject) ilike unaccent(?::text))';
-                $queryData[] = "%{$args['data']['search']}%";
+                $where[] = "(replace(alt_identifier, ' ', '') ilike ? OR unaccent(subject) ilike unaccent(?::text))";
+                $whiteStrippedChrono = str_replace(' ', '', $args['data']['search']);
+                $queryData[] = "%{$whiteStrippedChrono}%";
                 $queryData[] = "%{$args['data']['search']}%";
             }
         }

@@ -272,6 +272,7 @@ class MaarchParapheurController
                     $resId  = $value['res_id'];
                     $collId = 'attachments_coll';
 
+                    $adrInfo = null;
                     if ($value['status'] == 'SIGN') {
                         $signedAttachment = AttachmentModel::get([
                             'select'    => ['res_id'],

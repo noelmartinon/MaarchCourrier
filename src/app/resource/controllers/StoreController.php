@@ -206,7 +206,7 @@ class StoreController
         }
 
         $integrations = ['inSignatureBook' => false, 'inShipping' => false];
-        if (!empty($args['integrations'])) {
+        if (!empty($args['integrations']) && !empty($args['encodedFile'])) {
             $integrations['inSignatureBook'] = !empty($args['integrations']['inSignatureBook']);
             $integrations['inShipping'] = !empty($args['integrations']['inShipping']);
         }

@@ -241,7 +241,7 @@ export class FiltersToolComponent implements OnInit {
                 });
 
                 data.entities.forEach((element: any) => {
-                    if (this.listProperties.entities.map((entity: any) => (entity.id)).indexOf(element.entityId) === -1 && this.listProperties.subEntities === 0) {
+                    if (this.listProperties.entities.map((entity: any) => (entity.id)).indexOf(element.entityId) === -1 && this.listProperties.subEntities.length === 0) {
                         this.stateGroups[3].names.push(
                             {
                                 id: 'entities',
@@ -255,7 +255,7 @@ export class FiltersToolComponent implements OnInit {
                 });
 
                 data.entitiesChildren.forEach((element: any) => {
-                    if (this.listProperties.subEntities.map((entity: any) => (entity.id)).indexOf(element.entityId) === -1 && this.listProperties.entities === 0) {
+                    if (this.listProperties.subEntities.map((entity: any) => (entity.id)).indexOf(element.entityId) === -1 && this.listProperties.entities.length === 0) {
                         this.stateGroups[4].names.push(
                             {
                                 id: 'subEntities',

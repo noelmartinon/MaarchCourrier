@@ -133,3 +133,8 @@
 <div *ngIf="loading" style="display:flex;padding: 10px;">
     <mat-spinner style="margin:auto;"></mat-spinner>
 </div>
+<div style="text-align: right;">
+    <button mat-button color="primary" (click)="openHistory()">
+        {{'lang.showVisaWorkflowHistory' | translate}}
+    </button>
+</div>

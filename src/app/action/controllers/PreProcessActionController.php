@@ -503,7 +503,7 @@ class PreProcessActionController
                                 $additionalsInfos['noAttachment'][] = ['alt_identifier' => $noAttachmentsResource['alt_identifier'], 'res_id' => $resId, 'reason' => 'fileDoesNotExists'];
                                 break;
                             }
-                            $availableResources[] = ['resId' => $resId, 'subject' => $integratedResource['subject'], 'chrono' => $integratedResource['alt_identifier'], 'mainDocument' => true];
+                            $availableResources[] = ['resId' => $resId, 'subject' => $integratedResource[0]['subject'], 'chrono' => $integratedResource[0]['alt_identifier'], 'mainDocument' => true];
                         }
                         if (!$hasSignableAttachment && empty($integratedResource)) {
                             $additionalsInfos['noAttachment'][] = ['alt_identifier' => $noAttachmentsResource['alt_identifier'], 'res_id' => $resId, 'reason' => 'noSignableAttachmentInSignatoryBook'];

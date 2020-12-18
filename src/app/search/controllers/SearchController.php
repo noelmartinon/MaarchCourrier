@@ -327,20 +327,27 @@ class SearchController
         if (!empty($body['meta']) && !empty($body['meta']['values']) && is_string($body['meta']['values'])) {
             if ($body['meta']['values'][0] == '"' && $body['meta']['values'][strlen($body['meta']['values']) - 1] == '"') {
                 $quick = trim($body['meta']['values'], '"');
-                $quickWhere = "subject = ? OR alt_identifier = ? OR barcode = ?";
+                $quickWhere = "subject = ? OR replace(alt_identifier, ' ', '') = ? OR barcode = ?";
                 $quickWhere .= " OR res_id in (select res_id_master from res_attachments where (title = ? OR identifier = ?) and status in ('TRA', 'A_TRA', 'FRZ'))";
+
+                $whiteStrippedChrono = str_replace(' ', '', $quick);
+                $args['searchData'] = array_merge($args['searchData'], [$quick, $whiteStrippedChrono, $quick, $quick, $quick]);
+
                 if (ctype_digit($quick)) {
                     $quickWhere .= ' OR res_id = ?';
                     $args['searchData'][] = $quick;
                 }
 
                 $args['searchWhere'][] = '(' . $quickWhere . ')';
-                $args['searchData'] = array_merge($args['searchData'], [$quick, $quick, $quick, $quick, $quick]);
             } else {
-                $fields = ['subject', 'alt_identifier', 'barcode'];
+                $fields = ['subject', 'replace(alt_identifier, \' \', \'\')', 'barcode'];
+
+                $quick = $body['meta']['values'];
+                $quick = str_replace(' ', '', $quick);
+
                 $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
                 $requestDataDocument = AutoCompleteController::getDataForRequest([
-                    'search'        => $body['meta']['values'],
+                    'search'        => $quick,
                     'fields'        => $fields,
                     'where'         => [],
                     'data'          => [],
@@ -351,7 +358,7 @@ class SearchController
                 $fields = ['title', 'identifier'];
                 $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
                 $requestDataAttachment = AutoCompleteController::getDataForRequest([
-                    'search'        => $body['meta']['values'],
+                    'search'        => $quick,
                     'fields'        => $fields,
                     'where'         => [],
                     'data'          => [],
@@ -368,7 +375,7 @@ class SearchController
                     $args['searchData'] = array_merge($args['searchData'], $requestDataAttachment['data']);
                 }
 
-                if (ctype_digit(trim($body['meta']['values']))) {
+                if (ctype_digit(trim($quick))) {
                     $whereClause[] = 'res_id = ?';
                     $args['searchData'][] = trim($body['meta']['values']);
                 }
@@ -416,8 +423,9 @@ class SearchController
             }
         }
         if (!empty($body['chrono']) && !empty($body['chrono']['values']) && is_string($body['chrono']['values'])) {
-            $args['searchWhere'][] = '(alt_identifier ilike ? OR res_id in (select res_id_master from res_attachments where identifier ilike ? and status in (\'TRA\', \'A_TRA\', \'FRZ\')))';
-            $args['searchData'][] = "%{$body['chrono']['values']}%";
+            $args['searchWhere'][] = '(replace(alt_identifier, \' \', \'\') ilike ? OR res_id in (select res_id_master from res_attachments where identifier ilike ? and status in (\'TRA\', \'A_TRA\', \'FRZ\')))';
+            $whiteStrippedChrono = str_replace(' ', '', $body['chrono']['values']);
+            $args['searchData'][] = "%{$whiteStrippedChrono}%";
             $args['searchData'][] = "%{$body['chrono']['values']}%";
         }
         if (!empty($body['barcode']) && !empty($body['barcode']['values']) && is_string($body['barcode']['values'])) {
