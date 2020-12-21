@@ -87,6 +87,8 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
     data: any[] = [];
     config: any = {};
 
+    documentImported: boolean = false;
+
 
     constructor(
         public http: HttpClient,
@@ -303,6 +305,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                     this.template.file.content = this.getBase64Document(value.target.result);
                 }
 
+                this.documentImported = true;
                 this.getViewTemplateFile();
             };
         }
