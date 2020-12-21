@@ -410,6 +410,20 @@ class SignatureBookController
             return $response->withStatus(404)->withJson(['errors' => 'Signature not found on docserver']);
         }
 
+        $convertedDocument = AdrModel::getDocuments([
+            'select'  => ['docserver_id', 'path', 'filename', 'type', 'fingerprint'],
+            'where'   => ['res_id = ?', 'type in (?)'],
+            'data'    => [$args['resId'], ['PDF', 'SIGN']],
+            'orderBy' => ["type='SIGN' DESC", 'version DESC'],
+            'limit'   => 1
+        ]);
+
+        if (empty($convertedDocument[0])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Converted document does not exist']);
+        } elseif ($convertedDocument[0]['type'] == 'SIGN') {
+            return $response->withStatus(400)->withJson(['errors' => 'Document has already been signed']);
+        }
+
         $document = ResModel::getById(['select' => ['format'], 'resId' => $args['resId']]);
         if (in_array($document['format'], MergeController::OFFICE_EXTENSIONS)) {
             $result = MergeController::mergeAction(['resId' => $args['resId'], 'type' => 'resource']);
@@ -422,20 +436,6 @@ class SignatureBookController
                 'data'   => [$args['resId'], 'TMP'],
                 'limit'  => 1
             ]);
-        } else {
-            $convertedDocument = AdrModel::getDocuments([
-                'select'  => ['docserver_id', 'path', 'filename', 'type', 'fingerprint'],
-                'where'   => ['res_id = ?', 'type in (?)'],
-                'data'    => [$args['resId'], ['PDF', 'SIGN']],
-                'orderBy' => ["type='SIGN' DESC", 'version DESC'],
-                'limit'   => 1
-            ]);
-        }
-
-        if (empty($convertedDocument[0])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Converted document does not exist']);
-        } elseif ($convertedDocument[0]['type'] == 'SIGN') {
-            return $response->withStatus(400)->withJson(['errors' => 'Document has already been signed']);
         }
 
         $convertedDocument = $convertedDocument[0];
