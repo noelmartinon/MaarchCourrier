@@ -662,6 +662,8 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                 content: ''
             }
         };
+
+        this.documentImported = false;
     }
 
     loadTab(event: any) {
