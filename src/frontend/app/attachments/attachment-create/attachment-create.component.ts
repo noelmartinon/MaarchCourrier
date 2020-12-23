@@ -13,6 +13,7 @@ import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { FunctionsService } from '@service/functions.service';
 import { ContactService } from '@service/contact.service';
 import { ContactAutocompleteComponent } from '../../contact/autocomplete/contact-autocomplete.component';
+import {element} from "protractor";
 
 @Component({
     templateUrl: "attachment-create.component.html",
@@ -373,11 +374,19 @@ export class AttachmentCreateComponent implements OnInit {
         Object.keys(this.attachments[i]).forEach(element => {
             if (['title', 'validationDate', 'recipient'].indexOf(element) > -1) {
                 if (element === 'recipient' && this.attachments[i][element].value.length > 0) {
-                    datas['recipientId'] = this.attachments[i][element].value[0].id
-                    datas['recipientType'] = this.attachments[i][element].value[0].type
+                    datas['recipientId'] = this.attachments[i][element].value[0].id;
+                    datas['recipientType'] = this.attachments[i][element].value[0].type;
                 } else {
                     datas['attachment_' + element] = this.attachments[i][element].value;
                 }
+            }
+        });
+        let trKey = 1;
+        this.attachments.forEach((attachment) => {
+            if (attachment.type.value == 'transmission') {
+                datas['transmissionRecipientId' + trKey] = attachment.recipient.value[0].id;
+                datas['transmissionRecipientType' + trKey] = attachment.recipient.value[0].type;
+                trKey++;
             }
         });
         datas['resId'] = this.data.resIdMaster;
@@ -416,9 +425,6 @@ export class AttachmentCreateComponent implements OnInit {
         } else {
             this.asyncIndexTab = index;
         }
-
-
-
     }
 
     removePj(i: number) {

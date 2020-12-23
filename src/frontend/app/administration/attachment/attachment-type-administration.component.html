@@ -44,14 +44,16 @@
                                         <i class="fa fa-question-circle" color="primary" style="cursor: help;"
                                             [title]="'lang.' + idOpt + '_attachmentDesc' | translate"></i>
                                     </div>
-                                    <div mat-line *ngIf="attachmentType[idOpt].value && idOpt==='signable'">
-                                        <mat-form-field>
-                                            <span mattPrefix color="primary">{{'lang.iconLetter' | translate}} : </span>
-                                            <input matInput formControlName="icon" name="icon" type="text" maxlength="2">
-                                        </mat-form-field>
-                                    </div>
                                 </mat-list-item>
                             </mat-list>
+                            <div mat-line>
+                                <mat-form-field style="padding: 0px 16px">
+                                    <span mattPrefix color="primary">{{'lang.iconLetter' | translate}} 
+                                        <i class="fa fa-question-circle" color="primary" style="cursor: help;"
+                                            [title]="'lang.iconLetter_attachmentDesc' | translate"></i> : </span>
+                                    <input matInput formControlName="icon" name="icon" type="text" maxlength="2">
+                                </mat-form-field>
+                            </div>
                         </mat-expansion-panel>
                         <div style="text-align:center;">
                             <button mat-raised-button color="primary" type="submit"

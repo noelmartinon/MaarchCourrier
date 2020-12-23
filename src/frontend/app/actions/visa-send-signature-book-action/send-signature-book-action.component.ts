@@ -32,6 +32,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
     maximumSignRole: any = 0;
     visaNumberCorrect: any = true;
     signNumberCorrect: any = true;
+    atLeastOneSign: any = false;
 
     @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
     @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
@@ -193,23 +194,25 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
     }
 
     isValidAction() {
-        return !this.noResourceToProcess && this.appVisaWorkflow !== undefined && !this.appVisaWorkflow.emptyWorkflow() && !this.appVisaWorkflow.workflowEnd() && this.signNumberCorrect && this.visaNumberCorrect;
+        return !this.noResourceToProcess && this.appVisaWorkflow !== undefined && !this.appVisaWorkflow.emptyWorkflow() && !this.appVisaWorkflow.workflowEnd() && this.signNumberCorrect && this.visaNumberCorrect && this.atLeastOneSign;
     }
 
     checkMinMaxVisaSign(items: any[]) {
-        if (this.maximumSignRole !== 0 || this.minimumVisaRole !== 0) {
-            let nbVisaRole = 0;
-            let nbSignRole = 0;
-            items.forEach(item => {
-                if (item.requested_signature) {
-                    nbSignRole++;
-                } else {
-                    nbVisaRole++;
-                }
-            });
+        let nbVisaRole = 0;
+        let nbSignRole = 0;
+        items.forEach(item => {
+            if (item.requested_signature) {
+                nbSignRole++;
+            } else {
+                nbVisaRole++;
+            }
+        });
 
+        this.atLeastOneSign = nbSignRole >= 1;
+
+        if (this.maximumSignRole !== 0 || this.minimumVisaRole !== 0) {
             this.visaNumberCorrect = this.minimumVisaRole === 0 || nbVisaRole >= this.minimumVisaRole;
-            this.signNumberCorrect = this.maximumSignRole === 0 || nbSignRole <= this.maximumSignRole && nbSignRole >= 1;
+            this.signNumberCorrect = this.maximumSignRole === 0 || nbSignRole <= this.maximumSignRole;
         }
     }
 

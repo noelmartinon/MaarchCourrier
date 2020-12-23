@@ -14,9 +14,14 @@
 
 namespace ContentManagement\controllers;
 
+use Attachment\models\AttachmentModel;
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
+use Convert\controllers\ConvertPdfController;
+use Convert\models\AdrModel;
 use CustomField\models\CustomFieldModel;
+use Docserver\controllers\DocserverController;
+use Docserver\models\DocserverModel;
 use Doctype\models\DoctypeModel;
 use Endroid\QrCode\QrCode;
 use Entity\models\EntityModel;
@@ -342,6 +347,27 @@ class MergeController
             }
         }
 
+        //Transmissions
+        $transmissions = [];
+        if (!empty($args['recipientId']) && !empty($args['recipientType'])) {
+            $currentTransmission = MergeController::formatPerson(['id' => $args['recipientId'], 'type' => $args['recipientType']]);
+            $transmissions['currentContact_lastname'] = $currentTransmission['lastname'] ?? null;
+            $transmissions['currentContact_firstname'] = $currentTransmission['firstname'] ?? null;
+            $transmissions['currentContact_title'] = $currentTransmission['civility'] ?? null;
+            $transmissions['currentContact_function'] = $currentTransmission['function'] ?? null;
+        }
+
+        $trKey = 1;
+        while (!empty($args["transmissionRecipientId{$trKey}"])) {
+            $recipientTransmission = MergeController::formatPerson(['id' => $args["transmissionRecipientId{$trKey}"], 'type' => $args["transmissionRecipientType{$trKey}"]]);
+            $transmissions["lastname{$trKey}"] = $recipientTransmission['lastname'] ?? null;
+            $transmissions["firstname{$trKey}"] = $recipientTransmission['firstname'] ?? null;
+            $transmissions["title{$trKey}"] = $recipientTransmission['civility'] ?? null;
+            $transmissions["function{$trKey}"] = $recipientTransmission['function'] ?? null;
+            ++$trKey;
+        }
+
+
         //Datetime
         $datetime = [
             'date'  => date('d-m-Y'),
@@ -364,6 +390,7 @@ class MergeController
         $dataToBeMerge['contact']               = [];
         $dataToBeMerge['notes']                 = $mergedNote;
         $dataToBeMerge['datetime']              = $datetime;
+        $dataToBeMerge['transmissions']         = $transmissions;
         if (empty($args['inMailing'])) {
             $dataToBeMerge['attachmentRecipient'] = MergeController::formatPerson(['id' => $args['recipientId'], 'type' => $args['recipientType']]);
         }
@@ -502,6 +529,167 @@ class MergeController
         
         $myContent = $TBS->Source;
         return $myContent;
+    }
+
+    public static function mergeAction(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['resId', 'type']);
+        ValidatorModel::intVal($args, ['resId']);
+        ValidatorModel::stringType($args, ['type']);
+
+        $mergeData = [
+            'date'   => date('d/m/Y'),
+            'user'   => UserModel::getLabelledUserById(['id' => $GLOBALS['id']]),
+            'entity' => UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => ['*']])
+        ];
+
+        if ($args['type'] == 'attachment') {
+            $document = AttachmentModel::get([
+                'select' => ['res_id', 'docserver_id', 'path', 'filename', 'res_id_master', 'title', 'fingerprint', 'format', 'identifier', 'attachment_type'],
+                'where'  => ['res_id = ?', 'status not in (?)'],
+                'data'   => [$args['resId'], ['DEL']]
+            ]);
+            $document = $document[0];
+
+            $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+            if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
+                return ['errors' => 'Docserver does not exist'];
+            }
+
+            $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $document['path']) . $document['filename'];
+
+            if (!file_exists($pathToDocument)) {
+                return ['errors' => 'Document not found on docserver'];
+            }
+        } else {
+            $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename', 'category_id', 'version', 'fingerprint', 'format', 'version'], 'resId' => $args['resId']]);
+            if (empty($document['filename'])) {
+                return ['errors' => 'Document does not exist'];
+            }
+
+            $convertedDocument = AdrModel::getDocuments([
+                'select' => ['docserver_id', 'path', 'filename', 'fingerprint'],
+                'where'  => ['res_id = ?', 'type = ?', 'version = ?'],
+                'data'   => [$args['resId'], 'SIGN', $document['version']],
+                'limit'  => 1
+            ]);
+            $document = $convertedDocument[0] ?? $document;
+
+            $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+            if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
+                return ['errors' => 'Docserver does not exist'];
+            }
+
+            $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $document['path']) . $document['filename'];
+        }
+
+        $tbs = new \clsTinyButStrong();
+        $tbs->NoErr = true;
+        $tbs->PlugIn(TBS_INSTALL, OPENTBS_PLUGIN);
+
+        $pathInfo = pathinfo($pathToDocument);
+        $extension = $pathInfo['extension'];
+        $filename = $pathInfo['fullFilename'];
+
+        if ($extension == 'odt') {
+            $tbs->LoadTemplate($pathToDocument, OPENTBS_ALREADY_UTF8);
+        } elseif ($extension == 'docx') {
+            $tbs->LoadTemplate($pathToDocument, OPENTBS_ALREADY_UTF8);
+            $templates = ['word/header1.xml', 'word/header2.xml', 'word/header3.xml', 'word/footer1.xml', 'word/footer2.xml', 'word/footer3.xml'];
+            foreach ($templates as $template) {
+                if ($tbs->Plugin(OPENTBS_FILEEXISTS, $template)) {
+                    $tbs->LoadTemplate("#{$template}", OPENTBS_ALREADY_UTF8);
+                    $tbs->MergeField('signature', $mergeData);
+                }
+            }
+            $tbs->PlugIn(OPENTBS_SELECT_MAIN);
+        } else {
+            $tbs->LoadTemplate($pathToDocument, OPENTBS_ALREADY_UTF8);
+        }
+
+        $tbs->MergeField('signature', $mergeData);
+
+        if (in_array($extension, MergeController::OFFICE_EXTENSIONS)) {
+            $tbs->Show(OPENTBS_STRING);
+        } else {
+            $tbs->Show(TBS_NOTHING);
+        }
+
+        if ($args['type'] == 'attachment') {
+            $tmpPath = CoreConfigModel::getTmpPath();
+            $fileNameOnTmp = rand() . $filename;
+            file_put_contents($tmpPath . $fileNameOnTmp . '.' . $extension, $tbs->Source);
+
+            ConvertPdfController::convertInPdf(['fullFilename' => $tmpPath.$fileNameOnTmp.'.'.$extension]);
+
+            if (!file_exists($tmpPath.$fileNameOnTmp.'.pdf')) {
+                return ['errors' => 'Merged document conversion failed'];
+            }
+
+            $content = file_get_contents($tmpPath.$fileNameOnTmp.'.pdf');
+
+            $storeResult = DocserverController::storeResourceOnDocServer([
+                'collId'          => 'attachments_coll',
+                'docserverTypeId' => 'CONVERT',
+                'encodedResource' => base64_encode($content),
+                'format'          => 'pdf'
+            ]);
+
+            if (!empty($storeResult['errors'])) {
+                return ['errors' => $storeResult['errors']];
+            }
+
+            unlink($tmpPath.$fileNameOnTmp.'.'.$extension);
+            unlink($tmpPath.$fileNameOnTmp.'.pdf');
+
+            AdrModel::createAttachAdr([
+                'resId'       => $args['resId'],
+                'type'        => 'TMP',
+                'docserverId' => $storeResult['docserver_id'],
+                'path'        => $storeResult['destination_dir'],
+                'filename'    => $storeResult['file_destination_name'],
+                'fingerprint' => $storeResult['fingerPrint']
+            ]);
+        } else {
+            $tmpPath = CoreConfigModel::getTmpPath();
+            $fileNameOnTmp = rand() . $document['filename'];
+
+            file_put_contents($tmpPath . $fileNameOnTmp . '.' . $extension, $tbs->Source);
+
+            ConvertPdfController::convertInPdf(['fullFilename' => $tmpPath.$fileNameOnTmp.'.'.$extension]);
+
+            if (!file_exists($tmpPath.$fileNameOnTmp.'.pdf')) {
+                return ['errors' => 'Merged document conversion failed'];
+            }
+
+            $content = file_get_contents($tmpPath.$fileNameOnTmp.'.pdf');
+
+            $storeResult = DocserverController::storeResourceOnDocServer([
+                'collId'          => 'letterbox_coll',
+                'docserverTypeId' => 'CONVERT',
+                'encodedResource' => base64_encode($content),
+                'format'          => 'pdf'
+            ]);
+
+            if (!empty($storeResult['errors'])) {
+                return ['errors' => $storeResult['errors']];
+            }
+
+            unlink($tmpPath.$fileNameOnTmp.'.'.$extension);
+            unlink($tmpPath.$fileNameOnTmp.'.pdf');
+
+            AdrModel::createDocumentAdr([
+                'resId'       => $args['resId'],
+                'type'        => 'TMP',
+                'docserverId' => $storeResult['docserver_id'],
+                'path'        => $storeResult['destination_dir'],
+                'filename'    => $storeResult['file_destination_name'],
+                'version'     => $document['version'] + 1,
+                'fingerprint' => $storeResult['fingerPrint']
+            ]);
+        }
+
+        return true;
     }
 
     private static function formatPerson(array $args)

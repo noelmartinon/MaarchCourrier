@@ -796,7 +796,6 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     editAttachment() {
-
         this.triggerEvent.emit('setData');
 
         if (this.editor.mode === 'onlyoffice') {

@@ -21,6 +21,7 @@ use Basket\models\GroupBasketModel;
 use Basket\models\RedirectBasketModel;
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
+use ContentManagement\controllers\MergeController;
 use Convert\controllers\ConvertPdfController;
 use Convert\models\AdrModel;
 use Docserver\controllers\DocserverController;
@@ -414,16 +415,31 @@ class SignatureBookController
         }
 
         $convertedDocument = AdrModel::getDocuments([
-            'select'    => ['docserver_id', 'path', 'filename', 'type', 'fingerprint'],
-            'where'     => ['res_id = ?', 'type in (?)'],
-            'data'      => [$args['resId'], ['PDF', 'SIGN']],
-            'orderBy'   => ["type='SIGN' DESC", 'version DESC'],
-            'limit'     => 1
+            'select'  => ['docserver_id', 'path', 'filename', 'type', 'fingerprint'],
+            'where'   => ['res_id = ?', 'type in (?)'],
+            'data'    => [$args['resId'], ['PDF', 'SIGN']],
+            'orderBy' => ["type='SIGN' DESC", 'version DESC'],
+            'limit'   => 1
         ]);
+
         if (empty($convertedDocument[0])) {
             return $response->withStatus(400)->withJson(['errors' => 'Converted document does not exist']);
         } elseif ($convertedDocument[0]['type'] == 'SIGN') {
             return $response->withStatus(400)->withJson(['errors' => 'Document has already been signed']);
+        }
+
+        $document = ResModel::getById(['select' => ['format'], 'resId' => $args['resId']]);
+        if (in_array($document['format'], MergeController::OFFICE_EXTENSIONS)) {
+            $result = MergeController::mergeAction(['resId' => $args['resId'], 'type' => 'resource']);
+            if (!empty($result['errors'])) {
+                return $response->withStatus(400)->withJson(['errors' => $result['errors']]);
+            }
+            $convertedDocument = AdrModel::getDocuments([
+                'select' => ['docserver_id', 'path', 'filename', 'type', 'fingerprint'],
+                'where'  => ['res_id = ?', 'type = ?'],
+                'data'   => [$args['resId'], 'TMP'],
+                'limit'  => 1
+            ]);
         }
 
         $convertedDocument = $convertedDocument[0];
@@ -454,6 +470,11 @@ class SignatureBookController
             return $response->withStatus(400)->withJson(['errors' => 'Signature failed : ' . implode($output)]);
         }
         unlink($tmpPath.$convertedDocument['filename']);
+
+        if (in_array($document['format'], MergeController::OFFICE_EXTENSIONS)) {
+            unlink($pathToDocument);
+            AdrModel::deleteDocumentAdr(['where' => ['res_id = ?', 'type = ?'], 'data' => [$args['resId'], 'TMP']]);
+        }
 
         $storeResult = DocserverController::storeResourceOnDocServer([
             'collId'            => 'letterbox_coll',
@@ -550,7 +571,7 @@ class SignatureBookController
             return $response->withStatus(400)->withJson(['errors' => 'Route id is not an integer']);
         }
 
-        $attachment = AttachmentModel::getById(['id' => $args['id'], 'select' => ['res_id_master', 'title', 'typist', 'identifier', 'recipient_id', 'recipient_type']]);
+        $attachment = AttachmentModel::getById(['id' => $args['id'], 'select' => ['res_id_master', 'title', 'typist', 'identifier', 'recipient_id', 'recipient_type', 'format']]);
         if (empty($attachment)) {
             return $response->withStatus(403)->withJson(['errors' => 'Attachment out of perimeter']);
         } elseif (!SignatureBookController::isResourceInSignatureBook(['resId' => $attachment['res_id_master'], 'userId' => $GLOBALS['id']])) {
@@ -580,11 +601,24 @@ class SignatureBookController
             return $response->withStatus(404)->withJson(['errors' => 'Signature not found on docserver']);
         }
 
-        $convertedDocument = AdrModel::getAttachments([
-            'select'    => ['docserver_id', 'path', 'filename', 'type', 'fingerprint'],
-            'where'     => ['res_id = ?', 'type = ?'],
-            'data'      => [$args['id'], 'PDF']
-        ]);
+        if (in_array($attachment['format'], MergeController::OFFICE_EXTENSIONS)) {
+            $result = MergeController::mergeAction(['resId' => $args['id'], 'type' => 'attachment']);
+            if (!empty($result['errors'])) {
+                return $response->withStatus(400)->withJson(['errors' => $result['errors']]);
+            }
+            $convertedDocument = AdrModel::getAttachments([
+                'select' => ['docserver_id', 'path', 'filename', 'type', 'fingerprint'],
+                'where'  => ['res_id = ?', 'type = ?'],
+                'data'   => [$args['id'], 'TMP']
+            ]);
+        } else {
+            $convertedDocument = AdrModel::getAttachments([
+                'select' => ['docserver_id', 'path', 'filename', 'type', 'fingerprint'],
+                'where'  => ['res_id = ?', 'type = ?'],
+                'data'   => [$args['id'], 'PDF']
+            ]);
+        }
+
         if (empty($convertedDocument[0])) {
             return $response->withStatus(400)->withJson(['errors' => 'Converted document does not exist']);
         }
@@ -618,6 +652,11 @@ class SignatureBookController
             return $response->withStatus(400)->withJson(['errors' => 'Signature failed : ' . implode($output)]);
         }
         unlink($tmpPath.$convertedDocument['filename']);
+
+        if (in_array($attachment['format'], MergeController::OFFICE_EXTENSIONS)) {
+            unlink($pathToDocument);
+            AdrModel::deleteAttachmentAdr(['where' => ['res_id = ?', 'type = ?'], 'data' => [$args['id'], 'TMP']]);
+        }
 
         $data = [
             'title'                    => $attachment['title'],

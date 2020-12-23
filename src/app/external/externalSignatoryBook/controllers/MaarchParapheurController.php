@@ -340,9 +340,9 @@ class MaarchParapheurController
                             if (!empty($step['datePositions']) && is_array($step['datePositions'])) {
                                 $valid = true;
                                 foreach ($step['datePositions'] as $keyDP => $datePosition) {
-                                    if (empty($signaturePosition['positionX']) || empty($signaturePosition['positionY']) || empty($signaturePosition['page'])) {
+                                    if (empty($datePosition['positionX']) || empty($datePosition['positionY']) || empty($datePosition['page'])) {
                                         $valid = false;
-                                    } elseif (empty($signaturePosition['color']) || empty($signaturePosition['font']) || empty($signaturePosition['format']) || empty($signaturePosition['size'])) {
+                                    } elseif (empty($datePosition['color']) || empty($datePosition['font']) || empty($datePosition['format']) || empty($datePosition['size'])) {
                                         $valid = false;
                                     }
                                 }

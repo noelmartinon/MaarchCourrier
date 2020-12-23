@@ -4,13 +4,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FunctionsService } from '@service/functions.service';
-import { tap, exhaustMap, map, startWith, catchError, finalize, filter, debounceTime } from 'rxjs/operators';
+import { tap, exhaustMap, map, startWith, catchError, finalize, filter } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { LatinisePipe, ScanPipe } from 'ngx-pipes';
-import { Observable, of, Subject } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { AddVisaModelModalComponent } from './addVisaModel/add-visa-model-modal.component';
-import { ConfirmComponent } from '../../plugins/modal/confirm.component';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { ActivatedRoute } from '@angular/router';
 import { PrivilegeService } from '@service/privileges.service';
 import { HistoryVisaWorkflowModalComponent } from './history/modal/history-visa-workflow-modal.component';
@@ -39,6 +39,7 @@ export class VisaWorkflowComponent implements OnInit {
     filteredPrivateModels: Observable<string[]>;
 
     loading: boolean = false;
+    hasHistory: boolean = false;
     visaModelListNotLoaded: boolean = true;
     data: any;
 
@@ -91,7 +92,7 @@ export class VisaWorkflowComponent implements OnInit {
 
     ngOnInit(): void {
         if (!this.functions.empty(this.resId) && !this.loadedInConstructor) {
-            //this.initFilterVisaModelList();
+            // this.initFilterVisaModelList();
             this.loadWorkflow(this.resId);
         } else {
             this.loading = false;
@@ -114,9 +115,9 @@ export class VisaWorkflowComponent implements OnInit {
 
         this.visaWorkflow.items = [];
 
-        let route = this.linkedToMaarchParapheur === true ? `../rest/listTemplates/entities/${entityId}?type=visaCircuit&maarchParapheur=true` : `../rest/listTemplates/entities/${entityId}?type=visaCircuit`;
+        const route = this.linkedToMaarchParapheur === true ? `../rest/listTemplates/entities/${entityId}?type=visaCircuit&maarchParapheur=true` : `../rest/listTemplates/entities/${entityId}?type=visaCircuit`;
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.get(route)
                 .subscribe((data: any) => {
                     if (data.listTemplates[0]) {
@@ -124,8 +125,9 @@ export class VisaWorkflowComponent implements OnInit {
                             return {
                                 ...item,
                                 item_entity: item.descriptionToDisplay,
-                                requested_signature: item.item_mode !== 'visa'
-                            }
+                                requested_signature: item.item_mode !== 'visa',
+                                currentRole: item.item_mode
+                            };
                         });
                     }
                     this.visaWorkflow.items.forEach((element: any, key: number) => {
@@ -152,8 +154,9 @@ export class VisaWorkflowComponent implements OnInit {
                             entity: user.otherInfo,
                             type: 'user',
                             hasPrivilege: true,
-                            isValid: true
-                        }
+                            isValid: true,
+                            currentRole: 'visa'
+                        };
                     });
                     return data;
                 }),
@@ -188,7 +191,7 @@ export class VisaWorkflowComponent implements OnInit {
                             title: item.title,
                             label: item.title,
                             type: 'entity'
-                        }
+                        };
                     }));
 
                     this.visaTemplates.private = data.circuits.filter((item: any) => item.private).map((item: any) => {
@@ -197,7 +200,7 @@ export class VisaWorkflowComponent implements OnInit {
                             title: item.title,
                             label: item.title,
                             type: 'entity'
-                        }
+                        };
                     });
                     this.filteredPublicModels = this.searchVisaSignUser.valueChanges
                         .pipe(
@@ -287,20 +290,21 @@ export class VisaWorkflowComponent implements OnInit {
         this.resId = resId;
         this.loading = true;
         this.visaWorkflow.items = [];
-        return new Promise((resolve, reject) => {
-            this.http.get("../rest/resources/" + resId + "/visaCircuit").pipe(
+        return new Promise((resolve) => {
+            this.http.get('../rest/resources/' + resId + '/visaCircuit').pipe(
                 filter((data: any) => !this.functions.empty(data.circuit)),
                 tap((data: any) => {
                     data.circuit.forEach((element: any) => {
                         this.visaWorkflow.items.push(
                             {
                                 ...element,
-                                difflist_type: 'VISA_CIRCUIT'
+                                difflist_type: 'VISA_CIRCUIT',
+                                currentRole: element.requested_signature ? 'sign' : 'visa'
                             });
                     });
-                    console.log(this.visaWorkflow);
+                    this.hasHistory = data.hasHistory;
 
-                    this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items))
+                    this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
                 }),
                 finalize(() => {
                     this.loading = false;
@@ -317,7 +321,7 @@ export class VisaWorkflowComponent implements OnInit {
     loadDefaultWorkflow(resId: number) {
         this.loading = true;
         this.visaWorkflow.items = [];
-        this.http.get("../rest/resources/" + resId + "/defaultCircuit?circuit=visaCircuit").pipe(
+        this.http.get('../rest/resources/' + resId + '/defaultCircuit?circuit=visaCircuit').pipe(
             filter((data: any) => !this.functions.empty(data.circuit)),
             tap((data: any) => {
                 data.circuit.items.forEach((element: any) => {
@@ -328,7 +332,7 @@ export class VisaWorkflowComponent implements OnInit {
                             difflist_type: 'VISA_CIRCUIT'
                         });
                 });
-                this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items))
+                this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -355,7 +359,7 @@ export class VisaWorkflowComponent implements OnInit {
                         'isValid': true
                     };
                     this.visaWorkflow.items.push(user);
-                    this.http.get("../rest/maarchParapheur/user/" + element.userId + "/picture")
+                    this.http.get('../rest/maarchParapheur/user/' + element.userId + '/picture')
                         .subscribe((data: any) => {
                             this.visaWorkflow.items.filter((item: any) => item.id === element.userId)[0].picture = data.picture;
                         }, (err: any) => {
@@ -379,6 +383,7 @@ export class VisaWorkflowComponent implements OnInit {
 
     changeRole(i: number) {
         this.visaWorkflow.items[i].requested_signature = !this.visaWorkflow.items[i].requested_signature;
+        this.visaWorkflow.items[i].currentRole = this.visaWorkflow.items[i].requested_signature ? 'sign' : 'visa';
         this.workflowUpdated.emit(this.visaWorkflow.items);
     }
 
@@ -417,7 +422,7 @@ export class VisaWorkflowComponent implements OnInit {
     }
 
     getLastVisaUser() {
-        let arrOnlyProcess = this.visaWorkflow.items.filter((item: any) => !this.functions.empty(item.process_date) && item.isValid);
+        const arrOnlyProcess = this.visaWorkflow.items.filter((item: any) => !this.functions.empty(item.process_date) && item.isValid);
 
         return !this.functions.empty(arrOnlyProcess[arrOnlyProcess.length - 1]) ? arrOnlyProcess[arrOnlyProcess.length - 1] : '';
     }
@@ -477,6 +482,7 @@ export class VisaWorkflowComponent implements OnInit {
     addItemToWorkflow(item: any, maarchParapheurMode = false) {
         return new Promise((resolve, reject) => {
             if (maarchParapheurMode) {
+                const requestedSignature = !this.functions.empty(item.requested_signature) ? item.requested_signature : false;
                 this.visaWorkflow.items.push({
                     item_id: item.id,
                     item_type: 'user',
@@ -485,9 +491,10 @@ export class VisaWorkflowComponent implements OnInit {
                     externalId: item.externalId,
                     difflist_type: 'VISA_CIRCUIT',
                     signatory: !this.functions.empty(item.signatory) ? item.signatory : false,
-                    requested_signature: !this.functions.empty(item.requested_signature) ? item.requested_signature : false,
+                    requested_signature: requestedSignature,
                     hasPrivilege: true,
-                    isValid: true
+                    isValid: true,
+                    currentRole: requestedSignature ? 'sign' : 'visa'
                 });
                 if (this.linkedToMaarchParapheur) {
                     this.getMaarchParapheurUserAvatar(item.externalId.maarchParapheur, this.visaWorkflow.items.length - 1);
@@ -495,6 +502,7 @@ export class VisaWorkflowComponent implements OnInit {
                 this.searchVisaSignUser.reset();
                 resolve(true);
             } else if (item.type === 'user') {
+                const requestedSignature = !this.functions.empty(item.requested_signature) ? item.requested_signature : false;
                 this.visaWorkflow.items.push({
                     item_id: item.id,
                     item_type: 'user',
@@ -503,9 +511,10 @@ export class VisaWorkflowComponent implements OnInit {
                     externalId: !this.functions.empty(item.externalId) ? item.externalId : null,
                     difflist_type: 'VISA_CIRCUIT',
                     signatory: !this.functions.empty(item.signatory) ? item.signatory : false,
-                    requested_signature: !this.functions.empty(item.requested_signature) ? item.requested_signature : false,
+                    requested_signature: requestedSignature,
                     hasPrivilege: item.hasPrivilege,
-                    isValid: item.isValid
+                    isValid: item.isValid,
+                    currentRole: requestedSignature ? 'sign' : 'visa'
                 });
 
                 if (this.linkedToMaarchParapheur) {
@@ -530,8 +539,9 @@ export class VisaWorkflowComponent implements OnInit {
                                     signatory: false,
                                     requested_signature: itemTemplate.item_mode === 'sign',
                                     hasPrivilege: itemTemplate.hasPrivilege,
-                                    isValid: itemTemplate.isValid
-                                }
+                                    isValid: itemTemplate.isValid,
+                                    currentRole: itemTemplate.item_mode
+                                };
                             })
                         );
                         this.searchVisaSignUser.reset();
@@ -619,7 +629,7 @@ export class VisaWorkflowComponent implements OnInit {
 
     getMaarchParapheurUserAvatar(externalId: string, key: number) {
         if (!this.functions.empty(externalId)) {
-            this.http.get("../rest/maarchParapheur/user/" + externalId + "/picture")
+            this.http.get('../rest/maarchParapheur/user/' + externalId + '/picture')
                 .subscribe((data: any) => {
                     this.visaWorkflow.items[key].picture = data.picture;
                 }, (err: any) => {

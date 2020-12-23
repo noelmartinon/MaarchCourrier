@@ -28,7 +28,6 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
     @ViewChild('maarchTree', { static: true }) maarchTree: MaarchFlatTreeComponent;
 
-    
     loading: boolean = false;
 
     creationMode: boolean;
@@ -87,6 +86,9 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
     dialogRef: MatDialogRef<any>;
     data: any[] = [];
     config: any = {};
+
+    documentImported: boolean = false;
+    attachmentTypeIsVisible = true;
 
 
     constructor(
@@ -156,6 +158,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                         }
 
                         this.headerService.setHeader(this.translate.instant('lang.templateModification'), this.template.template_label);
+                        this.attachmentTypeUpdated();
                         this.loading = false;
                     });
             }
@@ -285,6 +288,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                     this.template.file.content = this.getBase64Document(value.target.result);
                 }
 
+                this.documentImported = true;
                 this.getViewTemplateFile();
             };
         }
@@ -621,6 +625,10 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
         }
     }
 
+    attachmentTypeUpdated() {
+        this.attachmentTypeIsVisible = (this.attachmentTypesList.filter((item: any) => item.id == this.template.template_attachment_type)[0]?.visible || this.template.template_attachment_type == 'all');
+    }
+
     changeType(ev: any) {
         if (ev.value === 'HTML') {
             this.initMce('textarea#templateHtml');
@@ -644,6 +652,8 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                 content: ''
             }
         };
+
+        this.documentImported = false;
     }
 
     loadTab(event: any) {
@@ -669,7 +679,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
     styleUrls: ['template-administration-checkEntities-modal.scss']
 })
 export class TemplateAdministrationCheckEntitiesModalComponent {
-    
+
 
     constructor(public http: HttpClient, @Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<TemplateAdministrationCheckEntitiesModalComponent>) {
     }

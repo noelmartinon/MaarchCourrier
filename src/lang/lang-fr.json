@@ -2180,9 +2180,11 @@
     "attachmentTypeAdded": "Type de pièce jointe ajouté",
     "attachmentTypeUpdated": "Type de pièce jointe modifié",
     "attachmentTypeDeleted": "Type de pièce jointe supprimé",
+    "invisibleAttachmentType": "Ce type de pièce jointe n'est actuellement pas utilisable lors de la création/modification d'une pièce jointe",
     "attachmentsTypes": "Type(s) de pièce(s) jointe(s)",
     "attachmentTypeModification": "Modification d'un type de pièce jointe",
     "iconLetter": "Lettre icône",
+    "iconLetter_attachmentDesc": "Ces lettres apparaîtront dans les onglets du parapheur",
     "noneAlt": "Aucune",
     "attachmentTypeUsed": "Ce type est utilisé pour certaines pièces jointes",
     "receptionCanceled": "Réception annulée",
@@ -2193,5 +2195,7 @@
     "diffusionHistory": "Historique de diffusion",
     "showDiffusionHistory": "Afficher l'historique de diffusion",
     "visaWorkflowHistory": "Historique du circuit de visa",
-    "showVisaWorkflowHistory": "Afficher l'historique du circuit de visa"
+    "showVisaWorkflowHistory": "Afficher l'historique du circuit de visa",
+    "list": "Liste",
+    "workflow": "Circuit"
 }

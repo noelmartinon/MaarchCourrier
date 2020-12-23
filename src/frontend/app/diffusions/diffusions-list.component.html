@@ -62,7 +62,7 @@
     <mat-spinner style="margin:auto;"></mat-spinner>
 </div>
 <div style="text-align: right;">
-    <button mat-button color="primary" (click)="openHistory()">
+    <button mat-button color="primary" (click)="openHistory()" *ngIf="!loading && hasHistory">
         {{'lang.showDiffusionHistory' | translate}}
     </button>
 </div>

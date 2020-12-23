@@ -26,7 +26,8 @@
               "./src/frontend/css/maarch-material.css",
               "./src/frontend/css/engine.scss",
               "./src/frontend/css/engine_2.scss",
-              "./node_modules/ng2-dnd/bundles/style.css"
+              "./node_modules/ng2-dnd/bundles/style.css",
+              "./node_modules/angular2-draggable/css/resizable.min.css"
             ],
             "scripts": [
               "./node_modules/jquery/dist/jquery.min.js",

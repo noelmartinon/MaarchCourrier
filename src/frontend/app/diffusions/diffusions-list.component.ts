@@ -22,6 +22,7 @@ export class DiffusionsListComponent implements OnInit {
 
     roles: any = [];
     loading: boolean = true;
+    hasHistory: boolean = false;
     availableRoles: any[] = [];
     keepRoles: any[] = [];
     currentEntityId: number = 0;
@@ -264,6 +265,7 @@ export class DiffusionsListComponent implements OnInit {
             if (resId != 0) {
                 this.http.get(`../rest/resources/${resId}/listInstance`).pipe(
                     map((data: any) => {
+                        this.hasHistory = data.hasHistory;
                         data.listInstance = data.listInstance.map((item: any) => {
 
                             const obj: any = {

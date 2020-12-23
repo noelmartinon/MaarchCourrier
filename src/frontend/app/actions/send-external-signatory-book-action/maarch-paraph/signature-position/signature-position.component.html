@@ -39,7 +39,7 @@
                     [style.width.px]="workingAreaWidth" [style.height.px]="workingAreaHeight">
                     <ng-container *ngFor="let sign of signList;let indexSign=index;">
                         <div *ngIf="sign.page === currentPage" [class.signDisabled]="currentUser!==sign.sequence"
-                            [position]="{x: (sign.position.positionX*workingAreaWidth)/100, y:(sign.position.positionY*workingAreaHeight)/100}"
+                            [position]="{x: (sign.positionX*workingAreaWidth)/100, y:(sign.positionY*workingAreaHeight)/100}"
                             [style.width.%]="25" [ngDraggable]="currentUser===sign.sequence"
                             (endOffset)="moveSign($event);" [preventDefaultEvent]="false" [bounds]="myBounds"
                             [inBounds]="true" class="signature"
@@ -53,40 +53,33 @@
                         </div>
                     </ng-container>
                     <ng-container *ngFor="let date of dateList;let indexSign=index;">
-                        <div *ngIf="date.page === currentPage" [class.signDisabled]="currentUser!==date.sequence"
-                            [position]="{x: (date.position.positionX*workingAreaWidth)/100, y:(date.position.positionY*workingAreaHeight)/100}"
-                            [ngDraggable]="currentUser===date.sequence" (endOffset)="moveDate($event);"
-                            [preventDefaultEvent]="false" [bounds]="myBounds" [inBounds]="true" class="dateBlock"
-                            (click)="currentUser!=date.sequence ? goToSignUserPage(date.sequence, currentPage) : false">
-                            <div style="position: absolute;top: -50px;left: 50%;transform: translateX(-50%);">
-                                <button mat-icon-button (click)="colorPicker.click()">
-                                    <mat-icon class="fas fa-circle" [style.color]="date.color"></mat-icon>
-                                </button>
-                                <input type="color" #colorPicker [(ngModel)]="date.color" name="color" style="display: none;" (click)="$event.stopPropagation()">
-                                <button mat-icon-button color="primary" [matMenuTriggerFor]="dateMenu">
-                                    <mat-icon class="fas fa-spell-check"></mat-icon>
-                                </button>
-                                <mat-menu #dateMenu="matMenu">
-                                    <button mat-menu-item [matMenuTriggerFor]="dateListFormat">Format</button>
-                                    <button mat-menu-item [matMenuTriggerFor]="dateListSize">Taille</button>
-                                </mat-menu>
-                                <mat-menu #dateListFormat="matMenu">
-                                    <button mat-menu-item *ngFor="let format of formatList" (click)="date.format=format" [class.selected]="format === date.format">
-                                        {{today | date:format : undefined : localDate}}
-                                    </button>
-                                </mat-menu>
-                                <mat-menu #dateListSize="matMenu">
-                                    <button mat-menu-item *ngFor="let size of sizes" (click)="date.size=size" [class.selected]="size === date.size">
-                                        {{size}}
-                                    </button>
-                                </mat-menu>
-                                <button mat-icon-button color="warn" [title]="'lang.delete' | translate"
-                                    (click)="deleteDate(indexSign)">
-                                    <mat-icon class="fa fa-trash-alt"></mat-icon>
-                                </button>
-                            </div>
-                            <div [style.color]="date.color" [style.fontSize.px]="date.size">
-                                {{today | date:date.format : undefined : localDate}}</div>
+                        <div 
+                        *ngIf="date.page === currentPage"
+                        [class.signDisabled]="currentUser!==date.sequence"
+                        [position]="{x: (date.positionX*workingAreaWidth)/100, y:(date.positionY*workingAreaHeight)/100}"
+                        [ngDraggable]="currentUser===date.sequence && !resizing"
+                        (endOffset)="moveDate($event, i);"
+                        [preventDefaultEvent]="false"
+                        [bounds]="bounds"
+                        [inBounds]="true"
+                        class="dateBlock"
+                        [style.width.%]="date.width"
+                        [style.height.%]="date.height"
+                        (click)="$event.stopPropagation();currentUser!=date.sequence ? goToSignUserPage(date.sequence, currentPage) : false"
+                        ngResizable
+                        [rzAspectRatio]="true"
+                        (rzStart)="resizing=true"
+                        (rzStop)="onResizeDateStop($event, indexSign);resizing=false;"
+                        (dblclick)="colorPicker.click()"
+                        >
+                        <div style="position: absolute;top: -50px;left: 50%;transform: translateX(-50%);">
+                            <button mat-icon-button (click)="colorPicker.click()">
+                                <mat-icon class="fas fa-circle" [style.color]="date.color"></mat-icon>
+                            </button>
+                            <input type="color" #colorPicker [(ngModel)]="date.color" name="color" style="display: none;" (click)="$event.stopPropagation()">
+                        </div>
+                        <svg [id]="'testSVG_'+ i" viewBox="0 0 130 30" preserveAspectRatio="xMinYMin meet">
+                            <text y="10" font-size="16" dy=".3em" [style.fill]="date.color">25 décembre 2020</text></svg>
                         </div>
                     </ng-container>
                 </div>

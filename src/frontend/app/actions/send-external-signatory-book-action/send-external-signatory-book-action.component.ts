@@ -89,7 +89,7 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
                                 this.resourcesMailing.push(value);
                             }
                         });
-                        data.availableResources.forEach((element: any) => {
+                        data.availableResources.filter((element: any) => !element.mainDocument).forEach((element: any) => {
                             this.toggleDocToSign(true, element, false);
                         });
                     }
@@ -139,6 +139,7 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
     }
 
     toggleIntegration(integrationId: string) {
+        this.resourcesToSign = [];
         this.http.put(`../rest/resourcesList/integrations`, { resources: this.data.resIds, integrations: { [integrationId]: !this.data.resource.integrations[integrationId] } }).pipe(
             tap(async () => {
                 this.data.resource.integrations[integrationId] = !this.data.resource.integrations[integrationId];

@@ -60,8 +60,13 @@ class ListInstanceController
                 $listInstances[$key]['descriptionToDisplay'] = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label']])['entity_label'];
             }
         }
+        $hasHistory = ListInstanceHistoryDetailModel::get([
+            'select'    => [1],
+            'where'     => ['difflist_type = ?', 'res_id = ?'],
+            'data'      => ['entity_id', $args['resId']]
+        ]);
 
-        return $response->withJson(['listInstance' => $listInstances]);
+        return $response->withJson(['listInstance' => $listInstances, 'hasHistory' => !empty($hasHistory)]);
     }
 
     public function getVisaCircuitByResId(Request $request, Response $response, array $aArgs)
@@ -90,8 +95,13 @@ class ListInstanceController
                 $listInstances[$key]['hasPrivilege'] = false;
             }
         }
+        $hasHistory = ListInstanceHistoryDetailModel::get([
+            'select'    => [1],
+            'where'     => ['difflist_type = ?', 'res_id = ?'],
+            'data'      => ['VISA_CIRCUIT', $aArgs['resId']]
+        ]);
 
-        return $response->withJson(['circuit' => $listInstances]);
+        return $response->withJson(['circuit' => $listInstances, 'hasHistory' => !empty($hasHistory)]);
     }
 
     public function getOpinionCircuitByResId(Request $request, Response $response, array $aArgs)
@@ -477,6 +487,7 @@ class ListInstanceController
                 }
             }
 
+            $listInstanceHistoryId = ListInstanceHistoryModel::create(['resId' => $resource['resId'], 'userId' => $GLOBALS['id']]);
             foreach ($listInstances as $key => $listInstance) {
                 ListInstanceModel::create([
                     'res_id'                => $resource['resId'],
@@ -490,6 +501,19 @@ class ListInstanceController
                     'process_comment'       => $listInstance['process_comment'],
                     'requested_signature'   => $listInstance['requested_signature'],
                     'delegate'              => $listInstance['delegate']
+                ]);
+                ListInstanceHistoryDetailModel::create([
+                    'listinstance_history_id'   => $listInstanceHistoryId,
+                    'res_id'                    => $resource['resId'],
+                    'sequence'                  => $key,
+                    'item_id'                   => $listInstance['item_id'],
+                    'item_type'                 => $listInstance['item_type'],
+                    'item_mode'                 => $listInstance['item_mode'],
+                    'added_by_user'             => $GLOBALS['id'],
+                    'difflist_type'             => $args['type'] == 'visaCircuit' ? 'VISA_CIRCUIT' : 'AVIS_CIRCUIT',
+                    'process_date'              => $listInstance['process_date'],
+                    'process_comment'           => $listInstance['process_comment'],
+                    'requested_signature'       => $listInstance['requested_signature']
                 ]);
             }
         }

@@ -668,23 +668,25 @@ class AlfrescoController
                     }
                 } elseif (strpos($alfrescoParameter, 'senderCompany_') !== false) {
                     $contactNb = explode('_', $alfrescoParameter)[1];
-                    $properties[$key] = $rawContacts[$contactNb]['company'];
+                    $properties[$key] = $rawContacts[$contactNb]['company'] ?? '';
                 } elseif (strpos($alfrescoParameter, 'senderCivility_') !== false) {
                     $contactNb = explode('_', $alfrescoParameter)[1];
                     $properties[$key] = ContactModel::getCivilityLabel(['civilityId' => $rawContacts[$contactNb]['civility']]);
                 } elseif (strpos($alfrescoParameter, 'senderFirstname_') !== false) {
                     $contactNb = explode('_', $alfrescoParameter)[1];
-                    $properties[$key] = $rawContacts[$contactNb]['firstname'];
+                    $properties[$key] = $rawContacts[$contactNb]['firstname'] ?? '';
                 } elseif (strpos($alfrescoParameter, 'senderLastname_') !== false) {
                     $contactNb = explode('_', $alfrescoParameter)[1];
-                    $properties[$key] = $rawContacts[$contactNb]['lastname'];
+                    $properties[$key] = $rawContacts[$contactNb]['lastname'] ?? '';
                 } elseif (strpos($alfrescoParameter, 'senderFunction_') !== false) {
                     $contactNb = explode('_', $alfrescoParameter)[1];
-                    $properties[$key] = $rawContacts[$contactNb]['function'];
+                    $properties[$key] = $rawContacts[$contactNb]['function'] ?? '';
                 } elseif (strpos($alfrescoParameter, 'senderAddress_') !== false) {
                     $contactNb = explode('_', $alfrescoParameter)[1];
-                    $contactToDisplay = ContactController::getFormattedContactWithAddress(['contact' => $rawContacts[$contactNb]]);
-                    $properties[$key] = $contactToDisplay['contact']['address'];
+                    if (!empty($rawContacts[$contactNb])) {
+                        $contactToDisplay = ContactController::getFormattedContactWithAddress(['contact' => $rawContacts[$contactNb]]);
+                    }
+                    $properties[$key] = $contactToDisplay['contact']['address'] ?? '';
                 } elseif ($alfrescoParameter == 'doctypeSecondLevelLabel') {
                     $doctype = DoctypeModel::getById(['select' => ['doctypes_second_level_id'], 'id' => $document['type_id']]);
                     $doctypeSecondLevel = SecondLevelModel::getById(['id' => $doctype['doctypes_second_level_id'], 'select' => ['doctypes_second_level_label']]);

@@ -1030,6 +1030,7 @@ viewed bigint,
 difflist_type character varying(50),
 process_date timestamp without time zone,
 process_comment character varying(255),
+requested_signature boolean default false,
 CONSTRAINT listinstance_history_details_pkey PRIMARY KEY (listinstance_history_details_id)
 ) WITH ( OIDS=FALSE );
 

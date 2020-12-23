@@ -88,10 +88,11 @@ class TemplateController
         $attachmentModelsTmp = AttachmentTypeModel::get(['select' => ['type_id', 'label', 'visible']]);
         $attachmentTypes = [];
         foreach ($attachmentModelsTmp as $value) {
-            if ($value['visible']) {
+            if ($value['visible'] || $value['type_id'] == $template['template_attachment_type']) {
                 $attachmentTypes[] = [
-                    'label' => $value['label'],
-                    'id'    => $value['type_id']
+                    'label'   => $value['label'],
+                    'id'      => $value['type_id'],
+                    'visible' => $value['visible']
                 ];
             }
         }

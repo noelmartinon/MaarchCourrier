@@ -411,11 +411,12 @@ $app->get('/resources/{resId}/notes', \Note\controllers\NoteController::class . 
 $app->get('/resources/{resId}/templates', \Template\controllers\TemplateController::class . ':getByResId');
 $app->get('/resources/{resId}/emailTemplates', \Template\controllers\TemplateController::class . ':getEmailTemplatesByResId');
 $app->get('/resources/{resId}/listInstance', \Entity\controllers\ListInstanceController::class . ':getByResId');
-$app->get('/resources/{resId}/listInstanceHistory', \Entity\controllers\ListInstanceHistoryController::class . ':getByResId');
+$app->get('/resources/{resId}/listInstanceHistory', \Entity\controllers\ListInstanceHistoryController::class . ':getDiffusionListByResId');
 $app->get('/resources/{resId}/visaCircuit', \Entity\controllers\ListInstanceController::class . ':getVisaCircuitByResId');
 $app->get('/resources/{resId}/opinionCircuit', \Entity\controllers\ListInstanceController::class . ':getOpinionCircuitByResId');
 $app->get('/resources/{resId}/parallelOpinion', \Entity\controllers\ListInstanceController::class . ':getParallelOpinionByResId');
 $app->get('/resources/{resId}/defaultCircuit', \Entity\controllers\ListTemplateController::class . ':getDefaultCircuitByResId');
+$app->get('/resources/{resId}/circuitsHistory', \Entity\controllers\ListInstanceHistoryController::class . ':getCircuitByResId');
 $app->get('/resources/{resId}/linkedResources', \Resource\controllers\LinkController::class . ':getLinkedResources');
 $app->post('/resources/{resId}/linkedResources', \Resource\controllers\LinkController::class . ':linkResources');
 $app->put('/resources/{resId}/sign', \SignatureBook\controllers\SignatureBookController::class . ':signResource');

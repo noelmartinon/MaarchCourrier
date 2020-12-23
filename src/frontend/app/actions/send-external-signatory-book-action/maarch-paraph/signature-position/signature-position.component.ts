@@ -41,6 +41,7 @@ export class SignaturePositionComponent implements OnInit {
 
     today: Date = new Date();
     localDate = this.translate.instant('lang.langISO');
+    resizing: boolean = false;
 
     constructor(
         public translate: TranslateService,
@@ -67,17 +68,33 @@ export class SignaturePositionComponent implements OnInit {
     }
 
     getPageAttachment() {
-        this.http.get(`../rest/attachments/${this.data.resource.resId}/thumbnail/${this.currentPage}`).pipe(
-            tap((data: any) => {
-                this.pages = Array.from({ length: data.pagesCount }).map((_, i) => i + 1);
-                this.imgContent = 'data:image/png;base64,' + data.fileContent;
-                this.getImageDimensions(this.imgContent);
-            }),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+        console.log(this.data.resource);
+
+        if (this.data.resource.mainDocument) {
+            this.http.get(`../rest/resources/${this.data.resource.resId}/thumbnail/${this.currentPage}`).pipe(
+                tap((data: any) => {
+                    this.pages = Array.from({ length: data.pagesCount }).map((_, i) => i + 1);
+                    this.imgContent = 'data:image/png;base64,' + data.fileContent;
+                    this.getImageDimensions(this.imgContent);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        } else {
+            this.http.get(`../rest/attachments/${this.data.resource.resId}/thumbnail/${this.currentPage}`).pipe(
+                tap((data: any) => {
+                    this.pages = Array.from({ length: data.pagesCount }).map((_, i) => i + 1);
+                    this.imgContent = 'data:image/png;base64,' + data.fileContent;
+                    this.getImageDimensions(this.imgContent);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        }
     }
 
     getImageDimensions(imgContent: any): void {
@@ -92,17 +109,21 @@ export class SignaturePositionComponent implements OnInit {
     moveSign(event: any) {
         const percentx = (event.x * 100) / this.workingAreaWidth;
         const percenty = (event.y * 100) / this.workingAreaHeight;
-        this.signList.filter((item: any) => item.sequence === this.currentUser && item.page === this.currentPage)[0].position.positionX = percentx;
-        this.signList.filter((item: any) => item.sequence === this.currentUser && item.page === this.currentPage)[0].position.positionY = percenty;
+        this.signList.filter((item: any) => item.sequence === this.currentUser && item.page === this.currentPage)[0].positionX = percentx;
+        this.signList.filter((item: any) => item.sequence === this.currentUser && item.page === this.currentPage)[0].positionY = percenty;
     }
 
     moveDate(event: any) {
         const percentx = (event.x * 100) / this.workingAreaWidth;
         const percenty = (event.y * 100) / this.workingAreaHeight;
-        this.dateList.filter((item: any) => item.sequence === this.currentUser && item.page === this.currentPage)[0].position.positionX = percentx;
-        this.dateList.filter((item: any) => item.sequence === this.currentUser && item.page === this.currentPage)[0].position.positionY = percenty;
+        this.dateList.filter((item: any) => item.sequence === this.currentUser && item.page === this.currentPage)[0].positionX = percentx;
+        this.dateList.filter((item: any) => item.sequence === this.currentUser && item.page === this.currentPage)[0].positionY = percenty;
     }
 
+    onResizeDateStop(event: any, index: number) {
+        this.dateList[index].height = (event.size.height * 100) / this.workingAreaHeight;
+        this.dateList[index].width = (event.size.width * 100) / this.workingAreaWidth;
+    }
 
     emptySign() {
         return this.signList.filter((item: any) => item.sequence === this.currentUser && item.page === this.currentPage).length === 0;
@@ -117,10 +138,8 @@ export class SignaturePositionComponent implements OnInit {
             {
                 sequence: this.currentUser,
                 page: this.currentPage,
-                position: {
-                    positionX: 0,
-                    positionY: 0
-                }
+                positionX: 0,
+                positionY: 0
             }
         );
         document.getElementsByClassName('signatureContainer')[0].scrollTo(0, 0);
@@ -132,13 +151,11 @@ export class SignaturePositionComponent implements OnInit {
                 sequence: this.currentUser,
                 page: this.currentPage,
                 color: '#666',
-                font: '',
                 format: 'd MMMM y',
-                size: 14,
-                position: {
-                    positionX: 0,
-                    positionY: 0
-                }
+                width: (130 * 100) / this.workingAreaWidth,
+                height: (30 * 100) / this.workingAreaHeight,
+                positionX: 0,
+                positionY: 0
             }
         );
         document.getElementsByClassName('signatureContainer')[0].scrollTo(0, 0);

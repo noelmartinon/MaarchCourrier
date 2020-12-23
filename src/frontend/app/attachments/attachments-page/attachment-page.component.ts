@@ -141,6 +141,7 @@ export class AttachmentPageComponent implements OnInit {
 
                     this.versions = data.versions;
 
+                    this.attachmentsTypes = this.attachmentsTypes.filter((item: any) => item.typeId === data.type || item.visible);
                     this.newVersion = this.attachmentsTypes.filter((item: any) => item.typeId === data.type)[0].newVersionDefault;
 
                     this.attachFormGroup = new FormGroup(this.attachment);
@@ -156,7 +157,12 @@ export class AttachmentPageComponent implements OnInit {
     }
 
     isVersionEnabled() {
-        return this.attachmentsTypes.filter((item: any) => item.typeId === this.attachment.type.value)[0].versionEnabled;
+
+        const versionEnabled = this.attachmentsTypes.filter((item: any) => item.typeId === this.attachment.type.value)[0].versionEnabled;
+        if (!versionEnabled) {
+            this.newVersion = false;
+        }
+        return versionEnabled
     }
 
     createNewVersion(mode: string = 'default') {
@@ -304,6 +310,7 @@ export class AttachmentPageComponent implements OnInit {
 
     getAttachType(attachType: any) {
         this.appAttachmentViewer.loadTemplatesByResId(this.attachment['resIdMaster'].value, attachType);
+        this.newVersion = this.attachmentsTypes.filter((item: any) => item.typeId === attachType)[0].newVersionDefault;
     }
 
     setNewVersion() {

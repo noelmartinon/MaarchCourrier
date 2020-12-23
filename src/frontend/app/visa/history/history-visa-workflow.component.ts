@@ -40,99 +40,11 @@ export class HistoryVisaWorkflowComponent implements OnInit {
 
     loadWorkflowHistory() {
         this.loading = true;
-        this.visaWorkflowHistory = [
-            {
-                user: 'Bernard BLIER',
-                creationDate: '2020-10-06 17:02:19.558904',
-                'items': [
-                    {
-                        'listinstance_id': 101,
-                        'sequence': 0,
-                        'item_id': 7,
-                        'item_type': 'user',
-                        'item_firstname': 'Edith',
-                        'item_lastname': 'ERINA',
-                        'item_entity': 'Cabinet du Maire',
-                        'viewed': 0,
-                        'process_date': '2020-11-02 16:51:00.635663',
-                        'process_comment': null,
-                        'signatory': false,
-                        'requested_signature': true,
-                        'delegate': null,
-                        'isValid': false,
-                        'labelToDisplay': 'Edith ERINA',
-                        'delegatedBy': null,
-                        'hasPrivilege': true,
-                        'difflist_type': 'VISA_CIRCUIT'
-                    },
-                    {
-                        'listinstance_id': 102,
-                        'sequence': 1,
-                        'item_id': 26,
-                        'item_type': 'user',
-                        'item_firstname': 'test',
-                        'item_lastname': 'test',
-                        'item_entity': 'Service Courrier',
-                        'viewed': 0,
-                        'process_date': '2020-11-30 09:35:11.06508',
-                        'process_comment': null,
-                        'signatory': false,
-                        'requested_signature': false,
-                        'delegate': 21,
-                        'isValid': true,
-                        'labelToDisplay': 'Bernard BLIER',
-                        'delegatedBy': 'test test',
-                        'hasPrivilege': true,
-                        'difflist_type': 'VISA_CIRCUIT'
-                    },
-                    {
-                        'listinstance_id': 103,
-                        'sequence': 2,
-                        'item_id': 18,
-                        'item_type': 'user',
-                        'item_firstname': 'Denis',
-                        'item_lastname': 'DAULL',
-                        'item_entity': 'Secrétariat Général',
-                        'viewed': 0,
-                        'process_date': null,
-                        'process_comment': null,
-                        'signatory': false,
-                        'requested_signature': false,
-                        'delegate': null,
-                        'isValid': true,
-                        'labelToDisplay': 'Denis DAULL',
-                        'delegatedBy': null,
-                        'hasPrivilege': true,
-                        'difflist_type': 'VISA_CIRCUIT'
-                    },
-                    {
-                        'listinstance_id': 104,
-                        'sequence': 3,
-                        'item_id': 6,
-                        'item_type': 'user',
-                        'item_firstname': 'Jenny',
-                        'item_lastname': 'JANE',
-                        'item_entity': 'Centre Communal d\'Action Sociale',
-                        'viewed': 0,
-                        'process_date': null,
-                        'process_comment': null,
-                        'signatory': false,
-                        'requested_signature': false,
-                        'delegate': null,
-                        'isValid': true,
-                        'labelToDisplay': 'Jenny JANE',
-                        'delegatedBy': null,
-                        'hasPrivilege': true,
-                        'difflist_type': 'VISA_CIRCUIT'
-                    }
-                ]
-            }
-        ];
 
-        /* return new Promise((resolve, reject) => {
-            this.http.get(`../rest/resources/${this.resId}/visaCircuitHistory`).pipe(
+        return new Promise((resolve, reject) => {
+            this.http.get(`../rest/resources/${this.resId}/circuitsHistory?type=visaCircuit`).pipe(
                 tap((data: any) => {
-
+                    this.visaWorkflowHistory = data['listInstanceHistory'];
                 }),
                 finalize(() => {
                     this.loading = false;
@@ -143,6 +55,6 @@ export class HistoryVisaWorkflowComponent implements OnInit {
                     return of(false);
                 })
             ).subscribe();
-        });*/
+        });
     }
 }
