@@ -9,10 +9,10 @@
             <id>response_project</id>
             <label>_RESPONSE_PROJECT</label>
         </type>
-        <type show="true" with_chrono="true" with_delay="60" icon="TR" sign="false">
-            <id>transmission</id>
-            <label>Transmission</label>
-        </type>
+<!--        <type show="true" with_chrono="true" with_delay="60" icon="TR" sign="false">-->
+<!--            <id>transmission</id>-->
+<!--            <label>Transmission</label>-->
+<!--        </type>-->
 		<type show="false" with_chrono="true" attach_in_mail="true" icon="" sign="false" select_in_reconciliation="true">
             <id>signed_response</id>
             <label>_SIGNED_RESPONSE</label>
