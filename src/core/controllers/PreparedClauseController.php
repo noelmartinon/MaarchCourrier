@@ -118,6 +118,41 @@ class PreparedClauseController
             $clause = str_replace("@all_entities", $allEntitiesClause, $clause);
         }
 
+        $total = preg_match_all("|@subentities_id\[([^\]]*)\]|", $clause, $subEntities, PREG_PATTERN_ORDER);
+        if ($total > 0) {
+            for ($i = 0; $i < $total; $i++) {
+                $aEntities = [];
+                $tmpSubEntities = str_replace("'", '', $subEntities[1][$i]);
+                if (preg_match('/,/', $tmpSubEntities)) {
+                    $aEntities = preg_split('/,/', $tmpSubEntities);
+                } else {
+                    $aEntities[] = $tmpSubEntities;
+                }
+
+                $allSubEntities = [];
+                foreach ($aEntities as $entity) {
+                    if (!empty($entity)) {
+                        $subEntitiesForEntity = EntityModel::getEntityChildrenById(['id' => trim($entity)]);
+                        unset($subEntitiesForEntity[0]);
+                        $allSubEntities = array_merge($allSubEntities, $subEntitiesForEntity);
+                    }
+                }
+
+                $allSubEntitiesClause = '';
+                foreach ($allSubEntities as $key => $allSubEntity) {
+                    if ($key > 0) {
+                        $allSubEntitiesClause .= ", ";
+                    }
+                    $allSubEntitiesClause .= "'{$allSubEntity}'";
+                }
+                if (empty($allSubEntitiesClause)) {
+                    $allSubEntitiesClause = "''";
+                }
+
+                $clause = preg_replace("|@subentities_id\[[^\]]*\]|", $allSubEntitiesClause, $clause, 1);
+            }
+        }
+
         $total = preg_match_all("|@subentities\[('[^\]]*')\]|", $clause, $subEntities, PREG_PATTERN_ORDER);
         if ($total > 0) {
             for ($i = 0; $i < $total; $i++) {

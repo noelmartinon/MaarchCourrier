@@ -242,6 +242,26 @@ abstract class EntityModelAbstract
         return $entities;
     }
 
+    public static function getEntityChildrenById(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['id']);
+        ValidatorModel::intVal($args, ['id']);
+
+        $aReturn = DatabaseModel::select([
+            'select'    => ['id'],
+            'table'     => ['entities'],
+            'where'     => ['parent_entity_id in (select entity_id from entities where id = ?)'],
+            'data'      => [$args['id']]
+        ]);
+
+        $entities = [$args['id']];
+        foreach ($aReturn as $value) {
+            $entities = array_merge($entities, EntityModel::getEntityChildrenById(['id' => $value['id']]));
+        }
+
+        return $entities;
+    }
+
     public static function getEntityChildrenSubLevel(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['entitiesId']);
