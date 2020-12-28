@@ -384,4 +384,8 @@ export class SentResourceListComponent implements OnInit {
             ).subscribe();
         });
     }
+
+    canSendNumericPackage() {
+        return this.privilegeService.getCurrentUserMenus().filter((item: any) => item.id === 'manage_numeric_package').length > 0;
+    }
 }

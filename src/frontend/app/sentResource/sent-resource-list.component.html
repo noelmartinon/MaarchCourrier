@@ -71,7 +71,7 @@
     <button mat-fab *ngIf="privilegeService.hasCurrentUserPrivilege('sendmail')" class="addSentResource" color="primary" [title]="'lang.sendElement' | translate" (click)="openPromptMail()">
         <mat-icon style="height: auto;width: auto;" class="fa fa-plus"></mat-icon>
     </button>
-    <button mat-fab *ngIf="privilegeService.hasCurrentUserPrivilege('sendmail')" class="addSentResource" color="primary" [title]="'lang.sendNumericPackage' | translate" (click)="openPromptNumericPackage()">
+    <button mat-fab *ngIf="canSendNumericPackage()" class="addSentResource" color="primary" [title]="'lang.sendNumericPackage' | translate" (click)="openPromptNumericPackage()">
         <mat-icon style="height: auto;width: auto;font-size: 20px;">
             <i class="fas fa-envelope-open-text" style="left: -5px;position: relative;"></i>
             <i class="fas fa-wifi" style="position: absolute;font-size: 10px;transform: rotate(35deg);margin-left: -3px;margin-top: -3px;"></i>
