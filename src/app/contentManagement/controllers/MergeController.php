@@ -342,6 +342,27 @@ class MergeController
             }
         }
 
+        //Transmissions
+        $transmissions = [];
+        if (!empty($args['recipientId']) && !empty($args['recipientType'])) {
+            $currentTransmission = MergeController::formatPerson(['id' => $args['recipientId'], 'type' => $args['recipientType']]);
+            $transmissions['currentContact_lastname'] = $currentTransmission['lastname'] ?? null;
+            $transmissions['currentContact_firstname'] = $currentTransmission['firstname'] ?? null;
+            $transmissions['currentContact_title'] = $currentTransmission['civility'] ?? null;
+            $transmissions['currentContact_function'] = $currentTransmission['function'] ?? null;
+        }
+
+        $trKey = 1;
+        while (!empty($args["transmissionRecipientId{$trKey}"])) {
+            $recipientTransmission = MergeController::formatPerson(['id' => $args["transmissionRecipientId{$trKey}"], 'type' => $args["transmissionRecipientType{$trKey}"]]);
+            $transmissions["lastname{$trKey}"] = $recipientTransmission['lastname'] ?? null;
+            $transmissions["firstname{$trKey}"] = $recipientTransmission['firstname'] ?? null;
+            $transmissions["title{$trKey}"] = $recipientTransmission['civility'] ?? null;
+            $transmissions["function{$trKey}"] = $recipientTransmission['function'] ?? null;
+            ++$trKey;
+        }
+
+
         //Datetime
         $datetime = [
             'date'  => date('d-m-Y'),
@@ -364,6 +385,7 @@ class MergeController
         $dataToBeMerge['contact']               = [];
         $dataToBeMerge['notes']                 = $mergedNote;
         $dataToBeMerge['datetime']              = $datetime;
+        $dataToBeMerge['transmissions']         = $transmissions;
         if (empty($args['inMailing'])) {
             $dataToBeMerge['attachmentRecipient'] = MergeController::formatPerson(['id' => $args['recipientId'], 'type' => $args['recipientType']]);
         }
