@@ -10,6 +10,7 @@ import { AlertComponent } from '../../plugins/modal/alert.component';
 import { MatDialog } from '@angular/material/dialog';
 import { FunctionsService } from '@service/functions.service';
 import { HeaderService } from '@service/header.service';
+import { HistoryDiffusionsListModalComponent } from './history/modal/history-diffusions-list-modal.component';
 
 @Component({
     selector: 'app-diffusions-list',
@@ -21,6 +22,7 @@ export class DiffusionsListComponent implements OnInit {
 
     roles: any = [];
     loading: boolean = true;
+    hasHistory: boolean = false;
     availableRoles: any[] = [];
     keepRoles: any[] = [];
     currentEntityId: number = 0;
@@ -263,6 +265,7 @@ export class DiffusionsListComponent implements OnInit {
             if (resId != 0) {
                 this.http.get(`../rest/resources/${resId}/listInstance`).pipe(
                     map((data: any) => {
+                        this.hasHistory = data.hasHistory;
                         data.listInstance = data.listInstance.map((item: any) => {
 
                             const obj: any = {
@@ -649,7 +652,7 @@ export class DiffusionsListComponent implements OnInit {
                         id: item.itemSerialId,
                         mode: role,
                         type: item.item_type === 'user' ? 'user' : 'entity'
-                    }
+                    };
                 })
             );
         });
@@ -663,5 +666,9 @@ export class DiffusionsListComponent implements OnInit {
 
     isModified() {
         return JSON.stringify(this.listinstanceClone) !== JSON.stringify(this.getCurrentListinstance());
+    }
+
+    openHistory() {
+        this.dialog.open(HistoryDiffusionsListModalComponent, { panelClass: 'maarch-modal', autoFocus: false, data: { resId: this.resId} });
     }
 }

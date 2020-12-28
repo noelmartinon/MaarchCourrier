@@ -2167,6 +2167,7 @@
     "redirectUserVisaWorkflow": "Change of approver / signatory for mails in the process of visa / signature",
     "chooseNewVisaUser": "is in <b>visa / signature</b> of some mails, please choose a <b>user replacement</b>",
     "hideModal": "Hide this modal",
+    "iconLetter_attachmentDesc": "These letters will be display in signatory book tabs",
     "noPreviousValid": "No valid previous user",
     "youCannotUnsign": "You do not have the right to <b>unsign</b> this document. You must be the person who signed this document.",
     "notEnoughVisaUser": "Not enough approvers",
@@ -2174,8 +2175,8 @@
     "requiredVisaUser": "{{min}} approvers required",
     "authorizedSignUser": "{{max}} signatories authorized",
     "templateNameMandatory": "Template name mandatory",
-    "receptionCanceled": "Reception canceled",
-    "confirmRescanTitle": "Registered mail already received",
+    "attachmentTypeUsed": "This type is used in attachment",
+    "confirmRescanTitle": "Registered mail not distributed",
     "confirmRescanToDistributed": "This registered mail was already scanned «Not distributed». Do you want to rescan it to «Distributed» ?",
     "confirmRescanToNotDistributed": "This registered mail was already scanned «Distributed». Do you want to rescan it to «Not distributed» ?",
     "selectReturnReason": "Please select a return reason"

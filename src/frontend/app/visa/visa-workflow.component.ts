@@ -4,15 +4,16 @@ import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FunctionsService } from '@service/functions.service';
-import { tap, exhaustMap, map, startWith, catchError, finalize, filter, debounceTime } from 'rxjs/operators';
+import { tap, exhaustMap, map, startWith, catchError, finalize, filter } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
 import { LatinisePipe, ScanPipe } from 'ngx-pipes';
-import { Observable, of, Subject } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
 import { AddVisaModelModalComponent } from './addVisaModel/add-visa-model-modal.component';
-import { ConfirmComponent } from '../../plugins/modal/confirm.component';
-import {ActivatedRoute} from "@angular/router";
-import {PrivilegeService} from "@service/privileges.service";
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { ActivatedRoute } from '@angular/router';
+import { PrivilegeService } from '@service/privileges.service';
+import { HistoryVisaWorkflowModalComponent } from './history/modal/history-visa-workflow-modal.component';
 
 @Component({
     selector: 'app-visa-workflow',
@@ -38,6 +39,7 @@ export class VisaWorkflowComponent implements OnInit {
     filteredPrivateModels: Observable<string[]>;
 
     loading: boolean = false;
+    hasHistory: boolean = false;
     visaModelListNotLoaded: boolean = true;
     data: any;
 
@@ -90,7 +92,7 @@ export class VisaWorkflowComponent implements OnInit {
 
     ngOnInit(): void {
         if (!this.functions.empty(this.resId) && !this.loadedInConstructor) {
-            //this.initFilterVisaModelList();
+            // this.initFilterVisaModelList();
             this.loadWorkflow(this.resId);
         } else {
             this.loading = false;
@@ -103,7 +105,7 @@ export class VisaWorkflowComponent implements OnInit {
                 moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
                 this.workflowUpdated.emit(event.container);
             } else {
-                this.notify.error(this.translate.instant('lang.moveVisaUserErr', {value1: this.visaWorkflow.items[event.previousIndex].labelToDisplay}));
+                this.notify.error(this.translate.instant('lang.moveVisaUserErr', { value1: this.visaWorkflow.items[event.previousIndex].labelToDisplay }));
             }
         }
     }
@@ -115,7 +117,7 @@ export class VisaWorkflowComponent implements OnInit {
 
         const route = this.linkedToMaarchParapheur === true ? `../rest/listTemplates/entities/${entityId}?type=visaCircuit&maarchParapheur=true` : `../rest/listTemplates/entities/${entityId}?type=visaCircuit`;
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.get(route)
                 .subscribe((data: any) => {
                     if (data.listTemplates[0]) {
@@ -288,19 +290,22 @@ export class VisaWorkflowComponent implements OnInit {
         this.resId = resId;
         this.loading = true;
         this.visaWorkflow.items = [];
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.get('../rest/resources/' + resId + '/visaCircuit').pipe(
-                filter((data: any) => !this.functions.empty(data.circuit)),
                 tap((data: any) => {
-                    data.circuit.forEach((element: any) => {
-                        this.visaWorkflow.items.push(
-                            {
-                                ...element,
-                                difflist_type: 'VISA_CIRCUIT',
-                                currentRole: element.requested_signature ? 'sign' : 'visa'
-                            });
-                    });
-                    this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
+                    if (!this.functions.empty(data.circuit)) {
+                        data.circuit.forEach((element: any) => {
+                            this.visaWorkflow.items.push(
+                                {
+                                    ...element,
+                                    difflist_type: 'VISA_CIRCUIT',
+                                    currentRole: element.requested_signature ? 'sign' : 'visa'
+                                });
+                        });
+
+                        this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
+                    }
+                    this.hasHistory = data.hasHistory;
                 }),
                 finalize(() => {
                     this.loading = false;
@@ -410,7 +415,7 @@ export class VisaWorkflowComponent implements OnInit {
     }*/
 
     getNextVisaUser() {
-        let index =  this.getCurrentVisaUserIndex();
+        let index = this.getCurrentVisaUserIndex();
         index = index + 1;
         const realIndex = this.getRealIndex(index);
 
@@ -650,5 +655,9 @@ export class VisaWorkflowComponent implements OnInit {
         } else {
             return false;
         }
+    }
+
+    openHistory() {
+        this.dialog.open(HistoryVisaWorkflowModalComponent, { panelClass: 'maarch-modal', autoFocus: false, data: { resId: this.resId } });
     }
 }
