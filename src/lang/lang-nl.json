@@ -1519,6 +1519,8 @@
     "inSignatureBook_doc": "Put the main document in signature book__TO_TRANSLATE",
     "inShipping_doc": "Intégrer le document principalin send Maileva__TO_TRANSLATE",
     "preRequisiteMissing": "Prerequisite missing for OnlyOffice : netcat__TO_TRANSLATE",
+    "javaEditDenied": "This document with extension__TO_TRANSLATE",
+    "javaEditDenied2": "can't be edited with Java__TO_TRANSLATE",
     "onlyofficeEditDenied": "This document with extension__TO_TRANSLATE",
     "onlyofficeEditDenied2": "can't be edited with onlyoffice__TO_TRANSLATE",
     "NOTE_version": "Annotated version__TO_TRANSLATE",

@@ -1140,6 +1140,8 @@
     "oneHour": "une heure",
     "oneMinute": "une minute",
     "onlyNumber": "Chiffre uniquement",
+    "javaEditDenied": "Le document avec l'extension",
+    "javaEditDenied2": "ne peut pas être édité avec Java",
     "onlyOfficeNotEnabled": "Le Serveur onlyoffice n'est pas activé dans documentEditorsConfig.xml",
     "onlyofficeEditDenied": "Le document avec l'extension",
     "onlyofficeEditDenied2": "ne peut pas être édité avec onlyoffice",

@@ -1136,6 +1136,8 @@
     "oneHour": "one hour",
     "oneMinute": "one minute",
     "onlyNumber": "Numbers only",
+    "javaEditDenied": "This document with extension",
+    "javaEditDenied2": "cannot be edited with Java",
     "onlyOfficeNotEnabled": "The onlyoffice server is not enabled in documentEditorsConfig.xml",
     "onlyofficeEditDenied": "This document with extension",
     "onlyofficeEditDenied2": "cannot be edited with onlyoffice",

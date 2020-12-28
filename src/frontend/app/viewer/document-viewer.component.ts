@@ -788,15 +788,18 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     editResource() {
-        if (this.mode === 'attachment') {
-            this.editAttachment();
+        if (this.editor.mode === 'java' && this.file.format.toLowerCase() === 'pdf') {
+            this.notify.error(this.translate.instant('lang.javaEditDenied') + ' <b>PDF</b> ' + this.translate.instant('lang.javaEditDenied2'));
         } else {
-            this.editMainDocument();
+            if (this.mode === 'attachment') {
+                this.editAttachment();
+            } else {
+                this.editMainDocument();
+            }
         }
     }
 
     editAttachment() {
-
         this.triggerEvent.emit('setData');
 
         if (this.editor.mode === 'onlyoffice') {
