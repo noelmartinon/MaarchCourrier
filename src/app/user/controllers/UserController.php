@@ -463,6 +463,11 @@ class UserController
             'where' => ['owner_user_id = ? OR actual_user_id = ?'],
             'data'  => [$aArgs['id'], $aArgs['id']]
         ]);
+        ListTemplateItemModel::delete([
+            'where' => ['item_id = ?', 'item_type = ?'],
+            'data'  => [$aArgs['id'], 'user']
+        ]);
+        ListTemplateModel::deleteNoItemsOnes();
 
         UserModel::update([
             'set'   => [

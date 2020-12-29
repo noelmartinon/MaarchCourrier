@@ -334,6 +334,10 @@ class ListTemplateController
                     $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['firstname', 'lastname', 'external_id', 'status']]);
                     $listTemplateItems[$itemKey]['isValid'] = true;
                     if (empty($user) || in_array($user['status'], ['SPD', 'DEL'])) {
+                        if ($listTemplate['type'] == 'diffusionList') {
+                            unset($listTemplateItems[$itemKey]);
+                            continue;
+                        }
                         $listTemplateItems[$itemKey]['isValid'] = false;
                     }
 
