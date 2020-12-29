@@ -481,3 +481,5 @@ define("_DOC_ADD_TO_SIGNATORY_BOOK", "Mail added to signatory book");
 define("_DOC_REMOVE_FROM_SIGNATORY_BOOK", "Mail removed from signatory book");
 define("_DOC_ADD_TO_MAILEVA", "Mail added to Maileva shippings");
 define("_DOC_REMOVE_FROM_MAILEVA", "Mail removed from Maileva shippings");
+
+define("_TARGET_RESOURCE_HAS_NO_FILE", "Target resource has no file");

@@ -481,3 +481,5 @@ define("_DOC_ADD_TO_SIGNATORY_BOOK", "Courrier intégré au parapheur électroni
 define("_DOC_REMOVE_FROM_SIGNATORY_BOOK", "Courrier retiré du parapheur électronique");
 define("_DOC_ADD_TO_MAILEVA", "Courrier intégré aux envois Maileva");
 define("_DOC_REMOVE_FROM_MAILEVA", "Courrier retiré des envois Maileva");
+
+define("_TARGET_RESOURCE_HAS_NO_FILE", "Le courrier cible n'a pas de document principal");

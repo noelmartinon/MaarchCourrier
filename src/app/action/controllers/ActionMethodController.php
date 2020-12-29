@@ -937,7 +937,7 @@ class ActionMethodController
         if (empty($targetResource)) {
             return ['errors' => ['Target resource does not exist']];
         } elseif ($targetResource['category_id'] == 'outgoing' && empty($targetResource['filename'])) {
-            return ['errors' => ['Target resource has no file']];
+            return ['errors' => [_TARGET_RESOURCE_HAS_NO_FILE]];
         }
 
         if ($targetResource['category_id'] == 'outgoing') {
