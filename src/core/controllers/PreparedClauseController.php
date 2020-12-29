@@ -146,7 +146,7 @@ class PreparedClauseController
                     $allSubEntitiesClause .= "'{$allSubEntity}'";
                 }
                 if (empty($allSubEntitiesClause)) {
-                    $allSubEntitiesClause = "''";
+                    $allSubEntitiesClause = "0";
                 }
 
                 $clause = preg_replace("|@subentities_id\[[^\]]*\]|", $allSubEntitiesClause, $clause, 1);
