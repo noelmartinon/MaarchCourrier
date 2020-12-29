@@ -918,8 +918,8 @@ class ActionMethodController
         }
         $latestNote = $latestNote[0];
 
-        if (!empty($args['data']['note'])) {
-            $newNote = $args['data']['note'];
+        if (!empty($args['data']['note']['content'])) {
+            $newNote = $args['data']['note']['content'];
 
             NoteModel::delete([
                 'where' => ['id = ?'],

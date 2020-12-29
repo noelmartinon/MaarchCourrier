@@ -169,7 +169,7 @@
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
         <button mat-raised-button color="primary"
-            *ngIf="canManageMail() && privilegeService.hasCurrentUserPrivilege('sendmail') && numericPackageStatus !== 'ERROR'" (click)="onSubmit()"
+            *ngIf="canManageMail() && canSendNumericPackage() && numericPackageStatus !== 'ERROR'" (click)="onSubmit()"
             [disabled]="recipients.length === 0 || numericPackage.mainExchangeDoc === null || loading">{{'lang.send' | translate}}</button>
         <button mat-raised-button color="warn" (click)="deleteEmail()"
             *ngIf="data.emailId && !loading && numericPackageStatus === 'ERROR'"

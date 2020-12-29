@@ -58,9 +58,9 @@
                         [class.signDisabled]="currentUser!==date.sequence"
                         [position]="{x: (date.positionX*workingAreaWidth)/100, y:(date.positionY*workingAreaHeight)/100}"
                         [ngDraggable]="currentUser===date.sequence && !resizing"
-                        (endOffset)="moveDate($event, i);"
+                        (endOffset)="moveDate($event);"
                         [preventDefaultEvent]="false"
-                        [bounds]="bounds"
+                        [bounds]="myBounds"
                         [inBounds]="true"
                         class="dateBlock"
                         [style.width.%]="date.width"
@@ -78,7 +78,7 @@
                             </button>
                             <input type="color" #colorPicker [(ngModel)]="date.color" name="color" style="display: none;" (click)="$event.stopPropagation()">
                         </div>
-                        <svg [id]="'testSVG_'+ i" viewBox="0 0 130 30" preserveAspectRatio="xMinYMin meet">
+                        <svg viewBox="0 0 130 30" preserveAspectRatio="xMinYMin meet">
                             <text y="10" font-size="16" dy=".3em" [style.fill]="date.color">25 décembre 2020</text></svg>
                         </div>
                     </ng-container>

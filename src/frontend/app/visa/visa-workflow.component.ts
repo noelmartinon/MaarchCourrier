@@ -292,19 +292,20 @@ export class VisaWorkflowComponent implements OnInit {
         this.visaWorkflow.items = [];
         return new Promise((resolve) => {
             this.http.get('../rest/resources/' + resId + '/visaCircuit').pipe(
-                filter((data: any) => !this.functions.empty(data.circuit)),
                 tap((data: any) => {
-                    data.circuit.forEach((element: any) => {
-                        this.visaWorkflow.items.push(
-                            {
-                                ...element,
-                                difflist_type: 'VISA_CIRCUIT',
-                                currentRole: element.requested_signature ? 'sign' : 'visa'
-                            });
-                    });
-                    this.hasHistory = data.hasHistory;
+                    if (!this.functions.empty(data.circuit)) {
+                        data.circuit.forEach((element: any) => {
+                            this.visaWorkflow.items.push(
+                                {
+                                    ...element,
+                                    difflist_type: 'VISA_CIRCUIT',
+                                    currentRole: element.requested_signature ? 'sign' : 'visa'
+                                });
+                        });
 
-                    this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
+                        this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
+                    }
+                    this.hasHistory = data.hasHistory;
                 }),
                 finalize(() => {
                     this.loading = false;

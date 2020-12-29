@@ -342,7 +342,7 @@ class MaarchParapheurController
                                 foreach ($step['datePositions'] as $keyDP => $datePosition) {
                                     if (empty($datePosition['positionX']) || empty($datePosition['positionY']) || empty($datePosition['page'])) {
                                         $valid = false;
-                                    } elseif (empty($datePosition['color']) || empty($datePosition['font']) || empty($datePosition['format']) || empty($datePosition['size'])) {
+                                    } elseif (empty($datePosition['color']) || empty($datePosition['font']) || empty($datePosition['format']) || empty($datePosition['width'])) {
                                         $valid = false;
                                     }
                                 }
@@ -419,7 +419,7 @@ class MaarchParapheurController
                                 foreach ($step['datePositions'] as $keyDP => $datePosition) {
                                     if (empty($datePosition['positionX']) || empty($datePosition['positionY']) || empty($datePosition['page'])) {
                                         $valid = false;
-                                    } elseif (empty($datePosition['color']) || empty($datePosition['font']) || empty($datePosition['format']) || empty($datePosition['size'])) {
+                                    } elseif (empty($datePosition['color']) || empty($datePosition['font']) || empty($datePosition['format']) || empty($datePosition['width'])) {
                                         $valid = false;
                                     }
                                 }

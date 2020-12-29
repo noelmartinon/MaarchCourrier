@@ -98,10 +98,11 @@ class ListInstanceController
         $hasHistory = ListInstanceHistoryDetailModel::get([
             'select'    => [1],
             'where'     => ['difflist_type = ?', 'res_id = ?'],
-            'data'      => ['VISA_CIRCUIT', $aArgs['resId']]
+            'data'      => ['VISA_CIRCUIT', $aArgs['resId']],
+            'groupBy'   => ['listinstance_history_id']
         ]);
 
-        return $response->withJson(['circuit' => $listInstances, 'hasHistory' => !empty($hasHistory)]);
+        return $response->withJson(['circuit' => $listInstances, 'hasHistory' => count($hasHistory) > 1]);
     }
 
     public function getOpinionCircuitByResId(Request $request, Response $response, array $aArgs)

@@ -221,20 +221,25 @@ class MergeController
         $visas = '';
         if (!empty($args['resId'])) {
             $visaWorkflow = ListInstanceModel::get([
-                'select'    => ['item_id', 'process_date', 'requested_signature'],
+                'select'    => ['item_id', 'process_date', 'requested_signature', 'delegate'],
                 'where'     => ['difflist_type = ?', 'res_id = ?'],
                 'data'      => ['VISA_CIRCUIT', $args['resId']],
                 'orderBy'   => ['listinstance_id']
             ]);
             foreach ($visaWorkflow as $value) {
-                $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['firstname', 'lastname']]);
+                $userLabel = UserModel::getLabelledUserById(['id' => $value['item_id']]);
                 $primaryentity = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label']]);
 
                 $mode = $value['requested_signature'] ? _SIGNATORY : _VISA_USER_MIN;
                 if (!empty($value['process_date'])) {
                     $mode .= ', ' . TextFormatModel::formatDate($value['process_date']);
                 }
-                $visas .= "{$user['firstname']} {$user['lastname']} ({$primaryentity['entity_label']}) - {$mode}\n";
+
+                $delegate = !empty($value['delegate']) ? UserModel::getLabelledUserById(['id' => $value['delegate']]) : '';
+                if (!empty($delegate)) {
+                    $userLabel = $delegate . ', ' . _INSTEAD_OF . ' ' . $userLabel;
+                }
+                $visas .= "{$userLabel} ({$primaryentity['entity_label']}) - {$mode}\n";
             }
         }
 
