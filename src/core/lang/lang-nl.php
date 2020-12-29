@@ -484,3 +484,5 @@ define("_REGISTERED_NUMBER_RANGE_DELETED", "Registered number range deleted"); /
 
 define('_REGISTERED_MAIL_DISTRIBUTED', 'Acknowledgement receipt received : registered mail distributed'); //TO TRANSLATE
 define('_REGISTERED_MAIL_NOT_DISTRIBUTED', 'Acknowledgement receipt received : registered mail not distributed'); //TO TRANSLATE
+
+define('_TARGET_RESOURCE_HAS_NO_FILE', 'Target resource has no file'); //TO TRANSLATE

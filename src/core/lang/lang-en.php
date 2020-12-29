@@ -499,3 +499,5 @@ define('_RESET_RECORD_MANAGEMENT', 'Reset record management');
 define('_RESET_RECORD_MANAGEMENT_DESC', 'Reset record management');
 
 define('_USER_SKIPPED', 'User skipped');
+
+define('_TARGET_RESOURCE_HAS_NO_FILE', 'Target resource has no file');
