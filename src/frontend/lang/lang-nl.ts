@@ -1457,6 +1457,8 @@ export const LANG_NL = {
     "endedCircuit": "Workflow ended", //_TO_TRANSLATE
     "userHasntSigned": "The assignee hasn't signed any document",  //_TO_TRANSLATE
     "noCircuitAvailable": "No workflow defined", //_TO_TRANSLATE
+    "cannotAddAvisCircuit": "You cannot set avis circuit", //_TO_TRANSLATE
+    "cannotAddVisaCircuit": "You cannot set visa circuit", //_TO_TRANSLATE
     "interrupted": "Interrupted", //_TO_TRANSLATE
     "addOpinionReason": "Please fill the opinion reason", //_TO_TRANSLATE
     "opinionLimitDate": "Opinion limit date", //_TO_TRANSLATE
