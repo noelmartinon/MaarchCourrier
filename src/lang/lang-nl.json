@@ -356,6 +356,7 @@
     "keywordHelpDesc_3": "Alle eenheden die aan de verbonden gebruiker gekoppeld zijn Bevat geen subeenheden",
     "keywordHelpDesc_4": "Primaire eenheid van de verbonden gebruiker",
     "keywordHelpDesc_5": "Subeenheden van de argumentenlijst die ook @my_entities of @my_primary_entity kan zijn",
+    "keywordHelpDesc_15": "Technical id of sub-entities of argument list, can be @my_entities_id or @my_primary_entity_id __TO_TRANSLATE",
     "keywordHelpDesc_6": "Bovenliggende eenheid van de eenheid in het argument",
     "keywordHelpDesc_7": "Alle eenheden van hetzelfde niveau van de eenheid in het argument",
     "keywordHelpDesc_8": "Alle eenheden van hetzelfde type dat in het argument voorkomt",

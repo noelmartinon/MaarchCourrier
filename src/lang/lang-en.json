@@ -841,6 +841,7 @@
     "keywordHelpDesc_4": "Logged user's primary entity",
     "keywordHelpDesc_14": "Logged user's identifier primary entity",
     "keywordHelpDesc_5": "Sub-entities of argument list, can be @my_entities or @my_primary_entity",
+    "keywordHelpDesc_15": "Technical id of sub-entities of argument list, can be @my_entities_id or @my_primary_entity_id",
     "keywordHelpDesc_6": "Parent entity passed as argument",
     "keywordHelpDesc_7": "All entities to the same level of entity passed as argument",
     "keywordHelpDesc_8": "All entities with de same type passed as argument",

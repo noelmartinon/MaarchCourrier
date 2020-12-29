@@ -169,6 +169,7 @@ DO $$ BEGIN
         UPDATE baskets SET basket_clause = REGEXP_REPLACE(basket_clause, '\(res_id,(\s*)@user\)', '(res_id, @user_id)', 'gmi');
         UPDATE security SET where_clause = REGEXP_REPLACE(where_clause, 'item_id(\s*)=(\s*)@user ', 'item_id = @user_id ', 'gmi');
         UPDATE baskets SET basket_clause = REGEXP_REPLACE(basket_clause, 'item_id(\s*)in(\s*)\(@subentities\[@my_primary_entity\]\)', 'item_id in (@subentities_id[@my_primary_entity_id])', 'gmi');
+        UPDATE baskets SET basket_clause = REGEXP_REPLACE(basket_clause, 'item_id(\s*)in(\s*)\(@subentities\[@my_entities\]\)', 'item_id in (@subentities_id[@my_entities_id])', 'gmi');
     END IF;
 END$$;
 DO $$ BEGIN

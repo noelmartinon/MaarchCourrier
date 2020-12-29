@@ -845,6 +845,7 @@
     "keywordHelpDesc_4": "Entité primaire de l'utilisateur connecté",
     "keywordHelpDesc_14": "Identifiant technique de l'entité primaire de l'utilisateur connecté",
     "keywordHelpDesc_5": "Sous-entités de la liste d'argument, qui peut aussi être @my_entities ou @my_primary_entity",
+    "keywordHelpDesc_15": "Identifiants techniques des sous-entités de la liste d'argument, qui peut aussi être @my_entities_id ou @my_primary_entity_id",
     "keywordHelpDesc_6": "Entité parente de l'entité en argument",
     "keywordHelpDesc_7": "Toutes les entités du même niveau que l'entité en argument",
     "keywordHelpDesc_8": "Toutes les entités du même type mis en argument",
