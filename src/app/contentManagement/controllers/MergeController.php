@@ -225,9 +225,10 @@ class MergeController
                 $userLabel = UserModel::getLabelledUserById(['id' => $value['item_id']]);
                 $primaryentity = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label']]);
 
-                $mode = $value['requested_signature'] ? _SIGNATORY : _VISA_USER_MIN;
                 if (!empty($value['process_date'])) {
-                    $mode .= ', ' . TextFormatModel::formatDate($value['process_date']);
+                    $mode = ($value['signatory'] ? _SIGNATORY : _VISA_USER_MIN) . ', ' . TextFormatModel::formatDate($value['process_date']);
+                } else {
+                    $mode = ($value['requested_signature'] ? _SIGNATORY : _VISA_USER_MIN);
                 }
 
                 $delegate = !empty($value['delegate']) ? UserModel::getLabelledUserById(['id' => $value['delegate']]) : '';
