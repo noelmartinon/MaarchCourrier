@@ -43,8 +43,11 @@
     </mat-form-field>
     <div cdkDropList #dataAvailableList="cdkDropList" [cdkDropListData]="avisWorkflow.items" class="cdk-list"
         (cdkDropListDropped)="drop($event)" [cdkDropListDisabled]="!adminMode">
-        <div class="emptyContent" *ngIf="avisWorkflow.items.length === 0">
-            {{'lang.noPerson' | translate}}
+        <div class="emptyContent" *ngIf="adminMode && avisWorkflow.items.length === 0">
+            {{'lang.noCircuitAvailable' | translate}}
+        </div>
+        <div class="emptyContent" *ngIf="!adminMode && avisWorkflow.items.length === 0">
+            {{'lang.cannotAddAvisCircuit' | translate}}
         </div>
         <mat-list-item disableRipple *ngFor="let diffusion of avisWorkflow.items;let i=index" cdkDrag class="columns workflow"
             [cdkDragDisabled]="!adminMode || !functions.empty(diffusion.process_date)"

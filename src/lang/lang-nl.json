@@ -1460,6 +1460,8 @@
     "endedCircuit": "Workflow ended__TO_TRANSLATE",
     "userHasntSigned": "The assignee hasn't signed any document__TO_TRANSLATE",
     "noCircuitAvailable": "No workflow defined__TO_TRANSLATE",
+    "cannotAddAvisCircuit": "You cannot set avis circuit__TO_TRANSLATE",
+    "cannotAddVisaCircuit": "You cannot set visa circuit__TO_TRANSLATE",
     "interrupted": "Interrupted__TO_TRANSLATE",
     "addOpinionReason": "Please fill the opinion reason__TO_TRANSLATE",
     "opinionLimitDate": "Opinion limit date__TO_TRANSLATE",

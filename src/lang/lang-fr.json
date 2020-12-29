@@ -1053,6 +1053,8 @@
     "noAvailablePreview": "Pas de visualisation disponible",
     "noAvailableValue": "Aucun élément disponible",
     "noCircuitAvailable": "Aucun circuit défini",
+    "cannotAddAvisCircuit": "Vous n'avez pas le privilège de définir un circuit d'avis",
+    "cannotAddVisaCircuit": "Vous n'avez pas le privilège de définir un circuit de visa",
     "noCustomFieldInfo": "<b>Aucun champ personnalisé</b> n'est défini, sélectionner des éléments disponibles sur le <b>panneau de droite</b> afin de créer de nouveaux champs.",
     "noDataAvailable": "Aucune donnée disponible",
     "noDatasource": "Aucune source de données",

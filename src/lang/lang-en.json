@@ -1049,6 +1049,8 @@
     "noAvailablePreview": "No available preview",
     "noAvailableValue": "No available value",
     "noCircuitAvailable": "No workflow defined",
+    "cannotAddAvisCircuit": "You cannot set avis circuit",
+    "cannotAddVisaCircuit": "You cannot set visa circuit",
     "noCustomFieldInfo": "<b>No custom field</b> available, choose available custom fields types on <b>right panel</b> in order to create new custom fields.",
     "noDataAvailable": "No available data",
     "noDatasource": "No data sources",
