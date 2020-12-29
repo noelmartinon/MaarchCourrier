@@ -397,6 +397,7 @@ class ListInstanceController
                 'data'    => [$resource['resId'], self::MAPPING_TYPES[$args['type']]],
                 'orderBy' => ['sequence']
             ]);
+            $originalListInstances = $listInstances;
             $newListSequenceOrdered = array_column($resource['listInstances'], null, 'sequence');
 
             ListInstanceModel::delete([
@@ -445,8 +446,11 @@ class ListInstanceController
                 }
                 if ($args['type'] == 'visaCircuit') {
                     if (!PrivilegeController::hasPrivilege(['privilegeId' => 'visa_documents', 'userId' => $user['id']]) && !PrivilegeController::hasPrivilege(['privilegeId' => 'sign_document', 'userId' => $user['id']])) {
-                        DatabaseModel::rollbackTransaction();
-                        return $response->withStatus(400)->withJson(['errors' => "Body resources[{$resourceKey}] listInstances[{$key}] item_id has not enough privileges"]);
+                        $rawOriginalListInstances = array_column($originalListInstances, 'item_id');
+                        if (!in_array($user['id'], $rawOriginalListInstances)) {
+                            DatabaseModel::rollbackTransaction();
+                            return $response->withStatus(400)->withJson(['errors' => "Body resources[{$resourceKey}] listInstances[{$key}] item_id has not enough privileges"]);
+                        }
                     }
                     $listInstance['item_mode'] = $listInstance['requested_signature'] ? 'sign' : 'visa';
                 } else {
