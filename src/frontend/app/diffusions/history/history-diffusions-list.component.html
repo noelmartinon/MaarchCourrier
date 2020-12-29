@@ -1,7 +1,9 @@
 <ng-container *ngIf="!loading">
     <ng-container *ngFor="let diffList of diffListHistory">
         <div class="dateTitle">
-            <div mat-subheader color="primary" [title]="diffList.creationDate | fullDate">{{'lang.list' | translate}}&nbsp;<b>{{diffList.creationDate | timeAgo : 'full'}}</b>&nbsp;{{'lang.by' | translate | lowercase}}&nbsp;<b>{{diffList.user}}</b></div>
+            <div mat-subheader color="primary" [title]="diffList.creationDate | fullDate">
+                {{'lang.createdBy' | translate}}&nbsp;<b>{{diffList.user}}</b> &nbsp;<b>{{diffList.creationDate | timeAgo : 'full'}}</b>
+            </div>
             <mat-divider></mat-divider>
         </div>
         <ng-container *ngFor="let role of availableRoles">
