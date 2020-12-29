@@ -315,36 +315,35 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                 .subscribe((data: any) => {
                     this.signatureBook.documents = data;
                 });
-        } else {
-            this.http.get('../rest/signatureBook/' + this.resId + '/attachments')
-                .subscribe((data: any) => {
-                    let i = 0;
-                    if (mode === 'add') {
-                        let found = false;
-                        data.forEach((elem: any, index: number) => {
-                            if (!found && (!this.signatureBook.attachments[index] || elem.res_id != this.signatureBook.attachments[index].res_id)) {
-                                i = index;
-                                found = true;
-                            }
-                        });
-                    } else if (mode === 'edit') {
-                        const id = this.signatureBook.attachments[this.rightSelectedThumbnail].res_id;
-                        data.forEach((elem: any, index: number) => {
-                            if (elem.res_id == id) {
-                                i = index;
-                            }
-                        });
-                    }
-
-                    this.signatureBook.attachments = data;
-
-                    if (mode === 'add' || mode === 'edit') {
-                        this.changeRightViewer(i);
-                    } else if (mode === 'del') {
-                        this.changeRightViewer(0);
-                    }
-                });
         }
+        this.http.get('../rest/signatureBook/' + this.resId + '/attachments')
+            .subscribe((data: any) => {
+                let i = 0;
+                if (mode === 'add') {
+                    let found = false;
+                    data.forEach((elem: any, index: number) => {
+                        if (!found && (!this.signatureBook.attachments[index] || elem.res_id != this.signatureBook.attachments[index].res_id)) {
+                            i = index;
+                            found = true;
+                        }
+                    });
+                } else if (mode === 'edit') {
+                    const id = this.signatureBook.attachments[this.rightSelectedThumbnail].res_id;
+                    data.forEach((elem: any, index: number) => {
+                        if (elem.res_id == id) {
+                            i = index;
+                        }
+                    });
+                }
+
+                this.signatureBook.attachments = data;
+
+                if (mode === 'add' || mode === 'edit') {
+                    this.changeRightViewer(i);
+                } else if (mode === 'del') {
+                    this.changeRightViewer(0);
+                }
+            });
     }
 
     delAttachment(attachment: any) {
