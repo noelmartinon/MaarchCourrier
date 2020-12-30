@@ -119,8 +119,8 @@ class RegisteredNumberRangeController
 
         $ranges = RegisteredNumberRangeModel::get([
             'select'  => ['range_start', 'range_end'],
-            'where'   => ['type = ?', 'status = ?'],
-            'data'    => [$body['registeredMailType'], 'OK'],
+            'where'   => ['type = ?'],
+            'data'    => [$body['registeredMailType']],
             'orderBy' => ['range_end desc']
         ]);
 
