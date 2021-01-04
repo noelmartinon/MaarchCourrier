@@ -340,8 +340,8 @@ $app->put('/installer/administrator', \SrcCore\controllers\InstallerController::
 $app->delete('/installer/lock', \SrcCore\controllers\InstallerController::class . ':terminateInstaller');
 
 //TODO REWORK
-$app->get('/dev/lang', \SrcCore\controllers\CoreController::class . ':getAvailableCoreLanguages');
-$app->put('/dev/lang', \SrcCore\controllers\CoreController::class . ':generateLang');
+$app->get('/languages', \SrcCore\controllers\CoreController::class . ':getAvailableCoreLanguages');
+$app->put('/languages', \SrcCore\controllers\CoreController::class . ':generateLang');
 
 //Languages
 $app->get('/languages/{lang}', \SrcCore\controllers\LanguageController::class . ':getByLang');

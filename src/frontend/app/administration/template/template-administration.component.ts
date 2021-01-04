@@ -218,6 +218,14 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                             this.template.file.electronic.content = tinymce.get('templateOfficeHtml').getContent();
                         }
                     });
+                    ed.on('change', (e: any) => {
+                        if (this.template.type === 'HTML' && tinymce.get('templateHtml') != null) {
+                            this.template.file.content = tinymce.get('templateHtml').getContent();
+                        }
+                        if (this.template.type === 'OFFICE_HTML' && tinymce.get('templateOfficeHtml') != null) {
+                            this.template.file.electronic.content = tinymce.get('templateOfficeHtml').getContent();
+                        }
+                    });
                 }
 
             });
@@ -383,7 +391,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                 editorOptions.objectType = 'templateModification';
                 editorOptions.objectId = this.template.id;
             }
-            editorOptions.authToken = this.authService.getToken(),
+            editorOptions.authToken = this.authService.getToken();
             this.launchJavaEditor(editorOptions);
         } else if (this.headerService.user.preferences.documentEdition !== 'java') {
             this.launchIntegratedEditor(editorOptions, this.headerService.user.preferences.documentEdition);

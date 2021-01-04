@@ -71,7 +71,7 @@ export class WelcomeComponent implements OnInit {
     }
 
     getLang() {
-        this.http.get('../rest/dev/lang').pipe(
+        this.http.get('../rest/languages').pipe(
             tap((data: any) => {
                 this.langs = Object.keys(data.langs).filter(lang => lang !== 'nl');
             }),

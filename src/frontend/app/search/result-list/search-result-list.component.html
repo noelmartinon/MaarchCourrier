@@ -164,7 +164,7 @@
                 </div>
                 <div class="main-info" [class.selected-data]="row.checked">
                     <span style="width:50px;">
-                        <mat-checkbox color="primary" [checked]="row.checked" (change)="toggleRes($event,row)"
+                        <mat-checkbox color="primary" [checked]="row.checked" (change)="toggleRes($event,row)" [disabled]="singleSelection && !row.hasDocument"
                             (click)="$event.stopPropagation();">
                         </mat-checkbox>
                     </span>

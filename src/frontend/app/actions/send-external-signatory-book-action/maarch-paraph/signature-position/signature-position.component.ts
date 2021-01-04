@@ -1,10 +1,12 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { catchError, tap } from 'rxjs/operators';
+import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { catchError, filter, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { NotificationService } from '@service/notification/notification.service';
+import { DateOptionModalComponent } from './dateOption/date-option-modal.component';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     templateUrl: 'signature-position.component.html',
@@ -32,7 +34,23 @@ export class SignaturePositionComponent implements OnInit {
         'd MMM y',
         'd MMMM y',
     ];
-    sizes = Array.from({ length: 50 }).map((_, i) => i + 1);
+    datefonts: any[] = [
+        'Arial',
+        'Verdana',
+        'Helvetica',
+        'Tahoma',
+        'Times New Roman',
+        'Courier New',
+    ];
+
+    size = {
+        'Arial': 15,
+        'Verdana': 13,
+        'Helvetica': 13,
+        'Tahoma': 13,
+        'Times New Roman': 15,
+        'Courier New': 13
+    };
     signList: any[] = [];
     dateList: any[] = [];
 
@@ -47,8 +65,10 @@ export class SignaturePositionComponent implements OnInit {
         public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
+        public dialog: MatDialog,
         public dialogRef: MatDialogRef<SignaturePositionComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: any
+        @Inject(MAT_DIALOG_DATA) public data: any,
+        private functions: FunctionsService
     ) { }
 
     ngOnInit(): void {
@@ -68,12 +88,10 @@ export class SignaturePositionComponent implements OnInit {
     }
 
     getPageAttachment() {
-        console.log(this.data.resource);
-
         if (this.data.resource.mainDocument) {
             this.http.get(`../rest/resources/${this.data.resource.resId}/thumbnail/${this.currentPage}`).pipe(
                 tap((data: any) => {
-                    this.pages = Array.from({ length: data.pagesCount }).map((_, i) => i + 1);
+                    this.pages = Array.from({ length: data.pageCount }).map((_, i) => i + 1);
                     this.imgContent = 'data:image/png;base64,' + data.fileContent;
                     this.getImageDimensions(this.imgContent);
                 }),
@@ -85,7 +103,7 @@ export class SignaturePositionComponent implements OnInit {
         } else {
             this.http.get(`../rest/attachments/${this.data.resource.resId}/thumbnail/${this.currentPage}`).pipe(
                 tap((data: any) => {
-                    this.pages = Array.from({ length: data.pagesCount }).map((_, i) => i + 1);
+                    this.pages = Array.from({ length: data.pageCount }).map((_, i) => i + 1);
                     this.imgContent = 'data:image/png;base64,' + data.fileContent;
                     this.getImageDimensions(this.imgContent);
                 }),
@@ -104,6 +122,7 @@ export class SignaturePositionComponent implements OnInit {
             this.workingAreaHeight = data.target.naturalHeight;
         };
         img.src = imgContent;
+        document.getElementsByClassName('signatureContainer')[0].scrollTop = 0;
     }
 
     moveSign(event: any) {
@@ -150,7 +169,9 @@ export class SignaturePositionComponent implements OnInit {
             {
                 sequence: this.currentUser,
                 page: this.currentPage,
-                color: '#666',
+                font: 'Arial',
+                size: 15,
+                color: '#000000',
                 format: 'd MMMM y',
                 width: (130 * 100) / this.workingAreaWidth,
                 height: (30 * 100) / this.workingAreaHeight,
@@ -219,5 +240,26 @@ export class SignaturePositionComponent implements OnInit {
 
     hasDate(userSequence: number, page: number) {
         return this.dateList.filter((item: any) => item.sequence === userSequence && item.page === page).length > 0;
+    }
+
+    openDateSettings(index: number) {
+        const dialogRef = this.dialog.open(DateOptionModalComponent, {
+            panelClass: 'maarch-modal',
+            // disableClose: true,
+            width: '500px',
+            data: {
+                currentDate : this.dateList[index]
+            }
+        });
+        dialogRef.afterClosed().pipe(
+            filter((res: any) => !this.functions.empty(res)),
+            tap((res: any) => {
+                this.dateList[index] = res;
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 }

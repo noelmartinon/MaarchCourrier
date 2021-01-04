@@ -47,6 +47,7 @@ import { SendExternalNoteBookActionComponent } from './actions/send-external-not
 import { XParaphComponent } from './actions/send-external-signatory-book-action/x-paraph/x-paraph.component';
 import { MaarchParaphComponent } from './actions/send-external-signatory-book-action/maarch-paraph/maarch-paraph.component';
 import { SignaturePositionComponent } from './actions/send-external-signatory-book-action/maarch-paraph/signature-position/signature-position.component';
+import { DateOptionModalComponent } from './actions/send-external-signatory-book-action/maarch-paraph/signature-position/dateOption/date-option-modal.component';
 import { IParaphComponent } from './actions/send-external-signatory-book-action/i-paraph/i-paraph.component';
 import { IxbusParaphComponent } from './actions/send-external-signatory-book-action/ixbus-paraph/ixbus-paraph.component';
 import { FastParaphComponent } from './actions/send-external-signatory-book-action/fast-paraph/fast-paraph.component';
@@ -222,6 +223,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         XParaphComponent,
         MaarchParaphComponent,
         SignaturePositionComponent,
+        DateOptionModalComponent,
         FastParaphComponent,
         IxbusParaphComponent,
         IParaphComponent,
@@ -288,6 +290,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         UpdateDepartureDateActionComponent,
         SendExternalSignatoryBookActionComponent,
         SignaturePositionComponent,
+        DateOptionModalComponent,
         SendExternalNoteBookActionComponent,
         ContinueVisaCircuitActionComponent,
         ContinueAvisCircuitActionComponent,

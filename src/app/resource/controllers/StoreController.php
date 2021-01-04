@@ -379,13 +379,13 @@ class StoreController
 
     public static function prepareAttachmentStorage(array $args)
     {
-        $attachmentsTypes = AttachmentTypeModel::get(['select' => ['type_id', 'chrono']]);
-        $attachmentsTypes = array_column($attachmentsTypes, 'chrono', 'type_id');
-        if ($attachmentsTypes[$args['type']] && empty($args['chrono'])) {
+        $attachmentsTypes = AttachmentTypeModel::get(['select' => ['type_id', 'chrono', 'signable']]);
+        $attachmentsTypes = array_column($attachmentsTypes, null, 'type_id');
+        if ($attachmentsTypes[$args['type']]['chrono'] && empty($args['chrono'])) {
             $resource = ResModel::getById(['select' => ['destination', 'type_id'], 'resId' => $args['resIdMaster']]);
             $args['chrono'] = ChronoModel::getChrono(['id' => 'outgoing', 'entityId' => $resource['destination'], 'typeId' => $resource['type_id'], 'resId' => $args['resIdMaster']]);
         }
-        $shouldBeInSignatureBook = $attachmentsTypes[$args['type']]['sign'];
+        $shouldBeInSignatureBook = $attachmentsTypes[$args['type']]['signable'];
 
         if ($args['type'] == 'signed_response') {
             $linkSign = "{$args['originId']},res_attachments";

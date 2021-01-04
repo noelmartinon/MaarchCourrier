@@ -197,8 +197,8 @@
     "availableUsers": "Utilisateur(s) disponible(s)",
     "availableValues": "Valeur(s) disponible(s)",
     "avis": "Circuit d'avis",
-    "avisAnswer": "Donner son avis",
-    "avisAnswerDesc": "Permet à ce groupe d'apparaître dans la liste des personnes Conseillers (circuit d'avis)",
+    "avisAnswer": "Donner son avis (parallèle et séquentiel)",
+    "avisAnswerDesc": "Permet à ce groupe d'apparaître dans la liste des personnes pouvant donner son avis (parallèle et séquentiel)",
     "avisSent": "Avis donné",
     "avisUserAsk": "pour avis",
     "avisUserState": "avis",
@@ -1053,6 +1053,8 @@
     "noAvailablePreview": "Pas de visualisation disponible",
     "noAvailableValue": "Aucun élément disponible",
     "noCircuitAvailable": "Aucun circuit défini",
+    "cannotAddAvisCircuit": "Vous n'avez pas le privilège de définir un circuit d'avis",
+    "cannotAddVisaCircuit": "Vous n'avez pas le privilège de définir un circuit de visa",
     "noCustomFieldInfo": "<b>Aucun champ personnalisé</b> n'est défini, sélectionner des éléments disponibles sur le <b>panneau de droite</b> afin de créer de nouveaux champs.",
     "noDataAvailable": "Aucune donnée disponible",
     "noDatasource": "Aucune source de données",
@@ -2200,5 +2202,11 @@
     "visaWorkflowHistory": "Historique du circuit de visa",
     "showVisaWorkflowHistory": "Afficher l'historique du circuit de visa",
     "list": "Liste",
-    "workflow": "Circuit"
+    "workflow": "Circuit",
+    "datePosMsg": "La date n'est qu'à titre <b>indicatif</b>, elle sera à jour quand la personne <b>signera</b> le document.",
+    "font": "Police",
+    "manageSignaturesPositions": "Gérer les positions de signatures",
+    "signature": "signature",
+    "addDateBlock": "Ajouter le bloc date",
+    "addSignaturePosition": "Ajouter la position de signature"
 }

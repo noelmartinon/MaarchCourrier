@@ -47,8 +47,11 @@
     <!--<div class="alert alert-danger" *ngIf="visaWorkflow.itemRemovedFromVisaTemplate.length > 0" [innerHTML]="('lang.itemRemovedFromVisaTemplate' | translate) + ' : ' + visaWorkflow.itemRemovedFromVisaTemplate.join(', ')"></div>-->
     <div cdkDropList #dataAvailableList="cdkDropList" [cdkDropListData]="visaWorkflow.items" class="cdk-list"
         (cdkDropListDropped)="drop($event)" [cdkDropListDisabled]="!adminMode">
-        <div class="emptyContent" *ngIf="visaWorkflow.items.length === 0">
-            {{'lang.noPerson' | translate}}
+        <div class="emptyContent" *ngIf="adminMode && visaWorkflow.items.length === 0">
+            {{'lang.noVisaWorkflow' | translate}}
+        </div>
+        <div class="emptyContent" *ngIf="!adminMode && visaWorkflow.items.length === 0">
+            {{'lang.cannotAddVisaCircuit' | translate}}
         </div>
         <mat-list-item disableRipple *ngFor="let diffusion of visaWorkflow.items;let i=index" cdkDrag class="columns workflow"
             [cdkDragDisabled]="!canManageUser(diffusion, i)"

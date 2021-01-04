@@ -92,7 +92,7 @@
                                                         <input matInput [(ngModel)]="value.label"
                                                             [placeholder]="'lang.newValue' | translate">
                                                         <button color="warn" mat-icon-button matSuffix
-                                                            [title]="'lang.delete' | translate" (click)="removeValue(custom, i)">
+                                                            [title]="'lang.delete' | translate" (click)="removeValue(custom, i)" [disabled]="custom.values.length === 1">
                                                             <mat-icon class="fa fa-trash"></mat-icon>
                                                         </button>
                                                     </mat-form-field>
