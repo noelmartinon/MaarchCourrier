@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, Input, OnInit, EventEmitter, Output, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
@@ -8,6 +8,7 @@ import { HeaderService } from '@service/header.service';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { FunctionsService } from '@service/functions.service';
+import { NoteEditorComponent } from './note-editor.component';
 
 @Component({
     selector: 'app-notes-list',
@@ -16,17 +17,18 @@ import { FunctionsService } from '@service/functions.service';
 })
 export class NotesListComponent implements OnInit {
 
-    
     notes: any[] = [];
     loading: boolean = true;
     resIds: number[] = [];
 
-    @Input('injectDatas') injectDatas: any;
+    @Input() injectDatas: any;
 
-    @Input('resId') resId: number = null;
-    @Input('editMode') editMode: boolean = false;
+    @Input() resId: number = null;
+    @Input() editMode: boolean = false;
 
-    @Output('reloadBadgeNotes') reloadBadgeNotes = new EventEmitter<string>();
+    @Output() reloadBadgeNotes = new EventEmitter<string>();
+
+    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
 
     dialogRef: MatDialogRef<any>;
 
@@ -58,7 +60,7 @@ export class NotesListComponent implements OnInit {
     loadNotes(resId: number) {
         this.resIds[0] = resId;
         this.loading = true;
-        this.http.get("../rest/resources/" + this.resIds[0] + "/notes")
+        this.http.get('../rest/resources/' + this.resIds[0] + '/notes')
             .subscribe((data: any) => {
                 this.notes = data['notes'];
                 this.reloadBadgeNotes.emit(`${this.notes.length}`);
@@ -80,7 +82,7 @@ export class NotesListComponent implements OnInit {
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.request('DELETE', '../rest/notes/' + note.id)),
             tap(() => {
-                var index = this.notes.findIndex(elem => elem.id == note.id)
+                const index = this.notes.findIndex(elem => elem.id == note.id);
                 if (index > -1) {
                     this.notes.splice(index, 1);
                 }
@@ -96,5 +98,13 @@ export class NotesListComponent implements OnInit {
         } else {
             note.edit = false;
         }
+    }
+
+    isModified() {
+        return this.noteEditor === undefined || this.noteEditor.isWritingNote();
+    }
+
+    addNote() {
+        this.noteEditor.addNote();
     }
 }

@@ -3,7 +3,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { DiffusionsListComponent } from '../../diffusions/diffusions-list.component';
 import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
 import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
-import { NotesListComponent } from '../../notes/notes.component';
+import { NotesListComponent } from '../../notes/notes-list.component';
 import { AttachmentsListComponent } from '../../attachments/attachments-list.component';
 
 declare var $: any;
@@ -14,8 +14,6 @@ declare var $: any;
     styleUrls: ['panel-list.component.scss'],
 })
 export class PanelListComponent implements OnInit {
-
-    
 
     loading: boolean = false;
 

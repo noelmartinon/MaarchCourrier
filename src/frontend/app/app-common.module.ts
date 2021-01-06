@@ -44,7 +44,7 @@ import { AlertComponent } from '../plugins/modal/alert.component';
 import { ConfirmComponent } from '../plugins/modal/confirm.component';
 
 /*PLUGIN COMPONENT*/
-import { NotesListComponent } from './notes/notes.component';
+import { NotesListComponent } from './notes/notes-list.component';
 import { NoteEditorComponent } from './notes/note-editor.component';
 
 import { PluginAutocomplete } from '../plugins/autocomplete/autocomplete.component';

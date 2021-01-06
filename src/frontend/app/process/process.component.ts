@@ -27,6 +27,7 @@ import { FunctionsService } from '@service/functions.service';
 import { PrintedFolderModalComponent } from '../printedFolder/printed-folder-modal.component';
 import { of, Subscription } from 'rxjs';
 import { TechnicalInformationComponent } from '@appRoot/indexation/technical-information/technical-information.component';
+import { NotesListComponent } from '@appRoot/notes/notes-list.component';
 
 
 @Component({
@@ -150,6 +151,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
     @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
     @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
+    @ViewChild('appNotesList', { static: false }) appNotesList: NotesListComponent;
     senderLightInfo: any = { 'displayName': null, 'fillingRate': null };
     hasContact: boolean = false;
 
@@ -767,6 +769,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
             return true;
         } else if (this.currentTool === 'opinionCircuit' && this.appAvisWorkflow !== undefined && this.appAvisWorkflow.isModified()) {
             return true;
+        } else if (this.currentTool === 'notes' && this.appNotesList !== undefined && this.appNotesList.isModified()) {
+            return true;
         } else {
             return false;
         }
@@ -795,6 +799,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
         } else if (this.currentTool === 'opinionCircuit' && this.appAvisWorkflow !== undefined) {
             await this.appAvisWorkflow.saveAvisWorkflow();
             this.loadBadges();
+        } else if (this.currentTool === 'notes' && this.appNotesList !== undefined) {
+            this.appNotesList.addNote();
         }
     }
 

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { SharedModule } from '../app-common.module';
 
-import { NotesListComponent } from '../notes/notes.component';
+import { NotesListComponent } from './notes-list.component';
 import { NoteEditorComponent } from '../notes/note-editor.component';
 
 @NgModule({
