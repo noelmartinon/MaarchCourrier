@@ -101,7 +101,7 @@ export class NotesListComponent implements OnInit {
     }
 
     isModified() {
-        return this.noteEditor === undefined || this.noteEditor.isWritingNote();
+        return this.noteEditor === undefined ? false :  this.noteEditor.isWritingNote();
     }
 
     addNote() {
