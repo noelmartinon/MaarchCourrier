@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
 import { HeaderService } from '@service/header.service';
-import { debounceTime, switchMap, distinctUntilChanged, filter, tap } from 'rxjs/operators';
+import { debounceTime, switchMap, distinctUntilChanged, filter, tap, catchError, finalize } from 'rxjs/operators';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { MatPaginator } from '@angular/material/paginator';
@@ -16,6 +16,8 @@ import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { AuthService } from '@service/auth.service';
 import { Router } from '@angular/router';
+import { AbsModalComponent } from './absModal/abs-modal.component';
+import { of } from 'rxjs';
 
 declare var $: any;
 declare var tinymce: any;
@@ -605,31 +607,15 @@ export class ProfileComponent implements OnInit {
             });
     }
 
-    activateAbsence() {
-        let r = confirm(this.translate.instant('lang.confirmToBeAbsent'));
-
-        if (r) {
-            this.http.put('../rest/users/' + this.user.id + '/status', { 'status': 'ABS' })
-                .subscribe(() => {
-                    this.authService.logout();
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
-    }
-
-    askRedirectBasket() {
-        this.myBasketExpansionPanel = false;
-        this.viewPanels.forEach(p => p.close());
-        let r = confirm(this.translate.instant('lang.askRedirectBasketBeforeAbsence'));
-        if (r) {
-            this.selectedIndex = 1;
-            setTimeout(() => {
-                this.myBasketExpansionPanel = true;
-            }, 0);
-        } else {
-            this.activateAbsence();
-        }
+    openAbsModal() {
+        this.dialog.open(AbsModalComponent, {
+            panelClass: 'maarch-modal',
+            disableClose: true,
+            // width: '500px',
+            data: {
+                user: this.user
+            }
+        });
     }
 
     updatePassword() {

@@ -171,7 +171,7 @@ class MergeController
         }
         $allDates = ['doc_date', 'departure_date', 'admission_date', 'process_limit_date', 'opinion_limit_date', 'closing_date', 'creation_date'];
         foreach ($allDates as $date) {
-            $resource[$date] = TextFormatModel::formatDate($resource[$date], 'd/m/Y');
+            $resource[$date] = TextFormatModel::formatDate($resource[$date], 'd-m-Y');
         }
         $resource['category_id'] = ResModel::getCategoryLabel(['categoryId' => $resource['category_id']]);
 

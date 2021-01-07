@@ -15,6 +15,8 @@ import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 import { of, Subscription } from 'rxjs';
 import { DocumentViewerComponent } from './viewer/document-viewer.component';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { NotesListComponent } from './notes/notes-list.component';
 
 declare var $: any;
 
@@ -90,6 +92,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
     @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
     @ViewChild('appDocumentViewer', { static: false }) appDocumentViewer: DocumentViewerComponent;
+    @ViewChild('appNotesList', { static: false }) appNotesList: NotesListComponent;
 
     constructor(
         public translate: TranslateService,
@@ -226,8 +229,54 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     }
 
     changeSignatureBookLeftContent(id: string) {
-        this.headerTab = id;
-        this.showTopLeftPanel = false;
+        if (this.isToolModified()) {
+            const dialogRef = this.openConfirmModification();
+
+            dialogRef.afterClosed().pipe(
+                tap((data: string) => {
+                    if (data !== 'ok') {
+                        this.headerTab = id;
+                        this.showTopLeftPanel = false;
+                    }
+                }),
+                filter((data: string) => data === 'ok'),
+                tap(() => {
+                    this.saveTool();
+                    this.headerTab = id;
+                    this.showTopLeftPanel = false;
+                }),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        } else {
+            this.headerTab = id;
+            this.showTopLeftPanel = false;
+        }
+    }
+
+    isToolModified() {
+        if (this.headerTab === 'visaCircuit' && this.appVisaWorkflow !== undefined && this.appVisaWorkflow.isModified()) {
+            return true;
+        } else if (this.headerTab === 'notes' && this.appNotesList !== undefined && this.appNotesList.isModified()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    async saveTool() {
+        if (this.headerTab === 'visaCircuit' && this.appVisaWorkflow !== undefined) {
+            await this.appVisaWorkflow.saveVisaWorkflow();
+            this.loadBadges();
+        } else if (this.headerTab === 'notes' && this.appNotesList !== undefined) {
+            this.appNotesList.addNote();
+        }
+    }
+
+    openConfirmModification() {
+        return this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirm'), msg: this.translate.instant('lang.saveModifiedData'), buttonValidate: this.translate.instant('lang.yes'), buttonCancel: this.translate.instant('lang.no') } });
     }
 
     changeRightViewer(index: number) {

@@ -331,8 +331,8 @@
                 </app-document-viewer>
             </div>
         </div>
-        <div class="modal-module {{modal.id}}" cdkDrag *ngFor="let modal of modalModule; let i=index"
-            [class.largeModal]="modal.id === 'info' || modal.id === 'history'" cdkDragBoundary=".process-content">
+        <div class="modal-module {{modal.id}} largeModal" cdkDrag *ngFor="let modal of modalModule; let i=index"
+            cdkDragBoundary=".process-content">
             <div class="modal-module-title" cdkDragHandle>
                 <span>
                     {{modal.label}}

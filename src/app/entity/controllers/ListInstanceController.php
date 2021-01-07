@@ -468,6 +468,7 @@ class ListInstanceController
                     'process_date'          => null,
                     'process_comment'       => $listInstance['process_comment'] ?? null,
                     'requested_signature'   => $listInstance['requested_signature'] ?? false,
+                    'signatory'             => $listInstance['signatory'] ?? false,
                     'delegate'              => $listInstance['delegate'] ?? null
                 ];
             }
@@ -505,6 +506,7 @@ class ListInstanceController
                     'process_date'          => $listInstance['process_date'],
                     'process_comment'       => $listInstance['process_comment'],
                     'requested_signature'   => $listInstance['requested_signature'],
+                    'signatory'             => $listInstance['signatory'],
                     'delegate'              => $listInstance['delegate']
                 ]);
                 ListInstanceHistoryDetailModel::create([
@@ -518,7 +520,8 @@ class ListInstanceController
                     'difflist_type'             => $args['type'] == 'visaCircuit' ? 'VISA_CIRCUIT' : 'AVIS_CIRCUIT',
                     'process_date'              => $listInstance['process_date'],
                     'process_comment'           => $listInstance['process_comment'],
-                    'requested_signature'       => $listInstance['requested_signature']
+                    'requested_signature'       => $listInstance['requested_signature'],
+                    'signatory'                 => $listInstance['signatory']
                 ]);
             }
         }

@@ -4,8 +4,9 @@
 <div *ngIf="!loading" class='visaContent'>
     <div class="titleSignatureBook">
         <div id="tabSignatureBook">
-            <div *ngIf="signatureBook.documents[0] && !signatureBook.documents[0].inSignatureBook" title="{{'lang.mail' | translate}}"
-                class="item" [ngClass]="{'activeTabSignatureBook': headerTab == 'document'}"
+            <div *ngIf="signatureBook.documents[0] && !signatureBook.documents[0].inSignatureBook"
+                title="{{'lang.mail' | translate}}" class="item"
+                [ngClass]="{'activeTabSignatureBook': headerTab == 'document'}"
                 (click)="changeSignatureBookLeftContent('document')">
                 <i class="fa fa-file-alt fa-2x"></i>
             </div>
@@ -29,8 +30,8 @@
             <select id="signatureBookActions">
                 <option *ngFor="let option of signatureBook.actions" value="{{option.id}}">{{option.label}}</option>
             </select>
-            <input name="send" id="send" value="{{'lang.validate' | translate}}" class="button button-form-primary-filled"
-                type="button" (click)="validForm()">
+            <input name="send" id="send" value="{{'lang.validate' | translate}}"
+                class="button button-form-primary-filled" type="button" (click)="validForm()">
         </div>
         <div class="others" *ngIf="!functions.empty(signatureBook.consigne)">
             <span id="consigne">
@@ -90,7 +91,8 @@
                 </div>
                 <div *ngIf="signatureBook.documents.length - 1 > 0" class="pjDetailsMore"
                     (click)="displayPanel('TOPLEFT')"
-                    title="{{signatureBook.documents.length - 1}} {{'lang.mailAttachments' | translate}}" style="left:25px;">
+                    title="{{signatureBook.documents.length - 1}} {{'lang.mailAttachments' | translate}}"
+                    style="left:25px;">
                     <i *ngIf="!showTopLeftPanel" class="fa fa-envelope-square fa-2x" aria-hidden="true"></i>
                     <sup *ngIf="!showTopLeftPanel" class="nbRes"
                         style="position: absolute;right: 6px;top: 5px;">{{signatureBook.documents.length - 1}}</sup>
@@ -104,7 +106,8 @@
                     (error)="pdfViewerError(leftViewerLink)"></pdf-viewer>
                 <div *ngIf="leftSelectedThumbnail > 0 && signatureBook.documents[leftSelectedThumbnail].format != 'pdf' && !signatureBook.documents[leftSelectedThumbnail].isConverted"
                     [ngStyle]="{'height': showTopLeftPanel ? '79%' : '96%'}" class="visaNoPdfWarning">
-                    <div style="padding-top: 25%;">{{'lang.noOverviewAvailable' | translate}}<br /><sub>{{'lang.pdfVersionFile' | translate}}
+                    <div style="padding-top: 25%;">
+                        {{'lang.noOverviewAvailable' | translate}}<br /><sub>{{'lang.pdfVersionFile' | translate}}
                             "{{signatureBook.documents[leftSelectedThumbnail].title}}.{{signatureBook.documents[leftSelectedThumbnail].format}}"
                             {{'lang.isNotAvailable' | translate}}.</sub></div>
                     <div class="visaPjView">
@@ -125,13 +128,6 @@
                 <app-visa-workflow #appVisaWorkflow [resId]="resId"
                     [adminMode]="privilegeService.hasCurrentUserPrivilege('config_visa_workflow')"
                     [target]="'signatureBook'"></app-visa-workflow>
-                <div style="position: sticky;bottom: 0px;text-align:right;">
-                    <button mat-fab [title]="'lang.saveModifications' | translate"
-                        *ngIf="appVisaWorkflow !== undefined && appVisaWorkflow.isModified()"
-                        (click)="saveVisaWorkflow()" color="accent">
-                        <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
-                    </button>
-                </div>
             </div>
             <div *ngIf="headerTab == 'history'" class="contentShow" style="width:98%;">
                 <app-history-list #appHistoryList [resId]="resId"></app-history-list>
@@ -141,6 +137,11 @@
                     (reloadBadgeLinkedResources)="refreshBadge($event,'linkedResources')">
                 </app-linked-resource-list>
             </div>
+            <button style="position: absolute;bottom: 20px;right:20px;" mat-fab
+                [title]="'lang.saveModifications' | translate" *ngIf="isToolModified()" (click)="saveTool()"
+                color="accent">
+                <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
+            </button>
             <div class="hideRightContent" (click)="displayPanel('MIDDLE')"
                 [ngStyle]="{'right': showRightPanel ? '-10px' : '0px'}">
                 <i class="fa fa-chevron-right" aria-hidden="true" *ngIf="showRightPanel"></i>
@@ -211,7 +212,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="pjDetailsMore" (click)="displayPanel('TOPRIGHT')" title="{{'lang.details' | translate}}">
+                    <div class="pjDetailsMore" (click)="displayPanel('TOPRIGHT')"
+                        title="{{'lang.details' | translate}}">
                         <i *ngIf="!showTopRightPanel" class="fa fa-list-alt fa-2x" aria-hidden="true"></i>
                         <i *ngIf="showTopRightPanel" class="fa fa-chevron-up" aria-hidden="true"></i>
                     </div>
@@ -222,15 +224,15 @@
                         (error)="pdfViewerError(rightViewerLink)"></pdf-viewer>-->
                     <app-document-viewer #appDocumentViewer id="rightPanelShowDocumentIframe"
                         *ngIf="signatureBook.attachments[rightSelectedThumbnail].isConverted"
-                        style="height:100%;width:100%;" [editMode]="true"
-                        [hideTools]="true"
+                        style="height:100%;width:100%;" [editMode]="true" [hideTools]="true"
                         [mode]="signatureBook.attachments[rightSelectedThumbnail].isResource ? 'mainDocument' : 'attachment'"
                         [resId]="signatureBook.attachments[rightSelectedThumbnail].signed ? signatureBook.attachments[rightSelectedThumbnail].viewerId : signatureBook.attachments[rightSelectedThumbnail].res_id"
                         [title]="signatureBook.attachments[rightSelectedThumbnail].identifier">
                     </app-document-viewer>
                     <div *ngIf="signatureBook.attachments[rightSelectedThumbnail].format != 'pdf' && signatureBook.attachments[rightSelectedThumbnail].status != 'TMP' && !signatureBook.attachments[rightSelectedThumbnail].isConverted"
                         [ngStyle]="{'height': showTopRightPanel ? '79%' : '96%'}" class="visaNoPdfWarning">
-                        <div style="padding-top: 25%;">{{'lang.noOverviewAvailable' | translate}}<br /><sub>{{'lang.pdfVersionFile' | translate}}
+                        <div style="padding-top: 25%;">
+                            {{'lang.noOverviewAvailable' | translate}}<br /><sub>{{'lang.pdfVersionFile' | translate}}
                                 "{{signatureBook.attachments[rightSelectedThumbnail].title}}.{{signatureBook.attachments[rightSelectedThumbnail].format}}"
                                 {{'lang.isNotAvailable' | translate}}.</sub></div>
                         <div class="visaPjView">
@@ -243,7 +245,8 @@
                     </div>
                     <div *ngIf="signatureBook.attachments[rightSelectedThumbnail].status == 'TMP' && !signatureBook.attachments[rightSelectedThumbnail].isConverted"
                         [ngStyle]="{'height': showTopRightPanel ? '79%' : '96%'}" class="visaNoPdfWarning">
-                        <div style="padding-top: 25%;" [innerHTML]="'lang.editingAttachmentInterrupted' | translate"></div>
+                        <div style="padding-top: 25%;" [innerHTML]="'lang.editingAttachmentInterrupted' | translate">
+                        </div>
                         <div>
                             <a title="{{'lang.editAttachment' | translate}}"
                                 (click)="showAttachment(signatureBook.attachments[rightSelectedThumbnail])">
@@ -274,7 +277,7 @@
                         </span>
                     </div>
                 </div>
-                
+
                 <app-attachments-list *ngIf="showAttachmentPanel" #appAttachmentsList [resId]="resId"
                     [target]="'process'" [canModify]="canUpdateDocument" (reloadBadgeAttachments)="refreshAttachments()"
                     (afterActionAttachment)="refreshAttachments()">
@@ -308,7 +311,8 @@
                 </div>
             </div>
             <div style="bottom: 0px;position: absolute;width:100%;">
-                <div class="panelRightListPj" (click)="displayAttachmentPanel()" title="{{'lang.displayAtt' | translate}}"
+                <div class="panelRightListPj" (click)="displayAttachmentPanel()"
+                    title="{{'lang.displayAtt' | translate}}"
                     [ngClass]="{'panelSelectedThumbnail': showAttachmentPanel}">
                     <i class="fa fa-bars fa-2x"></i>
                 </div>
@@ -323,9 +327,8 @@
                         (click)="showAttachment(signatureBook.attachments[rightSelectedThumbnail])">
                         <i class="fa fa-edit fa-2x"></i>
                     </div>
-                    <div [ngClass]="{'visaDisabledButton': !canUpdateDocument}"
-                        title="{{'lang.deleteAtt' | translate}}" class="visaPjDel"
-                        (click)="delAttachment(signatureBook.attachments[rightSelectedThumbnail])">
+                    <div [ngClass]="{'visaDisabledButton': !canUpdateDocument}" title="{{'lang.deleteAtt' | translate}}"
+                        class="visaPjDel" (click)="delAttachment(signatureBook.attachments[rightSelectedThumbnail])">
                         <i class="fa fa-trash-alt fa-2x"></i>
                     </div>
                 </div>
@@ -343,8 +346,8 @@
                 <span>{{version.relation}}</span>&nbsp;
                 <span>{{'lang.object' | translate}} : </span>
                 <span>{{version.title}}</span>&nbsp;
-                <a style="color:#135F7F" title="{{'lang.dlAttachment' | translate}}" (click)="downloadOriginalFile(version.resId)"
-                    style="cursor: pointer;">
+                <a style="color:#135F7F" title="{{'lang.dlAttachment' | translate}}"
+                    (click)="downloadOriginalFile(version.resId)" style="cursor: pointer;">
                     <i class="fa fa-download fa-2x"></i>
                 </a>
             </div>

@@ -59,7 +59,8 @@ class ListInstanceHistoryDetailModel
                 'difflist_type'             => $args['difflist_type'],
                 'process_date'              => $args['process_date'],
                 'process_comment'           => $args['process_comment'],
-                'requested_signature'       => empty($args['requested_signature']) ? 'false' : 'true'
+                'requested_signature'       => empty($args['requested_signature']) ? 'false' : 'true',
+                'signatory'                 => empty($args['signatory']) ? 'false' : 'true'
             ]
         ]);
 

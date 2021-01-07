@@ -9,12 +9,9 @@ import { AppService } from '@service/app.service';
 declare var $: any;
 
 @Component({
-    templateUrl: 'save-numeric-package.component.html',
-    styleUrls: ['profile.component.css']
+    templateUrl: 'save-numeric-package.component.html'
 })
 export class SaveNumericPackageComponent implements OnInit {
-
-    
 
     numericPackage: any = {
         base64: '',

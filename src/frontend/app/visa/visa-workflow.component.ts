@@ -13,7 +13,6 @@ import { AddVisaModelModalComponent } from './addVisaModel/add-visa-model-modal.
 import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { ActivatedRoute } from '@angular/router';
 import { PrivilegeService } from '@service/privileges.service';
-import { HistoryVisaWorkflowModalComponent } from './history/modal/history-visa-workflow-modal.component';
 
 @Component({
     selector: 'app-visa-workflow',
@@ -655,9 +654,5 @@ export class VisaWorkflowComponent implements OnInit {
         } else {
             return false;
         }
-    }
-
-    openHistory() {
-        this.dialog.open(HistoryVisaWorkflowModalComponent, { panelClass: 'maarch-modal', autoFocus: false, data: { resId: this.resId } });
     }
 }

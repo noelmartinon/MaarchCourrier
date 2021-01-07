@@ -29,3 +29,5 @@ UPDATE history_batch SET total_errors = 0 WHERE total_errors IS NULL;
 
 ALTER TABLE listinstance_history_details DROP COLUMN IF EXISTS requested_signature;
 ALTER TABLE listinstance_history_details ADD COLUMN requested_signature boolean default false;
+ALTER TABLE listinstance_history_details DROP COLUMN IF EXISTS signatory;
+ALTER TABLE listinstance_history_details ADD COLUMN signatory BOOLEAN DEFAULT FALSE;

@@ -16,7 +16,6 @@ import { LatinisePipe } from 'ngx-pipes';
 })
 export class NoteEditorComponent implements OnInit {
 
-    
     notes: any;
     loading: boolean = false;
     templatesNote: any = [];
@@ -24,17 +23,17 @@ export class NoteEditorComponent implements OnInit {
 
     entitiesRestriction: string[] = [];
 
-    @Input('title') title: string = this.translate.instant('lang.addNote');
-    @Input('content') content: string = '';
-    @Input('resIds') resIds: any[];
-    @Input('addMode') addMode: boolean;
-    @Input('upMode') upMode: boolean;
-    @Input('noteContent') noteContent: string;
-    @Input('entitiesNoteRestriction') entitiesNoteRestriction: string[];
-    @Input('noteId') noteId: number;
-    @Input('defaultRestriction') defaultRestriction: boolean;
-    @Input('disableRestriction') disableRestriction: boolean = false;
-    @Output('refreshNotes') refreshNotes = new EventEmitter<string>();
+    @Input() title: string = this.translate.instant('lang.addNote');
+    @Input() content: string = '';
+    @Input() resIds: any[];
+    @Input() addMode: boolean;
+    @Input() upMode: boolean;
+    @Input() noteContent: string;
+    @Input() entitiesNoteRestriction: string[];
+    @Input() noteId: number;
+    @Input() defaultRestriction: boolean;
+    @Input() disableRestriction: boolean = false;
+    @Output() refreshNotes = new EventEmitter<string>();
 
     searchTerm: FormControl = new FormControl();
     entitiesList: any[] = [];
@@ -108,7 +107,7 @@ export class NoteEditorComponent implements OnInit {
 
     addNote() {
         this.loading = true;
-        this.http.post("../rest/notes", { value: this.content, resId: this.resIds[0], entities: this.entitiesRestriction })
+        this.http.post('../rest/notes', { value: this.content, resId: this.resIds[0], entities: this.entitiesRestriction })
             .subscribe((data: any) => {
                 this.refreshNotes.emit(this.resIds[0]);
                 this.loading = false;
@@ -117,7 +116,7 @@ export class NoteEditorComponent implements OnInit {
 
     updateNote() {
         this.loading = true;
-        this.http.put("../rest/notes/" + this.noteId, { value: this.content, resId: this.resIds[0], entities: this.entitiesRestriction })
+        this.http.put('../rest/notes/' + this.noteId, { value: this.content, resId: this.resIds[0], entities: this.entitiesRestriction })
             .subscribe((data: any) => {
                 this.refreshNotes.emit(this.resIds[0]);
                 this.loading = false;
@@ -156,7 +155,7 @@ export class NoteEditorComponent implements OnInit {
             if (!this.functions.empty(this.resIds) && this.resIds.length == 1) {
                 params['resId'] = this.resIds[0];
             }
-            this.http.get("../rest/notesTemplates", { params: params })
+            this.http.get('../rest/notesTemplates', { params: params })
                 .subscribe((data: any) => {
                     this.templatesNote = data['templates'];
                 });
@@ -171,7 +170,7 @@ export class NoteEditorComponent implements OnInit {
                 if (!this.functions.empty(this.resIds) && this.resIds.length == 1) {
                     params['resId'] = this.resIds[0];
                 }
-                this.http.get("../rest/entities").pipe(
+                this.http.get('../rest/entities').pipe(
                     tap((data: any) => {
                         this.entities = data['entities'];
                         resolve(true);
@@ -190,5 +189,9 @@ export class NoteEditorComponent implements OnInit {
     removeEntityRestriction(index: number, realIndex: number) {
         this.entities[realIndex].selected = false;
         this.entitiesRestriction.splice(index, 1);
+    }
+
+    isWritingNote() {
+        return this.content !== '';
     }
 }

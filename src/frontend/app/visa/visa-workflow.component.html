@@ -135,8 +135,16 @@
 <div *ngIf="loading" style="display:flex;padding: 10px;">
     <mat-spinner style="margin:auto;"></mat-spinner>
 </div>
-<div style="text-align: right;" *ngIf="!loading && hasHistory">
-    <button mat-button color="primary" (click)="openHistory()">
-        {{'lang.showVisaWorkflowHistory' | translate}}
-    </button>
-</div>
+<ng-container *ngIf="!loading && hasHistory">
+    <mat-divider></mat-divider>
+    <mat-expansion-panel style="box-shadow: none;">
+        <mat-expansion-panel-header>
+            <mat-panel-title color="primary">
+                {{'lang.showVisaWorkflowHistory' | translate}}
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <ng-template matExpansionPanelContent>
+            <app-history-visa-workflow [resId]="resId" style="display: contents;"></app-history-visa-workflow>
+        </ng-template>
+    </mat-expansion-panel>
+</ng-container>

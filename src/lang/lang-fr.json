@@ -2208,5 +2208,7 @@
     "manageSignaturesPositions": "Gérer les positions de signatures",
     "signature": "signature",
     "addDateBlock": "Ajouter le bloc date",
-    "addSignaturePosition": "Ajouter la position de signature"
+    "addSignaturePosition": "Ajouter la position de signature",
+    "basketsToRedirect": "Bannettes à rediriger",
+    "maileva_digital_registered_mail": "Lettre recommandée en ligne"
 }

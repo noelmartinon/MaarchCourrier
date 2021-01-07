@@ -118,7 +118,8 @@ import { MaarchParapheurListComponent } from './home/maarch-parapheur/maarch-par
 import { PanelFolderComponent } from './folder/panel/panel-folder.component';
 import { PasswordModificationComponent, InfoChangePasswordModalComponent, } from './login/passwordModification/password-modification.component';
 import { PrintSeparatorComponent } from './separator/print-separator/print-separator.component';
-import { ProfileComponent } from './profile.component';
+import { ProfileComponent } from './profile/profile.component';
+import { AbsModalComponent } from './profile/absModal/abs-modal.component';
 import { RedirectIndexingModelComponent } from './administration/indexingModel/redirectIndexingModel/redirect-indexing-model.component';
 import { ResetPasswordComponent } from './login/resetPassword/reset-password.component';
 import { SaveNumericPackageComponent } from './save-numeric-package.component';
@@ -198,6 +199,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         PasswordModificationComponent,
         PrintSeparatorComponent,
         ProfileComponent,
+        AbsModalComponent,
         RedirectIndexingModelComponent,
         ResetPasswordComponent,
         SaveNumericPackageComponent,
@@ -309,7 +311,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         PrintDepositListActionComponent,
         ViewDocActionComponent,
         ReconcileActionComponent,
-        TechnicalInformationComponent
+        TechnicalInformationComponent,
+        AbsModalComponent
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

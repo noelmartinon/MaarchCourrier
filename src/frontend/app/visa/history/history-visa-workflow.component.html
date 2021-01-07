@@ -21,7 +21,9 @@
                     </div>
                     <div>
                         <button class="currentRoleButton" color="primary" disabled mat-raised-button
-                            title="{{'lang.' + diffusion.currentRole + 'User' | translate}}">{{diffusion.requested_signature ? ('lang.signUser' | translate) : ('lang.visaUser' | translate)}}</button>
+                            title="{{diffusion.process_date === null ? (diffusion.requested_signature ? ('lang.signUser' | translate) : ('lang.visaUser' | translate)) : (diffusion.signatory ? ('lang.signUser' | translate) : ('lang.visaUser' | translate))}}">
+                            {{diffusion.process_date === null ? (diffusion.requested_signature ? ('lang.signUser' | translate) : ('lang.visaUser' | translate)) : (diffusion.signatory ? ('lang.signUser' | translate) : ('lang.visaUser' | translate))}}
+                        </button>
                     </div>
                 </div>
             </mat-list-item>

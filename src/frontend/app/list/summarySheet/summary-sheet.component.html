@@ -33,35 +33,41 @@
                         <div class="columns" [class.disabled]="!item.enabled" *ngIf="item.unit !== 'qrcode'" cdkDrag
                             id="{{item.id}}" style="position: relative;">
                             <div class="unitTitle">
-                                <div class="handleDrag" cdkDragHandle>
-                                    <svg width="24px" fill="currentColor" viewBox="0 0 24 24">
-                                        <path
-                                            d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z">
-                                        </path>
-                                        <path d="M0 0h24v24H0z" fill="none"></path>
-                                    </svg>
-                                </div>
-                                <mat-form-field floatLabel="never" style="margin-top: -10px;">
-                                    <input matInput placeholder="{{'lang.label' | translate}}" [(ngModel)]="item.label"
-                                        (click)="$event.stopPropagation();">
-                                </mat-form-field>
+                                    <div class="handleDrag" cdkDragHandle>
+                                        <svg width="24px" fill="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z">
+                                            </path>
+                                            <path d="M0 0h24v24H0z" fill="none"></path>
+                                        </svg>
+                                    </div>
+                                    <mat-form-field floatLabel="never" style="margin-top: -10px;">
+                                        <input matInput placeholder="{{'lang.label' | translate}}" [(ngModel)]="item.label"
+                                            (click)="$event.stopPropagation();">
+                                    </mat-form-field>
+                                    <button *ngIf="item.unit == 'freeField'" mat-icon-button color="warn"
+                                            title="{{'lang.deleteUnit' | translate}}"
+                                            (click)="removeCustomUnit(i)">
+                                        <mat-icon fontSet="fas" fontIcon="fa-minus" style=""></mat-icon>
+                                    </button>
                             </div>
-                            <div class="row" class="unitData" (click)="item.enabled = !item.enabled" *ngIf="!functions.empty(item.desc)">
-                                <div class="{{item.css}}" *ngFor="let itemData of item.desc">
-                                    {{itemData}}
+                            <div class="rowData">
+                                <div class="column-1">
+                                    <div class="row unitData" (click)="item.enabled = !item.enabled" *ngIf="!functions.empty(item.desc)">
+                                        <div class="{{item.css}}" *ngFor="let itemData of item.desc">
+                                            {{itemData}}
+                                        </div>
+                                    </div><br>
+                                    <div class="row unitData" (click)="item.enabled = !item.enabled" *ngIf="item.advanced_desc">
+                                        <div  style="padding-top: 10px;" name="traffic_record_summary_sheet" id="traffic_record_summary_sheet"
+                                            [innerHTML]="item.advanced_desc"></div>
+                                    </div>
                                 </div>
-                            </div><br>
-                            <div class="row" class="unitData" (click)="item.enabled = !item.enabled" *ngIf="item.advanced_desc">
-                                <div  style="padding-top: 10px;" name="traffic_record_summary_sheet" id="traffic_record_summary_sheet"
-                                    [innerHTML]="item.advanced_desc"></div>
+                                <div class="column-2">
+                                    <mat-slide-toggle [(ngModel)]="item.enabled" color="primary" class="unitToggle">
+                                    </mat-slide-toggle>
+                                </div>
                             </div>
-                            <mat-slide-toggle [(ngModel)]="item.enabled" color="primary" class="unitToggle">
-                            </mat-slide-toggle>
-                            <button *ngIf="item.unit == 'freeField'" mat-icon-button color="warn"
-                                style="position: absolute;right:5px;top:0px;" title="{{'lang.deleteUnit' | translate}}"
-                                (click)="removeCustomUnit(i)">
-                                <mat-icon fontSet="fas" fontIcon="fa-minus"></mat-icon>
-                            </button>
                         </div>
                     </ng-container>
                 </div>

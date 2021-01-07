@@ -10,8 +10,6 @@ import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { MaarchFlatTreeComponent } from '../../../plugins/tree/maarch-flat-tree.component';
 
-declare var $: any;
-
 @Component({
     templateUrl: 'shipping-administration.component.html',
     styleUrls: ['shipping-administration.component.scss']
@@ -21,8 +19,6 @@ export class ShippingAdministrationComponent implements OnInit {
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('maarchTree', { static: true }) maarchTree: MaarchFlatTreeComponent;
 
-
-    
     loading: boolean = false;
     creationMode: boolean = true;
 
@@ -56,10 +52,9 @@ export class ShippingAdministrationComponent implements OnInit {
     ];
 
     sendModes: string[] = [
+        'digital_registered_mail',
         'fast',
         'economic'
-        // 'registered_mail',
-        // 'registered_mail_ar'
     ];
     hidePassword: boolean = true;
 
