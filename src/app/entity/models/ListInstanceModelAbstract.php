@@ -58,7 +58,8 @@ abstract class ListInstanceModelAbstract
                 'process_date'              => $args['process_date'],
                 'process_comment'           => $args['process_comment'],
                 'requested_signature'       => empty($args['requested_signature']) ? 'false' : 'true',
-                'delegate'                  => $args['delegate'] ?? null
+                'delegate'                  => $args['delegate'] ?? null,
+                'signatory'                 => empty($args['signatory']) ? 'false' : 'true'
             ]
         ]);
 
