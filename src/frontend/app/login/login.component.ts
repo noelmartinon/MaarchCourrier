@@ -43,7 +43,6 @@ export class LoginComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-
         this.headerService.hideSideBar = true;
         this.loginForm = this.formBuilder.group({
             login: [null, Validators.required],
@@ -104,6 +103,8 @@ export class LoginComponent implements OnInit {
                     window.location.href = this.authService.authUri;
                 } else if (this.authService.authMode === 'openam' && err.error.errors === 'Authentication Failed : User cookie is not set' && !this.functionsService.empty(this.authService.authUri)) {
                     window.location.href = this.authService.authUri;
+                } else if (this.authService.authMode === 'azure_saml' && err.error.errors === 'Authentication Failed : not logged') {
+                    window.location.href = err.error.authUri;
                 } else {
                     this.notify.handleSoftErrors(err);
                 }
@@ -113,7 +114,7 @@ export class LoginComponent implements OnInit {
     }
 
     initConnection() {
-        if (['sso', 'openam'].indexOf(this.authService.authMode) > -1) {
+        if (['sso', 'openam', 'azure_saml'].indexOf(this.authService.authMode) > -1) {
             this.loginForm.disable();
             this.loginForm.setValidators(null);
             this.onSubmit();

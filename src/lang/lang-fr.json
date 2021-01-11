@@ -2112,6 +2112,7 @@
     "keycloakEnabled": "Authentification Keycloak activée",
     "ssoEnabled": "Authentification SSO activée",
     "casEnabled": "Authentification CAS activée",
+    "azure_samlEnabled": "Authentification Azure AD activée",
     "displayAsTechnicalData": "Afficher en tant que donnée technique",
     "displayInForm": "Afficher dans le formulaire",
     "formDescription": "Permet d'utiliser ce champ dans les modèles d'enregistrement",
