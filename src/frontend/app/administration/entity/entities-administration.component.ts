@@ -46,6 +46,7 @@ export class EntitiesAdministrationComponent implements OnInit {
     idVisaCircuit: number;
     idOpinionCircuit: number;
     config: any = {};
+    emptyField: boolean = true;
 
     dataSourceUsers = new MatTableDataSource(this.currentEntity.users);
     dataSourceTemplates = new MatTableDataSource(this.currentEntity.templates);
@@ -144,10 +145,11 @@ export class EntitiesAdministrationComponent implements OnInit {
             });
             $('#jstree').jstree('select_node', this.entities[0]);
             let to: any = false;
-            $('#jstree_search').keyup(function () {
+            $('#jstree_search').keyup( () => {
+                const v: any = $('#jstree_search').val();
+                this.emptyField = v === '' ? true : false;
                 if (to) { clearTimeout(to); }
                 to = setTimeout(function () {
-                    const v: any = $('#jstree_search').val();
                     $('#jstree').jstree(true).search(v);
                 }, 250);
             });
@@ -784,6 +786,12 @@ export class EntitiesAdministrationComponent implements OnInit {
     openExportModal() {
         this.dialog.open(EntitiesExportComponent, { panelClass: 'maarch-modal', width: '400px', autoFocus: false });
 
+    }
+
+    clearFilter() {
+        $('#jstree_search').val('');
+        $('#jstree').jstree(true).search('');
+        this.emptyField = true;
     }
 }
 @Component({

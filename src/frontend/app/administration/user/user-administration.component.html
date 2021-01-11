@@ -498,8 +498,11 @@
                                     <div class="row">
                                         <div class="col-md-6 col-xs-6">
                                             <mat-form-field>
-                                                <input matInput (keyup)="applyFilter($event.target.value)"
+                                                <input matInput #filterHistory (keyup)="applyFilter($event.target.value)"
                                                     placeholder="{{'lang.filterBy' | translate}}">
+                                                    <mat-icon *ngIf="filterHistory.value" matSuffix class="fas fa-times" [title]="'lang.clearFilter' | translate"
+                                                        style="font-size: 15px; cursor: pointer;" color="primary" (click)="applyFilter(''); filterHistory.value = ''">
+                                                    </mat-icon>
                                             </mat-form-field>
                                         </div>
                                         <div class="col-md-6 col-xs-6">

@@ -38,6 +38,7 @@ export class DoctypesAdministrationComponent implements OnInit {
     creationMode: any = false;
     newSecondLevel: any = false;
     newFirstLevel: any = false;
+    emptyField: boolean = true;
 
     conservationRules: any = [];
 
@@ -118,10 +119,11 @@ export class DoctypesAdministrationComponent implements OnInit {
                         'plugins': ['search', 'dnd', 'contextmenu'],
                     });
                     let to: any = false;
-                    $('#jstree_search').keyup(function () {
+                    $('#jstree_search').keyup( () => {
+                        const v: any = $('#jstree_search').val();
+                        this.emptyField = v === '' ? true : false;
                         if (to) { clearTimeout(to); }
                         to = setTimeout(function () {
-                            const v: any = $('#jstree_search').val();
                             $('#jstree').jstree(true).search(v);
                         }, 250);
                     });
@@ -438,6 +440,12 @@ export class DoctypesAdministrationComponent implements OnInit {
                 this.notify.error(err.error.errors);
             });
         this.creationMode = mode;
+    }
+
+    clearFilter() {
+        $('#jstree_search').val('');
+        $('#jstree').jstree(true).search('');
+        this.emptyField = true;
     }
 }
 @Component({

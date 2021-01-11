@@ -103,7 +103,7 @@ export class AuthService {
     }
 
     async logout(cleanUrl: boolean = true, forcePageLogin: boolean = false) {
-        if (['cas', 'keycloak'].indexOf(this.authMode) > -1 && !forcePageLogin) {
+        if (['cas', 'keycloak', 'azure_saml'].indexOf(this.authMode) > -1 && !forcePageLogin) {
             this.SsoLogout(cleanUrl);
         } else {
             // AVOID UNLOCK ON DESROY COMPONENT

@@ -49,18 +49,23 @@
                 <div class="example-loading-shade" *ngIf="isLoadingResults">
                     <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
                 </div>
-                <div class="table-head">
-                    <div class="table-head-result">
-                        <mat-form-field floatLabel="never" style="font-size: 13px;">
-                            <input type="text" #autoCompleteInput [placeholder]="'lang.filterBy' | translate" matInput
+                <mat-card>
+                    <div class="row">
+                        <div class="col-md-6 col-xs-6">
+                            <mat-form-field floatLabel="never" style="font-size: 13px;">
+                                <input type="text" #autoCompleteInput [placeholder]="'lang.filterBy' | translate" matInput
                                 [formControl]="searchContact" (click)="$event.stopPropagation()" maxlength="128">
-                        </mat-form-field>
-                    </div>
-                    <div class="table-head-tool">
-                        <mat-paginator #paginatorContactList [length]="resultsLength" [hidePageSize]="true"
+                                <mat-icon *ngIf="searchContact.value" matSuffix class="fas fa-times" [title]="'lang.clearFilter' | translate"
+                                    style="font-size: 15px; cursor: pointer;" color="primary" (click)="searchContact.setValue('')">
+                                </mat-icon>
+                            </mat-form-field>
+                        </div>
+                        <div class="col-md-6 col-xs-6">
+                            <mat-paginator #paginatorContactList [length]="resultsLength" [hidePageSize]="true"
                             [pageSize]="10" class="paginatorResultList"></mat-paginator>
+                        </div>
                     </div>
-                </div>
+                </mat-card>
                 <div style="height:90%;overflow:auto;position:absolute;width:100%;">
                     <mat-table id="contact-list" #tableContactListSort="matSort" [dataSource]="data" matSort matSortDisableClear style="width:100%;">
                         <ng-container matColumnDef="filling">

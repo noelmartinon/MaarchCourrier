@@ -188,7 +188,7 @@ class AuthenticationController
         if (!in_array($args['currentRoute'], ['/passwordRules', '/users/{id}/password'])) {
             $loggingMethod = CoreConfigModel::getLoggingMethod();
 
-            if (!in_array($loggingMethod['id'], ['sso', 'cas', 'ldap', 'keycloak', 'shibboleth'])) {
+            if (in_array($loggingMethod['id'], ['standard'])) {
                 $passwordRules = PasswordModel::getEnabledRules();
                 if (!empty($passwordRules['renewal'])) {
                     $currentDate = new \DateTime();
@@ -315,6 +315,15 @@ class AuthenticationController
             if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
                 return $response->withStatus(403)->withJson(['errors' => 'Authentication unauthorized']);
             }
+        } elseif ($loggingMethod['id'] == 'azure_saml') {
+            $authenticated = AuthenticationController::azureSamlConnection();
+            if (!empty($authenticated['errors'])) {
+                return $response->withStatus(401)->withJson(['errors' => $authenticated['errors']]);
+            }
+            $login = strtolower($authenticated['login']);
+            if (!AuthenticationController::isUserAuthorized(['login' => $login])) {
+                return $response->withStatus(403)->withJson(['errors' => 'Authentication unauthorized']);
+            }
         } else {
             return $response->withStatus(403)->withJson(['errors' => 'Logging method unauthorized']);
         }
@@ -370,6 +379,9 @@ class AuthenticationController
             $logoutUrl = $disconnection['logoutUrl'];
         } elseif ($loggingMethod['id'] == 'keycloak') {
             $disconnection = AuthenticationController::keycloakDisconnection();
+            $logoutUrl = $disconnection['logoutUrl'];
+        } elseif ($loggingMethod['id'] == 'azure_saml') {
+            $disconnection = AuthenticationController::azureSamlDisconnection();
             $logoutUrl = $disconnection['logoutUrl'];
         }
 
@@ -633,6 +645,43 @@ class AuthenticationController
         }
 
         return ['login' => $login];
+    }
+
+    private static function azureSamlConnection()
+    {
+        $libDir = CoreConfigModel::getLibrariesDirectory();
+        if (!is_file($libDir . 'simplesamlphp/lib/_autoload.php')) {
+            return ['errors' => 'Library simplesamlphp not present'];
+        }
+
+        require_once($libDir . 'simplesamlphp/lib/_autoload.php');
+        $as = new \SimpleSAML\Auth\Simple('default-sp');
+        $as->requireAuth([
+            'ReturnTo'          => UrlController::getCoreUrl(),
+            'skipRedirection'   => true
+        ]);
+
+        $attributes = $as->getAttributes();
+        $login = $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'][0];
+        if (empty($login)) {
+            return ['errors' => 'Authentication Failed : login not present in attributes'];
+        }
+
+        return ['login' => $login];
+    }
+
+    private static function azureSamlDisconnection()
+    {
+        $libDir = CoreConfigModel::getLibrariesDirectory();
+        if (!is_file($libDir . 'simplesamlphp/lib/_autoload.php')) {
+            return ['errors' => 'Library simplesamlphp not present'];
+        }
+
+        require_once($libDir . 'simplesamlphp/lib/_autoload.php');
+        $as = new \SimpleSAML\Auth\Simple('default-sp');
+        $url = $as->getLogoutURL();
+
+        return ['logoutUrl' => $url];
     }
 
     public function getRefreshedToken(Request $request, Response $response)

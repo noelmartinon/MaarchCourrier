@@ -35,6 +35,7 @@ export class IndexingAdministrationComponent implements OnInit {
         entities: []
     };
     dialogRef: MatDialogRef<any>;
+    emptyField: boolean = true;
 
     constructor(
         public translate: TranslateService,
@@ -131,10 +132,11 @@ export class IndexingAdministrationComponent implements OnInit {
         });
 
         let to: any = false;
-        $('#jstree_search').keyup(function () {
+        $('#jstree_search').keyup( () => {
+            const v: any = $('#jstree_search').val();
+            this.emptyField = v === '' ? true : false;
             if (to) { clearTimeout(to); }
             to = setTimeout(function () {
-                const v: any = $('#jstree_search').val();
                 $('#jstree').jstree(true).search(v);
             }, 250);
         });
@@ -351,5 +353,11 @@ export class IndexingAdministrationComponent implements OnInit {
                 })
             ).subscribe();
         }
+    }
+
+    clearFilter() {
+        $('#jstree_search').val('');
+        $('#jstree').jstree(true).search('');
+        this.emptyField = true;
     }
 }

@@ -31,6 +31,10 @@
                     <mat-icon color="primary" class="fa fa-search">
                     </mat-icon>
                 </button>
+                <button *ngIf="searchHistory.value" mat-button matSuffix mat-icon-button (click)="searchHistory.setValue(''); directSearchHistory()" [title]="'lang.search' | translate" style="float: right">
+                    <mat-icon color="primary" class="fas fa-times">
+                    </mat-icon>
+                </button>
             </mat-form-field>
         </form>
     </div>

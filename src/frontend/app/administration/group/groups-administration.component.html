@@ -32,7 +32,13 @@
                     <div class="row" style="margin:0px;">
                         <div class="col-md-6 col-xs-6">
                             <mat-form-field>
-                                <input matInput [formControl]="adminService.getFilterField()" placeholder="{{'lang.filterBy' | translate}}">
+                                <input matInput [formControl]="adminService.getFilterField()"
+                                    placeholder="{{'lang.filterBy' | translate}}">
+                                <button mat-button *ngIf="adminService.searchTerm.value !== ''" matSuffix
+                                    mat-icon-button aria-label="Clear" (click)="adminService.searchTerm.setValue('')"
+                                    [title]="'lang.clearFilter' | translate">
+                                    <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
+                                </button>
                             </mat-form-field>
                         </div>
                         <div class="col-md-6 col-xs-6">
@@ -43,12 +49,14 @@
                     <mat-table #table [dataSource]="adminService.getDataSource()" matSortDisableClear matSort>
                         <ng-container matColumnDef="group_id">
                             <mat-header-cell *matHeaderCellDef mat-sort-header
-                                [class.hide-for-mobile]="appService.getViewMode()">{{'lang.id' | translate}}</mat-header-cell>
+                                [class.hide-for-mobile]="appService.getViewMode()">{{'lang.id' | translate}}
+                            </mat-header-cell>
                             <mat-cell *matCellDef="let element" [class.hide-for-mobile]="appService.getViewMode()">
                                 {{element.group_id}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="group_desc">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2;">{{'lang.description' | translate}}
+                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2;">
+                                {{'lang.description' | translate}}
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" style="flex:2;">
                                 {{element.group_desc}} </mat-cell>

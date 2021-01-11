@@ -25,7 +25,7 @@ chdir('../..');
 $customs = scandir('custom');
 
 foreach ($customs as $custom) {
-    if ($custom == 'custom.xml' || $custom == '.' || $custom == '..') {
+    if ($custom == 'custom.json' || $custom == '.' || $custom == '..') {
         continue;
     }
 
@@ -64,6 +64,11 @@ foreach ($customs as $custom) {
             }
         }
         if ($template['template_type'] == 'OFFICE' || $template['template_type'] == 'OFFICE_HTML') {
+            if (empty($template['template_file_name']) || empty($template['template_path'])) {
+                $nonMigrated++;
+                continue;
+            }
+
             $path = str_replace('#', '/', $template['template_path']);
 
             $pathToDocument = $templatesPath . $path . $template['template_file_name'];

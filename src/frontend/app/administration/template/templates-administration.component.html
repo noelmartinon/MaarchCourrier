@@ -33,6 +33,9 @@
                         <div class="col-md-6 col-xs-6">
                             <mat-form-field>
                                 <input matInput [formControl]="adminService.getFilterField()" placeholder="{{'lang.filterBy' | translate}}">
+                                <mat-icon *ngIf="adminService.searchTerm.value !== ''" matSuffix class="fas fa-times" [title]="'lang.clearFilter' | translate"
+                                    style="font-size: 15px; cursor: pointer;" color="primary" (click)="adminService.searchTerm.setValue('')">
+                                </mat-icon>
                             </mat-form-field>
                         </div>
                         <div class="col-md-6 col-xs-6">
