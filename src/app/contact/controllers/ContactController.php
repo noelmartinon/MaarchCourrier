@@ -562,9 +562,9 @@ class ContactController
         $contactsFilling = ContactFillingModel::get();
         $contactParameters = ContactParameterModel::get([
             'select' => ['*'],
-            'orderBy' => ['identifier=\'civility\' desc, identifier=\'firstname\' desc, identifier=\'lastname\' desc, identifier=\'company\' desc, identifier=\'department\' desc, 
-            identifier=\'function\' desc, identifier=\'address_number\' desc, identifier=\'address_street\' desc, identifier=\'address_additional1\' desc, identifier=\'address_additional2\' desc, 
-            identifier=\'address_postcode\' desc, identifier=\'address_town\' desc, identifier=\'address_country\' desc, identifier=\'email\' desc, identifier=\'phone\' desc, identifier=\'notes\' desc']
+            'orderBy' => ['identifier=\'civility\' desc, identifier=\'firstname\' desc, identifier=\'lastname\' desc,identifier=\'function\' desc, identifier=\'company\' desc, identifier=\'department\' desc,
+            identifier=\'email\' desc,  identifier=\'phone\' desc, identifier=\'addressAdditional1\' desc, identifier=\'addressNumber\' desc, identifier=\'addressStreet\' desc,
+            identifier=\'addressAdditional2\' desc, identifier=\'addressPostcode\' desc, identifier=\'addressTown\' desc, identifier=\'addressCountry\' desc, identifier=\'notes\' desc']
         ]);
         foreach ($contactParameters as $key => $parameter) {
             if (strpos($parameter['identifier'], 'contactCustomField_') !== false) {
