@@ -24,4 +24,8 @@
         <ID>openam</ID>
         <ENABLED>false</ENABLED>
     </METHOD>
+    <METHOD>
+        <ID>azure_saml</ID>
+        <ENABLED>false</ENABLED>
+    </METHOD>
 </ROOT>
