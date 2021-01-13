@@ -801,6 +801,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
             this.loadBadges();
         } else if (this.currentTool === 'notes' && this.appNotesList !== undefined) {
             this.appNotesList.addNote();
+            this.loadBadges();
         }
     }
 
