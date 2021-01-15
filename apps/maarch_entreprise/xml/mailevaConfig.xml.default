@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ROOT>
    <ENABLED>false</ENABLED>
-   <CONNECTION_URI>https://api.sandbox.aws.maileva.net</CONNECTION_URI>
-   <URI>https://api.sandbox.aws.maileva.net</URI>
+   <CONNECTION_URI>https://api.sandbox.maileva.net</CONNECTION_URI>
+   <URI>https://api.sandbox.maileva.net</URI>
    <CLIENT_ID>ed7637a582ea422d90a8f8753079a386</CLIENT_ID>
    <CLIENT_SECRET>abb3ebc779e84291aa4a06e7f36034ec</CLIENT_SECRET>
 </ROOT>

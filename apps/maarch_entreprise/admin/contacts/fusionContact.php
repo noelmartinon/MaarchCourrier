@@ -13,6 +13,9 @@ $master_address_id = $_POST['master_address_id'];
 $contacts_id = explode(',', $_POST['slave_contact_id']);
 $del_address_id = explode(',', $_POST['del_address_id']);
 
+$contacts_id = array_diff($contacts_id, [$master_contact_id]);
+$del_address_id = array_diff($del_address_id, [$master_address_id]);
+
 foreach ($contacts_id as $key => $value) {
 
     //mise à jour des contacts courriers de type arrivé

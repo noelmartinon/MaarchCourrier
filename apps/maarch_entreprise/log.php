@@ -234,6 +234,14 @@ if (!empty($_SESSION['error'])) {
                 ); //permet de rechercher les utilisateurs dans le LDAP sans prendre en compte la casse
                 $result = $stmt->fetch();
                 $login = $result['user_id'];
+                if (empty($login)) {
+                    $_SESSION['error'] = "L'utilisateur n'existe pas dans l'application Maarch Courrier";
+                    header(
+                        'location: ' . $_SESSION['config']['businessappurl']
+                        . 'index.php?display=true&page=login'
+                    );
+                    exit();
+                }
 
                 if (!empty($result['locked_until'])) {
                     $lockedDate = new \DateTime($result['locked_until']);

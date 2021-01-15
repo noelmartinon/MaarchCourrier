@@ -689,7 +689,7 @@ class ResController
         $baskets = BasketModel::getBasketsByLogin(['login' => $aArgs['userId'], 'unneededBasketId' => ['IndexingBasket']]);
         $basketsClause = '';
         foreach ($baskets as $basket) {
-            if (!empty($basket['basket_clause'])) {
+            if (!empty($basket['basket_clause']) && $basket['allowed']) {
                 $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $aArgs['userId']]);
                 if (!empty($basketsClause)) {
                     $basketsClause .= ' or ';

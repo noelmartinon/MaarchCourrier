@@ -102,21 +102,21 @@ abstract class visa_Abstract extends Database
             'res_id',
             'status',
             'category_id as category_img',
-                        'contact_firstname',
+            'contact_firstname',
             'contact_lastname',
             'contact_society',
             'user_lastname',
-                        'user_firstname',
+            'user_firstname',
             'priority',
             'creation_date',
             'admission_date',
             'subject',
-                        'process_limit_date',
+            'process_limit_date',
             'entity_label',
             'dest_user',
             'category_id',
             'type_label',
-                        'exp_user_id',
+            'exp_user_id',
             'doc_custom_n1 as count_attachment',
             'alt_identifier',
             'is_multicontacts',
@@ -1043,7 +1043,7 @@ abstract class visa_Abstract extends Database
                 $stmt = $db->query(
                     'select res_id, description, subject, title, format, filesize, res_id_master, attachment_type, creation_date, typist from '
                     .RES_ATTACHMENTS_TABLE
-                    ." where res_id_master = ? and coll_id = ? and attachment_type <> 'converted_pdf' and attachment_type <> 'print_folder' and status <> 'DEL' order by attachment_type, creation_date",
+                    ." where res_id_master = ? and coll_id = ? and attachment_type <> 'converted_pdf' and attachment_type <> 'print_folder' and status <> 'DEL' and status <> 'TMP' order by attachment_type, creation_date",
                     array($id, $coll_id)
                 );
             } else {
@@ -1051,7 +1051,7 @@ abstract class visa_Abstract extends Database
                     'select res_id, res_id_version, description, subject, title, format, filesize, res_id_master, attachment_type, creation_date, typist from '
                     .' res_view_attachments '
                     ." where res_id_master = ? and coll_id = ? and attachment_type = '"
-                    .$filter_attach_type."' and status not in ('DEL', 'OBS') order by creation_date",
+                    .$filter_attach_type."' and status not in ('DEL', 'OBS', 'TMP') order by creation_date",
                     array($id, $coll_id)
                 );
             }
