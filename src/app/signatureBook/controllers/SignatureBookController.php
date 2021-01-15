@@ -36,6 +36,7 @@ use SrcCore\controllers\PreparedClauseController;
 use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
 use User\models\UserSignatureModel;
+use Convert\models\AdrModel;
 
 class SignatureBookController
 {

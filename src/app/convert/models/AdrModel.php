@@ -19,6 +19,23 @@ use SrcCore\models\ValidatorModel;
 
 class AdrModel
 {
+    public static function getAttachments(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['select']);
+        ValidatorModel::arrayType($args, ['select', 'where', 'data', 'orderBy']);
+        ValidatorModel::intType($args, ['offset', 'limit']);
+        $attachments = DatabaseModel::select([
+            'select'    => empty($args['select']) ? ['*'] : $args['select'],
+            'table'     => ['adr_attachments'],
+            'where'     => empty($args['where']) ? [] : $args['where'],
+            'data'      => empty($args['data']) ? [] : $args['data'],
+            'order_by'  => empty($args['orderBy']) ? [] : $args['orderBy'],
+            'offset'    => empty($args['offset']) ? 0 : $args['offset'],
+            'limit'     => empty($args['limit']) ? 0 : $args['limit']
+        ]);
+        return $attachments;
+    }
+
     public static function getConvertedDocumentById(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['resId', 'type', 'collId']);
@@ -224,4 +241,19 @@ class AdrModel
 
         return true;
     }
+
+    public static function deleteAttachmentAdr(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['where', 'data']);
+        ValidatorModel::arrayType($args, ['where', 'data']);
+
+        DatabaseModel::delete([
+            'table' => 'adr_attachments',
+            'where' => $args['where'],
+            'data'  => $args['data']
+        ]);
+
+        return true;
+    }
+
 }

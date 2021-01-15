@@ -104,7 +104,30 @@ if (!empty($_REQUEST['id']) && !empty($_REQUEST['collId'])) {
             $isVersion = false;
             $attachResId = $line->res_id;
         }
-        $convertedAttachment =  \Convert\controllers\ConvertPdfController::getConvertedPdfById(['select' => ['docserver_id', 'path', 'filename'], 'resId' => $attachResId, 'collId' => 'attachments_coll', 'isVersion' => $isVersion]);
+
+        $attachment = \Attachment\models\AttachmentModel::getById(['id' => $attachResId, 'select' => ['res_id_master', 
+        'title', 'typist', 'identifier','format']]);
+
+        if (in_array($attachment['format'], \ContentManagement\controllers\MergeController::OFFICE_EXTENSIONS)) {
+            $result = \ContentManagement\controllers\MergeController::mergeAction(['resId' => $attachResId, 'type' => 'attachment']);
+            if (!empty($result['errors'])) {
+                echo "{\"status\": 1, \"error\": ".$result['errors']."}";
+                exit;
+            }
+            $convertedDocument = \Convert\models\AdrModel::getAttachments([
+                'select' => ['docserver_id', 'path', 'filename', 'type', 'fingerprint'],
+                'where'  => ['res_id = ?', 'type = ?'],
+                'data'   => [$attachResId, 'TMP']
+            ]);
+        } else {
+            $convertedDocument = \Convert\models\AdrModel::getAttachments([
+                'select' => ['docserver_id', 'path', 'filename', 'type', 'fingerprint'],
+                'where'  => ['res_id = ?', 'type = ?'],
+                'data'   => [$attachResId, 'PDF']
+            ]);
+        }
+        $convertedAttachment = $convertedDocument[0];
+
         if (!empty($convertedAttachment['errors'])) {
             echo "{\"status\":1, \"error\" : \""._ATTACH_PDF_NOT_FOUND . ": {$attachResId}, version : {$isVersion}\"}";
             exit;
@@ -190,6 +213,11 @@ if (!empty($_REQUEST['id']) && !empty($_REQUEST['collId'])) {
 
         $tmpFileName = pathinfo($fileOnDs, PATHINFO_BASENAME);
         $fileExtension = 'pdf';
+
+        if (in_array($attachment['format'],  \ContentManagement\controllers\MergeController::OFFICE_EXTENSIONS)) {
+            unlink($fileOnDs);
+            \Convert\models\AdrModel::deleteAttachmentAdr(['where' => ['res_id = ?', 'type = ?'], 'data' => [$attachResId, 'TMP']]);
+        }
 
         include 'modules/visa/save_attach_res_from_cm.php';
         $db->query('UPDATE listinstance set signatory = TRUE WHERE listinstance_id = (SELECT listinstance_id FROM listinstance WHERE res_id = ? AND item_id = ? AND difflist_type = ? AND process_date is null ORDER BY listinstance_id LIMIT 1)', [$objectResIdMaster, $_SESSION['user']['UserId'], 'VISA_CIRCUIT']);

@@ -22,6 +22,7 @@ use Note\models\NoteModel;
 use Resource\models\ResModel;
 use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
+use SrcCore\models\CoreConfigModel;
 use User\models\UserModel;
 use Docserver\controllers\DocserverController;
 use Docserver\models\DocserverModel;
@@ -34,6 +35,8 @@ include_once('vendor/tinybutstrong/opentbs/tbs_plugin_opentbs.php');
 
 class MergeController
 {
+    const OFFICE_EXTENSIONS = ['odt', 'ods', 'odp', 'xlsx', 'pptx', 'docx', 'odf'];
+
     public static function mergeDocument(array $args)
     {
         ValidatorModel::notEmpty($args, ['data']);
@@ -177,11 +180,11 @@ class MergeController
         $mergeData = [
             'date'   => date('d/m/Y'),
             'user'   => UserModel::getLabelledUserById(['id' => $GLOBALS['id']]),
-            'entity' => UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => ['*']])
+            'entity' => UserModel::getPrimaryEntityByUserId(['userId' => $GLOBALS['userId'], 'select' => ['*']])
         ];
 
         if ($args['type'] == 'attachment') {
-            $document = AttachmentModel::get([
+            $document = AttachmentModel::getOnView([
                 'select' => ['res_id', 'docserver_id', 'path', 'filename', 'res_id_master', 'title', 'fingerprint', 'format', 'identifier', 'attachment_type'],
                 'where'  => ['res_id = ?', 'status not in (?)'],
                 'data'   => [$args['resId'], ['DEL']]
@@ -327,4 +330,7 @@ class MergeController
         }
         return true;
     }
+
+
+
 }
