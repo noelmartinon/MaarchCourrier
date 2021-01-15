@@ -221,39 +221,39 @@ class AutoCompleteController
         $onlyContacts = [];
         $autocompleteData = [];
         foreach ($contacts as $contact) {
-            if (!empty($data['onlyContacts']) && $data['onlyContacts'] == 'true' && !in_array($contact['contact_id'], $onlyContacts)) {
-                $autocompleteData[] = AutoCompleteController::getFormattedOnlyContact(['contact' => $contact])['contact'];
-                $onlyContacts[] = $contact['contact_id'];
-            }
+            // if (!empty($data['onlyContacts']) && $data['onlyContacts'] == 'true' && !in_array($contact['contact_id'], $onlyContacts)) {
+            //     $autocompleteData[] = AutoCompleteController::getFormattedOnlyContact(['contact' => $contact])['contact'];
+            //     $onlyContacts[] = $contact['contact_id'];
+            // }
             $autocompleteData[] = AutoCompleteController::getFormattedContact(['contact' => $contact, 'color' => $color])['contact'];
         }
 
-        // $excludedUsers = ['superadmin'];
+        $excludedUsers = ['superadmin'];
 
-        // $requestData = AutoCompleteController::getDataForRequest([
-        //     'search'        => $data['search'],
-        //     'fields'        => '(firstname ilike ? OR lastname ilike ?)',
-        //     'where'         => ['enabled = ?', 'status != ?', 'user_id not in (?)'],
-        //     'data'          => ['Y', 'DEL', $excludedUsers],
-        //     'fieldsNumber'  => 2,
-        // ]);
+        $requestData = AutoCompleteController::getDataForRequest([
+            'search'        => $data['search'],
+            'fields'        => '(firstname ilike ? OR lastname ilike ?)',
+            'where'         => ['enabled = ?', 'status != ?', 'user_id not in (?)'],
+            'data'          => ['Y', 'DEL', $excludedUsers],
+            'fieldsNumber'  => 2,
+        ]);
 
-        // $users = UserModel::get([
-        //     'select'    => ['id', 'user_id', 'firstname', 'lastname'],
-        //     'where'     => $requestData['where'],
-        //     'data'      => $requestData['data'],
-        //     'orderBy'   => ['lastname'],
-        //     'limit'     => self::TINY_LIMIT
-        // ]);
+        $users = UserModel::get([
+            'select'    => ['id', 'user_id', 'firstname', 'lastname'],
+            'where'     => $requestData['where'],
+            'data'      => $requestData['data'],
+            'orderBy'   => ['lastname'],
+            'limit'     => self::TINY_LIMIT
+        ]);
 
-        // foreach ($users as $value) {
-        //     $autocompleteData[] = [
-        //         'type'          => 'user',
-        //         'id'            => $value['id'],
-        //         'idToDisplay'   => "{$value['firstname']} {$value['lastname']}",
-        //         'otherInfo'     => "{$value['firstname']} {$value['lastname']}"
-        //     ];
-        // }
+        foreach ($users as $value) {
+            $autocompleteData[] = [
+                'type'          => 'user',
+                'id'            => $value['id'],
+                'idToDisplay'   => "{$value['firstname']} {$value['lastname']}",
+                'otherInfo'     => "{$value['firstname']} {$value['lastname']}"
+            ];
+        }
 
         return $response->withJson($autocompleteData);
     }
@@ -676,7 +676,7 @@ class AutoCompleteController
         }
     }
 
-    private static function getDataForRequest(array $aArgs)
+    public static function getDataForRequest(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['search', 'fields', 'where', 'data', 'fieldsNumber']);
         ValidatorModel::stringType($aArgs, ['search', 'fields']);
