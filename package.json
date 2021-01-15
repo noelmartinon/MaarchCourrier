@@ -22,9 +22,10 @@
   "license": "GPL-3.0",
   "dependencies": {
     "core-js": "3.6.5",
-    "pdfjs-dist": "2.5.207",
-    "tinymce-i18n": "20.4.4",
+    "pdfjs-dist": "2.0.943",
+    "prod": "^1.0.1",
     "tinymce": "5.5.0",
+    "tinymce-i18n": "20.4.4",
     "zone.js": "0.11.2"
   },
   "devDependencies": {
@@ -63,7 +64,7 @@
     "jquery": "3.5.1",
     "jstree-bootstrap-theme": "1.0.1",
     "ng2-dnd": "5.0.2",
-    "ng2-pdf-viewer": "6.3.2",
+    "ng2-pdf-viewer": "5.2.4",
     "ngx-cookie-service": "10.0.1",
     "ngx-joyride": "2.3.1",
     "ngx-papaparse": "5.0.0",

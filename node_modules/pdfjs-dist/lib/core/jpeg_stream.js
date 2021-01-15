@@ -2,7 +2,7 @@
  * @licstart The following is the entire license notice for the
  * Javascript code in this page
  *
- * Copyright 2020 Mozilla Foundation
+ * Copyright 2018 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,93 +19,79 @@
  * @licend The above is the entire license notice for the
  * Javascript code in this page
  */
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.JpegStream = void 0;
+exports.JpegStream = undefined;
 
-var _stream = require("./stream.js");
+var _util = require('../shared/util');
 
-var _primitives = require("./primitives.js");
+var _stream = require('./stream');
 
-var _jpg = require("./jpg.js");
+var _primitives = require('./primitives');
 
-var _util = require("../shared/util.js");
+var _jpg = require('./jpg');
 
-const JpegStream = function JpegStreamClosure() {
+var JpegStream = function JpegStreamClosure() {
   function JpegStream(stream, maybeLength, dict, params) {
-    let ch;
-
+    var ch = void 0;
     while ((ch = stream.getByte()) !== -1) {
-      if (ch === 0xff) {
+      if (ch === 0xFF) {
         stream.skip(-1);
         break;
       }
     }
-
     this.stream = stream;
     this.maybeLength = maybeLength;
     this.dict = dict;
     this.params = params;
-
     _stream.DecodeStream.call(this, maybeLength);
   }
-
   JpegStream.prototype = Object.create(_stream.DecodeStream.prototype);
-  Object.defineProperty(JpegStream.prototype, "bytes", {
+  Object.defineProperty(JpegStream.prototype, 'bytes', {
     get: function JpegStream_bytes() {
-      return (0, _util.shadow)(this, "bytes", this.stream.getBytes(this.maybeLength));
+      return (0, _util.shadow)(this, 'bytes', this.stream.getBytes(this.maybeLength));
     },
     configurable: true
   });
-
   JpegStream.prototype.ensureBuffer = function (requested) {};
-
   JpegStream.prototype.readBlock = function () {
     if (this.eof) {
       return;
     }
-
-    const jpegOptions = {
+    var jpegOptions = {
       decodeTransform: undefined,
       colorTransform: undefined
     };
-    const decodeArr = this.dict.getArray("Decode", "D");
-
+    var decodeArr = this.dict.getArray('Decode', 'D');
     if (this.forceRGB && Array.isArray(decodeArr)) {
-      const bitsPerComponent = this.dict.get("BitsPerComponent") || 8;
-      const decodeArrLength = decodeArr.length;
-      const transform = new Int32Array(decodeArrLength);
-      let transformNeeded = false;
-      const maxValue = (1 << bitsPerComponent) - 1;
-
-      for (let i = 0; i < decodeArrLength; i += 2) {
+      var bitsPerComponent = this.dict.get('BitsPerComponent') || 8;
+      var decodeArrLength = decodeArr.length;
+      var transform = new Int32Array(decodeArrLength);
+      var transformNeeded = false;
+      var maxValue = (1 << bitsPerComponent) - 1;
+      for (var i = 0; i < decodeArrLength; i += 2) {
         transform[i] = (decodeArr[i + 1] - decodeArr[i]) * 256 | 0;
         transform[i + 1] = decodeArr[i] * maxValue | 0;
-
         if (transform[i] !== 256 || transform[i + 1] !== 0) {
           transformNeeded = true;
         }
       }
-
       if (transformNeeded) {
         jpegOptions.decodeTransform = transform;
       }
     }
-
     if ((0, _primitives.isDict)(this.params)) {
-      const colorTransform = this.params.get("ColorTransform");
-
+      var colorTransform = this.params.get('ColorTransform');
       if (Number.isInteger(colorTransform)) {
         jpegOptions.colorTransform = colorTransform;
       }
     }
-
-    const jpegImage = new _jpg.JpegImage(jpegOptions);
+    var jpegImage = new _jpg.JpegImage(jpegOptions);
     jpegImage.parse(this.bytes);
-    const data = jpegImage.getData({
+    var data = jpegImage.getData({
       width: this.drawWidth,
       height: this.drawHeight,
       forceRGB: this.forceRGB,
@@ -115,8 +101,11 @@ const JpegStream = function JpegStreamClosure() {
     this.bufferLength = data.length;
     this.eof = true;
   };
+  JpegStream.prototype.getIR = function () {
+    var forceDataSchema = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 
+    return (0, _util.createObjectURL)(this.bytes, 'image/jpeg', forceDataSchema);
+  };
   return JpegStream;
 }();
-
 exports.JpegStream = JpegStream;

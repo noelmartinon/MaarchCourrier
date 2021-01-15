@@ -2,7 +2,7 @@
  * @licstart The following is the entire license notice for the
  * Javascript code in this page
  *
- * Copyright 2020 Mozilla Foundation
+ * Copyright 2018 Mozilla Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,55 +19,48 @@
  * @licend The above is the entire license notice for the
  * Javascript code in this page
  */
-"use strict";
+'use strict';
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Jbig2Stream = void 0;
+exports.Jbig2Stream = undefined;
 
-var _primitives = require("./primitives.js");
+var _primitives = require('./primitives');
 
-var _stream = require("./stream.js");
+var _stream = require('./stream');
 
-var _jbig = require("./jbig2.js");
+var _jbig = require('./jbig2');
 
-var _util = require("../shared/util.js");
+var _util = require('../shared/util');
 
-const Jbig2Stream = function Jbig2StreamClosure() {
+var Jbig2Stream = function Jbig2StreamClosure() {
   function Jbig2Stream(stream, maybeLength, dict, params) {
     this.stream = stream;
     this.maybeLength = maybeLength;
     this.dict = dict;
     this.params = params;
-
     _stream.DecodeStream.call(this, maybeLength);
   }
-
   Jbig2Stream.prototype = Object.create(_stream.DecodeStream.prototype);
-  Object.defineProperty(Jbig2Stream.prototype, "bytes", {
-    get() {
-      return (0, _util.shadow)(this, "bytes", this.stream.getBytes(this.maybeLength));
+  Object.defineProperty(Jbig2Stream.prototype, 'bytes', {
+    get: function get() {
+      return (0, _util.shadow)(this, 'bytes', this.stream.getBytes(this.maybeLength));
     },
 
     configurable: true
   });
-
   Jbig2Stream.prototype.ensureBuffer = function (requested) {};
-
   Jbig2Stream.prototype.readBlock = function () {
     if (this.eof) {
       return;
     }
-
-    const jbig2Image = new _jbig.Jbig2Image();
-    const chunks = [];
-
+    var jbig2Image = new _jbig.Jbig2Image();
+    var chunks = [];
     if ((0, _primitives.isDict)(this.params)) {
-      const globalsStream = this.params.get("JBIG2Globals");
-
+      var globalsStream = this.params.get('JBIG2Globals');
       if ((0, _primitives.isStream)(globalsStream)) {
-        const globals = globalsStream.getBytes();
+        var globals = globalsStream.getBytes();
         chunks.push({
           data: globals,
           start: 0,
@@ -75,25 +68,20 @@ const Jbig2Stream = function Jbig2StreamClosure() {
         });
       }
     }
-
     chunks.push({
       data: this.bytes,
       start: 0,
       end: this.bytes.length
     });
-    const data = jbig2Image.parseChunks(chunks);
-    const dataLength = data.length;
-
-    for (let i = 0; i < dataLength; i++) {
-      data[i] ^= 0xff;
+    var data = jbig2Image.parseChunks(chunks);
+    var dataLength = data.length;
+    for (var i = 0; i < dataLength; i++) {
+      data[i] ^= 0xFF;
     }
-
     this.buffer = data;
     this.bufferLength = dataLength;
     this.eof = true;
   };
-
   return Jbig2Stream;
 }();
-
 exports.Jbig2Stream = Jbig2Stream;
