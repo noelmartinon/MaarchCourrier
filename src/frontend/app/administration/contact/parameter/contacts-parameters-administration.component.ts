@@ -7,6 +7,7 @@ import { AppService } from '@service/app.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     templateUrl: 'contacts-parameters-administration.component.html',
@@ -16,7 +17,6 @@ export class ContactsParametersAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
 
     subMenus: any[] = [
         {
@@ -69,7 +69,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
     loading: boolean = false;
 
     dataSource = new MatTableDataSource(this.contactsParameters);
-    displayedColumns = ['identifier', 'mandatory', 'filling', 'searchable', 'displayable'];
+    displayedColumns = ['label', 'mandatory', 'filling', 'searchable', 'displayable'];
 
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
@@ -80,6 +80,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
         private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
+        public functionsService: FunctionsService,
         private viewContainerRef: ViewContainerRef) { }
 
     ngOnInit(): void {
@@ -92,7 +93,13 @@ export class ContactsParametersAdministrationComponent implements OnInit {
         this.http.get('../rest/contactsParameters')
             .subscribe((data: any) => {
                 this.contactsFilling = data.contactsFilling;
-                this.contactsParameters = data.contactsParameters;
+                this.contactsParameters = data.contactsParameters.map((item: any) => {
+                    return {
+                        ...item,
+                        label : this.functionsService.empty(item.label) ? this.translate.instant('lang.contactsParameters_' + item.identifier) : item.label
+                    };
+                });
+
                 this.loading = false;
                 setTimeout(() => {
                     this.dataSource = new MatTableDataSource(this.contactsParameters);

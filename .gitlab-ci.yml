@@ -47,26 +47,18 @@ job_e2e:
  image: php:7.4-apache
  stage: test
  script:
-   - service apache2 start
-   - touch installed.lck
-   - chown -R www-data. /opt/maarch/
-   - chown -R www-data. /var/www/html/
-   - chmod -R 775 /opt/maarch/
-   - chmod -R 775 /var/www/html/
+   - apt-get install -yqq libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
    - curl -sL https://deb.nodesource.com/setup_14.x | bash - > /dev/null
    - apt-get install -yqq nodejs > /dev/null
    - npm install npm@latest -g 
    - node -v
    - npm set registry https://registry.npmjs.org/ 
    - npm install > /dev/null
-   - npm run build-prod
-   - curl -o /dev/null --silent --head --write-out '%{http_code}\n' http://127.0.0.1/MaarchCourrier
-   - firefox --version
-   - npm run ee-launch
+   - npm run cypress:run
  artifacts:
    paths:
      - queries_error.log
-     - test/e2e/screenshots/
+     - test/e2e/output/
    expire_in: 2 days
    when: always
  only:

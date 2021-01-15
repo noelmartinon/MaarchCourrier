@@ -766,27 +766,18 @@ class ResController extends ResourceControlController
             return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);
         }
 
+        $control = ConvertThumbnailController::convertOnePage(['type' => 'resource', 'resId' => $args['resId'], 'page' => $args['page']]);
+        if (!empty($control['errors'])) {
+            return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
+        }
         $adr = AdrModel::getDocuments([
             'select'  => ['path', 'filename'],
             'where'   => ['res_id = ?', 'type = ?'],
             'data'    => [$args['resId'], 'TNL' . $args['page']]
         ]);
-
         $pathToThumbnail = $docserver['path_template'] . $adr[0]['path'] . $adr[0]['filename'];
         if (!is_file($pathToThumbnail) || !is_readable($pathToThumbnail)) {
-            $control = ConvertThumbnailController::convertOnePage(['type' => 'resource', 'resId' => $args['resId'], 'page' => $args['page']]);
-            if (!empty($control['errors'])) {
-                return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
-            }
-            $adr = AdrModel::getDocuments([
-                'select'  => ['path', 'filename'],
-                'where'   => ['res_id = ?', 'type = ?'],
-                'data'    => [$args['resId'], 'TNL' . $args['page']]
-            ]);
-            $pathToThumbnail = $docserver['path_template'] . $adr[0]['path'] . $adr[0]['filename'];
-            if (!is_file($pathToThumbnail) || !is_readable($pathToThumbnail)) {
-                return $response->withStatus(400)->withJson(['errors' => 'Thumbnail not found on docserver or not readable', 'lang' => 'thumbnailNotFound']);
-            }
+            return $response->withStatus(400)->withJson(['errors' => 'Thumbnail not found on docserver or not readable', 'lang' => 'thumbnailNotFound']);
         }
 
         $fileContent = file_get_contents($pathToThumbnail);

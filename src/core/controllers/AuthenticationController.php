@@ -662,7 +662,7 @@ class AuthenticationController
         ]);
 
         $attributes = $as->getAttributes();
-        $login = $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'][0];
+        $login = $attributes['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'][0];
         if (empty($login)) {
             return ['errors' => 'Authentication Failed : login not present in attributes'];
         }

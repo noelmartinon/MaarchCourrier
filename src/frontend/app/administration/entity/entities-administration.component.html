@@ -54,9 +54,11 @@
                     <mat-form-field>
                         <input matInput id="jstree_search" name="jstree_search" type="text"
                             placeholder="{{'lang.searchEntities' | translate}}">
-                        <mat-icon *ngIf="!emptyField" matSuffix class="fas fa-times" [title]="'lang.clearFilter' | translate" style="font-size: 15px; cursor: pointer;" 
-                            color="primary" (click)="clearFilter()">
-                        </mat-icon>
+                        <button mat-button *ngIf="!emptyField" matSuffix
+                            mat-icon-button aria-label="Clear" (click)="clearFilter()"
+                            [title]="'lang.clearFilter' | translate">
+                            <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
+                        </button>
                         <mat-hint *ngIf="!creationMode">{{'lang.entityTreeInfo' | translate}}</mat-hint>
                         <mat-hint *ngIf="creationMode">{{'lang.entityTreeInfoCreation' | translate}}</mat-hint>
                     </mat-form-field>
@@ -323,9 +325,11 @@
                             <mat-form-field>
                                 <input matInput #filterUser (keyup)="applyFilterUsers($event.target.value)"
                                     placeholder="{{'lang.filterBy' | translate}}">
-                                <mat-icon *ngIf="filterUser.value" matSuffix class="fas fa-times" [title]="'lang.clearFilter' | translate" style="font-size: 15px; cursor: pointer;" 
-                                    color="primary" (click)="applyFilterUsers(''); filterUser.value = ''">
-                                </mat-icon>
+                                <button mat-button *ngIf="filterUser.value" matSuffix
+                                    mat-icon-button aria-label="Clear" (click)="applyFilterUsers(''); filterUser.value = ''"
+                                    [title]="'lang.clearFilter' | translate">
+                                    <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
+                                </button>
                             </mat-form-field>
                         </div>
                         <div class="col-md-6 col-xs-6">
@@ -355,9 +359,11 @@
                             <mat-form-field>
                                 <input matInput #filterTemplate (keyup)="applyFilterTemplates($event.target.value)"
                                     placeholder="{{'lang.filterBy' | translate}}">
-                                <mat-icon *ngIf="filterTemplate.value" matSuffix class="fas fa-times" [title]="'lang.clearFilter' | translate" style="font-size: 15px; cursor: pointer;" 
-                                    color="primary" (click)="applyFilterTemplates(''); filterTemplate.value = ''">
-                                </mat-icon>
+                                <button mat-button *ngIf="filterTemplate.value" matSuffix
+                                    mat-icon-button aria-label="Clear" (click)="applyFilterTemplates(''); filterTemplate.value = ''"
+                                    [title]="'lang.clearFilter' | translate">
+                                    <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
+                                </button>
                             </mat-form-field>
                         </div>
                         <div class="col-md-6 col-xs-6">

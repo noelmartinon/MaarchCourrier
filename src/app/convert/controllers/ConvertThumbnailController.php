@@ -238,6 +238,10 @@ class ConvertThumbnailController
         unlink("{$tmpPath}{$fileNameOnTmp}.png");
 
         if ($args['type'] == 'resource') {
+            AdrModel::deleteDocumentAdr([
+                'where' => ['res_id = ?', 'type = ?', 'version = ?'],
+                'data'  => [$args['resId'], 'TNL' . $args['page'], $resource['version']]
+            ]);
             AdrModel::createDocumentAdr([
                 'resId'         => $args['resId'],
                 'type'          => 'TNL' . $args['page'],

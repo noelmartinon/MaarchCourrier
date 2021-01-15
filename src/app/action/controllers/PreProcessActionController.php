@@ -1422,13 +1422,13 @@ class PreProcessActionController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $user = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
+        $user = UserModel::getById(['id' => $args['userId'], 'select' => ['id']]);
         if (empty($user)) {
             return $response->withStatus(400)->withJson(['errors' => 'User does not exist']);
         }
 
         $changeDestination = true;
-        $entities = UserEntityModel::get(['select' => ['entity_id'], 'where' => ['user_id = ?'], 'data' => [$user['user_id']]]);
+        $entities = UserEntityModel::get(['select' => ['entity_id'], 'where' => ['user_id = ?'], 'data' => [$user['id']]]);
         $resource = ResModel::getById(['select' => ['destination'], 'resId' => $args['resId']]);
         foreach ($entities as $entity) {
             if ($entity['entity_id'] == $resource['destination']) {

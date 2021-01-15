@@ -498,6 +498,16 @@ class AttachmentController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
+        $childAttachment = AttachmentModel::get([
+            'select' => ['res_id'],
+            'where'  => ['origin = ?', 'status not in (?)'],
+            'data'   => [$args['id'] . ',res_attachments', ['DEL', 'OBS']],
+            'limit'  => 1
+        ]);
+        if (!empty($childAttachment[0])) {
+            $args['id'] = $childAttachment[0]['res_id'];
+        }
+
         $docserver = DocserverModel::getByDocserverId(['docserverId' => 'TNL_ATTACH', 'select' => ['path_template']]);
         if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);

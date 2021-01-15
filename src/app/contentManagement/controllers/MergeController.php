@@ -544,7 +544,7 @@ class MergeController
         ValidatorModel::stringType($args, ['type']);
 
         $mergeData = [
-            'date'   => date('d/m/Y'),
+            'date'   => date('d-m-Y'),
             'user'   => UserModel::getLabelledUserById(['id' => $GLOBALS['id']]),
             'entity' => UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => ['*']])
         ];

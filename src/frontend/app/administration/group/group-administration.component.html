@@ -73,9 +73,11 @@
                                     <mat-form-field floatLabel="never" appearance="outline" class="basketsFilter"
                                         style="padding-left:20px;padding-right:20px;font-size: 11px;">
                                         <input matInput placeholder="{{'lang.filterBy' | translate}}" #listFilterAdmin>
-                                        <mat-icon *ngIf="listFilterAdmin.value" matSuffix class="fas fa-times" [title]="'lang.clearFilter' | translate" 
-                                            style="font-size: 15px; cursor: pointer;" color="primary" (click)="listFilterAdmin.value = ''">
-                                        </mat-icon>
+                                        <button mat-button *ngIf="listFilterAdmin.value" matSuffix
+                                            mat-icon-button aria-label="Clear" (click)="listFilterAdmin.value = ''"
+                                            [title]="'lang.clearFilter' | translate">
+                                            <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
+                                        </button>
                                     </mat-form-field>
                                     <div class="col-md-3"
                                         *ngFor="let administration of administrationPrivileges | sortBy: 'label' | filterList:listFilterAdmin.value:'label'"
@@ -100,9 +102,11 @@
                                     <mat-form-field floatLabel="never" appearance="outline" class="basketsFilter"
                                         style="padding-left:20px;padding-right:20px;font-size: 11px;">
                                         <input matInput placeholder="{{'lang.filterBy' | translate}}" #listFilter>
-                                        <mat-icon *ngIf="listFilter.value" matSuffix class="fas fa-times" [title]="'lang.clearFilter' | translate" 
-                                            style="font-size: 15px; cursor: pointer;" color="primary" (click)="listFilter.value = ''">
-                                        </mat-icon>
+                                        <button mat-button *ngIf="listFilter.value" matSuffix
+                                            mat-icon-button aria-label="Clear" (click)="listFilter.value = ''"
+                                            [title]="'lang.clearFilter' | translate">
+                                            <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
+                                        </button>
                                     </mat-form-field>
                                     <mat-expansion-panel *ngFor="let unit of unitPrivileges | sortBy: 'label'" expanded
                                         [class.emptyExpansionPanel]="(unit.services | filterList:listFilter.value:'label').length == 0">
@@ -184,9 +188,11 @@
                                     <mat-form-field>
                                         <input matInput #filterUser (keyup)="applyFilter($event.target.value)"
                                             placeholder="{{'lang.filterBy' | translate}}">
-                                        <mat-icon *ngIf="filterUser.value" matSuffix class="fas fa-times" [title]="'lang.clearFilter' | translate"
-                                            style="font-size: 15px; cursor: pointer;" color="primary" (click)="applyFilter(''); filterUser.value = ''">
-                                        </mat-icon>
+                                        <button mat-button *ngIf="filterUser.value" matSuffix
+                                            mat-icon-button aria-label="Clear" (click)="applyFilter(''); filterUser.value = ''"
+                                            [title]="'lang.clearFilter' | translate">
+                                            <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
+                                        </button>
                                     </mat-form-field>
                                 </div>
                                 <div class="col-md-6 col-xs-6">
@@ -220,9 +226,11 @@
                                     <mat-form-field>
                                         <input matInput #filterBasket (keyup)="applyBasketsFilter($event.target.value)"
                                             placeholder="{{'lang.filterBy' | translate}}">
-                                        <mat-icon *ngIf="filterBasket.value" matSuffix class="fas fa-times" [title]="'lang.clearFilter' | translate"
-                                            style="font-size: 15px; cursor: pointer;" color="primary" (click)="applyBasketsFilter(''); filterBasket.value = ''">
-                                        </mat-icon>
+                                        <button mat-button *ngIf="filterBasket.value" matSuffix
+                                            mat-icon-button aria-label="Clear" (click)="applyBasketsFilter(''); filterBasket.value = ''"
+                                            [title]="'lang.clearFilter' | translate">
+                                            <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
+                                        </button>
                                     </mat-form-field>
                                 </div>
                                 <div class="col-md-6 col-xs-6">

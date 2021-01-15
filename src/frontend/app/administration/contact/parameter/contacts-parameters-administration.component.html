@@ -94,11 +94,10 @@
                         </div>
                     </div>
                     <mat-table #table [dataSource]="dataSource" matSort>
-                        <ng-container matColumnDef="identifier">
+                        <ng-container matColumnDef="label">
                             <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.label' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element">
-                                <div *ngIf="!element.label">{{'lang.contactsParameters_' + element.identifier | translate}}</div>
-                                <div *ngIf="element.label">{{element.label}}</div>
+                                <div>{{element.label}}</div>
                             </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="mandatory">

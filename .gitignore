@@ -6,6 +6,7 @@ apps/maarch_entreprise/xml/mailevaConfig.xml
 apps/maarch_entreprise/xml/log4php.xml
 *.log
 test/unitTests/build/
+cypress/
 modules/visa/xml/remoteSignatoryBooks.xml
 dist/
 node_modules/

@@ -13,10 +13,9 @@ import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { FunctionsService } from '@service/functions.service';
 import { ContactService } from '@service/contact.service';
 import { ContactAutocompleteComponent } from '../../contact/autocomplete/contact-autocomplete.component';
-import {element} from "protractor";
 
 @Component({
-    templateUrl: "attachment-create.component.html",
+    templateUrl: 'attachment-create.component.html',
     styleUrls: [
         'attachment-create.component.scss',
         '../../indexation/indexing-form/indexing-form.component.scss'
@@ -26,7 +25,6 @@ import {element} from "protractor";
 
 export class AttachmentCreateComponent implements OnInit {
 
-    
 
     loading: boolean = true;
 
@@ -46,7 +44,7 @@ export class AttachmentCreateComponent implements OnInit {
 
     // To catch previous index to update file
     asyncIndexTab: number = 0;
-    
+
     indexTab: number = 0;
 
     resourceSubject: string = '';
@@ -72,7 +70,7 @@ export class AttachmentCreateComponent implements OnInit {
         private sortPipe: SortPipe,
         public dialog: MatDialog,
         public functions: FunctionsService,
-        private contactService: ContactService, ) {
+        private contactService: ContactService,) {
     }
 
     async ngOnInit(): Promise<void> {
@@ -413,7 +411,7 @@ export class AttachmentCreateComponent implements OnInit {
     }
 
     updateFile(index: number) {
-        if (this.functions.empty(this.attachments[this.asyncIndexTab].encodedFile.value)) {            
+        if (this.functions.empty(this.attachments[this.asyncIndexTab].encodedFile.value)) {
             this.appDocumentViewer.toArray()[this.asyncIndexTab].getFile().pipe(
                 take(1),
                 tap((data) => {

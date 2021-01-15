@@ -45,6 +45,8 @@ trait ShippingTrait
         $integrations = json_decode($resource['integrations'], true);
 
         $recipientEntity = EntityModel::getByEntityId(['select' => ['id'], 'entityId' => $resource['destination']]);
+        //TODO  get adresse entité + check si l'adresse est bien rempli si c'est un recommandé
+        $primaryEntity = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => ['entities.entity_label']]);
 
         $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
         if (empty($mailevaConfig)) {
@@ -172,17 +174,40 @@ trait ShippingTrait
         }
         $token = $curlAuth['response']['access_token'];
 
+        $urlComplement = 'mail';
+        $isRegisteredMail = false;
+        if ($shippingTemplate['options']['sendMode'] == 'digital_registered_mail') {
+            $urlComplement = 'registered_mail';
+            $isRegisteredMail = true;
+        }
+
         $errors = [];
         foreach ($resourcesList as $key => $resource) {
             $sendingName = CoreConfigModel::uniqueId();
             $resId = $resource['res_id'];
 
+            if ($isRegisteredMail) {
+                $body = [
+                    'name' => $sendingName,
+                    "sender_address_line_1" => "Société Durand",
+                    "sender_address_line_2" => "M. Pierre DUPONT",
+                    "sender_address_line_3" => "Batiment B",
+                    "sender_address_line_4" => "10 avenue Charles de Gaulle",
+                    "sender_address_line_5" => "",
+                    "sender_address_line_6" => "94673 Charenton-Le-Pont",
+                    "sender_country_code"   => "FR"
+                ];
+            } else {
+                $body = [
+                    'name' => $sendingName
+                ];
+            }
             $createSending = CurlModel::execSimple([
-                'url'           => $mailevaConfig['uri'] . '/mail/v2/sendings',
+                'url'           => "{$mailevaConfig['uri']}/{$urlComplement}/v2/sendings",
                 'bearerAuth'    => ['token' => $token],
                 'headers'       => ['Content-Type: application/json'],
                 'method'        => 'POST',
-                'body'          => json_encode(['name' => $sendingName])
+                'body'          => json_encode($body)
             ]);
             if ($createSending['code'] != 201) {
                 $errors[] = "Maileva sending creation failed for attachment {$resId}";
@@ -225,7 +250,7 @@ trait ShippingTrait
             }
 
             $createDocument = CurlModel::execSimple([
-                'url'           => $mailevaConfig['uri'] . "/mail/v2/sendings/{$sendingId}/documents",
+                'url'           => "{$mailevaConfig['uri']}/{$urlComplement}/v2/sendings/{$sendingId}/documents",
                 'bearerAuth'    => ['token' => $token],
                 'method'        => 'POST',
                 'multipartBody' => [
@@ -241,7 +266,7 @@ trait ShippingTrait
             $recipients = [];
             if ($resource['type'] == 'attachment') {
                 $createRecipient = CurlModel::execSimple([
-                    'url'           => $mailevaConfig['uri'] . "/mail/v2/sendings/{$sendingId}/recipients",
+                    'url'           => "{$mailevaConfig['uri']}/{$urlComplement}/v2/sendings/{$sendingId}/recipients",
                     'bearerAuth'    => ['token' => $token],
                     'headers'       => ['Content-Type: application/json'],
                     'method'        => 'POST',
@@ -263,7 +288,7 @@ trait ShippingTrait
             } else {
                 foreach ($contacts[$key] as $contact) {
                     $createRecipient = CurlModel::execSimple([
-                        'url'           => $mailevaConfig['uri'] . "/mail/v2/sendings/{$sendingId}/recipients",
+                        'url'           => "{$mailevaConfig['uri']}/{$urlComplement}/sendings/{$sendingId}/recipients",
                         'bearerAuth'    => ['token' => $token],
                         'headers'       => ['Content-Type: application/json'],
                         'method'        => 'POST',
@@ -285,17 +310,20 @@ trait ShippingTrait
                 }
             }
 
+            $body = [
+                'color_printing'            => in_array('color', $shippingTemplate['options']['shapingOptions']),
+                'duplex_printing'           => in_array('duplexPrinting', $shippingTemplate['options']['shapingOptions']),
+                'optional_address_sheet'    => in_array('addressPage', $shippingTemplate['options']['shapingOptions'])
+            ];
+            if (!$isRegisteredMail) {
+                $body['postage_type'] = strtoupper($shippingTemplate['options']['sendMode']);
+            }
             $setOptions = CurlModel::execSimple([
-                'url'           => $mailevaConfig['uri'] . "/mail/v2/sendings/{$sendingId}",
+                'url'           => "{$mailevaConfig['uri']}/{$urlComplement}/v2/sendings/{$sendingId}",
                 'bearerAuth'    => ['token' => $token],
                 'headers'       => ['Content-Type: application/json'],
                 'method'        => 'PATCH',
-                'body'          => json_encode([
-                    'postage_type'              => strtoupper($shippingTemplate['options']['sendMode']),
-                    'color_printing'            => in_array('color', $shippingTemplate['options']['shapingOptions']),
-                    'duplex_printing'           => in_array('duplexPrinting', $shippingTemplate['options']['shapingOptions']),
-                    'optional_address_sheet'    => in_array('addressPage', $shippingTemplate['options']['shapingOptions'])
-                ]),
+                'body'          => json_encode($body),
             ]);
             if ($setOptions['code'] != 200) {
                 $errors[] = "Maileva options modification failed for attachment {$resId}";
@@ -303,7 +331,7 @@ trait ShippingTrait
             }
 
             $submit = CurlModel::execSimple([
-                'url'           => $mailevaConfig['uri'] . "/mail/v2/sendings/{$sendingId}/submit",
+                'url'           => "{$mailevaConfig['uri']}/{$urlComplement}/v2/sendings/{$sendingId}/submit",
                 'bearerAuth'    => ['token' => $token],
                 'headers'       => ['Content-Type: application/json'],
                 'method'        => 'POST'
@@ -311,6 +339,16 @@ trait ShippingTrait
             if ($submit['code'] != 200) {
                 $errors[] = "Maileva submit failed for attachment {$resId}";
                 continue;
+            }
+
+            if ($isRegisteredMail) {
+                //TODO
+                $zip = CurlModel::execSimple([
+                    'url'           => "{$mailevaConfig['uri']}/{$urlComplement}/v2/sendings/{$sendingId}/download_deposit_proof",
+                    'bearerAuth'    => ['token' => $token],
+                    'headers'       => ['Content-Type: application/json'],
+                    'method'        => 'GET'
+                ]);
             }
 
             $externalId = json_decode($resource['external_id'], true);

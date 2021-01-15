@@ -95,9 +95,10 @@
                                     <mat-icon color="primary" class="fa fa-search">
                                     </mat-icon>
                                 </button>
-                                <button *ngIf="searchHistory.value" mat-button matSuffix mat-icon-button (click)="searchHistory.setValue(''); directSearchHistory()" [title]="'lang.search' | translate" style="float: right">
-                                    <mat-icon color="primary" class="fas fa-times">
-                                    </mat-icon>
+                                <button *ngIf="searchHistory.value" mat-button matSuffix mat-icon-button 
+                                    (click)="searchHistory.setValue(''); directSearchHistory()" [title]="'lang.search' | translate" 
+                                    style="float: right" aria-label="Clear">
+                                    <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
                                 </button>
                             </mat-form-field>
                         </form>
