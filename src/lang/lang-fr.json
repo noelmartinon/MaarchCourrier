@@ -2182,5 +2182,6 @@
     "visaWorkflowHistory": "Historique du circuit de visa",
     "showVisaWorkflowHistory": "Afficher l'historique du circuit de visa",
     "list": "Liste",
-    "workflow": "Circuit"
+    "workflow": "Circuit",
+    "arContentIsEmpty": "Le contenu de l'accusé de réception est vide"
 }

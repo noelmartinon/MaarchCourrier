@@ -8,6 +8,7 @@ import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { AppService } from '@service/app.service';
+import { FunctionsService } from '../../../service/functions.service';
 
 declare var tinymce: any;
 
@@ -50,6 +51,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
         public http: HttpClient, 
         private notify: NotificationService, 
         public dialogRef: MatDialogRef<CreateAcknowledgementReceiptActionComponent>, 
+        public functions: FunctionsService,
         @Inject(MAT_DIALOG_DATA) public data: any) { }
 
     ngOnInit(): void {
@@ -93,6 +95,11 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
     executeAction() {
         let data = null;
         if (this.manualAR) {
+            if (this.functions.empty(tinymce.get('emailSignature').getContent())) {
+                this.notify.error(this.translate.instant('lang.arContentIsEmpty'));
+                this.loading = false;
+                return false;
+            }
             data = {
                 subject : this.emailsubject,
                 content : tinymce.get('emailSignature').getContent(),
