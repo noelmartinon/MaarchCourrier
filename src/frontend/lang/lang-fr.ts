@@ -1744,5 +1744,6 @@ export const LANG_FR = {
     "indexingModelReplaceToDelete": "Pour le supprimer vous devez le remplacer par un autre modèle.",
     "indexingModelFieldsReset": "Les champs suivants ne sont pas dans le modèle sélectionné et seront réinitialisés pour tous les courriers : ",
     "indexingModelReassign": "Réaffectation du modèle d'enregistrement",
-    "youCannotUnsign" : "Vous n'avez pas le droit de <b>dé-signer</b> ce document. Vous devez ếtre la personne qui a signé ce document."
+    "youCannotUnsign" : "Vous n'avez pas le droit de <b>dé-signer</b> ce document. Vous devez ếtre la personne qui a signé ce document.",
+    "arContentIsEmpty": "Le contenu de l'accusé de réception est vide"
 };

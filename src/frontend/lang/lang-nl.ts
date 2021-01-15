@@ -1725,5 +1725,6 @@ export const LANG_NL = {
     "indexingModelReplaceToDelete": "Pour le supprimer vous devez le remplacer par un autre modèle.__TO_TRANSLATE",
     "indexingModelFieldsReset": "Les champs suivants ne sont pas dans le modèle sélectionné et seront réinitialisés pour tous les courriers : __TO_TRANSLATE",
     "indexingModelReassign": "Réaffectation du modèle d'enregistrement__TO_TRANSLATE",
-    "youCannotUnsign": "Vous n'avez pas le droit de <b>dé-signer</b> ce document. Vous devez ếtre la personne qui a signé ce document.__TO_TRANSLATE"
+    "youCannotUnsign": "Vous n'avez pas le droit de <b>dé-signer</b> ce document. Vous devez ếtre la personne qui a signé ce document.__TO_TRANSLATE",
+    "arContentIsEmpty": "AR content is empty" // _TO_TRANSLATE
 };
