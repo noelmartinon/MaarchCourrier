@@ -233,12 +233,23 @@ class IParapheurController
                     return false;
                 }
 
-                $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
+                try {
+                    if (is_bool($curlReturn['response']) === true) {
+                        echo "error" . PHP_EOL;
+                        var_dump($aArgs['config']);
+                        var_dump($noVersion);
+                        var_dump($curlReturn);
+                        break;
+                    }
+                    $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
+                } catch (Exception $e) {
+                    echo 'Exception : ',  $e->getMessage(), "\n";
+                }
 
                 if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']) {
                     // TODO gestion d'une potentielle erreur
                     echo 'retrieveSignedMails noVersion : [' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message;
-                    return false;
+                    break;
                 } else {
                     $noteContent = '';
                     foreach ($response->LogDossier as $res) {    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
@@ -249,12 +260,13 @@ class IParapheurController
                             $response = self::download([
                                'config' => $aArgs['config'],
                                'documentId' => $noVersion->external_id
-                           ]);
+                            ]);
                             $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->status = 'validated';
                             $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->format = 'pdf';
                             $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->encodedFile = $response['b64FileContent'];
                             $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->noteContent = $noteContent;
                             if ($status == $aArgs['config']['data']['signState']) {
+                                self::processVisaWorkflow(['res_id_master' => $noVersion->res_id_master]);
                                 break;
                             }
                         } elseif ($status == $aArgs['config']['data']['refusedVisa'] || $status == $aArgs['config']['data']['refusedSign']) {
@@ -286,16 +298,27 @@ class IParapheurController
 
                 if (!empty($curlReturn['response'])) {
                     // TODO gestin d'une erreur
-                    echo $curlReturn['error'];
+                    echo 'error : ' . $curlReturn['error'];
                     return false;
                 }
 
-                $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
+                try {
+                    if (is_bool($curlReturn['response']) === true) {
+                        echo "error" . PHP_EOL;
+                        var_dump($aArgs['config']);
+                        var_dump($noVersion);
+                        var_dump($curlReturn);
+                        break;
+                    }
+                    $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
+                } catch (Exception $e) {
+                    echo 'Exception : ',  $e->getMessage(), "\n";
+                }
 
                 if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']) {
                     // TODO gestion d'une potentielle erreur
                     echo 'retrieveSignedMails isVersion : [' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message;
-                    return false;
+                    break;
                 } else {
                     $noteContent = '';
                     foreach ($response->LogDossier as $res) {    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
@@ -311,6 +334,7 @@ class IParapheurController
                             $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->encodedFile = $response['b64FileContent'];
                             $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->noteContent = $noteContent;
                             if ($status == $aArgs['config']['data']['signState']) {
+                                self::processVisaWorkflow(['res_id_master' => $isVersion->res_id_master]);
                                 break;
                             }
                         } elseif ($status == $aArgs['config']['data']['refusedVisa'] || $status == $aArgs['config']['data']['refusedSign']) {
@@ -328,6 +352,32 @@ class IParapheurController
             }
         }
         return $aArgs['idsToRetrieve'];
+    }
+
+    public static function processVisaWorkflow($aArgs = [])
+    {
+        new \SrcCore\models\DatabasePDO(['customId' => $GLOBALS['CustomId']]);
+
+        $attachments = \Attachment\models\AttachmentModel::getOnView(['select' => ['count(1)'], 'where' => ['res_id_master = ?', 'status = ?'], 'data' => [$aArgs['res_id_master'], 'FRZ']]);
+        if (count($attachments) < 2) {
+            $visaWorkflow = \Entity\models\ListInstanceModel::get([
+                'select'  => ['listinstance_id', 'requested_signature'],
+                'where'   => ['res_id = ?', 'difflist_type = ?', 'process_date IS NULL'],
+                'data'    => [$aArgs['res_id_master'], 'VISA_CIRCUIT'],
+                'orderBY' => ['ORDER BY listinstance_id ASC']
+            ]);
+    
+            if (!empty($visaWorkflow)) {
+                foreach ($visaWorkflow as $listInstance) {
+                    \Entity\models\ListInstanceModel::update(['set' => ['process_date' => 'CURRENT_TIMESTAMP'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
+                    // Stop to the first signatory user
+                    if ($listInstance['requested_signature']) {
+                        \Entity\models\ListInstanceModel::update(['set' => ['signatory' => 'true'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     public static function getType($aArgs)

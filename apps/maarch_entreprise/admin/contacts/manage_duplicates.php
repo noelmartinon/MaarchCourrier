@@ -110,27 +110,24 @@ echo '<div class="block" style="text-align:left;">';
 $db->query("UPDATE contacts_v2 SET user_id='' WHERE user_id IS NULL");
 
 //duplicates by society
-$selectDuplicatesBySociety = "SELECT contact_id,
+$selectDuplicatesBySociety = "WITH s AS 
+(SELECT contact_id,
        society,
        lower(translate(society, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
-                       'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')) as society_comp
-from contacts_v2
-WHERE is_corporate_person = 'Y'
-  AND
-      lower(translate(society, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
-                      'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')) in (
-          SELECT lower(translate(society, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
-                                 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr '))
-          FROM contacts_v2
-          where is_corporate_person = 'Y'
-          GROUP BY lower(translate(society, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
-                                   'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr '))
-          HAVING Count(lower(translate(society, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
-                                       'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr '))) > 1
-             and lower(translate(society, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
-                                 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')) <> ''
+                       'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')) AS society_comp
+FROM contacts_v2
+WHERE is_corporate_person = 'Y')
+SELECT contact_id,
+       society,
+       society_comp
+FROM s WHERE society_comp IN (
+          SELECT society_comp
+          FROM s
+          GROUP BY society_comp
+          HAVING Count(society_comp) > 1
+             AND society_comp <> ''
       )
-order by lower(society), contact_id";
+ORDER BY lower(society), contact_id;";
 
 $htmlTabSoc = '<form name="manage_duplicate_society" action="#" onsubmit="return linkDuplicate(\'manage_duplicate_society\')" method="post">';
 $htmlTabSoc .= '<table style="width:100%;" id="duplicates_society">';
@@ -297,46 +294,50 @@ if ($cptSoc == 0) {
 /***********************************************************************/
 //duplicates by name
 
-$selectDuplicatesByName = "SELECT distinct contacts_v2.contact_id,
-                      lower(translate(contacts_v2.lastname || ' ' || contacts_v2.firstname,
-                                      'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
-                                      'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr '))         as lastname_firstname,
-                      society,
-                      society_short,
-                      is_corporate_person,
-                      contacts_v2.lastname,
-                      contacts_v2.firstname,
-                      contacts_v2.title,
-                      (select count(*)
-                       from contact_addresses as ca2
-                       where ca2.contact_id = contacts_v2.contact_id)                                               as nb_addresses,
-                      (select id from contact_addresses where contact_addresses.contact_id = contacts_v2.contact_id LIMIT 1),
-                      (select address_num from contact_addresses where contact_addresses.contact_id = contacts_v2.contact_id LIMIT 1),
-                      (select address_street from contact_addresses where contact_addresses.contact_id = contacts_v2.contact_id LIMIT 1),
-                      (select address_postal_code from contact_addresses where contact_addresses.contact_id = contacts_v2.contact_id LIMIT 1),
-                      (select address_town from contact_addresses where contact_addresses.contact_id = contacts_v2.contact_id LIMIT 1),
-                      (select email from contact_addresses where contact_addresses.contact_id = contacts_v2.contact_id LIMIT 1)
-      from contacts_v2
-      WHERE lower(translate(contacts_v2.lastname || ' ' || contacts_v2.firstname,
-                            'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
-                            'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')) in (
-                SELECT lower(translate(contacts_v2.lastname || ' ' || contacts_v2.firstname,
-                                       'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
-                                       'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')) as lastname_firstname
-                FROM contacts_v2
-                GROUP BY lastname_firstname
-                HAVING Count(lower(translate(contacts_v2.lastname || ' ' || contacts_v2.firstname,
-                                             'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
-                                             'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr '))) >
-                       1
-                   and lower(translate(contacts_v2.lastname || ' ' || contacts_v2.firstname,
-                                       'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
-                                       'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')) <>
-                       ' ')
-      order by lower(translate(contacts_v2.lastname || ' ' || contacts_v2.firstname,
-                               'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
-                               'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr ')),
-               contacts_v2.contact_id";
+$selectDuplicatesByName = "WITH c as
+(SELECT distinct contacts_v2.contact_id,
+                  (lower(translate(contacts_v2.lastname || ' ' || contacts_v2.firstname,
+                                  'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ-',
+                                  'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr '))) as lastname_firstname,
+                  society,
+                  society_short,
+                  is_corporate_person,
+                  contacts_v2.lastname,
+                  contacts_v2.firstname,
+                  contacts_v2.title,
+                  (select count(*) from contact_addresses as ca2 where ca2.contact_id = contacts_v2.contact_id) as nb_addresses,
+                  ca.id,
+                  ca.address_num,
+                  ca.address_street,
+                  ca.address_postal_code,
+                  ca.address_town,
+                  ca.email
+  FROM contacts_v2
+  left join contact_addresses ca on ca.contact_id = contacts_v2.contact_id)
+  SELECT distinct c.contact_id,
+                  c.lastname_firstname,
+                  c.society,
+                  c.society_short,
+                  c.is_corporate_person,
+                  c.lastname,
+                  c.firstname,
+                  c.title,
+                  c.nb_addresses,
+                  c.id,
+                  c.address_num,
+                  c.address_street,
+                  c.address_postal_code,
+                  c.address_town,
+                  c.email
+  FROM c
+  WHERE c.lastname_firstname in (
+                            SELECT c.lastname_firstname as lf
+                            FROM c
+                            GROUP BY c.lastname_firstname
+                            HAVING Count(c.lastname_firstname) > 1
+                            and c.lastname_firstname <> ' '
+                        )
+  order by c.lastname_firstname, c.contact_id;";
 
 $htmlTabName = '<form name="manage_duplicate_person" action="#" onsubmit="return linkDuplicate(\'manage_duplicate_person\')" method="post">';
 $htmlTabName .= '<table style="width:100%;">';

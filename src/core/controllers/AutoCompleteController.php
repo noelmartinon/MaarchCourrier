@@ -189,7 +189,7 @@ class AutoCompleteController
 
         $searchItems = explode(' ', $data['search']);
 
-        $fields = ['contact_firstname', 'contact_lastname', 'firstname', 'lastname', 'society', 'address_num', 'address_street', 'address_town', 'address_postal_code'];
+        $fields = ['contact_firstname', 'contact_lastname', 'firstname', 'lastname', 'society', 'society_short', 'address_num', 'address_street', 'address_town', 'address_postal_code'];
         foreach ($fields as $key => $field) {
             $fields[$key] = "translate({$field}, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ', 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')";
             $fields[$key] .= "ilike translate(?, 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ', 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr')";
@@ -199,13 +199,26 @@ class AutoCompleteController
 
         $where = [];
         $requestData = [];
-        foreach ($searchItems as $item) {
+        foreach ($searchItems as $keyItem => $item) {
             if (strlen($item) >= 2) {
                 $where[] = $fields;
-                for ($i = 0; $i < 9; $i++) {
-                    $requestData[] = "%{$item}%";
+                $isIncluded = false;
+                foreach ($searchItems as $key => $value) {
+                    if ($keyItem == $key) {
+                        continue;
+                    }
+                    if (strpos($value, $item) === 0) {
+                        $isIncluded = true;
+                    }
+                }
+                for ($i = 0; $i < 10; $i++) {
+                    $requestData[] = ($isIncluded ? "%{$item}" : "%{$item}%");
                 }
             }
+        }
+
+        if ($data['onlyContacts'] == "false") {
+            $where[] = '(enabled = \'Y\')';
         }
 
         $contacts = ContactModel::getOnView([

@@ -18,7 +18,7 @@ use SrcCore\models\CoreConfigModel;
 
 class TransferController
 {
-    public static function transfer($target, $reference, $type = null)
+    public static function transfer($target, $messageId, $type = null)
     {
         $xml            = CoreConfigModel::getXmlLoaded(['path' => 'modules/export_seda/xml/config.xml']);
         $adapter        = '';
@@ -37,9 +37,9 @@ class TransferController
 
         // [0] = url, [1] = header, [2] = cookie, [3] = data
         if ($type) {
-            $param = $adapter->getInformations($reference, $type);
+            $param = $adapter->getInformations($messageId, $type);
         } else {
-            $param = $adapter->getInformations($reference);
+            $param = $adapter->getInformations($messageId);
         }
 
         try {

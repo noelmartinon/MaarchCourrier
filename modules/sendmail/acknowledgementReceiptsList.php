@@ -30,7 +30,7 @@ $where = implode(' and ', $where_tab);
 $list->setOrderField('send_date');
 $orderstr = 'order by send_date desc NULLS LAST';
 //Request
-$tab=$request->PDOselect($select, $where, [$identifier], $orderstr, $_SESSION['config']['databasetype'], 50000);
+$tab=$request->PDOselect($select, $where, [$identifier], $orderstr, $_SESSION['config']['databasetype'], 10000);
 
 if (!empty($tab)) {
     //Result Array

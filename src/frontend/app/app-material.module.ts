@@ -1,6 +1,8 @@
+import { LANG } from '../app/translate.component';
 import { NativeDateAdapter, DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from "@angular/material";
 
 export class AppDateAdapter extends NativeDateAdapter {
+    lang: any = LANG;
     parse(value: any): Date | null {
         if ((typeof value === 'string') && (value.indexOf('/') > -1)) {
             const str = value.split('/');
@@ -20,7 +22,8 @@ export class AppDateAdapter extends NativeDateAdapter {
             let year = date.getFullYear();
             return this._to2digit(day) + '/' + this._to2digit(month) + '/' + year;
         } else {
-            return date.toDateString();
+            const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString(this.lang.langISO, options);
         }
     }
 

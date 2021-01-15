@@ -163,6 +163,8 @@ if (isset($_REQUEST['load'])) {
             $start = $list->getStart();
             $parameters .= '&start='.$start;
         }
+
+        $nbLines = !empty($_REQUEST['lines']) ? $_REQUEST['lines'] : 'default';
     
         //Request
         $tabNotes=$request->PDOselect(
@@ -171,7 +173,7 @@ if (isset($_REQUEST['load'])) {
         $arrayPDO,
         $orderstr,
         $_SESSION['config']['databasetype'],
-        "default",
+        $nbLines,
         true,
         NOTES_TABLE,
         USERS_TABLE,

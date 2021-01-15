@@ -121,7 +121,7 @@ $trace->add(
     _CONNECTION_CAS_OK,
     $_SESSION['config']['databasetype'],
     "ADMIN",
-    false
+    false, 'ok', 'DEBUG', $userId
 );
 
 exit();

@@ -236,7 +236,13 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
                 $attachmentToFreeze = IParapheurController::sendDatas(['config' => $config, 'resIdMaster' => $res_id]);
             } elseif ($config['id'] == 'fastParapheur') {
                 include_once 'modules/visa/class/FastParapheurController.php';
-                $attachmentToFreeze = FastParapheurController::sendDatas(['config' => $config, 'resIdMaster' => $res_id]);
+                $sendedInfo = FastParapheurController::sendDatas(['config' => $config, 'resIdMaster' => $res_id]);
+                if (!empty($sendedInfo['error'])) {
+                    var_dump($sendedInfo['error']);
+                    exit;
+                } else {
+                    $attachmentToFreeze = $sendedInfo['sended'];
+                }
             } elseif ($config['id'] == 'maarchParapheur') {
                 $listinstances = \Entity\models\ListInstanceModel::getVisaCircuitByResId(['select' => ['external_id', 'users.user_id', 'requested_signature'], 'id' => $res_id]);
                 if (empty($listinstances)) {

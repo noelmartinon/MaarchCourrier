@@ -802,6 +802,7 @@ class Install extends functions
 
         pg_close();
 
+        $_SESSION['installeurLock'] = true;
         $db = new Database();
 
         if (!$db) {
@@ -975,7 +976,7 @@ class Install extends functions
     private function setConfigXml()
     {
         $xmlconfig = simplexml_load_file('apps/maarch_entreprise/xml/config.xml.default');
-        //$xmlconfig = 'apps/maarch_entreprise/xml/config.xml.default';
+
         $CONFIG = $xmlconfig->CONFIG;
 
         $CONFIG->databaseserver = $_SESSION['config']['databaseserver'];
@@ -985,7 +986,7 @@ class Install extends functions
         $CONFIG->databasepassword = $_SESSION['config']['databasepassword'];
         $CONFIG->lang = $_SESSION['lang'];
         $res = $xmlconfig->asXML();
-        // $fp = @fopen("apps/maarch_entreprise/xml/config.xml", "w+");
+
         $fp = @fopen(realpath('.').'/custom/cs_'.$_SESSION['config']['databasename'].'/apps/maarch_entreprise/xml/config.xml', 'w+');
         if (!$fp) {
             return false;
@@ -1000,26 +1001,6 @@ class Install extends functions
         return true;
     }
 
-    // private function setConfigXmlVisa()
-    // {
-    //     $xmlconfig = simplexml_load_file('modules/visa/xml/config.xml.default');
-    //     $CONFIG = $xmlconfig->CONFIG;
-    //     //TODO fill the file...
-
-    //     $res = $xmlconfig->asXML();
-    //     $fp = @fopen("modules/visa/xml/config.xml", "w+");
-    //     if (!$fp) {
-    //         return false;
-    //         exit;
-    //     }
-    //     $write = fwrite($fp,$res);
-    //     if (!$write) {
-    //         return false;
-    //         exit;
-    //     }
-    //     return true;
-    // }
-
 
     private function setConfig_batch_XmlNotifications()
     {
@@ -1031,10 +1012,7 @@ class Install extends functions
 
         $CONFIG = $xmlconfig->CONFIG;
         $CONFIG->MaarchDirectory = realpath('.').'/';
-        //$path = "ifconfig eth2 | grep 'inet addr' | cut -f2 -d: | awk '{print $1}'";
-        //$ipconfig = shell_exec($path);
-        //$ipconfig = trim($ipconfig);
-        //$chemin = $ipconfig . dirname($_SERVER['PHP_SELF'] .'cs_'.$_SESSION['config']['databasename']);
+
         if ($_SERVER['SERVER_ADDR'] == '::1') {
             $SERVER_ADDR = 'localhost';
         } else {
@@ -1076,7 +1054,6 @@ class Install extends functions
     private function setConfig_LDAP()
     {
         $xmlconfig = simplexml_load_file('modules/ldap/xml/config.xml.default');
-        //$xmlconfig = 'apps/maarch_entreprise/xml/config.xml.default';
         $CONFIG_BASE = $xmlconfig->config_base;
 
         $CONFIG_BASE->databaseserver = $_SESSION['config']['databaseserver'];

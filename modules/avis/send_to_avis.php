@@ -175,7 +175,7 @@ function check_form($form_id, $values)
     $avis = new avis_controler();
     $curr_avis_wf = $avis->getWorkflow($_SESSION['doc_id'], $_SESSION['current_basket']['coll_id'], 'AVIS_CIRCUIT');
 
-    if (count($curr_avis_wf['avis']) == 0) {
+    if (!is_array($curr_avis_wf['avis']) || count($curr_avis_wf['avis']) == 0) {
         $_SESSION['action_error'] = _AVIS_WORKFLOW . " " . _MANDATORY;
         return false;
     }
@@ -226,7 +226,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
     include_once 'modules/notes/class/notes_controler.php';
     include_once 'modules/avis/class/avis_controler.php';
     $note = new notes_controler();
-
+    $avis = new avis_controler();
 
     $db = new Database();
 
@@ -238,6 +238,7 @@ function manage_form($arr_id, $history, $id_action, $label_action, $status, $col
         $formValues[$id] = $value;
     }
 
+    $avis->processAvis($res_id, $formValues['opinion_limit_date']);
 
     //save note
     if ($formValues['note_content_to_users'] != '') {

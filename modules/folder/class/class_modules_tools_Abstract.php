@@ -1003,12 +1003,10 @@ abstract class folder_Abstract extends request
 	{
 		$folders = array();
 		$db = new Database();
-		$stmt = $db->query('SELECT folders_system_id, folder_name, parent_id, folder_level FROM folders WHERE foldertype_id not in (100) AND status NOT IN (\'DEL\') AND parent_id = \''.$parent_id.'\' AND (destination IS NULL OR destination = ?) order by folder_id asc', array($_SESSION['user']['primaryentity']['id']));
+		$stmt = $db->query('SELECT folders_system_id, folder_name, parent_id, folder_level, (
+           SELECT count(folders_system_id) as total FROM folders f2 WHERE f2.foldertype_id not in (100) AND f2.parent_id = folders.folders_system_id  AND f2.status NOT IN (\'DEL\')
+           ) as total FROM folders WHERE foldertype_id not in (100) AND status NOT IN (\'DEL\') AND parent_id = \''.$parent_id.'\' AND (destination IS NULL OR destination = ?) order by folder_id asc', array($_SESSION['user']['primaryentity']['id']));
 		while($row=$stmt->fetch(PDO::FETCH_ASSOC)){
-			$stmt3 = $db->query(
-				"SELECT count(folders_system_id) as total FROM folders WHERE foldertype_id not in (100) AND parent_id IN (".$row['folders_system_id'].")  AND status NOT IN ('DEL')"
-			);
-			$row3 = $stmt3->fetch(PDO::FETCH_ASSOC);
 			$nbsp ='';
 			for ($i=1; $i < $row['folder_level'] ; $i++) { 
 				$nbsp .= '&emsp;&emsp; ';
@@ -1020,10 +1018,14 @@ abstract class folder_Abstract extends request
 				'folders_system_id' => $row['folders_system_id'],
 				'folder_name' => $row['folder_name'],
 				'folder_level' => $row['folder_level'],
-				'nb_subfolder' => $row3['total']
+				'nb_subfolder' => $row['total']
 			);
-			$folders = array_merge($folders,$this->get_folders_tree($row['folders_system_id']));
-		}
+
+			if ($row['total'] > 0 && $row['folders_system_id'] != $parent_id) {
+                $folders = array_merge($folders,$this->get_folders_tree($row['folders_system_id']));
+            }
+
+        }
         return $folders ;
     }
 }

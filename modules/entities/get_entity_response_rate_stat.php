@@ -280,7 +280,7 @@ if($report_type == 'graph')
 	}
 
 	$src1 = $_SESSION['config']['businessappurl']."index.php?display=true&module=reports&page=graphs&type=histo&largeur=$largeur&hauteur=600&marge_bas=300&title=".$title;
-	$_SESSION['GRAPH']['VALUES']='';
+	$_SESSION['GRAPH']['VALUES']=[];
 	for($i=0;$i<count($vol_an);$i++)
 	{
 		$_SESSION['GRAPH']['VALUES'][$i]=$vol_an[$i];

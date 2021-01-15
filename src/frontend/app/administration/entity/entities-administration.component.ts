@@ -407,7 +407,11 @@ export class EntitiesAdministrationComponent extends AutoCompletePlugin implemen
                                 this.notify.success(this.lang.entityDeleted);
                             }
                         }, (err) => {
-                            this.notify.error(err.error.errors);
+                            if (err.error.errors == 'Entity does not exist') {
+                                this.notify.error(this.lang.noEntity);
+                            } else {
+                                this.notify.error(err.error.errors);
+                            }
                         });
                 }
                 this.dialogRef = null;

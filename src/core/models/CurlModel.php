@@ -125,7 +125,9 @@ class CurlModel
                 'Cache-Control: no-cache',
                 'Pragma: no-cache',
                 'Content-length: ' . strlen($aArgs['xmlPostString']),
-            ]
+            ],
+            CURLOPT_SSL_VERIFYHOST  => false,
+            CURLOPT_SSL_VERIFYPEER  => false
         ];
 
         if (!empty($aArgs['soapAction'])) {
@@ -155,7 +157,7 @@ class CurlModel
             }
             $rawResponse = substr($rawResponse, $infos['header_size']);
         } elseif (!empty($aArgs['delete_header'])) { // Delete header for iparapheur
-            $body = explode(PHP_EOL . PHP_EOL, $rawResponse)[1]; // put the header ahead
+            $body = strstr($rawResponse, '<?xml'); // put the header ahead
             if (empty($body)) {
                 $body = explode(PHP_EOL, $rawResponse);
                 // we remove the 4 starting item of the array (header)

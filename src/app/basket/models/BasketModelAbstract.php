@@ -248,7 +248,7 @@ abstract class BasketModelAbstract
                 $data[]  = $aArgs['unneededBasketId'];
             }
             $aBaskets = DatabaseModel::select([
-                    'select'    => ['usergroups.id as groupSerialId', 'groupbasket.basket_id', 'groupbasket.group_id', 'basket_name', 'basket_desc', 'basket_clause', 'usergroups.group_desc'],
+                    'select'    => ['usergroups.id as groupSerialId', 'groupbasket.basket_id', 'groupbasket.group_id', 'basket_name', 'basket_desc', 'basket_clause', 'usergroups.group_desc', 'baskets.id as basketserialid'],
                     'table'     => ['groupbasket, baskets, usergroups'],
                     'where'     => $where,
                     'data'      => $data,
@@ -264,7 +264,9 @@ abstract class BasketModelAbstract
 
             foreach ($aBaskets as $key => $value) {
                 unset($aBaskets[$key]['groupserialid']);
+                unset($aBaskets[$key]['basketserialid']);
                 $aBaskets[$key]['groupSerialId'] = $value['groupserialid'];
+                $aBaskets[$key]['basketSerialId'] = $value['basketserialid'];
                 $aBaskets[$key]['owner_user_id'] = $user['id'];
                 $redirectedBasket = RedirectBasketModel::get([
                     'select'    => ['actual_user_id'],

@@ -40,7 +40,7 @@ class FastParapheurController
             $isError    = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body;
             if (!empty($isError ->Fault[0])) {
                 // TODO gestion des erreurs
-                echo _PJ_NUMBER . $noVersion->res_id . ' ' . _AND_DOC_ORIG . $noVersion->res_id_master . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
+                echo 'PJ n° ' . $noVersion->res_id . ' et document original n° ' . $noVersion->res_id_master . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
                 continue;
             }
 
@@ -53,6 +53,7 @@ class FastParapheurController
                     $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->status = 'validated';
                     $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->format = 'pdf';
                     $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->encodedFile = $response['b64FileContent'];
+                    self::processVisaWorkflow(['res_id_master' => $noVersion->res_id_master]);
                     break;
                 } elseif ($state == $aArgs['config']['data']['refusedState']) {
                     $GLOBALS['db'] = new \SrcCore\models\DatabasePDO(['customId' => $GLOBALS['CustomId']]);
@@ -95,7 +96,7 @@ class FastParapheurController
             $isError    = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body;
             if (!empty($isError ->Fault[0])) {
                 // TODO gestion des erreurs
-                echo _PJ_NUMBER . $isVersion->res_id_version . ' ' . _AND_DOC_ORIG . $isVersion->res_id_master . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
+                echo 'PJ n° ' . $isVersion->res_id_version . ' et document original n° ' . $isVersion->res_id_master . ' : ' . (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
                 continue;
             }
 
@@ -107,6 +108,7 @@ class FastParapheurController
                     $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->status = 'validated';
                     $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->format = 'pdf';
                     $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id_version]->encodedFile = $response['b64FileContent'];
+                    self::processVisaWorkflow(['res_id_master' => $isVersion->res_id_master]);
                     break;
                 } elseif ($state == $aArgs['config']['data']['refusedState']) {
                     $GLOBALS['db'] = new \SrcCore\models\DatabasePDO(['customId' => $GLOBALS['CustomId']]);
@@ -128,11 +130,37 @@ class FastParapheurController
         return $aArgs['idsToRetrieve'];
     }
 
+    public static function processVisaWorkflow($aArgs = [])
+    {
+        new \SrcCore\models\DatabasePDO(['customId' => $GLOBALS['CustomId']]);
+
+        $attachments = \Attachment\models\AttachmentModel::getOnView(['select' => ['count(1)'], 'where' => ['res_id_master = ?', 'status = ?'], 'data' => [$aArgs['res_id_master'], 'FRZ']]);
+        if (count($attachments) < 2) {
+            $visaWorkflow = \Entity\models\ListInstanceModel::get([
+                'select'  => ['listinstance_id', 'requested_signature'],
+                'where'   => ['res_id = ?', 'difflist_type = ?', 'process_date IS NULL'],
+                'data'    => [$aArgs['res_id_master'], 'VISA_CIRCUIT'],
+                'orderBY' => ['ORDER BY listinstance_id ASC']
+            ]);
+    
+            if (!empty($visaWorkflow)) {
+                foreach ($visaWorkflow as $listInstance) {
+                    \Entity\models\ListInstanceModel::update(['set' => ['process_date' => 'CURRENT_TIMESTAMP'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
+                    // Stop to the first signatory user
+                    if ($listInstance['requested_signature']) {
+                        \Entity\models\ListInstanceModel::update(['set' => ['signatory' => 'true'], 'where' => ['listinstance_id = ?'], 'data' => [$listInstance['listinstance_id']]]);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     public static function upload($aArgs)
     {
-        $circuitId          = $aArgs['circuitId'];
-        $label              = $aArgs['label'];
-        $subscriberId       = $aArgs['businessId'];
+        $circuitId     = str_replace('.', '-', $aArgs['circuitId']);
+        $label         = $aArgs['label'];
+        $subscriberId  = $aArgs['businessId'];
 
         // Retrieve the annexes of the attachemnt to sign (other attachment and the original document)
         $annexes = [];
@@ -164,7 +192,7 @@ class FastParapheurController
 
         $attachments         = \Attachment\models\AttachmentModel::getOnView([
             'select'         => ['res_id', 'res_id_version', 'title', 'attachment_type','path', 'res_id_master', 'format'],
-            'where'          => ['res_id_master = ?', 'attachment_type not in (?)', "status not in ('DEL', 'OBS')", 'in_signature_book = TRUE'],
+            'where'          => ['res_id_master = ?', 'attachment_type not in (?)', "status not in ('DEL', 'OBS', 'FRZ')", 'in_signature_book = TRUE'],
             'data'           => [$aArgs['resIdMaster'], ['converted_pdf', 'incoming_mail_attachment', 'print_folder', 'signed_response']]
         ]);
 
@@ -239,17 +267,18 @@ class FastParapheurController
                 ]
             ]);
 
-            $isError    = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body;
-            if (!empty($isError ->Fault[0])) {
-                // TODO gestion des erreurs
-                //echo (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
-                return false;
+            if (!empty($curlReturn['error'])) {
+                return ['error' => $curlReturn['error']];
+            } elseif (!empty($curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0])) {
+                $error = (string)$curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->Fault[0]->children()->faultstring . PHP_EOL;
+                return ['error' => $error];
             } else {
                 $documentId = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://sei.ws.fast.cdc.com/')->uploadResponse->children();
                 $attachmentToFreeze[$collId][$resId] = (string) $documentId;
             }
         }
-        return $attachmentToFreeze;
+
+        return ['sended' => $attachmentToFreeze];
     }
 
     public static function download($aArgs)

@@ -25,7 +25,7 @@ class AdapterMaarchCourrierController
     {
         $res = []; // [0] = url, [1] = header, [2] = cookie, [3] = data
 
-        $message = MessageExchangeModel::getMessageByReference(['reference' => $messageId]);
+        $message = MessageExchangeModel::getMessageByIdentifier(['messageId' => $messageId]);
 
         $messageObject = json_decode($message[0]['data']);
 

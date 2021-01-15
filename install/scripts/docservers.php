@@ -44,6 +44,11 @@ if ($checkDocserverRoot !== true) {
     exit;
 }
 
+if (empty($_SESSION['installeurLock'])) {
+    echo 'Action forbidden';
+    return false;
+}
+
 $_REQUEST['docserverRoot'] .= DIRECTORY_SEPARATOR . $_SESSION['config']['databasename'];
 
 if (!is_dir($_REQUEST['docserverRoot'])) {

@@ -44,7 +44,7 @@ class AdapterEmail
                 ]
             ]);
 
-            $this->db->updateStatusMessage($messageObject->MessageIdentifier->value, 'I');
+            $this->db->updateStatusMessage($messageId, 'I');
         }
 
         return $res;

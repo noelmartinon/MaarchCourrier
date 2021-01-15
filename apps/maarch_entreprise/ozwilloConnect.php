@@ -47,4 +47,4 @@ unset($_REQUEST['state']);
 
 header("location: log.php");
 $trace = new history();
-$trace->add('users', $idToken->sub, 'LOGIN', 'userlogin', 'Ozwillo Connection', $_SESSION['config']['databasetype'], 'ADMIN', false);
+$trace->add('users', $idToken->sub, 'LOGIN', 'userlogin', 'Ozwillo Connection', $_SESSION['config']['databasetype'], 'ADMIN', false, 'ok', 'DEBUG', $_SESSION['ozwillo']['userId']);

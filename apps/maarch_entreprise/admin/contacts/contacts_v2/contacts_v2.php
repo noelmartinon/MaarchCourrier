@@ -68,11 +68,11 @@ unset($_SESSION['fromContactTree']);
         <?php if ($admin->test_admin('admin_contacts', 'apps', false)) { ?>
         <td width="33%">
 
-                <a href="<?php 
+                <a href="<?php
                     echo $_SESSION['config']['businessappurl']
                     ;?>index.php?admin=contacts&page=manage_duplicates">
                     <h2>
-                        <i class="fa fa-magic fa-2x"></i>&nbsp;<?php 
+                        <i class="fa fa-magic fa-2x"></i>&nbsp;<?php
                         echo _MANAGE_DUPLICATES;?>
                     </h2>
                 </a>
@@ -80,10 +80,10 @@ unset($_SESSION['fromContactTree']);
         </td>
         <?php } ?>
         <td align="left">
-            <input class="button" type="button" value="<?php echo _EXPORT_CONTACT;?>" onclick="window.open('<?php echo $_SESSION['config']['businessappurl'] . 'index.php?display=true&dir=admin&page=export_admin_list'?>');window.location.reload();"/>      
+            <input class="button" type="button" value="<?php echo _EXPORT_CONTACT;?>" onclick="window.open('<?php echo $_SESSION['config']['businessappurl'] . 'index.php?display=true&dir=admin&page=export_admin_list'?>');window.location.reload();"/>
         </td>
         <td align="right">
-            <input class="button" type="button" value="<?php echo _MANAGE_CONTACT_ADDRESSES_LIST;?>" onclick="window.location.href='<?php echo $_SESSION['config']['businessappurl'] . 'index.php?page=contact_addresses_list'?>'"/>      
+            <input class="button" type="button" value="<?php echo _MANAGE_CONTACT_ADDRESSES_LIST;?>" onclick="window.location.href='<?php echo $_SESSION['config']['businessappurl'] . 'index.php?page=contact_addresses_list'?>'"/>
         </td>
    </tr>
 </table>
@@ -93,7 +93,7 @@ require_once("apps".DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_
 require_once("apps".DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_SEPARATOR."class".DIRECTORY_SEPARATOR."class_contacts_v2.php");
 $contact = new contacts_v2();
 $select[$_SESSION['tablename']['contacts_v2']] = array();
-array_push($select[$_SESSION['tablename']['contacts_v2']],"contact_id", "is_corporate_person", "contact_type", "society","lastname","firstname", "user_id", "enabled");
+array_push($select[$_SESSION['tablename']['contacts_v2']],"contact_id", "is_corporate_person", "contact_type", "society","society_short","lastname","firstname", "user_id", "enabled");
 $what = "";
 
 $where =" ";
@@ -207,6 +207,18 @@ for ($i=0;$i<count($tab);$i++)
                 $tab[$i][$j]["valign"]="bottom";
                 $tab[$i][$j]["show"]=true;
                 $tab[$i][$j]["order"]= "society";
+            }
+            if($tab[$i][$j][$value]=="society_short")
+            {
+                $tab[$i][$j]['value']=$request->show_string($tab[$i][$j]['value']);
+                $tab[$i][$j]["society"]=$tab[$i][$j]['value'];
+                $tab[$i][$j]["label"]="Sigle";
+                $tab[$i][$j]["size"]="15";
+                $tab[$i][$j]["label_align"]="left";
+                $tab[$i][$j]["align"]="left";
+                $tab[$i][$j]["valign"]="bottom";
+                $tab[$i][$j]["show"]=true;
+                $tab[$i][$j]["order"]= "society_short";
             }
             if($tab[$i][$j][$value]=="lastname")
             {

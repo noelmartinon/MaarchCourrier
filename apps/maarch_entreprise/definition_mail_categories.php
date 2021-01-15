@@ -1234,7 +1234,7 @@ function get_general_data($coll_id, $res_id, $mode, $params = array())
                 if (!empty($line->{$arr[$i]})) {
                     $stmt2 = $db->query('SELECT lastname, firstname FROM '.$_SESSION['tablename']['users'].' WHERE user_id = ?', array($line->{$arr[$i]}));
                     $res = $stmt2->fetchObject();
-                    $data[$arr[$i]]['show_value'] = $res->lastname.' '.$res->firstname;
+                    $data[$arr[$i]]['show_value'] = $res->firstname.' '.$res->lastname;
                     $pathScriptTab = $_SESSION['config']['businessappurl'].'index.php?display=true&page=user_info&id='.$line->{$arr[$i]};
 
                     $preAddon = '<a href="#" id="contact_card" title="'._CONTACT_CARD.'" onclick="';
@@ -1258,7 +1258,7 @@ function get_general_data($coll_id, $res_id, $mode, $params = array())
                             $data[$arr[$i]]['show_value'] .= '('.$res->society_short.') ';
                         }
                     } else {
-                        $data[$arr[$i]]['show_value'] = $res->contact_lastname.' '.$res->contact_firstname.' ';
+                        $data[$arr[$i]]['show_value'] = $res->contact_firstname.' '.$res->contact_lastname.' ';
                         if (!empty($res->society)) {
                             $data[$arr[$i]]['show_value'] .= '('.$res->society.') ';
                         }
@@ -1270,7 +1270,7 @@ function get_general_data($coll_id, $res_id, $mode, $params = array())
                         $contact = new contacts_v2();
                         $data[$arr[$i]]['show_value'] .= '- '.$contact->get_label_contact($res->contact_purpose_id, $_SESSION['tablename']['contact_purposes']).' : ';
                         if (!empty($res->lastname) || !empty($res->firstname)) {
-                            $data[$arr[$i]]['show_value'] .= $res->lastname.' '.$res->firstname.' ';
+                            $data[$arr[$i]]['show_value'] .= $res->firstname.' '.$res->lastname.' ';
                         }
                         if (!empty($res->address_num) || !empty($res->address_street) || !empty($res->address_town) || !empty($res->address_postal_code)) {
                             $data[$arr[$i]]['show_value'] .= ', '.$res->address_num.' '.$res->address_street.' '.$res->address_postal_code.' '.strtoupper($res->address_town);
@@ -1305,7 +1305,7 @@ function get_general_data($coll_id, $res_id, $mode, $params = array())
                                 $display_contact .= '('.$res->society_short.') ';
                             }
                         } else {
-                            $display_contact = $res->contact_lastname.' '.$res->contact_firstname.' ';
+                            $display_contact = $res->contact_firstname.' '.$res->contact_lastname.' ';
                             if (!empty($res->society)) {
                                 $display_contact .= '('.$res->society.') ';
                             }
@@ -1317,7 +1317,7 @@ function get_general_data($coll_id, $res_id, $mode, $params = array())
                             $contact = new contacts_v2();
                             $display_contact .= '- '.$contact->get_label_contact($res->contact_purpose_id, $_SESSION['tablename']['contact_purposes']).' : ';
                             if (!empty($res->lastname) || !empty($res->firstname)) {
-                                $display_contact .= $res->lastname.' '.$res->firstname.' ';
+                                $display_contact .= $res->firstname.' '.$res->lastname.' ';
                             }
                             if (!empty($res->address_num) || !empty($res->address_street) || !empty($res->address_town) || !empty($res->address_postal_code)) {
                                 $display_contact .= ', '.$res->address_num.' '.$res->address_street.' '.$res->address_postal_code.' '.strtoupper($res->address_town);
@@ -1395,7 +1395,7 @@ function get_general_data($coll_id, $res_id, $mode, $params = array())
                     $data['type_contact'] = 'internal';
                     $stmt2 = $db->query('SELECT lastname, firstname FROM '.$_SESSION['tablename']['users'].' WHERE user_id = ?', array($line->{$arr[$i]}));
                     $res = $stmt2->fetchObject();
-                    $data['contact'] = $res->lastname.' '.$res->firstname;
+                    $data['contact'] = $res->firstname.' '.$res->lastname;
                     $data['contactId'] = $line->{$arr[$i]};
                 }
                 unset($data[$arr[$i]]);
@@ -1413,7 +1413,7 @@ function get_general_data($coll_id, $res_id, $mode, $params = array())
                             $data['contact'] .= '('.$res->society_short.') ';
                         }
                     } else {
-                        $data['contact'] = $res->contact_lastname.' '.$res->contact_firstname.' ';
+                        $data['contact'] = $res->contact_firstname.' '.$res->contact_lastname.' ';
                         if (!empty($res->society)) {
                             $data['contact'] .= '('.$res->society.') ';
                         }
@@ -1425,7 +1425,7 @@ function get_general_data($coll_id, $res_id, $mode, $params = array())
                         $contact = new contacts_v2();
                         $data['contact'] .= '- '.$contact->get_label_contact($res->contact_purpose_id, $_SESSION['tablename']['contact_purposes']).' : ';
                         if (!empty($res->lastname) || !empty($res->firstname)) {
-                            $data['contact'] .= $res->lastname.' '.$res->firstname.' ';
+                            $data['contact'] .= $res->firstname.' '.$res->lastname.' ';
                         }
                         if (!empty($res->address_num) || !empty($res->address_street) || !empty($res->address_town) || !empty($res->address_postal_code)) {
                             $data['contact'] .= ', '.$res->address_num.' '.$res->address_street.' '.$res->address_postal_code.' '.strtoupper($res->address_town);

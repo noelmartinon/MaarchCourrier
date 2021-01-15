@@ -353,7 +353,7 @@ switch ($mode) {
     case 'updated':
         if (isset($_REQUEST['id']) && !empty($_REQUEST['id'])) {
             //Email ID
-            $id = $_REQUEST['id'];
+            $emailId = $_REQUEST['id'];
             $userEntitiesMails = array();
             if ($core_tools->test_service('use_mail_services', 'sendmail', false)) {
                 $userEntitiesMails = $sendmail_tools->checkAttachedEntitiesMails($_SESSION['user']['UserId']);
@@ -469,7 +469,7 @@ switch ($mode) {
 
                                     $isSent = \Email\controllers\EmailController::update([
                                         'userId'    => $userInfo['id'],
-                                        'emailId'   => $id,
+                                        'emailId'   => $emailId,
                                         'data'      => [
                                             'sender'        => empty($entityInfo) ? ['email' => $userInfo['mail']] : ['email' => $aSenderInfo[1], 'entityId' => $entityInfo['id']],
                                             'recipients'    => explode(",", $to),

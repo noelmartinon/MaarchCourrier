@@ -218,6 +218,7 @@ class ListInstanceController
 
             $listInstanceHistoryId = ListInstanceHistoryModel::create(['resId' => $ListInstanceByRes['resId'], 'userId' => $args['userId']]);
             foreach ($listInstances as $listInstance) {
+                $listInstance['added_by_entity'] = empty($listInstance['added_by_entity']) ? "''" : $listInstance['added_by_entity'];
                 ListInstanceHistoryDetailModel::create([
                     'listinstance_history_id'   => $listInstanceHistoryId,
                     'res_id'                    => $listInstance['res_id'],

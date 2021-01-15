@@ -56,7 +56,7 @@ include_once '../../core/class/class_functions.php';
 include_once '../../core/class/class_db_pdo.php';
 include_once '../../core/init.php';
 include 'apps/maarch_entreprise/tools/maarchIVS/MaarchIVS.php';
-
+unset($_SESSION['installeurLock']);
 //Ozwillo
 if (!empty($_REQUEST['code']) && !empty($_REQUEST['state'])) {
     $_SESSION['ozwillo']['code'] = $_REQUEST['code'];

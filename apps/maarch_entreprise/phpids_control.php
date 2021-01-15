@@ -39,7 +39,7 @@ if ($processIDS) {
             dirname(__FILE__)
             . '/tools/phpids/lib/IDS/Config/Config.ini.php'
         );
-        
+
         $init->config['General']['base_path'] = dirname(__FILE__)
             . '/tools/phpids/lib/IDS/';
         $init->config['General']['use_base_path'] = true;
@@ -66,7 +66,8 @@ if ($processIDS) {
                 'admin',
                 false,
                 'ok',
-                'ERROR'
+                'ERROR',
+                'tech'
             );
             if ($_SESSION['config']['debug'] == 'true') {
                 echo $result;

@@ -1097,6 +1097,9 @@ function close_action(id_action, page, path_manage_script, mode_req, res_id_valu
         if (actions_status.values.length > 0) {
             var status = actions_status.values[actions_status.values.length - 1];
             action_done = action_change_status(path_manage_script, mode_req, res_id_values, tablename, id_coll, status, page);
+            if (typeof window['angularSignatureBookComponent'] != "undefined") {
+                actions_status.values = [];
+            }
         } else {
             if (page != '' && page != NaN && page && page != null) {
                 if (typeof window['angularSignatureBookComponent'] != "undefined") {
