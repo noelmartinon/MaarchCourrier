@@ -414,6 +414,7 @@ export class SentResourcePageComponent implements OnInit {
                     if (this.pdfMode) {
                         this.emailsubject = this.translate.instant('lang.ARPaper');
                         this.emailContent = data.encodedDocument;
+                        this.loading = false;
                     } else {
                         this.emailsubject = this.translate.instant('lang.ARelectronic');
                         this.emailContent = this.b64DecodeUnicode(data.encodedDocument);
