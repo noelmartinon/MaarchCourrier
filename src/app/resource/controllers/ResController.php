@@ -252,8 +252,6 @@ class ResController extends ResourceControlController
 
         $onlyDocument = !empty($queryParams['onlyDocument']);
 
-        unset($body['destination']);
-        unset($body['diffusionList']);
         $control = ResourceControlController::controlUpdateResource(['body' => $body, 'resId' => $args['resId'], 'onlyDocument' => $onlyDocument]);
         if (!empty($control['errors'])) {
             return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
@@ -1181,6 +1179,34 @@ class ResController extends ResourceControlController
 
         $body = $args['body'];
 
+        if (!empty($body['diffusionList'])) {
+            ListInstanceModel::delete([
+                'where' => ['res_id = ?', 'difflist_type = ?'],
+                'data'  => [$args['resId'], 'entity_id']
+            ]);
+            foreach ($body['diffusionList'] as $diffusion) {
+                if ($diffusion['type'] == 'user') {
+                    $item = UserModel::getById(['id' => $diffusion['id'], 'select' => ['user_id']]);
+                    $diffusion['id'] = $item['user_id'];
+                } else {
+                    $item = EntityModel::getById(['id' => $diffusion['id'], 'select' => ['entity_id']]);
+                    $diffusion['id'] = $item['entity_id'];
+                }
+
+                if ($diffusion['mode'] == 'dest') {
+                    ResModel::update(['set' => ['dest_user' => $diffusion['id']], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
+                }
+                ListInstanceModel::create([
+                    'res_id'            => $args['resId'],
+                    'sequence'          => 0,
+                    'item_id'           => $diffusion['id'],
+                    'item_type'         => $diffusion['type'] == 'user' ? 'user_id' : 'entity_id',
+                    'item_mode'         => $diffusion['mode'],
+                    'added_by_user'     => $GLOBALS['userId'],
+                    'difflist_type'     => 'entity_id'
+                ]);
+            }
+        }
         $entities = EntityModel::getWithUserEntities([
             'select' => ['entities.id'],
             'where'  => ['user_id = ?'],
