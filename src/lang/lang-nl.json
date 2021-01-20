@@ -2183,6 +2183,6 @@
     "redirectUserVisaWorkflow": "Changement de viseur / signataire pour les courriers en cours de visa / signature__TO_TRANSLATE",
     "chooseNewVisaUser": "est en <b>visa / signature</b> de certains courriers, veuillez choisir un utilisateur de <b>remplacement</b>__TO_TRANSLATE",
     "hideModal": "Ne plus afficher cette fenêtre__TO_TRANSLATE",
-    "noPreviousValid": "Aucun utilisateur précédent valide__TO_TRANSLATE",
-    "youCannotUnsign": "Vous n'avez pas le droit de <b>dé-signer</b> ce document. Vous devez ếtre la personne qui a signé ce document.__TO_TRANSLATE"
+    "youCannotUnsign" : "Vous n'avez pas le droit de <b>dé-signer</b> ce document. Vous devez ếtre la personne qui a signé ce document.__TO_TRANSLATE",
+    "arContentIsEmpty": "AR content is empty__TO_TRANSLATE"
 }

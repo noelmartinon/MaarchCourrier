@@ -48,12 +48,21 @@ job_e2e:
  stage: test
  script:
    - apt-get install -yqq libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
+   - service apache2 start
+   - touch installed.lck
+   - chown -R www-data. /opt/maarch/
+   - chown -R www-data. /var/www/html/
+   - chmod -R 775 /opt/maarch/
+   - chmod -R 775 /var/www/html/
    - curl -sL https://deb.nodesource.com/setup_14.x | bash - > /dev/null
    - apt-get install -yqq nodejs > /dev/null
    - npm install npm@latest -g 
    - node -v
    - npm set registry https://registry.npmjs.org/ 
    - npm install > /dev/null
+   - npm run build-prod
+   - curl -o /dev/null --silent --head --write-out '%{http_code}\n' http://127.0.0.1/MaarchCourrier
+   - sed -i 's~https://preview.maarchcourrier.com~http://127.0.0.1/MaarchCourrier~' /var/www/html/MaarchCourrier/test/e2e/cypress-config.json
    - npm run cypress:run
  artifacts:
    paths:

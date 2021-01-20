@@ -66,6 +66,7 @@ foreach ($customs as $custom) {
         if ($template['template_type'] == 'OFFICE' || $template['template_type'] == 'OFFICE_HTML') {
             if (empty($template['template_file_name']) || empty($template['template_path'])) {
                 $nonMigrated++;
+                echo "Erreur lors de la migration du modèle : le modèle n'a pas de fichier : {$template['template_id']}\n";
                 continue;
             }
 
@@ -78,11 +79,13 @@ foreach ($customs as $custom) {
 
             if (!in_array($extension, OFFICE_EXTENSIONS)) {
                 $nonMigrated++;
+                echo "Erreur lors de la migration du modèle : le document n'est pas un document fusionnable : $pathToDocument\n";
                 continue;
             }
 
             if (!is_writable($pathToDocument) || !is_readable($pathToDocument)) {
                 $nonMigrated++;
+                echo "Erreur lors de la migration du modèle : droits d'accès insuffisants : $pathToDocument\n";
                 continue;
             }
 

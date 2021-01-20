@@ -250,6 +250,8 @@ class CurlModel
             $opts[CURLOPT_POST] = true;
         } elseif ($args['method'] == 'PUT' || $args['method'] == 'PATCH' || $args['method'] == 'DELETE') {
             $opts[CURLOPT_CUSTOMREQUEST] = $args['method'];
+        } elseif (!empty($args['customRequest'])) {
+            $opts[CURLOPT_CUSTOMREQUEST] = $args['customRequest'];
         }
 
         //Url
@@ -322,11 +324,11 @@ class CurlModel
     public static function makeCurlFile(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['path']);
-        ValidatorModel::stringType($aArgs, ['path']);
+        ValidatorModel::stringType($aArgs, ['path', 'name']);
 
         $mime = mime_content_type($aArgs['path']);
         $info = pathinfo($aArgs['path']);
-        $name = $info['basename'];
+        $name = $aArgs['path'] ?? $info['basename'];
         $output = new \CURLFile($aArgs['path'], $mime, $name);
 
         return $output;

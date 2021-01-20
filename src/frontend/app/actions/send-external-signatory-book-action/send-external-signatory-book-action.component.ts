@@ -44,6 +44,8 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
 
     errors: any;
 
+    mainDocumentSigned: boolean = false;
+
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
 
     @ViewChild('xParaph', { static: false }) xParaph: XParaphComponent;
@@ -63,7 +65,18 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
     ngOnInit(): void {
         this.loading = true;
         if (this.data.resource.integrations['inSignatureBook']) {
-            this.toggleDocToSign(true, this.data.resource, true);
+            this.http.get(`../rest/resources/${this.data.resource.resId}/versionsInformations`).pipe(
+                tap((data: any) => {
+                    this.mainDocumentSigned = data.SIGN.length !== 0;
+                    if (!this.mainDocumentSigned) {
+                        this.toggleDocToSign(true, this.data.resource, true);
+                    }
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
         }
         this.checkExternalSignatureBook();
     }
@@ -78,7 +91,7 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
     checkExternalSignatureBook() {
         this.loading = true;
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.post(`../rest/resourcesList/users/${this.data.userId}/groups/${this.data.groupId}/baskets/${this.data.basketId}/checkExternalSignatoryBook`, { resources: this.data.resIds }).pipe(
                 tap((data: any) => {
                     this.additionalsInfos = data.additionalsInfos;
@@ -143,7 +156,10 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
         this.http.put(`../rest/resourcesList/integrations`, { resources: this.data.resIds, integrations: { [integrationId]: !this.data.resource.integrations[integrationId] } }).pipe(
             tap(async () => {
                 this.data.resource.integrations[integrationId] = !this.data.resource.integrations[integrationId];
-                this.toggleDocToSign(this.data.resource.integrations[integrationId], this.data.resource, true);
+
+                if (!this.mainDocumentSigned) {
+                    this.toggleDocToSign(this.data.resource.integrations[integrationId], this.data.resource, true);
+                }
                 await this.checkExternalSignatureBook();
                 this.changeDetectorRef.detectChanges();
             }),

@@ -132,7 +132,7 @@ define('_OTHER', 'Autre');
 define('_NOTIFICATION_ALREADY_EXIST', 'Notification déjà existante');
 define('_WRONG_PSW', 'Le mot de passe actuel n\'est pas correct');
 define('_ALREADY_USED_PSW', 'Le mot de passe a déjà été utilisé');
-define('_BAD_LOGIN_OR_PSW', 'Mauvais nom d\'utilisateur ou mauvais mot de passe');
+define('_NOT_ALLOWED_USER_FOR_THIS_NATURE', 'Cet utilisateur n\'est pas un rédacteur autorisé pour cette nature');
 define('_ACCOUNT_LOCKED_FOR', 'Nombre de tentatives de connexion dépassée. Votre compte est verrouillé pendant');
 define('_ACCOUNT_LOCKED_UNTIL', 'Nombre de tentatives de connexion dépassée. Compte verrouillé jusqu\'au');
 define('_MAX_SIZE_UPLOAD_REACHED', 'Taille maximum de fichier dépassée');

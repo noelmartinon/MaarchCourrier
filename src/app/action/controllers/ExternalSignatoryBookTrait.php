@@ -14,6 +14,7 @@ namespace Action\controllers;
 
 use Attachment\controllers\AttachmentController;
 use Attachment\models\AttachmentModel;
+use Convert\models\AdrModel;
 use ExternalSignatoryBook\controllers\IxbusController;
 use ExternalSignatoryBook\controllers\IParapheurController;
 use ExternalSignatoryBook\controllers\FastParapheurController;
@@ -48,7 +49,7 @@ trait ExternalSignatoryBookTrait
                     'select'    => [
                         'res_id', 'status'
                     ],
-                    'where'     => ["res_id_master = ?", "attachment_type not in (?)", "status not in ('DEL', 'OBS', 'FRZ', 'TMP')", "in_signature_book = 'true'"],
+                    'where'     => ["res_id_master = ?", "attachment_type not in (?)", "status not in ('DEL', 'OBS', 'FRZ', 'TMP', 'SIGN')", "in_signature_book = 'true'"],
                     'data'      => [$args['resId'], ['signed_response']]
                 ]);
 
@@ -63,11 +64,10 @@ trait ExternalSignatoryBookTrait
             }
 
             if ($config['id'] == 'ixbus') {
-                $loginIxbus    = $args['data']['ixbus']['login'];
-                $passwordIxbus = $args['data']['ixbus']['password'];
-                $userInfo      = IxbusController::getInfoUtilisateur(['config' => $config, 'login' => $loginIxbus, 'password' => $passwordIxbus]);
-                if (empty($userInfo->Identifiant)) {
-                    return ['errors' => [_BAD_LOGIN_OR_PSW]];
+                $loginIxbus = $args['data']['ixbus']['login'];
+                $userInfo   = IxbusController::getInfoUtilisateur(['config' => $config, 'login' => $loginIxbus, 'natureId' => $args['data']['ixbus']['nature']]);
+                if (empty($userInfo['user'])) {
+                    return ['errors' => [_NOT_ALLOWED_USER_FOR_THIS_NATURE]];
                 }
             }
 
@@ -76,6 +76,15 @@ trait ExternalSignatoryBookTrait
                 'where'  => ['integrations->>\'inSignatureBook\' = \'true\'', 'external_id->>\'signatureBookId\' is null', 'res_id = ?'],
                 'data'   => [$args['resId']]
             ]);
+            $mainDocumentSigned = AdrModel::getConvertedDocumentById([
+                'select' => [1],
+                'resId'  => $args['resId'],
+                'collId' => 'letterbox_coll',
+                'type'   => 'SIGN'
+            ]);
+            if (!empty($mainDocumentSigned)) {
+                $integratedResource = false;
+            }
 
             if (empty($attachments) && empty($integratedResource) && $args['data']['objectSent'] == 'attachment') {
                 $noAttachmentsResource = ResModel::getById(['resId' => $args['resId'], 'select' => ['alt_identifier']]);
@@ -106,8 +115,7 @@ trait ExternalSignatoryBookTrait
                     'config'        => $config,
                     'resIdMaster'   => $args['resId'],
                     'loginIxbus'    => $loginIxbus,
-                    'passwordIxbus' => $passwordIxbus,
-                    'classeurName'  => $args['data']['ixbus']['nature'],
+                    'natureId'      => $args['data']['ixbus']['nature'],
                     'messageModel'  => $args['data']['ixbus']['messageModel'],
                     'manSignature'  => $args['data']['ixbus']['signatureMode']
                 ]);

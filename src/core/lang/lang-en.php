@@ -132,7 +132,7 @@ define('_OTHER', 'Other');
 define('_NOTIFICATION_ALREADY_EXIST', 'Notification already exists');
 define('_WRONG_PSW', 'Wrong password');
 define('_ALREADY_USED_PSW', 'The password has already been used');
-define('_BAD_LOGIN_OR_PSW', 'Wrong user name or wrong password');
+define('_NOT_ALLOWED_USER_FOR_THIS_NATURE', 'This user is not an allowed redactor for this nature');
 define('_ACCOUNT_LOCKED_FOR', 'Too many connections attempts. Your account is locked for');
 define('_ACCOUNT_LOCKED_UNTIL', 'Too many connections attempts. Account locked until');
 define('_MAX_SIZE_UPLOAD_REACHED', 'Maximum file size exceeded');

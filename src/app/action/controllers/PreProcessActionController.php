@@ -22,6 +22,7 @@ use Configuration\models\ConfigurationModel;
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
 use Convert\controllers\ConvertPdfController;
+use Convert\models\AdrModel;
 use CustomField\models\CustomFieldModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
@@ -446,7 +447,7 @@ class PreProcessActionController
                             'status', 'typist', 'docserver_id', 'path', 'filename', 'creation_date',
                             'validation_date', 'relation', 'origin_id'
                         ],
-                        'where'     => ["res_id_master = ?", "attachment_type not in (?)", "status not in ('DEL', 'OBS', 'FRZ', 'TMP')", "in_signature_book = 'true'"],
+                        'where'     => ["res_id_master = ?", "attachment_type not in (?)", "status not in ('DEL', 'OBS', 'FRZ', 'TMP', 'SIGN')", "in_signature_book = 'true'"],
                         'data'      => [$resId, ['signed_response']]
                     ]);
 
@@ -455,6 +456,15 @@ class PreProcessActionController
                         'where'  => ['integrations->>\'inSignatureBook\' = \'true\'', 'external_id->>\'signatureBookId\' is null', 'res_id = ?'],
                         'data'   => [$resId]
                     ]);
+                    $mainDocumentSigned = AdrModel::getConvertedDocumentById([
+                        'select' => [1],
+                        'resId'  => $resId,
+                        'collId' => 'letterbox_coll',
+                        'type'   => 'SIGN'
+                    ]);
+                    if (!empty($mainDocumentSigned)) {
+                        $integratedResource = false;
+                    }
 
                     $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id', 'signable']]);
                     $attachmentTypes = array_column($attachmentTypes, 'signable', 'type_id');
@@ -503,7 +513,6 @@ class PreProcessActionController
                                 $additionalsInfos['noAttachment'][] = ['alt_identifier' => $noAttachmentsResource['alt_identifier'], 'res_id' => $resId, 'reason' => 'fileDoesNotExists'];
                                 break;
                             }
-                            $availableResources[] = ['resId' => $resId, 'subject' => $integratedResource[0]['subject'], 'chrono' => $integratedResource[0]['alt_identifier'], 'mainDocument' => true];
                         }
                         if (!$hasSignableAttachment && empty($integratedResource)) {
                             $additionalsInfos['noAttachment'][] = ['alt_identifier' => $noAttachmentsResource['alt_identifier'], 'res_id' => $resId, 'reason' => 'noSignableAttachmentInSignatoryBook'];

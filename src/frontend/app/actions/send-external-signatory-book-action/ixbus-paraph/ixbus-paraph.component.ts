@@ -23,7 +23,6 @@ export class IxbusParaphComponent implements OnInit {
         nature: '',
         messageModel: '',
         login: '',
-        password: '',
         signatureMode: 'manual'
     };
 
@@ -47,17 +46,8 @@ export class IxbusParaphComponent implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.natures = this.additionalsInfos.ixbus.natures.map((element: any) => {
-            return {
-                id: element,
-                label: element
-            }
-        });
-        this.messagesModel = this.additionalsInfos.ixbus.messagesModel.map((element: any) => {
-            return {
-                id: element,
-                label: element
-            };
+        this.additionalsInfos.ixbus.natures.forEach((element: any) => {
+            this.natures.push({id: element.identifiant, label: element.nom});
         });
 
         if (this.localStorage.get(`ixBusSignatureMode_${this.headerService.user.id}`) !== null) {
@@ -67,9 +57,16 @@ export class IxbusParaphComponent implements OnInit {
         this.loading = false;
     }
 
+    changeModel(natureId: string) {
+        this.messagesModel = [];
+        this.additionalsInfos.ixbus.messagesModel[natureId].forEach((element: any) => {
+            this.messagesModel.push({id: element.identifiant, label: element.nom});
+        });
+    }
+
     isValidParaph() {
         if (this.additionalsInfos.attachments.length === 0 || this.natures.length === 0 || this.messagesModel.length === 0 || !this.ixbusDatas.nature
-            || !this.ixbusDatas.messageModel || !this.ixbusDatas.login || !this.ixbusDatas.password) {
+            || !this.ixbusDatas.messageModel || !this.ixbusDatas.login) {
             return false;
         } else {
             return true;

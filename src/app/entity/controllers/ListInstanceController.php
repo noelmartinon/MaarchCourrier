@@ -271,7 +271,13 @@ class ListInstanceController
                         return ['errors' => 'User not found', 'code' => 400];
                     }
                 } elseif (in_array($instance['item_type'], ['entity_id', 'entity'])) {
-                    $entity = EntityModel::getById(['id' => $instance['item_id'], 'select' => ['enabled']]);
+                    if (!is_numeric($instance['item_id'])) {
+                        $entity = EntityModel::getByEntityId(['entityId' => $instance['item_id'], 'select' => ['id', 'enabled']]);
+                        $instance['item_id'] = $entity['id'];
+                    } else {
+                        $entity = EntityModel::getById(['id' => $instance['item_id'], 'select' => ['enabled']]);
+                    }
+
                     $instance['item_type'] = 'entity_id';
                     if (empty($entity) || $entity['enabled'] != 'Y') {
                         DatabaseModel::rollbackTransaction();

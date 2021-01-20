@@ -14,7 +14,7 @@
 </div>
 <div class="col-md-12" style="text-align: right;">
     <button mat-button *ngIf="additionalsInfos.attachments.length === 1" color="primary" type="button"
-        [matMenuTriggerFor]="menu" [disabled]="!isValidParaph()">Gérer les positions de signature...</button>
+        [matMenuTriggerFor]="menu" [disabled]="!isValidParaph()">{{'lang.manageSignaturesPositions' | translate}}</button>
     <mat-menu #menu="matMenu" class="docToSignTemplateMenu">
         <button mat-menu-item *ngFor="let resource of resourcesToSign" (click)="openSignaturePosition(resource)"
             style="font-size:12px;">

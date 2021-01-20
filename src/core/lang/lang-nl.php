@@ -132,7 +132,7 @@ define('_OTHER', 'Andere');
 define('_NOTIFICATION_ALREADY_EXIST', 'Reeds bestaande melding');
 define('_WRONG_PSW', 'Het huidige wachtwoord is niet correct');
 define('_ALREADY_USED_PSW', 'Het wachtwoord werd reeds gebruikt');
-define('_BAD_LOGIN_OR_PSW', 'Verkeerde gebruikersnaam of verkeerd wachtwoord');
+define('_NOT_ALLOWED_USER_FOR_THIS_NATURE', 'This user is not an allowed redactor for this nature');//TRANSLATE
 define('_ACCOUNT_LOCKED_FOR', 'Aantal verbindingspogingen overschreden. Uw account wordt vergrendeld voor');
 define('_ACCOUNT_LOCKED_UNTIL', 'Aantal verbindingspogingen overschreden. Account vergrendeld tot');
 define('_MAX_SIZE_UPLOAD_REACHED', 'Maximumgrootte van het bestand overschreden');
