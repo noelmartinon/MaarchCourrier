@@ -515,7 +515,7 @@ export class IndexingFormComponent implements OnInit {
                                 id: entity.id,
                                 title: title,
                                 label: entity.entity_label,
-                                disabled: !entity.enabled
+                                disabled: this.mode !== 'indexation' ? false : !entity.enabled
                             };
                         });
                         elem.event = 'loadDiffusionList';
@@ -690,10 +690,10 @@ export class IndexingFormComponent implements OnInit {
                                 } else if (elem.identifier === 'processLimitDate' && !this.functions.empty(fieldValue)) {
                                     elem.startDate = '';
                                 } else if (elem.identifier === 'destination') {
-                                    if (this.mode === 'process') {
+                                    if (this.mode !== 'indexation') {
                                         this.arrFormControl[elem.identifier].disable();
+                                        this.arrFormControl['diffusionList'].disable();                                    
                                     }
-                                    this.arrFormControl['diffusionList'].disable();
                                 } else if (elem.identifier === 'initiator' && elem.values.filter((val: any) => val.id === fieldValue).length === 0 && !this.functions.empty(fieldValue)) {
                                     await this.getCurrentInitiator(elem, fieldValue);
                                 }
@@ -1007,6 +1007,18 @@ export class IndexingFormComponent implements OnInit {
 
         if (entityIds.indexOf(this.arrFormControl['destination'].value) === -1) {
             this.arrFormControl['destination'].setValue(entityIds[0]);
+        }
+    }
+
+    checkDestinationFieldByRole(roles: any[]) {
+        if (roles.filter((role: any) => role.canUpdate === true && role.id === 'dest').length > 0) {
+            this.arrFormControl['destination'].enable();
+        }
+        if (roles.filter((role: any) => role.canUpdate === true).length > 0) {
+            this.arrFormControl['diffusionList'].enable();
+        }
+        if (roles.filter((role: any) => role.canUpdate === false && role.id === 'dest').length > 0 || roles.filter((role: any) => role.canUpdate === false ).length === roles.length ) {
+            this.hideDiffusionList = true;
         }
     }
 

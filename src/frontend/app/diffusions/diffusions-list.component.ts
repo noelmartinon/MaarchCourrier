@@ -97,6 +97,8 @@ export class DiffusionsListComponent implements OnInit {
      */
     @Output() triggerEvent = new EventEmitter();
 
+    @Output() afterGetRoles = new EventEmitter();
+
     constructor(
         public http: HttpClient,
         private notify: NotificationService,
@@ -381,6 +383,7 @@ export class DiffusionsListComponent implements OnInit {
                             this.keepRoles.push(element.id);
                         }
                     });
+                    this.afterGetRoles.emit(this.availableRoles);
                     resolve(true);
                 }),
                 catchError((err: any) => {

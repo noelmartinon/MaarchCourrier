@@ -186,7 +186,7 @@
                                 align-items: center;">
                                 <div style="display: flex;flex: 1;align-items: center;">
                                     {{lang.diffusionList}} <button mat-icon-button
-                                        *ngIf="appDiffusionsList.canUpdateRoles() && canEdit && mode !== 'process'"
+                                        *ngIf="appDiffusionsList.canUpdateRoles()"
                                         color="primary" (click)="appDiffusionsList.switchMode()"
                                         [title]="lang.modifyDiffusionList">
                                         <mat-icon class="fa fa-edit"></mat-icon>
@@ -206,8 +206,8 @@
                                 [entityId]="arrFormControl[field.identifier].value"
                                 [diffFormControl]="arrFormControl['diffusionList']"
                                 [allowedEntities]="field.allowedEntities" [category]="currentCategory"
-                                [target]="'indexation'" [selfDest]="selfDest" [customDiffusion]="customDiffusion"
-                                (triggerEvent)="changeDestination($event,field.allowedEntities)">
+                                [target]="mode" [selfDest]="selfDest" [customDiffusion]="customDiffusion"
+                                (triggerEvent)="changeDestination($event,field.allowedEntities)" (afterGetRoles)="checkDestinationFieldByRole($event)">
                             </app-diffusions-list>
                             <mat-divider></mat-divider>
                         </div>
