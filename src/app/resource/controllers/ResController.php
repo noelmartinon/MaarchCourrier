@@ -252,6 +252,11 @@ class ResController extends ResourceControlController
 
         $onlyDocument = !empty($queryParams['onlyDocument']);
 
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'update_diffusion_details', 'userId' => $GLOBALS['id']]) && !PrivilegeController::hasPrivilege(['privilegeId' => 'update_diffusion_process', 'userId' => $GLOBALS['id']])) {
+            unset($body['destination']);
+            unset($body['diffusionList']);
+        }
+
         $control = ResourceControlController::controlUpdateResource(['body' => $body, 'resId' => $args['resId'], 'onlyDocument' => $onlyDocument]);
         if (!empty($control['errors'])) {
             return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
