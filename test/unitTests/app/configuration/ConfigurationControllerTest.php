@@ -27,7 +27,7 @@ class ConfigurationControllerTest extends TestCase
             'user'       => 'user@test.com',
             'password'   => '12345',
             'secure'     => 'ssl',
-            'from'       => 'info@maarch.org',
+            'from'       => 'dev.maarch@maarch.org',
             'charset'    => 'utf-8',
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
@@ -57,7 +57,7 @@ class ConfigurationControllerTest extends TestCase
                 'user'       => 'user@test.com',
                 'password'       => '',
                 'secure'     => 'ssl',
-                'from'       => 'info@maarch.org',
+                'from'       => 'dev.maarch@maarch.org',
                 'charset'    => 'utf-8',
                 'passwordAlreadyExists' => true
             ]
@@ -77,7 +77,7 @@ class ConfigurationControllerTest extends TestCase
             'user'       => '',
             'password'   => '',
             'secure'     => 'tls',
-            'from'       => 'info@maarch.org',
+            'from'       => 'dev.maarch@maarch.org',
             'charset'    => 'utf-8',
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
@@ -106,7 +106,7 @@ class ConfigurationControllerTest extends TestCase
                 'user'       => '',
                 'password'       => '',
                 'secure'     => 'tls',
-                'from'       => 'info@maarch.org',
+                'from'       => 'dev.maarch@maarch.org',
                 'charset'    => 'utf-8',
                 'passwordAlreadyExists' => false
             ]
@@ -189,7 +189,7 @@ class ConfigurationControllerTest extends TestCase
             'user'       => '',
             'password'   => '',
             'secure'     => 'tls',
-            'from'       => 'info@maarch.org',
+            'from'       => 'dev.maarch@maarch.org',
             'charset'    => 'utf-8',
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
