@@ -482,7 +482,7 @@ export class VisaWorkflowComponent implements OnInit {
     addItemToWorkflow(item: any, maarchParapheurMode = false) {
         return new Promise((resolve, reject) => {
             if (maarchParapheurMode) {
-                const requestedSignature = !this.functions.empty(item.requested_signature) ? item.requested_signature : false;
+                // const requestedSignature = !this.functions.empty(item.requested_signature) ? item.requested_signature : false;
                 this.visaWorkflow.items.push({
                     item_id: item.id,
                     item_type: 'user',
@@ -491,11 +491,15 @@ export class VisaWorkflowComponent implements OnInit {
                     externalId: item.externalId,
                     difflist_type: 'VISA_CIRCUIT',
                     signatory: !this.functions.empty(item.signatory) ? item.signatory : false,
-                    requested_signature: requestedSignature,
                     hasPrivilege: true,
                     isValid: true,
-                    currentRole: requestedSignature ? 'sign' : 'visa'
+                    availableRoles : ['visa'].concat(item.signatureModes),
+                    role: item.signatureModes[item.signatureModes.length - 1]
                 });
+                if (!this.isValidRole(this.visaWorkflow.items.length - 1, item.signatureModes[item.signatureModes.length - 1], item.signatureModes[item.signatureModes.length - 1])) {
+                    this.visaWorkflow.items[this.visaWorkflow.items.length - 1].role = 'visa';
+                }
+
                 if (this.linkedToMaarchParapheur) {
                     this.getMaarchParapheurUserAvatar(item.externalId.maarchParapheur, this.visaWorkflow.items.length - 1);
                 }
@@ -653,6 +657,16 @@ export class VisaWorkflowComponent implements OnInit {
             }
         } else {
             return false;
+        }
+    }
+
+    isValidRole(indexWorkflow: any, role: string, currentRole: string) {
+        if (this.visaWorkflow.items.filter((item: any, index: any) => index > indexWorkflow && ['stamp'].indexOf(item.role) > -1).length > 0 && ['visa', 'stamp'].indexOf(currentRole) > -1 && ['visa', 'stamp'].indexOf(role) === -1) {
+            return false;
+        } else if (this.visaWorkflow.items.filter((item: any, index: any) => index < indexWorkflow && ['visa', 'stamp'].indexOf(item.role) === -1).length > 0 && role === 'stamp') {
+            return false;
+        } else {
+            return true;
         }
     }
 }

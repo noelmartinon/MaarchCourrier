@@ -175,3 +175,7 @@
     white-space: break-spaces;
     text-align: center;
 }
+
+.selected {
+    background: rgba($secondary, 0.5);
+}

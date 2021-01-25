@@ -163,7 +163,7 @@ class CoreController
 
     public function generateLang(Request $request, Response $response)
     {
-        if (!is_file('dist/main-es5.js')) {
+        if (!is_file('dist/main-es5.js') && !is_file('dist/main.js')) {
             return $response->withStatus(403)->withJson(['errors' => 'Route forbidden']);
         }
 

@@ -473,6 +473,7 @@ $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/ac
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkPrintDepositList', \Action\controllers\PreProcessActionController::class . ':checkPrintDepositList');
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/checkAcknowledgementRecordManagement', \Action\controllers\PreProcessActionController::class . ':checkAcknowledgementRecordManagement');
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/checkReplyRecordManagement', \Action\controllers\PreProcessActionController::class . ':checkReplyRecordManagement');
+$app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkSendToRecordManagement', \Action\controllers\PreProcessActionController::class . ':checkSendToRecordManagement');
 
 //Search
 $app->post('/search', \Search\controllers\SearchController::class . ':get');
@@ -643,7 +644,6 @@ $app->delete('/collaboraOnline/file', \ContentManagement\controllers\CollaboraOn
 $app->post('/collaboraOnline/encodedFile', \ContentManagement\controllers\CollaboraOnlineController::class . ':saveTmpEncodedDocument');
 
 // Archival
-$app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkSendToRecordManagement', \ExportSeda\controllers\SedaController::class . ':checkSendToRecordManagement');
 $app->get('/archival/retentionRules', \ExportSeda\controllers\SedaController::class . ':getRetentionRules');
 $app->put('/archival/binding', \ExportSeda\controllers\SedaController::class . ':setBindingDocument');
 $app->put('/archival/freezeRetentionRule', \ExportSeda\controllers\SedaController::class . ':freezeRetentionRule');

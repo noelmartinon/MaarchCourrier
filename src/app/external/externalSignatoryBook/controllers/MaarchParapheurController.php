@@ -372,7 +372,8 @@ class MaarchParapheurController
                                     $datePositions = $step['datePositions'];
                                 }
                             }
-                            $workflow[(int)$step['sequence']] = ['userId' => $step['externalId'], 'mode' => $step['action'], 'signaturePositions' => $signaturePositions, 'datePositions' => $datePositions];
+
+                            $workflow[(int)$step['sequence']] = ['userId' => $step['externalId'], 'mode' => $step['action'], 'signatureMode' => $step['signatureMode'] ?? null, 'signaturePositions' => $signaturePositions, 'datePositions' => $datePositions];
                         }
                     }
 
@@ -450,7 +451,7 @@ class MaarchParapheurController
                                     $datePositions = $step['datePositions'];
                                 }
                             }
-                            $workflow[(int)$step['sequence']] = ['userId' => $step['externalId'], 'mode' => $step['action'], 'signaturePositions' => $signaturePositions, 'datePositions' => $datePositions];
+                            $workflow[(int)$step['sequence']] = ['userId' => $step['externalId'], 'mode' => $step['action'], 'signatureMode' => $step['signatureMode'] ?? null, 'signaturePositions' => $signaturePositions, 'datePositions' => $datePositions];
                         }
                     }
 

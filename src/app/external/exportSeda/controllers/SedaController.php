@@ -18,18 +18,13 @@ use Attachment\models\AttachmentModel;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
-use Doctype\models\DoctypeModel;
 use Email\models\EmailModel;
-use Entity\models\EntityModel;
 use ExportSeda\controllers\ExportSEDATrait;
 use Folder\models\FolderModel;
 use Group\controllers\PrivilegeController;
 use History\controllers\HistoryController;
-use MessageExchange\models\MessageExchangeModel;
 use Note\models\NoteModel;
-use Parameter\models\ParameterModel;
 use Resource\controllers\ResController;
-use Resource\controllers\ResourceListController;
 use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
@@ -41,114 +36,6 @@ use User\models\UserModel;
 
 class SedaController
 {
-    public function checkSendToRecordManagement(Request $request, Response $response, array $aArgs)
-    {
-        $body = $request->getParsedBody();
-
-        if (!Validator::arrayType()->notEmpty()->validate($body['resources'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body resources is empty or not an array']);
-        }
-
-        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $GLOBALS['id']]);
-        if (!empty($errors['errors'])) {
-            return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
-        }
-
-        $body['resources'] = array_slice($body['resources'], 0, 500);
-        if (!ResController::hasRightByResId(['resId' => $body['resources'], 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
-        }
-
-        $firstResource = $body['resources'][0];
-
-        $resource = ResModel::getById(['resId' => $firstResource, 'select' => ['res_id', 'destination', 'type_id', 'subject', 'linked_resources', 'retention_frozen', 'binding', 'creation_date']]);
-        if (empty($resource)) {
-            return $response->withStatus(400)->withJson(['errors' => 'resource does not exists']);
-        } elseif (empty($resource['destination'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'resource has no destination', 'lang' => 'noDestination']);
-        } elseif ($resource['retention_frozen'] === true) {
-            return $response->withStatus(400)->withJson(['errors' => 'retention rule is frozen', 'lang' => 'retentionRuleFrozen']);
-        }
-
-        $attachments = AttachmentModel::get([
-            'select' => ['res_id'],
-            'where'  => ['res_id_master = ?', 'attachment_type in (?)', 'status = ?'],
-            'data'   => [$firstResource, ['acknowledgement_record_management', 'reply_record_management'], 'TRA']
-        ]);
-        if (!empty($attachments)) {
-            return $response->withStatus(400)->withJson(['errors' => 'acknowledgement or reply already exists', 'lang' => 'recordManagement_alreadySent']);
-        }
-
-        $doctype = DoctypeModel::getById(['id' => $resource['type_id'], 'select' => ['description', 'duration_current_use', 'retention_rule', 'action_current_use', 'retention_final_disposition']]);
-        if (empty($doctype['retention_rule']) || empty($doctype['retention_final_disposition']) || empty($doctype['duration_current_use'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'retention_rule, retention_final_disposition or duration_current_use is empty for doctype', 'lang' => 'noRetentionInfo']);
-        } else {
-            $bindingDocument    = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'bindingDocumentFinalAction']);
-            $nonBindingDocument = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'nonBindingDocumentFinalAction']);
-            if ($resource['binding'] === null && !in_array($doctype['action_current_use'], ['transfer', 'copy'])) {
-                return $response->withStatus(400)->withJson(['errors' => 'action_current_use is not transfer or copy', 'lang' => 'noTransferCopyRecordManagement']);
-            } elseif ($resource['binding'] === true && !in_array($bindingDocument['param_value_string'], ['transfer', 'copy'])) {
-                return $response->withStatus(400)->withJson(['errors' => 'binding document is not transfer or copy', 'lang' => 'noTransferCopyBindingRecordManagement']);
-            } elseif ($resource['binding'] === false && !in_array($nonBindingDocument['param_value_string'], ['transfer', 'copy'])) {
-                return $response->withStatus(400)->withJson(['errors' => 'no binding document is not transfer or copy', 'lang' => 'noTransferCopyNoBindingRecordManagement']);
-            }
-            $date = new \DateTime($resource['creation_date']);
-            $date->add(new \DateInterval("P{$doctype['duration_current_use']}D"));
-            if (strtotime($date->format('Y-m-d')) >= time()) {
-                return $response->withStatus(400)->withJson(['errors' => 'duration current use is not exceeded', 'lang' => 'durationCurrentUseNotExceeded']);
-            }
-        }
-        $entity = EntityModel::getByEntityId(['entityId' => $resource['destination'], 'select' => ['producer_service', 'entity_label']]);
-        if (empty($entity['producer_service'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'producer_service is empty for this entity', 'lang' => 'noProducerService']);
-        }
-
-        $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
-        if (empty($config['exportSeda']['senderOrgRegNumber'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'No senderOrgRegNumber found in config.json', 'lang' => 'noSenderOrgRegNumber']);
-        }
-        if (empty($config['exportSeda']['accessRuleCode'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'No accessRuleCode found in config.json', 'lang' => 'noAccessRuleCode']);
-        }
-
-        $return = SedaController::initArchivalData([
-            'resource'           => $resource,
-            'senderOrgRegNumber' => $config['exportSeda']['senderOrgRegNumber'],
-            'entity'             => $entity,
-            'doctype'            => $doctype
-        ]);
-
-        if (!empty($return['errors'])) {
-            return $response->withStatus(400)->withJson(['errors' => $return['errors']]);
-        } else {
-            $return = $return['archivalData'];
-        }
-
-        $archivalAgreements = SedaController::getArchivalAgreements([
-            'config'              => $config,
-            'senderArchiveEntity' => $config['exportSeda']['senderOrgRegNumber'],
-            'producerService'     => $entity['producer_service']
-        ]);
-        if (!empty($archivalAgreements['errors'])) {
-            return $response->withStatus(400)->withJson($archivalAgreements);
-        }
-        $recipientArchiveEntities = SedaController::getRecipientArchiveEntities(['config' => $config, 'archivalAgreements' => $archivalAgreements['archivalAgreements']]);
-        if (!empty($recipientArchiveEntities['errors'])) {
-            return $response->withStatus(400)->withJson($recipientArchiveEntities);
-        }
-
-        $return['archivalAgreements']       = $archivalAgreements['archivalAgreements'];
-        $return['recipientArchiveEntities'] = $recipientArchiveEntities['archiveEntities'];
-
-        $unitIdentifier = MessageExchangeModel::getUnitIdentifierByResId(['select' => ['message_id'], 'resId' => (string)$firstResource]);
-        if (!empty($unitIdentifier[0]['message_id'])) {
-            MessageExchangeModel::delete(['where' => ['message_id = ?'], 'data' => [$unitIdentifier[0]['message_id']]]);
-        }
-        MessageExchangeModel::deleteUnitIdentifier(['where' => ['res_id = ?'], 'data' => [$firstResource]]);
-        
-        return $response->withJson($return);
-    }
-
     public static function initArchivalData($args = [])
     {
         $date = new \DateTime();
@@ -166,7 +53,7 @@ class SedaController
                     'retentionFinalDisposition' => $args['doctype']['retention_final_disposition']
                 ],
                 'slipInfo' => [
-                    'slipId'    => $GLOBALS['login'] . '-' . $date->format('Ymd-His'),
+                    'slipId'    => $GLOBALS['login'] . '-' . $date->format('Ymd-Hisu'),
                     'archiveId' => 'archive_' . $args['resource']['res_id']
                 ]
             ],
@@ -214,7 +101,8 @@ class SedaController
                 'id'               => 'letterbox_' . $args['resource']['res_id'],
                 'label'            => $args['resource']['subject'],
                 'type'             => 'mainDocument',
-                'descriptionLevel' => 'Item'
+                'descriptionLevel' => 'File',
+                'otherInfo'        => $args['resource']['alt_identifier']
             ];
 
             if ($args['getFile']) {
@@ -223,7 +111,7 @@ class SedaController
         }
         
         $attachments = AttachmentModel::get([
-            'select'  => ['res_id', 'title', 'docserver_id', 'path', 'filename', 'res_id_master', 'fingerprint', 'creation_date'],
+            'select'  => ['res_id', 'title', 'docserver_id', 'path', 'filename', 'res_id_master', 'fingerprint', 'creation_date', 'identifier'],
             'where'   => ['res_id_master = ?', 'status in (?)'],
             'data'    => [$args['resource']['res_id'], ['A_TRA', 'TRA']],
             'orderBy' => ['modification_date DESC']
@@ -234,7 +122,8 @@ class SedaController
                 'label'            => $attachment['title'],
                 'type'             => 'attachment',
                 'descriptionLevel' => 'Item',
-                'creationDate'     => $attachment['creation_date']
+                'creationDate'     => $attachment['creation_date'],
+                'otherInfo'        => $attachment['identifier']
             ];
             if ($args['getFile']) {
                 $attachment = ExportSEDATrait::getAttachmentFilePath(['data' => $attachment]);
@@ -250,7 +139,8 @@ class SedaController
                 'label'            => $note['note_text'],
                 'type'             => 'note',
                 'descriptionLevel' => 'Item',
-                'creationDate'     => $note['creation_date']
+                'creationDate'     => $note['creation_date'],
+                'otherInfo'        => null
             ];
             if ($args['getFile']) {
                 $note = ExportSEDATrait::getNoteFilePath(['id' => $note['id']]);
@@ -271,7 +161,8 @@ class SedaController
                 'label'            => $email['object'],
                 'type'             => 'email',
                 'descriptionLevel' => 'Item',
-                'creationDate'     => $email['creation_date']
+                'creationDate'     => $email['creation_date'],
+                'otherInfo'        => null
             ];
             if ($args['getFile']) {
                 $email = ExportSEDATrait::getEmailFilePath(['data' => $email]);
@@ -285,7 +176,8 @@ class SedaController
             'label'            => 'Fiche de liaison',
             'type'             => 'summarySheet',
             'descriptionLevel' => 'Item',
-            'creationDate'     => $date->format('Y-m-d H:i:s')
+            'creationDate'     => $date->format('Y-m-d H:i:s'),
+            'otherInfo'        => null
         ];
         if ($args['getFile']) {
             $summarySheet = ExportSEDATrait::getSummarySheetFilePath(['resId' => $args['resource']['res_id']]);
@@ -311,10 +203,13 @@ class SedaController
             $entities = [0];
         }
 
+        $folderLimit = $args['massAction'] ? 1 : 0;
         $folders = FolderModel::getWithEntitiesAndResources([
-            'select' => ['DISTINCT(folders.id)', 'folders.label'],
-            'where'  => ['res_id = ?', '(entity_id in (?) OR keyword = ?)', 'folders.public = TRUE'],
-            'data'   => [$args['resource']['res_id'], $entities, 'ALL_ENTITIES']
+            'select'  => ['DISTINCT(folders.id)', 'folders.label'],
+            'where'   => ['res_id = ?', '(entity_id in (?) OR keyword = ?)', 'folders.public = TRUE'],
+            'data'    => [$args['resource']['res_id'], $entities, 'ALL_ENTITIES'],
+            'orderBy' => ['folders.label'],
+            'limit'   => $folderLimit
         ]);
         foreach ($folders as $folder) {
             $return['additionalData']['folders'][] = [
@@ -326,7 +221,7 @@ class SedaController
         return ['archivalData' => $return];
     }
 
-    public function getRecipientArchiveEntities($args = [])
+    public static function getRecipientArchiveEntities($args = [])
     {
         $archiveEntities = [];
         if (strtolower($args['config']['exportSeda']['sae']) == 'maarchrm') {
@@ -375,7 +270,7 @@ class SedaController
         return ['archiveEntities' => $archiveEntities];
     }
 
-    public function getArchivalAgreements($args = [])
+    public static function getArchivalAgreements($args = [])
     {
         $archivalAgreements = [];
         if (strtolower($args['config']['exportSeda']['sae']) == 'maarchrm') {
@@ -430,7 +325,7 @@ class SedaController
         return ['archivalAgreements' => $archivalAgreements];
     }
 
-    public function getProducerServiceInfo($args = [])
+    public static function getProducerServiceInfo($args = [])
     {
         $curlResponse = CurlModel::execSimple([
             'url'     => rtrim($args['config']['exportSeda']['urlSAEService'], '/') . '/organization/organization/Search?term=' . $args['producerServiceName'],

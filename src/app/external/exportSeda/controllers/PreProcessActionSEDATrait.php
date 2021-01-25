@@ -12,21 +12,204 @@
 
 namespace ExportSeda\controllers;
 
-use Respect\Validation\Validator;
 use Action\controllers\PreProcessActionController;
+use Action\models\ActionModel;
 use Attachment\models\AttachmentModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
+use Doctype\models\DoctypeModel;
+use Entity\models\EntityModel;
 use MessageExchange\models\MessageExchangeModel;
+use Parameter\models\ParameterModel;
 use Resource\controllers\ResController;
 use Resource\controllers\ResourceListController;
 use Resource\controllers\StoreController;
 use Resource\models\ResModel;
+use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\models\CoreConfigModel;
 
 trait PreProcessActionSEDATrait
 {
+    public function checkSendToRecordManagement(Request $request, Response $response, array $aArgs)
+    {
+        $body = $request->getParsedBody();
+
+        if (!Validator::arrayType()->notEmpty()->validate($body['resources'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body resources is empty or not an array']);
+        }
+
+        $errors = ResourceListController::listControl(['groupId' => $aArgs['groupId'], 'userId' => $aArgs['userId'], 'basketId' => $aArgs['basketId'], 'currentUserId' => $GLOBALS['id']]);
+        if (!empty($errors['errors'])) {
+            return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
+        }
+
+        $body['resources'] = array_slice($body['resources'], 0, 500);
+        if (!ResController::hasRightByResId(['resId' => $body['resources'], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
+        $resourcesInformations = ['success' => [], 'errors' => []];
+        $body['resources'] = PreProcessActionController::getNonLockedResources(['resources' => $body['resources'], 'userId' => $GLOBALS['id']]);
+
+        // Common Data
+        $resources = ResModel::get([
+            'select' => ['res_id', 'destination', 'type_id', 'subject', 'linked_resources', 'retention_frozen', 'binding', 'creation_date', 'alt_identifier'],
+            'where'  => ['res_id in (?)'],
+            'data'   => [$body['resources']]
+        ]);
+        $resources      = array_column($resources, null, 'res_id');
+        $doctypesId     = array_column($resources, 'type_id');
+        $destinationsId = array_column($resources, 'destination');
+
+        $doctypes = DoctypeModel::get([
+            'select' => ['type_id', 'description', 'duration_current_use', 'retention_rule', 'action_current_use', 'retention_final_disposition'],
+            'where'  => ['type_id in (?)'],
+            'data'   => [$doctypesId]
+        ]);
+        $doctypesData = array_column($doctypes, null, 'type_id');
+
+        $attachments = AttachmentModel::get([
+            'select' => ['res_id_master', 'res_id'],
+            'where'  => ['res_id_master in (?)', 'attachment_type in (?)', 'status = ?'],
+            'data'   => [$body['resources'], ['acknowledgement_record_management', 'reply_record_management'], 'TRA']
+        ]);
+        $resourcesAcknowledgement = array_column($attachments, 'res_id', 'res_id_master');
+
+        $entities = EntityModel::get([
+            'select' => ['producer_service', 'entity_label', 'entity_id'],
+            'where'  => ['entity_id in (?)'],
+            'data'   => [$destinationsId]
+        ]);
+        $destinationsData = array_column($entities, null, 'entity_id');
+
+        $bindingDocument    = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'bindingDocumentFinalAction']);
+        $nonBindingDocument = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'nonBindingDocumentFinalAction']);
+
+        $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        if (empty($config['exportSeda']['senderOrgRegNumber'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'No senderOrgRegNumber found in config.json', 'lang' => 'noSenderOrgRegNumber']);
+        }
+        if (empty($config['exportSeda']['accessRuleCode'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'No accessRuleCode found in config.json', 'lang' => 'noAccessRuleCode']);
+        }
+
+        $producerService = '';
+        foreach ($destinationsData as $value) {
+            if (!empty($value['producer_service'])) {
+                if (!empty($producerService) && $producerService != $value['producer_service']) {
+                    return $response->withStatus(400)->withJson(['errors' => 'All producer services are not the same', 'lang' => 'differentProducerServices']);
+                }
+                $producerService = $value['producer_service'];
+            }
+        }
+        if (empty($producerService)) {
+            return $response->withStatus(400)->withJson(['errors' => 'No accessRuleCode found in config.json', 'lang' => 'noProducerService']);
+        }
+
+        $archivalAgreements = SedaController::getArchivalAgreements([
+            'config'              => $config,
+            'senderArchiveEntity' => $config['exportSeda']['senderOrgRegNumber'],
+            'producerService'     => $producerService
+        ]);
+        if (!empty($archivalAgreements['errors'])) {
+            return $response->withStatus(400)->withJson($archivalAgreements);
+        }
+        $recipientArchiveEntities = SedaController::getRecipientArchiveEntities(['config' => $config, 'archivalAgreements' => $archivalAgreements['archivalAgreements']]);
+        if (!empty($recipientArchiveEntities['errors'])) {
+            return $response->withStatus(400)->withJson($recipientArchiveEntities);
+        }
+
+        $resourcesInformations['archivalAgreements']       = $archivalAgreements['archivalAgreements'];
+        $resourcesInformations['recipientArchiveEntities'] = $recipientArchiveEntities['archiveEntities'];
+        $resourcesInformations['senderArchiveEntity']      = $config['exportSeda']['senderOrgRegNumber'];
+
+        $massAction = count($body['resources']) > 1;
+        if ($massAction) {
+            $action = ActionModel::getById(['id' => $aArgs['actionId'], 'select' => ['parameters']]);
+            $actionParams = json_decode($action['parameters'], true);
+            if (empty($actionParams['errorStatus']) || empty($actionParams['successStatus'])) {
+                return $response->withStatus(403)->withJson(['errors' => 'errorStatus or successStatus is not set for this action', 'lang' => 'actionStatusNotSet']);
+            }
+        }
+
+        $selectedResId = [];
+        // End of Common Data
+
+        foreach ($body['resources'] as $resId) {
+            if (empty($resources[$resId]['destination'])) {
+                $resourcesInformations['errors'][] = ['alt_identifier' => $resources[$resId]['alt_identifier'], 'res_id' => $resId, 'reason' => 'noDestination'];
+                continue;
+            } elseif ($resources[$resId]['retention_frozen'] === true) {
+                $resourcesInformations['errors'][] = ['alt_identifier' => $resources[$resId]['alt_identifier'], 'res_id' => $resId, 'reason' => 'retentionRuleFrozen'];
+                continue;
+            }
+    
+            if (!empty($resourcesAcknowledgement[$resId])) {
+                $resourcesInformations['errors'][] = ['alt_identifier' => $resources[$resId]['alt_identifier'], 'res_id' => $resId, 'reason' => 'recordManagement_alreadySent'];
+                continue;
+            }
+
+            $typeId = $resources[$resId]['type_id'];
+            if (empty($doctypesData[$typeId]['retention_rule']) || empty($doctypesData[$typeId]['retention_final_disposition']) || empty($doctypesData[$typeId]['duration_current_use'])) {
+                $resourcesInformations['errors'][] = ['alt_identifier' => $resources[$resId]['alt_identifier'], 'res_id' => $resId, 'reason' => 'noRetentionInfo'];
+                continue;
+            } else {
+                if ($resources[$resId]['binding'] === null && !in_array($doctypesData[$typeId]['action_current_use'], ['transfer', 'copy'])) {
+                    $resourcesInformations['errors'][] = ['alt_identifier' => $resources[$resId]['alt_identifier'], 'res_id' => $resId, 'reason' => 'noTransferCopyRecordManagement'];
+                    continue;
+                } elseif ($resources[$resId]['binding'] === true && !in_array($bindingDocument['param_value_string'], ['transfer', 'copy'])) {
+                    $resourcesInformations['errors'][] = ['alt_identifier' => $resources[$resId]['alt_identifier'], 'res_id' => $resId, 'reason' => 'noTransferCopyBindingRecordManagement'];
+                    continue;
+                } elseif ($resources[$resId]['binding'] === false && !in_array($nonBindingDocument['param_value_string'], ['transfer', 'copy'])) {
+                    $resourcesInformations['errors'][] = ['alt_identifier' => $resources[$resId]['alt_identifier'], 'res_id' => $resId, 'reason' => 'noTransferCopyNoBindingRecordManagement'];
+                    continue;
+                }
+                $date = new \DateTime($resources[$resId]['creation_date']);
+                $date->add(new \DateInterval("P{$doctypesData[$typeId]['duration_current_use']}D"));
+                if (strtotime($date->format('Y-m-d')) >= time()) {
+                    $resourcesInformations['errors'][] = ['alt_identifier' => $resources[$resId]['alt_identifier'], 'res_id' => $resId, 'reason' => 'durationCurrentUseNotExceeded'];
+                    continue;
+                }
+            }
+
+            $destinationId = $resources[$resId]['destination'];
+            if (empty($destinationsData[$destinationId]['producer_service'])) {
+                $resourcesInformations['errors'][] = ['alt_identifier' => $resources[$resId]['alt_identifier'], 'res_id' => $resId, 'reason' => 'noProducerService'];
+                continue;
+            }
+    
+            $archivalData = SedaController::initArchivalData([
+                'resource'           => $resources[$resId],
+                'senderOrgRegNumber' => $config['exportSeda']['senderOrgRegNumber'],
+                'entity'             => $destinationsData[$destinationId],
+                'doctype'            => $doctypesData[$typeId],
+                'massAction'         => $massAction
+            ]);
+    
+            if (!empty($archivalData['errors'])) {
+                $resourcesInformations['errors'][] = ['alt_identifier' => $resources[$resId]['alt_identifier'], 'res_id' => $resId, 'reason' => $archivalData['errors']];
+                continue;
+            } else {
+                $archivalData['archivalData']['data']['metadata'] = ['subject' => $resources[$resId]['subject'], 'alt_identifier' => $resources[$resId]['alt_identifier']];
+                $resourcesInformations['success'][$resId] = $archivalData['archivalData'];
+            }
+    
+            $unitIdentifier = MessageExchangeModel::getUnitIdentifierByResId(['select' => ['message_id'], 'resId' => (string)$resId]);
+            if (!empty($unitIdentifier[0]['message_id'])) {
+                MessageExchangeModel::delete(['where' => ['message_id = ?'], 'data' => [$unitIdentifier[0]['message_id']]]);
+            }
+            $selectedResId[] = $resId;
+        }
+
+        if (!empty($selectedResId)) {
+            MessageExchangeModel::deleteUnitIdentifier(['where' => ['res_id in (?)'], 'data' => [$selectedResId]]);
+        }
+
+        return $response->withJson($resourcesInformations);
+    }
+
     public function checkAcknowledgementRecordManagement(Request $request, Response $response, array $args)
     {
         $body = $request->getParsedBody();
