@@ -178,7 +178,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
         this.resultListDatabase = new ResultListHttpDao(this.http, this.filtersListService);
         // If the user changes the sort order, reset back to the first page.
         this.paginator.pageIndex = this.listProperties.page;
-        this.paginator.pageSize = this.listProperties.pageSize;
+        this.paginator.pageSize = 25;//this.listProperties.pageSize;
         this.sort.sortChange.subscribe(() => this.paginator.pageIndex = 0);
 
         // When list is refresh (sort, page, filters)

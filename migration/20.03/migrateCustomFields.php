@@ -30,16 +30,6 @@ foreach ($customs as $custom) {
 
             $i = 0;
             foreach ($loadedXml->INDEX as $value) {
-                $customExists = \SrcCore\models\DatabaseModel::select([
-                        'select' => [1],
-                        'table'  => ['doctypes_indexes'],
-                        'where'  => ['field_name = ?'],
-                        'data'   => [(string)$value->column]
-                ]);
-                if (empty($customExists)) {
-                    continue;
-                }
-
                 $label = (string)$value->label;
                 $type = trim((string)$value->type);
                 if ($type == 'float') {

@@ -145,7 +145,7 @@ class HomeController
                 'status.id as status_id',
                 'res_letterbox.filename'
             ],
-            'limit'     => 5,
+            'limit'     => 10,
             'userId'    => $GLOBALS['userId']
         ]);
 
