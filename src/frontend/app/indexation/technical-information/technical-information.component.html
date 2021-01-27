@@ -10,7 +10,7 @@
         <div *ngIf="loading" class="loading" color="primary">
             <mat-spinner></mat-spinner>
         </div>
-        <ng-container *ngFor="let data of techData | keyvalue">
+        <ng-container *ngFor="let data of techData | keyvalue: null">
             <mat-form-field *ngIf="!functions.empty(data.value.value)" class="data-item">
                 <mat-icon matPrefix [class]="data.value.icon" color="primary" style="width: 35px;text-align: center;">
                 </mat-icon>
