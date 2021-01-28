@@ -171,23 +171,26 @@ class UserController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $data = $request->getParams();
+        $body = $request->getParsedBody();
 
-        $check = Validator::stringType()->length(1, 128)->notEmpty()->validate($data['userId']) && preg_match("/^[\w.@-]*$/", $data['userId']);
-        $check = $check && Validator::stringType()->length(1, 255)->notEmpty()->validate($data['firstname']);
-        $check = $check && Validator::stringType()->length(1, 255)->notEmpty()->validate($data['lastname']);
-        $check = $check && Validator::stringType()->length(0, 32)->validate($data['initials'] ?? '');
-        $check = $check && Validator::stringType()->length(1, 255)->notEmpty()->validate($data['mail']);
-        $check = $check && filter_var($data['mail'], FILTER_VALIDATE_EMAIL);
-        if (PrivilegeController::hasPrivilege(['privilegeId' => 'manage_personal_data', 'userId' => $GLOBALS['id']])) {
-            $check = $check && (empty($data['phone']) || preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $data['phone'])) && Validator::stringType()->length(0, 32)->validate($data['phone'] ?? '');
-        }
-        if (!$check) {
-            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+        if (empty($body)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body is empty']);
+        } elseif (!Validator::stringType()->length(1, 128)->notEmpty()->validate($body['userId'] ?? null) || !preg_match("/^[\w.@-]*$/", $body['userId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body userId is empty, not a string or not valid']);
+        } elseif (!Validator::stringType()->length(1, 255)->notEmpty()->validate($body['firstname'] ?? null)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body firstname is empty or not a string']);
+        } elseif (!Validator::stringType()->length(1, 255)->notEmpty()->validate($body['lastname'] ?? null)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body lastname is empty or not a string']);
+        } elseif (!Validator::stringType()->length(0, 32)->validate($body['initials'] ?? '')) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body initials is too long']);
+        } elseif (!Validator::stringType()->length(1, 255)->notEmpty()->validate($body['mail'] ?? null) || !filter_var($body['mail'], FILTER_VALIDATE_EMAIL)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body mail is empty or not valid']);
+        } elseif (PrivilegeController::hasPrivilege(['privilegeId' => 'manage_personal_data', 'userId' => $GLOBALS['id']]) && !empty($body['phone']) && (!preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $body['phone']) || !Validator::stringType()->length(0, 32)->validate($body['phone'] ?? ''))) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body phone is not valid']);
         }
 
         $loggingMethod = CoreConfigModel::getLoggingMethod();
-        $existingUser = UserModel::getByLowerLogin(['login' => $data['userId'], 'select' => ['id', 'status', 'mail']]);
+        $existingUser = UserModel::getByLowerLogin(['login' => $body['userId'], 'select' => ['id', 'status', 'mail']]);
 
         if (!empty($existingUser) && $existingUser['status'] == 'DEL') {
             UserModel::update([
@@ -213,11 +216,11 @@ class UserController
         }
 
         $modes = ['standard', 'rest', 'root_visible', 'root_invisible'];
-        if (empty($data['mode']) || !in_array($data['mode'], $modes)) {
-            $data['mode'] = 'standard';
+        if (empty($body['mode']) || !in_array($body['mode'], $modes)) {
+            $body['mode'] = 'standard';
         }
 
-        if (in_array($data['mode'], ['root_visible', 'root_invisible']) && !UserController::isRoot(['id' => $GLOBALS['id']])) {
+        if (in_array($body['mode'], ['root_visible', 'root_invisible']) && !UserController::isRoot(['id' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
@@ -226,9 +229,9 @@ class UserController
         if (in_array('onlyoffice', $allowedMethods)) {
             $preferences = ['documentEdition' => 'onlyoffice'];
         }
-        $data['preferences'] = json_encode($preferences);
+        $body['preferences'] = json_encode($preferences);
 
-        $id = UserModel::create(['user' => $data]);
+        $id = UserModel::create(['user' => $body]);
 
         $userQuota = ParameterModel::getById(['id' => 'user_quota', 'select' => ['param_value_int']]);
         if (!empty($userQuota['param_value_int'])) {
@@ -239,7 +242,7 @@ class UserController
         }
 
         if ($loggingMethod['id'] == 'standard') {
-            AuthenticationController::sendAccountActivationNotification(['userId' => $id, 'userEmail' => $data['mail']]);
+            AuthenticationController::sendAccountActivationNotification(['userId' => $id, 'userEmail' => $body['mail']]);
         }
 
         HistoryController::add([
@@ -247,7 +250,7 @@ class UserController
             'recordId'     => $GLOBALS['id'],
             'eventType'    => 'ADD',
             'eventId'      => 'userCreation',
-            'info'         => _USER_CREATED . " {$data['userId']}"
+            'info'         => _USER_CREATED . " {$body['userId']}"
         ]);
 
         return $response->withJson(['id' => $id]);
@@ -270,7 +273,7 @@ class UserController
             return $response->withStatus(400)->withJson(['errors' => 'Body initials is too long']);
         } elseif (!empty($body['mail']) && !filter_var($body['mail'], FILTER_VALIDATE_EMAIL) && Validator::stringType()->length(1, 255)->notEmpty()->validate($body['mail'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body mail is not correct']);
-        } elseif (PrivilegeController::hasPrivilege(['privilegeId' => 'manage_personal_data', 'userId' => $GLOBALS['id']]) && !empty($body['phone']) && !preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $body['phone']) && Validator::stringType()->length(0, 32)->validate($body['phone'] ?? '')) {
+        } elseif (PrivilegeController::hasPrivilege(['privilegeId' => 'manage_personal_data', 'userId' => $GLOBALS['id']]) && !empty($body['phone']) && (!preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $body['phone']) || !Validator::stringType()->length(0, 32)->validate($body['phone'] ?? ''))) {
             return $response->withStatus(400)->withJson(['errors' => 'Body phone is not correct']);
         }
 
