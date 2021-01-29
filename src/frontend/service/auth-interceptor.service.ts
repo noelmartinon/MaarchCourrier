@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpHandler, HttpInterceptor, HttpRequest, HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { catchError, switchMap } from 'rxjs/operators';
+import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { NotificationService } from './notification/notification.service';
 import { AuthService } from './auth.service';
 import { Router } from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
@@ -41,6 +41,11 @@ export class AuthInterceptor implements HttpInterceptor {
             method: ['PUT']
         }
     ];
+    private isRefreshing = false;
+    private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(
+        null
+    );
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -60,9 +65,29 @@ export class AuthInterceptor implements HttpInterceptor {
         });
     }
 
-    logout() {
-        this.authService.logout(false, true);
-        this.notificationService.error(this.translate.instant('lang.sessionExpired'));
+    private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
+        if (!this.isRefreshing) {
+            this.isRefreshing = true;
+            this.refreshTokenSubject.next(null);
+
+            return this.authService.refreshToken().pipe(
+                switchMap((data: any) => {
+                    this.isRefreshing = false;
+                    this.refreshTokenSubject.next(data.token);
+                    request = this.addAuthHeader(request);
+                    return next.handle(request);
+                })
+            );
+        } else {
+            return this.refreshTokenSubject.pipe(
+                filter((token) => token != null),
+                take(1),
+                switchMap(() => {
+                    request = this.addAuthHeader(request);
+                    return next.handle(request);
+                })
+            );
+        }
     }
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
@@ -84,43 +109,7 @@ export class AuthInterceptor implements HttpInterceptor {
                     if (this.byPassHandleErrors.filter(url => request.url.indexOf(url.route) > -1 && url.method.indexOf(request.method) > -1).length > 0) {
                         return next.handle(request);
                     } else if (error.status === 401) {
-                        console.debug('Auth error', request.url);
-                        return this.http.get('../rest/authenticate/token', {
-                            params: {
-                                refreshToken: this.authService.getRefreshToken()
-                            }
-                        }).pipe(
-                            switchMap((data: any) => {
-                                console.debug('Attempt get token ... !', request.url);
-                                // Update stored token
-                                this.authService.setToken(data.token);
-
-                                // Update user info
-                                this.authService.updateUserInfo(data.token);
-
-                                // Clone our request with token updated ant try to resend it
-                                request = this.addAuthHeader(request);
-
-                                return next.handle(request).pipe(
-                                    catchError(err => {
-                                        // Disconnect user if bad token process
-                                        if (err.status === 401) {
-                                            this.logout();
-                                            return of(false);
-                                        }
-                                    })
-                                );
-                            }
-                            ),
-                            catchError(err => {
-                                // Disconnect user if bad token process
-                                if (err.status === 401) {
-                                    console.debug('Refresh token failed !', request.url, this.router.url);
-                                    this.logout();
-                                }
-                                return of(false);
-                            })
-                        );
+                        return this.handle401Error(request, next);
                     } else if (error.error.errors === 'User must change his password') {
                         return this.router.navigate(['/password-modification']);
                     } else {
