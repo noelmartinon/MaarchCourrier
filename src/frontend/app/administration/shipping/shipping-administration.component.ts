@@ -53,6 +53,7 @@ export class ShippingAdministrationComponent implements OnInit {
 
     sendModes: string[] = [
         'digital_registered_mail',
+        'digital_registered_mail_with_AR',
         'fast',
         'economic'
     ];

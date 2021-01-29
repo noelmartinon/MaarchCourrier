@@ -11,18 +11,19 @@ import { HeaderService } from '@service/header.service';
 import { Router } from '@angular/router';
 import { AppService } from '@service/app.service';
 import { DiffusionsListComponent } from '../../diffusions/diffusions-list.component';
-import { tap, catchError, filter, exhaustMap } from 'rxjs/operators';
+import { tap, catchError, filter, exhaustMap, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { FunctionsService } from '@service/functions.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
 import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import {EntitiesExportComponent} from './export/entities-export.component';
+import { FormControl } from '@angular/forms';
 
 declare var $: any;
 @Component({
     templateUrl: 'entities-administration.component.html',
-    styleUrls: ['entities-administration.component.css']
+    styleUrls: ['entities-administration.component.scss']
 })
 export class EntitiesAdministrationComponent implements OnInit {
     /*HEADER*/
@@ -52,6 +53,15 @@ export class EntitiesAdministrationComponent implements OnInit {
     dataSourceTemplates = new MatTableDataSource(this.currentEntity.templates);
     displayedColumnsUsers = ['firstname', 'lastname'];
     displayedColumnsTemplates = ['template_label', 'template_target'];
+
+    addressBANInfo: string = '';
+    addressBANMode: boolean = true;
+    addressBANControl = new FormControl();
+    addressBANLoading: boolean = false;
+    addressBANResult: any[] = [];
+    addressBANFilteredResult: Observable<string[]>;
+    addressBANCurrentDepartment: string = '75';
+    departmentList: any[] = [];
 
 
     @ViewChild('paginatorUsers', { static: false }) paginatorUsers: MatPaginator;
@@ -99,6 +109,7 @@ export class EntitiesAdministrationComponent implements OnInit {
         this.loading = false;
 
         this.initEntitiesTree();
+        this.initBanSearch();
 
     }
 
@@ -275,6 +286,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                         this.currentEntity.listTemplate.items[role.id] = [];
                     }
                 });
+                this.initAutocompleteAddressBan();
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -792,6 +804,81 @@ export class EntitiesAdministrationComponent implements OnInit {
         $('#jstree_search').val('');
         $('#jstree').jstree(true).search('');
         this.emptyField = true;
+    }
+
+    initBanSearch() {
+        this.http.get('../rest/ban/availableDepartments').pipe(
+            tap((data: any) => {
+                if (data.default !== null && data.departments.indexOf(data.default.toString()) !== - 1) {
+                    this.addressBANCurrentDepartment = data.default;
+                }
+                this.departmentList = data.departments;
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    initAutocompleteAddressBan() {
+        this.addressBANInfo = this.translate.instant('lang.autocompleteInfo');
+        this.addressBANResult = [];
+        this.addressBANControl.valueChanges
+            .pipe(
+                debounceTime(300),
+                filter(value => value.length > 2),
+                distinctUntilChanged(),
+                tap(() => this.addressBANLoading = true),
+                switchMap((data: any) => this.http.get('../rest/autocomplete/banAddresses', { params: { 'address': data, 'department': this.addressBANCurrentDepartment } })),
+                tap((data: any) => {
+                    if (data.length === 0) {
+                        this.addressBANInfo = this.translate.instant('lang.noAvailableValue');
+                    } else {
+                        this.addressBANInfo = '';
+                    }
+                    this.addressBANResult = data;
+                    this.addressBANFilteredResult = of(this.addressBANResult);
+                    this.addressBANLoading = false;
+                })
+            ).subscribe();
+    }
+
+    resetAutocompleteAddressBan() {
+        this.addressBANResult = [];
+        this.addressBANInfo = this.translate.instant('lang.autocompleteInfo');
+    }
+
+    selectAddressBan(ev: any) {
+        this.currentEntity.addressNumber = ev.option.value.number;
+        this.currentEntity.addressStreet = ev.option.value.afnorName;
+        this.currentEntity.addressPostcode = ev.option.value.postalCode;
+        this.currentEntity.addressTown = ev.option.value.city;
+        this.currentEntity.addressCountry = 'FRANCE';
+
+        this.addressBANControl.setValue('');
+    }
+
+    copyAddress() {
+        this.http.get(`../rest/entities/${this.currentEntity.id}/parentAddress`).pipe(
+            tap((data: any) => {
+                if (data !== null) {
+                    this.currentEntity.addressNumber = data.addressNumber;
+                    this.currentEntity.addressStreet = data.addressStreet;
+                    this.currentEntity.addressPostcode = data.addressPostcode;
+                    this.currentEntity.addressTown = data.addressTown;
+                    this.currentEntity.addressCountry = data.addressCountry;
+                    this.currentEntity.addressAdditional1 = data.addressAdditional1;
+                    this.currentEntity.addressAdditional2 = data.addressAdditional2;
+                } else {
+                    this.notify.error(this.translate.instant('lang.noAddressFound'));
+                }
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 }
 @Component({

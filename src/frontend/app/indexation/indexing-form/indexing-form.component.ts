@@ -1215,7 +1215,9 @@ export class IndexingFormComponent implements OnInit {
 
         this.http.get('../rest/indexing/priority', { params: { 'processLimitDate': limitDate.toDateString() } }).pipe(
             tap((data: any) => {
-                this.arrFormControl['priority'].setValue(data.priority);
+                if (!this.functions.empty(this.arrFormControl['priority'])) {
+                    this.arrFormControl['priority'].setValue(data.priority);
+                }
                 this.setPriorityColor(null, data.priority);
             }),
             catchError((err: any) => {

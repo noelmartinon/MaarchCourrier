@@ -1,0 +1,30 @@
+@import '../../../../../../css/vars.scss';
+
+.item {
+    font-size: 12px;
+}
+
+.tile-icon {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    font-size: 90px;
+    opacity: 0.1;
+}
+
+.resource{
+    background: none;
+    transition: all 0.2s;
+}
+
+.resource:hover{
+    background: rgba($primary,0.1);
+    transition: all 0.2s;
+}
+
+.view-action:hover {
+    z-index: 4;
+    .view-action-icon {
+        // visibility: hidden;
+    }
+}

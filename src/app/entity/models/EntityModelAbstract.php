@@ -78,34 +78,35 @@ abstract class EntityModelAbstract
         return $aEntity[0];
     }
 
-    public static function create(array $aArgs)
+    public static function create(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['entity_id', 'entity_label', 'short_label', 'entity_type']);
-        ValidatorModel::stringType($aArgs, [
-            'entity_id', 'entity_label', 'short_label', 'entity_type', 'adrs_1', 'adrs_2', 'adrs_3',
-            'zipcode', 'city', 'country', 'email', 'business_id', 'parent_entity_id',
-            'ldap_id', 'transferring_agency', 'entity_full_name', 'producerService'
+        ValidatorModel::notEmpty($args, ['entity_id', 'entity_label', 'short_label', 'entity_type']);
+        ValidatorModel::stringType($args, [
+            'entity_id', 'entity_label', 'short_label', 'entity_type', 'address_number', 'address_street', 'address_additional1',
+            'address_postcode', 'address_town', 'address_country', 'email', 'business_id', 'parent_entity_id',
+            'ldap_id', 'transferring_agency', 'entity_full_name', 'producer_service'
         ]);
 
         DatabaseModel::insert([
             'table'         => 'entities',
             'columnsValues' => [
-                'entity_id'             => $aArgs['entity_id'],
-                'entity_label'          => $aArgs['entity_label'],
-                'short_label'           => $aArgs['short_label'],
-                'adrs_1'                => $aArgs['adrs_1'],
-                'adrs_2'                => $aArgs['adrs_2'],
-                'adrs_3'                => $aArgs['adrs_3'],
-                'zipcode'               => $aArgs['zipcode'],
-                'city'                  => $aArgs['city'],
-                'country'               => $aArgs['country'],
-                'email'                 => $aArgs['email'],
-                'business_id'           => $aArgs['business_id'],
-                'parent_entity_id'      => $aArgs['parent_entity_id'],
-                'entity_type'           => $aArgs['entity_type'],
-                'ldap_id'               => $aArgs['ldap_id'],
-                'entity_full_name'      => $aArgs['entity_full_name'],
-                'producer_service'      => $aArgs['producerService']
+                'entity_id'             => $args['entity_id'],
+                'entity_label'          => $args['entity_label'],
+                'short_label'           => $args['short_label'],
+                'address_number'        => $args['address_number'],
+                'address_street'        => $args['address_street'],
+                'address_additional1'   => $args['address_additional1'],
+                'address_additional2'   => $args['address_additional2'],
+                'address_postcode'      => $args['address_postcode'],
+                'address_town'          => $args['address_town'],
+                'address_country'       => $args['address_country'],
+                'email'                 => $args['email'],
+                'business_id'           => $args['business_id'],
+                'parent_entity_id'      => $args['parent_entity_id'],
+                'entity_type'           => $args['entity_type'],
+                'ldap_id'               => $args['ldap_id'],
+                'entity_full_name'      => $args['entity_full_name'],
+                'producer_service'      => $args['producer_service']
             ]
         ]);
 

@@ -63,7 +63,7 @@
                 class="fa fa-chevron-right fa-2x" mat-list-icon color="accent">
             </mat-icon>
             <mat-icon class="fa fa-2x" [class.avatar]="!functions.empty(diffusion.picture)"
-                [class.fa-user]="functions.empty(diffusion.picture) && diffusion.isValid || (diffusion.process_date === null && diffusion.delegatedBy === null)"
+                [class.fa-user]="functions.empty(diffusion.picture) && (diffusion.isValid || (diffusion.process_date === null && diffusion.delegatedBy === null))"
                 [class.fa-user-friends]="diffusion.process_date != null && diffusion.delegatedBy !== null"
                 [class.fa-user-slash]="!diffusion.isValid"
                 [title]="!diffusion.isValid ? ('lang.userNotValid' | translate) : ''" mat-list-icon color="primary"

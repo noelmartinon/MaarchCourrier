@@ -1954,6 +1954,9 @@ class ResControllerTest extends TestCase
         $this->assertSame('txt', $responseBody['information']['format']);
         $this->assertIsString($responseBody['information']['fingerprint']);
         $this->assertNotEmpty($responseBody['information']['fingerprint']);
+        $this->assertIsString($responseBody['information']['typistLabel']);
+        $this->assertNotEmpty($responseBody['information']['typistLabel']);
+        $this->assertNotEmpty($responseBody['information']['typist']);
         $this->assertSame(46, $responseBody['information']['filesize']);
         $this->assertSame('SUCCESS', $responseBody['information']['fulltext_result']);
         $this->assertSame(true, $responseBody['information']['canConvert']);

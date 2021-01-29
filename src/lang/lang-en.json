@@ -150,6 +150,7 @@
     "askRedirectBasketBeforeAbsence": "Do you want to redirect your baskets before being absent ?",
     "assignBy": "Assigned by",
     "associatedStatus": "Associated status",
+    "intermediateStatus": "Intermediate status",
     "finalStatus": "Final status",
     "finalStatusAlt": "Final status if success",
     "errorStatus": "Error status",
@@ -2226,7 +2227,8 @@
     "addDateBlock": "Add date block",
     "addSignaturePosition": "Add signature position",
     "basketsToRedirect": "Baskets to redirect",
-    "maileva_digital_registered_mail": "Registered letter online",
+    "maileva_digital_registered_mail": "Registered letter online without receipt",
+    "maileva_digital_registered_mail_with_AR": "Registered letter online with receipt",
     "clearFilter": "Clear filter",
     "mailsToSendToRecordManagement": "Mail(s) to export to the archiving system",
     "associatedArchives": "Archive(s) associated with the mail"

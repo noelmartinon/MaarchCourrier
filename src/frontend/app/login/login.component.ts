@@ -13,6 +13,7 @@ import { FunctionsService } from '@service/functions.service';
 import { TimeLimitPipe } from '../../plugins/timeLimit.pipe';
 import { TranslateService } from '@ngx-translate/core';
 import { LocalStorageService } from '@service/local-storage.service';
+import { AboutUsComponent } from '@appRoot/about-us.component';
 
 @Component({
     templateUrl: 'login.component.html',
@@ -146,5 +147,9 @@ export class LoginComponent implements OnInit {
                 window.location.href = this.authService.authUri;
             }
         }
+    }
+
+    openAboutModal() {
+        this.dialog.open(AboutUsComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: false });
     }
 }

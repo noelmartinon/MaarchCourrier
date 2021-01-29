@@ -465,48 +465,48 @@ TRUNCATE TABLE entities;
 ALTER SEQUENCE entities_id_seq RESTART WITH 1;
 TRUNCATE TABLE list_templates;
 TRUNCATE TABLE list_templates_items;
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('VILLE', 'Ville de Maarch-les-bains', 'Ville de Maarch-les-bains', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', '', 'Direction');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('VILLE', 'Ville de Maarch-les-bains', 'Ville de Maarch-les-bains', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', '', 'Direction');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (1, 'Ville de Maarch-les-bains', 'Ville de Maarch-les-bains', 'diffusionList', 1);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (1, 15, 'user', 'dest', 0);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('CAB', 'Cabinet du Maire', 'Cabinet du Maire', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'VILLE', 'Direction');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('CAB', 'Cabinet du Maire', 'Cabinet du Maire', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'VILLE', 'Direction');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (2, 'Cabinet du Maire', 'Cabinet du Maire', 'diffusionList', 2);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (2, 7, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (2, 12, 'entity', 'cc', 1);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (2, 10, 'user', 'cc', 2);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (2, 3, 'user', 'cc', 3);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('DGS', 'Direction Générale des Services', 'Direction Générale des Services', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'VILLE', 'Direction');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('DGS', 'Direction Générale des Services', 'Direction Générale des Services', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'VILLE', 'Direction');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (3, 'Direction Générale des Services', 'Direction Générale des Services', 'diffusionList', 3);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (3, 1, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (3, 10, 'user', 'cc', 1);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('DGA', 'Direction Générale Adjointe', 'Direction Générale Adjointe', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGS', 'Bureau');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('DGA', 'Direction Générale Adjointe', 'Direction Générale Adjointe', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGS', 'Bureau');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (4, 'Direction Générale Adjointe', 'Direction Générale Adjointe', 'diffusionList', 4);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (4, 17, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (4, 12, 'entity', 'cc', 1);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (4, 8, 'user', 'cc', 2);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('PCU', 'Pôle Culturel', 'Pôle Culturel', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGA', 'Service');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('PCU', 'Pôle Culturel', 'Pôle Culturel', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGA', 'Service');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (5, 'Pôle Culturel', 'Pôle Culturel', 'diffusionList', 5);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (5, 9, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (5, 12, 'entity', 'cc', 1);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('PJS', 'Pôle Jeunesse et Sport', 'Pôle Jeunesse et Sport', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGA', 'Service');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('PJS', 'Pôle Jeunesse et Sport', 'Pôle Jeunesse et Sport', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGA', 'Service');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (6, 'Pôle Jeunesse et Sport', 'Pôle Jeunesse et Sport', 'diffusionList', 6);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (6, 19, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (6, 1, 'entity', 'cc', 1);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('PE', 'Petite enfance', 'Petite enfance', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'PJS', 'Service');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('PE', 'Petite enfance', 'Petite enfance', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'PJS', 'Service');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (7, 'Petite enfance', 'Petite enfance', 'diffusionList', 7);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (7, 15, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (7, 12, 'entity', 'cc', 1);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('SP', 'Sport', 'Sport', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'PJS', 'Service');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('SP', 'Sport', 'Sport', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'PJS', 'Service');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (8, 'Sport', 'Sport', 'diffusionList', 8);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (8, 13, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (8, 12, 'entity', 'cc', 1);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('PSO', 'Pôle Social', 'Pôle Social', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGA', 'Service');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('PSO', 'Pôle Social', 'Pôle Social', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGA', 'Service');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (9, 'Pôle Social', 'Pôle Social', 'diffusionList', 9);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (9, 4, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (9, 12, 'entity', 'cc', 1);
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (1009, 'visa Pôle Social', 'visa Pôle Social', 'visaCircuit', 9);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (1009, 17, 'user', 'visa', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (1009, 10, 'user', 'sign', 1);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('PTE', 'Pôle Technique', 'Pôle Technique', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGA', 'Service');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('PTE', 'Pôle Technique', 'Pôle Technique', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGA', 'Service');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (10, 'Pôle Technique', 'Pôle Technique', 'diffusionList', 10);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (10, 16, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (10, 12, 'entity', 'cc', 1);
@@ -514,41 +514,41 @@ INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mod
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (1010, 'visa Pôle Technique', 'visa Pôle Technique', 'visaCircuit', 10);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (1010, 17, 'user', 'visa', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (1010, 10, 'user', 'sign', 1);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('DRH', 'Direction des Ressources Humaines', 'Direction des Ressources Humaines', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGS', 'Service');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('DRH', 'Direction des Ressources Humaines', 'Direction des Ressources Humaines', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGS', 'Service');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (11, 'Direction des Ressources Humaines', 'Direction des Ressources Humaines', 'diffusionList', 11);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (11, 12, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (11, 12, 'entity', 'cc', 1);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('DSG', 'Secrétariat Général', 'Secrétariat Général', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGS', 'Direction');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('DSG', 'Secrétariat Général', 'Secrétariat Général', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGS', 'Direction');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (12, 'Secrétariat Général', 'Secrétariat Général', 'diffusionList', 12);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (12, 18, 'user', 'dest', 0);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('COU', 'Service Courrier', 'Service Courrier', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DSG', 'Service');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('COU', 'Service Courrier', 'Service Courrier', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DSG', 'Service');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (13, 'Service Courrier', 'Service Courrier', 'diffusionList', 13);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (13, 21, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (13, 12, 'entity', 'cc', 1);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('COR', 'Correspondants Archive', 'Correspondants Archive', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'COU', 'Service');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('COR', 'Correspondants Archive', 'Correspondants Archive', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'COU', 'Service');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (14, 'Correspondants Archive', 'Correspondants Archive', 'diffusionList', 14);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (14, 22, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (14, 14, 'user', 'cc', 1);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('PSF', 'Pôle des Services Fonctionnels', 'Services Fonctionnels', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DSG', 'Service');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('PSF', 'Pôle des Services Fonctionnels', 'Services Fonctionnels', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DSG', 'Service');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (15, 'Services Fonctionnels', 'Pôle des Services Fonctionnels', 'diffusionList', 15);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (15, 11, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (15, 12, 'entity', 'cc', 1);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('DSI', 'Direction des Systèmes d''Information', 'Direction des Systèmes d''Information', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGS', 'Service');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('DSI', 'Direction des Systèmes d''Information', 'Direction des Systèmes d''Information', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGS', 'Service');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (16, 'Direction des Systèmes d''Information', 'Direction des Systèmes d''Information', 'diffusionList', 16);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (16, 3, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (16, 12, 'entity', 'cc', 1);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (16, 2, 'user', 'cc', 2);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('FIN', 'Direction des Finances', 'Direction des Finances', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGS', 'Service');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('FIN', 'Direction des Finances', 'Direction des Finances', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'DGS', 'Service');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (17, 'Direction des Finances', 'Direction des Finances', 'diffusionList', 17);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (17, 14, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (17, 12, 'entity', 'cc', 1);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (17, 6, 'user', 'cc', 2);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('PJU', 'Pôle Juridique', 'Pôle Juridique', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'FIN', 'Service');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('PJU', 'Pôle Juridique', 'Pôle Juridique', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'FIN', 'Service');
 INSERT INTO list_templates (id, title, description, type, entity_id) VALUES (18, 'Pôle Juridique', 'Pôle Juridique', 'diffusionList', 18);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (18, 20, 'user', 'dest', 0);
 INSERT INTO list_templates_items (list_template_id, item_id, item_type, item_mode, sequence) VALUES (18, 12, 'entity', 'cc', 1);
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('ELUS', 'Ensemble des élus', 'ELUS:Ensemble des élus', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'VILLE', 'Direction');
-INSERT INTO entities (entity_id, entity_label, short_label, enabled, adrs_1, adrs_2, adrs_3, zipcode, city, country, email, business_id, parent_entity_id, entity_type) VALUES ('CCAS', 'Centre Communal d''Action Sociale', 'Centre Communal d''Action Sociale', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', '', 'Direction');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('ELUS', 'Ensemble des élus', 'ELUS:Ensemble des élus', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', 'VILLE', 'Direction');
+INSERT INTO entities (entity_id, entity_label, short_label, enabled, address_number, address_street, address_additional1, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type) VALUES ('CCAS', 'Centre Communal d''Action Sociale', 'Centre Communal d''Action Sociale', 'Y', '', '', '', '', '', '', 'support@maarch.fr', '', '', 'Direction');
 SELECT setval('list_templates_id_seq', (SELECT max(id)+1 FROM list_templates), false);
 
 -- Create BASKETS
@@ -1436,7 +1436,7 @@ INSERT INTO templates (template_id, template_label, template_comment, template_c
 <p>&nbsp;</p>
 <p><span style="color: #236fa1;"><strong>Accus&eacute; de r&eacute;ception</strong></span></p>
 <p>Service instructeur : <strong>[userPrimaryEntity.entity_label]</strong> <br />Courriel : [userPrimaryEntity.email]</p>
-<p>[userPrimaryEntity.city], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
+<p>[userPrimaryEntity.address_town], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
 <hr />
 <p>Bonjour,</p>
 <p>Votre demande concernant :</p>
@@ -1457,7 +1457,7 @@ INSERT INTO templates (template_id, template_label, template_comment, template_c
 <p><span style="color: #236fa1;"><strong>Accus&eacute; de r&eacute;ception de votre demande intervenant<br />dans le cadre d''une d&eacute;cision implicite d''acceptation<br /></strong></span></p>
 <p>Num&eacute;ro d''enregistrement :<strong> [res_letterbox.alt_identifier]</strong></p>
 <p>Service instructeur : <strong>[userPrimaryEntity.entity_label]</strong> <br />Courriel : [userPrimaryEntity.email]</p>
-<p>[userPrimaryEntity.city], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
+<p>[userPrimaryEntity.address_town], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
 <hr />
 <p>Bonjour,</p>
 <p>Votre demande concernant :</p>
@@ -1477,7 +1477,7 @@ INSERT INTO templates (template_id, template_label, template_comment, template_c
 <p><span style="color: #236fa1;"><strong>Accus&eacute; de r&eacute;ception de votre demande intervenant<br />dans le cadre d''une d&eacute;cision implicite de rejet<br /></strong></span></p>
 <p>Num&eacute;ro d''enregistrement :<strong> [res_letterbox.alt_identifier]</strong></p>
 <p>Service instructeur : <strong>[userPrimaryEntity.entity_label]</strong> <br />Courriel : [userPrimaryEntity.email]</p>
-<p>[userPrimaryEntity.city], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
+<p>[userPrimaryEntity.address_town], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
 <hr />
 <p>Bonjour,</p>
 <p>Votre demande concernant :</p>
@@ -1495,7 +1495,7 @@ INSERT INTO templates (template_id, template_label, template_comment, template_c
 <p><span style="color: #236fa1;"><strong>Accus&eacute; de r&eacute;ception de votre demande intervenant<br />dans le cadre d''une d&eacute;cision implicite de rejet<br /></strong></span></p>
 <p>Num&eacute;ro d''enregistrement :<strong> [res_letterbox.alt_identifier]</strong></p>
 <p>Service instructeur : <strong>[userPrimaryEntity.entity_label]</strong> <br />Courriel : [userPrimaryEntity.email]</p>
-<p>[userPrimaryEntity.city], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
+<p>[userPrimaryEntity.address_town], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
 <hr />
 <p>Bonjour,</p>
 <p>Votre demande concernant :</p>
@@ -1510,7 +1510,7 @@ Le pr&eacute;sent accus&eacute; de r&eacute;ception atteste de la r&eacute;cepti
 </div>', 'OFFICE_HTML', NULL, NULL, 'DOCX: AR_Masse_SVR', 'letterbox_attachment', 'acknowledgementReceipt', 'svr');
 INSERT INTO templates (template_id, template_label, template_comment, template_content, template_type, template_path, template_file_name, template_style, template_datasource, template_target, template_attachment_type) VALUES (20, 'Courriel d''accompagnement', 'Modèle de courriel d''accompagnement', '<div id="write" class="is-node"><br /><hr /><span style="color: #236fa1;">H&ocirc;tel de ville</span><br /><span style="color: #236fa1;">Place de la Libert&eacute;</span><br /><span style="color: #236fa1;">99000 Maarch-les-bains</span>
 <p>[user.firstname] [user.lastname]<br />[userPrimaryEntity.role]<br />[userPrimaryEntity.entity_label]<br /><br />T&eacute;l&eacute;phone : &nbsp;&nbsp; &nbsp;[user.phone]<br />Courriel : &nbsp;&nbsp; &nbsp;[user.mail]</p>
-<p>[userPrimaryEntity.city], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
+<p>[userPrimaryEntity.address_town], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
 <hr />
 <p>Bonjour,</p>
 <p>Veuillez trouver en pi&egrave;ce jointe &agrave; ce courriel notre r&eacute;ponse &agrave; votre demande du [res_letterbox.admission_date].</p>
@@ -1521,7 +1521,7 @@ INSERT INTO templates (template_id, template_label, template_comment, template_c
 </div>', 'HTML', NULL, NULL, 'DOCX: standard_nosign', 'letterbox_attachment', 'sendmail', 'all');
 INSERT INTO templates (template_id, template_label, template_comment, template_content, template_type, template_path, template_file_name, template_style, template_datasource, template_target, template_attachment_type) VALUES (1036, 'SVE - Courriel de réorientation', 'Modèle de courriel de réorientation d''une saisine SVE', '<div id="write" class="is-node"><br /><hr /><span style="color: #236fa1;">H&ocirc;tel de ville</span><br /><span style="color: #236fa1;">Place de la Libert&eacute;</span><br /><span style="color: #236fa1;">99000 Maarch-les-bains</span>
 <p>[destination.entity_label]<br /><br />T&eacute;l&eacute;phone : &nbsp;&nbsp; &nbsp;[user.phone]<br />Courriel : &nbsp;&nbsp;&nbsp; [destination.email]</p>
-<p>[destination.city], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
+<p>[destination.address_town], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
 <hr />
 <p>Bonjour,</p>
 Le [res_letterbox.doc_date], vous avez transmis par voie &eacute;lectronique &agrave; la Ville une demande qui ne rel&egrave;ve pas de sa comp&eacute;tence.<br /><br />Votre demande cit&eacute;e en objet de ce courriel a &eacute;t&eacute; transmise &agrave;</div>
@@ -1539,7 +1539,7 @@ INSERT INTO templates (template_id, template_label, template_comment, template_c
 <p>&nbsp;</p>
 <p><span style="color: #236fa1;"><strong>Accus&eacute; de r&eacute;ception</strong></span></p>
 <p>Service instructeur : <strong>[userPrimaryEntity.entity_label]</strong> <br />Courriel : [userPrimaryEntity.email]</p>
-<p>[userPrimaryEntity.city], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
+<p>[userPrimaryEntity.address_town], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
 <hr />
 <p>Bonjour,</p>
 <p>Votre demande concernant :</p>
@@ -1560,7 +1560,7 @@ INSERT INTO templates (template_id, template_label, template_comment, template_c
 <p><span style="color: #236fa1;"><strong>Accus&eacute; de r&eacute;ception de votre demande intervenant<br />dans le cadre d''une d&eacute;cision implicite d''acceptation<br /></strong></span></p>
 <p>Num&eacute;ro d''enregistrement :<strong> [res_letterbox.alt_identifier]</strong></p>
 <p>Service instructeur : <strong>[userPrimaryEntity.entity_label]</strong> <br />Courriel : [userPrimaryEntity.email]</p>
-<p>[userPrimaryEntity.city], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
+<p>[userPrimaryEntity.address_town], le [datetime.date;frm=dddd dd mmmm yyyy;locale]</p>
 <hr />
 <p>Bonjour,</p>
 <p>Votre demande concernant :</p>
@@ -1783,3 +1783,4 @@ INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable,
 INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES (7, 'summary_sheet', 'Fiche de liaison', false, false, false, '', true, true, true);
 INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES (8, 'acknowledgement_record_management', 'Accusé de réception (Archivage)', false, false, false, '', true, true, true);
 INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES (9, 'reply_record_management', 'Réponse au transfert (Archivage)', false, false, false, '', true, true, true);
+SELECT setval('attachment_types_id_seq', (select max(id)+1 from attachment_types), false);

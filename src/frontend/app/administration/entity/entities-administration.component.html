@@ -54,9 +54,8 @@
                     <mat-form-field>
                         <input matInput id="jstree_search" name="jstree_search" type="text"
                             placeholder="{{'lang.searchEntities' | translate}}">
-                        <button mat-button *ngIf="!emptyField" matSuffix
-                            mat-icon-button aria-label="Clear" (click)="clearFilter()"
-                            [title]="'lang.clearFilter' | translate">
+                        <button mat-button *ngIf="!emptyField" matSuffix mat-icon-button aria-label="Clear"
+                            (click)="clearFilter()" [title]="'lang.clearFilter' | translate">
                             <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
                         </button>
                         <mat-hint *ngIf="!creationMode">{{'lang.entityTreeInfo' | translate}}</mat-hint>
@@ -75,17 +74,20 @@
         fixedTopGap="56" position='end' [opened]="false" class="col-md-5 col-xs-11">
         <mat-nav-list>
             <mat-tab-group>
-                <mat-tab [label]="creationMode ? ('lang.createNewEntity' | translate) : ('lang.informations' | translate)">
+                <mat-tab
+                    [label]="creationMode ? ('lang.createNewEntity' | translate) : ('lang.informations' | translate)">
                     <form class="form-horizontal" #entityForm="ngForm" style="overflow:hidden;">
                         <div class="form-group">
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <mat-select id="parent_entity_id" name="parent_entity_id"
-                                        title="{{'lang.isLinkedTo' | translate}}" placeholder="{{'lang.isLinkedTo' | translate}}"
+                                        title="{{'lang.isLinkedTo' | translate}}"
+                                        placeholder="{{'lang.isLinkedTo' | translate}}"
                                         [(ngModel)]="currentEntity.parent_entity_id"
                                         (selectionChange)="selectParentEntity(currentEntity.parent_entity_id)">
                                         <mat-option value="">
-                                            <i style="opacity:0.5;text-align:center;">- {{'lang.noEntity' | translate}} -</i>
+                                            <i style="opacity:0.5;text-align:center;">- {{'lang.noEntity' | translate}}
+                                                -</i>
                                         </mat-option>
                                         <ng-container *ngFor="let entity of entities | sortBy : 'entity_label'">
                                             <mat-option [value]="entity.entity_id"
@@ -96,9 +98,10 @@
                                     </mat-select>
                                 </mat-form-field>
                                 <mat-form-field>
-                                    <mat-select id="entity_type" name="entity_type" title="{{'lang.entityType' | translate}}"
-                                        placeholder="{{'lang.entityType' | translate}}" [(ngModel)]="currentEntity.entity_type"
-                                        maxlength="32" required>
+                                    <mat-select id="entity_type" name="entity_type"
+                                        title="{{'lang.entityType' | translate}}"
+                                        placeholder="{{'lang.entityType' | translate}}"
+                                        [(ngModel)]="currentEntity.entity_type" maxlength="32" required>
                                         <mat-option *ngFor="let entity_type of entityTypeList" [value]="entity_type.id">
                                             {{entity_type.label}}
                                         </mat-option>
@@ -110,8 +113,8 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentEntity.id" name="id" id="id"
-                                        title="{{'lang.technicalId' | translate}}" type="text" placeholder="{{'lang.technicalId' | translate}}"
-                                        disabled>
+                                        title="{{'lang.technicalId' | translate}}" type="text"
+                                        placeholder="{{'lang.technicalId' | translate}}" disabled>
                                 </mat-form-field>
                             </div>
                         </div>
@@ -119,8 +122,9 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentEntity.entity_id" required name="entity_id"
-                                        id="entity_id" title="{{'lang.id' | translate}}" type="text" placeholder="{{'lang.id' | translate}}"
-                                        [disabled]="!creationMode" maxlength="32" pattern="^[\w-]*$">
+                                        id="entity_id" title="{{'lang.id' | translate}}" type="text"
+                                        placeholder="{{'lang.id' | translate}}" [disabled]="!creationMode"
+                                        maxlength="32" pattern="^[\w-]*$">
                                 </mat-form-field>
                             </div>
                         </div>
@@ -128,8 +132,8 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentEntity.entity_label" required
-                                        name="entity_label" id="entity_label" title="{{'lang.label' | translate}}" type="text"
-                                        placeholder="{{'lang.label' | translate}}" maxlength="255">
+                                        name="entity_label" id="entity_label" title="{{'lang.label' | translate}}"
+                                        type="text" placeholder="{{'lang.label' | translate}}" maxlength="255">
                                 </mat-form-field>
                             </div>
                         </div>
@@ -146,7 +150,8 @@
                             <div class="col-sm-12">
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="currentEntity.email" name="email" id="email"
-                                        title="{{'lang.email' | translate}}" type="text" placeholder="{{'lang.email' | translate}}" maxlength="255"
+                                        title="{{'lang.email' | translate}}" type="text"
+                                        placeholder="{{'lang.email' | translate}}" maxlength="255"
                                         pattern="(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)">
                                 </mat-form-field>
                             </div>
@@ -155,64 +160,133 @@
                             <mat-expansion-panel>
                                 <mat-expansion-panel-header>
                                     <mat-panel-title>
-                                        {{'lang.otherInformations' | translate}}
+                                        {{'lang.address' | translate}}
                                     </mat-panel-title>
                                 </mat-expansion-panel-header>
-                                <div class="form-group">
-                                    <div class="col-sm-4">
-                                        <mat-form-field>
-                                            <input matInput [(ngModel)]="currentEntity.adrs_1" name="adrs_1" id="adrs_1"
-                                                title="{{'lang.address' | translate}}1" type="text" placeholder="{{'lang.address' | translate}}1"
-                                                maxlength="255">
+                                <div style="display: flex;align-items: center;">
+                                    <div style="flex: 1;">
+                                        <mat-form-field appearance='outline' class="smallInput">
+                                            <button mat-button matSuffix [matMenuTriggerFor]="menuDep"
+                                                (click)="$event.stopPropagation();"
+                                                [title]="'lang.targetDepartment' | translate">
+                                                {{addressBANCurrentDepartment}}&nbsp;<i class="fa fa-chevron-down"></i>
+                                            </button>
+                                            <mat-menu #menuDep="matMenu">
+                                                <button mat-menu-item *ngFor="let dep of departmentList"
+                                                    (click)="addressBANCurrentDepartment = dep">{{dep}}</button>
+                                            </mat-menu>
+                                            <mat-icon color="primary" class="fa fa-search" matPrefix
+                                                style="font-size: 15px;"></mat-icon>
+                                            <input type="text" #autoCompleteInput
+                                                [placeholder]="'lang.searchAddressBan' | translate" matInput
+                                                [formControl]="addressBANControl" [matAutocomplete]="auto"
+                                                (click)="$event.stopPropagation()"
+                                                (focus)="resetAutocompleteAddressBan()" maxlength="128">
+                                            <mat-autocomplete #auto="matAutocomplete"
+                                                (optionSelected)="selectAddressBan($event)">
+                                                <ng-container *ngIf="addressBANResult.length > 0 && !addressBANLoading">
+                                                    <mat-option
+                                                        *ngFor="let addressBANResult of addressBANFilteredResult | async"
+                                                        [value]="addressBANResult">
+                                                        {{addressBANResult.address}}
+                                                    </mat-option>
+                                                </ng-container>
+                                                <mat-option class="autoCompleteInfoResult smallInputInfo"
+                                                    *ngIf="addressBANResult.length === 0 && !addressBANLoading" disabled
+                                                    [innerHTML]="addressBANInfo">
+                                                </mat-option>
+                                                <mat-option *ngIf="addressBANLoading" disabled>
+                                                    <mat-spinner diameter="20"></mat-spinner>
+                                                </mat-option>
+                                            </mat-autocomplete>
                                         </mat-form-field>
-
                                     </div>
-                                    <div class="col-sm-4">
-                                        <mat-form-field>
-                                            <input matInput [(ngModel)]="currentEntity.adrs_2" name="adrs_2" id="adrs_2"
-                                                title="{{'lang.address' | translate}}2" type="text" placeholder="{{'lang.address' | translate}}2"
-                                                maxlength="255">
-                                        </mat-form-field>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <mat-form-field>
-                                            <input matInput [(ngModel)]="currentEntity.adrs_3" name="adrs_3" id="adrs_3"
-                                                title="{{'lang.address' | translate}}3" type="text" placeholder="{{'lang.address' | translate}}3"
-                                                maxlength="255">
-                                        </mat-form-field>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-sm-4">
-                                        <mat-form-field>
-                                            <input matInput [(ngModel)]="currentEntity.zipcode" name="zipcode"
-                                                id="zipcode" title="{{'lang.zipcode' | translate}}" type="text"
-                                                placeholder="{{'lang.zipcode' | translate}}" maxlength="32">
-                                        </mat-form-field>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <mat-form-field>
-                                            <input matInput [(ngModel)]="currentEntity.city" name="city" id="city"
-                                                title="{{'lang.city' | translate}}" type="text" placeholder="{{'lang.city' | translate}}"
-                                                maxlength="255">
-                                        </mat-form-field>
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <mat-form-field>
-                                            <input matInput [(ngModel)]="currentEntity.country" name="country"
-                                                id="country" title="{{'lang.country' | translate}}" type="text"
-                                                placeholder="{{'lang.country' | translate}}" maxlength="255">
-                                        </mat-form-field>
+                                    <div>
+                                        <button [title]="'lang.copyRootEntityAddress' | translate" mat-icon-button
+                                            color="primary" (click)="copyAddress()">
+                                            <mat-icon class="fa fa-copy"></mat-icon>
+                                        </button>
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-sm-12">
                                         <mat-form-field>
+                                            <input matInput [(ngModel)]="currentEntity.addressAdditional1"
+                                                name="addressAdditional1" id="addressAdditional1"
+                                                [title]="currentEntity.addressAdditional1" type="text"
+                                                placeholder="{{'lang.contactsParameters_addressAdditional1' | translate}}"
+                                                maxlength="255">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <mat-form-field>
+                                            <input matInput [(ngModel)]="currentEntity.addressNumber"
+                                                name="addressNumber" id="addressNumber"
+                                                [title]="currentEntity.addressNumber" type="text"
+                                                placeholder="{{'lang.contactsParameters_addressNumber' | translate}}"
+                                                maxlength="255">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <mat-form-field>
+                                            <input matInput [(ngModel)]="currentEntity.addressStreet"
+                                                name="addressStreet" id="addressStreet"
+                                                [title]="currentEntity.addressStreet" type="text"
+                                                placeholder="{{'lang.contactsParameters_addressStreet' | translate}}"
+                                                maxlength="255">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <mat-form-field>
+                                            <input matInput [(ngModel)]="currentEntity.addressAdditional2"
+                                                name="addressAdditional2" id="addressAdditional2"
+                                                [title]="currentEntity.addressAdditional2" type="text"
+                                                placeholder="{{'lang.contactsParameters_addressAdditional2' | translate}}"
+                                                maxlength="255">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <mat-form-field>
+                                            <input matInput [(ngModel)]="currentEntity.addressPostcode"
+                                                name="addressPostcode" id="addressPostcode"
+                                                [title]="currentEntity.addressPostcode" type="text"
+                                                placeholder="{{'lang.contactsParameters_addressPostcode' | translate}}"
+                                                maxlength="255">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <mat-form-field>
+                                            <input matInput [(ngModel)]="currentEntity.addressTown" name="addressTown"
+                                                id="addressTown" [title]="currentEntity.addressTown" type="text"
+                                                placeholder="{{'lang.contactsParameters_addressTown' | translate}}"
+                                                maxlength="255">
+                                        </mat-form-field>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <mat-form-field>
+                                            <input matInput [(ngModel)]="currentEntity.addressCountry"
+                                                name="addressCountry" id="addressCountry"
+                                                [title]="currentEntity.addressCountry" type="text"
+                                                placeholder="{{'lang.contactsParameters_addressCountry' | translate}}"
+                                                maxlength="255">
+                                        </mat-form-field>
+                                    </div>
+                                </div>
+                            </mat-expansion-panel>
+                            <mat-expansion-panel>
+                                <mat-expansion-panel-header>
+                                    <mat-panel-title>
+                                        {{'lang.otherInformations' | translate}}
+                                    </mat-panel-title>
+                                </mat-expansion-panel-header>
+                                <div class="form-group">
+                                    <div class="col-sm-12">
+                                        <mat-form-field>
                                             <textarea matInput [(ngModel)]="currentEntity.entity_full_name"
                                                 name="entity_full_name" id="entity_full_name"
-                                                placeholder="{{'lang.entityFullName' | translate}}" title="{{'lang.entityFullName' | translate}}"
-                                                matTextareaAutosize matAutosizeMinRows="1"
-                                                matAutosizeMaxRows="5"></textarea>
+                                                placeholder="{{'lang.entityFullName' | translate}}"
+                                                title="{{'lang.entityFullName' | translate}}" matTextareaAutosize
+                                                matAutosizeMinRows="1" matAutosizeMaxRows="5"></textarea>
                                         </mat-form-field>
                                     </div>
                                 </div>
@@ -220,7 +294,8 @@
                                     <div class="col-sm-12">
                                         <mat-form-field>
                                             <input *ngIf="!currentEntity.canSynchronizeSiret" matInput
-                                                value="Paramètre SIRET manquant" title="{{'lang.siretCode' | translate}}" type="text"
+                                                value="Paramètre SIRET manquant"
+                                                title="{{'lang.siretCode' | translate}}" type="text"
                                                 placeholder="{{'lang.siretCode' | translate}}" maxlength="255" disabled>
                                             <input *ngIf="currentEntity.canSynchronizeSiret" matInput
                                                 [(ngModel)]="currentEntity.business_id" name="business_id"
@@ -240,7 +315,8 @@
                                             <input matInput [(ngModel)]="currentEntity.producerService"
                                                 name="producerService" id="producerService"
                                                 title="{{'lang.producerService' | translate}}" type="text"
-                                                placeholder="{{'lang.producerService' | translate}}" maxlength="255" pattern="^[\w-]*$">
+                                                placeholder="{{'lang.producerService' | translate}}" maxlength="255"
+                                                pattern="^[\w-]*$">
                                         </mat-form-field>
                                     </div>
                                 </div>
@@ -273,7 +349,8 @@
                                     (click)="appDiffusionsList.loadListModel(currentEntity.id)"
                                     [disabled]="!appDiffusionsList.isModified()">{{'lang.cancel' | translate}}</button>
                                 <button *ngIf="!appDiffusionsList.isEmptyList() && currentEntity.listTemplate.id"
-                                    mat-raised-button color="warn" (click)="deleteDiffList()">{{'lang.delete' | translate}}</button>
+                                    mat-raised-button color="warn"
+                                    (click)="deleteDiffList()">{{'lang.delete' | translate}}</button>
                             </div>
                         </div>
                     </div>
@@ -315,7 +392,8 @@
                 <mat-tab label="{{'lang.users' | translate}}" *ngIf="!creationMode">
                     <div class="row" style="margin:0px;">
                         <div class="col-md-12" *ngIf="currentEntity.canAdminUsers" style="padding:5px;">
-                            <plugin-autocomplete [labelPlaceholder]="'lang.linkUser' | translate" [labelList]="'lang.availableUsers' | translate"
+                            <plugin-autocomplete [labelPlaceholder]="'lang.linkUser' | translate"
+                                [labelList]="'lang.availableUsers' | translate"
                                 [routeDatas]="['/rest/autocomplete/users/administration']"
                                 [targetSearchKey]="'idToDisplay'" [subInfoKey]="'descriptionToDisplay'"
                                 (triggerEvent)="linkUser($event)"></plugin-autocomplete>
@@ -325,8 +403,8 @@
                             <mat-form-field>
                                 <input matInput #filterUser (keyup)="applyFilterUsers($event.target.value)"
                                     placeholder="{{'lang.filterBy' | translate}}">
-                                <button mat-button *ngIf="filterUser.value" matSuffix
-                                    mat-icon-button aria-label="Clear" (click)="applyFilterUsers(''); filterUser.value = ''"
+                                <button mat-button *ngIf="filterUser.value" matSuffix mat-icon-button aria-label="Clear"
+                                    (click)="applyFilterUsers(''); filterUser.value = ''"
                                     [title]="'lang.clearFilter' | translate">
                                     <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
                                 </button>
@@ -340,11 +418,13 @@
                     <mat-table #tableUsers="matSort" [dataSource]="dataSourceUsers" matSort matSortActive="lastname"
                         matSortDirection="asc">
                         <ng-container matColumnDef="firstname">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.firstname' | translate}}</mat-header-cell>
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.firstname' | translate}}
+                            </mat-header-cell>
                             <mat-cell *matCellDef="let element"> {{element.firstname}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="lastname">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.lastname' | translate}}</mat-header-cell>
+                            <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.lastname' | translate}}
+                            </mat-header-cell>
                             <mat-cell *matCellDef="let element"> {{element.lastname}} </mat-cell>
                         </ng-container>
                         <mat-header-row *matHeaderRowDef="displayedColumnsUsers"></mat-header-row>
@@ -359,8 +439,8 @@
                             <mat-form-field>
                                 <input matInput #filterTemplate (keyup)="applyFilterTemplates($event.target.value)"
                                     placeholder="{{'lang.filterBy' | translate}}">
-                                <button mat-button *ngIf="filterTemplate.value" matSuffix
-                                    mat-icon-button aria-label="Clear" (click)="applyFilterTemplates(''); filterTemplate.value = ''"
+                                <button mat-button *ngIf="filterTemplate.value" matSuffix mat-icon-button
+                                    aria-label="Clear" (click)="applyFilterTemplates(''); filterTemplate.value = ''"
                                     [title]="'lang.clearFilter' | translate">
                                     <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
                                 </button>
@@ -374,15 +454,18 @@
                     <mat-table #tableTemplates="matSort" [dataSource]="dataSourceTemplates" matSort
                         matSortActive="template_label" matSortDirection="asc">
                         <ng-container matColumnDef="template_label">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2;">{{'lang.templateName' | translate}}
+                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:2;">
+                                {{'lang.templateName' | translate}}
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element" style="flex:2;"
                                 matTooltip="{{element.template_comment}}"> {{element.template_label}} </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="template_target">
-                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:1;">{{'lang.templateTarget' | translate}}
+                            <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:1;">
+                                {{'lang.templateTarget' | translate}}
                             </mat-header-cell>
-                            <mat-cell *matCellDef="let element" style="flex:1;"> {{'lang.' + element.template_target | translate}}
+                            <mat-cell *matCellDef="let element" style="flex:1;">
+                                {{'lang.' + element.template_target | translate}}
                             </mat-cell>
                         </ng-container>
                         <mat-header-row *matHeaderRowDef="displayedColumnsTemplates"></mat-header-row>

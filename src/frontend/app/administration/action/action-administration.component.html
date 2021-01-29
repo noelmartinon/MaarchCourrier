@@ -94,7 +94,7 @@
                         <div class="form-group" *ngIf="action.actionPageId!='reconcile'">
                             <div class="col-sm-12">
                                 <plugin-select-search [showLabel]="true" [class]="''"
-                                    [label]="'lang.associatedStatus' | translate"
+                                    [label]="action.actionPageId == 'sendToRecordManagement' ? ('lang.intermediateStatus' | translate) : ('lang.associatedStatus' | translate)"
                                     [placeholderLabel]="'lang.associatedStatus' | translate"
                                     [formControlSelect]="selectStatusId" [datas]="statuses"
                                     (afterSelected)="action.id_status = selectStatusId.value" style="width:100%;">

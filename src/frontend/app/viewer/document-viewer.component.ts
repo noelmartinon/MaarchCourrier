@@ -1186,6 +1186,6 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     openMaarchParapheurWorkflow() {
-        this.dialog.open(VisaWorkflowModalComponent, { panelClass: 'maarch-modal', data: { id: this.resId, type: 'resource' } });
+        this.dialog.open(VisaWorkflowModalComponent, { panelClass: 'maarch-modal', data: { id: this.resId, type: 'resource', linkedToMaarchParapheur: true } });
     }
 }

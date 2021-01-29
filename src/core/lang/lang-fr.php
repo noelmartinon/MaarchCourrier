@@ -505,3 +505,10 @@ define('_USER_SKIPPED', 'Utilisateur passé');
 
 define('_MAARCH_PARAPHEUR_STATUS_VAL', 'Validé');
 define('_MAARCH_PARAPHEUR_STATUS_REF', 'Refusé');
+
+define('_INCA_CARD', 'Carte agent');
+define('_INCA_CARD_EIDAS', 'Carte agent + Cachet');
+define('_EIDAS', 'Cachet');
+define('_RGS_2STARS', 'Clé RGS**');
+define('_RGS_2STARS_TIMESTAMPED', 'Clé RGS** + horodatage');
+define('_STAMP', 'Griffe');

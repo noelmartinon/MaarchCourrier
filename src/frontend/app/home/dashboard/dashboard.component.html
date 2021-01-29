@@ -1,0 +1,35 @@
+<div class="dashboard-container" dnd-sortable-container [dropZones]="['boxers-zone']" [sortableData]="tiles">
+    <div class="tile" [class.empty_tile_edit]="tile.id === null && tile.editMode" [class.empty_tile]="tile.id === null"
+        *ngFor="let tile of tiles;let i=index" (mouseenter)="enterTile(tile, i)" (mouseleave)="leaveTile(tile, i)" dnd-sortable [sortableIndex]="i" (onDropSuccess)="transferDataSuccess()">
+        <div class="tool-left" *ngIf="tile.id !== null && tile.editMode">
+            <span dnd-sortable-handle style="cursor: move;">
+                <mat-icon color="primary" class="fa fa-arrows-alt"></mat-icon>
+            </span>
+        </div>
+        <div class="tool" *ngIf="tile.id !== null && tile.editMode">
+            <button #test color="primary" mat-button mat-icon-button [matMenuTriggerFor]="toolMenu" (mouseenter)="hoveredTool=true">
+                <mat-icon class="fas fa-chevron-down"></mat-icon>
+            </button>
+            <mat-menu #toolMenu="matMenu">
+                <ng-container  *ngFor="let menu of tile.menus">
+                    <button *ngIf="menu!=='view'" mat-menu-item (click)="launchAction(menu, tile)">{{'lang.'+ menu | translate}}</button>
+                    <button *ngIf="menu==='view'" mat-menu-item [matMenuTriggerFor]="toolMenuView">{{'lang.'+ menu | translate}}</button>
+                </ng-container>
+            </mat-menu>
+            <mat-menu #toolMenuView="matMenu">
+                <button mat-menu-item *ngFor="let view of tile.views" [disabled]="tile.view === view.id" (click)="changeView(tile,view.id)">
+                    <mat-icon *ngIf="view.id==='list'" class="fa fa-list" color="primary" style="height: auto;width: auto;"></mat-icon>
+                    <mat-icon *ngIf="view.id==='resume'" class="fas fa-equals" color="primary" style="height: auto;width: auto;"></mat-icon>
+                    <mat-icon *ngIf="view.id==='chart'" class="fas fa-chart-pie" color="primary" style="height: auto;width: auto;"></mat-icon>
+                    <span>{{'lang.' + view.id | translate}}</span>
+                </button>
+            </mat-menu>
+        </div>
+        <app-tile-last-mails-view #tileComponent *ngIf="tile.type === 'myLastResources'" [tile]="tile" [view]="tile.view"
+            style="display: flex;height: 100%;flex-direction: column;width: 100%;">
+        </app-tile-last-mails-view>
+        <button mat-button color="secondary" mat-icon-button *ngIf="tile.id === null && tile.editMode" (click)="addTilePrompt(tile)">
+            <mat-icon color="secondary" class="fa fa-plus"></mat-icon>
+        </button>
+    </div>
+</div>

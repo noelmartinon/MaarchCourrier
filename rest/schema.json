@@ -137,12 +137,13 @@
                                     "entity_label" : "Ville de Maarch-Les-Bains",
                                     "short_label" : "Ville de Maarch-Les-Bains",
                                     "enabled" : "Y",
-                                    "adrs_1" : "11 Bd du sud-est",
-                                    "adrs_2" : "",
-                                    "adrs_3" : "",
-                                    "zipcode" : "92000",
-                                    "city" : "Nanterre",
-                                    "country" : "FRANCE",
+                                    "address_number" : "11",
+                                    "address_street" : "Bd du sud-est",
+                                    "address_additional1" : "",
+                                    "address_additional2" : "",
+                                    "address_postcode" : "92000",
+                                    "address_town" : "Nanterre",
+                                    "address_country" : "FRANCE",
                                     "email" : "info@maarchlesbains.org",
                                     "business_id" : "",
                                     "parent_entity_id" : "",
@@ -207,27 +208,31 @@
                             "type" : "string",
                             "maxLength" : 1
                         },                       
-                        "adrs_1" : {
+                        "address_number" : {
                             "type" : "string",
                             "maxLength" : 255
                         },                       
-                        "adrs_2" : {
+                        "address_street" : {
                             "type" : "string",
                             "maxLength" : 255
                         },                       
-                        "adrs_3" : {
+                        "address_additional1" : {
                             "type" : "string",
                             "maxLength" : 255
                         },                       
-                        "zipcode" : {
+                        "address_additional2" : {
+                            "type" : "string",
+                            "maxLength" : 255
+                        },
+                        "address_postcode" : {
                             "type" : "string",
                             "maxLength" : 32
                         },                       
-                        "city" : {
+                        "address_town" : {
                             "type" : "string",
                             "maxLength" : 255
                         },                       
-                        "country" : {
+                        "address_country" : {
                             "type" : "string",
                             "maxLength" : 255
                         },                       

@@ -44,25 +44,29 @@ class EntityController
     {
         $entity = EntityModel::getById([
             'id' => $args['id'],
-            'select' => [
-                'id',
-                'entity_label',
-                'short_label',
-                'entity_full_name',
-                'entity_type',
-                'entity_id',
-                'enabled',
-                'parent_entity_id',
-                'adrs_1 as "address"',
-                'zipcode as "addressPostcode"',
-                'city as "addressTown"',
-                'country as "addressCountry"',
-                'email'
-            ]
+            'select' => ['*']
         ]);
         if (empty($entity)) {
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         }
+        $entity = [
+            'id'                    => $entity['id'],
+            'entity_label'          => $entity['entity_label'],
+            'short_label'           => $entity['short_label'],
+            'entity_full_name'      => $entity['entity_full_name'],
+            'entity_type'           => $entity['entity_type'],
+            'entity_id'             => $entity['entity_id'],
+            'enabled'               => $entity['enabled'],
+            'parent_entity_id'      => $entity['parent_entity_id'],
+            'addressNumber'         => $entity['address_number'],
+            'addressStreet'         => $entity['address_street'],
+            'addressAdditional1'    => $entity['address_additional1'],
+            'addressAdditional2'    => $entity['address_additional2'],
+            'addressPostcode'       => $entity['address_postcode'],
+            'addressTown'           => $entity['address_town'],
+            'addressCountry'        => $entity['address_country'],
+            'email'                 => $entity['email']
+        ];
 
         return $response->withJson($entity);
     }
@@ -77,9 +81,27 @@ class EntityController
         if (empty($entity)) {
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         }
-
-        $entity['producerService'] = $entity['producer_service'];
-        unset($entity['producer_service']);
+        $entity = [
+            'id'                    => $entity['id'],
+            'entity_label'          => $entity['entity_label'],
+            'short_label'           => $entity['short_label'],
+            'entity_full_name'      => $entity['entity_full_name'],
+            'entity_type'           => $entity['entity_type'],
+            'entity_id'             => $entity['entity_id'],
+            'enabled'               => $entity['enabled'],
+            'parent_entity_id'      => $entity['parent_entity_id'],
+            'addressNumber'         => $entity['address_number'],
+            'addressStreet'         => $entity['address_street'],
+            'addressAdditional1'    => $entity['address_additional1'],
+            'addressAdditional2'    => $entity['address_additional2'],
+            'addressPostcode'       => $entity['address_postcode'],
+            'addressTown'           => $entity['address_town'],
+            'addressCountry'        => $entity['address_country'],
+            'email'                 => $entity['email'],
+            'producerService'       => $entity['producer_service'],
+            'business_id'           => $entity['business_id'],
+            'external_id'           => $entity['external_id']
+        ];
 
         $aEntities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]);
         foreach ($aEntities as $aEntity) {
@@ -176,15 +198,18 @@ class EntityController
 
         $body = $request->getParsedBody();
 
-        $check = Validator::stringType()->notEmpty()->validate($body['entity_id']) && preg_match("/^[\w-]*$/", $body['entity_id']) && (strlen($body['entity_id']) < 33);
-        $check = $check && Validator::stringType()->notEmpty()->validate($body['entity_label']);
-        $check = $check && Validator::stringType()->notEmpty()->validate($body['short_label']);
-        $check = $check && Validator::stringType()->notEmpty()->validate($body['entity_type']);
-        if (!empty($body['email'])) {
-            $check = $check && preg_match("/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/", $body['email']);
-        }
-        if (!$check) {
-            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+        if (empty($body)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body is empty']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['entity_id']) || !preg_match("/^[\w-]*$/", $body['entity_id']) || (strlen($body['entity_id']) > 32)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body entity_id is empty, not a string or not valid']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['entity_label'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body entity_label is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['short_label'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body short_label is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['entity_type'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body entity_type is empty or not a string']);
+        } elseif (!empty($body['email']) && !filter_var($body['email'], FILTER_VALIDATE_EMAIL)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body email is not valid']);
         }
 
         $existingEntity = EntityModel::getByEntityId(['entityId' => $body['entity_id'], 'select' => [1]]);
@@ -192,7 +217,25 @@ class EntityController
             return $response->withStatus(400)->withJson(['errors' => _ENTITY_ID_ALREADY_EXISTS]);
         }
 
-        EntityModel::create($body);
+        EntityModel::create([
+            'entity_id'             => $body['entity_id'],
+            'entity_label'          => $body['entity_label'],
+            'short_label'           => $body['short_label'],
+            'address_number'        => $body['addressNumber'],
+            'address_street'        => $body['addressStreet'],
+            'address_additional1'   => $body['addressAdditional1'],
+            'address_additional2'   => $body['addressAdditional2'],
+            'address_postcode'      => $body['addressPostcode'],
+            'address_town'          => $body['addressTown'],
+            'address_country'       => $body['addressCountry'],
+            'email'                 => $body['email'],
+            'business_id'           => $body['business_id'],
+            'parent_entity_id'      => $body['parent_entity_id'],
+            'entity_type'           => $body['entity_type'],
+            'ldap_id'               => $body['ldap_id'],
+            'entity_full_name'      => $body['entity_full_name'],
+            'producer_service'      => $body['producerService']
+        ]);
         HistoryController::add([
             'tableName' => 'entities',
             'recordId'  => $body['entity_id'],
@@ -261,18 +304,27 @@ class EntityController
             $body['producer_service'] = $aArgs['id'];
         }
 
-        $neededData = [
-            'entity_label', 'short_label', 'entity_type', 'adrs_1', 'adrs_2', 'adrs_3',
-            'zipcode', 'city', 'country', 'email', 'business_id', 'parent_entity_id',
-            'ldap_id', 'entity_full_name', 'producer_service'
-        ];
-        foreach ($body as $key => $value) {
-            if (!in_array($key, $neededData)) {
-                unset($body[$key]);
-            }
-        }
-
-        EntityModel::update(['set' => $body, 'where' => ['entity_id = ?'], 'data' => [$aArgs['id']]]);
+        EntityModel::update(['set' => [
+                'entity_label'          => $body['entity_label'],
+                'short_label'           => $body['short_label'],
+                'address_number'        => $body['addressNumber'],
+                'address_street'        => $body['addressStreet'],
+                'address_additional1'   => $body['addressAdditional1'],
+                'address_additional2'   => $body['addressAdditional2'],
+                'address_postcode'      => $body['addressPostcode'],
+                'address_town'          => $body['addressTown'],
+                'address_country'       => $body['addressCountry'],
+                'email'                 => $body['email'],
+                'business_id'           => $body['business_id'],
+                'parent_entity_id'      => $body['parent_entity_id'],
+                'entity_type'           => $body['entity_type'],
+                'ldap_id'               => $body['ldap_id'],
+                'entity_full_name'      => $body['entity_full_name'],
+                'producer_service'      => $body['producerService']
+            ],
+            'where' => ['entity_id = ?'],
+            'data'  => [$aArgs['id']]
+        ]);
         HistoryController::add([
             'tableName' => 'entities',
             'recordId'  => $aArgs['id'],
@@ -548,6 +600,38 @@ class EntityController
         return $response->withJson(['types' => EntityModel::getTypes()]);
     }
 
+    public function getParentAddress(Request $request, Response $response, array $args)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'manage_entities', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $entity = EntityModel::getById(['id' => $args['id'], 'select' => ['parent_entity_id']]);
+        if (empty($entity)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Entity does not exist']);
+        }
+
+        while (!empty($entity['parent_entity_id'])) {
+            $entity = EntityModel::getByEntityId([
+                'entityId'  => $entity['parent_entity_id'],
+                'select'    => ['parent_entity_id', 'address_number', 'address_street', 'address_additional1', 'address_additional2', 'address_postcode', 'address_town', 'address_country']
+            ]);
+            if (!empty($entity['address_street'])) {
+                return $response->withJson([
+                    'addressNumber'         => $entity['address_number'],
+                    'addressStreet'         => $entity['address_street'],
+                    'addressAdditional1'    => $entity['address_additional1'],
+                    'addressAdditional2'    => $entity['address_additional2'],
+                    'addressPostcode'       => $entity['address_postcode'],
+                    'addressTown'           => $entity['address_town'],
+                    'addressCountry'        => $entity['address_country']
+                ]);
+            }
+        }
+
+        return $response->withJson(null);
+    }
+
     public function export(Request $request, Response $response)
     {
         if (!PrivilegeController::hasPrivilege(['privilegeId' => 'manage_entities', 'userId' => $GLOBALS['id']])) {
@@ -564,8 +648,8 @@ class EntityController
         }
 
         $fields = [
-            'id', 'entity_id', 'entity_label', 'short_label', 'entity_full_name', 'enabled', 'adrs_1', 'adrs_2', 'adrs_3', 'zipcode', 'city',
-            'country', 'email', 'parent_entity_id', 'entity_type', 'business_id', 'folder_import', 'producer_service'
+            'id', 'entity_id', 'entity_label', 'short_label', 'entity_full_name', 'enabled', 'address_number', 'address_street', 'address_additional1', 'address_additional2',
+            'address_postcode', 'address_town', 'address_country', 'email', 'parent_entity_id', 'entity_type', 'business_id', 'folder_import', 'producer_service'
         ];
 
         $csvHead = array_merge($fields, [ 'diffusionList', 'visaCircuit', 'opinionCircuit', 'users', 'templates']);

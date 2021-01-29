@@ -176,7 +176,7 @@ trait ShippingTrait
 
         $urlComplement = 'mail';
         $isRegisteredMail = false;
-        if ($shippingTemplate['options']['sendMode'] == 'digital_registered_mail') {
+        if (strpos($shippingTemplate['options']['sendMode'], 'digital_registered_mail') !== false) {
             $urlComplement = 'registered_mail';
             $isRegisteredMail = true;
         }
@@ -189,13 +189,14 @@ trait ShippingTrait
             if ($isRegisteredMail) {
                 $body = [
                     'name' => $sendingName,
-                    "sender_address_line_1" => "Société Durand",
-                    "sender_address_line_2" => "M. Pierre DUPONT",
-                    "sender_address_line_3" => "Batiment B",
-                    "sender_address_line_4" => "10 avenue Charles de Gaulle",
-                    "sender_address_line_5" => "",
-                    "sender_address_line_6" => "94673 Charenton-Le-Pont",
-                    "sender_country_code"   => "FR"
+                    'acknowledgement_of_receipt'    => $shippingTemplate['options']['sendMode'] == 'digital_registered_mail_with_AR',
+                    "sender_address_line_1"         => "Société Durand",
+                    "sender_address_line_2"         => "M. Pierre DUPONT",
+                    "sender_address_line_3"         => "Batiment B",
+                    "sender_address_line_4"         => "10 avenue Charles de Gaulle",
+                    "sender_address_line_5"         => "",
+                    "sender_address_line_6"         => "94673 Charenton-Le-Pont",
+                    "sender_country_code"           => "FR"
                 ];
             } else {
                 $body = [

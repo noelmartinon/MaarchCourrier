@@ -388,12 +388,13 @@ CREATE TABLE entities
   short_label character varying(50),
   entity_full_name text,
   enabled character(1) NOT NULL DEFAULT 'Y'::bpchar,
-  adrs_1 character varying(255),
-  adrs_2 character varying(255),
-  adrs_3 character varying(255),
-  zipcode character varying(32),
-  city character varying(255),
-  country character varying(255),
+  address_number character varying(255),
+  address_street character varying(255),
+  address_additional1 character varying(255),
+  address_additional2 character varying(256),
+  address_postcode character varying(32),
+  address_town character varying(255),
+  address_country character varying(255),
   email character varying(255),
   business_id character varying(32),
   parent_entity_id character varying(32),
@@ -1509,5 +1510,17 @@ CREATE TABLE attachment_types
     new_version_default BOOLEAN NOT NULL,
     CONSTRAINT attachment_types_pkey PRIMARY KEY (id),
     CONSTRAINT attachment_types_unique_key UNIQUE (type_id)
+)
+WITH (OIDS=FALSE);
+
+CREATE TABLE tiles
+(
+    id SERIAL NOT NULL,
+    user_id INTEGER NOT NULL,
+    type text NOT NULL,
+    view text NOT NULL,
+    position INTEGER NOT NULL,
+    parameters jsonb DEFAULT '{}' NOT NULL,
+    CONSTRAINT tiles_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);

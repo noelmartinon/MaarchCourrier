@@ -7,6 +7,7 @@ import { catchError, tap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '@service/notification/notification.service';
 import { of } from 'rxjs';
+import { MatDialogRef } from '@angular/material/dialog';
 
 @Component({
     templateUrl: 'about-us.component.html',
@@ -26,7 +27,8 @@ export class AboutUsComponent implements OnInit {
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
-        public appService: AppService) { }
+        public appService: AppService,
+        public dialogRef: MatDialogRef<AboutUsComponent>) { }
 
     async ngOnInit() {
         this.headerService.setHeader(this.translate.instant('lang.aboutUs'));

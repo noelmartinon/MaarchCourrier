@@ -1480,7 +1480,13 @@ class ContactController
                     'externalId'         => null
                 ];
             } elseif ($resourceContact['type'] == 'entity') {
-                $entity = EntityModel::getById(['id' => $resourceContact['item_id'], 'select' => ['entity_label', 'email', 'enabled', 'adrs_1', 'adrs_2', 'adrs_3', 'zipcode', 'city', 'country']]);
+                $entity = EntityModel::getById([
+                    'id' => $resourceContact['item_id'],
+                    'select' => [
+                        'entity_label', 'email', 'enabled', 'address_number', 'address_street', 'address_additional1', 'address_additional2',
+                        'address_postcode', 'address_town', 'address_country'
+                    ]
+                ]);
 
                 $contact = [
                     'type'               => 'entity',
@@ -1489,13 +1495,13 @@ class ContactController
                     'company'            => null,
                     'department'         => null,
                     'function'           => null,
-                    'addressNumber'      => null,
-                    'addressStreet'      => $entity['adrs_1'],
-                    'addressAdditional1' => null,
-                    'addressAdditional2' => null,
-                    'addressPostcode'    => $entity['zipcode'],
-                    'addressTown'        => $entity['city'],
-                    'addressCountry'     => $entity['country'],
+                    'addressNumber'      => $entity['address_number'],
+                    'addressStreet'      => $entity['address_street'],
+                    'addressAdditional1' => $entity['address_additional1'],
+                    'addressAdditional2' => $entity['address_additional2'],
+                    'addressPostcode'    => $entity['address_postcode'],
+                    'addressTown'        => $entity['address_town'],
+                    'addressCountry'     => $entity['address_country'],
                     'email'              => $entity['email'],
                     'phone'              => null,
                     'communicationMeans' => null,

@@ -180,7 +180,7 @@ class UserControllerTest extends TestCase
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
 
-        $this->assertSame('Bad Request', $responseBody['errors']);
+        $this->assertSame('Body firstname is empty or not a string', $responseBody['errors']);
 
 
         $GLOBALS['login'] = 'bbain';

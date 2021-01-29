@@ -26,8 +26,8 @@
                     style="color: white;border-color: #24b0ed;background: #24b0ed;">{{'lang.LOGIN' | translate}}</button>
             </form>
         </div>
-        <footer>
-            Maarch courrier {{environment.VERSION}} Powered by {{environment.AUTHOR}}
+        <footer style="padding: 8px; backdrop-filter: blur(8px)">
+            <a (click)="openAboutModal()" style="color: white;cursor: pointer">Maarch courrier {{environment.VERSION}}</a> Powered by {{environment.AUTHOR}}
         </footer>
     </div>
 </div>

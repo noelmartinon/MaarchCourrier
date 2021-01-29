@@ -290,6 +290,9 @@ export class ProcessComponent implements OnInit, OnDestroy {
     async initDetailPage(params: any) {
         this._activatedRoute.queryParamMap.subscribe((paramMap: ParamMap) => {
             this.isMailing = !this.functions.empty(paramMap.get('isMailing'));
+            if (this.isMailing) {
+                this.currentTool = 'attachments';
+            }
         });
 
         this.detailMode = true;
@@ -307,7 +310,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
         await this.checkAccesDocument(this.currentResourceInformations.resId);
 
         this.loadBadges();
-        this.loadResource();
+        this.loadResource(!this.isMailing);
 
         if (this.appService.getViewMode()) {
             setTimeout(() => {

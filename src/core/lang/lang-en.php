@@ -498,3 +498,10 @@ define('_USER_SKIPPED', 'User skipped');
 
 define('_MAARCH_PARAPHEUR_STATUS_VAL', 'Validé');
 define('_MAARCH_PARAPHEUR_STATUS_REF', 'Refusé');
+
+define('_INCA_CARD', 'Inca card');
+define('_INCA_CARD_EIDAS', 'Inca card + eidas');
+define('_EIDAS', 'Eidas');
+define('_RGS_2STARS', 'RGS** key');
+define('_RGS_2STARS_TIMESTAMPED', 'RGS** key + timestamped');
+define('_STAMP', 'Stamp');

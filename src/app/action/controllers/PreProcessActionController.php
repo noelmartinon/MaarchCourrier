@@ -441,14 +441,17 @@ class PreProcessActionController
                     }
 
                     // Check attachments
+                    $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id'], 'where' => ['signable = ?', 'type_id != ?'], 'data' => ['true', 'signed_response']]);
+                    $attachmentTypes = array_column($attachmentTypes, 'type_id');
+
                     $attachments = AttachmentModel::get([
                         'select'    => [
                             'res_id', 'title', 'identifier', 'attachment_type',
                             'status', 'typist', 'docserver_id', 'path', 'filename', 'creation_date',
                             'validation_date', 'relation', 'origin_id'
                         ],
-                        'where'     => ["res_id_master = ?", "attachment_type not in (?)", "status not in ('DEL', 'OBS', 'FRZ', 'TMP', 'SIGN')", "in_signature_book = 'true'"],
-                        'data'      => [$resId, ['signed_response']]
+                        'where'     => ["res_id_master = ?", "attachment_type in (?)", "status not in ('DEL', 'OBS', 'FRZ', 'TMP', 'SIGN')", "in_signature_book = 'true'"],
+                        'data'      => [$resId, $attachmentTypes]
                     ]);
 
                     $integratedResource = ResModel::get([
@@ -466,13 +469,9 @@ class PreProcessActionController
                         $integratedResource = false;
                     }
 
-                    $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id', 'signable']]);
-                    $attachmentTypes = array_column($attachmentTypes, 'signable', 'type_id');
-
                     if (empty($attachments) && empty($integratedResource)) {
                         $additionalsInfos['noAttachment'][] = ['alt_identifier' => $noAttachmentsResource['alt_identifier'], 'res_id' => $resId, 'reason' => 'noAttachmentInSignatoryBook'];
                     } else {
-                        $hasSignableAttachment = false;
                         foreach ($attachments as $value) {
                             $resIdAttachment  = $value['res_id'];
                             $collId = 'attachments_coll';
@@ -491,9 +490,6 @@ class PreProcessActionController
                             if (!is_file($filePath)) {
                                 $additionalsInfos['noAttachment'][] = ['alt_identifier' => $noAttachmentsResource['alt_identifier'], 'res_id' => $resIdAttachment, 'reason' => 'fileDoesNotExists'];
                                 break;
-                            }
-                            if ($attachmentTypes[$value['attachment_type']]) {
-                                $hasSignableAttachment = true;
                             }
                             $availableResources[] = ['resId' => $resIdAttachment, 'subject' => $value['title'], 'chrono' => $value['identifier'], 'mainDocument' => false];
                         }
@@ -514,7 +510,7 @@ class PreProcessActionController
                                 break;
                             }
                         }
-                        if (!$hasSignableAttachment && empty($integratedResource)) {
+                        if (empty($attachments) && empty($integratedResource)) {
                             $additionalsInfos['noAttachment'][] = ['alt_identifier' => $noAttachmentsResource['alt_identifier'], 'res_id' => $resId, 'reason' => 'noSignableAttachmentInSignatoryBook'];
                         } else {
                             $statuses = array_column($attachments, 'status');

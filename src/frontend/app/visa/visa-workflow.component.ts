@@ -100,13 +100,50 @@ export class VisaWorkflowComponent implements OnInit {
 
     drop(event: CdkDragDrop<string[]>) {
         if (event.previousContainer === event.container) {
-            if (this.canManageUser(this.visaWorkflow.items[event.currentIndex], event.currentIndex)) {
-                moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-                this.workflowUpdated.emit(event.container);
+            if (this.linkedToMaarchParapheur) {
+                if (this.canMoveUserExtParaph(event)) {
+                    moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+                } else {
+                    this.notify.error(this.translate.instant('lang.errorUserSignType'));
+                }
             } else {
-                this.notify.error(this.translate.instant('lang.moveVisaUserErr', { value1: this.visaWorkflow.items[event.previousIndex].labelToDisplay }));
+                if (this.canManageUser(this.visaWorkflow.items[event.currentIndex], event.currentIndex)) {
+                    moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+                    this.workflowUpdated.emit(event.container);
+                } else {
+                    this.notify.error(this.translate.instant('lang.moveVisaUserErr', { value1: this.visaWorkflow.items[event.previousIndex].labelToDisplay }));
+                }
             }
         }
+    }
+
+    canMoveUserExtParaph(ev: any) {
+        const newWorkflow = this.array_move(this.visaWorkflow.items.slice(), ev.currentIndex, ev.previousIndex);
+        const res = this.isValidExtWorkflow(newWorkflow);
+        return res;
+    }
+
+    array_move(arr: any, old_index: number, new_index: number) {
+        if (new_index >= arr.length) {
+            let k = new_index - arr.length + 1;
+            while (k--) {
+                arr.push(undefined);
+            }
+        }
+        arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+        return arr; // for testing
+    }
+
+    isValidExtWorkflow(workflow: any = this.visaWorkflow) {
+        let res: boolean = true;
+        workflow.forEach((item: any, indexUserRgs: number) => {
+            if (['visa', 'stamp'].indexOf(item.role) === -1) {
+                if (workflow.filter((itemUserStamp: any, indexUserStamp: number) => indexUserStamp > indexUserRgs && itemUserStamp.role === 'stamp').length > 0) {
+                    res = false;
+                }
+            }
+        });
+        return res;
     }
 
     loadListModel(entityId: number) {
@@ -356,7 +393,9 @@ export class VisaWorkflowComponent implements OnInit {
                         'process_date': this.functions.formatFrenchDateToTechnicalDate(element.processDate),
                         'picture': '',
                         'hasPrivilege': true,
-                        'isValid': true
+                        'isValid': true,
+                        'delegatedBy': null,
+                        'role': element.signatureMode
                     };
                     this.visaWorkflow.items.push(user);
                     this.http.get('../rest/maarchParapheur/user/' + element.userId + '/picture')

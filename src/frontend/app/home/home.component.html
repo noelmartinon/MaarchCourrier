@@ -1,8 +1,5 @@
 <mat-sidenav-container autosize class="maarch-container" joyrideStep="welcome" stepPosition="center">
     <mat-sidenav-content>
-        <mat-card id="viewThumbnail" style="display:none;position: fixed;z-index: 2;margin-left: 1px;"><img
-                style="max-height: 100vh;" *ngIf="thumbnailUrl !== ''" [src]="thumbnailUrl | secureUrl | async" />
-        </mat-card>
         <div class="bg-head">
             <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
                 <div class="bg-head-title-label">
@@ -20,16 +17,13 @@
                             <span [innerHTML]="homeMessage"></span>
                         </div>
                     </div>
-                    <div style="text-align: right;opacity: 0.5;">
-                        <button mat-button routerLink="/about-us"
-                            style="position:absolute;font-size:10px;right: 0px;bottom: 0px;">{{'lang.aboutUs' | translate}}</button>
-                    </div>
                 </mat-card>
             </div>
         </div>
         <div class="container" [class.fullContainer]="appService.getViewMode()">
             <div class="container-content">
-                <mat-tab-group>
+                <app-dashboard></app-dashboard>
+                <!--<mat-tab-group>
                     <mat-tab *ngIf="homeData !== undefined && homeData.isLinkedToMaarchParapheur">
                         <ng-template matTabLabel>
                             <span [class.noDoc]="nbMpDocs === 0" matBadge="{{nbMpDocs}}"
@@ -43,7 +37,6 @@
                         </div>
                         <table *ngIf="!loading" mat-table [dataSource]="dataSource" matSort matSortActive="res_id"
                             matSortDisableClear matSortDirection="asc" style="width:100%;table-layout: fixed;">
-                            <!-- Number Column -->
                             <ng-container matColumnDef="res_id">
                                 <td class="first_col" mat-cell *matCellDef="let row"
                                     [ngStyle]="{'width': appService.getViewMode() ? '30%' : '15%'}">
@@ -116,7 +109,7 @@
                                 style="cursor:pointer;"></tr>
                         </table>
                     </mat-tab>
-                </mat-tab-group>
+                </mat-tab-group>-->
             </div>
         </div>
     </mat-sidenav-content>

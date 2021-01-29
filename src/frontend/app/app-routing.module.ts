@@ -41,7 +41,6 @@ const routes: Routes = [
     { path: 'password-modification', component: PasswordModificationComponent },
     { path: 'folders/:folderId', canActivate: [AppGuard], component: FolderDocumentListComponent },
     { path: 'profile', canActivate: [AppGuard], component: ProfileComponent },
-    { path: 'about-us', canActivate: [AppGuard], component: AboutUsComponent },
     { path: 'home', canActivate: [AppGuard], component: HomeComponent },
     { path: 'basketList/users/:userSerialId/groups/:groupSerialId/baskets/:basketId', canActivate: [AppGuard], component: BasketListComponent },
     { path: 'login', canActivate: [AppLightGuard], component: LoginComponent },

@@ -26,8 +26,8 @@
                 </li>
             </ul>
         </div>
-        <div *ngIf="critcalError !== null" class="alert-message alert-message-danger" style="max-width: 100%;">
-            {{critcalError}}
+        <div *ngIf="criticalError !== null" class="alert-message alert-message-danger" style="max-width: 100%;">
+            {{criticalError}}
         </div>
         <ng-container *ngIf="!checking && resources.length > 0">
             <div class="row" style="padding-top: 10px;">
@@ -84,7 +84,7 @@
                     {{'lang.mailsToSendToRecordManagement' | translate}}
                 </div>
                 <div style="width: 100%;">
-                    <mat-paginator [length]="100" [hidePageSize]="true" [pageSize]="10" showFirstLastButtons
+                    <mat-paginator [length]="100" [hidePageSize]="true" [pageSize]="10"
                         [style.display]="resources.length > 10 ? 'initial': 'none'"></mat-paginator>
                     <table *ngIf="!checking" mat-table [dataSource]="dataSource" multiTemplateDataRows
                         class="mat-elevation-z8" style="width:100%;box-shadow: none;">
@@ -151,11 +151,11 @@
     </div>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
-        <button mat-raised-button mat-button color="primary" [disabled]="checking || !isValid()"
+        <button mat-raised-button mat-button color="primary" [disabled]="loading || checking || !isValid()"
             (click)="onSubmit('send')">{{'lang.send' | translate}}</button>
-        <button mat-raised-button mat-button color="primary" [disabled]="checking || !isValid()"
+        <button mat-raised-button mat-button color="primary" [disabled]="loading || checking || !isValid()"
             (click)="onSubmit('download')">{{'lang.download' | translate}}</button>
-        <button mat-raised-button mat-button [disabled]="checking"
+        <button mat-raised-button mat-button [disabled]="loading || checking"
             [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
     </div>
 </div>

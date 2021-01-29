@@ -150,6 +150,7 @@
     "askRedirectBasketBeforeAbsence": "Voulez-vous rediriger vos bannettes avant de vous mettre en absence ?",
     "assignBy": "Assignée par",
     "associatedStatus": "Statut associé",
+    "intermediateStatus": "Statut intermédiaire",
     "finalStatus": "Statut final",
     "finalStatusAlt": "Statut final si l'envoi est réussi",
     "errorStatus": "Statut d'erreur",
@@ -2217,7 +2218,8 @@
     "addDateBlock": "Ajouter le bloc date",
     "addSignaturePosition": "Ajouter la position de signature",
     "basketsToRedirect": "Bannettes à rediriger",
-    "maileva_digital_registered_mail": "Lettre recommandée en ligne",
+    "maileva_digital_registered_mail": "Lettre recommandée en ligne sans AR",
+    "maileva_digital_registered_mail_with_AR": "Lettre recommandée en ligne avec AR",
     "clearFilter" : "Effacer le filtre",
     "arContentIsEmpty": "Le contenu de l'accusé de réception est vide",
     "mailsToSendToRecordManagement": "Courrier(s) à exporter au système d'archivage",
@@ -2229,5 +2231,11 @@
     "eidas": "Cachet",
     "rgs_2stars": "Clé RGS**",
     "rgs_2stars_timestamped": "Clé RGS** + horodatage",
-    "stamp": "Griffe"
+    "stamp": "Griffe",
+    "errorUserSignType": "Les signataires sans certificat doivent être présent avant les signataires avec certificat.",
+    "copyRootEntityAddress": "Copier l'adresse existante de l'entité racine",
+    "noAddressFound": "Aucune adresse trouvée",
+    "searchTemplate": "Modèle de recherche",
+    "chart": "Graphique",
+    "resume": "Synthèse"
 }

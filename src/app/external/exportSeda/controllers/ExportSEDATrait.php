@@ -43,7 +43,7 @@ trait ExportSEDATrait
         ValidatorModel::intVal($args, ['resId']);
 
         $attachments = AttachmentModel::get([
-            'select' => ['res_id'],
+            'select' => [1],
             'where'  => ['res_id_master = ?', 'attachment_type in (?)', 'status = ?'],
             'data'   => [$args['resId'], ['acknowledgement_record_management', 'reply_record_management'], 'TRA']
         ]);

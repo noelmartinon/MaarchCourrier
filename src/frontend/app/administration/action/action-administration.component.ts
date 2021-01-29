@@ -8,7 +8,7 @@ import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 import { tap, catchError } from 'rxjs/operators';
 import { FunctionsService } from '@service/functions.service';
-import {FormControl, Validators} from '@angular/forms';
+import {FormControl} from '@angular/forms';
 import { of } from 'rxjs';
 
 

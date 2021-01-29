@@ -769,7 +769,6 @@ class SummarySheetController
                 $pdf->writeHTMLCell($widthNoMargins + $dimensions['lm'], 0, $dimensions['lm'] - 2, $pdf->GetY(), $parameter['param_value_string']);
                 $pdf->SetY($pdf->GetY() + abs($height));
             } elseif ($unit['unit'] == 'visaWorkflowMaarchParapheur') {
-
                 $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
                 if (empty($loadedXml)) {
                     continue;
@@ -832,7 +831,17 @@ class SummarySheetController
 
                     $users = [];
                     foreach ($workflow as $item) {
-                        $label = $item['userDisplay'] . ' (' . ($item['mode'] == 'visa' ? _VISA_USER_MIN : _SIGNATORY) . ')';
+                        $mode = '';
+                        switch ($item['signatureMode']) {
+                            case 'visa': $mode = _VISA_USER_MIN; break;
+                            case 'stamp': $mode = _STAMP; break;
+                            case 'eidas': $mode = _EIDAS; break;
+                            case 'inca_card': $mode = _INCA_CARD; break;
+                            case 'inca_card_eidas': $mode = _INCA_CARD_EIDAS; break;
+                            case 'rgs_2stars_timestamped': $mode = _RGS_2STARS_TIMESTAMPED; break;
+                            case 'rgs_2stars': $mode = _RGS_2STARS; break;
+                        }
+                        $label = $item['userDisplay'] . ' (' . $mode . ')';
                         if (!empty($item['status'])) {
                             if ($item['status'] == 'VAL') {
                                 $label .= ', ' . _MAARCH_PARAPHEUR_STATUS_VAL;

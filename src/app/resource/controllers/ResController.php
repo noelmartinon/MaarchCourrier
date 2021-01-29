@@ -1377,7 +1377,7 @@ class ResController extends ResourceControlController
 
         $resource = ResModel::getById([
             'resId'  => $args['resId'],
-            'select' => ['format', 'fingerprint', 'filesize', 'fulltext_result', 'creation_date', 'filename', 'docserver_id', 'path']
+            'select' => ['format', 'fingerprint', 'filesize', 'fulltext_result', 'creation_date', 'filename', 'docserver_id', 'path', 'typist']
         ]);
 
         if (!empty($resource['docserver_id'])) {
@@ -1387,6 +1387,7 @@ class ResController extends ResourceControlController
             $resource['docserverPathFile'] = str_replace('#', '/', $resource['docserverPathFile']);
         }
 
+        $resource['typistLabel'] = UserModel::getLabelledUserById(['id' => $resource['typist']]);
         $resource['creationDate'] = $resource['creation_date'];
         unset($resource['creation_date']);
 
