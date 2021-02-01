@@ -1,5 +1,6 @@
 #!/bin/sh
 php ./migrateConfigXml.php # mettre en premier
+php ./migrateRemoteSignatoryBooks.php
 php ./migrateNotificationsProperties.php
 php ./migrateNotificationsConfig.php
 php ./migrateRemoteSignatureBookConfig.php

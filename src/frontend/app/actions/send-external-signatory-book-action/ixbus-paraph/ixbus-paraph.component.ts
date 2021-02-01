@@ -1,6 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { NotificationService } from '@service/notification/notification.service';
 import { HttpClient } from '@angular/common/http';
 import { FormControl } from '@angular/forms';
 import { LocalStorageService } from '@service/local-storage.service';
@@ -19,11 +18,11 @@ export class IxbusParaphComponent implements OnInit {
     usersWorkflowList: any[] = [];
     natures: any[] = [];
     messagesModel: any[] = [];
+    users: any[] = [];
     ixbusDatas: any = {
         nature: '',
         messageModel: '',
-        login: '',
-        password: '',
+        userId: '',
         signatureMode: 'manual'
     };
 
@@ -34,6 +33,7 @@ export class IxbusParaphComponent implements OnInit {
 
     selectNature = new FormControl();
     selectWorkflow = new FormControl();
+    selectUser = new FormControl();
 
     @Input() additionalsInfos: any;
     @Input() externalSignatoryBookDatas: any;
@@ -41,23 +41,13 @@ export class IxbusParaphComponent implements OnInit {
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
-        private notify: NotificationService,
         public headerService: HeaderService,
         private localStorage: LocalStorageService
     ) { }
 
     ngOnInit(): void {
-        this.natures = this.additionalsInfos.ixbus.natures.map((element: any) => {
-            return {
-                id: element,
-                label: element
-            }
-        });
-        this.messagesModel = this.additionalsInfos.ixbus.messagesModel.map((element: any) => {
-            return {
-                id: element,
-                label: element
-            };
+        this.additionalsInfos.ixbus.natures.forEach((element: any) => {
+            this.natures.push({id: element.identifiant, label: element.nom});
         });
 
         if (this.localStorage.get(`ixBusSignatureMode_${this.headerService.user.id}`) !== null) {
@@ -67,9 +57,21 @@ export class IxbusParaphComponent implements OnInit {
         this.loading = false;
     }
 
+    changeModel(natureId: string) {
+        this.messagesModel = [];
+        this.additionalsInfos.ixbus.messagesModel[natureId].forEach((element: any) => {
+            this.messagesModel.push({id: element.identifiant, label: element.nom});
+        });
+
+        this.users = [];
+        this.additionalsInfos.ixbus.users[natureId].forEach((element: any) => {
+            this.users.push({id: element.identifiant, label: element.prenom + ' ' + element.nom});
+        });
+    }
+
     isValidParaph() {
-        if (this.additionalsInfos.attachments.length === 0 || this.natures.length === 0 || this.messagesModel.length === 0 || !this.ixbusDatas.nature
-            || !this.ixbusDatas.messageModel || !this.ixbusDatas.login || !this.ixbusDatas.password) {
+        if (this.additionalsInfos.attachments.length === 0 || this.natures.length === 0 || this.messagesModel.length === 0 || this.users.length === 0 || !this.ixbusDatas.nature
+            || !this.ixbusDatas.messageModel || !this.ixbusDatas.userId) {
             return false;
         } else {
             return true;
