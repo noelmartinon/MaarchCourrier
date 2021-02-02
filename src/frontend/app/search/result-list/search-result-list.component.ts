@@ -235,7 +235,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
             row.checked = true;
             this.toggleAllRes(thisDeselect);
             this.toggleRes(thisSelect, row);
-            this.router.navigate([`/resources/${row.resId}`]);
+            this.router.navigate([`/resources/${row.resId}`], {queryParams: {fromSearch: true}});
         } else {
             row.checked = !row.checked;
             this.toggleRes(row.checked ? thisSelect : thisDeselect, row);
@@ -349,7 +349,7 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     }
 
     goToDetail(row: any) {
-        this.router.navigate([`/resources/${row.resId}`]);
+        this.router.navigate([`/resources/${row.resId}`], {queryParams: {fromSearch: true}});
     }
 
     goToFolder(folder: any) {

@@ -44,6 +44,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     detailMode: boolean = false;
     isMailing: boolean = false;
+    isFromSearch: boolean = false;
     actionsList: any[] = [];
     currentUserId: number = null;
     currentBasketId: number = null;
@@ -125,7 +126,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     modalModule: any[] = [];
 
-    currentTool: string ;
+    currentTool: string = 'dashboard';
 
     subscription: Subscription;
 
@@ -290,9 +291,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     async initDetailPage(params: any) {
         this._activatedRoute.queryParamMap.subscribe((paramMap: ParamMap) => {
             this.isMailing = !this.functions.empty(paramMap.get('isMailing'));
-            if (this.isMailing) {
-                this.currentTool = 'attachments';
-            }
+            this.isFromSearch = !this.functions.empty(paramMap.get('fromSearch'));
         });
 
         this.detailMode = true;
@@ -310,7 +309,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
         await this.checkAccesDocument(this.currentResourceInformations.resId);
 
         this.loadBadges();
-        this.loadResource(!this.isMailing);
+        this.loadResource();
 
         if (this.appService.getViewMode()) {
             setTimeout(() => {
@@ -352,19 +351,21 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     setEditDataPrivilege() {
         if (this.detailMode) {
-            this.http.get('../rest/search/configuration').pipe(
-                tap((myData: any) => {
-                    if (myData.configuration.listEvent.defaultTab == null) {
-                        this.currentTool = 'dashboard';
-                    } else {
-                        this.currentTool = myData.configuration.listEvent.defaultTab;
-                    }
-                }),
-                catchError((err: any) => {
-                    this.notify.handleErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
+            if (this.isFromSearch) {
+                this.http.get('../rest/search/configuration').pipe(
+                    tap((myData: any) => {
+                        if (myData.configuration.listEvent.defaultTab == null) {
+                            this.currentTool = 'dashboard';
+                        } else {
+                            this.currentTool = myData.configuration.listEvent.defaultTab;
+                        }
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            }
             this.canEditData = this.privilegeService.hasCurrentUserPrivilege('edit_resource') && this.currentResourceInformations.statusAlterable && this.functions.empty(this.currentResourceInformations.registeredMail_deposit_id);
             if (this.isMailing && this.isToolEnabled('attachments')) {
                 this.currentTool = 'attachments';
