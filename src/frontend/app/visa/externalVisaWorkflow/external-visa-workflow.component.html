@@ -1,0 +1,89 @@
+<mat-list *ngIf="!loading">
+    <plugin-autocomplete *ngIf="linkedToMaarchParapheur && adminMode" [labelPlaceholder]="'lang.addPerson' | translate"
+        [routeDatas]="['/rest/autocomplete/maarchParapheurUsers']" [targetSearchKey]="'idToDisplay'"
+        [subInfoKey]="'email'" (triggerEvent)="addItemToWorkflow($event, true)" appearance="outline">
+    </plugin-autocomplete>
+    <!--<div class="alert alert-danger" *ngIf="visaWorkflow.itemRemovedFromVisaTemplate.length > 0" [innerHTML]="('lang.itemRemovedFromVisaTemplate' | translate) + ' : ' + visaWorkflow.itemRemovedFromVisaTemplate.join(', ')"></div>-->
+    <div cdkDropList #dataAvailableList="cdkDropList" [cdkDropListData]="visaWorkflow.items" class="cdk-list"
+        (cdkDropListDropped)="drop($event)" [cdkDropListDisabled]="!adminMode">
+        <div class="emptyContent" *ngIf="adminMode && visaWorkflow.items.length === 0">
+            {{'lang.noVisaWorkflow' | translate}}
+        </div>
+        <div class="emptyContent" *ngIf="!adminMode && visaWorkflow.items.length === 0">
+            {{'lang.cannotAddVisaCircuit' | translate}}
+        </div>
+        <mat-list-item disableRipple *ngFor="let diffusion of visaWorkflow.items;let i=index" cdkDrag
+            class="columns workflow" [cdkDragDisabled]="!canManageUser(diffusion, i)"
+            [class.notDraggable]="!canManageUser(diffusion, i)" [class.notEditable]="!adminMode"
+            [class.processed]="diffusion.process_date != null && diffusion.status === 'VAL'"
+            [class.interrupt]="diffusion.process_date != null && diffusion.status !== 'VAL'">
+            <mat-icon *ngIf="getCurrentVisaUserIndex() === i && (!adminMode || target === 'signatureBook')"
+                class="fa fa-chevron-right fa-2x" mat-list-icon color="accent">
+            </mat-icon>
+            <mat-icon class="fa fa-2x" [class.avatar]="!functions.empty(diffusion.picture)"
+                [class.fa-user]="functions.empty(diffusion.picture) && (diffusion.isValid || (diffusion.process_date === null && diffusion.delegatedBy === null))"
+                [class.fa-user-friends]="diffusion.process_date != null && diffusion.delegatedBy !== null"
+                [class.fa-user-slash]="!diffusion.isValid"
+                [title]="!diffusion.isValid ? ('lang.userNotValid' | translate) : ''" mat-list-icon color="primary"
+                [class.invalid]="!diffusion.hasPrivilege || !diffusion.isValid"
+                [style.background-image]="!functions.empty(diffusion.picture) ? 'url('+diffusion.picture+')' : ''"
+                style="position: relative;">
+            </mat-icon>
+            <ng-container *ngIf="(!adminMode || diffusion.process_date != null) && diffusion.isValid">
+                <mat-icon mat-list-icon class="fa-2x fa"
+                    [title]="'lang.' + (diffusion.status | lowercase) + 'Status' | translate"
+                    [class.fa-hourglass]="diffusion.process_date == null"
+                    [class.fa-thumbs-up]="diffusion.process_date != null && diffusion.status == 'VAL'"
+                    [class.fa-thumbs-down]="diffusion.process_date != null && diffusion.status === 'REF'"
+                    [class.fa-hand-paper]="diffusion.process_date != null && diffusion.status === 'STOP'"
+                    [class.valid]="diffusion.process_date != null && diffusion.status === 'VAL'"
+                    [class.invalid]="diffusion.process_date != null && diffusion.status !== 'VAL'"
+                    style="opacity:0.5;"></mat-icon>
+            </ng-container>
+            <div mat-line class="workflowLine">
+                <div class="workflowLineContainer">
+                    <div class="workflowLineLabel" [class.unauthorized]="!diffusion.hasPrivilege || !diffusion.isValid">
+                        {{diffusion.labelToDisplay}}
+                        <ng-container *ngIf="diffusion.process_date != null && diffusion.delegatedBy !== null">
+                            <mat-icon mat-list-icon class="fas fa-exclamation-circle"
+                                [title]="('lang.insteadOf' | translate) + ' ' + diffusion.delegatedBy"
+                                style="opacity:0.5;font-size: 125%;height: 15px;color: red;cursor: help;"></mat-icon>
+                        </ng-container>
+                    </div>
+                    <div class="workflowLineSubLabel"
+                        [class.unauthorized]="!diffusion.hasPrivilege || !diffusion.isValid">
+                        {{diffusion.item_entity}}
+                    </div>
+                    <div *ngIf="diffusion.requested_signature && diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) === -1"
+                        class="workflowLineProcessDate" title='{{diffusion.process_date | fullDate}}' color="accent">
+                        {{((functions.empty(diffusion.process_date) && diffusion.requested_signature) || diffusion.signatory) ? ('lang.signedUserDate' | translate) : ('lang.approvedUserDate' | translate)}} {{diffusion.process_date
+                                                | timeAgo : 'full'}}</div>
+                    <div *ngIf="diffusion.process_date != null && ['A terminé le circuit'].indexOf(diffusion.process_comment) > -1"
+                        class="workflowLineProcessDate" title='{{diffusion.process_date | fullDate}}' color="warn">
+                        {{'lang.interrupted' | translate}} {{diffusion.process_date | timeAgo : 'full'}}</div>
+                </div>
+                <div *ngIf="diffusion.hasPrivilege && diffusion.isValid">
+                    <ng-container>
+                        <button class="currentRoleButton" [color]="diffusion.role === 'visa' ? 'default':'primary'" mat-raised-button
+                            title="{{'lang.' + diffusion.role | translate}}"
+                            [matMenuTriggerFor]="rolesMenu">{{'lang.' + diffusion.role | translate}}</button>
+                        <mat-menu #rolesMenu="matMenu">
+                            <ng-container *ngFor="let role of diffusion.availableRoles">
+                                <button mat-menu-item (click)="diffusion.role=role" [class.selected]="diffusion.role===role" [disabled]="!isValidRole(i,role,diffusion.role)">{{'lang.'+ role | translate}}</button>
+                            </ng-container>
+                        </mat-menu>
+                    </ng-container>
+                </div>
+                <div *ngIf="!diffusion.hasPrivilege" class="invalid">
+                    {{'lang.noPrivileges' | translate}}
+                </div>
+                <div *ngIf="!diffusion.isValid" class="invalid invalidMsg">
+                    {{'lang.userNotValid' | translate}}
+                </div>
+            </div>
+            <button mat-icon-button *ngIf="canManageUser(diffusion, i)" (click)="deleteItem(i)">
+                <mat-icon class="fa fa-times" color="warn"></mat-icon>
+            </button>
+        </mat-list-item>
+    </div>
+</mat-list>

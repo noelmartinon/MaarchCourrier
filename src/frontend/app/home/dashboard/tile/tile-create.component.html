@@ -1,22 +1,61 @@
 <div class="mat-dialog-content-container">
-    <h1 mat-dialog-title>Ajouter une tuile</h1>
+    <h1 mat-dialog-title>{{'lang.addTile' | translate}}</h1>
     <div mat-dialog-content>
         <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
             <mat-spinner style="margin:auto;"></mat-spinner>
         </div>
-        <mat-form-field appearance="outline">
-            <mat-label>Type de tuile</mat-label>
+        <mat-form-field class="select-tile-type" appearance="outline">
+            <button mat-icon-button matSuffix [title]="'Couleur de la tuilde'" (click)="$event.stopPropagation()"
+                [matMenuTriggerFor]="menuColor">
+                <mat-icon class="fa fa-circle" [style.color]="selectedColor"></mat-icon>
+            </button>
+            <mat-menu #menuColor="matMenu">
+                <color-github color="#ef9a9a" width="100%" [colors]="colors" [triangle]="'hide'"
+                    (onChangeComplete)="handleChange($event)"></color-github>
+            </mat-menu>
+            <mat-label>{{'lang.tileType' | translate}}</mat-label>
             <mat-select [(ngModel)]="selectedTileType" (selectionChange)="getViews()">
                 <mat-option *ngFor="let tileType of tileTypes | sortBy : 'label'" [value]="tileType.id">
                     {{tileType.label}}
                 </mat-option>
             </mat-select>
         </mat-form-field>
+        <mat-form-field *ngIf="selectedTileType === 'basket'" appearance="outline">
+            <mat-label>{{'lang.basket' | translate}}</mat-label>
+            <mat-select [compareWith]="this.compareBaskets" [(ngModel)]="extraParams">
+                <mat-optgroup class="basket-group" *ngFor="let grpBasket of baskets" [label]="grpBasket.groupDesc">
+                    <mat-option *ngFor="let basket of grpBasket.baskets"
+                        [value]="{groupId:grpBasket.groupSerialId,basketId:basket.id}">
+                        {{basket.basket_name}}
+                    </mat-option>
+                </mat-optgroup>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" *ngIf="selectedTileType === 'folder'">
+            <mat-label>{{'lang.folderPinned' | translate}}</mat-label>
+            <mat-select [compareWith]="this.compareFolders" [(ngModel)]="extraParams">
+                <mat-option *ngFor="let folder of folders | sortBy : 'label'" [value]="{folderId:folder.id}">
+                    {{folder.label}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <plugin-select-search *ngIf="selectedTileType === 'shortcut'" [appearance]="'outline'" [showLabel]="true"
+            [class]="''" [label]="'lang.navigation' | translate" [datas]="menus" [formControlSelect]="menusControl"  [returnValue]="'object'" [dataKey]="'id'"
+            (afterSelected)="setMenu($event)">
+        </plugin-select-search>
         <mat-form-field appearance="outline" *ngIf="views.length > 0">
             <mat-label>Vue</mat-label>
-            <mat-select [(ngModel)]="selectedView">
+            <mat-select [(ngModel)]="selectedView" (selectionChange)="resetExtraParams()">
                 <mat-option *ngFor="let view of views | sortBy : 'label'" [value]="view.id">
                     {{view.label}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+        <mat-form-field *ngIf="selectedView === 'chart'" appearance="outline">
+            <mat-label>Mode</mat-label>
+            <mat-select [(ngModel)]="extraParams.chartMode">
+                <mat-option *ngFor="let mode of dashboardService.getChartMode()" [value]="mode">
+                    {{mode}}
                 </mat-option>
             </mat-select>
         </mat-form-field>

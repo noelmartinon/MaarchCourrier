@@ -1,13 +1,13 @@
 import { Component, OnInit, Input, ViewChild } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
-import { VisaWorkflowComponent } from '../../../visa/visa-workflow.component';
 import { SignaturePositionComponent } from './signature-position/signature-position.component';
 import { catchError, filter, finalize, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FunctionsService } from '@service/functions.service';
 import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog } from '@angular/material/dialog';
+import { ExternalVisaWorkflow } from '@appRoot/visa/externalVisaWorkflow/external-visa-workflow.component';
 
 @Component({
     selector: 'app-maarch-paraph',
@@ -28,7 +28,7 @@ export class MaarchParaphComponent implements OnInit {
         editable: true
     };
 
-    @ViewChild('appVisaWorkflow', { static: true }) appVisaWorkflow: VisaWorkflowComponent;
+    @ViewChild('appExternalVisaWorkflow', { static: true }) appExternalVisaWorkflow: ExternalVisaWorkflow;
 
     @Input() resourcesToSign: any[] = [];
     @Input() additionalsInfos: any;
@@ -45,13 +45,13 @@ export class MaarchParaphComponent implements OnInit {
     ngOnInit(): void {
         if (typeof this.additionalsInfos.destinationId !== 'undefined' && this.additionalsInfos.destinationId !== '') {
             setTimeout(() => {
-                this.appVisaWorkflow.loadListModel(this.additionalsInfos.destinationId);
+                this.appExternalVisaWorkflow.loadListModel(this.additionalsInfos.destinationId);
             }, 0);
         }
     }
 
     isValidParaph() {
-        if (this.additionalsInfos.attachments.length === 0 || this.appVisaWorkflow.getWorkflow().length === 0 || this.appVisaWorkflow.checkExternalSignatoryBook().length > 0 || this.resourcesToSign.length === 0) {
+        if (this.additionalsInfos.attachments.length === 0 || this.appExternalVisaWorkflow.getWorkflow().length === 0 || this.appExternalVisaWorkflow.checkExternalSignatoryBook().length > 0 || this.resourcesToSign.length === 0) {
             return false;
         } else {
             return true;
@@ -64,7 +64,7 @@ export class MaarchParaphComponent implements OnInit {
 
     getDatas() {
         const formatedData: any = { steps: [] };
-        const workflow = this.appVisaWorkflow.getWorkflow();
+        const workflow = this.appExternalVisaWorkflow.getWorkflow();
 
         this.resourcesToSign.forEach((resource: any) => {
             workflow.forEach((element: any, index: number) => {
@@ -92,7 +92,7 @@ export class MaarchParaphComponent implements OnInit {
             disableClose: true,
             data: {
                 resource: resource,
-                workflow: this.appVisaWorkflow.getWorkflow()
+                workflow: this.appExternalVisaWorkflow.getWorkflow()
             }
         });
         dialogRef.afterClosed().pipe(

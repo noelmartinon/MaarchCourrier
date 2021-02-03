@@ -305,7 +305,6 @@ $app->get('/header', \SrcCore\controllers\CoreController::class . ':getHeader');
 
 //Home
 $app->get('/home', \Home\controllers\HomeController::class . ':get');
-$app->get('/home/lastRessources', \Home\controllers\HomeController::class . ':getLastRessources');
 $app->get('/home/maarchParapheurDocuments', \Home\controllers\HomeController::class . ':getMaarchParapheurDocuments');
 
 //Indexing
@@ -528,6 +527,10 @@ $app->post('/templates/{id}/mergeEmail', \Template\controllers\TemplateControlle
 //Tiles
 $app->get('/tiles', \Home\controllers\TileController::class . ':get');
 $app->post('/tiles', \Home\controllers\TileController::class . ':create');
+$app->get('/tiles/{id}', \Home\controllers\TileController::class . ':getById');
+$app->put('/tiles/{id}', \Home\controllers\TileController::class . ':update');
+$app->delete('/tiles/{id}', \Home\controllers\TileController::class . ':delete');
+$app->put('/tilesPositions', \Home\controllers\TileController::class . ':updatePositions');
 
 //Users
 $app->put('/users/export', \User\controllers\UserController::class . ':getExport');

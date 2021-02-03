@@ -183,7 +183,7 @@ class IndexingController
         }
 
         if (!empty($clauseToProcess)) {
-            $preparedClause = PreparedClauseController::getPreparedClause(['clause' => $clauseToProcess, 'login' => $GLOBALS['login']]);
+            $preparedClause = PreparedClauseController::getPreparedClause(['clause' => $clauseToProcess, 'userId' => $GLOBALS['id']]);
             $preparedEntities = EntityModel::get(['select' => ['id'], 'where' => ['enabled = ?', "entity_id in {$preparedClause}"], 'data' => ['Y']]);
             $allowedEntities = array_column($preparedEntities, 'id');
         }

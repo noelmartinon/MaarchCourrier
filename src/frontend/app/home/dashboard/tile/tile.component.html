@@ -1,0 +1,34 @@
+<div class="tile-title" [title]="'lang.' + tile.type | translate" [style.background-color]="tile.color" style="color: white;">
+    {{tile.label}}
+</div>
+<ng-container *ngIf="loading; else elseLoaded">
+    <mat-progress-bar color="primary" mode="indeterminate" class="loader">
+    </mat-progress-bar>
+    <i class="{{tile.icon}} tile-icon" color="primary"></i>
+</ng-container>
+<ng-template #elseLoaded>
+    <app-tile-view-list *ngIf="view==='list'"
+        [displayColumns]="['contactLabel','subject','creationDate']"
+        [tile]="tile"
+        [resources]="resources" 
+        [icon]="tile.icon" 
+        [route]="route" 
+        [viewDocRoute]="viewDocRoute" 
+        style="display: flex;flex: 1;overflow: auto;">
+    </app-tile-view-list>
+    <app-tile-view-resume *ngIf="view==='resume'" 
+        [route]="route" 
+        [countResources]="countResources" 
+        [icon]="tile.icon"
+        [tile]="tile"
+        [resourceLabel]="tile.type==='shortcut' ? tile.label : 'courrier(s)'"
+        style="display: flex;flex: 1;overflow: auto;">
+    </app-tile-view-resume>
+    <app-tile-view-chart *ngIf="view==='chart'" 
+        [route]="route"
+        [resources]="resources"
+        [tile]="tile"
+        [icon]="tile.icon"
+        style="display: flex;flex: 1;overflow: auto;">
+    </app-tile-view-chart>
+</ng-template>

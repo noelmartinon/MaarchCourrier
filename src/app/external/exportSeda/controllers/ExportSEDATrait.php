@@ -33,7 +33,6 @@ use setasign\Fpdi\Tcpdf\Fpdi;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
 use SrcCore\models\ValidatorModel;
-use User\models\UserModel;
 
 trait ExportSEDATrait
 {
@@ -42,16 +41,63 @@ trait ExportSEDATrait
         ValidatorModel::notEmpty($args, ['resId']);
         ValidatorModel::intVal($args, ['resId']);
 
-        $attachments = AttachmentModel::get([
-            'select' => [1],
-            'where'  => ['res_id_master = ?', 'attachment_type in (?)', 'status = ?'],
-            'data'   => [$args['resId'], ['acknowledgement_record_management', 'reply_record_management'], 'TRA']
-        ]);
-        if (!empty($attachments)) {
+        static $resAttachments;
+        static $resAcknowledgement;
+        static $attachmentsData;
+        static $resources;
+        static $doctypes;
+        static $bindingDocument;
+        static $nonBindingDocument;
+        static $config;
+        static $entities;
+
+        if ($resources === null) {
+            $resAcknowledgement = [];
+            $attachments = AttachmentModel::get([
+                'select' => ['res_id_master', 'res_id', 'title', 'docserver_id', 'path', 'filename', 'res_id_master', 'fingerprint', 'creation_date', 'identifier', 'attachment_type'],
+                'where'  => ['res_id_master in (?)', 'status in (?)'],
+                'data'   => [$args['resources'], ['A_TRA', 'TRA']]
+            ]);
+            $resAttachments = array_column($attachments, 'res_id_master');
+            $attachmentsData = [];
+            foreach ($attachments as $attachment) {
+                if (in_array($attachment['attachment_type'], ['acknowledgement_record_management', 'reply_record_management'])) {
+                    $resAcknowledgement[$attachment['res_id_master']] = $attachment['res_id'];
+                } else {
+                    $attachmentsData[$attachment['res_id_master']][] = $attachment;
+                }
+            }
+
+            $resources = ResModel::get([
+                'select' => ['res_id', 'destination', 'type_id', 'subject', 'linked_resources', 'alt_identifier', 'admission_date', 'creation_date', 'modification_date', 'doc_date', 'retention_frozen', 'binding', 'docserver_id', 'path', 'filename', 'version', 'fingerprint'],
+                'where'  => ['res_id in (?)'],
+                'data'   => [$args['resources']]
+            ]);
+            $resources = array_column($resources, null, 'res_id');
+
+            $doctypesId = array_column($resources, 'type_id');
+            $doctypes = DoctypeModel::get([
+                'select' => ['type_id', 'description', 'duration_current_use', 'action_current_use', 'retention_rule', 'retention_final_disposition'],
+                'where'  => ['type_id in (?)'],
+                'data'   => [$doctypesId]
+            ]);
+            $doctypes = array_column($doctypes, null, 'type_id');
+
+            $entitiesId = array_column($resources, 'destination');
+            $entities   = EntityModel::get(['select' => ['entity_id', 'producer_service', 'entity_label'], 'where' => ['entity_id in (?)'], 'data' => [$entitiesId]]);
+            $entities   = array_column($entities, null, 'entity_id');
+
+            $bindingDocument    = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'bindingDocumentFinalAction']);
+            $nonBindingDocument = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'nonBindingDocumentFinalAction']);
+
+            $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        }
+
+        if (in_array($args['resId'], $resAcknowledgement)) {
             return ['errors' => ['acknowledgement or reply already exists']];
         }
 
-        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['res_id', 'destination', 'type_id', 'subject', 'linked_resources', 'alt_identifier', 'admission_date', 'creation_date', 'modification_date', 'doc_date', 'retention_frozen', 'binding']]);
+        $resource = $resources[$args['resId']];
         if (empty($resource)) {
             return ['errors' => ['resource does not exists']];
         } elseif (empty($resource['destination'])) {
@@ -60,12 +106,10 @@ trait ExportSEDATrait
             return ['errors' => ['retention rule is frozen']];
         }
 
-        $doctype = DoctypeModel::getById(['id' => $resource['type_id'], 'select' => ['description', 'duration_current_use', 'action_current_use', 'retention_rule', 'retention_final_disposition']]);
+        $doctype = $doctypes[$resource['type_id']];
         if (empty($doctype['retention_rule']) || empty($doctype['retention_final_disposition'])) {
             return ['errors' => ['retention_rule or retention_final_disposition is empty for doctype']];
         } else {
-            $bindingDocument    = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'bindingDocumentFinalAction']);
-            $nonBindingDocument = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'nonBindingDocumentFinalAction']);
             if ($resource['binding'] === null && !in_array($doctype['action_current_use'], ['transfer', 'copy'])) {
                 return ['errors' => 'action_current_use is not transfer or copy'];
             } elseif ($resource['binding'] === true && !in_array($bindingDocument['param_value_string'], ['transfer', 'copy'])) {
@@ -80,12 +124,11 @@ trait ExportSEDATrait
             }
         }
 
-        $entity = EntityModel::getByEntityId(['entityId' => $resource['destination'], 'select' => ['producer_service', 'entity_label']]);
+        $entity = $entities[$resource['destination']];
         if (empty($entity['producer_service'])) {
             return ['errors' => ['producer_service is empty for this entity']];
         }
 
-        $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
         if (empty($config['exportSeda']['senderOrgRegNumber'])) {
             return ['errors' => ['No senderOrgRegNumber found in config.json']];
         }
@@ -98,6 +141,7 @@ trait ExportSEDATrait
 
         $initData = SedaController::initArchivalData([
             'resource'           => $resource,
+            'attachments'        => $attachmentsData[$args['resId']] ?? [],
             'senderOrgRegNumber' => $config['exportSeda']['senderOrgRegNumber'],
             'entity'             => $entity,
             'doctype'            => $doctype,
@@ -132,7 +176,7 @@ trait ExportSEDATrait
                 'senders'    => ContactController::getParsedContacts(['resId' => $resource['res_id'], 'mode' => 'sender']),
                 'recipients' => ContactController::getParsedContacts(['resId' => $resource['res_id'], 'mode' => 'recipient'])
             ],
-            'attachments'               => $initData['archivalData']['archiveUnits'],
+            'attachments'               => $initData['archiveUnits'],
             'folders'                   => $folder['folderPath'],
             'links'                     => $initData['additionalData']['linkedResources']
         ];
@@ -163,25 +207,34 @@ trait ExportSEDATrait
         ExportSEDATrait::cleanTmpDocument(['archiveUnits' => $initData['archiveUnits']]);
 
         if ($args['data']['actionMode'] == 'download') {
+            static $downloadFiles;
+            if ($downloadFiles === null) {
+                $downloadFiles = [];
+            }
             $encodedContent = base64_encode(file_get_contents($sedaPackage['encodedFilePath']));
             unlink($sedaPackage['encodedFilePath']);
-            return ['data' => ['encodedFile' => $encodedContent]];
-        } elseif ($args['massAction']) {
-            $resId           = '--resId ' . $resource['res_id'];
-            $userId          = '--userId ' . $GLOBALS['id'];
-            $messageId       = '--messageId ' . $messageSaved['messageId'];
-            $encodedFilePath = '--encodedFilePath ' . $sedaPackage['encodedFilePath'];
-            $messageFileName = '--messageFilename ' . $sedaPackage['messageFilename'];
-            $reference       = '--reference ' . $data['messageObject']['messageIdentifier'];
-            $successStatus   = '--successStatus ' . $args['action']['parameters']['successStatus'];
-            $errorStatus     = '--errorStatus ' . $args['action']['parameters']['errorStatus'];
-
+            $downloadFiles[] = $encodedContent;
+            return ['data' => ['encodedFiles' => $downloadFiles]];
+        } elseif (count($args['resources']) > 1) {
             $customId = CoreConfigModel::getCustomId();
-            $customId = empty($customId) ? 'null' : $customId;
-            $customId = '--customId ' . $customId;
+            
+            static $massData;
+            if ($massData === null) {
+                $massData = [
+                    'resources'     => [],
+                    'successStatus' => $args['action']['parameters']['successStatus'],
+                    'errorStatus'   => $args['action']['parameters']['errorStatus'],
+                    'userId'        => $GLOBALS['id'],
+                    'customId'      => $customId
+                ];
+            }
 
-            exec("php src/app/external/exportSeda/scripts/ExportSedaScript.php {$customId} {$resId} {$userId} {$messageId} {$encodedFilePath} {$messageFileName} {$reference} {$successStatus} {$errorStatus} > /dev/null &");
-            return true;
+            $massData['resources'][] = [
+                'resId' => $resource['res_id'], 'messageId' => $messageSaved['messageId'], 'encodedFilePath' => $sedaPackage['encodedFilePath'],
+                'messageFilename' => $sedaPackage['messageFilename'], 'reference' => $data['messageObject']['messageIdentifier']
+            ];
+
+            return ['postscript' => 'src/app/external/exportSeda/scripts/ExportSedaScript.php', 'args' => $massData];
         } else {
             $elementSend  = ExportSEDATrait::sendSedaPackage([
                 'messageId'       => $messageSaved['messageId'],
@@ -311,15 +364,11 @@ trait ExportSEDATrait
     public static function getHistory($args = [])
     {
         $history = HistoryModel::get([
-            'select'  => ['event_date', 'user_id', 'info', 'remote_ip'],
+            'select'  => ['event_date', 'info'],
             'where'   => ['table_name in (?)', 'record_id = ?', 'event_type like ?'],
             'data'    => [['res_letterbox', 'res_view_letterbox'], $args['resId'], 'ACTION#%'],
             'orderBy' => ['event_date DESC']
         ]);
-
-        foreach ($history as $key => $value) {
-            $history[$key]['userLabel'] = UserModel::getLabelledUserById(['id' => $value['user_id']]);
-        }
 
         return ['history' => $history];
     }

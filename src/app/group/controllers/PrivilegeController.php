@@ -233,7 +233,7 @@ class PrivilegeController
         ValidatorModel::notEmpty($args, ['userId']);
         ValidatorModel::intVal($args, ['userId']);
 
-        $rawUserGroups = UserModel::getGroupsByUser(['id' => $args['userId']]);
+        $rawUserGroups = UserModel::getGroupsById(['id' => $args['userId']]);
         $userGroups = array_column($rawUserGroups, 'group_id');
 
         $assignable = [];
@@ -344,7 +344,7 @@ class PrivilegeController
                 $clauses = BasketModel::get(['select' => ['basket_clause'], 'where' => ['basket_id in (?)'], 'data' => [$baskets]]);
 
                 foreach ($clauses as $clause) {
-                    $basketClause = PreparedClauseController::getPreparedClause(['clause' => $clause['basket_clause'], 'login' => $currentUser['user_id']]);
+                    $basketClause = PreparedClauseController::getPreparedClause(['clause' => $clause['basket_clause'], 'userId' => $args['userId']]);
                     if (!empty($basketsClause)) {
                         $basketsClause .= ' or ';
                     }
@@ -367,8 +367,7 @@ class PrivilegeController
             }
             $hasSB = GroupBasketModel::get(['select' => [1], 'where' => $where, 'data' => $data]);
             if (!empty($hasSB)) {
-                $basketOwner = UserModel::getById(['id' => $basket['owner_user_id'], 'select' => ['user_id']]);
-                $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $basketOwner['user_id']]);
+                $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $basket['owner_user_id']]);
                 if (!empty($basketsClause)) {
                     $basketsClause .= ' or ';
                 }

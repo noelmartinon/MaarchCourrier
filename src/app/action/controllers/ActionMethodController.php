@@ -118,6 +118,13 @@ class ActionMethodController
             'data'  => [$args['resources']]
         ]);
 
+        $resLetterboxData = ResModel::get([
+            'select' => ['external_id', 'destination', 'res_id'],
+            'where'  => ['res_id in (?)'],
+            'data'   => [$args['resources']]
+        ]);
+        $resLetterboxData = array_column($resLetterboxData, null, 'res_id');
+
         foreach ($args['resources'] as $resource) {
             if (!empty(trim($args['note']['content']))) {
                 $noteId = NoteModel::create([
@@ -145,7 +152,7 @@ class ActionMethodController
                     'eventId'   => $args['id']
                 ]);
 
-                MessageExchangeReviewController::sendMessageExchangeReview(['res_id' => $resource, 'action_id' => $args['id'], 'userId' => $GLOBALS['login']]);
+                MessageExchangeReviewController::sendMessageExchangeReview(['resource' => $resLetterboxData[$resource], 'action_id' => $args['id'], 'userId' => $GLOBALS['login']]);
             }
         }
 
@@ -386,13 +393,24 @@ class ActionMethodController
         }
 
         if ($circuit[0]['requested_signature'] == true) {
-            foreach ($attachments as $attachment) {
-                if ($attachment['status'] == 'SEND_MASS') {
-                    $generated = AttachmentController::generateMailing(['id' => $attachment['res_id'], 'userId' => $GLOBALS['id']]);
-                    if (!empty($generated['errors'])) {
-                        return ['errors' => [$generated['errors']]];
-                    }
+            $attachmentsStatus = array_column($attachments, 'status');
+            if (in_array('SEND_MASS', $attachmentsStatus)) {
+                static $massData;
+                if ($massData === null) {
+                    $customId = CoreConfigModel::getCustomId();
+                    $massData = [
+                        'resources'     => [],
+                        'successStatus' => $args['action']['parameters']['successStatus'],
+                        'errorStatus'   => $args['action']['parameters']['errorStatus'],
+                        'userId'        => $GLOBALS['id'],
+                        'customId'      => $customId,
+                        'action'        => 'sendExternalSignatoryBookAction'
+                    ];
                 }
+
+                $massData['resources'][] = ['resId' => $args['resId'], 'data' => $args['data'], 'note' => $args['note'], 'inSignatureBook' => true];
+
+                return ['postscript' => 'src/app/external/externalSignatoryBook/scripts/MailingScript.php', 'args' => $massData];
             }
         }
 
@@ -467,11 +485,23 @@ class ActionMethodController
                 'where'   => ['res_id_master = ?', 'in_signature_book = ?', 'status = ?'],
                 'data'    => [$args['resId'], true, 'SEND_MASS']
             ]);
-            foreach ($attachments as $attachment) {
-                $generated = AttachmentController::generateMailing(['id' => $attachment['res_id'], 'userId' => $GLOBALS['id']]);
-                if (!empty($generated['errors'])) {
-                    return ['errors' => [$generated['errors']]];
+            if (!empty($attachments)) {
+                static $massData;
+                if ($massData === null) {
+                    $customId = CoreConfigModel::getCustomId();
+                    $massData = [
+                        'resources'     => [],
+                        'successStatus' => $args['action']['parameters']['successStatus'],
+                        'errorStatus'   => $args['action']['parameters']['errorStatus'],
+                        'userId'        => $GLOBALS['id'],
+                        'customId'      => $customId,
+                        'action'        => 'sendExternalSignatoryBookAction'
+                    ];
                 }
+
+                $massData['resources'][] = ['resId' => $args['resId'], 'data' => $args['data'], 'note' => $args['note'], 'inSignatureBook' => true];
+
+                return ['postscript' => 'src/app/external/externalSignatoryBook/scripts/MailingScript.php', 'args' => $massData];
             }
         }
 

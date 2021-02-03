@@ -110,7 +110,7 @@ export class EntitiesAdministrationComponent implements OnInit {
 
         this.initEntitiesTree();
         this.initBanSearch();
-
+        this.initAutocompleteAddressBan();
     }
 
     initEntitiesTree() {
@@ -286,7 +286,6 @@ export class EntitiesAdministrationComponent implements OnInit {
                         this.currentEntity.listTemplate.items[role.id] = [];
                     }
                 });
-                this.initAutocompleteAddressBan();
             }, (err) => {
                 this.notify.error(err.error.errors);
             });

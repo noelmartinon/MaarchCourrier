@@ -59,8 +59,8 @@ class TileModel
 
     public static function create(array $args)
     {
-        ValidatorModel::notEmpty($args, ['user_id', 'type', 'view', 'position']);
-        ValidatorModel::stringType($args, ['type', 'view', 'parameters']);
+        ValidatorModel::notEmpty($args, ['user_id', 'type', 'view']);
+        ValidatorModel::stringType($args, ['type', 'view', 'parameters', 'color']);
         ValidatorModel::intVal($args, ['user_id', 'position']);
 
         $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'tiles_id_seq']);
@@ -73,6 +73,7 @@ class TileModel
                 'type'          => $args['type'],
                 'view'          => $args['view'],
                 'position'      => $args['position'],
+                'color'         => $args['color'],
                 'parameters'    => $args['parameters'],
             ]
         ]);

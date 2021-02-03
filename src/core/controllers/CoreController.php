@@ -27,7 +27,7 @@ class CoreController
     public function getHeader(Request $request, Response $response)
     {
         $user             = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname']]);
-        $user['groups']   = UserModel::getGroupsByLogin(['login' => $GLOBALS['login']]);
+        $user['groups']   = UserModel::getGroupsById(['id' => $GLOBALS['id']]);
         $user['entities'] = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity']]);
 
         return $response->withJson(['user' => $user]);

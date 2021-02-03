@@ -201,7 +201,7 @@
                                             </mat-autocomplete>
                                         </mat-form-field>
                                     </div>
-                                    <div>
+                                    <div *ngIf="!creationMode">
                                         <button [title]="'lang.copyRootEntityAddress' | translate" mat-icon-button
                                             color="primary" (click)="copyAddress()">
                                             <mat-icon class="fa fa-copy"></mat-icon>

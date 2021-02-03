@@ -54,6 +54,8 @@ export class AttachmentCreateComponent implements OnInit {
 
     loadingContact: boolean = false;
 
+    defaultType: any = null;
+
     @Input('resId') resId: number = null;
 
 
@@ -70,7 +72,7 @@ export class AttachmentCreateComponent implements OnInit {
         private sortPipe: SortPipe,
         public dialog: MatDialog,
         public functions: FunctionsService,
-        private contactService: ContactService,) {
+        private contactService: ContactService) {
     }
 
     async ngOnInit(): Promise<void> {
@@ -83,11 +85,14 @@ export class AttachmentCreateComponent implements OnInit {
     }
 
     loadAttachmentTypes() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.get('../rest/attachmentsTypes').pipe(
                 tap((data: any) => {
                     Object.keys(data.attachmentsTypes).forEach(templateType => {
                         if (data.attachmentsTypes[templateType].visible) {
+                            if (templateType === 'response_project' || this.defaultType === null) {
+                                this.defaultType = templateType;
+                            }
                             this.attachmentsTypes.push({
                                 ...data.attachmentsTypes[templateType],
                                 id: templateType
@@ -95,7 +100,7 @@ export class AttachmentCreateComponent implements OnInit {
                         }
                     });
                     this.attachmentsTypes = this.sortPipe.transform(this.attachmentsTypes, 'label');
-                    resolve(true)
+                    resolve(true);
                 }),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);
@@ -129,13 +134,13 @@ export class AttachmentCreateComponent implements OnInit {
                     this.attachments.push({
                         title: new FormControl({ value: data.subject, disabled: false }, [Validators.required]),
                         recipient: new FormControl({ value: contact, disabled: false }),
-                        type: new FormControl({ value: 'response_project', disabled: false }, [Validators.required]),
+                        type: new FormControl({ value: this.defaultType, disabled: false }, [Validators.required]),
                         validationDate: new FormControl({ value: '', disabled: false }),
                         format: new FormControl({ value: '', disabled: false }, [Validators.required]),
                         encodedFile: new FormControl({ value: '', disabled: false }, [Validators.required])
                     });
                     setTimeout(() => {
-                        this.getAttachType('response_project', 0);
+                        this.getAttachType(this.defaultType, 0);
                     }, 800);
 
                     this.attachFormGroup.push(new FormGroup(this.attachments[0]));
@@ -406,7 +411,7 @@ export class AttachmentCreateComponent implements OnInit {
         this.attachFormGroup.push(new FormGroup(this.attachments[this.attachments.length - 1]));
         this.indexTab = this.attachments.length - 1;
         setTimeout(() => {
-            this.getAttachType('response_project', this.indexTab);
+            this.getAttachType(this.defaultType, this.indexTab);
         }, 800);
     }
 

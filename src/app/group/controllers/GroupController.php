@@ -336,16 +336,16 @@ class GroupController
         return $response->withStatus(204);
     }
 
-    public static function getGroupsClause(array $aArgs)
+    public static function getGroupsClause(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['userId']);
-        ValidatorModel::stringType($aArgs, ['userId']);
+        ValidatorModel::notEmpty($args, ['userId', 'login']);
+        ValidatorModel::stringType($args, ['login']);
 
-        $groups = UserModel::getGroupsByLogin(['login' => $aArgs['userId']]);
+        $groups = UserModel::getGroupsById(['id' => $args['userId']]);
         $groupsClause = '';
         foreach ($groups as $key => $group) {
             if (!empty($group['where_clause'])) {
-                $groupClause = PreparedClauseController::getPreparedClause(['clause' => $group['where_clause'], 'login' => $aArgs['userId']]);
+                $groupClause = PreparedClauseController::getPreparedClause(['clause' => $group['where_clause'], 'login' => $args['login']]);
                 if ($key > 0) {
                     $groupsClause .= ' or ';
                 }

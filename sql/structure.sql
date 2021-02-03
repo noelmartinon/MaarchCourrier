@@ -1520,6 +1520,7 @@ CREATE TABLE tiles
     type text NOT NULL,
     view text NOT NULL,
     position INTEGER NOT NULL,
+    color text,
     parameters jsonb DEFAULT '{}' NOT NULL,
     CONSTRAINT tiles_pkey PRIMARY KEY (id)
 )

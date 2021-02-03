@@ -14,7 +14,6 @@
 
 namespace Template\controllers;
 
-use Attachment\models\AttachmentModel;
 use Attachment\models\AttachmentTypeModel;
 use ContentManagement\controllers\MergeController;
 use Convert\controllers\ConvertPdfController;

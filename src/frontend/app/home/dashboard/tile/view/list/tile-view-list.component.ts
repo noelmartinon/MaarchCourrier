@@ -2,6 +2,8 @@ import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { AppService } from '@service/app.service';
+import { DashboardService } from '@appRoot/home/dashboard/dashboard.service';
+import { FunctionsService } from '@service/functions.service';
 import { Router } from '@angular/router';
 
 @Component({
@@ -14,17 +16,21 @@ export class TileViewListComponent implements OnInit, AfterViewInit {
     @Input() displayColumns: string[];
 
     @Input() resources: any[];
+    @Input() tile: any;
     @Input() icon: string = '';
     @Input() route: string = null;
+    @Input() viewDocRoute: string = null;
 
     thumbnailUrl: string = '';
-    testDate = new Date();
+    showThumbnail: boolean = false;
 
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
-        public appService: AppService,
         private router: Router,
+        public appService: AppService,
+        private dashboardService: DashboardService,
+        public functionsService: FunctionsService
     ) { }
 
     ngOnInit(): void { }
@@ -33,19 +39,33 @@ export class TileViewListComponent implements OnInit, AfterViewInit {
 
     viewThumbnail(ev: any, resource: any) {
         const timeStamp = +new Date();
-        this.thumbnailUrl = '../rest/resources/' + resource.resId + '/thumbnail?tsp=' + timeStamp;
-        $('#viewThumbnail').show();
-        console.log(ev);
+        const data = { ...resource, ...this.tile.parameters, ...this.tile };
+        delete data.parameters;
+        const link = this.dashboardService.getFormatedRoute(this.viewDocRoute, data);
+        if (link) {
+            this.thumbnailUrl = '../rest' + link + '?tsp=' + timeStamp;
+            this.showThumbnail = true;
+        }
     }
 
     closeThumbnail() {
-        $('#viewThumbnail').hide();
+        this.showThumbnail = false;
     }
 
     goTo(resource: any) {
-        // TO DO format route
-        const formatedRoute = this.route.replace(':resId', resource.resId);
-        console.log(formatedRoute);
-        // this.router.navigate([formatedRoute]);
+        const data = { ...resource, ...this.tile.parameters, ...this.tile };
+        delete data.parameters;
+        const link = this.dashboardService.getFormatedRoute(this.route, data);
+        if (link) {
+            this.router.navigate([link]);
+        }
+    }
+
+    isDate(val: any) {
+        if (!isNaN(Date.parse(val))) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

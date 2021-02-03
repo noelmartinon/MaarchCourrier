@@ -272,11 +272,11 @@ class SearchController
                 $dataClause = [0];
             }
     
-            $groups = UserModel::getGroupsByLogin(['login' => $args['login'], 'select' => ['where_clause']]);
+            $groups = UserModel::getGroupsById(['id' => $args['userId']]);
             $groupsClause = '';
             foreach ($groups as $key => $group) {
                 if (!empty($group['where_clause'])) {
-                    $groupClause = PreparedClauseController::getPreparedClause(['clause' => $group['where_clause'], 'login' => $args['login']]);
+                    $groupClause = PreparedClauseController::getPreparedClause(['clause' => $group['where_clause'], 'userId' => $args['userId']]);
                     if ($key > 0) {
                         $groupsClause .= ' or ';
                     }
@@ -291,7 +291,7 @@ class SearchController
             $basketsClause = '';
             foreach ($baskets as $basket) {
                 if (!empty($basket['basket_clause']) && $basket['allowed']) {
-                    $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $args['login']]);
+                    $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $args['userId']]);
                     if (!empty($basketsClause)) {
                         $basketsClause .= ' or ';
                     }
@@ -301,8 +301,7 @@ class SearchController
             $assignedBaskets = RedirectBasketModel::getAssignedBasketsByUserId(['userId' => $args['userId']]);
             foreach ($assignedBaskets as $basket) {
                 if (!empty($basket['basket_clause'])) {
-                    $basketOwner = UserModel::getById(['id' => $basket['owner_user_id'], 'select' => ['user_id']]);
-                    $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $basketOwner['user_id']]);
+                    $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $basket['owner_user_id']]);
                     if (!empty($basketsClause)) {
                         $basketsClause .= ' or ';
                     }

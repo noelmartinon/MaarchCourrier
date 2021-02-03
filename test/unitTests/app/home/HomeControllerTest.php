@@ -40,27 +40,6 @@ class HomeControllerTest extends TestCase
         $GLOBALS['id'] = $userInfo['id'];
     }
 
-    public function testGetLastRessources()
-    {
-        $GLOBALS['login'] = 'bblier';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-        $GLOBALS['id'] = $userInfo['id'];
-
-        $homeController = new \Home\controllers\HomeController();
-
-        $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
-        $request = \Slim\Http\Request::createFromEnvironment($environment);
-
-        $response = $homeController->getLastRessources($request, new \Slim\Http\Response());
-        $responseBody = json_decode((string) $response->getBody());
-        
-        $this->assertIsArray($responseBody->lastResources);
-
-        $GLOBALS['login'] = 'superadmin';
-        $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
-        $GLOBALS['id'] = $userInfo['id'];
-    }
-
     public function testGetMaarchParapheurDocuments()
     {
         $GLOBALS['login'] = 'jjane';

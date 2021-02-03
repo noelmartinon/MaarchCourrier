@@ -626,13 +626,26 @@ export class PrivilegeService {
         return priv;
     }
 
+    getAdminMenu(ids: string[] = null) {
+        let priv: any[] = [];
+
+        priv = priv.concat(this.administrations);
+        priv = priv.concat(this.menus);
+
+        if (ids !== null) {
+            return priv.filter(elem => ids.indexOf(elem.id) > -1);
+        } else {
+            return priv;
+        }
+
+    }
+
     getPrivileges(ids: string[] = null) {
         if (ids !== null) {
             return this.privileges.filter(elem => ids.indexOf(elem.id) > -1);
         } else {
             return this.privileges;
         }
-
     }
 
     getUnitsPrivileges(): Array<string> {
@@ -644,8 +657,12 @@ export class PrivilegeService {
         return this.privileges.filter(elem => elem.unit === unit);
     }
 
-    getMenus(): Array<menu> {
-        return this.menus;
+    getMenus(ids: string[] = null): Array<menu> {
+        if (ids !== null) {
+            return this.menus.filter(elem => ids.indexOf(elem.id) > -1);
+        } else {
+            return this.menus;
+        }
     }
 
     getCurrentUserMenus() {
@@ -727,8 +744,12 @@ export class PrivilegeService {
         }
     }
 
-    getAdministrations(): Array<administration> {
-        return this.administrations;
+    getAdministrations(ids: string[] = null): Array<administration> {
+        if (ids !== null) {
+            return this.administrations.filter(elem => ids.indexOf(elem.id) > -1);
+        } else {
+            return this.administrations;
+        }
     }
 
     getCurrentUserAdministrationsByUnit(unit: string): Array<administration> {

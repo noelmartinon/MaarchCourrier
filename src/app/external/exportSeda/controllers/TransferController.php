@@ -52,6 +52,7 @@ class TransferController
             curl_setopt($curl, CURLOPT_COOKIE, $param[2]);
             curl_setopt($curl, CURLOPT_POSTFIELDS, $param[3]);
             curl_setopt($curl, CURLOPT_FAILONERROR, false);
+            curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
 
             if (empty($config['exportSeda']['certificateSSL'])) {
                 curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);

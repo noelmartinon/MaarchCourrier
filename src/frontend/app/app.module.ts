@@ -13,6 +13,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { InternationalizationModule } from '@service/translate/internationalization.module';
 import { AngularDraggableModule } from 'angular2-draggable';
+import { ColorGithubModule } from 'ngx-color/github';
 
 import { JoyrideModule } from 'ngx-joyride';
 
@@ -33,8 +34,8 @@ import { DashboardComponent } from './home/dashboard/dashboard.component';
 import { TileViewListComponent } from './home/dashboard/tile/view/list/tile-view-list.component';
 import { TileViewResumeComponent } from './home/dashboard/tile/view/resume/tile-view-resume.component';
 import { TileViewChartComponent } from './home/dashboard/tile/view/chart/tile-view-chart.component';
-import { TileLastMailsViewDashboardComponent } from './home/dashboard/tile/lastMailsView/tile-last-mails-view.component';
 import { TileCreateComponent } from './home/dashboard/tile/tile-create.component';
+import { TileDashboardComponent } from './home/dashboard/tile/tile.component';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 // ACTIONS
@@ -133,6 +134,7 @@ import { ResetPasswordComponent } from './login/resetPassword/reset-password.com
 import { SaveNumericPackageComponent } from './save-numeric-package.component';
 import { SignatureBookComponent } from './signature-book.component';
 import { VisaWorkflowModalComponent } from './visa/modal/visa-workflow-modal.component';
+import { ExternalVisaWorkflow } from './visa/externalVisaWorkflow/external-visa-workflow.component';
 
 import { DevToolComponent } from '@service/debug/dev-tool.component';
 import { DevLangComponent } from '@service/debug/dev-lang.component';
@@ -161,16 +163,17 @@ export class MyHammerConfig extends HammerGestureConfig {
         AdministrationModule,
         DocumentViewerModule,
         AppListModule,
+        ColorGithubModule,
         NgxChartsModule
     ],
     declarations: [
         AppComponent,
         DashboardComponent,
-        TileLastMailsViewDashboardComponent,
         TileViewListComponent,
         TileViewResumeComponent,
         TileViewChartComponent,
         TileCreateComponent,
+        TileDashboardComponent,
         ProcessComponent,
         IndexationComponent,
         LinkResourceModalComponent,
@@ -267,7 +270,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         CheckReplyRecordManagementComponent,
         ResetRecordManagementComponent,
         CheckAcknowledgmentRecordManagementComponent,
-        TechnicalInformationComponent
+        TechnicalInformationComponent,
+        ExternalVisaWorkflow
     ],
     exports : [
         SharedModule

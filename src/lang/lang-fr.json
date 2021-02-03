@@ -2233,9 +2233,19 @@
     "rgs_2stars_timestamped": "Clé RGS** + horodatage",
     "stamp": "Griffe",
     "errorUserSignType": "Les signataires sans certificat doivent être présent avant les signataires avec certificat.",
-    "copyRootEntityAddress": "Copier l'adresse existante de l'entité racine",
+    "copyRootEntityAddress": "Copier la première adresse parente disponible",
     "noAddressFound": "Aucune adresse trouvée",
     "searchTemplate": "Modèle de recherche",
     "chart": "Graphique",
-    "resume": "Synthèse"
+    "resume": "Synthèse",
+    "addTile": "Ajouter une tuile",
+    "tileType": "Type de tuile",
+    "dashboardEmpty": "Votre tableau de bord est vide",
+    "refStatus": "Ce document a été refusé dans le parapheur externe",
+    "valStatus": "Ce document a été validé dans le parapheur externe",
+    "stopStatus": "Ce document a été interrompu dans la parapheur externe",
+    "nullStatus": "L'utilisateur na pas encore effectué d'action",
+    "intermediateStatusMailing": "Les statuts final et erreur ne sont utilisés que lors d'un publipostage dans l'action",
+    "navigation": "Navigation",
+    "acountNotLinkedTomaarchParapheur": "Votre compte n'est pas lié à Maarch Parapheur."
 }

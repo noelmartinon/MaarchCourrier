@@ -70,8 +70,7 @@ class SignatureBookController
             'data'      => [$aArgs['resId'], ['visa', 'sign']]
         ]);
 
-        $owner = UserModel::getById(['id' => $aArgs['userId'], 'select' => ['user_id']]);
-        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $owner['user_id']]);
+        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $aArgs['userId']]);
         $resources = ResModel::getOnView([
             'select'    => ['res_id'],
             'where'     => [$whereClause]
@@ -334,8 +333,7 @@ class SignatureBookController
 
         $basket = BasketModel::getById(['id' => $aArgs['basketId'], 'select' => ['basket_clause', 'basket_id', 'basket_name', 'basket_res_order']]);
 
-        $user   = UserModel::getById(['id' => $aArgs['userId'], 'select' => ['user_id']]);
-        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $user['user_id']]);
+        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $aArgs['userId']]);
         $resources = ResModel::getOnView([
             'select'    => ['res_id', 'alt_identifier', 'subject', 'creation_date', 'process_limit_date', 'priority'],
             'where'     => [$whereClause],
@@ -792,7 +790,7 @@ class SignatureBookController
                 $clauses = BasketModel::get(['select' => ['basket_clause'], 'where' => ['basket_id in (?)'], 'data' => [$baskets]]);
 
                 foreach ($clauses as $clause) {
-                    $basketClause = PreparedClauseController::getPreparedClause(['clause' => $clause['basket_clause'], 'login' => $currentUser['user_id']]);
+                    $basketClause = PreparedClauseController::getPreparedClause(['clause' => $clause['basket_clause'], 'userId' => $args['userId']]);
                     if (!empty($basketsClause)) {
                         $basketsClause .= ' or ';
                     }
@@ -812,8 +810,7 @@ class SignatureBookController
 
             $hasSB = GroupBasketModel::get(['select' => [1], 'where' => $where, 'data' => $data]);
             if (!empty($hasSB)) {
-                $basketOwner = UserModel::getById(['id' => $basket['owner_user_id'], 'select' => ['user_id']]);
-                $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $basketOwner['user_id']]);
+                $basketClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $basket['owner_user_id']]);
                 if (!empty($basketsClause)) {
                     $basketsClause .= ' or ';
                 }

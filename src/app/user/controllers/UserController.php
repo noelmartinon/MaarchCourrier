@@ -137,7 +137,7 @@ class UserController
             unset($user['phone']);
         }
 
-        $user['groups']             = UserModel::getGroupsByLogin(['login' => $user['user_id']]);
+        $user['groups']             = UserModel::getGroupsById(['id' => $aArgs['id']]);
         $user['allGroups']          = GroupModel::getAvailableGroupsByUserId(['userId' => $user['id'], 'administratorId' => $GLOBALS['id']]);
         $user['entities']           = UserModel::getEntitiesById(['id' => $aArgs['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity'], 'orderBy' => ['users_entities.primary_entity DESC']]);
         $user['allEntities']        = EntityModel::getAvailableEntitiesForAdministratorByUserId(['userId' => $user['user_id'], 'administratorUserId' => $GLOBALS['login']]);
@@ -569,7 +569,7 @@ class UserController
         unset($user['feature_tour']);
         $user['signatures']         = UserSignatureModel::getByUserSerialId(['userSerialid' => $user['id']]);
         $user['emailSignatures']    = UserEmailSignatureModel::getByUserId(['userId' => $GLOBALS['id']]);
-        $user['groups']             = UserModel::getGroupsByLogin(['login' => $user['user_id']]);
+        $user['groups']             = UserModel::getGroupsById(['id' => $GLOBALS['id']]);
         $user['entities']           = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity'], 'orderBy' => ['users_entities.primary_entity DESC']]);
         $user['baskets']            = BasketModel::getBasketsByLogin(['login' => $user['user_id']]);
         $user['assignedBaskets']    = RedirectBasketModel::getAssignedBasketsByUserId(['userId' => $user['id']]);
@@ -1207,7 +1207,7 @@ class UserController
         ]);
 
         return $response->withJson([
-            'groups'    => UserModel::getGroupsByLogin(['login' => $user['user_id']]),
+            'groups'    => UserModel::getGroupsById(['id' => $aArgs['id']]),
             'baskets'   => BasketModel::getBasketsByLogin(['login' => $user['user_id']])
         ]);
     }
@@ -1285,7 +1285,7 @@ class UserController
         ]);
 
         return $response->withJson([
-            'groups'            => UserModel::getGroupsByLogin(['login' => $user['user_id']]),
+            'groups'            => UserModel::getGroupsById(['id' => $aArgs['id']]),
             'baskets'           => BasketModel::getBasketsByLogin(['login' => $user['user_id']]),
             'redirectedBaskets' => RedirectBasketModel::getRedirectedBasketsByUserId(['userId' => $aArgs['id']]),
         ]);
@@ -1421,7 +1421,7 @@ class UserController
                     ]);
                 }
             } else {
-                $ressources = ResModel::getOnView([
+                $ressources = ResModel::get([
                     'select'    => ['res_id'],
                     'where'     => ['confidentiality = ?', 'destination = ?', 'closing_date is null'],
                     'data'      => ['Y', $aArgs['entityId']]
@@ -1536,8 +1536,7 @@ class UserController
                 return $response->withStatus(400)->withJson(['errors' => 'Group or basket does not exist']);
             }
 
-            $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
-            $groups = UserModel::getGroupsByLogin(['login' => $user['user_id']]);
+            $groups = UserModel::getGroupsById(['id' => $aArgs['id']]);
             $groupFound = false;
             foreach ($groups as $value) {
                 if ($value['id'] == $basketContainer['groupSerialId']) {

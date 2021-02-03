@@ -1272,7 +1272,7 @@ class ResController extends ResourceControlController
 
         $where = [$data['clause']];
         if (!UserController::isRoot(['id' => $GLOBALS['id']])) {
-            $groupsClause = GroupController::getGroupsClause(['userId' => $GLOBALS['login']]);
+            $groupsClause = GroupController::getGroupsClause(['userId' => $GLOBALS['id'], 'login' => $GLOBALS['login']]);
             if (empty($groupsClause)) {
                 return $response->withStatus(400)->withJson(['errors' => 'User has no groups']);
             }

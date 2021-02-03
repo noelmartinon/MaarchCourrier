@@ -193,7 +193,7 @@ abstract class GroupModelAbstract
         ValidatorModel::notEmpty($aArgs, ['userId', 'administratorId']);
         ValidatorModel::intVal($aArgs, ['userId', 'administratorId']);
 
-        $rawUserGroups = UserModel::getGroupsByUser(['id' => $aArgs['userId']]);
+        $rawUserGroups = UserModel::getGroupsById(['id' => $aArgs['userId']]);
         $userGroups = array_column($rawUserGroups, 'group_id');
 
         $allGroups = GroupModel::get(['select' => ['group_id', 'group_desc'], 'orderBy' => ['group_desc']]);

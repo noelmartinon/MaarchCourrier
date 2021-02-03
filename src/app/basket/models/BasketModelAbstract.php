@@ -185,7 +185,8 @@ abstract class BasketModelAbstract
         ValidatorModel::stringType($aArgs, ['login']);
         ValidatorModel::arrayType($aArgs, ['unneededBasketId']);
 
-        $userGroups = UserModel::getGroupsByLogin(['login' => $aArgs['login']]);
+        $user = UserModel::getByLogin(['login' => $aArgs['login'], 'select' => ['id']]);
+        $userGroups = UserModel::getGroupsById(['id' => $user['id']]);
         $groupIds = array_column($userGroups, 'group_id');
 
         $aBaskets = [];
@@ -204,7 +205,6 @@ abstract class BasketModelAbstract
                     'order_by'  => ['groupbasket.group_id, basket_order, basket_name']
             ]);
 
-            $user = UserModel::getByLogin(['login' => $aArgs['login'], 'select' => ['id']]);
             $userPrefs = UserBasketPreferenceModel::get([
                 'select'    => ['group_serial_id', 'basket_id'],
                 'where'     => ['user_serial_id = ?'],
@@ -243,7 +243,7 @@ abstract class BasketModelAbstract
 
         $user = UserModel::getByLogin(['login' => $aArgs['userId'], 'select' => ['id']]);
 
-        $groups = UserModel::getGroupsByLogin(['login' => $aArgs['userId']]);
+        $groups = UserModel::getGroupsById(['id' => $user['id']]);
         foreach ($groups as $group) {
             $baskets = BasketModel::getAvailableBasketsByGroupUser([
                 'select'        => ['baskets.basket_id', 'baskets.basket_name', 'baskets.basket_desc', 'baskets.color', 'users_baskets_preferences.color as pcolor'],
@@ -319,18 +319,16 @@ abstract class BasketModelAbstract
         return $aAction[0]['id_action'];
     }
 
-    public static function getResourceNumberByClause(array $aArgs)
+    public static function getResourceNumberByClause(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['userId', 'clause']);
-        ValidatorModel::stringType($aArgs, ['clause']);
-        ValidatorModel::intVal($aArgs, ['userId']);
-
-        $user = UserModel::getById(['id' => $aArgs['userId'], 'select' => ['user_id']]);
+        ValidatorModel::notEmpty($args, ['userId', 'clause']);
+        ValidatorModel::stringType($args, ['clause']);
+        ValidatorModel::intVal($args, ['userId']);
 
         try {
             $count = ResModel::getOnView([
                 'select'    => ['COUNT(1)'],
-                'where'     => [PreparedClauseController::getPreparedClause(['login' => $user['user_id'], 'clause' => $aArgs['clause']])]
+                'where'     => [PreparedClauseController::getPreparedClause(['userId' => $args['userId'], 'clause' => $args['clause']])]
             ]);
         } catch (\Exception $e) {
             return 0;

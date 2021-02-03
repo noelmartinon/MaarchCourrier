@@ -197,8 +197,7 @@ class ResourceListController
         }
 
         $basket = BasketModel::getById(['id' => $aArgs['basketId'], 'select' => ['basket_clause']]);
-        $user = UserModel::getById(['id' => $aArgs['userId'], 'select' => ['user_id']]);
-        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $user['user_id']]);
+        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $aArgs['userId']]);
         $where = [$whereClause];
         $queryData = [];
 
@@ -218,7 +217,8 @@ class ResourceListController
         $leftJoin = [];
         $where = [];
         if (!empty($args['basketClause'])) {
-            $whereClause = PreparedClauseController::getPreparedClause(['clause' => $args['basketClause'], 'login' => $args['login']]);
+            $user = UserModel::getByLogin(['login' => $args['login'], 'select' => ['id']]);
+            $whereClause = PreparedClauseController::getPreparedClause(['clause' => $args['basketClause'], 'userId' => $user['id']]);
             $where = [$whereClause];
         }
         $queryData = [];
@@ -389,7 +389,7 @@ class ResourceListController
             foreach ($actions as $key => $action) {
                 if (!empty($queryParams['resId'])) {
                     if (!empty($actionsClauses[$action['id']])) {
-                        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $actionsClauses[$action['id']], 'login' => $GLOBALS['login']]);
+                        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $actionsClauses[$action['id']], 'userId' => $GLOBALS['id']]);
                         $ressource = ResModel::getOnView(['select' => [1], 'where' => ['res_id = ?', $whereClause], 'data' => [$queryParams['resId']]]);
                         if (empty($ressource)) {
                             unset($actions[$key]);
@@ -447,8 +447,7 @@ class ResourceListController
         $action['parameters'] = json_decode($action['parameters'], true);
         $actionRequiredFields = $parameters['requiredFields'] ?? [];
 
-        $user   = UserModel::getById(['id' => $aArgs['userId'], 'select' => ['user_id']]);
-        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $user['user_id']]);
+        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $aArgs['userId']]);
         $resources = ResModel::getOnView([
             'select'    => ['res_id', 'locker_user_id', 'locker_time'],
             'where'     => [$whereClause, 'res_view_letterbox.res_id in (?)'],
@@ -485,7 +484,6 @@ class ResourceListController
 
         $method          = ActionMethodController::COMPONENTS_ACTIONS[$action['component']];
         $methodResponses = [];
-        $massAction      = count($resourcesForAction) > 1;
         foreach ($resourcesForAction as $key => $resId) {
             if (!empty($actionRequiredFields)) {
                 $requiredFieldsValid = ActionController::checkRequiredFields(['resId' => $resId, 'actionRequiredFields' => $actionRequiredFields]);
@@ -507,7 +505,7 @@ class ResourceListController
             }
 
             if (!empty($method)) {
-                $methodResponse = ActionMethodController::$method(['resId' => $resId, 'data' => $body['data'], 'note' => $body['note'], 'action' => $action, 'massAction' => $massAction]);
+                $methodResponse = ActionMethodController::$method(['resId' => $resId, 'data' => $body['data'], 'note' => $body['note'], 'action' => $action, 'resources' => $resourcesForAction]);
 
                 if (!empty($methodResponse['errors'])) {
                     if (empty($methodResponses['errors'])) {
@@ -527,6 +525,11 @@ class ResourceListController
         $historic = empty($methodResponse['history']) ? '' : $methodResponse['history'];
         if (!empty($resourcesForAction)) {
             ActionMethodController::terminateAction(['id' => $aArgs['actionId'], 'resources' => $resourcesForAction, 'basketName' => $basket['basket_name'], 'note' => $body['note'], 'history' => $historic]);
+        }
+
+        if (!empty($methodResponse['postscript'])) {
+            $base64Args = base64_encode(json_encode($methodResponse['args']));
+            exec("php {$methodResponse['postscript']} --encodedData {$base64Args} > /dev/null &");
         }
 
         if (!empty($methodResponses)) {
@@ -550,9 +553,8 @@ class ResourceListController
         }
 
         $basket = BasketModel::getById(['id' => $aArgs['basketId'], 'select' => ['basket_clause']]);
-        $user   = UserModel::getById(['id' => $aArgs['userId'], 'select' => ['user_id']]);
 
-        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $user['user_id']]);
+        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $aArgs['userId']]);
         $resources = ResModel::getOnView([
             'select'    => ['res_id', 'locker_user_id', 'locker_time'],
             'where'     => [$whereClause, 'res_view_letterbox.res_id in (?)'],
@@ -609,9 +611,8 @@ class ResourceListController
         }
 
         $basket = BasketModel::getById(['id' => $aArgs['basketId'], 'select' => ['basket_clause']]);
-        $user   = UserModel::getById(['id' => $aArgs['userId'], 'select' => ['user_id']]);
 
-        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $user['user_id']]);
+        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $aArgs['userId']]);
         $resources = ResModel::getOnView([
             'select'    => ['res_id', 'locker_user_id', 'locker_time'],
             'where'     => [$whereClause, 'res_view_letterbox.res_id in (?)'],
@@ -656,9 +657,8 @@ class ResourceListController
         }
 
         $basket = BasketModel::getById(['id' => $args['basketId'], 'select' => ['basket_clause']]);
-        $user   = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
 
-        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $user['user_id']]);
+        $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $args['userId']]);
         $resources = ResModel::getOnView([
             'select'    => ['res_id', 'locker_user_id', 'locker_time'],
             'where'     => [$whereClause, 'res_view_letterbox.res_id in (?)'],
@@ -733,8 +733,7 @@ class ResourceListController
             }
         }
 
-        $user = UserModel::getById(['id' => $aArgs['userId'], 'select' => ['user_id']]);
-        $groups = UserModel::getGroupsByLogin(['login' => $user['user_id']]);
+        $groups = UserModel::getGroupsById(['id' => $aArgs['userId']]);
         $groups = array_column($groups, 'id');
         if (!in_array($aArgs['groupId'], $groups)) {
             return ['errors' => 'Group is not linked to this user', 'code' => 403];

@@ -35,7 +35,7 @@ class HomeController
         $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['preferences', 'external_id']]);
 
         $redirectedBaskets = RedirectBasketModel::getRedirectedBasketsByUserId(['userId' => $GLOBALS['id']]);
-        $groups = UserModel::getGroupsByLogin(['login' => $GLOBALS['login']]);
+        $groups = UserModel::getGroupsById(['id' => $GLOBALS['id']]);
 
         $preferences = json_decode($user['preferences'], true);
         if (!empty($preferences['homeGroups'])) {
@@ -126,44 +126,6 @@ class HomeController
             'homeMessage'                   => $homeMessage,
             'isLinkedToMaarchParapheur'     => $isMaarchParapheurConnected
         ]);
-    }
-
-    public function getLastRessources(Request $request, Response $response)
-    {
-        $lastResources = ResModel::getLastResources([
-            'select'    => [
-                'res_letterbox.alt_identifier',
-                'res_letterbox.closing_date',
-                'res_letterbox.creation_date',
-                'res_letterbox.priority',
-                'res_letterbox.process_limit_date',
-                'res_letterbox.res_id',
-                'res_letterbox.subject',
-                'res_letterbox.confidentiality',
-                'status.img_filename as status_icon',
-                'status.label_status as status_label',
-                'status.id as status_id',
-                'res_letterbox.filename'
-            ],
-            'limit'     => 5,
-            'userId'    => $GLOBALS['id']
-        ]);
-
-        if (!empty($lastResources)) {
-            $priorities     = array_column($lastResources, 'priority');
-            $prioritiesInfo = PriorityModel::get(['select' => ['id', 'color'], 'where' => ['id in (?)'], 'data' => [$priorities]]);
-            $aPriorities    = array_column($prioritiesInfo, 'color', 'id');
-
-            foreach ($lastResources as $key => $lastResource) {
-                $lastResources[$key]['hasDocument'] = $lastResource['filename'] != null;
-                unset($lastResources[$key]['filename']);
-                if (!empty($lastResource['priority'])) {
-                    $lastResources[$key]['priority_color'] = $aPriorities[$lastResource['priority']] ?? null;
-                }
-            }
-        }
-
-        return $response->withJson(['lastResources' => $lastResources]);
     }
 
     public function getMaarchParapheurDocuments(Request $request, Response $response)

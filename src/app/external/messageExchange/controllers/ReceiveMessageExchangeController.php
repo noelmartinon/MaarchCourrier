@@ -117,7 +117,7 @@ class ReceiveMessageExchangeController
         if (!empty($userBaskets)) {
             foreach ($userBaskets as $value) {
                 if ($value['basket_id'] == $aDefaultConfig['basketRedirection_afterUpload'][0]) {
-                    $userGroups = UserModel::getGroupsByLogin(['login' => $GLOBALS['login']]);
+                    $userGroups = UserModel::getGroupsById(['id' => $GLOBALS['id']]);
                     $basketRedirection = 'index.php#/basketList/users/'.$GLOBALS['id'].'/groups/'.$userGroups[0]['id'].'/baskets/'.$value['id'];
                     $resource = ResModel::getById(['id' => $resLetterboxReturn]);
                     if (!empty($resource['alt_identifier'])) {

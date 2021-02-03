@@ -1,4 +1,4 @@
-<mat-form-field [class]="class + ' search-select'" [floatLabel]="appService.getViewMode() || showLabel ? '' : 'never'">
+<mat-form-field [class]="class + ' search-select'" [appearance]="appearance" [floatLabel]="appService.getViewMode() || showLabel ? '' : 'never'">
     <mat-label *ngIf="appService.getViewMode() || showLabel">{{label}}</mat-label>
     <mat-select [id]="id" [formControl]="formControlSelect" [placeholder]="placeholderLabel" #test
         (selectionChange)="launchEvent($event)" [required]="required" [multiple]="multiple">

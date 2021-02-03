@@ -19,20 +19,11 @@ require 'vendor/autoload.php';
 use ExportSeda\controllers\ExportSEDATrait;
 use Resource\models\ResModel;
 use SrcCore\controllers\LogsController;
-use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabasePDO;
 use User\models\UserModel;
 
 // ARGS
-// --customId    : instance id;
-// --resId      : res_id of the mail to archive;
-// --userId      : technical identifer user (for saving log);
-// --successStatus   : status of the mail if script end without problem
-// --errorStatus   : status of the mail if script end with failures
-// --messageId : message_id in message_exchange table
-// --encodedFilePath : Path of the encoded archive file
-// --messageFilename : Name of the archive file
-// --reference : reference of the archive
+// --encodedData : All data encoded in base64
 
 ExportSedaScript::initialize($argv);
 
@@ -40,110 +31,67 @@ class ExportSedaScript
 {
     public static function initialize($args)
     {
-        $customId        = '';
-        $resId           = '';
-        $successStatus   = '';
-        $errorStatus     = '';
-        $messageId       = '';
-        $encodedFilePath = '';
-        $messageFilename = '';
-        $reference       = '';
-
-        if (array_search('--customId', $args) > 0) {
-            $cmd = array_search('--customId', $args);
-            $customId = $args[$cmd+1];
-        }
-        
-        if (array_search('--resId', $args) > 0) {
-            $cmd = array_search('--resId', $args);
-            $resId = $args[$cmd+1];
+        if (array_search('--encodedData', $args) > 0) {
+            $cmd = array_search('--encodedData', $args);
+            $data = json_decode(base64_decode($args[$cmd+1]), true);
         }
 
-        if (array_search('--userId', $args) > 0) {
-            $cmd = array_search('--userId', $args);
-            $userId = $args[$cmd+1];
-        }
-        
-        if (array_search('--successStatus', $args) > 0) {
-            $cmd = array_search('--successStatus', $args);
-            $successStatus = $args[$cmd+1];
-        }
-
-        if (array_search('--errorStatus', $args) > 0) {
-            $cmd = array_search('--errorStatus', $args);
-            $errorStatus = $args[$cmd+1];
-        }
-
-        if (array_search('--messageId', $args) > 0) {
-            $cmd = array_search('--messageId', $args);
-            $messageId = $args[$cmd+1];
-        }
-
-        if (array_search('--encodedFilePath', $args) > 0) {
-            $cmd = array_search('--encodedFilePath', $args);
-            $encodedFilePath = $args[$cmd+1];
-        }
-
-        if (array_search('--messageFilename', $args) > 0) {
-            $cmd = array_search('--messageFilename', $args);
-            $messageFilename = $args[$cmd+1];
-        }
-
-        if (array_search('--reference', $args) > 0) {
-            $cmd = array_search('--reference', $args);
-            $reference = $args[$cmd+1];
-        }
-
-        if (!empty($userId)) {
-            ExportSedaScript::send([
-                'customId' => $customId, 'resId' => $resId, 'userId' => $userId, 'successStatus' => $successStatus, 'errorStatus' => $errorStatus,
-                'messageId' => $messageId, 'encodedFilePath' => $encodedFilePath, 'messageFilename' => $messageFilename, 'reference' => $reference]);
+        if (!empty($data)) {
+            ExportSedaScript::send(['data' => $data]);
         }
     }
 
     public static function send(array $args)
     {
         DatabasePDO::reset();
-        new DatabasePDO(['customId' => $args['customId']]);
-        $GLOBALS['customId'] = $args['customId'];
+        new DatabasePDO(['customId' => $args['data']['customId']]);
+        $GLOBALS['customId'] = $args['data']['customId'];
 
-        $currentUser = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
+        $currentUser = UserModel::getById(['id' => $args['data']['userId'], 'select' => ['user_id']]);
         $GLOBALS['login'] = $currentUser['user_id'];
-        $GLOBALS['id']    = $args['userId'];
+        $GLOBALS['id']    = $args['data']['userId'];
 
-        $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $path = 'apps/maarch_entreprise/xml/config.json';
+        if (!empty($args['data']['customId']) && file_exists("custom/{$args['data']['customId']}/{$path}")) {
+            $path = "custom/{$args['data']['customId']}/{$path}";
+        }
 
-        $elementSend  = ExportSEDATrait::sendSedaPackage([
-            'messageId'       => $args['messageId'],
-            'config'          => $config,
-            'encodedFilePath' => $args['encodedFilePath'],
-            'messageFilename' => $args['messageFilename'],
-            'resId'           => $args['resId'],
-            'reference'       => $args['reference']
-        ]);
-        unlink($args['encodedFilePath']);
-        if (!empty($elementSend['errors'])) {
-            ResModel::update(['set' => ['status' => $args['errorStatus']], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
-            LogsController::add([
-                'isTech'    => true,
-                'moduleId'  => 'exportSeda',
-                'level'     => 'ERROR',
-                'tableName' => 'letterbox_coll',
-                'recordId'  => $args['resId'],
-                'eventType' => "Export Seda failed : {$elementSend['errors']}",
-                'eventId'   => "resId : {$args['resId']}"
+        $config = file_get_contents($path);
+        $config = json_decode($config, true);
+
+        foreach ($args['data']['resources'] as $resource) {
+            $elementSend  = ExportSEDATrait::sendSedaPackage([
+                'messageId'       => $resource['messageId'],
+                'config'          => $config,
+                'encodedFilePath' => $resource['encodedFilePath'],
+                'messageFilename' => $resource['messageFilename'],
+                'resId'           => $resource['resId'],
+                'reference'       => $resource['reference']
             ]);
-        } else {
-            ResModel::update(['set' => ['status' => $args['successStatus']], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
-            LogsController::add([
-                'isTech'    => true,
-                'moduleId'  => 'exportSeda',
-                'level'     => 'INFO',
-                'tableName' => 'letterbox_coll',
-                'recordId'  => $args['resId'],
-                'eventType' => "Export Seda success",
-                'eventId'   => "resId : {$args['resId']}"
-            ]);
+            unlink($resource['encodedFilePath']);
+            if (!empty($elementSend['errors'])) {
+                ResModel::update(['set' => ['status' => $args['data']['errorStatus']], 'where' => ['res_id = ?'], 'data' => [$resource['resId']]]);
+                LogsController::add([
+                    'isTech'    => true,
+                    'moduleId'  => 'exportSeda',
+                    'level'     => 'ERROR',
+                    'tableName' => 'letterbox_coll',
+                    'recordId'  => $resource['resId'],
+                    'eventType' => "Export Seda failed : {$elementSend['errors']}",
+                    'eventId'   => "resId : {$resource['resId']}"
+                ]);
+            } else {
+                ResModel::update(['set' => ['status' => $args['data']['successStatus']], 'where' => ['res_id = ?'], 'data' => [$resource['resId']]]);
+                LogsController::add([
+                    'isTech'    => true,
+                    'moduleId'  => 'exportSeda',
+                    'level'     => 'INFO',
+                    'tableName' => 'letterbox_coll',
+                    'recordId'  => $resource['resId'],
+                    'eventType' => "Export Seda success",
+                    'eventId'   => "resId : {$resource['resId']}"
+                ]);
+            }
         }
 
         return true;

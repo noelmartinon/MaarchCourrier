@@ -1,7 +1,8 @@
 <ngx-charts-pie-chart 
+    [class.link]="route !== null"
     (click)="route !== null ? goTo(): false"
     [results]="resources"
     [legend]="false"
     [labels]="true" >
 </ngx-charts-pie-chart>
-<i class="fa {{icon}} tile-icon" color="primary"></i>
+<i class="{{icon}} tile-icon" color="primary"></i>

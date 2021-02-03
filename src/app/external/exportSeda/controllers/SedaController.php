@@ -14,7 +14,6 @@
 
 namespace ExportSeda\controllers;
 
-use Attachment\models\AttachmentModel;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
@@ -53,7 +52,7 @@ class SedaController
                     'retentionFinalDisposition' => $args['doctype']['retention_final_disposition']
                 ],
                 'slipInfo' => [
-                    'slipId'    => $GLOBALS['login'] . '-' . $date->format('Ymd-Hisu'),
+                    'slipId'    => $GLOBALS['login'] . '-' . $date->format('Ymd-Hisu') . '-' . $args['resource']['res_id'],
                     'archiveId' => 'archive_' . $args['resource']['res_id']
                 ]
             ],
@@ -61,7 +60,7 @@ class SedaController
             'additionalData' => ['folders' => [], 'linkedResources' => []]
         ];
 
-        $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename', 'version', 'fingerprint'], 'resId' => $args['resource']['res_id']]);
+        $document = $args['resource'];
         if (!empty($document['docserver_id']) && !empty($document['filename'])) {
             $convertedDocument = AdrModel::getDocuments([
                 'select'    => ['docserver_id', 'path', 'filename', 'fingerprint'],
@@ -110,12 +109,7 @@ class SedaController
             }
         }
         
-        $attachments = AttachmentModel::get([
-            'select'  => ['res_id', 'title', 'docserver_id', 'path', 'filename', 'res_id_master', 'fingerprint', 'creation_date', 'identifier'],
-            'where'   => ['res_id_master = ?', 'status in (?)'],
-            'data'    => [$args['resource']['res_id'], ['A_TRA', 'TRA']],
-            'orderBy' => ['modification_date DESC']
-        ]);
+        $attachments = $args['attachments'];
         foreach ($attachments as $attachment) {
             $tmpAttachment = [
                 'id'               => 'attachment_' . $attachment['res_id'],

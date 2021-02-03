@@ -4,9 +4,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { DashboardService } from './dashboard.service';
 import { FunctionsService } from '@service/functions.service';
 import { TileCreateComponent } from './tile/tile-create.component';
-import { exhaustMap, filter, tap } from 'rxjs/operators';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { of } from 'rxjs';
+import { NotificationService } from '@service/notification/notification.service';
+import { PrivilegeService } from '@service/privileges.service';
+import { HeaderService } from '@service/header.service';
 
 @Component({
     selector: 'app-dashboard',
@@ -24,8 +28,11 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
-        private dashboardService: DashboardService,
+        private notify: NotificationService,
+        public dashboardService: DashboardService,
         private functionsService: FunctionsService,
+        private privilegeService: PrivilegeService,
+        private headerService: HeaderService,
         public dialog: MatDialog,
     ) { }
 
@@ -49,62 +56,82 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     getDashboardConfig() {
-        const test: any = [
-            {
-                id: 1,
-                type: 'myLastResources',
-                view: 'resume',
-                sequence: 0
-            },
-            {
-                id: 1,
-                type: 'myLastResources',
-                view: 'list',
-                sequence: 3
-            },
-            {
-                id: 1,
-                type: 'myLastResources',
-                view: 'chart',
-                sequence: 5
-            }
-        ];
-
-        for (let index = 0; index < 6; index++) {
-            const tmpTile = test.find((tile: any) => tile.sequence === index);
-            if (!this.functionsService.empty(tmpTile)) {
-                const objTile = {...this.dashboardService.getTile(tmpTile.type), ...tmpTile};
-                this.tiles.push(objTile);
-            } else {
-                this.tiles.push({
-                    id: null,
-                    sequence: index,
-                    editMode: false
-                });
-            }
-        }
+        this.http.get('../rest/tiles').pipe(
+            tap((data: any) => {
+                for (let index = 0; index < 6; index++) {
+                    const tmpTile = data.tiles.find((tile: any) => tile.position === index);
+                    if (!this.functionsService.empty(tmpTile)) {
+                        let objTile = {...this.dashboardService.getTile(tmpTile.type), ...tmpTile};
+                        if (tmpTile.type === 'shortcut') {
+                            objTile = {...objTile, ...this.initShortcutTile(tmpTile.parameters.privilegeId)};
+                        }
+                        objTile.label = this.functionsService.empty(objTile.label) ? this.translate.instant('lang.' + objTile.type) : objTile.label;
+                        this.tiles.push(objTile);
+                    } else {
+                        this.tiles.push({
+                            id: null,
+                            position: index,
+                            editMode: false
+                        });
+                    }
+                }
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
-    changeView(tile: any, view: string) {
-        const indexTile = this.tiles.filter((tileItem: any) => tileItem.id !== null).map((tileItem: any) => tileItem.sequence).indexOf(tile.sequence);
-        this.tileComponent.toArray()[indexTile].changeView(view);
-        tile.view = view;
+    initShortcutTile(privilegeId: string) {
+        const menu = this.privilegeService.getAdminMenu([privilegeId])[0];
+        return {
+            icon : menu.style,
+            privRoute: menu.route,
+            label: this.translate.instant(menu.label)
+        };
+    }
+
+    changeView(tile: any, view: string, extraParams: any = null) {
+        const tileToSend = JSON.parse(JSON.stringify(tile));
+        tileToSend.view = view;
+        if (extraParams !== null) {
+            Object.keys(extraParams).forEach(paramKey => {
+                tileToSend.parameters[paramKey] = extraParams[paramKey];
+            });
+        }
+        this.http.put(`../rest/tiles/${tile.id}`, tileToSend).pipe(
+            tap(() => {
+                const indexTile = this.tiles.filter((tileItem: any) => tileItem.id !== null).map((tileItem: any) => tileItem.position).indexOf(tile.position);
+                this.tiles[tile.position] = tileToSend;
+                this.tileComponent.toArray()[indexTile].changeView(view, extraParams);
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     transferDataSuccess() {
         this.tiles.forEach((tile: any, index: number) => {
-            tile.sequence = index;
+            tile.position = index;
         });
-        // TO DO : SAVE IN BACK
+        this.http.put('../rest/tilesPositions', {tiles : this.tiles.filter((tile: any) => tile.id !== null)}).pipe(
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     addTilePrompt(tile: any) {
-        const dialogRef = this.dialog.open(TileCreateComponent, { panelClass: 'maarch-modal', width: '450px', autoFocus: false, disableClose: true, data: { sequence: tile.sequence} });
+        const dialogRef = this.dialog.open(TileCreateComponent, { panelClass: 'maarch-modal', width: '450px', autoFocus: false, disableClose: true, data: { position: tile.position} });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => !this.functionsService.empty(data)),
             tap((data: any) => {
-                tile = {...this.dashboardService.getTile(data.type), ...data};
+                this.tiles[tile.position] = {...this.dashboardService.getTile(data.type), ...data};
             })
         ).subscribe();
     }
@@ -116,16 +143,20 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     delete(tile: any) {
         const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
 
-        // TO DO: SAVE IN BACK
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete(`../rest/tiles/${tile.id}`)),
             tap(() => {
-                this.tiles[tile.sequence] = {
+                this.tiles[tile.position] = {
                     id: null,
-                    sequence: tile.sequence,
+                    position: tile.position,
                     editMode: false
                 };
             })
         ).subscribe();
+    }
+
+    emptyDashboard() {
+        return this.tiles.filter((item: any) => item.id !== null).length === 0;
     }
 }

@@ -1,12 +1,38 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { LatinisePipe } from 'ngx-pipes';
+import { NotificationService } from '@service/notification/notification.service';
+import { of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+
+interface Tiles {
+    'myLastResources': Tile;
+    'basket': Tile;
+    // 'searchTemplate': Tile;
+    'followedMail': Tile;
+    'folder': Tile;
+    'externalSignatoryBook': Tile;
+    'shortcut': Tile;
+}
+
+interface Tile {
+    'icon': string; // icon of tile
+    'menus': ('delete' | 'view')[]; // action of tile
+    'views': TileView[]; // views tile
+}
+
+interface TileView {
+    'id': 'list' | 'resume' | 'chart'; // identifier
+    'route': string; // router when click on tile
+    'viewDocRoute'?: string; // router when view a doc (usefull for list view)
+}
 
 @Injectable()
 export class DashboardService {
 
-    tileTypes: any = {
+    tileTypes: Tiles = {
         myLastResources : {
+            icon: 'fa fa-history',
             menus : [
                 'view',
                 'delete'
@@ -14,7 +40,8 @@ export class DashboardService {
             views: [
                 {
                     id: 'list',
-                    route: '/resources/:resId'
+                    route: '/resources/:resId',
+                    viewDocRoute: '/resources/:resId/thumbnail'
                 },
                 {
                     id: 'resume',
@@ -26,27 +53,30 @@ export class DashboardService {
                 }
             ]
         },
-        basket : {
-            menus : [
+        basket: {
+            icon: 'fa fa-inbox',
+            menus: [
                 'view',
                 'delete'
             ],
             views: [
                 {
                     id: 'list',
-                    route: '/process/users/:userId/groups/:groupId/baskets/:basketId/resId/:resId'
+                    route: '/process/users/:userId/groups/:groupId/baskets/:basketId/resId/:resId',
+                    viewDocRoute: '/resources/:resId/thumbnail'
                 },
                 {
                     id: 'resume',
-                    route: '/process/users/:userId/groups/:groupId/baskets/:basketId'
+                    route: '/basketList/users/:userId/groups/:groupId/baskets/:basketId'
                 },
                 {
                     id: 'chart',
-                    route: '/process/users/:userId/groups/:groupId/baskets/:basketId'
+                    route: '/basketList/users/:userId/groups/:groupId/baskets/:basketId'
                 }
             ]
         },
-        searchTemplate : {
+        /*searchTemplate : {
+            icon: 'fa fa-search',
             menus : [
                 'view',
                 'delete'
@@ -65,8 +95,9 @@ export class DashboardService {
                     route: '/search'
                 }
             ]
-        },
+        },*/
         followedMail : {
+            icon: 'fa fa-star',
             menus : [
                 'view',
                 'delete'
@@ -74,7 +105,8 @@ export class DashboardService {
             views: [
                 {
                     id: 'list',
-                    route: '/resources/:resId'
+                    route: '/resources/:resId',
+                    viewDocRoute: '/resources/:resId/thumbnail'
                 },
                 {
                     id: 'resume',
@@ -87,6 +119,7 @@ export class DashboardService {
             ]
         },
         folder : {
+            icon: 'fa fa-folder',
             menus : [
                 'view',
                 'delete'
@@ -94,7 +127,8 @@ export class DashboardService {
             views: [
                 {
                     id: 'list',
-                    route: '/resources/:resId'
+                    route: '/resources/:resId',
+                    viewDocRoute: '/resources/:resId/thumbnail'
                 },
                 {
                     id: 'resume',
@@ -107,6 +141,7 @@ export class DashboardService {
             ]
         },
         externalSignatoryBook : {
+            icon: 'fas fa-pen-nib',
             menus : [
                 'view',
                 'delete'
@@ -114,29 +149,33 @@ export class DashboardService {
             views: [
                 {
                     id: 'list',
-                    route: ':signatoryBookPathresources/dist/documents/:resId'
+                    route: ':maarchParapheurUrl/dist/documents/:id',
+                    viewDocRoute: null
                 },
                 {
                     id: 'resume',
-                    route: ':signatoryBookPathresources/dist/home'
-                },
-                {
-                    id: 'chart',
-                    route: ':signatoryBookPathresources/dist/home'
+                    route: ':maarchParapheurUrl/dist/home'
                 }
             ]
         },
         shortcut : {
+            icon: null,
             menus : [
                 'delete'
             ],
-            views: []
+            views: [
+                {
+                    id: 'resume',
+                    route: ':privRoute'
+                }
+            ]
         },
     };
 
     constructor(
+        public http: HttpClient,
         public translate: TranslateService,
-        private latinisePipe: LatinisePipe,
+        private notify: NotificationService
     ) { }
 
     getTile(id: string) {
@@ -149,5 +188,40 @@ export class DashboardService {
 
     getViewsByTileType(tileType: string) {
         return this.tileTypes[tileType].views;
+    }
+
+    getChartMode() {
+        return [
+            'doctype',
+            'status'
+        ];
+    }
+
+    getFormatedRoute(route: string, data: any) {
+        const regex = /:\w*/g;
+        const res = route.match(regex);
+
+        let formatedRoute = route;
+        let errors = [];
+
+        if (res !== null) {
+            let routeIdValue = null;
+            errors = res.slice();
+
+            res.forEach((routeId: any) => {
+                routeIdValue = data[routeId.replace(':', '')];
+                if (routeIdValue !== undefined) {
+                    formatedRoute = formatedRoute.replace(routeId, routeIdValue);
+                    errors.splice(errors.indexOf(routeId), 1);
+                }
+            });
+        }
+
+        if (errors.length === 0) {
+            return formatedRoute;
+        } else {
+            this.notify.error(errors + ' not found');
+            return false;
+        }
     }
 }

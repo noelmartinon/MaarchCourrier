@@ -117,15 +117,12 @@ export class ContactDetailComponent implements OnInit {
             this.http.get('../rest/entities/' + contactId).pipe(
                 tap((data: any) => {
                     this.contact = {
+                        ...data,
                         type: 'entity',
                         civility: this.contactService.formatCivilityObject(null),
                         fillingRate: this.contactService.formatFillingObject(null),
                         customFields: [],
                         lastname: data.short_label,
-                        email: data.email,
-                        addressStreet: data.address,
-                        addressPostcode : data.addressPostcode,
-                        addressCountry : data.addressCountry,
                         enabled: data.enabled === 'Y'
                     };
                     this.contactClone = JSON.parse(JSON.stringify(this.contact));

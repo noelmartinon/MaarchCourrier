@@ -328,7 +328,7 @@ class CurlModel
 
         $mime = mime_content_type($aArgs['path']);
         $info = pathinfo($aArgs['path']);
-        $name = $aArgs['path'] ?? $info['basename'];
+        $name = $aArgs['name'] ?? $info['basename'];
         $output = new \CURLFile($aArgs['path'], $mime, $name);
 
         return $output;

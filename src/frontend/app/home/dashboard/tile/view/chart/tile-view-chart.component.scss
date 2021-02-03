@@ -2,8 +2,11 @@
 
 .tile-icon {
     position: absolute;
-    bottom: 0px;
-    left: 0px;
+    bottom: 5px;
+    left: 5px;
     font-size: 90px;
     opacity: 0.1;
+}
+.link {
+    cursor: pointer;
 }

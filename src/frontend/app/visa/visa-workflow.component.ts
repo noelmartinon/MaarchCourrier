@@ -50,8 +50,6 @@ export class VisaWorkflowComponent implements OnInit {
     @Input('showListModels') showListModels: boolean = true;
     @Input('showComment') showComment: boolean = true;
 
-    @Input('linkedToMaarchParapheur') linkedToMaarchParapheur: boolean = false;
-
     @Output() workflowUpdated = new EventEmitter<any>();
 
     @ViewChild('searchVisaSignUserInput', { static: false }) searchVisaSignUserInput: ElementRef;
@@ -100,19 +98,11 @@ export class VisaWorkflowComponent implements OnInit {
 
     drop(event: CdkDragDrop<string[]>) {
         if (event.previousContainer === event.container) {
-            if (this.linkedToMaarchParapheur) {
-                if (this.canMoveUserExtParaph(event)) {
-                    moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-                } else {
-                    this.notify.error(this.translate.instant('lang.errorUserSignType'));
-                }
+            if (this.canManageUser(this.visaWorkflow.items[event.currentIndex], event.currentIndex)) {
+                moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+                this.workflowUpdated.emit(event.container);
             } else {
-                if (this.canManageUser(this.visaWorkflow.items[event.currentIndex], event.currentIndex)) {
-                    moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-                    this.workflowUpdated.emit(event.container);
-                } else {
-                    this.notify.error(this.translate.instant('lang.moveVisaUserErr', { value1: this.visaWorkflow.items[event.previousIndex].labelToDisplay }));
-                }
+                this.notify.error(this.translate.instant('lang.moveVisaUserErr', { value1: this.visaWorkflow.items[event.previousIndex].labelToDisplay }));
             }
         }
     }
@@ -151,7 +141,7 @@ export class VisaWorkflowComponent implements OnInit {
 
         this.visaWorkflow.items = [];
 
-        const route = this.linkedToMaarchParapheur === true ? `../rest/listTemplates/entities/${entityId}?type=visaCircuit&maarchParapheur=true` : `../rest/listTemplates/entities/${entityId}?type=visaCircuit`;
+        const route = `../rest/listTemplates/entities/${entityId}?type=visaCircuit`;
 
         return new Promise((resolve) => {
             this.http.get(route)
@@ -280,18 +270,16 @@ export class VisaWorkflowComponent implements OnInit {
     }
 
     async initFilterVisaModelList() {
-        if (!this.linkedToMaarchParapheur) {
-            if (this.visaModelListNotLoaded) {
-                await this.loadVisaSignUsersList();
+        if (this.visaModelListNotLoaded) {
+            await this.loadVisaSignUsersList();
 
-                if (this.showListModels) {
-                    await this.loadVisaModelList();
-                }
-
-                this.searchVisaSignUser.reset();
-
-                this.visaModelListNotLoaded = false;
+            if (this.showListModels) {
+                await this.loadVisaModelList();
             }
+
+            this.searchVisaSignUser.reset();
+
+            this.visaModelListNotLoaded = false;
         }
     }
 
@@ -377,38 +365,6 @@ export class VisaWorkflowComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
-    }
-
-    loadWorkflowMaarchParapheur(attachmentId: number, type: string) {
-        this.loading = true;
-        this.visaWorkflow.items = [];
-        this.http.get(`../rest/documents/${attachmentId}/maarchParapheurWorkflow?type=${type}`)
-            .subscribe((data: any) => {
-                data.workflow.forEach((element: any, key: any) => {
-                    const user = {
-                        'listinstance_id': key,
-                        'id': element.userId,
-                        'labelToDisplay': element.userDisplay,
-                        'requested_signature': element.mode !== 'visa',
-                        'process_date': this.functions.formatFrenchDateToTechnicalDate(element.processDate),
-                        'picture': '',
-                        'hasPrivilege': true,
-                        'isValid': true,
-                        'delegatedBy': null,
-                        'role': element.signatureMode
-                    };
-                    this.visaWorkflow.items.push(user);
-                    this.http.get('../rest/maarchParapheur/user/' + element.userId + '/picture')
-                        .subscribe((data: any) => {
-                            this.visaWorkflow.items.filter((item: any) => item.id === element.userId)[0].picture = data.picture;
-                        }, (err: any) => {
-                            this.notify.handleErrors(err);
-                        });
-                });
-                this.loading = false;
-            }, (err: any) => {
-                this.notify.handleErrors(err);
-            });
     }
 
     deleteItem(index: number) {
@@ -539,9 +495,6 @@ export class VisaWorkflowComponent implements OnInit {
                     this.visaWorkflow.items[this.visaWorkflow.items.length - 1].role = 'visa';
                 }
 
-                if (this.linkedToMaarchParapheur) {
-                    this.getMaarchParapheurUserAvatar(item.externalId.maarchParapheur, this.visaWorkflow.items.length - 1);
-                }
                 this.searchVisaSignUser.reset();
                 resolve(true);
             } else if (item.type === 'user') {
@@ -559,10 +512,6 @@ export class VisaWorkflowComponent implements OnInit {
                     isValid: item.isValid,
                     currentRole: requestedSignature ? 'sign' : 'visa'
                 });
-
-                if (this.linkedToMaarchParapheur) {
-                    this.getMaarchParapheurUserAvatar(item.externalId.maarchParapheur, this.visaWorkflow.items.length - 1);
-                }
                 this.searchVisaSignUser.reset();
                 this.searchVisaSignUserInput.nativeElement.blur();
                 this.workflowUpdated.emit(this.visaWorkflow.items);

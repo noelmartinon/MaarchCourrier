@@ -2,11 +2,11 @@
     <div class="fieldsetdContainer" style="flex:2">
         <h2>{{'lang.visaWorkflow' | translate}} :</h2>
         <div class="fieldsetdContent">
-            <app-visa-workflow #appVisaWorkflow [adminMode]="true" [injectDatas]="injectDatasParam"
-                [linkedToMaarchParapheur]="true"></app-visa-workflow>
-            <div *ngIf="appVisaWorkflow.checkExternalSignatoryBook().length > 0"
+            <app-external-visa-workflow  #appExternalVisaWorkflow [adminMode]="true" [injectDatas]="injectDatasParam"
+                [linkedToMaarchParapheur]="true"></app-external-visa-workflow >
+            <div *ngIf="appExternalVisaWorkflow.checkExternalSignatoryBook().length > 0"
                 class="alert-message alert-message-danger" role="alert">
-                <b>{{appVisaWorkflow.checkExternalSignatoryBook().join(', ')}}</b>
+                <b>{{appExternalVisaWorkflow.checkExternalSignatoryBook().join(', ')}}</b>
                 {{'lang.usersMissingInSignatureBook' | translate}} !
             </div>
         </div>

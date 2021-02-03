@@ -67,7 +67,6 @@ class PreProcessActionController
 
         $basket = BasketModel::getById(['id' => $args['basketId'], 'select' => ['basket_id']]);
         $group = GroupModel::getById(['id' => $args['groupId'], 'select' => ['group_id']]);
-        $user = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
 
         $keywords = [
             'ALL_ENTITIES'          => '@all_entities',
@@ -106,7 +105,7 @@ class PreProcessActionController
             }
 
             if (!empty($clauseToProcess)) {
-                $preparedClause = PreparedClauseController::getPreparedClause(['clause' => $clauseToProcess, 'login' => $user['user_id']]);
+                $preparedClause = PreparedClauseController::getPreparedClause(['clause' => $clauseToProcess, 'userId' => $args['userId']]);
                 $preparedEntities = EntityModel::get(['select' => ['entity_id'], 'where' => ['enabled = ?', "entity_id in {$preparedClause}"], 'data' => ['Y']]);
                 foreach ($preparedEntities as $preparedEntity) {
                     $allowedEntities[] = $preparedEntity['entity_id'];

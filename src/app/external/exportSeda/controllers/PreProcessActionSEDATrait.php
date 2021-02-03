@@ -55,7 +55,7 @@ trait PreProcessActionSEDATrait
 
         // Common Data
         $resources = ResModel::get([
-            'select' => ['res_id', 'destination', 'type_id', 'subject', 'linked_resources', 'retention_frozen', 'binding', 'creation_date', 'alt_identifier'],
+            'select' => ['res_id', 'destination', 'type_id', 'subject', 'linked_resources', 'retention_frozen', 'binding', 'creation_date', 'alt_identifier', 'docserver_id', 'path', 'filename', 'version', 'fingerprint'],
             'where'  => ['res_id in (?)'],
             'data'   => [$body['resources']]
         ]);
@@ -71,11 +71,19 @@ trait PreProcessActionSEDATrait
         $doctypesData = array_column($doctypes, null, 'type_id');
 
         $attachments = AttachmentModel::get([
-            'select' => ['res_id_master', 'res_id'],
-            'where'  => ['res_id_master in (?)', 'attachment_type in (?)', 'status = ?'],
-            'data'   => [$body['resources'], ['acknowledgement_record_management', 'reply_record_management'], 'TRA']
+            'select' => ['res_id_master', 'res_id', 'title', 'creation_date', 'identifier', 'attachment_type'],
+            'where'  => ['res_id_master in (?)', 'status in (?)'],
+            'data'   => [$body['resources'], ['A_TRA', 'TRA']]
         ]);
-        $resourcesAcknowledgement = array_column($attachments, 'res_id', 'res_id_master');
+        $resAcknowledgement = [];
+        $resAttachments = [];
+        foreach ($attachments as $attachment) {
+            if (in_array($attachment['attachment_type'], ['acknowledgement_record_management', 'reply_record_management'])) {
+                $resAcknowledgement[$attachment['res_id_master']] = $attachment['res_id'];
+            } else {
+                $resAttachments[$attachment['res_id_master']][] = $attachment;
+            }
+        }
 
         $entities = EntityModel::get([
             'select' => ['producer_service', 'entity_label', 'entity_id'],
@@ -146,7 +154,7 @@ trait PreProcessActionSEDATrait
                 continue;
             }
     
-            if (!empty($resourcesAcknowledgement[$resId])) {
+            if (!empty($resAcknowledgement[$resId])) {
                 $resourcesInformations['errors'][] = ['alt_identifier' => $resources[$resId]['alt_identifier'], 'res_id' => $resId, 'reason' => 'recordManagement_alreadySent'];
                 continue;
             }
@@ -182,6 +190,7 @@ trait PreProcessActionSEDATrait
     
             $archivalData = SedaController::initArchivalData([
                 'resource'           => $resources[$resId],
+                'attachments'        => $resAttachments[$resId] ?? [],
                 'senderOrgRegNumber' => $config['exportSeda']['senderOrgRegNumber'],
                 'entity'             => $destinationsData[$destinationId],
                 'doctype'            => $doctypesData[$typeId],

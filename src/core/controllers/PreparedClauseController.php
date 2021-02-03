@@ -23,25 +23,24 @@ class PreparedClauseController
 {
     public static function getPreparedClause(array $aArgs)
     {
-        ValidatorModel::notEmpty($aArgs, ['clause', 'login']);
-        ValidatorModel::stringType($aArgs, ['clause', 'login']);
+        ValidatorModel::notEmpty($aArgs, ['clause', 'userId']);
+        ValidatorModel::stringType($aArgs, ['clause']);
+        ValidatorModel::intVal($aArgs, ['userId']);
 
         $clause = $aArgs['clause'];
+        $user = UserModel::getById(['id' => $aArgs['userId'], 'select' => ['user_id', 'mail']]);
 
         if (preg_match('/@user_id/', $clause)) {
-            $user = UserModel::getByLogin(['login' => $aArgs['login'], 'select' => ['id']]);
-            $clause = str_replace('@user_id', "{$user['id']}", $clause);
+            $clause = str_replace('@user_id', "{$aArgs['userId']}", $clause);
         }
         if (preg_match('/@user/', $clause)) {
-            $clause = str_replace('@user', "'{$aArgs['login']}'", $clause);
+            $clause = str_replace('@user', "'{$user['user_id']}'", $clause);
         }
         if (preg_match('/@email/', $clause)) {
-            $user = UserModel::getByLogin(['login' => $aArgs['login'], 'select' => ['mail']]);
             $clause = str_replace('@email', "'{$user['mail']}'", $clause);
         }
         if (preg_match('/@my_entities_id/', $clause)) {
-            $user = UserModel::getByLogin(['login' => $aArgs['login'], 'select' => ['id']]);
-            $entities = EntityModel::getByUserId(['userId' => $user['id'], 'select' => ['entity_id']]);
+            $entities = EntityModel::getByUserId(['userId' => $aArgs['userId'], 'select' => ['entity_id']]);
             $entities = array_column($entities, 'entity_id');
             if (!empty($entities)) {
                 $entities = EntityModel::get(['select' => ['id'], 'where' => ['entity_id in (?)'], 'data' => [$entities]]);
@@ -61,8 +60,7 @@ class PreparedClauseController
             $clause = str_replace('@my_entities_id', $myEntitiesClause, $clause);
         }
         if (preg_match('/@my_entities/', $clause)) {
-            $user = UserModel::getByLogin(['login' => $aArgs['login'], 'select' => ['id']]);
-            $entities = EntityModel::getByUserId(['userId' => $user['id'], 'select' => ['entity_id']]);
+            $entities = EntityModel::getByUserId(['userId' => $aArgs['userId'], 'select' => ['entity_id']]);
 
             $myEntitiesClause = '';
             foreach ($entities as $key => $entity) {
@@ -78,8 +76,7 @@ class PreparedClauseController
             $clause = str_replace('@my_entities', $myEntitiesClause, $clause);
         }
         if (preg_match('/@my_primary_entity_id/', $clause)) {
-            $user = UserModel::getByLogin(['login' => $aArgs['login'], 'select' => ['id', 'firstname', 'lastname']]);
-            $entity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.id']]);
+            $entity = UserModel::getPrimaryEntityById(['id' => $aArgs['userId'], 'select' => ['entities.id']]);
 
             if (empty($entity)) {
                 $primaryEntity = 0;
@@ -90,8 +87,7 @@ class PreparedClauseController
             $clause = str_replace('@my_primary_entity_id', $primaryEntity, $clause);
         }
         if (preg_match('/@my_primary_entity/', $clause)) {
-            $user = UserModel::getByLogin(['login' => $aArgs['login'], 'select' => ['id']]);
-            $entity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_id']]);
+            $entity = UserModel::getPrimaryEntityById(['id' => $aArgs['userId'], 'select' => ['entities.entity_id']]);
 
             if (empty($entity)) {
                 $primaryEntity = "''";
@@ -297,7 +293,8 @@ class PreparedClauseController
         ValidatorModel::arrayType($aArgs, ['select', 'orderBy']);
         ValidatorModel::intType($aArgs, ['limit']);
 
-        $clause = PreparedClauseController::getPreparedClause(['clause' => $aArgs['clause'], 'login' => $aArgs['userId']]);
+        $user = UserModel::getByLogin(['login' => $aArgs['userId'], 'select' => ['id']]);
+        $clause = PreparedClauseController::getPreparedClause(['clause' => $aArgs['clause'], 'userId' => $user['id']]);
 
         $preg = preg_match('#\b(?:abort|alter|copy|create|delete|disgard|drop|execute|grant|insert|load|lock|move|reset|truncate|update)\b#i', $clause);
         if ($preg === 1) {

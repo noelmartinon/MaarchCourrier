@@ -35,6 +35,32 @@ trait ExternalSignatoryBookTrait
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
         $config = [];
 
+        if (!empty($args['resources'])) {
+            $hasMailing = AttachmentModel::get([
+                'select' => ['res_id', 'status'],
+                'where'  => ["res_id_master in (?)", "attachment_type not in (?)", "status = 'SEND_MASS'", "in_signature_book = 'true'"],
+                'data'   => [$args['resources'], ['signed_response']]
+            ]);
+            if (count($args['resources']) > 1 || !empty($hasMailing)) {
+                static $massData;
+                if ($massData === null) {
+                    $customId = CoreConfigModel::getCustomId();
+                    $massData = [
+                        'resources'     => [],
+                        'successStatus' => $args['action']['parameters']['successStatus'],
+                        'errorStatus'   => $args['action']['parameters']['errorStatus'],
+                        'userId'        => $GLOBALS['id'],
+                        'customId'      => $customId,
+                        'action'        => 'sendExternalSignatoryBookAction'
+                    ];
+                }
+
+                $massData['resources'][] = ['resId' => $args['resId'], 'data' => $args['data'], 'note' => $args['note']];
+
+                return ['postscript' => 'src/app/external/externalSignatoryBook/scripts/MailingScript.php', 'args' => $massData];
+            }
+        }
+
         if (!empty($loadedXml)) {
             $config['id'] = (string)$loadedXml->signatoryBookEnabled;
             foreach ($loadedXml->signatoryBook as $value) {
@@ -60,14 +86,6 @@ trait ExternalSignatoryBookTrait
                             return ['errors' => [$generated['errors']]];
                         }
                     }
-                }
-            }
-
-            if ($config['id'] == 'ixbus') {
-                $loginIxbus = $args['data']['ixbus']['login'];
-                $userInfo   = IxbusController::getInfoUtilisateur(['config' => $config, 'login' => $loginIxbus, 'natureId' => $args['data']['ixbus']['nature']]);
-                if (empty($userInfo['user'])) {
-                    return ['errors' => [_NOT_ALLOWED_USER_FOR_THIS_NATURE]];
                 }
             }
 
@@ -114,7 +132,7 @@ trait ExternalSignatoryBookTrait
                 $sentInfo = IxbusController::sendDatas([
                     'config'        => $config,
                     'resIdMaster'   => $args['resId'],
-                    'loginIxbus'    => $loginIxbus,
+                    'referent'      => $args['data']['ixbus']['userId'],
                     'natureId'      => $args['data']['ixbus']['nature'],
                     'messageModel'  => $args['data']['ixbus']['messageModel'],
                     'manSignature'  => $args['data']['ixbus']['signatureMode']

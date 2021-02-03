@@ -190,7 +190,7 @@ class UserFollowedResourceController
                 continue;
             } else {
                 if (!in_array($basket['id'], $inCheckedBaskets)) {
-                    $preparedClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'login' => $GLOBALS['login']]);
+                    $preparedClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $GLOBALS['id']]);
                     $resource = ResModel::getOnView(['select' => [1], 'where' => ['res_id = ?', "({$preparedClause})"], 'data' => [$args['resId']]]);
                     if (empty($resource)) {
                         $outCheckedBaskets[] = $basket['id'];

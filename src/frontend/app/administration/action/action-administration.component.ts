@@ -43,6 +43,8 @@ export class ActionAdministrationComponent implements OnInit {
     selectSuccessStatusId = new FormControl();
     selectErrorStatusId = new FormControl();
 
+    intermediateStatusActions = ['sendToRecordManagement', 'sendToExternalSignatureBook', 'send_to_visa', 'visa_workflow'];
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -128,7 +130,7 @@ export class ActionAdministrationComponent implements OnInit {
                             });
                         } else if (this.action.actionPageId === 'create_acknowledgement_receipt') {
                             this.arMode = this.action.parameters.mode;
-                        } else if (this.action.actionPageId === 'sendToRecordManagement') {
+                        } else if (this.intermediateStatusActions.indexOf(this.action.actionPageId) !== -1) {
                             this.selectSuccessStatusId.setValue(this.action.parameters.successStatus);
                             this.selectErrorStatusId.setValue(this.action.parameters.errorStatus);
                         }
@@ -145,7 +147,7 @@ export class ActionAdministrationComponent implements OnInit {
             this.action.actionCategories = ['registeredMail'];
         }
 
-        if (this.action.actionPageId == 'sendToRecordManagement') {
+        if (this.intermediateStatusActions.indexOf(this.action.actionPageId) !== -1) {
             this.selectSuccessStatusId.setValue('_NOSTATUS_');
             this.selectErrorStatusId.setValue('_NOSTATUS_');
         }
@@ -195,7 +197,7 @@ export class ActionAdministrationComponent implements OnInit {
             this.action.parameters = { requiredFields: this.selectedFieldsId };
         } else if (this.action.actionPageId === 'create_acknowledgement_receipt') {
             this.action.parameters = { mode: this.arMode };
-        } else if (this.action.actionPageId === 'sendToRecordManagement') {
+        } else if (this.intermediateStatusActions.indexOf(this.action.actionPageId) !== -1) {
             this.action.parameters = { successStatus: this.successStatus, errorStatus: this.errorStatus };
         }
         if (this.creationMode) {

@@ -121,29 +121,31 @@ export class SendToRecordManagementComponent implements OnInit {
 
         this.http.put(this.data.processActionRoute, { resources: realResSelected, data: this.formatData(mode) }).pipe(
             tap((data: any) => {
-                if (mode === 'download' && !this.functions.empty(data.data.encodedFile)) {
+                if (mode === 'download' && !this.functions.empty(data.data.encodedFiles)) {
                     const downloadLink = document.createElement('a');
-                    downloadLink.href = `data:application/zip;base64,${data.data.encodedFile}`;
-                    let today: any;
-                    let dd: any;
-                    let mm: any;
-                    let yyyy: any;
-
-                    today = new Date();
-                    dd = today.getDate();
-                    mm = today.getMonth() + 1;
-                    yyyy = today.getFullYear();
-
-                    if (dd < 10) {
-                        dd = '0' + dd;
-                    }
-                    if (mm < 10) {
-                        mm = '0' + mm;
-                    }
-                    today = dd + '-' + mm + '-' + yyyy;
-                    downloadLink.setAttribute('download', 'seda_package_' + today + '.zip');
-                    document.body.appendChild(downloadLink);
-                    downloadLink.click();
+                    data.data.encodedFiles.forEach((file:string) => {
+                        downloadLink.href = `data:application/zip;base64,${file}`;
+                        let today: any;
+                        let dd: any;
+                        let mm: any;
+                        let yyyy: any;
+    
+                        today = new Date();
+                        dd = today.getDate();
+                        mm = today.getMonth() + 1;
+                        yyyy = today.getFullYear();
+    
+                        if (dd < 10) {
+                            dd = '0' + dd;
+                        }
+                        if (mm < 10) {
+                            mm = '0' + mm;
+                        }
+                        today = dd + '-' + mm + '-' + yyyy;
+                        downloadLink.setAttribute('download', 'seda_package_' + today + '.zip');
+                        document.body.appendChild(downloadLink);
+                        downloadLink.click();
+                    });
                     this.dialogRef.close('success');
                 } else if (!data) {
                     this.dialogRef.close('success');
