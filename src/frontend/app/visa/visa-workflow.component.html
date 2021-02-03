@@ -94,7 +94,7 @@
                         <mat-form-field>
                             <input matInput class="comment" maxlength="255" [disabled]="!adminMode || diffusion.process_date != null || (target === 'signatureBook' && getCurrentVisaUserIndex() === i)" [placeholder]="lang.visaNote" [(ngModel)]="diffusion.process_comment">
                         </mat-form-field>
-                    </div>
+                    </div>20
                     <div *ngIf="diffusion.process_date != null && [lang.visaWorkflowInterrupted, lang.hasInterruptedWorkflow].indexOf(diffusion.process_comment) === -1" class="workflowLineProcessDate"
                         title='{{diffusion.process_date | fullDate}}'
                         color="accent">{{diffusion.requested_signature ? lang.signedUserDate : lang.approvedUserDate}} {{diffusion.process_date
@@ -107,7 +107,7 @@
                     <button class="currentRoleButton" [color]="diffusion.requested_signature ? 'primary': '' "
                         [disabled]="!canManageUser(diffusion, i)" mat-raised-button
                         title="{{lang[diffusion.currentRole+'User']}}"
-                        (click)="changeRole(i)">{{diffusion.process_date === null ? (diffusion.requested_signature ? lang.signUser : lang.visaUser) : (diffusion.signatory ? lang.signUser : lang.visaUser)}}</button>
+                        (click)="changeRole(i)">{{functions.empty(diffusion.process_date) ? (diffusion.requested_signature ? lang.signUser : lang.visaUser) : (diffusion.signatory ? lang.signUser : lang.visaUser)}}</button>
                 </div>
                 <div *ngIf="!diffusion.hasPrivilege" class="invalid">
                     {{lang.noPrivileges}}
