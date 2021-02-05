@@ -413,7 +413,7 @@ export class ProfileComponent implements OnInit {
         this.http.get('../rest/currentUser/profile')
             .subscribe((data: any) => {
                 this.user = data;
-
+                this.user.baskets = this.user.baskets.filter((basket: any) => !basket.basketSearch);
                 this.user.baskets.forEach((value: any, index: number) => {
                     this.user.baskets[index]['disabled'] = false;
                     this.user.redirectedBaskets.forEach((value2: any) => {
