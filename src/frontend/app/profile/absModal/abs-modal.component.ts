@@ -38,7 +38,7 @@ export class AbsModalComponent implements OnInit {
 
     getBasketInfo() {
         let objBasket = {};
-        this.data.user.baskets.forEach((basket: any) => {
+        this.data.user.baskets.filter((basket: any) => !basket.basketSearch).forEach((basket: any) => {
             objBasket = { ...basket };
 
             const redirBasket = this.data.user.redirectedBaskets.find((redBask: any) => redBask.basket_id === basket.basket_id && redBask.group_id === basket.groupSerialId);

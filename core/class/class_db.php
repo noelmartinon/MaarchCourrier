@@ -10,9 +10,7 @@
 * Allow to changes the databases server
 *
 * @file
-* @author  Claire Figueras <dev@maarch.org>
-* @author  Laurent Giovannoni  <dev@maarch.org>
-* @author  Loic Vinet <dev@maarch.org>
+* @author  <dev@maarch.org>
 * @date $date$
 * @version $Revision$
 * @ingroup core
@@ -472,31 +470,6 @@ class dbquery extends functions
                 return array_change_key_case($tmpStatement, CASE_LOWER);
             }
             // no break
-        default: return false;
-        }
-    }
-
-    /**
-    * Returns the number of results for the current query
-    *
-    * @return integer Results number
-    */
-    public function nb_result()
-    {
-        switch ($this->_databasetype) {
-        case 'MYSQL': return @mysqli_num_rows($this->query);
-        case 'POSTGRESQL': return @pg_num_rows($this->query);
-        case 'SQLSERVER': return @mssql_num_rows($this->query);
-        case 'ORACLE':
-        if (file_exists($GLOBALS['configFile'])) {
-            $dbNbResult = new dbquery($GLOBALS['configFile']);
-        } else {
-            $dbNbResult = new dbquery();
-        }
-            $dbNbResult->connect();
-            $dbNbResult->query("SELECT COUNT(*) FROM  (" . $this->_debugQuery . ")", true);
-            $row = $dbNbResult->fetch_array();
-            return $row[0];
         default: return false;
         }
     }

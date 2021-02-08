@@ -80,3 +80,7 @@
         }
     }
 }
+
+::ng-deep.chartTypeMenu {
+    min-width: auto !important;
+}

@@ -120,8 +120,12 @@ class CoreController
             return $response->withStatus(400)->withJson(['errors' => 'Image not found']);
         }
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
+        if (in_array($queryParams['image'], ['logo', 'onlyLogo'])) {
+            $mimeType = 'image/svg+xml';
+        } else {
+            $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+            $mimeType = $finfo->buffer($fileContent);
+        }
         $pathInfo = pathinfo($path);
 
         $response->write($fileContent);
@@ -134,12 +138,11 @@ class CoreController
     {
         $uploadMaxFilesize = ini_get('upload_max_filesize');
         $uploadMaxFilesize = StoreController::getBytesSizeFromPhpIni(['size' => $uploadMaxFilesize]);
-        $postMaxSize = ini_get('post_max_size');
-        $postMaxSize = $postMaxSize == 0 ? $uploadMaxFilesize : StoreController::getBytesSizeFromPhpIni(['size' => $postMaxSize]);
-        $memoryLimit = ini_get('memory_limit');
-        $memoryLimit = $memoryLimit < 1 ? $uploadMaxFilesize : StoreController::getBytesSizeFromPhpIni(['size' => $memoryLimit]);
-
-        $maximumSize = min($uploadMaxFilesize, $postMaxSize, $memoryLimit);
+        $postMaxSize       = ini_get('post_max_size');
+        $postMaxSize       = $postMaxSize == 0 ? $uploadMaxFilesize : StoreController::getBytesSizeFromPhpIni(['size' => $postMaxSize]);
+        $memoryLimit       = ini_get('memory_limit');
+        $memoryLimit       = $memoryLimit < 1 ? $uploadMaxFilesize : StoreController::getBytesSizeFromPhpIni(['size' => $memoryLimit]);
+        $maximumSize       = min($uploadMaxFilesize, $postMaxSize, $memoryLimit);
 
         return $maximumSize;
     }

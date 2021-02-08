@@ -8,6 +8,7 @@ import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { CriteriaToolComponent } from './criteria-tool/criteria-tool.component';
 import { SearchResultListComponent } from './result-list/search-result-list.component';
+import { NotificationService } from '@service/notification/notification.service';
 
 
 @Component({
@@ -17,6 +18,7 @@ import { SearchResultListComponent } from './result-list/search-result-list.comp
 export class SearchComponent implements OnInit {
 
     searchTerm: string = '';
+    searchTemplateId: string = null;
 
     filtersChange = new EventEmitter();
 
@@ -35,10 +37,15 @@ export class SearchComponent implements OnInit {
         private headerService: HeaderService,
         public viewContainerRef: ViewContainerRef,
         public appService: AppService,
-        public functions: FunctionsService) {
+        public functions: FunctionsService,
+        private notify: NotificationService
+    ) {
         _activatedRoute.queryParams.subscribe(
             params => {
-                if (!this.functions.empty(params.value)) {
+                if (!this.functions.empty(params.searchTemplateId)) {
+                    this.searchTemplateId = params.searchTemplateId;
+                    window.history.replaceState({}, document.title, window.location.pathname + window.location.hash.split('?')[0]);
+                } else if (!this.functions.empty(params.value)) {
                     this.searchTerm = params.value;
                 }
             }
@@ -49,5 +56,23 @@ export class SearchComponent implements OnInit {
         this.headerService.sideBarAdmin = true;
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
         this.headerService.setHeader(this.translate.instant('lang.searchMails'), '', '');
+    }
+
+    setLaunchWithSearchTemplate(templates: any) {
+        if (this.searchTemplateId !== null) {
+            const template = templates.find((itemTemplate: any) => itemTemplate.id == this.searchTemplateId);
+            if (template !== undefined) {
+                this.appCriteriaTool.selectSearchTemplate(template);
+                this.appCriteriaTool.getCurrentCriteriaValues();
+            } else {
+                this.notify.error(this.translate.instant('lang.noTemplateFound'));
+            }
+        }
+    }
+
+    initSearch() {
+        if (this.searchTemplateId === null) {
+            this.appSearchResultList.initSavedCriteria();
+        }
     }
 }

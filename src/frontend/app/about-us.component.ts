@@ -16,6 +16,7 @@ import { MatDialogRef } from '@angular/material/dialog';
 export class AboutUsComponent implements OnInit {
 
     applicationVersion: string;
+    currentYear: number;
 
 
     loading: boolean = false;
@@ -34,6 +35,7 @@ export class AboutUsComponent implements OnInit {
         this.headerService.setHeader(this.translate.instant('lang.aboutUs'));
 
         this.applicationVersion = environment.VERSION;
+        this.currentYear = new Date().getFullYear();
         this.loading = false;
 
         await this.loadCommitInformation();

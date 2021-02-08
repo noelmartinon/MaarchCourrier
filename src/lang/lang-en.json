@@ -2250,5 +2250,18 @@
     "valStatus": "This document has been validated in the external signature",
     "stopStatus": "This document has been interrupted in the external signature",
     "nullStatus": "The user has not yet taken any action",
-    "intermediateStatusMailing": "The final and error statuses are only used when mailing in the action"
+    "intermediateStatusMailing": "The final and error statuses are only used when mailing in the action",
+    "addTile": "Add a tile",
+    "tileType": "Tile type",
+    "dashboardEmpty": "Your dashboard is empty",
+    "navigation": "Navigation",
+    "acountNotLinkedTomaarchParapheur": "Your account is not linked to Maarch Parapheur",
+    "error": "Eroor",
+    "tileLoadError": "Error loading tile <b> {{0}} </b>",
+    "tileColor": "Tile color",
+    "model": "Model",
+    "refused": "Refused",
+    "endStatus": "This document was interrupted following a refusal action",
+    "summary": "Synthesis",
+    "noTemplateFound": "Search template not found"
 }

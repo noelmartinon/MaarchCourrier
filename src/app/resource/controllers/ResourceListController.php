@@ -530,6 +530,7 @@ class ResourceListController
         if (!empty($methodResponse['postscript'])) {
             $base64Args = base64_encode(json_encode($methodResponse['args']));
             exec("php {$methodResponse['postscript']} --encodedData {$base64Args} > /dev/null &");
+            unset($methodResponse['postscript']);
         }
 
         if (!empty($methodResponses)) {

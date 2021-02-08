@@ -11,6 +11,7 @@ import { of } from 'rxjs';
 import { NotificationService } from '@service/notification/notification.service';
 import { PrivilegeService } from '@service/privileges.service';
 import { HeaderService } from '@service/header.service';
+import { ColorEvent } from 'ngx-color';
 
 @Component({
     selector: 'app-dashboard',
@@ -65,7 +66,9 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                         if (tmpTile.type === 'shortcut') {
                             objTile = {...objTile, ...this.initShortcutTile(tmpTile.parameters.privilegeId)};
                         }
+                        objTile.charts = this.dashboardService.getCharts();
                         objTile.label = this.functionsService.empty(objTile.label) ? this.translate.instant('lang.' + objTile.type) : objTile.label;
+                        objTile.parameters = this.functionsService.empty(objTile.parameters) ? {} : objTile.parameters;
                         this.tiles.push(objTile);
                     } else {
                         this.tiles.push({
@@ -106,6 +109,16 @@ export class DashboardComponent implements OnInit, AfterViewInit {
                 this.tiles[tile.position] = tileToSend;
                 this.tileComponent.toArray()[indexTile].changeView(view, extraParams);
             }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    changeTileColor(tile: any, $event: ColorEvent) {
+        this.tiles[tile.position].color = $event.color.hex;
+        this.http.put(`../rest/tiles/${tile.id}`, this.tiles[tile.position]).pipe(
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);

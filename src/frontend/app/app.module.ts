@@ -32,7 +32,7 @@ import { AppComponent } from './app.component';
 
 import { DashboardComponent } from './home/dashboard/dashboard.component';
 import { TileViewListComponent } from './home/dashboard/tile/view/list/tile-view-list.component';
-import { TileViewResumeComponent } from './home/dashboard/tile/view/resume/tile-view-resume.component';
+import { TileViewSummaryComponent } from './home/dashboard/tile/view/summary/tile-view-summary.component';
 import { TileViewChartComponent } from './home/dashboard/tile/view/chart/tile-view-chart.component';
 import { TileCreateComponent } from './home/dashboard/tile/tile-create.component';
 import { TileDashboardComponent } from './home/dashboard/tile/tile.component';
@@ -170,7 +170,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         AppComponent,
         DashboardComponent,
         TileViewListComponent,
-        TileViewResumeComponent,
+        TileViewSummaryComponent,
         TileViewChartComponent,
         TileCreateComponent,
         TileDashboardComponent,

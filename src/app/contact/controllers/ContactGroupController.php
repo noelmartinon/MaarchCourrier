@@ -48,7 +48,7 @@ class ContactGroupController
         $contactsGroup = ContactGroupModel::getById(['id' => $aArgs['id']]);
         if (empty($contactsGroup)) {
             return $response->withStatus(400)->withJson(['errors' => 'Contacts group not found']);
-        } elseif (!$contactsGroup['public'] && $contactsGroup['owner'] != $GLOBALS['id']) {
+        } elseif (!$contactsGroup['public'] && $contactsGroup['owner'] != $GLOBALS['id'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Contacts group out of perimeter']);
         }
 

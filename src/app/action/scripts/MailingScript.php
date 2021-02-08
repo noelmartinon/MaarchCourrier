@@ -19,6 +19,7 @@ require 'vendor/autoload.php';
 use Action\controllers\ExternalSignatoryBookTrait;
 use Attachment\controllers\AttachmentController;
 use Attachment\models\AttachmentModel;
+use Resource\models\ResModel;
 use SrcCore\controllers\LogsController;
 use SrcCore\models\DatabasePDO;
 use User\models\UserModel;
@@ -39,27 +40,28 @@ class MailingScript
 
         if (!empty($data)) {
             DatabasePDO::reset();
-            new DatabasePDO(['customId' => $args['data']['customId']]);
-            $GLOBALS['customId'] = $args['data']['customId'];
+            new DatabasePDO(['customId' => $data['customId']]);
+            $GLOBALS['customId'] = $data['customId'];
 
-            $currentUser = UserModel::getById(['id' => $args['data']['userId'], 'select' => ['user_id']]);
+            $currentUser = UserModel::getById(['id' => $data['userId'], 'select' => ['user_id']]);
             $GLOBALS['login'] = $currentUser['user_id'];
-            $GLOBALS['id']    = $args['data']['userId'];
+            $GLOBALS['id']    = $data['userId'];
 
-            if ($args['action'] == 'sendExternalSignatoryBookAction') {
-                MailingScript::sendExternalSignatoryBookAction($args);
-            } elseif ($args['action'] == 'generateMailing') {
-                MailingScript::generateMailing($args);
+            if ($data['action'] == 'sendExternalSignatoryBookAction') {
+                MailingScript::sendExternalSignatoryBookAction($data);
+            } elseif ($data['action'] == 'generateMailing') {
+                MailingScript::generateMailing($data);
             }
         }
     }
 
     public static function sendExternalSignatoryBookAction(array $args)
     {
-        foreach ($args['data']['resources'] as $resource) {
+        foreach ($args['resources'] as $resource) {
             $result = ExternalSignatoryBookTrait::sendExternalSignatoryBookAction($resource);
 
             if (!empty($result['errors'])) {
+                ResModel::update(['set' => ['status' => $args['errorStatus']], 'where' => ['res_id = ?'], 'data' => [$resource['resId']]]);
                 LogsController::add([
                     'isTech'    => true,
                     'moduleId'  => 'resource',
@@ -69,23 +71,26 @@ class MailingScript
                     'eventType' => "Send to external Signature Book failed : {$result['errors']}",
                     'eventId'   => "resId : {$resource['resId']}"
                 ]);
-            } elseif (!empty($result['history'])) {
-                LogsController::add([
-                    'isTech'    => true,
-                    'moduleId'  => 'resource',
-                    'level'     => 'INFO',
-                    'tableName' => 'letterbox_coll',
-                    'recordId'  => $resource['resId'],
-                    'eventType' => "Send to external Signature Book success : {$result['history']}",
-                    'eventId'   => "resId : {$resource['resId']}"
-                ]);
+            } else {
+                ResModel::update(['set' => ['status' => $args['successStatus']], 'where' => ['res_id = ?'], 'data' => [$resource['resId']]]);
+                if (!empty($result['history'])) {
+                    LogsController::add([
+                        'isTech'    => true,
+                        'moduleId'  => 'resource',
+                        'level'     => 'INFO',
+                        'tableName' => 'letterbox_coll',
+                        'recordId'  => $resource['resId'],
+                        'eventType' => "Send to external Signature Book success : {$result['history']}",
+                        'eventId'   => "resId : {$resource['resId']}"
+                    ]);
+                }
             }
         }
     }
 
     public static function generateMailing(array $args)
     {
-        foreach ($args['data']['resources'] as $resource) {
+        foreach ($args['resources'] as $resource) {
             $where = ['res_id_master = ?', 'status = ?'];
             $data = [$resource['resId'], 'SEND_MASS'];
 
@@ -100,10 +105,13 @@ class MailingScript
                 'data'    => $data
             ]);
 
+            $mailingSuccess = true;
+
             foreach ($attachments as $attachment) {
                 $result = AttachmentController::generateMailing(['id' => $attachment['res_id'], 'userId' => $GLOBALS['id']]);
 
                 if (!empty($result['errors'])) {
+                    $mailingSuccess = false;
                     LogsController::add([
                         'isTech'    => true,
                         'moduleId'  => 'resource',
@@ -117,12 +125,17 @@ class MailingScript
                         'isTech'    => true,
                         'moduleId'  => 'resource',
                         'level'     => 'INFO',
-                        'tableName' => 'letterbox_coll',
                         'recordId'  => $attachment['res_id'],
                         'eventType' => "Mailing generation success",
                         'eventId'   => "resId : {$attachment['res_id']}"
                     ]);
                 }
+            }
+
+            if ($mailingSuccess) {
+                ResModel::update(['set' => ['status' => $args['successStatus']], 'where' => ['res_id = ?'], 'data' => [$resource['resId']]]);
+            } else {
+                ResModel::update(['set' => ['status' => $args['errorStatus']], 'where' => ['res_id = ?'], 'data' => [$resource['resId']]]);
             }
         }
     }

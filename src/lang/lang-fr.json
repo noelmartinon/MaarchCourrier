@@ -2237,7 +2237,7 @@
     "noAddressFound": "Aucune adresse trouvée",
     "searchTemplate": "Modèle de recherche",
     "chart": "Graphique",
-    "resume": "Synthèse",
+    "summary": "Synthèse",
     "addTile": "Ajouter une tuile",
     "tileType": "Type de tuile",
     "dashboardEmpty": "Votre tableau de bord est vide",
@@ -2247,5 +2247,16 @@
     "nullStatus": "L'utilisateur na pas encore effectué d'action",
     "intermediateStatusMailing": "Les statuts final et erreur ne sont utilisés que lors d'un publipostage dans l'action",
     "navigation": "Navigation",
-    "acountNotLinkedTomaarchParapheur": "Votre compte n'est pas lié à Maarch Parapheur."
+    "acountNotLinkedTomaarchParapheur": "Votre compte n'est pas lié à Maarch Parapheur.",
+    "error": "Erreur",
+    "tileLoadError": "Erreur de chargement de la tuile <b>{{0}}</b>",
+    "tileColor": "Couleur de la tuile",
+    "model": "Modèle",
+    "refused": "Refusé",
+    "endStatus": "Ce document a été interrompu suite à une action de refus",
+    "noTemplateFound": "Modèle de recherche introuvable",
+    "chart_pie": "Diagramme circulaire",
+    "chart_vertical-bar": "Diagramme en bâtons",
+    "chart_line": "Courbe",
+    "chartView": "Vue"
 }

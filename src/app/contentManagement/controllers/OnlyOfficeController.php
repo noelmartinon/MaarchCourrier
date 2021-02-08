@@ -431,7 +431,7 @@ class OnlyOfficeController
             $headers[] =  $authorizationHeader;
         }
 
-        $response = CurlModel::execSimple([
+        $response = CurlModel::exec([
             'url'     => $convertUrl,
             'headers' => $headers,
             'method'  => 'POST',

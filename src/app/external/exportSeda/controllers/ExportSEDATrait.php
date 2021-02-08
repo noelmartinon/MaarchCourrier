@@ -41,7 +41,6 @@ trait ExportSEDATrait
         ValidatorModel::notEmpty($args, ['resId']);
         ValidatorModel::intVal($args, ['resId']);
 
-        static $resAttachments;
         static $resAcknowledgement;
         static $attachmentsData;
         static $resources;
@@ -50,6 +49,7 @@ trait ExportSEDATrait
         static $nonBindingDocument;
         static $config;
         static $entities;
+        static $zipFilename;
 
         if ($resources === null) {
             $resAcknowledgement = [];
@@ -58,7 +58,6 @@ trait ExportSEDATrait
                 'where'  => ['res_id_master in (?)', 'status in (?)'],
                 'data'   => [$args['resources'], ['A_TRA', 'TRA']]
             ]);
-            $resAttachments = array_column($attachments, 'res_id_master');
             $attachmentsData = [];
             foreach ($attachments as $attachment) {
                 if (in_array($attachment['attachment_type'], ['acknowledgement_record_management', 'reply_record_management'])) {
@@ -91,6 +90,11 @@ trait ExportSEDATrait
             $nonBindingDocument = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'nonBindingDocumentFinalAction']);
 
             $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+
+            if (count($args['resources']) > 1 && $args['data']['actionMode'] == 'download') {
+                $tmpPath     = CoreConfigModel::getTmpPath();
+                $zipFilename = $tmpPath . $GLOBALS['login'] . "_" . rand() . ".zip";
+            }
         }
 
         if (in_array($args['resId'], $resAcknowledgement)) {
@@ -138,13 +142,66 @@ trait ExportSEDATrait
                 return ['errors' => [$value . ' is empty']];
             }
         }
+        
+        if ($args['data']['actionMode'] == 'download') {
+            $sedaPackage = ExportSedaTrait::makeSedaPackage([
+                'resource'               => $resource,
+                'attachments'            => $attachmentsData[$args['resId']] ?? [],
+                'config'                 => $config,
+                'entity'                 => $entity,
+                'doctype'                => $doctype,
+                'folder'                 => $args['data']['folder'],
+                'archivalAgreement'      => $args['data']['archivalAgreement'],
+                'entityArchiveRecipient' => $args['data']['entityArchiveRecipient']
+            ]);
 
+            if (count($args['resources']) > 1) {
+                $zip = new \ZipArchive();
+                if ($zip->open($zipFilename, \ZipArchive::CREATE) === true) {
+                    $zip->addFile($sedaPackage['encodedFilePath'], 'sedaPackage' . $resource['res_id'] . '.zip');
+                    $zip->close();
+    
+                    $zipPath = $zipFilename;
+                } else {
+                    return ['errors' => ['Cannot open zip file ' . $zipFilename]];
+                }
+            } else {
+                $zipPath = $sedaPackage['encodedFilePath'];
+            }
+            $encodedContent = base64_encode(file_get_contents($zipPath));
+            unlink($sedaPackage['encodedFilePath']);
+            return ['data' => ['encodedFile' => $encodedContent]];
+        } else {
+            $customId = CoreConfigModel::getCustomId();
+            
+            static $massData;
+            if ($massData === null) {
+                $massData = [
+                    'resources'              => [],
+                    'successStatus'          => $args['action']['parameters']['successStatus'],
+                    'errorStatus'            => $args['action']['parameters']['errorStatus'],
+                    'userId'                 => $GLOBALS['id'],
+                    'customId'               => $customId,
+                    'archivalAgreement'      => $args['data']['archivalAgreement'],
+                    'entityArchiveRecipient' => $args['data']['entityArchiveRecipient'],
+                    'folder'                 => $args['data']['folder']
+                ];
+            }
+
+            $massData['resources'][] = $resource['res_id'];
+
+            return ['postscript' => 'src/app/external/exportSeda/scripts/ExportSedaScript.php', 'args' => $massData];
+        }
+    }
+
+    public static function makeSedaPackage($args = [])
+    {
         $initData = SedaController::initArchivalData([
-            'resource'           => $resource,
-            'attachments'        => $attachmentsData[$args['resId']] ?? [],
-            'senderOrgRegNumber' => $config['exportSeda']['senderOrgRegNumber'],
-            'entity'             => $entity,
-            'doctype'            => $doctype,
+            'resource'           => $args['resource'],
+            'attachments'        => $args['attachments'],
+            'senderOrgRegNumber' => $args['config']['exportSeda']['senderOrgRegNumber'],
+            'entity'             => $args['entity'],
+            'doctype'            => $args['doctype'],
             'getFile'            => true
         ]);
 
@@ -154,27 +211,27 @@ trait ExportSEDATrait
             $initData = $initData['archivalData'];
         }
 
-        $history = ExportSEDATrait::getHistory(['resId' => $resource['res_id']]);
-        $folder  = ExportSEDATrait::getFolderPath(['selectedFolder' => $args['data']['folder'], 'folders' => $initData['additionalData']['folders']]);
+        $history = ExportSEDATrait::getHistory(['resId' => $args['resource']['res_id']]);
+        $folder  = ExportSEDATrait::getFolderPath(['selectedFolder' => $args['folder'], 'folders' => $initData['additionalData']['folders']]);
 
         $dataObjectPackage = [
             'archiveId'                 => $initData['data']['slipInfo']['archiveId'],
-            'chrono'                    => $resource['alt_identifier'],
+            'chrono'                    => $args['resource']['alt_identifier'],
             'originatorAgency'          => [
-                'id'    => $entity['producer_service'],
-                'label' => $entity['entity_label']
+                'id'    => $args['entity']['producer_service'],
+                'label' => $args['entity']['entity_label']
             ],
-            'receivedDate'              => $resource['admission_date'],
-            'documentDate'              => $resource['doc_date'],
-            'creationDate'              => $resource['creation_date'],
-            'modificationDate'          => $resource['modification_date'],
+            'receivedDate'              => $args['resource']['admission_date'],
+            'documentDate'              => $args['resource']['doc_date'],
+            'creationDate'              => $args['resource']['creation_date'],
+            'modificationDate'          => $args['resource']['modification_date'],
             'retentionRule'             => $initData['data']['doctype']['retentionRule'],
             'retentionFinalDisposition' => $initData['data']['doctype']['retentionFinalDisposition'],
-            'accessRuleCode'            => $config['exportSeda']['accessRuleCode'],
+            'accessRuleCode'            => $args['config']['exportSeda']['accessRuleCode'],
             'history'                   => $history['history'],
             'contacts'                  => [
-                'senders'    => ContactController::getParsedContacts(['resId' => $resource['res_id'], 'mode' => 'sender']),
-                'recipients' => ContactController::getParsedContacts(['resId' => $resource['res_id'], 'mode' => 'recipient'])
+                'senders'    => ContactController::getParsedContacts(['resId' => $args['resource']['res_id'], 'mode' => 'sender']),
+                'recipients' => ContactController::getParsedContacts(['resId' => $args['resource']['res_id'], 'mode' => 'recipient'])
             ],
             'attachments'               => $initData['archiveUnits'],
             'folders'                   => $folder['folderPath'],
@@ -185,9 +242,9 @@ trait ExportSEDATrait
             'type' => 'ArchiveTransfer',
             'messageObject' => [
                 'messageIdentifier'  => $initData['data']['slipInfo']['slipId'],
-                'archivalAgreement'  => $args['data']['archivalAgreement'],
+                'archivalAgreement'  => $args['archivalAgreement'],
                 'dataObjectPackage'  => $dataObjectPackage,
-                'archivalAgency'     => $args['data']['entityArchiveRecipient'],
+                'archivalAgency'     => $args['entityArchiveRecipient'],
                 'transferringAgency' => $initData['data']['entity']['senderArchiveEntity']
             ]
         ];
@@ -201,54 +258,15 @@ trait ExportSEDATrait
         MessageExchangeModel::insertUnitIdentifier([
             'messageId' => $messageSaved['messageId'],
             'tableName' => 'res_letterbox',
-            'resId'     => $resource['res_id']
+            'resId'     => $args['resource']['res_id']
         ]);
 
         ExportSEDATrait::cleanTmpDocument(['archiveUnits' => $initData['archiveUnits']]);
 
-        if ($args['data']['actionMode'] == 'download') {
-            static $downloadFiles;
-            if ($downloadFiles === null) {
-                $downloadFiles = [];
-            }
-            $encodedContent = base64_encode(file_get_contents($sedaPackage['encodedFilePath']));
-            unlink($sedaPackage['encodedFilePath']);
-            $downloadFiles[] = $encodedContent;
-            return ['data' => ['encodedFiles' => $downloadFiles]];
-        } elseif (count($args['resources']) > 1) {
-            $customId = CoreConfigModel::getCustomId();
-            
-            static $massData;
-            if ($massData === null) {
-                $massData = [
-                    'resources'     => [],
-                    'successStatus' => $args['action']['parameters']['successStatus'],
-                    'errorStatus'   => $args['action']['parameters']['errorStatus'],
-                    'userId'        => $GLOBALS['id'],
-                    'customId'      => $customId
-                ];
-            }
-
-            $massData['resources'][] = [
-                'resId' => $resource['res_id'], 'messageId' => $messageSaved['messageId'], 'encodedFilePath' => $sedaPackage['encodedFilePath'],
-                'messageFilename' => $sedaPackage['messageFilename'], 'reference' => $data['messageObject']['messageIdentifier']
-            ];
-
-            return ['postscript' => 'src/app/external/exportSeda/scripts/ExportSedaScript.php', 'args' => $massData];
-        } else {
-            $elementSend  = ExportSEDATrait::sendSedaPackage([
-                'messageId'       => $messageSaved['messageId'],
-                'config'          => $config,
-                'encodedFilePath' => $sedaPackage['encodedFilePath'],
-                'messageFilename' => $sedaPackage['messageFilename'],
-                'resId'           => $resource['res_id'],
-                'reference'       => $data['messageObject']['messageIdentifier']
-            ]);
-            unlink($sedaPackage['encodedFilePath']);
-            if (!empty($elementSend['errors'])) {
-                return ['errors' => [$elementSend['errors']]];
-            }
-        }
+        return [
+            'messageId' => $messageSaved['messageId'], 'encodedFilePath' => $sedaPackage['encodedFilePath'],
+            'messageFilename' => $sedaPackage['messageFilename'], 'reference' => $data['messageObject']['messageIdentifier']
+        ];
     }
 
     public static function sendSedaPackage($args = [])
@@ -258,7 +276,7 @@ trait ExportSEDATrait
             'filename'    => $args['messageFilename'],
             'schema'      => 'seda2'
         ];
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'     => rtrim($args['config']['exportSeda']['urlSAEService'], '/') . '/medona/archiveTransfer',
             'method'  => 'POST',
             'cookie'  => 'LAABS-AUTH=' . urlencode($args['config']['exportSeda']['token']),
@@ -296,10 +314,7 @@ trait ExportSEDATrait
             return ['errors' => ['[storeAttachment] ' . $id['errors']]];
         }
 
-        ConvertPdfController::convert([
-            'resId'  => $id,
-            'collId' => 'attachments_coll'
-        ]);
+        ConvertPdfController::convert(['resId' => $id, 'collId' => 'attachments_coll']);
 
         return [];
     }
@@ -546,7 +561,7 @@ trait ExportSEDATrait
 
     public static function getAcknowledgement($args = [])
     {
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'     => rtrim($args['config']['exportSeda']['urlSAEService'], '/') . '/medona/message/reference?reference='.urlencode($args['reference']."_Ack"),
             'method'  => 'GET',
             'cookie'  => 'LAABS-AUTH=' . urlencode($args['config']['exportSeda']['token']),
@@ -565,7 +580,7 @@ trait ExportSEDATrait
 
         $messageId = $curlResponse['response']['messageId'];
 
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'     => rtrim($args['config']['exportSeda']['urlSAEService'], '/') . '/medona/message/'.urlencode($messageId).'/Export',
             'method'  => 'GET',
             'cookie'  => 'LAABS-AUTH=' . urlencode($args['config']['exportSeda']['token']),

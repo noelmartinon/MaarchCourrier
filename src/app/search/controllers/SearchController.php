@@ -316,7 +316,7 @@ class SearchController
         return ['searchWhere' => ["({$whereClause})"], 'searchData' => $dataClause];
     }
 
-    private static function getQuickFieldClause(array $args)
+    public static function getQuickFieldClause(array $args)
     {
         ValidatorModel::notEmpty($args, ['searchWhere', 'searchData']);
         ValidatorModel::arrayType($args, ['body', 'searchWhere', 'searchData']);
@@ -388,7 +388,7 @@ class SearchController
         return ['searchWhere' => $args['searchWhere'], 'searchData' => $args['searchData']];
     }
 
-    private static function getMainFieldsClause(array $args)
+    public static function getMainFieldsClause(array $args)
     {
         ValidatorModel::notEmpty($args, ['searchWhere', 'searchData']);
         ValidatorModel::arrayType($args, ['body', 'searchWhere', 'searchData']);
@@ -863,7 +863,7 @@ class SearchController
         return ['searchWhere' => $args['searchWhere'], 'searchData' => $args['searchData']];
     }
 
-    private static function getListFieldsClause(array $args)
+    public static function getListFieldsClause(array $args)
     {
         ValidatorModel::notEmpty($args, ['searchWhere', 'searchData']);
         ValidatorModel::arrayType($args, ['body', 'searchWhere', 'searchData']);
@@ -932,7 +932,7 @@ class SearchController
         return ['searchWhere' => $args['searchWhere'], 'searchData' => $args['searchData']];
     }
 
-    private static function getCustomFieldsClause(array $args)
+    public static function getCustomFieldsClause(array $args)
     {
         ValidatorModel::notEmpty($args, ['searchWhere', 'searchData']);
         ValidatorModel::arrayType($args, ['body', 'searchWhere', 'searchData']);
@@ -1061,7 +1061,7 @@ class SearchController
         return ['searchWhere' => $args['searchWhere'], 'searchData' => $args['searchData']];
     }
 
-    private static function getRegisteredMailsClause(array $args)
+    public static function getRegisteredMailsClause(array $args)
     {
         ValidatorModel::notEmpty($args, ['searchWhere', 'searchData']);
         ValidatorModel::arrayType($args, ['body', 'searchWhere', 'searchData']);
@@ -1177,7 +1177,7 @@ class SearchController
         return ['searchWhere' => $args['searchWhere'], 'searchData' => $args['searchData']];
     }
 
-    private function getFulltextClause(array $args)
+    public static function getFulltextClause(array $args)
     {
         ValidatorModel::notEmpty($args, ['searchWhere', 'searchData']);
         ValidatorModel::arrayType($args, ['body', 'searchWhere', 'searchData']);
@@ -1249,7 +1249,7 @@ class SearchController
         return ['searchWhere' => $args['searchWhere'], 'searchData' => $args['searchData'], 'matchingResources' => $matchingResources];
     }
 
-    private static function getFiltersClause(array $args)
+    public static function getFiltersClause(array $args)
     {
         ValidatorModel::arrayType($args, ['body']);
 

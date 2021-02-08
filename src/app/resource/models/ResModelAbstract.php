@@ -139,7 +139,7 @@ abstract class ResModelAbstract
                 'res_letterbox.status = status.id'
             ],
             'data'      => [$aArgs['userId'], ['res_letterbox', 'res_view_letterbox'], 'none', 'linkup', 'attach%', 'DEL'],
-            'groupBy'   => ['res_letterbox.type_id', 'res_letterbox.creation_date', 'res_letterbox.res_id', 'res_letterbox.subject', 'res_letterbox.status'],
+            'groupBy'   => ['res_letterbox.type_id', 'res_letterbox.creation_date', 'res_letterbox.res_id', 'res_letterbox.subject', 'res_letterbox.status', 'res_letterbox.category_id'],
             'order_by'  => ['MAX(history.event_date) DESC'],
             'limit'     => $aArgs['limit']
         ]);

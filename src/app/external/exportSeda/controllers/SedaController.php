@@ -219,7 +219,7 @@ class SedaController
     {
         $archiveEntities = [];
         if (strtolower($args['config']['exportSeda']['sae']) == 'maarchrm') {
-            $curlResponse = CurlModel::execSimple([
+            $curlResponse = CurlModel::exec([
                 'url'     => rtrim($args['config']['exportSeda']['urlSAEService'], '/') . '/organization/organization/Byrole/archiver',
                 'method'  => 'GET',
                 'cookie'  => 'LAABS-AUTH=' . urlencode($args['config']['exportSeda']['token']),
@@ -268,7 +268,7 @@ class SedaController
     {
         $archivalAgreements = [];
         if (strtolower($args['config']['exportSeda']['sae']) == 'maarchrm') {
-            $curlResponse = CurlModel::execSimple([
+            $curlResponse = CurlModel::exec([
                 'url'     => rtrim($args['config']['exportSeda']['urlSAEService'], '/') . '/medona/archivalAgreement/Index',
                 'method'  => 'GET',
                 'cookie'  => 'LAABS-AUTH=' . urlencode($args['config']['exportSeda']['token']),
@@ -321,7 +321,7 @@ class SedaController
 
     public static function getProducerServiceInfo($args = [])
     {
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'     => rtrim($args['config']['exportSeda']['urlSAEService'], '/') . '/organization/organization/Search?term=' . $args['producerServiceName'],
             'method'  => 'GET',
             'cookie'  => 'LAABS-AUTH=' . urlencode($args['config']['exportSeda']['token']),
@@ -361,7 +361,7 @@ class SedaController
         }
         
         if (strtolower($config['exportSeda']['sae']) == 'maarchrm') {
-            $curlResponse = CurlModel::execSimple([
+            $curlResponse = CurlModel::exec([
                 'url'     => rtrim($config['exportSeda']['urlSAEService'], '/') . '/recordsManagement/retentionRule/Index',
                 'method'  => 'GET',
                 'cookie'  => 'LAABS-AUTH=' . urlencode($config['exportSeda']['token']),

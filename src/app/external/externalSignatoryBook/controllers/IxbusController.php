@@ -57,7 +57,7 @@ class IxbusController
 
     public static function getNature($aArgs)
     {
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
                 'url'     => rtrim($aArgs['config']['data']['url'], '/') . '/api/parapheur/v1/nature',
                 'headers' => ['content-type:application/json', 'IXBUS_API:' . $aArgs['config']['data']['tokenAPI']],
                 'method'  => 'GET'
@@ -75,7 +75,7 @@ class IxbusController
 
     public static function getMessagesModel($aArgs)
     {
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'     => rtrim($aArgs['config']['data']['url'], '/') . '/api/parapheur/v1/circuit/' . $aArgs['natureId'],
             'headers' => ['content-type:application/json', 'IXBUS_API:' . $aArgs['config']['data']['tokenAPI']],
             'method'  => 'GET'
@@ -94,7 +94,7 @@ class IxbusController
 
     public static function getNatureUsers($aArgs)
     {
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'     => rtrim($aArgs['config']['data']['url'], '/') . '/api/parapheur/v1/nature/' . $aArgs['natureId'] . '/redacteur',
             'headers' => ['content-type:application/json', 'IXBUS_API:' . $aArgs['config']['data']['tokenAPI']],
             'method'  => 'GET'
@@ -301,7 +301,7 @@ class IxbusController
 
     public static function createFolder(array $aArgs)
     {
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'     => rtrim($aArgs['config']['data']['url'], '/') . '/api/parapheur/v1/dossier',
             'headers' => ['content-type:application/json', 'IXBUS_API:' . $aArgs['config']['data']['tokenAPI']],
             'method'  => 'POST',
@@ -316,7 +316,7 @@ class IxbusController
 
     public static function addFileToFolder(array $aArgs)
     {
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'           => rtrim($aArgs['config']['data']['url'], '/') . '/api/parapheur/v1/document/' . $aArgs['folderId'],
             'headers'       => ['IXBUS_API:' . $aArgs['config']['data']['tokenAPI']],
             'customRequest' => 'POST',
@@ -332,7 +332,7 @@ class IxbusController
 
     public static function transmitFolder(array $aArgs)
     {
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'     => rtrim($aArgs['config']['data']['url'], '/') . '/api/parapheur/v1/dossier/' . $aArgs['folderId'] . '/transmettre',
             'headers' => ['content-type:application/json', 'IXBUS_API:' . $aArgs['config']['data']['tokenAPI']],
             'method'  => 'POST'
@@ -369,7 +369,7 @@ class IxbusController
 
     public static function getDossier($aArgs)
     {
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'     => rtrim($aArgs['config']['data']['url'], '/') . '/api/parapheur/v1/dossier/' . $aArgs['folderId'],
             'headers' => ['content-type:application/json', 'IXBUS_API:' . $aArgs['config']['data']['tokenAPI']],
             'method'  => 'GET'
@@ -383,7 +383,7 @@ class IxbusController
 
     public static function getDocument($aArgs)
     {
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'       => rtrim($aArgs['config']['data']['url'], '/') . '/api/parapheur/v1/document/contenu/' . $aArgs['documentId'],
             'headers'   => [
                 'Accept: application/zip',

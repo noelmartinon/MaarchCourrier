@@ -633,7 +633,7 @@ class AuthenticationController
         if (empty($_COOKIE[$configuration['cookieName']])) {
             return ['errors' => 'Authentication Failed : User cookie is not set'];
         }
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'           => "{$configuration['attributeUrl']}?subjectid={$_COOKIE[$configuration['cookieName']]}&attributenames={$configuration['attributeName']}",
             'method'        => 'GET',
         ]);

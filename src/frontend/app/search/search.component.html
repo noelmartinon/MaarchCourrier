@@ -14,7 +14,7 @@
             </div>
             <div class="bg-head-content" [class.fullContainer]="appService.getViewMode()">
                 <app-criteria-tool #appCriteriaTool [isLoadingResult]="loadingResult" (searchUrlGenerated)="appSearchResultList.launchSearch($event, true);"
-                   style="width:100%;padding-bottom: 10px;" (loaded)="appSearchResultList.initSavedCriteria()"></app-criteria-tool>
+                   style="width:100%;padding-bottom: 10px;" (loaded)="initSearch()" (afterGetSearchTemplates)="setLaunchWithSearchTemplate($event)"></app-criteria-tool>
                 <div id="toolTemplate" style="width: 100%;"></div>
             </div>
         </div>

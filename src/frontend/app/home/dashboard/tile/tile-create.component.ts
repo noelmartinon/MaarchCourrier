@@ -26,6 +26,11 @@ export class TileCreateComponent implements OnInit {
     views: any[] = [];
     baskets: any[] = [];
     folders: any[] = [];
+    chartTypes: any[] = [];
+    chartModes: any[] = [];
+    searchTemplates: any[] = [];
+    searchTemplatesControl: FormControl = new FormControl();
+
     menus: any[] = [];
     menusControl: FormControl = new FormControl();
 
@@ -37,34 +42,13 @@ export class TileCreateComponent implements OnInit {
     selectedColor: string = '#90caf9';
     extraParams: any = {};
 
-    colors: string[] = [
-        '#ef9a9a',
-        '#f48fb1',
-        '#ce93d8',
-        '#b39ddb',
-        '#9fa8da',
-        '#90caf9',
-        '#81d4fa',
-        '#80deea',
-        '#80cbc4',
-        '#a5d6a7',
-        '#c5e1a5',
-        '#e6ee9c',
-        '#fff59d',
-        '#ffe082',
-        '#ffcc80',
-        '#ffab91',
-        '#bcaaa4',
-        '#b0bec5',
-    ];
-
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<TileCreateComponent>,
         public dashboardService: DashboardService,
-        private functionsService: FunctionsService,
+        public functionsService: FunctionsService,
         private notify: NotificationService,
         public headerService: HeaderService,
         public privilegeService: PrivilegeService,
@@ -105,19 +89,42 @@ export class TileCreateComponent implements OnInit {
             this.getAdminMenu();
         } else if (this.selectedTileType === 'externalSignatoryBook') {
             this.getMPInfos();
+        } else if (this.selectedTileType === 'searchTemplate') {
+            this.getSearchTemplates();
         }
+    }
+
+    getChartTypes() {
+        if (this.chartTypes.length === 0) {
+            this.chartTypes = this.dashboardService.getChartTypes();
+            this.chartTypes = this.chartTypes.map((type: any) => {
+                return {
+                    ...type,
+                    label: this.translate.instant('lang.chart_' + type.type)
+                };
+            });
+        }
+    }
+
+    setChartModes() {
+        this.chartModes = this.dashboardService.getChartModes(this.extraParams.chartType);
     }
 
     getBaskets() {
         if (this.baskets.length === 0) {
             this.http.get('../rest/home').pipe(
                 tap((data: any) => {
-                    this.baskets = data.regroupedBaskets;
-                    this.tileLabel = `${this.baskets[0].baskets[0].basket_name} (${this.baskets[0].groupDesc})`;
-                    this.extraParams = {
-                        groupId: this.baskets[0].groupSerialId,
-                        basketId: this.baskets[0].baskets[0].id
-                    };
+                    if (data.regroupedBaskets.length > 0) {
+                        this.baskets = data.regroupedBaskets;
+                        this.tileLabel = `${this.baskets[0].baskets[0].basket_name} (${this.baskets[0].groupDesc})`;
+                        this.extraParams = {
+                            groupId: this.baskets[0].groupSerialId,
+                            basketId: this.baskets[0].baskets[0].id
+                        };
+                    } else {
+                        this.notify.error(this.translate.instant('lang.noAvailableBasket'));
+                        this.resetData();
+                    }
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
@@ -140,6 +147,34 @@ export class TileCreateComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    getSearchTemplates() {
+        if (this.searchTemplates.length === 0) {
+            this.http.get('../rest/searchTemplates').pipe(
+                tap((data: any) => {
+                    if (data.searchTemplates.length > 0) {
+                        this.searchTemplates = data.searchTemplates;
+                        this.setSearchTemplate(this.searchTemplates[0]);
+                        this.searchTemplatesControl.setValue(this.searchTemplates[0]);
+                    } else {
+                        this.notify.error(this.translate.instant('lang.nosearchTemplate'));
+                        this.resetData();
+                    }
+                }),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        }
+    }
+
+    setSearchTemplate(searchTemplate: any) {
+        this.extraParams = {
+            searchTemplateId: searchTemplate.id,
+        };
+        this.tileLabel = searchTemplate.label;
     }
 
     getFolders() {
@@ -182,7 +217,7 @@ export class TileCreateComponent implements OnInit {
                 };
             });
             tmpMenus = this.sortPipe.transform(tmpMenus, 'label');
-            
+
             if (tmpMenus.length > 0) {
                 tmpMenus.unshift({
                     id: 'opt_menu',
@@ -215,22 +250,30 @@ export class TileCreateComponent implements OnInit {
             }
             if (arrMenus.length > 0) {
                 this.menus = arrMenus;
-                this.setMenu(this.menus[1])
-                this.menusControl.setValue(this.menus[1])
+                this.setMenu(this.menus[1]);
+                this.menusControl.setValue(this.menus[1]);
             } else {
-                this.notify.error(this.translate.instant('lang.noData'));
+                this.notify.error(this.translate.instant('lang.noDataAvailable'));
                 this.resetData();
             }
         }
+    }
+
+    setBasket(data: any) {
+        this.tileLabel = `${data.basketName} (${data.groupName})`;
+        this.extraParams = {
+            basketId: data.basketId,
+            groupId: data.groupId
+        };
     }
 
     setMenu(menu: any) {
         this.extraParams.privilegeId = menu.id;
         this.tileLabel = menu.label;
         this.tileOtherInfos = {
-            icon : menu.style,
+            icon: menu.style,
             privRoute: menu.route,
-        }
+        };
     }
 
     compareBaskets(basket1: any, basket2: any) {
@@ -262,7 +305,10 @@ export class TileCreateComponent implements OnInit {
 
     resetExtraParams() {
         if (this.selectedView === 'chart') {
+            this.getChartTypes();
+            this.extraParams['chartType'] = 'pie';
             this.extraParams['chartMode'] = 'doctype';
+            this.setChartModes();
         } else {
             delete this.extraParams.chartMode;
         }
@@ -279,7 +325,8 @@ export class TileCreateComponent implements OnInit {
                 objToSend.id = data.id;
                 objToSend.label = this.tileLabel;
                 objToSend.position = this.position;
-                objToSend = {...objToSend,...this.tileOtherInfos};
+                objToSend.charts = this.dashboardService.getCharts();
+                objToSend = { ...objToSend, ...this.tileOtherInfos };
                 this.dialogRef.close(objToSend);
             }),
             catchError((err: any) => {

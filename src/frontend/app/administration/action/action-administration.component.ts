@@ -133,6 +133,8 @@ export class ActionAdministrationComponent implements OnInit {
                         } else if (this.intermediateStatusActions.indexOf(this.action.actionPageId) !== -1) {
                             this.selectSuccessStatusId.setValue(this.action.parameters.successStatus);
                             this.selectErrorStatusId.setValue(this.action.parameters.errorStatus);
+                            this.errorStatus = this.action.parameters.errorStatus;
+                            this.successStatus = this.action.parameters.successStatus;
                         }
                     });
             }
@@ -152,7 +154,7 @@ export class ActionAdministrationComponent implements OnInit {
             this.selectErrorStatusId.setValue('_NOSTATUS_');
         }
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             if (this.action.actionPageId === 'close_mail' && this.functions.empty(this.availableCustomFields)) {
                 this.http.get('../rest/customFields').pipe(
                     tap((data: any) => {

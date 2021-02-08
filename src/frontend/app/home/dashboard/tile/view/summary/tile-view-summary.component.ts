@@ -6,19 +6,17 @@ import { DashboardService } from '@appRoot/home/dashboard/dashboard.service';
 import { Router } from '@angular/router';
 
 @Component({
-    selector: 'app-tile-view-chart',
-    templateUrl: 'tile-view-chart.component.html',
-    styleUrls: ['tile-view-chart.component.scss'],
+    selector: 'app-tile-view-summary',
+    templateUrl: 'tile-view-summary.component.html',
+    styleUrls: ['tile-view-summary.component.scss'],
 })
-export class TileViewChartComponent implements OnInit, AfterViewInit {
+export class TileViewSummaryComponent implements OnInit, AfterViewInit {
 
+    @Input() countResources: any[];
     @Input() icon: string = '';
-    @Input() resources: any[];
+    @Input() resourceLabel: string = '';
     @Input() route: string = null;
     @Input() tile: any;
-    @Input() resourceLabel: string = '';
-
-    formatedData: any = null;
 
     constructor(
         private router: Router,
@@ -28,22 +26,7 @@ export class TileViewChartComponent implements OnInit, AfterViewInit {
         private dashboardService: DashboardService,
     ) { }
 
-    ngOnInit(): void {
-        this.formatData();
-    }
-
-    formatData() {
-        if (this.tile.parameters.chartType === 'line') {
-            this.formatedData = [
-                {
-                    'name': this.resourceLabel,
-                    'series': this.resources
-                }
-            ];
-        } else {
-            this.formatedData = this.resources;
-        }
-    }
+    ngOnInit(): void { }
 
     ngAfterViewInit(): void { }
 
@@ -51,6 +34,7 @@ export class TileViewChartComponent implements OnInit, AfterViewInit {
         const data = { ...this.tile.parameters, ...this.tile };
         delete data.parameters;
         const link = this.dashboardService.getFormatedRoute(this.route, data);
+
         if (link) {
             const regex = /http[.]*/g;
             if (link.route.match(regex) === null) {

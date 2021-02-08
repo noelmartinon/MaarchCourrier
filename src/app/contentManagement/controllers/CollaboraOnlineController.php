@@ -360,7 +360,7 @@ class CollaboraOnlineController
             }
         }
 
-        $discovery = CurlModel::execSimple([
+        $discovery = CurlModel::exec([
             'url'    => $url . '/hosting/discovery',
             'method' => 'GET',
             'isXml'  => true

@@ -180,7 +180,7 @@ class SendMessageController
         return $messageObject;
     }
 
-    private function getBinaryDataObject($filePath, $id)
+    private static function getBinaryDataObject($filePath, $id)
     {
         $binaryDataObject = new \stdClass();
 
@@ -207,7 +207,7 @@ class SendMessageController
         return $binaryDataObject;
     }
 
-    private function getArchiveUnit(
+    private static function getArchiveUnit(
         $type,
         $object = null,
         $attachments = null,
@@ -276,7 +276,7 @@ class SendMessageController
         return $archiveUnit;
     }
 
-    private function getContent($type, $object = null, $relatedObjectReference = null)
+    private static function getContent($type, $object = null, $relatedObjectReference = null)
     {
         $content = new \stdClass();
 
@@ -313,9 +313,9 @@ class SendMessageController
                     foreach ($object->contacts as $contactType => $contacts) {
                         foreach ($contacts as $contact) {
                             if ($contactType == "senders") {
-                                $content->Sender[] = self::getAddresse($contact);
+                                $content->Sender[] = self::getAddress($contact);
                             } elseif ($contactType == "recipients") {
-                                $content->Addressee[] = self::getAddresse($contact);
+                                $content->Addressee[] = self::getAddress($contact);
                             }
                         }
                     }
@@ -422,7 +422,7 @@ class SendMessageController
         return $content;
     }
 
-    private function getManagement($valueInData = null)
+    private static function getManagement($valueInData = null)
     {
         $management = new \stdClass();
 
@@ -448,7 +448,7 @@ class SendMessageController
         return $management;
     }
 
-    private function getCustodialHistoryItem($history)
+    private static function getCustodialHistoryItem($history)
     {
         $date = new \DateTime($history->event_date);
 
@@ -459,19 +459,19 @@ class SendMessageController
         return $custodialHistoryItem;
     }
 
-    private function getAddresse($informations)
+    private static function getAddress($informations)
     {
-        $addressee = new \stdClass();
+        $address = new \stdClass();
         
         if ($informations->civility) {
-            $addressee->Gender = $informations->civility->label;
+            $address->Gender = $informations->civility->label;
         }
         if ($informations->firstname) {
-            $addressee->FirstName = $informations->firstname;
+            $address->FirstName = $informations->firstname;
         }
         if ($informations->lastname) {
-            $addressee->BirthName = $informations->lastname;
+            $address->BirthName = $informations->lastname;
         }
-        return $addressee;
+        return $address;
     }
 }

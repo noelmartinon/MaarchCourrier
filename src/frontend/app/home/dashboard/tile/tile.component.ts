@@ -6,6 +6,7 @@ import { DashboardService } from '@appRoot/home/dashboard/dashboard.service';
 import { catchError, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { NotificationService } from '@service/notification/notification.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     selector: 'app-tile',
@@ -19,6 +20,7 @@ export class TileDashboardComponent implements OnInit, AfterViewInit {
     @Input() tile: any = null;
 
     loading: boolean = true;
+    onError: boolean = false;
 
     resources: any[] = [];
     countResources: number = 0;
@@ -31,6 +33,7 @@ export class TileDashboardComponent implements OnInit, AfterViewInit {
         private notify: NotificationService,
         public appService: AppService,
         public dashboardService: DashboardService,
+        private functionsService: FunctionsService
     ) { }
 
     ngOnInit(): void { }
@@ -58,43 +61,34 @@ export class TileDashboardComponent implements OnInit, AfterViewInit {
                     const resources = data.tile.resources.map((resource: any) => {
                         let contactLabel = '';
                         let contactTitle = '';
-                        if (resource.senders.length > 0) {
-                            if (resource.senders.length === 1) {
-                                contactLabel = resource.senders[0];
-                                contactTitle = this.translate.instant('lang.sender') + ': ' + resource.senders[0];
-                            } else {
-                                contactLabel = resource.senders.length + ' ' + this.translate.instant('lang.senders');
-                                contactTitle = resource.senders;
-                            }
-                        } else if (resource.recipients.length > 0) {
-                            if (resource.recipients.length === 1) {
-                                contactLabel = resource.recipients[0];
-                                contactTitle = this.translate.instant('lang.sender') + ': ' + resource.recipients[0];
-                            } else {
-                                contactLabel = resource.recipients.length + ' ' + this.translate.instant('lang.recipients');
-                                contactTitle = resource.recipients;
-                            }
+                        if (resource.correspondents.length === 1) {
+                            contactLabel = resource.correspondents[0];
+                            contactTitle = this.translate.instant('lang.contact') + ': ' + resource.correspondents[0];
+                        } else if (resource.correspondents.length > 1) {
+                            contactLabel = resource.correspondents.length + ' ' + this.translate.instant('lang.contacts');
+                            contactTitle = resource.correspondents;
                         }
-                        delete resource.recipients;
-                        delete resource.senders;
                         return {
                             ...resource,
                             contactLabel: contactLabel,
                             contactTitle: contactTitle
                         };
                     });
-                    this.resources = resources
+                    this.resources = resources;
                     resolve(true);
                 }),
                 catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
+                    console.log(err);
+                    this.notify.error(this.translate.instant('lang.tileLoadError', { 0: (this.tile.position + 1) }));
+                    this.onError = true;
+                    resolve(false);
                     return of(false);
                 })
             ).subscribe();
         });
     }
 
-    async get_resume(extraParams: any) {
+    async get_summary(extraParams: any) {
         return new Promise((resolve) => {
             this.http.get(`../rest/tiles/${this.tile.id}`).pipe(
                 tap((data: any) => {
@@ -102,7 +96,10 @@ export class TileDashboardComponent implements OnInit, AfterViewInit {
                     resolve(true);
                 }),
                 catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
+                    console.log(err);
+                    this.notify.error(this.translate.instant('lang.tileLoadError', { 0: (this.tile.position + 1) }));
+                    this.onError = true;
+                    resolve(false);
                     return of(false);
                 })
             ).subscribe();
@@ -113,11 +110,19 @@ export class TileDashboardComponent implements OnInit, AfterViewInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/tiles/${this.tile.id}`).pipe(
                 tap((data: any) => {
-                    this.resources = data.tile.resources;
+                    this.resources = data.tile.resources.map((item: any) => {
+                        return {
+                            ...item,
+                            name: !this.functionsService.empty(item.name) ? item.name : this.translate.instant('lang.undefined')
+                        };
+                    });
                     resolve(true);
                 }),
                 catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
+                    console.log(err);
+                    this.notify.error(this.translate.instant('lang.tileLoadError', { 0: (this.tile.position + 1) }));
+                    this.onError = true;
+                    resolve(false);
                     return of(false);
                 })
             ).subscribe();

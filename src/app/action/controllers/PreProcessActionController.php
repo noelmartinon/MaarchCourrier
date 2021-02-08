@@ -661,7 +661,7 @@ class PreProcessActionController
                     continue;
                 }
                 if (!empty($noAttachmentsResource['signaturebookid'])) {
-                    $additionalsInfos['noMail'][] = ['alt_identifier' => $noAttachmentsResource['alt_identifier'], 'res_id' => $resId, 'reason' => 'fileAlreadySendToSignatureBook'];
+                    $additionalsInfos['noMail'][] = ['alt_identifier' => $noAttachmentsResource['alt_identifier'], 'res_id' => $resId, 'reason' => 'fileAlreadySentToSignatureBook'];
                     continue;
                 }
                 $additionalsInfos['mails'][] = ['res_id' => $resId];

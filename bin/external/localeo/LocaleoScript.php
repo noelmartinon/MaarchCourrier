@@ -90,7 +90,7 @@ class LocaleoScript
             }
             $body = array_merge($body, $dataToMerge);
 
-            $response = \SrcCore\models\CurlModel::execSimple([
+            $response = \SrcCore\models\CurlModel::exec([
                 'url'       => $url,
                 'method'    => 'NO-METHOD',
                 'headers'   => ["Api-Key: {$apiKey}", "appName: {$appName}"],
@@ -182,7 +182,7 @@ class LocaleoScript
             $body['id'] = $externalId['localeoId'];
             $body = array_merge($body, $dataToMerge);
 
-            $response = \SrcCore\models\CurlModel::execSimple([
+            $response = \SrcCore\models\CurlModel::exec([
                 'url'       => $url,
                 'method'    => 'NO-METHOD',
                 'headers'   => ["Api-Key: {$apiKey}", "appName: {$appName}"],
@@ -289,7 +289,7 @@ class LocaleoScript
             $body['requete'] = json_encode($requete);
             $body['citoyen'] = json_encode($citoyen);
 
-            $response = \SrcCore\models\CurlModel::execSimple([
+            $response = \SrcCore\models\CurlModel::exec([
                 'url'       => $url,
                 'method'    => 'NO-METHOD',
                 'headers'   => ["Api-Key: {$apiKey}", "appName: {$appName}"],
@@ -405,7 +405,7 @@ class LocaleoScript
             $body['requete'] = json_encode($requete);
             $body['citoyen'] = json_encode($citoyen);
 
-            $response = \SrcCore\models\CurlModel::execSimple([
+            $response = \SrcCore\models\CurlModel::exec([
                 'url'       => $url,
                 'method'    => 'NO-METHOD',
                 'headers'   => ["Api-Key: {$apiKey}", "appName: {$appName}"],
@@ -498,7 +498,7 @@ class LocaleoScript
 
             $body['requete'] = json_encode($requete);
 
-            $response = \SrcCore\models\CurlModel::execSimple([
+            $response = \SrcCore\models\CurlModel::exec([
                 'url'       => $url,
                 'method'    => 'NO-METHOD',
                 'headers'   => ["Api-Key: {$apiKey}", "appName: {$appName}"],

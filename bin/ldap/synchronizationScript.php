@@ -311,7 +311,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
         $user['userId'] = $user['user_id'];
         if (!empty($maarchUsersLogin[$user['userId']])) {
             if ($maarchUsersLogin[$user['userId']]['status'] == 'SPD') {
-                $curlResponse = \SrcCore\models\CurlModel::execSimple([
+                $curlResponse = \SrcCore\models\CurlModel::exec([
                     'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $maarchUsersLogin[$user['user_id']]['id'] . '/status',
                     'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
                     'headers'       => ['content-type:application/json'],
@@ -328,7 +328,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
                 || $user['phone'] != $maarchUsersLogin[$user['user_id']]['phone']
                 || $user['mail'] != $maarchUsersLogin[$user['user_id']]['mail']
             ) {
-                $curlResponse = \SrcCore\models\CurlModel::execSimple([
+                $curlResponse = \SrcCore\models\CurlModel::exec([
                     'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $maarchUsersLogin[$user['user_id']]['id'],
                     'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
                     'headers'       => ['content-type:application/json'],
@@ -342,7 +342,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
                 if (!empty($user['entityId'])) {
                     $entityExists = \Entity\models\EntityModel::getByEntityId(['entityId' => $user['entityId'], 'select' => [1]]);
                     if (empty($entityExists) && !empty($user['defaultEntity'])) {
-                        $curlResponse = \SrcCore\models\CurlModel::execSimple([
+                        $curlResponse = \SrcCore\models\CurlModel::exec([
                             'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $maarchUsersLogin[$user['user_id']]['id'] . '/entities',
                             'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
                             'headers'       => ['content-type:application/json'],
@@ -353,7 +353,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
                             writeLog(['message' => "[ERROR] Add entity to user [{$maarchUsersLogin[$user['user_id']]['user_id']}] failed : {$curlResponse['response']['errors']}"]);
                         }
                     } elseif (!empty($entityExists) && !\User\models\UserModel::hasEntity(['id' => $maarchUsersLogin[$user['user_id']]['id'], 'entityId' => $user['entityId']])) {
-                        $curlResponse = \SrcCore\models\CurlModel::execSimple([
+                        $curlResponse = \SrcCore\models\CurlModel::exec([
                             'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $maarchUsersLogin[$user['user_id']]['id'] . '/entities',
                             'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
                             'headers'       => ['content-type:application/json'],
@@ -373,7 +373,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
                 continue;
             }
 
-            $curlResponse = \SrcCore\models\CurlModel::execSimple([
+            $curlResponse = \SrcCore\models\CurlModel::exec([
                 'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users',
                 'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
                 'headers'       => ['content-type:application/json'],
@@ -386,7 +386,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
             }
 
             if (!empty($user['entityId'])) {
-                $curlResponse = \SrcCore\models\CurlModel::execSimple([
+                $curlResponse = \SrcCore\models\CurlModel::exec([
                     'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $curlResponse['response']['id'] . '/entities',
                     'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
                     'headers'       => ['content-type:application/json'],
@@ -403,7 +403,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
 
     foreach ($maarchUsers as $user) {
         if (empty($ldapUsersLogin[$user['user_id']])) {
-            $curlResponse = \SrcCore\models\CurlModel::execSimple([
+            $curlResponse = \SrcCore\models\CurlModel::exec([
                 'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $user['id'] . '/suspend',
                 'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
                 'headers'       => ['content-type:application/json'],
@@ -436,7 +436,7 @@ function synchronizeEntities(array $ldapEntities, array $maarchEntities)
             ) {
                 $entity['short_label'] = $maarchEntitiesId[$entity['entity_id']]['short_label'];
                 $entity['entity_type'] = $maarchEntitiesId[$entity['entity_id']]['entity_type'];
-                $curlResponse = \SrcCore\models\CurlModel::execSimple([
+                $curlResponse = \SrcCore\models\CurlModel::exec([
                     'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/entities/' . $entity['entity_id'],
                     'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
                     'headers'       => ['content-type:application/json'],
@@ -450,7 +450,7 @@ function synchronizeEntities(array $ldapEntities, array $maarchEntities)
         } else {
             $entity['short_label'] = $entity['entity_label'];
             $entity['entity_type'] = 'Service';
-            $curlResponse = \SrcCore\models\CurlModel::execSimple([
+            $curlResponse = \SrcCore\models\CurlModel::exec([
                 'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/entities',
                 'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
                 'headers'       => ['content-type:application/json'],
@@ -465,7 +465,7 @@ function synchronizeEntities(array $ldapEntities, array $maarchEntities)
 
     foreach ($maarchEntities as $entity) {
         if (empty($ldapEntitiesId[$entity['entity_id']])) {
-            $curlResponse = \SrcCore\models\CurlModel::execSimple([
+            $curlResponse = \SrcCore\models\CurlModel::exec([
                 'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/entities/' . $entity['entity_id'],
                 'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
                 'headers'       => ['content-type:application/json'],

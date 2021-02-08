@@ -57,7 +57,7 @@ trait ExternalSignatoryBookTrait
 
                 $massData['resources'][] = ['resId' => $args['resId'], 'data' => $args['data'], 'note' => $args['note']];
 
-                return ['postscript' => 'src/app/external/externalSignatoryBook/scripts/MailingScript.php', 'args' => $massData];
+                return ['postscript' => 'src/app/action/scripts/MailingScript.php', 'args' => $massData];
             }
         }
 

@@ -2,13 +2,11 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
-import { of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
 
 interface Tiles {
     'myLastResources': Tile;
     'basket': Tile;
-    // 'searchTemplate': Tile;
+    'searchTemplate': Tile;
     'followedMail': Tile;
     'folder': Tile;
     'externalSignatoryBook': Tile;
@@ -17,12 +15,12 @@ interface Tiles {
 
 interface Tile {
     'icon': string; // icon of tile
-    'menus': ('delete' | 'view')[]; // action of tile
+    'menus': ('delete' | 'view' | 'color')[]; // action of tile
     'views': TileView[]; // views tile
 }
 
 interface TileView {
-    'id': 'list' | 'resume' | 'chart'; // identifier
+    'id': 'list' | 'summary' | 'chart'; // identifier
     'route': string; // router when click on tile
     'viewDocRoute'?: string; // router when view a doc (usefull for list view)
 }
@@ -31,10 +29,11 @@ interface TileView {
 export class DashboardService {
 
     tileTypes: Tiles = {
-        myLastResources : {
+        myLastResources: {
             icon: 'fa fa-history',
-            menus : [
+            menus: [
                 'view',
+                'color',
                 'delete'
             ],
             views: [
@@ -44,7 +43,7 @@ export class DashboardService {
                     viewDocRoute: '/resources/:resId/thumbnail'
                 },
                 {
-                    id: 'resume',
+                    id: 'summary',
                     route: null
                 },
                 {
@@ -57,6 +56,7 @@ export class DashboardService {
             icon: 'fa fa-inbox',
             menus: [
                 'view',
+                'color',
                 'delete'
             ],
             views: [
@@ -66,7 +66,7 @@ export class DashboardService {
                     viewDocRoute: '/resources/:resId/thumbnail'
                 },
                 {
-                    id: 'resume',
+                    id: 'summary',
                     route: '/basketList/users/:userId/groups/:groupId/baskets/:basketId'
                 },
                 {
@@ -75,31 +75,34 @@ export class DashboardService {
                 }
             ]
         },
-        /*searchTemplate : {
+        searchTemplate: {
             icon: 'fa fa-search',
-            menus : [
+            menus: [
                 'view',
+                'color',
                 'delete'
             ],
             views: [
                 {
                     id: 'list',
-                    route: '/resources/:resId'
+                    route: '/resources/:resId',
+                    viewDocRoute: '/resources/:resId/thumbnail'
                 },
                 {
-                    id: 'resume',
-                    route: '/search'
+                    id: 'summary',
+                    route: '/search?searchTemplateId=:searchTemplateId'
                 },
                 {
                     id: 'chart',
-                    route: '/search'
+                    route: '/search?searchTemplateId=:searchTemplateId'
                 }
             ]
-        },*/
-        followedMail : {
+        },
+        followedMail: {
             icon: 'fa fa-star',
-            menus : [
+            menus: [
                 'view',
+                'color',
                 'delete'
             ],
             views: [
@@ -109,7 +112,7 @@ export class DashboardService {
                     viewDocRoute: '/resources/:resId/thumbnail'
                 },
                 {
-                    id: 'resume',
+                    id: 'summary',
                     route: '/followed'
                 },
                 {
@@ -118,10 +121,11 @@ export class DashboardService {
                 }
             ]
         },
-        folder : {
+        folder: {
             icon: 'fa fa-folder',
-            menus : [
+            menus: [
                 'view',
+                'color',
                 'delete'
             ],
             views: [
@@ -131,7 +135,7 @@ export class DashboardService {
                     viewDocRoute: '/resources/:resId/thumbnail'
                 },
                 {
-                    id: 'resume',
+                    id: 'summary',
                     route: '/folders/:folderId'
                 },
                 {
@@ -140,38 +144,67 @@ export class DashboardService {
                 }
             ]
         },
-        externalSignatoryBook : {
+        externalSignatoryBook: {
             icon: 'fas fa-pen-nib',
-            menus : [
+            menus: [
                 'view',
+                'color',
                 'delete'
             ],
             views: [
                 {
                     id: 'list',
-                    route: ':maarchParapheurUrl/dist/documents/:id',
+                    route: ':maarchParapheurUrl/dist/documents/:resId',
                     viewDocRoute: null
                 },
                 {
-                    id: 'resume',
+                    id: 'summary',
                     route: ':maarchParapheurUrl/dist/home'
                 }
             ]
         },
-        shortcut : {
+        shortcut: {
             icon: null,
-            menus : [
+            menus: [
+                'color',
                 'delete'
             ],
             views: [
                 {
-                    id: 'resume',
+                    id: 'summary',
                     route: ':privRoute'
                 }
             ]
         },
     };
 
+    charts: any[] =  [
+        {
+            icon: 'fas fa-chart-pie',
+            type: 'pie',
+            modes: [
+                'doctype',
+                'status',
+                'destination'
+            ],
+        },
+        {
+            icon: 'far fa-chart-bar',
+            type: 'vertical-bar',
+            modes: [
+                'doctype',
+                'status',
+                'destination'
+            ],
+        },
+        {
+            icon: 'fas fa-chart-line',
+            type: 'line',
+            modes: [
+                'creationDate',
+            ],
+        }
+    ];
     constructor(
         public http: HttpClient,
         public translate: TranslateService,
@@ -190,10 +223,58 @@ export class DashboardService {
         return this.tileTypes[tileType].views;
     }
 
-    getChartMode() {
+    getCharts() {
+        return this.charts.map((item: any) => {
+            return {
+                ...item,
+                modes: item.modes.map((chartMode: any) => {
+                    return {
+                        id: chartMode,
+                        label: this.translate.instant('lang.' + chartMode)
+                    };
+                })
+            };
+        });
+    }
+
+    getChartTypes() {
+        return this.charts.map((chartType: any) => {
+            return {
+                icon : chartType.icon,
+                type: chartType.type
+            };
+        });
+    }
+
+    getChartModes(charType: string) {
+        return this.charts.filter((chart: any) => chart.type === charType)[0].modes.map((chartMode: any) => {
+            return {
+                id: chartMode,
+                label: this.translate.instant('lang.' + chartMode)
+            };
+        });
+    }
+
+    getColors() {
         return [
-            'doctype',
-            'status'
+            '#ef9a9a',
+            '#f48fb1',
+            '#ce93d8',
+            '#b39ddb',
+            '#9fa8da',
+            '#90caf9',
+            '#81d4fa',
+            '#80deea',
+            '#80cbc4',
+            '#a5d6a7',
+            '#c5e1a5',
+            '#e6ee9c',
+            '#fff59d',
+            '#ffe082',
+            '#ffcc80',
+            '#ffab91',
+            '#bcaaa4',
+            '#b0bec5',
         ];
     }
 
@@ -216,9 +297,19 @@ export class DashboardService {
                 }
             });
         }
-
         if (errors.length === 0) {
-            return formatedRoute;
+            const objParams = {};
+            const splitFormatedRoute = formatedRoute.split('?');
+            if (splitFormatedRoute.length === 2) {
+                const arrUriParams = splitFormatedRoute[1].split('=');
+                for (let index = 0; index < arrUriParams.length; index = index + 2) {
+                    objParams[arrUriParams[index]] = arrUriParams[index + 1];
+                }
+            }
+            return {
+                route: splitFormatedRoute[0],
+                params: objParams
+            };
         } else {
             this.notify.error(errors + ' not found');
             return false;

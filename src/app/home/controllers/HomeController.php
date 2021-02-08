@@ -158,7 +158,7 @@ class HomeController
             return $response->withStatus(400)->withJson(['errors' => 'Maarch Parapheur configuration missing']);
         }
 
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'           => rtrim($url, '/') . '/rest/documents',
             'basicAuth'     => ['user' => $userId, 'password' => $password],
             'headers'       => ['content-type:application/json'],

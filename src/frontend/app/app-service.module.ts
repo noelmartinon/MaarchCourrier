@@ -8,7 +8,6 @@ import { SafeHtmlPipe } from '@plugins/safeHtml.pipe';
 import { SecureUrlPipe } from '@plugins/secureUrl.pipe';
 import { NgStringPipesModule } from 'ngx-pipes';
 import { LatinisePipe } from 'ngx-pipes';
-import { CookieService } from 'ngx-cookie-service';
 import { SortPipe } from '@plugins/sorting.pipe';
 import { HighlightPipe } from '@plugins/highlight.pipe';
 
@@ -40,8 +39,7 @@ import { HighlightPipe } from '@plugins/highlight.pipe';
     entryComponents: [
     ],
     providers: [
-        LatinisePipe,
-        CookieService,
+        LatinisePipe
     ],
 })
 export class AppServiceModule {}

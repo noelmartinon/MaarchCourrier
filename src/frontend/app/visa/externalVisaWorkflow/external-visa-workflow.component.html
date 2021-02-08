@@ -16,8 +16,8 @@
             class="columns workflow" [cdkDragDisabled]="!canManageUser(diffusion, i)"
             [class.notDraggable]="!canManageUser(diffusion, i)" [class.notEditable]="!adminMode"
             [class.processed]="diffusion.process_date != null && diffusion.status === 'VAL'"
-            [class.interrupt]="diffusion.process_date != null && diffusion.status !== 'VAL'">
-            <mat-icon *ngIf="getCurrentVisaUserIndex() === i && (!adminMode || target === 'signatureBook')"
+            [class.interrupt]="(diffusion.process_date != null && diffusion.status !== 'VAL') || this.getLastVisaUser().status === 'REF'">
+            <mat-icon *ngIf="(getCurrentVisaUserIndex() === i && !adminMode || target === 'signatureBook') && diffusion.status !== 'END'"
                 class="fa fa-chevron-right fa-2x" mat-list-icon color="accent">
             </mat-icon>
             <mat-icon class="fa fa-2x" [class.avatar]="!functions.empty(diffusion.picture)"
@@ -32,12 +32,12 @@
             <ng-container *ngIf="(!adminMode || diffusion.process_date != null) && diffusion.isValid">
                 <mat-icon mat-list-icon class="fa-2x fa"
                     [title]="'lang.' + (diffusion.status | lowercase) + 'Status' | translate"
-                    [class.fa-hourglass]="diffusion.process_date == null"
+                    [class.fa-hourglass]="diffusion.process_date == null && diffusion.status !== 'END'"
                     [class.fa-thumbs-up]="diffusion.process_date != null && diffusion.status == 'VAL'"
                     [class.fa-thumbs-down]="diffusion.process_date != null && diffusion.status === 'REF'"
-                    [class.fa-hand-paper]="diffusion.process_date != null && diffusion.status === 'STOP'"
+                    [class.fa-hand-paper]="(diffusion.process_date != null && diffusion.status === 'STOP') || this.getLastVisaUser().status === 'REF'"
                     [class.valid]="diffusion.process_date != null && diffusion.status === 'VAL'"
-                    [class.invalid]="diffusion.process_date != null && diffusion.status !== 'VAL'"
+                    [class.invalid]="(diffusion.process_date != null && diffusion.status !== 'VAL') || this.getLastVisaUser().status === 'REF'"
                     style="opacity:0.5;"></mat-icon>
             </ng-container>
             <div mat-line class="workflowLine">
@@ -50,17 +50,18 @@
                                 style="opacity:0.5;font-size: 125%;height: 15px;color: red;cursor: help;"></mat-icon>
                         </ng-container>
                     </div>
-                    <div class="workflowLineSubLabel"
-                        [class.unauthorized]="!diffusion.hasPrivilege || !diffusion.isValid">
-                        {{diffusion.item_entity}}
-                    </div>
-                    <div *ngIf="diffusion.requested_signature && diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) === -1"
+                    <div *ngIf="diffusion.process_date != null && diffusion.status === 'VAL'"
                         class="workflowLineProcessDate" title='{{diffusion.process_date | fullDate}}' color="accent">
-                        {{((functions.empty(diffusion.process_date) && diffusion.requested_signature) || diffusion.signatory) ? ('lang.signedUserDate' | translate) : ('lang.approvedUserDate' | translate)}} {{diffusion.process_date
-                                                | timeAgo : 'full'}}</div>
-                    <div *ngIf="diffusion.process_date != null && ['A terminé le circuit'].indexOf(diffusion.process_comment) > -1"
+                        {{diffusion.requested_signature ? ('lang.signedUserDate' | translate) : ('lang.approvedUserDate' | translate)}} {{diffusion.process_date | timeAgo : 'full'}}
+                    </div>
+                    <div *ngIf="diffusion.process_date != null && diffusion.status !== 'VAL'"
                         class="workflowLineProcessDate" title='{{diffusion.process_date | fullDate}}' color="warn">
-                        {{'lang.interrupted' | translate}} {{diffusion.process_date | timeAgo : 'full'}}</div>
+                        {{ diffusion.status === 'STOP' ? ('lang.interrupted' | translate) : ('lang.refused' | translate) }} {{diffusion.process_date | timeAgo : 'full'}}
+                    </div>
+                    <div *ngIf="diffusion.process_date == null && this.getLastVisaUser().status === 'REF'"
+                        class="workflowLineProcessDate" title='{{this.getLastVisaUser().process_date | fullDate}}' color="warn">
+                        {{ 'lang.interrupted' | translate }} {{ this.getLastVisaUser().process_date | timeAgo : 'full' }}
+                    </div>
                 </div>
                 <div *ngIf="diffusion.hasPrivilege && diffusion.isValid">
                     <ng-container>

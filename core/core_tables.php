@@ -11,7 +11,7 @@
 *
 *
 * @file
-* @author  Claire Figueras  <dev@maarch.org>
+* @author  <dev@maarch.org>
 * @date $date$
 * @version $Revision$
 * @ingroup core
@@ -29,22 +29,4 @@ if (! defined('_LC_CYCLE_STEPS_TABLE_NAME')) {
 }
 if (! defined('HISTORY_TABLE')) {
     define('HISTORY_TABLE', 'history');
-}
-if (! defined('SECURITY_TABLE')) {
-    define('SECURITY_TABLE', 'security');
-}
-if (! defined('SESSION_SECURITY_TABLE')) {
-    define('SESSION_SECURITY_TABLE', 'session_security');
-}
-if (! defined('STATUS_TABLE')) {
-    define('STATUS_TABLE', 'status');
-}
-if (! defined('USERGROUPS_TABLE')) {
-    define('USERGROUPS_TABLE', 'usergroups');
-}
-if (! defined('USERGROUPS_SERVICES_TABLE')) {
-    define('USERGROUPS_SERVICES_TABLE', 'usergroups_services');
-}
-if (! defined('USERS_TABLE')) {
-    define('USERS_TABLE', 'users');
 }

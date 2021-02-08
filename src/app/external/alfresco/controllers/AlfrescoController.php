@@ -335,7 +335,7 @@ class AlfrescoController
                 ],
                 'fields' => ['id', 'name']
             ];
-            $curlResponse = CurlModel::execSimple([
+            $curlResponse = CurlModel::exec([
                 'url'           => "{$alfrescoUri}/search/versions/1/search",
                 'basicAuth'     => ['user' => $body['login'], 'password' => $body['password']],
                 'headers'       => ['content-type:application/json', 'Accept: application/json'],
@@ -344,7 +344,7 @@ class AlfrescoController
             ]);
 
         } else {
-            $curlResponse = CurlModel::execSimple([
+            $curlResponse = CurlModel::exec([
                 'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$body['nodeId']}/children",
                 'basicAuth'     => ['user' => $body['login'], 'password' => $body['password']],
                 'headers'       => ['content-type:application/json'],
@@ -391,7 +391,7 @@ class AlfrescoController
         }
         $entityInformations['alfresco']['password'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfresco']['password']]);
 
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$entityInformations['alfresco']['nodeId']}/children",
             'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
             'headers'       => ['content-type:application/json'],
@@ -441,7 +441,7 @@ class AlfrescoController
         }
         $entityInformations['alfresco']['password'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfresco']['password']]);
 
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['id']}/children",
             'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
             'headers'       => ['content-type:application/json'],
@@ -506,7 +506,7 @@ class AlfrescoController
             ],
             'fields' => ['id', 'name']
         ];
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'           => "{$alfrescoUri}/search/versions/1/search",
             'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
             'headers'       => ['content-type:application/json', 'Accept: application/json'],
@@ -598,7 +598,7 @@ class AlfrescoController
         if (!empty($alfrescoParameters['mapping']['folderCreation'])) {
             $body['properties'] = $alfrescoParameters['mapping']['folderCreation'];
         }
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['folderId']}/children",
             'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
             'headers'       => ['content-type:application/json', 'Accept: application/json'],
@@ -614,7 +614,7 @@ class AlfrescoController
         $multipartBody = [
             'filedata' => ['isFile' => true, 'filename' => $document['subject'], 'content' => $fileContent],
         ];
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$resourceFolderId}/children",
             'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
             'method'        => 'POST',
@@ -707,7 +707,7 @@ class AlfrescoController
         $body = [
             'properties' => $properties,
         ];
-        $curlResponse = CurlModel::execSimple([
+        $curlResponse = CurlModel::exec([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$documentId}",
             'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
             'headers'       => ['content-type:application/json', 'Accept: application/json'],
@@ -752,7 +752,7 @@ class AlfrescoController
             }
 
             if ($firstAttachment) {
-                $curlResponse = CurlModel::execSimple([
+                $curlResponse = CurlModel::exec([
                     'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$resourceFolderId}/children",
                     'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
                     'headers'       => ['content-type:application/json', 'Accept: application/json'],
@@ -781,7 +781,7 @@ class AlfrescoController
             $multipartBody = [
                 'filedata' => ['isFile' => true, 'filename' => $attachment['title'], 'content' => $fileContent],
             ];
-            $curlResponse = CurlModel::execSimple([
+            $curlResponse = CurlModel::exec([
                 'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$attachmentsFolderId}/children",
                 'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
                 'method'        => 'POST',
@@ -808,7 +808,7 @@ class AlfrescoController
             $body = [
                 'properties' => $properties,
             ];
-            $curlResponse = CurlModel::execSimple([
+            $curlResponse = CurlModel::exec([
                 'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$attachmentId}",
                 'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
                 'headers'       => ['content-type:application/json', 'Accept: application/json'],
@@ -830,7 +830,7 @@ class AlfrescoController
             $body = [
                 'properties' => $alfrescoParameters['mapping']['folderModification'],
             ];
-            $curlResponse = CurlModel::execSimple([
+            $curlResponse = CurlModel::exec([
                 'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$resourceFolderId}",
                 'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
                 'headers'       => ['content-type:application/json', 'Accept: application/json'],

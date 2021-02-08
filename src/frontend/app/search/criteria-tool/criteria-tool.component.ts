@@ -65,6 +65,7 @@ export class CriteriaToolComponent implements OnInit {
 
     @Output() searchUrlGenerated = new EventEmitter<any>();
     @Output() loaded = new EventEmitter<any>();
+    @Output() afterGetSearchTemplates = new EventEmitter<any>();
 
     @ViewChild('criteriaTool', { static: false }) criteriaTool: MatExpansionPanel;
     @ViewChild('searchCriteriaInput', { static: false }) searchCriteriaInput: ElementRef;
@@ -633,6 +634,8 @@ export class CriteriaToolComponent implements OnInit {
         this.http.get(`../rest/searchTemplates`).pipe(
             tap((data: any) => {
                 this.searchTemplates = data.searchTemplates;
+                this.afterGetSearchTemplates.emit(this.searchTemplates);
+                // this.selectSearchTemplate(this.searchTemplates[0], false);
             })
         ).subscribe();
     }

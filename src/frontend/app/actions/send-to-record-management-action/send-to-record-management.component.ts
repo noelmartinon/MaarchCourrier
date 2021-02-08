@@ -121,10 +121,13 @@ export class SendToRecordManagementComponent implements OnInit {
 
         this.http.put(this.data.processActionRoute, { resources: realResSelected, data: this.formatData(mode) }).pipe(
             tap((data: any) => {
-                if (mode === 'download' && !this.functions.empty(data.data.encodedFiles)) {
+                if (mode === 'download' && !this.functions.empty(data.data.encodedFile)) {
                     const downloadLink = document.createElement('a');
-                    data.data.encodedFiles.forEach((file:string) => {
-                        downloadLink.href = `data:application/zip;base64,${file}`;
+                    let filenameDetail: string;
+                    downloadLink.href = `data:application/zip;base64,${data.data.encodedFile}`;
+                    if (this.data.resIds.length === 1) {
+                        filenameDetail = this.data.resource.chrono.split(' ').join('_');
+                    } else {
                         let today: any;
                         let dd: any;
                         let mm: any;
@@ -141,11 +144,13 @@ export class SendToRecordManagementComponent implements OnInit {
                         if (mm < 10) {
                             mm = '0' + mm;
                         }
-                        today = dd + '-' + mm + '-' + yyyy;
-                        downloadLink.setAttribute('download', 'seda_package_' + today + '.zip');
-                        document.body.appendChild(downloadLink);
-                        downloadLink.click();
-                    });
+                        filenameDetail = dd + '-' + mm + '-' + yyyy;
+                    }
+
+                    downloadLink.setAttribute('download', 'seda_package_' + filenameDetail + '.zip');
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+
                     this.dialogRef.close('success');
                 } else if (!data) {
                     this.dialogRef.close('success');

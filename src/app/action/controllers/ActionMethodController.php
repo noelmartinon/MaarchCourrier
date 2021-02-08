@@ -17,7 +17,6 @@ use Action\models\ActionModel;
 use Action\models\BasketPersistenceModel;
 use Action\models\ResMarkAsReadModel;
 use Alfresco\controllers\AlfrescoController;
-use Attachment\controllers\AttachmentController;
 use Attachment\models\AttachmentModel;
 use Attachment\models\AttachmentTypeModel;
 use Convert\controllers\ConvertPdfController;
@@ -404,13 +403,13 @@ class ActionMethodController
                         'errorStatus'   => $args['action']['parameters']['errorStatus'],
                         'userId'        => $GLOBALS['id'],
                         'customId'      => $customId,
-                        'action'        => 'sendExternalSignatoryBookAction'
+                        'action'        => 'generateMailing'
                     ];
                 }
 
                 $massData['resources'][] = ['resId' => $args['resId'], 'data' => $args['data'], 'note' => $args['note'], 'inSignatureBook' => true];
 
-                return ['postscript' => 'src/app/external/externalSignatoryBook/scripts/MailingScript.php', 'args' => $massData];
+                return ['postscript' => 'src/app/action/scripts/MailingScript.php', 'args' => $massData];
             }
         }
 
@@ -495,13 +494,13 @@ class ActionMethodController
                         'errorStatus'   => $args['action']['parameters']['errorStatus'],
                         'userId'        => $GLOBALS['id'],
                         'customId'      => $customId,
-                        'action'        => 'sendExternalSignatoryBookAction'
+                        'action'        => 'generateMailing'
                     ];
                 }
 
                 $massData['resources'][] = ['resId' => $args['resId'], 'data' => $args['data'], 'note' => $args['note'], 'inSignatureBook' => true];
 
-                return ['postscript' => 'src/app/external/externalSignatoryBook/scripts/MailingScript.php', 'args' => $massData];
+                return ['postscript' => 'src/app/action/scripts/MailingScript.php', 'args' => $massData];
             }
         }
 

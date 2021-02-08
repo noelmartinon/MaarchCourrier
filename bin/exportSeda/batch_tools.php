@@ -143,7 +143,7 @@ function Bt_writeLog($args = [])
 function Bt_getReply($args = [])
 {
     $refEncode = str_replace('.', '%2E', urlencode($args['reference']));
-    $curlResponse = \SrcCore\models\CurlModel::execSimple([
+    $curlResponse = \SrcCore\models\CurlModel::exec([
         'url'     => rtrim($GLOBALS['urlSAEService'], '/') . '/medona/message/reference?reference=' . $refEncode,
         'method'  => 'GET',
         'cookie'  => 'LAABS-AUTH=' . urlencode($GLOBALS['token']),
@@ -166,7 +166,7 @@ function Bt_getReply($args = [])
 
     $messageId = $curlResponse['response']['replyMessage']['messageId'];
 
-    $curlResponse = \SrcCore\models\CurlModel::execSimple([
+    $curlResponse = \SrcCore\models\CurlModel::exec([
         'url'     => rtrim($GLOBALS['urlSAEService'], '/') . '/medona/message/'.urlencode($messageId).'/Export',
         'method'  => 'GET',
         'cookie'  => 'LAABS-AUTH=' . urlencode($GLOBALS['token']),
