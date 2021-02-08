@@ -635,7 +635,7 @@ class FolderController
         }
 
         $children = [];
-        if (!empty($children)) {
+        if (!empty($args['entities'])) {
             $children = FolderModel::getWithEntities([
                 'select' => ['distinct (folders.id)', 'edition', 'user_id', 'keyword', 'entity_id', 'parent_id'],
                 'where'  => ['parent_id = ?', '(entity_id in (?) OR entity_id is null)'],
