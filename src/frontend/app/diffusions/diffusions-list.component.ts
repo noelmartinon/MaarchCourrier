@@ -553,7 +553,6 @@ export class DiffusionsListComponent implements OnInit {
     changeRole(user: any, oldRole: any, newRole: any) {
         if (newRole.id === 'dest') {
             this.switchUserWithOldDest(user, oldRole);
-
         } else {
             this.changeUserRole(user, oldRole, newRole);
         }
@@ -573,7 +572,7 @@ export class DiffusionsListComponent implements OnInit {
     switchUserWithOldDest(user: any, oldRole: any) {
         this.http.get("../rest/users/" + user.itemSerialId + "/entities").pipe(
             map((data: any) => {
-                data.entities = data.entities.filter((item: any) => item.primary_entity === 'Y').map((entity: any) => entity.id);
+                data.entities = data.entities.map((entity: any) => entity.id);
                 return data;
             }),
             tap((data: any) => {
