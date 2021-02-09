@@ -150,6 +150,11 @@
     "askRedirectBasketBeforeAbsence": "Voulez-vous rediriger vos bannettes avant de vous mettre en absence ?",
     "assignBy": "Assignée par",
     "associatedStatus": "Statut associé",
+    "intermediateStatus": "Statut intermédiaire",
+    "finalStatus": "Statut final",
+    "finalStatusAlt": "Statut final si l'envoi est réussi",
+    "errorStatus": "Statut d'erreur",
+    "errorStatusAlt": "Statut d'erreur si l'envoi échoue",
     "at": "À",
     "atRange": "à",
     "attachAttachment": "Attacher une pièce jointe",
@@ -2099,7 +2104,9 @@
     "noTransferCopyNoBindingRecordManagement": "Les documents non engageants ne doivent pas être envoyés au SAE",
     "durationCurrentUseNotExceeded": "La durée de conservation n'est pas dépassée",
     "noProducerService": "L'entité traitante n'a pas d'identifiant de service producteur",
+    "differentProducerServices": "Tous les courriers n'ont pas le même service producteur",
     "noSenderOrgRegNumber": "Aucun service versant défini (senderOrgRegNumber dans config.json)",
+    "actionStatusNotSet": "L'action n'a pas de statut d'erreur ou de succès défini",
     "producerServiceDoesNotExists": "Le service producteur n'existe pas dans MaarchRM",
     "nextPage": "Page suivante",
     "prevPage": "Page précédente",
@@ -2183,5 +2190,7 @@
     "showVisaWorkflowHistory": "Afficher l'historique du circuit de visa",
     "list": "Liste",
     "workflow": "Circuit",
-    "arContentIsEmpty": "Le contenu de l'accusé de réception est vide"
+    "arContentIsEmpty": "Le contenu de l'accusé de réception est vide",
+    "mailsToSendToRecordManagement": "Courrier(s) à exporter au système d'archivage",
+    "associatedArchives": "Archive(s) associée(s) au courrier"
 }

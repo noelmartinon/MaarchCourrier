@@ -117,6 +117,13 @@ class ActionMethodController
             'data'  => [$args['resources']]
         ]);
 
+        $resLetterboxData = ResModel::get([
+            'select' => ['external_id', 'destination', 'res_id'],
+            'where'  => ['res_id in (?)'],
+            'data'   => [$args['resources']]
+        ]);
+        $resLetterboxData = array_column($resLetterboxData, null, 'res_id');
+
         foreach ($args['resources'] as $resource) {
             if (!empty(trim($args['note']['content']))) {
                 $noteId = NoteModel::create([
@@ -144,7 +151,7 @@ class ActionMethodController
                     'eventId'   => $args['id']
                 ]);
 
-                MessageExchangeReviewController::sendMessageExchangeReview(['res_id' => $resource, 'action_id' => $args['id'], 'userId' => $GLOBALS['login']]);
+                MessageExchangeReviewController::sendMessageExchangeReview(['resource' => $resLetterboxData[$resource], 'action_id' => $args['id'], 'userId' => $GLOBALS['login']]);
             }
         }
 
@@ -335,7 +342,7 @@ class ActionMethodController
             'select'    => ['requested_signature', 'item_mode'],
             'where'     => ['res_id = ?', 'difflist_type = ?', 'process_date is null'],
             'data'      => [$args['resId'], 'VISA_CIRCUIT'],
-            'orderBy'   => ['listinstance_id'],
+            'orderBy'   => ['listinstance_id']
         ]);
         if (empty($circuit)) {
             return ['errors' => ['No available circuit']];

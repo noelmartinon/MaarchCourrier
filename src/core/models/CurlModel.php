@@ -32,6 +32,7 @@ class CurlModel
             CURLOPT_URL => $curlConfig['url'],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_CONNECTTIMEOUT  => 10
         ];
 
         if (empty($aArgs['multipleObject'])) {
@@ -122,7 +123,8 @@ class CurlModel
                 'Content-length: ' . strlen($aArgs['xmlPostString']),
             ],
             CURLOPT_SSL_VERIFYHOST  => false,
-            CURLOPT_SSL_VERIFYPEER  => false
+            CURLOPT_SSL_VERIFYPEER  => false,
+            CURLOPT_CONNECTTIMEOUT  => 10
         ];
 
         if (!empty($aArgs['soapAction'])) {
@@ -201,7 +203,7 @@ class CurlModel
 
         $args['isXml'] = $args['isXml'] ?? false;
 
-        $opts = [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true, CURLOPT_SSL_VERIFYPEER => false];
+        $opts = [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true, CURLOPT_SSL_VERIFYPEER => false, CURLOPT_CONNECTTIMEOUT => 10];
 
         //Headers
         if (!empty($args['headers'])) {

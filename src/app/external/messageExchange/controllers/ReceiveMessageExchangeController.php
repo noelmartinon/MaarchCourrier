@@ -407,7 +407,7 @@ class ReceiveMessageExchangeController
         return $resId;
     }
 
-    protected function getBinaryDataObjectInfo($aArgs = [])
+    protected static function getBinaryDataObjectInfo($aArgs = [])
     {
         $dataObject   = $aArgs['binaryDataObject'];
         $dataObjectId = $aArgs['binaryDataObjectId'];

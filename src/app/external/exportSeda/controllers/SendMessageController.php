@@ -90,7 +90,7 @@ class SendMessageController
             null
         );
 
-        foreach($messageObject->dataObjectPackage->attachments as $attachment) {
+        foreach ($messageObject->dataObjectPackage->attachments as $attachment) {
             $seda2Message->DataObjectPackage->BinaryDataObject[] = self::getBinaryDataObject(
                 $attachment->filePath,
                 $attachment->id
@@ -180,7 +180,7 @@ class SendMessageController
         return $messageObject;
     }
 
-    private function getBinaryDataObject($filePath, $id)
+    private static function getBinaryDataObject($filePath, $id)
     {
         $binaryDataObject = new \stdClass();
 
@@ -207,7 +207,7 @@ class SendMessageController
         return $binaryDataObject;
     }
 
-    private function getArchiveUnit(
+    private static function getArchiveUnit(
         $type,
         $object = null,
         $attachments = null,
@@ -248,7 +248,6 @@ class SendMessageController
             } else {
                 $archiveUnit->DataObjectReference->DataObjectReferenceId = $dataObjectReferenceId;
             }
-
         }
 
         $archiveUnit->ArchiveUnit = [];
@@ -277,9 +276,8 @@ class SendMessageController
         return $archiveUnit;
     }
 
-    private function getContent($type, $object = null, $relatedObjectReference = null)
+    private static function getContent($type, $object = null, $relatedObjectReference = null)
     {
-
         $content = new \stdClass();
 
         switch ($type) {
@@ -312,23 +310,22 @@ class SendMessageController
                 $content->Keyword = [];
 
                 if ($object->contacts) {
-                    foreach($object->contacts as $contactType => $contacts) {
-                        foreach($contacts as $contact) {
+                    foreach ($object->contacts as $contactType => $contacts) {
+                        foreach ($contacts as $contact) {
                             if ($contactType == "senders") {
-                                $content->Sender[] = self::getAddresse($contact, $contactType);
-                            } else if ($contactType == "recipients") {
-                                $content->Addressee[] = self::getAddresse($contact, $contactType);
+                                $content->Sender[] = self::getAddress($contact);
+                            } elseif ($contactType == "recipients") {
+                                $content->Addressee[] = self::getAddress($contact);
                             }
-                            
                         }
                     }
                 }
 
-                if ($object->folders ) {
+                if ($object->folders) {
                     $content->FilePlanPosition = [];
                     $content->FilePlanPosition[] = new \stdClass;
                     $content->FilePlanPosition[0]->value="";
-                    foreach($object->folders as $folder) {
+                    foreach ($object->folders as $folder) {
                         $content->FilePlanPosition[0]->value .= "/".$folder;
                     }
                 }
@@ -392,14 +389,12 @@ class SendMessageController
                     $reference->ArchiveUnitRefId = 'letterbox_' . $key;
                     $content->RelatedObjectReference->References[] = $reference;
                 } else {
-                    if (isset($destination)) {
-                        $res = array_key_exists($destination, self::entities);
-                        $reference->RepositoryArchiveUnitPID = 'originator:' . $entity->business_id . ':' . $key;
+                    if (isset($object->originatorAgency)) {
+                        $reference->RepositoryArchiveUnitPID = 'originator:' . $object->originatorAgency->id . ':' . $key;
                         $content->RelatedObjectReference->References[] = $reference;
                     }
                 }
             }
-
         }
 
         if (isset($object->originatorAgency)) {
@@ -415,7 +410,7 @@ class SendMessageController
         if (isset($object->history)) {
             $content->CustodialHistory = new \stdClass();
             $content->CustodialHistory->CustodialHistoryItem = [];
-            foreach($object->history as $history) {
+            foreach ($object->history as $history) {
                 $content->CustodialHistory->CustodialHistoryItem[] = self::getCustodialHistoryItem($history);
             }
 
@@ -427,7 +422,7 @@ class SendMessageController
         return $content;
     }
 
-    private function getManagement($valueInData = null)
+    private static function getManagement($valueInData = null)
     {
         $management = new \stdClass();
 
@@ -453,7 +448,7 @@ class SendMessageController
         return $management;
     }
 
-    private function getCustodialHistoryItem($history)
+    private static function getCustodialHistoryItem($history)
     {
         $date = new \DateTime($history->event_date);
 
@@ -464,21 +459,19 @@ class SendMessageController
         return $custodialHistoryItem;
     }
 
-    private function getAddresse($informations, $type = null)
+    private static function getAddress($informations)
     {
-        $addressee = new \stdClass();
+        $address = new \stdClass();
         
         if ($informations->civility) {
-            $addressee->Gender = $informations->civility->label;
+            $address->Gender = $informations->civility->label;
         }
         if ($informations->firstname) {
-            $addressee->FirstName = $informations->firstname;
+            $address->FirstName = $informations->firstname;
         }
         if ($informations->lastname) {
-            $addressee->BirthName = $informations->lastname;
+            $address->BirthName = $informations->lastname;
         }
-        return $addressee;
+        return $address;
     }
-
-
 }

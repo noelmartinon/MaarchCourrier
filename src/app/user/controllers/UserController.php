@@ -1421,7 +1421,7 @@ class UserController
                     ]);
                 }
             } else {
-                $ressources = ResModel::getOnView([
+                $ressources = ResModel::get([
                     'select'    => ['res_id'],
                     'where'     => ['confidentiality = ?', 'destination = ?', 'closing_date is null'],
                     'data'      => ['Y', $aArgs['entityId']]
