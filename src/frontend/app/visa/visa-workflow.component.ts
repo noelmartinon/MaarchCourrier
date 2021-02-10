@@ -321,25 +321,31 @@ export class VisaWorkflowComponent implements OnInit {
     loadDefaultWorkflow(resId: number) {
         this.loading = true;
         this.visaWorkflow.items = [];
-        this.http.get('../rest/resources/' + resId + '/defaultCircuit?circuit=visaCircuit').pipe(
-            filter((data: any) => !this.functions.empty(data.circuit)),
-            tap((data: any) => {
-                data.circuit.items.forEach((element: any) => {
-                    this.visaWorkflow.items.push(
-                        {
-                            ...element,
-                            requested_signature: element.item_mode !== 'visa',
-                            difflist_type: 'VISA_CIRCUIT'
-                        });
-                });
-                this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
-            }),
-            finalize(() => this.loading = false),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+        return new Promise((resolve) => {
+            this.http.get('../rest/resources/' + resId + '/defaultCircuit?circuit=visaCircuit').pipe(
+                filter((data: any) => !this.functions.empty(data.circuit)),
+                tap((data: any) => {
+                    data.circuit.items.forEach((element: any) => {
+                        this.visaWorkflow.items.push(
+                            {
+                                ...element,
+                                requested_signature: element.item_mode !== 'visa',
+                                difflist_type: 'VISA_CIRCUIT'
+                            });
+                    });
+                    this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
+                    this.workflowUpdated.emit(this.visaWorkflow.items);
+                }),
+                finalize(() => {
+                    this.loading = false
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     loadWorkflowMaarchParapheur(attachmentId: number, type: string) {
