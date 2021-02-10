@@ -464,16 +464,12 @@ class TemplateController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['destination']]);
-        if (!empty($resource['destination'])) {
-            $entities = [$resource['destination']];
-        } else {
-            $entities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['users_entities.entity_id']]);
-            $entities = array_column($entities, 'entity_id');
-            if (empty($entities)) {
-                $entities = [0];
-            }
+        $entities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['users_entities.entity_id']]);
+        $entities = array_column($entities, 'entity_id');
+        if (empty($entities)) {
+            $entities = [0];
         }
+
         $where = ['templates_association.value_field in (?)', 'templates.template_type = ?', 'templates.template_target = ?'];
         $data = [$entities, 'HTML', 'sendmail'];
 
