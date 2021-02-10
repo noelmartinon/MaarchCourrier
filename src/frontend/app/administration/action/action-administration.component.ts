@@ -129,6 +129,8 @@ export class ActionAdministrationComponent implements OnInit {
                         } else if (this.action.actionPageId === 'create_acknowledgement_receipt') {
                             this.arMode = this.action.parameters.mode;
                         } else if (this.action.actionPageId === 'sendToRecordManagement') {
+                            this.successStatus = this.action.parameters.successStatus;
+                            this.errorStatus = this.action.parameters.errorStatus;
                             this.selectSuccessStatusId.setValue(this.action.parameters.successStatus);
                             this.selectErrorStatusId.setValue(this.action.parameters.errorStatus);
                         }
