@@ -75,7 +75,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
         this.resourcesError = [];
 
         return new Promise((resolve, reject) => {
-            this.http.post('../../../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkSignatureBook', { resources: this.data.resIds })
+            this.http.post('../../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkSignatureBook', { resources: this.data.resIds })
                 .subscribe((data: any) => {
                     if (!this.functions.empty(data.resourcesInformations.error)) {
                         this.resourcesError = data.resourcesInformations.error;
@@ -99,7 +99,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
         };
 
         return new Promise((resolve) => {
-            this.http.post('../../../rest/resources', this.data.resource).pipe(
+            this.http.post('../../rest/resources', this.data.resource).pipe(
                 tap((data: any) => {
                     this.data.resIds = [data.resId];
                     resolve(true);
