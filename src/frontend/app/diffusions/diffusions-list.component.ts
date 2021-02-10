@@ -568,7 +568,7 @@ export class DiffusionsListComponent implements OnInit {
     switchUserWithOldDest(user: any, oldRole: any) {
         this.http.get("../../rest/users/" + user.itemSerialId + "/entities").pipe(
             map((data: any) => {
-                data.entities = data.entities.filter((item: any) => item.primary_entity === 'Y').map((entity: any) => entity.id);
+                data.entities = data.entities.map((entity: any) => entity.id);
                 return data;
             }),
             tap((data: any) => {
@@ -576,10 +576,10 @@ export class DiffusionsListComponent implements OnInit {
                 let isAllowed: boolean = false;
                 let allowedEntitiesIds: number[] = [];
 
-                this.allowedEntities.forEach(allowedEntity => {
-                    if (data.entities.indexOf(allowedEntity) > -1) {
+                data.entities.forEach((entityValue: any) => {
+                    if (this.allowedEntities.indexOf(entityValue) > -1) {
                         isAllowed = true;
-                        allowedEntitiesIds.push(data.entities[data.entities.indexOf(allowedEntity)]);
+                        allowedEntitiesIds.push(entityValue);
                     }
                 });
                 if (isAllowed || this.target === 'process' || this.target === 'details') {
