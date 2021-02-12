@@ -288,7 +288,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
             reader.onload = (value: any) => {
                 this.file.content = this.getBase64Document(value.target.result);
-                this.triggerEvent.emit();
+                this.triggerEvent.emit('uploadFile');
                 if (this.file.type !== 'application/pdf') {
                     this.convertDocument(this.file);
                 } else {
@@ -602,7 +602,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 (data: any) => {
                     if (data.encodedDocument) {
                         this.file.contentMode = 'route';
-                        this.file.name = `${resId}.${data.originalFormat}`;
+                        this.file.name = `${data.filename}`;
                         this.file.format = data.originalFormat;
                         this.file.creatorId = data.originalCreatorId;
                         this.file.signatoryId = data.signatoryId;
@@ -644,7 +644,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                     (data: any) => {
                         if (data.encodedDocument) {
                             this.file.contentMode = 'route';
-                            this.file.name = `${resId}.${data.originalFormat}`;
+                            this.file.name = `${data.filename}`;
                             this.file.format = data.originalFormat;
                             this.file.signatoryId = data.signatoryId;
                             this.file.content = `../rest/resources/${resId}/originalContent?mode=base64`;

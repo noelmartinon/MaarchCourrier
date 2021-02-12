@@ -107,7 +107,7 @@
                     </div>
                     <div class="documentContent col-md-9 col-sm-12">
                         <app-document-viewer #appDocumentViewer style="height:100%;width:100%;position: relative;"
-                            [editMode]="true" [mode]="'attachment'" (triggerEvent)="setDatasViewer(i)">
+                            [editMode]="true" [mode]="'attachment'" (triggerEvent)="setDatasViewer($event, i)">
                         </app-document-viewer>
                         <div class="fieldState stateDoc">
                             <i class="fas fa-exclamation-triangle fieldError"
