@@ -313,9 +313,9 @@ class SendMessageController
                     foreach ($object->contacts as $contactType => $contacts) {
                         foreach ($contacts as $contact) {
                             if ($contactType == "senders") {
-                                $content->Sender[] = self::getAddress($contact);
+                                $content->Sender[] = self::getContactData($contact);
                             } elseif ($contactType == "recipients") {
-                                $content->Addressee[] = self::getAddress($contact);
+                                $content->Addressee[] = self::getContactData($contact);
                             }
                         }
                     }
@@ -328,14 +328,6 @@ class SendMessageController
                     foreach ($object->folders as $folder) {
                         $content->FilePlanPosition[0]->value .= "/".$folder;
                     }
-                }
-
-                if (!empty($keyword)) {
-                    $content->Keyword[] = $keyword;
-                }
-
-                if (!empty($addressee)) {
-                    $content->Addressee[] = $addressee;
                 }
 
                 $content->DocumentType = 'Document Principal';
@@ -459,19 +451,19 @@ class SendMessageController
         return $custodialHistoryItem;
     }
 
-    private static function getAddress($informations)
+    private static function getContactData($informations)
     {
-        $address = new \stdClass();
+        $contactData = new \stdClass();
         
         if ($informations->civility) {
-            $address->Gender = $informations->civility->label;
+            $contactData->Gender = $informations->civility->label;
         }
         if ($informations->firstname) {
-            $address->FirstName = $informations->firstname;
+            $contactData->FirstName = $informations->firstname;
         }
         if ($informations->lastname) {
-            $address->BirthName = $informations->lastname;
+            $contactData->BirthName = $informations->lastname;
         }
-        return $address;
+        return $contactData;
     }
 }

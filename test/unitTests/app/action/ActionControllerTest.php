@@ -27,7 +27,8 @@ class ActionsControllerTest extends TestCase
             'keyword'       => 'indexing',
             'label_action'  => 'TEST-LABEL',
             'id_status'     => '_NOSTATUS_',
-            'actionPageId'  => 'close_mail',
+            'action_page'   => 'close_mail',
+            'component'     => 'closeMailAction',
             'history'       => true
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
@@ -41,11 +42,12 @@ class ActionsControllerTest extends TestCase
 
         // FAIL CREATE
         $aArgs = [
-            'keyword'          => 'indexing',
-            'label_action'     => '',
-            'id_status'        => '',
-            'actionPageId'     => 'close_mail',
-            'history'          => true
+            'keyword'       => 'indexing',
+            'label_action'  => '',
+            'id_status'     => '',
+            'action_page'   => 'close_mail',
+            'component'     => 'closeMailAction',
+            'history'       => true
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
@@ -101,11 +103,12 @@ class ActionsControllerTest extends TestCase
         $environment = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);
         $request     = \Slim\Http\Request::createFromEnvironment($environment);
         $aArgs = [
-            'keyword'          => '',
-            'label_action'     => 'TEST-LABEL_UPDATED',
-            'id_status'        => 'COU',
-            'actionPageId'     => 'close_mail',
-            'history'          => false
+            'keyword'      => '',
+            'label_action' => 'TEST-LABEL_UPDATED',
+            'id_status'    => 'COU',
+            'action_page'  => 'close_mail',
+            'component'    => 'closeMailAction',
+            'history'      => false
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
@@ -117,11 +120,12 @@ class ActionsControllerTest extends TestCase
 
         // UPDATE FAIL
         $aArgs = [
-            'keyword'          => '',
-            'label_action'     => 'TEST-LABEL_UPDATED',
-            'id_status'        => 'COU',
-            'actionPageId'     => 'close_mail',
-            'history'          => false
+            'keyword'      => '',
+            'label_action' => 'TEST-LABEL_UPDATED',
+            'id_status'    => 'COU',
+            'action_page'  => 'close_mail',
+            'component'    => 'closeMailAction',
+            'history'      => false
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
@@ -172,7 +176,6 @@ class ActionsControllerTest extends TestCase
         $this->assertNotNull($responseBody->action);
         $this->assertNotNull($responseBody->categoriesList);
         $this->assertNotNull($responseBody->statuses);
-        $this->assertNotNull($responseBody->actionPages);
         $this->assertNotNull($responseBody->keywordsList);
     }
 }

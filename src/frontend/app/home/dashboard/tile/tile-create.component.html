@@ -43,6 +43,14 @@
             [class]="''" [label]="'lang.navigation' | translate" [datas]="menus" [formControlSelect]="menusControl"  [returnValue]="'object'" [dataKey]="'id'"
             (afterSelected)="setMenu($event)">
         </plugin-select-search>
+        <mat-form-field appearance="outline" *ngIf="extraParams.privilegeId === 'indexing'">
+            <mat-label>{{'lang.group' | translate}}</mat-label>
+            <mat-select [compareWith]="this.compareGroups" [(ngModel)]="extraParams.groupId" (selectionChange)="setIndexingGroup($event.value)">
+                <mat-option *ngFor="let group of menusControl.value.groups | sortBy : 'label'" [value]="group">
+                    {{group.label}}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
         <plugin-select-search *ngIf="selectedTileType === 'searchTemplate'" [appearance]="'outline'" [showLabel]="true"
             [class]="''" [label]="'lang.model' | translate" [datas]="searchTemplates" [formControlSelect]="searchTemplatesControl"  [returnValue]="'object'" [dataKey]="'id'"
             (afterSelected)="setSearchTemplate($event)">

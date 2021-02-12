@@ -28,41 +28,181 @@
                     <mat-spinner style="margin:auto;"></mat-spinner>
                 </div>
                 <mat-card *ngIf="!loading" class="card-app-content">
-                    <mat-tab-group>
+                    <form class="form-horizontal" (ngSubmit)="onSubmit()" #contactsGroupFormUp="ngForm">
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <mat-form-field>
+                                    <input matInput [(ngModel)]="contactsGroup.label" required name="label" id="label"
+                                        title="{{'lang.label' | translate}}" type="text"
+                                        placeholder="{{'lang.label' | translate}}" maxlength="32">
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-12">
+                                <mat-form-field>
+                                    <input matInput [(ngModel)]="contactsGroup.description" required name="description"
+                                        id="description" title="{{'lang.description' | translate}}" type="text"
+                                        placeholder="{{'lang.description' | translate}}" maxlength="255">
+                                </mat-form-field>
+                            </div>
+                        </div>
+                        <!--<div class="form-group">
+                            <div class="col-sm-6" style="text-align:center;">
+                                <mat-slide-toggle name="public" title="{{'lang.contactsGroupDesc' | translate}}" id="public"
+                                    color="primary" [(ngModel)]="contactsGroup.public"
+                                    [checked]="contactsGroup.public">{{'lang.public' | translate}}</mat-slide-toggle>
+                            </div>
+                        </div>-->
+                        <div class="form-group">
+                            <div class="col-sm-12" style="text-align:center;">
+                                <button mat-raised-button color="primary" type="submit"
+                                    [disabled]="!contactsGroupFormUp.form.valid">{{'lang.save' | translate}}</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="formType">
+                        <div class="formType-title">
+                            {{nbCorrespondents}} {{'lang.relatedCorrespondents' | translate}}&nbsp;<span *ngIf="dataSourceLinkedCorrespondents.filteredData.length !== dataSourceLinkedCorrespondents.data.length" style="font-weight: normal;font-style: italic;color:#666;">{{dataSourceLinkedCorrespondents.filteredData.length}} affiché(s)</span> : 
+                        </div>
+                        <div style="width: 100%;">
+                            <div class="row" style="margin:0px;">
+                                <div class="col-md-6 col-xs-6">
+                                    <mat-form-field>
+                                        <input matInput #filterUser #trigger="matAutocompleteTrigger"
+                                            (keyup)="applyFilter($event.target.value)"
+                                            placeholder="{{'lang.filterBy' | translate}} / {{'lang.linkContact' | translate}}"
+                                            [matAutocomplete]="auto">
+                                        <button mat-button *ngIf="filterUser.value" matSuffix mat-icon-button
+                                            aria-label="Clear" (click)="applyFilter(''); filterUser.value = ''"
+                                            [title]="'lang.clearFilter' | translate">
+                                            <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
+                                        </button>
+                                        <mat-autocomplete #auto="matAutocomplete" class="test"
+                                            [panelWidth]="(dataSource && dataSource.data.length > 0) ? '900px' : undefined">
+                                            <mat-option *ngIf="filterUser.value !== '' && !dataSource"
+                                                (click)="searchContact(filterUser.value);open($event,trigger)"
+                                                [value]="filterUser.value" style="color:#666">
+                                                Cliquez ici pour rechercher <b>{{filterUser.value}}</b> à associer.
+                                            </mat-option>
+                                            <mat-option disabled *ngIf="dataSource && dataSource.data.length === 0">
+                                                Aucun résultat</mat-option>
+                                            <mat-option disabled *ngIf="dataSource && dataSource.data.length > 0"
+                                                style="display: none;"></mat-option>
+                                            <div *ngIf="dataSource && dataSource.data.length > 0">
+                                                <div
+                                                    style="padding: 10px;padding-left: 24px;font-size: 12px;position: sticky;top:0px;background: white;z-index:1;border-bottom: solid 1px rgba(0, 0, 0, 0.12);display: flex;">
+                                                    <span style="color: #666;flex:1;">
+                                                        Recherche associé à <b>{{filterUser.value}}</b> :
+                                                    </span>
+                                                    <span>
+                                                        <a color="primary" (click)="toggleAll()"
+                                                            style="cursor: pointer;">tout sélectionner</a>
+                                                    </span>
+                                                </div>
+                                                <mat-table #tableContactList [dataSource]="dataSource">
+                                                    <ng-container matColumnDef="select">
+                                                        <mat-cell *matCellDef="let element"
+                                                            style="width:50px;flex: initial;align-items: center;display: flex;">
+                                                            <mat-checkbox id="check_{{element.id}}" color="primary"
+                                                                (click)="$event.stopPropagation()"
+                                                                (change)="$event ? toggleCorrespondent(element) : null"
+                                                                [disabled]="isInGrp(element)"
+                                                                [checked]="selection.isSelected(element.id) || isInGrp(element)">
+                                                            </mat-checkbox>
+                                                        </mat-cell>
+                                                    </ng-container>
+                                                    <ng-container matColumnDef="type">
+                                                        <mat-cell *matCellDef="let element"
+                                                            style="width:50px;flex: initial;align-items: center;justify-content: center;display: flex;">
+                                                            <mat-icon color="primary"
+                                                                [title]="'lang.' + element.type | translate"
+                                                                class="fa"
+                                                                [class.fa-address-card]="element.type === 'contact'"
+                                                                [class.fa-user]="element.type === 'user'"
+                                                                [class.fa-sitemap]="element.type === 'entity'"
+                                                                style="align-items: center;justify-content: center;display: flex;">
+                                                            </mat-icon>
+                                                        </mat-cell>
+                                                    </ng-container>
+                                                    <ng-container matColumnDef="contact">
+                                                        <mat-cell *matCellDef="let element"
+                                                            style="flex:3;padding-left: 5px;padding-right: 5px;font-size: 12px;">
+                                                            {{element.contact}}
+                                                        </mat-cell>
+                                                    </ng-container>
+                                                    <ng-container matColumnDef="address">
+                                                        <mat-cell *matCellDef="let element"
+                                                            style="flex:3;padding-left: 5px;padding-right: 5px;font-size: 12px">
+                                                            {{element.address}}
+                                                        </mat-cell>
+                                                    </ng-container>
+                                                    <mat-row *matRowDef="let element; columns: displayedColumns;"
+                                                        (click)="toggleCorrespondent(element);"
+                                                        [ngStyle]="{'opacity': !isInGrp(element) ? '' : '0.5'}"
+                                                        style="cursor: pointer;">
+                                                    </mat-row>
+                                                </mat-table>
+                                            </div>
+                                        </mat-autocomplete>
+                                    </mat-form-field>
+                                </div>
+                                <div class="col-md-6 col-xs-6">
+                                    <mat-paginator #paginatorLinkedCorrespondents [length]="0" [hidePageSize]="true"
+                                        [pageSize]="10">
+                                    </mat-paginator>
+                                </div>
+                            </div>
+                            <mat-table *ngIf="!loading" #sortLinkedCorrespondents="matSort"
+                                [dataSource]="dataSourceLinkedCorrespondents" matSort matSortActive="contact"
+                                matSortDirection="asc">
+                                <ng-container matColumnDef="type">
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header style="width:70px;flex: initial;padding-left: 5px;padding-right: 5px;">
+                                        {{'lang.type' | translate}}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let element" style="width:70px;flex: initial;padding-left: 5px;padding-right: 5px;">
+                                        <mat-icon color="primary"
+                                            [title]="'lang.' + element.type | translate"
+                                            class="fa"
+                                            [class.fa-address-card]="element.type === 'contact'"
+                                            [class.fa-user]="element.type === 'user'"
+                                            [class.fa-sitemap]="element.type === 'entity'"
+                                            style="align-items: center;justify-content: center;display: flex;">
+                                        </mat-icon>
+                                    </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="contact">
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:3;">
+                                        {{'lang.correspondent' | translate}}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let element" style="flex:3;"> {{element.contact}} </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="address">
+                                    <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:3;">
+                                        {{'lang.address' | translate}}
+                                    </mat-header-cell>
+                                    <mat-cell *matCellDef="let element" style="flex:3;"> {{element.address}} </mat-cell>
+                                </ng-container>
+                                <ng-container matColumnDef="actions">
+                                    <mat-header-cell *matHeaderCellDef style="flex:1;"></mat-header-cell>
+                                    <mat-cell *matCellDef="let element" style="justify-content: flex-end;flex:1;">
+                                        <button mat-icon-button color="warn" matTooltip="{{'lang.delete' | translate}}"
+                                            (click)="$event.stopPropagation();preDelete(element.position)">
+                                            <mat-icon class="fa fa-trash-alt fa-2x" aria-hidden="true"></mat-icon>
+                                        </button>
+                                    </mat-cell>
+                                </ng-container>
+                                <mat-header-row *matHeaderRowDef="displayedColumnsAdded"></mat-header-row>
+                                <mat-row *matRowDef="let element; columns: displayedColumnsAdded;"></mat-row>
+                            </mat-table>
+                        </div>
+
+
+                    </div>
+
+                    <!--<mat-tab-group>
                         <mat-tab label="{{'lang.informations' | translate}}">
-                            <form class="form-horizontal" (ngSubmit)="onSubmit()" #contactsGroupFormUp="ngForm">
-                                <div class="form-group">
-                                    <div class="col-sm-12">
-                                        <mat-form-field>
-                                            <input matInput [(ngModel)]="contactsGroup.label" required name="label"
-                                                id="label" title="{{'lang.label' | translate}}" type="text"
-                                                placeholder="{{'lang.label' | translate}}" maxlength="32">
-                                        </mat-form-field>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-sm-12">
-                                        <mat-form-field>
-                                            <input matInput [(ngModel)]="contactsGroup.description" required
-                                                name="description" id="description" title="{{'lang.description' | translate}}"
-                                                type="text" placeholder="{{'lang.description' | translate}}" maxlength="255">
-                                        </mat-form-field>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-sm-6" style="text-align:center;">
-                                        <mat-slide-toggle name="public" title="{{'lang.contactsGroupDesc' | translate}}" id="public"
-                                            color="primary" [(ngModel)]="contactsGroup.public"
-                                            [checked]="contactsGroup.public">{{'lang.public' | translate}}</mat-slide-toggle>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-sm-12" style="text-align:center;">
-                                        <button mat-raised-button color="primary" type="submit"
-                                            [disabled]="!contactsGroupFormUp.form.valid">{{'lang.save' | translate}}</button>
-                                    </div>
-                                </div>
-                            </form>
+                            
                         </mat-tab>
                         <mat-tab label="{{'lang.addContacts' | translate}}" *ngIf="!creationMode">
                             <div class="row" style="margin:0px;">
@@ -127,56 +267,18 @@
                                 </div>
                             </div>
                         </mat-tab>
-                    </mat-tab-group>
+                    </mat-tab-group>-->
                 </mat-card>
             </div>
         </div>
     </mat-sidenav-content>
     <mat-sidenav #snav2 [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()"
-        position='end' [opened]="appService.getViewMode() || creationMode ? false : true"
-        style="overflow-x:hidden;width:40%;">
+        fixedTopGap="56" position='end' [opened]="!appService.getViewMode()" style="overflow-x:hidden;width:400px;">
         <mat-list>
-            <h3 mat-subheader>{{nbContact}} {{'lang.relatedContacts' | translate}} : </h3>
+            <h3 mat-subheader>{{'lang.shareWith' | translate}} :</h3>
+            <div style="padding:10px;">
+                <app-maarch-flat-tree #maarchTree></app-maarch-flat-tree>
+            </div>
         </mat-list>
-        <div class="row" style="margin:0px;">
-            <div class="col-md-6 col-xs-6">
-                <mat-form-field>
-                    <input matInput #filterUser (keyup)="applyFilter($event.target.value)" placeholder="{{'lang.filterBy' | translate}}">
-                    <button mat-button *ngIf="filterUser.value" matSuffix
-                        mat-icon-button aria-label="Clear" (click)="applyFilter(''); filterUser.value = ''"
-                        [title]="'lang.clearFilter' | translate">
-                        <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
-                    </button>
-                </mat-form-field>
-            </div>
-            <div class="col-md-6 col-xs-6">
-                <mat-paginator #paginatorAdded [length]="0" [hidePageSize]="true" [pageSize]="10">
-                </mat-paginator>
-            </div>
-        </div>
-        <mat-table #tableAdded="matSort" [dataSource]="dataSourceAdded" matSort matSortActive="contact"
-            matSortDirection="asc">
-            <ng-container matColumnDef="contact">
-                <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:3;">{{'lang.contact' | translate}}
-                </mat-header-cell>
-                <mat-cell *matCellDef="let element" style="flex:3;"> {{element.contact}} </mat-cell>
-            </ng-container>
-            <ng-container matColumnDef="address">
-                <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:3;">{{'lang.address' | translate}}
-                </mat-header-cell>
-                <mat-cell *matCellDef="let element" style="flex:3;"> {{element.address}} </mat-cell>
-            </ng-container>
-            <ng-container matColumnDef="actions">
-                <mat-header-cell *matHeaderCellDef style="flex:1;"></mat-header-cell>
-                <mat-cell *matCellDef="let element" style="justify-content: flex-end;flex:1;">
-                    <button mat-icon-button color="warn" matTooltip="{{'lang.delete' | translate}}"
-                        (click)="$event.stopPropagation();preDelete(element.position)">
-                        <mat-icon class="fa fa-trash-alt fa-2x" aria-hidden="true"></mat-icon>
-                    </button>
-                </mat-cell>
-            </ng-container>
-            <mat-header-row *matHeaderRowDef="displayedColumnsAdded"></mat-header-row>
-            <mat-row *matRowDef="let element; columns: displayedColumnsAdded;"></mat-row>
-        </mat-table>
     </mat-sidenav>
 </mat-sidenav-container>

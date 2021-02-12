@@ -105,12 +105,14 @@ class HomeController
         $externalId = json_decode($user['external_id'], true);
 
         $isMaarchParapheurConnected = false;
+        $maarchParapheurUrl = null;
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
         if (!empty($loadedXml)) {
             foreach ($loadedXml->signatoryBook as $value) {
                 if ($value->id == "maarchParapheur") {
                     if (!empty($value->url) && !empty($value->userId) && !empty($value->password) && !empty($externalId['maarchParapheur'])) {
                         $isMaarchParapheurConnected = true;
+                        $maarchParapheurUrl = rtrim((string)$value->url, "/");
                     }
                     break;
                 }
@@ -121,10 +123,11 @@ class HomeController
         $homeMessage = trim($homeMessage['param_value_string']);
 
         return $response->withJson([
-            'regroupedBaskets'              => $regroupedBaskets,
-            'assignedBaskets'               => $assignedBaskets,
-            'homeMessage'                   => $homeMessage,
-            'isLinkedToMaarchParapheur'     => $isMaarchParapheurConnected
+            'regroupedBaskets'          => $regroupedBaskets,
+            'assignedBaskets'           => $assignedBaskets,
+            'homeMessage'               => $homeMessage,
+            'isLinkedToMaarchParapheur' => $isMaarchParapheurConnected,
+            'maarchParapheurUrl'        => $maarchParapheurUrl
         ]);
     }
 

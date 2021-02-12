@@ -7,7 +7,7 @@ import { of } from 'rxjs';
 import { FunctionsService } from '@service/functions.service';
 import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog } from '@angular/material/dialog';
-import { ExternalVisaWorkflow } from '@appRoot/visa/externalVisaWorkflow/external-visa-workflow.component';
+import { ExternalVisaWorkflowComponent } from '@appRoot/visa/externalVisaWorkflow/external-visa-workflow.component';
 
 @Component({
     selector: 'app-maarch-paraph',
@@ -28,7 +28,7 @@ export class MaarchParaphComponent implements OnInit {
         editable: true
     };
 
-    @ViewChild('appExternalVisaWorkflow', { static: true }) appExternalVisaWorkflow: ExternalVisaWorkflow;
+    @ViewChild('appExternalVisaWorkflow', { static: true }) appExternalVisaWorkflow: ExternalVisaWorkflowComponent;
 
     @Input() resourcesToSign: any[] = [];
     @Input() additionalsInfos: any;

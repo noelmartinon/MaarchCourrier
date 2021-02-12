@@ -56,7 +56,7 @@ export class TileViewChartComponent implements OnInit, AfterViewInit {
             if (link.route.match(regex) === null) {
                 this.router.navigate([link.route], { queryParams: link.params });
             } else {
-                window.location.href = link.route;
+                window.open(link.route, '_blank');
             }
         }
     }

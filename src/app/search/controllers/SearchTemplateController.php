@@ -24,7 +24,7 @@ class SearchTemplateController
 {
     public function get(Request $request, Response $response)
     {
-        $searchTemplates = SearchTemplateModel::get(['select' => ['id', 'label', 'query'], 'where' => ['user_id = ?'], 'data' => [$GLOBALS['id']]]);
+        $searchTemplates = SearchTemplateModel::get(['select' => ['id', 'label', 'query'], 'where' => ['user_id = ?'], 'data' => [$GLOBALS['id']], 'orderBy' => ['label']]);
         foreach ($searchTemplates as $key => $searchTemplate) {
             $searchTemplates[$key]['query'] = json_decode($searchTemplate['query'], true);
         }

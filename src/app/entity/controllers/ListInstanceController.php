@@ -75,8 +75,10 @@ class ListInstanceController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $listInstances = ListInstanceModel::getVisaCircuitByResId(['select' => ['listinstance_id', 'sequence', 'item_id', 'item_type', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment', 'signatory', 'requested_signature', 'delegate'], 'id' => $aArgs['resId']]);
+        $listInstances = ListInstanceModel::getVisaCircuitByResId(['select' => ['listinstance_id', 'sequence', 'item_id', 'item_type', 'firstname as item_firstname', 'lastname as item_lastname', 'viewed', 'process_date', 'process_comment', 'signatory', 'requested_signature', 'delegate'], 'id' => $aArgs['resId']]);
         foreach ($listInstances as $key => $value) {
+            $primaryEntity = UserModel::getPrimaryEntityById(['select' => ['entity_label'], 'id' => $value['item_id']]);
+            $listInstances[$key]['item_entity'] = $primaryEntity['entity_label'] ?? '';
             $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['status']]);
             $listInstances[$key]['isValid'] = !empty($user) && !in_array($user['status'], ['SPD', 'DEL']);
 
@@ -111,8 +113,10 @@ class ListInstanceController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $listInstances = ListInstanceModel::getAvisCircuitByResId(['select' => ['listinstance_id', 'sequence', 'item_id', 'item_type', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment', 'delegate'], 'id' => $aArgs['resId']]);
+        $listInstances = ListInstanceModel::getAvisCircuitByResId(['select' => ['listinstance_id', 'sequence', 'item_id', 'item_type', 'firstname as item_firstname', 'lastname as item_lastname', 'viewed', 'process_date', 'process_comment', 'delegate'], 'id' => $aArgs['resId']]);
         foreach ($listInstances as $key => $value) {
+            $primaryEntity = UserModel::getPrimaryEntityById(['select' => ['entity_label'], 'id' => $value['item_id']]);
+            $listInstances[$key]['item_entity'] = $primaryEntity['entity_label'] ?? '';
             $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['status']]);
             $listInstances[$key]['isValid'] = !empty($user) && !in_array($user['status'], ['SPD', 'DEL']);
 
@@ -143,6 +147,8 @@ class ListInstanceController
 
         $listInstances = ListInstanceModel::getParallelOpinionByResId(['select' => ['listinstance_id', 'sequence', 'item_mode', 'item_id', 'item_type', 'firstname as item_firstname', 'lastname as item_lastname', 'entity_label as item_entity', 'viewed', 'process_date', 'process_comment', 'delegate'], 'id' => $aArgs['resId']]);
         foreach ($listInstances as $key => $value) {
+            $primaryEntity = UserModel::getPrimaryEntityById(['select' => ['entity_label'], 'id' => $value['item_id']]);
+            $listInstances[$key]['item_entity'] = $primaryEntity['entity_label'] ?? '';
             $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['status']]);
             $listInstances[$key]['isValid'] = !empty($user) && !in_array($user['status'], ['SPD', 'DEL']);
 

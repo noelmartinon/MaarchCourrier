@@ -26,6 +26,7 @@ import { FiltersListService } from '@service/filtersList.service';
 import { CriteriaSearchService } from '@service/criteriaSearch.service';
 import { FoldersService } from './folder/folders.service';
 import { PrivilegeService } from '@service/privileges.service';
+import { ActionPagesService } from '@service/actionPages.service';
 import { ActionsService } from './actions/actions.service';
 
 import { AppComponent } from './app.component';
@@ -134,7 +135,7 @@ import { ResetPasswordComponent } from './login/resetPassword/reset-password.com
 import { SaveNumericPackageComponent } from './save-numeric-package.component';
 import { SignatureBookComponent } from './signature-book.component';
 import { VisaWorkflowModalComponent } from './visa/modal/visa-workflow-modal.component';
-import { ExternalVisaWorkflow } from './visa/externalVisaWorkflow/external-visa-workflow.component';
+import { ExternalVisaWorkflowComponent } from './visa/externalVisaWorkflow/external-visa-workflow.component';
 
 import { DevToolComponent } from '@service/debug/dev-tool.component';
 import { DevLangComponent } from '@service/debug/dev-lang.component';
@@ -271,7 +272,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         ResetRecordManagementComponent,
         CheckAcknowledgmentRecordManagementComponent,
         TechnicalInformationComponent,
-        ExternalVisaWorkflow
+        ExternalVisaWorkflowComponent
     ],
     exports : [
         SharedModule
@@ -342,6 +343,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         FoldersService,
         ActionsService,
         PrivilegeService,
+        ActionPagesService,
         {
             provide: HAMMER_GESTURE_CONFIG,
             useClass: MyHammerConfig

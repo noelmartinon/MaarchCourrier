@@ -104,10 +104,10 @@ abstract class ListInstanceModelAbstract
 
         $aListinstance = DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
-            'table'     => ['listinstance', 'users', 'users_entities', 'entities'],
-            'left_join' => ['listinstance.item_id = users.id', 'users_entities.user_id = users.id', 'entities.entity_id = users_entities.entity_id'],
-            'where'     => ['res_id = ?', 'item_type = ?', 'difflist_type = ?', 'primary_entity = ?'],
-            'data'      => [$aArgs['id'], 'user_id', 'VISA_CIRCUIT', 'Y'],
+            'table'     => ['listinstance', 'users'],
+            'left_join' => ['listinstance.item_id = users.id'],
+            'where'     => ['res_id = ?', 'item_type = ?', 'difflist_type = ?'],
+            'data'      => [$aArgs['id'], 'user_id', 'VISA_CIRCUIT'],
             'order_by'  => ['listinstance_id ASC'],
         ]);
 
@@ -122,10 +122,10 @@ abstract class ListInstanceModelAbstract
 
         $aListinstance = DatabaseModel::select([
             'select'    => empty($aArgs['select']) ? ['*'] : $aArgs['select'],
-            'table'     => ['listinstance', 'users', 'users_entities', 'entities'],
-            'left_join' => ['listinstance.item_id = users.id', 'users_entities.user_id = users.id', 'entities.entity_id = users_entities.entity_id'],
-            'where'     => ['res_id = ?', 'item_type = ?', 'difflist_type = ?', 'primary_entity = ?'],
-            'data'      => [$aArgs['id'], 'user_id', 'AVIS_CIRCUIT', 'Y'],
+            'table'     => ['listinstance', 'users'],
+            'left_join' => ['listinstance.item_id = users.id'],
+            'where'     => ['res_id = ?', 'item_type = ?', 'difflist_type = ?'],
+            'data'      => [$aArgs['id'], 'user_id', 'AVIS_CIRCUIT'],
             'order_by'  => ['listinstance_id ASC'],
         ]);
 

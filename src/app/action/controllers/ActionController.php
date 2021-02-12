@@ -74,14 +74,7 @@ class ActionController
 
         $action['statuses'] = StatusModel::get();
         array_unshift($action['statuses'], ['id' => '_NOSTATUS_', 'label_status' => _UNCHANGED]);
-        $action['actionPages'] = ActionModel::getActionPages();
         $action['keywordsList'] = ActionModel::getKeywords();
-
-        foreach ($action['actionPages'] as $actionPage) {
-            if ($actionPage['component'] == $action['action']['component']) {
-                $action['action']['actionPageId'] = $actionPage['id'];
-            }
-        }
 
         $action['action']['parameters'] = json_decode($action['action']['parameters'], true);
 
@@ -100,17 +93,6 @@ class ActionController
         $errors = $this->control($body, 'create');
         if (!empty($errors)) {
             return $response->withStatus(400)->withJson(['errors' => $errors]);
-        }
-
-        $actionPages = ActionModel::getActionPages();
-        foreach ($actionPages as $actionPage) {
-            if ($actionPage['id'] == $body['actionPageId']) {
-                $body['action_page'] = $actionPage['id'];
-                $body['component'] = $actionPage['component'];
-            }
-        }
-        if (empty($body['action_page'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Data actionPageId does not exist']);
         }
 
         $requiredFields = [];
@@ -180,28 +162,17 @@ class ActionController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $body = $request->getParsedBody();
+        $body       = $request->getParsedBody();
         $body['id'] = $args['id'];
 
-        $body    = $this->manageValue($body);
+        $body   = $this->manageValue($body);
         $errors = $this->control($body, 'update');
         if (!empty($errors)) {
             return $response->withStatus(500)->withJson(['errors' => $errors]);
         }
 
-        $actionPages = ActionModel::getActionPages();
-        foreach ($actionPages as $actionPage) {
-            if ($actionPage['id'] == $body['actionPageId']) {
-                $body['action_page'] = $actionPage['id'];
-                $body['component'] = $actionPage['component'];
-            }
-        }
-        if (empty($body['action_page'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Data actionPageId does not exist']);
-        }
-
         $requiredFields = [];
-        $parameters = [];
+        $parameters     = [];
         if (!empty($body['parameters'])) {
             $parameters = $body['parameters'];
 
@@ -325,7 +296,7 @@ class ActionController
             !Validator::length(1, 255)->validate($aArgs['label_action'])) {
             $errors[] = 'Invalid label action';
         }
-        if (!Validator::stringType()->notEmpty()->validate($aArgs['actionPageId'])) {
+        if (!Validator::stringType()->notEmpty()->validate($aArgs['action_page'])) {
             $errors[] = 'Invalid page action';
         }
 
@@ -352,7 +323,6 @@ class ActionController
 
         $obj['statuses'] = StatusModel::get();
         array_unshift($obj['statuses'], ['id'=>'_NOSTATUS_','label_status'=> _UNCHANGED]);
-        $obj['actionPages'] = ActionModel::getActionPages();
         $obj['keywordsList'] = ActionModel::getKeywords();
         
         return $response->withJson($obj);

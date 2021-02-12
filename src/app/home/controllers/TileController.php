@@ -431,24 +431,32 @@ class TileController
                     'orderBy' => [$type]
                 ]);
                 $tile['resources'] = [];
+
+                $dataResources = array_column($resources, $type);
+                if (!empty($dataResources)) {
+                    if ($type == 'status') {
+                        $statuses      = StatusModel::get(['select' => ['label_status', 'id'], 'where' => ['id in (?)'], 'data' => [$dataResources]]);
+                        $dataResources = array_column($statuses, 'label_status', 'id');
+                    } elseif ($type == 'destination') {
+                        $destination   = EntityModel::get(['select' => ['short_label', 'entity_id'], 'where' => ['entity_id in (?)'], 'data' => [$dataResources]]);
+                        $dataResources = array_column($destination, 'short_label', 'entity_id');
+                    } elseif ($type == 'type_id') {
+                        $doctypes      = DoctypeModel::get(['select' => ['description', 'type_id'], 'where' => ['type_id in (?)'], 'data' => [$dataResources]]);
+                        $dataResources = array_column($doctypes, 'description', 'type_id');
+                    }
+                }
+
                 foreach ($resources as $resource) {
                     if ($type == 'status') {
-                        if (!empty($resource['status'])) {
-                            $status = StatusModel::getById(['select' => ['label_status'], 'id' => $resource['status']]);
-                        }
-                        $tile['resources'][] = ['name' => $status['label_status'] ?? '', 'value' => $resource['count']];
+                        $tile['resources'][] = ['name' => $dataResources[$resource['status']] ?? '', 'value' => $resource['count']];
                     } elseif ($type == 'destination') {
-                        if (!empty($resource['destination'])) {
-                            $entity = EntityModel::getByEntityId(['select' => ['short_label'], 'entityId' => $resource['destination']]);
-                        }
-                        $tile['resources'][] = ['name' => $entity['short_label'] ?? '', 'value' => $resource['count']];
+                        $tile['resources'][] = ['name' => $dataResources[$resource['destination']] ?? '', 'value' => $resource['count']];
                     } elseif (!empty($tile['parameters']['chartMode']) && $tile['parameters']['chartMode'] == 'creationDate') {
                         $date = new \DateTime($resource['date_trunc']);
                         $date = $date->format('d/m/Y');
                         $tile['resources'][] = ['name' => $date, 'value' => $resource['count']];
                     } else {
-                        $doctype = DoctypeModel::getById(['select' => ['description'], 'id' => $resource['type_id']]);
-                        $tile['resources'][] = ['name' => $doctype['description'], 'value' => $resource['count']];
+                        $tile['resources'][] = ['name' => $dataResources[$resource['type_id']], 'value' => $resource['count']];
                     }
                 }
             }
@@ -548,7 +556,10 @@ class TileController
     private static function getShortcutDetails(array &$tile)
     {
         $tile['resourcesNumber'] = null;
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => $tile['parameters']['privilegeId'], 'userId' => $GLOBALS['id']])) {
+
+        if (($tile['parameters']['privilegeId'] == 'indexing' && !PrivilegeController::canIndex(['userId' => $GLOBALS['id']])) ||
+            ($tile['parameters']['privilegeId'] != 'indexing' && !PrivilegeController::hasPrivilege(['privilegeId' => $tile['parameters']['privilegeId'], 'userId' => $GLOBALS['id']]))
+        ) {
             return ['errors' => 'Service forbidden'];
         }
         if ($tile['parameters']['privilegeId'] == 'admin_users') {

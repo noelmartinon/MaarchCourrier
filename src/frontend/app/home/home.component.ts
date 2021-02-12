@@ -7,6 +7,7 @@ import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 import { Router } from '@angular/router';
 import { FeatureTourService } from '@service/featureTour.service';
+import {DomSanitizer} from '@angular/platform-browser';
 
 declare var $: any;
 
@@ -20,7 +21,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     loading: boolean = false;
 
     homeData: any;
-    homeMessage: string;
+    homeMessage: any;
 
     constructor(
         public translate: TranslateService,
@@ -30,7 +31,8 @@ export class HomeComponent implements OnInit, AfterViewInit {
         private headerService: HeaderService,
         public appService: AppService,
         private router: Router,
-        private featureTourService: FeatureTourService
+        private featureTourService: FeatureTourService,
+        private sanitizer: DomSanitizer
     ) { }
 
     ngOnInit(): void {
@@ -39,7 +41,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.http.get('../rest/home')
             .subscribe((data: any) => {
                 this.homeData = data;
-                this.homeMessage = data['homeMessage'];
+                this.homeMessage = this.sanitizer.bypassSecurityTrustHtml(data['homeMessage']);
             });
     }
 

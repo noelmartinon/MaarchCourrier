@@ -50,6 +50,7 @@
             <file>test/unitTests/app/notification/DiffusionTypesControllerTest.php</file>
             <file>test/unitTests/app/registeredMail/IssuingSiteControllerTest.php</file>
             <file>test/unitTests/app/registeredMail/RegisteredNumberRangeControllerTest.php</file>
+            <file>test/unitTests/app/home/TileControllerTest.php</file>
             <!-- The last one should be history -->
             <file>test/unitTests/app/history/HistoryControllerTest.php</file>
         </testsuite>

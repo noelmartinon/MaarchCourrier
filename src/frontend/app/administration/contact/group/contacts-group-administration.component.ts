@@ -5,13 +5,16 @@ import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
 import { HeaderService } from '@service/header.service';
 import { FormControl } from '@angular/forms';
-import { debounceTime, switchMap, distinctUntilChanged, filter } from 'rxjs/operators';
+import { debounceTime, switchMap, distinctUntilChanged, filter, tap, map, catchError } from 'rxjs/operators';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
 import { AppService } from '@service/app.service';
+import { MaarchFlatTreeComponent } from '@plugins/tree/maarch-flat-tree.component';
+import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
+import { of } from 'rxjs';
 
 declare var $: any;
 
@@ -25,8 +28,6 @@ export class ContactsGroupAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-
-    
 
     subMenus: any[] = [
         {
@@ -63,7 +64,7 @@ export class ContactsGroupAdministrationComponent implements OnInit {
 
     creationMode: boolean;
     contactsGroup: any = {};
-    nbContact: number;
+    nbCorrespondents: number;
 
     loading: boolean = false;
     initAutoCompleteContact = true;
@@ -71,33 +72,34 @@ export class ContactsGroupAdministrationComponent implements OnInit {
     searchTerm: FormControl = new FormControl();
     searchResult: any = [];
 
-    displayedColumns = ['select', 'contact', 'address'];
-    displayedColumnsAdded = ['contact', 'address', 'actions'];
+    displayedColumns = ['select', 'type', 'contact', 'address'];
+    displayedColumnsAdded = ['type', 'contact', 'address', 'actions'];
     dataSource: any;
-    dataSourceAdded: any;
+    dataSourceLinkedCorrespondents: any;
     selection = new SelectionModel<Element>(true, []);
 
     @ViewChild('paginatorContactList', { static: true }) paginator: MatPaginator;
-    @ViewChild('paginatorAdded', { static: true }) paginatorAdded: MatPaginator;
-    @ViewChild('tableAdded', { static: true }) sortAdded: MatSort;
+    @ViewChild('paginatorLinkedCorrespondents', { static: false }) paginatorLinkedCorrespondents: MatPaginator;
+    @ViewChild('sortLinkedCorrespondents', { static: false }) sortLinkedCorrespondents: MatSort;
+    @ViewChild('maarchTree', { static: true }) maarchTree: MaarchFlatTreeComponent;
 
     /** Selects all rows if they are not all selected; otherwise clear selection. */
-    masterToggle(event: any) {
-        if (event.checked) {
-            this.dataSource.data.forEach((row: any) => {
-                if (!$('#check_' + row.id + '-input').is(':disabled')) {
-                    this.selection.select(row.id);
-                }
-            });
-        } else {
-            this.selection.clear();
+    toggleAll() {
+        this.dataSource.data.forEach((row: any) => {
+            if (!$('#check_' + row.id + '-input').is(':disabled')) {
+                this.selection.select(row.id);
+            }
+        });
+        if (this.selection.selected.length > 0) {
+            this.saveContactsList();
         }
     }
 
     applyFilter(filterValue: string) {
+        this.dataSource = null;
         filterValue = filterValue.trim();
         filterValue = filterValue.toLowerCase();
-        this.dataSourceAdded.filter = filterValue;
+        this.dataSourceLinkedCorrespondents.filter = filterValue;
     }
 
     constructor(
@@ -143,33 +145,75 @@ export class ContactsGroupAdministrationComponent implements OnInit {
                     .subscribe((data: any) => {
                         this.contactsGroup = data.contactsGroup;
                         this.headerService.setHeader(this.translate.instant('lang.contactsGroupModification'), this.contactsGroup.label);
-                        this.nbContact = this.contactsGroup.nbContacts;
-                        setTimeout(() => {
-                            this.dataSourceAdded = new MatTableDataSource(this.contactsGroup.contacts);
-                            this.dataSourceAdded.paginator = this.paginatorAdded;
-                            this.dataSourceAdded.sort = this.sortAdded;
-                        }, 0);
-
+                        this.nbCorrespondents = this.contactsGroup.nbCorrespondentss;
+                        this.dataSourceLinkedCorrespondents = new MatTableDataSource(this.contactsGroup.contacts);
                         this.loading = false;
+                        setTimeout(() => {
+                            this.dataSourceLinkedCorrespondents.paginator = this.paginatorLinkedCorrespondents;
+                            this.dataSourceLinkedCorrespondents.sort = this.sortLinkedCorrespondents;
+                        }, 0);
                     });
+                this.initTree();
             }
         });
     }
 
-    saveContactsList(elem: any): void {
-        elem.textContent = this.translate.instant('lang.loading') + '...';
-        elem.disabled = true;
+    initTree() {
+        // FOR TEST
+        this.http.get('../rest/entities').pipe(
+            map((data: any) => {
+                data.entities = data.entities.map((entity: any) => {
+                    return {
+                        text: entity.entity_label,
+                        icon: entity.icon,
+                        parent_id: entity.parentSerialId,
+                        id: entity.serialId,
+                        state: {
+                            opened: true
+                        }
+                    };
+                });
+                return data.entities;
+            }),
+            tap((entities: any) => {
+                /*entities.forEach(element => {
+                    if (this.availableEntities.indexOf(+element.id) > -1) {
+                        element.state.disabled = false;
+                    } else {
+                        element.state.disabled = true;
+                    }
+                });*/
+                this.maarchTree.initData(entities);
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+
+    searchContact(search: string) {
+        this.http.get('../rest/autocomplete/contacts', { params: { 'search': search } }).pipe(
+            tap((data: any) => {
+                this.searchResult = data;
+                this.dataSource = new MatTableDataSource(this.searchResult);
+                this.dataSource.paginator = this.paginator;
+            })
+        ).subscribe();
+    }
+
+    saveContactsList(): void {
         this.http.post('../rest/contactsGroups/' + this.contactsGroup.id + '/contacts', { 'contacts': this.selection.selected })
             .subscribe((data: any) => {
                 this.notify.success(this.translate.instant('lang.contactAdded'));
-                this.nbContact = this.nbContact + this.selection.selected.length;
+                this.nbCorrespondents = this.nbCorrespondents + this.selection.selected.length;
                 this.selection.clear();
-                elem.textContent = this.translate.instant('lang.add');
                 this.contactsGroup = data.contactsGroup;
                 setTimeout(() => {
-                    this.dataSourceAdded = new MatTableDataSource(this.contactsGroup.contacts);
-                    this.dataSourceAdded.paginator = this.paginatorAdded;
-                    this.dataSourceAdded.sort = this.sortAdded;
+                    this.dataSourceLinkedCorrespondents = new MatTableDataSource(this.contactsGroup.contacts);
+                    this.dataSourceLinkedCorrespondents.paginator = this.paginatorLinkedCorrespondents;
+                    this.dataSourceLinkedCorrespondents.sort = this.sortLinkedCorrespondents;
                 }, 0);
             }, (err) => {
                 this.notify.error(err.error.errors);
@@ -212,10 +256,10 @@ export class ContactsGroupAdministrationComponent implements OnInit {
                 this.contactsGroup.contacts[row] = this.contactsGroup.contacts[lastElement];
                 this.contactsGroup.contacts[row].position = row;
                 this.contactsGroup.contacts.splice(lastElement, 1);
-                this.nbContact = this.nbContact - 1;
-                this.dataSourceAdded = new MatTableDataSource(this.contactsGroup.contacts);
-                this.dataSourceAdded.paginator = this.paginatorAdded;
-                this.dataSourceAdded.sort = this.sortAdded;
+                this.nbCorrespondents = this.nbCorrespondents - 1;
+                this.dataSourceLinkedCorrespondents = new MatTableDataSource(this.contactsGroup.contacts);
+                this.dataSourceLinkedCorrespondents.paginator = this.paginatorLinkedCorrespondents;
+                this.dataSourceLinkedCorrespondents.sort = this.sortLinkedCorrespondents;
                 this.notify.success(this.translate.instant('lang.contactDeletedFromGroup'));
             }, (err) => {
                 this.notify.error(err.error.errors);
@@ -239,9 +283,17 @@ export class ContactsGroupAdministrationComponent implements OnInit {
         return isInGrp;
     }
 
-    selectContact(id: any) {
-        if (!$('#check_' + id + '-input').is(':disabled')) {
-            this.selection.toggle(id);
+    toggleCorrespondent(element: any) {
+        if (!$('#check_' + element.id + '-input').is(':disabled')) {
+            this.selection.toggle(element.id);
+            this.saveContactsList();
         }
+    }
+
+    open(event: Event, trigger: MatAutocompleteTrigger) {
+        event.stopPropagation();
+        setTimeout(() => {
+            trigger.openPanel();
+        }, 100);
     }
 }

@@ -12,14 +12,14 @@ import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
 import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 
 @Component({
-    templateUrl: "diffusionModel-administration.component.html",
+    templateUrl: 'diffusionModel-administration.component.html',
     styleUrls: ['diffusionModel-administration.component.scss']
 })
 export class DiffusionModelAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
 
-    
+
     loading: boolean = true;
 
     diffusionModel: any = {
@@ -32,11 +32,11 @@ export class DiffusionModelAdministrationComponent implements OnInit {
     idCircuit: number;
     itemTypeList: any = [
         {
-            id: "visaCircuit",
+            id: 'visaCircuit',
             label: this.translate.instant('lang.visaCircuit')
         },
         {
-            id: "opinionCircuit",
+            id: 'opinionCircuit',
             label: this.translate.instant('lang.opinionCircuit')
         }
     ];
@@ -61,8 +61,7 @@ export class DiffusionModelAdministrationComponent implements OnInit {
         this.loading = true;
 
         this.route.params.subscribe(async params => {
-            
-            if (typeof params['id'] == "undefined") {
+            if (typeof params['id'] == 'undefined') {
                 this.headerService.setHeader(this.translate.instant('lang.diffusionModelCreation'));
 
                 this.creationMode = true;
@@ -108,9 +107,9 @@ export class DiffusionModelAdministrationComponent implements OnInit {
 
         setTimeout(async () => {
             this.appVisaWorkflow.resetWorkflow();
-            await this.appVisaWorkflow.addItemToWorkflow(item, false);
+            await this.appVisaWorkflow.addItemToWorkflow(item);
             this.diffusionModel.items = this.appVisaWorkflow.getWorkflow();
-            this.diffusionModelClone = JSON.parse(JSON.stringify(this.diffusionModel));            
+            this.diffusionModelClone = JSON.parse(JSON.stringify(this.diffusionModel));
         }, 0);
     }
 
@@ -123,7 +122,7 @@ export class DiffusionModelAdministrationComponent implements OnInit {
             this.appAvisWorkflow.resetWorkflow();
             await this.appAvisWorkflow.addItemToWorkflow(item);
             this.diffusionModel.items = this.appAvisWorkflow.getWorkflow();
-            this.diffusionModelClone = JSON.parse(JSON.stringify(this.diffusionModel)); 
+            this.diffusionModelClone = JSON.parse(JSON.stringify(this.diffusionModel));
         }, 0);
     }
 
@@ -136,9 +135,9 @@ export class DiffusionModelAdministrationComponent implements OnInit {
     }
 
     createTemplate() {
-        this.http.post("../rest/listTemplates?admin=true", this.formatCircuit()).pipe(
+        this.http.post('../rest/listTemplates?admin=true', this.formatCircuit()).pipe(
             tap(() => {
-                this.router.navigate(["/administration/diffusionModels"]);
+                this.router.navigate(['/administration/diffusionModels']);
                 this.notify.success(this.translate.instant('lang.diffusionModelAdded'));
             }),
             catchError((err: any) => {
@@ -151,7 +150,7 @@ export class DiffusionModelAdministrationComponent implements OnInit {
     updateTemplate() {
         this.http.put(`../rest/listTemplates/${this.diffusionModel.id}`, this.formatCircuit()).pipe(
             tap(() => {
-                this.router.navigate(["/administration/diffusionModels"]);
+                this.router.navigate(['/administration/diffusionModels']);
                 this.notify.success(this.translate.instant('lang.diffusionModelUpdated'));
             }),
             catchError((err: any) => {
@@ -165,21 +164,21 @@ export class DiffusionModelAdministrationComponent implements OnInit {
         if (this.diffusionModel.type === 'visaCircuit') {
             this.diffusionModel.items = this.appVisaWorkflow.getWorkflow().map((item: any, index: number) => {
                 return {
-                    "id": item.item_id,
-                    "type": "user",
-                    "mode": item.requested_signature ? 'sign' : 'visa',
-                    "sequence": index
-                }
+                    'id': item.item_id,
+                    'type': 'user',
+                    'mode': item.requested_signature ? 'sign' : 'visa',
+                    'sequence': index
+                };
             });
             return this.diffusionModel;
         } else {
             this.diffusionModel.items = this.appAvisWorkflow.getWorkflow().map((item: any, index: number) => {
                 return {
-                    "id": item.item_id,
-                    "type": "user",
-                    "mode": 'avis',
-                    "sequence": index
-                }
+                    'id': item.item_id,
+                    'type': 'user',
+                    'mode': 'avis',
+                    'sequence': index
+                };
             });
             return this.diffusionModel;
         }

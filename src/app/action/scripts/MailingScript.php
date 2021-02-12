@@ -61,7 +61,9 @@ class MailingScript
             $result = ExternalSignatoryBookTrait::sendExternalSignatoryBookAction($resource);
 
             if (!empty($result['errors'])) {
-                ResModel::update(['set' => ['status' => $args['errorStatus']], 'where' => ['res_id = ?'], 'data' => [$resource['resId']]]);
+                if ($args['errorStatus'] != '_NOSTATUS_') {
+                    ResModel::update(['set' => ['status' => $args['errorStatus']], 'where' => ['res_id = ?'], 'data' => [$resource['resId']]]);
+                }
                 LogsController::add([
                     'isTech'    => true,
                     'moduleId'  => 'resource',
@@ -72,7 +74,9 @@ class MailingScript
                     'eventId'   => "resId : {$resource['resId']}"
                 ]);
             } else {
-                ResModel::update(['set' => ['status' => $args['successStatus']], 'where' => ['res_id = ?'], 'data' => [$resource['resId']]]);
+                if ($args['successStatus'] != '_NOSTATUS_') {
+                    ResModel::update(['set' => ['status' => $args['successStatus']], 'where' => ['res_id = ?'], 'data' => [$resource['resId']]]);
+                }
                 if (!empty($result['history'])) {
                     LogsController::add([
                         'isTech'    => true,
@@ -132,9 +136,9 @@ class MailingScript
                 }
             }
 
-            if ($mailingSuccess) {
+            if ($mailingSuccess && $args['successStatus'] != '_NOSTATUS_') {
                 ResModel::update(['set' => ['status' => $args['successStatus']], 'where' => ['res_id = ?'], 'data' => [$resource['resId']]]);
-            } else {
+            } elseif (!$mailingSuccess && $args['errorStatus'] != '_NOSTATUS_') {
                 ResModel::update(['set' => ['status' => $args['errorStatus']], 'where' => ['res_id = ?'], 'data' => [$resource['resId']]]);
             }
         }

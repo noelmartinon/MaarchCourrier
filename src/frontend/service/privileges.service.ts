@@ -10,6 +10,7 @@ interface menu {
     'style': string; // icon used interface
     'unit': string; // category of administration
     'angular': boolean; // to navigate in V1 <=>V2
+    'groups'?: any[]; // groups of indexation if id === 'indexing'
     'shortcut': boolean; // show in panel
 }
 
@@ -665,10 +666,15 @@ export class PrivilegeService {
         }
     }
 
-    getCurrentUserMenus() {
-        let menus = this.menus.filter(elem => this.headerService.user.privileges.indexOf(elem.id) > -1);
+    getCurrentUserMenus(ids: string[] = null) {
+        let menus: menu[];
+        if (ids !== null) {
+            menus = this.menus.filter(elem => ids.indexOf(elem.id) > -1 && this.headerService.user.privileges.indexOf(elem.id) > -1);
+        } else {
+            menus = this.menus.filter(elem => this.headerService.user.privileges.indexOf(elem.id) > -1);
+        }
 
-        if (this.headerService.user.groups.filter((group: any) => group.can_index === true).length > 0) {
+        if (this.headerService.user.groups.filter((group: any) => group.can_index === true).length > 0 && (ids === null || ids.indexOf('indexing') > -1)) {
             const indexingGroups: any[] = [];
 
             this.headerService.user.groups.filter((group: any) => group.can_index === true).forEach((group: any) => {

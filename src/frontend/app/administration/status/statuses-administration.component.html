@@ -50,9 +50,9 @@
                             <mat-header-cell *matHeaderCellDef>{{'lang.imgRelated' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element" color="primary">
                                 <mat-icon class="fm {{element.img_filename}} fm-2x"
-                                    *ngIf="element.img_filename.indexOf('fm') == 0" aria-hidden="true"></mat-icon>
+                                    *ngIf="element.img_filename?.indexOf('fm') == 0" aria-hidden="true"></mat-icon>
                                 <mat-icon class="fa {{element.img_filename}} fa-2x"
-                                    *ngIf="element.img_filename.indexOf('fa') == 0" aria-hidden="true"></mat-icon>
+                                    *ngIf="element.img_filename?.indexOf('fa') == 0" aria-hidden="true"></mat-icon>
                             </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="id">

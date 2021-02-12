@@ -5,6 +5,9 @@
     color: $primary;
     font-weight: bold;
     text-align: center;
+    white-space: pre;
+    text-overflow: ellipsis;
+    overflow: hidden;
 }
 
 .tile-icon {

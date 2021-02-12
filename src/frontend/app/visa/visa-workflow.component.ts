@@ -42,13 +42,13 @@ export class VisaWorkflowComponent implements OnInit {
     visaModelListNotLoaded: boolean = true;
     data: any;
 
-    @Input('injectDatas') injectDatas: any;
-    @Input('target') target: string = '';
-    @Input('adminMode') adminMode: boolean;
-    @Input('resId') resId: number = null;
+    @Input() injectDatas: any;
+    @Input() target: string = '';
+    @Input() adminMode: boolean;
+    @Input() resId: number = null;
 
-    @Input('showListModels') showListModels: boolean = true;
-    @Input('showComment') showComment: boolean = true;
+    @Input() showListModels: boolean = true;
+    @Input() showComment: boolean = true;
 
     @Output() workflowUpdated = new EventEmitter<any>();
 
@@ -107,35 +107,6 @@ export class VisaWorkflowComponent implements OnInit {
         }
     }
 
-    canMoveUserExtParaph(ev: any) {
-        const newWorkflow = this.array_move(this.visaWorkflow.items.slice(), ev.currentIndex, ev.previousIndex);
-        const res = this.isValidExtWorkflow(newWorkflow);
-        return res;
-    }
-
-    array_move(arr: any, old_index: number, new_index: number) {
-        if (new_index >= arr.length) {
-            let k = new_index - arr.length + 1;
-            while (k--) {
-                arr.push(undefined);
-            }
-        }
-        arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
-        return arr; // for testing
-    }
-
-    isValidExtWorkflow(workflow: any = this.visaWorkflow) {
-        let res: boolean = true;
-        workflow.forEach((item: any, indexUserRgs: number) => {
-            if (['visa', 'stamp'].indexOf(item.role) === -1) {
-                if (workflow.filter((itemUserStamp: any, indexUserStamp: number) => indexUserStamp > indexUserRgs && itemUserStamp.role === 'stamp').length > 0) {
-                    res = false;
-                }
-            }
-        });
-        return res;
-    }
-
     loadListModel(entityId: number) {
         this.loading = true;
 
@@ -156,11 +127,6 @@ export class VisaWorkflowComponent implements OnInit {
                             };
                         });
                     }
-                    this.visaWorkflow.items.forEach((element: any, key: number) => {
-                        if (!this.functions.empty(element['externalId'])) {
-                            this.getMaarchParapheurUserAvatar(element.externalId.maarchParapheur, key);
-                        }
-                    });
                     this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
                     this.loading = false;
                     resolve(true);
@@ -346,25 +312,31 @@ export class VisaWorkflowComponent implements OnInit {
     loadDefaultWorkflow(resId: number) {
         this.loading = true;
         this.visaWorkflow.items = [];
-        this.http.get('../rest/resources/' + resId + '/defaultCircuit?circuit=visaCircuit').pipe(
-            filter((data: any) => !this.functions.empty(data.circuit)),
-            tap((data: any) => {
-                data.circuit.items.forEach((element: any) => {
-                    this.visaWorkflow.items.push(
-                        {
-                            ...element,
-                            requested_signature: element.item_mode !== 'visa',
-                            difflist_type: 'VISA_CIRCUIT'
-                        });
-                });
-                this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
-            }),
-            finalize(() => this.loading = false),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+        return new Promise((resolve) => {
+            this.http.get('../rest/resources/' + resId + '/defaultCircuit?circuit=visaCircuit').pipe(
+                filter((data: any) => !this.functions.empty(data.circuit)),
+                tap((data: any) => {
+                    data.circuit.items.forEach((element: any) => {
+                        this.visaWorkflow.items.push(
+                            {
+                                ...element,
+                                requested_signature: element.item_mode !== 'visa',
+                                difflist_type: 'VISA_CIRCUIT'
+                            });
+                    });
+                    this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
+                    this.workflowUpdated.emit(this.visaWorkflow.items);
+                }),
+                finalize(() => {
+                    this.loading = false
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     deleteItem(index: number) {
@@ -474,30 +446,9 @@ export class VisaWorkflowComponent implements OnInit {
         });
     }
 
-    addItemToWorkflow(item: any, maarchParapheurMode = false) {
+    addItemToWorkflow(item: any) {
         return new Promise((resolve, reject) => {
-            if (maarchParapheurMode) {
-                // const requestedSignature = !this.functions.empty(item.requested_signature) ? item.requested_signature : false;
-                this.visaWorkflow.items.push({
-                    item_id: item.id,
-                    item_type: 'user',
-                    item_entity: item.email,
-                    labelToDisplay: item.idToDisplay,
-                    externalId: item.externalId,
-                    difflist_type: 'VISA_CIRCUIT',
-                    signatory: !this.functions.empty(item.signatory) ? item.signatory : false,
-                    hasPrivilege: true,
-                    isValid: true,
-                    availableRoles : ['visa'].concat(item.signatureModes),
-                    role: item.signatureModes[item.signatureModes.length - 1]
-                });
-                if (!this.isValidRole(this.visaWorkflow.items.length - 1, item.signatureModes[item.signatureModes.length - 1], item.signatureModes[item.signatureModes.length - 1])) {
-                    this.visaWorkflow.items[this.visaWorkflow.items.length - 1].role = 'visa';
-                }
-
-                this.searchVisaSignUser.reset();
-                resolve(true);
-            } else if (item.type === 'user') {
+            if (item.type === 'user') {
                 const requestedSignature = !this.functions.empty(item.requested_signature) ? item.requested_signature : false;
                 this.visaWorkflow.items.push({
                     item_id: item.id,
@@ -619,17 +570,6 @@ export class VisaWorkflowComponent implements OnInit {
         ).subscribe();
     }
 
-    getMaarchParapheurUserAvatar(externalId: string, key: number) {
-        if (!this.functions.empty(externalId)) {
-            this.http.get('../rest/maarchParapheur/user/' + externalId + '/picture')
-                .subscribe((data: any) => {
-                    this.visaWorkflow.items[key].picture = data.picture;
-                }, (err: any) => {
-                    this.notify.handleErrors(err);
-                });
-        }
-    }
-
     isModified() {
         return !(this.loading || JSON.stringify(this.visaWorkflow.items) === JSON.stringify(this.visaWorkflowClone));
     }
@@ -645,16 +585,6 @@ export class VisaWorkflowComponent implements OnInit {
             }
         } else {
             return false;
-        }
-    }
-
-    isValidRole(indexWorkflow: any, role: string, currentRole: string) {
-        if (this.visaWorkflow.items.filter((item: any, index: any) => index > indexWorkflow && ['stamp'].indexOf(item.role) > -1).length > 0 && ['visa', 'stamp'].indexOf(currentRole) > -1 && ['visa', 'stamp'].indexOf(role) === -1) {
-            return false;
-        } else if (this.visaWorkflow.items.filter((item: any, index: any) => index < indexWorkflow && ['visa', 'stamp'].indexOf(item.role) === -1).length > 0 && role === 'stamp') {
-            return false;
-        } else {
-            return true;
         }
     }
 }

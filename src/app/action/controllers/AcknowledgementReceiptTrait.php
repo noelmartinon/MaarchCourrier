@@ -127,9 +127,10 @@ trait AcknowledgementReceiptTrait
                         return [];
                     }
 
+                    $fileContent = MergeController::mergeChronoDocument(['chrono' => '', 'path' => $pathToDocument, 'type' => 'acknowledgementReceipt', 'resIdMaster' => $args['resId'], 'resId' => null, 'title' => null]);
                     $mergedDocument = MergeController::mergeDocument([
-                        'path' => $pathToDocument,
-                        'data' => ['resId' => $args['resId'], 'senderId' => $contactToProcess, 'senderType' => 'contact', 'userId' => $GLOBALS['id']]
+                        'content' => base64_decode($fileContent['encodedDocument']),
+                        'data'    => ['resId' => $args['resId'], 'senderId' => $contactToProcess, 'senderType' => 'contact', 'userId' => $GLOBALS['id']]
                     ]);
 
                     $extension = pathinfo($pathToDocument, PATHINFO_EXTENSION);

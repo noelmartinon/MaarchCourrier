@@ -169,3 +169,9 @@
 .selected {
     background: rgba($secondary, 0.5);
 }
+
+.readonly {
+    background: none;
+    box-shadow: none;
+    color: $primary;
+}

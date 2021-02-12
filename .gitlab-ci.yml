@@ -56,7 +56,7 @@ job_e2e:
    - chmod -R 775 /var/www/html/
    - curl -sL https://deb.nodesource.com/setup_14.x | bash - > /dev/null
    - apt-get install -yqq nodejs > /dev/null
-   - npm install npm@latest -g 
+   - npm install npm@6.14.5 -g 
    - node -v
    - npm set registry https://registry.npmjs.org/ 
    - npm install > /dev/null

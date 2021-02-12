@@ -215,51 +215,8 @@ define('_TAG_DEFAULT', 'Sleutelwoord');
 define('_PRIVATE_TAGS', 'De sleutelwoorden verbinden met de eenheid van de gebruiker (Directieniveau)');
 define('_PRIVATE_TAGS_DESC', 'De gebruiker zal enkel de sleutelwoorden zien die beperkt werden tot zijn directie (de toevoeging / wijziging zal het sleutelwoord automatisch aan zijn directie koppelen).');
 
-// ACTIONS
 define('_REDIRECTION', 'Doorsturen');
-define('_REDIRECTION_DESC', 'Opent een modaliteit waarmee een nieuwe verwerkende gebruiker gekozen kan worden OF die de verwerkende dienst met een nieuwe distributielijst opnieuw kan instellen.');
-define('_SIMPLE_CONFIRM', 'Eenvoudige bevestiging');
-define('_SIMPLE_CONFIRM_DESC', 'Opent eenvoudigweg een bevestigingsmodaliteit van de uit te voeren actie.');
-define('_NO_CONFIRM', 'No confirmation'); //_TO_TRANSLATE
-define('_NO_CONFIRM_DESC', "Perform the action without confirmation"); //_TO_TRANSLATE
-define('_VIEW_DOC', 'Het brief bekijken');
-define('_CLOSE_MAIL', 'Een brief afsluiten');
-define('_CLOSE_MAIL_DESC', 'Om de afsluitingsdatum van een brief bij te werken. ESSENTIEEL om uw documentworkflow af te sluiten.');
-define('_SET_PERSISTENT_MODE_ON', 'De persistentie activeren');
-define('_SET_PERSISTENT_MODE_ON_DESC', 'Om een biref in een bakje te bewaren ongeacht zijn status. Voegt het gegeven in de tabel \basket_persistent_mode\.');
-define('_SET_PERSISTENT_MODE_OFF', 'De persistentie uitschakelen');
-define('_SET_PERSISTENT_MODE_OFF_DESC', 'Reset het weergavegedrag van het brief in het bakje. Verwijdert het gegeven in de tabel \basket_persistent_mode\.');
-define('_MARK_AS_READ', 'Markeren als gelezen');
-define('_MARK_AS_READ_DESC', 'Markeert het brief als \gelezen\ in het bakje. Voegt het gegeven van de \res_mark_as_read\ in de tabel in (nuttig indien gebruikt in de bakjes clauses)');
-define('_SEND_TO_EXTERNAL_SB', 'Gegevens naar een extern vloeiboek verzenden');
-define('_CLOSE_MAIL_AND_INDEX', 'Een brief afsluiten en de indexering starten');
-define('_CLOSE_MAIL_AND_INDEX_DESC', 'Om de afsluitingsdatum van een brief bij te werken EN de indexeringspagina te openen om een nieuw brief te bewaren.');
-define('_CLOSE_MAIL_WITH_ATTACHMENT', 'Een brief met een bijlage afsluiten');
-define('_CLOSE_MAIL_WITH_ATTACHMENT_DESC', 'Om de afsluitingsdatum van een brief bij te werken met VERPLICHTE aanwezigheid van bijlage(n) / opmerking(en).');
-define('_SEND_TO_VISA', 'Versturen voor goedkeuring');
-define('_SEND_TO_VISA_DESC', 'Controleert of er een goedkeuringscircuit is geconfigureerd EN of er één of meerdere antwoordprojecten aan het brief gekoppeld zijn.');
-define('_REJECTION_WORKFLOW_PREVIOUS', 'De goedkeuring weigeren - terug naar de vorige goedkeurder');
-define('_REJECTION_WORKFLOW_PREVIOUS_DESC', 'Reset de datum van de vorige goedkeurder die in het goedkeuringscircuit van het brief aanwezig is (\process_date\ van de tabel listinstance).');
-define('_RESET_VISA_WORKFLOW', 'Goedkeuring weigeren - terug naar opsteller');
-define('_RESET_VISA_WORKFLOW_DESC', 'Reset de datum van alle huidige goedkeurders die in het goedkeuringscircuit van het brief aanwezig zijn (\process_date\ van de tabel listinstance).');
-define('_REDIRECT_WORKFLOW_ENTITY', 'Doorsturen naar de initiatiefnemende eenheid');
-define('_REDIRECT_WORKFLOW_ENTITY_DESC', 'Stuurt het brief terug naar de initiatiefnemende eenheid.');
-define('_INTERRUPT_WORKFLOW', 'Het goedkeuringscircuit onderbreken');
-define('_INTERRUPT_WORKFLOW_DESC', 'Werkt de datum bij van de huidige goedkeurder / ondertekenaar en van alle volgende goedkeurders die in het goedkeuringscircuit van het brief aanwezig zijn (\process_date\ van de tabel listinstance). Voegt eveneens een onderbrekingsbericht op de huidige goedkeurder in (\process_comment\ van de tabel listinstance).');
-define('_PROCEED_WORKFLOW', 'Het goedkeuringscircuit verderzetten');
-define('_PROCEED_WORKFLOW_DESC', 'Werkt de datum bij van de huidige goedkeurder / ondertekenaar die in het goedkeuringscircuit van het brief aanwezig is (\process_date\ van de tabel listinstance).');
-define('_VISA_MAIL', 'De e-mail goedkeuren');
-define('_SEND_DOCS_TO_RECOMMENDATION', 'Een (parallelle) berichtenvraag verzenden');
-define('_SEND_DOCS_TO_RECOMMENDATION_DESC', 'Opent een modaliteit die toelaat personen in het bericht, in de verdelingslijst toe te voegen of te verwijderen.');
-define('_VALIDATE_RECOMMENDATION', 'Een (parallelle) berichtenvraag bevestigen');
-define('_VALIDATE_RECOMMENDATION_DESC', 'Om in de opmerking van de berichtaanvraag de persoon toe te voegen die de vraag gecontroleerd heeft.');
-define('_SEND_TO_AVIS_WF', 'Een (sequentiële) berichtenvraag verzenden');
-define('_SEND_TO_AVIS_WF_DESC', 'Opent een modaliteit die een berichtencircuit voor het brief kan configureren.');
-define('_PROCEED_WORKFLOW_AVIS', 'Een bericht uitzenden (sequentieel)');
-define('_PROCEED_WORKFLOW_AVIS_DESC', 'Werkt de uitgiftedatum bij van het bericht van de huidige consultant van het berichtencircuit (\'process_date\' van de tabel listinstance).');
-define('_PROCEED_WORKFLOW_AVIS_SIMPLE', 'Een bericht uitzenden (parallel)');
-define('_PROCEED_WORKFLOW_AVIS_SIMPLE_DESC', 'Werkt de uitgiftedatum bij van het bericht van de gebruiker die aanwezig is in het bericht in de verdelingslijst van het brief (\'process_date\' van de tabel listinstance).');
-define('_SIMPLE_CONFIRM_WITH_UPDATE_DATE', 'Bevestiging en bijwerking van de vertrekdatum');
+
 define('_NOT_INCOMING_CATEGORY', 'Categorie verschillend van \'Inkomende post\''); //_TO_TRANSLATE
 define('_AR_ALREADY_GENERATED', 'Ontvangstbevestiging gegenereerd maar niet verzonden'); //_TO_TRANSLATE
 define('_NO_CONTACT', 'Geen bijbehorend contact'); //_TO_TRANSLATE

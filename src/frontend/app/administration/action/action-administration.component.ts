@@ -8,7 +8,8 @@ import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 import { tap, catchError } from 'rxjs/operators';
 import { FunctionsService } from '@service/functions.service';
-import {FormControl} from '@angular/forms';
+import { FormControl } from '@angular/forms';
+import { ActionPagesService } from '@service/actionPages.service'
 import { of } from 'rxjs';
 
 
@@ -53,7 +54,8 @@ export class ActionAdministrationComponent implements OnInit {
         private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
-        public functions: FunctionsService) { }
+        public functions: FunctionsService,
+        public actionPagesService: ActionPagesService) { }
 
     ngOnInit(): void {
         this.loading = true;
@@ -67,7 +69,8 @@ export class ActionAdministrationComponent implements OnInit {
                 this.http.get('../rest/initAction')
                     .subscribe((data: any) => {
                         this.action = data.action;
-                        this.selectActionPageId.setValue(this.action.actionPageId);
+                        this.action.actionPageId = 'confirm_status';
+                        this.selectActionPageId.setValue('confirm_status');
                         this.selectStatusId.setValue(this.action.id_status);
                         this.categoriesList = data.categoriesList;
                         this.statuses = data.statuses.map((status: any) => {
@@ -77,7 +80,7 @@ export class ActionAdministrationComponent implements OnInit {
                             };
                         });
 
-                        this.actionPages = data['actionPages'];
+                        this.actionPages = this.actionPagesService.getAllActionPages();
                         this.actionPages.map(action => action.category).filter((cat, index, self) => self.indexOf(cat) === index).forEach(element => {
                             this.group.push({
                                 id : element,
@@ -95,6 +98,8 @@ export class ActionAdministrationComponent implements OnInit {
                 this.http.get('../rest/actions/' + params['id'])
                     .subscribe(async (data: any) => {
                         this.action = data.action;
+                        let currentAction = this.actionPagesService.getActionPageByComponent(this.action.component);
+                        this.action.actionPageId = currentAction.id;
                         this.selectActionPageId.setValue(this.action.actionPageId);
                         this.selectStatusId.setValue(this.action.id_status);
                         this.categoriesList = data.categoriesList;
@@ -104,7 +109,7 @@ export class ActionAdministrationComponent implements OnInit {
                                 label: status.label_status
                             };
                         });
-                        this.actionPages = data['actionPages'];
+                        this.actionPages = this.actionPagesService.getAllActionPages();
                         this.actionPages.map(action => action.category).filter((cat, index, self) => self.indexOf(cat) === index).forEach(element => {
                             this.group.push({
                                 id : element,
@@ -202,6 +207,9 @@ export class ActionAdministrationComponent implements OnInit {
         } else if (this.intermediateStatusActions.indexOf(this.action.actionPageId) !== -1) {
             this.action.parameters = { successStatus: this.successStatus, errorStatus: this.errorStatus };
         }
+
+        this.action.action_page = this.action.actionPageId;
+        this.action.component = this.actionPagesService.getAllActionPages(this.action.actionPageId).component;
         if (this.creationMode) {
             this.http.post('../rest/actions', this.action)
                 .subscribe(() => {

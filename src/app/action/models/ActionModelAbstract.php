@@ -154,50 +154,6 @@ abstract class ActionModelAbstract
         return true;
     }
 
-    public static function getActionPages()
-    {
-        $actionsPages = [];
-
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'core/xml/actions_pages.xml']);
-        if ($loadedXml) {
-            foreach ($loadedXml->ACTIONPAGE as $actionPage) {
-                if (!defined((string) $actionPage->LABEL)) {
-                    $label = (string) $actionPage->LABEL;
-                } else {
-                    $label = constant((string) $actionPage->LABEL);
-                }
-                if (!empty((string) $actionPage->DESC)) {
-                    $desc = constant((string) $actionPage->DESC);
-                } else {
-                    $desc = 'No description';
-                }
-                $component = empty((string)$actionPage->component) ? null : (string)$actionPage->component;
-
-                $actionsPages[] = [
-                    'id'        => (string)$actionPage->ID,
-                    'label'     => $label,
-                    'name'      => (string)$actionPage->NAME,
-                    'component' => $component,
-                    'category' => (string)$actionPage->MODULE,
-                    'desc'      => $desc
-                ];
-            }
-        }
-
-        array_multisort(
-            array_map(
-                function ($element) {
-                    return $element['label'];
-                },
-                $actionsPages
-            ),
-            SORT_ASC,
-            $actionsPages
-        );
-
-        return $actionsPages;
-    }
-
     public static function getKeywords()
     {
         $tabKeyword   = [];

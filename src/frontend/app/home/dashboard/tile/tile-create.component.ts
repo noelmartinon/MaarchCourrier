@@ -140,6 +140,10 @@ export class TileCreateComponent implements OnInit {
                 if (!data.isLinkedToMaarchParapheur) {
                     this.notify.error(this.translate.instant('lang.acountNotLinkedTomaarchParapheur'));
                     this.resetData();
+                } else {
+                    this.tileOtherInfos = {
+                        maarchParapheurUrl: data.maarchParapheurUrl
+                    };
                 }
             }),
             catchError((err: any) => {
@@ -158,7 +162,7 @@ export class TileCreateComponent implements OnInit {
                         this.setSearchTemplate(this.searchTemplates[0]);
                         this.searchTemplatesControl.setValue(this.searchTemplates[0]);
                     } else {
-                        this.notify.error(this.translate.instant('lang.nosearchTemplate'));
+                        this.notify.error(this.translate.instant('lang.noSearchTemplate'));
                         this.resetData();
                     }
                 }),
@@ -210,7 +214,7 @@ export class TileCreateComponent implements OnInit {
         if (this.menus.length === 0) {
             let arrMenus: any[] = [];
             let tmpMenus: any;
-            tmpMenus = this.privilegeService.getMenus(this.headerService.user.privileges).map((menu: any) => {
+            tmpMenus = this.privilegeService.getCurrentUserMenus().map((menu: any) => {
                 return {
                     ...menu,
                     label: this.translate.instant(menu.label)
@@ -267,17 +271,32 @@ export class TileCreateComponent implements OnInit {
         };
     }
 
+    setIndexingGroup(data: any) {
+        this.tileLabel = `${this.translate.instant('lang.' + this.selectedTileType)} (${data.label})`;
+        this.extraParams.groupId = data.id;
+        this.tileOtherInfos.privRoute = `/indexing/${this.extraParams.groupId}`;
+    }
+
     setMenu(menu: any) {
+        this.extraParams = {};
         this.extraParams.privilegeId = menu.id;
         this.tileLabel = menu.label;
         this.tileOtherInfos = {
             icon: menu.style,
             privRoute: menu.route,
         };
+        if (menu.id === 'indexing') {
+            this.extraParams.groupId = menu.groups[0].id;
+            this.tileLabel =  menu.label + '(' + menu.groups[0].label + ')'
+        };
     }
 
     compareBaskets(basket1: any, basket2: any) {
         return (basket1.groupId === basket2.groupId && basket1.basketId === basket2.basketId);
+    }
+
+    compareGroups(groupInSelect: any, currentGroupId: any) {
+        return (groupInSelect.id === currentGroupId);
     }
 
     compareFolders(folder1: any, folder2: any) {
