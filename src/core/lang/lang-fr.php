@@ -508,3 +508,6 @@ define('_RESET_RECORD_MANAGEMENT_DESC', 'Remise à zéro du circuit d\'archivage
 define('_USER_SKIPPED', 'Utilisateur passé');
 
 define('_TARGET_RESOURCE_HAS_NO_FILE', 'Le courrier cible n\'a pas de document principal');
+
+define('_SIGNED', 'Signé');
+define('_VALIDATED', 'Validé');
