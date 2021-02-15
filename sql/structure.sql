@@ -1378,6 +1378,7 @@ CREATE TABLE indexing_models
     private BOOLEAN NOT NULL,
     master INTEGER DEFAULT NULL,
     enabled BOOLEAN DEFAULT TRUE NOT NULL,
+    mandatory_file BOOLEAN DEFAULT FALSE NOT NULL,
     CONSTRAINT indexing_models_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);

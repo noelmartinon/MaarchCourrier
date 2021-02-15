@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '20.10.5' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '20.10.6' WHERE id = 'database_version';
 
 DROP VIEW IF EXISTS res_view_letterbox;
 
@@ -49,6 +49,8 @@ END$$;
 /*INDEXING_MODELS_FIELDS*/
 ALTER TABLE indexing_models_fields DROP COLUMN IF EXISTS enabled;
 ALTER TABLE indexing_models_fields ADD COLUMN enabled BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE indexing_models DROP COLUMN IF EXISTS mandatory_file;
+ALTER TABLE indexing_models ADD COLUMN mandatory_file BOOLEAN NOT NULL DEFAULT FALSE;
 
 /* CONTACTS GROUPS */
 ALTER TABLE contacts_groups DROP COLUMN IF EXISTS entity_owner;

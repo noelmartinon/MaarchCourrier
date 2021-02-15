@@ -58,7 +58,7 @@ class IndexingModelModel
 
     public static function create(array $args)
     {
-        ValidatorModel::notEmpty($args, ['label', 'category', 'default', 'owner', 'private']);
+        ValidatorModel::notEmpty($args, ['label', 'category', 'default', 'owner', 'private', 'mandatoryFile']);
         ValidatorModel::stringType($args, ['label', 'category', 'default', 'private']);
         ValidatorModel::intVal($args, ['owner', 'master']);
 
@@ -67,13 +67,14 @@ class IndexingModelModel
         DatabaseModel::insert([
             'table'         => 'indexing_models',
             'columnsValues' => [
-                'id'        => $nextSequenceId,
-                'label'     => $args['label'],
-                'category'  => $args['category'],
-                '"default"' => $args['default'],
-                'owner'     => $args['owner'],
-                'private'   => $args['private'],
-                'master'    => $args['master']
+                'id'             => $nextSequenceId,
+                'label'          => $args['label'],
+                'category'       => $args['category'],
+                '"default"'      => $args['default'],
+                'owner'          => $args['owner'],
+                'private'        => $args['private'],
+                'mandatory_file' => $args['mandatoryFile'],
+                'master'         => $args['master']
             ]
         ]);
 

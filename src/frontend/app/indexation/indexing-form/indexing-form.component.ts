@@ -248,6 +248,7 @@ export class IndexingFormComponent implements OnInit {
 
     arrFormControl: any = {};
 
+    mandatoryFile = false;
     currentCategory: string = '';
     currentPriorityColor: string = '';
 
@@ -898,6 +899,7 @@ export class IndexingFormComponent implements OnInit {
             tap(async (data: any) => {
                 this.indexingFormId = data.indexingModel.master !== null ? data.indexingModel.master : data.indexingModel.id;
                 this.currentCategory = data.indexingModel.category;
+                this.mandatoryFile = data.indexingModel.mandatoryFile;
                 let fieldExist: boolean;
                 if (data.indexingModel.fields.length === 0) {
                     this.initFields();

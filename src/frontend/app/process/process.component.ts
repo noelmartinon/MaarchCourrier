@@ -12,7 +12,7 @@ import { FiltersListService } from '@service/filtersList.service';
 import { Overlay } from '@angular/cdk/overlay';
 import { AppService } from '@service/app.service';
 import { ActionsService } from '../actions/actions.service';
-import { tap, catchError, map, finalize, filter } from 'rxjs/operators';
+import { tap, catchError, map, finalize, filter, take } from 'rxjs/operators';
 import { DocumentViewerComponent } from '../viewer/document-viewer.component';
 import { IndexingFormComponent } from '../indexation/indexing-form/indexing-form.component';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
@@ -790,10 +790,20 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     async saveTool() {
         if (this.currentTool === 'info' && this.indexingForm !== undefined) {
-            await this.indexingForm.saveData();
-            setTimeout(() => {
-                this.loadResource(false);
-            }, 400);
+            this.appDocumentViewer.getFile().pipe(
+                take(1),
+                tap(async (data: any) => {
+                    console.log(data)
+                    if (this.functions.empty(data.contentView) && this.indexingForm.mandatoryFile) {
+                        this.notify.error(this.translate.instant('lang.mandatoryFileForIndexingModel'));
+                    } else {
+                        await this.indexingForm.saveData();
+                        setTimeout(() => {
+                            this.loadResource(false);
+                        }, 400);
+                    }
+                })
+            ).subscribe();
         } else if (this.currentTool === 'diffusionList' && this.appDiffusionsList !== undefined) {
             await this.appDiffusionsList.saveListinstance();
             this.loadBadges();
