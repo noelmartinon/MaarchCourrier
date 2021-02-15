@@ -384,9 +384,11 @@ class ListInstanceController
         if ($args['type'] == 'visaCircuit') {
             $minimumVisaRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'minimumVisaRole']);
             $maximumSignRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'maximumSignRole']);
+            $workflowEndBySignatory = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'workflowEndBySignatory']);
 
             $minimumVisaRole = !empty($minimumVisaRole['param_value_int']) ? $minimumVisaRole['param_value_int'] : 0;
             $maximumSignRole = !empty($maximumSignRole['param_value_int']) ? $maximumSignRole['param_value_int'] : 0;
+            $workflowEndBySignatory = !empty($workflowEndBySignatory['param_value_int']);
         }
 
         DatabaseModel::beginTransaction();
@@ -401,6 +403,17 @@ class ListInstanceController
             } elseif (!Validator::arrayType()->notEmpty()->validate($resource['listInstances'])) {
                 DatabaseModel::rollbackTransaction();
                 return $response->withStatus(400)->withJson(['errors' => "Body resources[{$resourceKey}] listInstances is empty"]);
+            }
+
+            if ($args['type'] == 'visaCircuit' && !empty($workflowEndBySignatory)) {
+                $last = count($resource['listInstances']) -1;
+                if (empty($resource['listInstances'][$last]['process_date']) && $resource['listInstances'][$last]['requested_signature'] == false) {
+                    DatabaseModel::rollbackTransaction();
+                    return $response->withStatus(400)->withJson(['errors' => "Body resources[{$resourceKey}] listInstances last user is not a signatory", 'lang' => 'lastNotSignatory']);
+                } elseif (!empty($resource['listInstances'][$last]['process_date']) && $resource['listInstances'][$last]['signatory'] == false) {
+                    DatabaseModel::rollbackTransaction();
+                    return $response->withStatus(400)->withJson(['errors' => "Body resources[{$resourceKey}] listInstances last user is not a signatory", 'lang' => 'lastNotSignatory']);
+                }
             }
 
             $listInstances = ListInstanceModel::get([

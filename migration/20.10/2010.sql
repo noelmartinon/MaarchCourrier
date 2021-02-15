@@ -359,6 +359,8 @@ DELETE FROM parameters WHERE id = 'minimumVisaRole';
 INSERT INTO parameters (id, description, param_value_int) VALUES ('minimumVisaRole', 'Nombre minimum de viseur dans les circuits de visa (0 pour désactiver)', 0);
 DELETE FROM parameters WHERE id = 'maximumSignRole';
 INSERT INTO parameters (id, description, param_value_int) VALUES ('maximumSignRole', 'Nombre maximum de signataires dans les circuits de visa (0 pour désactiver)', 0);
+DELETE FROM parameters WHERE id = 'workflowEndBySignatory';
+INSERT INTO parameters (id, description, param_value_int) VALUES ('workflowEndBySignatory', 'Si activé (1), le dernier utilisateur du circuit de visa doit être Signataire (0 pour désactiver)', 0);
 
 UPDATE history_batch SET total_errors = 0 WHERE total_errors IS NULL;
 

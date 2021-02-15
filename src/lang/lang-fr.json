@@ -2192,5 +2192,9 @@
     "workflow": "Circuit",
     "arContentIsEmpty": "Le contenu de l'accusé de réception est vide",
     "mailsToSendToRecordManagement": "Courrier(s) à exporter au système d'archivage",
-    "associatedArchives": "Archive(s) associée(s) au courrier"
+    "associatedArchives": "Archive(s) associée(s) au courrier",
+    "lastNotSignatory": "Le dernier utilisateur du circuit n'est pas un signataire",
+    "minimumVisaUser": "Nombre minimum de Viseur",
+    "maximumSignUser": "Nombre maximum de Signataire",
+    "workflowEndBySignatory": "Le circuit doit se terminer par un Signataire"
 }

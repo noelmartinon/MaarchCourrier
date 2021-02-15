@@ -350,9 +350,11 @@ class ActionMethodController
 
         $minimumVisaRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'minimumVisaRole']);
         $maximumSignRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'maximumSignRole']);
+        $workflowEndBySignatory = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'workflowEndBySignatory']);
 
         $minimumVisaRole = !empty($minimumVisaRole['param_value_int']) ? $minimumVisaRole['param_value_int'] : 0;
         $maximumSignRole = !empty($maximumSignRole['param_value_int']) ? $maximumSignRole['param_value_int'] : 0;
+        $workflowEndBySignatory = !empty($workflowEndBySignatory['param_value_int']);
 
         $nbVisaRole = 0;
         $nbSignRole = 0;
@@ -368,6 +370,13 @@ class ActionMethodController
         }
         if ($maximumSignRole != 0 && $nbSignRole > $maximumSignRole) {
             return ['errors' => ['Circuit have too many sign users']];
+        }
+
+        if ($workflowEndBySignatory) {
+            $last = count($circuit) - 1;
+            if ($circuit[$last]['requested_signature'] == false) {
+                return ['errors' => 'Circuit last user is not a signatory'];
+            }
         }
 
         $resource       = ResModel::getById(['select' => ['integrations'], 'resId' => $args['resId']]);

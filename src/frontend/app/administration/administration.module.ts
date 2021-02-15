@@ -78,6 +78,7 @@ import { RegisteredMailListComponent } from './registered-mail/registered-mail-l
 import { SearchAdministrationComponent } from './search/search-administration.component';
 import { SsoAdministrationComponent } from './connection/sso/sso-administration.component';
 import { LifeCycleComponent } from './parameter/lifeCycle/life-cycle.component';
+import { VisaParametersComponent } from '@appRoot/administration/parameter/visa/visa-parameters.component';
 
 
 @NgModule({
@@ -163,7 +164,8 @@ import { LifeCycleComponent } from './parameter/lifeCycle/life-cycle.component';
         RegisteredMailListComponent,
         SearchAdministrationComponent,
         SsoAdministrationComponent,
-        LifeCycleComponent
+        LifeCycleComponent,
+        VisaParametersComponent
     ],
     entryComponents: [
         AccountLinkComponent,

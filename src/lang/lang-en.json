@@ -2185,5 +2185,9 @@
     "confirmRescanToDistributed": "This registered mail was already scanned «Not distributed». Do you want to rescan it to «Distributed» ?",
     "confirmRescanToNotDistributed": "This registered mail was already scanned «Distributed». Do you want to rescan it to «Not distributed» ?",
     "selectReturnReason": "Please select a return reason",
-    "arContentIsEmpty": "AR content is empty"
+    "arContentIsEmpty": "AR content is empty",
+    "lastNotSignatory": "The last user in the workflow is not a signatory",
+    "minimumVisaUser": "Minimum number of Approver",
+    "maximumSignUser": "Maximum number of Signatory",
+    "workflowEndBySignatory": "Workflow has to end with a Signatory"
 }
