@@ -377,6 +377,11 @@ DO $$ BEGIN
     END IF;
 END$$;
 
+ALTER TABLE listinstance_history_details DROP COLUMN IF EXISTS requested_signature;
+ALTER TABLE listinstance_history_details ADD COLUMN requested_signature boolean default false;
+ALTER TABLE listinstance_history_details DROP COLUMN IF EXISTS signatory;
+ALTER TABLE listinstance_history_details ADD COLUMN signatory BOOLEAN DEFAULT FALSE;
+
 /* ORDER ON CHRONO */
 CREATE OR REPLACE FUNCTION order_alphanum(text) RETURNS text AS $$
 declare
