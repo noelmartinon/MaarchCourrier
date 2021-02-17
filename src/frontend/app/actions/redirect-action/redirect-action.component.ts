@@ -188,12 +188,10 @@ export class RedirectActionComponent implements OnInit {
         if (this.data.resIds.length === 1) {
             this.http.get('../rest/resources/' + this.data.resIds[0] + '/listInstance').subscribe((data: any) => {
                 this.diffusionListDestRedirect = data.listInstance;
-                Object.keys(data).forEach(diffusionRole => {
-                    data[diffusionRole].forEach((line: any) => {
-                        if (line.item_mode === 'dest') {
-                            this.oldUser = line;
-                        }
-                    });
+                data.listInstance.forEach((line: any) => {
+                    if (line.item_mode === 'dest') {
+                        this.oldUser = line;
+                    }
                 });
                 $('.searchUserRedirect').click();
             }, (err: any) => {

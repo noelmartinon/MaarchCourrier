@@ -2197,6 +2197,5 @@
     "minimumVisaUser": "Nombre minimum de Viseur",
     "maximumSignUser": "Nombre maximum de Signataire",
     "workflowEndBySignatory": "Le circuit doit se terminer par un Signataire",
-    "mandatoryFile": "Fichier obligatoire",
-    "mandatoryFileForIndexingModel": "Vous devez obligatoirement ajouter un fichier pour utiliser ce modèle d'enregistrement"
+    "mandatoryFile": "Fichier obligatoire"
 }

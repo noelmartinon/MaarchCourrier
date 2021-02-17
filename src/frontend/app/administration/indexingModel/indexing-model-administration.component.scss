@@ -6,15 +6,38 @@
     }
 }
 
-.defaultModel {
+.options {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-left: 10px;
-}
+    margin-top: 20px;
+    border-radius: 5px;
+    border: solid 1px #e0e0e0;
+    position: relative;
+    padding: 18px;
+    width: 100%;
 
-.mandatoryFile {
-    display: flex;
-    padding-left: 10px;
-    padding-top: 10px;
+    .title {
+        white-space: pre;
+        overflow: hidden;
+        max-width: 85%;
+        text-overflow: ellipsis;
+        z-index: 1;
+        font-size: 15px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        position: absolute;
+        top: -13px;
+        left: 10px;
+        padding: 0px;
+        margin: 0px;
+        color: $primary;
+
+        &-divider {
+            position: absolute;
+            width: 99%;
+            z-index: -1;
+            top: 12px;
+            background: white;
+            height: 1px;
+        }
+    }
 }

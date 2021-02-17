@@ -794,7 +794,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                 take(1),
                 tap(async (data: any) => {
                     if (this.functions.empty(data.contentView) && this.indexingForm.mandatoryFile) {
-                        this.notify.error(this.translate.instant('lang.mandatoryFileForIndexingModel'));
+                        this.notify.error(this.translate.instant('lang.mandatoryFile'));
                     } else {
                         await this.indexingForm.saveData();
                         setTimeout(() => {
