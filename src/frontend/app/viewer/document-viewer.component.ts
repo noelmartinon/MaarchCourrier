@@ -863,7 +863,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             this.editor.options = {
                 objectType: 'resourceModification',
                 objectId: this.resId,
-                cookie: document.cookie
+                cookie: document.cookie,
+                authToken: this.authService.getToken()
             };
             this.editInProgress = true;
 
