@@ -466,11 +466,15 @@ class TemplateController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-
-        $entities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['users_entities.entity_id']]);
-        $entities = array_column($entities, 'entity_id');
-        if (empty($entities)) {
-            $entities = [0];
+        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['destination']]);
+        if (!empty($resource['destination'])) {
+            $entities = [$resource['destination']];
+        } else {
+            $entities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['users_entities.entity_id']]);
+            $entities = array_column($entities, 'entity_id');
+            if (empty($entities)) {
+                $entities = [0];
+            }
         }
 
         $where = ['templates_association.value_field in (?)', 'templates.template_type = ?', 'templates.template_target = ?'];
@@ -500,10 +504,21 @@ class TemplateController
             return $response->withStatus(400)->withJson(['errors' => 'Route param id is not an integer']);
         }
 
-        $entities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['users_entities.entity_id']]);
-        $entities = array_column($entities, 'entity_id');
-        if (empty($entities)) {
-            $entities = [0];
+        $body = $request->getParsedBody();
+
+        if (!Validator::intVal()->validate($body['data']['resId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body param resId is missing']);
+        }
+
+        $resource = ResModel::getById(['resId' => $body['data']['resId'], 'select' => ['destination']]);
+        if (!empty($resource['destination'])) {
+            $entities = [$resource['destination']];
+        } else {
+            $entities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['users_entities.entity_id']]);
+            $entities = array_column($entities, 'entity_id');
+            if (empty($entities)) {
+                $entities = [0];
+            }
         }
 
         $templates = TemplateModel::getWithAssociation([
@@ -519,12 +534,6 @@ class TemplateController
         $template = $templates[0];
         if (empty($template['template_content'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Template has no content']);
-        }
-
-        $body = $request->getParsedBody();
-
-        if (!Validator::intVal()->validate($body['data']['resId'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body param resId is missing']);
         }
 
         $dataToMerge = ['userId' => $GLOBALS['id']];

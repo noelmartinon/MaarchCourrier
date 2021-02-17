@@ -441,7 +441,7 @@ class MergeController
         $qrcodeFile = CoreConfigModel::getTmpPath() . mt_rand() ."_{$GLOBALS['id']}_qrcode.png";
         $parameter = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'QrCodePrefix']);
         $prefix = '';
-        if ($parameter['param_value_int'] == 1) {
+        if ($parameter['param_value_int'] == 1 && !empty($args['chrono'])) {
             $prefix = 'MAARCH_';
         }
 
@@ -501,6 +501,9 @@ class MergeController
         } else {
             $tbs->Show(TBS_NOTHING);
         }
+
+        unlink($qrcodeFile);
+        unlink($barcodeFile);
 
         return ['encodedDocument' => base64_encode($tbs->Source)];
     }

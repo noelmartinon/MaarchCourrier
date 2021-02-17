@@ -764,16 +764,16 @@ class TemplateControllerTest extends TestCase
 
         $this->assertSame('Route param id is not an integer', $responseBody['errors']);
 
-        $response       = $templates->mergeEmailTemplate($request, new \Slim\Http\Response(), ['id' => self::$id * 1000]);
-        $responseBody   = json_decode((string)$response->getBody(), true);
-        $this->assertSame(400, $response->getStatusCode());
-
-        $this->assertSame('Template does not exist', $responseBody['errors']);
-
         $response       = $templates->mergeEmailTemplate($request, new \Slim\Http\Response(), ['id' => self::$id]);
         $this->assertSame(400, $response->getStatusCode());
         $responseBody   = json_decode((string)$response->getBody(), true);
         $this->assertSame('Body param resId is missing', $responseBody['errors']);
+
+        $response       = $templates->mergeEmailTemplate($fullRequest, new \Slim\Http\Response(), ['id' => self::$id * 1000]);
+        $responseBody   = json_decode((string)$response->getBody(), true);
+        $this->assertSame(400, $response->getStatusCode());
+
+        $this->assertSame('Template does not exist', $responseBody['errors']);
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);

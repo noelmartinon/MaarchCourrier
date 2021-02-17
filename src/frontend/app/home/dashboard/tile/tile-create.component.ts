@@ -272,7 +272,7 @@ export class TileCreateComponent implements OnInit {
     }
 
     setIndexingGroup(data: any) {
-        this.tileLabel = `${this.translate.instant('lang.' + this.selectedTileType)} (${data.label})`;
+        this.tileLabel = `${this.menusControl.value.label} (${data.label})`;
         this.extraParams.groupId = data.id;
         this.tileOtherInfos.privRoute = `/indexing/${this.extraParams.groupId}`;
     }
@@ -287,7 +287,7 @@ export class TileCreateComponent implements OnInit {
         };
         if (menu.id === 'indexing') {
             this.extraParams.groupId = menu.groups[0].id;
-            this.tileLabel =  menu.label + '(' + menu.groups[0].label + ')'
+            this.tileLabel =  menu.label + ' (' + menu.groups[0].label + ')'
         };
     }
 

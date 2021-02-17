@@ -24,6 +24,7 @@ use Entity\models\EntityModel;
 use Group\controllers\PrivilegeController;
 use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
+use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\ValidatorModel;
 use Template\models\TemplateModel;
@@ -127,11 +128,16 @@ trait AcknowledgementReceiptTrait
                         return [];
                     }
 
+                    $pathInfo = pathinfo($pathToDocument);
+                    $extension = $pathInfo['extension'];
+                    $tmpFile = CoreConfigModel::getTmpPath() . "tmp_file_{$GLOBALS['id']}_" .rand(). "." . $extension;
                     $fileContent = MergeController::mergeChronoDocument(['chrono' => '', 'path' => $pathToDocument, 'type' => 'acknowledgementReceipt', 'resIdMaster' => $args['resId'], 'resId' => null, 'title' => null]);
+                    file_put_contents($tmpFile, base64_decode($fileContent['encodedDocument']));
                     $mergedDocument = MergeController::mergeDocument([
-                        'content' => base64_decode($fileContent['encodedDocument']),
-                        'data'    => ['resId' => $args['resId'], 'senderId' => $contactToProcess, 'senderType' => 'contact', 'userId' => $GLOBALS['id']]
+                        'path' => $tmpFile,
+                        'data' => ['resId' => $args['resId'], 'senderId' => $contactToProcess, 'senderType' => 'contact', 'userId' => $GLOBALS['id']]
                     ]);
+                    unlink($tmpFile);
 
                     $extension = pathinfo($pathToDocument, PATHINFO_EXTENSION);
                     $encodedDocument = ConvertPdfController::convertFromEncodedResource(['encodedResource' => $mergedDocument['encodedDocument'], 'extension' => $extension]);

@@ -520,7 +520,13 @@ export class PrivilegeService {
             'label': 'lang.freezeRetentionRule',
             'comment': 'lang.freezeRetentionRule',
             'unit': 'lifeCycle'
-        }
+        },
+        {
+            'id': 'add_correspondent_in_shared_groups_on_profile',
+            'label': 'lang.addCorrespondentInSharedGroupsOnProfile',
+            'comment': 'lang.addCorrespondentInSharedGroupsOnProfile',
+            'unit': 'application'
+        },
     ];
 
     private menus: menu[] = [

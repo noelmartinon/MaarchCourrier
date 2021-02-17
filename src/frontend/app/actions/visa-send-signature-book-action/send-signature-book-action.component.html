@@ -19,12 +19,15 @@
                         (click)="toggleIntegration(inteKey.key)" [checked]="data.resource.integrations[inteKey.key]">
                         {{'lang.' + inteKey.key + '_doc' | translate}}</mat-checkbox>
                 </div>
-                <div *ngIf="!noResourceToProcess && (!visaNumberCorrect || !signNumberCorrect || !atLeastOneSign)" class="alert-message alert-message-danger" role="alert">
+                <div *ngIf="!noResourceToProcess && (!visaNumberCorrect || !signNumberCorrect || !atLeastOneSign || (!lastOneIsSign && lastOneMustBeSignatory))" class="alert-message alert-message-danger" role="alert">
                     <p *ngIf="!visaNumberCorrect">
                         {{'lang.notEnoughVisaUser' | translate}} ({{'lang.requiredVisaUser' | translate: {min: minimumVisaRole} }})
                     </p>
                     <p *ngIf="!signNumberCorrect">
                         {{'lang.tooManySignUser' | translate}} ({{'lang.authorizedSignUser' | translate: {max: maximumSignRole} }})
+                    </p>
+                    <p *ngIf="!lastOneIsSign && lastOneMustBeSignatory">
+                        {{'lang.lastNotSignatory' | translate}}
                     </p>
                     <p *ngIf="!atLeastOneSign">{{'lang.signUserRequired' | translate}}</p>
                 </div>
@@ -48,7 +51,7 @@
                     </ul>
                 </div>
                 <app-visa-workflow *ngIf="!noResourceToProcess"
-                    [adminMode]="true" (workflowUpdated)="checkMinMaxVisaSign($event)" #appVisaWorkflow>
+                       [adminMode]="true" (workflowUpdated)="checkWorkflowParameters($event)" #appVisaWorkflow>
                 </app-visa-workflow>
                 <div *ngIf="!noResourceToProcess" style="padding-top: 10px;">
                     <app-note-editor #noteEditor [resIds]="data.resIds"></app-note-editor>

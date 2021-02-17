@@ -67,6 +67,12 @@ import { AvisWorkflowComponent } from './avis/avis-workflow.component';
 
 import { ContactResourceComponent } from './contact/contact-resource/contact-resource.component';
 import { ContactDetailComponent } from './contact/contact-detail/contact-detail.component';
+import { ContactsGroupFormComponent } from './administration/contact/group/form/contacts-group-form.component';
+import { ContactsGroupsListComponent } from './administration/contact/group/list/contacts-groups-list.component';
+import { ContactsGroupFormModalComponent } from './administration/contact/group/form/modal/contacts-group-form-modal.component';
+import { ContactsGroupMergeModalComponent } from './administration/contact/group/list/merge-modal/contacts-group-merge-modal.component';
+
+
 import { AttachmentsListComponent } from './attachments/attachments-list.component';
 
 import { FolderMenuComponent } from './folder/folder-menu/folder-menu.component';
@@ -121,6 +127,7 @@ import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-to
         DragDropDirective,
         ContactAutocompleteComponent,
         ContactsFormComponent,
+        ContactsGroupsListComponent,
         HistoryComponent,
         AddressBanAutocompleteComponent,
         VisaWorkflowComponent,
@@ -130,6 +137,7 @@ import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-to
         MaarchFlatTreeComponent,
         ContactResourceComponent,
         ContactDetailComponent,
+        ContactsGroupFormComponent,
         AutocompleteListComponent,
         AttachmentsListComponent,
         FolderMenuComponent,
@@ -137,7 +145,9 @@ import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-to
         LinkedResourceListComponent,
         NotesListComponent,
         NoteEditorComponent,
-        CriteriaToolComponent
+        CriteriaToolComponent,
+        ContactsGroupFormModalComponent,
+        ContactsGroupMergeModalComponent
 
     ],
     exports: [
@@ -167,6 +177,8 @@ import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-to
         DragDropDirective,
         ContactAutocompleteComponent,
         ContactsFormComponent,
+        ContactsGroupFormComponent,
+        ContactsGroupsListComponent,
         HistoryComponent,
         AddressBanAutocompleteComponent,
         VisaWorkflowComponent,
@@ -188,14 +200,16 @@ import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-to
         FolderInputComponent,
         IssuingSiteInputComponent,
         RegisteredMailRecipientInputComponent,
-        CriteriaToolComponent
+        CriteriaToolComponent,
     ],
     providers: [],
     entryComponents: [
         IndexingGroupModalComponent,
         RegisteredMailImportComponent,
         AlertComponent,
-        ConfirmComponent
+        ConfirmComponent,
+        ContactsGroupFormModalComponent,
+        ContactsGroupMergeModalComponent
     ],
 })
 export class SharedModule {

@@ -1024,6 +1024,7 @@ INSERT INTO parameters (id, param_value_string) VALUES ('bindingDocumentFinalAct
 INSERT INTO parameters (id, param_value_string) VALUES ('nonBindingDocumentFinalAction', 'delete');
 INSERT INTO parameters (id, param_value_int) VALUES ('minimumVisaRole', 0);
 INSERT INTO parameters (id, param_value_int) VALUES ('maximumSignRole', 0);
+INSERT INTO parameters (id, description, param_value_int) VALUES ('workflowEndBySignatory', 0);
 
 ------------
 --DIFFLIST_TYPES

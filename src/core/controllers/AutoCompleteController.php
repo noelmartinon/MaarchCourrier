@@ -19,6 +19,7 @@ use Contact\models\ContactGroupModel;
 use Contact\models\ContactModel;
 use Contact\models\ContactParameterModel;
 use Entity\models\EntityModel;
+use Group\controllers\PrivilegeController;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -162,6 +163,13 @@ class AutoCompleteController
             return $response->withStatus(400)->withJson(['errors' => 'Query params search is empty']);
         }
 
+        $limit = self::TINY_LIMIT;
+        if (!empty($queryParams['limit']) && is_numeric($queryParams['limit'])) {
+            $limit = (int)$queryParams['limit'];
+        } elseif (!empty($queryParams['limit']) && $queryParams['limit'] == 'none') {
+            $limit = 0;
+        }
+
         $searchOnEmails = !empty($queryParams['searchEmails']);
 
         //Contacts
@@ -199,7 +207,7 @@ class AutoCompleteController
                 'where'     => $requestData['where'],
                 'data'      => $requestData['data'],
                 'orderBy'   => ['company', 'lastname NULLS FIRST'],
-                'limit'     => self::TINY_LIMIT
+                'limit'     => $limit
             ]);
 
             foreach ($contacts as $contact) {
@@ -238,7 +246,7 @@ class AutoCompleteController
                 'where'     => $requestData['where'],
                 'data'      => $requestData['data'],
                 'orderBy'   => ['lastname'],
-                'limit'     => self::TINY_LIMIT
+                'limit'     => $limit
             ]);
 
             foreach ($users as $user) {
@@ -278,19 +286,29 @@ class AutoCompleteController
             ]);
 
             $entities = EntityModel::get([
-                'select'    => ['id', 'entity_id', 'entity_label', 'short_label', 'email'],
+                'select'    => [
+                    'id', 'entity_id', 'entity_label', 'short_label', 'email', 'address_number', 'address_street', 'address_additional1',
+                    'address_additional2', 'address_postcode', 'address_town', 'address_country'
+                ],
                 'where'     => $requestData['where'],
                 'data'      => $requestData['data'],
                 'orderBy'   => ['entity_label'],
-                'limit'     => self::TINY_LIMIT
+                'limit'     => $limit
             ]);
 
             foreach ($entities as $value) {
                 $entity = [
-                    'type'          => 'entity',
-                    'id'            => $value['id'],
-                    'lastname'      => $value['entity_label'],
-                    'firstname'     => ''
+                    'type'                  => 'entity',
+                    'id'                    => $value['id'],
+                    'lastname'              => $value['entity_label'],
+                    'firstname'             => '',
+                    'addressNumber'         => $value['address_number'],
+                    'addressStreet'         => $value['address_street'],
+                    'addressAdditional1'    => $value['address_additional1'],
+                    'addressAdditional2'    => $value['address_additional2'],
+                    'addressPostcode'       => $value['address_postcode'],
+                    'addressTown'           => $value['address_town'],
+                    'addressCountry'        => $value['address_country']
                 ];
 
                 if ($searchOnEmails) {
@@ -306,11 +324,29 @@ class AutoCompleteController
         if (empty($queryParams['noContactsGroups'])) {
             $fields = ['label'];
             $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
+            $hasService = PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']]);
+
+            $where = [];
+            $data = [];
+            if ($hasService) {
+                $where[] = '1=1';
+            } else {
+                $userEntities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id']]);
+
+                $entitiesId = [];
+                foreach ($userEntities as $userEntity) {
+                    $entitiesId[] = (string)$userEntity['id'];
+                }
+                $where[] = '(owner = ? OR entities @> ?)';
+                $data[] = $GLOBALS['id'];
+                $data[] = json_encode($entitiesId);
+            }
+
             $requestData = AutoCompleteController::getDataForRequest([
                 'search'        => $queryParams['search'],
                 'fields'        => $fields,
-                'where'         => ['(public = ? OR owner = ?)'],
-                'data'          => [true, $GLOBALS['id']],
+                'where'         => $where,
+                'data'          => $data,
                 'fieldsNumber'  => 1,
             ]);
 
@@ -319,7 +355,7 @@ class AutoCompleteController
                 'where'     => $requestData['where'],
                 'data'      => $requestData['data'],
                 'orderBy'   => ['label'],
-                'limit'     => self::TINY_LIMIT
+                'limit'     => $limit
             ]);
 
             foreach ($contactsGroups as $value) {
@@ -333,8 +369,8 @@ class AutoCompleteController
         }
 
         $total = count($autocompleteContacts) + count($autocompleteUsers) + count($autocompleteEntities) + count($autocompleteContactsGroups);
-        if ($total > self::TINY_LIMIT) {
-            $divider = $total / self::TINY_LIMIT;
+        if ($total > $limit) {
+            $divider = $total / $limit;
             $autocompleteContacts       = array_slice($autocompleteContacts, 0, round(count($autocompleteContacts) / $divider));
             $autocompleteUsers          = array_slice($autocompleteUsers, 0, round(count($autocompleteUsers) / $divider));
             $autocompleteEntities       = array_slice($autocompleteEntities, 0, round(count($autocompleteEntities) / $divider));
@@ -447,14 +483,14 @@ class AutoCompleteController
         }
 
         $requestData['where'] = [
-            'usergroups.group_id = usergroups_services.group_id',
+            '(users.mode = ? or (usergroups.group_id = usergroups_services.group_id',
             'usergroups.id = usergroup_content.group_id',
             'usergroup_content.user_id = users.id',
-            'usergroups_services.service_id in (?)',
+            'usergroups_services.service_id in (?)))',
             'users.mode not in (?)',
             'users.status not in (?)'
         ];
-        $requestData['data'] = [$services, ['root_invisible', 'rest'], ['DEL', 'SPD']];
+        $requestData['data'] = ['root_visible', $services, ['root_invisible', 'rest'], ['DEL', 'SPD']];
 
         if (!empty($queryParams['search'])) {
             $fields = ['users.firstname', 'users.lastname'];

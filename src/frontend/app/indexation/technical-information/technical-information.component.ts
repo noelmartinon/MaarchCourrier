@@ -7,7 +7,7 @@ import { FunctionsService } from '@service/functions.service';
 import { catchError, exhaustMap, tap } from 'rxjs/operators';
 import { NotificationService } from '@service/notification/notification.service';
 import { of } from 'rxjs';
-import { DatePipe } from '@angular/common';
+import { DatePipe, KeyValue } from '@angular/common';
 
 
 @Component({
@@ -18,7 +18,7 @@ export class TechnicalInformationComponent implements OnInit {
 
     loading: boolean = false;
 
-    techData: any = {
+    techData: {[key: string]: any} = {
         initiator: {
             label: 'initiator',
             value: '',
@@ -123,5 +123,9 @@ export class TechnicalInformationComponent implements OnInit {
 
     isEmptyCustom() {
         return Object.keys(this.customsData).length === 0;
+    }
+
+    originalOrder = (a: KeyValue<number,string>, b: KeyValue<number,string>): number => {
+        return 0;
     }
 }

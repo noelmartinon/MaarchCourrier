@@ -445,7 +445,7 @@ class ResourceListController
             return $response->withStatus(400)->withJson(['errors' => 'Action method does not exist']);
         }
         $action['parameters'] = json_decode($action['parameters'], true);
-        $actionRequiredFields = $parameters['requiredFields'] ?? [];
+        $actionRequiredFields = $action['parameters']['requiredFields'] ?? [];
 
         $whereClause = PreparedClauseController::getPreparedClause(['clause' => $basket['basket_clause'], 'userId' => $aArgs['userId']]);
         $resources = ResModel::getOnView([
@@ -524,7 +524,7 @@ class ResourceListController
         }
         $historic = empty($methodResponse['history']) ? '' : $methodResponse['history'];
         if (!empty($resourcesForAction)) {
-            ActionMethodController::terminateAction(['id' => $aArgs['actionId'], 'resources' => $resourcesForAction, 'basketName' => $basket['basket_name'], 'note' => $body['note'], 'history' => $historic]);
+            ActionMethodController::terminateAction(['id' => $aArgs['actionId'], 'resources' => $resourcesForAction, 'basketName' => $basket['basket_name'], 'note' => $body['note'], 'history' => $historic, 'finishInScript' => !empty($methodResponses['postscript'])]);
         }
 
         if (!empty($methodResponse['postscript'])) {

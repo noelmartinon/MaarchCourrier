@@ -372,7 +372,7 @@ export class AttachmentCreateComponent implements OnInit {
         return state;
     }
 
-    setDatasViewer(i: number) {
+    setDatasViewer(ev: any, i: number) {
         let datas: any = {};
         Object.keys(this.attachments[i]).forEach(element => {
             if (['title', 'validationDate', 'recipient'].indexOf(element) > -1) {
@@ -397,6 +397,11 @@ export class AttachmentCreateComponent implements OnInit {
             datas['inMailing'] = true;
         }
         this.appDocumentViewer.toArray()[i].setDatas(datas);
+
+        if (ev === 'uploadFile') {
+            const filename = this.appDocumentViewer.toArray()[i].file.name;
+            this.attachments[i].title.setValue(filename.substr(0, filename.lastIndexOf('.')));
+        }
     }
 
     newPj() {

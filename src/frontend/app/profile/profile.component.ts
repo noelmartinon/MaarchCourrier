@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
 import { HeaderService } from '@service/header.service';
-import { debounceTime, switchMap, distinctUntilChanged, filter, tap, catchError, finalize } from 'rxjs/operators';
+import { tap } from 'rxjs/operators';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatExpansionPanel } from '@angular/material/expansion';
 import { MatPaginator } from '@angular/material/paginator';
@@ -11,13 +11,11 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
-import { FormControl, FormGroup, Validators, AbstractControl, ValidationErrors, ValidatorFn, FormBuilder } from '@angular/forms';
+import { FormGroup, Validators, AbstractControl, ValidationErrors, ValidatorFn, FormBuilder } from '@angular/forms';
 import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { AuthService } from '@service/auth.service';
-import { Router } from '@angular/router';
 import { AbsModalComponent } from './absModal/abs-modal.component';
-import { of } from 'rxjs';
 
 declare var $: any;
 declare var tinymce: any;
@@ -76,7 +74,6 @@ export class ProfileComponent implements OnInit {
     selectedSignatureLabel: string = '';
     loading: boolean = false;
     selectedIndex: number = 0;
-    selectedIndexContactsGrp: number = 0;
     loadingSign: boolean = false;
 
     @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
@@ -99,56 +96,6 @@ export class ProfileComponent implements OnInit {
     }
 
     @ViewChildren(MatExpansionPanel) viewPanels: QueryList<MatExpansionPanel>;
-
-    // Groups contacts
-    contactsGroups: any[] = [];
-    displayedColumnsGroupsList: string[] = ['label', 'description', 'nbContacts', 'public', 'actions'];
-    dataSourceGroupsList: any;
-    @ViewChild('paginatorGroupsList', { static: false }) paginatorGroupsList: MatPaginator;
-    @ViewChild('tableGroupsListSort', { static: false }) sortGroupsList: MatSort;
-    applyFilterGroupsList(filterValue: string) {
-        filterValue = filterValue.trim(); // Remove whitespace
-        filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-        this.dataSourceGroupsList.filter = filterValue;
-    }
-
-    // Group contacts
-    contactsGroup: any = { public: false };
-
-    // Group contacts List Autocomplete
-    initAutoCompleteContact = true;
-
-    searchTerm: FormControl = new FormControl();
-    searchResult: any = [];
-    displayedColumnsContactsListAutocomplete: string[] = ['select', 'contact', 'address'];
-    dataSourceContactsListAutocomplete: any;
-    @ViewChild('paginatorGroupsListAutocomplete', { static: false }) paginatorGroupsListAutocomplete: MatPaginator;
-    selection = new SelectionModel<Element>(true, []);
-    masterToggle(event: any) {
-        if (event.checked) {
-            this.dataSourceContactsListAutocomplete.data.forEach((row: any) => {
-                if (!$('#check_' + row.id + '-input').is(':disabled')) {
-                    this.selection.select(row.id);
-                }
-            });
-        } else {
-            this.selection.clear();
-        }
-    }
-
-
-    // Group contacts List
-    contactsListMode: boolean = false;
-    contactsList: any[] = [];
-    displayedColumnsContactsList: string[] = ['contact', 'address', 'actions'];
-    dataSourceContactsList: any;
-    @ViewChild('paginatorContactsList', { static: false }) paginatorContactsList: MatPaginator;
-    @ViewChild('tableContactsListSort', { static: false }) sortContactsList: MatSort;
-    applyFilterContactsList(filterValue: string) {
-        filterValue = filterValue.trim(); // Remove whitespace
-        filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-        this.dataSourceContactsList.filter = filterValue;
-    }
 
     // History
     displayedColumns = ['event_date', 'record_id', 'info'];
@@ -178,17 +125,6 @@ export class ProfileComponent implements OnInit {
         window['angularProfileComponent'] = {
             componentAfterUpload: (base64Content: any) => this.processAfterUpload(base64Content),
         };
-        this.searchTerm.valueChanges.pipe(
-            debounceTime(500),
-            filter(value => value.length > 2),
-            distinctUntilChanged(),
-            switchMap(data => this.http.get('../rest/autocomplete/contacts', { params: { 'search': data } }))
-        ).subscribe((response: any) => {
-            this.searchResult = response;
-            this.dataSourceContactsListAutocomplete = new MatTableDataSource(this.searchResult);
-            this.dataSourceContactsListAutocomplete.paginator = this.paginatorGroupsListAutocomplete;
-            // this.dataSource.sort      = this.sortContactList;
-        });
 
         this.http.get('../rest/documentEditors').pipe(
             tap((data: any) => {
@@ -254,156 +190,6 @@ export class ProfileComponent implements OnInit {
             theme_styles: 'Header 1=header1;Header 2=header2;Header 3=header3;Table Row=tableRow1'
 
         });
-    }
-
-    initGroupsContact() {
-        this.contactsListMode = false;
-        this.selectedIndexContactsGrp = 0;
-        this.http.get('../rest/contactsGroups')
-            .subscribe((data) => {
-                this.contactsGroups = [];
-                this.contactsGroup = { public: false, contacts: [] };
-                let i = 0;
-                data['contactsGroups'].forEach((ct: any) => {
-                    if (ct.owner == this.headerService.user.id) {
-                        ct.position = i;
-                        this.contactsGroups.push(ct);
-                        i++;
-                    }
-                });
-                setTimeout(() => {
-                    this.dataSourceGroupsList = new MatTableDataSource(this.contactsGroups);
-                    this.dataSourceGroupsList.paginator = this.paginatorGroupsList;
-                    this.dataSourceGroupsList.sort = this.sortGroupsList;
-                }, 0);
-            }, (err) => {
-                this.notify.handleErrors(err);
-            });
-    }
-
-    contactsGroupSubmit() {
-        this.http.post('../rest/contactsGroups', this.contactsGroup)
-            .subscribe((data: any) => {
-                this.initGroupsContact();
-                // this.toggleAddGrp();
-                this.notify.success(this.translate.instant('lang.contactsGroupAdded'));
-            }, (err) => {
-                this.notify.error(err.error.errors);
-            });
-    }
-
-    updateGroupSubmit() {
-        this.http.put('../rest/contactsGroups/' + this.contactsGroup.id, this.contactsGroup)
-            .subscribe(() => {
-                this.notify.success(this.translate.instant('lang.contactsGroupUpdated'));
-                this.initGroupsContact();
-            }, (err) => {
-                this.notify.error(err.error.errors);
-            });
-    }
-
-    deleteContactsGroup(row: any) {
-        var contactsGroup = this.contactsGroups[row];
-        let r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + contactsGroup.label + ' »');
-        if (r) {
-            this.http.delete('../rest/contactsGroups/' + contactsGroup.id)
-                .subscribe(() => {
-                    this.contactsListMode = false;
-                    var lastElement = this.contactsGroups.length - 1;
-                    this.contactsGroups[row] = this.contactsGroups[lastElement];
-                    this.contactsGroups[row].position = row;
-                    this.contactsGroups.splice(lastElement, 1);
-
-                    this.dataSourceGroupsList = new MatTableDataSource(this.contactsGroups);
-                    this.dataSourceGroupsList.paginator = this.paginatorGroupsList;
-                    this.notify.success(this.translate.instant('lang.contactsGroupDeleted'));
-
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
-    }
-
-    loadContactsGroup(contactsGroup: any) {
-        this.contactsListMode = true;
-
-        this.http.get('../rest/contactsGroups/' + contactsGroup.id)
-            .subscribe((data: any) => {
-                this.contactsGroup = data.contactsGroup;
-                setTimeout(() => {
-                    this.dataSourceContactsList = new MatTableDataSource(this.contactsGroup.contacts);
-                    this.dataSourceContactsList.paginator = this.paginatorContactsList;
-                    this.dataSourceContactsList.sort = this.sortContactsList;
-                    this.selectedIndexContactsGrp = 1;
-                }, 0);
-            });
-    }
-
-    saveContactsList(elem: any): void {
-        elem.textContent = this.translate.instant('lang.loading') + '...';
-        elem.disabled = true;
-        this.http.post('../rest/contactsGroups/' + this.contactsGroup.id + '/contacts', { 'contacts': this.selection.selected })
-            .subscribe((data: any) => {
-                this.notify.success(this.translate.instant('lang.contactAdded'));
-                this.selection.clear();
-                elem.textContent = this.translate.instant('lang.add');
-                this.contactsGroup = data.contactsGroup;
-                setTimeout(() => {
-                    this.dataSourceContactsList = new MatTableDataSource(this.contactsGroup.contacts);
-                    this.dataSourceContactsList.paginator = this.paginatorContactsList;
-                    this.dataSourceContactsList.sort = this.sortContactsList;
-                }, 0);
-            }, (err) => {
-                this.notify.error(err.error.errors);
-            });
-    }
-
-    preDelete(index: number) {
-        let r = confirm(this.translate.instant('lang.reallyWantToDeleteContactFromGroup'));
-
-        if (r) {
-            this.removeContact(this.contactsGroup.contacts[index], index);
-        }
-    }
-
-    removeContact(contact: any, row: any) {
-        this.http.delete('../rest/contactsGroups/' + this.contactsGroup.id + '/contacts/' + contact['id'])
-            .subscribe(() => {
-                var lastElement = this.contactsGroup.contacts.length - 1;
-                this.contactsGroup.contacts[row] = this.contactsGroup.contacts[lastElement];
-                this.contactsGroup.contacts[row].position = row;
-                this.contactsGroup.contacts.splice(lastElement, 1);
-
-                this.dataSourceContactsList = new MatTableDataSource(this.contactsGroup.contacts);
-                this.dataSourceContactsList.paginator = this.paginatorContactsList;
-                this.dataSourceContactsList.sort = this.sortContactsList;
-                this.notify.success(this.translate.instant('lang.contactDeletedFromGroup'));
-            }, (err) => {
-                this.notify.error(err.error.errors);
-            });
-    }
-
-    launchLoading() {
-        if (this.searchTerm.value.length > 2) {
-            this.dataSourceContactsListAutocomplete = null;
-            this.initAutoCompleteContact = false;
-        }
-    }
-
-    isInGrp(contact: any): boolean {
-        let isInGrp = false;
-        this.contactsGroup.contacts.forEach((row: any) => {
-            if (row.id == contact.id) {
-                isInGrp = true;
-            }
-        });
-        return isInGrp;
-    }
-
-    selectContact(id: any) {
-        if (!$('#check_' + id + '-input').is(':disabled')) {
-            this.selection.toggle(id);
-        }
     }
 
     ngOnInit(): void {
@@ -903,23 +689,6 @@ export class ProfileComponent implements OnInit {
 
     hideActions(basket: any) {
         $('#' + basket.basket_id + '_' + basket.group_id).hide();
-    }
-
-    toggleAddGrp() {
-        this.initGroupsContact();
-        $('#contactsGroupFormUp').toggle();
-        $('#contactsGroupList').toggle();
-    }
-    toggleAddContactGrp() {
-        $('#contactsGroupFormAdd').toggle();
-        // $('#contactsGroup').toggle();
-    }
-
-    changeTabContactGrp(event: any) {
-        this.selectedIndexContactsGrp = event;
-        if (event == 0) {
-            this.initGroupsContact();
-        }
     }
 
     syncMP() {

@@ -32,7 +32,7 @@
             <mat-optgroup [label]="('lang.visaUser' | translate) + ' / ' + ('lang.signUser' | translate)"
                 *ngIf="(filteredSignVisaUsers | async)?.length > 0" class="visaSignList">
                 <mat-option *ngFor="let user of filteredSignVisaUsers | async | sortBy : 'label'" [value]="user">
-                    {{user.label}}&nbsp;<small>({{user.entity}})</small>
+                    {{user.label}}&nbsp;<small *ngIf="!functions.empty(user.entity)">({{user.entity}})</small>
                 </mat-option>
             </mat-optgroup>
         </mat-autocomplete>

@@ -461,3 +461,6 @@ define('_EIDAS', 'Eidas');
 define('_RGS_2STARS', 'RGS** key');
 define('_RGS_2STARS_TIMESTAMPED', 'RGS** key + timestamped');
 define('_STAMP', 'Stamp');
+
+define('_SIGNED', 'Signed');
+define('_VALIDATED', 'Validated');

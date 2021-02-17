@@ -31,6 +31,14 @@ class TextFormatModel
         return utf8_encode($string);
     }
 
+    public static function formatFilename(array $args)
+    {
+        if (!empty($args['maxLength'])) {
+            $args['filename'] = substr($args['filename'], 0, $args['maxLength']);
+        }
+        return preg_replace(utf8_decode('@[\\/:*?"<>|]@i'), '_', $args['filename']);
+    }
+
     public static function formatDate($date, $format = null)
     {
         if (empty($date)) {

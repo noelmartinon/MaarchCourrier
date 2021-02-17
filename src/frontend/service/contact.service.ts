@@ -11,7 +11,7 @@ export class ContactService {
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
-        public functions: FunctionsService 
+        public functions: FunctionsService
     ) { }
 
     getFillingColor(thresholdLevel: 'first' | 'second' | 'third') {
@@ -28,12 +28,12 @@ export class ContactService {
 
     formatCivilityObject(civility: any) {
         if (!this.empty(civility)) {
-            return civility
+            return civility;
         } else {
             return {
-                label:'',
-                abbreviation:''
-            }
+                label: '',
+                abbreviation: ''
+            };
         }
     }
 
@@ -41,13 +41,13 @@ export class ContactService {
         if (!this.empty(filling)) {
             return {
                 rate: filling.rate,
-                color:  this.getFillingColor(filling.thresholdLevel)
-            }
+                color: this.getFillingColor(filling.thresholdLevel)
+            };
         } else {
             return {
-                rate:'',
-                color:''
-            }
+                rate: '',
+                color: ''
+            };
         }
     }
 
@@ -71,7 +71,17 @@ export class ContactService {
                 arrInfo.push('(' + contact.company + ')');
             }
 
-            return arrInfo.filter(info => info !== '').join(' ');
+            return arrInfo.filter(info => !this.functions.empty(info)).join(' ');
         }
+    }
+
+    formatContactAddress(contact: any) {
+        const arrInfo = [];
+        arrInfo.push(contact.addressNumber);
+        arrInfo.push(contact.addressStreet);
+        arrInfo.push(contact.addressPostcode);
+        arrInfo.push(contact.addressTown);
+
+        return arrInfo.filter(info => !this.functions.empty(info)).join(' ');
     }
 }

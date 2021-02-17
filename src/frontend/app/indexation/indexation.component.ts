@@ -165,7 +165,10 @@ export class IndexationComponent implements OnInit {
 
                     this.isMailing = !this.functions.empty(formatdatas.recipients) && formatdatas.recipients.length > 0 && this.currentIndexingModel.category === 'outgoing' && formatdatas['encodedFile'] === null;
 
-                    if (formatdatas['encodedFile'] === null && this.currentIndexingModel.category !== 'registeredMail') {
+                    if (formatdatas['encodedFile'] === null && this.currentIndexingModel.mandatoryFile) {
+                        this.notify.error(this.translate.instant('lang.mandatoryFileForIndexingModel'));
+                        this.actionService.loading = false;
+                    } else if (formatdatas['encodedFile'] === null && this.currentIndexingModel.category !== 'registeredMail') {
                         this.dialogRef = this.dialog.open(
                             ConfirmComponent, {
                             panelClass: 'maarch-modal',

@@ -5,3 +5,24 @@
     border-left: solid 5px $primary;
     background: rgba($primary, 0.14);
 }
+
+.table-tools {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 10px;
+}
+
+.hasCorrespondent {
+    color: $primary;
+    font-weight: bold;
+}
+
+.noCorrespondent {
+    opacity: 0.5;
+}
+
+.header-item {
+    ::ng-deep.mat-sort-header-content {
+        text-align: left !important;
+    }
+}

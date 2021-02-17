@@ -119,7 +119,13 @@ class IndexingController
         }
 
         $historic = empty($methodResponse['history']) ? '' : $methodResponse['history'];
-        ActionMethodController::terminateAction(['id' => $args['actionId'], 'resources' => [$body['resource']], 'note' => $body['note'], 'history' => $historic]);
+        ActionMethodController::terminateAction(['id' => $args['actionId'], 'resources' => [$body['resource']], 'note' => $body['note'], 'history' => $historic, 'finishInScript' => !empty($methodResponse['postscript'])]);
+
+        if (!empty($methodResponse['postscript'])) {
+            $base64Args = base64_encode(json_encode($methodResponse['args']));
+            exec("php {$methodResponse['postscript']} --encodedData {$base64Args} > /dev/null &");
+            unset($methodResponse['postscript']);
+        }
 
         if (!empty($methodResponse['data'])) {
             return $response->withJson($methodResponse['data']);

@@ -468,3 +468,6 @@ define('_EIDAS', 'Cachet');
 define('_RGS_2STARS', 'Clé RGS**');
 define('_RGS_2STARS_TIMESTAMPED', 'Clé RGS** + horodatage');
 define('_STAMP', 'Griffe');
+
+define('_SIGNED', 'Signé');
+define('_VALIDATED', 'Validé');

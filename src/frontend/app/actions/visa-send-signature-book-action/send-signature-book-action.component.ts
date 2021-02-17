@@ -33,6 +33,8 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
     visaNumberCorrect: any = true;
     signNumberCorrect: any = true;
     atLeastOneSign: any = false;
+    lastOneIsSign: any = false;
+    lastOneMustBeSignatory: any = false;
 
     @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
     @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
@@ -140,7 +142,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
             if (!this.functions.empty(this.data.resource.destination) && !this.noResourceToProcess) {
                 this.noResourceToProcess = false;
                 await this.appVisaWorkflow.loadListModel(this.data.resource.destination);
-                await this.loadMinMaxVisaSignParameters();
+                await this.loadVisaSignParameters();
             }
         } else if (this.data.resIds.length > 1) {
             // List page
@@ -154,7 +156,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
             }
         }
         if (!this.noResourceToProcess) {
-            this.checkMinMaxVisaSign(this.appVisaWorkflow.visaWorkflow.items);
+            this.checkWorkflowParameters(this.appVisaWorkflow.visaWorkflow.items);
         }
     }
 
@@ -201,6 +203,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
                     }
                     this.minimumVisaRole = data.minimumVisaRole;
                     this.maximumSignRole = data.maximumSignRole;
+                    this.lastOneMustBeSignatory = data.workflowEndBySignatory;
                     resolve(true);
                 }, (err: any) => {
                     this.notify.handleSoftErrors(err);
@@ -229,17 +232,25 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
     }
 
     isValidAction() {
-        return !this.noResourceToProcess && this.appVisaWorkflow !== undefined && !this.appVisaWorkflow.emptyWorkflow() && !this.appVisaWorkflow.workflowEnd() && this.signNumberCorrect && this.visaNumberCorrect && this.atLeastOneSign;
+        return !this.noResourceToProcess && this.appVisaWorkflow !== undefined && !this.appVisaWorkflow.emptyWorkflow() && !this.appVisaWorkflow.workflowEnd() && this.signNumberCorrect && this.visaNumberCorrect && this.atLeastOneSign && ((this.lastOneIsSign && this.lastOneMustBeSignatory) || !this.lastOneMustBeSignatory);
     }
 
-    checkMinMaxVisaSign(items: any[]) {
+    checkWorkflowParameters(items: any[]) {
         let nbVisaRole = 0;
         let nbSignRole = 0;
         items.forEach(item => {
-            if (item.requested_signature) {
-                nbSignRole++;
+            if (this.functions.empty(item.process_date)) {
+                if (item.requested_signature) {
+                    nbSignRole++;
+                } else {
+                    nbVisaRole++;
+                }
             } else {
-                nbVisaRole++;
+                if (item.signatory) {
+                    nbSignRole++;
+                } else {
+                    nbVisaRole++;
+                }
             }
         });
 
@@ -249,9 +260,14 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
             this.visaNumberCorrect = this.minimumVisaRole === 0 || nbVisaRole >= this.minimumVisaRole;
             this.signNumberCorrect = this.maximumSignRole === 0 || nbSignRole <= this.maximumSignRole;
         }
+
+        if (this.lastOneMustBeSignatory) {
+            const lastItem = items[items.length - 1];
+            this.lastOneIsSign = this.functions.empty(lastItem.process_date) ? lastItem.requested_signature : lastItem.signatory;
+        }
     }
 
-    async loadMinMaxVisaSignParameters() {
+    async loadVisaSignParameters() {
         return new Promise((resolve) => {
             this.http.get('../rest/parameters/minimumVisaRole').pipe(
                 tap((data: any) => {
@@ -260,6 +276,11 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
                 exhaustMap(() => this.http.get('../rest/parameters/maximumSignRole')),
                 tap((data: any) => {
                     this.maximumSignRole = data.parameter.param_value_int;
+                    resolve(true);
+                }),
+                exhaustMap(() => this.http.get('../rest/parameters/workflowEndBySignatory')),
+                tap((data: any) => {
+                    this.lastOneMustBeSignatory = data.parameter.param_value_int !== 0;
                     resolve(true);
                 }),
                 catchError((err: any) => {

@@ -9,6 +9,11 @@ import { MatSort } from '@angular/material/sort';
 import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../../administration.service';
+import { SelectionModel } from '@angular/cdk/collections';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     templateUrl: 'contacts-groups-administration.component.html',
@@ -19,16 +24,7 @@ import { AdministrationService } from '../../administration.service';
 
 export class ContactsGroupsAdministrationComponent implements OnInit {
 
-    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-
-    
-    search: string = null;
-
-    contactsGroups: any[] = [];
-    titles: any[] = [];
-
-    loading: boolean = false;
 
     subMenus: any[] = [
         {
@@ -63,17 +59,12 @@ export class ContactsGroupsAdministrationComponent implements OnInit {
         },
     ];
 
-    displayedColumns = ['label', 'description', 'nbContacts', 'public', 'owner', 'actions'];
-    filterColumns = ['label', 'description'];
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
-
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
+        public dialog: MatDialog,
         public appService: AppService,
         public functions: FunctionsService,
         public adminService: AdministrationService,
@@ -83,37 +74,5 @@ export class ContactsGroupsAdministrationComponent implements OnInit {
     ngOnInit(): void {
         this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.contactsGroups'));
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
-
-        this.loading = true;
-
-        this.http.get('../rest/contactsGroups')
-            .subscribe((data) => {
-                this.contactsGroups = data['contactsGroups'];
-                this.loading = false;
-                setTimeout(() => {
-                    this.adminService.setDataSource('admin_contacts_groups', this.contactsGroups, this.sort, this.paginator, this.filterColumns);
-                }, 0);
-            }, (err) => {
-                this.notify.handleErrors(err);
-            });
-    }
-
-    deleteContactsGroup(row: any) {
-        const contactsGroup = this.contactsGroups[row];
-        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + contactsGroup.label + ' »');
-
-        if (r) {
-            this.http.delete('../rest/contactsGroups/' + contactsGroup.id)
-                .subscribe(() => {
-                    const lastElement = this.contactsGroups.length - 1;
-                    this.contactsGroups[row] = this.contactsGroups[lastElement];
-                    this.contactsGroups[row].position = row;
-                    this.contactsGroups.splice(lastElement, 1);
-                    this.adminService.setDataSource('admin_contacts_groups', this.contactsGroups, this.sort, this.paginator, this.filterColumns);
-                    this.notify.success(this.translate.instant('lang.contactsGroupDeleted'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
     }
 }

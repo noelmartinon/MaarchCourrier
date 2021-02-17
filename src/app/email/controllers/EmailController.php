@@ -612,7 +612,7 @@ class EmailController
                     return ['errors' => 'Document not found on docserver'];
                 }
 
-                $title = preg_replace(utf8_decode('@[\\/:*?"<>|]@i'), '_', substr($messageExchange['reference'], 0, 30));
+                $title = TextFormatModel::formatFilename(['filename' => $messageExchange['reference'], 'maxLength' => 30]);
 
                 $phpmailer->addStringAttachment($fileContent, $title . '.zip');
             }

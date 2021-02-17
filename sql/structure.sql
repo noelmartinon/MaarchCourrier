@@ -786,8 +786,8 @@ CREATE TABLE contacts_groups
   id serial,
   label character varying(32) NOT NULL,
   description character varying(255) NOT NULL,
-  public boolean NOT NULL,
   owner integer NOT NULL,
+  entities jsonb NOT NULL DEFAULT '{}',
   CONSTRAINT contacts_groups_pkey PRIMARY KEY (id),
   CONSTRAINT contacts_groups_key UNIQUE (label, owner)
 )
@@ -797,9 +797,9 @@ CREATE TABLE contacts_groups_lists
 (
   id serial,
   contacts_groups_id integer NOT NULL,
-  contact_id integer NOT NULL,
-  CONSTRAINT contacts_groups_lists_pkey PRIMARY KEY (id),
-  CONSTRAINT contacts_groups_lists_key UNIQUE (contacts_groups_id, contact_id)
+  correspondent_id integer NOT NULL,
+  correspondent_type CHARACTER VARYING(256) NOT NULL,
+  CONSTRAINT contacts_groups_lists_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);
 
@@ -1379,6 +1379,7 @@ CREATE TABLE indexing_models
     private BOOLEAN NOT NULL,
     master INTEGER DEFAULT NULL,
     enabled BOOLEAN DEFAULT TRUE NOT NULL,
+    mandatory_file BOOLEAN DEFAULT FALSE NOT NULL,
     CONSTRAINT indexing_models_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);

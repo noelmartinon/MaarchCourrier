@@ -106,9 +106,18 @@ class ActionMethodController
 
         $set = ['locker_user_id' => null, 'locker_time' => null, 'modification_date' => 'CURRENT_TIMESTAMP'];
 
-        $action = ActionModel::getById(['id' => $args['id'], 'select' => ['label_action', 'id_status', 'history']]);
-        if (!empty($action['id_status']) && $action['id_status'] != '_NOSTATUS_') {
-            $set['status'] = $action['id_status'];
+        $action = ActionModel::getById(['id' => $args['id'], 'select' => ['label_action', 'id_status', 'history', 'parameters']]);
+        $action['parameters'] = json_decode($action['parameters'], true);
+
+        if (empty($args['finishInScript'])) {
+            $status = !empty($action['parameters']['successStatus']) ? $action['parameters']['successStatus'] : $action['id_status'];
+            if (!empty($status) && $status != '_NOSTATUS_') {
+                $set['status'] = $status;
+            }
+        } else {
+            if (!empty($action['id_status']) && $action['id_status'] != '_NOSTATUS_') {
+                $set['status'] = $action['id_status'];
+            }
         }
 
         ResModel::update([
@@ -350,9 +359,11 @@ class ActionMethodController
 
         $minimumVisaRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'minimumVisaRole']);
         $maximumSignRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'maximumSignRole']);
+        $workflowEndBySignatory = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'workflowEndBySignatory']);
 
         $minimumVisaRole = !empty($minimumVisaRole['param_value_int']) ? $minimumVisaRole['param_value_int'] : 0;
         $maximumSignRole = !empty($maximumSignRole['param_value_int']) ? $maximumSignRole['param_value_int'] : 0;
+        $workflowEndBySignatory = !empty($workflowEndBySignatory['param_value_int']);
 
         $nbVisaRole = 0;
         $nbSignRole = 0;
@@ -368,6 +379,13 @@ class ActionMethodController
         }
         if ($maximumSignRole != 0 && $nbSignRole > $maximumSignRole) {
             return ['errors' => ['Circuit have too many sign users']];
+        }
+
+        if ($workflowEndBySignatory) {
+            $last = count($circuit) - 1;
+            if ($circuit[$last]['requested_signature'] == false) {
+                return ['errors' => 'Circuit last user is not a signatory'];
+            }
         }
 
         $resource       = ResModel::getById(['select' => ['integrations'], 'resId' => $args['resId']]);

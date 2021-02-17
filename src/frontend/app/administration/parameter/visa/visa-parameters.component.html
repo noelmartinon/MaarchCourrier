@@ -1,0 +1,23 @@
+<form [formGroup]="visaParameters" style="display: contents;">
+    <div>
+        <mat-slide-toggle style="display: inline-block; width: 20%" color="primary" name="minimumVisaRole" (toggleChange)="toggle('minimumVisaRole')"
+                          [checked]="visaParameters.controls['minimumVisaRole'].value !== 0">
+            {{'lang.minimumVisaUser' | translate}}
+        </mat-slide-toggle>
+        <mat-form-field style="margin-left: 10px; display: inline-block; width: 70% !important;">
+            <input type="text" matInput required formControlName="minimumVisaRole" [value]="visaParameters.controls['minimumVisaRole'].value">
+        </mat-form-field>
+    </div>
+
+    <div>
+        <mat-slide-toggle style="display: inline-block; width: 20%" color="primary" name="maximumSignRole" (toggleChange)="toggle('maximumSignRole')"
+                          [checked]="visaParameters.controls['maximumSignRole'].value !== 0">
+            {{'lang.maximumSignUser' | translate}}
+        </mat-slide-toggle>
+        <mat-form-field style="margin-left: 10px; display: inline-block; width: 70% !important;">
+            <input type="text" matInput required formControlName="maximumSignRole" [value]="visaParameters.controls['maximumSignRole'].value">
+        </mat-form-field>
+    </div>
+
+    <mat-slide-toggle color="primary" name="workflowEndBySignatory" (toggleChange)="toggle('workflowEndBySignatory')" [checked]="visaParameters.controls['workflowEndBySignatory'].value !== 0">{{'lang.workflowEndBySignatory' | translate}}</mat-slide-toggle>
+</form>

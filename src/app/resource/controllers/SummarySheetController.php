@@ -588,22 +588,31 @@ class SummarySheetController
                 $users = [];
                 $found = false;
 
-                $roles = EntityModel::getRoles();
-                $roles = array_column($roles, 'label', 'id');
-
                 foreach ($args['data']['listInstancesVisa'] as $listKey => $listInstance) {
                     if ($found && $listInstance['res_id'] != $resource['res_id']) {
                         break;
                     } elseif ($listInstance['res_id'] == $resource['res_id']) {
-                        $mode = $roles[$listInstance['item_mode']];
+                        if (!empty($listInstance['process_date'])) {
+                            $mode = ($listInstance['signatory'] ? _SIGNATORY : _VISA_USER_MIN);
+                        } else {
+                            $mode = ($listInstance['requested_signature'] ? _SIGNATORY : _VISA_USER_MIN);
+                        }
                         $userLabel = UserModel::getLabelledUserById(['id' => $listInstance['item_id']]);
 
                         $delegate = !empty($listInstance['delegate']) ? UserModel::getLabelledUserById(['id' => $listInstance['delegate']]) : '';
                         if (!empty($delegate)) {
                             $mode .= ', ' . _INSTEAD_OF . ' ' . $userLabel;
-                            $userLabel = $delegate . " ({$mode}) ";
+                            $userLabel = $delegate . " ({$mode})";
                         } else {
-                            $userLabel .= " ({$mode}) ";
+                            $userLabel .= " ({$mode})";
+                        }
+
+                        if (!empty($listInstance['process_date'])) {
+                            if (empty($listInstance['process_comment'])) {
+                                $userLabel .= ',' .  ($listInstance['signatory'] ? _SIGNED : _VALIDATED);
+                            } else {
+                                $userLabel .= ', ' . $listInstance['process_comment'];
+                            }
                         }
 
                         $users[] = [
@@ -932,7 +941,7 @@ class SummarySheetController
                 ]);
             } elseif ($unit['unit'] == 'visaWorkflow') {
                 $data['listInstancesVisa'] = ListInstanceModel::get([
-                    'select'    => ['item_id', 'requested_signature', 'process_date', 'res_id', 'delegate', 'item_mode'],
+                    'select'    => ['item_id', 'requested_signature', 'process_date', 'res_id', 'delegate', 'item_mode', 'signatory', 'process_comment'],
                     'where'     => ['difflist_type = ?', 'res_id in (?)'],
                     'data'      => ['VISA_CIRCUIT', $tmpIds],
                     'orderBy'   => ['listinstance_id']

@@ -17,7 +17,7 @@ use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
 use Attachment\models\AttachmentModel;
 use Contact\models\ContactCustomFieldListModel;
 use Contact\models\ContactFillingModel;
-use Contact\models\ContactGroupModel;
+use Contact\models\ContactGroupListModel;
 use Contact\models\ContactModel;
 use Contact\models\ContactParameterModel;
 use Entity\models\EntityModel;
@@ -533,7 +533,7 @@ class ContactController
             'data'  => [$args['id']]
         ]);
 
-        ContactGroupModel::deleteByContactId(['contactId' => $args['id']]);
+        ContactGroupListModel::delete(['where' => ['correspondent_id = ?', 'correspondent_type = ?'], 'data' => [$args['id'], 'contact']]);
 
         $historyInfoContact = '';
         if (!empty($contact['firstname']) || !empty($contact['lastname'])) {
@@ -1071,7 +1071,7 @@ class ContactController
         ]);
 
         foreach ($body['duplicates'] as $duplicate) {
-            ContactGroupModel::deleteByContactId(['contactId' => $duplicate]);
+            ContactGroupListModel::delete(['where' => ['correspondent_id = ?', 'correspondent_type = ?'], 'data' => [$duplicate, 'contact']]);
         }
 
         ContactModel::delete([

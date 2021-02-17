@@ -80,6 +80,7 @@ import { SsoAdministrationComponent } from './connection/sso/sso-administration.
 import { LifeCycleComponent } from './parameter/lifeCycle/life-cycle.component';
 import { AttachmentTypesAdministrationComponent } from './attachment/attachment-types-administration.component';
 import { AttachmentTypeAdministrationComponent } from './attachment/attachment-type-administration.component';
+import { VisaParametersComponent } from '@appRoot/administration/parameter/visa/visa-parameters.component';
 
 
 @NgModule({
@@ -167,7 +168,8 @@ import { AttachmentTypeAdministrationComponent } from './attachment/attachment-t
         SsoAdministrationComponent,
         LifeCycleComponent,
         AttachmentTypeAdministrationComponent,
-        AttachmentTypesAdministrationComponent
+        AttachmentTypesAdministrationComponent,
+        VisaParametersComponent
     ],
     entryComponents: [
         AccountLinkComponent,

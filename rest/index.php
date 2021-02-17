@@ -152,6 +152,9 @@ $app->get('/formattedContacts/{id}/types/{type}', \Contact\controllers\ContactCo
 $app->get('/ban/availableDepartments', \Contact\controllers\ContactController::class . ':getAvailableDepartments');
 $app->get('/duplicatedContacts', \Contact\controllers\ContactController::class . ':getDuplicatedContacts');
 $app->put('/contacts/{id}/merge', \Contact\controllers\ContactController::class . ':mergeContacts');
+$app->get('/contactsParameters', \Contact\controllers\ContactController::class . ':getContactsParameters');
+$app->put('/contactsParameters', \Contact\controllers\ContactController::class . ':updateContactsParameters');
+$app->get('/civilities', \Contact\controllers\ContactController::class . ':getCivilities');
 
 //ContactsCustomFields
 $app->get('/contactsCustomFields', \Contact\controllers\ContactCustomFieldController::class . ':get');
@@ -165,11 +168,11 @@ $app->post('/contactsGroups', \Contact\controllers\ContactGroupController::class
 $app->get('/contactsGroups/{id}', \Contact\controllers\ContactGroupController::class . ':getById');
 $app->put('/contactsGroups/{id}', \Contact\controllers\ContactGroupController::class . ':update');
 $app->delete('/contactsGroups/{id}', \Contact\controllers\ContactGroupController::class . ':delete');
-$app->post('/contactsGroups/{id}/contacts', \Contact\controllers\ContactGroupController::class . ':addContacts');
-$app->delete('/contactsGroups/{id}/contacts/{contactId}', \Contact\controllers\ContactGroupController::class . ':deleteContact');
-$app->get('/contactsParameters', \Contact\controllers\ContactController::class . ':getContactsParameters');
-$app->put('/contactsParameters', \Contact\controllers\ContactController::class . ':updateContactsParameters');
-$app->get('/civilities', \Contact\controllers\ContactController::class . ':getCivilities');
+$app->post('/contactsGroups/{id}/duplicate', \Contact\controllers\ContactGroupController::class . ':duplicate');
+$app->get('/contactsGroups/{id}/correspondents', \Contact\controllers\ContactGroupController::class . ':getCorrespondents');
+$app->post('/contactsGroups/{id}/correspondents', \Contact\controllers\ContactGroupController::class . ':addCorrespondents');
+$app->delete('/contactsGroups/{id}/correspondents', \Contact\controllers\ContactGroupController::class . ':deleteCorrespondents');
+$app->get('/contactsGroupsEntities', \Contact\controllers\ContactGroupController::class . ':getAllowedEntities');
 
 //Convert
 $app->post('/convertedFile', \Convert\controllers\ConvertPdfController::class . ':convertedFile');

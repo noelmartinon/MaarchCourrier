@@ -22,6 +22,7 @@ use Docserver\models\DocserverTypeModel;
 use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use SrcCore\models\CurlModel;
+use SrcCore\models\TextFormatModel;
 
 /**
     * @codeCoverageIgnore
@@ -171,7 +172,7 @@ class IxbusController
         if (!empty($mainDocumentFilePath)) {
             $attachmentsData = [[
                 'filePath' => $mainDocumentFilePath,
-                'fileName' => $mainResource['subject'] . '.pdf'
+                'fileName' => TextFormatModel::formatFilename(['filename' => $mainResource['subject'], 'maxLength' => 250]) . '.pdf'
             ]];
         };
         $attachmentsData = array_merge($annexesAttachments, $attachmentsData);
@@ -211,7 +212,7 @@ class IxbusController
                 'config'   => $aArgs['config'],
                 'folderId' => $folderId,
                 'filePath' => $filePath,
-                'fileName' => $value['title'] . '.pdf',
+                'fileName' => TextFormatModel::formatFilename(['filename' => $value['title'], 'maxLength' => 250]) . '.pdf',
                 'fileType' => 'principal'
             ]);
             if (!empty($addedFile['error'])) {
@@ -268,7 +269,7 @@ class IxbusController
                 'config'   => $aArgs['config'],
                 'folderId' => $folderId,
                 'filePath' => $filePath,
-                'fileName' => $mainResource['title'] . '.pdf',
+                'fileName' => TextFormatModel::formatFilename(['filename' => $mainResource['subject'], 'maxLength' => 250]) . '.pdf',
                 'fileType' => 'principal'
             ]);
             if (!empty($addedFile['error'])) {

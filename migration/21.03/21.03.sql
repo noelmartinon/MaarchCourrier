@@ -27,11 +27,6 @@ WITH (OIDS=FALSE);
 
 UPDATE history_batch SET total_errors = 0 WHERE total_errors IS NULL;
 
-ALTER TABLE listinstance_history_details DROP COLUMN IF EXISTS requested_signature;
-ALTER TABLE listinstance_history_details ADD COLUMN requested_signature boolean default false;
-ALTER TABLE listinstance_history_details DROP COLUMN IF EXISTS signatory;
-ALTER TABLE listinstance_history_details ADD COLUMN signatory BOOLEAN DEFAULT FALSE;
-
 DO $$ BEGIN
     IF (SELECT count(column_name) from information_schema.columns where table_name = 'entities' and column_name = 'adrs_1') THEN
         ALTER TABLE entities RENAME COLUMN adrs_1 TO address_number;
@@ -63,3 +58,22 @@ SELECT id, 'myLastResources', 'list', 1, '#90caf9', '{}' FROM users WHERE status
 
 INSERT INTO tiles (user_id, type, view, position, color, parameters)
 SELECT id, 'followedMail', 'chart', 0, '#90caf9', '{"chartMode": "status", "chartType": "pie"}' FROM users WHERE status != 'DEL';
+
+
+DO $$ BEGIN
+    IF (SELECT count(column_name) from information_schema.columns where table_name = 'contacts_groups' and column_name = 'public') THEN
+        ALTER TABLE contacts_groups DROP COLUMN IF EXISTS entities;
+        ALTER TABLE contacts_groups ADD COLUMN entities jsonb NOT NULL DEFAULT '{}';
+        UPDATE contacts_groups SET entities = (select to_jsonb(array_agg(id)) from entities) WHERE public = true;
+        ALTER TABLE contacts_groups DROP COLUMN IF EXISTS public;
+    END IF;
+END$$;
+DO $$ BEGIN
+    IF (SELECT count(column_name) from information_schema.columns where table_name = 'contacts_groups_lists' and column_name = 'contact_id') THEN
+        ALTER TABLE contacts_groups_lists RENAME COLUMN contact_id TO correspondent_id;
+        ALTER TABLE contacts_groups_lists ADD COLUMN correspondent_type CHARACTER VARYING(256);
+        ALTER TABLE contacts_groups_lists DROP CONSTRAINT IF EXISTS contacts_groups_lists_key;
+        UPDATE contacts_groups_lists SET correspondent_type = 'contact';
+        ALTER TABLE contacts_groups_lists ALTER COLUMN correspondent_type set not null;
+    END IF;
+END$$;

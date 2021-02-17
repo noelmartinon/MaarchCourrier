@@ -58,13 +58,15 @@ class ResourceControlController
             return ['errors' => 'Body doctype does not exist'];
         }
 
-        $indexingModel = IndexingModelModel::getById(['id' => $body['modelId'], 'select' => ['master', 'enabled']]);
+        $indexingModel = IndexingModelModel::getById(['id' => $body['modelId'], 'select' => ['master', 'enabled', 'mandatory_file']]);
         if (empty($indexingModel)) {
             return ['errors' => 'Body modelId does not exist'];
         } elseif (!$indexingModel['enabled']) {
             return ['errors' => 'Body modelId is disabled'];
         } elseif (!empty($indexingModel['master'])) {
             return ['errors' => 'Body modelId is not public'];
+        } elseif (empty($body['encodedFile']) && $indexingModel['mandatory_file']) {
+            return ['errors' => 'File is mandatory for this indexing model'];
         }
 
         $control = ResourceControlController::controlFileData(['body' => $body]);
@@ -125,7 +127,7 @@ class ResourceControlController
             return ['errors' => 'Body is not set or empty'];
         }
 
-        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['status', 'model_id', 'format', 'initiator', 'external_id->>\'signatureBookId\' as signaturebookid']]);
+        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['status', 'model_id', 'format', 'initiator', 'external_id->>\'signatureBookId\' as signaturebookid', 'filename']]);
         if (empty($resource['status'])) {
             return ['errors' => 'Resource status is empty. It can not be modified'];
         }
@@ -138,13 +140,15 @@ class ResourceControlController
             if (!PrivilegeController::isResourceInProcess(['userId' => $GLOBALS['id'], 'resId' => $args['resId'], 'canUpdateData' => true, 'canUpdateModel' => true])) {
                 return ['errors' => 'Model can not be modified'];
             }
-            $indexingModel = IndexingModelModel::getById(['id' => $body['modelId'], 'select' => ['master', 'enabled']]);
+            $indexingModel = IndexingModelModel::getById(['id' => $body['modelId'], 'select' => ['master', 'enabled', 'mandatory_file']]);
             if (empty($indexingModel)) {
                 return ['errors' => 'Body modelId does not exist'];
             } elseif (!$indexingModel['enabled']) {
                 return ['errors' => 'Body modelId is disabled'];
             } elseif (!empty($indexingModel['master'])) {
                 return ['errors' => 'Body modelId is not public'];
+            } elseif (empty($resource['filename']) && $indexingModel['mandatory_file']) {
+                return ['errors' => 'File is mandatory for this indexing model'];
             }
         }
 

@@ -136,6 +136,7 @@ import { SaveNumericPackageComponent } from './save-numeric-package.component';
 import { SignatureBookComponent } from './signature-book.component';
 import { VisaWorkflowModalComponent } from './visa/modal/visa-workflow-modal.component';
 import { ExternalVisaWorkflowComponent } from './visa/externalVisaWorkflow/external-visa-workflow.component';
+import { ProfileContactsGroupsComponent } from './profile/contacts-groups/profile-contacts-groups.component';
 
 import { DevToolComponent } from '@service/debug/dev-tool.component';
 import { DevLangComponent } from '@service/debug/dev-lang.component';
@@ -272,7 +273,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         ResetRecordManagementComponent,
         CheckAcknowledgmentRecordManagementComponent,
         TechnicalInformationComponent,
-        ExternalVisaWorkflowComponent
+        ExternalVisaWorkflowComponent,
+        ProfileContactsGroupsComponent
     ],
     exports : [
         SharedModule
