@@ -67,18 +67,14 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
                 this.realResSelected = data.sendList;
                 this.loadingInit = false;
                 this.arMode = data.mode;
-                this.arModeInit(this.arMode);
+                if (this.arMode === 'manual') {
+                    this.toggleArManual(true);
+                }
             }, (err) => {
                 this.notify.error(err.error.errors);
                 this.dialogRef.close();
                 this.loadingInit = false;
             });
-    }
-
-    arModeInit(mode : string) {
-        if (mode === 'manual') {
-            this.toggleArManual(true);
-        }
     }
 
     onSubmit() {
@@ -158,8 +154,10 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
 
     toggleArManual(state: boolean) {
         if (state) {
-            this.currentMode = 'mode=manual';
-            this.checkAcknowledgementReceipt();
+            if (this.currentMode != 'mode=manual') {
+                this.currentMode = 'mode=manual';
+                this.checkAcknowledgementReceipt();
+            }
             this.manualAR = true;
             if (this.data.resIds.length === 1) {
                 this.emailsubject = this.data.resource.subject;
