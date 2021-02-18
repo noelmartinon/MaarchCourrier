@@ -124,7 +124,7 @@
                             <div class="col-md-4">
                                 <mat-form-field>
                                     <mat-select id="diffusion_type" name="diffusion_type" title="{{'lang.sendTo' | translate}}"
-                                        placeholder="{{'lang.sendTo' | translate}}" [(ngModel)]="notification.diffusion_type"
+                                        placeholder="{{'lang.sendTo' | translate}}" [ngModel]="notification.diffusion_type" (ngModelChange)="updateDiffusionType($event)"
                                         required>
                                         <mat-optgroup label="{{'lang.memberUserDest' | translate}} :"
                                             *ngIf="notification.event_id != 'baskets'">
