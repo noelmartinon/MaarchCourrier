@@ -28,7 +28,6 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
     @ViewChild('maarchTree', { static: true }) maarchTree: MaarchFlatTreeComponent;
 
-    
     loading: boolean = false;
 
     creationMode: boolean;
@@ -210,6 +209,14 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                 theme_styles: 'Header 1=header1;Header 2=header2;Header 3=header3;Table Row=tableRow1',
                 setup: (ed: any) => {
                     ed.on('keyup', (e: any) => {
+                        if (this.template.type === 'HTML' && tinymce.get('templateHtml') != null) {
+                            this.template.file.content = tinymce.get('templateHtml').getContent();
+                        }
+                        if (this.template.type === 'OFFICE_HTML' && tinymce.get('templateOfficeHtml') != null) {
+                            this.template.file.electronic.content = tinymce.get('templateOfficeHtml').getContent();
+                        }
+                    });
+                    ed.on('change', (e: any) => {
                         if (this.template.type === 'HTML' && tinymce.get('templateHtml') != null) {
                             this.template.file.content = tinymce.get('templateHtml').getContent();
                         }
