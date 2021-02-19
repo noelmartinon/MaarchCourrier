@@ -198,6 +198,7 @@ class TemplateController
 
         $body = $request->getParsedBody();
         $body['type'] = $template['template_type'];
+        $body['template_id'] = $aArgs['id'];
 
         if (!TemplateController::controlUpdateTemplate(['data' => $body])) {
             return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
