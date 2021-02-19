@@ -43,6 +43,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
      */
     @Input() base64: any = null;
     @Input() format: string = null;
+    @Input() filename: string = null;
 
     /**
      * Target of resource (document or attachment)
@@ -233,6 +234,10 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             content: this.base64,
             src: this.base64ToArrayBuffer(this.base64)
         };
+        if (!this.functions.empty(this.filename)) {
+            this.file.name = this.filename.substring(0, this.filename.lastIndexOf("."));
+            this.file.format = this.filename.split('.').pop();
+        }
         this.loading = false;
     }
 
@@ -558,7 +563,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             this.http.get(this.file.content).pipe(
                 tap((data: any) => {
                     downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
-                    downloadLink.setAttribute('download', this.file.name);
+                    downloadLink.setAttribute('download', data.filename);
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
                 }),
@@ -1151,8 +1156,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
         this.http.get(`../rest/resources/${this.resId}/content/${version}?type=${type}`).pipe(
             tap((data: any) => {
-
-                this.dialog.open(DocumentViewerModalComponent, { autoFocus: false, panelClass: 'maarch-full-height-modal', data: { title: `${title}`, base64: data.encodedDocument } });
+                this.dialog.open(DocumentViewerModalComponent, { autoFocus: false, panelClass: 'maarch-full-height-modal', data: { title: `${title}`, base64: data.encodedDocument, filename: data.filename } });
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
