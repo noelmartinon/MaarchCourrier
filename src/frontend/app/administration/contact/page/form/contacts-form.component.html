@@ -360,6 +360,6 @@
         <button mat-raised-button color="default" type="button"
             [matMenuTriggerFor]="menu">{{'lang.moreInfos' | translate}}...</button>
 
-        <button mat-raised-button color="primary" type="button" (click)="onSubmit()">{{'lang.validate' | translate}}</button>
+        <button mat-raised-button *ngIf="actionButton" color="primary" type="button" (click)="onSubmit()">{{'lang.validate' | translate}}</button>
     </div>
 </ng-template>

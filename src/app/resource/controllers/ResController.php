@@ -568,7 +568,7 @@ class ResController extends ResourceControlController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['version', 'filename']]);
+        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['version', 'filename', 'subject']]);
         if (empty($resource['filename'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Document has no file']);
         } elseif (!Validator::intVal()->validate($args['version']) || $args['version'] > $resource['version'] || $args['version'] < 1) {
@@ -576,6 +576,7 @@ class ResController extends ResourceControlController
         }
 
         $queryParams = $request->getQueryParams();
+        $subject     = $resource['subject'];
 
         $type = 'PDF';
         if (!empty($queryParams['type']) && in_array($queryParams['type'], ['PDF', 'SIGN', 'NOTE'])) {
@@ -625,7 +626,9 @@ class ResController extends ResourceControlController
             return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
         }
 
-        return $response->withJson(['encodedDocument' => base64_encode($fileContent)]);
+        $pathInfo = pathinfo($pathToDocument);
+        $filename = TextFormatModel::formatFilename(['filename' => $subject, 'maxLength' => 250]);
+        return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'filename' => $filename.'_V'.$args['version'].'.'.$pathInfo['extension']]);
     }
 
     public function getOriginalFileContent(Request $request, Response $response, array $args)
@@ -690,12 +693,12 @@ class ResController extends ResourceControlController
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($fileContent);
         $pathInfo = pathinfo($pathToDocument);
-        $data = $request->getQueryParams();
+        $data     = $request->getQueryParams();
+        $filename = TextFormatModel::formatFilename(['filename' => $subject, 'maxLength' => 250]);
 
         if ($data['mode'] == 'base64') {
-            return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'extension' => $pathInfo['extension'], 'mimeType' => $mimeType]);
+            return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'extension' => $pathInfo['extension'], 'mimeType' => $mimeType, 'filename' => $filename.'.'.$pathInfo['extension']]);
         } else {
-            $filename = TextFormatModel::formatFilename(['filename' => $subject, 'maxLength' => 250]);
             $response->write($fileContent);
             $response = $response->withAddedHeader('Content-Disposition', "attachment; filename={$filename}.{$pathInfo['extension']}");
             return $response->withHeader('Content-Type', $mimeType);

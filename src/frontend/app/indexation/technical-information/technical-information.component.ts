@@ -125,7 +125,7 @@ export class TechnicalInformationComponent implements OnInit {
         return Object.keys(this.customsData).length === 0;
     }
 
-    originalOrder = (a: KeyValue<number,string>, b: KeyValue<number,string>): number => {
+    originalOrder = (a: KeyValue<string,any>, b: KeyValue<string,any>): number => {
         return 0;
     }
 }

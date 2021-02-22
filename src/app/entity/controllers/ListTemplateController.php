@@ -364,6 +364,8 @@ class ListTemplateController
                             $listTemplateItems[$itemKey]['externalId']['maarchParapheur'] = $externalId['maarchParapheur'];
                             $listTemplateItems[$itemKey]['descriptionToDisplay']          = $userExists['email'];
                             $listTemplateItems[$itemKey]['labelToDisplay']                = $userExists['firstname'] . ' ' . $userExists['lastname'];
+                            $listTemplateItems[$itemKey]['availableRoles']                = array_merge(['visa'], $userExists['signatureModes']);
+                            $listTemplateItems[$itemKey]['role']                          = end($userExists['signatureModes']);
                         }
                     }
                 }

@@ -103,4 +103,23 @@ class ContactGroupModel
 
         return true;
     }
+
+    public static function getWithList(array $args = [])
+    {
+        ValidatorModel::arrayType($args, ['select', 'where', 'data', 'orderBy']);
+        ValidatorModel::intType($args, ['limit']);
+
+        $contactGroups = DatabaseModel::select([
+            'select'    => empty($args['select']) ? ['*'] : $args['select'],
+            'table'     => ['contacts_groups', 'contacts_groups_lists'],
+            'left_join' => ['contacts_groups.id = contacts_groups_lists.contacts_groups_id'],
+            'where'     => empty($args['where']) ? [] : $args['where'],
+            'data'      => empty($args['data']) ? [] : $args['data'],
+            'order_by'  => empty($args['orderBy']) ? [] : $args['orderBy'],
+            'limit'     => empty($args['limit']) ? 0 : $args['limit'],
+            'offset'    => empty($args['offset']) ? 0 : $args['offset']
+        ]);
+
+        return $contactGroups;
+    }
 }

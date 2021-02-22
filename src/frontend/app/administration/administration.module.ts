@@ -81,6 +81,7 @@ import { LifeCycleComponent } from './parameter/lifeCycle/life-cycle.component';
 import { AttachmentTypesAdministrationComponent } from './attachment/attachment-types-administration.component';
 import { AttachmentTypeAdministrationComponent } from './attachment/attachment-type-administration.component';
 import { VisaParametersComponent } from '@appRoot/administration/parameter/visa/visa-parameters.component';
+import { InputCorrespondentGroupComponent } from './contact/group/inputCorrespondent/input-correspondent-group.component';
 
 
 @NgModule({
@@ -169,7 +170,8 @@ import { VisaParametersComponent } from '@appRoot/administration/parameter/visa/
         LifeCycleComponent,
         AttachmentTypeAdministrationComponent,
         AttachmentTypesAdministrationComponent,
-        VisaParametersComponent
+        VisaParametersComponent,
+        InputCorrespondentGroupComponent
     ],
     entryComponents: [
         AccountLinkComponent,

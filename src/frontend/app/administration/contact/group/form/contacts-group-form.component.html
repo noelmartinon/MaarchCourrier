@@ -20,7 +20,7 @@
                 [disabled]="!isValid()">{{'lang.save' | translate}}</button>
         </div>
     </form>
-    <div class="formType" *ngIf="!creationMode">
+    <div class="formType" *ngIf="!creationMode || (creationMode && contactIds.length > 0)">
         <div class="formType-title">
             {{nbLinkedCorrespondents}} {{'lang.relatedCorrespondents' | translate}}&nbsp;<span
                 *ngIf="nbLinkedCorrespondents !== nbFilteredLinkedCorrespondents"
@@ -28,15 +28,16 @@
                 affiché(s)</span> :
         </div>
         <div style="width: 100%;">
-            <div style="display: grid;grid-template-columns: 60px 1fr 1fr;grid-gap: 10px;align-items: center;">
+            <div class="displayed-title">
                 <div style="text-align: center;">
-                    <button mat-icon-button *ngIf="canAddCorrespondents && relatedCorrespondentsSelected.hasValue()" color="warn"
-                        [title]="'lang.delete' | translate" (click)="$event.stopPropagation();removeContact()">
+                    <button mat-icon-button *ngIf="canAddCorrespondents && relatedCorrespondentsSelected.hasValue()"
+                        color="warn" [title]="'lang.delete' | translate"
+                        (click)="$event.stopPropagation();removeContact()">
                         <mat-icon class="fa fa-trash-alt" aria-hidden="true"></mat-icon>
                     </button>
                 </div>
                 <div>
-                    <mat-form-field *ngIf="!canAddCorrespondents">
+                    <mat-form-field *ngIf="!canAddCorrespondents && !creationMode">
                         <input matInput #filterUser [formControl]="filterInputControl"
                             [placeholder]="'lang.filterBy' | translate">
                         <button mat-button *ngIf="filterUser.value" matSuffix mat-icon-button aria-label="Clear"
@@ -44,33 +45,29 @@
                             <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
                         </button>
                     </mat-form-field>
-                    <mat-form-field *ngIf="canAddCorrespondents">
+                    <mat-form-field *ngIf="canAddCorrespondents && !creationMode">
                         <input matInput #filterUser #trigger="matAutocompleteTrigger" [formControl]="filterInputControl"
                             placeholder="{{'lang.filterBy' | translate}} / {{'lang.linkContact' | translate}}"
                             [matAutocomplete]="auto">
+                        <button mat-stroked-button color="primary" *ngIf="filterUser.value !== '' && !dataSource" [title]="'lang.searchForCorrespondentsGroupAssociation' | translate" matSuffix style="font-size: 12px;line-height: 20px;"
+                            (click)="searchContact(filterUser.value,$event,trigger);open($event,trigger)">
+                        {{'lang.associate' | translate}}...
+                        </button>
                         <button mat-button *ngIf="filterUser.value" matSuffix mat-icon-button aria-label="Clear"
                             (click)="filterInputControl.reset('')" [title]="'lang.clearFilter' | translate">
                             <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
                         </button>
                         <mat-autocomplete #auto="matAutocomplete" class="addCorrespondentAC"
                             [panelWidth]="(dataSource && dataSource.data.length > 0) ? '900px' : undefined">
-                            <mat-option *ngIf="filterUser.value !== '' && !dataSource"
-                                (click)="searchContact(filterUser.value,$event,trigger);open($event,trigger)"
-                                [value]="filterUser.value" style="color:#666">
-                                Cliquez ici pour rechercher <b>{{filterUser.value}}</b> à associer.
-                                <mat-progress-bar *ngIf="loadingCorrespondents" mode="indeterminate"
-                                    style="position: absolute;bottom: 0px;left: 0px;height: 7px;">
-                                </mat-progress-bar>
-                            </mat-option>
                             <mat-option disabled *ngIf="dataSource && dataSource.data.length === 0">
-                                Aucun résultat</mat-option>
+                                {{'lang.noResult' | translate}}, <a (click)="openContactForm()" style="cursor: pointer;">{{'lang.createContact' | translate}} ?</a></mat-option>
                             <mat-option disabled *ngIf="dataSource && dataSource.data.length > 0"
                                 style="display: none;"></mat-option>
                             <div *ngIf="dataSource && dataSource.data.length > 0">
-                                <div
-                                    style="padding: 10px;padding-left: 24px;font-size: 12px;position: sticky;top:0px;background: white;z-index:1;border-bottom: solid 1px rgba(0, 0, 0, 0.12);display: flex;">
+                                <div class="title-search-result">
                                     <span style="color: #666;flex:1;">
-                                        Recherche associé à <b>{{filterUser.value}}</b> :
+                                        <span [innerHTML]="'lang.linkedSearchTo' | translate:{value: filterUser.value}"></span>,
+                                        <a (click)="openContactForm()" style="cursor: pointer;">{{'lang.createContact' | translate  | lowercase}} ?</a>
                                     </span>
                                     <span style="color:#666">
                                         <a color="primary" (click)="!savingCorrespondents ? toggleAll() : false"
@@ -79,28 +76,26 @@
                                         ({{dataSource.data.length}} résultat(s))
                                     </span>
                                 </div>
-                                <cdk-virtual-scroll-viewport *ngIf="!displayCorrespondents" itemSize="48" class="example-viewport"
-                                    style="height: 300px;">
+                                <cdk-virtual-scroll-viewport *ngIf="!displayCorrespondents" itemSize="48"
+                                    class="example-viewport" style="height: 300px;">
 
                                     <mat-selection-list (selectionChange)="toggleCorrespondent($event.option.value)">
                                         <ng-container *cdkVirtualFor="let element of dataSource.data;let i=index">
-
                                             <mat-list-option checkboxPosition="before" class="correspondent-list-item"
                                                 color="primary"
                                                 [disabled]="selection.isSelected(element) || isInGrp(element)"
                                                 [selected]="selection.isSelected(element) || isInGrp(element)"
                                                 [value]="element">
-                                                <p mat-line class="contact-list-container-{{displayedColumns.length}}"
-                                                    style="display: grid;grid-gap: 10px;grid-template-columns: 30px 1fr 1fr;align-items: center;">
+                                                <p mat-line class="search-result-container">
                                                     <span *ngFor="let item of displayedColumns"
                                                         style="overflow: hidden;text-overflow: ellipsis;font-size: 12px;">
                                                         <ng-container *ngIf="item==='type'; else elseData">
                                                             <mat-icon color="primary"
-                                                                [title]="'lang.' + element.type | translate" class="fa"
+                                                                [title]="'lang.' + element.type | translate"
+                                                                class="correspondent-type-icon fa"
                                                                 [class.fa-address-card]="element.type === 'contact'"
                                                                 [class.fa-user]="element.type === 'user'"
-                                                                [class.fa-sitemap]="element.type === 'entity'"
-                                                                style="align-items: center;justify-content: center;display: flex;">
+                                                                [class.fa-sitemap]="element.type === 'entity'">
                                                             </mat-icon>
                                                         </ng-container>
                                                         <ng-template #elseData>
@@ -123,8 +118,8 @@
                     </mat-paginator>
                 </div>
             </div>
-            <mat-table *ngIf="!loading" #sortLinkedCorrespondents="matSort" [dataSource]="relatedCorrespondents" matSort matSortDisableClear
-                matSortActive="name" matSortDirection="asc">
+            <mat-table *ngIf="!loading" #sortLinkedCorrespondents="matSort" [dataSource]="relatedCorrespondents" matSort
+                matSortDisableClear matSortActive="name" matSortDirection="asc">
                 <ng-container matColumnDef="select">
                     <mat-header-cell *matHeaderCellDef
                         style="width:60px;flex: initial;align-items: center;display: flex;">
@@ -138,7 +133,7 @@
                         style="width:60px;flex: initial;align-items: center;display: flex;">
                         <mat-checkbox color="primary" (click)="$event.stopPropagation()"
                             (change)="$event ? toggleRelatedCorrespondent(element) : null"
-                            [checked]="relatedCorrespondentsSelected.isSelected(element.id)">
+                            [checked]="isRelatedCorrespondentsSelected(element)">
                         </mat-checkbox>
                     </mat-cell>
                 </ng-container>
@@ -174,8 +169,7 @@
                 <ng-container matColumnDef="actions">
                     <mat-header-cell *matHeaderCellDef style="flex:1;"></mat-header-cell>
                     <mat-cell *matCellDef="let element" style="justify-content: flex-end;flex:1;">
-                        <button mat-icon-button color="warn"
-                            [title]="'lang.delete' | translate"
+                        <button mat-icon-button color="warn" [title]="'lang.delete' | translate"
                             (click)="$event.stopPropagation();removeContact(element)">
                             <mat-icon class="fa fa-trash-alt fa-2x" aria-hidden="true"></mat-icon>
                         </button>

@@ -16,6 +16,7 @@ export class ContactsGroupFormModalComponent implements OnInit{
     canAddCorrespondents: boolean = true;
     canModifyGroupInfo: boolean = true;
     allPerimeters: boolean = true;
+    contactIds: number[] = [];
 
     @ViewChild('appContactsGroupForm', { static: false }) appContactsGroupForm: ContactsGroupFormComponent;
 
@@ -32,6 +33,7 @@ export class ContactsGroupFormModalComponent implements OnInit{
         this.canAddCorrespondents = !this.functionsService.empty(this.data.canAddCorrespondents) ? this.data.canAddCorrespondents : true;
         this.canModifyGroupInfo = !this.functionsService.empty(this.data.canModifyGroupInfo) ? this.data.canModifyGroupInfo : true;
         this.allPerimeters = !this.functionsService.empty(this.data.allPerimeters) ? this.data.allPerimeters : true;
+        this.contactIds = !this.functionsService.empty(this.data.contactIds) ? this.data.contactIds : [];
     }
 
     onSubmit() {

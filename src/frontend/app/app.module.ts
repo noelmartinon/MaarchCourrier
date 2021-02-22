@@ -138,6 +138,13 @@ import { VisaWorkflowModalComponent } from './visa/modal/visa-workflow-modal.com
 import { ExternalVisaWorkflowComponent } from './visa/externalVisaWorkflow/external-visa-workflow.component';
 import { ProfileContactsGroupsComponent } from './profile/contacts-groups/profile-contacts-groups.component';
 
+import { EditorOptionComponent } from './profile/parameters/editorOption/editor-option.component';
+import { BasketColorComponent } from './profile/parameters/basketsColor/basket-color.component';
+import { MyBasketsComponent } from './profile/parameters/baskets/baskets.component';
+import { MySignatureMailComponent } from './profile/parameters/signatureMail/signature-mail.component';
+import { MySignatureBookComponent } from './profile/parameters/signatureBook/signature-book.component';
+import { ProfileHistoryComponent } from './profile/history/history.component';
+
 import { DevToolComponent } from '@service/debug/dev-tool.component';
 import { DevLangComponent } from '@service/debug/dev-lang.component';
 import { AcknowledgementReceptionComponent } from './registeredMail/acknowledgement-reception/acknowledgement-reception.component';
@@ -274,7 +281,13 @@ export class MyHammerConfig extends HammerGestureConfig {
         CheckAcknowledgmentRecordManagementComponent,
         TechnicalInformationComponent,
         ExternalVisaWorkflowComponent,
-        ProfileContactsGroupsComponent
+        ProfileContactsGroupsComponent,
+        EditorOptionComponent,
+        BasketColorComponent,
+        MyBasketsComponent,
+        MySignatureMailComponent,
+        MySignatureBookComponent,
+        ProfileHistoryComponent
     ],
     exports : [
         SharedModule

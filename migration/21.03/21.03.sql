@@ -66,6 +66,8 @@ DO $$ BEGIN
         ALTER TABLE contacts_groups ADD COLUMN entities jsonb NOT NULL DEFAULT '{}';
         UPDATE contacts_groups SET entities = (select to_jsonb(array_agg(id)) from entities) WHERE public = true;
         ALTER TABLE contacts_groups DROP COLUMN IF EXISTS public;
+        ALTER TABLE contacts_groups ALTER COLUMN label TYPE text;
+        ALTER TABLE contacts_groups ALTER COLUMN description TYPE text;
     END IF;
 END$$;
 DO $$ BEGIN

@@ -1,6 +1,9 @@
 @import '../../../../../css/vars.scss';
 
-.active, .active:hover , .active:active, .active:focus {
+.active,
+.active:hover,
+.active:active,
+.active:focus {
     color: $primary;
     border-left: solid 5px $primary;
     background: rgba($primary, 0.14);
@@ -33,6 +36,13 @@
     }
 }
 
+.displayed-title {
+    display: grid;
+    grid-template-columns: 60px 1fr 1fr;
+    grid-gap: 10px;
+    align-items: center;
+}
+
 .mat-list-item-disabled {
     background: initial;
     opacity: 0.5;
@@ -46,6 +56,7 @@
     .mat-list-text {
         padding-left: 0px !important;
     }
+
     .mat-pseudo-checkbox {
         display: none;
     }
@@ -54,4 +65,29 @@
 .empty {
     font-style: italic;
     opacity: 0.5;
+}
+
+.title-search-result {
+    padding: 10px;
+    padding-left: 24px;
+    font-size: 12px;
+    position: sticky;
+    top: 0px;
+    background: white;
+    z-index: 1;
+    border-bottom: solid 1px rgba(0, 0, 0, 0.12);
+    display: flex;
+}
+
+.search-result-container {
+    display: grid !important;
+    grid-gap: 10px;
+    grid-template-columns: 30px 1fr 1fr;
+    align-items: center;
+}
+
+.correspondent-type-icon {
+    align-items: center;
+    justify-content: center;
+    display: flex;
 }

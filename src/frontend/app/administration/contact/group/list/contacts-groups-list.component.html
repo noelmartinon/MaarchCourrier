@@ -4,11 +4,11 @@
 <mat-card *ngIf="!loading" class="card-app-content">
     <div class="table-tools">
         <div>
-            <button *ngIf="showAddButton" mat-flat-button color="primary" [title]="'lang.addNewCorrespondentsGroup' | translate" (click)="openContactsGroupModal(null)" style="margin-left: 5px;margin-right: 5px;">
+            <button class="action-button" *ngIf="showAddButton" mat-stroked-button color="primary" [title]="'lang.addNewCorrespondentsGroup' | translate" (click)="openContactsGroupModal(null)">
                 <mat-icon class="fa fa-plus" style="width: auto;height: auto;"></mat-icon>
                 {{'lang.add' | translate}}
             </button>
-            <button mat-flat-button color="primary" [disabled]="selection.selected.length <= 1" (click)="mergeContactsGroups()" style="margin-left: 5px;margin-right: 5px;">
+            <button class="action-button" mat-stroked-button color="primary" [disabled]="selection.selected.length <= 1" (click)="mergeContactsGroups()">
                 <mat-icon class="far fa-object-group" style="width: auto;height: auto;"></mat-icon>
                 {{'lang.merge' | translate}}
             </button>
@@ -102,7 +102,7 @@
         </ng-container>
         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
         <mat-row *matRowDef="let row; columns: displayedColumns;" style="cursor:pointer;"
-            [title]="'lang.view' | translate" (click)="goTo(row)"></mat-row>
+            [class.selected]="selection.isSelected(row)" [title]="'lang.view' | translate" (click)="goTo(row)"></mat-row>
     </mat-table>
     <div class="mat-paginator"
         style="min-height:48px;min-height: 48px;display: flex;justify-content: end;align-items: center;padding-right: 20px;">

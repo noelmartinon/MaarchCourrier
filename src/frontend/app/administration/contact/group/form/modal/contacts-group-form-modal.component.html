@@ -8,7 +8,7 @@
         </button></h1>
     <mat-dialog-content class="modal-container">
         <div style="overflow: auto;">
-            <app-contacts-group-form *ngIf="!loading" #appContactsGroupForm [contactGroupId]="contactGroupId" [allPerimeters]="allPerimeters" [hideSaveButton]="true" [canModifyGroupInfo]="canModifyGroupInfo" [canAddCorrespondents]="canAddCorrespondents" (afterUpdate)="goTo($event)"></app-contacts-group-form>
+            <app-contacts-group-form *ngIf="!loading" #appContactsGroupForm [contactGroupId]="contactGroupId" [allPerimeters]="allPerimeters" [hideSaveButton]="true" [canModifyGroupInfo]="canModifyGroupInfo" [canAddCorrespondents]="canAddCorrespondents" [contactIds]="contactIds" (afterUpdate)="goTo($event)"></app-contacts-group-form>
         </div>
         <div style="overflow: auto;overflow-x: hidden;">
             <mat-list>

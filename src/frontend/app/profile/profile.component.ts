@@ -16,16 +16,17 @@ import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { AuthService } from '@service/auth.service';
 import { AbsModalComponent } from './absModal/abs-modal.component';
+import { MySignatureMailComponent } from './parameters/signatureMail/signature-mail.component';
 
 declare var $: any;
-declare var tinymce: any;
-
 
 @Component({
     templateUrl: 'profile.component.html',
     styleUrls: ['profile.component.css']
 })
 export class ProfileComponent implements OnInit {
+
+    @ViewChild(MySignatureMailComponent) MySignatureMailComponent: MySignatureMailComponent;
 
     dialogRef: MatDialogRef<any>;
 
@@ -80,34 +81,8 @@ export class ProfileComponent implements OnInit {
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     // Redirect Baskets
-    selectionBaskets = new SelectionModel<Element>(true, []);
     myBasketExpansionPanel: boolean = false;
-    editorsList: any;
-    masterToggleBaskets(event: any) {
-        if (event.checked) {
-            this.user.baskets.forEach((basket: any) => {
-                if (!basket.userToDisplay) {
-                    this.selectionBaskets.select(basket);
-                }
-            });
-        } else {
-            this.selectionBaskets.clear();
-        }
-    }
-
     @ViewChildren(MatExpansionPanel) viewPanels: QueryList<MatExpansionPanel>;
-
-    // History
-    displayedColumns = ['event_date', 'record_id', 'info'];
-    dataSource: any;
-    @ViewChild('paginatorHistory', { static: false }) paginatorHistory: MatPaginator;
-    @ViewChild('tableHistorySort', { static: false }) sortHistory: MatSort;
-    applyFilter(filterValue: string) {
-        filterValue = filterValue.trim(); // Remove whitespace
-        filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
-        this.dataSource.filter = filterValue;
-    }
-
 
     constructor(
         public translate: TranslateService,
@@ -125,13 +100,6 @@ export class ProfileComponent implements OnInit {
         window['angularProfileComponent'] = {
             componentAfterUpload: (base64Content: any) => this.processAfterUpload(base64Content),
         };
-
-        this.http.get('../rest/documentEditors').pipe(
-            tap((data: any) => {
-                this.editorsList = data;
-            })
-        ).subscribe();
-
     }
 
     initComponents(event: any) {
@@ -140,56 +108,11 @@ export class ProfileComponent implements OnInit {
             if (!this.appService.getViewMode()) {
                 this.sidenavRight.open();
             }
-
-            this.http.get('../rest/history/users/' + this.user.id)
-                .subscribe((data: any) => {
-                    this.histories = data.histories;
-                    setTimeout(() => {
-                        this.dataSource = new MatTableDataSource(this.histories);
-                        this.dataSource.sortingDataAccessor = this.functions.listSortingDataAccessor;
-                        this.dataSource.paginator = this.paginatorHistory;
-                        this.dataSource.sort = this.sortHistory;
-                    }, 0);
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-
         } else if (event.index == 1) {
             this.sidenavRight.close();
         } else if (!this.appService.getViewMode()) {
             this.sidenavRight.open();
         }
-    }
-
-    initMce() {
-        tinymce.remove('textarea');
-        // LOAD EDITOR TINYMCE for MAIL SIGN
-        tinymce.baseURL = '../node_modules/tinymce';
-        tinymce.suffix = '.min';
-        tinymce.init({
-            selector: 'textarea#emailSignature',
-            statusbar: false,
-            language: this.translate.instant('lang.langISO').replace('-', '_'),
-            language_url: `../node_modules/tinymce-i18n/langs/${this.translate.instant('lang.langISO').replace('-', '_')}.js`,
-            height: '200',
-            plugins: [
-                'textcolor'
-            ],
-            external_plugins: {
-                'maarch_b64image': '../../src/frontend/plugins/tinymce/maarch_b64image/plugin.min.js'
-            },
-            menubar: false,
-            toolbar: 'undo | bold italic underline | alignleft aligncenter alignright | maarch_b64image | forecolor',
-            theme_buttons1_add: 'fontselect,fontsizeselect',
-            theme_buttons2_add_before: 'cut,copy,paste,pastetext,pasteword,separator,search,replace,separator',
-            theme_buttons2_add: 'separator,insertdate,inserttime,preview,separator,forecolor,backcolor',
-            theme_buttons3_add_before: 'tablecontrols,separator',
-            theme_buttons3_add: 'separator,print,separator,ltr,rtl,separator,fullscreen,separator,insertlayer,moveforward,movebackward,absolut',
-            theme_toolbar_align: 'left',
-            theme_advanced_toolbar_location: 'top',
-            theme_styles: 'Header 1=header1;Header 2=header2;Header 3=header3;Table Row=tableRow1'
-
-        });
     }
 
     ngOnInit(): void {
@@ -215,6 +138,10 @@ export class ProfileComponent implements OnInit {
             });
     }
 
+    initMce() {
+        this.MySignatureMailComponent.initMce();
+    }
+
     processAfterUpload(b64Content: any) {
         this.zone.run(() => this.resfreshUpload(b64Content));
     }
@@ -238,98 +165,9 @@ export class ProfileComponent implements OnInit {
         this.showPassword = !this.showPassword;
     }
 
-    clickOnUploader(id: string) {
-        $('#' + id).click();
-    }
-
-    uploadSignatureTrigger(fileInput: any) {
-        if (fileInput.target.files && fileInput.target.files[0]) {
-            var reader = new FileReader();
-
-            this.signatureModel.name = fileInput.target.files[0].name;
-            this.signatureModel.size = fileInput.target.files[0].size;
-            this.signatureModel.type = fileInput.target.files[0].type;
-            if (this.signatureModel.label == '') {
-                this.signatureModel.label = this.signatureModel.name;
-            }
-
-            reader.readAsDataURL(fileInput.target.files[0]);
-
-            reader.onload = (value: any) => {
-                window['angularProfileComponent'].componentAfterUpload(value.target.result);
-                this.submitSignature();
-            };
-
-        }
-    }
-
-    dndUploadSignature(event: any) {
-        if (event.mouseEvent.dataTransfer.files && event.mouseEvent.dataTransfer.files[0]) {
-            var reader = new FileReader();
-
-            this.signatureModel.name = event.mouseEvent.dataTransfer.files[0].name;
-            this.signatureModel.size = event.mouseEvent.dataTransfer.files[0].size;
-            this.signatureModel.type = event.mouseEvent.dataTransfer.files[0].type;
-            if (this.signatureModel.label == '') {
-                this.signatureModel.label = this.signatureModel.name;
-            }
-
-            reader.readAsDataURL(event.mouseEvent.dataTransfer.files[0]);
-
-            reader.onload = (value: any) => {
-                window['angularProfileComponent'].componentAfterUpload(value.target.result);
-                this.submitSignature();
-            };
-        }
-    }
-
     displaySignatureEditionForm(index: number) {
         this.selectedSignature = index;
         this.selectedSignatureLabel = this.user.signatures[index].signature_label;
-    }
-
-    changeEmailSignature(i: any) {
-        this.mailSignatureModel.selected = i;
-
-        tinymce.get('emailSignature').setContent(this.user.emailSignatures[i].html_body);
-        this.mailSignatureModel.title = this.user.emailSignatures[i].title;
-    }
-
-    resetEmailSignature() {
-        this.mailSignatureModel.selected = -1;
-
-        tinymce.get('emailSignature').setContent('');
-        this.mailSignatureModel.title = '';
-
-    }
-
-    addBasketRedirection(newUser: any) {
-        let basketsRedirect: any[] = [];
-
-        this.selectionBaskets.selected.forEach((elem: any) => {
-            basketsRedirect.push(
-                {
-                    actual_user_id: newUser.serialId,
-                    basket_id: elem.basket_id,
-                    group_id: elem.groupSerialId,
-                    originalOwner: null
-                }
-            )
-        });
-
-        let r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.redirectBasket'));
-
-        if (r) {
-            this.http.post('../rest/users/' + this.user.id + '/redirectedBaskets', basketsRedirect)
-                .subscribe((data: any) => {
-                    this.user.baskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
-                    this.user.redirectedBaskets = data['redirectedBaskets'];
-                    this.selectionBaskets.clear();
-                    this.notify.success(this.translate.instant('lang.basketUpdated'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
     }
 
     delBasketRedirection(basket: any, i: number) {
@@ -362,38 +200,6 @@ export class ProfileComponent implements OnInit {
         }
     }
 
-    reassignBasketRedirection(newUser: any, basket: any, i: number) {
-        let r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.redirectBasket'));
-
-        if (r) {
-            this.http.post('../rest/users/' + this.user.id + '/redirectedBaskets', [
-                {
-                    'actual_user_id': newUser.serialId,
-                    'basket_id': basket.basket_id,
-                    'group_id': basket.group_id,
-                    'originalOwner': basket.owner_user_id,
-                }
-            ])
-                .subscribe((data: any) => {
-                    this.user.baskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
-                    this.user.assignedBaskets.splice(i, 1);
-                    this.notify.success(this.translate.instant('lang.basketUpdated'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
-    }
-
-    updateBasketColor(i: number, y: number) {
-        this.http.put('../rest/currentUser/groups/' + this.user.regroupedBaskets[i].groupSerialId + '/baskets/' + this.user.regroupedBaskets[i].baskets[y].basket_id, { 'color': this.user.regroupedBaskets[i].baskets[y].color })
-            .subscribe((data: any) => {
-                this.user.regroupedBaskets = data.userBaskets;
-                this.notify.success(this.translate.instant('lang.modificationSaved'));
-            }, (err) => {
-                this.notify.error(err.error.errors);
-            });
-    }
-
     openAbsModal() {
         this.dialog.open(AbsModalComponent, {
             panelClass: 'maarch-modal',
@@ -423,123 +229,12 @@ export class ProfileComponent implements OnInit {
             });
     }
 
-    submitEmailSignature() {
-        this.mailSignatureModel.htmlBody = tinymce.get('emailSignature').getContent();
-
-        this.http.post('../rest/currentUser/emailSignature', this.mailSignatureModel)
-            .subscribe((data: any) => {
-                if (data.errors) {
-                    this.notify.error(data.errors);
-                } else {
-                    this.user.emailSignatures = data.emailSignatures;
-                    this.mailSignatureModel = {
-                        selected: -1,
-                        htmlBody: '',
-                        title: '',
-                    };
-                    tinymce.get('emailSignature').setContent('');
-                    this.notify.success(this.translate.instant('lang.emailSignatureAdded'));
-                }
-            });
-    }
-
-    updateEmailSignature() {
-        this.mailSignatureModel.htmlBody = tinymce.get('emailSignature').getContent();
-        var id = this.user.emailSignatures[this.mailSignatureModel.selected].id;
-
-        this.http.put('../rest/currentUser/emailSignature/' + id, this.mailSignatureModel)
-            .subscribe((data: any) => {
-                if (data.errors) {
-                    this.notify.error(data.errors);
-                } else {
-                    this.user.emailSignatures[this.mailSignatureModel.selected].title = data.emailSignature.title;
-                    this.user.emailSignatures[this.mailSignatureModel.selected].html_body = data.emailSignature.html_body;
-                    this.notify.success(this.translate.instant('lang.emailSignatureUpdated'));
-                }
-            });
-    }
-
-    deleteEmailSignature() {
-        let r = confirm(this.translate.instant('lang.confirmDeleteMailSignature'));
-
-        if (r) {
-            var id = this.user.emailSignatures[this.mailSignatureModel.selected].id;
-
-            this.http.delete('../rest/currentUser/emailSignature/' + id)
-                .subscribe((data: any) => {
-                    if (data.errors) {
-                        this.notify.error(data.errors);
-                    } else {
-                        this.user.emailSignatures = data.emailSignatures;
-                        this.mailSignatureModel = {
-                            selected: -1,
-                            htmlBody: '',
-                            title: '',
-                        };
-                        tinymce.get('emailSignature').setContent('');
-                        this.notify.success(this.translate.instant('lang.emailSignatureDeleted'));
-                    }
-                });
-        }
-    }
-
-    submitSignature() {
-        this.http.post('../rest/users/' + this.user.id + '/signatures', this.signatureModel)
-            .subscribe((data: any) => {
-                this.user.signatures = data.signatures;
-                this.signatureModel = {
-                    base64: '',
-                    base64ForJs: '',
-                    name: '',
-                    type: '',
-                    size: 0,
-                    label: '',
-                };
-                this.notify.success(this.translate.instant('lang.signatureAdded'));
-            }, (err) => {
-                this.notify.error(err.error.errors);
-            });
-    }
-
-    updateSignature(signature: any) {
-        this.http.put('../rest/users/' + this.user.id + '/signatures/' + signature.id, { 'label': signature.signature_label })
-            .subscribe((data: any) => {
-                this.notify.success(this.translate.instant('lang.signatureUpdated'));
-            }, (err) => {
-                this.notify.error(err.error.errors);
-            });
-    }
-
-    deleteSignature(id: number) {
-        let r = confirm(this.translate.instant('lang.confirmDeleteSignature'));
-
-        if (r) {
-            this.http.delete('../rest/users/' + this.user.id + '/signatures/' + id)
-                .subscribe((data: any) => {
-                    this.user.signatures = data.signatures;
-                    this.notify.success(this.translate.instant('lang.signatureDeleted'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
-    }
-
     onSubmit() {
         this.http.put('../rest/currentUser/profile', this.user)
             .subscribe(() => {
                 this.notify.success(this.translate.instant('lang.modificationSaved'));
                 this.headerService.user.firstname = this.user.firstname;
                 this.headerService.user.lastname = this.user.lastname;
-            }, (err) => {
-                this.notify.error(err.error.errors);
-            });
-    }
-
-    updateUserPreferences() {
-        this.http.put('../rest/currentUser/profile/preferences', { documentEdition: this.user.preferences.documentEdition })
-            .subscribe(() => {
-                this.notify.success(this.translate.instant('lang.modificationSaved'));
-                this.headerService.resfreshCurrentUser();
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -681,26 +376,5 @@ export class ProfileComponent implements OnInit {
             this.validPassword = true;
             return '';
         }
-    }
-
-    showActions(basket: any) {
-        $('#' + basket.basket_id + '_' + basket.group_id).show();
-    }
-
-    hideActions(basket: any) {
-        $('#' + basket.basket_id + '_' + basket.group_id).hide();
-    }
-
-    syncMP() {
-        this.loadingSign = true;
-
-        this.http.put('../rest/users/' + this.user.id + '/externalSignatures', {})
-            .subscribe((data: any) => {
-                this.loadingSign = false;
-                this.notify.success(this.translate.instant('lang.signsSynchronized'));
-            }, (err) => {
-                this.loadingSign = false;
-                this.notify.handleErrors(err);
-            });
     }
 }

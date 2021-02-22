@@ -142,7 +142,7 @@ trait AcknowledgementReceiptTrait
                     $extension = pathinfo($pathToDocument, PATHINFO_EXTENSION);
                     $encodedDocument = ConvertPdfController::convertFromEncodedResource(['encodedResource' => $mergedDocument['encodedDocument'], 'extension' => $extension]);
                 } else {
-                    $encodedDocument = ConvertPdfController::convertFromEncodedResource(['encodedResource' => base64_encode($contentToSend), 'extension' => 'txt']);
+                    $encodedDocument = ConvertPdfController::convertFromEncodedResource(['encodedResource' => base64_encode($contentToSend), 'extension' => 'html']);
                 }
                 $mergedDocument['encodedDocument'] = $encodedDocument["encodedResource"];
                 $format = 'pdf';

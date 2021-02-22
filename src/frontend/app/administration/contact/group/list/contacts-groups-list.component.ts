@@ -106,8 +106,6 @@ export class ContactsGroupsListComponent implements OnInit {
     }
 
     mergeContactsGroups() {
-        console.log(this.selection.selected);
-        
         const dialogRef = this.dialog.open(ContactsGroupMergeModalComponent, { panelClass: 'maarch-modal', autoFocus: false, data: { itemsToMerge: this.selection.selected } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'success'),

@@ -784,8 +784,8 @@ WITH (OIDS=FALSE);
 CREATE TABLE contacts_groups
 (
   id serial,
-  label character varying(32) NOT NULL,
-  description character varying(255) NOT NULL,
+  label text NOT NULL,
+  description text NOT NULL,
   owner integer NOT NULL,
   entities jsonb NOT NULL DEFAULT '{}',
   CONSTRAINT contacts_groups_pkey PRIMARY KEY (id),

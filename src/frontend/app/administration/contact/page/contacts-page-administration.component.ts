@@ -5,52 +5,20 @@ import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
+import { ContactService } from '@service/contact.service';
 
 @Component({
     templateUrl: 'contacts-page-administration.component.html',
-    styleUrls: ['contacts-page-administration.component.scss']
+    styleUrls: ['contacts-page-administration.component.scss'],
+    providers: [ContactService]
 })
 export class ContactsPageAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
     loading: boolean = false;
 
     creationMode: boolean = true;
-
-    subMenus: any[] = [
-        {
-            icon: 'fa fa-book',
-            route: '/administration/contacts',
-            label: this.translate.instant('lang.contactsList'),
-            current: false
-        },
-        {
-            icon: 'fa fa-code',
-            route: '/administration/contacts/contactsCustomFields',
-            label: this.translate.instant('lang.customFieldsAdmin'),
-            current: false
-        },
-        {
-            icon: 'fa fa-cog',
-            route: '/administration/contacts/contacts-parameters',
-            label: this.translate.instant('lang.contactsParameters'),
-            current: false
-        },
-        {
-            icon: 'fa fa-users',
-            route: '/administration/contacts/contacts-groups',
-            label: this.translate.instant('lang.contactsGroups'),
-            current: false
-        },
-        {
-            icon: 'fas fa-magic',
-            route: '/administration/contacts/duplicates',
-            label: this.translate.instant('lang.duplicatesContactsAdmin'),
-            current: false
-        }
-    ];
 
     contactId: number = null;
 
@@ -62,6 +30,7 @@ export class ContactsPageAdministrationComponent implements OnInit {
         private headerService: HeaderService,
         public appService: AppService,
         public dialog: MatDialog,
+        public contactService: ContactService,
         private viewContainerRef: ViewContainerRef) { }
 
     ngOnInit(): void {

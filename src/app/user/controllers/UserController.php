@@ -18,6 +18,7 @@ use Basket\models\BasketModel;
 use Basket\models\GroupBasketModel;
 use Basket\models\RedirectBasketModel;
 use Configuration\models\ConfigurationModel;
+use Contact\models\ContactGroupModel;
 use ContentManagement\controllers\DocumentEditorController;
 use Docserver\controllers\DocserverController;
 use Docserver\models\DocserverModel;
@@ -116,20 +117,20 @@ class UserController
         return $response->withJson($user);
     }
 
-    public function getDetailledById(Request $request, Response $response, array $aArgs)
+    public function getDetailledById(Request $request, Response $response, array $args)
     {
-        $error = $this->hasUsersRights(['id' => $aArgs['id']]);
+        $error = $this->hasUsersRights(['id' => $args['id']]);
         if (!empty($error['error'])) {
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
         }
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'status', 'phone', 'mail', 'initials', 'mode', 'authorized_api', 'external_id']]);
+        $user = UserModel::getById(['id' => $args['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'status', 'phone', 'mail', 'initials', 'mode', 'authorized_api', 'external_id']]);
         $user['external_id']        = json_decode($user['external_id'], true);
         $user['authorizedApi']      = json_decode($user['authorized_api'], true);
         unset($user['authorized_api']);
 
-        if ($GLOBALS['id'] == $aArgs['id'] || PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']])) {
-            $user['signatures'] = UserSignatureModel::getByUserSerialId(['userSerialid' => $aArgs['id']]);
+        if ($GLOBALS['id'] == $args['id'] || PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']])) {
+            $user['signatures'] = UserSignatureModel::getByUserSerialId(['userSerialid' => $args['id']]);
             $user['emailSignatures'] = UserEmailSignatureModel::getByUserId(['userId' => $user['id']]);
         } else {
             $user['signatures'] = [];
@@ -137,14 +138,14 @@ class UserController
             unset($user['phone']);
         }
 
-        $user['groups']             = UserModel::getGroupsById(['id' => $aArgs['id']]);
+        $user['groups']             = UserModel::getGroupsById(['id' => $args['id']]);
         $user['allGroups']          = GroupModel::getAvailableGroupsByUserId(['userId' => $user['id'], 'administratorId' => $GLOBALS['id']]);
-        $user['entities']           = UserModel::getEntitiesById(['id' => $aArgs['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity'], 'orderBy' => ['users_entities.primary_entity DESC']]);
+        $user['entities']           = UserModel::getEntitiesById(['id' => $args['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity'], 'orderBy' => ['users_entities.primary_entity DESC']]);
         $user['allEntities']        = EntityModel::getAvailableEntitiesForAdministratorByUserId(['userId' => $user['user_id'], 'administratorUserId' => $GLOBALS['login']]);
         $user['baskets']            = BasketModel::getBasketsByLogin(['login' => $user['user_id']]);
         $user['assignedBaskets']    = RedirectBasketModel::getAssignedBasketsByUserId(['userId' => $user['id']]);
         $user['redirectedBaskets']  = RedirectBasketModel::getRedirectedBasketsByUserId(['userId' => $user['id']]);
-        $user['history']            = HistoryModel::get(['select' => ['record_id', 'event_date', 'info', 'remote_ip'], 'where' => ['user_id = ?'], 'data' => [$aArgs['id']], 'orderBy' => ['event_date DESC'], 'limit' => 500]);
+        $user['history']            = HistoryModel::get(['select' => ['record_id', 'event_date', 'info', 'remote_ip'], 'where' => ['user_id = ?'], 'data' => [$args['id']], 'orderBy' => ['event_date DESC'], 'limit' => 500]);
         $user['canModifyPassword']              = false;
         $user['canSendActivationNotification']  = false;
         $user['canCreateMaarchParapheurUser']   = false;

@@ -11,7 +11,7 @@ import { FunctionsService } from '@service/functions.service';
 import { CdkDragDrop, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ContactService } from '@service/contact.service';
 import { AppService } from '@service/app.service';
-import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { PrivilegeService } from '@service/privileges.service';
 import { HeaderService } from '@service/header.service';
 import { Observable, of } from 'rxjs';
@@ -85,7 +85,6 @@ export class SentResourcePageComponent implements OnInit {
     };
     emailAttach: any = {};
 
-    encodedSummarySheet: any = null;
     summarySheetUnits: any = [];
 
     canManage: boolean = false;
@@ -122,7 +121,9 @@ export class SentResourcePageComponent implements OnInit {
             }
         });
 
-        await this.getAttachElements();
+        if (this.functions.empty(this.data.emailId)) {
+            await this.getAttachElements();
+        }
 
         if (this.data.emailId && this.data.emailType === 'email') {
             await this.getEmailData(this.data.emailId);
@@ -153,7 +154,7 @@ export class SentResourcePageComponent implements OnInit {
             selector: 'textarea#emailSignature',
             base_url: '../node_modules/tinymce/',
             setup: (editor: any) => {
-                editor.on('init', (e: any) => {
+                editor.on('init', () => {
                     this.loading = false;
                 });
             },
@@ -358,29 +359,26 @@ export class SentResourcePageComponent implements OnInit {
 
                     this.emailContent = data.body;
                     Object.keys(data.document).forEach(element => {
-                        if (['id', 'isLinked', 'original'].indexOf(element) === -1) {
-                            this.emailAttach[element] = [];
-                            data.document[element].forEach((dataAttach: any) => {
-                                const elem = this.emailAttachTool[element].list.filter((item: any) => item.id === dataAttach.id || item.id === dataAttach);
-                                if (elem.length > 0) {
-                                    this.emailAttach[element] = this.emailAttach[element].concat(elem.map((item: any) => {
-                                        return {
-                                            ...item,
-                                            format: dataAttach.original || dataAttach.original === undefined ? item.format : 'pdf',
-                                            original: dataAttach.original,
-                                            size: dataAttach.original || dataAttach.original === undefined ? item.size : item.convertedDocument.size
-                                        };
-                                    }));
-                                }
+                        if (['id', 'isLinked', 'original', 'resource'].indexOf(element) === -1) {
+                            data.document[element].forEach(item => this.emailAttachTool[element].list.push(item));
+
+                            this.emailAttachTool[element].list = data.document[element].map((item: any) => {
+                                this.toggleAttachMail(item, element, item.status === 'SIGN' ? 'pdf' : 'original');
+                                return {
+                                    ...item,
+                                    original: item.original !== undefined ? item.original : true,
+                                    title: item.chrono !== undefined ? `${item.chrono} - ${item.label} (${item.typeLabel})` : `${item.label} (${item.typeLabel})`
+                                };
                             });
                         } else if (element === 'isLinked' && data.document.isLinked === true) {
                             this.emailAttach.document.isLinked = true;
-                            this.emailAttach.document.format = data.document.original || data.document.original === undefined ? this.emailAttachTool.document.list[0].format : 'pdf';
+                            this.emailAttach.document.format = data.document.original || data.document.original === undefined ? data.document.resource.format : 'pdf';
                             this.emailAttach.document.original = data.document.original;
-                            this.emailAttach.document.size = this.emailAttach.document.original ? this.emailAttachTool.document.list[0].size : this.emailAttachTool.document.list[0].convertedDocument.size;
+                            this.emailAttach.document.size = data.document.resource.size;
+                            this.emailAttach.document.label = data.document.resource.label;
+                            this.emailAttach.document.chrono = data.document.resource.chrono;
                         }
                     });
-
                     resolve(true);
                 }),
                 catchError((err) => {
@@ -575,7 +573,7 @@ export class SentResourcePageComponent implements OnInit {
             switchMap(data => this.http.get('../rest/autocomplete/correspondents', { params: { 'search': data, 'searchEmails': 'true' } })),
             tap((data: any) => {
                 data = data.filter((contact: any) => !this.functions.empty(contact.email) || contact.type === 'contactGroup').map((contact: any) => {
-                    let label = '';
+                    let label: string;
                     if (contact.type === 'user' || contact.type === 'contact') {
                         if (!this.functions.empty(contact.firstname) || !this.functions.empty(contact.lastname)) {
                             label = contact.firstname + ' ' + contact.lastname;

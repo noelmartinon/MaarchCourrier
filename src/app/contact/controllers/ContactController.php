@@ -18,6 +18,7 @@ use Attachment\models\AttachmentModel;
 use Contact\models\ContactCustomFieldListModel;
 use Contact\models\ContactFillingModel;
 use Contact\models\ContactGroupListModel;
+use Contact\models\ContactGroupModel;
 use Contact\models\ContactModel;
 use Contact\models\ContactParameterModel;
 use Entity\models\EntityModel;
@@ -224,6 +225,8 @@ class ContactController
             return $response->withStatus(400)->withJson(['errors' => 'Contact does not exist']);
         }
 
+        $queryParams = $request->getQueryParams();
+
         $contact = [
             'id'                    => $rawContact['id'],
             'civility'              => null,
@@ -268,7 +271,6 @@ class ContactController
         $filling = ContactController::getFillingRate(['contactId' => $rawContact['id']]);
         $contact['fillingRate'] = empty($filling) ? null : $filling;
 
-        $queryParams = $request->getQueryParams();
         if (!empty($queryParams['resourcesCount'])) {
             $inResources = ResourceContactModel::get([
                 'select' => ['item_id'],
@@ -1066,12 +1068,24 @@ class ContactController
 
         AttachmentModel::update([
             'set'   => ['recipient_id' => $args['id']],
-            'where' => ['recipient_id in (?)', "recipient_type = 'contact'"],
-            'data'  => [$body['duplicates']]
+            'where' => ['recipient_id in (?)', "recipient_type = ?"],
+            'data'  => [$body['duplicates'], 'contact']
         ]);
 
-        foreach ($body['duplicates'] as $duplicate) {
-            ContactGroupListModel::delete(['where' => ['correspondent_id = ?', 'correspondent_type = ?'], 'data' => [$duplicate, 'contact']]);
+        $contactsgroupsList = ContactGroupListModel::get(['select' => ['contacts_groups_id'], 'where' => ['correspondent_id in (?)', 'correspondent_type = ?'], 'data' => [$body['duplicates'], 'contact']]);
+        ContactGroupListModel::delete(['where' => ['correspondent_id in (?)', 'correspondent_type = ?'], 'data' => [$body['duplicates'], 'contact']]);
+
+        $contactsgroupsWhereContactIs = ContactGroupListModel::get(['select' => ['contacts_groups_id'], 'where' => ['correspondent_id = ?', 'correspondent_type = ?'], 'data' => [$args['id'], 'contact']]);
+        $contactsgroupsWhereContactIs = array_column($contactsgroupsWhereContactIs, 'contacts_groups_id');
+
+        foreach ($contactsgroupsList as $value) {
+            if (!in_array($value['contacts_groups_id'], $contactsgroupsWhereContactIs)) {
+                ContactGroupListModel::create([
+                    'contacts_groups_id'    => $value['contacts_groups_id'],
+                    'correspondent_id'      => $args['id'],
+                    'correspondent_type'    => 'contact'
+                ]);
+            }
         }
 
         ContactModel::delete([

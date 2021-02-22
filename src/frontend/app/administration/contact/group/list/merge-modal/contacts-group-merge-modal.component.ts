@@ -32,7 +32,7 @@ export class ContactsGroupMergeModalComponent implements OnInit {
 
     onSubmit() {
         this.loading = true;
-        this.http.post('../rest/contactsGroups/merge', this.formatData()).pipe(
+        this.http.put('../rest/contactsGroups/merge', this.formatData()).pipe(
             tap((data: any) => {
                 this.notify.success(this.translate.instant('lang.contactsGroupMerged'));
                 this.dialogRef.close('success');
@@ -46,10 +46,10 @@ export class ContactsGroupMergeModalComponent implements OnInit {
 
     formatData() {
         return {
-            idsToMerge: this.itemsToMerge.map((item: any) => item.id),
+            contactsGroups: this.itemsToMerge.map((item: any) => item.id),
             label: this.label,
             description: this.description
-        }
+        };
     }
 
     isValid() {

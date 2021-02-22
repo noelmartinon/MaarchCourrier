@@ -524,7 +524,7 @@ class ResourceListController
         }
         $historic = empty($methodResponse['history']) ? '' : $methodResponse['history'];
         if (!empty($resourcesForAction)) {
-            ActionMethodController::terminateAction(['id' => $aArgs['actionId'], 'resources' => $resourcesForAction, 'basketName' => $basket['basket_name'], 'note' => $body['note'], 'history' => $historic, 'finishInScript' => !empty($methodResponses['postscript'])]);
+            ActionMethodController::terminateAction(['id' => $aArgs['actionId'], 'resources' => $resourcesForAction, 'basketName' => $basket['basket_name'], 'note' => $body['note'], 'history' => $historic, 'finishInScript' => !empty($methodResponse['postscript'])]);
         }
 
         if (!empty($methodResponse['postscript'])) {

@@ -100,7 +100,7 @@ export class VisaWorkflowComponent implements OnInit {
         if (event.previousContainer === event.container) {
             if (this.canManageUser(this.visaWorkflow.items[event.currentIndex], event.currentIndex)) {
                 moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-                this.workflowUpdated.emit(event.container);
+                this.workflowUpdated.emit(event.container.data);
             } else {
                 this.notify.error(this.translate.instant('lang.moveVisaUserErr', { value1: this.visaWorkflow.items[event.previousIndex].labelToDisplay }));
             }

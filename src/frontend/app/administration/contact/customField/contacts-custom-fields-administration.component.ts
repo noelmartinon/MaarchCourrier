@@ -7,9 +7,10 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '@service/app.service';
 import { tap, catchError, filter, exhaustMap, map, finalize } from 'rxjs/operators';
-import { ConfirmComponent } from '../../../../plugins/modal/confirm.component';
-import { SortPipe } from '../../../../plugins/sorting.pipe';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { SortPipe } from '@plugins/sorting.pipe';
 import { of } from 'rxjs';
+import { ContactService } from '@service/contact.service';
 
 @Component({
     templateUrl: 'contacts-custom-fields-administration.component.html',
@@ -17,7 +18,7 @@ import { of } from 'rxjs';
         'contacts-custom-fields-administration.component.scss',
         '../../../indexation/indexing-form/indexing-form.component.scss'
     ],
-    providers: [SortPipe]
+    providers: [SortPipe, ContactService]
 })
 
 export class ContactsCustomFieldsAdministrationComponent implements OnInit {
@@ -25,42 +26,7 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
-
     loading: boolean = true;
-
-    subMenus: any[] = [
-        {
-            icon: 'fa fa-book',
-            route: '/administration/contacts',
-            label: this.translate.instant('lang.contactsList'),
-            current: false
-        },
-        {
-            icon: 'fa fa-code',
-            route: '/administration/contacts/contactsCustomFields',
-            label: this.translate.instant('lang.customFieldsAdmin'),
-            current: true
-        },
-        {
-            icon: 'fa fa-cog',
-            route: '/administration/contacts/contacts-parameters',
-            label: this.translate.instant('lang.contactsParameters'),
-            current: false
-        },
-        {
-            icon: 'fa fa-users',
-            route: '/administration/contacts/contacts-groups',
-            label: this.translate.instant('lang.contactsGroups'),
-            current: false
-        },
-        {
-            icon: 'fas fa-magic',
-            route: '/administration/contacts/duplicates',
-            label: this.translate.instant('lang.duplicatesContactsAdmin'),
-            current: false
-        },
-    ];
 
     customFieldsTypes: any[] = [
         {
@@ -106,6 +72,7 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
         private headerService: HeaderService,
         public appService: AppService,
         private sortPipe: SortPipe,
+        public contactService: ContactService,
         private viewContainerRef: ViewContainerRef
     ) {
 

@@ -8,48 +8,16 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FunctionsService } from '@service/functions.service';
+import { ContactService } from '@service/contact.service';
 
 @Component({
     templateUrl: 'contacts-parameters-administration.component.html',
-    styleUrls: ['contacts-parameters-administration.component.scss']
+    styleUrls: ['contacts-parameters-administration.component.scss'],
+    providers: [ContactService]
 })
 export class ContactsParametersAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-
-
-    subMenus: any[] = [
-        {
-            icon: 'fa fa-book',
-            route: '/administration/contacts',
-            label: this.translate.instant('lang.contactsList'),
-            current: false
-        },
-        {
-            icon: 'fa fa-code',
-            route: '/administration/contacts/contactsCustomFields',
-            label: this.translate.instant('lang.customFieldsAdmin'),
-            current: false
-        },
-        {
-            icon: 'fa fa-cog',
-            route: '/administration/contacts/contacts-parameters',
-            label: this.translate.instant('lang.contactsParameters'),
-            current: true
-        },
-        {
-            icon: 'fa fa-users',
-            route: '/administration/contacts/contacts-groups',
-            label: this.translate.instant('lang.contactsGroups'),
-            current: false
-        },
-        {
-            icon: 'fas fa-magic',
-            route: '/administration/contacts/duplicates',
-            label: this.translate.instant('lang.duplicatesContactsAdmin'),
-            current: false
-        },
-    ];
 
     contactsFilling: any = {
         'enable': false,
@@ -81,7 +49,9 @@ export class ContactsParametersAdministrationComponent implements OnInit {
         private headerService: HeaderService,
         public appService: AppService,
         public functionsService: FunctionsService,
-        private viewContainerRef: ViewContainerRef) { }
+        public contactService: ContactService,
+        private viewContainerRef: ViewContainerRef
+    ) { }
 
     ngOnInit(): void {
 

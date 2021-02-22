@@ -162,6 +162,84 @@ class EmailController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
+        if (!empty($document['isLinked'])) {
+            $resource = ResModel::getById(['resId' => $document['id'], 'select' => ['alt_identifier', 'subject', 'typist', 'format', 'filesize', 'version']]);
+            $size = null;
+            if (empty($document['original'])) {
+                $convertedResource = AdrModel::getDocuments([
+                    'select'  => ['docserver_id', 'path', 'filename'],
+                    'where'   => ['res_id = ?', 'type in (?)', 'version = ?'],
+                    'data'    => [$document['id'], ['PDF', 'SIGN'], $resource['version']],
+                    'orderBy' => ["type='SIGN' DESC"],
+                    'limit'   => 1
+                ]);
+                $convertedDocument = null;
+                if (!empty($convertedResource[0])) {
+                    $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedResource[0]['docserver_id'], 'select' => ['path_template']]);
+                    $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedResource[0]['path']) . $convertedResource[0]['filename'];
+                    if (file_exists($pathToDocument)) {
+                        $size = StoreController::getFormattedSizeFromBytes(['size' => filesize($pathToDocument)]);
+                    }
+                }
+            } else {
+                $size = StoreController::getFormattedSizeFromBytes(['size' => $resource['filesize']]);
+            }
+
+            $document['resource'] = [
+                'id'                => $document['id'],
+                'chrono'            => $resource['alt_identifier'],
+                'label'             => $resource['subject'],
+                'creator'           => UserModel::getLabelledUserById(['id' => $resource['typist']]),
+                'format'            => $resource['format'],
+                'size'              => $size
+            ];;
+        }
+        if (!empty($document['attachments'])) {
+            foreach ($document['attachments'] as $key => $attachment) {
+                $attachmentInfo = AttachmentModel::getById(['id' => $attachment['id'], 'select' => ['title', 'format', 'filesize']]);
+
+                $size = null;
+                if (empty($attachment['original'])) {
+                    $convertedResource = AdrModel::getDocuments([
+                        'select'  => ['docserver_id', 'path', 'filename'],
+                        'where'   => ['res_id = ?', 'type in (?)'],
+                        'data'    => [$attachment['id'], ['PDF', 'SIGN']],
+                        'orderBy' => ["type='SIGN' DESC"],
+                        'limit'   => 1
+                    ]);
+                    $convertedDocument = null;
+                    if (!empty($convertedResource[0])) {
+                        $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedResource[0]['docserver_id'], 'select' => ['path_template']]);
+                        $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedResource[0]['path']) . $convertedResource[0]['filename'];
+                        if (file_exists($pathToDocument)) {
+                            $size = StoreController::getFormattedSizeFromBytes(['size' => filesize($pathToDocument)]);
+                            $document['attachments'][$key]['format'] = 'PDF';
+                        }
+                    }
+                } else {
+                    $document['attachments'][$key]['format'] = $attachmentInfo['format'];
+                    $size = StoreController::getFormattedSizeFromBytes(['size' => $attachmentInfo['filesize']]);
+                }
+
+                $document['attachments'][$key]['label'] = $attachmentInfo['title'];
+                $document['attachments'][$key]['size'] = $size;
+            }
+        }
+        if (!empty($document['notes'])) {
+            $notes = NoteModel::get(['select' => ['id', 'note_text', 'user_id'], 'where' => ['id in (?)'], 'data' => [$document['notes']]]);
+            $notes = array_column($notes, null, 'id');
+            foreach ($document['notes'] as $key => $noteId) {
+                $document['notes'][$key] = [
+                    'id'        => $noteId,
+                    'label'     => $notes[$noteId]['note_text'],
+                    'typeLabel' => 'note',
+                    'creator'   => UserModel::getLabelledUserById(['id' => $notes[$noteId]['user_id']]),
+                    'format'    => 'pdf',
+                    'size'      => null
+                ];
+            }
+        }
+
         $sender = json_decode($rawEmail['sender'], true);
         $entityLabel = null;
         if (!empty($sender['entityId'])) {

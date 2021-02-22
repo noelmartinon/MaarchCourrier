@@ -15,6 +15,7 @@
 namespace Entity\controllers;
 
 use Basket\models\GroupBasketRedirectModel;
+use Contact\models\ContactGroupModel;
 use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use Entity\models\ListTemplateItemModel;
@@ -71,16 +72,17 @@ class EntityController
         return $response->withJson($entity);
     }
 
-    public function getDetailledById(Request $request, Response $response, array $aArgs)
+    public function getDetailledById(Request $request, Response $response, array $args)
     {
         if (!PrivilegeController::hasPrivilege(['privilegeId' => 'manage_entities', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $entity = EntityModel::getByEntityId(['entityId' => $aArgs['id']]);
+        $entity = EntityModel::getByEntityId(['entityId' => $args['id']]);
         if (empty($entity)) {
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         }
+
         $entity = [
             'id'                    => $entity['id'],
             'entity_label'          => $entity['entity_label'],
@@ -105,7 +107,7 @@ class EntityController
 
         $aEntities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]);
         foreach ($aEntities as $aEntity) {
-            if ($aEntity['entity_id'] == $aArgs['id'] && $aEntity['allowed'] == false) {
+            if ($aEntity['entity_id'] == $args['id'] && $aEntity['allowed'] == false) {
                 return $response->withStatus(403)->withJson(['errors' => 'Entity out of perimeter']);
             }
         }
@@ -170,17 +172,17 @@ class EntityController
 
         $entity['templates'] = TemplateModel::getByEntity([
             'select'    => ['t.template_id', 't.template_label', 'template_comment', 't.template_target', 't.template_attachment_type'],
-            'entities'  => [$aArgs['id']]
+            'entities'  => [$args['id']]
         ]);
 
         $entity['users'] = EntityModel::getUsersById(['id' => $entity['entity_id'], 'select' => ['users.id','users.user_id', 'users.firstname', 'users.lastname', 'users.status']]);
-        $children = EntityModel::get(['select' => [1], 'where' => ['parent_entity_id = ?'], 'data' => [$aArgs['id']]]);
+        $children = EntityModel::get(['select' => [1], 'where' => ['parent_entity_id = ?'], 'data' => [$args['id']]]);
         $entity['hasChildren'] = count($children) > 0;
-        $documents = ResModel::get(['select' => [1], 'where' => ['destination = ?'], 'data' => [$aArgs['id']]]);
+        $documents = ResModel::get(['select' => [1], 'where' => ['destination = ?'], 'data' => [$args['id']]]);
         $entity['documents'] = count($documents);
         $instances = ListInstanceModel::get(['select' => [1], 'where' => ['item_id = ?', 'item_type = ?'], 'data' => [$entity['id'], 'entity_id']]);
         $entity['instances'] = count($instances);
-        $redirects = GroupBasketRedirectModel::get(['select' => [1], 'where' => ['entity_id = ?'], 'data' => [$aArgs['id']]]);
+        $redirects = GroupBasketRedirectModel::get(['select' => [1], 'where' => ['entity_id = ?'], 'data' => [$args['id']]]);
         $entity['redirects'] = count($redirects);
         $entity['canAdminUsers'] = PrivilegeController::hasPrivilege(['privilegeId' => 'admin_users', 'userId' => $GLOBALS['id']]);
         $entity['canAdminTemplates'] = PrivilegeController::hasPrivilege(['privilegeId' => 'admin_templates', 'userId' => $GLOBALS['id']]);

@@ -8,54 +8,22 @@ import { MatDialog } from '@angular/material/dialog';
 import { FunctionsService } from '@service/functions.service';
 import { of } from 'rxjs';
 import { catchError, tap, map, exhaustMap, filter, finalize } from 'rxjs/operators';
-import { SortPipe } from '../../../../plugins/sorting.pipe';
+import { SortPipe } from '@plugins/sorting.pipe';
 import { FormControl } from '@angular/forms';
 import { ManageDuplicateComponent } from './manage-duplicate/manage-duplicate.component';
+import { ContactService } from '@service/contact.service';
 
 @Component({
     selector: 'app-contact-duplicate',
     templateUrl: './contact-duplicate.component.html',
     styleUrls: ['./contact-duplicate.component.scss'],
-    providers: [SortPipe]
+    providers: [SortPipe, ContactService]
 })
 export class ContactDuplicateComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     loading: boolean = true;
-
-    subMenus: any[] = [
-        {
-            icon: 'fa fa-book',
-            route: '/administration/contacts',
-            label: this.translate.instant('lang.contactsList'),
-            current: false
-        },
-        {
-            icon: 'fa fa-code',
-            route: '/administration/contacts/contactsCustomFields',
-            label: this.translate.instant('lang.customFieldsAdmin'),
-            current: false
-        },
-        {
-            icon: 'fa fa-cog',
-            route: '/administration/contacts/contacts-parameters',
-            label: this.translate.instant('lang.contactsParameters'),
-            current: false
-        },
-        {
-            icon: 'fa fa-users',
-            route: '/administration/contacts/contacts-groups',
-            label: this.translate.instant('lang.contactsGroups'),
-            current: false
-        },
-        {
-            icon: 'fas fa-magic',
-            route: '/administration/contacts/duplicates',
-            label: this.translate.instant('lang.duplicatesContactsAdmin'),
-            current: true
-        },
-    ];
 
     contactFields: any = [];
 
@@ -84,6 +52,7 @@ export class ContactDuplicateComponent implements OnInit {
         public dialog: MatDialog,
         public functions: FunctionsService,
         private sortPipe: SortPipe,
+        public contactService: ContactService,
         private viewContainerRef: ViewContainerRef,
         private functionsService: FunctionsService
     ) { }

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, EventEmitter, Inject, TemplateRef, ViewContainerRef } from '@angular/core';
+import { Component, OnInit, ViewChild, EventEmitter, Inject, TemplateRef, ViewContainerRef, ViewChildren } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
@@ -16,18 +16,23 @@ import { FunctionsService } from '@service/functions.service';
 import { ContactExportComponent } from './export/contact-export.component';
 import { AdministrationService } from '../../../../app/administration/administration.service';
 import { ContactImportComponent } from './import/contact-import.component';
+import { SelectionModel } from '@angular/cdk/collections';
+import { ContactsGroupFormModalComponent } from '../group/form/modal/contacts-group-form-modal.component';
+import { MatMenuTrigger } from '@angular/material/menu';
+import { LatinisePipe } from 'ngx-pipes';
+import { ContactService } from '@service/contact.service';
 
 @Component({
     selector: 'contact-list',
     templateUrl: 'contacts-list-administration.component.html',
-    styleUrls: ['contacts-list-administration.component.scss']
+    styleUrls: ['contacts-list-administration.component.scss'],
+    providers: [ContactService]
 })
 export class ContactsListAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
     loading: boolean = false;
 
     filtersChange = new EventEmitter();
@@ -37,51 +42,30 @@ export class ContactsListAdministrationComponent implements OnInit {
     displayedColumnsContact: string[] = ['filling', 'firstname', 'lastname', 'company', 'formatedAddress', 'actions'];
 
     isLoadingResults = true;
+    allContacts: any = [];
     routeUrl: string = '../rest/contacts';
     resultListDatabase: ContactListHttpDao | null;
     resultsLength = 0;
+    correspondentsGroups: any = [];
+    selection = new SelectionModel<Element>(true, []);
 
     searchContact = new FormControl();
     search: string = '';
     dialogRef: MatDialogRef<any>;
+    filterCorrespondentsGroups = new FormControl();
+    filteredCorrespondentsGroups: Observable<string[]>;
+
 
     @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
     @ViewChild('tableContactListSort', { static: true }) sort: MatSort;
 
     private destroy$ = new Subject<boolean>();
 
-    subMenus: any[] = [
-        {
-            icon: 'fa fa-book',
-            route: '/administration/contacts',
-            label: this.translate.instant('lang.contactsList'),
-            current: true
-        },
-        {
-            icon: 'fa fa-code',
-            route: '/administration/contacts/contactsCustomFields',
-            label: this.translate.instant('lang.customFieldsAdmin'),
-            current: false
-        },
-        {
-            icon: 'fa fa-cog',
-            route: '/administration/contacts/contacts-parameters',
-            label: this.translate.instant('lang.contactsParameters'),
-            current: false
-        },
-        {
-            icon: 'fa fa-users',
-            route: '/administration/contacts/contacts-groups',
-            label: this.translate.instant('lang.contactsGroups'),
-            current: false
-        },
-        {
-            icon: 'fas fa-magic',
-            route: '/administration/contacts/duplicates',
-            label: this.translate.instant('lang.duplicatesContactsAdmin'),
-            current: false
-        },
-    ];
+    contextMenuPosition = { x: '0px', y: '0px' };
+
+    @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
+    @ViewChildren(MatMenuTrigger) contextMenus: any;
+
 
     constructor(
         public translate: TranslateService,
@@ -91,7 +75,9 @@ export class ContactsListAdministrationComponent implements OnInit {
         public appService: AppService,
         public dialog: MatDialog,
         public functions: FunctionsService,
+        private latinisePipe: LatinisePipe,
         public adminService: AdministrationService,
+        public contactService: ContactService,
         private viewContainerRef: ViewContainerRef) { }
 
 
@@ -149,6 +135,44 @@ export class ContactsListAdministrationComponent implements OnInit {
             ).subscribe(data => this.data = data);
     }
 
+    getCorrespondentsGroups() {
+        this.filterCorrespondentsGroups.reset();
+        this.http.get('../rest/contactsGroups').pipe(
+            tap((data: any) => {
+                this.correspondentsGroups = data['contactsGroups'];
+                this.filteredCorrespondentsGroups = this.filterCorrespondentsGroups.valueChanges
+                    .pipe(
+                        startWith(''),
+                        map(state => state ? this._filter(state) : this.correspondentsGroups.slice())
+                    );
+            })
+        ).subscribe();
+    }
+
+    addContactsToCorrespondentsGroup(groupId: number) {
+        const objTosend = this.selection.selected.map((contactId: any) => {
+            return {
+                id: contactId,
+                type: 'contact'
+            };
+        });
+        this.http.post('../rest/contactsGroups/' + groupId + '/correspondents', { correspondents: objTosend }).pipe(
+            tap(() => {
+                this.selection.clear();
+                this.notify.success('Contact(s) associé(s)');
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    private _filter(value: string): string[] {
+        const filterValue = this.latinisePipe.transform(value.toLowerCase());
+        return this.correspondentsGroups.filter((option: any) => this.latinisePipe.transform(this.translate.instant(option['label']).toLowerCase()).includes(filterValue));
+    }
+
     processPostData(data: any) {
         data.contacts.forEach((element: any) => {
             let tmpFormatedAddress = [];
@@ -161,9 +185,9 @@ export class ContactsListAdministrationComponent implements OnInit {
         });
 
         if (!this.functions.empty(data.contacts[0]) && !this.functions.empty(data.contacts[0].filling)) {
-            this.displayedColumnsContact = ['filling', 'firstname', 'lastname', 'company', 'formatedAddress', 'actions'];
+            this.displayedColumnsContact = ['select', 'filling', 'firstname', 'lastname', 'company', 'formatedAddress', 'actions'];
         } else {
-            this.displayedColumnsContact = ['firstname', 'lastname', 'company', 'formatedAddress', 'actions'];
+            this.displayedColumnsContact = ['select', 'firstname', 'lastname', 'company', 'formatedAddress', 'actions'];
         }
         return data;
     }
@@ -251,6 +275,7 @@ export class ContactsListAdministrationComponent implements OnInit {
     }
 
     refreshDao() {
+        this.selection.clear();
         this.filtersChange.emit();
     }
 
@@ -296,6 +321,59 @@ export class ContactsListAdministrationComponent implements OnInit {
             return true;
         }
     }
+
+    selectContact(contactId: any) {
+        this.selection.toggle(contactId);
+    }
+
+    isAllSelected() {
+        const numSelected = this.selection.selected.length;
+        const numRows = this.allContacts.length;
+        return numSelected === numRows;
+    }
+
+    selectAllContacts() {
+        this.isAllSelected() ? this.selection.clear() : this.allContacts.forEach(contactId => this.selection.select(contactId));
+    }
+
+    openContactsGroupModal() {
+        const dialogRef = this.dialog.open(ContactsGroupFormModalComponent, {
+            panelClass: 'maarch-modal',
+            disableClose: true,
+            width: '99%',
+            height: '99%',
+            data: {
+                contactIds: this.selection.selected,
+                allPerimeters: true
+            }
+        });
+        dialogRef.afterClosed().pipe(
+            filter((data: any) => !this.functions.empty(data)),
+            tap(async (res: any) => {
+                this.refreshDao();
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    open({ x, y }: MouseEvent, element: any) {
+        if (!this.selection.isSelected(element.id)) {
+            this.selection.clear();
+            this.selection.select(element.id);
+        }
+        // Adjust the menu anchor position
+        this.contextMenuPosition.x = x + 'px';
+        this.contextMenuPosition.y = y + 'px';
+
+        // Opens the menu
+        this.contextMenus.toArray()[this.contextMenus.toArray().map((item: any) => item._element.nativeElement.id).indexOf('menuButtonContext')].openMenu();
+
+        // prevents default
+        return false;
+    }
 }
 
 export interface ContactList {
@@ -319,7 +397,7 @@ export class ContactListHttpDao {
     styleUrls: [],
 })
 export class ContactsListAdministrationRedirectModalComponent {
-    
+
     modalTitle: string = this.translate.instant('lang.confirmAction');
     redirectContact: number;
     processMode: string = 'delete';

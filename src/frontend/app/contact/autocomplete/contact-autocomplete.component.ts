@@ -239,15 +239,15 @@ export class ContactAutocompleteComponent implements OnInit {
 
     setFormValue(item: any) {
         if (item.type === 'contactGroup') {
-            this.http.get('../rest/contactsGroups/' + item.id).pipe(
+            this.http.get('../rest/contactsGroups/' + item.id + '/correspondents?limit=none').pipe(
                 map((data: any) => {
-                    const contacts = data.contactsGroup.contacts.map((contact: any) => {
+                    const contacts = data.correspondents.map((correspondent: any) => {
                         return {
-                            id: contact.id,
-                            type: contact.type,
-                            lastname: contact.contact,
-                            fillingRate: !this.functions.empty(contact.thresholdLevel) ? {
-                                color: this.contactService.getFillingColor(contact.thresholdLevel)
+                            id: correspondent.id,
+                            type: correspondent.type,
+                            lastname: correspondent.name,
+                            fillingRate: !this.functions.empty(correspondent.thresholdLevel) ? {
+                                color: this.contactService.getFillingColor(correspondent.thresholdLevel)
                             } : ''
                         };
                     });
@@ -260,7 +260,7 @@ export class ContactAutocompleteComponent implements OnInit {
                 }),
                 finalize(() => this.loadingValues = false),
                 catchError((err: any) => {
-                    this.notify.error(err.error.errors);
+                    this.notify.handleSoftErrors(err);
                     return of(false);
                 })
             ).subscribe();
