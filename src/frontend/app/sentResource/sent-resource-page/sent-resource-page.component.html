@@ -164,7 +164,7 @@
                 <ng-container *ngIf="keyVal.key !== 'document'">
                     <mat-chip class="copy" *ngFor="let item of emailAttach[keyVal.key]; let i=index;"
                         [removable]="canManageMail()"
-                        (removed)="removeAttachMail(i, keyVal.key)" [title]="item.title">
+                        (removed)="removeAttachMail(i, keyVal.key)" [title]="item.label">
                         <i
                             class="{{emailAttachTool[keyVal.key].icon}} attachLabel"></i>&nbsp;{{item.label | shorten: 25: '...'}}&nbsp;<small
                             class="attachLabel">({{item.format}}{{!functions.empty(item.size) ? ' - '+item.size : ''}})</small>
