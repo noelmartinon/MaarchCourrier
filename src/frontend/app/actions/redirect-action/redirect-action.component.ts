@@ -287,8 +287,7 @@ export class RedirectActionComponent implements OnInit {
                 })
             ).subscribe();
         } else {
-
-            this.http.put(this.data.processActionRoute, { resources: this.data.resIds, data: { listInstances: this.appDiffusionsList.getCurrentListinstance() }, note: this.noteEditor.getNote() }).pipe(
+            this.http.put(this.data.processActionRoute, { resources: this.data.resIds, data: { destination: this.currentEntity.serialId, listInstances: this.appDiffusionsList.getCurrentListinstance() }, note: this.noteEditor.getNote() }).pipe(
                 tap((data: any) => {
                     if (data && data.errors != null) {
                         this.notify.error(data.errors);
