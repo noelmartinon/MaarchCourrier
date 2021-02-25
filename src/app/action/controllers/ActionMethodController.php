@@ -259,7 +259,11 @@ class ActionMethodController
         }
 
         $listInstances = array_merge($listInstances, $args['data']['listInstances']);
-        $controller = ListInstanceController::updateListInstance(['data' => [['resId' => $args['resId'], 'listInstances' => $listInstances]], 'userId' => $GLOBALS['id'], 'fullRight' => true]);
+        $controller = ListInstanceController::updateListInstance([
+            'data'      => [['resId' => $args['resId'], 'listInstances' => $listInstances, 'destination' => $args['data']['destination']]],
+            'userId'    => $GLOBALS['id'],
+            'fullRight' => true
+        ]);
         if (!empty($controller['errors'])) {
             return ['errors' => [$controller['errors']]];
         }
