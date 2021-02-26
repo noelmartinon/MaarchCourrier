@@ -12,8 +12,6 @@ import { of } from 'rxjs';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { FunctionsService } from '../../../service/functions.service';
 
-declare function $j(selector: any): any;
-
 @Component({
     templateUrl: "custom-fields-administration.component.html",
     styleUrls: [
@@ -94,20 +92,15 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
         this.getTables();
 
+        this.loadCustomFields();
+    }
+
+    loadCustomFields() {
         this.http.get('../../rest/customFields?admin=true').pipe(
             // TO FIX DATA BINDING SIMPLE ARRAY VALUES
             map((data: any) => {
                 data.customFields.forEach((element: any) => {
-                    if (this.functionsService.empty(element.values.key)) {
-                        element.SQLMode = false;
-                        element.values = Object.keys(element.values).map((key: any) => {
-                            return {
-                                label: element.values[key]
-                            };
-                        });
-                    } else {
-                        element.SQLMode = true;
-                    }
+                    element.SQLMode = element.SQLMode !== false;
                 });
                 return data;
             }),
@@ -121,6 +114,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+
     }
 
     addCustomField(customFieldType: any) {
@@ -138,7 +132,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
                     values: []
                 };
             }),
-            exhaustMap((data) => this.http.post('../../rest/customFields', newCustomField)),
+            exhaustMap(() => this.http.post('../../rest/customFields', newCustomField)),
             tap((data: any) => {
                 newCustomField.id = data.customFieldId;
                 this.customFields.push(newCustomField);
@@ -155,13 +149,14 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     addValue(indexCustom: number) {
         this.customFields[indexCustom].values.push(
             {
+                key: this.customFields[indexCustom].values.length,
                 label: ''
             }
         );
     }
 
     removeValue(customField: any, indexValue: number) {
-        customField.values.splice(indexValue, 1);
+        customField.values[indexValue].label = null;
     }
 
     removeCustomField(indexCustom: number) {
@@ -189,7 +184,6 @@ export class CustomFieldsAdministrationComponent implements OnInit {
             customField.values = customField.values.filter((x: any, i: any, a: any) => a.map((info: any) => info.label).indexOf(x.label) === i);
 
             // TO FIX DATA BINDING SIMPLE ARRAY VALUES
-            customFieldToUpdate.values = customField.values.map((data: any) => data.label);
             const alreadyExists = this.customFields.filter(customFieldItem => customFieldItem.label === customFieldToUpdate.label);
             if (alreadyExists.length > 1) {
                 this.notify.handleErrors(this.lang.customFieldAlreadyExists);
@@ -209,6 +203,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
             tap(() => {
                 this.customFieldsClone[indexCustom] = JSON.parse(JSON.stringify(customField));
                 this.notify.success(this.lang.customFieldUpdated);
+                this.loadCustomFields();
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -276,7 +271,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
     isValidField(field: any) {
         if (field.SQLMode) {
-            return !this.functionsService.empty(field.values.key) && !this.functionsService.empty(field.values.label) && !this.functionsService.empty(field.values.table) && !this.functionsService.empty(field.values.clause)
+            return !this.functionsService.empty(field.values.key) && !this.functionsService.empty(field.values.label) && !this.functionsService.empty(field.values.table) && !this.functionsService.empty(field.values.clause);
         } else {
             return true;
         }
