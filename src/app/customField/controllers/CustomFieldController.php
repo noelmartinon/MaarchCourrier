@@ -60,6 +60,14 @@ class CustomFieldController
                         $customFields[$key]['values'][] = ['key' => $value, 'label' => $value];
                     }
                 }
+            } else {
+                if (empty($customFields[$key]['values']['table']) && !empty($customFields[$key]['values'])) {
+                    $values = $customFields[$key]['values'];
+                    $customFields[$key]['values'] = [];
+                    foreach ($values as $valueKey => $value) {
+                        $customFields[$key]['values'][] = ['key' => $valueKey, 'label' => $value];
+                    }
+                }
             }
         }
 
@@ -161,40 +169,39 @@ class CustomFieldController
                 }
             }
         } else {
-            unset($body['values']['key'], $body['values']['label'], $body['values']['table'], $body['values']['clause']);
-            if (count(array_unique($body['values'])) < count($body['values'])) {
+            unset($body['values']['table'], $body['values']['clause']);
+            $uniqueValues = array_column($body['values'], 'label');
+            $uniqueValues = array_unique($uniqueValues);
+            if (count(array_unique($uniqueValues)) < count($body['values'])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Some values have the same name']);
             }
         }
 
         $values = json_decode($field['values'], true);
+
+        if (count($body['values']) != count($values)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Number of values sent is different from the number of values currently saved']);
+        }
+
+        $newValues = [];
         if (empty($body['SQLMode']) && empty($values['table'])) {
-            if (in_array($field['type'], ['checkbox'])) {
-                foreach ($values as $key => $value) {
-                    if (!empty($body['values'][$key]) && !in_array($value, $body['values'])) {
-                        ResModel::update([
-                            'postSet'   => ['custom_fields' => "jsonb_insert(custom_fields, '{{$args['id']}, 0}', '\"".str_replace(["\\", "'", '"'], ["\\\\", "''", '\"'], $body['values'][$key])."\"')"],
-                            'where'     => ["custom_fields->'{$args['id']}' @> ?"],
-                            'data'      => ["\"".str_replace(["\\", '"'], ["\\\\", '\"'], $value)."\""]
-                        ]);
-                        ResModel::update([
-                            'postSet'   => ['custom_fields' => "jsonb_set(custom_fields, '{{$args['id']}}', (custom_fields->'{$args['id']}') - '".str_replace(["\\", "'", '"'], ["\\\\", "''", '\"'], $value)."')"],
-                            'where'     => ["custom_fields->'{$args['id']}' @> ?"],
-                            'data'      => ["\"".str_replace(["\\", '"'], ["\\\\", '\"'], $value)."\""]
-                        ]);
+            if (in_array($field['type'], ['select', 'radio', 'checkbox'])) {
+                foreach ($body['values'] as $value) {
+                    if ($value['label'] != null) {
+                        $newValues[] = $value['label'];
                     }
-                }
-            } elseif (in_array($field['type'], ['select', 'radio'])) {
-                foreach ($values as $key => $value) {
-                    if (!empty($body['values'][$key]) && !in_array($value, $body['values'])) {
+
+                    if (!empty($values[$value['key']]) && !empty($value['label']) && $value['label'] != $values[$value['key']]) {
                         ResModel::update([
-                            'postSet'   => ['custom_fields' => "jsonb_set(custom_fields, '{{$args['id']}}', '\"".str_replace(["\\", "'", '"'], ["\\\\", "''", '\"'], $body['values'][$key])."\"')"],
-                            'where'     => ["custom_fields->'{$args['id']}' @> ?"],
-                            'data'      => ["\"".str_replace(["\\", '"'], ["\\\\", '\"'], $value)."\""]
+                            'postSet' => ['custom_fields' => "jsonb_set(custom_fields, '{{$args['id']}}', '\"" . str_replace(["\\", "'", '"'], ["\\\\", "''", '\"'], $value['label']) . "\"')"],
+                            'where'   => ["custom_fields->'{$args['id']}' @> ?"],
+                            'data'    => ["\"" . str_replace(["\\", '"'], ["\\\\", '\"'], $values[$value['key']]) . "\""]
                         ]);
                     }
                 }
             }
+        } else {
+            $newValues = $body['values'];
         }
 
         if ($field['mode'] == 'form' && $body['mode'] == 'technical') {
@@ -205,7 +212,7 @@ class CustomFieldController
             'set'   => [
                 'label'  => $body['label'],
                 'mode'   => $body['mode'],
-                'values' => empty($body['values']) ? '[]' : json_encode($body['values'])
+                'values' => empty($newValues) ? '[]' : json_encode($newValues)
             ],
             'where' => ['id = ?'],
             'data'  => [$args['id']]
