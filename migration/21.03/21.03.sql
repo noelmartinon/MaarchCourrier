@@ -68,6 +68,7 @@ DO $$ BEGIN
         ALTER TABLE contacts_groups DROP COLUMN IF EXISTS public;
         ALTER TABLE contacts_groups ALTER COLUMN label TYPE text;
         ALTER TABLE contacts_groups ALTER COLUMN description TYPE text;
+        ALTER TABLE contacts_groups DROP CONSTRAINT IF EXISTS contacts_groups_key;
     END IF;
 END$$;
 DO $$ BEGIN

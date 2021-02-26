@@ -18,6 +18,7 @@ use Basket\models\BasketModel;
 use Basket\models\GroupBasketModel;
 use Basket\models\RedirectBasketModel;
 use Configuration\models\ConfigurationModel;
+use Contact\models\ContactGroupListModel;
 use Contact\models\ContactGroupModel;
 use ContentManagement\controllers\DocumentEditorController;
 use Docserver\controllers\DocserverController;
@@ -433,19 +434,19 @@ class UserController
         return $response->withJson(['isDeletable' => true, 'listTemplates' => $listTemplates, 'listInstances' => $listInstances, 'workflowListInstances' => $workflowListInstances]);
     }
 
-    public function suspend(Request $request, Response $response, array $aArgs)
+    public function suspend(Request $request, Response $response, array $args)
     {
-        $error = $this->hasUsersRights(['id' => $aArgs['id'], 'delete' => true, 'himself' => true]);
+        $error = $this->hasUsersRights(['id' => $args['id'], 'delete' => true, 'himself' => true]);
         if (!empty($error['error'])) {
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
         }
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['firstname', 'lastname', 'user_id', 'mode']]);
+        $user = UserModel::getById(['id' => $args['id'], 'select' => ['firstname', 'lastname', 'user_id', 'mode']]);
         if (in_array($user['mode'], ['root_visible', 'root_invisible']) && !UserController::isRoot(['id' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $listInstances = ListInstanceModel::getWhenOpenMailsByUserId(['select' => [1], 'userId' => $aArgs['id'], 'itemMode' => 'dest']);
+        $listInstances = ListInstanceModel::getWhenOpenMailsByUserId(['select' => [1], 'userId' => $args['id'], 'itemMode' => 'dest']);
         if (!empty($listInstances)) {
             return $response->withStatus(403)->withJson(['errors' => 'User is still present in listInstances']);
         }
@@ -453,7 +454,7 @@ class UserController
         $listTemplates = ListTemplateModel::getWithItems([
             'select'    => [1],
             'where'     => ['item_id = ?', 'type = ?', 'item_mode = ?', 'item_type = ?', 'entity_id is not null'],
-            'data'      => [$aArgs['id'], 'diffusionList', 'dest', 'user']
+            'data'      => [$args['id'], 'diffusionList', 'dest', 'user']
         ]);
         if (!empty($listTemplates)) {
             return $response->withStatus(403)->withJson(['errors' => 'User is still present in listTemplates']);
@@ -461,24 +462,25 @@ class UserController
 
         ListInstanceModel::delete([
             'where' => ['item_id = ?', 'difflist_type = ?', 'item_type = ?', 'item_mode != ?'],
-            'data'  => [$aArgs['id'], 'entity_id', 'user_id', 'dest']
+            'data'  => [$args['id'], 'entity_id', 'user_id', 'dest']
         ]);
         RedirectBasketModel::delete([
             'where' => ['owner_user_id = ? OR actual_user_id = ?'],
-            'data'  => [$aArgs['id'], $aArgs['id']]
+            'data'  => [$args['id'], $args['id']]
         ]);
         ListTemplateItemModel::delete([
             'where' => ['item_id = ?', 'item_type = ?'],
-            'data'  => [$aArgs['id'], 'user']
+            'data'  => [$args['id'], 'user']
         ]);
         ListTemplateModel::deleteNoItemsOnes();
+        ContactGroupListModel::delete(['where' => ['correspondent_id = ?', 'correspondent_type = ?'], 'data' => [$args['id'], 'user']]);
 
         UserModel::update([
             'set'   => [
                 'status'   => 'SPD'
             ],
             'where' => ['id = ?'],
-            'data'  => [$aArgs['id']]
+            'data'  => [$args['id']]
         ]);
 
         HistoryController::add([
@@ -527,6 +529,7 @@ class UserController
             'data'  => [$aArgs['id'], 'user']
         ]);
         ListTemplateModel::deleteNoItemsOnes();
+        ContactGroupListModel::delete(['where' => ['correspondent_id = ?', 'correspondent_type = ?'], 'data' => [$args['id'], 'user']]);
         RedirectBasketModel::delete([
             'where' => ['owner_user_id = ? OR actual_user_id = ?'],
             'data'  => [$aArgs['id'], $aArgs['id']]

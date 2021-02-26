@@ -87,15 +87,17 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-12">
-                                                    <mat-form-field *ngFor="let value of custom.values;let i=index;"
-                                                        floatLabel="never">
-                                                        <input matInput [(ngModel)]="value.label"
-                                                            [placeholder]="'lang.newValue' | translate">
-                                                        <button color="warn" mat-icon-button matSuffix
-                                                            [title]="'lang.delete' | translate" (click)="removeValue(custom, i)" [disabled]="custom.values.length === 1">
-                                                            <mat-icon class="fa fa-trash"></mat-icon>
-                                                        </button>
-                                                    </mat-form-field>
+                                                    <span *ngFor="let value of custom.values;let i=index;">
+                                                        <mat-form-field
+                                                            floatLabel="never" *ngIf="value.label !== null">
+                                                            <input matInput [(ngModel)]="value.label"
+                                                                [placeholder]="'lang.newValue' | translate">
+                                                            <button color="warn" mat-icon-button matSuffix
+                                                                [title]="'lang.delete' | translate" (click)="removeValue(custom, i)" [disabled]="custom.values.length === 1">
+                                                                <mat-icon class="fa fa-trash"></mat-icon>
+                                                            </button>
+                                                        </mat-form-field>
+                                                    </span>
                                                 </div>
                                             </mat-expansion-panel>
                                         </div>
@@ -120,7 +122,7 @@
                                                         <mat-form-field>
                                                             <mat-label>{{'lang.targetTable' | translate}}</mat-label>
                                                             <mat-select [(ngModel)]="custom.values.table" required>
-                                                                <mat-option *ngFor="let table of availaibleTables | keyvalue"
+                                                                <mat-option *ngFor="let table of availableTables | keyvalue"
                                                                     [value]="table.key">
                                                                     {{table.key}} 
                                                                     <ng-container *ngIf="!functionsService.empty('lang.' + table.key | translate)">
@@ -151,14 +153,14 @@
                                                             </button>
                                                             <mat-menu #menu="matMenu">
                                                                 <button mat-menu-item
-                                                                    *ngFor="let column of availaibleTables[custom.values.table]" (click)="addColumnLabel(custom.values.label, column)">{{column}}</button>
+                                                                        *ngFor="let column of availableTables[custom.values.table]" (click)="addColumnLabel(custom.values.label, column)">{{column}}</button>
                                                             </mat-menu>
 
                                                         </div>
                                                         <mat-form-field *ngIf="custom.values.table">
                                                             <mat-label>{{'lang.targetIdentifier' | translate}}</mat-label>
                                                             <mat-select [(ngModel)]="custom.values.key" required>
-                                                                <mat-option *ngFor="let column of availaibleTables[custom.values.table]"
+                                                                <mat-option *ngFor="let column of availableTables[custom.values.table]"
                                                                     [value]="column">
                                                                     {{column}}
                                                                 </mat-option>

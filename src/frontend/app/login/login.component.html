@@ -14,7 +14,7 @@
                         <input id="password" name="password" matInput [placeholder]="'lang.password' | translate" type="password"
                             formControlName="password">
                         <mat-hint align="end" *ngIf="authService.authMode === 'standard'"><a
-                                routerLink="/forgot-password" class="infoLogin">{{'lang.forgotPassword' | translate}} ?</a></mat-hint>
+                                 style="cursor: pointer;" (click)="goTo('/forgot-password')" class="infoLogin">{{'lang.forgotPassword' | translate}} ?</a></mat-hint>
                         <mat-hint align="end" *ngIf="authService.authMode === 'ldap'"><span
                                 class="infoLogin">{{'lang.' + authService.authMode + 'Enabled' | translate}}</span></mat-hint>
                     </mat-form-field>

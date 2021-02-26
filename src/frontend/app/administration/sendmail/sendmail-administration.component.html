@@ -116,6 +116,8 @@
                                 <div class="col-md-12 text-center" style="padding:10px;">
                                     <button mat-raised-button type="submit" color="primary"
                                         [disabled]="checkModif() || !sendmailForm.valid">{{'lang.validate' | translate}}</button>
+                                    <button mat-raised-button type="button" color="default"
+                                        (click)="openMailServerTest()">{{'lang.test' | translate}}</button>
                                     <button mat-raised-button type="button" color="default" [disabled]="checkModif()"
                                         (click)="cancelModification()">{{'lang.cancel' | translate}}</button>
                                 </div>

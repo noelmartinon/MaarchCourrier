@@ -417,7 +417,7 @@ export class IndexingFormComponent implements OnInit {
                     }
                 }
             } else {
-                element.default_value = this.arrFormControl[element.identifier].value === '' ? null : this.arrFormControl[element.identifier].value;
+                element.default_value = this.functions.empty(this.arrFormControl[element.identifier].value) ? null : this.arrFormControl[element.identifier].value;
             }
 
             if (element.identifier === 'destination' && !this.adminMode && withDiffusionList) {
@@ -818,6 +818,9 @@ export class IndexingFormComponent implements OnInit {
 
                                 if (elem.type === 'date' && !this.functions.empty(fieldValue)) {
                                     fieldValue = new Date(fieldValue);
+                                } else{
+                                    elem.default_value = null;
+                                    this.arrFormControl[elem.identifier].value = null;
                                 }
                                 if (!this.functions.empty(fieldValue)) {
                                     this.arrFormControl[elem.identifier].setValue(fieldValue);

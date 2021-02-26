@@ -152,4 +152,12 @@ export class LoginComponent implements OnInit {
     openAboutModal() {
         this.dialog.open(AboutUsComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: false });
     }
+
+    goTo(route: string) {
+        if (this.authService.mailServerOnline) {
+            this.router.navigate([route]);
+        } else {
+            this.notify.error(this.translate.instant('lang.mailServerOffline'));
+        }
+    }
 }

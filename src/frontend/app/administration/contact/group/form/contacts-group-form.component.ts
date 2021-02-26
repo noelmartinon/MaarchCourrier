@@ -19,6 +19,7 @@ import { FunctionsService } from '@service/functions.service';
 import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { ContactsFormModalComponent } from '../../page/form/modal/contacts-form-modal.component';
+import { PrivilegeService } from '@service/privileges.service';
 
 @Component({
     selector: 'app-contacts-group-form',
@@ -87,10 +88,11 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
         public contactService: ContactService,
         private viewContainerRef: ViewContainerRef,
         private functionsService: FunctionsService,
+        public privilegeService: PrivilegeService,
     ) { }
 
     ngOnInit(): void {
-        this.headerService.injectInSideBarLeft(this.contactsGroupTreeTemplate, this.viewContainerRef, 'contactsGroupTree');
+        this.headerService.initTemplate(this.contactsGroupTreeTemplate, this.viewContainerRef, 'contactsGroupTree');
     }
 
     ngAfterViewInit(): void {
@@ -99,7 +101,6 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
             this.initTree();
             this.canAddCorrespondents = false;
             this.canModifyGroupInfo = true;
-            console.log(this.contactIds);
             if (this.contactIds.length > 0) {
                 this.initContacts();
             }
@@ -218,7 +219,7 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
                 map(data => {
                     this.loadingLinkedCorrespondents = false;
                     data = this.processPostData(data);
-                    if (this.filterInputControl.value === '') {
+                    if (this.filterInputControl.value === '' || this.nbLinkedCorrespondents === 0) {
                         this.nbLinkedCorrespondents = data.count;
                     }
                     this.nbFilteredLinkedCorrespondents = data.count;
@@ -233,7 +234,6 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
                     return of(false);
                 })
             ).subscribe(data => this.relatedCorrespondents = data);
-        // ).subscribe(data => this.relatedCorrespondents = []);
     }
 
     processPostData(data: any) {
@@ -312,9 +312,10 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
         this.savingCorrespondents = true;
         this.http.post('../rest/contactsGroups/' + cGroupId + '/correspondents', { 'correspondents': this.formatCorrespondents() })
             .subscribe((data: any) => {
-                this.notify.success(this.translate.instant('lang.contactAdded'));
+                this.notify.success(this.translate.instant('lang.correspondentAdded'));
                 this.selection.clear();
                 this.savingCorrespondents = false;
+                this.allRelatedCorrespondents = [];
                 this.refreshDao();
             }, (err) => {
                 this.notify.error(err.error.errors);
@@ -349,7 +350,11 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
                         this.saveContactsList(data.id);
                     }
                     if (!this.hideSaveButton) {
-                        this.router.navigate(['/administration/contacts/contacts-groups/' + data.id]);
+                        // WORKAROUND ISSUE TREE DOESNT LOAD
+                        this.router.navigate(['/administration/contacts/contacts-groups']);
+                        setTimeout(() => {
+                            this.router.navigate(['/administration/contacts/contacts-groups/' + data.id]);
+                        }, 100);
                     }
                     this.notify.success(this.translate.instant('lang.contactsGroupAdded'));
                     this.afterUpdate.emit(data.id);
@@ -380,6 +385,8 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
             exhaustMap(() => this.http.request('DELETE', `../rest/contactsGroups/${this.contactsGroup.id}/correspondents`, { body: { correspondents: objTosend } })),
             tap(() => {
                 this.notify.success(this.translate.instant('lang.contactDeletedFromGroup'));
+                this.selection.clear();
+                this.allRelatedCorrespondents = [];
                 this.refreshDao();
             }),
             catchError((err: any) => {
@@ -391,8 +398,8 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
 
     isInGrp(contact: any): boolean {
         let isInGrp = false;
-        this.relatedCorrespondents.forEach((row: any) => {
-            if (row.id == contact.id) {
+        this.allRelatedCorrespondents.forEach((row: any) => {
+            if (row.id === contact.id && row.type === contact.type) {
                 isInGrp = true;
             }
         });

@@ -134,11 +134,6 @@ class ContactGroupController
             return $response->withStatus(400)->withJson(['errors' => 'Body description is empty or not a string']);
         }
 
-        $existingGroup = ContactGroupModel::get(['select' => [1], 'where' => ['label = ?', 'owner = ?'], 'data' => [$body['label'], $GLOBALS['id']]]);
-        if (!empty($existingGroup)) {
-            return $response->withStatus(400)->withJson(['errors' => _CONTACTS_GROUP_LABEL_ALREADY_EXISTS]);
-        }
-
         if (!empty($body['entities']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {
             $userEntities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id']]);
             $userEntities = array_column($userEntities, 'id');
@@ -175,11 +170,6 @@ class ContactGroupController
             return $response->withStatus(400)->withJson(['errors' => 'Body label is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['description'] ?? null)) {
             return $response->withStatus(400)->withJson(['errors' => 'Body description is empty or not a string']);
-        }
-
-        $existingGroup = ContactGroupModel::get(['select' => [1], 'where' => ['label = ?', 'owner = ?', 'id != ?'], 'data' => [$body['label'], $GLOBALS['id'], $args['id']]]);
-        if (!empty($existingGroup)) {
-            return $response->withStatus(400)->withJson(['errors' => _CONTACTS_GROUP_LABEL_ALREADY_EXISTS]);
         }
 
         if (!empty($body['entities']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_contacts', 'userId' => $GLOBALS['id']])) {

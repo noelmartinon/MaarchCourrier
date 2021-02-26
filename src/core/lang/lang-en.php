@@ -35,7 +35,6 @@ define('_CONTACTS_GROUP_UPDATED', 'Contacts group updated');
 define('_CONTACTS_GROUP_DELETED', 'Contacts group deleted');
 define('_CONTACTS_GROUP_LIST_ADDED', 'Add contacts to group');
 define('_CONTACTS_GROUP_LIST_DELETED', 'Delete contacts from group');
-define('_CONTACTS_GROUP_LABEL_ALREADY_EXISTS', 'Group with this label already exists');
 define('_DELETE_NOTIFICATIONS', 'Notification deleted');
 define('_DEST_USER', 'Recipient');
 define('_DOCSERVER_ADDED', 'Document server added');

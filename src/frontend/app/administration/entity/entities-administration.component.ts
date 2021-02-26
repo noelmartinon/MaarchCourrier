@@ -19,6 +19,7 @@ import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 import { Observable, of } from 'rxjs';
 import {EntitiesExportComponent} from './export/entities-export.component';
 import { FormControl } from '@angular/forms';
+import { InputCorrespondentGroupComponent } from '../contact/group/inputCorrespondent/input-correspondent-group.component';
 
 declare var $: any;
 @Component({
@@ -30,6 +31,7 @@ export class EntitiesAdministrationComponent implements OnInit {
     titleHeader: string;
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild('appInputCorrespondentGroup', { static: false }) appInputCorrespondentGroup: InputCorrespondentGroupComponent;
 
     dialogRef: MatDialogRef<any>;
 
@@ -255,7 +257,7 @@ export class EntitiesAdministrationComponent implements OnInit {
         this.http.get('../rest/entities/' + entity_id + '/details')
             .subscribe((data: any) => {
                 this.currentEntity = data['entity'];
-
+                this.appInputCorrespondentGroup.ngOnInit();
                 this.appDiffusionsList.loadListModel(this.currentEntity.id);
                 this.appVisaWorkflow.loadListModel(this.currentEntity.id);
                 this.appAvisWorkflow.loadListModel(this.currentEntity.id);
@@ -343,6 +345,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                 }
                 this.http.post('../rest/entities', this.currentEntity)
                     .subscribe((data: any) => {
+                        this.appInputCorrespondentGroup.linkGrpAfterCreation(data.id, 'entity');
                         this.currentEntity.listTemplate = [];
                         this.entities = data['entities'];
                         this.creationMode = false;

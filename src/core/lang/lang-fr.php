@@ -35,7 +35,6 @@ define('_CONTACTS_GROUP_UPDATED', 'Groupe de contacts modifié');
 define('_CONTACTS_GROUP_DELETED', 'Groupe de contacts supprimé');
 define('_CONTACTS_GROUP_LIST_ADDED', 'Ajout de contacts dans le groupe');
 define('_CONTACTS_GROUP_LIST_DELETED', 'Suppression de contacts dans le groupe');
-define('_CONTACTS_GROUP_LABEL_ALREADY_EXISTS', 'Un groupe avec ce libellé existe déjà');
 define('_DELETE_NOTIFICATIONS', 'Notification supprimée');
 define('_DEST_USER', 'Destinataire');
 define('_DOCSERVER_ADDED', 'Zone de stockage ajoutée');

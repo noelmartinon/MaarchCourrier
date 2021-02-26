@@ -53,6 +53,10 @@ export class ContactService {
         ];
     }
 
+    goTo(route: string) {
+        this.router.navigate([route]);
+    }
+
     getFillingColor(thresholdLevel: 'first' | 'second' | 'third') {
         if (thresholdLevel === 'first') {
             return '#E81C2B';

@@ -79,7 +79,7 @@ class CustomFieldControllerTest extends TestCase
         $args = [
             'label'     => 'mon custom22',
             'mode'      => 'form',
-            'values'    => ['one', 'two', 'trois']
+            'values'    => [['key' => 0, 'label' => 'one'], ['key' => 1, 'label' => 'two'], ['key' => 2, 'label' => 'trois']]
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
 
@@ -87,6 +87,18 @@ class CustomFieldControllerTest extends TestCase
         $this->assertSame(204, $response->getStatusCode());
 
         //  Errors
+        $args = [
+            'label'     => 'mon custom22',
+            'mode'      => 'form',
+            'values'    => [['key' => 0, 'label' => 'one']]
+        ];
+        $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
+
+        $response     = $customFieldController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertSame('Not enough values sent', $responseBody['errors']);
+        $this->assertSame(400, $response->getStatusCode());
+
         unset($args['label']);
         $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
 

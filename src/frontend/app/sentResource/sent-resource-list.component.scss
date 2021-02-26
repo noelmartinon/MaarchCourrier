@@ -128,3 +128,8 @@
     align-items: center;
     justify-content: center;
 }
+
+.waitingSent {
+    cursor: not-allowed;
+    background: rgba($primary, 0.1);
+}

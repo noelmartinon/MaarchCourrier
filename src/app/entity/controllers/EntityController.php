@@ -15,7 +15,7 @@
 namespace Entity\controllers;
 
 use Basket\models\GroupBasketRedirectModel;
-use Contact\models\ContactGroupModel;
+use Contact\models\ContactGroupListModel;
 use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use Entity\models\ListTemplateItemModel;
@@ -219,7 +219,7 @@ class EntityController
             return $response->withStatus(400)->withJson(['errors' => _ENTITY_ID_ALREADY_EXISTS]);
         }
 
-        EntityModel::create([
+        $id = EntityModel::create([
             'entity_id'             => $body['entity_id'],
             'entity_label'          => $body['entity_label'],
             'short_label'           => $body['short_label'],
@@ -265,7 +265,7 @@ class EntityController
             ]);
         }
 
-        return $response->withJson(['entities' => EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']])]);
+        return $response->withJson(['entities' => EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]), 'id' => $id]);
     }
 
     public function update(Request $request, Response $response, array $aArgs)
@@ -410,6 +410,7 @@ class EntityController
             }
         }
 
+        ContactGroupListModel::delete(['where' => ['correspondent_id = ?', 'correspondent_type = ?'], 'data' => [$entity['id'], 'entity']]);
         GroupModel::update([
             'postSet'   => ['indexation_parameters' => "jsonb_set(indexation_parameters, '{entities}', (indexation_parameters->'entities') - '{$entity['id']}')"],
             'where'     => ["indexation_parameters->'entities' @> ?"],

@@ -16,6 +16,8 @@ import { AppService } from '@service/app.service';
 import { PrivilegeService } from '@service/privileges.service';
 import { MaarchFlatTreeComponent } from '../../../plugins/tree/maarch-flat-tree.component';
 import { environment } from '../../../environments/environment';
+import { InputCorrespondentGroupComponent } from '../contact/group/inputCorrespondent/input-correspondent-group.component';
+import { AuthService } from '@service/auth.service';
 
 declare var $: any;
 
@@ -28,9 +30,8 @@ export class UserAdministrationComponent implements OnInit {
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
     @ViewChild('maarchTree', { static: false }) maarchTree: MaarchFlatTreeComponent;
+    @ViewChild('appInputCorrespondentGroup', { static: false }) appInputCorrespondentGroup: InputCorrespondentGroupComponent;
 
-
-    
     loading: boolean = false;
     dialogRef: MatDialogRef<any>;
     highlightMe: boolean = false;
@@ -151,6 +152,7 @@ export class UserAdministrationComponent implements OnInit {
         public headerService: HeaderService,
         private _formBuilder: FormBuilder,
         public appService: AppService,
+        public authService: AuthService,
         private privilegeService: PrivilegeService,
         private viewContainerRef: ViewContainerRef
     ) {
@@ -928,6 +930,7 @@ export class UserAdministrationComponent implements OnInit {
                                 } else {
                                     this.notify.success(this.translate.instant('lang.userAdded'));
                                 }
+                                this.appInputCorrespondentGroup.linkGrpAfterCreation(result.id, 'user');
                                 this.router.navigate(['/administration/users/' + result.id]);
                             }, (err: any) => {
                                 this.notify.handleSoftErrors(err);

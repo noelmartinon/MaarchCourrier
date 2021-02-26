@@ -158,7 +158,7 @@ export class SentResourcePageComponent implements OnInit {
                     this.loading = false;
                 });
             },
-            readonly: this.emailStatus === 'SENT',
+            readonly: this.emailStatus === 'SENT' || this.data.status === 'WAITING',
             height: '400',
             suffix: '.min',
             language: this.translate.instant('lang.langISO').replace('-', '_'),

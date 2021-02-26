@@ -87,9 +87,12 @@ abstract class EntityModelAbstract
             'ldap_id', 'transferring_agency', 'entity_full_name', 'producer_service'
         ]);
 
+        $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'entities_id_seq']);
+
         DatabaseModel::insert([
             'table'         => 'entities',
             'columnsValues' => [
+                'id'                    => $nextSequenceId,
                 'entity_id'             => $args['entity_id'],
                 'entity_label'          => $args['entity_label'],
                 'short_label'           => $args['short_label'],
@@ -110,7 +113,7 @@ abstract class EntityModelAbstract
             ]
         ]);
 
-        return true;
+        return $nextSequenceId;
     }
 
     public static function update(array $args)

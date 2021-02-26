@@ -25,7 +25,7 @@
             {{nbLinkedCorrespondents}} {{'lang.relatedCorrespondents' | translate}}&nbsp;<span
                 *ngIf="nbLinkedCorrespondents !== nbFilteredLinkedCorrespondents"
                 style="font-weight: normal;font-style: italic;color:#666;">{{nbFilteredLinkedCorrespondents}}
-                affiché(s)</span> :
+                {{'lang.displayed' | translate}}</span> :
         </div>
         <div style="width: 100%;">
             <div class="displayed-title">
@@ -67,13 +67,13 @@
                                 <div class="title-search-result">
                                     <span style="color: #666;flex:1;">
                                         <span [innerHTML]="'lang.linkedSearchTo' | translate:{value: filterUser.value}"></span>,
-                                        <a (click)="openContactForm()" style="cursor: pointer;">{{'lang.createContact' | translate  | lowercase}} ?</a>
+                                        <a *ngIf="privilegeService.hasCurrentUserPrivilege('add_correspondent_in_shared_groups_on_profile')" (click)="openContactForm()" style="cursor: pointer;">{{'lang.createContact' | translate  | lowercase}} ?</a>
                                     </span>
                                     <span style="color:#666">
                                         <a color="primary" (click)="!savingCorrespondents ? toggleAll() : false"
                                             [style.opacity]="savingCorrespondents ? '0.5' : '1'"
-                                            style="cursor: pointer;">tout sélectionner</a>
-                                        ({{dataSource.data.length}} résultat(s))
+                                            style="cursor: pointer;">{{ 'lang.selectAll' | translate }}</a>
+                                        ({{dataSource.data.length}} {{'lang.records' | translate}})
                                     </span>
                                 </div>
                                 <cdk-virtual-scroll-viewport *ngIf="!displayCorrespondents" itemSize="48"

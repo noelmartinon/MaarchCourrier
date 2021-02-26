@@ -14,6 +14,7 @@ import { UsersExportComponent } from './export/users-export.component';
 import { catchError, filter, tap } from 'rxjs/operators';
 import { AdministrationService } from '../administration.service';
 import { UsersAdministrationRedirectModalComponent } from './redirect-modal/users-administration-redirect-modal.component';
+import { AuthService } from '@service/auth.service';
 
 @Component({
     templateUrl: 'users-administration.component.html',
@@ -56,6 +57,7 @@ export class UsersAdministrationComponent implements OnInit {
         public appService: AppService,
         public functions: FunctionsService,
         public adminService: AdministrationService,
+        public authService: AuthService,
         private viewContainerRef: ViewContainerRef,
     ) { }
 

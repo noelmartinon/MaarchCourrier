@@ -89,17 +89,6 @@ class ContactGroupControllerTest extends TestCase
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame('Body description is empty or not a string', $responseBody['errors']);
-
-        $body = [
-            'label'             => 'Groupe petition',
-            'description'       => 'Groupe de petition'
-        ];
-        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
-
-        $response     = $contactGroupController->create($fullRequest, new \Slim\Http\Response());
-        $this->assertSame(400, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame(_CONTACTS_GROUP_LABEL_ALREADY_EXISTS, $responseBody['errors']);
     }
 
     public function testGet()
@@ -189,17 +178,6 @@ class ContactGroupControllerTest extends TestCase
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame('Body description is empty or not a string', $responseBody['errors']);
-
-        $body = [
-            'label'             => 'Groupe petition updated',
-            'description'       => 'Groupe de petition 2 updated'
-        ];
-        $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
-
-        $response     = $contactGroupController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id2]);
-        $this->assertSame(400, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame(_CONTACTS_GROUP_LABEL_ALREADY_EXISTS, $responseBody['errors']);
     }
 
     public function testAddCorrespondents()

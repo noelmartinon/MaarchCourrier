@@ -15,6 +15,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { Observable, of } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { LatinisePipe } from 'ngx-pipes';
+import { InputCorrespondentGroupComponent } from '../../group/inputCorrespondent/input-correspondent-group.component';
 
 @Component({
     selector: 'app-contact-form',
@@ -41,7 +42,7 @@ import { LatinisePipe } from 'ngx-pipes';
 export class ContactsFormComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
-
+    @ViewChild('appInputCorrespondentGroup', { static: false }) appInputCorrespondentGroup: InputCorrespondentGroupComponent;
 
     countries: any = [];
     countriesFilteredResult: Observable<string[]>;
@@ -665,6 +666,7 @@ export class ContactsFormComponent implements OnInit {
         this.http.post('../rest/contacts', this.formatContact()).pipe(
             tap((data: any) => {
                 this.onSubmitEvent.emit(data.id);
+                this.appInputCorrespondentGroup.linkGrpAfterCreation(data.id, 'contact');
                 this.notify.success(this.translate.instant('lang.contactAdded'));
                 if (!this.functions.empty(data.warning)) {
                     this.notify.error(data.warning);

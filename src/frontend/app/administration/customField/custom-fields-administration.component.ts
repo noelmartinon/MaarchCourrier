@@ -7,8 +7,8 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '@service/app.service';
 import { tap, catchError, filter, exhaustMap, map, finalize } from 'rxjs/operators';
-import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
-import { SortPipe } from '../../../plugins/sorting.pipe';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { SortPipe } from '@plugins/sorting.pipe';
 import { of } from 'rxjs';
 import { FunctionsService } from '@service/functions.service';
 
@@ -82,7 +82,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     sampleIncrement: number[] = [1, 2, 3, 4];
 
     SQLMode: boolean = false;
-    availaibleTables: any = {};
+    availableTables: any = {};
 
     dialogRef: MatDialogRef<any>;
 
@@ -99,28 +99,23 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
     }
 
-    ngOnInit(): void {
+    ngOnInit() {
         this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.customFieldsAdmin'));
 
         this.getTables();
 
+        this.loadCustomFields();
+    }
+
+    loadCustomFields() {
         this.http.get('../rest/customFields?admin=true').pipe(
             // TO FIX DATA BINDING SIMPLE ARRAY VALUES
             map((data: any) => {
                 data.customFields.forEach((element: any) => {
-                    if (this.functionsService.empty(element.values.key)) {
-                        element.SQLMode = false;
-                        element.values = Object.values(element.values).map((info: any) => {
-                            return {
-                                label: info
-                            };
-                        });
-                    } else {
-                        element.SQLMode = true;
-                    }
+                    element.SQLMode = element.SQLMode !== false;
                     const label = element.label;
                     if (label.includes(this.translate.instant('lang.newField'))) {
-                        let tmpField = label.substr(this.translate.instant('lang.newField').length + 1);
+                        const tmpField = label.substr(this.translate.instant('lang.newField').length + 1);
                         if (!isNaN(Number(tmpField))) {
                             this.idTable.push(tmpField);
                             this.incrementCreation = Math.max( ... this.idTable) + 1;
@@ -156,7 +151,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
                     mode : 'form'
                 };
             }),
-            exhaustMap((data) => this.http.post('../rest/customFields', newCustomField)),
+            exhaustMap(() => this.http.post('../rest/customFields', newCustomField)),
             tap((data: any) => {
                 newCustomField.id = data.customFieldId;
                 newCustomField.values = newCustomField.values.map((val: any) => {
@@ -178,13 +173,14 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     addValue(indexCustom: number) {
         this.customFields[indexCustom].values.push(
             {
+                key: this.customFields[indexCustom].values.length,
                 label: ''
             }
         );
     }
 
     removeValue(customField: any, indexValue: number) {
-        customField.values.splice(indexValue, 1);
+        customField.values[indexValue].label = null;
     }
 
     removeCustomField(indexCustom: number) {
@@ -209,7 +205,6 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         if (!customField.SQLMode) {
             customField.values = customField.values.filter((x: any, i: any, a: any) => a.map((info: any) => info.label).indexOf(x.label) === i);
             // TO FIX DATA BINDING SIMPLE ARRAY VALUES
-            customFieldToUpdate.values = customField.values.map((data: any) => data.label);
             const alreadyExists = this.customFields.filter(customFieldItem => customFieldItem.label === customFieldToUpdate.label);
             if (alreadyExists.length > 1) {
                 this.notify.handleErrors(this.translate.instant('lang.customFieldAlreadyExists'));
@@ -228,6 +223,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
             tap(() => {
                 this.customFieldsClone[indexCustom] = JSON.parse(JSON.stringify(customField));
                 this.notify.success(this.translate.instant('lang.customFieldUpdated'));
+                this.loadCustomFields();
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -270,7 +266,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         this.http.get('../rest/customFieldsWhiteList').pipe(
             tap((data: any) => {
                 data.allowedTables.forEach((table: any) => {
-                    this.availaibleTables[table.name] = table.columns;
+                    this.availableTables[table.name] = table.columns;
                 });
             }),
             catchError((err: any) => {
@@ -295,7 +291,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
     isValidField(field: any) {
         if (field.SQLMode) {
-            return !this.functionsService.empty(field.values.key) && !this.functionsService.empty(field.values.label) && !this.functionsService.empty(field.values.table) && !this.functionsService.empty(field.values.clause)
+            return !this.functionsService.empty(field.values.key) && !this.functionsService.empty(field.values.label) && !this.functionsService.empty(field.values.table) && !this.functionsService.empty(field.values.clause);
         } else {
             return true;
         }

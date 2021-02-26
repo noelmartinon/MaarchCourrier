@@ -96,11 +96,7 @@ export class ProfileComponent implements OnInit {
         public appService: AppService,
         private viewContainerRef: ViewContainerRef,
         private functions: FunctionsService
-    ) {
-        window['angularProfileComponent'] = {
-            componentAfterUpload: (base64Content: any) => this.processAfterUpload(base64Content),
-        };
-    }
+    ) {}
 
     initComponents(event: any) {
         this.selectedIndex = event.index;
@@ -110,6 +106,7 @@ export class ProfileComponent implements OnInit {
             }
         } else if (event.index == 1) {
             this.sidenavRight.close();
+            this.initMce();
         } else if (!this.appService.getViewMode()) {
             this.sidenavRight.open();
         }
@@ -140,25 +137,6 @@ export class ProfileComponent implements OnInit {
 
     initMce() {
         this.MySignatureMailComponent.initMce();
-    }
-
-    processAfterUpload(b64Content: any) {
-        this.zone.run(() => this.resfreshUpload(b64Content));
-    }
-
-    resfreshUpload(b64Content: any) {
-        if (this.signatureModel.size <= 2000000) {
-            this.signatureModel.base64 = b64Content.replace(/^data:.*?;base64,/, '');
-            this.signatureModel.base64ForJs = b64Content;
-        } else {
-            this.signatureModel.name = '';
-            this.signatureModel.size = 0;
-            this.signatureModel.type = '';
-            this.signatureModel.base64 = '';
-            this.signatureModel.base64ForJs = '';
-
-            this.notify.error('Taille maximum de fichier dépassée (2 MB)');
-        }
     }
 
     displayPassword() {

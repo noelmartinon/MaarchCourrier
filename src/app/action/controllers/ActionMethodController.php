@@ -19,6 +19,7 @@ use Action\models\ResMarkAsReadModel;
 use Alfresco\controllers\AlfrescoController;
 use Attachment\models\AttachmentModel;
 use Attachment\models\AttachmentTypeModel;
+use Basket\models\BasketModel;
 use Convert\controllers\ConvertPdfController;
 use Convert\models\AdrModel;
 use Docserver\controllers\DocserverController;
@@ -256,20 +257,29 @@ class ActionMethodController
         return true;
     }
 
-    public static function resMarkAsReadAction(array $aArgs)
+    public static function resMarkAsReadAction(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['resId', 'data']);
-        ValidatorModel::intVal($aArgs, ['resId']);
+        ValidatorModel::notEmpty($args, ['resId', 'data']);
+        ValidatorModel::intVal($args, ['resId']);
 
+        $basket['basket_id'] = 0;
+        if (is_numeric($args['data']['basketId'])) {
+            $basket = BasketModel::getById(['id' => $args['data']['basketId'], 'select' => ['basket_id']]);
+        }
+        
         ResMarkAsReadModel::delete([
-            'where' => ['res_id = ?', 'user_id = ?', 'basket_id = ?'],
-            'data'  => [$aArgs['resId'], $GLOBALS['id'], $aArgs['data']['basketId']]
+            'where' => ['res_id = ?', 'user_id = ?', '(basket_id = ? OR basket_id = ?)'],
+            'data'  => [$args['resId'], $GLOBALS['id'], $args['data']['basketId'], $basket['basket_id']]
         ]);
 
+        if (empty($basket['basket_id'])) {
+            $basket['basket_id'] = $args['data']['basketId'];
+        }
+
         ResMarkAsReadModel::create([
-            'res_id'    => $aArgs['resId'],
+            'res_id'    => $args['resId'],
             'user_id'   => $GLOBALS['id'],
-            'basket_id' => $aArgs['data']['basketId']
+            'basket_id' => $basket['basket_id']
         ]);
 
         return true;
@@ -289,7 +299,11 @@ class ActionMethodController
         }
 
         $listInstances = array_merge($listInstances, $args['data']['listInstances']);
-        $controller = ListInstanceController::updateListInstance(['data' => [['resId' => $args['resId'], 'listInstances' => $listInstances]], 'userId' => $GLOBALS['id'], 'fullRight' => true]);
+        $controller = ListInstanceController::updateListInstance([
+            'data'      => [['resId' => $args['resId'], 'listInstances' => $listInstances, 'destination' => $args['data']['destination']]],
+            'userId'    => $GLOBALS['id'],
+            'fullRight' => true
+        ]);
         if (!empty($controller['errors'])) {
             return ['errors' => [$controller['errors']]];
         }

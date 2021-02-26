@@ -173,7 +173,7 @@
                 </ng-container>
             </ng-container>
         </mat-chip-list>
-        <div class="models" *ngIf="canManageMail()">
+        <div class="models" *ngIf="canManageMail() && data.status !== 'WAITING'">
             <plugin-select-search *ngIf="availableEmailModels.length > 0" [label]="'lang.emailModel' | translate"
                 [placeholderLabel]="'lang.emailModel' | translate" [datas]="availableEmailModels"
                 [formControlSelect]="templateEmailListForm" (afterSelected)="mergeEmailTemplate($event)">

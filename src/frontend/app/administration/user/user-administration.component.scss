@@ -36,3 +36,12 @@
         display: flex;
     }
 }
+
+.mat-list-item-disabled {
+    cursor: not-allowed !important;
+    background-color: initial;
+
+    .mat-line, mat-icon {
+        opacity: 0.5;
+    }
+}

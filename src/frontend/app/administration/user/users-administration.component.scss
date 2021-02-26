@@ -29,3 +29,12 @@ button:disabled{
 .admin {
     font-weight: bold;
 }
+
+.mat-list-item-disabled {
+    cursor: not-allowed !important;
+    background-color: initial;
+
+    .mat-line, mat-icon {
+        opacity: 0.5;
+    }
+}

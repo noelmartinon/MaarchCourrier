@@ -16,7 +16,7 @@
     </div>
     <mat-table #table [dataSource]="dataSource" matSort matSortActive="creationDate" matSortDirection="desc">
         <ng-container matColumnDef="creationDate">
-            <mat-cell *matCellDef="let row" class="dataLine" [class.canManage]="row.canManage" style="flex: 1;padding: 0px;flex-direction: column;" (click)="open(row)">
+            <mat-cell *matCellDef="let row" class="dataLine" [ngClass]="{'canManage' : row.canManage && row.status !== 'WAITING', 'waitingSent': row.status === 'WAITING'}" style="flex: 1;padding: 0px;flex-direction: column;" (click)="row.status === 'WAITING' ? $event.stopPropagation() : open(row)">
                 <div class="subinfo">
                     <span *ngIf="(row.sendDate === null && row.status === 'SENT' && row.type == 'm2m_ARCHIVETRANSFER') || row.type != 'm2m_ARCHIVETRANSFER'" style="flex:1" [title]="row.creationDate | fullDate">
                         {{row.type == 'm2m_ARCHIVETRANSFER' ? ('lang.sent' | translate) : ('lang.createdAlt' | translate)}} : <b>{{row.creationDate | timeAgo : 'full'}}</b>

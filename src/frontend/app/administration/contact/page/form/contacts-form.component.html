@@ -69,6 +69,7 @@
             </button>
         </ng-container>
     </mat-menu>
+    <app-input-correspondent-group #appInputCorrespondentGroup [id]="contactId" [type]="'contact'" style="padding-top:10px;padding-left: 10px;padding-right:10px;display: block;"></app-input-correspondent-group>
     <div style="padding: 10px;" *ngIf="this.fillingParameters.enable">
         <div class="rate" [style.color]="fillingRate.color">{{'lang.contactFilledTo' | translate}} <b>{{fillingRate.value}} %</b>
         </div>

@@ -149,12 +149,13 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                             this.template.file.name = data.template.template_file_name;
                             this.getViewTemplateContent();
                         } else if (this.template.target === 'acknowledgementReceipt') {
+                            this.template.file.electronic.content = data.template.template_content;
+
                             if (!this.functionsService.empty(data.template.template_file_name)) {
                                 this.template.file.paper.format = data.template.template_file_name.split('.').pop();
+                                this.template.file.paper.name = data.template.template_file_name;
+                                this.getViewTemplateContent();
                             }
-                            this.template.file.paper.name = data.template.template_file_name;
-                            this.template.file.electronic.content = data.template.template_content;
-                            this.getViewTemplateContent();
                         }
 
                         this.headerService.setHeader(this.translate.instant('lang.templateModification'), this.template.template_label);

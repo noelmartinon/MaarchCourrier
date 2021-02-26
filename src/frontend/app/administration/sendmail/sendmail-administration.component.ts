@@ -6,6 +6,11 @@ import { NotificationService } from '@service/notification/notification.service'
 import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 import { NgForm } from '@angular/forms';
+import { CheckMailServerModalComponent } from './checkMailServer/check-mail-server-modal.component';
+import { catchError, filter, tap } from 'rxjs/operators';
+import { FunctionsService } from '@service/functions.service';
+import { of } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     templateUrl: 'sendmail-administration.component.html',
@@ -86,6 +91,8 @@ export class SendmailAdministrationComponent implements OnInit {
         private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
+        public dialog: MatDialog,
+        private functionsService: FunctionsService,
         private viewContainerRef: ViewContainerRef
     ) { }
 
@@ -186,5 +193,24 @@ export class SendmailAdministrationComponent implements OnInit {
 
         this.sendmail.user = '';
         this.sendmail.password = '';
+    }
+
+    openMailServerTest() {
+        const dialogRef = this.dialog.open(CheckMailServerModalComponent, {
+            panelClass: 'maarch-modal',
+            disableClose: true,
+            // width: '99%',
+            // height: '99%',
+            data: { }
+        });
+        dialogRef.afterClosed().pipe(
+            filter((data: any) => !this.functionsService.empty(data)),
+            tap((data: any) => {
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 }

@@ -72,6 +72,7 @@ import { ContactsGroupsListComponent } from './administration/contact/group/list
 import { ContactsGroupFormModalComponent } from './administration/contact/group/form/modal/contacts-group-form-modal.component';
 import { ContactsGroupMergeModalComponent } from './administration/contact/group/list/merge-modal/contacts-group-merge-modal.component';
 import { ContactsFormModalComponent } from './administration/contact/page/form/modal/contacts-form-modal.component';
+import { InputCorrespondentGroupComponent } from './administration/contact/group/inputCorrespondent/input-correspondent-group.component';
 
 
 import { AttachmentsListComponent } from './attachments/attachments-list.component';
@@ -149,7 +150,8 @@ import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-to
         CriteriaToolComponent,
         ContactsGroupFormModalComponent,
         ContactsGroupMergeModalComponent,
-        ContactsFormModalComponent
+        ContactsFormModalComponent,
+        InputCorrespondentGroupComponent
     ],
     exports: [
         CommonModule,
@@ -202,6 +204,7 @@ import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-to
         IssuingSiteInputComponent,
         RegisteredMailRecipientInputComponent,
         CriteriaToolComponent,
+        InputCorrespondentGroupComponent
     ],
     providers: [],
     entryComponents: [

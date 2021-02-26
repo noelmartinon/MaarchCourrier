@@ -39,9 +39,6 @@ export class MySignatureMailComponent implements OnInit {
             language: this.translate.instant('lang.langISO').replace('-', '_'),
             language_url: `../node_modules/tinymce-i18n/langs/${this.translate.instant('lang.langISO').replace('-', '_')}.js`,
             height: '200',
-            plugins: [
-                'textcolor'
-            ],
             external_plugins: {
                 'maarch_b64image': '../../src/frontend/plugins/tinymce/maarch_b64image/plugin.min.js'
             },

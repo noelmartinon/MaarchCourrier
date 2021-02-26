@@ -788,8 +788,7 @@ CREATE TABLE contacts_groups
   description text NOT NULL,
   owner integer NOT NULL,
   entities jsonb NOT NULL DEFAULT '{}',
-  CONSTRAINT contacts_groups_pkey PRIMARY KEY (id),
-  CONSTRAINT contacts_groups_key UNIQUE (label, owner)
+  CONSTRAINT contacts_groups_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);
 

@@ -1,3 +1,5 @@
+<div class="alert-message alert-message-info" [innerHTML]="'lang.infoVisaParameters' | translate" style="min-width: 100%">
+</div>
 <form [formGroup]="visaParameters" style="display: contents;">
     <div>
         <mat-slide-toggle style="display: inline-block; width: 20%" color="primary" name="minimumVisaRole" (toggleChange)="toggle('minimumVisaRole')"

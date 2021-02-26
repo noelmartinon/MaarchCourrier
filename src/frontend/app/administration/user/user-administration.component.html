@@ -2,6 +2,8 @@
     <ng-template #adminMenuTemplate>
         <mat-nav-list *ngIf="!creationMode && !loading">
             <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
+            <div *ngIf="!authService.mailServerOnline" class="alert-message alert-message-danger mailList"
+            style="max-width: 100%;margin: 0px;" [innerHTML]="'lang.mailServerOfflineMsg' | translate :{action:('lang.activateAbsence' | translate)}"></div>
             <a mat-list-item *ngIf="user.status != 'ABS'" (click)="activateAbsence()">
                 <mat-icon color="warn" mat-list-icon class="fa fa-plane"></mat-icon>
                 <p mat-line>
@@ -14,7 +16,7 @@
                     {{'lang.desactivateAbsence' | translate}}
                 </p>
             </a>
-            <a mat-list-item *ngIf="user.canSendActivationNotification" (click)="resendActivationNotification()">
+            <a mat-list-item *ngIf="user.canSendActivationNotification" [disabled]="!authService.mailServerOnline" (click)="resendActivationNotification()">
                 <mat-icon color="primary" mat-list-icon class="fa fa-paper-plane"></mat-icon>
                 <p mat-line>
                     {{'lang.sendActivationNotification' | translate}}
@@ -227,7 +229,7 @@
                                             </mat-panel-title>
                                         </mat-expansion-panel-header>
                                         <div>
-                                            <app-input-correspondent-group [id]="serialId" [type]="'user'" style="display: block;"></app-input-correspondent-group>
+                                            <app-input-correspondent-group #appInputCorrespondentGroup [id]="serialId" [type]="'user'" style="display: block;"></app-input-correspondent-group>
                                             <mat-form-field>
                                                 <mat-label>{{'lang.accountType' | translate}}</mat-label>
                                                 <mat-select [(ngModel)]="user.mode" id="accountType" name="accountType"

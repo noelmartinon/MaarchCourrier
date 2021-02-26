@@ -558,8 +558,17 @@ class AttachmentController
         $pathToPdf = $docserver['path_template'] . $adrPdf[0]['path'] . $adrPdf[0]['filename'];
         $pathToPdf = str_replace('#', '/', $pathToPdf);
 
-        $pdf = new Fpdi('P', 'pt');
-        $pageCount = $pdf->setSourceFile($pathToPdf);
+        $libDir = CoreConfigModel::getLibrariesDirectory();
+        if (!empty($libDir) && is_file($libDir . 'SetaPDF-FormFiller-Full/library/SetaPDF/Autoload.php')) {
+            require_once ($libDir . 'SetaPDF-FormFiller-Full/library/SetaPDF/Autoload.php');
+
+            $document = \SetaPDF_Core_Document::loadByFilename($pathToPdf);
+            $pages = $document->getCatalog()->getPages();
+            $pageCount = count($pages);
+        } else {
+            $pdf = new Fpdi('P', 'pt');
+            $pageCount = $pdf->setSourceFile($pathToPdf);
+        }
 
         return $response->withJson(['fileContent' => $base64Content, 'pageCount' => $pageCount]);
     }
@@ -671,7 +680,7 @@ class AttachmentController
         }
 
         $attachment = AttachmentModel::get([
-            'select' => ['res_id', 'docserver_id', 'path', 'filename', 'res_id_master', 'title', 'fingerprint'],
+            'select' => ['res_id', 'docserver_id', 'path', 'filename', 'res_id_master', 'title', 'fingerprint', 'relation'],
             'where'  => ['res_id = ?', 'status not in (?)'],
             'data'   => [$args['id'], ['DEL']],
             'limit'  => 1
@@ -726,6 +735,18 @@ class AttachmentController
         $pathInfo = pathinfo($pathToDocument);
         $data     = $request->getQueryParams();
         $filename = TextFormatModel::formatFilename(['filename' => $attachmentTodisplay['title'], 'maxLength' => 250]);
+        if ($attachmentTodisplay['relation'] > 1) {
+            $filename .= '_V' . $attachmentTodisplay['relation'];
+        } else {
+            $attachmentVersion = AttachmentModel::get([
+                'select'    => [1],
+                'where'     => ['origin_id = ?', 'status not in (?)'],
+                'data'      => [$args['id'], ['DEL']]
+            ]);
+            if (!empty($attachmentVersion)) {
+                $filename .= '_V1';
+            }
+        }
         
         HistoryController::add([
             'tableName' => 'res_attachments',

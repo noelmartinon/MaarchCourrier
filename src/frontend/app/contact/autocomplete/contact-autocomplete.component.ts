@@ -271,21 +271,29 @@ export class ContactAutocompleteComponent implements OnInit {
     }
 
     setContact(contact: any) {
-        if (this.controlAutocomplete.value.map((contactItem: any) => contactItem.id).indexOf(contact['id']) === -1) {
-            let arrvalue = [];
-            if (this.controlAutocomplete.value !== null) {
-                arrvalue = this.controlAutocomplete.value;
+        var alreadyIn = false;
+        this.controlAutocomplete.value.forEach((contactItem: any) => {
+            if (contactItem.id == contact['id'] && contactItem.type == contact['type']) {
+                alreadyIn = true;
+                return;
             }
-            this.valuesToDisplay[contact['id']] = contact;
-            arrvalue.push(
-                {
-                    type: contact['type'],
-                    id: contact['id'],
-                    label: this.getFormatedContact(contact['id'])
-                });
-            this.controlAutocomplete.setValue(arrvalue);
-            this.loadingValues = false;
+        });
+        if (alreadyIn) {
+            return;
         }
+        let arrvalue = [];
+        if (this.controlAutocomplete.value !== null) {
+            arrvalue = this.controlAutocomplete.value;
+        }
+        this.valuesToDisplay[contact['id']] = contact;
+        arrvalue.push(
+            {
+                type: contact['type'],
+                id: contact['id'],
+                label: this.getFormatedContact(contact['id'])
+            });
+        this.controlAutocomplete.setValue(arrvalue);
+        this.loadingValues = false;
     }
 
     resetAutocomplete() {

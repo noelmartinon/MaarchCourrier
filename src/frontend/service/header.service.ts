@@ -5,7 +5,7 @@ import { tap, catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { MatSidenav } from '@angular/material/sidenav';
 import { FoldersService } from '../app/folder/folders.service';
-import { DomPortalHost, TemplatePortal } from '@angular/cdk/portal';
+import { DomPortalOutlet, TemplatePortal } from '@angular/cdk/portal';
 
 @Injectable({
     providedIn: 'root'
@@ -34,8 +34,8 @@ export class HeaderService {
     nbResourcesFollowed: number = 0;
     base64: string = null;
 
-    private portalHost: DomPortalHost;
-    
+    private portalHost: DomPortalOutlet;
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -134,9 +134,8 @@ export class HeaderService {
             this.showMenuShortcut = true;
             this.showMenuNav = true;
         }
-
         // Create a portalHost from a DOM element
-        this.portalHost = new DomPortalHost(
+        this.portalHost = new DomPortalOutlet(
             document.querySelector(`#${id}`),
             this.componentFactoryResolver,
             this.appRef,
@@ -154,9 +153,8 @@ export class HeaderService {
     }
 
     initTemplate(template: TemplateRef<any>, viewContainerRef: ViewContainerRef, id: string = 'adminMenu', mode: string = '') {
-
         // Create a portalHost from a DOM element
-        this.portalHost = new DomPortalHost(
+        this.portalHost = new DomPortalOutlet(
             document.querySelector(`#${id}`),
             this.componentFactoryResolver,
             this.appRef,

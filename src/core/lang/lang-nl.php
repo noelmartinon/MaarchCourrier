@@ -93,7 +93,6 @@ define('_CONTACTS_GROUP_UPDATED', 'Gewijzigde contactengroep');
 define('_CONTACTS_GROUP_DELETED', 'Verwijderde contactengroep');
 define('_CONTACTS_GROUP_LIST_ADDED', 'Verwijdering van contacten in de groep');
 define('_CONTACTS_GROUP_LIST_DELETED', '');
-define('_CONTACTS_GROUP_LABEL_ALREADY_EXISTS', 'Er bestaat reeds een groep met dit label');
 define('_DOCSERVER_ADDED', 'Opslagruimte toegevoegd');
 define('_DOCSERVER_UPDATED', 'Opslagruimte gewijzigd');
 define('_DOCSERVER_DELETED', 'Opslagruimte verwijderd');

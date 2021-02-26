@@ -28,7 +28,7 @@ export class ContactsGroupsListComponent implements OnInit {
 
     @Input() allPerimeters: boolean = false;
     @Input() contactGroupFormMode: 'route' | 'modal' = 'route';
-    @Input() showAddButton: boolean = false;
+    @Input() showAddButton: boolean = true;
 
     search: string = null;
 
@@ -39,7 +39,7 @@ export class ContactsGroupsListComponent implements OnInit {
     loading: boolean = false;
 
 
-    displayedColumns = ['select', 'label', 'description', 'nbCorrespondents', 'shared', 'owner', 'actions'];
+    displayedColumns = ['select', 'label', 'description', 'nbCorrespondents', 'shared', 'labelledOwner', 'actions'];
     filterColumns = ['label', 'description'];
     selection = new SelectionModel<Element>(true, []);
 
@@ -50,7 +50,7 @@ export class ContactsGroupsListComponent implements OnInit {
         public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
-        private headerService: HeaderService,
+        public headerService: HeaderService,
         public dialog: MatDialog,
         public appService: AppService,
         public functions: FunctionsService,
@@ -76,6 +76,7 @@ export class ContactsGroupsListComponent implements OnInit {
                     this.contactsGroups = data['contactsGroups'].map((contactGroup: any) => {
                         return {
                             ...contactGroup,
+                            shared : contactGroup.entities.length > 0,
                             allowed: !this.isLocked(contactGroup)
                         };
                     });
@@ -153,16 +154,19 @@ export class ContactsGroupsListComponent implements OnInit {
         if (this.allPerimeters) {
             return false;
         } else {
-            return !(element.entities.filter((entity: any) => this.userEntitiesIds.indexOf(entity) > -1).length > 0 || element.owner === this.headerService.user.id);
-
+            return element.owner !== this.headerService.user.id;
         }
     }
 
-    goTo(element: any) {
-        if (this.contactGroupFormMode === 'modal') {
-            this.openContactsGroupModal(element);
+    goTo(element: any = null) {
+        if (element === null) {
+            this.router.navigate([`/administration/contacts/contacts-groups/new`]);
         } else {
-            this.router.navigate([`/administration/contacts/contacts-groups/${element.id}`]);
+            if (this.contactGroupFormMode === 'modal') {
+                this.openContactsGroupModal(element);
+            } else {
+                this.router.navigate([`/administration/contacts/contacts-groups/${element.id}`]);
+            }
         }
     }
 
