@@ -919,10 +919,10 @@ class core_tools extends functions
                     require 'apps'.DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_SEPARATOR.'admin'.DIRECTORY_SEPARATOR.$tabModuleOrAdmin[1].DIRECTORY_SEPARATOR.$tabPage[1].'.php';
                 }
             } else {
-                require 'apps'.DIRECTORY_SEPARATOR.$_SESSION['config']['app_id'].DIRECTORY_SEPARATOR.'welcome.php';
+                header('location: ../../dist/index.html');
             }
         } else {
-            require 'apps'.DIRECTORY_SEPARATOR.'welcome.php';
+            header('location: ../../dist/index.html');
         }
     }
 
