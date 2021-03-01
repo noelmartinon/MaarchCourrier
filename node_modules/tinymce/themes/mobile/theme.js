@@ -3,10 +3,6 @@ var mobile = (function (domGlobals) {
     'use strict';
 
     var noop = function () {
-      var args = [];
-      for (var _i = 0; _i < arguments.length; _i++) {
-        args[_i] = arguments[_i];
-      }
     };
     var compose = function (fa, fb) {
       return function () {
@@ -60,13 +56,16 @@ var mobile = (function (domGlobals) {
     var always = constant(true);
 
     var typeOf = function (x) {
-      if (x === null)
+      if (x === null) {
         return 'null';
+      }
       var t = typeof x;
-      if (t === 'object' && Array.prototype.isPrototypeOf(x))
+      if (t === 'object' && (Array.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'Array')) {
         return 'array';
-      if (t === 'object' && String.prototype.isPrototypeOf(x))
+      }
+      if (t === 'object' && (String.prototype.isPrototypeOf(x) || x.constructor && x.constructor.name === 'String')) {
         return 'string';
+      }
       return t;
     };
     var isType = function (type) {
@@ -92,17 +91,20 @@ var mobile = (function (domGlobals) {
     var baseMerge = function (merger) {
       return function () {
         var objects = new Array(arguments.length);
-        for (var i = 0; i < objects.length; i++)
+        for (var i = 0; i < objects.length; i++) {
           objects[i] = arguments[i];
-        if (objects.length === 0)
+        }
+        if (objects.length === 0) {
           throw new Error('Can\'t merge zero objects');
+        }
         var ret = {};
         for (var j = 0; j < objects.length; j++) {
           var curObject = objects[j];
-          for (var key in curObject)
+          for (var key in curObject) {
             if (hasOwnProperty.call(curObject, key)) {
               ret[key] = merger(ret[key], curObject[key]);
             }
+          }
         }
         return ret;
       };
@@ -110,8 +112,6 @@ var mobile = (function (domGlobals) {
     var deepMerge = baseMerge(deep);
     var merge = baseMerge(shallow);
 
-    var never$1 = never;
-    var always$1 = always;
     var none = function () {
       return NONE;
     };
@@ -125,37 +125,27 @@ var mobile = (function (domGlobals) {
       var id = function (n) {
         return n;
       };
-      var noop = function () {
-      };
-      var nul = function () {
-        return null;
-      };
-      var undef = function () {
-        return undefined;
-      };
       var me = {
         fold: function (n, s) {
           return n();
         },
-        is: never$1,
-        isSome: never$1,
-        isNone: always$1,
+        is: never,
+        isSome: never,
+        isNone: always,
         getOr: id,
         getOrThunk: call,
         getOrDie: function (msg) {
           throw new Error(msg || 'error: getOrDie called on none.');
         },
-        getOrNull: nul,
-        getOrUndefined: undef,
+        getOrNull: constant(null),
+        getOrUndefined: constant(undefined),
         or: id,
         orThunk: call,
         map: none,
-        ap: none,
         each: noop,
         bind: none,
-        flatten: none,
-        exists: never$1,
-        forall: always$1,
+        exists: never,
+        forall: always,
         filter: none,
         equals: eq,
         equals_: eq,
@@ -164,19 +154,15 @@ var mobile = (function (domGlobals) {
         },
         toString: constant('none()')
       };
-      if (Object.freeze)
+      if (Object.freeze) {
         Object.freeze(me);
+      }
       return me;
     }();
     var some = function (a) {
-      var constant_a = function () {
-        return a;
-      };
+      var constant_a = constant(a);
       var self = function () {
         return me;
-      };
-      var map = function (f) {
-        return some(f(a));
       };
       var bind = function (f) {
         return f(a);
@@ -188,8 +174,8 @@ var mobile = (function (domGlobals) {
         is: function (v) {
           return a === v;
         },
-        isSome: always$1,
-        isNone: never$1,
+        isSome: always,
+        isNone: never,
         getOr: constant_a,
         getOrThunk: constant_a,
         getOrDie: constant_a,
@@ -197,35 +183,31 @@ var mobile = (function (domGlobals) {
         getOrUndefined: constant_a,
         or: self,
         orThunk: self,
-        map: map,
-        ap: function (optfab) {
-          return optfab.fold(none, function (fab) {
-            return some(fab(a));
-          });
+        map: function (f) {
+          return some(f(a));
         },
         each: function (f) {
           f(a);
         },
         bind: bind,
-        flatten: constant_a,
         exists: bind,
         forall: bind,
         filter: function (f) {
           return f(a) ? me : NONE;
-        },
-        equals: function (o) {
-          return o.is(a);
-        },
-        equals_: function (o, elementEq) {
-          return o.fold(never$1, function (b) {
-            return elementEq(a, b);
-          });
         },
         toArray: function () {
           return [a];
         },
         toString: function () {
           return 'some(' + a + ')';
+        },
+        equals: function (o) {
+          return o.is(a);
+        },
+        equals_: function (o, elementEq) {
+          return o.fold(never, function (b) {
+            return elementEq(a, b);
+          });
         }
       };
       return me;
@@ -245,21 +227,21 @@ var mobile = (function (domGlobals) {
       for (var k = 0, len = props.length; k < len; k++) {
         var i = props[k];
         var x = obj[i];
-        f(x, i, obj);
+        f(x, i);
       }
     };
     var map = function (obj, f) {
-      return tupleMap(obj, function (x, i, obj) {
+      return tupleMap(obj, function (x, i) {
         return {
           k: i,
-          v: f(x, i, obj)
+          v: f(x, i)
         };
       });
     };
     var tupleMap = function (obj, f) {
       var r = {};
       each(obj, function (x, i) {
-        var tuple = f(x, i, obj);
+        var tuple = f(x, i);
         r[tuple.k] = tuple.v;
       });
       return r;
@@ -305,18 +287,20 @@ var mobile = (function (domGlobals) {
     var firstMatch = function (regexes, s) {
       for (var i = 0; i < regexes.length; i++) {
         var x = regexes[i];
-        if (x.test(s))
+        if (x.test(s)) {
           return x;
+        }
       }
       return undefined;
     };
     var find = function (regexes, agent) {
       var r = firstMatch(regexes, agent);
-      if (!r)
+      if (!r) {
         return {
           major: 0,
           minor: 0
         };
+      }
       var group = function (i) {
         return Number(agent.replace(r, '$' + i));
       };
@@ -324,8 +308,9 @@ var mobile = (function (domGlobals) {
     };
     var detect = function (versionRegexes, agent) {
       var cleanedAgent = String(agent).toLowerCase();
-      if (versionRegexes.length === 0)
+      if (versionRegexes.length === 0) {
         return unknown();
+      }
       return find(versionRegexes, cleanedAgent);
     };
     var unknown = function () {
@@ -451,48 +436,50 @@ var mobile = (function (domGlobals) {
       };
     };
 
-    var rawIndexOf = function () {
-      var pIndexOf = Array.prototype.indexOf;
-      var fastIndex = function (xs, x) {
-        return pIndexOf.call(xs, x);
-      };
-      var slowIndex = function (xs, x) {
-        return slowIndexOf(xs, x);
-      };
-      return pIndexOf === undefined ? slowIndex : fastIndex;
-    }();
+    var nativeSlice = Array.prototype.slice;
+    var nativeIndexOf = Array.prototype.indexOf;
+    var nativePush = Array.prototype.push;
+    var rawIndexOf = function (ts, t) {
+      return nativeIndexOf.call(ts, t);
+    };
     var contains = function (xs, x) {
       return rawIndexOf(xs, x) > -1;
     };
     var exists = function (xs, pred) {
-      return findIndex(xs, pred).isSome();
+      for (var i = 0, len = xs.length; i < len; i++) {
+        var x = xs[i];
+        if (pred(x, i)) {
+          return true;
+        }
+      }
+      return false;
     };
     var map$1 = function (xs, f) {
       var len = xs.length;
       var r = new Array(len);
       for (var i = 0; i < len; i++) {
         var x = xs[i];
-        r[i] = f(x, i, xs);
+        r[i] = f(x, i);
       }
       return r;
     };
     var each$1 = function (xs, f) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
-        f(x, i, xs);
+        f(x, i);
       }
     };
     var eachr = function (xs, f) {
       for (var i = xs.length - 1; i >= 0; i--) {
         var x = xs[i];
-        f(x, i, xs);
+        f(x, i);
       }
     };
     var filter = function (xs, pred) {
       var r = [];
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
-        if (pred(x, i, xs)) {
+        if (pred(x, i)) {
           r.push(x);
         }
       }
@@ -513,7 +500,7 @@ var mobile = (function (domGlobals) {
     var find$1 = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
-        if (pred(x, i, xs)) {
+        if (pred(x, i)) {
           return Option.some(x);
         }
       }
@@ -522,27 +509,19 @@ var mobile = (function (domGlobals) {
     var findIndex = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; i++) {
         var x = xs[i];
-        if (pred(x, i, xs)) {
+        if (pred(x, i)) {
           return Option.some(i);
         }
       }
       return Option.none();
     };
-    var slowIndexOf = function (xs, x) {
-      for (var i = 0, len = xs.length; i < len; ++i) {
-        if (xs[i] === x) {
-          return i;
-        }
-      }
-      return -1;
-    };
-    var push = Array.prototype.push;
     var flatten = function (xs) {
       var r = [];
       for (var i = 0, len = xs.length; i < len; ++i) {
-        if (!Array.prototype.isPrototypeOf(xs[i]))
+        if (!isArray(xs[i])) {
           throw new Error('Arr.flatten item ' + i + ' was not an array, input: ' + xs);
-        push.apply(r, xs[i]);
+        }
+        nativePush.apply(r, xs[i]);
       }
       return r;
     };
@@ -553,15 +532,14 @@ var mobile = (function (domGlobals) {
     var forall = function (xs, pred) {
       for (var i = 0, len = xs.length; i < len; ++i) {
         var x = xs[i];
-        if (pred(x, i, xs) !== true) {
+        if (pred(x, i) !== true) {
           return false;
         }
       }
       return true;
     };
-    var slice = Array.prototype.slice;
     var reverse = function (xs) {
-      var r = slice.call(xs, 0);
+      var r = nativeSlice.call(xs, 0);
       r.reverse();
       return r;
     };
@@ -574,7 +552,7 @@ var mobile = (function (domGlobals) {
       return [x];
     };
     var from$1 = isFunction(Array.from) ? Array.from : function (x) {
-      return slice.call(x);
+      return nativeSlice.call(x);
     };
 
     var detect$1 = function (candidates, userAgent) {
@@ -607,10 +585,12 @@ var mobile = (function (domGlobals) {
     };
 
     var checkRange = function (str, substr, start) {
-      if (substr === '')
+      if (substr === '') {
         return true;
-      if (str.length < substr.length)
+      }
+      if (str.length < substr.length) {
         return false;
+      }
       var x = str.substr(start, start + substr.length);
       return x === substr;
     };
@@ -645,8 +625,7 @@ var mobile = (function (domGlobals) {
         name: 'Edge',
         versionRegexes: [/.*?edge\/ ?([0-9]+)\.([0-9]+)$/],
         search: function (uastring) {
-          var monstrosity = contains$1(uastring, 'edge/') && contains$1(uastring, 'chrome') && contains$1(uastring, 'safari') && contains$1(uastring, 'applewebkit');
-          return monstrosity;
+          return contains$1(uastring, 'edge/') && contains$1(uastring, 'chrome') && contains$1(uastring, 'safari') && contains$1(uastring, 'applewebkit');
         }
       },
       {
@@ -849,6 +828,32 @@ var mobile = (function (domGlobals) {
     var ENTITY = domGlobals.Node.ENTITY_NODE;
     var NOTATION = domGlobals.Node.NOTATION_NODE;
 
+    var Global = typeof domGlobals.window !== 'undefined' ? domGlobals.window : Function('return this;')();
+
+    var path = function (parts, scope) {
+      var o = scope !== undefined && scope !== null ? scope : Global;
+      for (var i = 0; i < parts.length && o !== undefined && o !== null; ++i) {
+        o = o[parts[i]];
+      }
+      return o;
+    };
+    var resolve = function (p, scope) {
+      var parts = p.split('.');
+      return path(parts, scope);
+    };
+
+    var unsafe = function (name, scope) {
+      return resolve(name, scope);
+    };
+    var getOrDie = function (name, scope) {
+      var actual = unsafe(name, scope);
+      if (actual === undefined || actual === null) {
+        throw new Error(name + ' not available on this browser');
+      }
+      return actual;
+    };
+    var Global$1 = { getOrDie: getOrDie };
+
     var name = function (element) {
       var r = element.dom().nodeName;
       return r.toLowerCase();
@@ -910,11 +915,13 @@ var mobile = (function (domGlobals) {
       throw new Error('Unsupported keys for object: ' + sort(unsupported).join(', '));
     };
     var validateStrArr = function (label, array) {
-      if (!isArray(array))
+      if (!isArray(array)) {
         throw new Error('The ' + label + ' fields must be an array. Was: ' + array + '.');
+      }
       each$1(array, function (a) {
-        if (!isString(a))
+        if (!isString(a)) {
           throw new Error('The value ' + a + ' in the ' + label + ' fields was not a string.');
+        }
       });
     };
     var invalidTypeMessage = function (incorrect, type) {
@@ -932,8 +939,9 @@ var mobile = (function (domGlobals) {
 
     var MixedBag = function (required, optional) {
       var everything = required.concat(optional);
-      if (everything.length === 0)
+      if (everything.length === 0) {
         throw new Error('You must specify at least one required or optional field.');
+      }
       validateStrArr('required', required);
       validateStrArr('optional', optional);
       checkDupes(everything);
@@ -942,13 +950,15 @@ var mobile = (function (domGlobals) {
         var allReqd = forall(required, function (req) {
           return contains(keys$1, req);
         });
-        if (!allReqd)
+        if (!allReqd) {
           reqMessage(required, keys$1);
+        }
         var unsupported = filter(keys$1, function (key) {
           return !contains(everything, key);
         });
-        if (unsupported.length > 0)
+        if (unsupported.length > 0) {
           unsuppMessage(unsupported);
+        }
         var r = {};
         each$1(required, function (req) {
           r[req] = constant(obj[req]);
@@ -959,30 +969,6 @@ var mobile = (function (domGlobals) {
         return r;
       };
     };
-
-    var Global = typeof domGlobals.window !== 'undefined' ? domGlobals.window : Function('return this;')();
-
-    var path = function (parts, scope) {
-      var o = scope !== undefined && scope !== null ? scope : Global;
-      for (var i = 0; i < parts.length && o !== undefined && o !== null; ++i)
-        o = o[parts[i]];
-      return o;
-    };
-    var resolve = function (p, scope) {
-      var parts = p.split('.');
-      return path(parts, scope);
-    };
-
-    var unsafe = function (name, scope) {
-      return resolve(name, scope);
-    };
-    var getOrDie = function (name, scope) {
-      var actual = unsafe(name, scope);
-      if (actual === undefined || actual === null)
-        throw name + ' not available on this browser';
-      return actual;
-    };
-    var Global$1 = { getOrDie: getOrDie };
 
     var node = function () {
       var f = Global$1.getOrDie('Node');
@@ -1005,19 +991,22 @@ var mobile = (function (domGlobals) {
     var ELEMENT$1 = ELEMENT;
     var DOCUMENT$1 = DOCUMENT;
     var is = function (element, selector) {
-      var elem = element.dom();
-      if (elem.nodeType !== ELEMENT$1) {
+      var dom = element.dom();
+      if (dom.nodeType !== ELEMENT$1) {
         return false;
-      } else if (elem.matches !== undefined) {
-        return elem.matches(selector);
-      } else if (elem.msMatchesSelector !== undefined) {
-        return elem.msMatchesSelector(selector);
-      } else if (elem.webkitMatchesSelector !== undefined) {
-        return elem.webkitMatchesSelector(selector);
-      } else if (elem.mozMatchesSelector !== undefined) {
-        return elem.mozMatchesSelector(selector);
       } else {
-        throw new Error('Browser lacks native selectors');
+        var elem = dom;
+        if (elem.matches !== undefined) {
+          return elem.matches(selector);
+        } else if (elem.msMatchesSelector !== undefined) {
+          return elem.msMatchesSelector(selector);
+        } else if (elem.webkitMatchesSelector !== undefined) {
+          return elem.webkitMatchesSelector(selector);
+        } else if (elem.mozMatchesSelector !== undefined) {
+          return elem.mozMatchesSelector(selector);
+        } else {
+          throw new Error('Browser lacks native selectors');
+        }
       }
     };
     var bypassSelector = function (dom) {
@@ -1050,16 +1039,13 @@ var mobile = (function (domGlobals) {
       return Element.fromDom(element.dom().ownerDocument);
     };
     var defaultView = function (element) {
-      var el = element.dom();
-      var defView = el.ownerDocument.defaultView;
-      return Element.fromDom(defView);
+      return Element.fromDom(element.dom().ownerDocument.defaultView);
     };
     var parent = function (element) {
-      var dom = element.dom();
-      return Option.from(dom.parentNode).map(Element.fromDom);
+      return Option.from(element.dom().parentNode).map(Element.fromDom);
     };
     var parents = function (element, isRoot) {
-      var stop = isFunction(isRoot) ? isRoot : constant(false);
+      var stop = isFunction(isRoot) ? isRoot : never;
       var dom = element.dom();
       var ret = [];
       while (dom.parentNode !== null && dom.parentNode !== undefined) {
@@ -1083,12 +1069,10 @@ var mobile = (function (domGlobals) {
       return parent(element).map(children).map(filterSelf).getOr([]);
     };
     var nextSibling = function (element) {
-      var dom = element.dom();
-      return Option.from(dom.nextSibling).map(Element.fromDom);
+      return Option.from(element.dom().nextSibling).map(Element.fromDom);
     };
     var children = function (element) {
-      var dom = element.dom();
-      return map$1(dom.childNodes, Element.fromDom);
+      return map$1(element.dom().childNodes, Element.fromDom);
     };
     var child = function (element, index) {
       var cs = element.dom().childNodes;
@@ -1300,9 +1284,15 @@ var mobile = (function (domGlobals) {
         toOption: Option.none
       };
     };
+    var fromOption = function (opt, err) {
+      return opt.fold(function () {
+        return error(err);
+      }, value);
+    };
     var Result = {
       value: value,
-      error: error
+      error: error,
+      fromOption: fromOption
     };
 
     var generate = function (cases) {
@@ -1335,8 +1325,9 @@ var mobile = (function (domGlobals) {
             throw new Error('Wrong number of arguments to case ' + key + '. Expected ' + value.length + ' (' + value + '), got ' + argLength);
           }
           var args = new Array(argLength);
-          for (var i = 0; i < args.length; i++)
+          for (var i = 0; i < args.length; i++) {
             args[i] = arguments[i];
+          }
           var match = function (branches) {
             var branchKeys = keys(branches);
             if (constructors.length !== branchKeys.length) {
@@ -1345,8 +1336,9 @@ var mobile = (function (domGlobals) {
             var allReqd = forall(constructors, function (reqKey) {
               return contains(branchKeys, reqKey);
             });
-            if (!allReqd)
+            if (!allReqd) {
               throw new Error('Not all branches were specified when using match. Specified: ' + branchKeys.join(', ') + '\nRequired: ' + constructors.join(', '));
+            }
             return branches[key].apply(null, args);
           };
           return {
@@ -2315,8 +2307,9 @@ var mobile = (function (domGlobals) {
       });
     };
     var baseWith = function (handleUnsupported, required, pred) {
-      if (required.length === 0)
+      if (required.length === 0) {
         throw new Error('You must specify at least one required field.');
+      }
       validateStrArr('required', required);
       checkDupes(required);
       return function (obj) {
@@ -2324,14 +2317,16 @@ var mobile = (function (domGlobals) {
         var allReqd = forall(required, function (req) {
           return contains(keys$1, req);
         });
-        if (!allReqd)
+        if (!allReqd) {
           reqMessage(required, keys$1);
+        }
         handleUnsupported(required, keys$1);
         var invalidKeys = filter(required, function (key) {
           return !pred.validate(obj[key], key);
         });
-        if (invalidKeys.length > 0)
+        if (invalidKeys.length > 0) {
           invalidTypeMessage(invalidKeys, pred.label);
+        }
         return obj;
       };
     };
@@ -2339,8 +2334,9 @@ var mobile = (function (domGlobals) {
       var unsupported = filter(keys, function (key) {
         return !contains(required, key);
       });
-      if (unsupported.length > 0)
+      if (unsupported.length > 0) {
         unsuppMessage(unsupported);
+      }
     };
     var allowExtra = noop;
     var exactly = function (required) {
@@ -2571,16 +2567,17 @@ var mobile = (function (domGlobals) {
       return Option.none();
     };
     var closest = function (scope, predicate, isRoot) {
-      var is = function (s) {
-        return predicate(s);
+      var is = function (s, test) {
+        return test(s);
       };
       return ClosestOrAncestor(is, ancestor, scope, predicate, isRoot);
     };
     var descendant = function (scope, predicate) {
       var descend = function (node) {
         for (var i = 0; i < node.childNodes.length; i++) {
-          if (predicate(Element.fromDom(node.childNodes[i]))) {
-            return Option.some(Element.fromDom(node.childNodes[i]));
+          var child_1 = Element.fromDom(node.childNodes[i]);
+          if (predicate(child_1)) {
+            return Option.some(child_1);
           }
           var res = descend(node.childNodes[i]);
           if (res.isSome()) {
@@ -2602,8 +2599,8 @@ var mobile = (function (domGlobals) {
       var doc = owner(element).dom();
       return element.dom() === doc.activeElement;
     };
-    var active = function (_DOC) {
-      var doc = _DOC !== undefined ? _DOC.dom() : domGlobals.document;
+    var active = function (_doc) {
+      var doc = _doc !== undefined ? _doc.dom() : domGlobals.document;
       return Option.from(doc.activeElement).map(Element.fromDom);
     };
     var search = function (element) {
@@ -2612,9 +2609,9 @@ var mobile = (function (domGlobals) {
       });
     };
 
-    var global = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
+    var global$1 = tinymce.util.Tools.resolve('tinymce.dom.DOMUtils');
 
-    var global$1 = tinymce.util.Tools.resolve('tinymce.ThemeManager');
+    var global$2 = tinymce.util.Tools.resolve('tinymce.ThemeManager');
 
     var openLink = function (target) {
       var link = domGlobals.document.createElement('a');
@@ -2729,6 +2726,9 @@ var mobile = (function (domGlobals) {
       }
       return Option.none();
     };
+    var someIf = function (b, a) {
+      return b ? Option.some(a) : Option.none();
+    };
 
     var unknown$3 = 'unknown';
     var eventsMonitored = [];
@@ -2758,7 +2758,7 @@ var mobile = (function (domGlobals) {
       write: noop
     };
     var monitorEvent = function (eventName, initialTarget, f) {
-      var logger = eventsMonitored === '*' || contains(eventsMonitored, eventName) ? function () {
+      var logger =  (eventsMonitored === '*' || contains(eventsMonitored, eventName)) ? function () {
         var sequence = [];
         return {
           logEventCut: function (name, target, purpose) {
@@ -3095,7 +3095,7 @@ var mobile = (function (domGlobals) {
     });
 
     var isSupported = function (dom) {
-      return dom.style !== undefined;
+      return dom.style !== undefined && isFunction(dom.style.getPropertyValue);
     };
 
     var internalSet = function (dom, property, value) {
@@ -3356,19 +3356,19 @@ var mobile = (function (domGlobals) {
     };
     var highlight = function (component, hConfig, hState, target) {
       var wasHighlighted = isHighlighted(component, hConfig, hState, target);
-      dehighlightAll(component, hConfig, hState);
+      dehighlightAll(component, hConfig);
       add$2(target.element(), hConfig.highlightClass());
       if (!wasHighlighted) {
         hConfig.onHighlight()(component, target);
       }
     };
     var highlightFirst = function (component, hConfig, hState) {
-      getFirst(component, hConfig, hState).each(function (firstComp) {
+      getFirst(component, hConfig).each(function (firstComp) {
         highlight(component, hConfig, hState, firstComp);
       });
     };
     var highlightLast = function (component, hConfig, hState) {
-      getLast(component, hConfig, hState).each(function (lastComp) {
+      getLast(component, hConfig).each(function (lastComp) {
         highlight(component, hConfig, hState, lastComp);
       });
     };
@@ -3753,8 +3753,7 @@ var mobile = (function (domGlobals) {
     };
 
     var locateVisible = function (container, current, selector) {
-      var filter = isVisible;
-      return locateIn(container, current, selector, filter);
+      return locateIn(container, current, selector);
     };
     var locateIn = function (container, current, selector, filter$1) {
       var predicate = curry(eq, current);
@@ -4531,7 +4530,7 @@ var mobile = (function (domGlobals) {
       ]).concat(partUidsSchemas);
     };
     var asStructOrDie$1 = function (label, schema, spec, partSchemas, partUidsSchemas) {
-      var baseS = base$1(label, partSchemas, partUidsSchemas, spec);
+      var baseS = base$1(label, partSchemas, partUidsSchemas);
       return asStructOrDie(label + ' [SpecSchema]', objOfOnly(baseS.concat(schema)), spec);
     };
 
@@ -5485,7 +5484,7 @@ var mobile = (function (domGlobals) {
       });
     };
     var getRawOrComputed = function (isRoot, rawStart) {
-      var optStart = isElement(rawStart) ? Option.some(rawStart) : parent(rawStart);
+      var optStart = isElement(rawStart) ? Option.some(rawStart) : parent(rawStart).filter(isElement);
       return optStart.map(function (start) {
         var inline = closest(start, function (elem) {
           return getRaw(elem, 'font-size').isSome();
@@ -5578,60 +5577,14 @@ var mobile = (function (domGlobals) {
       };
     };
 
-    function create$3(width, height) {
-      return resize(domGlobals.document.createElement('canvas'), width, height);
-    }
-    function clone$1(canvas) {
-      var tCanvas, ctx;
-      tCanvas = create$3(canvas.width, canvas.height);
-      ctx = get2dContext(tCanvas);
-      ctx.drawImage(canvas, 0, 0);
-      return tCanvas;
-    }
-    function get2dContext(canvas) {
-      return canvas.getContext('2d');
-    }
-    function get3dContext(canvas) {
-      var gl = null;
-      try {
-        gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-      } catch (e) {
-      }
-      if (!gl) {
-        gl = null;
-      }
-      return gl;
-    }
-    function resize(canvas, width, height) {
-      canvas.width = width;
-      canvas.height = height;
-      return canvas;
-    }
-    var Canvas = {
-      create: create$3,
-      clone: clone$1,
-      resize: resize,
-      get2dContext: get2dContext,
-      get3dContext: get3dContext
-    };
-
-    function getWidth(image) {
-      return image.naturalWidth || image.width;
-    }
-    function getHeight(image) {
-      return image.naturalHeight || image.height;
-    }
-    var ImageSize = {
-      getWidth: getWidth,
-      getHeight: getHeight
-    };
-
     var promise = function () {
       var Promise = function (fn) {
-        if (typeof this !== 'object')
+        if (typeof this !== 'object') {
           throw new TypeError('Promises must be constructed via new');
-        if (typeof fn !== 'function')
+        }
+        if (typeof fn !== 'function') {
           throw new TypeError('not a function');
+        }
         this._state = null;
         this._value = null;
         this._deferreds = [];
@@ -5642,7 +5595,7 @@ var mobile = (function (domGlobals) {
       };
       function bind(fn, thisArg) {
         return function () {
-          fn.apply(thisArg, arguments);
+          return fn.apply(thisArg, arguments);
         };
       }
       var isArray = Array.isArray || function (value) {
@@ -5672,8 +5625,9 @@ var mobile = (function (domGlobals) {
       }
       function resolve(newValue) {
         try {
-          if (newValue === this)
+          if (newValue === this) {
             throw new TypeError('A promise cannot be resolved with itself.');
+          }
           if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
             var then = newValue.then;
             if (typeof then === 'function') {
@@ -5694,10 +5648,11 @@ var mobile = (function (domGlobals) {
         finale.call(this);
       }
       function finale() {
-        for (var i = 0, len = this._deferreds.length; i < len; i++) {
-          handle.call(this, this._deferreds[i]);
+        for (var _i = 0, _a = this._deferreds; _i < _a.length; _i++) {
+          var deferred = _a[_i];
+          handle.call(this, deferred);
         }
-        this._deferreds = null;
+        this._deferreds = [];
       }
       function Handler(onFulfilled, onRejected, resolve, reject) {
         this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
@@ -5709,24 +5664,27 @@ var mobile = (function (domGlobals) {
         var done = false;
         try {
           fn(function (value) {
-            if (done)
+            if (done) {
               return;
+            }
             done = true;
             onFulfilled(value);
           }, function (reason) {
-            if (done)
+            if (done) {
               return;
+            }
             done = true;
             onRejected(reason);
           });
         } catch (ex) {
-          if (done)
+          if (done) {
             return;
+          }
           done = true;
           onRejected(ex);
         }
       }
-      Promise.prototype['catch'] = function (onRejected) {
+      Promise.prototype.catch = function (onRejected) {
         return this.then(null, onRejected);
       };
       Promise.prototype.then = function (onFulfilled, onRejected) {
@@ -5736,10 +5694,15 @@ var mobile = (function (domGlobals) {
         });
       };
       Promise.all = function () {
-        var args = Array.prototype.slice.call(arguments.length === 1 && isArray(arguments[0]) ? arguments[0] : arguments);
+        var values = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+          values[_i] = arguments[_i];
+        }
+        var args = Array.prototype.slice.call(values.length === 1 && isArray(values[0]) ? values[0] : values);
         return new Promise(function (resolve, reject) {
-          if (args.length === 0)
+          if (args.length === 0) {
             return resolve([]);
+          }
           var remaining = args.length;
           function res(i, val) {
             try {
@@ -5773,15 +5736,16 @@ var mobile = (function (domGlobals) {
           resolve(value);
         });
       };
-      Promise.reject = function (value) {
+      Promise.reject = function (reason) {
         return new Promise(function (resolve, reject) {
-          reject(value);
+          reject(reason);
         });
       };
       Promise.race = function (values) {
         return new Promise(function (resolve, reject) {
-          for (var i = 0, len = values.length; i < len; i++) {
-            values[i].then(resolve, reject);
+          for (var _i = 0, values_1 = values; _i < values_1.length; _i++) {
+            var value = values_1[_i];
+            value.then(resolve, reject);
           }
         });
       };
@@ -5789,174 +5753,13 @@ var mobile = (function (domGlobals) {
     };
     var Promise = window.Promise ? window.Promise : promise();
 
-    function Blob (parts, properties) {
-      var f = Global$1.getOrDie('Blob');
-      return new f(parts, properties);
-    }
-
-    function FileReader () {
-      var f = Global$1.getOrDie('FileReader');
-      return new f();
-    }
-
-    function Uint8Array (arr) {
-      var f = Global$1.getOrDie('Uint8Array');
-      return new f(arr);
-    }
-
-    var requestAnimationFrame = function (callback) {
-      var f = Global$1.getOrDie('requestAnimationFrame');
-      f(callback);
-    };
-    var atob = function (base64) {
-      var f = Global$1.getOrDie('atob');
-      return f(base64);
-    };
-    var Window = {
-      atob: atob,
-      requestAnimationFrame: requestAnimationFrame
-    };
-
-    function imageToBlob(image) {
-      var src = image.src;
-      if (src.indexOf('data:') === 0) {
-        return dataUriToBlob(src);
-      }
-      return anyUriToBlob(src);
-    }
-    function blobToImage(blob) {
-      return new Promise(function (resolve, reject) {
-        var blobUrl = domGlobals.URL.createObjectURL(blob);
-        var image = new domGlobals.Image();
-        var removeListeners = function () {
-          image.removeEventListener('load', loaded);
-          image.removeEventListener('error', error);
-        };
-        function loaded() {
-          removeListeners();
-          resolve(image);
-        }
-        function error() {
-          removeListeners();
-          reject('Unable to load data of type ' + blob.type + ': ' + blobUrl);
-        }
-        image.addEventListener('load', loaded);
-        image.addEventListener('error', error);
-        image.src = blobUrl;
-        if (image.complete) {
-          loaded();
-        }
-      });
-    }
-    function anyUriToBlob(url) {
-      return new Promise(function (resolve, reject) {
-        var xhr = new domGlobals.XMLHttpRequest();
-        xhr.open('GET', url, true);
-        xhr.responseType = 'blob';
-        xhr.onload = function () {
-          if (this.status == 200) {
-            resolve(this.response);
-          }
-        };
-        xhr.onerror = function () {
-          var _this = this;
-          var corsError = function () {
-            var obj = new Error('No access to download image');
-            obj.code = 18;
-            obj.name = 'SecurityError';
-            return obj;
-          };
-          var genericError = function () {
-            return new Error('Error ' + _this.status + ' downloading image');
-          };
-          reject(this.status === 0 ? corsError() : genericError());
-        };
-        xhr.send();
-      });
-    }
-    function dataUriToBlobSync(uri) {
-      var data = uri.split(',');
-      var matches = /data:([^;]+)/.exec(data[0]);
-      if (!matches)
-        return Option.none();
-      var mimetype = matches[1];
-      var base64 = data[1];
-      var sliceSize = 1024;
-      var byteCharacters = Window.atob(base64);
-      var bytesLength = byteCharacters.length;
-      var slicesCount = Math.ceil(bytesLength / sliceSize);
-      var byteArrays = new Array(slicesCount);
-      for (var sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
-        var begin = sliceIndex * sliceSize;
-        var end = Math.min(begin + sliceSize, bytesLength);
-        var bytes = new Array(end - begin);
-        for (var offset = begin, i = 0; offset < end; ++i, ++offset) {
-          bytes[i] = byteCharacters[offset].charCodeAt(0);
-        }
-        byteArrays[sliceIndex] = Uint8Array(bytes);
-      }
-      return Option.some(Blob(byteArrays, { type: mimetype }));
-    }
-    function dataUriToBlob(uri) {
-      return new Promise(function (resolve, reject) {
-        dataUriToBlobSync(uri).fold(function () {
-          reject('uri is not base64: ' + uri);
-        }, resolve);
-      });
-    }
-    function uriToBlob(url) {
-      if (url.indexOf('blob:') === 0) {
-        return anyUriToBlob(url);
-      }
-      if (url.indexOf('data:') === 0) {
-        return dataUriToBlob(url);
-      }
-      return null;
-    }
-    function canvasToBlob(canvas, type, quality) {
-      type = type || 'image/png';
-      if (domGlobals.HTMLCanvasElement.prototype.toBlob) {
-        return new Promise(function (resolve) {
-          canvas.toBlob(function (blob) {
-            resolve(blob);
-          }, type, quality);
-        });
-      } else {
-        return dataUriToBlob(canvas.toDataURL(type, quality));
-      }
-    }
-    function canvasToDataURL(getCanvas, type, quality) {
-      type = type || 'image/png';
-      return getCanvas.then(function (canvas) {
-        return canvas.toDataURL(type, quality);
-      });
-    }
-    function blobToCanvas(blob) {
-      return blobToImage(blob).then(function (image) {
-        revokeImageUrl(image);
-        var context, canvas;
-        canvas = Canvas.create(ImageSize.getWidth(image), ImageSize.getHeight(image));
-        context = Canvas.get2dContext(canvas);
-        context.drawImage(image, 0, 0);
-        return canvas;
-      });
-    }
     function blobToDataUri(blob) {
       return new Promise(function (resolve) {
-        var reader = FileReader();
+        var reader = new domGlobals.FileReader();
         reader.onloadend = function () {
           resolve(reader.result);
         };
         reader.readAsDataURL(blob);
-      });
-    }
-    function blobToArrayBuffer(blob) {
-      return new Promise(function (resolve) {
-        var reader = FileReader();
-        reader.onloadend = function () {
-          resolve(reader.result);
-        };
-        reader.readAsArrayBuffer(blob);
       });
     }
     function blobToBase64(blob) {
@@ -5964,51 +5767,13 @@ var mobile = (function (domGlobals) {
         return dataUri.split(',')[1];
       });
     }
-    function revokeImageUrl(image) {
-      domGlobals.URL.revokeObjectURL(image.src);
-    }
-    var Conversions = {
-      blobToImage: blobToImage,
-      imageToBlob: imageToBlob,
-      blobToArrayBuffer: blobToArrayBuffer,
-      blobToDataUri: blobToDataUri,
-      blobToBase64: blobToBase64,
-      dataUriToBlobSync: dataUriToBlobSync,
-      canvasToBlob: canvasToBlob,
-      canvasToDataURL: canvasToDataURL,
-      blobToCanvas: blobToCanvas,
-      uriToBlob: uriToBlob
-    };
 
-    var blobToImage$1 = function (image) {
-      return Conversions.blobToImage(image);
-    };
-    var imageToBlob$1 = function (blob) {
-      return Conversions.imageToBlob(blob);
-    };
-    var blobToDataUri$1 = function (blob) {
-      return Conversions.blobToDataUri(blob);
-    };
     var blobToBase64$1 = function (blob) {
-      return Conversions.blobToBase64(blob);
-    };
-    var dataUriToBlobSync$1 = function (uri) {
-      return Conversions.dataUriToBlobSync(uri);
-    };
-    var uriToBlob$1 = function (uri) {
-      return Option.from(Conversions.uriToBlob(uri));
-    };
-    var BlobConversions = {
-      blobToImage: blobToImage$1,
-      imageToBlob: imageToBlob$1,
-      blobToDataUri: blobToDataUri$1,
-      blobToBase64: blobToBase64$1,
-      dataUriToBlobSync: dataUriToBlobSync$1,
-      uriToBlob: uriToBlob$1
+      return blobToBase64(blob);
     };
 
     var addImage = function (editor, blob) {
-      BlobConversions.blobToBase64(blob).then(function (base64) {
+      blobToBase64$1(blob).then(function (base64) {
         editor.undoManager.transact(function () {
           var cache = editor.editorUpload.blobCache;
           var info = cache.create(generate$1('mceu'), blob, base64);
@@ -6438,7 +6203,7 @@ var mobile = (function (domGlobals) {
     ];
     var onLoad$5 = function (component, disableConfig, disableState) {
       if (disableConfig.disabled()) {
-        disable(component, disableConfig, disableState);
+        disable(component, disableConfig);
       }
     };
     var hasNative = function (component) {
@@ -7941,7 +7706,7 @@ var mobile = (function (domGlobals) {
       insert(component, replaceConfig, prepend, prependee);
     };
     var remove$7 = function (component, replaceConfig, replaceState, removee) {
-      var children = contents(component, replaceConfig);
+      var children = contents(component);
       var foundChild = find$1(children, function (child) {
         return eq(removee.element(), child.element());
       });
@@ -8083,7 +7848,7 @@ var mobile = (function (domGlobals) {
       var layeredState = LayeredState.init();
       var setup = function (container) {
         var componentMap = buildMenus(container, detail.data().menus());
-        var directory = toDirectory(container);
+        var directory = toDirectory();
         layeredState.setContents(detail.data().primary(), componentMap, detail.data().expansions(), directory);
         return layeredState.getPrimary();
       };
@@ -8322,7 +8087,7 @@ var mobile = (function (domGlobals) {
       });
     };
     var getTransition = function (comp, transConfig, transState) {
-      var route = getCurrentRoute(comp, transConfig, transState);
+      var route = getCurrentRoute(comp, transConfig);
       return route.bind(function (r) {
         return getTransitionOf(comp, transConfig, transState, r);
       });
@@ -8371,7 +8136,7 @@ var mobile = (function (domGlobals) {
       }
     };
     var progressTo = function (comp, transConfig, transState, destination) {
-      fasttrack(comp, transConfig, transState, destination);
+      fasttrack(comp, transConfig);
       var route = getNewRoute(comp, transConfig, transState, destination);
       getTransitionOf(comp, transConfig, transState, route).fold(function () {
         jumpTo(comp, transConfig, transState, destination);
@@ -8400,7 +8165,7 @@ var mobile = (function (domGlobals) {
       return derive([
         run(transitionend(), function (component, simulatedEvent) {
           var raw = simulatedEvent.event().raw();
-          getCurrentRoute(component, transConfig, transState).each(function (route) {
+          getCurrentRoute(component, transConfig).each(function (route) {
             findRoute(component, transConfig, transState, route).each(function (rInfo) {
               rInfo.transition().each(function (rTransition) {
                 if (raw.propertyName === rTransition.property()) {
@@ -9232,18 +8997,9 @@ var mobile = (function (domGlobals) {
         }
         return getOption(element).getOr('');
       };
-      var getOptionIE10 = function (element) {
-        try {
-          return getOptionSafe(element);
-        } catch (e) {
-          return Option.none();
-        }
-      };
-      var getOptionSafe = function (element) {
+      var getOption = function (element) {
         return is(element) ? Option.from(element.dom().nodeValue) : Option.none();
       };
-      var browser = PlatformDetection$1.detect().browser;
-      var getOption = browser.isIE() && browser.version.major === 10 ? getOptionIE10 : getOptionSafe;
       var set = function (element, value) {
         if (!is(element)) {
           throw new Error('Can only set raw ' + name + ' value of a ' + name + ' node');
@@ -9258,9 +9014,6 @@ var mobile = (function (domGlobals) {
     }
 
     var api$3 = NodeValue(isText, 'text');
-    var get$b = function (element) {
-      return api$3.get(element);
-    };
     var getOption = function (element) {
       return api$3.getOption(element);
     };
@@ -9272,20 +9025,9 @@ var mobile = (function (domGlobals) {
         return v.length;
       });
     };
-    var NBSP = '\xA0';
-    var isTextNodeWithCursorPosition = function (el) {
-      return getOption(el).filter(function (text) {
-        return text.trim().length !== 0 || text.indexOf(NBSP) > -1;
-      }).isSome();
-    };
-    var elementsWithCursorPosition = [
-      'img',
-      'br'
-    ];
-    var isCursorPosition = function (elem) {
-      var hasCursorPosition = isTextNodeWithCursorPosition(elem);
-      return hasCursorPosition || contains(elementsWithCursorPosition, name(elem));
-    };
+
+    var create$3 = Immutable('start', 'soffset', 'finish', 'foffset');
+    var SimRange = { create: create$3 };
 
     var adt$4 = Adt.generate([
       { before: ['element'] },
@@ -9314,7 +9056,7 @@ var mobile = (function (domGlobals) {
       getStart: getStart
     };
 
-    var type$1 = Adt.generate([
+    var adt$5 = Adt.generate([
       { domRange: ['rng'] },
       {
         relative: [
@@ -9331,21 +9073,37 @@ var mobile = (function (domGlobals) {
         ]
       }
     ]);
-    var range = Immutable('start', 'soffset', 'finish', 'foffset');
-    var relative = type$1.relative;
-    var exact = type$1.exact;
-
-    var makeRange = function (start, soffset, finish, foffset) {
-      var doc = owner(start);
-      var rng = doc.dom().createRange();
-      rng.setStart(start.dom(), soffset);
-      rng.setEnd(finish.dom(), foffset);
-      return rng;
+    var exactFromRange = function (simRange) {
+      return adt$5.exact(simRange.start(), simRange.soffset(), simRange.finish(), simRange.foffset());
     };
-    var after$2 = function (start, soffset, finish, foffset) {
-      var r = makeRange(start, soffset, finish, foffset);
-      var same = eq(start, finish) && soffset === foffset;
-      return r.collapsed && !same;
+    var getStart$1 = function (selection) {
+      return selection.match({
+        domRange: function (rng) {
+          return Element.fromDom(rng.startContainer);
+        },
+        relative: function (startSitu, finishSitu) {
+          return Situ.getStart(startSitu);
+        },
+        exact: function (start, soffset, finish, foffset) {
+          return start;
+        }
+      });
+    };
+    var domRange = adt$5.domRange;
+    var relative = adt$5.relative;
+    var exact = adt$5.exact;
+    var getWin = function (selection) {
+      var start = getStart$1(selection);
+      return defaultView(start);
+    };
+    var range = SimRange.create;
+    var Selection = {
+      domRange: domRange,
+      relative: relative,
+      exact: exact,
+      exactFromRange: exactFromRange,
+      getWin: getWin,
+      range: range
     };
 
     var setStart = function (rng, situ) {
@@ -9394,7 +9152,7 @@ var mobile = (function (domGlobals) {
       return rect.width > 0 || rect.height > 0 ? Option.some(rect).map(toRect) : Option.none();
     };
 
-    var adt$5 = Adt.generate([
+    var adt$6 = Adt.generate([
       {
         ltr: [
           'start',
@@ -9452,12 +9210,12 @@ var mobile = (function (domGlobals) {
           return rev.collapsed === false;
         });
         return reversed.map(function (rev) {
-          return adt$5.rtl(Element.fromDom(rev.endContainer), rev.endOffset, Element.fromDom(rev.startContainer), rev.startOffset);
+          return adt$6.rtl(Element.fromDom(rev.endContainer), rev.endOffset, Element.fromDom(rev.startContainer), rev.startOffset);
         }).getOrThunk(function () {
-          return fromRange(win, adt$5.ltr, rng);
+          return fromRange(win, adt$6.ltr, rng);
         });
       } else {
-        return fromRange(win, adt$5.ltr, rng);
+        return fromRange(win, adt$6.ltr, rng);
       }
     };
     var diagnose = function (win, selection) {
@@ -9482,165 +9240,6 @@ var mobile = (function (domGlobals) {
       });
     };
 
-    var searchForPoint = function (rectForOffset, x, y, maxX, length) {
-      if (length === 0) {
-        return 0;
-      } else if (x === maxX) {
-        return length - 1;
-      }
-      var xDelta = maxX;
-      for (var i = 1; i < length; i++) {
-        var rect = rectForOffset(i);
-        var curDeltaX = Math.abs(x - rect.left);
-        if (y <= rect.bottom) {
-          if (y < rect.top || curDeltaX > xDelta) {
-            return i - 1;
-          } else {
-            xDelta = curDeltaX;
-          }
-        }
-      }
-      return 0;
-    };
-    var inRect = function (rect, x, y) {
-      return x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
-    };
-
-    var locateOffset = function (doc, textnode, x, y, rect) {
-      var rangeForOffset = function (o) {
-        var r = doc.dom().createRange();
-        r.setStart(textnode.dom(), o);
-        r.collapse(true);
-        return r;
-      };
-      var rectForOffset = function (o) {
-        var r = rangeForOffset(o);
-        return r.getBoundingClientRect();
-      };
-      var length = get$b(textnode).length;
-      var offset = searchForPoint(rectForOffset, x, y, rect.right, length);
-      return rangeForOffset(offset);
-    };
-    var locate$1 = function (doc, node, x, y) {
-      var r = doc.dom().createRange();
-      r.selectNode(node.dom());
-      var rects = r.getClientRects();
-      var foundRect = findMap(rects, function (rect) {
-        return inRect(rect, x, y) ? Option.some(rect) : Option.none();
-      });
-      return foundRect.map(function (rect) {
-        return locateOffset(doc, node, x, y, rect);
-      });
-    };
-
-    var searchInChildren = function (doc, node, x, y) {
-      var r = doc.dom().createRange();
-      var nodes = children(node);
-      return findMap(nodes, function (n) {
-        r.selectNode(n.dom());
-        return inRect(r.getBoundingClientRect(), x, y) ? locateNode(doc, n, x, y) : Option.none();
-      });
-    };
-    var locateNode = function (doc, node, x, y) {
-      var locator = isText(node) ? locate$1 : searchInChildren;
-      return locator(doc, node, x, y);
-    };
-    var locate$2 = function (doc, node, x, y) {
-      var r = doc.dom().createRange();
-      r.selectNode(node.dom());
-      var rect = r.getBoundingClientRect();
-      var boundedX = Math.max(rect.left, Math.min(rect.right, x));
-      var boundedY = Math.max(rect.top, Math.min(rect.bottom, y));
-      return locateNode(doc, node, boundedX, boundedY);
-    };
-
-    var first$1 = function (element) {
-      return descendant(element, isCursorPosition);
-    };
-    var last = function (element) {
-      return descendantRtl(element, isCursorPosition);
-    };
-    var descendantRtl = function (scope, predicate) {
-      var descend = function (element) {
-        var children$1 = children(element);
-        for (var i = children$1.length - 1; i >= 0; i--) {
-          var child = children$1[i];
-          if (predicate(child)) {
-            return Option.some(child);
-          }
-          var res = descend(child);
-          if (res.isSome()) {
-            return res;
-          }
-        }
-        return Option.none();
-      };
-      return descend(scope);
-    };
-
-    var COLLAPSE_TO_LEFT = true;
-    var COLLAPSE_TO_RIGHT = false;
-    var getCollapseDirection = function (rect, x) {
-      return x - rect.left < rect.right - x ? COLLAPSE_TO_LEFT : COLLAPSE_TO_RIGHT;
-    };
-    var createCollapsedNode = function (doc, target, collapseDirection) {
-      var r = doc.dom().createRange();
-      r.selectNode(target.dom());
-      r.collapse(collapseDirection);
-      return r;
-    };
-    var locateInElement = function (doc, node, x) {
-      var cursorRange = doc.dom().createRange();
-      cursorRange.selectNode(node.dom());
-      var rect = cursorRange.getBoundingClientRect();
-      var collapseDirection = getCollapseDirection(rect, x);
-      var f = collapseDirection === COLLAPSE_TO_LEFT ? first$1 : last;
-      return f(node).map(function (target) {
-        return createCollapsedNode(doc, target, collapseDirection);
-      });
-    };
-    var locateInEmpty = function (doc, node, x) {
-      var rect = node.dom().getBoundingClientRect();
-      var collapseDirection = getCollapseDirection(rect, x);
-      return Option.some(createCollapsedNode(doc, node, collapseDirection));
-    };
-    var search$1 = function (doc, node, x) {
-      var f = children(node).length === 0 ? locateInEmpty : locateInElement;
-      return f(doc, node, x);
-    };
-
-    var caretPositionFromPoint = function (doc, x, y) {
-      return Option.from(doc.dom().caretPositionFromPoint(x, y)).bind(function (pos) {
-        if (pos.offsetNode === null) {
-          return Option.none();
-        }
-        var r = doc.dom().createRange();
-        r.setStart(pos.offsetNode, pos.offset);
-        r.collapse();
-        return Option.some(r);
-      });
-    };
-    var caretRangeFromPoint = function (doc, x, y) {
-      return Option.from(doc.dom().caretRangeFromPoint(x, y));
-    };
-    var searchTextNodes = function (doc, node, x, y) {
-      var r = doc.dom().createRange();
-      r.selectNode(node.dom());
-      var rect = r.getBoundingClientRect();
-      var boundedX = Math.max(rect.left, Math.min(rect.right, x));
-      var boundedY = Math.max(rect.top, Math.min(rect.bottom, y));
-      return locate$2(doc, node, boundedX, boundedY);
-    };
-    var searchFromPoint = function (doc, x, y) {
-      return Element.fromPoint(doc, x, y).bind(function (elem) {
-        var fallback = function () {
-          return search$1(doc, elem, x);
-        };
-        return children(elem).length === 0 ? fallback() : searchTextNodes(doc, elem, x, y).orThunk(fallback);
-      });
-    };
-    var availableSearch = document.caretPositionFromPoint ? caretPositionFromPoint : document.caretRangeFromPoint ? caretRangeFromPoint : searchFromPoint;
-
     var beforeSpecial = function (element, offset) {
       var name$1 = name(element);
       if ('input' === name$1) {
@@ -9657,7 +9256,20 @@ var mobile = (function (domGlobals) {
     var preprocessExact = function (start, soffset, finish, foffset) {
       var startSitu = beforeSpecial(start, soffset);
       var finishSitu = beforeSpecial(finish, foffset);
-      return relative(startSitu, finishSitu);
+      return Selection.relative(startSitu, finishSitu);
+    };
+
+    var makeRange = function (start, soffset, finish, foffset) {
+      var doc = owner(start);
+      var rng = doc.dom().createRange();
+      rng.setStart(start.dom(), soffset);
+      rng.setEnd(finish.dom(), foffset);
+      return rng;
+    };
+    var after$2 = function (start, soffset, finish, foffset) {
+      var r = makeRange(start, soffset, finish, foffset);
+      var same = eq(start, finish) && soffset === foffset;
+      return r.collapsed && !same;
     };
 
     var doSetNativeRange = function (win, rng) {
@@ -9703,7 +9315,7 @@ var mobile = (function (domGlobals) {
       if (selection.rangeCount > 0) {
         var firstRng = selection.getRangeAt(0);
         var lastRng = selection.getRangeAt(selection.rangeCount - 1);
-        return Option.some(range(Element.fromDom(firstRng.startContainer), firstRng.startOffset, Element.fromDom(lastRng.endContainer), lastRng.endOffset));
+        return Option.some(SimRange.create(Element.fromDom(firstRng.startContainer), firstRng.startOffset, Element.fromDom(lastRng.endContainer), lastRng.endOffset));
       } else {
         return Option.none();
       }
@@ -9711,16 +9323,16 @@ var mobile = (function (domGlobals) {
     var doGetExact = function (selection) {
       var anchor = Element.fromDom(selection.anchorNode);
       var focus = Element.fromDom(selection.focusNode);
-      return after$2(anchor, selection.anchorOffset, focus, selection.focusOffset) ? Option.some(range(anchor, selection.anchorOffset, focus, selection.focusOffset)) : readRange(selection);
+      return after$2(anchor, selection.anchorOffset, focus, selection.focusOffset) ? Option.some(SimRange.create(anchor, selection.anchorOffset, focus, selection.focusOffset)) : readRange(selection);
     };
     var getExact = function (win) {
       return Option.from(win.getSelection()).filter(function (sel) {
         return sel.rangeCount > 0;
       }).bind(doGetExact);
     };
-    var get$c = function (win) {
+    var get$b = function (win) {
       return getExact(win).map(function (range) {
-        return exact(range.start(), range.soffset(), range.finish(), range.foffset());
+        return Selection.exact(range.start(), range.soffset(), range.finish(), range.foffset());
       });
     };
     var getFirstRect$1 = function (win, selection) {
@@ -9759,7 +9371,7 @@ var mobile = (function (domGlobals) {
       } else {
         var start_1 = Element.fromDom(range.startContainer);
         return parent(start_1).bind(function (parent) {
-          var selection = exact(start_1, range.startOffset, parent, getEnd(parent));
+          var selection = Selection.exact(start_1, range.startOffset, parent, getEnd(parent));
           var optRect = getFirstRect$1(range.startContainer.ownerDocument.defaultView, selection);
           return optRect.map(collapsedRect).map(pure);
         }).getOr([]);
@@ -9911,7 +9523,7 @@ var mobile = (function (domGlobals) {
             var html = Element.fromDom(doc.dom().documentElement);
             var getCursorBox = editor.getCursorBox.getOrThunk(function () {
               return function () {
-                return get$c(win).bind(function (sel) {
+                return get$b(win).bind(function (sel) {
                   return getFirstRect$1(win, sel).orThunk(function () {
                     return tryFallbackBox(win);
                   });
@@ -10075,7 +9687,7 @@ var mobile = (function (domGlobals) {
     };
     var AndroidMode = { create: create$4 };
 
-    var first$2 = function (fn, rate) {
+    var first$1 = function (fn, rate) {
       var timer = null;
       var cancel = function () {
         if (timer !== null) {
@@ -10100,7 +9712,7 @@ var mobile = (function (domGlobals) {
         throttle: throttle
       };
     };
-    var last$1 = function (fn, rate) {
+    var last = function (fn, rate) {
       var timer = null;
       var cancel = function () {
         if (timer !== null) {
@@ -10113,8 +9725,9 @@ var mobile = (function (domGlobals) {
         for (var _i = 0; _i < arguments.length; _i++) {
           args[_i] = arguments[_i];
         }
-        if (timer !== null)
+        if (timer !== null) {
           domGlobals.clearTimeout(timer);
+        }
         timer = domGlobals.setTimeout(function () {
           fn.apply(null, args);
           timer = null;
@@ -10134,7 +9747,7 @@ var mobile = (function (domGlobals) {
             toggleOnExecute: false
           })])
       }));
-      var onViewThrottle = first$2(onView, 200);
+      var onViewThrottle = first$1(onView, 200);
       return Container.sketch({
         dom: dom$1('<div class="${prefix}-disabled-mask"></div>'),
         components: [Container.sketch({
@@ -10545,7 +10158,7 @@ var mobile = (function (domGlobals) {
       return has$1(root, slideConfig.shrinkingClass()) === true;
     };
     var isTransitioning = function (component, slideConfig, slideState) {
-      return isGrowing(component, slideConfig, slideState) === true || isShrinking(component, slideConfig, slideState) === true;
+      return isGrowing(component, slideConfig) === true || isShrinking(component, slideConfig) === true;
     };
     var toggleGrow = function (component, slideConfig, slideState) {
       var f = slideState.isExpanded() ? doStartShrink : doStartGrow;
@@ -10857,7 +10470,7 @@ var mobile = (function (domGlobals) {
       };
     };
 
-    var adt$6 = Adt.generate([
+    var adt$7 = Adt.generate([
       { stopped: [] },
       { resume: ['element'] },
       { complete: [] }
@@ -10867,24 +10480,24 @@ var mobile = (function (domGlobals) {
       var simulatedEvent = fromSource(rawEvent, source);
       return handler.fold(function () {
         logger.logEventNoHandlers(eventType, target);
-        return adt$6.complete();
+        return adt$7.complete();
       }, function (handlerInfo) {
         var descHandler = handlerInfo.descHandler();
         var eventHandler = getCurried(descHandler);
         eventHandler(simulatedEvent);
         if (simulatedEvent.isStopped()) {
           logger.logEventStopped(eventType, handlerInfo.element(), descHandler.purpose());
-          return adt$6.stopped();
+          return adt$7.stopped();
         } else if (simulatedEvent.isCut()) {
           logger.logEventCut(eventType, handlerInfo.element(), descHandler.purpose());
-          return adt$6.complete();
+          return adt$7.complete();
         } else {
           return parent(handlerInfo.element()).fold(function () {
             logger.logNoParent(eventType, handlerInfo.element(), descHandler.purpose());
-            return adt$6.complete();
+            return adt$7.complete();
           }, function (parent) {
             logger.logEventResponse(eventType, handlerInfo.element(), descHandler.purpose());
-            return adt$6.resume(parent);
+            return adt$7.resume(parent);
           });
         }
       });
@@ -11411,7 +11024,7 @@ var mobile = (function (domGlobals) {
         });
       };
       var tapping = TappingEvent.monitor(editorApi);
-      var refreshThrottle = last$1(refreshView, 300);
+      var refreshThrottle = last(refreshView, 300);
       var listeners = [
         editorApi.onKeyup(clearAndRefresh),
         editorApi.onNodeChanged(refreshIosSelection),
@@ -11510,6 +11123,503 @@ var mobile = (function (domGlobals) {
       };
     }
 
+    var exports$1 = {}, module = { exports: exports$1 };
+    (function (define, exports, module, require) {
+      (function (f) {
+        if (typeof exports === 'object' && typeof module !== 'undefined') {
+          module.exports = f();
+        } else if (typeof define === 'function' && define.amd) {
+          define([], f);
+        } else {
+          var g;
+          if (typeof window !== 'undefined') {
+            g = window;
+          } else if (typeof global !== 'undefined') {
+            g = global;
+          } else if (typeof self !== 'undefined') {
+            g = self;
+          } else {
+            g = this;
+          }
+          g.EphoxContactWrapper = f();
+        }
+      }(function () {
+        return function () {
+          function r(e, n, t) {
+            function o(i, f) {
+              if (!n[i]) {
+                if (!e[i]) {
+                  var c = 'function' == typeof require && require;
+                  if (!f && c)
+                    return c(i, !0);
+                  if (u)
+                    return u(i, !0);
+                  var a = new Error('Cannot find module \'' + i + '\'');
+                  throw a.code = 'MODULE_NOT_FOUND', a;
+                }
+                var p = n[i] = { exports: {} };
+                e[i][0].call(p.exports, function (r) {
+                  var n = e[i][1][r];
+                  return o(n || r);
+                }, p, p.exports, r, e, n, t);
+              }
+              return n[i].exports;
+            }
+            for (var u = 'function' == typeof require && require, i = 0; i < t.length; i++)
+              o(t[i]);
+            return o;
+          }
+          return r;
+        }()({
+          1: [
+            function (require, module, exports) {
+              var process = module.exports = {};
+              var cachedSetTimeout;
+              var cachedClearTimeout;
+              function defaultSetTimout() {
+                throw new Error('setTimeout has not been defined');
+              }
+              function defaultClearTimeout() {
+                throw new Error('clearTimeout has not been defined');
+              }
+              (function () {
+                try {
+                  if (typeof setTimeout === 'function') {
+                    cachedSetTimeout = setTimeout;
+                  } else {
+                    cachedSetTimeout = defaultSetTimout;
+                  }
+                } catch (e) {
+                  cachedSetTimeout = defaultSetTimout;
+                }
+                try {
+                  if (typeof clearTimeout === 'function') {
+                    cachedClearTimeout = clearTimeout;
+                  } else {
+                    cachedClearTimeout = defaultClearTimeout;
+                  }
+                } catch (e) {
+                  cachedClearTimeout = defaultClearTimeout;
+                }
+              }());
+              function runTimeout(fun) {
+                if (cachedSetTimeout === setTimeout) {
+                  return setTimeout(fun, 0);
+                }
+                if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+                  cachedSetTimeout = setTimeout;
+                  return setTimeout(fun, 0);
+                }
+                try {
+                  return cachedSetTimeout(fun, 0);
+                } catch (e) {
+                  try {
+                    return cachedSetTimeout.call(null, fun, 0);
+                  } catch (e) {
+                    return cachedSetTimeout.call(this, fun, 0);
+                  }
+                }
+              }
+              function runClearTimeout(marker) {
+                if (cachedClearTimeout === clearTimeout) {
+                  return clearTimeout(marker);
+                }
+                if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+                  cachedClearTimeout = clearTimeout;
+                  return clearTimeout(marker);
+                }
+                try {
+                  return cachedClearTimeout(marker);
+                } catch (e) {
+                  try {
+                    return cachedClearTimeout.call(null, marker);
+                  } catch (e) {
+                    return cachedClearTimeout.call(this, marker);
+                  }
+                }
+              }
+              var queue = [];
+              var draining = false;
+              var currentQueue;
+              var queueIndex = -1;
+              function cleanUpNextTick() {
+                if (!draining || !currentQueue) {
+                  return;
+                }
+                draining = false;
+                if (currentQueue.length) {
+                  queue = currentQueue.concat(queue);
+                } else {
+                  queueIndex = -1;
+                }
+                if (queue.length) {
+                  drainQueue();
+                }
+              }
+              function drainQueue() {
+                if (draining) {
+                  return;
+                }
+                var timeout = runTimeout(cleanUpNextTick);
+                draining = true;
+                var len = queue.length;
+                while (len) {
+                  currentQueue = queue;
+                  queue = [];
+                  while (++queueIndex < len) {
+                    if (currentQueue) {
+                      currentQueue[queueIndex].run();
+                    }
+                  }
+                  queueIndex = -1;
+                  len = queue.length;
+                }
+                currentQueue = null;
+                draining = false;
+                runClearTimeout(timeout);
+              }
+              process.nextTick = function (fun) {
+                var args = new Array(arguments.length - 1);
+                if (arguments.length > 1) {
+                  for (var i = 1; i < arguments.length; i++) {
+                    args[i - 1] = arguments[i];
+                  }
+                }
+                queue.push(new Item(fun, args));
+                if (queue.length === 1 && !draining) {
+                  runTimeout(drainQueue);
+                }
+              };
+              function Item(fun, array) {
+                this.fun = fun;
+                this.array = array;
+              }
+              Item.prototype.run = function () {
+                this.fun.apply(null, this.array);
+              };
+              process.title = 'browser';
+              process.browser = true;
+              process.env = {};
+              process.argv = [];
+              process.version = '';
+              process.versions = {};
+              function noop() {
+              }
+              process.on = noop;
+              process.addListener = noop;
+              process.once = noop;
+              process.off = noop;
+              process.removeListener = noop;
+              process.removeAllListeners = noop;
+              process.emit = noop;
+              process.prependListener = noop;
+              process.prependOnceListener = noop;
+              process.listeners = function (name) {
+                return [];
+              };
+              process.binding = function (name) {
+                throw new Error('process.binding is not supported');
+              };
+              process.cwd = function () {
+                return '/';
+              };
+              process.chdir = function (dir) {
+                throw new Error('process.chdir is not supported');
+              };
+              process.umask = function () {
+                return 0;
+              };
+            },
+            {}
+          ],
+          2: [
+            function (require, module, exports) {
+              (function (setImmediate) {
+                (function (root) {
+                  var setTimeoutFunc = setTimeout;
+                  function noop() {
+                  }
+                  function bind(fn, thisArg) {
+                    return function () {
+                      fn.apply(thisArg, arguments);
+                    };
+                  }
+                  function Promise(fn) {
+                    if (typeof this !== 'object')
+                      throw new TypeError('Promises must be constructed via new');
+                    if (typeof fn !== 'function')
+                      throw new TypeError('not a function');
+                    this._state = 0;
+                    this._handled = false;
+                    this._value = undefined;
+                    this._deferreds = [];
+                    doResolve(fn, this);
+                  }
+                  function handle(self, deferred) {
+                    while (self._state === 3) {
+                      self = self._value;
+                    }
+                    if (self._state === 0) {
+                      self._deferreds.push(deferred);
+                      return;
+                    }
+                    self._handled = true;
+                    Promise._immediateFn(function () {
+                      var cb = self._state === 1 ? deferred.onFulfilled : deferred.onRejected;
+                      if (cb === null) {
+                        (self._state === 1 ? resolve : reject)(deferred.promise, self._value);
+                        return;
+                      }
+                      var ret;
+                      try {
+                        ret = cb(self._value);
+                      } catch (e) {
+                        reject(deferred.promise, e);
+                        return;
+                      }
+                      resolve(deferred.promise, ret);
+                    });
+                  }
+                  function resolve(self, newValue) {
+                    try {
+                      if (newValue === self)
+                        throw new TypeError('A promise cannot be resolved with itself.');
+                      if (newValue && (typeof newValue === 'object' || typeof newValue === 'function')) {
+                        var then = newValue.then;
+                        if (newValue instanceof Promise) {
+                          self._state = 3;
+                          self._value = newValue;
+                          finale(self);
+                          return;
+                        } else if (typeof then === 'function') {
+                          doResolve(bind(then, newValue), self);
+                          return;
+                        }
+                      }
+                      self._state = 1;
+                      self._value = newValue;
+                      finale(self);
+                    } catch (e) {
+                      reject(self, e);
+                    }
+                  }
+                  function reject(self, newValue) {
+                    self._state = 2;
+                    self._value = newValue;
+                    finale(self);
+                  }
+                  function finale(self) {
+                    if (self._state === 2 && self._deferreds.length === 0) {
+                      Promise._immediateFn(function () {
+                        if (!self._handled) {
+                          Promise._unhandledRejectionFn(self._value);
+                        }
+                      });
+                    }
+                    for (var i = 0, len = self._deferreds.length; i < len; i++) {
+                      handle(self, self._deferreds[i]);
+                    }
+                    self._deferreds = null;
+                  }
+                  function Handler(onFulfilled, onRejected, promise) {
+                    this.onFulfilled = typeof onFulfilled === 'function' ? onFulfilled : null;
+                    this.onRejected = typeof onRejected === 'function' ? onRejected : null;
+                    this.promise = promise;
+                  }
+                  function doResolve(fn, self) {
+                    var done = false;
+                    try {
+                      fn(function (value) {
+                        if (done)
+                          return;
+                        done = true;
+                        resolve(self, value);
+                      }, function (reason) {
+                        if (done)
+                          return;
+                        done = true;
+                        reject(self, reason);
+                      });
+                    } catch (ex) {
+                      if (done)
+                        return;
+                      done = true;
+                      reject(self, ex);
+                    }
+                  }
+                  Promise.prototype['catch'] = function (onRejected) {
+                    return this.then(null, onRejected);
+                  };
+                  Promise.prototype.then = function (onFulfilled, onRejected) {
+                    var prom = new this.constructor(noop);
+                    handle(this, new Handler(onFulfilled, onRejected, prom));
+                    return prom;
+                  };
+                  Promise.all = function (arr) {
+                    var args = Array.prototype.slice.call(arr);
+                    return new Promise(function (resolve, reject) {
+                      if (args.length === 0)
+                        return resolve([]);
+                      var remaining = args.length;
+                      function res(i, val) {
+                        try {
+                          if (val && (typeof val === 'object' || typeof val === 'function')) {
+                            var then = val.then;
+                            if (typeof then === 'function') {
+                              then.call(val, function (val) {
+                                res(i, val);
+                              }, reject);
+                              return;
+                            }
+                          }
+                          args[i] = val;
+                          if (--remaining === 0) {
+                            resolve(args);
+                          }
+                        } catch (ex) {
+                          reject(ex);
+                        }
+                      }
+                      for (var i = 0; i < args.length; i++) {
+                        res(i, args[i]);
+                      }
+                    });
+                  };
+                  Promise.resolve = function (value) {
+                    if (value && typeof value === 'object' && value.constructor === Promise) {
+                      return value;
+                    }
+                    return new Promise(function (resolve) {
+                      resolve(value);
+                    });
+                  };
+                  Promise.reject = function (value) {
+                    return new Promise(function (resolve, reject) {
+                      reject(value);
+                    });
+                  };
+                  Promise.race = function (values) {
+                    return new Promise(function (resolve, reject) {
+                      for (var i = 0, len = values.length; i < len; i++) {
+                        values[i].then(resolve, reject);
+                      }
+                    });
+                  };
+                  Promise._immediateFn = typeof setImmediate === 'function' ? function (fn) {
+                    setImmediate(fn);
+                  } : function (fn) {
+                    setTimeoutFunc(fn, 0);
+                  };
+                  Promise._unhandledRejectionFn = function _unhandledRejectionFn(err) {
+                    if (typeof console !== 'undefined' && console) {
+                      console.warn('Possible Unhandled Promise Rejection:', err);
+                    }
+                  };
+                  Promise._setImmediateFn = function _setImmediateFn(fn) {
+                    Promise._immediateFn = fn;
+                  };
+                  Promise._setUnhandledRejectionFn = function _setUnhandledRejectionFn(fn) {
+                    Promise._unhandledRejectionFn = fn;
+                  };
+                  if (typeof module !== 'undefined' && module.exports) {
+                    module.exports = Promise;
+                  } else if (!root.Promise) {
+                    root.Promise = Promise;
+                  }
+                }(this));
+              }.call(this, require('timers').setImmediate));
+            },
+            { 'timers': 3 }
+          ],
+          3: [
+            function (require, module, exports) {
+              (function (setImmediate, clearImmediate) {
+                var nextTick = require('process/browser.js').nextTick;
+                var apply = Function.prototype.apply;
+                var slice = Array.prototype.slice;
+                var immediateIds = {};
+                var nextImmediateId = 0;
+                exports.setTimeout = function () {
+                  return new Timeout(apply.call(setTimeout, window, arguments), clearTimeout);
+                };
+                exports.setInterval = function () {
+                  return new Timeout(apply.call(setInterval, window, arguments), clearInterval);
+                };
+                exports.clearTimeout = exports.clearInterval = function (timeout) {
+                  timeout.close();
+                };
+                function Timeout(id, clearFn) {
+                  this._id = id;
+                  this._clearFn = clearFn;
+                }
+                Timeout.prototype.unref = Timeout.prototype.ref = function () {
+                };
+                Timeout.prototype.close = function () {
+                  this._clearFn.call(window, this._id);
+                };
+                exports.enroll = function (item, msecs) {
+                  clearTimeout(item._idleTimeoutId);
+                  item._idleTimeout = msecs;
+                };
+                exports.unenroll = function (item) {
+                  clearTimeout(item._idleTimeoutId);
+                  item._idleTimeout = -1;
+                };
+                exports._unrefActive = exports.active = function (item) {
+                  clearTimeout(item._idleTimeoutId);
+                  var msecs = item._idleTimeout;
+                  if (msecs >= 0) {
+                    item._idleTimeoutId = setTimeout(function onTimeout() {
+                      if (item._onTimeout)
+                        item._onTimeout();
+                    }, msecs);
+                  }
+                };
+                exports.setImmediate = typeof setImmediate === 'function' ? setImmediate : function (fn) {
+                  var id = nextImmediateId++;
+                  var args = arguments.length < 2 ? false : slice.call(arguments, 1);
+                  immediateIds[id] = true;
+                  nextTick(function onNextTick() {
+                    if (immediateIds[id]) {
+                      if (args) {
+                        fn.apply(null, args);
+                      } else {
+                        fn.call(null);
+                      }
+                      exports.clearImmediate(id);
+                    }
+                  });
+                  return id;
+                };
+                exports.clearImmediate = typeof clearImmediate === 'function' ? clearImmediate : function (id) {
+                  delete immediateIds[id];
+                };
+              }.call(this, require('timers').setImmediate, require('timers').clearImmediate));
+            },
+            {
+              'process/browser.js': 1,
+              'timers': 3
+            }
+          ],
+          4: [
+            function (require, module, exports) {
+              var promisePolyfill = require('promise-polyfill');
+              var Global = function () {
+                if (typeof window !== 'undefined') {
+                  return window;
+                } else {
+                  return Function('return this;')();
+                }
+              }();
+              module.exports = { boltExport: Global.Promise || promisePolyfill };
+            },
+            { 'promise-polyfill': 2 }
+          ]
+        }, {}, [4])(4);
+      }));
+    }(undefined, exports$1, module, undefined));
+    var Promise$1 = module.exports.boltExport;
+
     var nu$8 = function (baseFn) {
       var data = Option.none();
       var callbacks = [];
@@ -11521,10 +11631,11 @@ var mobile = (function (domGlobals) {
         });
       };
       var get = function (nCallback) {
-        if (isReady())
+        if (isReady()) {
           call(nCallback);
-        else
+        } else {
           callbacks.push(nCallback);
+        }
       };
       var set = function (x) {
         data = Option.some(x);
@@ -11561,42 +11672,31 @@ var mobile = (function (domGlobals) {
       pure: pure$1
     };
 
-    var bounce = function (f) {
-      return function () {
-        var args = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-          args[_i] = arguments[_i];
-        }
-        var me = this;
-        domGlobals.setTimeout(function () {
-          f.apply(me, args);
-        }, 0);
-      };
+    var errorReporter = function (err) {
+      domGlobals.setTimeout(function () {
+        throw err;
+      }, 0);
     };
-
-    var nu$9 = function (baseFn) {
+    var make$4 = function (run) {
       var get = function (callback) {
-        baseFn(bounce(callback));
+        run().then(callback, errorReporter);
       };
       var map = function (fab) {
-        return nu$9(function (callback) {
-          get(function (a) {
-            var value = fab(a);
-            callback(value);
-          });
+        return make$4(function () {
+          return run().then(fab);
         });
       };
       var bind = function (aFutureB) {
-        return nu$9(function (callback) {
-          get(function (a) {
-            aFutureB(a).get(callback);
+        return make$4(function () {
+          return run().then(function (v) {
+            return aFutureB(v).toPromise();
           });
         });
       };
       var anonBind = function (futureB) {
-        return nu$9(function (callback) {
-          get(function (a) {
-            futureB.get(callback);
+        return make$4(function () {
+          return run().then(function () {
+            return futureB.toPromise();
           });
         });
       };
@@ -11605,25 +11705,32 @@ var mobile = (function (domGlobals) {
       };
       var toCached = function () {
         var cache = null;
-        return nu$9(function (callback) {
+        return make$4(function () {
           if (cache === null) {
-            cache = toLazy();
+            cache = run();
           }
-          cache.get(callback);
+          return cache;
         });
       };
+      var toPromise = run;
       return {
         map: map,
         bind: bind,
         anonBind: anonBind,
         toLazy: toLazy,
         toCached: toCached,
+        toPromise: toPromise,
         get: get
       };
     };
+    var nu$9 = function (baseFn) {
+      return make$4(function () {
+        return new Promise$1(baseFn);
+      });
+    };
     var pure$2 = function (a) {
-      return nu$9(function (callback) {
-        callback(a);
+      return make$4(function () {
+        return Promise$1.resolve(a);
       });
     };
     var Future = {
@@ -11729,7 +11836,7 @@ var mobile = (function (domGlobals) {
         }
       ];
       return findMap(devices, function (device) {
-        return deviceWidth <= device.width && deviceHeight <= device.height ? Option.some(device.keyboard) : Option.none();
+        return someIf(deviceWidth <= device.width && deviceHeight <= device.height, device.keyboard);
       }).getOr({
         portrait: deviceHeight / 5,
         landscape: deviceWidth / 4
@@ -11871,7 +11978,7 @@ var mobile = (function (domGlobals) {
       var dropupHeight = get$4(dropup);
       var viewportHeight = deriveViewportHeight(viewport, toolbarHeight, dropupHeight);
       var viewportSetup = takeoverViewport(toolbarHeight, viewportHeight, viewport);
-      var dropupSetup = takeoverDropup(dropup, toolbarHeight, viewportHeight);
+      var dropupSetup = takeoverDropup(dropup);
       var isActive = true;
       var restore = function () {
         isActive = false;
@@ -11891,7 +11998,6 @@ var mobile = (function (domGlobals) {
           var newHeight = deriveViewportHeight(viewport, newToolbarHeight, dropupHeight_1);
           set(viewport, yFixedData, newToolbarHeight + 'px');
           set$2(viewport, 'height', newHeight + 'px');
-          set$2(dropup, 'bottom', -(newToolbarHeight + newHeight + dropupHeight_1) + 'px');
           DeviceZones.updatePadding(contentBody, viewport, dropup);
         }
       };
@@ -12101,7 +12207,7 @@ var mobile = (function (domGlobals) {
           }) : Option.none();
         });
       };
-      var scrollThrottle = last$1(function () {
+      var scrollThrottle = last(function () {
         scroller.idle(function () {
           IosUpdates.updatePositions(container, outerWindow.pageYOffset).get(function () {
             var extraScroll = scrollBounds();
@@ -12392,11 +12498,11 @@ var mobile = (function (domGlobals) {
       };
     }
 
-    var global$2 = tinymce.util.Tools.resolve('tinymce.EditorManager');
+    var global$3 = tinymce.util.Tools.resolve('tinymce.EditorManager');
 
     var derive$3 = function (editor) {
       var base = readOptFrom$1(editor.settings, 'skin_url').fold(function () {
-        return global$2.baseURL + '/skins/' + 'lightgray';
+        return global$3.baseURL + '/skins/' + 'lightgray';
       }, function (url) {
         return url;
       });
@@ -12458,12 +12564,12 @@ var mobile = (function (domGlobals) {
 
     var READING = constant('toReading');
     var EDITING = constant('toEditing');
-    global$1.add('mobile', function (editor) {
+    global$2.add('mobile', function (editor) {
       var renderUI = function (args) {
         var cssUrls = CssUrls.derive(editor);
         if (isSkinDisabled(editor) === false) {
           editor.contentCSS.push(cssUrls.content);
-          global.DOM.styleSheetLoader.load(cssUrls.ui, SkinLoaded.fireSkinLoaded(editor));
+          global$1.DOM.styleSheetLoader.load(cssUrls.ui, SkinLoaded.fireSkinLoaded(editor));
         } else {
           SkinLoaded.fireSkinLoaded(editor)();
         }
@@ -12574,7 +12680,7 @@ var mobile = (function (domGlobals) {
               setReadOnly(dynamicGroup, readOnlyGroups, mainGroups, ro);
             },
             readOnlyOnInit: function () {
-              return readOnlyOnInit(editor);
+              return readOnlyOnInit();
             }
           });
           var hideDropup = function () {
