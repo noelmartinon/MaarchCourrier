@@ -148,7 +148,7 @@ if (!empty($_REQUEST['page']) && empty($_REQUEST['triggerAngular'])) {
             }
             $error .= $message . PHP_EOL;
             $error .= $validOutpout['validationErrors'][$cptV]->parameter . PHP_EOL;
-            $error .= $validOutpout['validationErrors'][$cptV]->value . PHP_EOL;
+            $error .= htmlspecialchars($validOutpout['validationErrors'][$cptV]->value) . PHP_EOL;
         }
         foreach ($_REQUEST as $name => $value) {
             if (is_string($value) && strpos($value, "<") !== false) {
