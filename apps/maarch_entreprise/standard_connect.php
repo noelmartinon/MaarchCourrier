@@ -26,7 +26,7 @@ echo '<form id="formlogin" method="post" action="'
                     echo '<input placeholder="'._ID.'" name="login" id="login" type="text" class="standardConnectInput" />';
                 echo '</p>';
                 echo '<p>';
-                    echo '<input placeholder="'._PASSWORD.'" name="pass" id="pass" type="password" class="standardConnectInput" />';
+                    echo '<input placeholder="'._PASSWORD.'" name="pass" id="pass" type="password" class="standardConnectInput" autocomplete="off"/>';
                 echo '</p>';
                 $loggingMethod = \SrcCore\models\CoreConfigModel::getLoggingMethod();
                 if ($loggingMethod['id'] == 'standard') {
