@@ -1464,9 +1464,9 @@ class core_tools extends functions
     private function load_css()
     {
         ?>
-        <link rel="stylesheet" href="../../node_modules/@fortawesome/fontawesome-free/css/all.css" media="screen" />
-        <link rel="stylesheet" href="css/font-awesome-maarch/css/font-maarch.css" media="screen" />
-        <link rel="stylesheet" type="text/css" href="merged_css.php" media="screen" />
+        <link rel="stylesheet" href="<?php echo $_SESSION['config']['coreurl']; ?>node_modules/@fortawesome/fontawesome-free/css/all.css" media="screen" />
+        <link rel="stylesheet" href="<?php echo $_SESSION['config']['businessappurl']; ?>css/font-awesome-maarch/css/font-maarch.css" media="screen" />
+        <link rel="stylesheet" type="text/css" href="<?php echo $_SESSION['config']['businessappurl']; ?>merged_css.php" media="screen" />
         <?php
     }
 
