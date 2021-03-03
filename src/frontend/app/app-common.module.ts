@@ -15,6 +15,7 @@ import { NotificationModule } from '@service/notification/notification.module';
 import { MaarchTreeComponent } from '../plugins/tree/maarch-tree.component';
 import { MaarchFlatTreeComponent } from '../plugins/tree/maarch-flat-tree.component';
 import { AutocompleteListComponent } from '../plugins/autocomplete-list/autocomplete-list.component';
+import { MessageBoxComponent } from '../plugins/messageBox/message-box.component';
 
 /*FRONT IMPORTS*/
 import { AppMaterialModule } from './app-material.module';
@@ -118,6 +119,7 @@ import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-to
         FolderInputComponent,
         IssuingSiteInputComponent,
         RegisteredMailRecipientInputComponent,
+        MessageBoxComponent,
         AlertComponent,
         ConfirmComponent,
         PluginAutocomplete,
@@ -204,7 +206,8 @@ import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-to
         IssuingSiteInputComponent,
         RegisteredMailRecipientInputComponent,
         CriteriaToolComponent,
-        InputCorrespondentGroupComponent
+        InputCorrespondentGroupComponent,
+        MessageBoxComponent
     ],
     providers: [],
     entryComponents: [

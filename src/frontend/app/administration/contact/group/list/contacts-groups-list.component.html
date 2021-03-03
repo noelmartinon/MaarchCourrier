@@ -4,7 +4,7 @@
 <mat-card *ngIf="!loading" class="card-app-content">
     <div class="table-tools">
         <div>
-            <button class="action-button" *ngIf="showAddButton" mat-stroked-button color="primary" [title]="'lang.addNewCorrespondentsGroup' | translate" (click)="goTo()">
+            <button class="action-button" *ngIf="showAddButton" mat-stroked-button color="primary" [title]="'lang.addNewCorrespondentsGroup' | translate" (click)="contactGroupFormMode !== 'modal' ? goTo() : openContactsGroupModal()">
                 <mat-icon class="fa fa-plus" style="width: auto;height: auto;"></mat-icon>
                 {{'lang.add' | translate}}
             </button>

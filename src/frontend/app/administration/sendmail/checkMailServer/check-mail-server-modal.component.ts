@@ -1,20 +1,64 @@
-import { Component, Inject, OnInit, ViewChild } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { TranslateService } from '@ngx-translate/core';
 import { FunctionsService } from '@service/functions.service';
+import { of } from 'rxjs';
+import { catchError, finalize, tap } from 'rxjs/operators';
 
 @Component({
     templateUrl: 'check-mail-server-modal.component.html',
     styleUrls: ['check-mail-server-modal.component.scss'],
 })
-export class CheckMailServerModalComponent implements OnInit{
+export class CheckMailServerModalComponent implements OnInit {
 
-    loading: boolean = false;
+    loading: boolean = true;
+
+    serverConf: any = null;
+    recipient: string = null;
+
+    statusMsg: string = this.translate.instant('lang.emailSendInProgress');
+    error: string = null;
 
     constructor(
+        public http: HttpClient,
+        public translate: TranslateService,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<CheckMailServerModalComponent>,
-        private functionsService: FunctionsService) {
+        private functionsService: FunctionsService
+    ) { }
+
+    ngOnInit(): void {
+        this.serverConf = this.data.serverConf;
+        this.recipient = this.data.recipient;
+        this.statusMsg = this.translate.instant('lang.emailSendInProgress', {0: this.recipient});
+        this.testEmailServer();
     }
 
-    ngOnInit(): void { }
+
+    testEmailServer() {
+        const email = {
+            'sender': { 'email': this.serverConf.from },
+            'recipients': [this.recipient],
+            'object': '[' + this.translate.instant('lang.doNotReply') + '] ' + this.translate.instant('lang.emailSendTest'),
+            'status': 'EXPRESS',
+            'body': this.translate.instant('lang.emailSendTest'),
+            'isHtml': false
+        };
+
+        this.http.post('../rest/emails', email).pipe(
+            tap((data: any) => {
+                this.statusMsg = this.translate.instant('lang.emailSendSuccess', {0: this.recipient});
+                setTimeout(() => {
+                    this.dialogRef.close('success');
+                }, 1000);
+            }),
+            finalize(() => this.loading = false),
+            catchError((err: any) => {
+                this.statusMsg = this.translate.instant('lang.emailSendFailed', {sender: this.serverConf.from, recipient: this.recipient});
+                this.error = err.error.errors;
+                return of(false);
+            })
+        ).subscribe();
+    }
 }

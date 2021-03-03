@@ -307,6 +307,7 @@ export class AuthService {
                             id: data.id,
                             status: data.status,
                             userId: data.user_id,
+                            mail: data.mail,
                             firstname: data.firstname,
                             lastname: data.lastname,
                             entities: data.entities,

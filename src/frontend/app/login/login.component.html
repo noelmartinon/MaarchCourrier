@@ -12,7 +12,7 @@
                     </mat-form-field>
                     <mat-form-field *ngIf="['cas', 'keycloak', 'sso', 'azure_saml'].indexOf(authService.authMode) === -1" class="input-row" appearance="outline">
                         <input id="password" name="password" matInput [placeholder]="'lang.password' | translate" type="password"
-                            formControlName="password">
+                            formControlName="password" autocomplete="off">
                         <mat-hint align="end" *ngIf="authService.authMode === 'standard'"><a
                                  style="cursor: pointer;" (click)="goTo('/forgot-password')" class="infoLogin">{{'lang.forgotPassword' | translate}} ?</a></mat-hint>
                         <mat-hint align="end" *ngIf="authService.authMode === 'ldap'"><span

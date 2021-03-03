@@ -137,10 +137,10 @@ class LogsController
             'WHERE'     => $aArgs['tableName'],
             'ID'        => $aArgs['recordId'],
             'HOW'       => $aArgs['eventType'],
-            'USER'      => $GLOBALS['login'],
+            'USER'      => $GLOBALS['login'] ?? '',
             'WHAT'      => $aArgs['eventId'],
             'ID_MODULE' => $aArgs['moduleId'],
-            'REMOTE_IP' => $_SERVER['REMOTE_ADDR'],
+            'REMOTE_IP' => $_SERVER['REMOTE_ADDR'] ?? '',
             'LEVEL'     => $aArgs['level']
         ];
 

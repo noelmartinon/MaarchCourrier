@@ -508,12 +508,10 @@ class ResourceControlController
             foreach ($groups as $group) {
                 $group['indexation_parameters'] = json_decode($group['indexation_parameters'], true);
                 foreach ($group['indexation_parameters']['keywords'] as $keywordValue) {
-                    if (strpos($clauseToProcess, IndexingController::KEYWORDS[$keywordValue]) === false) {
-                        if (!empty($clauseToProcess)) {
-                            $clauseToProcess .= ', ';
-                        }
-                        $clauseToProcess .= IndexingController::KEYWORDS[$keywordValue];
+                    if (!empty($clauseToProcess)) {
+                        $clauseToProcess .= ', ';
                     }
+                    $clauseToProcess .= IndexingController::KEYWORDS[$keywordValue];
                 }
                 $allowedEntities = array_merge($allowedEntities, $group['indexation_parameters']['entities']);
                 $allowedEntities = array_unique($allowedEntities);

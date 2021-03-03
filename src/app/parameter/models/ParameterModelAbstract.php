@@ -66,10 +66,10 @@ abstract class ParameterModelAbstract
             'table'         => 'parameters',
             'columnsValues' => [
                 'id'                    => $aArgs['id'],
-                'description'           => $aArgs['description'],
-                'param_value_string'    => $aArgs['param_value_string'],
-                'param_value_int'       => $aArgs['param_value_int'],
-                'param_value_date'      => $aArgs['param_value_date']
+                'description'           => $aArgs['description'] ?? '',
+                'param_value_string'    => $aArgs['param_value_string'] ?? null,
+                'param_value_int'       => $aArgs['param_value_int'] ?? null,
+                'param_value_date'      => $aArgs['param_value_date'] ?? null
             ]
         ]);
 
@@ -85,10 +85,10 @@ abstract class ParameterModelAbstract
         DatabaseModel::update([
             'table'     => 'parameters',
             'set'       => [
-                'description'           => $aArgs['description'],
-                'param_value_string'    => $aArgs['param_value_string'],
-                'param_value_int'       => $aArgs['param_value_int'],
-                'param_value_date'      => $aArgs['param_value_date']
+                'description'           => $aArgs['description'] ?? '',
+                'param_value_string'    => $aArgs['param_value_string'] ?? null,
+                'param_value_int'       => $aArgs['param_value_int'] ?? null,
+                'param_value_date'      => $aArgs['param_value_date'] ?? null
             ],
             'where'     => ['id = ?'],
             'data'      => [$aArgs['id']]

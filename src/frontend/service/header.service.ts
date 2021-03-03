@@ -71,6 +71,7 @@ export class HeaderService {
                             mode: data.mode,
                             id: data.id,
                             userId: data.user_id,
+                            mail: data.mail,
                             firstname: data.firstname,
                             lastname: data.lastname,
                             entities: data.entities,

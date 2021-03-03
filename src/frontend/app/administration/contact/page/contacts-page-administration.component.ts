@@ -17,6 +17,8 @@ export class ContactsPageAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
+    subMenus: any[] = [];
+
     loading: boolean = false;
 
     creationMode: boolean = true;
@@ -33,7 +35,10 @@ export class ContactsPageAdministrationComponent implements OnInit {
         public dialog: MatDialog,
         public contactService: ContactService,
         public functionsService: FunctionsService,
-        private viewContainerRef: ViewContainerRef) { }
+        private viewContainerRef: ViewContainerRef
+    ) {
+        this.subMenus = contactService.getAdminMenu();
+    }
 
     ngOnInit(): void {
 

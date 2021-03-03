@@ -114,7 +114,8 @@ class ContactGroupController
             $allEntities[$key]['state']['disabled'] = false;
             if (!$hasPrivilege && !in_array($value['id'], $userEntities)) {
                 $allEntities[$key]['state']['disabled'] = true;
-            } elseif (in_array($value['id'], $contactsGroup['entities'])) {
+            }
+            if (in_array($value['id'], $contactsGroup['entities'])) {
                 $allEntities[$key]['state']['selected'] = true;
             }
 
@@ -247,7 +248,7 @@ class ContactGroupController
         $id = ContactGroupModel::create([
             'label'         => $label,
             'description'   => $contactGroup['description'],
-            'entities'      => $contactGroup['entities'],
+            'entities'      => '{}',
             'owner'         => $GLOBALS['id']
         ]);
 

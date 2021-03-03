@@ -18,6 +18,8 @@ export class ContactsGroupAdministrationComponent implements OnInit {
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
+    subMenus: any[] = [];
+
     contactGroupId: number = null;
     loading: boolean = false;
 
@@ -29,7 +31,9 @@ export class ContactsGroupAdministrationComponent implements OnInit {
         public appService: AppService,
         private viewContainerRef: ViewContainerRef,
         public contactService: ContactService
-    ) { }
+    ) {
+        this.subMenus = contactService.getAdminMenu();
+    }
 
     ngOnInit(): void {
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');

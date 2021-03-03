@@ -194,6 +194,7 @@
             <References>
                 <ArchiveUnitRefId><?merge .ArchiveUnitRefId ?></ArchiveUnitRefId>
                 <RepositoryArchiveUnitPID><?merge .RepositoryArchiveUnitPID ?></RepositoryArchiveUnitPID>
+                <ExternalReference><?merge .ExternalReference ?></ExternalReference>
             </References>
         </RelatedObjectReference>
         <CreatedDate><?merge .Content.CreatedDate ?></CreatedDate>

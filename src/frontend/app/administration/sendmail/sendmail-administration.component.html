@@ -2,7 +2,7 @@
     <ng-template #adminMenuTemplate>
         <mat-nav-list>
             <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
-            <a mat-list-item (click)="snav2.toggle();" joyrideStep="emailTour2">
+            <a mat-list-item (click)="openMailServerTest(false)" joyrideStep="emailTour2">
                 <mat-icon color="primary" mat-list-icon class="fas fa-signal"></mat-icon>
                 <p mat-line>
                     {{'lang.checkSendmail' | translate}}
@@ -29,6 +29,9 @@
                     <mat-spinner style="margin:auto;"></mat-spinner>
                 </div>
                 <mat-card *ngIf="!loading" class="card-app-content">
+                    <div class="alert-message alert-message-info" style="min-width: 100%;margin: 0px;">
+                        <input class="input-recipient" [(ngModel)]="recipientTest"/>&nbsp;<span [innerHTML]="'lang.recipientServerTestMsg' | translate"></span>
+                    </div>
                     <mat-tab-group>
                         <mat-tab label="{{'lang.informations' | translate}}">
                             <form (ngSubmit)="onSubmit()" #sendmailForm="ngForm">
@@ -114,10 +117,8 @@
                                     </div>
                                 </div>
                                 <div class="col-md-12 text-center" style="padding:10px;">
-                                    <button mat-raised-button type="submit" color="primary"
-                                        [disabled]="checkModif() || !sendmailForm.valid">{{'lang.validate' | translate}}</button>
-                                    <button mat-raised-button type="button" color="default"
-                                        (click)="openMailServerTest()">{{'lang.test' | translate}}</button>
+                                    <button mat-raised-button type="button" color="primary"  (click)="openMailServerTest()"
+                                        [disabled]="checkModif() || !sendmailForm.valid">{{'lang.testAndValidate' | translate}}</button>
                                     <button mat-raised-button type="button" color="default" [disabled]="checkModif()"
                                         (click)="cancelModification()">{{'lang.cancel' | translate}}</button>
                                 </div>
@@ -128,32 +129,4 @@
             </div>
         </div>
     </mat-sidenav-content>
-    <mat-sidenav #snav2 [mode]="appService.getViewMode() ? 'over' : 'side'" [fixedInViewport]="appService.getViewMode()"
-        fixedTopGap="56" position='end' [opened]="appService.getViewMode() ? false : false"
-        style="overflow-x:hidden;width:500px;" (opened)="onSubmit();initEmailSend()">
-        <mat-nav-list disableRipple="true" style="display: flex;flex-direction: column;">
-            <h3 mat-subheader>{{'lang.emailSendTest' | translate}}</h3>
-            <div class="form-group">
-                <div class="col-md-12">
-                    <form #testSendmailForm="ngForm">
-                        <mat-form-field>
-                            <input name="recipientTest" matInput placeholder="{{'lang.mailTo' | translate}}"
-                                [(ngModel)]="recipientTest" [disabled]="emailSendLoading"
-                                pattern="(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)">
-                            <mat-icon *ngIf="!emailSendLoading && testSendmailForm.valid" title="{{'lang.beginSendTest' | translate}}"
-                                (click)="testEmailSend()" color="primary" style="cursor: pointer;" matSuffix
-                                class="fa fa-paper-plane fa-2x"></mat-icon>
-                        </mat-form-field>
-                    </form>
-                </div>
-            </div>
-            <mat-list-item *ngIf="emailSendResult.msg != ''">
-                <mat-icon mat-list-icon class="fas {{emailSendResult.icon}} fa-2x"></mat-icon>
-                <p mat-line> {{emailSendResult.msg}} </p>
-            </mat-list-item>
-        </mat-nav-list>
-        <div class="bash" *ngIf="this.emailSendResult.msg === ('lang.emailSendFailed' | translate)">
-            {{this.emailSendResult.debug}}
-        </div>
-    </mat-sidenav>
 </mat-sidenav-container>

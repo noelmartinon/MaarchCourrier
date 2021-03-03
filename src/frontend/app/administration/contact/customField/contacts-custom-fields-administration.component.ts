@@ -26,6 +26,8 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
+    subMenus: any[] = [];
+
     loading: boolean = true;
 
     customFieldsTypes: any[] = [
@@ -75,7 +77,7 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
         public contactService: ContactService,
         private viewContainerRef: ViewContainerRef
     ) {
-
+        this.subMenus = contactService.getAdminMenu();
     }
 
     ngOnInit(): void {

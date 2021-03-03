@@ -278,8 +278,21 @@ export class ContactsFormComponent implements OnInit {
             display: false,
             filling: false,
             values: []
+        },
+        {
+            id: 'correspondentsGroups',
+            unit: 'complement',
+            label: this.translate.instant('lang.correspondentsGroups'),
+            desc: this.translate.instant('lang.correspondentsGroups'),
+            type: 'correspondentsGroups',
+            control: new FormControl(),
+            required: false,
+            display: true,
+            filling: false,
+            values: []
         }
     ];
+    initCorrespondentsGroups: boolean = true;
 
     addressBANInfo: string = '';
     addressBANMode: boolean = true;
@@ -367,7 +380,7 @@ export class ContactsFormComponent implements OnInit {
             this.creationMode = false;
 
             this.contactForm.forEach(element => {
-                element.display = false;
+                element.display = element.id === 'correspondentsGroups';
             });
 
             this.http.get('../rest/contactsParameters').pipe(
@@ -850,6 +863,13 @@ export class ContactsFormComponent implements OnInit {
             }
         }
         this.checkFilling();
+    }
+
+    handleCorrespondentsGroupsField(correspondentsGroups: any, field: any) {
+        if (!this.functions.empty(this.contactId) && correspondentsGroups.length === 0 && this.initCorrespondentsGroups) {
+            this.removeField(field);
+        }
+        this.initCorrespondentsGroups = false;
     }
 
     initAutocompleteCommunicationMeans() {

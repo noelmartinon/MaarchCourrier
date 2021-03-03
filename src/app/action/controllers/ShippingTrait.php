@@ -307,7 +307,6 @@ trait ShippingTrait
                     $errors[] = "Maileva recipient creation failed for resource {$resId}";
                     continue;
                 }
-                $recipientId = $createRecipient['response']['id'];
                 $recipients[] = $contacts[$key];
             } else {
                 foreach ($contacts[$key] as $contact) {
@@ -363,22 +362,6 @@ trait ShippingTrait
             if ($submit['code'] != 200) {
                 $errors[] = "Maileva submit failed for attachment {$resId}";
                 continue;
-            }
-
-            if ($isRegisteredMail) {
-                //TODO
-//                $zip = CurlModel::exec([
-//                    'url'           => "{$mailevaConfig['uri']}/{$urlComplement}/v2/sendings/{$sendingId}/download_deposit_proof",
-//                    'bearerAuth'    => ['token' => $token],
-//                    'headers'       => ['Content-Type: application/json'],
-//                    'method'        => 'GET'
-//                ]);
-//                $zip = CurlModel::exec([
-//                    'url'           => "{$mailevaConfig['uri']}/{$urlComplement}/v2/sendings/{$sendingId}/recipients/{$recipientId}/download_archive",
-//                    'bearerAuth'    => ['token' => $token],
-//                    'headers'       => ['Content-Type: application/json'],
-//                    'method'        => 'GET'
-//                ]);
             }
 
             $externalId = json_decode($resource['external_id'], true);

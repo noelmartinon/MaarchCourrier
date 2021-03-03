@@ -400,7 +400,7 @@ foreach ($retrievedMails['resLetterbox'] as $resId => $value) {
             'set'     => ['status' => $status],
             'postSet' => ['external_id' => "external_id - 'signatureBookId'"],
             'where'   => ['res_id = ?'],
-            'data'    => [$value['res_id_master']]
+            'data'    => [$resId]
         ]);
         $nbMailsRetrieved++;
     }

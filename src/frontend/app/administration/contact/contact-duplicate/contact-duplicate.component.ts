@@ -23,6 +23,8 @@ export class ContactDuplicateComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
+    subMenus: any[] = [];
+
     loading: boolean = true;
 
     contactFields: any = [];
@@ -55,7 +57,9 @@ export class ContactDuplicateComponent implements OnInit {
         public contactService: ContactService,
         private viewContainerRef: ViewContainerRef,
         private functionsService: FunctionsService
-    ) { }
+    ) {
+        this.subMenus = contactService.getAdminMenu();
+    }
 
     async ngOnInit(): Promise<void> {
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');

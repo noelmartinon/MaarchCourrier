@@ -33,6 +33,8 @@ export class ContactsListAdministrationComponent implements OnInit {
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
+    subMenus: any[] = [];
+
     loading: boolean = false;
 
     filtersChange = new EventEmitter();
@@ -78,7 +80,10 @@ export class ContactsListAdministrationComponent implements OnInit {
         private latinisePipe: LatinisePipe,
         public adminService: AdministrationService,
         public contactService: ContactService,
-        private viewContainerRef: ViewContainerRef) { }
+        private viewContainerRef: ViewContainerRef
+    ) {
+        this.subMenus = contactService.getAdminMenu();
+    }
 
 
     ngOnInit(): void {

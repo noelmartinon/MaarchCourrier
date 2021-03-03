@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild, TemplateRef, ViewContainerRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
-import { MatSidenav } from '@angular/material/sidenav';
 import { NotificationService } from '@service/notification/notification.service';
 import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
@@ -18,12 +17,10 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class SendmailAdministrationComponent implements OnInit {
 
-    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     @ViewChild('sendmailForm', { static: false }) public sendmailFormCpt: NgForm;
 
-    
     loading: boolean = false;
 
     sendmail: any = {
@@ -84,7 +81,6 @@ export class SendmailAdministrationComponent implements OnInit {
     passwordLabel: string = '';
 
 
-
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -105,6 +101,7 @@ export class SendmailAdministrationComponent implements OnInit {
 
         this.http.get('../rest/configurations/admin_email_server')
             .subscribe((data: any) => {
+                this.recipientTest = this.headerService.user.mail;
                 this.sendmail = data.configuration.value;
                 this.sendmailClone = JSON.parse(JSON.stringify(this.sendmail));
 
@@ -119,73 +116,20 @@ export class SendmailAdministrationComponent implements OnInit {
     }
 
     onSubmit() {
-        if (this.sendmailFormCpt.invalid) {
-            this.notify.handleErrors({ 'error': { 'errors': this.translate.instant('lang.notSavedBecauseInvalid') } });
-        } else {
-            this.http.put('../rest/configurations/admin_email_server', this.sendmail)
-                .subscribe((data: any) => {
-                    this.sendmailClone = JSON.parse(JSON.stringify(this.sendmail));
-                    this.notify.success(this.translate.instant('lang.configurationUpdated'));
-                }, (err) => {
-                    this.notify.handleErrors(err);
-                });
-        }
+        this.http.put('../rest/configurations/admin_email_server', this.sendmail).pipe(
+            tap((data: any) => {
+                this.sendmailClone = JSON.parse(JSON.stringify(this.sendmail));
+                this.notify.success(this.translate.instant('lang.configurationUpdated'));
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     checkModif() {
         return (JSON.stringify(this.sendmailClone) === JSON.stringify(this.sendmail));
-    }
-
-    initEmailSend() {
-        this.emailSendResult = {
-            icon: '',
-            msg: '',
-            debug: '',
-        };
-        if (this.currentUser.mail === undefined) {
-            this.http.get('../rest/currentUser/profile')
-                .subscribe((data: any) => {
-                    this.currentUser = data;
-                    this.recipientTest = data.mail;
-                });
-        }
-    }
-
-    testEmailSend() {
-        if (JSON.stringify(this.sendmailClone) !== JSON.stringify(this.sendmail)) {
-            this.onSubmit();
-        }
-        this.emailSendResult = {
-            icon: 'fa-paper-plane primary',
-            msg: this.translate.instant('lang.emailSendInProgress'),
-            debug: ''
-        };
-        const email = {
-            'sender': { 'email': this.currentUser.mail },
-            'recipients': [this.recipientTest],
-            'object': '[' + this.translate.instant('lang.doNotReply') + '] ' + this.translate.instant('lang.emailSendTest'),
-            'status': 'EXPRESS',
-            'body': this.translate.instant('lang.emailSendTest'),
-            'isHtml': false
-        };
-        this.emailSendLoading = true;
-
-        this.http.post('../rest/emails', email)
-            .subscribe((data: any) => {
-                this.emailSendLoading = false;
-                this.emailSendResult = {
-                    icon: 'fa-check green',
-                    msg: this.translate.instant('lang.emailSendSuccess'),
-                    debug: ''
-                };
-            }, (err) => {
-                this.emailSendLoading = false;
-                this.emailSendResult = {
-                    icon: 'fa-times red',
-                    msg: this.translate.instant('lang.emailSendFailed'),
-                    debug: err.error.errors
-                };
-            });
     }
 
     cleanAuthInfo(event: any) {
@@ -195,17 +139,22 @@ export class SendmailAdministrationComponent implements OnInit {
         this.sendmail.password = '';
     }
 
-    openMailServerTest() {
+    openMailServerTest(saveMode: boolean = true) {
         const dialogRef = this.dialog.open(CheckMailServerModalComponent, {
             panelClass: 'maarch-modal',
             disableClose: true,
-            // width: '99%',
+            width: '500px',
             // height: '99%',
-            data: { }
+            data: {
+                serverConf: this.sendmail,
+                recipient: this.recipientTest,
+                sender: this.emailSendResult
+            }
         });
         dialogRef.afterClosed().pipe(
-            filter((data: any) => !this.functionsService.empty(data)),
+            filter((data: any) => data === 'success' && saveMode),
             tap((data: any) => {
+                this.onSubmit();
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

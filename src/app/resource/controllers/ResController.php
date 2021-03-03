@@ -807,9 +807,18 @@ class ResController extends ResourceControlController
         $pathToPdf = $docserver['path_template'] . $adrPdf[0]['path'] . $adrPdf[0]['filename'];
         $pathToPdf = str_replace('#', '/', $pathToPdf);
 
-        $pdf = new Fpdi('P', 'pt');
-        $pageCount = $pdf->setSourceFile($pathToPdf);
+        $libDir = CoreConfigModel::getLibrariesDirectory();
+        if (!empty($libDir) && is_file($libDir . 'SetaPDF-FormFiller-Full/library/SetaPDF/Autoload.php')) {
+            require_once ($libDir . 'SetaPDF-FormFiller-Full/library/SetaPDF/Autoload.php');
 
+            $document = \SetaPDF_Core_Document::loadByFilename($pathToPdf);
+            $pages = $document->getCatalog()->getPages();
+            $pageCount = count($pages);
+        } else {
+            $pdf = new Fpdi('P', 'pt');
+            $pageCount = $pdf->setSourceFile($pathToPdf);
+        }
+        
         return $response->withJson(['fileContent' => $base64Content, 'pageCount' => $pageCount]);
     }
 

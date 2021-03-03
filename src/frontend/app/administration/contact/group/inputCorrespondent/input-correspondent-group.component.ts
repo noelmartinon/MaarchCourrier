@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { FunctionsService } from '@service/functions.service';
@@ -24,6 +24,8 @@ export class InputCorrespondentGroupComponent implements OnInit, AfterViewInit {
 
     @Input() id: string;
     @Input() type: string;
+
+    @Output() afterCorrespondentsGroupsLoaded = new EventEmitter<any>();
 
     visible = true;
     separatorKeysCodes: number[] = [ENTER, COMMA];
@@ -88,6 +90,7 @@ export class InputCorrespondentGroupComponent implements OnInit, AfterViewInit {
                         this.allCorrespondentGroups.splice(index, 1);
                     }
                 });
+                this.afterCorrespondentsGroupsLoaded.emit(this.correspondentGroups);
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
@@ -116,7 +119,7 @@ export class InputCorrespondentGroupComponent implements OnInit, AfterViewInit {
     }
 
     removeCorrespondentsGroup(item: any) {
-        const index = this.correspondentGroups.map(cor => cor.id).indexOf(item);
+        const index = this.correspondentGroups.map(cor => cor.id).indexOf(item.id);
         this.allCorrespondentGroups.push(item);
         this.sortPipe.transform(this.allCorrespondentGroups, 'label');
         if (index > -1) {

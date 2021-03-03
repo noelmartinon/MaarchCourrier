@@ -605,9 +605,9 @@
     "emailCannotSent": "Erreur lors de l'envoi du courriel",
     "emailDeleted": "Courriel supprimé",
     "emailModel": "Modèle de courriel",
-    "emailSendFailed": "Échec d'envoi",
-    "emailSendInProgress": "En cours d'envoi...",
-    "emailSendSuccess": "Envoi réussi",
+    "emailSendFailed": "Échec d'envoi à <b>{{recipient}}</b> depuis l'adresse <b>{{sender}}</b>",
+    "emailSendInProgress": "En cours d'envoi à <b>{{0}}</b>...",
+    "emailSendSuccess": "Envoi réussi à <b>{{0}}</b>",
     "emailSendTest": "Test d'envoi",
     "emailSent": "Courriel envoyé",
     "emailServerParam": "Serveur e-mail",
@@ -1435,6 +1435,7 @@
     "shippingNotEligible": "Courrier(s) non éligible(s)",
     "shippingReadyToSend": "document(s) prêt(s) à l'envoi",
     "shippingUnavailable": "<b>Attention !</b> Maileva n'est pas activé. Veuillez vérifier le fichier de configuration mailevaConfig.xml",
+    "shippingDepositProofInformations": "Les preuves de dépôts seront disponibles dans l'espace client Maileva",
     "shippingUpdated": "Modèle d'envoi Maileva modifié",
     "shippings": "Modèle(s) d'envoi Maileva",
     "shortLabel": "Libellé court",
@@ -2352,5 +2353,8 @@
     "correspondentAdded": "Correspondant(s) ajouté(s)",
     "displayed": "affiché(s)",
     "mailServerOfflineMsg": "Le serveur de mail doit être <b>testé</b> et <b>opérationnel</b> pour : <b>{{action}}</b>",
-    "mailServerOffline": "Le serveur de mail est indisponible pour le moment, veuillez ré-essayer ultérieurement"
+    "mailServerOffline": "Le serveur de mail est indisponible pour le moment, veuillez ré-essayer ultérieurement",
+    "testAndValidate": "Tester et valider",
+    "mailServerTest": "Test du serveur de mail",
+    "recipientServerTestMsg": "sera utilisée pour <b>tester</b> le serveur de mail."
 }

@@ -104,7 +104,13 @@
                             </div>
                         </div>
                     </div>
-
+                    <div class="col-md-12" *ngIf="currentShipping != null">
+                        <div>
+                            <div class="alert-message alert-message-info mailList" role="alert">
+                                {{'lang.shippingDepositProofInformations' | translate}}
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-md-12">
                         <app-note-editor #noteEditor [resIds]="data.resIds"></app-note-editor>
                     </div>

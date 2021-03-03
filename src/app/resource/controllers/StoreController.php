@@ -165,7 +165,7 @@ class StoreController
                 $idCustom = explode("_", $field['identifier']);
                 $idCustom = $idCustom[1];
                 $args['customFields'][$idCustom] = $defaultValue;
-            } else {
+            } elseif ($field['identifier'] != 'initiator') {
                 $args[$field['identifier']] = $defaultValue;
             }
         }

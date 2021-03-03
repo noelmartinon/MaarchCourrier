@@ -17,6 +17,8 @@ export class ContactsGroupsAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
+    subMenus: any[] = [];
+
     constructor(
         public translate: TranslateService,
         private headerService: HeaderService,
@@ -24,7 +26,9 @@ export class ContactsGroupsAdministrationComponent implements OnInit {
         public functions: FunctionsService,
         private viewContainerRef: ViewContainerRef,
         public contactService: ContactService
-    ) { }
+    ) {
+        this.subMenus = contactService.getAdminMenu();
+    }
 
     ngOnInit(): void {
         this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.contactsGroups'));

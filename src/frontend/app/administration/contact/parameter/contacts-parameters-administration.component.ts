@@ -19,6 +19,8 @@ export class ContactsParametersAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
+    subMenus: any[] = [];
+
     contactsFilling: any = {
         'enable': false,
         'first_threshold': '33',
@@ -51,7 +53,9 @@ export class ContactsParametersAdministrationComponent implements OnInit {
         public functionsService: FunctionsService,
         public contactService: ContactService,
         private viewContainerRef: ViewContainerRef
-    ) { }
+    ) {
+        this.subMenus = contactService.getAdminMenu();
+    }
 
     ngOnInit(): void {
 

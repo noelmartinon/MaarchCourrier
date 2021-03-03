@@ -165,7 +165,7 @@ class DiffusionTypesController
                 'data'      => [':recordid' => $args['event']['record_id']],
             ]);
 
-            return $resId[0]['res_id'];
+            return $resId[0]['res_id'] ?? null;
         }
     }
 

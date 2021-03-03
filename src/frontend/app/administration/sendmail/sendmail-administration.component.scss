@@ -1,26 +1,6 @@
-.mat-list-item:hover {
-    background: inherit;
-}
+@import '../../../css/vars.scss';
 
-.green {
-    color : green;
+.input-recipient {
+    border: none;
+    border-bottom: solid 1px $primary;
 }
-
-.primary {
-    color : #135f7f;
-}
-
-.red {
-    color: red;
-}
-
-.bash {
-    background : #34495e; 
-    height : 310px ; 
-    border-radius : 5px ;
-    top: 40px;
-    display : absolute; 
-    color : #fff ;
-    padding: 10px;
-    margin: 10px;
-  }
