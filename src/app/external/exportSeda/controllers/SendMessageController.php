@@ -109,7 +109,7 @@ class SendMessageController
                     null,
                     $attachment->id,
                     "res_" . $attachment->id,
-                    null
+                    $messageObject->dataObjectPackage->links
                 );
             } else {
                 if (!isset($attachment->retentionRule)) {
@@ -371,20 +371,15 @@ class SendMessageController
                 break;
         }
 
-        if (isset($relatedObjectReference)) {
+        if (isset($relatedObjectReference) && !empty((array) $relatedObjectReference)) {
             $content->RelatedObjectReference = new \stdClass();
             $content->RelatedObjectReference->References = [];
 
-            foreach ($relatedObjectReference as $key => $value) {
-                $reference = new \stdClass();
-                if ($value) {
-                    $reference->ArchiveUnitRefId = 'letterbox_' . $key;
+            foreach ($relatedObjectReference as $ref) {
+                if ($ref) {
+                    $reference = new \stdClass();
+                    $reference->ExternalReference = $ref->chrono;
                     $content->RelatedObjectReference->References[] = $reference;
-                } else {
-                    if (isset($object->originatorAgency)) {
-                        $reference->RepositoryArchiveUnitPID = 'originator:' . $object->originatorAgency->id . ':' . $key;
-                        $content->RelatedObjectReference->References[] = $reference;
-                    }
                 }
             }
         }
