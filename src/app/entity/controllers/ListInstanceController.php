@@ -218,6 +218,7 @@ class ListInstanceController
                 'data'  => [$listInstanceByRes['resId'], 'entity_id']
             ]);
 
+            $hasCopy = false;
             foreach ($listInstanceByRes['listInstances'] as $key => $instance) {
                 $listControl = ['item_id', 'item_type', 'item_mode'];
                 foreach ($listControl as $itemControl) {
@@ -272,6 +273,10 @@ class ListInstanceController
                     }
                 }
 
+                if ($instance['item_mode'] == 'cc') {
+                    $hasCopy = true;
+                }
+
                 ListInstanceModel::create([
                     'res_id'                => $listInstanceByRes['resId'],
                     'sequence'              => $key,
@@ -313,12 +318,34 @@ class ListInstanceController
                         }
                     }
 
+                    $resource = ResModel::getById(['select' => ['dest_user'], 'resId' => $listInstanceByRes['resId']]);
+                    if ($resource['dest_user'] != $instance['item_id']) {
+                        HistoryController::add([
+                            'tableName' => 'res_letterbox',
+                            'recordId'  => $listInstanceByRes['resId'],
+                            'eventType' => 'UP',
+                            'info'      => _UPDATE_LISTINSTANCE_DEST,
+                            'moduleId'  => 'listinstance',
+                            'eventId'   => 'diffdestuser',
+                        ]);
+                    }
+
                     ResModel::update([
                         'set'   => $set,
                         'where' => ['res_id = ?'],
                         'data'  => [$listInstanceByRes['resId']]
                     ]);
                 }
+            }
+            if ($hasCopy) {
+                HistoryController::add([
+                    'tableName' => 'res_letterbox',
+                    'recordId'  => $listInstanceByRes['resId'],
+                    'eventType' => 'UP',
+                    'info'      => _UPDATE_LISTINSTANCE,
+                    'moduleId'  => 'listinstance',
+                    'eventId'   => 'diffcopy',
+                ]);
             }
 
             $listInstanceHistoryId = ListInstanceHistoryModel::create(['resId' => $listInstanceByRes['resId'], 'userId' => $args['userId']]);
@@ -393,6 +420,8 @@ class ListInstanceController
             }
             $listInstances =  array_values($listInstances);
 
+            $hasVisa = false;
+            $hasSign = false;
             foreach ($resource['listInstances'] as $key => $listInstance) {
                 if (!empty($listInstance['process_date'])) {
                     continue;
@@ -443,6 +472,33 @@ class ListInstanceController
                     'requested_signature'   => $listInstance['requested_signature'] ?? false,
                     'signatory'             => $listInstance['signatory'] ?? false,
                 ];
+
+                if ($args['type'] == 'visaCircuit' && $listInstance['item_mode'] == 'visa') {
+                    $hasVisa = true;
+                } elseif ($args['type'] == 'visaCircuit' && $listInstance['item_mode'] == 'sign') {
+                    $hasSign = true;
+                }
+            }
+
+            if ($hasVisa) {
+                HistoryController::add([
+                    'tableName' => 'res_letterbox',
+                    'recordId'  => $resource['resId'],
+                    'eventType' => 'UP',
+                    'info'      => _UPDATE_VISA_CIRCUIT,
+                    'moduleId'  => 'listinstance',
+                    'eventId'   => 'diffvisauser',
+                ]);
+            }
+            if ($hasSign) {
+                HistoryController::add([
+                    'tableName' => 'res_letterbox',
+                    'recordId'  => $resource['resId'],
+                    'eventType' => 'UP',
+                    'info'      => _UPDATE_VISA_CIRCUIT,
+                    'moduleId'  => 'listinstance',
+                    'eventId'   => 'diffsignuser',
+                ]);
             }
 
             foreach ($listInstances as $key => $listInstance) {
