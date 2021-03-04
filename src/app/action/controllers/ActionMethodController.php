@@ -107,9 +107,18 @@ class ActionMethodController
 
         $set = ['locker_user_id' => null, 'locker_time' => null, 'modification_date' => 'CURRENT_TIMESTAMP'];
 
-        $action = ActionModel::getById(['id' => $args['id'], 'select' => ['label_action', 'id_status', 'history']]);
-        if (!empty($action['id_status']) && $action['id_status'] != '_NOSTATUS_') {
-            $set['status'] = $action['id_status'];
+        $action = ActionModel::getById(['id' => $args['id'], 'select' => ['label_action', 'id_status', 'history', 'parameters']]);
+        $action['parameters'] = json_decode($action['parameters'], true);
+
+        if (empty($args['finishInScript'])) {
+            $status = !empty($action['parameters']['successStatus']) ? $action['parameters']['successStatus'] : $action['id_status'];
+            if (!empty($status) && $status != '_NOSTATUS_') {
+                $set['status'] = $status;
+            }
+        } else {
+            if (!empty($action['id_status']) && $action['id_status'] != '_NOSTATUS_') {
+                $set['status'] = $action['id_status'];
+            }
         }
 
         ResModel::update([
