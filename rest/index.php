@@ -145,7 +145,6 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
     $GLOBALS['userId'] = $userId;
 
     $response = $next($request, $response);
-    \SrcCore\controllers\CoreController::setResponseHeaders($response);
 
     return $response;
 });
