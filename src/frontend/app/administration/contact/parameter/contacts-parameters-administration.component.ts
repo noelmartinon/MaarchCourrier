@@ -9,6 +9,11 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FunctionsService } from '@service/functions.service';
 import { ContactService } from '@service/contact.service';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { KeyValue } from '@angular/common';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     templateUrl: 'contacts-parameters-administration.component.html',
@@ -35,6 +40,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
         'second_threshold': '#F4891E',
         'third_threshold': '#0AA34F',
     };
+    civilities: any[] = [];
 
     loading: boolean = false;
 
@@ -52,7 +58,8 @@ export class ContactsParametersAdministrationComponent implements OnInit {
         public appService: AppService,
         public functionsService: FunctionsService,
         public contactService: ContactService,
-        private viewContainerRef: ViewContainerRef
+        private viewContainerRef: ViewContainerRef,
+        private dialog: MatDialog,
     ) {
         this.subMenus = contactService.getAdminMenu();
     }
@@ -64,6 +71,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
         this.headerService.setHeader(this.translate.instant('lang.contactsParameters'));
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
 
+        this.getCivilities();
         this.http.get('../rest/contactsParameters')
             .subscribe((data: any) => {
                 this.contactsFilling = data.contactsFilling;
@@ -81,6 +89,61 @@ export class ContactsParametersAdministrationComponent implements OnInit {
                     this.dataSource.sort = this.sort;
                 }, 0);
             });
+    }
+
+    getCivilities() {
+        this.http.get('../rest/civilities').pipe(
+            tap((data: any) => {
+                this.civilities = data.civilities;
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    updateCivility(civility: any) {
+        console.log('update!');
+        /*this.http.put(`../rest/civilities/${civility.id}`, civility).pipe(
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })*/
+    }
+
+    addCivility() {
+        const newCivility = {
+            id: `title${this.civilities.length + 1}`,
+            label: 'label',
+            abbreviation: 'abbreviation'
+        };
+        this.civilities.push(newCivility);
+        /*this.http.post(`../rest/civilities`, newCivility).pipe(
+            tap((data: any) => {
+                this.civilities.push(newCivility);
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })*/
+    }
+
+
+    deleteCivility(civility: any, index: number) {
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
+
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            // exhaustMap(() => this.http.delete(`../rest/civilities/${civility.id}`)),
+            tap(() => {
+                this.civilities.splice(index, 1);
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     addCriteria(event: any, criteria: any, type: string) {
@@ -109,5 +172,9 @@ export class ContactsParametersAdministrationComponent implements OnInit {
     toggleFillingContact() {
         this.contactsFilling.enable === true ? this.contactsFilling.enable = false : this.contactsFilling.enable = true;
         this.onSubmit();
+    }
+
+    originalOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
+        return 0;
     }
 }

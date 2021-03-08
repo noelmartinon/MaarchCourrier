@@ -48,6 +48,9 @@ class AuthenticationController
         $hashedPath = md5($path);
 
         $appName   = CoreConfigModel::getApplicationName();
+        $configFile = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $maarchUrl = $configFile['config']['maarchUrl'] ?? '';
+
         $parameter = ParameterModel::getById(['id' => 'loginpage_message', 'select' => ['param_value_string']]);
 
         $encryptKey = CoreConfigModel::getEncryptKey();
@@ -74,6 +77,9 @@ class AuthenticationController
             $authUri        = $configuration['connectionUrl'] ?? null;
         }
 
+        $emailConfiguration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_email_server', 'select' => ['value']]);
+        $emailConfiguration = !empty($emailConfiguration['value']) ? json_decode($emailConfiguration['value'], true) : null;
+
         $return = [
             'instanceId'        => $hashedPath,
             'applicationName'   => $appName,
@@ -81,7 +87,9 @@ class AuthenticationController
             'changeKey'         => $encryptKey == 'Security Key Maarch Courrier #2008',
             'authMode'          => $loggingMethod['id'],
             'authUri'           => $authUri,
-            'lang'              => CoreConfigModel::getLanguage()
+            'lang'              => CoreConfigModel::getLanguage(),
+            'mailServerOnline'  => $emailConfiguration['online'],
+            'maarchUrl'         => $maarchUrl
         ];
 
         if (!empty($keycloakState)) {

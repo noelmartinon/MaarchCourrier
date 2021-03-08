@@ -177,7 +177,6 @@ writeLog(['message' => "{$totalNotificationsToProcess} notification(s) to proces
 
 //=========================================================================================================================================
 //FOURTH STEP
-
 $i = 1;
 foreach ($tmpNotifs as $login => $tmpNotif) {
     foreach ($tmpNotif['baskets'] as $basketId => $basket_list) {

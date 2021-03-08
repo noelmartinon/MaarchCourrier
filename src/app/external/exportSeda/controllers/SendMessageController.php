@@ -376,15 +376,10 @@ class SendMessageController
             $content->RelatedObjectReference->References = [];
 
             foreach ($relatedObjectReference as $ref) {
-                $reference = new \stdClass();
                 if ($ref) {
+                    $reference = new \stdClass();
                     $reference->ExternalReference = $ref->chrono;
                     $content->RelatedObjectReference->References[] = $reference;
-                } else {
-                    if (isset($object->originatorAgency)) {
-                        $reference->ExternalReference = 'originator:' . $object->originatorAgency->id . ':' . $key;
-                        $content->RelatedObjectReference->References[] = $reference;
-                    }
                 }
             }
         }

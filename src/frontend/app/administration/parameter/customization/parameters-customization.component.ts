@@ -34,6 +34,7 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
 
         this.stepFormGroup = this._formBuilder.group({
             applicationName: ['', Validators.required],
+            maarchUrl: ['', Validators.required],
             loginpage_message: [''],
             homepage_message: [''],
             traffic_record_summary_sheet: [''],
@@ -54,7 +55,7 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
     }
 
     getParameters() {
-        return new Promise((resolve) => {
+        return new Promise(() => {
             this.http.get('../rest/parameters').pipe(
                 tap((data: any) => {
                     this.stepFormGroup.controls['homepage_message'].setValue(data.parameters.filter((item: any) => item.id === 'homepage_message')[0].value);
@@ -64,6 +65,7 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
                 exhaustMap(() => this.http.get('../rest/authenticationInformations')),
                 tap((data: any) => {
                     this.stepFormGroup.controls['applicationName'].setValue(data.applicationName);
+                    this.stepFormGroup.controls['maarchUrl'].setValue(data.maarchUrl);
                     setTimeout(() => {
 
                         this.stepFormGroup.controls['applicationName'].valueChanges.pipe(
@@ -71,6 +73,10 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
                             tap(() => this.saveParameter('applicationName'))
                         ).subscribe();
 
+                        this.stepFormGroup.controls['maarchUrl'].valueChanges.pipe(
+                            debounceTime(1000),
+                            tap(() => this.saveParameter('maarchUrl'))
+                        ).subscribe();
 
                         this.stepFormGroup.controls['homepage_message'].valueChanges.pipe(
                             debounceTime(100),
@@ -97,12 +103,8 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
         });
     }
 
-    isValidStep() {
-        return this.stepFormGroup === undefined ? false : this.stepFormGroup.valid;
-    }
-
     initMce(readonly = false) {
-        let param = {
+        const param = {
             selector: '#loginpage_message',
             setup: (editor: any) => {
                 editor.on('Blur', (e) => {
@@ -213,8 +215,8 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
         let param = {};
         if (parameterId === 'logo' || parameterId === 'bodyImage') {
             param['image'] = this.stepFormGroup.controls[parameterId].value;
-        } else if (parameterId === 'applicationName') {
-            param['applicationName'] = this.stepFormGroup.controls[parameterId].value;
+        } else if (parameterId === 'applicationName' || parameterId === 'maarchUrl') {
+            param[parameterId] = this.stepFormGroup.controls[parameterId].value;
         } else {
             param = {
                 param_value_string: this.stepFormGroup.controls[parameterId].value

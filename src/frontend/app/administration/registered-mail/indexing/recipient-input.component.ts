@@ -60,12 +60,7 @@ export class RegisteredMailRecipientInputComponent implements OnInit {
     getCivilities() {
         this.http.get('../rest/civilities').pipe(
             tap((data: any) => {
-                Object.keys(data.civilities).forEach(element => {
-                    this.civilities.push({
-                        id: element,
-                        label: data.civilities[element].label.toUpperCase()
-                    });
-                });
+                this.civilities = data.civilities;
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);

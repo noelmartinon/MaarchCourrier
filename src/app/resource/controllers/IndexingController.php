@@ -379,7 +379,7 @@ class IndexingController
             $processDelayUpdated = 1;
             for ($i = 1; $i <= $args['delay']; $i++) {
                 $tmpDate = new \DateTime($args['date']);
-                if ($args['sub']) {
+                if (!empty($args['sub'])) {
                     $tmpDate->sub(new \DateInterval("P{$i}D"));
                 } else {
                     $tmpDate->add(new \DateInterval("P{$i}D"));
@@ -392,7 +392,7 @@ class IndexingController
                 }
             }
 
-            if ($args['sub']) {
+            if (!empty($args['sub'])) {
                 $date->sub(new \DateInterval("P{$processDelayUpdated}D"));
             } else {
                 $date->add(new \DateInterval("P{$processDelayUpdated}D"));

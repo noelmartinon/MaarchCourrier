@@ -103,6 +103,11 @@
                                 <app-visa-parameters></app-visa-parameters>
                             </ng-template>
                         </mat-tab>
+                        <mat-tab [label]="'lang.others' | translate">
+                            <ng-template matTabContent>
+                                <app-other-parameters></app-other-parameters>
+                            </ng-template>
+                        </mat-tab>
                     </mat-tab-group>
                 </mat-card>
             </div>

@@ -38,24 +38,24 @@ abstract class HistoryModelAbstract
         return $aHistories;
     }
 
-    public static function create(array $aArgs)
+    public static function create(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['tableName', 'recordId', 'eventType', 'userId', 'info', 'moduleId', 'eventId']);
-        ValidatorModel::stringType($aArgs, ['tableName', 'eventType', 'info', 'moduleId', 'eventId']);
-        ValidatorModel::intVal($aArgs, ['userId']);
+        ValidatorModel::notEmpty($args, ['tableName', 'recordId', 'eventType', 'userId', 'info', 'moduleId', 'eventId']);
+        ValidatorModel::stringType($args, ['tableName', 'eventType', 'info', 'moduleId', 'eventId']);
+        ValidatorModel::intVal($args, ['userId']);
 
         DatabaseModel::insert([
             'table'         => 'history',
             'columnsValues' => [
-                'table_name' => $aArgs['tableName'],
-                'record_id'  => $aArgs['recordId'],
-                'event_type' => $aArgs['eventType'],
-                'user_id'    => $aArgs['userId'],
+                'table_name' => $args['tableName'],
+                'record_id'  => $args['recordId'],
+                'event_type' => $args['eventType'],
+                'user_id'    => $args['userId'],
                 'event_date' => 'CURRENT_TIMESTAMP',
-                'info'       => $aArgs['info'],
-                'id_module'  => $aArgs['moduleId'],
-                'remote_ip'  => $_SERVER['REMOTE_ADDR'],
-                'event_id'   => $aArgs['eventId'],
+                'info'       => $args['info'],
+                'id_module'  => $args['moduleId'],
+                'remote_ip'  => $_SERVER['REMOTE_ADDR'] ?? '',
+                'event_id'   => $args['eventId']
             ]
         ]);
 

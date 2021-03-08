@@ -100,7 +100,7 @@
                                                         </ng-container>
                                                         <ng-template #elseData>
                                                             <span [title]="element[item]"
-                                                                [class.empty]="element[item]===('lang.unavailable' | translate)">{{element[item]}}</span>
+                                                                [class.empty]="element[item]===('lang.addressNotSet' | translate)">{{element[item]}}</span>
                                                         </ng-template>
                                                     </span>
                                                 </p>
@@ -162,7 +162,7 @@
                         {{'lang.address' | translate}}
                     </mat-header-cell>
                     <mat-cell *matCellDef="let element" style="flex:3;"
-                        [class.empty]="element.address===('lang.unavailable' | translate)">
+                        [class.empty]="element.address===('lang.addressNotSet' | translate)">
                         {{element.address}}
                     </mat-cell>
                 </ng-container>

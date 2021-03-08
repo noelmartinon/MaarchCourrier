@@ -178,15 +178,15 @@ class ParameterController
             if (!empty($tmpFileName) && is_file($tmpFileName)) {
                 unset($tmpFileName);
             }
-        } elseif ($args['id'] == 'applicationName') {
+        } elseif (in_array($args['id'], ['applicationName', 'maarchUrl'])) {
             $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
-            $config['config']['applicationName'] = $body['applicationName'];
+            $config['config'][$args['id']] = $body[$args['id']];
             if (file_exists("custom/{$customId}/apps/maarch_entreprise/xml/config.json")) {
                 $fp = fopen("custom/{$customId}/apps/maarch_entreprise/xml/config.json", 'w');
             } else {
                 $fp = fopen("apps/maarch_entreprise/xml/config.json", 'w');
             }
-            fwrite($fp, json_encode($config, JSON_PRETTY_PRINT));
+            fwrite($fp, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
             fclose($fp);
         } elseif (in_array($args['id'], ['bindingDocumentFinalAction', 'nonBindingDocumentFinalAction'])) {
             $parameter = ParameterModel::getById(['id' => $args['id']]);

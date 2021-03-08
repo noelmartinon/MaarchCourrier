@@ -15,6 +15,7 @@
 namespace ContentManagement\controllers;
 
 use Attachment\models\AttachmentModel;
+use Contact\controllers\ContactCivilityController;
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
 use Convert\controllers\ConvertPdfController;
@@ -734,7 +735,11 @@ class MergeController
                 }
                 $postalAddress = array_values($postalAddress);
                 $person['postal_address'] = implode("\n", $postalAddress);
-                $person['civility'] = ContactModel::getCivilityLabel(['civilityId' => $person['civility']]);
+                if (!empty($person['civility'])) {
+                    $person['civility'] = ContactCivilityController::getLabelById(['id' => $person['civility']]);
+                } else {
+                    $person['civility'] = '';
+                }
                 $customFields = json_decode($person['custom_fields'], true);
                 unset($person['custom_fields']);
                 if (!empty($customFields)) {

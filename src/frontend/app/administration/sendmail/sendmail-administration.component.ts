@@ -116,16 +116,19 @@ export class SendmailAdministrationComponent implements OnInit {
     }
 
     onSubmit() {
-        this.http.put('../rest/configurations/admin_email_server', this.sendmail).pipe(
-            tap((data: any) => {
-                this.sendmailClone = JSON.parse(JSON.stringify(this.sendmail));
-                this.notify.success(this.translate.instant('lang.configurationUpdated'));
-            }),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+        return new Promise((resolve) => {
+            this.http.put('../rest/configurations/admin_email_server', this.sendmail).pipe(
+                tap((data: any) => {
+                    this.sendmailClone = JSON.parse(JSON.stringify(this.sendmail));
+                    this.notify.success(this.translate.instant('lang.configurationUpdated'));
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     checkModif() {
@@ -139,8 +142,9 @@ export class SendmailAdministrationComponent implements OnInit {
         this.sendmail.password = '';
     }
 
-    openMailServerTest(saveMode: boolean = true) {
-        const dialogRef = this.dialog.open(CheckMailServerModalComponent, {
+    async openMailServerTest() {
+        await this.onSubmit();
+        this.dialog.open(CheckMailServerModalComponent, {
             panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',
@@ -151,15 +155,5 @@ export class SendmailAdministrationComponent implements OnInit {
                 sender: this.emailSendResult
             }
         });
-        dialogRef.afterClosed().pipe(
-            filter((data: any) => data === 'success' && saveMode),
-            tap((data: any) => {
-                this.onSubmit();
-            }),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
     }
 }

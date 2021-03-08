@@ -2340,7 +2340,7 @@
     "shareWith": "Share with",
     "shared": "Shared",
     "mergeConfirm": "Do you want to merge {{0}}?",
-    "unavailable": "Not available",
+    "addressNotSet": "Address not set",
     "addCorrespondentInSharedGroupsOnProfile": "Add correspondents in shared groups from the profile",
     "correspondents": "Correspondent(s)",
     "mergeCorrespondentsGroupInfo": "The following groups of correspondents will be merged",
@@ -2360,5 +2360,7 @@
     "infoVisaParameters": "These parameters concern the visa workflow in the <b> internal signature </b>",
     "noData": "No available groupement ",
     "correspondentAdded": "Correspondent(s) added",
-    "displayed": "displayed"
+    "displayed": "displayed",
+    "maarchUrl": "Application URL",
+    "maarchUrlHelp": "URL used in notifications and in documents synchronization with an external signature book"
 }

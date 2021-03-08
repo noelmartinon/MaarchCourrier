@@ -477,16 +477,7 @@ export class ContactsFormComponent implements OnInit {
     }
 
     initCivilities(civilities: any) {
-        const formatedCivilities: any[] = [];
-
-        Object.keys(civilities).forEach(element => {
-            formatedCivilities.push({
-                id: element,
-                label: civilities[element].label
-            });
-        });
-
-        this.contactForm.filter(contact => contact.id === 'civility')[0].values = formatedCivilities;
+        this.contactForm.filter(contact => contact.id === 'civility')[0].values = civilities;
     }
 
     getCountries() {
@@ -679,7 +670,9 @@ export class ContactsFormComponent implements OnInit {
         this.http.post('../rest/contacts', this.formatContact()).pipe(
             tap((data: any) => {
                 this.onSubmitEvent.emit(data.id);
-                this.appInputCorrespondentGroup.linkGrpAfterCreation(data.id, 'contact');
+                if (this.appInputCorrespondentGroup !== undefined) {
+                    this.appInputCorrespondentGroup.linkGrpAfterCreation(data.id, 'contact');
+                }
                 this.notify.success(this.translate.instant('lang.contactAdded'));
                 if (!this.functions.empty(data.warning)) {
                     this.notify.error(data.warning);

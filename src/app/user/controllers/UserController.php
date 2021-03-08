@@ -19,7 +19,6 @@ use Basket\models\GroupBasketModel;
 use Basket\models\RedirectBasketModel;
 use Configuration\models\ConfigurationModel;
 use Contact\models\ContactGroupListModel;
-use Contact\models\ContactGroupModel;
 use ContentManagement\controllers\DocumentEditorController;
 use Docserver\controllers\DocserverController;
 use Docserver\models\DocserverModel;
@@ -214,7 +213,7 @@ class UserController
         }
 
         if (!PrivilegeController::hasPrivilege(['privilegeId' => 'manage_personal_data', 'userId' => $GLOBALS['id']])) {
-            $data['phone'] = null;
+            $body['phone'] = null;
         }
 
         $modes = ['standard', 'rest', 'root_visible', 'root_invisible'];

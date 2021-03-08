@@ -98,8 +98,8 @@ abstract class ResModelAbstract
 
         DatabaseModel::update([
             'table'     => 'res_letterbox',
-            'set'       => $args['set'],
-            'postSet'   => $args['postSet'],
+            'set'       => $args['set'] ?? null,
+            'postSet'   => $args['postSet'] ?? null,
             'where'     => $args['where'],
             'data'      => $args['data']
         ]);

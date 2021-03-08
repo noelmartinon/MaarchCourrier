@@ -8,15 +8,22 @@ import { MatSort } from '@angular/material/sort';
 import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
+import { FormControl } from '@angular/forms';
+import { debounceTime, tap } from 'rxjs/operators';
 
 @Component({
-    templateUrl: 'shippings-administration.component.html'
+    templateUrl: 'shippings-administration.component.html',
+    styleUrls: ['shippings-administration.component.scss']
 })
 export class ShippingsAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
+    shippingConf: any = {
+        enabled: new FormControl(true),
+        authUri: new FormControl('https://connect.maileva.com'),
+        uri: new FormControl('https://api.maileva.com'),
+    };
 
     shippings: any[] = [];
 
@@ -47,6 +54,8 @@ export class ShippingsAdministrationComponent implements OnInit {
 
         this.loading = true;
 
+        this.initConfiguration();
+
         this.http.get('../rest/administration/shippings')
             .subscribe((data: any) => {
                 this.shippings = data.shippings;
@@ -58,6 +67,38 @@ export class ShippingsAdministrationComponent implements OnInit {
                 this.loading = false;
             });
     }
+
+    initConfiguration() {
+        Object.keys(this.shippingConf).forEach(elemId => {
+            this.shippingConf[elemId].valueChanges
+                .pipe(
+                    debounceTime(300),
+                    tap((value: any) => {
+                        this.saveConfiguration();
+                    }),
+                ).subscribe();
+        });
+    }
+
+    saveConfiguration() {
+        console.log(this.formatConfiguration());
+
+        /*this.http.put(`../rest/configurations/documentEditor`, this.formatEditorsConfig()).pipe(
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })*/
+    }
+
+    formatConfiguration() {
+        const obj: any = {};
+        Object.keys(this.shippingConf).forEach(elemId => {
+            obj[elemId] = this.shippingConf[elemId].value;
+
+        });
+        return obj;
+    }
+
 
     deleteShipping(id: number) {
         const r = confirm(this.translate.instant('lang.deleteMsg'));

@@ -59,6 +59,8 @@ SELECT id, 'myLastResources', 'list', 1, '#90caf9', '{}' FROM users WHERE status
 INSERT INTO tiles (user_id, type, view, position, color, parameters)
 SELECT id, 'followedMail', 'chart', 0, '#90caf9', '{"chartMode": "status", "chartType": "pie"}' FROM users WHERE status != 'DEL';
 
+ALTER TABLE configurations ALTER COLUMN value TYPE jsonb;
+UPDATE configurations SET value = jsonb_set(value, '{online}', 'true') where privilege = 'admin_email_server';
 
 DO $$ BEGIN
     IF (SELECT count(column_name) from information_schema.columns where table_name = 'contacts_groups' and column_name = 'public') THEN
@@ -80,3 +82,16 @@ DO $$ BEGIN
         ALTER TABLE contacts_groups_lists ALTER COLUMN correspondent_type set not null;
     END IF;
 END$$;
+
+DROP TABLE IF EXISTS contacts_civilities;
+CREATE TABLE contacts_civilities
+(
+    id SERIAL NOT NULL,
+    label text NOT NULL,
+    abbreviation CHARACTER VARYING(16) NOT NULL,
+    CONSTRAINT contacts_civilities_pkey PRIMARY KEY (id)
+)
+WITH (OIDS=FALSE);
+
+ALTER TABLE contacts DROP COLUMN IF EXISTS civility_tmp;
+ALTER TABLE contacts ADD COLUMN civility_tmp INTEGER;

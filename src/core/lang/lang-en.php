@@ -379,6 +379,7 @@ define("_TO_AVIS", "FOR OPINION");
 define("_VALIDATE_BY", "Validated by");
 define('_MAIN_DOCUMENT', 'Main document');
 define("_UPDATE_LISTINSTANCE", "Diffusion list updated");
+define("_UPDATE_LISTINSTANCE_DEST", "Diffusion list recipient updated");
 define("_UPDATE_VISA_CIRCUIT", "Visa workflow updated");
 define("_UPDATE_AVIS_CIRCUIT", "Opinion workflow updated");
 

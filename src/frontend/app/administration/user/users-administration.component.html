@@ -2,10 +2,7 @@
     <ng-template #adminMenuTemplate>
         <mat-nav-list>
             <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
-            <div *ngIf="!authService.mailServerOnline" class="alert-message alert-message-danger mailList"
-            style="max-width: 100%;margin: 0px;" [innerHTML]="'lang.mailServerOfflineMsg' | translate :{action:('lang.add' | translate)}">
-        </div>
-            <a mat-list-item routerLink="/administration/users/new" [disabled]="!authService.mailServerOnline">
+            <a mat-list-item routerLink="/administration/users/new">
                 <mat-icon color="primary" mat-list-icon class="fa fa-plus"></mat-icon>
                 <p mat-line>
                     {{'lang.add' | translate}}

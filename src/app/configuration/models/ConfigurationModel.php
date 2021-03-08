@@ -57,14 +57,15 @@ class ConfigurationModel
 
     public static function update(array $args)
     {
-        ValidatorModel::notEmpty($args, ['set', 'where', 'data']);
-        ValidatorModel::arrayType($args, ['set', 'where', 'data']);
+        ValidatorModel::notEmpty($args, ['where', 'data']);
+        ValidatorModel::arrayType($args, ['postSet', 'set', 'where', 'data']);
 
         DatabaseModel::update([
-            'table' => 'configurations',
-            'set'   => $args['set'],
-            'where' => $args['where'],
-            'data'  => $args['data']
+            'table'   => 'configurations',
+            'set'     => empty($args['set']) ? [] : $args['set'],
+            'postSet' => empty($args['postSet']) ? [] : $args['postSet'],
+            'where'   => $args['where'],
+            'data'    => $args['data']
         ]);
 
         return true;

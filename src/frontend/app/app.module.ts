@@ -13,7 +13,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { InternationalizationModule } from '@service/translate/internationalization.module';
 import { AngularDraggableModule } from 'angular2-draggable';
-import { ColorGithubModule } from 'ngx-color/github';
 
 import { JoyrideModule } from 'ngx-joyride';
 
@@ -172,7 +171,6 @@ export class MyHammerConfig extends HammerGestureConfig {
         AdministrationModule,
         DocumentViewerModule,
         AppListModule,
-        ColorGithubModule,
         NgxChartsModule
     ],
     declarations: [

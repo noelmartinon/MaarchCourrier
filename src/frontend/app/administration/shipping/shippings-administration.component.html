@@ -2,6 +2,14 @@
     <ng-template #adminMenuTemplate>
         <mat-nav-list>
             <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
+            <a mat-list-item disableRipple="true" matTooltip="{{'lang.basketNotification' | translate}}">
+                <mat-icon color="primary" mat-list-icon>
+                    <mat-slide-toggle #toggleConf [formControl]="shippingConf.enabled" color="primary" style="position: absolute;"></mat-slide-toggle>
+                </mat-icon>
+                <p mat-line [ngStyle]="{'opacity': shippingConf.enabled.value ? '' : '0.3'}" (click)="toggleConf.toggle()">
+                    {{(shippingConf.enabled.value ? 'lang.enabled' : 'lang.disabled') | translate}}
+                </p>
+            </a>
             <a mat-list-item routerLink="/administration/shippings/new">
                 <mat-icon color="primary" mat-list-icon class="fa fa-plus"></mat-icon>
                 <p mat-line>
@@ -29,6 +37,18 @@
                     <mat-spinner style="margin:auto;"></mat-spinner>
                 </div>
                 <mat-card *ngIf="!loading" class="card-app-content">
+                    <div class="maileva-config">
+                        <mat-form-field appearance="outline">
+                            <mat-label>{{'lang.authUri' | translate}}</mat-label>
+                            <input matInput type="text" [formControl]="shippingConf.authUri">
+                            <mat-hint align="end" [innerHTML]="'lang.shippingAuthUriDesc' | translate"></mat-hint>
+                        </mat-form-field>
+                        <mat-form-field appearance="outline">
+                            <mat-label>{{'lang.uri' | translate}}</mat-label>
+                            <input matInput type="text" [formControl]="shippingConf.uri">
+                            <mat-hint align="end" [innerHTML]="'lang.shippingUriDesc' | translate"></mat-hint>
+                        </mat-form-field>
+                    </div>
                     <div class="row">
                         <div class="col-md-6 col-xs-6">
                             <mat-form-field>

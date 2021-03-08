@@ -3,7 +3,7 @@
         <mat-nav-list *ngIf="!creationMode && !loading">
             <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
             <div *ngIf="!authService.mailServerOnline" class="alert-message alert-message-danger mailList"
-            style="max-width: 100%;margin: 0px;" [innerHTML]="'lang.mailServerOfflineMsg' | translate :{action:('lang.activateAbsence' | translate)}"></div>
+            style="max-width: 100%;margin: 0px;" [innerHTML]="'lang.mailServerOfflineMsg' | translate :{action:('lang.sendActivationNotification' | translate)}"></div>
             <a mat-list-item *ngIf="user.status != 'ABS'" (click)="activateAbsence()">
                 <mat-icon color="warn" mat-list-icon class="fa fa-plane"></mat-icon>
                 <p mat-line>
@@ -76,6 +76,10 @@
                     <mat-spinner style="margin:auto;"></mat-spinner>
                 </div>
                 <mat-card *ngIf="!loading" class="card-app-content">
+                    <div *ngIf="!authService.mailServerOnline && creationMode">
+                        <div class="alert-message alert-message-danger" role="alert" style="max-width: 660px" 
+                            [innerHTML]="'lang.mailServerOfflineMsg' | translate :{action:('lang.receiveActivationNotification' | translate)}"></div>
+                    </div>
                     <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="initService()">
                         <mat-tab label="{{'lang.informations' | translate}}">
                             <div *ngIf="showPassword" style="margin-bottom: 5%">

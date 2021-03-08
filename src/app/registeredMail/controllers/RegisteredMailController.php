@@ -14,6 +14,7 @@
 namespace RegisteredMail\controllers;
 
 use Com\Tecnick\Barcode\Barcode;
+use Contact\controllers\ContactCivilityController;
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
 use Convert\models\AdrModel;
@@ -501,7 +502,7 @@ class RegisteredMailController
 
         $recipient = ContactController::getContactAfnor([
             'company'               => $args['recipient']['company'],
-            'civility'              => ContactModel::getCivilityId(['civilityLabel' => $args['recipient']['civility']]),
+            'civility'              => !empty($args['recipient']['civility']) ? ContactCivilityController::getIdByLabel(['label' => $args['recipient']['civility']]) : '',
             'firstname'             => $args['recipient']['firstname'],
             'lastname'              => $args['recipient']['lastname'],
             'address_number'        => $args['recipient']['addressNumber'],
@@ -1036,7 +1037,7 @@ class RegisteredMailController
             $referenceInfo = json_decode($registeredMail['recipient'], true);
             $recipient = ContactController::getContactAfnor([
                 'company'               => $referenceInfo['company'],
-                'civility'              => ContactModel::getCivilityId(['civilityLabel' => $referenceInfo['civility']]),
+                'civility'              => !empty($referenceInfo['civility']) ? ContactCivilityController::getIdByLabel(['label' => $referenceInfo['civility']]) : '',
                 'firstname'             => $referenceInfo['firstname'],
                 'lastname'              => $referenceInfo['lastname'],
                 'address_number'        => $referenceInfo['addressNumber'],

@@ -802,6 +802,15 @@ CREATE TABLE contacts_groups_lists
 )
 WITH (OIDS=FALSE);
 
+CREATE TABLE contacts_civilities
+(
+    id SERIAL NOT NULL,
+    label text NOT NULL,
+    abbreviation CHARACTER VARYING(16) NOT NULL,
+    CONSTRAINT contacts_civilities_pkey PRIMARY KEY (id)
+)
+WITH (OIDS=FALSE);
+
 CREATE TABLE search_templates (
   id serial,
   user_id integer NOT NULL,
@@ -1298,7 +1307,7 @@ CREATE TABLE configurations
 (
 id serial NOT NULL,
 privilege character varying(64) NOT NULL,
-value json DEFAULT '{}' NOT NULL,
+value jsonb DEFAULT '{}' NOT NULL,
 CONSTRAINT configuration_pkey PRIMARY KEY (id),
 CONSTRAINT configuration_unique_key UNIQUE (privilege)
 )

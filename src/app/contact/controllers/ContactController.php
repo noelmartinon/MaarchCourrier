@@ -15,6 +15,7 @@ namespace Contact\controllers;
 
 use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
 use Attachment\models\AttachmentModel;
+use Contact\models\ContactCivilityModel;
 use Contact\models\ContactCustomFieldListModel;
 use Contact\models\ContactFillingModel;
 use Contact\models\ContactGroupListModel;
@@ -256,7 +257,9 @@ class ContactController
         ];
 
         if (!empty($rawContact['civility'])) {
-            $civilities = ContactModel::getCivilities();
+            $civilities = ContactCivilityModel::get(['select' => ['*']]);
+            $civilities = array_column($civilities, null, 'id');
+
             $contact['civility'] = [
                 'id'           => $rawContact['civility'],
                 'label'        => $civilities[$rawContact['civility']]['label'],
@@ -677,13 +680,6 @@ class ContactController
         return $response->withJson(['contact' => $contact]);
     }
 
-    public function getCivilities(Request $request, Response $response)
-    {
-        $civilities = ContactModel::getCivilities();
-
-        return $response->withJson(['civilities' => $civilities]);
-    }
-
     public static function getFillingRate(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['contactId']);
@@ -792,11 +788,13 @@ class ContactController
 
     public static function controlLengthNameAfnor(array $args)
     {
-        $aCivility = ContactModel::getCivilities();
-        if (strlen($args['civility'].' '.$args['fullName']) > $args['strMaxLength']) {
-            $args['civility'] = $aCivility[$args['civility']]['abbreviation'];
+        $civilities = ContactCivilityModel::get(['select' => ['*']]);
+        $civilities = array_column($civilities, null, 'id');
+
+        if (strlen($civilities[$args['civility']]['label'].' '.$args['fullName']) > $args['strMaxLength']) {
+            $args['civility'] = $civilities[$args['civility']]['abbreviation'];
         } else {
-            $args['civility'] = $aCivility[$args['civility']]['label'];
+            $args['civility'] = $civilities[$args['civility']]['label'];
         }
 
         return substr($args['civility'].' '.$args['fullName'], 0, $args['strMaxLength']);
@@ -947,7 +945,9 @@ class ContactController
         $contactsUsed = ContactController::isContactUsed(['ids' => $contactIds]);
 
 
-        $civilities = ContactModel::getCivilities();
+        $civilities = ContactCivilityModel::get(['select' => ['*']]);
+        $civilities = array_column($civilities, null, 'id');
+
         $contacts = [];
         foreach ($duplicates as $key => $contact) {
             unset($duplicates[$key]['count']);
@@ -1182,7 +1182,9 @@ class ContactController
         fputcsv($file, $csvHead, $delimiter);
 
         $contacts = ContactModel::get(['select' => $fields]);
-        $civilities = ContactModel::getCivilities();
+
+        $civilities = ContactCivilityModel::get(['select' => ['*']]);
+        $civilities = array_column($civilities, null, 'id');
 
         foreach ($contacts as $contact) {
             foreach ($contact as $field => $value) {
@@ -1296,7 +1298,7 @@ class ContactController
 
             // Replace civility label by civility id
             if (!empty($contact['civility'])) {
-                $civility = ContactModel::getCivilityId(['civilityLabel' => $contact['civility']]);
+                $civility = ContactCivilityController::getIdByLabel(['label' => $contact['civility']]);
                 if (empty($civility)) {
                     $errors[] = ['error' => "Argument civility is not a valid civility for contact {$key}", 'index' => $key, 'lang' => 'argumentCivilityNotCorrect'];
                     continue;
@@ -1408,7 +1410,9 @@ class ContactController
                     'id'        => $resourceContact['item_id']
                 ]);
 
-                $civilities = ContactModel::getCivilities();
+                $civilities = ContactCivilityModel::get(['select' => ['*']]);
+                $civilities = array_column($civilities, null, 'id');
+
                 $xmlCivility = $civilities[$contactRaw['civility']];
                 $civility = [
                     'id'           => $contactRaw['civility'],
@@ -1615,7 +1619,7 @@ class ContactController
 
         if (empty($body)) {
             return ['errors' => 'Body is not set or empty'];
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['lastname']) && !Validator::stringType()->notEmpty()->validate($body['company'])) {
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['lastname'] ?? null) && !Validator::stringType()->notEmpty()->validate($body['company'] ?? null)) {
             return ['errors' => 'Body lastname or company is mandatory'];
         } elseif (!empty($body['email']) && !filter_var($body['email'], FILTER_VALIDATE_EMAIL)) {
             return ['errors' => 'Body email is not valid'];
@@ -1624,7 +1628,6 @@ class ContactController
         }
         
         $lengthFields = [
-            'civility',
             'firstname',
             'lastname',
             'company',
@@ -1804,7 +1807,9 @@ class ContactController
             $contact['civility'] = null;
 
             if (!empty($rawContact['civility'])) {
-                $civilities = ContactModel::getCivilities();
+                $civilities = ContactCivilityModel::get(['select' => ['*']]);
+                $civilities = array_column($civilities, null, 'id');
+
                 $contact['civility'] = [
                     'id'           => $rawContact['civility'],
                     'label'        => $civilities[$rawContact['civility']]['label'],

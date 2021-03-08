@@ -26,7 +26,7 @@ class ContactControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $args = [
-            'civility'          => 'title1',
+            'civility'          => 1,
             'firstname'         => 'Hal',
             'lastname'          => 'Jordan',
             'company'           => 'Green Lantern Corps',
@@ -60,7 +60,7 @@ class ContactControllerTest extends TestCase
         \Group\models\PrivilegeModel::addPrivilegeToGroup(['privilegeId' => 'create_contacts', 'groupId' => 'WEBSERVICE']);
 
         $args = [
-            'civility'        => 'title1',
+            'civility'        => 1,
             'firstname'       => 'Hal',
             'lastname'        => 'Jordan',
             'company'         => 'Green Lantern Corps',
@@ -90,7 +90,7 @@ class ContactControllerTest extends TestCase
         $GLOBALS['id'] = $userInfo['id'];
 
         $args2 = [
-            'civility'           => 'title1',
+            'civility'           => 1,
             'firstname'          => 'Dwight',
             'lastname'           => 'Schrute',
             'company'            => 'Dunder Mifflin Paper Company Inc.',
@@ -178,7 +178,7 @@ class ContactControllerTest extends TestCase
         $this->assertSame('Body is not set or empty', $responseBody['errors']);
 
         $args = [
-            'civility'          => 'title1',
+            'civility'          => 1,
             'firstname'         => 'Hal',
             'department'        => 'Sector 2814',
             'function'          => 'member',
@@ -199,7 +199,7 @@ class ContactControllerTest extends TestCase
         $this->assertSame('Body lastname or company is mandatory', $responseBody['errors']);
 
         $args = [
-            'civility'           => 'title1',
+            'civility'           => 1,
             'firstname'          => 'Dwight',
             'lastname'           => 'Schrute',
             'company'            => 'Dunder Mifflin Paper Company Inc.',
@@ -224,7 +224,7 @@ class ContactControllerTest extends TestCase
 
 
         $args = [
-            'civility'        => 'title1',
+            'civility'        => 1,
             'firstname'       => 'Dwight',
             'lastname'        => 'Schrute',
             'company'         => 'Dunder Mifflin Paper Company Inc.',
@@ -248,7 +248,7 @@ class ContactControllerTest extends TestCase
         $this->assertSame('Body email is not valid', $responseBody['errors']);
 
         $args = [
-            'civility'           => 'title1',
+            'civility'           => 1,
             'firstname'          => 'Dwight',
             'lastname'           => 'Schrute',
             'company'            => 'Dunder Mifflin Paper Company Inc.',
@@ -272,7 +272,7 @@ class ContactControllerTest extends TestCase
         $this->assertSame('Body phone is not valid', $responseBody['errors']);
 
         $args = [
-            'civility'        => 'title1',
+            'civility'        => 1,
             'firstname'       => 'Dwight',
             'lastname'        => 'Schrute',
             'company'         => 'Dunder Mifflin Paper Company Inc.',
@@ -296,7 +296,7 @@ class ContactControllerTest extends TestCase
         $this->assertSame('Body customFields : One or more custom fields do not exist', $responseBody['errors']);
 
         $args = [
-            'civility'        => 'title1',
+            'civility'        => 1,
             'firstname'       => 'Dwight',
             'lastname'        => 'Schrute',
             'company'         => 'Dunder Mifflin Paper Company Inc.',
@@ -320,7 +320,7 @@ class ContactControllerTest extends TestCase
         $this->assertSame('Body customFields is not an array', $responseBody['errors']);
 
         $args = [
-            'civility'        => 'title1',
+            'civility'        => 1,
             'firstname'       => 'Dwight',
             'lastname'        => 'Schrute',
             'company'         => 'Dunder Mifflin Paper Company Inc. blablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablablalablablablablablablablablablabla',
@@ -489,7 +489,7 @@ class ContactControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $args = [
-            'civility'          => 'title1',
+            'civility'          => 1,
             'lastname'          => 'Sinestro',
             'company'           => 'Yellow Lantern Corps',
             'department'        => 'Sector 2813',
@@ -539,7 +539,7 @@ class ContactControllerTest extends TestCase
         $this->assertNotNull($responseBody['modificationDate']);
 
         $args = [
-            'civility'        => 'title1',
+            'civility'        => 1,
             'firstname'       => 'Dwight',
             'lastname'        => 'Schrute',
             'company'         => 'Dunder Mifflin Paper Company Inc.',
@@ -566,7 +566,7 @@ class ContactControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $args = [
-            'civility'          => 'title1',
+            'civility'          => 1,
             'firstname'         => 'Hal',
             'department'        => 'Sector 2814',
             'function'          => 'member',
@@ -587,7 +587,7 @@ class ContactControllerTest extends TestCase
         $this->assertSame('Body lastname or company is mandatory', $responseBody['errors']);
 
         $args = [
-            'civility'        => 'title1',
+            'civility'        => 1,
             'firstname'       => 'Dwight',
             'lastname'        => 'Schrute',
             'company'         => 'Dunder Mifflin Paper Company Inc.',
@@ -682,11 +682,11 @@ class ContactControllerTest extends TestCase
 
     public function testControlLengthNameAfnor()
     {
-        $name = \Contact\controllers\ContactController::controlLengthNameAfnor(['civility' => 'title1', 'fullName' => 'Prénom NOM', 'strMaxLength' => 38]);
+        $name = \Contact\controllers\ContactController::controlLengthNameAfnor(['civility' => 1, 'fullName' => 'Prénom NOM', 'strMaxLength' => 38]);
 
         $this->assertSame('Monsieur Prénom NOM', $name);
 
-        $name = \Contact\controllers\ContactController::controlLengthNameAfnor(['civility' => 'title3', 'fullName' => 'Prénom NOM TROP LOOOOOOOOOOOOONG', 'strMaxLength' => 38]);
+        $name = \Contact\controllers\ContactController::controlLengthNameAfnor(['civility' => 3, 'fullName' => 'Prénom NOM TROP LOOOOOOOOOOOOONG', 'strMaxLength' => 38]);
 
         $this->assertSame('Mlle Prénom NOM TROP LOOOOOOOOOOOOONG', $name);
     }
@@ -921,13 +921,13 @@ class ContactControllerTest extends TestCase
 
     public function testGetCivilities()
     {
-        $contactController = new \Contact\controllers\ContactController();
+        $contactCivilityController = new \Contact\controllers\ContactCivilityController();
 
         //  GET
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
-        $response = $contactController->getCivilities($request, new \Slim\Http\Response());
+        $response = $contactCivilityController->get($request, new \Slim\Http\Response());
         $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
 

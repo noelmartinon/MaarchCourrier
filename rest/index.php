@@ -156,7 +156,13 @@ $app->get('/duplicatedContacts', \Contact\controllers\ContactController::class .
 $app->put('/contacts/{id}/merge', \Contact\controllers\ContactController::class . ':mergeContacts');
 $app->get('/contactsParameters', \Contact\controllers\ContactController::class . ':getContactsParameters');
 $app->put('/contactsParameters', \Contact\controllers\ContactController::class . ':updateContactsParameters');
-$app->get('/civilities', \Contact\controllers\ContactController::class . ':getCivilities');
+
+//ContactsCivilities
+$app->get('/civilities', \Contact\controllers\ContactCivilityController::class . ':get');
+$app->post('/civilities', \Contact\controllers\ContactCivilityController::class . ':create');
+$app->get('/civilities/{id}', \Contact\controllers\ContactCivilityController::class . ':getById');
+$app->put('/civilities/{id}', \Contact\controllers\ContactCivilityController::class . ':update');
+$app->delete('/civilities/{id}', \Contact\controllers\ContactCivilityController::class . ':delete');
 
 //ContactsCustomFields
 $app->get('/contactsCustomFields', \Contact\controllers\ContactCustomFieldController::class . ':get');

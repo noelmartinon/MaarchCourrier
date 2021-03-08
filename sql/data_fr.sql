@@ -886,18 +886,18 @@ INSERT INTO users_entities (user_id, entity_id, user_role, primary_entity) VALUE
 -- CONTACTS
 ------------
 TRUNCATE TABLE contacts;
-INSERT INTO contacts VALUES (1, 'title1', 'Jean-Louis', 'ERCOLANI', 'MAARCH', '', 'Directeur Général', '11', 'Boulevard du Sud-Est', '', '', '99000', 'MAARCH LES BAINS', 'France', 'dev.maarch@maarch.org', '', NULL, 'Editeur du logiciel libre Maarch', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}');
-INSERT INTO contacts VALUES (2, 'title1', 'Karim', 'SY', 'MAARCH', '', 'Administrateur', '', 'Sacré Coeur 3', '', 'Villa 9653 4ème phase', '', 'DAKAR', 'SENEGAL', 'dev.maarch@maarch.org', '', NULL, 'Editeur du logiciel libre Maarch', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}');
-INSERT INTO contacts VALUES (3, 'title1', 'Laurent', 'GIOVANNONI', 'MAARCH', '', 'Directeur Général Adjoint', '11', 'Boulevard du Sud-Est', NULL, '', '99000', 'MAARCH LES BAINS', 'FRANCE', 'dev.maarch@maarch.org', '', NULL, 'Editeur du logiciel libre Maarch', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}');
---INSERT INTO contacts VALUES (4, 'title1', 'Nicolas', 'MARTIN', 'Préfecture de Maarch Les Bains', '', '', '13', 'RUE LA PREFECTURE', NULL, '', '99000', 'MAARCH LES BAINS', '', '', '', '{"url": "https://cchaplin:maarch@demo.maarchcourrier.com"}', 'Préfecture de Maarch Les Bains', 21, '2018-04-18 12:43:54.97424', '2018-04-18 16:28:38.498185', true, '{"m2m": "45239273100025/COU"}');
-INSERT INTO contacts VALUES (4, 'title1', 'Nicolas', 'MARTIN', 'Préfecture de Maarch Les Bains', NULL, NULL, '13', 'RUE LA PREFECTURE', NULL, NULL, '99000', 'MAARCH LES BAINS', NULL, NULL, NULL, '{"url": "https://cchaplin:maarch@demo.maarchcourrier.com"}', NULL, 21, '2018-04-18 12:43:54.97424', '2020-03-24 15:06:58.16582', true, NULL, '{"m2m": "45239273100025/COU"}');
-INSERT INTO contacts VALUES (5, 'title2', 'Brigitte', 'BERGER', 'ACME', '', 'Directrice Générale', '25', 'PLACE DES MIMOSAS', NULL, '', '99000', 'MAARCH LES BAINS', 'FRANCE', 'dev.maarch@maarch.org', '', NULL, 'Archivage et Conservation des Mémoires Electroniques', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}');
-INSERT INTO contacts VALUES (6, 'title1', 'Bernard', 'PASCONTENT', '', '', '', '25', 'route de Pampelone', NULL, '', '99000', 'MAARCH-LES-BAINS', '', 'bernard.pascontent@gmail.com', '06 08 09 07 55', NULL, '', 21, '2019-03-20 13:59:09.23436', NULL, true, '{}');
-INSERT INTO contacts VALUES (7, 'title1', 'Jacques', 'DUPONT', '', '', '', '1', 'rue du Peuplier', NULL, '', '92000', 'NANTERRE', '', '', '', NULL, '', 21, '2019-03-20 13:59:09.23436', NULL, true, '{}');
-INSERT INTO contacts VALUES (8, 'title1', 'Pierre', 'BRUNEL', '', '', '', '5', 'allée des Pommiers', NULL, '', '99000', 'MAARCH-LES-BAINS', '', 'dev.maarch@maarch.org', '06 08 09 07 55', NULL, '', 21, '2019-03-20 13:59:09.23436', NULL, true, '{}');
-INSERT INTO contacts VALUES (9, 'title1', 'Eric', 'MACKIN', '', '', '', '13', 'rue du Square Carré', NULL, '', '99000', 'MAARCH-LES-BAINS', '', '', '06 11 12 13 14', NULL, '', 21, '2019-03-20 13:59:09.23436', NULL, true, '{}');
-INSERT INTO contacts VALUES (10, 'title2', 'Carole', 'COTIN', 'MAARCH', '', 'Directrice Administrative et Qualité', '11', 'Boulevard du Sud-Est', NULL, '', '99000', 'MAARCH LES BAINS', 'FRANCE', 'dev.maarch@maarch.org', '', NULL, 'Editeur du logiciel libre Maarch', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}');
-INSERT INTO contacts VALUES (11, 'title1', 'Martin Donald', 'PELLE', '', '', '', '17', 'rue de la Demande', NULL, '', '99000', 'MAARCH-LES-BAINS', '', 'dev.maarch@maarch.org', '01 23 24 21 22', NULL, '', 21, '2019-03-20 13:59:09.23436', NULL, true, '{}');
+INSERT INTO contacts VALUES (1, 1, 'Jean-Louis', 'ERCOLANI', 'MAARCH', '', 'Directeur Général', '11', 'Boulevard du Sud-Est', '', '', '99000', 'MAARCH LES BAINS', 'France', 'dev.maarch@maarch.org', '', NULL, 'Editeur du logiciel libre Maarch', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}');
+INSERT INTO contacts VALUES (2, 1, 'Karim', 'SY', 'MAARCH', '', 'Administrateur', '', 'Sacré Coeur 3', '', 'Villa 9653 4ème phase', '', 'DAKAR', 'SENEGAL', 'dev.maarch@maarch.org', '', NULL, 'Editeur du logiciel libre Maarch', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}');
+INSERT INTO contacts VALUES (3, 1, 'Laurent', 'GIOVANNONI', 'MAARCH', '', 'Directeur Général Adjoint', '11', 'Boulevard du Sud-Est', NULL, '', '99000', 'MAARCH LES BAINS', 'FRANCE', 'dev.maarch@maarch.org', '', NULL, 'Editeur du logiciel libre Maarch', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}');
+--INSERT INTO contacts VALUES (4, 1, 'Nicolas', 'MARTIN', 'Préfecture de Maarch Les Bains', '', '', '13', 'RUE LA PREFECTURE', NULL, '', '99000', 'MAARCH LES BAINS', '', '', '', '{"url": "https://cchaplin:maarch@demo.maarchcourrier.com"}', 'Préfecture de Maarch Les Bains', 21, '2018-04-18 12:43:54.97424', '2018-04-18 16:28:38.498185', true, '{"m2m": "45239273100025/COU"}');
+INSERT INTO contacts VALUES (4, 1, 'Nicolas', 'MARTIN', 'Préfecture de Maarch Les Bains', NULL, NULL, '13', 'RUE LA PREFECTURE', NULL, NULL, '99000', 'MAARCH LES BAINS', NULL, NULL, NULL, '{"url": "https://cchaplin:maarch@demo.maarchcourrier.com"}', NULL, 21, '2018-04-18 12:43:54.97424', '2020-03-24 15:06:58.16582', true, NULL, '{"m2m": "45239273100025/COU"}');
+INSERT INTO contacts VALUES (5, 2, 'Brigitte', 'BERGER', 'ACME', '', 'Directrice Générale', '25', 'PLACE DES MIMOSAS', NULL, '', '99000', 'MAARCH LES BAINS', 'FRANCE', 'dev.maarch@maarch.org', '', NULL, 'Archivage et Conservation des Mémoires Electroniques', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}');
+INSERT INTO contacts VALUES (6, 1, 'Bernard', 'PASCONTENT', '', '', '', '25', 'route de Pampelone', NULL, '', '99000', 'MAARCH-LES-BAINS', '', 'bernard.pascontent@gmail.com', '06 08 09 07 55', NULL, '', 21, '2019-03-20 13:59:09.23436', NULL, true, '{}');
+INSERT INTO contacts VALUES (7, 1, 'Jacques', 'DUPONT', '', '', '', '1', 'rue du Peuplier', NULL, '', '92000', 'NANTERRE', '', '', '', NULL, '', 21, '2019-03-20 13:59:09.23436', NULL, true, '{}');
+INSERT INTO contacts VALUES (8, 1, 'Pierre', 'BRUNEL', '', '', '', '5', 'allée des Pommiers', NULL, '', '99000', 'MAARCH-LES-BAINS', '', 'dev.maarch@maarch.org', '06 08 09 07 55', NULL, '', 21, '2019-03-20 13:59:09.23436', NULL, true, '{}');
+INSERT INTO contacts VALUES (9, 1, 'Eric', 'MACKIN', '', '', '', '13', 'rue du Square Carré', NULL, '', '99000', 'MAARCH-LES-BAINS', '', '', '06 11 12 13 14', NULL, '', 21, '2019-03-20 13:59:09.23436', NULL, true, '{}');
+INSERT INTO contacts VALUES (10, 2, 'Carole', 'COTIN', 'MAARCH', '', 'Directrice Administrative et Qualité', '11', 'Boulevard du Sud-Est', NULL, '', '99000', 'MAARCH LES BAINS', 'FRANCE', 'dev.maarch@maarch.org', '', NULL, 'Editeur du logiciel libre Maarch', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}');
+INSERT INTO contacts VALUES (11, 1, 'Martin Donald', 'PELLE', '', '', '', '17', 'rue de la Demande', NULL, '', '99000', 'MAARCH-LES-BAINS', '', 'dev.maarch@maarch.org', '01 23 24 21 22', NULL, '', 21, '2019-03-20 13:59:09.23436', NULL, true, '{}');
 
 select setval('contacts_id_seq', (select max(id)+1 from contacts), false);
 
@@ -1660,7 +1660,7 @@ INSERT INTO contacts_filling (enable, first_threshold, second_threshold) VALUES 
 
 /* Configurations */
 TRUNCATE TABLE configurations;
-INSERT INTO configurations (privilege, value) VALUES ('admin_email_server', '{"type":"smtp","host":"smtp.gmail.com","port":465,"user":"notifications.maarch@gmail.com","password":"1OkrZQPFNJmI7uY8::7e870f0f61ecc7e9fb6e7065dd31aea5","auth":true,"secure":"ssl","from":"notifications.maarch@gmail.com","charset":"utf-8"}');
+INSERT INTO configurations (privilege, value) VALUES ('admin_email_server', '{"type":"smtp","host":"smtp.gmail.com","port":465,"user":"notifications.maarch@gmail.com","password":"1OkrZQPFNJmI7uY8::7e870f0f61ecc7e9fb6e7065dd31aea5","auth":true,"secure":"ssl","from":"notifications.maarch@gmail.com","charset":"utf-8","online":false}');
 INSERT INTO configurations (privilege, value) VALUES ('admin_search', '{"listEvent": {"defaultTab": "dashboard"},"listDisplay":{"templateColumns":6,"subInfos":[{"value":"getPriority","cssClasses":["align_leftData"],"icon":"fa-traffic-light"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_leftData"],"icon":"fa-calendar"},{"value":"getAssignee","cssClasses":["align_leftData"],"icon":"fa-sitemap"},{"value":"getDoctype","cssClasses":["align_leftData"],"icon":"fa-suitcase"},{"value":"getRecipients","cssClasses":["align_leftData"],"icon":"fa-user"},{"value":"getSenders","cssClasses":["align_leftData"],"icon":"fa-book"}]}}');
 INSERT INTO configurations (privilege, value) VALUES ('admin_sso', '{"url":"","mapping":[{"ssoId":"","maarchId":"login"}]}');
 
@@ -1789,3 +1789,11 @@ INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable,
 INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES (8, 'acknowledgement_record_management', 'Accusé de réception (Archivage)', false, false, false, '', true, true, true);
 INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES (9, 'reply_record_management', 'Réponse au transfert (Archivage)', false, false, false, '', true, true, true);
 SELECT setval('attachment_types_id_seq', (select max(id)+1 from attachment_types), false);
+
+/* Contacts Civilities */
+INSERT INTO contacts_civilities (label, abbreviation) VALUES ('Monsieur', 'M.');
+INSERT INTO contacts_civilities (label, abbreviation) VALUES ('Madame', 'Mme');
+INSERT INTO contacts_civilities (label, abbreviation) VALUES ('Mademoiselle', 'Mlle');
+INSERT INTO contacts_civilities (label, abbreviation) VALUES ('Messieurs', 'MM.');
+INSERT INTO contacts_civilities (label, abbreviation) VALUES ('Mesdames', 'Mmes');
+INSERT INTO contacts_civilities (label, abbreviation) VALUES ('Mesdemoiselles', 'Mlles');

@@ -83,8 +83,8 @@ class ContactModel
 
         DatabaseModel::update([
             'table'     => 'contacts',
-            'set'       => $args['set'],
-            'postSet'   => $args['postSet'],
+            'set'       => $args['set'] ?? [],
+            'postSet'   => $args['postSet'] ?? [],
             'where'     => $args['where'],
             'data'      => $args['data']
         ]);
@@ -144,32 +144,5 @@ class ContactModel
         }
 
         return $civilities;
-    }
-
-    public static function getCivilityLabel(array $args)
-    {
-        ValidatorModel::stringType($args, ['civilityId']);
-
-        $civilities = ContactModel::getCivilities();
-        if (!empty($civilities[$args['civilityId']])) {
-            return $civilities[$args['civilityId']]['label'];
-        }
-
-        return '';
-    }
-
-    public static function getCivilityId(array $args)
-    {
-        ValidatorModel::stringType($args, ['civilityLabel']);
-
-        if (!empty($args['civilityLabel'])) {
-            $aCivility = ContactModel::getCivilities();
-            foreach ($aCivility as $civilityId => $civility) {
-                if (mb_strtolower($civility['label']) == mb_strtolower($args['civilityLabel'])) {
-                    return $civilityId;
-                }
-            }
-        }
-        return null;
     }
 }

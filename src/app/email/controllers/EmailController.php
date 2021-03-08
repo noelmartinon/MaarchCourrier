@@ -98,6 +98,14 @@ class EmailController
                 } else {
                     EmailModel::update(['set' => ['status' => 'ERROR', 'send_date' => 'CURRENT_TIMESTAMP'], 'where' => ['id = ?'], 'data' => [$id]]);
                 }
+                if (PrivilegeController::hasPrivilege(['privilegeId' => 'admin_email_server', 'userId' => $GLOBALS['id']])) {
+                    $online = !empty($isSent['success']) ? 'true' : 'false';
+                    ConfigurationModel::update([
+                        'postSet' => ['value' => "jsonb_set(value, '{online}', '{$online}')"],
+                        'where'   => ['privilege = ?'],
+                        'data'    => ['admin_email_server']
+                    ]);
+                }
             } else {
                 $customId = CoreConfigModel::getCustomId();
                 if (empty($customId)) {
@@ -192,7 +200,7 @@ class EmailController
                 'creator'           => UserModel::getLabelledUserById(['id' => $resource['typist']]),
                 'format'            => $resource['format'],
                 'size'              => $size
-            ];;
+            ];
         }
         if (!empty($document['attachments'])) {
             foreach ($document['attachments'] as $key => $attachment) {
@@ -414,11 +422,11 @@ class EmailController
         ]);
 
         foreach ($emails as $key => $email) {
-            $emails[$key]['sender']     = json_decode($emails[$key]['sender']);
-            $emails[$key]['recipients'] = json_decode($emails[$key]['recipients']);
-            $emails[$key]['cc']         = json_decode($emails[$key]['cc']);
-            $emails[$key]['cci']        = json_decode($emails[$key]['cci']);
-            $emails[$key]['document']   = json_decode($emails[$key]['document']);
+            $emails[$key]['sender']     = json_decode($email['sender']);
+            $emails[$key]['recipients'] = json_decode($email['recipients']);
+            $emails[$key]['cc']         = json_decode($email['cc']);
+            $emails[$key]['cci']        = json_decode($email['cci']);
+            $emails[$key]['document']   = json_decode($email['document']);
         }
 
         return $response->withJson(['emails' => $emails]);

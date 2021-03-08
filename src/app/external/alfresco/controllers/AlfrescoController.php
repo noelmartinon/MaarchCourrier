@@ -17,6 +17,7 @@ namespace Alfresco\controllers;
 use Attachment\models\AttachmentModel;
 use Attachment\models\AttachmentTypeModel;
 use Configuration\models\ConfigurationModel;
+use Contact\controllers\ContactCivilityController;
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
 use Docserver\models\DocserverModel;
@@ -671,7 +672,11 @@ class AlfrescoController
                     $properties[$key] = $rawContacts[$contactNb]['company'] ?? '';
                 } elseif (strpos($alfrescoParameter, 'senderCivility_') !== false) {
                     $contactNb = explode('_', $alfrescoParameter)[1];
-                    $properties[$key] = ContactModel::getCivilityLabel(['civilityId' => $rawContacts[$contactNb]['civility']]);
+                    $civility = null;
+                    if (!empty($rawContacts[$contactNb]['civility'])) {
+                        $civility = ContactCivilityController::getLabelById(['id' => $rawContacts[$contactNb]['civility']]);
+                    }
+                    $properties[$key] = $civility ?? '';
                 } elseif (strpos($alfrescoParameter, 'senderFirstname_') !== false) {
                     $contactNb = explode('_', $alfrescoParameter)[1];
                     $properties[$key] = $rawContacts[$contactNb]['firstname'] ?? '';

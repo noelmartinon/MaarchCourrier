@@ -88,6 +88,7 @@ import { TranslateService } from '@ngx-translate/core';
 
 import { RegisteredMailImportComponent } from '@appRoot/registeredMail/import/registered-mail-import.component';
 import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-tool.component';
+import { ColorGithubModule } from 'ngx-color/github';
 
 
 @NgModule({
@@ -100,7 +101,8 @@ import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-to
         DragDropModule,
         AppServiceModule,
         NotificationModule,
-        InternationalizationModule
+        InternationalizationModule,
+        ColorGithubModule,
     ],
     declarations: [
         MenuNavComponent,
@@ -207,7 +209,8 @@ import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-to
         RegisteredMailRecipientInputComponent,
         CriteriaToolComponent,
         InputCorrespondentGroupComponent,
-        MessageBoxComponent
+        MessageBoxComponent,
+        ColorGithubModule
     ],
     providers: [],
     entryComponents: [

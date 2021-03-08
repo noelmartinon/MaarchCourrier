@@ -14,6 +14,10 @@
             formControlName="homepage_message"></textarea>
         <br />
         <br />
+        <mat-form-field appearance="outline" [title]="'lang.maarchUrlHelp' | translate">
+            <mat-label>{{'lang.maarchUrl' | translate}}</mat-label>
+            <input matInput formControlName="maarchUrl">
+        </mat-form-field>
     </div>
     <div class="col-md-6">
         <div>{{'lang.chooseLogo' | translate}} : </div>

@@ -87,19 +87,29 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     initShortcutTile(param: any) {
-        let menu = null;
+        let menu: any = {
+            style : null
+        };
         let route = '';
         let label = '';
         if (param.privilegeId === 'indexing') {
-            menu = this.privilegeService.getCurrentUserMenus([param.privilegeId])[0];
-            label = this.translate.instant(menu.label);
-            const group = menu.groups.find((group: any) => group.id === param.groupId);
-            route = `/indexing/${group.id}`;
-            label = `${label} (${group.label})`;
+            const priv = this.privilegeService.getCurrentUserMenus([param.privilegeId])[0];
+            if (priv !== undefined) {
+                menu = priv;
+                label = this.translate.instant(menu.label);
+                const group = menu.groups.find((groupItem: any) => groupItem.id === param.groupId);
+                route = `/indexing/${group.id}`;
+                label = `${label} (${group.label})`;
+            }
+
         } else {
-            menu = this.privilegeService.getAdminMenu([param.privilegeId])[0];
-            route = menu.route;
-            label = this.translate.instant(menu.label);
+            const priv = this.privilegeService.getCurrentUserMenus([param.privilegeId])[0];
+            if (priv !== undefined) {
+                menu = priv;
+                route = menu.route;
+                label = this.translate.instant(menu.label);
+            }
+
         }
 
         return {

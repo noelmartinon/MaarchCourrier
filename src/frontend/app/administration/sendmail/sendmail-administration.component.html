@@ -1,14 +1,5 @@
 <mat-sidenav-container autosize class="maarch-container">
     <ng-template #adminMenuTemplate>
-        <mat-nav-list>
-            <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
-            <a mat-list-item (click)="openMailServerTest(false)" joyrideStep="emailTour2">
-                <mat-icon color="primary" mat-list-icon class="fas fa-signal"></mat-icon>
-                <p mat-line>
-                    {{'lang.checkSendmail' | translate}}
-                </p>
-            </a>
-        </mat-nav-list>
     </ng-template>
     <mat-sidenav-content>
         <div class="bg-head">
@@ -118,7 +109,7 @@
                                 </div>
                                 <div class="col-md-12 text-center" style="padding:10px;">
                                     <button mat-raised-button type="button" color="primary"  (click)="openMailServerTest()"
-                                        [disabled]="checkModif() || !sendmailForm.valid">{{'lang.testAndValidate' | translate}}</button>
+                                        [disabled]="!sendmailForm.valid">{{'lang.testAndValidate' | translate}}</button>
                                     <button mat-raised-button type="button" color="default" [disabled]="checkModif()"
                                         (click)="cancelModification()">{{'lang.cancel' | translate}}</button>
                                 </div>

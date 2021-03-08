@@ -5,3 +5,17 @@
     border-left: solid 5px $primary;
     background: rgba($primary, 0.14);
 }
+
+.civilities-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.civility-input {
+    ::ng-deep.mat-form-field-wrapper{
+        padding-bottom: 0 !important;
+    }
+} 
+  

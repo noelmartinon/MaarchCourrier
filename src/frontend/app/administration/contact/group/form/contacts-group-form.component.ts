@@ -133,7 +133,7 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
                         id: data.id,
                         type: 'contact',
                         name: this.contactService.formatContact(data),
-                        address: !this.functionsService.empty(formatedContact) ? formatedContact : this.translate.instant('lang.unavailable')
+                        address: !this.functionsService.empty(formatedContact) ? formatedContact : this.translate.instant('lang.addressNotSet')
                     };
                     resolve(data);
                 }),
@@ -240,7 +240,7 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
         data.correspondents = data.correspondents.map((item: any) => {
             return {
                 ...item,
-                address: !this.functionsService.empty(item.address) ? item.address : this.translate.instant('lang.unavailable')
+                address: !this.functionsService.empty(item.address) ? item.address : this.translate.instant('lang.addressNotSet')
             };
         });
 
@@ -284,7 +284,7 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
                         id: contact.id,
                         type: contact.type,
                         name: this.contactService.formatContact(contact),
-                        address: !this.functionsService.empty(formatedContact) ? formatedContact : this.translate.instant('lang.unavailable')
+                        address: !this.functionsService.empty(formatedContact) ? formatedContact : this.translate.instant('lang.addressNotSet')
                     };
                 });
                 this.dataSource = new MatTableDataSource(this.searchResult);
