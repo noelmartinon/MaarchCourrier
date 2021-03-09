@@ -59,7 +59,7 @@ class IxbusController
     {
         $curlResponse = CurlModel::execSimple([
                 'url'     => rtrim($aArgs['config']['data']['url'], '/') . '/api/parapheur/v1/nature',
-                'headers' => ['content-type:application/json', 'IXBUS_API:' . $aArgs['config']['data']['tokenAPI']],
+                'headers' => ['IXBUS_API:' . $aArgs['config']['data']['tokenAPI']],
                 'method'  => 'GET'
             ]);
 
@@ -77,7 +77,7 @@ class IxbusController
     {
         $curlResponse = CurlModel::execSimple([
             'url'     => rtrim($aArgs['config']['data']['url'], '/') . '/api/parapheur/v1/circuit/' . $aArgs['natureId'],
-            'headers' => ['content-type:application/json', 'IXBUS_API:' . $aArgs['config']['data']['tokenAPI']],
+            'headers' => ['IXBUS_API:' . $aArgs['config']['data']['tokenAPI']],
             'method'  => 'GET'
         ]);
 
@@ -96,7 +96,7 @@ class IxbusController
     {
         $curlResponse = CurlModel::execSimple([
             'url'     => rtrim($aArgs['config']['data']['url'], '/') . '/api/parapheur/v1/nature/' . $aArgs['natureId'] . '/redacteur',
-            'headers' => ['content-type:application/json', 'IXBUS_API:' . $aArgs['config']['data']['tokenAPI']],
+            'headers' => ['IXBUS_API:' . $aArgs['config']['data']['tokenAPI']],
             'method'  => 'GET'
         ]);
 
@@ -333,7 +333,7 @@ class IxbusController
     {
         $curlResponse = CurlModel::execSimple([
             'url'     => rtrim($aArgs['config']['data']['url'], '/') . '/api/parapheur/v1/dossier/' . $aArgs['folderId'] . '/transmettre',
-            'headers' => ['content-type:application/json', 'IXBUS_API:' . $aArgs['config']['data']['tokenAPI']],
+            'headers' => ['IXBUS_API:' . $aArgs['config']['data']['tokenAPI']],
             'method'  => 'POST'
         ]);
         if (!empty($curlResponse['response']['error'])) {
