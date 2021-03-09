@@ -17,6 +17,10 @@ class FastParapheurController
     public static function retrieveSignedMails($aArgs)
     {
         foreach ($aArgs['idsToRetrieve']['noVersion'] as $noVersion) {
+            if (empty(trim($noVersion->external_id))) {
+                $aArgs['idsToRetrieve']['noVersion'][$noVersion->res_id]->status = 'waiting';
+                continue;
+            }
             $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sei="http://sei.ws.fast.cdc.com/">
                 <soapenv:Header/>
@@ -72,6 +76,10 @@ class FastParapheurController
             }
         }
         foreach ($aArgs['idsToRetrieve']['isVersion'] as $isVersion) {
+            if (empty(trim($isVersion->external_id))) {
+                $aArgs['idsToRetrieve']['isVersion'][$isVersion->res_id]->status = 'waiting';
+                continue;
+            }
             $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sei="http://sei.ws.fast.cdc.com/">
                 <soapenv:Header/>
