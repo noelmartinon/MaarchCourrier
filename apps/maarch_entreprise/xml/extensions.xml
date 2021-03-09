@@ -21,6 +21,16 @@
         <canConvert>true</canConvert>
     </FORMAT>
     <FORMAT>
+        <name>DOC</name>
+        <mime>application/vnd.openxmlformats-officedocument.wordprocessingml.document</mime>
+        <canConvert>true</canConvert>
+    </FORMAT>
+    <FORMAT>
+        <name>DOC</name>
+        <mime>application/zip</mime>
+        <canConvert>true</canConvert>
+    </FORMAT>
+    <FORMAT>
         <name>XLS</name>
         <mime>application/msexcel</mime>
         <canConvert>true</canConvert>
