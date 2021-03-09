@@ -37,6 +37,10 @@ class FastParapheurController
     {
         $version = $aArgs['version'];
         foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
+            if (empty(trim($value['external_id']))) {
+                $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'waiting';
+                continue;
+            }
             $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
             <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sei="http://sei.ws.fast.cdc.com/">
                 <soapenv:Header/>
