@@ -179,8 +179,8 @@ class CustomFieldController
 
         $values = json_decode($field['values'], true);
 
-        if (count($body['values']) != count($values)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Number of values sent is different from the number of values currently saved']);
+        if (count($body['values']) < count($values)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Not enough values sent']);
         }
 
         $newValues = [];
