@@ -165,17 +165,20 @@ class CustomFieldController
             }
         } else {
             unset($body['values']['table'], $body['values']['clause']);
-            $uniqueValues = array_column($body['values'], 'label');
+            $bodyValuesNoNulls = array_filter($body['values'], function ($value) {
+                return $value['label'] != null;
+            });
+            $uniqueValues = array_column($bodyValuesNoNulls, 'label');
             $uniqueValues = array_unique($uniqueValues);
-            if (count(array_unique($uniqueValues)) < count($body['values'])) {
+            if (count(array_unique($uniqueValues)) < count($bodyValuesNoNulls)) {
                 return $response->withStatus(400)->withJson(['errors' => 'Some values have the same name']);
             }
         }
 
         $values = json_decode($field['values'], true);
 
-        if (count($body['values']) != count($values)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Number of values sent is different from the number of values currently saved']);
+        if (count($body['values']) < count($values)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Not enough values sent']);
         }
 
         $newValues = [];
