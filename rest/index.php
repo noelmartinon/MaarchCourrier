@@ -82,72 +82,38 @@ if (strpos(getcwd(), '/rest')) {
     chdir('..');
 }
 
-//$userId = null;
-//if (!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
-//    if (\SrcCore\models\SecurityModel::authentication(['userId' => $_SERVER['PHP_AUTH_USER'], 'password' => $_SERVER['PHP_AUTH_PW']])) {
-//        $loginMethod = \SrcCore\models\CoreConfigModel::getLoggingMethod();
-//        $loadedXml = \SrcCore\models\CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/config.xml']);
-//        if ($loginMethod['id'] != 'standard' || (string)$loadedXml->CONFIG->ldap == 'true') {
-//            $user = \User\models\UserModel::getByUserId(['select' => ['loginmode'], 'userId' => $_SERVER['PHP_AUTH_USER']]);
-//            if ($user['loginmode'] == 'restMode') {
-//                $userId = $_SERVER['PHP_AUTH_USER'];
-//            }
-//        } else {
-//            $userId = $_SERVER['PHP_AUTH_USER'];
-//        }
-//    }
-//} else {
-//    $cookie = \SrcCore\models\SecurityModel::getCookieAuth();
-//    if (!empty($cookie) && \SrcCore\models\SecurityModel::cookieAuthentication($cookie)) {
-//        \SrcCore\models\SecurityModel::setCookieAuth(['userId' => $cookie['userId']]);
-//        $userId = $cookie['userId'];
-//    }
-//}
-//
-//if (empty($userId)) {
-//    echo 'Authentication Failed';
-//    exit();
-//}
+$userId = null;
+if (!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
+    if (\SrcCore\models\SecurityModel::authentication(['userId' => $_SERVER['PHP_AUTH_USER'], 'password' => $_SERVER['PHP_AUTH_PW']])) {
+        $loginMethod = \SrcCore\models\CoreConfigModel::getLoggingMethod();
+        $loadedXml = \SrcCore\models\CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/config.xml']);
+        if ($loginMethod['id'] != 'standard' || (string)$loadedXml->CONFIG->ldap == 'true') {
+            $user = \User\models\UserModel::getByUserId(['select' => ['loginmode'], 'userId' => $_SERVER['PHP_AUTH_USER']]);
+            if ($user['loginmode'] == 'restMode') {
+                $userId = $_SERVER['PHP_AUTH_USER'];
+            }
+        } else {
+            $userId = $_SERVER['PHP_AUTH_USER'];
+        }
+    }
+} else {
+    $cookie = \SrcCore\models\SecurityModel::getCookieAuth();
+    if (!empty($cookie) && \SrcCore\models\SecurityModel::cookieAuthentication($cookie)) {
+        \SrcCore\models\SecurityModel::setCookieAuth(['userId' => $cookie['userId']]);
+        $userId = $cookie['userId'];
+    }
+}
+
+if (empty($userId)) {
+    echo 'Authentication Failed';
+    exit();
+}
 
 $language = \SrcCore\models\CoreConfigModel::getLanguage();
 require_once("src/core/lang/lang-{$language}.php");
 
-$app = new \Slim\App(['settings' => ['displayErrorDetails' => true, 'determineRouteBeforeAppMiddleware' => true]]);
 
-//Authentication
-$app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, callable $next) {
-    $userId = null;
-    if (!empty($_SERVER['PHP_AUTH_USER']) && !empty($_SERVER['PHP_AUTH_PW'])) {
-        if (\SrcCore\models\SecurityModel::authentication(['userId' => $_SERVER['PHP_AUTH_USER'], 'password' => $_SERVER['PHP_AUTH_PW']])) {
-            $loginMethod = \SrcCore\models\CoreConfigModel::getLoggingMethod();
-            $loadedXml = \SrcCore\models\CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/config.xml']);
-            if ($loginMethod['id'] != 'standard' || (string)$loadedXml->CONFIG->ldap == 'true') {
-                $user = \User\models\UserModel::getByUserId(['select' => ['loginmode'], 'userId' => $_SERVER['PHP_AUTH_USER']]);
-                if ($user['loginmode'] == 'restMode') {
-                    $userId = $_SERVER['PHP_AUTH_USER'];
-                }
-            } else {
-                $userId = $_SERVER['PHP_AUTH_USER'];
-            }
-        }
-    } else {
-        $cookie = \SrcCore\models\SecurityModel::getCookieAuth();
-        if (!empty($cookie) && \SrcCore\models\SecurityModel::cookieAuthentication($cookie)) {
-            \SrcCore\models\SecurityModel::setCookieAuth(['userId' => $cookie['userId']]);
-            $userId = $cookie['userId'];
-        }
-    }
-
-    if (empty($userId)) {
-        echo 'Authentication Failed';
-        exit();
-    }
-    $GLOBALS['userId'] = $userId;
-
-    $response = $next($request, $response);
-
-    return $response;
-});
+$app = new \Slim\App(['settings' => ['displayErrorDetails' => true]]);
 
 
 //Initialize
