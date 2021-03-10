@@ -163,7 +163,9 @@ $attachments = \Attachment\models\AttachmentModel::get([
 $idsToRetrieve = ['noVersion' => [], 'resLetterbox' => []];
 
 foreach ($attachments as $value) {
-    $idsToRetrieve['noVersion'][$value['res_id']] = $value;
+    if (!empty(trim($value['external_id']))) {
+        $idsToRetrieve['noVersion'][$value['res_id']] = $value;
+    }
 }
 
 // On récupère les pj signés dans le parapheur distant
@@ -187,7 +189,9 @@ $resources = \Resource\models\ResModel::get([
 ]);
 
 foreach ($resources as $value) {
-    $idsToRetrieve['resLetterbox'][$value['res_id']] = $value;
+    if (!empty(trim($value['external_id']))) {
+        $idsToRetrieve['resLetterbox'][$value['res_id']] = $value;
+    }
 }
 
 if (!empty($idsToRetrieve['resLetterbox'])) {
