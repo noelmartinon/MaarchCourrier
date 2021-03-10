@@ -5,6 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
+--DATABASE_BACKUP|res_mark_as_read
 
 UPDATE res_mark_as_read SET basket_id =  (SELECT basket_id FROM baskets WHERE baskets.id = res_mark_as_read.basket_id::int) WHERE basket_id < '9999999';
 
