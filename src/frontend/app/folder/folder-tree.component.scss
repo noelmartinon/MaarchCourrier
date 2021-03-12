@@ -1,9 +1,8 @@
-@import '../../css/vars.scss';
 
 
 .selectedFolder {
-    border-left: solid 5px $primary;
-    background: rgba($primary, 0.14);
+    border-left: solid 5px var(--maarch-color-primary);
+    background: rgba(var(--maarch-color-primary), 0.14);
 }
 
 .mat-icon-rtl-mirror {
@@ -19,7 +18,7 @@
 }
 
 ::ng-deep.mat-form-field-appearance-outline .mat-form-field-outline-thick {
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 
 .example-tree-invisible {
@@ -76,7 +75,7 @@ form {
 }
 
 .drag {
-    color: $secondary !important;
+    color: var(--maarch-color-secondary) !important;
 }
 
 .more {
@@ -94,11 +93,11 @@ form {
 
 .private {
     margin-left: 5px;
-    color: $secondary;
+    color: var(--maarch-color-secondary);
 }
 
 .countResources {
-    color: $primary;
+    color: var(--maarch-color-primary);
     font-weight: bold;
 }
 
@@ -108,7 +107,7 @@ button:disabled {
 
 .countResources {
     font-weight: bold;
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 
 .empty {
@@ -145,7 +144,7 @@ button:disabled {
 
         .mat-menu-item {
             .pinnedActionIcon {
-                color: $warn;
+                color: var(--maarch-color-danger);
                 height: auto;
 
                 i {
@@ -156,7 +155,7 @@ button:disabled {
 
             }
             .revertPinnedActionIcon {
-                color: $primary;
+                color: var(--maarch-color-primary);
                 height: auto;
 
                 i {
@@ -170,7 +169,7 @@ button:disabled {
 
         .mat-menu-item:hover {
             .pinnedActionIcon {
-                color: $primary;
+                color: var(--maarch-color-primary);
                 i {
                     transition: all 0.3s;
                     transform: rotate(0deg) translate(0px, 0px);
@@ -178,7 +177,7 @@ button:disabled {
             }
 
             .revertPinnedActionIcon {
-                color: $warn;
+                color: var(--maarch-color-danger);
                 i {
                     transition: all 0.3s;
                     transform: rotate(15deg) translate(0px, -50%);

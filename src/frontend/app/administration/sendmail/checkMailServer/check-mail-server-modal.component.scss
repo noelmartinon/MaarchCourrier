@@ -1,8 +1,7 @@
-@import '../../../../css/vars.scss';
 
 
 .msg-loading {
-    color: $primary;
+    color: var(--maarch-color-primary);
     padding-top: 10px;
     padding-bottom: 10px;
     display: flex;

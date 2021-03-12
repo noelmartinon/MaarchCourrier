@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 
 button:disabled{
@@ -6,11 +5,11 @@ button:disabled{
 }
 
 .statusUserLabelWarn {
-    color : $warn;
+    color : var(--maarch-color-danger);
 }
 
 .statusUserLabelPrimary {
-    color : $primary;
+    color : var(--maarch-color-primary);
 }
 
 .webserviceAccount {

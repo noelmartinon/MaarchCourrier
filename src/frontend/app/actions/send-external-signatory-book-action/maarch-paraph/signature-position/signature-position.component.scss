@@ -1,4 +1,3 @@
-@import '../../../../../css/vars.scss';
 
 
 * {
@@ -28,7 +27,7 @@
 }
 
 .mat-tab-label {
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 
 .mat-tab-label-active {
@@ -61,8 +60,8 @@
 
 .signature {
     position: absolute;
-    border: dashed 1px $warn;
-    background: rgba($warn, 0.6) none repeat scroll 0% 0%;
+    border: dashed 1px var(--maarch-color-danger);
+    background: rgba(var(--maarch-color-danger), 0.6) none repeat scroll 0% 0%;
     font-weight: bold;
     font-size: 20px;
     color: white;
@@ -117,7 +116,7 @@
 }
 
 .selected {
-    background: rgba($secondary, 0.3);
+    background: rgba(var(--maarch-color-secondary), 0.3);
 }
 
 .paginate-left {

@@ -1,4 +1,3 @@
-@import "../../css/vars.scss";
 
 .document-container {
     flex: 1;
@@ -15,7 +14,7 @@
     margin-top: 0px;
     width: 100%;
     overflow: hidden;
-    background-color: $primary;
+    background-color: var(--maarch-color-primary);
 
     .content {
         overflow-y: auto;
@@ -109,7 +108,7 @@
     .mat-menu-item:hover:hover {
         .listModels-menu-badge {
             background: white !important;
-            color: $primary !important;
+            color: var(--maarch-color-primary) !important;
         }
 
         .listModels-menu-delete {
@@ -121,7 +120,7 @@
 
     &-badge {
         font-size: 70%;
-        background: $primary;
+        background: var(--maarch-color-primary);
         padding: 2px;
         border-radius: 20px;
         color: white;
@@ -138,17 +137,17 @@
 
     &-selected {
         color: white !important;
-        background: $primary;
+        background: var(--maarch-color-primary);
 
         .listModels-menu-badge {
             background: white !important;
-            color: $primary !important;
+            color: var(--maarch-color-primary) !important;
         }
     }
 }
 
 .emptyAction {
-    color: $warn;
+    color: var(--maarch-color-danger);
     font-size: 14px;
     text-align: center;
     // opacity: 0.3;
@@ -182,7 +181,7 @@
     position: relative;
     padding: 20px;
     padding-right: 40px;
-    background: lighten($primary, 10%);
+    background: var(--maarch-color-primary-light);
     width: 100%;
 
     .title {
@@ -206,7 +205,7 @@
             width: 99%;
             z-index: -1;
             top: 17px;
-            background: lighten($primary, 10%);
+            background: var(--maarch-color-primary-light);
             height: 1px;
         }
     }
@@ -279,12 +278,12 @@
 
         &-active {
             font-weight: bold;
-            color: $primary;
+            color: var(--maarch-color-primary);
         }
 
         &:hover:not(.tool-disabled) {
             transition: all 0.3s;
-            color: $primary;
+            color: var(--maarch-color-primary);
         }
     }
 }
@@ -294,7 +293,7 @@
     right: 15px;
     top: 15px;
     font-size: 10px !important;
-    color: $secondary;
+    color: var(--maarch-color-secondary);
 }
 
 .banner {
@@ -354,7 +353,7 @@
         color: white;
         padding-left: 10px;
         padding-right: 10px;
-        background: $secondary;
+        background: var(--maarch-color-secondary);
         margin-top: -10px;
         margin-left: -10px;
         margin-right: -10px;
@@ -394,7 +393,7 @@
     display: flex;
     padding-left: 20px;
     align-items: center;
-    color: $primary;
+    color: var(--maarch-color-primary);
     font-weight: bold;
 }
 
@@ -407,19 +406,19 @@
 }
 
 .followIcon {
-    color: $secondary;
+    color: var(--maarch-color-secondary);
 }
 
 .freezeUnfreezIcon {
-    color: $secondary;
+    color: var(--maarch-color-secondary);
 }
 
 .nonFreeze {
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 
 .bindIcon {
-    color: $secondary;
+    color: var(--maarch-color-secondary);
     margin-left: 5px;
 }
 
@@ -430,7 +429,7 @@
 
 .checked {
     opacity: 1;
-    color : $secondary;
+    color : var(--maarch-color-secondary);
 }
 
 .unchecked {
@@ -442,9 +441,9 @@
 }
 
 .subSubject {
-    color: $secondary;
+    color: var(--maarch-color-secondary);
 }
 
 .isSelectedMenu {
-    background: $secondary;
+    background: var(--maarch-color-secondary);
   }

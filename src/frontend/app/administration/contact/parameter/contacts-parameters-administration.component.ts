@@ -9,11 +9,12 @@ import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { FunctionsService } from '@service/functions.service';
 import { ContactService } from '@service/contact.service';
-import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { catchError, debounceTime, exhaustMap, filter, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { KeyValue } from '@angular/common';
 import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
+import { FormControl } from '@angular/forms';
 
 @Component({
     templateUrl: 'contacts-parameters-administration.component.html',
@@ -94,7 +95,23 @@ export class ContactsParametersAdministrationComponent implements OnInit {
     getCivilities() {
         this.http.get('../rest/civilities').pipe(
             tap((data: any) => {
-                this.civilities = data.civilities;
+                data.civilities.forEach((civility: any, index: number) => {
+                    this.civilities[index] = {};
+                    Object.keys(civility).forEach((elementId: any) => {
+                        this.civilities[index][elementId] = new FormControl(civility[elementId]);
+                        if (elementId === 'id') {
+                            this.civilities[index][elementId].disable();
+                        } else {
+                            this.civilities[index][elementId].valueChanges
+                            .pipe(
+                                debounceTime(300),
+                                tap(() => {
+                                    this.updateCivility(this.civilities[index]);
+                                }),
+                            ).subscribe();
+                        }
+                    });
+                });
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -104,29 +121,52 @@ export class ContactsParametersAdministrationComponent implements OnInit {
     }
 
     updateCivility(civility: any) {
-        console.log('update!');
-        /*this.http.put(`../rest/civilities/${civility.id}`, civility).pipe(
+        this.http.put(`../rest/civilities/${civility.id.value}`, this.formatCivilityData(civility)).pipe(
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
-            })*/
+            })
+        ).subscribe();
+    }
+
+    formatCivilityData(data: any) {
+        const obj: any = {};
+        Object.keys(data).forEach(elemId => {
+            obj[elemId] = data[elemId].value;
+        });
+        return obj;
     }
 
     addCivility() {
-        const newCivility = {
-            id: `title${this.civilities.length + 1}`,
+        const newCivility: any = {
+            id: null,
             label: 'label',
             abbreviation: 'abbreviation'
         };
-        this.civilities.push(newCivility);
-        /*this.http.post(`../rest/civilities`, newCivility).pipe(
+        this.http.post(`../rest/civilities`, newCivility).pipe(
             tap((data: any) => {
+                newCivility.id = data.id;
+                Object.keys(newCivility).forEach((elementId: any) => {
+                    newCivility[elementId] = new FormControl(newCivility[elementId]);
+                    if (elementId === 'id') {
+                        newCivility[elementId].disable();
+                    } else {
+                        newCivility[elementId].valueChanges
+                        .pipe(
+                            debounceTime(300),
+                            tap(() => {
+                                this.updateCivility(newCivility);
+                            }),
+                        ).subscribe();
+                    }
+                });
                 this.civilities.push(newCivility);
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
-            })*/
+            })
+        ).subscribe();
     }
 
 
@@ -135,7 +175,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            // exhaustMap(() => this.http.delete(`../rest/civilities/${civility.id}`)),
+            exhaustMap(() => this.http.delete(`../rest/civilities/${civility.id.value}`)),
             tap(() => {
                 this.civilities.splice(index, 1);
             }),

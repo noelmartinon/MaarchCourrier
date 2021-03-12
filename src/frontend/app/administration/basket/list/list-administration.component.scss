@@ -1,4 +1,3 @@
-@import '../../../../css/vars.scss';
 
 .availableData {
   margin: 10px;
@@ -230,7 +229,7 @@
 
 .badge-folder {
   cursor: default;
-  background: $primary;
+  background: var(--maarch-color-primary);
   margin: 5px;
   font-size: 8px;
   max-width: 250px;

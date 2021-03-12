@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 .listModels {
     background: #F9F9F9;
@@ -29,7 +28,7 @@
     .mat-menu-item:hover:hover {
         .listModels-menu-badge {
             background: white !important;
-            color: $primary !important;
+            color: var(--maarch-color-primary) !important;
         }
     
         .listModels-menu-delete {
@@ -40,7 +39,7 @@
     }
     &-badge {
         font-size: 70%;
-        background: $primary;
+        background: var(--maarch-color-primary);
         padding: 2px;
         border-radius: 20px;
         color: white;
@@ -57,10 +56,10 @@
 
     &-selected {
         color: white !important;
-        background: $primary;
+        background: var(--maarch-color-primary);
         .listModels-menu-badge {
             background: white !important;
-            color: $primary !important;
+            color: var(--maarch-color-primary) !important;
         }
     }
 }
@@ -77,7 +76,7 @@
     display: flex;
     padding-left: 20px;
     align-items: center;
-    color: $primary;
+    color: var(--maarch-color-primary);
     font-weight: bold;
 }
 

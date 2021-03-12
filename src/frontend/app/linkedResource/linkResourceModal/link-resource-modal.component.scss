@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 .mat-dialog-content {
     padding: 0px;
@@ -6,5 +5,5 @@
 
 .bg-primary {
     padding: 10px;
-    background: $primary;
+    background: var(--maarch-color-primary);
 }

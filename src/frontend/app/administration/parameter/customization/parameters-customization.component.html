@@ -4,6 +4,13 @@
             <mat-label>{{'lang.applicationName' | translate}}</mat-label>
             <input matInput formControlName="applicationName">
         </mat-form-field>
+        <br />
+        <mat-form-field appearance="outline" [title]="'lang.maarchUrlHelp' | translate">
+            <mat-label>{{'lang.maarchUrl' | translate}}</mat-label>
+            <input matInput formControlName="maarchUrl">
+        </mat-form-field>
+        <br />
+        <br />
         <div>{{'lang.loginMsg' | translate}} : </div>
         <textarea style="padding-top: 10px;" name="loginpage_message" id="loginpage_message"
             formControlName="loginpage_message"></textarea>
@@ -12,12 +19,6 @@
         <div>{{'lang.homeMsg' | translate}} : </div>
         <textarea style="padding-top: 10px;" name="homepage_message" id="homepage_message"
             formControlName="homepage_message"></textarea>
-        <br />
-        <br />
-        <mat-form-field appearance="outline" [title]="'lang.maarchUrlHelp' | translate">
-            <mat-label>{{'lang.maarchUrl' | translate}}</mat-label>
-            <input matInput formControlName="maarchUrl">
-        </mat-form-field>
     </div>
     <div class="col-md-6">
         <div>{{'lang.chooseLogo' | translate}} : </div>

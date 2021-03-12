@@ -289,10 +289,18 @@ class PrivilegeController
         ValidatorModel::notEmpty($args, ['userId']);
         ValidatorModel::intVal($args, ['userId']);
 
+        $where = ['usergroup_content.user_id = ?', 'usergroups.can_index = ?'];
+        $data  = [$args['userId'], true];
+
+        if (!empty($args['groupId'])) {
+            $where[] = 'usergroups.id = ?';
+            $data[]  = $args['groupId'];
+        }
+
         $canIndex = UserGroupModel::getWithGroups([
             'select'    => [1],
-            'where'     => ['usergroup_content.user_id = ?', 'usergroups.can_index = ?'],
-            'data'      => [$args['userId'], true]
+            'where'     => $where,
+            'data'      => $data
         ]);
 
         return !empty($canIndex);

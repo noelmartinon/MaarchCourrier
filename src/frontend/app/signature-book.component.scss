@@ -1,7 +1,6 @@
-@import "../css/vars.scss";
 
 .selectedId {
-    background-color: $secondary;
+    background-color: var(--maarch-color-secondary);
 }
 
 #tab_visaSetWorkflow td {
@@ -66,8 +65,8 @@
 }
 
 .droptarget.currentVis {
-    color: $primary;
-    border: solid 2px $primary;
+    color: var(--maarch-color-primary);
+    border: solid 2px var(--maarch-color-primary);
 }
 
 .visaUserInfo,
@@ -214,7 +213,7 @@
 }
 
 .resListContentFrame:hover {
-    background-color: $secondary;
+    background-color: var(--maarch-color-secondary);
 }
 
 .resListContentFrame {
@@ -376,7 +375,7 @@
     margin-top: 2px;
     text-align: center;
     cursor: pointer;
-    background: $primary;
+    background: var(--maarch-color-primary);
     color: white;
     padding: 10px;
     -moz-box-shadow: 0px 0px 10px 0px #656565;
@@ -420,7 +419,7 @@
 
 img.panelSelectedThumbnail,
 img:hover.panelSelectedThumbnail {
-    border: solid 2px $primary;
+    border: solid 2px var(--maarch-color-primary);
     cursor: pointer;
 }
 
@@ -450,7 +449,7 @@ img:hover.panelSelectedThumbnail {
 
 #signatureBookActions {
     background: white;
-    border: solid 1px $primary;
+    border: solid 1px var(--maarch-color-primary);
     color: black;
     font: 400 13.3333px Arial;
 }
@@ -463,7 +462,7 @@ img:hover.panelSelectedThumbnail {
     border: solid 1px black;
     vertical-align: middle;
     font-weight: bold;
-    background: $primary;
+    background: var(--maarch-color-primary);
     color: white;
     text-transform: uppercase;
     white-space: nowrap;
@@ -537,7 +536,7 @@ img:hover.panelSelectedThumbnail {
 }
 
 .resListContentFrameSelected {
-    background-color: $secondary;
+    background-color: var(--maarch-color-secondary);
 
 }
 
@@ -546,7 +545,7 @@ img:hover.panelSelectedThumbnail {
     -webkit-box-shadow: inset 0px 0px 5px 0px #656565;
     -o-box-shadow: inset 0px 0px 5px 0px #656565;
     box-shadow: inset 0px 0px 5px 0px #656565;
-    background-color: $secondary;
+    background-color: var(--maarch-color-secondary);
 }
 
 .panelSelectedThumbnail {
@@ -554,7 +553,7 @@ img:hover.panelSelectedThumbnail {
     -webkit-box-shadow: inset 0px 0px 5px 0px #656565;
     -o-box-shadow: inset 0px 0px 5px 0px #656565;
     box-shadow: inset 0px 0px 5px 0px #656565;
-    background-color: $secondary;
+    background-color: var(--maarch-color-secondary);
     color: #666 !important;
 }
 
@@ -850,7 +849,7 @@ img:hover.panelSelectedThumbnail {
     background-color: transparent;
     border-collapse: collapse;
     border-spacing: 0;
-    border-bottom: solid 1px $primary;
+    border-bottom: solid 1px var(--maarch-color-primary);
 }
 
 .ng-table td {
@@ -859,7 +858,7 @@ img:hover.panelSelectedThumbnail {
 }
 
 .ng-table th {
-    border-bottom: solid 1px $primary;
+    border-bottom: solid 1px var(--maarch-color-primary);
 }
 
 .ng-table-counts {
@@ -868,14 +867,14 @@ img:hover.panelSelectedThumbnail {
 
 .ng-table-pagination li {
     display: inline-block;
-    border: solid 1px $primary;
+    border: solid 1px var(--maarch-color-primary);
     padding: 5px;
     margin: 5px;
     border-radius: 10px;
 }
 
 .ng-table-pagination li.active {
-    background: $primary;
+    background: var(--maarch-color-primary);
     color: white;
 }
 
@@ -884,7 +883,7 @@ img:hover.panelSelectedThumbnail {
 }
 
 .ng-table-pagination li:hover {
-    background: $primary;
+    background: var(--maarch-color-primary);
     color: white;
 }
 
@@ -950,7 +949,7 @@ img:hover.panelSelectedThumbnail {
 }
 
 .pjSign:hover img:hover {
-    border: solid 2px $primary;
+    border: solid 2px var(--maarch-color-primary);
 }
 
 .pjSign:hover {
@@ -974,7 +973,7 @@ img:hover.panelSelectedThumbnail {
 }
 
 .panelRightListPj:hover {
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 
 .panelRightAddPj {
@@ -1082,7 +1081,7 @@ img:hover.panelSelectedThumbnail {
 }
 
 .nbRes {
-    background: $secondary;
+    background: var(--maarch-color-secondary);
     color: white;
     padding: 3px;
     border-radius: 7px;
@@ -1090,12 +1089,12 @@ img:hover.panelSelectedThumbnail {
 
 .haveContent {
     font-size: 9px !important;
-    color: $secondary;
+    color: var(--maarch-color-secondary);
     margin-left: 2px;
 }
 
 .button-form-primary-filled {
-    background: $primary;
+    background: var(--maarch-color-primary);
     border: solid 1px white;
     color: white;
     border-radius: 30px;

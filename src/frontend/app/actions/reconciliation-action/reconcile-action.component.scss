@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 
 .highlight {
@@ -7,5 +6,5 @@
 
 .bg-primary {
     padding: 10px;
-    background: $primary;
+    background: var(--maarch-color-primary);
 }

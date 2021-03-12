@@ -47,12 +47,12 @@ class ContactCivilityController
         }
 
 
-        ContactCivilityModel::create([
+        $id = ContactCivilityModel::create([
             'label'         => $body['label'],
             'abbreviation'  => $body['abbreviation']
         ]);
 
-        return $response->withStatus(201);
+        return $response->withJson(['id' => $id]);
     }
 
     public function getById(Request $request, Response $response, array $args)

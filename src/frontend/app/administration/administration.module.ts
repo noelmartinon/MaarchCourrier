@@ -83,6 +83,7 @@ import { AttachmentTypesAdministrationComponent } from './attachment/attachment-
 import { AttachmentTypeAdministrationComponent } from './attachment/attachment-type-administration.component';
 import { VisaParametersComponent } from '@appRoot/administration/parameter/visa/visa-parameters.component';
 import { OtherParametersComponent } from '@appRoot/administration/parameter/other/other-parameters.component';
+import { MaarchToMaarchParametersComponent } from '@appRoot/administration/parameter/maarchToMaarch/maarch-to-maarch-parameters.component';
 
 @NgModule({
     imports: [
@@ -172,7 +173,8 @@ import { OtherParametersComponent } from '@appRoot/administration/parameter/othe
         AttachmentTypeAdministrationComponent,
         AttachmentTypesAdministrationComponent,
         VisaParametersComponent,
-        OtherParametersComponent
+        OtherParametersComponent,
+        MaarchToMaarchParametersComponent
     ],
     entryComponents: [
         AccountLinkComponent,

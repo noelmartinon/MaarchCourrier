@@ -1,7 +1,6 @@
-@import '../../../css/vars.scss';
 
 .label {
     white-space: break-spaces;
-    background: $primary;
+    background: var(--maarch-color-primary);
     margin: 5px;
 }

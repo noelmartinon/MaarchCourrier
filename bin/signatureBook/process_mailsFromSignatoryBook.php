@@ -67,7 +67,13 @@ $file = file_get_contents($GLOBALS['configFile']);
 $file = json_decode($file, true);
 
 if (empty($file)) {
-    print("Error on loading config file:" . $GLOBALS['configFile'] . "\n");
+    print("Error on loading config file: " . $GLOBALS['configFile'] . "\n");
+    exit(103);
+} elseif (empty($file['config'])) {
+    print("config part is missing in config file: " . $GLOBALS['configFile'] . "\n");
+    exit(103);
+} elseif (empty($file['signatureBook'])) {
+    print("signatureBook part is missing in config file: " . $GLOBALS['configFile'] . "\n");
     exit(103);
 }
 
@@ -163,7 +169,9 @@ $attachments = \Attachment\models\AttachmentModel::get([
 $idsToRetrieve = ['noVersion' => [], 'resLetterbox' => []];
 
 foreach ($attachments as $value) {
-    $idsToRetrieve['noVersion'][$value['res_id']] = $value;
+    if (!empty(trim($value['external_id']))) {
+        $idsToRetrieve['noVersion'][$value['res_id']] = $value;
+    }
 }
 
 // On récupère les pj signés dans le parapheur distant
@@ -187,7 +195,9 @@ $resources = \Resource\models\ResModel::get([
 ]);
 
 foreach ($resources as $value) {
-    $idsToRetrieve['resLetterbox'][$value['res_id']] = $value;
+    if (!empty(trim($value['external_id']))) {
+        $idsToRetrieve['resLetterbox'][$value['res_id']] = $value;
+    }
 }
 
 if (!empty($idsToRetrieve['resLetterbox'])) {
@@ -412,4 +422,4 @@ Bt_writeLog(['level' => 'INFO', 'message' => $nbMailsRetrieved.' document(s) ret
 Bt_logInDataBase($nbMailsRetrieved, 0, $nbMailsRetrieved.' mail(s) retrieved from signatory book');
 Bt_updateWorkBatch();
 
-exit($GLOBALS['exitCode']);
+exit(0);

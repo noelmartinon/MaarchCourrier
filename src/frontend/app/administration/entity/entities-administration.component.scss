@@ -1,4 +1,3 @@
-@import "../../../css/vars.scss";
 
 .mat-list-item[draggable="false"]:hover{
     background: inherit;
@@ -24,7 +23,7 @@
     .mat-button {
         width: 30px;
         height: 25px;
-        color: $primary;
+        color: var(--maarch-color-primary);
 
         ::ng-deep.mat-button-wrapper {
             display: flex;

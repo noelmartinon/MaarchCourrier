@@ -1,0 +1,17 @@
+{
+    "name": "maarch/plugin_office365",
+    "description": "Outlook plugin to register mails in Maarch Courrier",
+    "type": "project",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "require": {
+      "php-ews/php-ews": "~1.0"
+    },
+    "autoload":
+    {
+        "psr-4":
+        {
+            "Mini\\" : "src/backend/"
+        }
+    }
+}

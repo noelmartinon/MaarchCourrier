@@ -3,7 +3,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
 import { FormControl } from '@angular/forms';
-import { debounceTime, tap } from 'rxjs/operators';
+import { catchError, debounceTime, filter, tap } from 'rxjs/operators';
 import { ColorEvent } from 'ngx-color';
 import {
     amber,
@@ -25,6 +25,10 @@ import {
     teal,
     yellow,
 } from 'material-colors';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { of } from 'rxjs';
+import { NotificationService } from '@service/notification/notification.service';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-other-parameters',
@@ -39,13 +43,13 @@ export class OtherParametersComponent implements OnInit {
             ssl: new FormControl(false),
             uri: new FormControl('192.168.0.11'),
             port: new FormControl(8765),
-            token: new FormControl('')
+            token: new FormControl(''),
+            authorizationHeader: new FormControl('Authorization')
         },
         collaboraonline: {
             ssl: new FormControl(false),
             uri: new FormControl('192.168.0.11'),
             port: new FormControl(9980),
-            token: new FormControl(''),
             lang: new FormControl('fr-FR')
         }
     };
@@ -160,6 +164,8 @@ export class OtherParametersComponent implements OnInit {
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
+        private dialog: MatDialog,
+        private notify: NotificationService,
     ) { }
 
     ngOnInit() {
@@ -195,10 +201,24 @@ export class OtherParametersComponent implements OnInit {
 
     addEditor(id: string) {
         this.editorsEnabled.push(id);
+        this.saveConfEditor();
     }
 
     removeEditor(index: number) {
-        this.editorsEnabled.splice(index, 1);
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
+
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            tap(() => {
+                this.editorsEnabled.splice(index, 1);
+                this.saveConfEditor();
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+        
     }
 
     getAvailableEditors() {

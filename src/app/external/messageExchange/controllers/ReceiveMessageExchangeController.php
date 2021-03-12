@@ -180,13 +180,6 @@ class ReceiveMessageExchangeController
 
     public static function readXmlConfig()
     {
-        $customId = CoreConfigModel::getCustomId();
-
-        if (file_exists("custom/{$customId}/apps/maarch_entreprise/xml/m2m_config.xml")) {
-            $path = "custom/{$customId}/apps/maarch_entreprise/xml/m2m_config.xml";
-        } else {
-            $path = 'apps/maarch_entreprise/xml/m2m_config.xml';
-        }
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/m2m_config.xml']);
 
         $aDefaultConfig = [];

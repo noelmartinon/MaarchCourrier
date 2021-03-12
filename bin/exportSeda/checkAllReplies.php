@@ -190,4 +190,4 @@ Bt_writeLog(['level' => 'INFO', 'message' => $nbMailsRetrieved.' document(s) ret
 Bt_logInDataBase($nbMailsRetrieved, 0, $nbMailsRetrieved.' replie(s) retrieved from archiving system');
 Bt_updateWorkBatch();
 
-exit($GLOBALS['exitCode']);
+exit(0);

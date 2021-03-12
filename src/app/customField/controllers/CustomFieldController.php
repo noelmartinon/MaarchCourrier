@@ -170,9 +170,12 @@ class CustomFieldController
             }
         } else {
             unset($body['values']['table'], $body['values']['clause']);
-            $uniqueValues = array_column($body['values'], 'label');
-            $uniqueValues = array_unique($uniqueValues);
-            if (count(array_unique($uniqueValues)) < count($body['values'])) {
+            $bodyValuesNoNulls = array_filter($body['values'], function ($value) {
+                return $value['label'] != null;
+            });
+            $uniqueValues = array_column($bodyValuesNoNulls, 'label');
+
+            if (count(array_unique($uniqueValues)) < count($bodyValuesNoNulls)) {
                 return $response->withStatus(400)->withJson(['errors' => 'Some values have the same name']);
             }
         }

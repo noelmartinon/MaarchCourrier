@@ -1424,6 +1424,30 @@ class ResController extends ResourceControlController
         return $response->withJson(['information' => $resource]);
     }
 
+    public function getByExternalId(Request $request, Response $response, array $args)
+    {
+        $queryParams = $request->getQueryParams();
+
+        if (!Validator::notEmpty()->validate($queryParams['type'])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Missing externalId type']);
+        } elseif (!Validator::notEmpty()->validate($queryParams['value'])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Missing externalId value']);
+        }
+
+        $document = ResModel::get([
+            'select' => ['res_id'],
+            'where'  => ["external_id->'" . $queryParams['type'] . "' = ?"],
+            'data'   => [$queryParams['value']]
+        ]);
+
+        if (empty($document[0]['res_id']) || !ResController::hasRightByResId(['resId' => [$document[0]['res_id']], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
+
+        return $response->withJson(['resId' => $document[0]['res_id']]);
+    }
+
     public static function resetResourceFields(array $args)
     {
         ValidatorModel::notEmpty($args, ['oldFieldList', 'newFieldList']);

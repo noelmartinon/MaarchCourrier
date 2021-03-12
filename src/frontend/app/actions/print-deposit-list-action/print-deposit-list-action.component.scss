@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 .highlight {
     font-size: 110%;
@@ -47,5 +46,5 @@
 }
 
 .attachLabel {
-    color: $primary;
+    color: var(--maarch-color-primary);
 }

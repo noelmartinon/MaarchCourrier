@@ -261,6 +261,20 @@
                                         [externalIdMaarchParapheur]="user.external_id.maarchParapheur">
                                     </app-signature-book>
                                 </mat-expansion-panel>
+                                <mat-expansion-panel>
+                                    <mat-expansion-panel-header>
+                                        <mat-panel-title>
+                                            <mat-icon color="primary" class="fas fa-cubes"
+                                                style="font-size:25px;width:50px;"></mat-icon>
+                                            {{'lang.otherPlugins' | translate}}
+                                        </mat-panel-title>
+                                        <mat-panel-description *ngIf="!appService.getViewMode()">
+                                            {{'lang.otherPluginsDesc' | translate}}
+                                        </mat-panel-description>
+                                    </mat-expansion-panel-header>
+
+                                    <app-other-plugin></app-other-plugin>
+                                </mat-expansion-panel>
                             </mat-accordion>
                         </mat-tab>
                         <mat-tab label="{{'lang.myContactsGroups' | translate}}">

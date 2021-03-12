@@ -1,4 +1,3 @@
-@import '../../css/vars.scss';
 
 .mat-form-field-appearance-outline {
     font-size: 11px;
@@ -6,7 +5,7 @@
 
 .visaSignList {
     ::ng-deep.mat-optgroup-label {
-        color: $primary;
+        color: var(--maarch-color-primary);
         position: sticky;
         top: 0px;
         background: white !important;
@@ -81,11 +80,11 @@
 }
 
 .processed {
-    background: rgba($accent, 0.11) !important;
+    background: rgba(var(--maarch-color-success), 0.11) !important;
 }
 
 .interrupt {
-    background: rgba($warn, 0.11) !important;
+    background: rgba(var(--maarch-color-danger), 0.11) !important;
 }
 
 .workflow {
@@ -129,7 +128,7 @@
 
     .mat-raised-button[disabled] {
         background: none;
-        color: $primary !important;
+        color: var(--maarch-color-primary) !important;
         opacity: 1;
     }
 }
@@ -144,11 +143,11 @@
 }
 
 .valid {
-    color: $accent;
+    color: var(--maarch-color-success);
 }
 
 .invalid {
-    color: $warn;
+    color: var(--maarch-color-danger);
 }
 
 .commentBubble {
@@ -165,7 +164,7 @@
 }
 
 .unauthorized {
-    color: $warn;
+    color: var(--maarch-color-danger);
     text-decoration: line-through;
 }
 
@@ -177,5 +176,5 @@
 }
 
 .selected {
-    background: rgba($secondary, 0.5);
+    background: rgba(var(--maarch-color-secondary), 0.5);
 }

@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 .pinnedFolderList {
     .mat-list-item {
@@ -30,7 +29,7 @@
 
 .pinnedIcon {
     cursor: pointer;
-    color: $primary;
+    color: var(--maarch-color-primary);
     text-align: center;
 
     i {
@@ -40,7 +39,7 @@
     }
 
     &:hover {
-        color: $warn;
+        color: var(--maarch-color-danger);
 
         i {
             transition: all 0.3s;
@@ -50,7 +49,7 @@
 }
 
 .countResources {
-    color: $primary;
+    color: var(--maarch-color-primary);
     font-weight: bold;
     font-size: 14px;
 }
@@ -66,16 +65,16 @@ button:disabled {
 }
 
 .selectedFolder {
-    border-left: solid 5px $primary;
-    background: rgba($primary, 0.14);
+    border-left: solid 5px var(--maarch-color-primary);
+    background: rgba(var(--maarch-color-primary), 0.14);
 }
 
 .public {
-    color: $secondary;
+    color: var(--maarch-color-secondary);
 }
 
 .drag {
-    color: $secondary !important;
+    color: var(--maarch-color-secondary) !important;
 }
 
 .noPinnedFolder {

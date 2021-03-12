@@ -103,6 +103,11 @@
                                 <app-visa-parameters></app-visa-parameters>
                             </ng-template>
                         </mat-tab>
+                        <mat-tab [label]="'lang.maarch2Maarch' | translate">
+                            <ng-template matTabContent>
+                                <app-maarch-to-maarch-parameters></app-maarch-to-maarch-parameters>
+                            </ng-template>
+                        </mat-tab>
                         <mat-tab [label]="'lang.others' | translate">
                             <ng-template matTabContent>
                                 <app-other-parameters></app-other-parameters>

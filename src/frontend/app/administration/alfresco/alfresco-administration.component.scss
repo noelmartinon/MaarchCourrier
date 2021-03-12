@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 .form-group {
     display: flex;
@@ -44,18 +43,18 @@
 
     ::ng-deep.mat-radio-checked,::ng-deep.mat-checked {
         opacity: 1;
-        color: $primary;
+        color: var(--maarch-color-primary);
     }
 
 
     ::ng-deep.mat-checked {
         .mat-slide-toggle-label {
-            color: $primary;
+            color: var(--maarch-color-primary);
         }
     }
 
     ::ng-deep.mat-form-field-suffix {
-        color: $secondary;
+        color: var(--maarch-color-secondary);
         font-size: 15px;
         top: 0;
     }

@@ -15,7 +15,6 @@
 namespace Contact\models;
 
 use Resource\models\ResourceContactModel;
-use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\ValidatorModel;
 
@@ -116,33 +115,5 @@ class ContactModel
         if ($count[0]['count'] < 1) {
             ContactModel::delete(['where' => ['id = ?'], 'data' => [$aArgs['id']]]);
         }
-    }
-
-    public static function getCivilities()
-    {
-        static $civilities;
-
-        if (!empty($civilities)) {
-            return $civilities;
-        }
-
-        $civilities = [];
-
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/entreprise.xml']);
-        if ($loadedXml != false) {
-            $result = $loadedXml->xpath('/ROOT/titles');
-            foreach ($result as $title) {
-                foreach ($title as $value) {
-                    if (!empty((string) $value->id)) {
-                        $civilities[(string) $value->id] = [
-                            'label'         => (string)$value->label,
-                            'abbreviation'  => (string)$value->abbreviation,
-                        ];
-                    }
-                }
-            }
-        }
-
-        return $civilities;
     }
 }

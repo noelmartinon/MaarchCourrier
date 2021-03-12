@@ -1,4 +1,3 @@
-@import '../../../../css/vars.scss';
 
 .smallInput {
     width: 230px !important;
@@ -7,7 +6,7 @@
     .mat-button {
         width: 30px;
         height: 25px;
-        color: $primary;
+        color: var(--maarch-color-primary);
 
         ::ng-deep.mat-button-wrapper {
             display: flex;

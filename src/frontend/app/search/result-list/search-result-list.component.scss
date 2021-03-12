@@ -1,8 +1,7 @@
-@import '../../../css/vars.scss';
 
 
 .followIcon {
-    color: $secondary;
+    color: var(--maarch-color-secondary);
 }
 
 .folder-info {
@@ -12,7 +11,7 @@
 
 .badge-folder {
     cursor: pointer;
-    background: $secondary;
+    background: var(--maarch-color-secondary);
     margin: 5px;
     font-size: 12px;
     border-radius: 3px;
@@ -42,7 +41,7 @@
 .filterBadges>.badge-search {
     margin: 5px;
     background: white;
-    color: $primary;
+    color: var(--maarch-color-primary);
     cursor: pointer;
 }
 
@@ -175,19 +174,19 @@
 }
 
 .freezeIcon {
-    color: $secondary;
+    color: var(--maarch-color-secondary);
 }
 
 .unfreezeIcon {
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 
 .bindIcon {
-    color: $secondary;
+    color: var(--maarch-color-secondary);
 }
 
 .noBindIcon {
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 .watermark {
     position: absolute;

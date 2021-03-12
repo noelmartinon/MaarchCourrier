@@ -1,0 +1,6 @@
+.plugins-list {
+    display: grid;
+    grid-template-columns: 1fr 2fr auto;
+    grid-gap: 10px;
+    align-items: center;
+}

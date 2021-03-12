@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 .loading {
     display: flex;
@@ -40,16 +39,16 @@
 }
 
 .activeButton {
-    color: $secondary;
+    color: var(--maarch-color-secondary);
     font-weight: bold;
 }
 
 .attachLabel {
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 
 .pdfVersion:hover {
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 
 ::ng-deep.attachListMenu {

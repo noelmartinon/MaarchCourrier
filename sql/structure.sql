@@ -742,7 +742,7 @@ WITH (
 CREATE TABLE contacts
 (
     id SERIAL NOT NULL,
-    civility CHARACTER VARYING(256),
+    civility INTEGER,
     firstname CHARACTER VARYING(256),
     lastname CHARACTER VARYING(256),
     company CHARACTER VARYING(256),

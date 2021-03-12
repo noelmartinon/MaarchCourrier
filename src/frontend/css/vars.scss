@@ -1,7 +1,66 @@
-$color-main: #4F4F4F; // default color in application
+$default: #4F4F4F; // default color in application
 $primary: #135f7f; // main color theme of application
 $secondary: #F99830; // main color theme of application
-$accent: #006841; // accent color theme of application (like success buttons)
-$warn: #8e3e52; // warning color theme of application
+$success: #006841; // accent color theme of application (like success buttons)
+$danger: #8e3e52; // warning color theme of application
 
-// WARNING ! YOU MUST RECOMPILATE maarch-material.scss IF VALUES CHANGES
+$primary-light: lighten($primary, 10%);
+$primary-dark: darken($primary, 10%);
+$secondary-light: lighten($secondary, 10%);
+$secondary-dark: darken($secondary, 10%);
+$success-light: lighten($success, 10%);
+$success-dark: darken($success, 10%);
+$danger-light: lighten($danger, 10%);
+$danger-dark: darken($danger, 10%);
+
+:root {
+    --maarch-color-default: #{$default};
+
+    --maarch-color-primary: #{$primary};
+    --maarch-color-primary-light: #{$primary-light};
+    --maarch-color-primary-dark: #{$primary-dark};
+
+    --maarch-color-secondary: #{$secondary};
+    --maarch-color-secondary-light: #{$secondary-light};
+    --maarch-color-secondary-dark: #{$secondary-dark};
+
+    --maarch-color-success: #{$success};
+    --maarch-color-success-light: #{$success-light};
+    --maarch-color-success-dark: #{$success-dark};
+
+    --maarch-color-danger: #{$danger};
+    --maarch-color-danger-light: #{$danger-light};
+    --maarch-color-danger-dark: #{$danger-dark};
+}
+
+[color=primary],
+.primary {
+    color: var(--maarch-color-primary);
+}
+
+[color=secondary],
+.secondary {
+    color: var(--maarch-color-secondary);
+}
+
+[color=warn],
+.warn {
+    color: var(--maarch-color-danger);
+}
+
+[color=accent],
+.accent {
+    color: var(--maarch-color-success);
+}
+
+[bgcolor=primary] {
+    background-color: var(--maarch-color-primary);
+}
+
+[bgcolor=warn] {
+    background-color: var(--maarch-color-danger);
+}
+
+[bgcolor=accent] {
+    background-color: var(--maarch-color-success);
+}

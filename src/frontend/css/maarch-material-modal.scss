@@ -1,10 +1,9 @@
-@import 'vars.scss';
 
 /*.mat-dialog-title {
   margin: -24px !important;
   margin-bottom: -24px !important;
   margin-bottom: 0 !important;
-  background: $primary;
+  background: var(--maarch-color-primary);
   color: white;
   padding: 5px;
 
@@ -34,7 +33,7 @@
     padding: 5px;
     padding-left: 20px;
     padding-right: 20px;
-    background: $primary;
+    background: var(--maarch-color-primary);
     color: white;
     display: flex;
     align-items: center;
@@ -84,7 +83,7 @@
     padding: 5px;
     padding-left: 20px;
     padding-right: 20px;
-    background: $primary;
+    background: var(--maarch-color-primary);
     color: white;
     display: flex;
     align-items: center;
@@ -136,7 +135,7 @@
       margin: -24px !important;
       margin-bottom: -24px !important;
       margin-bottom: 0 !important;
-      background: $primary;
+      background: var(--maarch-color-primary);
       color: white;
       padding: 5px;
     

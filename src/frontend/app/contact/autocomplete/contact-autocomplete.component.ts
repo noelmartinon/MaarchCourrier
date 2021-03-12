@@ -8,13 +8,18 @@ import { AppService } from '@service/app.service';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { FormControl } from '@angular/forms';
 import { Observable, of } from 'rxjs';
-import { debounceTime, filter, distinctUntilChanged, tap, switchMap, exhaustMap, catchError, finalize, map } from 'rxjs/operators';
+import { debounceTime, filter, tap, switchMap, catchError, finalize, map } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
 import { PrivilegeService } from '@service/privileges.service';
 import { ContactModalComponent } from '../../administration/contact/modal/contact-modal.component';
 import { ContactService } from '@service/contact.service';
-import { DocumentViewerComponent } from '../../viewer/document-viewer.component';
 import { FunctionsService } from '@service/functions.service';
+
+interface DisplayContactList {
+    'contact': any;
+    'user': any;
+    'entity': any;
+}
 
 @Component({
     selector: 'app-contact-autocomplete',
@@ -42,7 +47,11 @@ export class ContactAutocompleteComponent implements OnInit {
     myControl = new FormControl();
     filteredOptions: Observable<string[]>;
     options: any;
-    valuesToDisplay: any = {};
+    valuesToDisplay: DisplayContactList = {
+        contact : {},
+        user: {},
+        entity: {}
+    };
     dialogRef: MatDialogRef<any>;
     newIds: number[] = [];
     customFields: any[] = [];
@@ -169,7 +178,7 @@ export class ContactAutocompleteComponent implements OnInit {
 
     initFormValue() {
         this.controlAutocomplete.value.forEach((contact: any) => {
-            this.valuesToDisplay[contact.id] = {
+            this.valuesToDisplay[contact.type][contact.id] = {
                 type: '',
                 firstname: '',
                 lastname: this.translate.instant('lang.undefined'),
@@ -182,7 +191,7 @@ export class ContactAutocompleteComponent implements OnInit {
             if (contact.type === 'contact') {
                 this.http.get('../rest/contacts/' + contact.id).pipe(
                     tap((data: any) => {
-                        this.valuesToDisplay[data.id] = {
+                        this.valuesToDisplay['contact'][data.id] = {
                             type: 'contact',
                             firstname: data.firstname,
                             lastname: data.lastname,
@@ -201,7 +210,7 @@ export class ContactAutocompleteComponent implements OnInit {
             } else if (contact.type === 'user') {
                 this.http.get('../rest/users/' + contact.id).pipe(
                     tap((data: any) => {
-                        this.valuesToDisplay[data.id] = {
+                        this.valuesToDisplay['user'][data.id] = {
                             type: 'user',
                             firstname: data.firstname,
                             lastname: data.lastname,
@@ -219,7 +228,7 @@ export class ContactAutocompleteComponent implements OnInit {
             } else if (contact.type === 'entity') {
                 this.http.get('../rest/entities/' + contact.id).pipe(
                     tap((data: any) => {
-                        this.valuesToDisplay[data.id] = {
+                        this.valuesToDisplay['entity'][data.id] = {
                             type: 'entity',
                             lastname: data.entity_label,
                             fillingRate: {
@@ -271,29 +280,21 @@ export class ContactAutocompleteComponent implements OnInit {
     }
 
     setContact(contact: any) {
-        var alreadyIn = false;
-        this.controlAutocomplete.value.forEach((contactItem: any) => {
-            if (contactItem.id == contact['id'] && contactItem.type == contact['type']) {
-                alreadyIn = true;
-                return;
+        if (this.controlAutocomplete.value.filter((contactItem: any) => contactItem.id === contact.id && contactItem.type === contact.type).length === 0) {
+            let arrvalue = [];
+            if (this.controlAutocomplete.value !== null) {
+                arrvalue = this.controlAutocomplete.value;
             }
-        });
-        if (alreadyIn) {
-            return;
+            this.valuesToDisplay[contact['type']][contact['id']] = contact;
+            arrvalue.push(
+                {
+                    type: contact['type'],
+                    id: contact['id'],
+                    label: this.getFormatedContact(contact['type'], contact['id'])
+                });
+            this.controlAutocomplete.setValue(arrvalue);
+            this.loadingValues = false;
         }
-        let arrvalue = [];
-        if (this.controlAutocomplete.value !== null) {
-            arrvalue = this.controlAutocomplete.value;
-        }
-        this.valuesToDisplay[contact['id']] = contact;
-        arrvalue.push(
-            {
-                type: contact['type'],
-                id: contact['id'],
-                label: this.getFormatedContact(contact['id'])
-            });
-        this.controlAutocomplete.setValue(arrvalue);
-        this.loadingValues = false;
     }
 
     resetAutocomplete() {
@@ -381,11 +382,15 @@ export class ContactAutocompleteComponent implements OnInit {
 
     resetAll() {
         this.controlAutocomplete.setValue([]);
-        this.valuesToDisplay = {};
+        this.valuesToDisplay = {
+            contact : {},
+            user: {},
+            entity: {}
+        };
     }
 
-    getFormatedContact(id: number) {
-        return this.contactService.formatContact(this.valuesToDisplay[id]);
+    getFormatedContact(type: string, id: number) {
+        return this.contactService.formatContact(this.valuesToDisplay[type][id]);
     }
 
     getInputValue() {

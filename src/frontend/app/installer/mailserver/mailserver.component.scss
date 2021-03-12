@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 
 .stepContent {
@@ -6,7 +5,7 @@
     margin: auto;
 
     .stepContentTitle {
-        color: $primary;
+        color: var(--maarch-color-primary);
         margin-bottom: 30px;
         border-bottom: solid 1px;
         padding: 0;
@@ -22,11 +21,11 @@
 .selected {
     transition: all 0.3s;
     opacity: 1 !important;
-    border: solid 10px $secondary !important;
+    border: solid 10px var(--maarch-color-secondary) !important;
 }
 
 .backgroundItem {
-    border: solid 0px $secondary;
+    border: solid 0px var(--maarch-color-secondary);
     opacity: 0.5;
     transition: all 0.3s;
     cursor: pointer;

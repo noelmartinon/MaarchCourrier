@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 .dashboard-container {
     display: grid;
@@ -44,7 +43,7 @@
 }
 
 .empty_tile_edit {
-    border: dashed 2px $secondary;
+    border: dashed 2px var(--maarch-color-secondary);
 }
 
 .tool {

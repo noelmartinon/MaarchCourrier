@@ -1,4 +1,3 @@
-@import '../../css/vars.scss';
 
 .mat-icon {
     height: auto;
@@ -20,21 +19,21 @@
 .followAction {
     .mat-icon {
         font-size:20px;
-        color: $warn;
+        color: var(--maarch-color-danger);
     }
 }
 
 .freezeIcon {
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 
 .bindidngIcon {
-    color: $primary;
+    color: var(--maarch-color-primary);
     margin-left: 5px;
 }
 
 .isSelectedMenu {
-    background: $secondary;
+    background: var(--maarch-color-secondary);
   }
 
 .notSelectedMenu {

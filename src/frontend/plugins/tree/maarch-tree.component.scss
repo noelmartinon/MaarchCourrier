@@ -1,4 +1,3 @@
-@import '../../css/vars.scss';
 
 .example-tree-progress-bar {
     margin-left: 30px;
@@ -62,7 +61,7 @@
     white-space: pre;
 
     i {
-        color: $primary;
+        color: var(--maarch-color-primary);
     }
 }
 .node-content:not(.node-selected):hover {
@@ -71,7 +70,7 @@
 }
 
 .node-selected {
-    background-color: $primary;
+    background-color: var(--maarch-color-primary);
     color:white;
     transition: all 0.3s;
 

@@ -1,8 +1,7 @@
-@import '../../../../css/vars.scss';
 
 .tile-title {
     padding: 10px;
-    color: $primary;
+    color: var(--maarch-color-primary);
     font-weight: bold;
     text-align: center;
     white-space: pre;

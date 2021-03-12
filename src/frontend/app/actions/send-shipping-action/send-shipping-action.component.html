@@ -104,6 +104,15 @@
                             </div>
                         </div>
                     </div>
+                    <div class="col-md-12" *ngIf="currentShipping != null && (currentShipping.options.sendMode == 'digital_registered_mail' || currentShipping.options.sendMode == 'digital_registered_mail_with_AR') && invalidEntityAddress">
+                        <div>
+                            <div class="alert-message alert-message-danger mailList" role="alert" style="max-width: 530px">
+                                <p>
+                                    {{'lang.shippingInvalidEntityAddress' | translate}}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                     <div class="col-md-12" *ngIf="currentShipping != null">
                         <div>
                             <div class="alert-message alert-message-info mailList" role="alert">
@@ -128,7 +137,7 @@
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
         <button mat-raised-button mat-button color="primary"
-            [disabled]="loading || currentShipping == null || attachList.length == 0"
+            [disabled]="loading || currentShipping == null || attachList.length == 0 || ((currentShipping.options.sendMode == 'digital_registered_mail' || currentShipping.options.sendMode == 'digital_registered_mail_with_AR') && invalidEntityAddress)"
             (click)="onSubmit()">{{'lang.validate' | translate}}</button>
         <button mat-raised-button mat-button [disabled]="loading" [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
     </div>

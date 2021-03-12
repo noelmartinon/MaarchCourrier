@@ -387,8 +387,9 @@ class TemplateController
         foreach ($attachmentModelsTmp as $value) {
             if ($value['visible']) {
                 $attachmentTypes[] = [
-                    'label' => $value['label'],
-                    'id'    => $value['type_id']
+                    'label'   => $value['label'],
+                    'id'      => $value['type_id'],
+                    'visible' => $value['visible']
                 ];
             }
         }

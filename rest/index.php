@@ -50,7 +50,6 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
         }
     }
     $response = $next($request, $response);
-    \SrcCore\controllers\CoreController::setResponseHeaders($response);
     
     return $response;
 });
@@ -390,6 +389,8 @@ $app->post('/parameters', \Parameter\controllers\ParameterController::class . ':
 $app->get('/parameters/{id}', \Parameter\controllers\ParameterController::class . ':getById');
 $app->put('/parameters/{id}', \Parameter\controllers\ParameterController::class . ':update');
 $app->delete('/parameters/{id}', \Parameter\controllers\ParameterController::class . ':delete');
+$app->get('/m2mConfiguration', \Parameter\controllers\ParameterController::class . ':getM2MConfiguration');
+$app->put('/m2mConfiguration', \Parameter\controllers\ParameterController::class . ':setM2MConfiguration');
 
 //PasswordRules
 $app->get('/passwordRules', \SrcCore\controllers\PasswordController::class . ':getRules');
@@ -406,6 +407,7 @@ $app->put('/sortedPriorities', \Priority\controllers\PriorityController::class .
 
 //Resources
 $app->post('/resources', \Resource\controllers\ResController::class . ':create');
+$app->get('/resources/external', \Resource\controllers\ResController::class . ':getByExternalId');
 $app->get('/resources/{resId}', \Resource\controllers\ResController::class . ':getById');
 $app->put('/resources/{resId}', \Resource\controllers\ResController::class . ':update');
 $app->get('/resources/{resId}/content', \Resource\controllers\ResController::class . ':getFileContent');

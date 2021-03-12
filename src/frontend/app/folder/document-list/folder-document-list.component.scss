@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 .dragPreview {
     text-align: center;
@@ -6,7 +5,7 @@
     background: white;
     padding: 10px;
     box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 
 .banner-opened {
@@ -17,7 +16,7 @@
     border: solid 1px #ccc;
     position: relative;
     padding: 20px;
-    background: lighten($primary, 10%);
+    background: var(--maarch-color-primary-light);
     width: 100%;
 
     .title {
@@ -41,7 +40,7 @@
             width: 99%;
             z-index: -1;
             top: 17px;
-            background: lighten($primary, 10%);
+            background: var(--maarch-color-primary-light);
             height: 1px; 
         }
     }
@@ -91,7 +90,7 @@
 }
 
 .followIcon {
-    color: $secondary;
+    color: var(--maarch-color-secondary);
 }
 
 .folder-info {
@@ -101,7 +100,7 @@
 
 .badge-folder {
     cursor: pointer;
-    background: $secondary;
+    background: var(--maarch-color-secondary);
     margin: 5px;
     font-size: 12px;
     border-radius: 3px;

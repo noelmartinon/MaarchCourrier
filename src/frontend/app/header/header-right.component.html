@@ -55,12 +55,12 @@
         <div style="display:flex;padding: 5px;">
             <div style="text-align:left;flex:1">
                 <a routerLink="/profile" style="color: white;padding-left: 10px;">
-                    <span class="badge" style="background:white;" color="primary">{{'lang.myProfile' | translate}}</span>
+                    <span class="badge action-header-profile">{{'lang.myProfile' | translate}}</span>
                 </a>
             </div>
             <div *ngIf="showLogout()" style="text-align:right;flex:2;">
                 <a (click)="authService.logout()" style="cursor:pointer; color: white;padding-right: 10px;">
-                    <span class="badge" style="background:white;" color="primary">{{'lang.logout' | translate}}</span>
+                    <span class="badge action-header-profile">{{'lang.logout' | translate}}</span>
                 </a>
             </div>
         </div>

@@ -1,6 +1,5 @@
-@import '../../../css/vars.scss';
 
 .input-recipient {
     border: none;
-    border-bottom: solid 1px $primary;
+    border-bottom: solid 1px var(--maarch-color-primary);
 }

@@ -557,7 +557,7 @@ class TileController
     {
         $tile['resourcesNumber'] = null;
 
-        if (($tile['parameters']['privilegeId'] == 'indexing' && !PrivilegeController::canIndex(['userId' => $GLOBALS['id']])) ||
+        if (($tile['parameters']['privilegeId'] == 'indexing' && !PrivilegeController::canIndex(['userId' => $GLOBALS['id'], 'groupId' => $tile['parameters']['groupId']])) ||
             ($tile['parameters']['privilegeId'] != 'indexing' && !PrivilegeController::hasPrivilege(['privilegeId' => $tile['parameters']['privilegeId'], 'userId' => $GLOBALS['id']]))
         ) {
             return ['errors' => 'Service forbidden'];

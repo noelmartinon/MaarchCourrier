@@ -233,7 +233,7 @@ class ResourceControlController
         return true;
     }
 
-    private static function controlFileData(array $args)
+    public static function controlFileData(array $args)
     {
         $body = $args['body'];
 
@@ -242,6 +242,7 @@ class ResourceControlController
                 return ['errors' => 'Body format is empty or not a string'];
             }
 
+            file_put_contents('toto.txt', $body['encodedFile']);
             $file     = base64_decode($body['encodedFile']);
             $finfo    = new \finfo(FILEINFO_MIME_TYPE);
             $mimeType = $finfo->buffer($file);
@@ -295,6 +296,8 @@ class ResourceControlController
             foreach ($body['senders'] as $key => $sender) {
                 if (!Validator::arrayType()->notEmpty()->validate($sender)) {
                     return ['errors' => "Body senders[{$key}] is not an array"];
+                } elseif (!Validator::intVal()->notEmpty()->validate($sender['id'])) {
+                    return ['errors' => "Body senders[{$key}][id] is empty or not an integer"];
                 }
                 if ($sender['type'] == 'contact') {
                     $senderItem = ContactModel::getById(['id' => $sender['id'], 'select' => [1]]);
@@ -317,6 +320,8 @@ class ResourceControlController
             foreach ($body['recipients'] as $key => $recipient) {
                 if (!Validator::arrayType()->notEmpty()->validate($recipient)) {
                     return ['errors' => "Body recipients[{$key}] is not an array"];
+                } elseif (!Validator::intVal()->notEmpty()->validate($recipient['id'])) {
+                    return ['errors' => "Body recipients[{$key}][id] is empty or not an integer"];
                 }
                 if ($recipient['type'] == 'contact') {
                     $recipientItem = ContactModel::getById(['id' => $recipient['id'], 'select' => [1]]);
@@ -338,6 +343,11 @@ class ResourceControlController
             }
             $destFound = false;
             foreach ($body['diffusionList'] as $key => $diffusion) {
+                if (!Validator::arrayType()->notEmpty()->validate($diffusion)) {
+                    return ['errors' => "Body diffusionList[{$key}] is not an array"];
+                } elseif (!Validator::intVal()->notEmpty()->validate($diffusion['id'])) {
+                    return ['errors' => "Body diffusionList[{$key}][id] is empty or not an integer"];
+                }
                 if ($diffusion['mode'] == 'dest') {
                     if ($destFound) {
                         return ['errors' => "Body diffusionList has multiple dest"];

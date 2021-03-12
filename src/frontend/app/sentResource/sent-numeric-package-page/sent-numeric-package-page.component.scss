@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 .loading {
     display: flex;
@@ -19,12 +18,12 @@
 }
 
 .activeButton {
-    color: $secondary;
+    color: var(--maarch-color-secondary);
     font-weight: bold;
 }
 
 .attachLabel {
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 
 ::ng-deep.attachListMenu {
@@ -42,7 +41,7 @@
     align-items: center;
 
     .subInfo {
-        color: $primary;
+        color: var(--maarch-color-primary);
         font-size: 80%;
     }
 }
@@ -85,7 +84,7 @@
     color: white;
     font-weight: normal;
     border-radius: .25em;
-    background: $primary;
+    background: var(--maarch-color-primary);
 }
 
 .alert-message {
@@ -110,7 +109,7 @@
 
 
     &Date {
-        color: $primary;
+        color: var(--maarch-color-primary);
     }
 }
 

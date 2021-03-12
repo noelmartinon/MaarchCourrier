@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 .loading {
     position: absolute;
@@ -64,18 +63,18 @@
     ::ng-deep.mat-radio-checked,
     ::ng-deep.mat-checked {
         opacity: 1;
-        color: $primary;
+        color: var(--maarch-color-primary);
     }
 
 
     ::ng-deep.mat-checked {
         .mat-slide-toggle-label {
-            color: $primary;
+            color: var(--maarch-color-primary);
         }
     }
 
     ::ng-deep.mat-form-field-suffix {
-        color: $secondary;
+        color: var(--maarch-color-secondary);
         font-size: 15px;
         top: 0;
     }
@@ -90,7 +89,7 @@
 }
 
 .mat-input-element:disabled {
-    color: $primary !important;
+    color: var(--maarch-color-primary) !important;
 }
 
 tr.example-detail-row {
@@ -145,7 +144,7 @@ tr.example-detail-row {
 }
 
 .badge {
-    background: $secondary;
+    background: var(--maarch-color-secondary);
 }
 
 .label {

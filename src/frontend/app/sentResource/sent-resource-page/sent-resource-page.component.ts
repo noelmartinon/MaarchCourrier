@@ -122,7 +122,7 @@ export class SentResourcePageComponent implements OnInit {
         });
 
         if (this.functions.empty(this.data.emailId)) {
-            await this.getAttachElements();
+            await this.getAttachElements(true);
         }
 
         if (this.data.emailId && this.data.emailType === 'email') {
@@ -319,7 +319,7 @@ export class SentResourcePageComponent implements OnInit {
     getEmailData(emailId: number) {
         return new Promise((resolve) => {
             this.http.get(`../rest/emails/${emailId}`).pipe(
-                tap((data: any) => {
+                tap(async (data: any) => {
                     this.emailCreatorId = data.userId;
 
                     this.recipients = data.recipients.map((item: any) => {
@@ -379,6 +379,11 @@ export class SentResourcePageComponent implements OnInit {
                             this.emailAttach.document.chrono = data.document.resource.chrono;
                         }
                     });
+
+                    if (this.emailStatus === 'DRAFT') {
+                        await this.getAttachElements(false);
+                    }
+
                     resolve(true);
                 }),
                 catchError((err) => {
@@ -524,7 +529,7 @@ export class SentResourcePageComponent implements OnInit {
         });
     }
 
-    getAttachElements() {
+    getAttachElements(attachElements: boolean) {
         return new Promise((resolve) => {
             this.http.get(`../rest/resources/${this.data.resId}/emailsInitialization`).pipe(
                 tap((data: any) => {
@@ -536,7 +541,7 @@ export class SentResourcePageComponent implements OnInit {
                             }
                         } else {
                             this.emailAttachTool[element].list = data[element].map((item: any) => {
-                                if (item.attachInMail) {
+                                if (item.attachInMail && attachElements) {
                                     this.toggleAttachMail(item, element, item.status === 'SIGN' ? 'pdf' : 'original');
                                 }
                                 return {

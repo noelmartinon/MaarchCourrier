@@ -47,15 +47,15 @@
                     <mat-expansion-panel style="margin-bottom: 10px;">
                         <mat-expansion-panel-header>
                             <mat-panel-title color="primary">
-                                Paramétrage des civilités
+                                {{'lang.adminCivilities' | translate}}
                             </mat-panel-title>
                         </mat-expansion-panel-header>
 
                         <div class="civilities-list">
                             <ng-container *ngFor="let civility of civilities;let i=index">
                                 <mat-form-field class="civility-input" *ngFor="let civ of civility | keyvalue: originalOrder" appearance="outline">
-                                    <mat-label>{{civ.key}}</mat-label>
-                                    <input matInput (blur)="updateCivility(civility)" [(ngModel)]="civ.value">
+                                    <mat-label>{{'lang.' + civ.key | translate}}</mat-label>
+                                    <input matInput [formControl]="civility[civ.key]">
                                 </mat-form-field>
                                 <button mat-icon-button color="warn" matTooltip="{{'lang.delete' | translate}}"
                                     (click)="deleteCivility(civility,i)">

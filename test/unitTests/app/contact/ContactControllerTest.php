@@ -618,7 +618,7 @@ class ContactControllerTest extends TestCase
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
 
-        $response     = $contactController->update($fullRequest, new \Slim\Http\Response(),  ['id' => self::$id2]);
+        $response     = $contactController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id2]);
         $this->assertSame(403, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame('Service forbidden', $responseBody['errors']);
@@ -919,22 +919,6 @@ class ContactControllerTest extends TestCase
         $GLOBALS['id'] = $userInfo['id'];
     }
 
-    public function testGetCivilities()
-    {
-        $contactCivilityController = new \Contact\controllers\ContactCivilityController();
-
-        //  GET
-        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
-        $request        = \Slim\Http\Request::createFromEnvironment($environment);
-
-        $response = $contactCivilityController->get($request, new \Slim\Http\Response());
-        $this->assertSame(200, $response->getStatusCode());
-        $responseBody = json_decode((string)$response->getBody(), true);
-
-        $this->assertIsArray($responseBody['civilities']);
-        $this->assertNotEmpty($responseBody['civilities']);
-    }
-
     public function testGetAvailableDepartments()
     {
         $contactController = new \Contact\controllers\ContactController();
@@ -1002,7 +986,6 @@ class ContactControllerTest extends TestCase
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
         $this->assertSame('Contact does not exist', $responseBody['errors']);
-
     }
 
     public function testUpdateContactsParameters()

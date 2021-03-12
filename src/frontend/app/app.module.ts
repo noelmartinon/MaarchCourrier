@@ -143,6 +143,8 @@ import { MyBasketsComponent } from './profile/parameters/baskets/baskets.compone
 import { MySignatureMailComponent } from './profile/parameters/signatureMail/signature-mail.component';
 import { MySignatureBookComponent } from './profile/parameters/signatureBook/signature-book.component';
 import { ProfileHistoryComponent } from './profile/history/history.component';
+import { ProfileOtherPluginComponent } from './profile/other-plugin/other-plugin.component';
+import { AddinOutlookConfigurationModalComponent } from './profile/other-plugin/configuration/addin-outlook-configuration-modal.component';
 
 import { DevToolComponent } from '@service/debug/dev-tool.component';
 import { DevLangComponent } from '@service/debug/dev-lang.component';
@@ -285,7 +287,9 @@ export class MyHammerConfig extends HammerGestureConfig {
         MyBasketsComponent,
         MySignatureMailComponent,
         MySignatureBookComponent,
-        ProfileHistoryComponent
+        ProfileHistoryComponent,
+        ProfileOtherPluginComponent,
+        AddinOutlookConfigurationModalComponent
     ],
     exports : [
         SharedModule
@@ -346,7 +350,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         ReconcileActionComponent,
         TechnicalInformationComponent,
         AbsModalComponent,
-        TileCreateComponent
+        TileCreateComponent,
+        AddinOutlookConfigurationModalComponent
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

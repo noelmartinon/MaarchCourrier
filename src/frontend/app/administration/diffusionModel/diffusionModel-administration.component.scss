@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 .mat-list-item[draggable="false"]:hover{
     background: inherit;
@@ -17,7 +16,7 @@
 }
 
 .primaryColor {
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 
 .redColor {

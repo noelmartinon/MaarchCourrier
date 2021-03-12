@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 .adminArea {
   display: flex;
@@ -60,12 +59,12 @@
   gap: 10px;
   height: 100px;
   color: white;
-  background: $primary;
+  background: var(--maarch-color-primary);
   cursor: pointer;
 }
 
 .avatarCount {
-  color: $primary;
+  color: var(--maarch-color-primary);
   align-items: center;
   display: flex;
   justify-content: center;
@@ -81,7 +80,7 @@
   display: flex;
   justify-content: center;
   font-size: 30px;
-  background: $primary;
+  background: var(--maarch-color-primary);
   border-radius: 40px;
   padding: 10px;
   width: 55px !important;
@@ -89,6 +88,6 @@
 }
 
 .countLabel {
-  color: $primary;
+  color: var(--maarch-color-primary);
   font-size: 16px;
 }

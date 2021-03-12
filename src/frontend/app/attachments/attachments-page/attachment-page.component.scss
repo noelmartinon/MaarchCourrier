@@ -1,4 +1,3 @@
-@import "../../../css/vars.scss";
 
 
 .attach-container {
@@ -85,7 +84,7 @@
         display: block;
         height: 100% !important;
         text-align: center;
-        background: $primary;
+        background: var(--maarch-color-primary);
         color: white;
     }
 }
@@ -120,7 +119,7 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    background: $primary;
+    background: var(--maarch-color-primary);
     overflow: auto;
     color: white;
 }

@@ -1,4 +1,3 @@
-@import "../../../css/vars.scss";
 
 .noteList {
     font-size: 13px;
@@ -8,13 +7,13 @@
     align-items: center;
 
     &:nth-child(2n) {
-        background: rgba($primary, .1);
+        background: rgba(var(--maarch-color-primary), .1);
     }
 }
 
 .date {
     padding: 5px;
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 
 .info {
@@ -44,6 +43,6 @@
     padding: 0;
     line-height: 20px;
     width: 35px;
-    color: $secondary;
+    color: var(--maarch-color-secondary);
     font-weight: bold;
 }

@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 .smallInputInfo {
     font-size: 9px;
@@ -10,9 +9,9 @@
 }
 
 .mat-chip.mat-standard-chip {
-    color: lighten($primary, 10%);
+    color: var(--maarch-color-primary-light);
     background-color: white;
-    border: solid 1px lighten($primary, 10%);
+    border: solid 1px var(--maarch-color-primary-light);
 }
 
 .noResult {
@@ -114,7 +113,7 @@
 
 
 .contact-header-image {
-    background: $primary;
+    background: var(--maarch-color-primary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -125,7 +124,7 @@
 }
 
 .contact-group {
-    color: $primary;
+    color: var(--maarch-color-primary);
     font-size: 10px !important;
     display: flex;
     align-items: center;

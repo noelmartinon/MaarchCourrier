@@ -88,8 +88,6 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
     config: any = {};
 
     documentImported: boolean = false;
-    attachmentTypeIsVisible = true;
-
 
     constructor(
         public http: HttpClient,
@@ -159,7 +157,6 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                         }
 
                         this.headerService.setHeader(this.translate.instant('lang.templateModification'), this.template.template_label);
-                        this.attachmentTypeUpdated();
                         this.loading = false;
                     });
             }
@@ -587,6 +584,10 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
         }
     }
 
+    isVisibleAttachment(id: string) {
+        return this.attachmentTypesList.find((attach: any) => attach.id === id)?.visible;
+    }
+
     displayDatasources(datasource: any) {
         if (datasource.target === 'notification' && this.template.target === 'notifications') {
             return true;
@@ -632,10 +633,6 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
             this.template.template_attachment_type = '';
             this.initMce('textarea#templateOfficeHtml');
         }
-    }
-
-    attachmentTypeUpdated() {
-        this.attachmentTypeIsVisible = (this.attachmentTypesList.filter((item: any) => item.id == this.template.template_attachment_type)[0]?.visible || this.template.template_attachment_type == 'all');
     }
 
     changeType(ev: any) {

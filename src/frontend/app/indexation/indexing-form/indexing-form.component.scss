@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 .banner {
     display: flex;
@@ -24,7 +23,7 @@
         left: 20px;
         padding: 0px;
         margin: 0px;
-        color: $primary;
+        color: var(--maarch-color-primary);
 
         &-divider {
             position: absolute;
@@ -70,12 +69,12 @@
 
     .fieldRequired {
         font-size: 5px;
-        color: $primary;
+        color: var(--maarch-color-primary);
     }
 
     .fieldError {
         font-size: 15px;
-        color: $secondary;
+        color: var(--maarch-color-secondary);
 
     }
 
@@ -114,7 +113,7 @@
     width: 500px;
 
     .mat-input-element {
-        color: $primary;
+        color: var(--maarch-color-primary);
         padding-left: 20px;
     }
 
@@ -125,7 +124,7 @@
 
     ::ng-deep.mat-select-value-text {
         padding-left: 20px;
-        color: $primary;
+        color: var(--maarch-color-primary);
     }
 
     ::ng-deep.mat-form-field-label {
@@ -147,7 +146,7 @@
         background: white;
         height: 40px;
         border-radius: 10px;
-        border: solid 1px $primary;
+        border: solid 1px var(--maarch-color-primary);
     }
 
     ::ng-deep .mat-form-field-underline {
@@ -199,7 +198,7 @@
     }
 
     ::ng-deep.mat-date-range-input-inner {
-        color: $primary;
+        color: var(--maarch-color-primary);
     }
     /*::ng-deep.mat-form-field-infix {
         padding-top: 5px;
@@ -218,26 +217,26 @@
         ::ng-deep.mat-form-field-flex {
             background: white !important;
             border: solid 1px white !important;
-            color: $primary !important;
+            color: var(--maarch-color-primary) !important;
             transition: all 0.1s;
 
         }
 
         ::ng-deep.mat-select-placeholder {
-            color: $primary !important;
+            color: var(--maarch-color-primary) !important;
         }
 
         ::ng-deep.mat-form-field-label {
-            color: $primary !important;
+            color: var(--maarch-color-primary) !important;
         }
 
         ::ng-deep.mat-select-arrow {
-            color: rgba($primary, 0.54);
+            color: rgba(var(--maarch-color-primary), 0.54);
         }
     }
 
     .mat-input-element {
-        color: $primary;
+        color: var(--maarch-color-primary);
         padding-left: 20px;
     }
 
@@ -266,7 +265,7 @@
     }
 
     ::ng-deep.mat-form-field-flex {
-        background: $primary;
+        background: var(--maarch-color-primary);
         border-radius: 30px;
         border: solid 1px white;
     }
@@ -337,8 +336,8 @@
 
 .button-form-primary {
     background: white;
-    border: solid 1px $primary;
-    color: $primary;
+    border: solid 1px var(--maarch-color-primary);
+    color: var(--maarch-color-primary);
     border-radius: 30px;
     padding-left: 20px;
     padding-right: 20px;
@@ -353,7 +352,7 @@
 
     &:hover,
     &[aria-expanded=true] {
-        background: $primary !important;
+        background: var(--maarch-color-primary) !important;
         border: solid 1px white !important;
         color: white !important;
         transition: all 0.1s;
@@ -381,7 +380,7 @@
 }
 
 .button-form-primary-filled {
-    background: $primary;
+    background: var(--maarch-color-primary);
     border: solid 1px white;
     color: white;
     border-radius: 30px;
@@ -423,7 +422,7 @@
         font-size: 1em;
     }
 
-    background: $primary;
+    background: var(--maarch-color-primary);
     border: solid 1px white;
     color: white;
     border-radius: 30px;
@@ -437,7 +436,7 @@
     &[aria-expanded=true] {
         background: white !important;
         border: solid 1px white !important;
-        color: $primary !important;
+        color: var(--maarch-color-primary) !important;
         transition: all 0.1s;
 
     }
@@ -462,10 +461,10 @@
 
 
 .button-form-primary[aria-expanded=true] {
-    color: $primary;
+    color: var(--maarch-color-primary);
     background: white;
     transition: all 0.1s;
-    border: solid 1px $primary;
+    border: solid 1px var(--maarch-color-primary);
     /*border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
     border-top-left-radius: 30px;
@@ -474,7 +473,7 @@
 
 .button-form {
     background: white;
-    color: $primary;
+    color: var(--maarch-color-primary);
     border-radius: 30px;
     padding: 5px;
     padding-left: 20px;
@@ -516,7 +515,7 @@
         .mat-menu-item:hover {
             transition: all 0.1s;
             color: white;
-            background: lighten($primary, 10%);
+            background: var(--maarch-color-primary-light);
         }
     }
 }
@@ -543,7 +542,7 @@
 .checkbox-form {
     width: 100%;
     padding: 0px;
-    border: solid 1px $primary;
+    border: solid 1px var(--maarch-color-primary);
     border-radius: 30px;
     overflow: hidden;
 }
@@ -657,7 +656,7 @@
         font-size: 1em;
     }
 
-    color: $primary;
+    color: var(--maarch-color-primary);
     font-weight: bold;
 }
 
@@ -669,7 +668,7 @@
     .mat-input-element {
         padding: 0px;
         margin: 0px;
-        color: $primary;
+        color: var(--maarch-color-primary);
     }
 
     ::ng-deep.mat-form-field-flex {

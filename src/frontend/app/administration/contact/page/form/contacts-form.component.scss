@@ -1,4 +1,3 @@
-@import "../../../../../css/vars.scss";
 
 .contact-item {
     height: auto !important;
@@ -16,7 +15,7 @@
 
 .unitTitle {
     display: flex;
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 
 .contact-address {
@@ -42,7 +41,7 @@
     .mat-button {
         width: 30px;
         height: 25px;
-        color: $primary;
+        color: var(--maarch-color-primary);
 
         ::ng-deep.mat-button-wrapper {
             display: flex;

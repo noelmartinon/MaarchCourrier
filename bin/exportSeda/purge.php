@@ -223,4 +223,4 @@ if ($nbMailsPurge == 0) {
 }
 Bt_updateWorkBatch();
 
-exit($GLOBALS['exitCode']);
+exit(0);

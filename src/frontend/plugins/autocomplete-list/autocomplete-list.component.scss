@@ -1,11 +1,10 @@
-@import '../../css/vars.scss';
 
 .mat-form-field-appearance-outline {
     font-size: 11px;
 }
 
 ::ng-deep.mat-form-field-appearance-outline .mat-form-field-outline-thick {
-    color: $primary;
+    color: var(--maarch-color-primary);
 }
 
 ::ng-deep.mat-form-field-prefix {

@@ -1,4 +1,3 @@
-@import '../../css/vars.scss';
 
 
 $mat-menu-side-padding: 16px !default;
@@ -86,5 +85,5 @@ $multiple-check-width: 33px;
 }
 
 .multipleLabels {
-    color: $secondary;
+    color: var(--maarch-color-secondary);
 }

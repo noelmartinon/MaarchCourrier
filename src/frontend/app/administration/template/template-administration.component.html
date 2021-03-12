@@ -32,9 +32,7 @@
                 </div>
                 <mat-card *ngIf="!loading" class="card-app-content" style="display: contents;">
                     <form style="display: contents;" class="form-horizontal" (ngSubmit)="onSubmit()" #templatesFormUp="ngForm">
-                        <div *ngIf="!attachmentTypeIsVisible" class="alert-message alert-message-danger" role="alert">
-                            <p>{{'lang.invisibleAttachmentType' | translate}}</p>
-                        </div>
+                        <app-maarch-message *ngIf="template.target === 'attachments' && !isVisibleAttachment(template.template_attachment_type) && template.template_attachment_type !== 'all'" mode="danger" [content]="'lang.invisibleAttachmentType' | translate"></app-maarch-message>
                         <div class="col-sm-12">
                             <div class="form-group" *ngIf="!creationMode">
                                 <div class="col-sm-12">
@@ -82,7 +80,7 @@
                                     <mat-form-field>
                                         <mat-select id="template_attachment_type" name="template_attachment_type"
                                             title="{{'lang.attachmentType' | translate}}" placeholder="{{'lang.attachmentType' | translate}}"
-                                            [(ngModel)]="template.template_attachment_type" (selectionChange)="attachmentTypeUpdated()">
+                                            [(ngModel)]="template.template_attachment_type">
                                             <mat-option value="all">{{'lang.allAttachments' | translate}}</mat-option>
                                             <mat-option *ngFor="let value of attachmentTypesList" [value]="value.id">
                                                 {{value.label}}

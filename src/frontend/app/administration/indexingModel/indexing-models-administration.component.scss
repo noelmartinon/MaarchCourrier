@@ -1,11 +1,10 @@
-@import '../../../css/vars.scss';
 
 .dataLabelWarn {
-    color : $warn;
+    color : var(--maarch-color-danger);
 }
 
 .dataLabelPrimary {
-    color : $primary;
+    color : var(--maarch-color-primary);
 }
 
 .label{

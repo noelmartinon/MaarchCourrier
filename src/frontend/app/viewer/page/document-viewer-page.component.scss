@@ -1,7 +1,6 @@
-@import "../../../css/vars.scss";
 
 .doc-container {
-    background: $primary;
+    background: var(--maarch-color-primary);
     display: flex;
     justify-content: center;
 }

@@ -1,4 +1,3 @@
-@import "../../css/vars.scss";
 
 .upload-icon {
   font-size: 180px;
@@ -23,7 +22,7 @@
   .percent {
     position: absolute;
     margin-top: -5px;
-    color: $primary;
+    color: var(--maarch-color-primary);
   }
 }
 
@@ -31,7 +30,7 @@
   position: fixed;
   margin-top: 5px;
   z-index: 1;
-  background: $primary;
+  background: var(--maarch-color-primary);
   margin-left: 5px;
   border-radius: 10px;
   //opacity: 0.5;

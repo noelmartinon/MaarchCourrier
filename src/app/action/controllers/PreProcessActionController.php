@@ -724,10 +724,40 @@ class PreProcessActionController
                 'select'   => ['id', 'label', 'description', 'options', 'fee'],
                 'entities' => $entitiesId
             ]);
-    
+
+            $hasRegisteredMail = false;
             foreach ($aTemplates as $key => $value) {
                 $aTemplates[$key]['options']  = json_decode($value['options'], true);
                 $aTemplates[$key]['fee']      = json_decode($value['fee'], true);
+                if (strpos($aTemplates[$key]['options']['sendMode'], 'digital_registered_mail') !== false) {
+                    $hasRegisteredMail = true;
+                }
+            }
+        }
+        $invalidEntityAddress = false;
+        if (!empty($hasRegisteredMail)) {
+            $addressEntity = UserModel::getPrimaryEntityById([
+                'id'        => $GLOBALS['id'],
+                'select'    => [
+                    'entities.entity_id', 'entities.short_label', 'entities.address_number', 'entities.address_street', 'entities.address_additional1', 'entities.address_additional2', 'entities.address_postcode', 'entities.address_town', 'entities.address_country'
+                ]
+            ]);
+            $entityRoot = EntityModel::getEntityRootById(['entityId' => $addressEntity['entity_id']]);
+            $addressEntity = ContactController::getContactAfnor([
+                'company'               => $entityRoot['entity_label'],
+                'civility'              => '',
+                'firstname'             => $addressEntity['short_label'],
+                'lastname'              => '',
+                'address_number'        => $addressEntity['address_number'],
+                'address_street'        => $addressEntity['address_street'],
+                'address_additional1'   => $addressEntity['address_additional1'],
+                'address_additional2'   => $addressEntity['address_additional2'],
+                'address_postcode'      => $addressEntity['address_postcode'],
+                'address_town'          => $addressEntity['address_town'],
+                'address_country'       => $addressEntity['address_country']
+            ]);
+            if ((empty($addressEntity[1]) && empty($addressEntity[2])) || empty($addressEntity[6]) || !preg_match("/^\d{5}\s/", $addressEntity[6])) {
+                $invalidEntityAddress = true;
             }
         }
 
@@ -887,10 +917,11 @@ class PreProcessActionController
         }
 
         return $response->withJson([
-            'shippingTemplates' => $aTemplates,
-            'entities'          => $entitiesInfos,
-            'resources'         => $resources,
-            'canNotSend'        => $canNotSend
+            'shippingTemplates'     => $aTemplates,
+            'entities'              => $entitiesInfos,
+            'resources'             => $resources,
+            'canNotSend'            => $canNotSend,
+            'invalidEntityAddress'  => $invalidEntityAddress
         ]);
     }
 

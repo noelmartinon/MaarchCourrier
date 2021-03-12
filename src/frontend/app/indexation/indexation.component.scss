@@ -1,4 +1,3 @@
-@import '../../css/vars.scss';
 
 .panel-left {
     ::ng-deep.mat-drawer-inner-container {
@@ -20,7 +19,7 @@
     margin-top: 0px;
     width: 100%;
     overflow: hidden;
-    background-color: $primary;
+    background-color: var(--maarch-color-primary);
 
     .content {
         overflow-y: auto;
@@ -110,7 +109,7 @@
     .mat-menu-item:hover:hover {
         .listModels-menu-badge {
             background: white !important;
-            color: $primary !important;
+            color: var(--maarch-color-primary) !important;
         }
     
         .listModels-menu-delete {
@@ -121,7 +120,7 @@
     }
     &-badge {
         font-size: 70%;
-        background: $primary;
+        background: var(--maarch-color-primary);
         padding: 2px;
         border-radius: 20px;
         color: white;
@@ -138,16 +137,16 @@
 
     &-selected {
         color: white !important;
-        background: $primary;
+        background: var(--maarch-color-primary);
         .listModels-menu-badge {
             background: white !important;
-            color: $primary !important;
+            color: var(--maarch-color-primary) !important;
         }
     }
 }
 
 .emptyAction {
-    color: $warn;
+    color: var(--maarch-color-danger);
     font-size: 14px;
     text-align: center;
     // opacity: 0.3;
@@ -170,7 +169,7 @@
     display: flex;
     padding-left: 20px;
     align-items: center;
-    color: $primary;
+    color: var(--maarch-color-primary);
     font-weight: bold;
 }
 

@@ -201,12 +201,4 @@ class CoreController
         }
         return $response->withJson(['langs' => $arrLanguages]);
     }
-
-    public static function setResponseHeaders(Response &$response)
-    {
-        $response = $response->withHeader('X-Frame-Options', 'deny');
-        $response = $response->withHeader('Referrer-Policy', 'no-referrer');
-        $response = $response->withHeader('X-Content-Type-Options', 'nosniff');
-        $response = $response->withHeader('Feature-Policy', "autoplay 'none'; camera 'none'; geolocation 'none'; microphone 'none'");
-    }
 }

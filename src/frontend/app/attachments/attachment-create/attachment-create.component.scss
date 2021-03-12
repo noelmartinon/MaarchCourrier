@@ -1,4 +1,3 @@
-@import "../../../css/vars.scss";
 
 
 .loading {
@@ -36,7 +35,7 @@
         min-width: 50px;
         padding: 0;
         opacity: 1;
-        color: $primary;
+        color: var(--maarch-color-primary);
     }
 }
 
@@ -98,12 +97,12 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    background: $primary;
+    background: var(--maarch-color-primary);
     overflow: auto;
     color: white;
     height: 100%;
 }
 
 .active {
-    color: $secondary;
+    color: var(--maarch-color-secondary);
 }

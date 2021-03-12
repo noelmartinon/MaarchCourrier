@@ -44,6 +44,7 @@ export class SendShippingActionComponent implements OnInit {
         }
     };
     fatalError: any = '';
+    invalidEntityAddress: boolean = false;
 
     @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
 
@@ -79,6 +80,7 @@ export class SendShippingActionComponent implements OnInit {
                     this.mailsNotSend = data.canNotSend;
                     this.entitiesList = data.entities;
                     this.attachList   = data.resources;
+                    this.invalidEntityAddress = data.invalidEntityAddress;
                 }
             }),
             finalize(() => this.loading = false),

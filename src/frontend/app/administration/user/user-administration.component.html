@@ -77,7 +77,7 @@
                 </div>
                 <mat-card *ngIf="!loading" class="card-app-content">
                     <div *ngIf="!authService.mailServerOnline && creationMode">
-                        <div class="alert-message alert-message-danger" role="alert" style="max-width: 660px" 
+                        <div class="alert-message alert-message-danger" role="alert" style="max-width: 100%" 
                             [innerHTML]="'lang.mailServerOfflineMsg' | translate :{action:('lang.receiveActivationNotification' | translate)}"></div>
                     </div>
                     <mat-tab-group [(selectedIndex)]="selectedTabIndex" (selectedTabChange)="initService()">

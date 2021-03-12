@@ -1,4 +1,3 @@
-@import '../../../../css/vars.scss';
 
 .backgroundList {
     display: grid;
@@ -9,11 +8,11 @@
 .selected {
     transition: all 0.3s;
     opacity: 1 !important;
-    border: solid 10px $secondary !important;
+    border: solid 10px var(--maarch-color-secondary) !important;
 }
 
 .backgroundItem {
-    border: solid 0px $secondary;
+    border: solid 0px var(--maarch-color-secondary);
     opacity: 0.5;
     transition: all 0.3s;
     cursor: pointer;

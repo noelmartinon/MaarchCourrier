@@ -1,11 +1,10 @@
-@import '../../../css/vars.scss';
 
 .stepContent {
     // max-width: 850px;
     margin: auto;
 
     .stepContentTitle {
-        color: $primary;
+        color: var(--maarch-color-primary);
         margin-bottom: 30px;
         border-bottom: solid 1px;
         padding: 0;
@@ -55,7 +54,7 @@
 
 .link {
     text-decoration: underline;
-    color: $primary !important;
+    color: var(--maarch-color-primary) !important;
 }
 
 .packageName {
@@ -64,7 +63,7 @@
     i {
         cursor: help;
         opacity: 0.5;
-        color: $primary;
+        color: var(--maarch-color-primary);
     }
 }
 

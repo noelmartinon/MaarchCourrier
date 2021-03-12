@@ -1,4 +1,3 @@
-@import '../../css/vars.scss';
 
 .notif-container {
     display: flex;
@@ -27,13 +26,13 @@
 }
 
 ::ng-deep.mat-snack-bar-container.error-snackbar  {
-    color: $warn;
+    color: var(--maarch-color-danger);
     background: white;
-    border: solid 1px $warn;
+    border: solid 1px var(--maarch-color-danger);
 }
   
 ::ng-deep.mat-snack-bar-container.success-snackbar  {
-    color: $primary;
+    color: var(--maarch-color-primary);
     background: white;
-    border: solid 1px $primary;
+    border: solid 1px var(--maarch-color-primary);
 }

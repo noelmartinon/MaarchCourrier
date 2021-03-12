@@ -1,5 +1,3 @@
-@import 'vars.scss';
-
 // import all mixins and utils to create a theme
 @import './node_modules/@angular/material/theming';
 
@@ -10,9 +8,9 @@
 // theme colors
 // @function mat-palette($base-palette, $default: 500, $lighter: 100, $darker: 700)
 $mat-maarch-primary: (
-  100: lighten( $primary, 10% ),
-  500: $primary,
-  700: darken( $primary, 10% ),
+  100: var(--maarch-color-primary-light),
+  500: var(--maarch-color-primary),
+  700: var(--maarch-color-primary-dark),
   contrast: (
     100: $dark-primary-text,
     500: $light-primary-text,
@@ -21,9 +19,9 @@ $mat-maarch-primary: (
 );
 
 $mat-maarch-warn: (
-  100: lighten( $warn, 10% ),
-  500: $warn,
-  700: darken( $warn, 10% ),
+  100: var(--maarch-color-danger-light),
+  500: var(--maarch-color-danger),
+  700: var(--maarch-color-danger-dark),
   contrast: (
     100: $dark-primary-text,
     500: $light-primary-text,
@@ -32,9 +30,9 @@ $mat-maarch-warn: (
 );
 
 $mat-maarch-accent: (
-  100: lighten( $accent, 10% ),
-  500: $accent,
-  700: darken( $accent, 10% ),
+  100: var(--maarch-color-success-light),
+  500: var(--maarch-color-success),
+  700: var(--maarch-color-success-dark),
   contrast: (
     100: $dark-primary-text,
     500: $light-primary-text,
@@ -42,9 +40,9 @@ $mat-maarch-accent: (
   )
 );
 
-$primary: mat-palette($mat-maarch-primary,500);
-$accent: mat-palette($mat-maarch-accent,500);
-$warn: mat-palette($mat-maarch-warn,500);
+$primary: mat-palette($mat-maarch-primary, 500);
+$accent: mat-palette($mat-maarch-accent, 500);
+$warn: mat-palette($mat-maarch-warn, 500);
 
 // create theme from palettes
 $theme: mat-light-theme($primary, $accent, $warn);
@@ -52,60 +50,34 @@ $theme: mat-light-theme($primary, $accent, $warn);
 // apply theme
 @include angular-material-theme($theme);
 
-[color=primary], .primary {
-    color: mat-color($primary, 500);
-}
-
-[color=secondary], .secondary {
-  color: $secondary;
-}
-
-[color=warn], .warn {
-    color: mat-color($warn, 500);
-}
-
-[color=accent], .accent {
-    color: mat-color($accent, 500);
-}
-
-[bgcolor=primary] {
-  background-color: mat-color($primary, 500);
-}
-
-[bgcolor=warn] {
-  background-color: mat-color($warn, 500);
-}
-
-[bgcolor=accent] {
-  background-color: mat-color($accent, 500);
-}
-
 .jstree-proton .jstree-clicked {
-    background : mat-color($primary, 100) !important;
-}
-.jstree-proton :not(.jstree-disabled).jstree-hovered {
-    background: mat-color($primary, 100) !important;
-    box-shadow: inset 0 0 1px mat-color($primary, 500) !important;
-}
-.jstree-proton .jstree-disabled:hover {
-  cursor:not-allowed;
+  background: var(--maarch-color-primary-light) !important;
 }
 
-.dndFile{
+.jstree-proton :not(.jstree-disabled).jstree-hovered {
+  background: var(--maarch-color-primary-light) !important;
+  box-shadow: inset 0 0 1px var(--maarch-color-primary) !important;
+}
+
+.jstree-proton .jstree-disabled:hover {
+  cursor: not-allowed;
+}
+
+.dndFile {
   border: dashed 5px grey;
-  padding:10px;
-  text-align:center;
-  opacity:0.5;
-  font-size:15px;
-  font-weight:bolder;
-  margin:20px;
+  padding: 10px;
+  text-align: center;
+  opacity: 0.5;
+  font-size: 15px;
+  font-weight: bolder;
+  margin: 20px;
 
 }
 
 .dndFileHighlighted {
-  opacity : 1 !important;
-  border: dashed 5px mat-color($primary, 500) !important;
-  color : mat-color($primary, 500);
+  opacity: 1 !important;
+  border: dashed 5px var(--maarch-color-primary) !important;
+  color: var(--maarch-color-primary);
 }
 
 .cdk-textarea-autosize {

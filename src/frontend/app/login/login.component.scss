@@ -1,12 +1,11 @@
-@import '../../css/vars.scss';
 
 .login-container {
-    background-color: $primary;
+    background-color: var(--maarch-color-primary);
 }
 
 .login-content {
     opacity: 0;
-    background-color: $primary;
+    background-color: var(--maarch-color-primary);
     /* Keep the inherited background full size. */
     background-attachment: fixed;
     background-size: cover;

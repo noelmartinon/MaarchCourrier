@@ -370,11 +370,29 @@ class CollaboraOnlineController
             return $response->withStatus(400)->withJson(['errors' => 'Collabora discovery failed']);
         }
 
+        $version4 = false;
+        foreach ($discovery['headers'] as $header) {
+            if (strpos($header, 'UserAgent') !== false) {
+                $version4 = strpos($header, 'LOOLWSD WOPI Agent 4') !== false;
+            }
+        }
+
         $urlSrc = null;
-        foreach ($discovery['response']->{'net-zone'}->app as $app) {
-            if ($app->action['ext'] == $extension) {
-                $urlSrc = (string) $app->action['urlsrc'];
-                break;
+        if ($version4) {
+            foreach ($discovery['response']->{'net-zone'}->app as $app) {
+                if ($app->action['ext'] == $extension) {
+                    $urlSrc = (string) $app->action['urlsrc'];
+                    break;
+                }
+            }
+        } else {
+            foreach ($discovery['response']->{'net-zone'}->app as $app) {
+                foreach ($app->action as $action) {
+                    if ($action['ext'] == $extension) {
+                        $urlSrc = (string) $action['urlsrc'];
+                        break;
+                    }
+                }
             }
         }
 

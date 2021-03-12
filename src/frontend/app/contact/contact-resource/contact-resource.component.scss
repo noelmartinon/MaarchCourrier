@@ -1,4 +1,3 @@
-@import '../../../css/vars.scss';
 
 
 .contact-list-container {
@@ -47,7 +46,7 @@
 }
 
 .contact-header-image {
-    background: $primary;
+    background: var(--maarch-color-primary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -56,7 +55,7 @@
 }
 
 .contact-group {
-    color: $primary;
+    color: var(--maarch-color-primary);
     font-size: 16px !important;
     display: flex;
     align-items: center;
