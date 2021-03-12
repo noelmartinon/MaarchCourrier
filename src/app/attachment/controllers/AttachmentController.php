@@ -22,6 +22,7 @@ use Convert\controllers\ConvertThumbnailController;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
+use Email\models\EmailModel;
 use Group\controllers\PrivilegeController;
 use History\controllers\HistoryController;
 use Resource\controllers\ResController;
@@ -259,6 +260,38 @@ class AttachmentController
             'where' => ['res_id = ? or origin_id = ?'],
             'data'  => [$idToDelete, $idToDelete]
         ]);
+
+        $emails = EmailModel::get([
+            'select' => ['id', 'document'],
+            'where'  => ["status = 'DRAFT'"]
+        ]);
+        foreach ($emails as $key => $email) {
+            $emails[$key]['document'] = json_decode($email['document'], true);
+        }
+
+        $emails = array_filter($emails, function($email) { return !empty($email['document']['attachments']); });
+        $emails = array_filter($emails, function ($email) use ($idToDelete) {
+            $attachmentFound = false;
+            foreach ($email['document']['attachments'] as $attachment) {
+                if ($attachment['id'] == $idToDelete) {
+                    $attachmentFound = true;
+                }
+            }
+            return $attachmentFound;
+        });
+
+        foreach ($emails as $key => $email) {
+            $emails[$key]['document']['attachments'] = array_filter($emails[$key]['document']['attachments'], function ($attachment) use ($idToDelete){
+                return $attachment['id'] != $idToDelete;
+            });
+            $emails[$key]['document']['attachments'] = array_values($emails[$key]['document']['attachments']);
+            $encoded = json_encode($emails[$key]['document']);
+            EmailModel::update([
+                'set'   => ['document' => $encoded],
+                'where' => ['id = ?'],
+                'data'  => [$emails[$key]['id']]
+            ]);
+        }
 
         HistoryController::add([
             'tableName' => 'res_attachments',
