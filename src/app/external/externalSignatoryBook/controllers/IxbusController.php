@@ -355,7 +355,7 @@ class IxbusController
                 $aArgs['idsToRetrieve'][$version][$resId]['format']      = 'pdf';
                 $aArgs['idsToRetrieve'][$version][$resId]['encodedFile'] = $signedDocument['encodedDocument'];
                 if (!empty($folderData['data']['detailEtat'])) {
-                    $aArgs['idsToRetrieve'][$version][$resId]['notes'][] = ['content' => $folderData['data']['detailEtat']];
+                    $aArgs['idsToRetrieve'][$version][$resId]['noteContent'] = $folderData['data']['detailEtat'];
                 }
             } else {
                 unset($aArgs['idsToRetrieve'][$version][$resId]);
