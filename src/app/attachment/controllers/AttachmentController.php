@@ -37,7 +37,6 @@ use setasign\Fpdi\Tcpdf\Fpdi;
 use SignatureBook\controllers\SignatureBookController;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\controllers\CoreController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
@@ -267,19 +266,18 @@ class AttachmentController
 
         $emails = EmailModel::get([
             'select' => ['id', 'document'],
-            'where'  => ["status = 'DRAFT'"]
+            'where'  => ["status = 'DRAFT'", "document->>'id' = ?::varchar"],
+            'data'   => [$attachment['res_id_master']]
         ]);
         foreach ($emails as $key => $email) {
             $emails[$key]['document'] = json_decode($email['document'], true);
         }
 
-        $emails = array_filter($emails, function ($email) {
-            return !empty($email['document']['attachments']);
-        });
-        $emails = array_filter($emails, function ($email) use ($idToDelete) {
+        $emails = array_filter($emails, function($email) { return !empty($email['document']['attachments']); });
+        $emails = array_filter($emails, function ($email) use ($attachment) {
             $attachmentFound = false;
-            foreach ($email['document']['attachments'] as $attachment) {
-                if ($attachment['id'] == $idToDelete) {
+            foreach ($email['document']['attachments'] as $value) {
+                if ($value['id'] == $attachment['res_id'] || $value['id'] == $attachment['origin_id']) {
                     $attachmentFound = true;
                 }
             }
@@ -287,13 +285,12 @@ class AttachmentController
         });
 
         foreach ($emails as $key => $email) {
-            $emails[$key]['document']['attachments'] = array_filter($emails[$key]['document']['attachments'], function ($attachment) use ($idToDelete) {
-                return $attachment['id'] != $idToDelete;
+            $emails[$key]['document']['attachments'] = array_filter($emails[$key]['document']['attachments'], function ($element) use ($attachment){
+                return $element['id'] != $attachment['res_id'] && $element['id'] != $attachment['origin_id'];
             });
             $emails[$key]['document']['attachments'] = array_values($emails[$key]['document']['attachments']);
-            $encoded = json_encode($emails[$key]['document']);
             EmailModel::update([
-                'set'   => ['document' => $encoded],
+                'set'   => ['document' => json_encode($emails[$key]['document'])],
                 'where' => ['id = ?'],
                 'data'  => [$emails[$key]['id']]
             ]);

@@ -15,6 +15,7 @@
 
 namespace Note\controllers;
 
+use Email\models\EmailModel;
 use Note\models\NoteModel;
 use Note\models\NoteEntityModel;
 use Entity\models\EntityModel;
@@ -223,6 +224,38 @@ class NoteController
             'where' => ['note_id = ?'],
             'data'  => [$args['id']]
         ]);
+
+        $emails = EmailModel::get([
+            'select' => ['id', 'document'],
+            'where'  => ["status = 'DRAFT'", "document->>'id' = ?::varchar"],
+            'data'   => [$note['identifier']]
+        ]);
+        foreach ($emails as $key => $email) {
+            $emails[$key]['document'] = json_decode($email['document'], true);
+        }
+
+        $emails = array_filter($emails, function($email) { return !empty($email['document']['notes']); });
+        $emails = array_filter($emails, function ($email) use ($args) {
+            $noteFound = false;
+            foreach ($email['document']['notes'] as $id) {
+                if ($id == $args['id']) {
+                    $noteFound = true;
+                }
+            }
+            return $noteFound;
+        });
+
+        foreach ($emails as $key => $email) {
+            $emails[$key]['document']['notes'] = array_filter($emails[$key]['document']['notes'], function ($note) use ($args){
+                return $note != $args['id'];
+            });
+            $emails[$key]['document']['notes'] = array_values($emails[$key]['document']['notes']);
+            EmailModel::update([
+                'set'   => ['document' => json_encode($emails[$key]['document'])],
+                'where' => ['id = ?'],
+                'data'  => [$emails[$key]['id']]
+            ]);
+        }
 
         HistoryController::add([
             'tableName' => 'notes',

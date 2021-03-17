@@ -355,6 +355,7 @@ define("_PASSWORD_REINIT", "Mot de passe réinitialisé");
 define("_NOTIFICATIONS_USER_CREATION_SUBJECT", "[Maarch Courrier] Activer votre compte utilisateur");
 define("_NOTIFICATIONS_USER_CREATION_BODY", "Bienvenue,<br/><br/>Vous disposez maintenant d'un compte dans l'application de gestion électronique de courrier Maarch Courrier.<br/><br/>Pour vous connecter et définir votre mot de passe, merci de bien vouloir cliquer sur le lien ci-dessous :<br/><br/>");
 define("_CLICK_HERE", "Cliquez-ici pour définir votre mot de passe");
+define("_YOUR_ID", "<b>Votre identifiant :</b>");
 define("_NOTIFICATIONS_USER_CREATION_FOOTER", "<br/><br/>Ce message est envoyé automatiquement à la suite d'une action de l'administrateur.<br/>Merci de ne pas y répondre.<br/><br/>Pour toutes questions, merci de contacter l'administrateur technique de la solution.");
 
 define("_M2M_ANNUARY_IS_NOT_SET", "Aucun annuaire M2M paramétré");

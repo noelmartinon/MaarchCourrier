@@ -919,6 +919,22 @@ class ContactControllerTest extends TestCase
         $GLOBALS['id'] = $userInfo['id'];
     }
 
+    public function testGetCivilities()
+    {
+        $contactCivilityController = new \Contact\controllers\ContactCivilityController();
+
+        //  GET
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $response = $contactCivilityController->get($request, new \Slim\Http\Response());
+        $this->assertSame(200, $response->getStatusCode());
+        $responseBody = json_decode((string)$response->getBody(), true);
+
+        $this->assertIsArray($responseBody['civilities']);
+        $this->assertNotEmpty($responseBody['civilities']);
+    }
+
     public function testGetAvailableDepartments()
     {
         $contactController = new \Contact\controllers\ContactController();

@@ -359,6 +359,7 @@ define("_NOTIFICATIONS_USER_CREATION_SUBJECT", "[Maarch Courrier] Activate your 
 define("_NOTIFICATIONS_USER_CREATION_BODY", "Welcome,<br/><br/>You have now an account to Maarch Courrier.<br/><br/>To log in and set your password, please click on the link below :<br/><br/>_TO_TRANSLATE");
 define("_NOTIFICATIONS_USER_CREATION_FOOTER", "<br/><br/>This message is sent automatically as a result of an administrator action.<br/>Please do not answer.<br/><br/>For any questions, please contact your software administrator_TO_TRANSLATE");
 define("_CLICK_HERE", "Click-here_TO_TRANSLATE");
+define("_YOUR_ID", "<b>Your ID:</b>_TO_TRANSLATE");
 
 define("_M2M_ANNUARY_IS_NOT_SET", "M2M annuary is not set");//TO TRANSLATE
 define("_M2M_LDAP_AUTHENTICATION_FAILED", "M2M annuary authentication failed");//TO TRANSLATE

@@ -40,9 +40,9 @@ class ContactCivilityController
 
         if (empty($body)) {
             return $response->withStatus(400)->withJson(['errors' => 'Body is not set or empty']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['label'])) {
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['label'] ?? null)) {
             return $response->withStatus(400)->withJson(['errors' => 'Body label is empty or not a string']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['abbreviation'])) {
+        } elseif (!Validator::stringType()->length(1, 16)->notEmpty()->validate($body['abbreviation'] ?? null)) {
             return $response->withStatus(400)->withJson(['errors' => 'Body abbreviation is empty or not a string']);
         }
 
@@ -83,12 +83,11 @@ class ContactCivilityController
 
         if (empty($body)) {
             return $response->withStatus(400)->withJson(['errors' => 'Body is not set or empty']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['label'])) {
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['label'] ?? null)) {
             return $response->withStatus(400)->withJson(['errors' => 'Body label is empty or not a string']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['abbreviation'])) {
+        } elseif (!Validator::stringType()->length(1, 16)->notEmpty()->validate($body['abbreviation'] ?? null)) {
             return $response->withStatus(400)->withJson(['errors' => 'Body abbreviation is empty or not a string']);
         }
-
 
         ContactCivilityModel::update([
             'set'   => [

@@ -2,7 +2,7 @@
 .active, .active:hover , .active:active, .active:focus {
     color: var(--maarch-color-primary);
     border-left: solid 5px var(--maarch-color-primary);
-    background: rgba(var(--maarch-color-primary), 0.14);
+    background: var(--maarch-color-primary-opacity-10);
 }
 
 .paginatorResultList {
@@ -25,7 +25,7 @@
 }
 
 .selected {
-    background: rgba(var(--maarch-color-primary), 0.14);
+    background: var(--maarch-color-primary-opacity-10);
 }
 
 ::ng-deep.correspondentsGroupMenuMenu {

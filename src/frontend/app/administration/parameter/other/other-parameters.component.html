@@ -15,7 +15,8 @@
                             [formControl]="editorsConf[editor][info.key]">
                     </mat-form-field>
                     <mat-slide-toggle style="height:40px;" *ngIf="info.key === 'ssl'" color="primary"
-                        [formControl]="editorsConf[editor][info.key]">{{'lang.' + info.key | translate}}</mat-slide-toggle>
+                        [formControl]="editorsConf[editor][info.key]">{{'lang.' + info.key | translate}}
+                    </mat-slide-toggle>
                 </ng-container>
                 <div style="display: flex;justify-content: center;">
                     <button mat-button color="warn" mat-raised-button (click)="removeEditor(i)">
@@ -43,7 +44,8 @@
                 {{'lang.documentsWatermark' | translate}}
             </mat-panel-title>
         </mat-expansion-panel-header>
-        <mat-slide-toggle style="height:40px;" color="primary" [formControl]="watermark.enabled">{{(watermark.enabled.value ? 'lang.enabled' : 'lang.disabled') | translate}}
+        <mat-slide-toggle style="height:40px;" color="primary" [formControl]="watermark.enabled">
+            {{(watermark.enabled.value ? 'lang.enabled' : 'lang.disabled') | translate}}
         </mat-slide-toggle>
         <mat-form-field appearance="outline">
             <mat-label>{{'lang.content' |translate}}</mat-label>
@@ -56,22 +58,25 @@
             </div>
             <div
                 style="padding-top: 1.25em;width: 100%;display: grid;grid-template-columns: 1fr 1fr auto;grid-gap: 10px;">
-                <mat-form-field>
-                    <mat-label>{{'lang.font' |translate}}</mat-label>
-                    <input matInput type="text" [formControl]="watermark.font">
-                </mat-form-field>
+                <plugin-select-search [id]="'font'" [label]="'lang.font' | translate" [class]="''"
+                    [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="watermark.font"
+                    [datas]="fonts" [showLabel]="true" style="width:100%;">
+                </plugin-select-search>
                 <mat-form-field>
                     <mat-label>{{'lang.size' |translate}}</mat-label>
                     <input matInput type="number" [formControl]="watermark.size">
                     <span matSuffix class="input-suffix">px</span>
                 </mat-form-field>
-                <button mat-icon-button matSuffix [title]="'lang.color' | translate"
-                    (click)="$event.stopPropagation()" [matMenuTriggerFor]="menuColor">
-                    <mat-icon class="fa fa-circle" [style.color]="'rgb('+watermark.color.value[0]+', '+watermark.color.value[1]+', '+watermark.color.value[2]+')'"></mat-icon>
+                <button mat-icon-button matSuffix [title]="'lang.color' | translate" (click)="$event.stopPropagation()"
+                    [matMenuTriggerFor]="menuColor">
+                    <mat-icon class="fa fa-circle"
+                        [style.color]="'rgb('+watermark.color.value[0]+', '+watermark.color.value[1]+', '+watermark.color.value[2]+')'">
+                    </mat-icon>
                 </button>
                 <mat-menu #menuColor="matMenu">
-                    <color-github [color]="{ r: watermark.color[0], g: watermark.color[1], b: watermark.color[2] }" width="100%" [colors]="colors"
-                        [triangle]="'hide'" (onChangeComplete)="handleChange($event)"></color-github>
+                    <color-github [color]="{ r: watermark.color[0], g: watermark.color[1], b: watermark.color[2] }"
+                        width="100%" [colors]="colors" [triangle]="'hide'" (onChangeComplete)="handleChange($event)">
+                    </color-github>
                 </mat-menu>
             </div>
         </div>

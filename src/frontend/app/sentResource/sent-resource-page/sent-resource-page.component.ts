@@ -90,6 +90,7 @@ export class SentResourcePageComponent implements OnInit {
     canManage: boolean = false;
     pdfMode: boolean = false;
     htmlMode: boolean = true;
+    sendmailClone: any;
 
     @ViewChild('recipientsField', { static: true }) recipientsField: ElementRef<HTMLInputElement>;
     @ViewChild('copiesField', { static: false }) copiesField: ElementRef<HTMLInputElement>;
@@ -146,6 +147,9 @@ export class SentResourcePageComponent implements OnInit {
         // this.loading = false;
         setTimeout(() => {
             this.initMce();
+            setTimeout(() => {
+                this.sendmailClone = JSON.stringify(this.formatEmail());
+            }, 500);
         }, 0);
     }
 
@@ -736,7 +740,7 @@ export class SentResourcePageComponent implements OnInit {
     }
 
     saveDraft() {
-        if (this.canManageMail()) {
+        if (this.canManageMail() && this.sendmailClone !== JSON.stringify(this.formatEmail())) {
             this.emailStatus = 'DRAFT';
             if (this.data.emailId === null) {
                 if (!this.functions.empty(tinymce.get('emailSignature').getContent())) {

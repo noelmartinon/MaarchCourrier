@@ -31,7 +31,7 @@
                         En attente de réception
                     </span>
                     <span *ngIf="row.status === 'WAITING'" style="flex:1;color:orange;font-weight: bold;">
-                        {{'lang.emailSendInProgress' | translate}}
+                        {{'lang.emailSendInProgressShort' | translate}}
                     </span>
                     <span *ngIf="row.status === 'ERROR'" style="flex:1;color:red;font-weight: bold;">
                         {{'lang.notSent' | translate}}

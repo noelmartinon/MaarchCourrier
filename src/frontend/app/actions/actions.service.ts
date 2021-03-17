@@ -495,6 +495,7 @@ export class ActionsService implements OnDestroy {
 
     disabledBasketPersistenceAction(options: any = null) {
         const dialogRef = this.dialog.open(DisabledBasketPersistenceActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',
             data: this.setDatasActionToSend()
@@ -517,6 +518,7 @@ export class ActionsService implements OnDestroy {
 
     enabledBasketPersistenceAction(options: any = null) {
         const dialogRef = this.dialog.open(EnabledBasketPersistenceActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',
             data: this.setDatasActionToSend()
@@ -539,6 +541,7 @@ export class ActionsService implements OnDestroy {
 
     resMarkAsReadAction(options: any = null) {
         const dialogRef = this.dialog.open(ResMarkAsReadActionComponent, {
+            panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',
             data: this.setDatasActionToSend()

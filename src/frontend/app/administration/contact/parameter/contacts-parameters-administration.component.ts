@@ -104,7 +104,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
                         } else {
                             this.civilities[index][elementId].valueChanges
                             .pipe(
-                                debounceTime(300),
+                                debounceTime(1000),
                                 tap(() => {
                                     this.updateCivility(this.civilities[index]);
                                 }),
@@ -122,6 +122,9 @@ export class ContactsParametersAdministrationComponent implements OnInit {
 
     updateCivility(civility: any) {
         this.http.put(`../rest/civilities/${civility.id.value}`, this.formatCivilityData(civility)).pipe(
+            tap(() => {
+                this.notify.success(this.translate.instant('lang.civilityUpdated'));
+            }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
@@ -153,7 +156,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
                     } else {
                         newCivility[elementId].valueChanges
                         .pipe(
-                            debounceTime(300),
+                            debounceTime(1000),
                             tap(() => {
                                 this.updateCivility(newCivility);
                             }),
@@ -161,6 +164,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
                     }
                 });
                 this.civilities.push(newCivility);
+                this.notify.success(this.translate.instant('lang.civilityAdded'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -178,6 +182,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
             exhaustMap(() => this.http.delete(`../rest/civilities/${civility.id.value}`)),
             tap(() => {
                 this.civilities.splice(index, 1);
+                this.notify.success(this.translate.instant('lang.civilityDeleted'));
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);

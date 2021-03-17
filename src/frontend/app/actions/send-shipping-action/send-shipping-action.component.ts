@@ -9,12 +9,11 @@ import { of } from 'rxjs';
 import { FunctionsService } from '@service/functions.service';
 
 @Component({
-    templateUrl: "send-shipping-action.component.html",
+    templateUrl: 'send-shipping-action.component.html',
     styleUrls: ['send-shipping-action.component.scss'],
 })
 export class SendShippingActionComponent implements OnInit {
 
-    
     loading: boolean = false;
 
     shippings: any[] = [{
@@ -50,9 +49,9 @@ export class SendShippingActionComponent implements OnInit {
 
     constructor(
         public translate: TranslateService,
-        public http: HttpClient, 
-        private notify: NotificationService, 
-        public dialogRef: MatDialogRef<SendShippingActionComponent>, 
+        public http: HttpClient,
+        private notify: NotificationService,
+        public dialogRef: MatDialogRef<SendShippingActionComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public functions: FunctionsService) { }
 
@@ -64,7 +63,7 @@ export class SendShippingActionComponent implements OnInit {
 
     onSubmit() {
         this.loading = true;
-        if ( this.data.resIds.length > 0) {
+        if (this.data.resIds.length > 0) {
             this.executeAction();
         }
     }
@@ -76,10 +75,10 @@ export class SendShippingActionComponent implements OnInit {
                     this.fatalError = data;
                     this.shippings = [];
                 } else {
-                    this.shippings    = data.shippingTemplates;
+                    this.shippings = data.shippingTemplates;
                     this.mailsNotSend = data.canNotSend;
                     this.entitiesList = data.entities;
-                    this.attachList   = data.resources;
+                    this.attachList = data.resources;
                     this.invalidEntityAddress = data.invalidEntityAddress;
                 }
             }),
@@ -89,7 +88,7 @@ export class SendShippingActionComponent implements OnInit {
                 this.dialogRef.close();
                 return of(false);
             })
-        ).subscribe()
+        ).subscribe();
     }
 
     executeAction() {
@@ -97,7 +96,7 @@ export class SendShippingActionComponent implements OnInit {
 
         realResSelected = realResSelected.concat(this.attachList.filter(attach => attach.type === 'mail').map((e: any) => { return e.res_id; }));
 
-        this.http.put(this.data.processActionRoute, {resources : realResSelected, data: { shippingTemplateId: this.currentShipping.id }, note : this.noteEditor.getNote()}).pipe(
+        this.http.put(this.data.processActionRoute, { resources: realResSelected, data: { shippingTemplateId: this.currentShipping.id }, note: this.noteEditor.getNote() }).pipe(
             tap((data: any) => {
                 if (data && data.errors != null) {
                     this.notify.error(data.errors);
@@ -114,7 +113,7 @@ export class SendShippingActionComponent implements OnInit {
     }
 
     toggleIntegration(integrationId: string) {
-        this.http.put(`../rest/resourcesList/integrations`, {resources : this.data.resIds, integrations : { [integrationId] : !this.data.resource.integrations[integrationId]}}).pipe(
+        this.http.put(`../rest/resourcesList/integrations`, { resources: this.data.resIds, integrations: { [integrationId]: !this.data.resource.integrations[integrationId] } }).pipe(
             tap(() => {
                 this.data.resource.integrations[integrationId] = !this.data.resource.integrations[integrationId];
                 this.checkShipping();
@@ -126,4 +125,11 @@ export class SendShippingActionComponent implements OnInit {
         ).subscribe();
     }
 
+    isValid() {
+        if (['digital_registered_mail', 'digital_registered_mail'].indexOf(this.currentShipping?.options?.sendMode) > -1) {
+            return this.currentShipping !== null && this.attachList.length > 0  && this.attachList.length > this.mailsNotSend.length && !this.invalidEntityAddress;
+        } else {
+            return this.currentShipping !== null && this.attachList.length > 0 && this.attachList.length > this.mailsNotSend.length;
+        }
+    }
 }

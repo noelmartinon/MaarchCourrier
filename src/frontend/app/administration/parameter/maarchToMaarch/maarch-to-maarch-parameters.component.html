@@ -1,5 +1,6 @@
 <ng-container *ngIf="!loading; else elseTemplate">
-    <app-maarch-message [content]="'lang.maarch2maarchDesc' | translate : {url : maarch2maarchUrl}"></app-maarch-message>
+    <app-maarch-message [content]="'lang.maarch2maarchDesc' | translate : {url : maarch2maarchUrl}">
+    </app-maarch-message>
     <div class="formType" style="margin-top: 20px;">
         <div class="formType-title">
             {{('lang.communicationMeans' | translate)}}
@@ -22,11 +23,19 @@
             {{'lang.m2mSection1' | translate}}
         </div>
         <div style="width: 100%;">
-            <mat-form-field>
-                <mat-label>{{'lang.redirectToBasketAfterIndexing' | translate}}</mat-label>
-                <input matInput [formControl]="basketToRedirect">
-                <mat-hint align="end" [innerHTML]="'lang.basketId' | translate"></mat-hint>
-            </mat-form-field>
+            <ng-container *ngIf="privilegeService.hasCurrentUserPrivilege('admin_baskets'); else elseNoAdminBaskets">
+                <plugin-select-search [id]="'basketToRedirect'" [label]="'lang.redirectToBasketAfterIndexing' | translate" [class]="''"
+                    [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="basketToRedirect"
+                    [datas]="baskets" [showLabel]="true" style="width:100%;">
+                </plugin-select-search>
+            </ng-container>
+            <ng-template #elseNoAdminBaskets>
+                <mat-form-field>
+                    <mat-label>{{'lang.redirectToBasketAfterIndexing' | translate}}</mat-label>
+                    <input matInput [formControl]="basketToRedirect">
+                    <mat-hint align="end" [innerHTML]="'lang.basketId' | translate"></mat-hint>
+                </mat-form-field>
+            </ng-template>
         </div>
     </div>
     <div class="formType" style="margin-top: 20px;">

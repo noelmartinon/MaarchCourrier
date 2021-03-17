@@ -62,7 +62,7 @@ export class DashboardService {
             views: [
                 {
                     id: 'list',
-                    route: '/process/users/:userId/groups/:groupId/baskets/:basketId/resId/:resId',
+                    route: ':basketRoute',
                     viewDocRoute: '/resources/:resId/thumbnail'
                 },
                 {
@@ -280,7 +280,7 @@ export class DashboardService {
 
     getFormatedRoute(route: string, data: any) {
         const regex = /:\w*/g;
-        const res = route.match(regex);
+        let  res = route.match(regex);
 
         let formatedRoute = route;
         let errors = [];
@@ -306,10 +306,16 @@ export class DashboardService {
                     objParams[arrUriParams[index]] = arrUriParams[index + 1];
                 }
             }
-            return {
-                route: splitFormatedRoute[0],
-                params: objParams
-            };
+
+            res = splitFormatedRoute[0].match(regex);
+            if (res) {
+                return this.getFormatedRoute(splitFormatedRoute[0], data);
+            } else {
+                return {
+                    route: splitFormatedRoute[0],
+                    params: objParams
+                };
+            }
         } else {
             this.notify.error(errors + ' not found');
             return false;

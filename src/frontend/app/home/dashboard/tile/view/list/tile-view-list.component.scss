@@ -34,7 +34,7 @@
 }
 
 .resource-link:hover{
-    background: rgba(var(--maarch-color-primary),0.1);
+    background: var(--maarch-color-primary-opacity-10);
     transition: all 0.2s;
 }
 

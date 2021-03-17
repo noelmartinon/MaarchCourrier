@@ -25,6 +25,7 @@ export class AttachmentTypeAdministrationComponent implements OnInit {
         typeId: new FormControl({ value: '', disabled: false }, [Validators.required]),
         label: new FormControl({ value: '', disabled: false }, [Validators.required]),
         visible: new FormControl({ value: true, disabled: false }),
+        chrono: new FormControl({ value: true, disabled: false }),
         emailLink: new FormControl({ value: false, disabled: false }),
         signable: new FormControl({ value: false, disabled: false }),
         icon: new FormControl({ value: '', disabled: false }),

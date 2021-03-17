@@ -15,6 +15,7 @@
 namespace Resource\controllers;
 
 use Attachment\models\AttachmentModel;
+use Configuration\models\ConfigurationModel;
 use Resource\models\ResModel;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use SrcCore\models\CoreConfigModel;
@@ -28,12 +29,12 @@ class WatermarkController
         ValidatorModel::intVal($args, ['resId']);
         ValidatorModel::stringType($args, ['path']);
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/features.xml']);
-        if (empty($loadedXml)) {
+        $configuration = ConfigurationModel::getByPrivilege(['select' => ['value'], 'privilege' => 'admin_parameters_watermark']);
+        if (empty($configuration)) {
             return null;
         }
 
-        $watermark = (array)$loadedXml->FEATURES->watermark;
+        $watermark = json_decode($configuration['value'], true);
         if ($watermark['enabled'] != 'true') {
             return null;
         } elseif (empty($watermark['text'])) {
@@ -54,27 +55,9 @@ class WatermarkController
             $text = str_replace("[{$value}]", $tmp, $text);
         }
 
-        $color = ['192', '192', '192']; //RGB
-        if (!empty($watermark['text_color'])) {
-            $rawColor = explode(',', $watermark['text_color']);
-            $color = count($rawColor) == 3 ? $rawColor : $color;
-        }
-
-        $font = ['helvetica', '10']; //Familly Size
-        if (!empty($watermark['font'])) {
-            $rawFont = explode(',', $watermark['font']);
-            $font = count($rawFont) == 2 ? $rawFont : $font;
-        }
-
-        $position = [30, 35, 0, 0.5]; //X Y Angle Opacity
-        if (!empty($watermark['position'])) {
-            $rawPosition = explode(',', $watermark['position']);
-            $position = count($rawPosition) == 4 ? $rawPosition : $position;
-        }
-
         $libDir = CoreConfigModel::getLibrariesDirectory();
         if (!empty($libDir) && is_file($libDir . 'SetaPDF-FormFiller-Full/library/SetaPDF/Autoload.php')) {
-            require_once ($libDir . 'SetaPDF-FormFiller-Full/library/SetaPDF/Autoload.php');
+            require_once($libDir . 'SetaPDF-FormFiller-Full/library/SetaPDF/Autoload.php');
 
             $flattenedFile = CoreConfigModel::getTmpPath() . "tmp_file_{$GLOBALS['id']}_" .rand(). "_watermark.pdf";
             $writer = new \SetaPDF_Core_Writer_File($flattenedFile);
@@ -97,11 +80,11 @@ class WatermarkController
                 $size = $pdf->getTemplateSize($page);
                 $pdf->AddPage($size['orientation'], $size);
                 $pdf->useImportedPage($page);
-                $pdf->SetFont($font[0], '', $font[1]);
-                $pdf->SetTextColor($color[0], $color[1], $color[2]);
-                $pdf->SetAlpha($position[3]);
-                $pdf->Rotate($position[2]);
-                $pdf->Text($position[0], $position[1], $text);
+                $pdf->SetFont($watermark['font'], '', $watermark['size']);
+                $pdf->SetTextColor($watermark['color'][0], $watermark['color'][1], $watermark['color'][2]);
+                $pdf->SetAlpha($watermark['opacity']);
+                $pdf->Rotate($watermark['angle']);
+                $pdf->Text($watermark['posX'], $watermark['posY'], $text);
             }
             $fileContent = $pdf->Output('', 'S');
         } catch (\Exception $e) {
@@ -170,7 +153,7 @@ class WatermarkController
 
         $libDir = CoreConfigModel::getLibrariesDirectory();
         if (!empty($libDir) && is_file($libDir . 'SetaPDF-FormFiller-Full/library/SetaPDF/Autoload.php')) {
-            require_once ($libDir . 'SetaPDF-FormFiller-Full/library/SetaPDF/Autoload.php');
+            require_once($libDir . 'SetaPDF-FormFiller-Full/library/SetaPDF/Autoload.php');
 
             $flattenedFile = CoreConfigModel::getTmpPath() . "tmp_file_{$GLOBALS['id']}_" .rand(). "_watermark.pdf";
             $writer = new \SetaPDF_Core_Writer_File($flattenedFile);

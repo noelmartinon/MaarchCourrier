@@ -795,15 +795,16 @@ class AuthenticationController
         } else {
             $sender = $args['userEmail'];
         }
+        $user = UserModel::getById(['select' => ['user_id'], 'id' => $args['userId']]);
         EmailController::createEmail([
             'userId'    => $args['userId'],
             'data'      => [
-                'sender'        => ['email' => $sender],
-                'recipients'    => [$args['userEmail']],
-                'object'        => _NOTIFICATIONS_USER_CREATION_SUBJECT,
-                'body'          => _NOTIFICATIONS_USER_CREATION_BODY . '<a href="' . $url . '">'._CLICK_HERE.'</a>' . _NOTIFICATIONS_USER_CREATION_FOOTER,
-                'isHtml'        => true,
-                'status'        => 'WAITING'
+                'sender'     => ['email' => $sender],
+                'recipients' => [$args['userEmail']],
+                'object'     => _NOTIFICATIONS_USER_CREATION_SUBJECT,
+                'body'       => _NOTIFICATIONS_USER_CREATION_BODY . '<a href="' . $url . '">'._CLICK_HERE.'</a><br/><br/>' . _YOUR_ID . ' ' . $user['user_id'] . _NOTIFICATIONS_USER_CREATION_FOOTER,
+                'isHtml'     => true,
+                'status'     => 'WAITING'
             ]
         ]);
 

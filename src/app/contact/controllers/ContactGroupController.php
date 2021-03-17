@@ -465,7 +465,7 @@ class ContactGroupController
     public function addCorrespondents(Request $request, Response $response, array $args)
     {
         if (!ContactGroupController::hasRightById(['id' => $args['id'], 'userId' => $GLOBALS['id'], 'canUpdate' => true])) {
-            if (!ContactGroupController::hasRightById(['id' => $args['id'], 'userId' => $GLOBALS['id']]) || !PrivilegeController::hasPrivilege(['privilegeId' => 'add_correspondent_in_shared_groups_on_profile', 'userId' => $args['userId']])) {
+            if (!ContactGroupController::hasRightById(['id' => $args['id'], 'userId' => $GLOBALS['id']]) || !PrivilegeController::hasPrivilege(['privilegeId' => 'add_correspondent_in_shared_groups_on_profile', 'userId' => $GLOBALS['id']])) {
                 return $response->withStatus(403)->withJson(['errors' => 'Contacts group out of perimeter']);
             }
         }
@@ -516,7 +516,7 @@ class ContactGroupController
     public function deleteCorrespondents(Request $request, Response $response, array $args)
     {
         if (!ContactGroupController::hasRightById(['id' => $args['id'], 'userId' => $GLOBALS['id'], 'canUpdate' => true])) {
-            if (!ContactGroupController::hasRightById(['id' => $args['id'], 'userId' => $GLOBALS['id']]) || !PrivilegeController::hasPrivilege(['privilegeId' => 'add_correspondent_in_shared_groups_on_profile', 'userId' => $args['userId']])) {
+            if (!ContactGroupController::hasRightById(['id' => $args['id'], 'userId' => $GLOBALS['id']]) || !PrivilegeController::hasPrivilege(['privilegeId' => 'add_correspondent_in_shared_groups_on_profile', 'userId' => $GLOBALS['id']])) {
                 return $response->withStatus(403)->withJson(['errors' => 'Contacts group out of perimeter']);
             }
         }
@@ -609,13 +609,11 @@ class ContactGroupController
         } else {
             $wherePerimeter = 'owner = ?';
             $data[] = $GLOBALS['id'];
-            if ($hasPrivilege) {
-                $userEntities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id']]);
 
-                foreach ($userEntities as $userEntity) {
-                    $wherePerimeter .= ' OR entities @> ?';
-                    $data[] = json_encode($userEntity['id']);
-                }
+            $userEntities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id']]);
+            foreach ($userEntities as $userEntity) {
+                $wherePerimeter .= ' OR entities @> ?';
+                $data[] = json_encode($userEntity['id']);
             }
 
             $where[] = "({$wherePerimeter})";
@@ -626,12 +624,18 @@ class ContactGroupController
         $where[] = 'correspondent_type = ?';
         $data[] = $queryParams['correspondentId'];
         $data[] = $queryParams['correspondentType'];
-        $contactsgroupsWhereContactIs = ContactGroupModel::getWithList(['select' => ['contacts_groups.id', 'contacts_groups.label'], 'where' => $where, 'data' => $data]);
+        $contactsgroupsWhereContactIs = ContactGroupModel::getWithList(['select' => ['contacts_groups.id', 'contacts_groups.label', 'contacts_groups.owner'], 'where' => $where, 'data' => $data]);
         $contactsGroups = [];
         foreach ($contactsgroupsWhereContactIs as $value) {
+            $canUpdateCorrespondents = false;
+            if ($hasAdmin || $hasPrivilege || $value['owner'] == $GLOBALS['id']) {
+                $canUpdateCorrespondents = true;
+            }
+
             $contactsGroups[] = [
-                'id'    => $value['id'],
-                'label' => $value['label']
+                'id'                        => $value['id'],
+                'label'                     => $value['label'],
+                'canUpdateCorrespondents'   => $canUpdateCorrespondents
             ];
         }
 

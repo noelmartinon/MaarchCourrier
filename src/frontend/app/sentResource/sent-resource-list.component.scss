@@ -97,7 +97,7 @@
     transition: all 0.5s;
 
     &:hover {
-        background: rgba(var(--maarch-color-primary), 0.1);
+        background: var(--maarch-color-primary-opacity-10);
         transition: all 0.5s;
     }
 }
@@ -130,5 +130,5 @@
 
 .waitingSent {
     cursor: not-allowed;
-    background: rgba(var(--maarch-color-primary), 0.1);
+    background: var(--maarch-color-primary-opacity-10);
 }

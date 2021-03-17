@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
-import { FormControl } from '@angular/forms';
-import { catchError, debounceTime, filter, tap } from 'rxjs/operators';
+import { FormControl, Validators } from '@angular/forms';
+import { catchError, debounceTime, filter, map, tap } from 'rxjs/operators';
 import { ColorEvent } from 'ngx-color';
+import { FunctionsService } from '@service/functions.service';
 import {
     amber,
     blue,
@@ -41,16 +42,15 @@ export class OtherParametersComponent implements OnInit {
         java: {},
         onlyoffice: {
             ssl: new FormControl(false),
-            uri: new FormControl('192.168.0.11'),
-            port: new FormControl(8765),
+            uri: new FormControl('192.168.0.11', [Validators.required]),
+            port: new FormControl(8765, [Validators.required]),
             token: new FormControl(''),
             authorizationHeader: new FormControl('Authorization')
         },
         collaboraonline: {
             ssl: new FormControl(false),
-            uri: new FormControl('192.168.0.11'),
-            port: new FormControl(9980),
-            lang: new FormControl('fr-FR')
+            uri: new FormControl('192.168.0.11', [Validators.required]),
+            port: new FormControl(9980, [Validators.required]),
         }
     };
 
@@ -66,7 +66,66 @@ export class OtherParametersComponent implements OnInit {
         color: new FormControl([20, 192, 30]),
     };
 
-    editorsEnabled = ['java', 'onlyoffice'];
+    editorsEnabled = [];
+
+    fonts = [
+        {
+            id: 'courier',
+            label: 'courier'
+        },
+        {
+            id: 'courierB',
+            label: 'courierB'
+        },
+        {
+            id: 'courierI',
+            label: 'courierI'
+        },
+        {
+            id: 'courierBI',
+            label: 'courierBI'
+        },
+        {
+            id: 'helvetica',
+            label: 'helvetica'
+        },
+        {
+            id: 'helveticaB',
+            label: 'helveticaB'
+        },
+        {
+            id: 'helveticaI',
+            label: 'helveticaI'
+        },
+        {
+            id: 'helveticaBI',
+            label: 'helveticaBI'
+        },
+        {
+            id: 'times',
+            label: 'times'
+        },
+        {
+            id: 'timesB',
+            label: 'timesB'
+        },
+        {
+            id: 'timesI',
+            label: 'timesI'
+        },
+        {
+            id: 'timesBI',
+            label: 'timesBI'
+        },
+        {
+            id: 'symbol',
+            label: 'symbol'
+        },
+        {
+            id: 'zapfdingbats',
+            label: 'zapfdingbats'
+        }
+    ];
 
     colors: string[] = [
         red['900'],
@@ -166,15 +225,19 @@ export class OtherParametersComponent implements OnInit {
         public http: HttpClient,
         private dialog: MatDialog,
         private notify: NotificationService,
+        public functions: FunctionsService,
     ) { }
 
-    ngOnInit() {
+    async ngOnInit() {
+        await this.getWatermarkConfiguration();
+        await this.getEditorsConfiguration();
         Object.keys(this.editorsConf).forEach(editorId => {
             Object.keys(this.editorsConf[editorId]).forEach((elementId: any) => {
                 this.editorsConf[editorId][elementId].valueChanges
                     .pipe(
-                        debounceTime(300),
-                        tap((value: any) => {
+                        debounceTime(1000),
+                        filter(() => this.editorsConf[editorId][elementId].valid),
+                        tap(() => {
                             this.saveConfEditor();
                         }),
                     ).subscribe();
@@ -183,11 +246,51 @@ export class OtherParametersComponent implements OnInit {
         Object.keys(this.watermark).forEach(elemId => {
             this.watermark[elemId].valueChanges
                 .pipe(
-                    debounceTime(300),
+                    debounceTime(1000),
                     tap((value: any) => {
                         this.saveWatermarkConf();
                     }),
                 ).subscribe();
+        });
+    }
+
+    getWatermarkConfiguration() {
+        return new Promise((resolve, reject) => {
+            this.http.get(`../rest/watermark/configuration`).pipe(
+                tap((data: any) => {
+                    if (!this.functions.empty(data.configuration)) {
+                        this.watermark = {
+                            enabled: new FormControl(data.configuration.enabled),
+                            text: new FormControl(data.configuration.text),
+                            posX: new FormControl(data.configuration.posX),
+                            posY: new FormControl(data.configuration.posY),
+                            angle: new FormControl(data.configuration.angle),
+                            opacity: new FormControl(data.configuration.opacity),
+                            font: new FormControl(data.configuration.font),
+                            size: new FormControl(data.configuration.size),
+                            color: new FormControl(data.configuration.color),
+                        };
+                    }
+                    resolve(true);
+                })
+            ).subscribe();
+        });
+    }
+
+    getEditorsConfiguration() {
+        return new Promise((resolve, reject) => {
+            this.http.get(`../rest/configurations/admin_document_editors`).pipe(
+                map((data: any) => data.configuration.value),
+                tap((data: any) => {
+                    Object.keys(data).forEach(confId => {
+                        this.editorsEnabled.push(confId);
+                        Object.keys(data[confId]).forEach(itemId => {
+                            this.editorsConf[confId][itemId].setValue(data[confId][itemId]);
+                        });
+                    });
+                    resolve(true);
+                })
+            ).subscribe();
         });
     }
 
@@ -218,7 +321,6 @@ export class OtherParametersComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
-        
     }
 
     getAvailableEditors() {
@@ -232,23 +334,27 @@ export class OtherParametersComponent implements OnInit {
     }
 
     saveWatermarkConf() {
-        console.log(this.formatWatermarkConfig());
-
-        /*this.http.put(`../rest/configurations/documentEditor`, this.formatEditorsConfig()).pipe(
+        this.http.put(`../rest/watermark/configuration`, this.formatWatermarkConfig()).pipe(
+            tap(() => {
+                this.notify.success(this.translate.instant('lang.dataUpdated'));
+            }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
-            })*/
+            })
+        ).subscribe();
     }
 
     saveConfEditor() {
-        console.log(this.formatEditorsConfig());
-
-        /*this.http.put(`../rest/configurations/documentEditor`, this.formatEditorsConfig()).pipe(
+        this.http.put(`../rest/configurations/admin_document_editors`, this.formatEditorsConfig()).pipe(
+            tap(() => {
+                this.notify.success(this.translate.instant('lang.dataUpdated'));
+            }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
-            })*/
+            })
+        ).subscribe();
     }
 
     formatWatermarkConfig() {
@@ -262,7 +368,7 @@ export class OtherParametersComponent implements OnInit {
 
     formatEditorsConfig() {
         const obj: any = {};
-        Object.keys(this.editorsConf).forEach(id => {
+        this.editorsEnabled.forEach(id => {
             if (this.editorsEnabled.indexOf(id) > -1) {
                 obj[id] = {};
                 Object.keys(this.editorsConf[id]).forEach(elemId => {

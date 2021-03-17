@@ -17,6 +17,7 @@ namespace Home\controllers;
 use Action\models\ActionModel;
 use Attachment\models\AttachmentTypeModel;
 use Basket\models\BasketModel;
+use Basket\models\GroupBasketModel;
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
 use CustomField\models\CustomFieldModel;
@@ -295,9 +296,24 @@ class TileController
     private static function getShortDetails(array &$tile)
     {
         if ($tile['type'] == 'basket') {
-            $basket = BasketModel::getById(['select' => ['basket_name'], 'id' => $tile['parameters']['basketId']]);
-            $group  = GroupModel::getById(['select' => ['group_desc'], 'id' => $tile['parameters']['groupId']]);
+            $basket = BasketModel::getById(['select' => ['basket_name', 'basket_id'], 'id' => $tile['parameters']['basketId']]);
+            $group  = GroupModel::getById(['select' => ['group_desc', 'group_id'], 'id' => $tile['parameters']['groupId']]);
             $tile['label'] = "{$basket['basket_name']} ({$group['group_desc']})";
+
+            $groupBasket = GroupBasketModel::get([
+                'select' => ['list_event'],
+                'where'  => ['basket_id = ?', 'group_id = ?'],
+                'data'   => [$basket['basket_id'], $group['group_id']]
+            ]);
+            
+            $tile['basketRoute'] = null;
+            if ($groupBasket[0]['list_event'] == 'processDocument') {
+                $tile['basketRoute'] = '/process/users/:userId/groups/:groupId/baskets/:basketId/resId/:resId';
+            } elseif ($groupBasket[0]['list_event'] == 'documentDetails') {
+                $tile['basketRoute'] = '/resources/:resId';
+            } elseif ($groupBasket[0]['list_event'] == 'signatureBookAction') {
+                $tile['basketRoute'] = '/signatureBook/users/:userId/groups/:groupId/baskets/:basketId/resources/:resId';
+            }
         } elseif ($tile['type'] == 'folder') {
             $folder = FolderModel::getById(['select' => ['label'], 'id' => $tile['parameters']['folderId']]);
             $tile['label'] = "{$folder['label']}";
@@ -330,7 +346,10 @@ class TileController
         } elseif ($tile['type'] == 'myLastResources') {
             TileController::getLastResourcesDetails($tile);
         } elseif ($tile['type'] == 'searchTemplate') {
-            TileController::getSearchTemplateDetails($tile);
+            $control = TileController::getSearchTemplateDetails($tile);
+            if (!empty($control['errors'])) {
+                return ['errors' => $control['errors']];
+            }
         } elseif ($tile['type'] == 'followedMail') {
             $followedResources = UserFollowedResourceModel::get([
                 'select' => ['res_id'],
@@ -676,12 +695,15 @@ class TileController
         foreach ($rawQuery as $value) {
             if (!empty($value['values'][0]['id']) && !in_array($value['identifier'], ['recipients', 'senders']) && strpos($value['identifier'], 'role_') === false) {
                 $value['values'] = array_column($value['values'], 'id');
-            } elseif (!empty($value['values']['start'])) {
-                $date = new \DateTime($value['values']['start']);
-                $value['values']['start'] = $date->format('Y-m-d');
-            } elseif (!empty($value['values']['end'])) {
-                $date = new \DateTime($value['values']['end']);
-                $value['values']['end'] = $date->format('Y-m-d');
+            } else {
+                if (!empty($value['values']['start'])) {
+                    $date = new \DateTime($value['values']['start']);
+                    $value['values']['start'] = $date->format('Y-m-d');
+                }
+                if (!empty($value['values']['end'])) {
+                    $date = new \DateTime($value['values']['end']);
+                    $value['values']['end'] = $date->format('Y-m-d');
+                }
             }
             $query[$value['identifier']] = ['values' => $value['values']];
         }

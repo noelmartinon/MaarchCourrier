@@ -843,14 +843,17 @@ class SummarySheetController
                     $users = [];
                     foreach ($workflow as $item) {
                         $mode = '';
-                        switch ($item['signatureMode']) {
-                            case 'visa': $mode = _VISA_USER_MIN; break;
-                            case 'stamp': $mode = _STAMP; break;
-                            case 'eidas': $mode = _EIDAS; break;
-                            case 'inca_card': $mode = _INCA_CARD; break;
-                            case 'inca_card_eidas': $mode = _INCA_CARD_EIDAS; break;
-                            case 'rgs_2stars_timestamped': $mode = _RGS_2STARS_TIMESTAMPED; break;
-                            case 'rgs_2stars': $mode = _RGS_2STARS; break;
+                        if ($item['mode'] == 'sign') {
+                            switch ($item['signatureMode']) {
+                                case 'stamp': $mode = _STAMP; break;
+                                case 'eidas': $mode = _EIDAS; break;
+                                case 'inca_card': $mode = _INCA_CARD; break;
+                                case 'inca_card_eidas': $mode = _INCA_CARD_EIDAS; break;
+                                case 'rgs_2stars_timestamped': $mode = _RGS_2STARS_TIMESTAMPED; break;
+                                case 'rgs_2stars': $mode = _RGS_2STARS; break;
+                            }
+                        } elseif ($item['mode'] == 'visa') {
+                            $mode = _VISA_USER_MIN;
                         }
                         $label = $item['userDisplay'] . ' (' . $mode . ')';
                         if (!empty($item['status'])) {

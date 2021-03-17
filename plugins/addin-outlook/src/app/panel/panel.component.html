@@ -1,6 +1,6 @@
-<div style="display: flex;flex-direction: column;height: 100%;">
+<div style="display: flex;flex-direction: column;height: 100vh;">
     <div style="flex:1;padding-left: 5px;padding-right: 5px;">
-        <ng-container *ngIf="!loading; else elseTemplate">
+        <ng-container *ngIf="status === 'end' && authService.isAuth()">
             <ng-container *ngIf="!inApp; else elseInApp">
                 <div style="display: grid;grid-template-columns: 1fr auto;grid-gap:10px;padding-top: 5px;padding-bottom: 15px;align-items: center;">
                     <app-maarch-message style="font-size:12px;" [content]="'Les informations ci-dessous seront envoyées :'"></app-maarch-message>
@@ -19,17 +19,23 @@
                 </mat-card>
             </ng-container>
             <ng-template #elseInApp>
-                <div class="in-app-content">
+                <div class="status-app-content">
                     <i class="fas fa-check green" style="font-size: 70px;"></i>
-                    <div class="in-app-text primary">Courriel déjà présent dans {{authService.applicationName}}</div>
+                    <div class="status-app-text primary">Courriel déjà présent dans <a [href]="authService.appUrl" target="_blank">{{authService.applicationName}}</a></div>
                 </div>
             </ng-template>
         </ng-container>
-        <ng-template #elseTemplate>
+        <ng-container *ngIf="status !== 'loading' && !authService.isAuth()">
+            <div class="status-app-content">
+                <i class="fas fa-plug red" style="font-size: 70px;"></i>
+                <div class="status-app-text red">Veuilez vous connecter sur <a [href]="authService.appUrl" target="_blank">{{authService.applicationName}}</a></div>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="status === 'loading'">
             <div style="display: flex;flex-direction: column;align-items: center;justify-content: center;">
                 <mat-spinner></mat-spinner>
-            </div>
-        </ng-template>
+            </div> 
+        </ng-container>
     </div>
     <div style="padding: 10px;text-align: right;font-size: 10px; opacity: 0.5;">{{authService.applicationName}}</div>
 </div>

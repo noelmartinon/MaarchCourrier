@@ -2,9 +2,9 @@
     <mat-chip-list #chipList aria-label="correspondentGroups">
     <mat-chip *ngFor="let item of correspondentGroups" color="primary"
         [selectable]="true"
-        [removable]="true" (removed)="remove(item)">
+        [removable]="item.canUpdateCorrespondents" (removed)="remove(item)">
         <i class="correspondent-type-icon fas fa-atlas"></i>&nbsp;&nbsp;{{ item.label }}
-        <mat-icon matChipRemove class="fa fa-times-circle"></mat-icon>
+        <mat-icon matChipRemove class="fa fa-times-circle" *ngIf="item.canUpdateCorrespondents"></mat-icon>
     </mat-chip>
       <input
         #correspondentGroupsInput

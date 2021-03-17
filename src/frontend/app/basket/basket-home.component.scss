@@ -23,11 +23,11 @@
 
 .selectedBasket {
     border-left: solid 5px var(--maarch-color-primary);
-    background: rgba(var(--maarch-color-primary), 0.14);
+    background: var(--maarch-color-primary-opacity-10);
 }
 
 .selectedBasket:focus {
-    background: rgba(var(--maarch-color-primary), 0.14);
+    background: var(--maarch-color-primary-opacity-10);
 }
 .nbRes {
     color : var(--maarch-color-primary);

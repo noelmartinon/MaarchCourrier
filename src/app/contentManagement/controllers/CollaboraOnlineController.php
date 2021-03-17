@@ -15,6 +15,7 @@
 namespace ContentManagement\controllers;
 
 use Attachment\models\AttachmentModel;
+use Configuration\models\ConfigurationModel;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
@@ -283,17 +284,19 @@ class CollaboraOnlineController
 
     public static function isAvailable(Request $request, Response $response)
     {
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
-        if (empty($loadedXml) || empty($loadedXml->collaboraonline->enabled) || $loadedXml->collaboraonline->enabled == 'false') {
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_document_editors', 'select' => ['value']]);
+        $configuration = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
+
+        if (empty($configuration) || empty($configuration['collaboraonline'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Collabora Online is not enabled', 'lang' => 'collaboraOnlineNotEnabled']);
-        } elseif (empty($loadedXml->collaboraonline->server_uri)) {
+        } elseif (empty($configuration['collaboraonline']['uri'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Collabora Online server_uri is empty', 'lang' => 'uriIsEmpty']);
-        } elseif (empty($loadedXml->collaboraonline->server_port)) {
+        } elseif (empty($configuration['collaboraonline']['port'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Collabora Online server_port is empty', 'lang' => 'portIsEmpty']);
         }
 
-        $uri  = (string)$loadedXml->collaboraonline->server_uri;
-        $port = (string)$loadedXml->collaboraonline->server_port;
+        $uri  = $configuration['collaboraonline']['uri'];
+        $port = (string)$configuration['collaboraonline']['port'];
 
         $isAvailable = DocumentEditorController::isAvailable(['uri' => $uri, 'port' => $port]);
 
@@ -306,9 +309,10 @@ class CollaboraOnlineController
 
     public static function getConfiguration(Request $request, Response $response)
     {
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_document_editors', 'select' => ['value']]);
+        $configuration = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
 
-        if (empty($loadedXml) || empty($loadedXml->collaboraonline->enabled) || $loadedXml->collaboraonline->enabled == 'false' || empty($loadedXml->collaboraonline->server_uri)) {
+        if (empty($configuration) || empty($configuration['collaboraonline']) || empty($configuration['collaboraonline']['uri'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Collabora Online is not enabled', 'lang' => 'collaboraOnlineNotEnabled']);
         }
 
@@ -345,10 +349,10 @@ class CollaboraOnlineController
 
         $extension = pathinfo($document['filename'], PATHINFO_EXTENSION);
 
-        $url = (string)$loadedXml->collaboraonline->server_uri . ':' . (string)$loadedXml->collaboraonline->server_port;
+        $url = $configuration['collaboraonline']['uri'] . ':' . $configuration['collaboraonline']['port'];
 
         $coreUrl   = str_replace('rest/', '', UrlController::getCoreUrl());
-        $serverSsl = filter_var((string)$loadedXml->collaboraonline->server_ssl, FILTER_VALIDATE_BOOLEAN);
+        $serverSsl = $configuration['collaboraonline']['ssl'];
         if (!empty($serverSsl)) {
             if (strpos($coreUrl, 'https') === false) {
                 return $response->withStatus(400)->withJson(['errors' => 'Collabora Online cannot be configured to use SSL if Maarch Courrier is not using SSL']);

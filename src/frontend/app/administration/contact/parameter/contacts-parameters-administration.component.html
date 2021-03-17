@@ -55,7 +55,7 @@
                             <ng-container *ngFor="let civility of civilities;let i=index">
                                 <mat-form-field class="civility-input" *ngFor="let civ of civility | keyvalue: originalOrder" appearance="outline">
                                     <mat-label>{{'lang.' + civ.key | translate}}</mat-label>
-                                    <input matInput [formControl]="civility[civ.key]">
+                                    <input matInput [formControl]="civility[civ.key]" [maxlength]="civ.key === 'abbreviation' ? 16 : 255">
                                 </mat-form-field>
                                 <button mat-icon-button color="warn" matTooltip="{{'lang.delete' | translate}}"
                                     (click)="deleteCivility(civility,i)">

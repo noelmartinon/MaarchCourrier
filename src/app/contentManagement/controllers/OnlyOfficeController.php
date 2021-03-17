@@ -15,6 +15,7 @@
 namespace ContentManagement\controllers;
 
 use Attachment\models\AttachmentModel;
+use Configuration\models\ConfigurationModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
 use Firebase\JWT\JWT;
@@ -39,9 +40,10 @@ class OnlyOfficeController
 
     public function getConfiguration(Request $request, Response $response)
     {
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_document_editors', 'select' => ['value']]);
+        $configuration = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
 
-        if (empty($loadedXml) || empty($loadedXml->onlyoffice->enabled) || $loadedXml->onlyoffice->enabled == 'false' || empty($loadedXml->onlyoffice->server_uri)) {
+        if (empty($configuration) || empty($configuration['onlyoffice']) || empty($configuration['onlyoffice']['uri'])) {
             return $response->withJson(['enabled' => false]);
         }
 
@@ -49,9 +51,9 @@ class OnlyOfficeController
 
         $configurations = [
             'enabled'    => true,
-            'serverUri'  => (string)$loadedXml->onlyoffice->server_uri,
-            'serverPort' => (int)$loadedXml->onlyoffice->server_port,
-            'serverSsl'  => filter_var((string)$loadedXml->onlyoffice->server_ssl, FILTER_VALIDATE_BOOLEAN),
+            'serverUri'  => $configuration['onlyoffice']['uri'],
+            'serverPort' => (int)$configuration['onlyoffice']['port'],
+            'serverSsl'  => $configuration['onlyoffice']['ssl'],
             'coreUrl'    => $coreUrl
         ];
 
@@ -65,14 +67,15 @@ class OnlyOfficeController
             return $response->withStatus(400)->withJson(['errors' => 'Body params config is empty']);
         }
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_document_editors', 'select' => ['value']]);
+        $configuration = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
 
-        if (empty($loadedXml) || empty($loadedXml->onlyoffice->enabled) || $loadedXml->onlyoffice->enabled == 'false' || empty($loadedXml->onlyoffice->server_uri)) {
+        if (empty($configuration) || empty($configuration['onlyoffice']) || empty($configuration['onlyoffice']['uri'])) {
             return $response->withStatus(400)->withJson(['errors' => 'OnlyOffice server is disabled']);
         }
 
         $jwt = null;
-        $serverSecret = (string)$loadedXml->onlyoffice->server_secret;
+        $serverSecret = $configuration['onlyoffice']['token'];
         if (!empty($serverSecret)) {
             $header = [
                 "alg" => "HS256",
@@ -255,18 +258,20 @@ class OnlyOfficeController
             return $response->withStatus(400)->withJson(['errors' => 'Query params url is empty']);
         }
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
-        if (empty($loadedXml) || empty($loadedXml->onlyoffice->enabled) || $loadedXml->onlyoffice->enabled == 'false' || empty($loadedXml->onlyoffice->server_uri)) {
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_document_editors', 'select' => ['value']]);
+        $configuration = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
+
+        if (empty($configuration) || empty($configuration['onlyoffice']) || empty($configuration['onlyoffice']['uri'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Onlyoffice is not enabled']);
         }
 
         $checkUrl   = str_replace('http://', '', $queryParams['url']);
         $checkUrl   = str_replace('https://', '', $checkUrl);
-        $uri        = (string)$loadedXml->onlyoffice->server_uri;
+        $uri        = $configuration['onlyoffice']['uri'];
         $uriPaths   = explode('/', $uri, 2);
         $masterPath = $uriPaths[0];
         $lastPath   = !empty($uriPaths[1]) ? rtrim("/{$uriPaths[1]}", '/') : '';
-        $port       = (string)$loadedXml->onlyoffice->server_port;
+        $port       = (int)$configuration['onlyoffice']['port'];
 
         if (strpos($checkUrl, "{$masterPath}:{$port}{$lastPath}/cache/files/") !== 0 && (($port != 80 && $port != 443) || strpos($checkUrl, "{$masterPath}{$lastPath}/cache/files/") !== 0)) {
             return $response->withStatus(400)->withJson(['errors' => 'Query params url is not allowed']);
@@ -282,17 +287,19 @@ class OnlyOfficeController
 
     public function isAvailable(Request $request, Response $response)
     {
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
-        if (empty($loadedXml) || empty($loadedXml->onlyoffice->enabled) || $loadedXml->onlyoffice->enabled == 'false') {
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_document_editors', 'select' => ['value']]);
+        $configuration = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
+
+        if (empty($configuration) || empty($configuration['onlyoffice'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Onlyoffice is not enabled', 'lang' => 'onlyOfficeNotEnabled']);
-        } elseif (empty($loadedXml->onlyoffice->server_uri)) {
+        } elseif (empty($configuration['onlyoffice']['uri'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Onlyoffice server_uri is empty', 'lang' => 'uriIsEmpty']);
-        } elseif (empty($loadedXml->onlyoffice->server_port)) {
+        } elseif (empty($configuration['onlyoffice']['port'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Onlyoffice server_port is empty', 'lang' => 'portIsEmpty']);
         }
 
-        $uri  = (string)$loadedXml->onlyoffice->server_uri;
-        $port = (string)$loadedXml->onlyoffice->server_port;
+        $uri  = $configuration['onlyoffice']['uri'];
+        $port = (string)$configuration['onlyoffice']['port'];
 
         $isAvailable = DocumentEditorController::isAvailable(['uri' => $uri, 'port' => $port]);
 
@@ -308,17 +315,15 @@ class OnlyOfficeController
         ValidatorModel::notEmpty($args, ['url', 'fullFilename']);
         ValidatorModel::stringType($args, ['url', 'fullFilename']);
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
-        if (empty($loadedXml) || empty($loadedXml->onlyoffice->enabled) || $loadedXml->onlyoffice->enabled == 'false') {
-            return false;
-        } elseif (empty($loadedXml->onlyoffice->server_uri)) {
-            return false;
-        } elseif (empty($loadedXml->onlyoffice->server_port)) {
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_document_editors', 'select' => ['value']]);
+        $configuration = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
+
+        if (empty($configuration) || empty($configuration['onlyoffice']) || empty($configuration['onlyoffice']['uri']) || empty($configuration['onlyoffice']['port'])) {
             return false;
         }
 
-        $uri  = (string)$loadedXml->onlyoffice->server_uri;
-        $port = (string)$loadedXml->onlyoffice->server_port;
+        $uri  = $configuration['onlyoffice']['uri'];
+        $port = (string)$configuration['onlyoffice']['port'];
 
         $isAvailable = DocumentEditorController::isAvailable(['uri' => $uri, 'port' => $port]);
 
@@ -349,17 +354,19 @@ class OnlyOfficeController
         ValidatorModel::stringType($args, ['url', 'fullFilename']);
         ValidatorModel::intVal($args, ['userId']);
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
-        if (empty($loadedXml) || empty($loadedXml->onlyoffice->enabled) || $loadedXml->onlyoffice->enabled == 'false') {
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_document_editors', 'select' => ['value']]);
+        $configuration = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
+
+        if (empty($configuration) || empty($configuration['onlyoffice'])) {
             return ['errors' => 'Onlyoffice is not enabled', 'lang' => 'onlyOfficeNotEnabled'];
-        } elseif (empty($loadedXml->onlyoffice->server_uri)) {
+        } elseif (empty($configuration['onlyoffice']['uri'])) {
             return ['errors' => 'Onlyoffice server_uri is empty', 'lang' => 'uriIsEmpty'];
-        } elseif (empty($loadedXml->onlyoffice->server_port)) {
+        } elseif (empty($configuration['onlyoffice']['port'])) {
             return ['errors' => 'Onlyoffice server_port is empty', 'lang' => 'portIsEmpty'];
         }
 
-        $uri  = (string)$loadedXml->onlyoffice->server_uri;
-        $port = (string)$loadedXml->onlyoffice->server_port;
+        $uri  = $configuration['onlyoffice']['uri'];
+        $port = (string)$configuration['onlyoffice']['port'];
 
         $tmpPath = CoreConfigModel::getTmpPath();
         $docInfo = pathinfo($args['fullFilename']);
@@ -382,9 +389,9 @@ class OnlyOfficeController
             'url'        => $docUrl
         ];
 
-        $serverSecret = (string)$loadedXml->onlyoffice->server_secret;
-        $serverAuthorizationHeader = (string)$loadedXml->onlyoffice->server_authorization_header;
-        $serverSsl = filter_var((string)$loadedXml->onlyoffice->server_ssl, FILTER_VALIDATE_BOOLEAN);
+        $serverSecret = $configuration['onlyoffice']['token'];
+        $serverAuthorizationHeader = $configuration['onlyoffice']['authorizationHeader'];
+        $serverSsl = $configuration['onlyoffice']['ssl'];
 
         $uri = explode("/", $uri);
         $domain = $uri[0];

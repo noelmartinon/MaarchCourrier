@@ -14,9 +14,9 @@
 
 namespace ContentManagement\controllers;
 
+use Configuration\models\ConfigurationModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
 
 class DocumentEditorController
@@ -32,13 +32,12 @@ class DocumentEditorController
 
     public static function getAllowedMethods()
     {
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/documentEditorsConfig.xml']);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_document_editors', 'select' => ['value']]);
+        $configuration = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
 
         $allowedMethods = [];
-        foreach (self::DOCUMENT_EDITION_METHODS as $method) {
-            if (!empty($loadedXml->$method->enabled) && $loadedXml->$method->enabled == 'true') {
-                $allowedMethods[] = $method;
-            }
+        foreach ($configuration as $key => $method) {
+            $allowedMethods[] = $key;
         }
 
         return $allowedMethods;

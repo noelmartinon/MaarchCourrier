@@ -317,14 +317,23 @@ export class DoctypesAdministrationComponent implements OnInit {
                     this.notify.error(err.error.errors);
                 });
         } else {
-            this.http.put('../rest/doctypes/types/' + this.currentType.type_id, this.currentType)
-                .subscribe((data: any) => {
-                    this.doctypes = data['doctypeTree'];
-                    this.refreshTree();
-                    this.notify.success(this.translate.instant('lang.documentTypeUpdated'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
+            if (Number.isInteger(this.currentType.duration_current_use)) {
+                if (Math.sign(this.currentType.duration_current_use) !== -1) {
+                    this.http.put('../rest/doctypes/types/' + this.currentType.type_id, this.currentType)
+                    .subscribe((data: any) => {
+                        this.doctypes = data['doctypeTree'];
+                        this.refreshTree();
+                        this.notify.success(this.translate.instant('lang.documentTypeUpdated'));
+                    }, (err) => {
+                        this.notify.error(err.error.errors);
+                    });
+                } else {
+                    this.notify.error(this.translate.instant('lang.signDurationCurrentUse'));
+                }
+            } else if(this.currentType.duration_current_use === null) {
+                this.notify.error(this.translate.instant('lang.invalidDurationCurrentUse'));
+            }
+            
         }
     }
 

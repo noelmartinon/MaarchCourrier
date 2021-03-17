@@ -27,6 +27,11 @@
     </FORMAT>
     <FORMAT>
         <name>DOC</name>
+        <mime>application/octet-stream</mime>
+        <canConvert>true</canConvert>
+    </FORMAT>
+    <FORMAT>
+        <name>DOC</name>
         <mime>application/zip</mime>
         <canConvert>true</canConvert>
     </FORMAT>

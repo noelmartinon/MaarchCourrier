@@ -48,7 +48,6 @@ export class TileDashboardComponent implements OnInit, AfterViewInit {
     async changeView(view: string, extraParams: any) {
         this.view = null;
         this.loading = true;
-        await this['get_' + view](extraParams);
         this.view = view;
         this.route = this.tile.views.find((viewItem: any) => viewItem.id === this.view).route;
         this.loading = false;

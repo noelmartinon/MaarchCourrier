@@ -61,7 +61,7 @@
 .signature {
     position: absolute;
     border: dashed 1px var(--maarch-color-danger);
-    background: rgba(var(--maarch-color-danger), 0.6) none repeat scroll 0% 0%;
+    background: var(--maarch-color-danger-opacity-60) none repeat scroll 0% 0%;
     font-weight: bold;
     font-size: 20px;
     color: white;
@@ -116,7 +116,7 @@
 }
 
 .selected {
-    background: rgba(var(--maarch-color-secondary), 0.3);
+    background: var(--maarch-color-secondary-opacity-30);
 }
 
 .paginate-left {

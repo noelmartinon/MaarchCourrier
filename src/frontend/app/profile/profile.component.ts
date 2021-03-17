@@ -3,14 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
 import { HeaderService } from '@service/header.service';
-import { tap } from 'rxjs/operators';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatExpansionPanel } from '@angular/material/expansion';
-import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
-import { MatSort } from '@angular/material/sort';
-import { MatTableDataSource } from '@angular/material/table';
-import { SelectionModel } from '@angular/cdk/collections';
 import { FormGroup, Validators, AbstractControl, ValidationErrors, ValidatorFn, FormBuilder } from '@angular/forms';
 import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
@@ -213,6 +208,7 @@ export class ProfileComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.modificationSaved'));
                 this.headerService.user.firstname = this.user.firstname;
                 this.headerService.user.lastname = this.user.lastname;
+                this.headerService.user.mail = this.user.mail;
             }, (err) => {
                 this.notify.error(err.error.errors);
             });

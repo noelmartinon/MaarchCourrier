@@ -1434,16 +1434,19 @@ class ResController extends ResourceControlController
             return $response->withStatus(403)->withJson(['errors' => 'Missing externalId value']);
         }
 
-        $document = ResModel::get([
-            'select' => ['res_id'],
-            'where'  => ["external_id->'" . $queryParams['type'] . "' = ?"],
-            'data'   => [$queryParams['value']]
-        ]);
-
-        if (empty($document[0]['res_id']) || !ResController::hasRightByResId(['resId' => [$document[0]['res_id']], 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        try {
+            $document = ResModel::get([
+                'select' => ['res_id'],
+                'where'  => ["external_id->'" . $queryParams['type'] . "' = ?"],
+                'data'   => [$queryParams['value']]
+            ]);
+        } catch (\Exception $exception) {
+            return $response->withStatus(400)->withJson(['errors' => 'externalId type or value has wrong format']);
         }
 
+        if (empty($document[0]['res_id'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Document not found']);
+        }
 
         return $response->withJson(['resId' => $document[0]['res_id']]);
     }

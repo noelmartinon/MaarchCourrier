@@ -13,7 +13,7 @@ declare const Office: any;
     styleUrls: ['./panel.component.scss']
 })
 export class PanelComponent implements OnInit {
-    loading: boolean = true;
+    status: string = 'loading';
 
     // must be REST USER (with create_contact privilege)
     /*headers = new HttpHeaders({
@@ -29,42 +29,63 @@ export class PanelComponent implements OnInit {
     mailBody: any;
     contactId: number;
 
+    connectionTry: any = null;
+
     constructor(
         public http: HttpClient,
         private notificationService: NotificationService,
         public authService: AuthService
-    ) { }
+    ) { 
+        this.authService.catchEvent().subscribe(async (result: any) => {
+            if (result === 'connected') {
+                this.inApp = await this.checkMailInApp();
 
-    async ngOnInit(): Promise<void> {
-        await this.authService.getAppInfo();
+                if (!this.inApp) {
+                    // console.log(Office.context.mailbox.item);
+                    this.initMailInfo();
+                    this.status = 'end';
+                } 
+            } else if (result === 'not connected') {
+                this.status = 'end';
+            }
+        });
+    }
 
-        /*var exch = new ExchangeService(ExchangeVersion.Exchange2013);
-
-        console.log(exch);*/
-        console.log(Office.context);
-
-        this.inApp = await this.checkMailInApp();
-
-        if (!this.inApp) {
-            // console.log(Office.context.mailbox.item);
-            this.initMailInfo();
+    ngOnInit() {
+        const res = this.authService.getConnection();
+        if (!res) {
+            this.authService.tryConnection();
         }
-        this.loading = false;
     }
 
     async sendToMaarch() {
-        this.loading = true;
+        this.status = 'loading';
         await this.getMailBody();
         await this.createContact();
         this.createDocFromMail();
-        this.getAttachments();
-        this.getToken();
+        // this.getAttachments();
+        // this.getToken();
     }
 
     checkMailInApp(): Promise<boolean> {
+        let emailId: string = "\"" + Office.context.mailbox.item.itemId + "\""
         return new Promise((resolve) => {
-            resolve(false);
-            // TO DO route check resource
+            this.http.get('../rest/resources/external', {params: {type: 'emailId', value: emailId}}).pipe(
+                tap((data: any) => {
+                    this.status = 'end';
+                    const result =  data.resId !== undefined ? true : false;
+                    resolve(result);
+                }),
+                catchError((err: any) => {
+                    if (err.error.errors === 'Document not found') {
+                        this.status = 'end';
+                        this.initMailInfo();
+                    } else {
+                        this.notificationService.handleErrors(err.error.errors);
+                    }
+                    return of(false);
+                })
+            ).subscribe();
         });
     }
 
@@ -82,6 +103,10 @@ export class PanelComponent implements OnInit {
         };
     }
 
+    getConfiguration() {
+        // TO DO get info addin conf (modelId, doctype, etc)
+    }
+
     createDocFromMail() {
         // TO DO get id user
         this.docFromMail = {
@@ -89,7 +114,7 @@ export class PanelComponent implements OnInit {
             doctype: 102,
             subject: Office.context.mailbox.item.subject,
             chrono: true,
-            typist : this.authService.user.id,
+            typist: this.authService.user.id,
             status: 'NEW',
             documentDate: Office.context.mailbox.item.dateTimeCreated,
             arrivalDate: Office.context.mailbox.item.dateTimeCreated,
@@ -107,7 +132,7 @@ export class PanelComponent implements OnInit {
                         this.inApp = true;
                         resolve(true);
                     }),
-                    finalize(() => this.loading = false),
+                    finalize(() => this.status = 'end'),
                     catchError((err: any) => {
                         console.log(err);
                         return of(false);
@@ -124,7 +149,7 @@ export class PanelComponent implements OnInit {
                 resolve(true);
             }));
         });
-        
+
     }
 
     createContact() {
@@ -155,40 +180,42 @@ export class PanelComponent implements OnInit {
     }
 
     attachmentTokenCallback(asyncResult: any) {
-        let serviceRequest : any = {
+        let serviceRequest: any = {
             attachmentToken: '',
-            ewsUrl : Office.context.mailbox.ewsUrl,
+            ewsUrl: Office.context.mailbox.ewsUrl,
             restUrl: Office.context.mailbox.restUrl,
             attachments: []
         };
         let ewsId = Office.context.mailbox.item.itemId;
         let restId = Office.context.mailbox.convertToRestId(ewsId, Office.MailboxEnums.RestVersion.v2_0);
-        let getMessageUrl = serviceRequest.restUrl + '/v2.0/me/messages/' + restId + '/attachments'; 
+        let getMessageUrl = serviceRequest.restUrl + '/v2.0/me/messages/' + restId + '/attachments';
         if (asyncResult.status == "succeeded") {
             serviceRequest.attachmentToken = asyncResult.value;
             for (var i = 0; i < Office.context.mailbox.item.attachments.length; i++) {
                 serviceRequest.attachments.push(Office.context.mailbox.item.attachments[i].id);
-            } 
+            }
             console.log(serviceRequest);
 
             // Access-Control-Allow-Origin not allowed
-            let xhr = new XMLHttpRequest();
+            /*let xhr = new XMLHttpRequest();
             xhr.open('GET', getMessageUrl);
-            xhr.setRequestHeader("Authorization", "Bearer " + serviceRequest.attachmentToken);
+            xhr.setRequestHeader('Authorization', 'Bearer ' + serviceRequest.attachmentToken);
+            xhr.setRequestHeader('Content-Type', 'application/json')
             xhr.onload = ((res) => {
                 console.log(res);
-            });
-            xhr.send();
+            });            
+            xhr.send();*/
 
             // Test with EWS GetAttachment function
-            let ews = new ExchangeService();
+            /*let ews = new ExchangeService();
             ews.Credentials = new WebCredentials('userName', 'pwd'); // required to make conn
             ews.Url = new Uri(serviceRequest.ewsUrl);
-            let getAttachmentsResponse: any = ews.GetAttachments(serviceRequest.attachments, BodyType.Text,  null);
-            if (getAttachmentsResponse.OverallResult == asyncResult.status){
+            let getAttachmentsResponse: any = ews.GetAttachments(serviceRequest.attachments, BodyType.Text, null);
+            if (getAttachmentsResponse.OverallResult == asyncResult.status) {
                 console.log(getAttachmentsResponse);
                 return ews;
-            }
+            }*/
+            
         }
         else {
             console.log(asyncResult.error.message);
@@ -198,7 +225,7 @@ export class PanelComponent implements OnInit {
     getAttachments() {
         if (Office.context.requirements.isSetSupported('Mailbox', '1.8')) {
             if (Office.context.mailbox.item.attachments.length > 0) {
-                for (let i = 0 ; i < Office.context.mailbox.item.attachments.length ; i++) {
+                for (let i = 0; i < Office.context.mailbox.item.attachments.length; i++) {
                     Office.context.mailbox.item.getAttachmentContentAsync(Office.context.mailbox.item.attachments[i].id, this.handleAttachmentsCallback);
                 }
             }
@@ -206,10 +233,10 @@ export class PanelComponent implements OnInit {
             console.log('Impossible de récupérer les pj : version minimum Office server 1.8');
         }
     }
-    
+
     handleAttachmentsCallback(result) {
         console.log(result);
-        
+
         // Parse string to be a url, an .eml file, a base64-encoded string, or an .icalendar file.
         /*switch (result.value.format) {
             case Office.MailboxEnums.AttachmentContentFormat.Base64:

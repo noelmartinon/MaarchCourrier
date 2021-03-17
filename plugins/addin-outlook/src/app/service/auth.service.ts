@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LocalStorageService } from './local-storage.service';
 import { NotificationService } from './notification/notification.service';
-import { of } from 'rxjs';
+import { Observable, of, Subject } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 // import { TranslateService } from '@ngx-translate/core';
 
@@ -12,7 +12,12 @@ import { catchError, tap } from 'rxjs/operators';
 export class AuthService {
 
     applicationName: string = 'Maarch Courrier';
+    appUrl: string = null;
     user: any = {};
+
+    connectionTry: any = null;
+
+    private eventAction = new Subject<any>();
 
     constructor(
         public http: HttpClient,
@@ -20,6 +25,40 @@ export class AuthService {
         private localStorage: LocalStorageService,
         // public translate: TranslateService,
     ) { }
+
+    catchEvent(): Observable<any> {
+        return this.eventAction.asObservable();
+    }
+
+    setEvent(content: any) {
+        return this.eventAction.next(content);
+    }
+
+    getConnection() {
+        return new Promise(async (resolve) => {
+            const res = await this.getAppInfo();
+            if (res) {
+                this.setEvent('connected');
+                resolve(true);
+            } else {
+                this.setEvent('not connected'); 
+                resolve(false);
+            }
+        });
+    }
+
+    tryConnection() {
+        this.connectionTry = setInterval(async () => {
+            const res = await this.getAppInfo();
+            if (res) {
+                clearInterval(this.connectionTry);
+                this.connectionTry = null;
+                this.setEvent('connected');
+            } else {
+                this.setEvent('not connected'); 
+            }
+        }, 2000);
+    }
 
     getToken() {
         return this.localStorage.get('MaarchCourrierToken');
@@ -53,19 +92,24 @@ export class AuthService {
     getAppInfo() {
         return new Promise((resolve) => {
             this.http.get('../rest/authenticationInformations')
-        .pipe(
-            tap((data: any) => {
-                console.log(data);
-                this.applicationName = data.applicationName;
-                this.setAppSession(data.instanceId);
-                this.updateUserInfo(this.getToken());
-                resolve(true)
-            }),
-            catchError((err: any) => {
-                console.log(err);
-                return of(false);
-            })
-        ).subscribe();
+                .pipe(
+                    tap((data: any) => {
+                        console.log(data);
+                        this.applicationName = data.applicationName;
+                        this.appUrl = data.maarchUrl;
+                        this.setAppSession(data.instanceId);
+                        if (this.isAuth()) {
+                            this.updateUserInfo(this.getToken());
+                            resolve(true);
+                        } else {
+                            resolve(false);
+                        }
+                    }),
+                    catchError((err: any) => {
+                        console.log(err);
+                        return of(false);
+                    })
+                ).subscribe();
         });
     }
 
@@ -81,7 +125,6 @@ export class AuthService {
                     this.updateUserInfo(data.token);
                 }),
                 catchError((error) => {
-                    // this.notify.error(this.translate.instant('lang.sessionExpired'));
                     return of(false);
                 })
             );
@@ -93,7 +136,10 @@ export class AuthService {
     }
 
     isAuth(): boolean {
-        return this.user.id !== undefined;
+        if (this.getToken() === null && this.connectionTry === null) {
+            this.tryConnection();
+        }
+        return this.getToken() !== null;
     }
 
     updateUserInfo(token: string) {

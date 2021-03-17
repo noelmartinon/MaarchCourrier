@@ -3,7 +3,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { tap, catchError, debounceTime } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NotificationService } from '@service/notification/notification.service';
 import {FunctionsService} from '@service/functions.service';
 
@@ -23,8 +23,8 @@ export class VisaParametersComponent implements OnInit {
         private functions: FunctionsService
     ) {
         this.visaParameters = this._formBuilder.group({
-            minimumVisaRole: [''],
-            maximumSignRole: [''],
+            minimumVisaRole: ['', [Validators.required, Validators.max(50)]],
+            maximumSignRole: ['', [Validators.required, Validators.max(50)]],
             workflowEndBySignatory: ['']
         });
     }
@@ -84,15 +84,23 @@ export class VisaParametersComponent implements OnInit {
         });
     }
 
-    saveParameter(id: string) {
-        this.http.put('../rest/parameters/' + id, {
-            param_value_int : this.visaParameters.controls[id].value
-        })
-            .subscribe(() => {
-                this.notify.success(this.translate.instant('lang.parameterUpdated'));
-            }, (err) => {
-                this.notify.error(err.error.errors);
-            });
+    saveParameter(id: string) {        
+        if (Number.isSafeInteger(this.visaParameters.controls[id].value)) {
+            if (Math.sign(this.visaParameters.controls[id].value) !== -1) {
+                if (!this.visaParameters.get(id).hasError('max')) {
+                    this.http.put('../rest/parameters/' + id, {
+                        param_value_int : Math.abs(this.visaParameters.controls[id].value)
+                    })
+                        .subscribe(() => {
+                            this.notify.success(this.translate.instant('lang.parameterUpdated'));
+                        }, (err) => {
+                            this.notify.error(err.error.errors);
+                        });
+                }
+            } else {
+                this.visaParameters.controls[id].setValue(Math.abs(this.visaParameters.controls[id].value));
+            }
+        }        
     }
 
     toggle(id: string) {

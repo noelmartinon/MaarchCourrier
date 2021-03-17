@@ -45,7 +45,6 @@ export class MySignatureBookComponent implements OnInit {
     }
 
     resfreshUpload(b64Content: any) {
-        console.log('ssss');
         if (this.signatureModel.size <= 2000000) {
             this.signatureModel.base64 = b64Content.replace(/^data:.*?;base64,/, '');
             this.signatureModel.base64ForJs = b64Content;

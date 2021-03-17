@@ -333,10 +333,7 @@ class AutoCompleteController
             } else {
                 $userEntities = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id']]);
 
-                $entitiesId = [];
-                foreach ($userEntities as $userEntity) {
-                    $entitiesId[] = (string)$userEntity['id'];
-                }
+                $entitiesId = array_column($userEntities, 'id');
                 $where[] = '(owner = ? OR entities @> ?)';
                 $data[] = $GLOBALS['id'];
                 $data[] = json_encode($entitiesId);

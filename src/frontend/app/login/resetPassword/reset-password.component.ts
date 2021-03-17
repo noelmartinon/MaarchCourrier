@@ -65,7 +65,7 @@ export class ResetPasswordComponent implements OnInit {
 
 
     updatePassword() {
-        this.labelButton = this.translate.instant('lang.emailSendInProgress');
+        this.labelButton = this.translate.instant('lang.emailSendInProgressShort');
         this.loading = true;
 
         this.http.put('../rest/password', { 'token': this.token, 'password': this.password.newPassword })

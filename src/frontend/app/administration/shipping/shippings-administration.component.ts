@@ -9,7 +9,8 @@ import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
 import { FormControl } from '@angular/forms';
-import { debounceTime, tap } from 'rxjs/operators';
+import { catchError, debounceTime, map, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
     templateUrl: 'shippings-administration.component.html',
@@ -20,7 +21,7 @@ export class ShippingsAdministrationComponent implements OnInit {
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     shippingConf: any = {
-        enabled: new FormControl(true),
+        enabled: new FormControl(false),
         authUri: new FormControl('https://connect.maileva.com'),
         uri: new FormControl('https://api.maileva.com'),
     };
@@ -69,25 +70,39 @@ export class ShippingsAdministrationComponent implements OnInit {
     }
 
     initConfiguration() {
-        Object.keys(this.shippingConf).forEach(elemId => {
-            this.shippingConf[elemId].valueChanges
-                .pipe(
-                    debounceTime(300),
-                    tap((value: any) => {
-                        this.saveConfiguration();
-                    }),
-                ).subscribe();
-        });
-    }
-
-    saveConfiguration() {
-        console.log(this.formatConfiguration());
-
-        /*this.http.put(`../rest/configurations/documentEditor`, this.formatEditorsConfig()).pipe(
+        this.http.get(`../rest/configurations/admin_shippings`).pipe(
+            map((data: any) => data.configuration.value),
+            tap((data: any) => {
+                Object.keys(this.shippingConf).forEach(elemId => {
+                    if (!this.functions.empty(data)) {
+                        this.shippingConf[elemId].setValue(data[elemId]);
+                    }
+                    this.shippingConf[elemId].valueChanges
+                        .pipe(
+                            debounceTime(1000),
+                            tap(() => {
+                                this.saveConfiguration();
+                            }),
+                        ).subscribe();
+                });
+            }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
-            })*/
+            })
+        ).subscribe();
+    }
+
+    saveConfiguration() {
+        this.http.put(`../rest/configurations/admin_shippings`, this.formatConfiguration()).pipe(
+            tap(() => {
+                this.notify.success(this.translate.instant('lang.dataUpdated'));
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     formatConfiguration() {

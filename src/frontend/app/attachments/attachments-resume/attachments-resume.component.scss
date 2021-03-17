@@ -8,7 +8,7 @@
     align-items: center;
 
     &:nth-child(2n) {
-        background: rgba(var(--maarch-color-primary), .1);
+        background: var(--maarch-color-primary-opacity-10);
     }
 }
 

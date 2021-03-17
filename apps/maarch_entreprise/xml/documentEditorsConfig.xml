@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Fichier DEPRECATED : sera supprimé dans la prochaine version -->
 <ROOT>
     <java>
         <enabled>true</enabled>

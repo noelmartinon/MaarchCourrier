@@ -17,7 +17,7 @@ export class CheckMailServerModalComponent implements OnInit {
     serverConf: any = null;
     recipient: string = null;
 
-    statusMsg: string = this.translate.instant('lang.emailSendInProgress');
+    statusMsg: string = this.translate.instant('lang.emailSendInProgressShort');
     error: string = null;
 
     constructor(

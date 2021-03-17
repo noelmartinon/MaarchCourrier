@@ -7,7 +7,11 @@
             {{'lang.minimumVisaUser' | translate}}
         </mat-slide-toggle>
         <mat-form-field style="margin-left: 10px; display: inline-block; width: 70% !important;">
-            <input type="text" matInput required formControlName="minimumVisaRole" [value]="visaParameters.controls['minimumVisaRole'].value">
+            <input type="number" matInput required max="50" formControlName="minimumVisaRole" [value]="visaParameters.controls['minimumVisaRole'].value">
+            <mat-hint *ngIf="visaParameters.get('minimumVisaRole').errors && visaParameters.get('minimumVisaRole').hasError('max')" 
+            align="start" style="color: red;" [innerHTML]="('lang.maxValueVisaWorklow' | translate) + ' ' + visaParameters.get('minimumVisaRole').errors.max.max"></mat-hint>
+            <mat-hint *ngIf="visaParameters.get('minimumVisaRole').errors && visaParameters.get('minimumVisaRole').hasError('required')" 
+            align="start" style="color: red;" [innerHTML]="('lang.mandatoryField' | translate)"></mat-hint>
         </mat-form-field>
     </div>
 
@@ -17,7 +21,11 @@
             {{'lang.maximumSignUser' | translate}}
         </mat-slide-toggle>
         <mat-form-field style="margin-left: 10px; display: inline-block; width: 70% !important;">
-            <input type="text" matInput required formControlName="maximumSignRole" [value]="visaParameters.controls['maximumSignRole'].value">
+            <input type="number" matInput required max="50" formControlName="maximumSignRole" [value]="visaParameters.controls['maximumSignRole'].value">
+            <mat-hint *ngIf="visaParameters.get('maximumSignRole').errors && visaParameters.get('maximumSignRole').hasError('max')" 
+            align="start" style="color: red;" [innerHTML]="('lang.maxValueVisaWorklow' | translate) + ' ' + visaParameters.get('maximumSignRole').errors.max.max"></mat-hint>
+            <mat-hint *ngIf="visaParameters.get('maximumSignRole').errors && visaParameters.get('maximumSignRole').hasError('required')" 
+            align="start" style="color: red;" [innerHTML]="('lang.mandatoryField' | translate)"></mat-hint>
         </mat-form-field>
     </div>
 

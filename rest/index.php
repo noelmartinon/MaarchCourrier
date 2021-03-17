@@ -140,6 +140,11 @@ $app->put('/sortedBaskets/{id}', \Basket\controllers\BasketController::class . '
 $app->get('/configurations/{privilege}', \Configuration\controllers\ConfigurationController::class . ':getByPrivilege');
 $app->put('/configurations/{privilege}', \Configuration\controllers\ConfigurationController::class . ':update');
 
+$app->get('/m2m/configuration', \Configuration\controllers\ConfigurationController::class . ':getM2MConfiguration');
+$app->put('/m2m/configuration', \Configuration\controllers\ConfigurationController::class . ':updateM2MConfiguration');
+$app->get('/watermark/configuration', \Configuration\controllers\ConfigurationController::class . ':getWatermarkConfiguration');
+$app->put('/watermark/configuration', \Configuration\controllers\ConfigurationController::class . ':updateWatermarkConfiguration');
+
 //Contacts
 $app->get('/contacts', \Contact\controllers\ContactController::class . ':get');
 $app->post('/contacts', \Contact\controllers\ContactController::class . ':create');
@@ -389,8 +394,6 @@ $app->post('/parameters', \Parameter\controllers\ParameterController::class . ':
 $app->get('/parameters/{id}', \Parameter\controllers\ParameterController::class . ':getById');
 $app->put('/parameters/{id}', \Parameter\controllers\ParameterController::class . ':update');
 $app->delete('/parameters/{id}', \Parameter\controllers\ParameterController::class . ':delete');
-$app->get('/m2mConfiguration', \Parameter\controllers\ParameterController::class . ':getM2MConfiguration');
-$app->put('/m2mConfiguration', \Parameter\controllers\ParameterController::class . ':setM2MConfiguration');
 
 //PasswordRules
 $app->get('/passwordRules', \SrcCore\controllers\PasswordController::class . ':getRules');
