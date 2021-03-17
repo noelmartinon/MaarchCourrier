@@ -142,7 +142,7 @@ class DatasourceController
         $preferenceBasket = UserBasketPreferenceModel::get([
             'select'  => ['group_serial_id'],
             'where'   => ['user_serial_id = ?', 'basket_id = ?'],
-            'data'    => [$aArgs['params']['recipient']['user_id'], 'MyBasket']
+            'data'    => [$aArgs['params']['recipient']['id'], 'MyBasket']
         ]);
         
         foreach ($aArgs['params']['events'] as $event) {
