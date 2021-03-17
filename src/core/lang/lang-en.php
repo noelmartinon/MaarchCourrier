@@ -401,6 +401,7 @@ define("_PASSWORD_REINIT", "Password reset");
 define("_NOTIFICATIONS_USER_CREATION_SUBJECT", "[Maarch Courrier] Activate your user account");
 define("_NOTIFICATIONS_USER_CREATION_BODY", "Welcome,<br/><br/>You have now an account to Maarch Courrier.<br/><br/>To log in and set your password, please click on the link below :<br/><br/>");
 define("_NOTIFICATIONS_USER_CREATION_FOOTER", "<br/><br/>This message was sent automatically as a result of an administrator action.<br/>Please do not answer.<br/><br/>If you have any questions, please contact your software administrator");
+define("_YOUR_ID", "<b>Your ID:</b>");
 define("_CLICK_HERE", "Click-here to set your password");
 
 define("_M2M_ANNUARY_IS_NOT_SET", "M2M annuary is not set");
