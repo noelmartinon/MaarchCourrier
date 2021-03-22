@@ -1,9 +1,8 @@
 <div class="plugins-list">
-    <div>
+    <div color="primary">
         {{ 'lang.outlookSendingModule' | translate }}
     </div>
-    <div class="alert-message alert-message-info" style="min-width: 100%;"
-        [innerHTML]="'lang.infoOutlookPlugin' | translate"></div>
+    <app-maarch-message [content]="'lang.infoOutlookPlugin' | translate"></app-maarch-message>
     <div>
         <button mat-raised-button color="primary" (click)="openAddinOutlookConfiguration()">{{ 'lang.downloadManifest' | translate }}</button>
     </div>

@@ -273,7 +273,9 @@ class AttachmentController
             $emails[$key]['document'] = json_decode($email['document'], true);
         }
 
-        $emails = array_filter($emails, function($email) { return !empty($email['document']['attachments']); });
+        $emails = array_filter($emails, function ($email) {
+            return !empty($email['document']['attachments']);
+        });
         $emails = array_filter($emails, function ($email) use ($attachment) {
             $attachmentFound = false;
             foreach ($email['document']['attachments'] as $value) {
@@ -285,7 +287,7 @@ class AttachmentController
         });
 
         foreach ($emails as $key => $email) {
-            $emails[$key]['document']['attachments'] = array_filter($emails[$key]['document']['attachments'], function ($element) use ($attachment){
+            $emails[$key]['document']['attachments'] = array_filter($emails[$key]['document']['attachments'], function ($element) use ($attachment) {
                 return $element['id'] != $attachment['res_id'] && $element['id'] != $attachment['origin_id'];
             });
             $emails[$key]['document']['attachments'] = array_values($emails[$key]['document']['attachments']);
@@ -756,9 +758,8 @@ class AttachmentController
             return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
         }
 
-        if (empty($fileContent)) {
-            $fileContent = file_get_contents($pathToDocument);
-        }
+        $fileContent = file_get_contents($pathToDocument);
+
         if ($fileContent === false) {
             return $response->withStatus(400)->withJson(['errors' => 'Document not found on docserver']);
         }

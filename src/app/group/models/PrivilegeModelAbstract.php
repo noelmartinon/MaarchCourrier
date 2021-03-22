@@ -109,7 +109,7 @@ abstract class PrivilegeModelAbstract
 
         $extra = array_column($extra, 'parameters');
 
-        if (count($extra) == 0) {
+        if (empty($extra)) {
             return null;
         }
 

@@ -220,10 +220,12 @@ export class CustomFieldsAdministrationComponent implements OnInit {
             }
         }
         this.http.put('../rest/customFields/' + customField.id, customFieldToUpdate).pipe(
-            tap(() => {
-                this.customFieldsClone[indexCustom] = JSON.parse(JSON.stringify(customField));
+            tap((data: any) => {
+                this.customFieldsClone[indexCustom] = JSON.parse(JSON.stringify(data.customField));
+                this.customFields[indexCustom].values = this.customFieldsClone[indexCustom].values;
+
                 this.notify.success(this.translate.instant('lang.customFieldUpdated'));
-                this.loadCustomFields();
+                this.customFieldsClone = JSON.parse(JSON.stringify(this.customFields));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

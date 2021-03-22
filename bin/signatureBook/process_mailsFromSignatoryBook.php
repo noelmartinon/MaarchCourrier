@@ -83,6 +83,13 @@ $GLOBALS['MaarchDirectory']        = $config['maarchDirectory'];
 $GLOBALS['customId']               = $config['customID'];
 $GLOBALS['applicationUrl']         = $config['maarchUrl'];
 
+foreach (['maarchDirectory', 'maarchUrl'] as $value) {
+    if (empty($config[$value])) {
+        print($value . " is not set in config file: " . $GLOBALS['configFile'] . "\n");
+        exit(103);
+    }
+}
+
 $config = $file['signatureBook'];
 $GLOBALS['userWS']                 = $config['userWS'];
 $GLOBALS['passwordWS']             = $config['passwordWS'];
@@ -92,6 +99,13 @@ $validatedStatusOnlyVisa           = $config['validatedStatusOnlyVisa'];
 $refusedStatus                     = $config['refusedStatus'];
 $validatedStatusAnnot              = $config['validatedStatusAnnot'];
 $refusedStatusAnnot                = $config['refusedStatusAnnot'];
+
+foreach (['userWS', 'passwordWS'] as $value) {
+    if (empty($config[$value])) {
+        print($value . " is not set in config file: " . $GLOBALS['configFile'] . "\n");
+        exit(103);
+    }
+}
 
 chdir($GLOBALS['MaarchDirectory']);
 
@@ -227,12 +241,12 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
         Bt_writeLog(['level' => 'INFO', 'message' => 'Create log Attachment']);
         Bt_createAttachment([
             'resIdMaster'       => $value['res_id_master'],
-            'title'             => '[xParaph Log] ' . $value['title'],
+            'title'             => $value['logTitle'] . ' ' . $value['title'],
             'chrono'            => $value['identifier'],
             'recipientId'       => $value['recipient_id'],
             'recipientType'     => $value['recipient_type'],
             'typist'            => $value['typist'],
-            'format'            => 'xml',
+            'format'            => $value['logFormat'],
             'type'              => $value['attachment_type'],
             'inSignatureBook'   => false,
             'encodedFile'       => $value['log'],

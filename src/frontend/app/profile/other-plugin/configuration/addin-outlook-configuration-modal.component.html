@@ -1,14 +1,50 @@
 <div class="mat-dialog-content-container">
     <h1 mat-dialog-title>{{'lang.configuration' | translate}}</h1>
     <div mat-dialog-content>
-        <img style="width:100%" src="assets/addin_outlook_1.png"/>
-        <img style="width:100%" src="assets/addin_outlook_2.png"/>
-        <img style="width:100%" src="assets/addin_outlook_3.png"/>
-        <img style="width:100%" src="assets/addin_outlook_4.png"/>
-        <img style="width:100%" src="assets/addin_outlook_5.png"/>
-        <img style="width:100%" src="assets/addin_outlook_6.png"/>
-        <img style="width:100%" src="assets/addin_outlook_7.png"/>
-        <img style="width:100%" src="assets/addin_outlook_8.png"/>
+        <app-maarch-message [content]="'lang.addingOutlookMsg' | translate"></app-maarch-message>
+        <mat-tab-group mat-align-tabs="center" class="helper-addin-outlook">
+            <mat-tab [label]="'lang.webInterface' | translate">
+                <ng-template matTabContent>
+                    <div style="padding-left: 100px;padding-right: 100px;">
+                        <app-maarch-message [content]="'lang.addingOutlookWebMsg1' | translate"></app-maarch-message>
+                        <mat-card>
+                            <img style="width:100%" src="assets/addin_outlook_1.png"/>
+                        </mat-card>
+                        <app-maarch-message [content]="'lang.addingOutlookWebMsg2' | translate"></app-maarch-message>
+                        <mat-card>
+                            <img style="width:100%" src="assets/addin_outlook_2.png"/>
+                        </mat-card>
+                        <app-maarch-message [content]="'lang.addingOutlookWebMsg3' | translate"></app-maarch-message>
+                        <mat-card>
+                            <img style="width:100%" src="assets/addin_outlook_3.png"/>
+                        </mat-card>
+                        <app-maarch-message [content]="'lang.addingOutlookWebMsg4' | translate"></app-maarch-message>
+                        <mat-card>
+                            <img style="width:100%" src="assets/addin_outlook_4.png"/>
+                            <img style="width:100%" src="assets/addin_outlook_5.png"/>
+                        </mat-card>
+                        <app-maarch-message [content]="'lang.addingOutlookWebMsg5' | translate"></app-maarch-message>
+                        <mat-card>
+                            <img style="width:100%" src="assets/addin_outlook_6.png"/>
+                        </mat-card>
+                        <app-maarch-message [content]="'lang.addingOutlookWebMsg6' | translate"></app-maarch-message>
+                        <mat-card>
+                            <img style="width:100%" src="assets/addin_outlook_7.png"/>
+                        </mat-card>
+                        <app-maarch-message [content]="'lang.addingOutlookWebMsg7' | translate"></app-maarch-message>
+                        <mat-card>
+                            <img style="width:100%" src="assets/addin_outlook_8.png"/>
+                        </mat-card>
+                    </div>
+                </ng-template>
+            </mat-tab>
+            <!--<mat-tab label="Interface application"> 
+                <ng-template matTabContent>
+                    <div style="padding-left: 100px;padding-right: 100px;">
+                    </div>
+                </ng-template>
+            </mat-tab>-->
+          </mat-tab-group>
     </div>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">

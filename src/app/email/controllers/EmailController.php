@@ -181,7 +181,7 @@ class EmailController
                     'orderBy' => ["type='SIGN' DESC"],
                     'limit'   => 1
                 ]);
-                $convertedDocument = null;
+
                 if (!empty($convertedResource[0])) {
                     $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedResource[0]['docserver_id'], 'select' => ['path_template']]);
                     $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedResource[0]['path']) . $convertedResource[0]['filename'];
@@ -215,7 +215,7 @@ class EmailController
                         'orderBy' => ["type='SIGN' DESC"],
                         'limit'   => 1
                     ]);
-                    $convertedDocument = null;
+
                     if (!empty($convertedResource[0])) {
                         $docserver = DocserverModel::getByDocserverId(['docserverId' => $convertedResource[0]['docserver_id'], 'select' => ['path_template']]);
                         $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedResource[0]['path']) . $convertedResource[0]['filename'];

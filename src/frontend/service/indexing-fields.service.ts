@@ -522,7 +522,4 @@ export class IndexingFieldsService {
         });
     }
 
-    formatData() {
-
-    }
 }

@@ -68,9 +68,13 @@ export class PanelComponent implements OnInit {
     }
 
     checkMailInApp(): Promise<boolean> {
-        let emailId: string = "\"" + Office.context.mailbox.item.itemId + "\""
+        let emailId: string = "\"" + Office.context.mailbox.item.itemId + "\"";
+        let infoEmail: any = {
+            type: 'emailId',
+            value: emailId
+        }
         return new Promise((resolve) => {
-            this.http.get('../rest/resources/external', {params: {type: 'emailId', value: emailId}}).pipe(
+            this.http.put('../rest/resources/external', infoEmail).pipe(
                 tap((data: any) => {
                     this.status = 'end';
                     const result =  data.resId !== undefined ? true : false;
@@ -81,7 +85,7 @@ export class PanelComponent implements OnInit {
                         this.status = 'end';
                         this.initMailInfo();
                     } else {
-                        this.notificationService.handleErrors(err.error.errors);
+                        this.notificationService.handleErrors(err);
                     }
                     return of(false);
                 })
@@ -134,7 +138,7 @@ export class PanelComponent implements OnInit {
                     }),
                     finalize(() => this.status = 'end'),
                     catchError((err: any) => {
-                        console.log(err);
+                        this.notificationService.handleErrors(err);
                         return of(false);
                     })
                 ).subscribe();
@@ -168,7 +172,7 @@ export class PanelComponent implements OnInit {
                     resolve(true);
                 }),
                 catchError((err: any) => {
-                    console.log(err);
+                    this.notificationService.handleErrors(err);
                     return of(false);
                 })
             ).subscribe();

@@ -156,14 +156,14 @@ class ConfigurationControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $aArgs = [
-            'type'       => 'sendmail'
+            'type' => 'sendmail'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
         $response     = $configurationController->update($fullRequest, new \Slim\Http\Response(), ['privilege' => 'admin_email_server_fail']);
         $responseBody = json_decode((string)$response->getBody());
 
-        $this->assertSame('Privilege configuration does not exist', $responseBody->errors);
+        $this->assertSame('Unknown privilege', $responseBody->errors);
 
         //  UPDATE ERROR
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'PUT']);

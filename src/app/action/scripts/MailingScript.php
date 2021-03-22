@@ -42,6 +42,13 @@ class MailingScript
             DatabasePDO::reset();
             new DatabasePDO(['customId' => $data['customId']]);
             $GLOBALS['customId'] = $data['customId'];
+            $language = \SrcCore\models\CoreConfigModel::getLanguage();
+
+            if (file_exists("custom/{$GLOBALS['customId']}/src/core/lang/lang-{$language}.php")) {
+                require_once("custom/{$GLOBALS['customId']}/src/core/lang/lang-{$language}.php");
+            }
+            require_once("src/core/lang/lang-{$language}.php");
+
 
             $currentUser = UserModel::getById(['id' => $data['userId'], 'select' => ['user_id']]);
             $GLOBALS['login'] = $currentUser['user_id'];
@@ -70,7 +77,7 @@ class MailingScript
                     'level'     => 'ERROR',
                     'tableName' => 'letterbox_coll',
                     'recordId'  => $resource['resId'],
-                    'eventType' => "Send to external Signature Book failed : {$result['errors']}",
+                    'eventType' => "Send to external Signature Book failed : {$result['errors'][0]}",
                     'eventId'   => "resId : {$resource['resId']}"
                 ]);
             } else {

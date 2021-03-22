@@ -174,7 +174,7 @@ class IxbusController
                 'filePath' => $mainDocumentFilePath,
                 'fileName' => TextFormatModel::formatFilename(['filename' => $mainResource['subject'], 'maxLength' => 250]) . '.pdf'
             ]];
-        };
+        }
         $attachmentsData = array_merge($annexesAttachments, $attachmentsData);
 
         $signature = $aArgs['manSignature'] == 'manual' ? 1 : 0;

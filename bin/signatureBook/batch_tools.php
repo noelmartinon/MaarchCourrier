@@ -184,6 +184,13 @@ function Bt_createAttachment($args = [])
     curl_setopt_array($curl, $opts);
     $rawResponse = curl_exec($curl);
     $error       = curl_error($curl);
+    
+    $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    if ($code == 404) {
+        Bt_writeLog(['level' => 'ERROR', 'message' => 'maarchUrl is not correct']);
+        exit;
+    }
+
     if (!empty($error)) {
         Bt_writeLog(['level' => 'ERROR', 'message' => $error]);
         exit;

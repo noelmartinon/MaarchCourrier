@@ -49,9 +49,9 @@
                         <ng-container matColumnDef="img_filename">
                             <mat-header-cell *matHeaderCellDef>{{'lang.imgRelated' | translate}}</mat-header-cell>
                             <mat-cell *matCellDef="let element" color="primary">
-                                <mat-icon class="fm {{element.img_filename}} fm-2x"
+                                <mat-icon color="primary" class="fm {{element.img_filename}} fm-2x status-icon"
                                     *ngIf="element.img_filename?.indexOf('fm') == 0" aria-hidden="true"></mat-icon>
-                                <mat-icon class="fa {{element.img_filename}} fa-2x"
+                                <mat-icon color="primary" class="fa {{element.img_filename}} fa-2x status-icon"
                                     *ngIf="element.img_filename?.indexOf('fa') == 0" aria-hidden="true"></mat-icon>
                             </mat-cell>
                         </ng-container>
@@ -81,7 +81,7 @@
                             matTooltip="{{'lang.view' | translate}}"></mat-row>
                     </mat-table>
                     <div class="mat-paginator"
-                        style="min-height:48px;min-height: 48px;display: flex;justify-content: end;align-items: center;padding-right: 20px;">
+                        style="min-height:48px;display: flex;justify-content: end;align-items: center;padding-right: 20px;">
                         {{statuses.length}} {{'lang.statuses' | translate}}</div>
                 </mat-card>
             </div>

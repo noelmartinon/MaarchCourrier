@@ -333,7 +333,7 @@ class ResControllerTest extends TestCase
         $response     = $resController->create($fullRequest, new \Slim\Http\Response());
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Body senders[0] type is not valid', $responseBody['errors']);
+        $this->assertSame('Body senders[0][id] is empty or not an integer', $responseBody['errors']);
 
         $body = [
             'doctype' => 102,
@@ -381,7 +381,7 @@ class ResControllerTest extends TestCase
         $response     = $resController->create($fullRequest, new \Slim\Http\Response());
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Body recipients[0] type is not valid', $responseBody['errors']);
+        $this->assertSame('Body recipients[0][id] is empty or not an integer', $responseBody['errors']);
 
         $body = [
             'doctype' => 102,

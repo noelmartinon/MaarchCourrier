@@ -83,14 +83,14 @@ export class TechnicalInformationComponent implements OnInit {
     fetchData() {
         this.http.get(`../rest/resources/${this.data.resId}/fileInformation`).pipe(
             tap((data: any) => {
-                this.techData.format.value = data.information.format,
-                this.techData.fingerprint.value = data.information.fingerprint,
-                this.techData.size.value = this.functions.formatBytes(data.information.filesize),
-                this.techData.fulltext.value = data.information.fulltext_result,
-                this.techData.docserverPathFile.value = data.information.docserverPathFile,
-                this.techData.filename.value = data.information.filename,
-                this.techData.initiator.value = data.information.typistLabel,
-                this.techData.creationDate.value = this.datePipe.transform(data.information.creationDate, 'dd/MM/y HH:mm') ,
+                this.techData.format.value = data.information.format;
+                this.techData.fingerprint.value = data.information.fingerprint;
+                this.techData.size.value = this.functions.formatBytes(data.information.filesize);
+                this.techData.fulltext.value = data.information.fulltext_result;
+                this.techData.docserverPathFile.value = data.information.docserverPathFile;
+                this.techData.filename.value = data.information.filename;
+                this.techData.initiator.value = data.information.typistLabel;
+                this.techData.creationDate.value = this.datePipe.transform(data.information.creationDate, 'dd/MM/y HH:mm');
                 this.loading = false;
             }),
             exhaustMap(() => this.http.get('../rest/customFields')),

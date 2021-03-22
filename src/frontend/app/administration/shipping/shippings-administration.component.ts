@@ -8,8 +8,8 @@ import { MatSort } from '@angular/material/sort';
 import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
-import { FormControl } from '@angular/forms';
-import { catchError, debounceTime, map, tap } from 'rxjs/operators';
+import { FormControl, Validators } from '@angular/forms';
+import { catchError, debounceTime, filter, map, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
@@ -22,8 +22,8 @@ export class ShippingsAdministrationComponent implements OnInit {
 
     shippingConf: any = {
         enabled: new FormControl(false),
-        authUri: new FormControl('https://connect.maileva.com'),
-        uri: new FormControl('https://api.maileva.com'),
+        authUri: new FormControl('https://connect.maileva.com', [Validators.required]),
+        uri: new FormControl('https://api.maileva.com', [Validators.required]),
     };
 
     shippings: any[] = [];
@@ -80,6 +80,7 @@ export class ShippingsAdministrationComponent implements OnInit {
                     this.shippingConf[elemId].valueChanges
                         .pipe(
                             debounceTime(1000),
+                            filter(() => this.shippingConf['authUri'].valid && this.shippingConf['uri'].valid),
                             tap(() => {
                                 this.saveConfiguration();
                             }),

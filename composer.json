@@ -41,6 +41,7 @@
             "ExportSeda\\"              : "src/app/external/exportSeda/",
             "ExternalSignatoryBook\\"   : "src/app/external/externalSignatoryBook/",
             "ExternalSummary\\"         : "src/app/external/summary/",
+            "Outlook\\"                 : "src/app/external/outlook/",
             "Sendmail\\"                : "modules/sendmail/",
             "Noxxie\\PdfParser\\"       : "vendor/noxxie/pdfparser/src/Smalot/PdfParser/"
     	}
@@ -64,5 +65,8 @@
         "rafikhaceb/pi-barcode": "^1.0",
         "sdaoudi/oauth2-keycloak": "^2.2",
         "jasig/phpcas": "^1.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9"
     }
 }

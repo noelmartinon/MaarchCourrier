@@ -348,7 +348,7 @@ class MaarchParapheurController
                             $signaturePositions = null;
                             if (!empty($step['signaturePositions']) && is_array($step['signaturePositions'])) {
                                 $valid = true;
-                                foreach ($step['signaturePositions'] as $keySP => $signaturePosition) {
+                                foreach ($step['signaturePositions'] as $signaturePosition) {
                                     if (empty($signaturePosition['positionX']) || empty($signaturePosition['positionY']) || empty($signaturePosition['page'])) {
                                         $valid = false;
                                     }
@@ -360,7 +360,7 @@ class MaarchParapheurController
                             $datePositions = null;
                             if (!empty($step['datePositions']) && is_array($step['datePositions'])) {
                                 $valid = true;
-                                foreach ($step['datePositions'] as $keyDP => $datePosition) {
+                                foreach ($step['datePositions'] as $datePosition) {
                                     if (empty($datePosition['positionX']) || empty($datePosition['positionY']) || empty($datePosition['page'])) {
                                         $valid = false;
                                     } elseif (empty($datePosition['color']) || empty($datePosition['font']) || empty($datePosition['format']) || empty($datePosition['width'])) {
@@ -431,7 +431,7 @@ class MaarchParapheurController
                             $signaturePositions = null;
                             if (!empty($step['signaturePositions']) && is_array($step['signaturePositions'])) {
                                 $valid = true;
-                                foreach ($step['signaturePositions'] as $keySP => $signaturePosition) {
+                                foreach ($step['signaturePositions'] as $signaturePosition) {
                                     if (empty($signaturePosition['positionX']) || empty($signaturePosition['positionY']) || empty($signaturePosition['page'])) {
                                         $valid = false;
                                     }
@@ -443,7 +443,7 @@ class MaarchParapheurController
                             $datePositions = null;
                             if (!empty($step['datePositions']) && is_array($step['datePositions'])) {
                                 $valid = true;
-                                foreach ($step['datePositions'] as $keyDP => $datePosition) {
+                                foreach ($step['datePositions'] as $datePosition) {
                                     if (empty($datePosition['positionX']) || empty($datePosition['positionY']) || empty($datePosition['page'])) {
                                         $valid = false;
                                     } elseif (empty($datePosition['color']) || empty($datePosition['font']) || empty($datePosition['format']) || empty($datePosition['width'])) {
@@ -626,6 +626,12 @@ class MaarchParapheurController
                 $aArgs['idsToRetrieve'][$version][$resId]['encodedFile'] = $signedDocument['encodedDocument'];
                 if ($state['status'] == 'validated' && in_array($state['mode'], ['sign', 'visa'])) {
                     $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'validated';
+                    $signedProofDocument = MaarchParapheurController::getDocumentProof(['config' => $aArgs['config'], 'documentId' => $value['external_id']]);
+                    if (!empty($signedProofDocument['encodedProofDocument'])) {
+                        $aArgs['idsToRetrieve'][$version][$resId]['log']       = $signedProofDocument['encodedProofDocument'];
+                        $aArgs['idsToRetrieve'][$version][$resId]['logFormat'] = $signedProofDocument['format'];
+                        $aArgs['idsToRetrieve'][$version][$resId]['logTitle']  = '[Faisceau de preuve]';
+                    }
                 } elseif ($state['status'] == 'refused' && in_array($state['mode'], ['sign', 'visa'])) {
                     $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'refused';
                 } elseif ($state['status'] == 'validated' && $state['mode'] == 'note') {
@@ -677,6 +683,17 @@ class MaarchParapheurController
         ]);
 
         return $response['response']['workflow'];
+    }
+
+    public static function getDocumentProof(array $args)
+    {
+        $response = CurlModel::exec([
+            'url'       => rtrim($args['config']['data']['url'], '/') . '/rest/documents/' . $args['documentId'] . '/proof?onlyProof=true',
+            'basicAuth' => ['user' => $args['config']['data']['userId'], 'password' => $args['config']['data']['password']],
+            'method'    => 'GET'
+        ]);
+
+        return $response['response'];
     }
 
     public static function getDocument(array $args)

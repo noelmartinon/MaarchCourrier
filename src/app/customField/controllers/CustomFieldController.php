@@ -145,7 +145,7 @@ class CustomFieldController
             return $response->withStatus(400)->withJson(['errors' => 'Body mode is empty, not a string or value is incorrect']);
         }
 
-        $field = CustomFieldModel::getById(['select' => ['type', 'values', 'mode'], 'id' => $args['id']]);
+        $field = CustomFieldModel::getById(['select' => ['type', 'values', 'mode', 'id'], 'id' => $args['id']]);
         if (empty($field)) {
             return $response->withStatus(400)->withJson(['errors' => 'Custom field not found']);
         }
@@ -221,6 +221,23 @@ class CustomFieldController
             'data'  => [$args['id']]
         ]);
 
+        if (empty($body['SQLMode'])) {
+            $valuesTmp = $newValues;
+            $newValues = [];
+            foreach ($valuesTmp as $valueKey => $value) {
+                $newValues[] = ['key' => $valueKey, 'label' => $value];
+            }
+        }
+
+        $customField = [
+            'id'      => $field['id'],
+            'label'   => $body['label'],
+            'type'    => $field['type'],
+            'values'  => $newValues,
+            'mode'    => $body['mode'],
+            'SQLMode' => !empty($body['SQLMode'])
+        ];
+
         HistoryController::add([
             'tableName' => 'custom_fields',
             'recordId'  => $args['id'],
@@ -230,7 +247,7 @@ class CustomFieldController
             'eventId'   => 'customFieldModification',
         ]);
 
-        return $response->withStatus(204);
+        return $response->withJson(['customField' => $customField]);
     }
 
     public function delete(Request $request, Response $response, array $args)

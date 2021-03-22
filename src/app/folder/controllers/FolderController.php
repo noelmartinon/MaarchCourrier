@@ -644,7 +644,7 @@ class FolderController
         }
 
         $allEntitiesCanDelete = true;
-        foreach ($children as $key => $child) {
+        foreach ($children as $child) {
             if (!($child['keyword'] == 'ALL_ENTITIES' && $child['edition'] == true)) {
                 $allEntitiesCanDelete = false;
                 break;

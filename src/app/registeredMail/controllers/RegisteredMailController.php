@@ -254,7 +254,7 @@ class RegisteredMailController
         return $response->withJson(['previousStatus' => $registeredMail['status'], 'canRescan' => false]);
     }
 
-    public function rollbackAcknowledgementReception(Request $request, Response $response, array $args)
+    public function rollbackAcknowledgementReception(Request $request, Response $response)
     {
         if (!PrivilegeController::hasPrivilege(['privilegeId' => 'registered_mail_receive_ar', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);

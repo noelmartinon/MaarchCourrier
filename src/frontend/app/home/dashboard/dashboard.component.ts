@@ -56,26 +56,40 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         }
     }
 
-    getDashboardConfig() {
+    getDashboardConfig(position: number = null) {
         this.http.get('../rest/tiles').pipe(
             tap((data: any) => {
                 for (let index = 0; index < 6; index++) {
-                    const tmpTile = data.tiles.find((tile: any) => tile.position === index);
-                    if (!this.functionsService.empty(tmpTile)) {
-                        let objTile = {...this.dashboardService.getTile(tmpTile.type), ...tmpTile};
-                        if (tmpTile.type === 'shortcut') {
-                            objTile = {...objTile, ...this.initShortcutTile(tmpTile.parameters)};
+                    if (position === index || position === null) {
+                        const tmpTile = data.tiles.find((tile: any) => tile.position === index);
+                        if (!this.functionsService.empty(tmpTile)) {
+                            let objTile = { ...this.dashboardService.getTile(tmpTile.type), ...tmpTile };
+                            if (tmpTile.type === 'shortcut') {
+                                objTile = { ...objTile, ...this.initShortcutTile(tmpTile.parameters) };
+                            }
+                            objTile.charts = this.dashboardService.getCharts();
+                            objTile.label = this.functionsService.empty(objTile.label) ? this.translate.instant('lang.' + objTile.type) : objTile.label;
+                            objTile.parameters = this.functionsService.empty(objTile.parameters) ? {} : objTile.parameters;
+                            if (position !== null) {
+                                this.tiles[index] = objTile;
+                            } else {
+                                this.tiles.push(objTile);
+                            }
+                        } else {
+                            if (position !== null) {
+                                this.tiles[index] = {
+                                    id: null,
+                                    position: index,
+                                    editMode: false
+                                };
+                            } else {
+                                this.tiles.push({
+                                    id: null,
+                                    position: index,
+                                    editMode: false
+                                });
+                            }
                         }
-                        objTile.charts = this.dashboardService.getCharts();
-                        objTile.label = this.functionsService.empty(objTile.label) ? this.translate.instant('lang.' + objTile.type) : objTile.label;
-                        objTile.parameters = this.functionsService.empty(objTile.parameters) ? {} : objTile.parameters;
-                        this.tiles.push(objTile);
-                    } else {
-                        this.tiles.push({
-                            id: null,
-                            position: index,
-                            editMode: false
-                        });
                     }
                 }
             }),
@@ -88,7 +102,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
     initShortcutTile(param: any) {
         let menu: any = {
-            style : null
+            style: null
         };
         let route = '';
         let label = '';
@@ -113,7 +127,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         }
 
         return {
-            icon : menu.style,
+            icon: menu.style,
             privRoute: route,
             label: label
         };
@@ -154,7 +168,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.tiles.forEach((tile: any, index: number) => {
             tile.position = index;
         });
-        this.http.put('../rest/tilesPositions', {tiles : this.tiles.filter((tile: any) => tile.id !== null)}).pipe(
+        this.http.put('../rest/tilesPositions', { tiles: this.tiles.filter((tile: any) => tile.id !== null) }).pipe(
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
@@ -163,12 +177,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
     }
 
     addTilePrompt(tile: any) {
-        const dialogRef = this.dialog.open(TileCreateComponent, { panelClass: 'maarch-modal', width: '450px', autoFocus: false, disableClose: true, data: { position: tile.position} });
+        const dialogRef = this.dialog.open(TileCreateComponent, { panelClass: 'maarch-modal', width: '450px', autoFocus: false, disableClose: true, data: { position: tile.position } });
 
         dialogRef.afterClosed().pipe(
             filter((data: string) => !this.functionsService.empty(data)),
             tap((data: any) => {
-                this.tiles[tile.position] = {...this.dashboardService.getTile(data.type), ...data};
+                this.getDashboardConfig(tile.position);
             })
         ).subscribe();
     }

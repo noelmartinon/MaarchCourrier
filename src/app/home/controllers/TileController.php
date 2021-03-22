@@ -693,7 +693,8 @@ class TileController
         $rawQuery = json_decode($searchTemplate[0]['query'], true);
         $query = [];
         foreach ($rawQuery as $value) {
-            if (!empty($value['values'][0]['id']) && !in_array($value['identifier'], ['recipients', 'senders']) && strpos($value['identifier'], 'role_') === false) {
+            $definedVars = get_defined_vars();
+            if (!empty($value['values'][0]) && array_key_exists('id', $definedVars['value']['values'][0]) && !in_array($value['identifier'], ['recipients', 'senders']) && strpos($value['identifier'], 'role_') === false) {
                 $value['values'] = array_column($value['values'], 'id');
             } else {
                 if (!empty($value['values']['start'])) {

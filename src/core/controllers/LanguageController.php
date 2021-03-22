@@ -27,7 +27,7 @@ class LanguageController
         return $response->withJson($language);
     }
 
-    private static function getLanguage(array $args)
+    public static function getLanguage(array $args)
     {
         ValidatorModel::notEmpty($args, ['language']);
         ValidatorModel::stringType($args, ['language']);

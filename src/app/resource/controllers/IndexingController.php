@@ -149,11 +149,14 @@ class IndexingController
         $categories = ResModel::getCategories();
 
         foreach ($indexingParameters['indexingParameters']['actions'] as $value) {
-            $action         = ActionModel::getById(['id' => $value, 'select' => ['id', 'label_action', 'component', 'id_status']]);
+            $action         = ActionModel::getById(['id' => $value, 'select' => ['id', 'label_action', 'component', 'id_status', 'parameters']]);
             $categoriesList = ActionModel::getCategoriesById(['id' => $value]);
 
             $action['label']   = $action['label_action'];
-            $action['enabled'] = !empty($action['id_status']) && $action['id_status'] != '_NOSTATUS_';
+
+            $action['parameters'] = json_decode($action['parameters'], true);
+            $action['enabled'] = !empty($action['parameters']['successStatus']) ? $action['parameters']['successStatus'] != '_NOSTATUS_' : !empty($action['id_status']) && $action['id_status'] != '_NOSTATUS_';
+            unset($action['parameters']);
 
             if (!empty($categoriesList)) {
                 $action['categories'] = array_column($categoriesList, 'category_id');

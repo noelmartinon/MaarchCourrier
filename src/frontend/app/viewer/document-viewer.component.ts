@@ -78,6 +78,23 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
 
     /**
+     * Use in resourceDatas.inMailing = true
+     */
+    allowedExtensionsMailing: string[] = [
+        'doc',
+        'docx',
+        'dotx',
+        'odt',
+        'ott',
+        'html',
+        'xlsl',
+        'xlsx',
+        'xltx',
+        'ods',
+        'ots',
+        'csv',
+    ];
+    /**
      * To load specific attachment type in template list (to create document)
      */
     @Input() attachType: string = null;
@@ -454,28 +471,36 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         console.log(error);
     }
 
-    cleanFile() {
-        this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
+    cleanFile(confirm: boolean = true) {
+        if (confirm) {
+            this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.delete'), msg: this.translate.instant('lang.confirmAction') } });
 
-        this.dialogRef.afterClosed().pipe(
-            filter((data: string) => data === 'ok'),
-            tap(() => {
-                this.templateListForm.reset();
-                this.file = {
-                    name: '',
-                    type: '',
-                    content: null,
-                    src: null
-                };
-                this.docToUploadValue = '';
-                this.triggerEvent.emit('cleanFile');
-            }),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+            this.dialogRef.afterClosed().pipe(
+                filter((data: string) => data === 'ok'),
+                tap(() => {
+                    this.resetFileData();
+                }),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        } else {
+            this.resetFileData();
+        }
 
+    }
+
+    resetFileData() {
+        this.templateListForm.reset();
+        this.file = {
+            name: '',
+            type: '',
+            content: null,
+            src: null
+        };
+        this.docToUploadValue = '';
+        this.triggerEvent.emit('cleanFile');
     }
 
     async saveDocService() {
@@ -541,8 +566,10 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     isExtensionAllowed(file: any) {
         const fileExtension = '.' + file.name.toLowerCase().split('.').pop();
-        if (this.allowedExtensions.filter(ext => ext.mimeType === file.type && ext.extension === fileExtension).length === 0) {
-            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.notAllowedExtension') + ' !', msg: this.translate.instant('lang.file') + ' : <b>' + file.name + '</b>, ' + this.translate.instant('lang.type') + ' : <b>' + file.type + '</b><br/><br/><u>' + this.translate.instant('lang.allowedExtensions') + '</u> : <br/>' + this.allowedExtensions.map(ext => ext.extension).filter((elem: any, index: any, self: any) => index === self.indexOf(elem)).join(', ') } });
+        const allowedExtensions = this.resourceDatas?.inMailing ? this.allowedExtensions.filter(ext => this.allowedExtensionsMailing.indexOf(ext.extension.replace('.','')) > -1) : this.allowedExtensions
+
+        if (allowedExtensions.filter(ext => ext.mimeType === file.type && ext.extension === fileExtension).length === 0) {
+            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.notAllowedExtension') + ' !', msg: this.translate.instant('lang.file') + ' : <b>' + file.name + '</b>, ' + this.translate.instant('lang.type') + ' : <b>' + file.type + '</b><br/><br/><u>' + this.translate.instant('lang.allowedExtensions') + '</u> : <br/>' + allowedExtensions.map(ext => ext.extension).filter((elem: any, index: any, self: any) => index === self.indexOf(elem)).join(', ') } });
             return false;
         } else if (file.size > this.maxFileSize && this.maxFileSize > 0) {
             this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.maxFileSizeReached') + ' ! ', msg: this.translate.instant('lang.maxFileSize') + ' : ' + this.maxFileSizeLabel } });

@@ -107,7 +107,7 @@ class AuthenticationController
 
         $jsonFile = file_get_contents('custom/custom.json');
         $jsonFile = json_decode($jsonFile, true);
-        if (count($jsonFile) == 0) {
+        if (empty($jsonFile)) {
             return $response->withJson(['message' => 'No custom', 'lang' => 'noConfiguration']);
         } elseif (count($jsonFile) > 1) {
             return $response->withJson(['message' => 'There is more than 1 custom', 'lang' => 'moreOneCustom']);
@@ -802,7 +802,7 @@ class AuthenticationController
                 'sender'     => ['email' => $sender],
                 'recipients' => [$args['userEmail']],
                 'object'     => _NOTIFICATIONS_USER_CREATION_SUBJECT,
-                'body'       => _NOTIFICATIONS_USER_CREATION_BODY . '<a href="' . $url . '">'._CLICK_HERE.'</a><br/><br/>' . _YOUR_ID . ' ' . $user['user_id'] . _NOTIFICATIONS_USER_CREATION_FOOTER,
+                'body'       => _NOTIFICATIONS_USER_CREATION_BODY . '<a href="' . $url . '">'.$url.'</a><br/><br/>' . _YOUR_ID . ' ' . $user['user_id'] . _NOTIFICATIONS_USER_CREATION_FOOTER,
                 'isHtml'     => true,
                 'status'     => 'WAITING'
             ]

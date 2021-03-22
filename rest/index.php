@@ -410,7 +410,7 @@ $app->put('/sortedPriorities', \Priority\controllers\PriorityController::class .
 
 //Resources
 $app->post('/resources', \Resource\controllers\ResController::class . ':create');
-$app->get('/resources/external', \Resource\controllers\ResController::class . ':getByExternalId');
+$app->put('/resources/external', \Resource\controllers\ResController::class . ':getByExternalId');
 $app->get('/resources/{resId}', \Resource\controllers\ResController::class . ':getById');
 $app->put('/resources/{resId}', \Resource\controllers\ResController::class . ':update');
 $app->get('/resources/{resId}/content', \Resource\controllers\ResController::class . ':getFileContent');
@@ -693,5 +693,7 @@ $app->put('/registeredMails/acknowledgement', \RegisteredMail\controllers\Regist
 $app->put('/registeredMails/acknowledgement/rollback', \RegisteredMail\controllers\RegisteredMailController::class . ':rollbackAcknowledgementReception');
 $app->put('/registeredMails/import', \RegisteredMail\controllers\RegisteredMailController::class . ':setImport');
 $app->put('/registeredMails/{resId}', \RegisteredMail\controllers\RegisteredMailController::class . ':update');
+
+$app->get('/plugins/outlook/manifest', \Outlook\controllers\OutlookController::class . ':generateManifest');
 
 $app->run();

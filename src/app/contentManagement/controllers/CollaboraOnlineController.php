@@ -81,10 +81,10 @@ class CollaboraOnlineController
             $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
             $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
 
-            if (empty($convertedDocument) && empty($document['fingerprint']) && $tokenCheckResult['type'] == 'resourceModification') {
+            if (empty($document['fingerprint']) && $tokenCheckResult['type'] == 'resourceModification') {
                 ResModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$args['id']]]);
                 $document['fingerprint'] = $fingerprint;
-            } elseif (empty($convertedDocument) && empty($document['fingerprint']) && $tokenCheckResult['type'] == 'attachmentModification') {
+            } elseif (empty($document['fingerprint']) && $tokenCheckResult['type'] == 'attachmentModification') {
                 AttachmentModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$args['id']]]);
                 $document['fingerprint'] = $fingerprint;
             }

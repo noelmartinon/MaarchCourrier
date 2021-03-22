@@ -49,7 +49,7 @@ class ListInstanceHistoryController
                 'data'      => [$value['listinstance_history_id'], 'entity_id']
             ]);
             $formattedDetails = [];
-            foreach ($listInstancesDetails as $key => $listInstancesDetail) {
+            foreach ($listInstancesDetails as $listInstancesDetail) {
                 if (empty($formattedDetails[$listInstancesDetail['item_mode']])) {
                     $formattedDetails[$listInstancesDetail['item_mode']] = ['items' => []];
                 }
@@ -105,7 +105,7 @@ class ListInstanceHistoryController
         ]);
 
         $formattedHistory = [];
-        foreach ($listInstancesModification as $limKey => $value) {
+        foreach ($listInstancesModification as $value) {
             $where = ['listinstance_history_id = ?'];
             $data = [$value['listinstance_history_id']];
             if (!empty($queryParams['type']) && in_array($queryParams['type'], ['visaCircuit', 'opinionCircuit'])) {

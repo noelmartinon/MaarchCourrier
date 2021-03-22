@@ -23,8 +23,7 @@
  *
  * @author Cyril Vazquez <cyril.vazquez@maarch.org>
  */
-class DOMTemplateProcessor
-    extends \DOMXPath
+class DOMTemplateProcessor extends \DOMXPath
 {
     /**
      * The array of parsed processing instructions
@@ -136,7 +135,7 @@ class DOMTemplateProcessor
             $node = $this->document->documentElement;
         }
 
-        switch($node->nodeType) {
+        switch ($node->nodeType) {
             case \XML_ELEMENT_NODE:
                 $childNodeList = $node->childNodes;
                 for ($i=$childNodeList->length-1; $i>=0; $i--) {
@@ -193,7 +192,7 @@ class DOMTemplateProcessor
 
         foreach ($mergeNodes as $i => $mergeNode) {
             switch ($mergeNode->nodeType) {
-                case XML_PI_NODE :
+                case XML_PI_NODE:
                     if (!isset($this->parsedPis[$mergeNode->data])) {
                         $this->parsedPis[$mergeNode->data] = $this->parse($mergeNode->data);
                     }
@@ -241,9 +240,6 @@ class DOMTemplateProcessor
 
         // Get type of value
         $type = gettype($value);
-        //var_dump($type);
-        //if (isset($instr->params['source']))
-        //    var_dump($instr->params['source']);
 
         switch (true) {
             // If value is scalar, merge text before Pi
@@ -264,19 +260,19 @@ class DOMTemplateProcessor
             case $type == 'array':
                 return $this->mergeArray($pi, $instr, $value);
 
-            case $type == 'object' :
+            case $type == 'object':
                 switch (true) {
                     // Object merged with a form
-                    case ($targetForm = $this->query("following-sibling::form", $pi)->item(0)) :
+                    case ($targetForm = $this->query("following-sibling::form", $pi)->item(0)):
                         $this->mergedForms->attach($targetForm, array($pi, $instr, $value));
                         break;
 
                     // ArrayObject -> merge array
-                    case ($value instanceof \ArrayAccess && $value instanceof \Iterator) :
+                    case ($value instanceof \ArrayAccess && $value instanceof \Iterator):
                         return $this->mergeArray($pi, $instr, $value);
 
                     // DOMNode -> merge as xml
-                    case $value instanceof \DOMNode :
+                    case $value instanceof \DOMNode:
                         return $this->mergeNode($pi, $instr, $value);
 
                     // If value is an object but no form : merge string version if possible
@@ -285,7 +281,6 @@ class DOMTemplateProcessor
                 }
 
         }
-
     }
 
     protected function addVar($name, &$var)
@@ -398,7 +393,6 @@ class DOMTemplateProcessor
 
             $targetNode = $this->document->createDocumentFragment();
             $targetNode->appendXML($source);
-
         } elseif (!$targetNode = $this->query("following-sibling::*", $pi)->item(0)) {
             return true;
         }
@@ -589,10 +583,6 @@ class DOMTemplateProcessor
     ------------------------------------------------------------------------ */
     protected function &getData($instr, $source = null)
     {
-        //var_dump("getData");
-        //var_dump($instr);
-        //var_dump($source);
-
         $value = null;
 
         $steps = $instr->source;
@@ -637,9 +627,6 @@ class DOMTemplateProcessor
 
     protected function &stepData($step, $source)
     {
-        //var_dump("stepData");
-        //var_dump($step);
-        //var_dump("from " . gettype($source));
         $value = null;
         switch ($step[0]) {
             case 'func':
@@ -675,7 +662,7 @@ class DOMTemplateProcessor
 
             return $value;
         }
-        //var_dump($params);
+
         switch ($name) {
             // Callback functions
             case 'func':
@@ -1046,8 +1033,8 @@ class DOMTemplateProcessor
         for ($i = 0, $l = count($steps); $i < $l; $i++) {
             $step = $steps[$i];
             switch (true) {
-                case $step == "" :
-                case $step == false :
+                case $step == "":
+                case $step == false:
                     if ($i == 0) {
                         $source[] = array('arg', '');
                     } else {
@@ -1067,7 +1054,7 @@ class DOMTemplateProcessor
                     $source[] = array($ext['ext'], $ext['name']);
                     break;
 
-                case preg_match('#^(?<name>[^(\/]+)\((?<params>.*)?\)$#', $step, $func) :
+                case preg_match('#^(?<name>[^(\/]+)\((?<params>.*)?\)$#', $step, $func):
                     $params = $this->explode($func['params'], ",");
                     $source[] = array('func', $func['name'], $params);
                     break;
@@ -1076,7 +1063,7 @@ class DOMTemplateProcessor
                     $source[] = array('offset', $offset['name']);
                     break;
 
-                case preg_match('#^\/(?<name>[^(]+)\((?<params>.*)?\)$#', $step, $method) :
+                case preg_match('#^\/(?<name>[^(]+)\((?<params>.*)?\)$#', $step, $method):
                     $params = $this->explode($method['params'], ",");
                     $source[] = array('method', $method['name'], $params);
                     break;
@@ -1121,24 +1108,38 @@ class DOMTemplateProcessor
             // Special characters that affect parsing
             switch ($str[$i]) {
                 case "'":
-                    if (!$sq) $sq = true;
-                    else $sq = false;
+                    if (!$sq) {
+                        $sq = true;
+                    } else {
+                        $sq = false;
+                    }
                     break;
                 case '"':
-                    if (!$dq) $dq = true;
-                    else $dq = false;
+                    if (!$dq) {
+                        $dq = true;
+                    } else {
+                        $dq = false;
+                    }
                     break;
                 case '(':
-                    if (!$sq && !$dq) $br++;
+                    if (!$sq && !$dq) {
+                        $br++;
+                    }
                     break;
                 case ')':
-                    if (!$sq && !$dq) $br--;
+                    if (!$sq && !$dq) {
+                        $br--;
+                    }
                     break;
                 case '[':
-                    if (!$sq && !$dq) $sbr++;
+                    if (!$sq && !$dq) {
+                        $sbr++;
+                    }
                     break;
                 case ']':
-                    if (!$sq && !$dq) $sbr--;
+                    if (!$sq && !$dq) {
+                        $sbr--;
+                    }
                     break;
                 case '\\':
                     $esc = true;
@@ -1206,18 +1207,28 @@ class DOMTemplateProcessor
             // Special characters that affect parsing
             switch ($str[$i]) {
                 case "'":
-                    if (!$sq) $sq = true;
-                    else $sq = false;
+                    if (!$sq) {
+                        $sq = true;
+                    } else {
+                        $sq = false;
+                    }
                     break;
                 case '"':
-                    if (!$dq) $dq = true;
-                    else $dq = false;
+                    if (!$dq) {
+                        $dq = true;
+                    } else {
+                        $dq = false;
+                    }
                     break;
                 case '(':
-                    if (!$sq && !$dq) $br++;
+                    if (!$sq && !$dq) {
+                        $br++;
+                    }
                     break;
                 case ')':
-                    if (!$sq && !$dq) $br--;
+                    if (!$sq && !$dq) {
+                        $br--;
+                    }
                     break;
                 case '\\':
                     $esc = true;
@@ -1225,11 +1236,13 @@ class DOMTemplateProcessor
             }
         }
         $tail = trim(substr($str, $o, $i - $o));
-        if ($tail !== false)
+        if ($tail !== false) {
             $steps[] = $tail;
+        }
 
-        if ($sq || $dq || $br || $sbr || $esc)
+        if ($sq || $dq || $br || $sbr || $esc) {
             throw new \Exception("Invalid string: unexpected end of string at offset $i");
+        }
 
         return $steps;
     }

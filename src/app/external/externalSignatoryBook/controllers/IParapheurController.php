@@ -311,7 +311,7 @@ class IParapheurController
                         return ['error' => 'Curl response is a boolean'];
                     }
                     $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
-                } catch (Exception $e) {
+                } catch (\Exception $e) {
                     return ['error' => 'Exception : ' . $e->getMessage()];
                 }
 

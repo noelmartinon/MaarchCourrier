@@ -147,9 +147,6 @@ export class SentResourcePageComponent implements OnInit {
         // this.loading = false;
         setTimeout(() => {
             this.initMce();
-            setTimeout(() => {
-                this.sendmailClone = JSON.stringify(this.formatEmail());
-            }, 500);
         }, 0);
     }
 
@@ -160,6 +157,7 @@ export class SentResourcePageComponent implements OnInit {
             setup: (editor: any) => {
                 editor.on('init', () => {
                     this.loading = false;
+                    this.sendmailClone = JSON.stringify(this.formatEmail());
                 });
             },
             readonly: this.emailStatus === 'SENT' || this.data.status === 'WAITING',

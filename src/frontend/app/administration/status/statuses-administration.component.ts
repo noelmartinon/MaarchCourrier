@@ -10,13 +10,13 @@ import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
 
 @Component({
-    templateUrl: 'statuses-administration.component.html'
+    templateUrl: 'statuses-administration.component.html',
+    styleUrls: ['statuses-administration.component.scss']
 })
 export class StatusesAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
     loading: boolean = false;
 
     statuses: Status[] = [];

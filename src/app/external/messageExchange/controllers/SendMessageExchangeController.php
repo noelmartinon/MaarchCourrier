@@ -45,9 +45,9 @@ class SendMessageExchangeController
         ]);
 
         $entities = [];
-        foreach ($rawEntities as $key => $entity) {
+        foreach ($rawEntities as $entity) {
             $entities[] = [
-                'id' => $entity['id'],
+                'id'    => $entity['id'],
                 'label' => $entity['entity_label'],
                 'm2m'   => $entity['business_id']
             ];
@@ -75,7 +75,7 @@ class SendMessageExchangeController
         $oData->ArchivalAgency->Identifier->value     = $dataObject->ArchivalAgency->Identifier->value;
         
         $oData->archivalAgreement                     = new \stdClass();
-        $oData->archivalAgreement->value              = ""; // TODO : ???
+        $oData->archivalAgreement->value              = "";
         
         $replyCode = "";
         if (!empty($dataObject->ReplyCode)) {

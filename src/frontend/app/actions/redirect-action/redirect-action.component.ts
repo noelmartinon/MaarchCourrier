@@ -306,7 +306,7 @@ export class RedirectActionComponent implements OnInit {
     checkValidity() {
         if (this.redirectMode === 'entity' && this.appDiffusionsList && this.appDiffusionsList.getDestUser().length > 0 && this.currentEntity.serialId > 0 && !this.loading) {
             return false;
-        } if (this.redirectMode === 'user' && this.currentDiffusionListDestRedirect.length > 0 && this.destUser != null && !this.loading) {
+        } else if (this.redirectMode === 'user' && this.currentDiffusionListDestRedirect.length > 0 && this.destUser != null && !this.loading) {
             return false;
         } else {
             return true;

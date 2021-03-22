@@ -198,7 +198,7 @@ class SignatureBookController
         $canUpdateDocuments = SignatureBookController::isResourceInSignatureBook(['resId' => $args['resId'], 'userId' => $args['userId'], 'canUpdateDocuments' => true]);
 
         foreach ($attachments as $key => $value) {
-            if (($value['attachment_type'] == 'signed_response' && !empty($value['origin']))) {
+            if ($value['attachment_type'] == 'signed_response' && !empty($value['origin'])) {
                 continue;
             }
 
@@ -209,8 +209,7 @@ class SignatureBookController
             foreach ($attachments as $tmpKey => $tmpValue) {
                 if ($value['status'] == 'SIGN' && $tmpValue['attachment_type'] == 'signed_response' && !empty($tmpValue['origin'])) {
                     $signDaddy = explode(',', $tmpValue['origin']);
-                    if (($signDaddy[0] == $value['res_id'] && $signDaddy[1] == "res_attachments")
-                    ) {
+                    if ($signDaddy[0] == $value['res_id'] && $signDaddy[1] == "res_attachments") {
                         $viewerId = $tmpValue['res_id'];
                         unset($attachments[$tmpKey]);
                     }

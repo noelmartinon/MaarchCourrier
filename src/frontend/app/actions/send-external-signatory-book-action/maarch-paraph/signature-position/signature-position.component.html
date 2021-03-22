@@ -37,7 +37,7 @@
                 </a>
             </nav>
             <div class="signatureContainer">
-                <div id="myBounds" #myBounds style="position: absolute;position: absolute;"
+                <div id="myBounds" #myBounds style="position: absolute;"
                     [style.width.px]="workingAreaWidth" [style.height.px]="workingAreaHeight">
                     <ng-container *ngFor="let sign of signList;let indexSign=index;">
                         <div *ngIf="sign.page === currentPage" [class.signDisabled]="currentUser!==sign.sequence"

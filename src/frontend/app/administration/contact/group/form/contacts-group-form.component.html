@@ -28,6 +28,69 @@
                 {{'lang.displayed' | translate}}</span> :
         </div>
         <div style="width: 100%;">
+            <div>
+                <mat-form-field *ngIf="canAddCorrespondents && !creationMode" appearance="outline" style="font-size: 12px;">
+                    <mat-label>{{'lang.linkCorrespondents' | translate}}</mat-label>
+                    <input matInput #searchCorrespondent #trigger="matAutocompleteTrigger" [formControl]="searchCorrespondentInputControl"
+                        [matAutocomplete]="auto">
+                    <button mat-button *ngIf="searchCorrespondent.value" matSuffix mat-icon-button aria-label="Clear"
+                        (click)="searchCorrespondentInputControl.reset('');dataSource=null" [title]="'lang.clearFilter' | translate">
+                        <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
+                    </button>
+                    <mat-autocomplete #auto="matAutocomplete" class="addCorrespondentAC" (closed)="searchCorrespondentInputControl.reset('');dataSource=null">
+                        <mat-option disabled *ngIf="dataSource && dataSource.data.length === 0">
+                            {{'lang.noResult' | translate}}, <a (click)="openContactForm()" style="cursor: pointer;">{{'lang.createContact' | translate}} ?</a></mat-option>
+                        <mat-option disabled *ngIf="dataSource && dataSource.data.length > 0"
+                            style="display: none;"></mat-option>
+                        <div *ngIf="dataSource && dataSource.data.length > 0">
+                            <div class="title-search-result">
+                                <span style="color: #666;flex:1;">
+                                    <span [innerHTML]="'lang.linkedSearchTo' | translate:{value: searchCorrespondentInputControl.value}"></span>,
+                                    <a *ngIf="privilegeService.hasCurrentUserPrivilege('add_correspondent_in_shared_groups_on_profile')" (click)="openContactForm()" style="cursor: pointer;">{{'lang.createContact' | translate  | lowercase}} ?</a>
+                                </span>
+                                <span style="color:#666">
+                                    <a color="primary" (click)="!savingCorrespondents ? toggleAll(trigger) : false"
+                                        [style.opacity]="savingCorrespondents ? '0.5' : '1'"
+                                        style="cursor: pointer;">{{ 'lang.selectAll' | translate }}</a>
+                                    ({{dataSource.data.length}} {{'lang.records' | translate}})
+                                </span>
+                            </div>
+                            <cdk-virtual-scroll-viewport *ngIf="!displayCorrespondents" itemSize="48"
+                                class="example-viewport" style="height: 300px;">
+
+                                <mat-selection-list (selectionChange)="toggleCorrespondent($event.option.value)">
+                                    <ng-container *cdkVirtualFor="let element of dataSource.data;let i=index">
+                                        <mat-list-option checkboxPosition="before" class="correspondent-list-item"
+                                            color="primary"
+                                            [disabled]="selection.isSelected(element) || isInGrp(element)"
+                                            [selected]="selection.isSelected(element) || isInGrp(element)"
+                                            [value]="element">
+                                            <p mat-line class="search-result-container">
+                                                <span *ngFor="let item of displayedColumns"
+                                                    style="overflow: hidden;text-overflow: ellipsis;font-size: 12px;">
+                                                    <ng-container *ngIf="item==='type'; else elseData">
+                                                        <mat-icon color="primary"
+                                                            [title]="'lang.' + element.type | translate"
+                                                            class="correspondent-type-icon fa"
+                                                            [class.fa-address-card]="element.type === 'contact'"
+                                                            [class.fa-user]="element.type === 'user'"
+                                                            [class.fa-sitemap]="element.type === 'entity'">
+                                                        </mat-icon>
+                                                    </ng-container>
+                                                    <ng-template #elseData>
+                                                        <span [title]="element[item]"
+                                                            [class.empty]="element[item]===('lang.addressNotSet' | translate)">{{element[item]}}</span>
+                                                    </ng-template>
+                                                </span>
+                                            </p>
+                                        </mat-list-option>
+                                    </ng-container>
+                                </mat-selection-list>
+                            </cdk-virtual-scroll-viewport>
+                        </div>
+                    </mat-autocomplete>
+                </mat-form-field> 
+            </div>
             <div class="displayed-title">
                 <div style="text-align: center;">
                     <button mat-icon-button *ngIf="canAddCorrespondents && relatedCorrespondentsSelected.hasValue()"
@@ -37,79 +100,13 @@
                     </button>
                 </div>
                 <div>
-                    <mat-form-field *ngIf="!canAddCorrespondents && !creationMode">
+                    <mat-form-field *ngIf="!creationMode">
                         <input matInput #filterUser [formControl]="filterInputControl"
                             [placeholder]="'lang.filterBy' | translate">
                         <button mat-button *ngIf="filterUser.value" matSuffix mat-icon-button aria-label="Clear"
                             (click)="filterInputControl.reset('')" [title]="'lang.clearFilter' | translate">
                             <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
                         </button>
-                    </mat-form-field>
-                    <mat-form-field *ngIf="canAddCorrespondents && !creationMode">
-                        <input matInput #filterUser #trigger="matAutocompleteTrigger" [formControl]="filterInputControl"
-                            placeholder="{{'lang.filterBy' | translate}} / {{'lang.linkContact' | translate}}"
-                            [matAutocomplete]="auto">
-                        <button mat-stroked-button color="primary" *ngIf="filterUser.value !== '' && !dataSource" [title]="'lang.searchForCorrespondentsGroupAssociation' | translate" matSuffix style="font-size: 12px;line-height: 20px;"
-                            (click)="searchContact(filterUser.value,$event,trigger);open($event,trigger)">
-                        {{'lang.associate' | translate}}...
-                        </button>
-                        <button mat-button *ngIf="filterUser.value" matSuffix mat-icon-button aria-label="Clear"
-                            (click)="filterInputControl.reset('')" [title]="'lang.clearFilter' | translate">
-                            <mat-icon class="fas fa-times" style="color:#B3B3B3"></mat-icon>
-                        </button>
-                        <mat-autocomplete #auto="matAutocomplete" class="addCorrespondentAC"
-                            [panelWidth]="(dataSource && dataSource.data.length > 0) ? '900px' : undefined">
-                            <mat-option disabled *ngIf="dataSource && dataSource.data.length === 0">
-                                {{'lang.noResult' | translate}}, <a (click)="openContactForm()" style="cursor: pointer;">{{'lang.createContact' | translate}} ?</a></mat-option>
-                            <mat-option disabled *ngIf="dataSource && dataSource.data.length > 0"
-                                style="display: none;"></mat-option>
-                            <div *ngIf="dataSource && dataSource.data.length > 0">
-                                <div class="title-search-result">
-                                    <span style="color: #666;flex:1;">
-                                        <span [innerHTML]="'lang.linkedSearchTo' | translate:{value: filterUser.value}"></span>,
-                                        <a *ngIf="privilegeService.hasCurrentUserPrivilege('add_correspondent_in_shared_groups_on_profile')" (click)="openContactForm()" style="cursor: pointer;">{{'lang.createContact' | translate  | lowercase}} ?</a>
-                                    </span>
-                                    <span style="color:#666">
-                                        <a color="primary" (click)="!savingCorrespondents ? toggleAll() : false"
-                                            [style.opacity]="savingCorrespondents ? '0.5' : '1'"
-                                            style="cursor: pointer;">{{ 'lang.selectAll' | translate }}</a>
-                                        ({{dataSource.data.length}} {{'lang.records' | translate}})
-                                    </span>
-                                </div>
-                                <cdk-virtual-scroll-viewport *ngIf="!displayCorrespondents" itemSize="48"
-                                    class="example-viewport" style="height: 300px;">
-
-                                    <mat-selection-list (selectionChange)="toggleCorrespondent($event.option.value)">
-                                        <ng-container *cdkVirtualFor="let element of dataSource.data;let i=index">
-                                            <mat-list-option checkboxPosition="before" class="correspondent-list-item"
-                                                color="primary"
-                                                [disabled]="selection.isSelected(element) || isInGrp(element)"
-                                                [selected]="selection.isSelected(element) || isInGrp(element)"
-                                                [value]="element">
-                                                <p mat-line class="search-result-container">
-                                                    <span *ngFor="let item of displayedColumns"
-                                                        style="overflow: hidden;text-overflow: ellipsis;font-size: 12px;">
-                                                        <ng-container *ngIf="item==='type'; else elseData">
-                                                            <mat-icon color="primary"
-                                                                [title]="'lang.' + element.type | translate"
-                                                                class="correspondent-type-icon fa"
-                                                                [class.fa-address-card]="element.type === 'contact'"
-                                                                [class.fa-user]="element.type === 'user'"
-                                                                [class.fa-sitemap]="element.type === 'entity'">
-                                                            </mat-icon>
-                                                        </ng-container>
-                                                        <ng-template #elseData>
-                                                            <span [title]="element[item]"
-                                                                [class.empty]="element[item]===('lang.addressNotSet' | translate)">{{element[item]}}</span>
-                                                        </ng-template>
-                                                    </span>
-                                                </p>
-                                            </mat-list-option>
-                                        </ng-container>
-                                    </mat-selection-list>
-                                </cdk-virtual-scroll-viewport>
-                            </div>
-                        </mat-autocomplete>
                     </mat-form-field>
                 </div>
                 <div>

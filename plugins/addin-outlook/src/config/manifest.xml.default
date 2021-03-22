@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0" xsi:type="MailApp">
-  <Id>{APP_UUID}</Id>
+  <Id>{config.applicationUuid}</Id>
   <Version>1.0.0.0</Version>
   <ProviderName>Maarch</ProviderName>
-  <DefaultLocale>{LANG.ISO}</DefaultLocale>
-  <DisplayName DefaultValue="{APP_NAME}"/>
-  <Description DefaultValue="{LANG.ADDIN_OUTLOOK_DESC}"/>
-  <IconUrl DefaultValue="https://{INSTANCE_URL}/dist-addin/assets/logo-32.png"/>
-  <HighResolutionIconUrl DefaultValue="https://{INSTANCE_URL}/dist-addin/assets/logo-80.png"/>
+      <DefaultLocale>{lang.langISO}</DefaultLocale>
+  <DisplayName DefaultValue="{config.applicationName}"/>
+  <Description DefaultValue="{lang.addinOutlookDesc}"/>
+  <IconUrl DefaultValue="{config.instanceUrl}dist-addin/assets/logo-32.png"/>
+  <HighResolutionIconUrl DefaultValue="{config.instanceUrl}dist-addin/assets/logo-80.png"/>
   <SupportUrl DefaultValue="https://www.maarch.com/"/>
   <AppDomains>
-    <AppDomain>https://{APP_URL}</AppDomain>
+    <AppDomain>{config.applicationUrl}</AppDomain>
   </AppDomains>
   <Hosts>
     <Host Name="Mailbox"/>
@@ -23,7 +23,7 @@
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <SourceLocation DefaultValue="https://{INSTANCE_URL}/dist-addin/index.html"/>
+        <SourceLocation DefaultValue="{config.instanceUrl}dist-addin/index.html"/>
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -70,19 +70,19 @@
     </Hosts>
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://{INSTANCE_URL}/dist-addin/assets/logo-16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://{INSTANCE_URL}/dist-addin/assets/logo-32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://{INSTANCE_URL}/dist-addin/assets/logo-80.png"/>
+        <bt:Image id="Icon.16x16" DefaultValue="{config.instanceUrl}dist-addin/assets/logo-16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="{config.instanceUrl}dist-addin/assets/logo-32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="{config.instanceUrl}dist-addin/assets/logo-80.png"/>
       </bt:Images>
       <bt:Urls>
-        <bt:Url id="Taskpane.Url" DefaultValue="https://{INSTANCE_URL}/dist-addin/index.html"/>
+        <bt:Url id="Taskpane.Url" DefaultValue="{config.instanceUrl}dist-addin/index.html"/>
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GroupLabel" DefaultValue="Contoso Add-in"/>
-        <bt:String id="TaskpaneButton.Label" DefaultValue="{LANG.SEND}..."/>
+            <bt:String id="TaskpaneButton.Label" DefaultValue="{lang.send}..."/>
       </bt:ShortStrings>
       <bt:LongStrings>
-        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Ouvre le panneau afin d'effectuer des actions pour Maarch Courrier."/>
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="{lang.addinOutlookSendDesc}"/>
       </bt:LongStrings>
     </Resources>
   </VersionOverrides>

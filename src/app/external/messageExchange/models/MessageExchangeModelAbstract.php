@@ -266,7 +266,7 @@ abstract class MessageExchangeModelAbstract
                     'filesize'                     => $filesize
                 ]
                 ]);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return ['error' => $e];
         }
 

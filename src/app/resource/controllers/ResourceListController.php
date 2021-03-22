@@ -1219,7 +1219,7 @@ class ResourceListController
             'groupBy'   => ['priority']
         ]);
 
-        foreach ($rawPriorities as $key => $value) {
+        foreach ($rawPriorities as $value) {
             $priority = null;
             if (!empty($value['priority'])) {
                 $priority = PriorityModel::getById(['select' => ['label'], 'id' => $value['priority']]);
@@ -1239,7 +1239,7 @@ class ResourceListController
             'data'      => $dataCategories,
             'groupBy'   => ['category_id']
         ]);
-        foreach ($rawCategories as $key => $value) {
+        foreach ($rawCategories as $value) {
             $label = null;
             if (!empty($value['category_id'])) {
                 foreach ($allCategories as $category) {
@@ -1262,7 +1262,7 @@ class ResourceListController
             'data'      => $dataStatuses,
             'groupBy'   => ['status']
         ]);
-        foreach ($rawStatuses as $key => $value) {
+        foreach ($rawStatuses as $value) {
             if (!empty($value['status'])) {
                 $status = StatusModel::getById(['select' => ['label_status'], 'id' => $value['status']]);
                 $statuses[] = [
@@ -1280,7 +1280,7 @@ class ResourceListController
             'data'      => $dataEntities,
             'groupBy'   => ['destination']
         ]);
-        foreach ($rawEntities as $key => $value) {
+        foreach ($rawEntities as $value) {
             $entity = null;
             if (!empty($value['destination'])) {
                 $entity = EntityModel::getByEntityId(['select' => ['entity_label'], 'entityId' => $value['destination']]);
@@ -1299,7 +1299,7 @@ class ResourceListController
             'data'      => $dataDocTypes,
             'groupBy'   => ['type_id', 'type_label']
         ]);
-        foreach ($rawDocType as $key => $value) {
+        foreach ($rawDocType as $value) {
             $docTypes[] = [
                 'id'        => empty($value['type_id']) ? null : $value['type_id'],
                 'label'     => empty($value['type_label']) ? '_UNDEFINED' : $value['type_label'],
@@ -1331,7 +1331,7 @@ class ResourceListController
                 'data'    => [$resIds, $GLOBALS['id'], $userEntities, 'ALL_ENTITIES'],
                 'groupBy' => ['folders.id', 'folders.label']
             ]);
-            foreach ($rawFolders as $key => $value) {
+            foreach ($rawFolders as $value) {
                 $folders[] = [
                     'id'    => empty($value['id']) ? null : $value['id'],
                     'label' => empty($value['label']) ? '_UNDEFINED' : $value['label'],

@@ -187,7 +187,7 @@ class CoreController
         }
     }
 
-    public static function getAvailableCoreLanguages(Request $request, Response $response)
+    public function getAvailableCoreLanguages(Request $request, Response $response)
     {
         $files = array_diff(scandir('src/lang'), ['..', '.']);
         $arrLanguages = [];

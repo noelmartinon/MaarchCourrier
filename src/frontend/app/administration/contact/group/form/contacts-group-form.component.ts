@@ -69,6 +69,7 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
     private destroy$ = new Subject<boolean>();
     filtersChange = new EventEmitter();
     filterInputControl = new FormControl('');
+    searchCorrespondentInputControl = new FormControl('');
 
     @ViewChild('contactsGroupTreeTemplate', { static: true }) contactsGroupTreeTemplate: TemplateRef<any>;
     @ViewChild('paginatorLinkedCorrespondents', { static: false }) paginatorLinkedCorrespondents: MatPaginator;
@@ -107,6 +108,17 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
         } else {
             this.creationMode = false;
             this.getContactGroup(this.contactGroupId);
+            this.searchCorrespondentInputControl.valueChanges.pipe(
+                startWith(''),
+                debounceTime(300),
+                tap((value: any) => {
+                    if (this.functionsService.empty(value)) {
+                        this.dataSource = null;
+                    } else {
+                        this.searchContact(value);
+                    }
+                })
+            ).subscribe();
         }
     }
 
@@ -273,7 +285,7 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
         this.filtersChange.emit();
     }
 
-    searchContact(search: string, event: Event, trigger: MatAutocompleteTrigger) {
+    searchContact(search: string) {
         this.loadingCorrespondents = true;
         this.displayCorrespondents = true;
         this.http.get('../rest/autocomplete/correspondents', { params: { 'noContactsGroups': 'true', 'limit': '1000', 'search': search } }).pipe(
@@ -289,10 +301,7 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
                 });
                 this.dataSource = new MatTableDataSource(this.searchResult);
                 this.loadingCorrespondents = false;
-                setTimeout(() => {
-                    trigger.openPanel();
-                    this.displayCorrespondents = false;
-                }, 100);
+                this.displayCorrespondents = false;
             })
         ).subscribe();
     }
@@ -406,7 +415,7 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
         return isInGrp;
     }
 
-    toggleAll() {
+    toggleAll(trigger: MatAutocompleteTrigger) {
         this.dataSource.data.forEach((row: any) => {
             if (!this.isInGrp(row)) {
                 this.selection.select(row);
@@ -415,6 +424,7 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
         if (this.selection.selected.length > 0) {
             this.saveContactsList();
         }
+        trigger.closePanel();
     }
 
     toggleCorrespondent(element: any) {

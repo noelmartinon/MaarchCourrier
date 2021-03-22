@@ -231,8 +231,8 @@ class ConvertThumbnailController
             'encodedResource'   => base64_encode($content),
             'format'            => 'png'
         ]);
-        if (!empty($storeInfos['errors'])) {
-            return ['errors' => $storeInfos['errors']];
+        if (!empty($storeResult['errors'])) {
+            return ['errors' => $storeResult['errors']];
         }
 
         unlink("{$tmpPath}{$fileNameOnTmp}.png");

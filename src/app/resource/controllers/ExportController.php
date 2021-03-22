@@ -55,7 +55,7 @@ class ExportController
         return $response->withJson(['templates' => $templates]);
     }
 
-    public function updateExport(Request $request, Response $response, array $aArgs)
+    public function updateExport(Request $request, Response $response)
     {
         set_time_limit(240);
 

@@ -288,7 +288,7 @@ export class TileCreateComponent implements OnInit {
         if (menu.id === 'indexing') {
             this.extraParams.groupId = menu.groups[0].id;
             this.tileLabel =  menu.label + ' (' + menu.groups[0].label + ')'
-        };
+        }
     }
 
     compareBaskets(basket1: any, basket2: any) {
@@ -338,15 +338,10 @@ export class TileCreateComponent implements OnInit {
     }
 
     onSubmit() {
-        let objToSend: any = this.formatData();
+        const objToSend: any = this.formatData();
         this.http.post('../rest/tiles', objToSend).pipe(
             tap((data: any) => {
-                objToSend.id = data.id;
-                objToSend.label = this.tileLabel;
-                objToSend.position = this.position;
-                objToSend.charts = this.dashboardService.getCharts();
-                objToSend = { ...objToSend, ...this.tileOtherInfos };
-                this.dialogRef.close(objToSend);
+                this.dialogRef.close(data.id);
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

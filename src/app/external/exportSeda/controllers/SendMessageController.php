@@ -128,7 +128,7 @@ class SendMessageController
             }
         }
 
-        $filename = self::generateMessageFile(["messageObject" => $seda2Message, "type" => $type], $isForSeda = true);
+        $filename = self::generateMessageFile(["messageObject" => $seda2Message, "type" => $type], true);
 
         $arrayReturn = [
             "messageObject" => $seda2Message,
@@ -239,15 +239,7 @@ class SendMessageController
 
         if ($dataObjectReferenceId) {
             $archiveUnit->DataObjectReference = new \stdClass();
-            if ($type == 'File') {
-                $archiveUnit->DataObjectReference->DataObjectReferenceId = $dataObjectReferenceId;
-            } elseif ($type == 'Note') {
-                $archiveUnit->DataObjectReference->DataObjectReferenceId = $dataObjectReferenceId;
-            } elseif ($type == 'Email') {
-                $archiveUnit->DataObjectReference->DataObjectReferenceId = $dataObjectReferenceId;
-            } else {
-                $archiveUnit->DataObjectReference->DataObjectReferenceId = $dataObjectReferenceId;
-            }
+            $archiveUnit->DataObjectReference->DataObjectReferenceId = $dataObjectReferenceId;
         }
 
         $archiveUnit->ArchiveUnit = [];

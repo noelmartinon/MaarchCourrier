@@ -59,15 +59,12 @@ class docservers_controler extends ObjectControler implements ObjectControlerIF
      */
     public function get($docserver_id)
     {
-        //var_dump($docserver_id);
         $this->set_foolish_ids(array('docserver_id'));
         $this->set_specific_id('docserver_id');
         $docserver = $this->advanced_get($docserver_id, _DOCSERVERS_TABLE_NAME);
-        //var_dump($docserver);
         if (get_class($docserver) <> 'docservers') {
             return null;
         } else {
-            //var_dump($docserver);
             return $docserver;
         }
     }

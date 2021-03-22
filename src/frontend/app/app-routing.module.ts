@@ -5,7 +5,6 @@ import { AppGuard, AfterProcessGuard } from '@service/app.guard';
 import { ActivateUserComponent } from './activate-user.component';
 import { PasswordModificationComponent } from './login/passwordModification/password-modification.component';
 import { ProfileComponent } from './profile/profile.component';
-import { AboutUsComponent } from './about-us.component';
 import { HomeComponent } from './home/home.component';
 import { SaveNumericPackageComponent } from './save-numeric-package.component';
 import { PrintSeparatorComponent } from './separator/print-separator/print-separator.component';

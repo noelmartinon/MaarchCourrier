@@ -716,7 +716,7 @@ class SummarySheetController
                             $notes[] = [
                                 'user'  => UserModel::getLabelledUserById(['id' => $rawNote['user_id']]),
                                 'date'  => TextFormatModel::formatDate($rawNote['creation_date']),
-                                'note'  => $noteText = str_replace('←', '<=', $rawNote['note_text'])
+                                'note'  => str_replace('←', '<=', $rawNote['note_text'])
                             ];
                         }
                         unset($args['data']['notes'][$noteKey]);
@@ -907,7 +907,7 @@ class SummarySheetController
                     $pdf->SetY($pdf->GetY() + 2);
 
                     $pdf->SetFont('', '', 10);
-                    foreach ($historyList as $keyHistory => $history) {
+                    foreach ($historyList as $history) {
                         $date = new \DateTime($history['event_date']);
                         $date = $date->format('d/m/Y H:i:s');
                         $label = $date . " - " . UserModel::getLabelledUserById(['id' => $history['user_id']]) . "\n" . $history['info'];

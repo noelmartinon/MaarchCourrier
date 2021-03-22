@@ -84,7 +84,7 @@ class CustomFieldControllerTest extends TestCase
         $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
 
         $response     = $customFieldController->update($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
-        $this->assertSame(204, $response->getStatusCode());
+        $this->assertSame(200, $response->getStatusCode());
 
         //  Errors
         $args = [

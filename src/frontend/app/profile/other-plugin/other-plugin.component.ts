@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from '@service/header.service';
 import { AddinOutlookConfigurationModalComponent } from './configuration/addin-outlook-configuration-modal.component';
@@ -16,7 +15,6 @@ export class ProfileOtherPluginComponent implements OnInit {
 
     constructor(
         public translate: TranslateService,
-        public http: HttpClient,
         public headerService: HeaderService,
         public dialog: MatDialog,
     ) {}

@@ -485,7 +485,7 @@ class SearchController
             if (in_array(false, $body['binding']['values'], true)) {
                 $bindingData[] = 'false';
             }
-            if (count($bindingData) > 0) {
+            if (!empty($bindingData)) {
                 $args['searchData'][] = $bindingData;
                 $bindingWhere[]       = 'binding in (?)';
             }
@@ -503,7 +503,7 @@ class SearchController
             if (in_array(false, $body['retentionFrozen']['values'], true)) {
                 $retentionFrozenData[] = 'false';
             }
-            if (count($retentionFrozenData) > 0) {
+            if (!empty($retentionFrozenData)) {
                 $args['searchData'][]   = $retentionFrozenData;
                 $retentionFrozenWhere[] = 'retention_frozen in (?)';
             }
@@ -1578,7 +1578,7 @@ class SearchController
             'groupBy' => ['category_id']
         ]);
         if (!empty($body['filters']['categories']['values']) && is_array($body['filters']['categories']['values'])) {
-            foreach ($body['filters']['categories']['values'] as $key => $filter) {
+            foreach ($body['filters']['categories']['values'] as $filter) {
                 $count = 0;
                 foreach ($rawCategories as $value) {
                     if ($filter['id'] === $value['category_id']) {
@@ -1593,8 +1593,8 @@ class SearchController
                 ];
             }
             $categories = [
-                'values'    => $categories,
-                'expand'    => $body['filters']['categories']['expand']
+                'values' => $categories,
+                'expand' => $body['filters']['categories']['expand']
             ];
         } else {
             foreach ($rawCategories as $value) {
@@ -1620,7 +1620,7 @@ class SearchController
             'groupBy' => ['status']
         ]);
         if (!empty($body['filters']['statuses']['values']) && is_array($body['filters']['statuses']['values'])) {
-            foreach ($body['filters']['statuses']['values'] as $key => $filter) {
+            foreach ($body['filters']['statuses']['values'] as $filter) {
                 $count = 0;
                 foreach ($rawStatuses as $value) {
                     if ($filter['id'] === $value['status']) {
@@ -1669,7 +1669,7 @@ class SearchController
             'groupBy' => ['type_id']
         ]);
         if (!empty($body['filters']['doctypes']['values']) && is_array($body['filters']['doctypes']['values'])) {
-            foreach ($body['filters']['doctypes']['values'] as $key => $filter) {
+            foreach ($body['filters']['doctypes']['values'] as $filter) {
                 $count = 0;
                 foreach ($rawDocTypes as $value) {
                     if ($filter['id'] === $value['type_id']) {
@@ -1715,7 +1715,7 @@ class SearchController
             'groupBy' => ['destination']
         ]);
         if (!empty($body['filters']['entities']['values']) && is_array($body['filters']['entities']['values'])) {
-            foreach ($body['filters']['entities']['values'] as $key => $filter) {
+            foreach ($body['filters']['entities']['values'] as $filter) {
                 $count = 0;
                 foreach ($rawEntities as $value) {
                     if ($filter['id'] === $value['destination']) {
@@ -1790,7 +1790,7 @@ class SearchController
 
         $folders = [];
         if (!empty($body['filters']['folders']['values']) && is_array($body['filters']['folders']['values'])) {
-            foreach ($body['filters']['folders']['values'] as $key => $filter) {
+            foreach ($body['filters']['folders']['values'] as $filter) {
                 $count = 0;
                 foreach ($rawFolders as $value) {
                     if ($filter['id'] == $value['id']) {

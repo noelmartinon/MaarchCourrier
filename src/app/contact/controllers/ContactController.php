@@ -1460,7 +1460,7 @@ class ContactController
                 $user = UserModel::getById(['id' => $resourceContact['item_id']]);
 
                 $phone = null;
-                if (($user['id'] == $GLOBALS['id'] || PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']]))) {
+                if ($user['id'] == $GLOBALS['id'] || PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']])) {
                     $phone = $user['phone'];
                 }
 

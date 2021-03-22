@@ -334,7 +334,7 @@ export class EntitiesAdministrationComponent implements OnInit {
         }
 
         let r = true;
-        if (this.currentEntity.parent_entity_id === '') {
+        if (this.currentEntity.parent_entity_id === '' || this.functions.empty(this.currentEntity.parent_entity_id)) {
             r = confirm(this.translate.instant('lang.entityWithoutParentMessage'));
         }
 

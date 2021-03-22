@@ -25,9 +25,7 @@ class TransferController
         $res['status']  = 0;
         $res['content'] = '';
 
-        if ($target == 'maarchrm') {
-            // $adapter = new AdapterMaarchRM();     TODO EXPORT SEDA !!!
-        } elseif ($target == 'maarchcourrier') {
+        if ($target == 'maarchcourrier') {
             $adapter = new AdapterMaarchCourrierController();
         } else {
             $res['status'] = 0;
@@ -98,8 +96,7 @@ class TransferController
                 $res['content'] = $data;
             }
             curl_close($curl);
-        } catch (Exception $e) {
-            // $_SESSION['error'] = _ERROR_CURL;
+        } catch (\Exception $e) {
             return false;
         }
 
