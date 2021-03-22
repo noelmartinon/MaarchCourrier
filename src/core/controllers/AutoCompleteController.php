@@ -19,6 +19,8 @@ use Contact\models\ContactGroupModel;
 use Contact\models\ContactModel;
 use Contact\models\ContactParameterModel;
 use Entity\models\EntityModel;
+use Group\models\GroupModel;
+use Group\models\PrivilegeModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -446,15 +448,19 @@ class AutoCompleteController
             $services = ['avis_documents'];
         }
 
+        $allowedGroups = [0];
+        $groups = PrivilegeModel::get(['select' => ['DISTINCT group_id'], 'where' => ['service_id in (?)'], 'data' => [$services]]);
+        if (!empty($groups)) {
+            $groups = array_column($groups, 'group_id');
+            $groups = GroupModel::get(['select' => ['id'], 'where' => ['group_id in (?)'], 'data' => [$groups]]);
+            $allowedGroups = array_column($groups, 'id');
+        }
         $requestData['where'] = [
-            '(users.mode = ? or (usergroups.group_id = usergroups_services.group_id',
-            'usergroups.id = usergroup_content.group_id',
-            'usergroup_content.user_id = users.id',
-            'usergroups_services.service_id in (?)))',
+            '(users.mode = ? OR (usergroup_content.user_id = users.id AND usergroup_content.group_id in (?)))',
             'users.mode not in (?)',
             'users.status not in (?)'
         ];
-        $requestData['data'] = ['root_visible', $services, ['root_invisible', 'rest'], ['DEL', 'SPD']];
+        $requestData['data'] = ['root_visible', $allowedGroups, ['root_invisible', 'rest'], ['DEL', 'SPD']];
 
         if (!empty($queryParams['search'])) {
             $fields = ['users.firstname', 'users.lastname'];
@@ -471,7 +477,7 @@ class AutoCompleteController
 
         $users = DatabaseModel::select([
             'select'    => ['DISTINCT users.id', 'users.firstname', 'users.lastname'],
-            'table'     => ['users, usergroup_content, usergroups, usergroups_services'],
+            'table'     => ['users, usergroup_content'],
             'where'     => $requestData['where'],
             'data'      => $requestData['data'],
             'order_by'  => ['users.lastname']
