@@ -114,8 +114,12 @@ export class CustomizationComponent implements OnInit {
             }),
             catchError((err: any) => {
                 const regex = /^Custom already exists/g;
+                const regexInvalid = /^Unauthorized custom name/g;
                 if (err.error.errors.match(regex) !== null) {
                     this.stepFormGroup.controls['customId'].setErrors({ ...this.stepFormGroup.controls['customId'].errors, customExist: true });
+                    this.stepFormGroup.controls['customId'].markAsTouched();
+                }else if (err.error.errors.match(regexInvalid) !== null) {
+                    this.stepFormGroup.controls['customId'].setErrors({ ...this.stepFormGroup.controls['customId'].errors, invalidCustomName: true });
                     this.stepFormGroup.controls['customId'].markAsTouched();
                 } else {
                     this.notify.handleSoftErrors(err);

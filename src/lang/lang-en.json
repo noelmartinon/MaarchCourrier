@@ -1819,6 +1819,7 @@
     "install_curl_desc": "Tool to transfer data from or to a server, using some protocols",
     "onlyExtensionsAllowed": "Only \"<b> {{value1}} </b>\" extensions are allowed",
     "customAlreadyExist": "This custom already seems to exist.",
+    "invalidCustomName": "Unauthorized name",
     "onlySpecialCharAllowed": "Only special characters {{value1}} are allowed.",
     "dbNotEmpty": "This database already exists and is not empty",
     "stepMailServer": "Mail server",

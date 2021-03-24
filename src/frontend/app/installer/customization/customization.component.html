@@ -12,6 +12,9 @@
                     <ng-container *ngIf="stepFormGroup.controls['customId'].errors?.customExist">
                         {{'lang.customAlreadyExist' | translate}}
                     </ng-container>
+                    <ng-container *ngIf="stepFormGroup.controls['customId'].errors?.invalidCustomName">
+                        {{'lang.invalidCustomName' | translate}}
+                    </ng-container>
                     <ng-container *ngIf="stepFormGroup.controls['customId'].errors?.pattern">
                         {{'lang.onlySpecialCharAllowed' | translate:{value1: '"_", "-"'} }}
                     </ng-container>
