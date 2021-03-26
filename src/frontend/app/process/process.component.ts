@@ -220,12 +220,12 @@ export class ProcessComponent implements OnInit, OnDestroy {
                         resolve(true);
                     } else {
                         this.notify.error(this.translate.instant('lang.documentOutOfPerimeter'));
-                        this.router.navigate([`/home`]);
+                        this.router.navigate(['/home']);
                     }
                 }),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);
-                    this.router.navigate([`/home`]);
+                    this.router.navigate(['/home']);
                     return of(false);
                 })
             )
@@ -267,14 +267,12 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
         this.http.get(`../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/actions?resId=${this.currentResourceInformations.resId}`).pipe(
             map((data: any) => {
-                data.actions = data.actions.map((action: any, index: number) => {
-                    return {
-                        id: action.id,
-                        label: action.label,
-                        component: action.component,
-                        categoryUse: action.categories
-                    };
-                });
+                data.actions = data.actions.map((action: any, index: number) => ({
+                    id: action.id,
+                    label: action.label,
+                    component: action.component,
+                    categoryUse: action.categories
+                }));
                 return data;
             }),
             tap((data: any) => {
@@ -303,7 +301,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
         this.headerService.sideBarButton = {
             icon: 'fas fa-arrow-left',
             label: this.translate.instant('lang.back'),
-            route: `__GOBACK`
+            route: '__GOBACK'
         };
 
         await this.checkAccesDocument(this.currentResourceInformations.resId);
@@ -397,7 +395,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     loadAvaibleIntegrations(integrationsData: any) {
         this.integrationsInfo['inSignatureBook'].enable = !this.functions.empty(integrationsData['inSignatureBook']) ? integrationsData['inSignatureBook'] : false;
 
-        this.http.get(`../rest/externalConnectionsEnabled`).pipe(
+        this.http.get('../rest/externalConnectionsEnabled').pipe(
             tap((data: any) => {
                 Object.keys(data.connection).filter(connectionId => connectionId !== 'maarchParapheur').forEach(connectionId => {
                     if (connectionId === 'maileva') {
@@ -415,7 +413,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     }
 
     toggleIntegration(integrationId: string) {
-        this.http.put(`../rest/resourcesList/integrations`, { resources: [this.currentResourceInformations.resId], integrations: { [integrationId]: !this.currentResourceInformations.integrations[integrationId] } }).pipe(
+        this.http.put('../rest/resourcesList/integrations', { resources: [this.currentResourceInformations.resId], integrations: { [integrationId]: !this.currentResourceInformations.integrations[integrationId] } }).pipe(
             tap(() => {
                 this.currentResourceInformations.integrations[integrationId] = !this.currentResourceInformations.integrations[integrationId];
                 this.notify.success(this.translate.instant('lang.actionDone'));
@@ -860,21 +858,21 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     toggleFreezing() {
         this.resourceFreezed = !this.resourceFreezed;
-            this.http.put('../rest/archival/freezeRetentionRule', { resources: [this.currentResourceInformations.resId], freeze : this.resourceFreezed }).pipe(
-                tap(() => {
-                    if (this.resourceFreezed) {
-                        this.notify.success(this.translate.instant('lang.retentionRuleFrozen'));
-                    } else {
-                        this.notify.success(this.translate.instant('lang.retentionRuleUnfrozen'));
-                    }
+        this.http.put('../rest/archival/freezeRetentionRule', { resources: [this.currentResourceInformations.resId], freeze : this.resourceFreezed }).pipe(
+            tap(() => {
+                if (this.resourceFreezed) {
+                    this.notify.success(this.translate.instant('lang.retentionRuleFrozen'));
+                } else {
+                    this.notify.success(this.translate.instant('lang.retentionRuleUnfrozen'));
                 }
-                ),
-                catchError((err: any) => {
-                    this.resourceFreezed = !this.resourceFreezed;
-                    this.notify.handleSoftErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
+            }
+            ),
+            catchError((err: any) => {
+                this.resourceFreezed = !this.resourceFreezed;
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     toggleBinding(value) {

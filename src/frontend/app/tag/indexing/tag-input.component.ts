@@ -177,13 +177,13 @@ export class TagInputComponent implements OnInit {
     removeItem(index: number) {
 
         if (this.newIds.indexOf(this.controlAutocomplete.value[index]) === -1) {
-            let arrValue = this.controlAutocomplete.value;
+            const arrValue = this.controlAutocomplete.value;
             this.controlAutocomplete.value.splice(index, 1);
             this.controlAutocomplete.setValue(arrValue);
         } else {
             this.http.delete('../rest/tags/' + this.controlAutocomplete.value[index]).pipe(
                 tap((data: any) => {
-                    let arrValue = this.controlAutocomplete.value;
+                    const arrValue = this.controlAutocomplete.value;
                     this.controlAutocomplete.value.splice(index, 1);
                     this.controlAutocomplete.setValue(arrValue);
                 }),
@@ -202,7 +202,7 @@ export class TagInputComponent implements OnInit {
 
         this.http.post('../rest/tags', { label: newElem[this.key] }).pipe(
             tap((data: any) => {
-                for (var key in data) {
+                for (const key in data) {
                     newElem['id'] = data[key];
                     this.newIds.push(data[key]);
                 }
@@ -230,12 +230,10 @@ export class TagInputComponent implements OnInit {
         });
         dialogRef.afterClosed().pipe(
             filter((data: any) => !this.functionsService.empty(data)),
-            map((data: any) => {
-                return {
-                    id: data.id,
-                    idToDisplay: data.label
-                };
-            }),
+            map((data: any) => ({
+                id: data.id,
+                idToDisplay: data.label
+            })),
             tap((tagItem: any) => {
                 this.tmpObject = tagItem;
                 this.setFormValue(tagItem);

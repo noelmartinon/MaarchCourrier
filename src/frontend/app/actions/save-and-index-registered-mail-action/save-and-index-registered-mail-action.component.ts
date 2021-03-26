@@ -8,12 +8,12 @@ import { tap, exhaustMap, catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
-    templateUrl: "save-and-index-registered-mail-action.component.html",
+    templateUrl: 'save-and-index-registered-mail-action.component.html',
     styleUrls: ['save-and-index-registered-mail-action.component.scss'],
 })
 export class SaveAndIndexRegisteredMailActionComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
@@ -42,17 +42,17 @@ export class SaveAndIndexRegisteredMailActionComponent implements OnInit {
             tap((data: any) => {
                 this.data.resIds = [data.resId];
             }),
-            exhaustMap(() => this.http.put(this.data.indexActionRoute, { resource: this.data.resIds[0], note: this.noteEditor.getNote(), 
-                    data: {
-                        type: this.data.resource.registeredMail_type,
-                        warranty: this.data.resource.registeredMail_warranty,
-                        issuingSiteId: this.data.resource.registeredMail_issuingSite,
-                        letter: this.data.resource.registeredMail_letter,
-                        recipient: this.data.resource.registeredMail_recipient,
-                        reference: this.data.resource.registeredMail_reference,
-                        generated: false
-                    }
-                })
+            exhaustMap(() => this.http.put(this.data.indexActionRoute, { resource: this.data.resIds[0], note: this.noteEditor.getNote(),
+                data: {
+                    type: this.data.resource.registeredMail_type,
+                    warranty: this.data.resource.registeredMail_warranty,
+                    issuingSiteId: this.data.resource.registeredMail_issuingSite,
+                    letter: this.data.resource.registeredMail_letter,
+                    recipient: this.data.resource.registeredMail_recipient,
+                    reference: this.data.resource.registeredMail_reference,
+                    generated: false
+                }
+            })
             ),
             tap(() => {
                 this.dialogRef.close(this.data.resIds);

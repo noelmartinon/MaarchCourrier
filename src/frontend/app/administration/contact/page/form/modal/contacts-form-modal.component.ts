@@ -20,7 +20,7 @@ export class ContactsFormModalComponent implements OnInit {
     ngOnInit(): void { }
 
     onSubmit() {
-       this.appContactForm.onSubmit();
+        this.appContactForm.onSubmit();
     }
 
     isValid() {

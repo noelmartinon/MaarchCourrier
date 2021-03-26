@@ -26,15 +26,15 @@ import { InputCorrespondentGroupComponent } from '../../group/inputCorrespondent
         trigger('hideShow', [
             transition(
                 ':enter', [
-                style({ height: '0px' }),
-                animate('200ms', style({ 'height': '30px' }))
-            ]
+                    style({ height: '0px' }),
+                    animate('200ms', style({ 'height': '30px' }))
+                ]
             ),
             transition(
                 ':leave', [
-                style({ height: '30px' }),
-                animate('200ms', style({ 'height': '0px' }))
-            ]
+                    style({ height: '30px' }),
+                    animate('200ms', style({ 'height': '0px' }))
+                ]
             )
         ]),
     ],
@@ -481,7 +481,7 @@ export class ContactsFormComponent implements OnInit {
     }
 
     getCountries() {
-        this.http.get(`../rest/registeredMail/countries`).pipe(
+        this.http.get('../rest/registeredMail/countries').pipe(
             tap((data: any) => {
                 this.countries = data.countries.map(
                     (item: any) => this.latinisePipe.transform(item.toUpperCase()));
@@ -497,10 +497,10 @@ export class ContactsFormComponent implements OnInit {
         this.contactForm.map((field: any) => {
             if (field.id === 'addressCountry') {
                 this.countriesFilteredResult = field.control.valueChanges
-                .pipe(
-                    startWith(''),
-                    map((value: any) => this._filter(value))
-                );
+                    .pipe(
+                        startWith(''),
+                        map((value: any) => this._filter(value))
+                    );
             }
         });
     }
@@ -950,7 +950,7 @@ export class ContactsFormComponent implements OnInit {
             this.contactForm[indexFieldAnnuaryId].control.setValue('');
         } else {
             this.contactForm.push({
-                id: `externalId_m2m_annuary_id`,
+                id: 'externalId_m2m_annuary_id',
                 unit: 'maarch2maarch',
                 label: 'm2m_annuary_id',
                 type: 'string',

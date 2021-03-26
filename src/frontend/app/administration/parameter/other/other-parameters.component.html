@@ -108,4 +108,24 @@
             </div>
         </div>
     </mat-expansion-panel>
+    <mat-expansion-panel>
+        <mat-expansion-panel-header>
+            <mat-panel-title class="primary">
+                {{'lang.outlookSendingModule' | translate}}
+            </mat-panel-title>
+        </mat-expansion-panel-header>
+        <app-maarch-message [content]="'lang.outlookSendingModuleDesc' | translate"></app-maarch-message>
+        <plugin-select-search [id]="'indexingModelId'" [label]="'lang.indexingModel' | translate" [class]="''"
+            [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="addinOutlookConf.indexingModelId"
+            [datas]="indexingModels" [showLabel]="true" style="width:100%;">
+        </plugin-select-search>
+        <plugin-select-search [id]="'typeId'" [label]="'lang.typeId' | translate" [class]="''"
+            [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="addinOutlookConf.typeId"
+            [datas]="doctypes" [showLabel]="true" style="width:100%;">
+        </plugin-select-search>
+        <plugin-select-search [id]="'statusId'" [label]="'lang.status' | translate" [class]="''"
+            [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="addinOutlookConf.statusId"
+            [datas]="statuses" [showLabel]="true" style="width:100%;">
+        </plugin-select-search>
+    </mat-expansion-panel>
 </mat-accordion>

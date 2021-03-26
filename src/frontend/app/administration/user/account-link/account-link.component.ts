@@ -9,7 +9,7 @@ import { NotificationService } from '@service/notification/notification.service'
     styleUrls: ['account-link.component.scss'],
 })
 export class AccountLinkComponent implements OnInit {
-    
+
     externalUser: any = {
         inMaarchParapheur: false,
         login: '',

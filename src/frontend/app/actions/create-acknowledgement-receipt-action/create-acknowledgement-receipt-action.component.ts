@@ -10,10 +10,10 @@ import { FormControl } from '@angular/forms';
 import { AppService } from '@service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
 
-declare var tinymce: any;
+declare let tinymce: any;
 
 @Component({
-    templateUrl: "create-acknowledgement-receipt-action.component.html",
+    templateUrl: 'create-acknowledgement-receipt-action.component.html',
     styleUrls: ['create-acknowledgement-receipt-action.component.scss'],
 })
 export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDestroy {
@@ -37,7 +37,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
         sendList: []
     };
 
-    realResSelected: number[]= [];
+    realResSelected: number[] = [];
     currentMode: string = '';
 
     manualAR: boolean = false;
@@ -48,9 +48,9 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
 
     constructor(
         public translate: TranslateService,
-        public http: HttpClient, 
-        private notify: NotificationService, 
-        public dialogRef: MatDialogRef<CreateAcknowledgementReceiptActionComponent>, 
+        public http: HttpClient,
+        private notify: NotificationService,
+        public dialogRef: MatDialogRef<CreateAcknowledgementReceiptActionComponent>,
         public functions: FunctionsService,
         @Inject(MAT_DIALOG_DATA) public data: any) { }
 
@@ -122,9 +122,9 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
 
     downloadAcknowledgementReceipt(data: any) {
         this.loadingExport = true;
-        this.http.post('../rest/acknowledgementReceipts', { 'resources': data }, { responseType: "blob" })
+        this.http.post('../rest/acknowledgementReceipts', { 'resources': data }, { responseType: 'blob' })
             .subscribe((data) => {
-                let downloadLink = document.createElement('a');
+                const downloadLink = document.createElement('a');
                 downloadLink.href = window.URL.createObjectURL(data);
                 let today: any;
                 let dd: any;
@@ -143,7 +143,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
                     mm = '0' + mm;
                 }
                 today = dd + '-' + mm + '-' + yyyy;
-                downloadLink.setAttribute('download', "acknowledgement_receipt_maarch_" + today + ".pdf");
+                downloadLink.setAttribute('download', 'acknowledgement_receipt_maarch_' + today + '.pdf');
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
                 this.loadingExport = false;
@@ -163,7 +163,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
                 this.emailsubject = this.data.resource.subject;
                 this.emailsubject = this.emailsubject.substring(0, 100);
             }
-            
+
             this.initEmailModelsList();
             this.initSignEmailModelsList();
             setTimeout(() => {
@@ -179,7 +179,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
 
     initMce() {
         tinymce.init({
-            selector: "textarea#emailSignature",
+            selector: 'textarea#emailSignature',
             base_url: '../node_modules/tinymce/',
             readonly: false,
             suffix: '.min',
@@ -191,7 +191,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
                 'autolink', 'autoresize'
             ],
             external_plugins: {
-                'maarch_b64image': "../../src/frontend/plugins/tinymce/maarch_b64image/plugin.min.js"
+                'maarch_b64image': '../../src/frontend/plugins/tinymce/maarch_b64image/plugin.min.js'
             },
             toolbar_sticky: true,
             toolbar_drawer: 'floating',
@@ -208,7 +208,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
         this.http.post(`../rest/templates/${templateId}/mergeEmail`, { data: { resId: this.data.resIds[0] } }).pipe(
             tap((data: any) => {
 
-                var div = document.createElement('div');
+                const div = document.createElement('div');
 
                 div.innerHTML = tinymce.get('emailSignature').getContent();
 
@@ -237,7 +237,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
 
         this.http.get(`../rest/currentUser/emailSignatures/${templateId}`).pipe(
             tap((data: any) => {
-                var div = document.createElement('div');
+                const div = document.createElement('div');
 
                 div.innerHTML = tinymce.get('emailSignature').getContent();
 
@@ -273,7 +273,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
 
     initSignEmailModelsList() {
         if (this.availableSignEmailModels.length === 0  && this.data.resIds.length === 1) {
-            this.http.get(`../rest/currentUser/emailSignatures`).pipe(
+            this.http.get('../rest/currentUser/emailSignatures').pipe(
                 tap((data: any) => {
                     this.availableSignEmailModels = data.emailSignatures;
                 }),

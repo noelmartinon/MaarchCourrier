@@ -9,7 +9,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { NotificationService } from '@service/notification/notification.service';
 import { of, Subject } from 'rxjs';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     selector: 'app-collabora-online-viewer',
@@ -178,7 +178,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
                 this.notify.error(`${this.translate.instant('lang.errorCollaboraOnline1')}`);
                 this.triggerCloseEditor.emit();
             } else {
-                this.http.get(`../rest/collaboraOnline/available`).pipe(
+                this.http.get('../rest/collaboraOnline/available').pipe(
                     tap((data: any) => {
                         if (data.isAvailable) {
                             resolve(true);

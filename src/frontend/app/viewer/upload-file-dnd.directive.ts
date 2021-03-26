@@ -40,9 +40,9 @@ export class DragDropDirective {
             evt.stopPropagation();
             this.background = 'rgba(255,255,255,0)';
             this.opacity = '1';
-            let files = evt.dataTransfer.files;
+            const files = evt.dataTransfer.files;
             if (files.length > 0) {
-                this.onFileDropped.emit(files)
+                this.onFileDropped.emit(files);
             }
         }
 

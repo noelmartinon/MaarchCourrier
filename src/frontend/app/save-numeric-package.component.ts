@@ -6,7 +6,7 @@ import { HeaderService } from '@service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '@service/app.service';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'save-numeric-package.component.html'
@@ -55,7 +55,7 @@ export class SaveNumericPackageComponent implements OnInit {
 
     uploadNumericPackage(fileInput: any) {
         if (fileInput.target.files && fileInput.target.files[0]) {
-            var reader = new FileReader();
+            const reader = new FileReader();
 
             this.numericPackage.name = fileInput.target.files[0].name;
             this.numericPackage.size = fileInput.target.files[0].size;

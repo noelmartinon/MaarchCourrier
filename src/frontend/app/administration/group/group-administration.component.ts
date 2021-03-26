@@ -93,12 +93,10 @@ export class GroupAdministrationComponent implements OnInit {
 
                         this.administrationPrivileges = this.privilegeService.getAdministrations();
 
-                        this.administrationPrivileges = this.administrationPrivileges.map(admin => {
-                            return {
-                                ...admin,
-                                checked: this.group.privileges.indexOf(admin.id) > -1
-                            };
-                        });
+                        this.administrationPrivileges = this.administrationPrivileges.map(admin => ({
+                            ...admin,
+                            checked: this.group.privileges.indexOf(admin.id) > -1
+                        }));
 
                         this.privilegeService.getUnitsPrivileges().forEach(element => {
                             let services: any[] = this.privilegeService.getPrivilegesByUnit(element);
@@ -383,14 +381,12 @@ export class GroupAdministrationComponent implements OnInit {
         } else {
             this.panelMode = id;
             this.paramsLoading = true;
-            this.http.get(`../rest/groups`).pipe(
+            this.http.get('../rest/groups').pipe(
                 map((data: any) => {
-                    data.groups = data.groups.map((group: any) => {
-                        return {
-                            id: group.id,
-                            label: group.group_desc
-                        };
-                    });
+                    data.groups = data.groups.map((group: any) => ({
+                        id: group.id,
+                        label: group.group_desc
+                    }));
                     return data;
                 }),
                 tap((data: any) => {

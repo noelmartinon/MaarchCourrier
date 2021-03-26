@@ -18,7 +18,7 @@ export class PrioritiesAdministrationComponent implements OnInit {
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
+
     loading: boolean = false;
 
     priorities: any[] = [];
@@ -58,9 +58,9 @@ export class PrioritiesAdministrationComponent implements OnInit {
                     }, (err) => {
                         this.notify.handleErrors(err);
                     });
-                    setTimeout(() => {
-                        this.adminService.setDataSource('admin_priorities', this.priorities, this.sort, this.paginator, this.filterColumns);
-                    }, 0);
+                setTimeout(() => {
+                    this.adminService.setDataSource('admin_priorities', this.priorities, this.sort, this.paginator, this.filterColumns);
+                }, 0);
             }, (err) => {
                 this.notify.handleErrors(err);
             });

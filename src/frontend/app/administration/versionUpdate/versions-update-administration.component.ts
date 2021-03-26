@@ -19,7 +19,7 @@ export class VersionsUpdateAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
 
-    
+
     loading: boolean = false;
     updateInprogress: boolean = false;
     dialogRef: MatDialogRef<any>;

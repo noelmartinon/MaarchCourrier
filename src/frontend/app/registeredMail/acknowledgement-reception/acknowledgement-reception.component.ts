@@ -172,7 +172,7 @@ export class AcknowledgementReceptionComponent implements OnInit {
 
     focusRegisteredMailNumber() {
         setTimeout(() => {
-                this.numberInput.nativeElement.focus();
+            this.numberInput.nativeElement.focus();
         }, 0);
     }
 

@@ -1,22 +1,22 @@
 import { Injectable } from '@angular/core';
 
-interface listProperties {
-    'id': number,
-    'groupId': number,
-    'targetId': number,
-    'page': string,
-    'pageSize': number,
-    'order': string,
-    'orderDir': string,
-    'search': string,
-    'delayed': boolean,
-    'categories': string[],
-    'priorities': string[],
-    'entities': string[],
-    'subEntities': string[],
-    'statuses': string[],
-    'doctypes': string[],
-    'folders': string[],
+interface ListProperties {
+    'id': number;
+    'groupId': number;
+    'targetId': number;
+    'page': string;
+    'pageSize': number;
+    'order': string;
+    'orderDir': string;
+    'search': string;
+    'delayed': boolean;
+    'categories': string[];
+    'priorities': string[];
+    'entities': string[];
+    'subEntities': string[];
+    'statuses': string[];
+    'doctypes': string[];
+    'folders': string[];
 }
 
 @Injectable()
@@ -35,7 +35,7 @@ export class FiltersListService {
 
         this.listsPropertiesIndex = 0;
         this.mode = mode;
-        let listProperties: listProperties;
+        let listProperties: ListProperties;
 
         if (this.listsProperties != null) {
             this.listsProperties.forEach((element, index) => {
@@ -68,7 +68,7 @@ export class FiltersListService {
                 'folders': [],
             };
             this.listsProperties.push(listProperties);
-            this.listsPropertiesIndex = this.listsProperties.length -1;
+            this.listsPropertiesIndex = this.listsProperties.length - 1;
             this.saveListsProperties();
         }
         return listProperties;
@@ -112,7 +112,7 @@ export class FiltersListService {
                 filters += '&search=' + this.listsProperties[this.listsPropertiesIndex].search;
             }
             if (this.listsProperties[this.listsPropertiesIndex].categories.length > 0) {
-                let cat: any[] = [];
+                const cat: any[] = [];
                 this.listsProperties[this.listsPropertiesIndex].categories.forEach((element: any) => {
                     cat.push(element.id);
                 });
@@ -120,7 +120,7 @@ export class FiltersListService {
                 filters += '&categories=' + cat.join(',');
             }
             if (this.listsProperties[this.listsPropertiesIndex].priorities.length > 0) {
-                let prio: any[] = [];
+                const prio: any[] = [];
                 this.listsProperties[this.listsPropertiesIndex].priorities.forEach((element: any) => {
                     prio.push(element.id);
                 });
@@ -128,7 +128,7 @@ export class FiltersListService {
                 filters += '&priorities=' + prio.join(',');
             }
             if (this.listsProperties[this.listsPropertiesIndex].statuses.length > 0) {
-                let status: any[] = [];
+                const status: any[] = [];
                 this.listsProperties[this.listsPropertiesIndex].statuses.forEach((element: any) => {
                     status.push(element.id);
                 });
@@ -137,7 +137,7 @@ export class FiltersListService {
             }
 
             if (this.listsProperties[this.listsPropertiesIndex].entities.length > 0) {
-                let ent: any[] = [];
+                const ent: any[] = [];
                 this.listsProperties[this.listsPropertiesIndex].entities.forEach((element: any) => {
                     ent.push(element.id);
                 });
@@ -145,7 +145,7 @@ export class FiltersListService {
                 filters += '&entities=' + ent.join(',');
             }
             if (this.listsProperties[this.listsPropertiesIndex].subEntities.length > 0) {
-                let ent: any[] = [];
+                const ent: any[] = [];
                 this.listsProperties[this.listsPropertiesIndex].subEntities.forEach((element: any) => {
                     ent.push(element.id);
                 });
@@ -153,7 +153,7 @@ export class FiltersListService {
                 filters += '&entitiesChildren=' + ent.join(',');
             }
             if (this.listsProperties[this.listsPropertiesIndex].doctypes.length > 0) {
-                let doct: any[] = [];
+                const doct: any[] = [];
                 this.listsProperties[this.listsPropertiesIndex].doctypes.forEach((element: any) => {
                     doct.push(element.id);
                 });
@@ -161,7 +161,7 @@ export class FiltersListService {
                 filters += '&doctypes=' + doct.join(',');
             }
             if (this.listsProperties[this.listsPropertiesIndex].folders.length > 0) {
-                let folders: any[] = [];
+                const folders: any[] = [];
                 this.listsProperties[this.listsPropertiesIndex].folders.forEach((element: any) => {
                     folders.push(element.id);
                 });

@@ -10,12 +10,12 @@ import { FunctionsService } from '@service/functions.service';
 import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 
 @Component({
-    templateUrl: "send-avis-parallel-action.component.html",
+    templateUrl: 'send-avis-parallel-action.component.html',
     styleUrls: ['send-avis-parallel-action.component.scss'],
 })
 export class SendAvisParallelComponent implements AfterViewInit {
 
-    
+
     loading: boolean = false;
 
     resourcesError: any[] = [];
@@ -51,7 +51,7 @@ export class SendAvisParallelComponent implements AfterViewInit {
     async onSubmit() {
         this.loading = true;
         if (this.data.resIds.length === 0) {
-            let res = await this.indexDocument();
+            const res = await this.indexDocument();
 
             if (res) {
                 this.executeAction(this.data.resIds);

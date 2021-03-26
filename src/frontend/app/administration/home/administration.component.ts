@@ -58,18 +58,14 @@ export class AdministrationComponent implements OnInit, AfterViewInit {
         this.supervisionServices = this.privilegeService.getCurrentUserAdministrationsByUnit('supervision');
 
         this.administrations = this.organisationServices.concat(this.productionServices).concat(this.classementServices).concat(this.supervisionServices);
-        this.administrations = this.administrations.map((admin: any) => {
-            return {
-                ...admin,
-                label : this.translate.instant(admin.label)
-            };
-        });
-        this.shortcutsAdmin = this.administrations.filter(admin => ['admin_users', 'admin_groups', 'manage_entities'].indexOf(admin.id) > -1).map(admin => {
-            return {
-                ...admin,
-                count: 0
-            };
-        });
+        this.administrations = this.administrations.map((admin: any) => ({
+            ...admin,
+            label : this.translate.instant(admin.label)
+        }));
+        this.shortcutsAdmin = this.administrations.filter(admin => ['admin_users', 'admin_groups', 'manage_entities'].indexOf(admin.id) > -1).map(admin => ({
+            ...admin,
+            count: 0
+        }));
 
         this.getNbShortcuts();
 

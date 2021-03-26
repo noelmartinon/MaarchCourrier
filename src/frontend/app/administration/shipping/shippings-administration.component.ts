@@ -70,7 +70,7 @@ export class ShippingsAdministrationComponent implements OnInit {
     }
 
     initConfiguration() {
-        this.http.get(`../rest/configurations/admin_shippings`).pipe(
+        this.http.get('../rest/configurations/admin_shippings').pipe(
             map((data: any) => data.configuration.value),
             tap((data: any) => {
                 Object.keys(this.shippingConf).forEach(elemId => {
@@ -95,7 +95,7 @@ export class ShippingsAdministrationComponent implements OnInit {
     }
 
     saveConfiguration() {
-        this.http.put(`../rest/configurations/admin_shippings`, this.formatConfiguration()).pipe(
+        this.http.put('../rest/configurations/admin_shippings', this.formatConfiguration()).pipe(
             tap(() => {
                 this.notify.success(this.translate.instant('lang.dataUpdated'));
             }),

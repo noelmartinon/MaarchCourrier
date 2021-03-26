@@ -338,14 +338,13 @@ class GroupController
 
     public static function getGroupsClause(array $args)
     {
-        ValidatorModel::notEmpty($args, ['userId', 'login']);
-        ValidatorModel::stringType($args, ['login']);
+        ValidatorModel::notEmpty($args, ['userId', 'userId']);
 
         $groups = UserModel::getGroupsById(['id' => $args['userId']]);
         $groupsClause = '';
         foreach ($groups as $key => $group) {
             if (!empty($group['where_clause'])) {
-                $groupClause = PreparedClauseController::getPreparedClause(['clause' => $group['where_clause'], 'login' => $args['login']]);
+                $groupClause = PreparedClauseController::getPreparedClause(['clause' => $group['where_clause'], 'userId' => $args['userId']]);
                 if ($key > 0) {
                     $groupsClause .= ' or ';
                 }

@@ -109,12 +109,10 @@ export class TileDashboardComponent implements OnInit, AfterViewInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/tiles/${this.tile.id}`).pipe(
                 tap((data: any) => {
-                    this.resources = data.tile.resources.map((item: any) => {
-                        return {
-                            ...item,
-                            name: !this.functionsService.empty(item.name) ? item.name : this.translate.instant('lang.undefined')
-                        };
-                    });
+                    this.resources = data.tile.resources.map((item: any) => ({
+                        ...item,
+                        name: !this.functionsService.empty(item.name) ? item.name : this.translate.instant('lang.undefined')
+                    }));
                     resolve(true);
                 }),
                 catchError((err: any) => {

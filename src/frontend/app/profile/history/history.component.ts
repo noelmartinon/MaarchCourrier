@@ -19,7 +19,7 @@ export class ProfileHistoryComponent implements OnInit {
     @ViewChild('tableHistorySort', { static: false }) sortHistory: MatSort;
 
     displayedColumns = ['event_date', 'record_id', 'info'];
-    
+
     dataSource: any;
     histories: any;
 
@@ -33,20 +33,20 @@ export class ProfileHistoryComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
-        this.getHistories();        
+        this.getHistories();
     }
 
     getHistories() {
         this.http.get('../rest/history/users/' + this.headerService.user.id)
-                .subscribe((data: any) => {
-                    this.histories = data.histories;
-                    this.dataSource = new MatTableDataSource(this.histories);
-                    this.dataSource.sortingDataAccessor = this.functions.listSortingDataAccessor;
-                    this.dataSource.paginator = this.paginatorHistory;
-                    this.dataSource.sort = this.sortHistory;                        
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
+            .subscribe((data: any) => {
+                this.histories = data.histories;
+                this.dataSource = new MatTableDataSource(this.histories);
+                this.dataSource.sortingDataAccessor = this.functions.listSortingDataAccessor;
+                this.dataSource.paginator = this.paginatorHistory;
+                this.dataSource.sort = this.sortHistory;
+            }, (err) => {
+                this.notify.error(err.error.errors);
+            });
     }
 
     applyFilter(filterValue: string) {

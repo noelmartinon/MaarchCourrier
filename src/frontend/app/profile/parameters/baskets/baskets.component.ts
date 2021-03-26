@@ -44,7 +44,7 @@ export class MyBasketsComponent implements OnInit {
     }
 
     addBasketRedirection(newUser: any) {
-        let basketsRedirect: any[] = [];
+        const basketsRedirect: any[] = [];
 
         this.selectionBaskets.selected.forEach((elem: any) => {
             basketsRedirect.push(
@@ -54,10 +54,10 @@ export class MyBasketsComponent implements OnInit {
                     group_id: elem.groupSerialId,
                     originalOwner: null
                 }
-            )
+            );
         });
 
-        let r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.redirectBasket'));
+        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.redirectBasket'));
 
         if (r) {
             this.http.post('../rest/users/' + this.headerService.user.id + '/redirectedBaskets', basketsRedirect)
@@ -73,7 +73,7 @@ export class MyBasketsComponent implements OnInit {
     }
 
     reassignBasketRedirection(newUser: any, basket: any, i: number) {
-        let r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.redirectBasket'));
+        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.redirectBasket'));
 
         if (r) {
             this.http.post('../rest/users/' + this.headerService.user.id + '/redirectedBaskets', [
@@ -84,17 +84,17 @@ export class MyBasketsComponent implements OnInit {
                     'originalOwner': basket.owner_user_id,
                 }
             ]).subscribe((data: any) => {
-                    this.userBaskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
-                    this.assignedBaskets.splice(i, 1);
-                    this.notify.success(this.translate.instant('lang.basketUpdated'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
+                this.userBaskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
+                this.assignedBaskets.splice(i, 1);
+                this.notify.success(this.translate.instant('lang.basketUpdated'));
+            }, (err) => {
+                this.notify.error(err.error.errors);
+            });
         }
     }
 
     delBasketAssignRedirection(basket: any, i: number) {
-        let r = confirm(this.translate.instant('lang.confirmAction'));
+        const r = confirm(this.translate.instant('lang.confirmAction'));
 
         if (r) {
             this.http.delete('../rest/users/' + this.headerService.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
@@ -109,7 +109,7 @@ export class MyBasketsComponent implements OnInit {
     }
 
     delBasketRedirection(basket: any, i: number) {
-        let r = confirm(this.translate.instant('lang.confirmAction'));
+        const r = confirm(this.translate.instant('lang.confirmAction'));
 
         if (r) {
             this.http.delete('../rest/users/' + this.headerService.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)

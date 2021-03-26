@@ -105,14 +105,12 @@ export class ExternalVisaWorkflowComponent implements OnInit {
             this.http.get(route)
                 .subscribe((data: any) => {
                     if (data.listTemplates[0]) {
-                        this.visaWorkflow.items = data.listTemplates[0].items.map((item: any) => {
-                            return {
-                                ...item,
-                                item_entity: item.descriptionToDisplay,
-                                requested_signature: item.item_mode !== 'visa',
-                                currentRole: item.item_mode
-                            };
-                        });
+                        this.visaWorkflow.items = data.listTemplates[0].items.map((item: any) => ({
+                            ...item,
+                            item_entity: item.descriptionToDisplay,
+                            requested_signature: item.item_mode !== 'visa',
+                            currentRole: item.item_mode
+                        }));
                     }
                     this.visaWorkflow.items.forEach((element: any, key: number) => {
                         if (!this.functions.empty(element['externalId'])) {
@@ -223,13 +221,11 @@ export class ExternalVisaWorkflowComponent implements OnInit {
                     })
                 ).subscribe();
             } else if (this.isValidWorkflow()) {
-                const arrVisa = resIds.map(resId => {
-                    return {
-                        resId: resId,
-                        listInstances: this.visaWorkflow.items
-                    };
-                });
-                this.http.put(`../rest/circuits/visaCircuit`, { resources: arrVisa }).pipe(
+                const arrVisa = resIds.map(resId => ({
+                    resId: resId,
+                    listInstances: this.visaWorkflow.items
+                }));
+                this.http.put('../rest/circuits/visaCircuit', { resources: arrVisa }).pipe(
                     tap((data: any) => {
                         this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
                         this.notify.success(this.translate.instant('lang.visaWorkflowUpdated'));

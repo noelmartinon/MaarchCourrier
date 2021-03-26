@@ -6,14 +6,14 @@ import { PrivilegeService } from '@service/privileges.service';
 import { HeaderService } from '@service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'contact-modal.component.html',
     styleUrls: ['contact-modal.component.scss'],
 })
 export class ContactModalComponent implements OnInit{
-    
+
     creationMode: boolean = true;
     canUpdate: boolean = false;
     contact: any = null;

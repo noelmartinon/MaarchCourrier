@@ -141,15 +141,13 @@ export class ContactImportComponent implements OnInit {
     }
 
     initCustomFields() {
-        this.http.get(`../rest/contactsCustomFields`).pipe(
+        this.http.get('../rest/contactsCustomFields').pipe(
             map((data: any) => {
-                data = data.customFields.map(custom => {
-                    return {
-                        id: `contactCustomField_${custom.id}`,
-                        label: custom.label,
-                        type: custom.type
-                    };
-                });
+                data = data.customFields.map(custom => ({
+                    id: `contactCustomField_${custom.id}`,
+                    label: custom.label,
+                    type: custom.type
+                }));
                 return data;
             }),
             tap((customFields) => {
@@ -321,7 +319,7 @@ export class ContactImportComponent implements OnInit {
                     }
                 });
             }),
-            exhaustMap(() => this.http.put(`../rest/contacts/import`, { contacts: dataToSend })),
+            exhaustMap(() => this.http.put('../rest/contacts/import', { contacts: dataToSend })),
             tap((data: any) => {
                 let textModal = '';
                 if (data.errors.count > 0) {

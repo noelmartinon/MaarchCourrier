@@ -22,6 +22,17 @@ import { PrivilegeService } from '@service/privileges.service';
 })
 export class VisaWorkflowComponent implements OnInit {
 
+    @Input() injectDatas: any;
+    @Input() target: string = '';
+    @Input() adminMode: boolean;
+    @Input() resId: number = null;
+
+    @Input() showListModels: boolean = true;
+    @Input() showComment: boolean = true;
+
+    @Output() workflowUpdated = new EventEmitter<any>();
+    @ViewChild('searchVisaSignUserInput', { static: false }) searchVisaSignUserInput: ElementRef;
+
     visaWorkflow: any = {
         roles: ['sign', 'visa'],
         items: []
@@ -41,18 +52,6 @@ export class VisaWorkflowComponent implements OnInit {
     hasHistory: boolean = false;
     visaModelListNotLoaded: boolean = true;
     data: any;
-
-    @Input() injectDatas: any;
-    @Input() target: string = '';
-    @Input() adminMode: boolean;
-    @Input() resId: number = null;
-
-    @Input() showListModels: boolean = true;
-    @Input() showComment: boolean = true;
-
-    @Output() workflowUpdated = new EventEmitter<any>();
-
-    @ViewChild('searchVisaSignUserInput', { static: false }) searchVisaSignUserInput: ElementRef;
 
     searchVisaSignUser = new FormControl();
 
@@ -118,14 +117,12 @@ export class VisaWorkflowComponent implements OnInit {
             this.http.get(route)
                 .subscribe((data: any) => {
                     if (data.listTemplates[0]) {
-                        this.visaWorkflow.items = data.listTemplates[0].items.map((item: any) => {
-                            return {
-                                ...item,
-                                item_entity: item.descriptionToDisplay,
-                                requested_signature: item.item_mode !== 'visa',
-                                currentRole: item.item_mode
-                            };
-                        });
+                        this.visaWorkflow.items = data.listTemplates[0].items.map((item: any) => ({
+                            ...item,
+                            item_entity: item.descriptionToDisplay,
+                            requested_signature: item.item_mode !== 'visa',
+                            currentRole: item.item_mode
+                        }));
                     }
                     this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
                     this.loading = false;
@@ -136,20 +133,18 @@ export class VisaWorkflowComponent implements OnInit {
 
     loadVisaSignUsersList() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/autocomplete/users/circuit`).pipe(
+            this.http.get('../rest/autocomplete/users/circuit').pipe(
                 map((data: any) => {
-                    data = data.map((user: any) => {
-                        return {
-                            id: user.id,
-                            title: `${user.idToDisplay} (${user.otherInfo})`,
-                            label: user.idToDisplay,
-                            entity: user.otherInfo,
-                            type: 'user',
-                            hasPrivilege: true,
-                            isValid: true,
-                            currentRole: 'visa'
-                        };
-                    });
+                    data = data.map((user: any) => ({
+                        id: user.id,
+                        title: `${user.idToDisplay} (${user.otherInfo})`,
+                        label: user.idToDisplay,
+                        entity: user.otherInfo,
+                        type: 'user',
+                        hasPrivilege: true,
+                        isValid: true,
+                        currentRole: 'visa'
+                    }));
                     return data;
                 }),
                 tap((data) => {
@@ -175,25 +170,21 @@ export class VisaWorkflowComponent implements OnInit {
         }
 
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/availableCircuits?circuit=visa`).pipe(
+            this.http.get('../rest/availableCircuits?circuit=visa').pipe(
                 tap((data: any) => {
-                    this.visaTemplates.public = this.visaTemplates.public.concat(data.circuits.filter((item: any) => !item.private).map((item: any) => {
-                        return {
-                            id: item.id,
-                            title: item.title,
-                            label: item.title,
-                            type: 'entity'
-                        };
-                    }));
+                    this.visaTemplates.public = this.visaTemplates.public.concat(data.circuits.filter((item: any) => !item.private).map((item: any) => ({
+                        id: item.id,
+                        title: item.title,
+                        label: item.title,
+                        type: 'entity'
+                    })));
 
-                    this.visaTemplates.private = data.circuits.filter((item: any) => item.private).map((item: any) => {
-                        return {
-                            id: item.id,
-                            title: item.title,
-                            label: item.title,
-                            type: 'entity'
-                        };
-                    });
+                    this.visaTemplates.private = data.circuits.filter((item: any) => item.private).map((item: any) => ({
+                        id: item.id,
+                        title: item.title,
+                        label: item.title,
+                        type: 'entity'
+                    }));
                     this.filteredPublicModels = this.searchVisaSignUser.valueChanges
                         .pipe(
                             startWith(''),
@@ -249,33 +240,6 @@ export class VisaWorkflowComponent implements OnInit {
         }
     }
 
-    private _filter(value: string): string[] {
-        if (typeof value === 'string') {
-            const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.signVisaUsers.filter((option: any) => this.latinisePipe.transform(option['title'].toLowerCase()).includes(filterValue));
-        } else {
-            return this.signVisaUsers;
-        }
-    }
-
-    private _filterPrivateModel(value: string): string[] {
-        if (typeof value === 'string') {
-            const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.visaTemplates.private.filter((option: any) => this.latinisePipe.transform(option['title'].toLowerCase()).includes(filterValue));
-        } else {
-            return this.visaTemplates.private;
-        }
-    }
-
-    private _filterPublicModel(value: string): string[] {
-        if (typeof value === 'string') {
-            const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.visaTemplates.public.filter((option: any) => this.latinisePipe.transform(option['title'].toLowerCase()).includes(filterValue));
-        } else {
-            return this.visaTemplates.public;
-        }
-    }
-
     loadWorkflow(resId: number) {
         this.resId = resId;
         this.loading = true;
@@ -328,7 +292,7 @@ export class VisaWorkflowComponent implements OnInit {
                     this.workflowUpdated.emit(this.visaWorkflow.items);
                 }),
                 finalize(() => {
-                    this.loading = false
+                    this.loading = false;
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -421,13 +385,11 @@ export class VisaWorkflowComponent implements OnInit {
                     })
                 ).subscribe();
             } else if (this.isValidWorkflow()) {
-                const arrVisa = resIds.map(resId => {
-                    return {
-                        resId: resId,
-                        listInstances: this.visaWorkflow.items
-                    };
-                });
-                this.http.put(`../rest/circuits/visaCircuit`, { resources: arrVisa }).pipe(
+                const arrVisa = resIds.map(resId => ({
+                    resId: resId,
+                    listInstances: this.visaWorkflow.items
+                }));
+                this.http.put('../rest/circuits/visaCircuit', { resources: arrVisa }).pipe(
                     tap((data: any) => {
                         this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
                         this.notify.success(this.translate.instant('lang.visaWorkflowUpdated'));
@@ -472,20 +434,18 @@ export class VisaWorkflowComponent implements OnInit {
                     tap((data: any) => {
                         this.visaWorkflow.items = this.visaWorkflow.items.concat(
 
-                            data.listTemplate.items.map((itemTemplate: any) => {
-                                return {
-                                    item_id: itemTemplate.item_id,
-                                    item_type: 'user',
-                                    labelToDisplay: itemTemplate.idToDisplay,
-                                    item_entity: itemTemplate.descriptionToDisplay,
-                                    difflist_type: 'VISA_CIRCUIT',
-                                    signatory: false,
-                                    requested_signature: itemTemplate.item_mode === 'sign',
-                                    hasPrivilege: itemTemplate.hasPrivilege,
-                                    isValid: itemTemplate.isValid,
-                                    currentRole: itemTemplate.item_mode
-                                };
-                            })
+                            data.listTemplate.items.map((itemTemplate: any) => ({
+                                item_id: itemTemplate.item_id,
+                                item_type: 'user',
+                                labelToDisplay: itemTemplate.idToDisplay,
+                                item_entity: itemTemplate.descriptionToDisplay,
+                                difflist_type: 'VISA_CIRCUIT',
+                                signatory: false,
+                                requested_signature: itemTemplate.item_mode === 'sign',
+                                hasPrivilege: itemTemplate.hasPrivilege,
+                                isValid: itemTemplate.isValid,
+                                currentRole: itemTemplate.item_mode
+                            }))
                         );
                         this.searchVisaSignUser.reset();
                         this.searchVisaSignUserInput.nativeElement.blur();
@@ -585,6 +545,33 @@ export class VisaWorkflowComponent implements OnInit {
             }
         } else {
             return false;
+        }
+    }
+
+    private _filter(value: string): string[] {
+        if (typeof value === 'string') {
+            const filterValue = this.latinisePipe.transform(value.toLowerCase());
+            return this.signVisaUsers.filter((option: any) => this.latinisePipe.transform(option['title'].toLowerCase()).includes(filterValue));
+        } else {
+            return this.signVisaUsers;
+        }
+    }
+
+    private _filterPrivateModel(value: string): string[] {
+        if (typeof value === 'string') {
+            const filterValue = this.latinisePipe.transform(value.toLowerCase());
+            return this.visaTemplates.private.filter((option: any) => this.latinisePipe.transform(option['title'].toLowerCase()).includes(filterValue));
+        } else {
+            return this.visaTemplates.private;
+        }
+    }
+
+    private _filterPublicModel(value: string): string[] {
+        if (typeof value === 'string') {
+            const filterValue = this.latinisePipe.transform(value.toLowerCase());
+            return this.visaTemplates.public.filter((option: any) => this.latinisePipe.transform(option['title'].toLowerCase()).includes(filterValue));
+        } else {
+            return this.visaTemplates.public;
         }
     }
 }

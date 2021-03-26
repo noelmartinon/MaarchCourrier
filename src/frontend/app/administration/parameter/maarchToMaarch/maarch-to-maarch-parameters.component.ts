@@ -83,7 +83,7 @@ export class MaarchToMaarchParametersComponent implements OnInit {
 
     getDoctypes() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/doctypes`).pipe(
+            this.http.get('../rest/doctypes').pipe(
                 tap((data: any) => {
                     let arrValues: any[] = [];
                     data.structure.forEach((doctype: any) => {
@@ -105,15 +105,13 @@ export class MaarchToMaarchParametersComponent implements OnInit {
                                     isTitle: true,
                                     color: secondDoctype.css_style
                                 });
-                                arrValues = arrValues.concat(data.structure.filter((infoDoctype: any) => infoDoctype.doctypes_second_level_id === secondDoctype.doctypes_second_level_id && infoDoctype.description !== undefined).map((infoType: any) => {
-                                    return {
-                                        id: infoType.type_id,
-                                        label: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + infoType.description,
-                                        title: infoType.description,
-                                        disabled: false,
-                                        isTitle: false,
-                                    };
-                                }));
+                                arrValues = arrValues.concat(data.structure.filter((infoDoctype: any) => infoDoctype.doctypes_second_level_id === secondDoctype.doctypes_second_level_id && infoDoctype.description !== undefined).map((infoType: any) => ({
+                                    id: infoType.type_id,
+                                    label: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + infoType.description,
+                                    title: infoType.description,
+                                    disabled: false,
+                                    isTitle: false,
+                                })));
                             });
                         }
                     });
@@ -126,14 +124,12 @@ export class MaarchToMaarchParametersComponent implements OnInit {
 
     getBaskets() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/baskets`).pipe(
+            this.http.get('../rest/baskets').pipe(
                 tap((data: any) => {
-                    this.baskets = data.baskets.map((basket: any) => {
-                        return {
-                            id: basket.basket_id,
-                            label: basket.basket_name
-                        };
-                    });
+                    this.baskets = data.baskets.map((basket: any) => ({
+                        id: basket.basket_id,
+                        label: basket.basket_name
+                    }));
                     resolve(true);
                 })
             ).subscribe();
@@ -142,14 +138,12 @@ export class MaarchToMaarchParametersComponent implements OnInit {
 
     getStatuses() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/statuses`).pipe(
+            this.http.get('../rest/statuses').pipe(
                 tap((data: any) => {
-                    this.statuses = data.statuses.map((status: any) => {
-                        return {
-                            id: status.identifier,
-                            label: status.label_status
-                        };
-                    });
+                    this.statuses = data.statuses.map((status: any) => ({
+                        id: status.identifier,
+                        label: status.label_status
+                    }));
                     resolve(true);
                 })
             ).subscribe();
@@ -158,7 +152,7 @@ export class MaarchToMaarchParametersComponent implements OnInit {
 
     getPriorities() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/priorities`).pipe(
+            this.http.get('../rest/priorities').pipe(
                 tap((data: any) => {
                     this.priorities = data.priorities;
                     resolve(true);
@@ -169,7 +163,7 @@ export class MaarchToMaarchParametersComponent implements OnInit {
 
     getIndexingModels() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/indexingModels`).pipe(
+            this.http.get('../rest/indexingModels').pipe(
                 tap((data: any) => {
                     this.indexingModels = data.indexingModels.filter((info: any) => info.private === false);
                     resolve(true);
@@ -180,7 +174,7 @@ export class MaarchToMaarchParametersComponent implements OnInit {
 
     getAttachmentTypes() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/attachmentsTypes`).pipe(
+            this.http.get('../rest/attachmentsTypes').pipe(
                 tap((data: any) => {
                     Object.keys(data.attachmentsTypes).forEach(templateType => {
                         this.attachmentsTypes.push({
@@ -196,10 +190,8 @@ export class MaarchToMaarchParametersComponent implements OnInit {
 
     getConfiguration() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/m2m/configuration`).pipe(
-                map((data: any) => {
-                    return data.configuration;
-                }),
+            this.http.get('../rest/m2m/configuration').pipe(
+                map((data: any) => data.configuration),
                 tap((data: any) => {
                     Object.keys(this.communications).forEach(elemId => {
                         this.communications[elemId].setValue(data.communications[elemId]);
@@ -360,12 +352,10 @@ export class MaarchToMaarchParametersComponent implements OnInit {
     }
 
 
-    originalOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
-        return 0;
-    }
+    originalOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => 0;
 
     saveConfiguration() {
-        this.http.put(`../rest/m2m/configuration`, { configuration: this.formatConfiguration() }).pipe(
+        this.http.put('../rest/m2m/configuration', { configuration: this.formatConfiguration() }).pipe(
             tap(() => {
                 this.notify.success(this.translate.instant('lang.dataUpdated'));
             }),

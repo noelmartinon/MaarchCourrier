@@ -155,12 +155,10 @@ export class ContactsListAdministrationComponent implements OnInit {
     }
 
     addContactsToCorrespondentsGroup(groupId: number) {
-        const objTosend = this.selection.selected.map((contactId: any) => {
-            return {
-                id: contactId,
-                type: 'contact'
-            };
-        });
+        const objTosend = this.selection.selected.map((contactId: any) => ({
+            id: contactId,
+            type: 'contact'
+        }));
         this.http.post('../rest/contactsGroups/' + groupId + '/correspondents', { correspondents: objTosend }).pipe(
             tap(() => {
                 this.selection.clear();
@@ -180,7 +178,7 @@ export class ContactsListAdministrationComponent implements OnInit {
 
     processPostData(data: any) {
         data.contacts.forEach((element: any) => {
-            let tmpFormatedAddress = [];
+            const tmpFormatedAddress = [];
             tmpFormatedAddress.push(element.addressNumber);
             tmpFormatedAddress.push(element.addressStreet);
             tmpFormatedAddress.push(element.addressPostcode);
@@ -202,8 +200,8 @@ export class ContactsListAdministrationComponent implements OnInit {
         if (contact.isUsed) {
             this.dialogRef = this.dialog.open(ContactsListAdministrationRedirectModalComponent, { panelClass: 'maarch-modal', autoFocus: false });
             this.dialogRef.afterClosed().subscribe((result: any) => {
-                if (typeof result != "undefined" && result != '') {
-                    var queryparams = '';
+                if (typeof result != 'undefined' && result != '') {
+                    let queryparams = '';
                     if (result.processMode == 'reaffect') {
                         queryparams = '?redirect=' + result.contactId;
                     }
@@ -391,7 +389,7 @@ export class ContactListHttpDao {
 
     getRepoIssues(sort: string, order: string, page: number, href: string, search: string): Observable<ContactList> {
 
-        let offset = page * 10;
+        const offset = page * 10;
         const requestUrl = `${href}?limit=10&offset=${offset}&order=${order}&orderBy=${sort}&search=${search}`;
 
         return this.http.get<ContactList>(requestUrl);

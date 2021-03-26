@@ -13,7 +13,7 @@ export class PriorityAdministrationComponent implements OnInit {
 
     id: string;
     creationMode: boolean;
-    
+
     loading: boolean = false;
 
     priority: any = {

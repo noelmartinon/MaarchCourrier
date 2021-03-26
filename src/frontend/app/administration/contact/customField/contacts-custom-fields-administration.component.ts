@@ -89,11 +89,9 @@ export class ContactsCustomFieldsAdministrationComponent implements OnInit {
             // TO FIX DATA BINDING SIMPLE ARRAY VALUES
             map((data: any) => {
                 data.customFields.forEach((element: any) => {
-                    element.values = element.values.map((info: any) => {
-                        return {
-                            label: info
-                        };
-                    });
+                    element.values = element.values.map((info: any) => ({
+                        label: info
+                    }));
 
                 });
                 return data;

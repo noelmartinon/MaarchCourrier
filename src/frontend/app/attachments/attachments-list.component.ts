@@ -24,22 +24,22 @@ import { AppService } from '@service/app.service';
             [
                 transition(
                     ':enter', [
-                    style({ transform: 'translateY(-10%)', opacity: 0 }),
-                    animate('150ms', style({ transform: 'translateY(0)', 'opacity': 1 }))
-                ]
+                        style({ transform: 'translateY(-10%)', opacity: 0 }),
+                        animate('150ms', style({ transform: 'translateY(0)', 'opacity': 1 }))
+                    ]
                 ),
                 transition(
                     ':leave', [
-                    style({ transform: 'translateY(0)', 'opacity': 1 }),
-                    animate('150ms', style({ transform: 'translateY(-10%)', 'opacity': 0 })),
-                ]
+                        style({ transform: 'translateY(0)', 'opacity': 1 }),
+                        animate('150ms', style({ transform: 'translateY(-10%)', 'opacity': 0 })),
+                    ]
                 )]
         )
     ],
 })
 export class AttachmentsListComponent implements OnInit {
 
-    
+
     attachments: any;
     loading: boolean = true;
     pos = 0;
@@ -102,7 +102,7 @@ export class AttachmentsListComponent implements OnInit {
     }
 
     checkMaarchParapheurEnabled() {
-        this.http.get("../rest/externalSignatureBooks/enabled")
+        this.http.get('../rest/externalSignatureBooks/enabled')
             .subscribe((data: any) => {
                 if (data.enabledSignatureBook === 'maarchParapheur') {
                     this.maarchParapheurEnabled = true;
@@ -113,11 +113,11 @@ export class AttachmentsListComponent implements OnInit {
     }
 
     loadAttachments(resId: number) {
-        let timeStamp = +new Date();
+        const timeStamp = +new Date();
         this.resId = resId;
         this.loading = true;
         this.filterAttachTypes = [];
-        this.http.get("../rest/resources/" + this.resId + "/attachments")
+        this.http.get('../rest/resources/' + this.resId + '/attachments')
             .subscribe((data: any) => {
                 this.mailevaEnabled = data.mailevaEnabled;
                 this.attachments = data.attachments;
@@ -142,7 +142,7 @@ export class AttachmentsListComponent implements OnInit {
     }
 
     setInSignatureBook(attachment: any) {
-        this.http.put("../rest/attachments/" + attachment.resId + "/inSignatureBook", {})
+        this.http.put('../rest/attachments/' + attachment.resId + '/inSignatureBook', {})
             .subscribe(() => {
                 attachment.inSignatureBook = !attachment.inSignatureBook;
                 this.afterActionAttachment.emit('setInSignatureBook');
@@ -153,7 +153,7 @@ export class AttachmentsListComponent implements OnInit {
     }
 
     setInSendAttachment(attachment: any) {
-        this.http.put("../rest/attachments/" + attachment.resId + "/inSendAttachment", {})
+        this.http.put('../rest/attachments/' + attachment.resId + '/inSendAttachment', {})
             .subscribe(() => {
                 attachment.inSendAttach = !attachment.inSendAttach;
                 this.afterActionAttachment.emit('setInSendAttachment');

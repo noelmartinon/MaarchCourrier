@@ -8,12 +8,12 @@ import { tap, exhaustMap, catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
-    templateUrl: "confirm-action.component.html",
+    templateUrl: 'confirm-action.component.html',
     styleUrls: ['confirm-action.component.scss'],
 })
 export class ConfirmActionComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;

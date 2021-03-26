@@ -8,7 +8,7 @@ import { AlertComponent } from '../plugins/modal/alert.component';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 
-declare var $: any;
+declare let $: any;
 
 @Injectable({
     providedIn: 'root'

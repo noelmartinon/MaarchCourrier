@@ -122,7 +122,9 @@ export class DoctypesAdministrationComponent implements OnInit {
                     $('#jstree_search').keyup( () => {
                         const v: any = $('#jstree_search').val();
                         this.emptyField = v === '' ? true : false;
-                        if (to) { clearTimeout(to); }
+                        if (to) {
+                            clearTimeout(to);
+                        }
                         to = setTimeout(function () {
                             $('#jstree').jstree(true).search(v);
                         }, 250);
@@ -318,13 +320,13 @@ export class DoctypesAdministrationComponent implements OnInit {
                 });
         } else {
             this.http.put('../rest/doctypes/types/' + this.currentType.type_id, this.currentType)
-                    .subscribe((data: any) => {
-                        this.doctypes = data['doctypeTree'];
-                        this.refreshTree();
-                        this.notify.success(this.translate.instant('lang.documentTypeUpdated'));
-                    }, (err) => {
-                        this.notify.error(err.error.errors);
-                    });            
+                .subscribe((data: any) => {
+                    this.doctypes = data['doctypeTree'];
+                    this.refreshTree();
+                    this.notify.success(this.translate.instant('lang.documentTypeUpdated'));
+                }, (err) => {
+                    this.notify.error(err.error.errors);
+                });
         }
     }
 
@@ -452,7 +454,7 @@ export class DoctypesAdministrationComponent implements OnInit {
     templateUrl: 'doctypes-administration-redirect-modal.component.html'
 })
 export class DoctypesAdministrationRedirectModalComponent {
-    
+
 
     constructor(public http: HttpClient, @Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<DoctypesAdministrationRedirectModalComponent>) {
 

@@ -227,7 +227,7 @@ export class ActionsService implements OnDestroy {
         console.debug(`Lock resources : ${resIds}`);
 
         this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
-            tap(() => console.debug(`Cycle lock : `, this.currentResourceLock)),
+            tap(() => console.debug('Cycle lock : ', this.currentResourceLock)),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
@@ -240,7 +240,7 @@ export class ActionsService implements OnDestroy {
 
         this.currentResourceLock = setInterval(() => {
             this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
-                tap(() => console.debug(`Cycle lock : `, this.currentResourceLock)),
+                tap(() => console.debug('Cycle lock : ', this.currentResourceLock)),
                 catchError((err: any) => {
                     if (err.status === 403) {
                         clearInterval(this.currentResourceLock);

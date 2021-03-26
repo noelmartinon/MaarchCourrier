@@ -15,7 +15,7 @@ export class DocserversAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
+
     loading: boolean = false;
     dataSource: any;
 

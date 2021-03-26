@@ -28,7 +28,9 @@ export class NotificationService {
             duration: duration,
             panelClass: 'success-snackbar',
             verticalPosition : 'top',
-            data: { message: message, icon: 'info-circle', close: () => {snackBar.dismiss()} }
+            data: { message: message, icon: 'info-circle', close: () => {
+                snackBar.dismiss();
+            } }
         });
     }
 
@@ -38,13 +40,15 @@ export class NotificationService {
             duration: duration,
             panelClass: 'error-snackbar',
             verticalPosition : 'top',
-            data: { url: url, message: message, icon: 'exclamation-triangle', close: () => {snackBar.dismiss()} }
+            data: { url: url, message: message, icon: 'exclamation-triangle', close: () => {
+                snackBar.dismiss();
+            } }
         });
     }
 
     handleErrors(err: any) {
         console.log(err);
-        /*if (err.status === 401 && this.router.url !== '/home') {
+        /* if (err.status === 401 && this.router.url !== '/home') {
             this.router.navigate(['/home']);
             window.location.reload(true);
             this.error(this.translate.instant('lang.mustReconnect'));

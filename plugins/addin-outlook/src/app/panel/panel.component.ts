@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
-import { catchError, finalize, tap } from 'rxjs/operators';
+import { catchError, filter, finalize, map, tap } from 'rxjs/operators';
 import { NotificationService } from '../service/notification/notification.service';
-import { ExchangeService, ExchangeVersion, WebCredentials, BodyType, Uri, BasePropertySet, PropertySet } from 'ews-js-api-browser';
 import { AuthService } from '../service/auth.service';
+import { TranslateService } from '@ngx-translate/core';
+import { FunctionsService } from '../service/functions.service';
+import { KeyValue } from '@angular/common';
 
 declare const Office: any;
 @Component({
@@ -15,36 +17,40 @@ declare const Office: any;
 export class PanelComponent implements OnInit {
     status: string = 'loading';
 
-    // must be REST USER (with create_contact privilege)
-    /*headers = new HttpHeaders({
-        Authorization: 'Basic ' + btoa('cchaplin:maarch')
-    });*/
-
     inApp: boolean = false;
+    resId: number = null;
 
+    displayResInfo: any = {};
     displayMailInfo: any = {};
     docFromMail: any = {};
     contactInfos: any = {};
     userInfos: any;
     mailBody: any;
+    attachments: any = [];
     contactId: number;
 
+    addinConfig: any = {}
+
     connectionTry: any = null;
+
+    serviceRequest: any = {};
 
     constructor(
         public http: HttpClient,
         private notificationService: NotificationService,
-        public authService: AuthService
-    ) { 
+        public authService: AuthService,
+        public translate: TranslateService,
+        public functions: FunctionsService
+    ) {
         this.authService.catchEvent().subscribe(async (result: any) => {
             if (result === 'connected') {
                 this.inApp = await this.checkMailInApp();
 
                 if (!this.inApp) {
-                    // console.log(Office.context.mailbox.item);
+                    console.log(Office.context.mailbox.item);
                     this.initMailInfo();
                     this.status = 'end';
-                } 
+                }
             } else if (result === 'not connected') {
                 this.status = 'end';
             }
@@ -62,22 +68,23 @@ export class PanelComponent implements OnInit {
         this.status = 'loading';
         await this.getMailBody();
         await this.createContact();
-        this.createDocFromMail();
-        // this.getAttachments();
-        // this.getToken();
+        await this.createDocFromMail();
+        if (this.attachments.filter((attachment: any) => attachment.selected).length > 0) {
+            this.createAttachments(this.resId);
+        }
     }
 
     checkMailInApp(): Promise<boolean> {
-        let emailId: string = "\"" + Office.context.mailbox.item.itemId + "\"";
+        let emailId: string = '"' + Office.context.mailbox.item.itemId + '"';
         let infoEmail: any = {
             type: 'emailId',
             value: emailId
-        }
+        };
         return new Promise((resolve) => {
             this.http.put('../rest/resources/external', infoEmail).pipe(
                 tap((data: any) => {
                     this.status = 'end';
-                    const result =  data.resId !== undefined ? true : false;
+                    const result = data.resId !== undefined ? true : false;
                     resolve(result);
                 }),
                 catchError((err: any) => {
@@ -87,68 +94,83 @@ export class PanelComponent implements OnInit {
                     } else {
                         this.notificationService.handleErrors(err);
                     }
+                    resolve(false);
                     return of(false);
                 })
             ).subscribe();
         });
     }
 
-    initMailInfo() {
-        this.displayMailInfo = {
-            modelId: 5,
-            doctype: 'Courriel',
-            subject: Office.context.mailbox.item.subject,
+    async initMailInfo() {
+        await this.getConfiguration();
+        this.displayResInfo = {
             typist: `${this.authService.user.firstname} ${this.authService.user.lastname}`,
-            status: 'NEW',
-            documentDate: Office.context.mailbox.item.dateTimeCreated,
-            arrivalDate: Office.context.mailbox.item.dateTimeCreated,
-            emailId: Office.context.mailbox.item.itemId,
-            sender: Office.context.mailbox.item.from.displayName
+            indexingModel: this.addinConfig?.indexingModelLabel,
+            doctype: this.addinConfig?.typeLabel,
+            status: this.addinConfig?.statusLabel,
+        }
+        this.displayMailInfo = {
+            sender: Office.context.mailbox.item.from.displayName,
+            subject: Office.context.mailbox.item.subject,
+            documentDate: this.functions.formatObjectToDateFullFormat(Office.context.mailbox.item.dateTimeCreated),
+            emailId: Office.context.mailbox.item.itemId, 
         };
+        this.attachments = Office.context.mailbox.item.attachments.filter((attachment: any) => !attachment.isInline).map((attachment: any) => {
+            return {
+                ...attachment,
+                selected: true
+            };
+        });
     }
 
     getConfiguration() {
-        // TO DO get info addin conf (modelId, doctype, etc)
+        return new Promise((resolve) => {
+            this.http.get(`../rest/plugins/outlook/configuration`).pipe(
+                filter((data: any) => !this.functions.empty(data.configuration)),
+                map((data: any) => data.configuration),
+                tap((data: any) => {
+                    this.addinConfig = data;
+                    resolve(true);
+                })
+            ).subscribe();
+        });
     }
 
     createDocFromMail() {
-        // TO DO get id user
         this.docFromMail = {
-            modelId: 5,
-            doctype: 102,
+            modelId: this.addinConfig.indexingModelId,
+            doctype: this.addinConfig.typeId,
             subject: Office.context.mailbox.item.subject,
             chrono: true,
             typist: this.authService.user.id,
-            status: 'NEW',
+            status: this.addinConfig.status,
             documentDate: Office.context.mailbox.item.dateTimeCreated,
             arrivalDate: Office.context.mailbox.item.dateTimeCreated,
-            format: 'TXT',
+            format: 'html',
             encodedFile: btoa(unescape(encodeURIComponent(this.mailBody))),
             externalId: { emailId: Office.context.mailbox.item.itemId },
             senders: [{ id: this.contactId, type: 'contact' }]
         };
         return new Promise((resolve) => {
-            return new Promise((resolve) => {
-                this.http.post('../rest/resources', this.docFromMail).pipe(
-                    tap((data: any) => {
-                        // console.log(data);
-                        this.notificationService.success('Courriel envoyé');
-                        this.inApp = true;
-                        resolve(true);
-                    }),
-                    finalize(() => this.status = 'end'),
-                    catchError((err: any) => {
-                        this.notificationService.handleErrors(err);
-                        return of(false);
-                    })
-                ).subscribe();
-            });
+            this.http.post('../rest/resources', this.docFromMail).pipe(
+                tap((data: any) => {
+                    this.resId = data.resId;
+                    this.notificationService.success(this.translate.instant('lang.emailSent'));
+                    this.inApp = true;
+                    resolve(true);
+                }),
+                finalize(() => this.status = 'end'),
+                catchError((err: any) => {
+                    this.notificationService.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
         });
     }
 
     getMailBody() {
         return new Promise((resolve) => {
-            Office.context.mailbox.item.body.getAsync(Office.CoercionType.Text, ((res: { value: any; }) => {
+            Office.context.mailbox.item.body.getAsync(Office.CoercionType.Html, ((res: { value: any; }) => {
                 this.mailBody = res.value;
                 resolve(true);
             }));
@@ -179,85 +201,29 @@ export class PanelComponent implements OnInit {
         });
     }
 
-    getToken() {
-        Office.context.mailbox.getCallbackTokenAsync(this.attachmentTokenCallback);
-    }
-
-    attachmentTokenCallback(asyncResult: any) {
-        let serviceRequest: any = {
-            attachmentToken: '',
+    createAttachments(resId: number) {
+        const objToSend = {
             ewsUrl: Office.context.mailbox.ewsUrl,
-            restUrl: Office.context.mailbox.restUrl,
-            attachments: []
+            emailId: Office.context.mailbox.item.itemId,
+            userId: Office.context.mailbox.userProfile.emailAddress,
+            attachments: this.attachments.map((attachment: any) => attachment.id)
         };
-        let ewsId = Office.context.mailbox.item.itemId;
-        let restId = Office.context.mailbox.convertToRestId(ewsId, Office.MailboxEnums.RestVersion.v2_0);
-        let getMessageUrl = serviceRequest.restUrl + '/v2.0/me/messages/' + restId + '/attachments';
-        if (asyncResult.status == "succeeded") {
-            serviceRequest.attachmentToken = asyncResult.value;
-            for (var i = 0; i < Office.context.mailbox.item.attachments.length; i++) {
-                serviceRequest.attachments.push(Office.context.mailbox.item.attachments[i].id);
-            }
-            console.log(serviceRequest);
+        return new Promise((resolve) => {
+            // FOR TEST
+            console.log(objToSend);
+            resolve(true);
 
-            // Access-Control-Allow-Origin not allowed
-            /*let xhr = new XMLHttpRequest();
-            xhr.open('GET', getMessageUrl);
-            xhr.setRequestHeader('Authorization', 'Bearer ' + serviceRequest.attachmentToken);
-            xhr.setRequestHeader('Content-Type', 'application/json')
-            xhr.onload = ((res) => {
-                console.log(res);
-            });            
-            xhr.send();*/
-
-            // Test with EWS GetAttachment function
-            /*let ews = new ExchangeService();
-            ews.Credentials = new WebCredentials('userName', 'pwd'); // required to make conn
-            ews.Url = new Uri(serviceRequest.ewsUrl);
-            let getAttachmentsResponse: any = ews.GetAttachments(serviceRequest.attachments, BodyType.Text, null);
-            if (getAttachmentsResponse.OverallResult == asyncResult.status) {
-                console.log(getAttachmentsResponse);
-                return ews;
-            }*/
-            
-        }
-        else {
-            console.log(asyncResult.error.message);
-        }
+            /*this.http.post('../rest/???', objToSend).pipe(
+                finalize(() => resolve(true)),
+                catchError((err: any) => {
+                    this.notificationService.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();*/
+        });
     }
 
-    getAttachments() {
-        if (Office.context.requirements.isSetSupported('Mailbox', '1.8')) {
-            if (Office.context.mailbox.item.attachments.length > 0) {
-                for (let i = 0; i < Office.context.mailbox.item.attachments.length; i++) {
-                    Office.context.mailbox.item.getAttachmentContentAsync(Office.context.mailbox.item.attachments[i].id, this.handleAttachmentsCallback);
-                }
-            }
-        } else {
-            console.log('Impossible de récupérer les pj : version minimum Office server 1.8');
-        }
-    }
-
-    handleAttachmentsCallback(result) {
-        console.log(result);
-
-        // Parse string to be a url, an .eml file, a base64-encoded string, or an .icalendar file.
-        /*switch (result.value.format) {
-            case Office.MailboxEnums.AttachmentContentFormat.Base64:
-                console.log(result);
-                // Handle file attachment.
-                break;
-            case Office.MailboxEnums.AttachmentContentFormat.Eml:
-                // Handle email item attachment.
-                break;
-            case Office.MailboxEnums.AttachmentContentFormat.ICalendar:
-                // Handle .icalender attachment.
-                break;
-            case Office.MailboxEnums.AttachmentContentFormat.Url:
-                // Handle cloud attachment.
-                break;
-            default:
-                // Handle attachment formats that are not supported.
-        }*/
+    originalOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
+        return 0;
     }
 }

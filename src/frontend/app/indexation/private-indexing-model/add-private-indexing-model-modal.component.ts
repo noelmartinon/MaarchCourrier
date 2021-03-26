@@ -7,16 +7,16 @@ import { tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
-    templateUrl: "add-private-indexing-model-modal.component.html",
+    templateUrl: 'add-private-indexing-model-modal.component.html',
     styleUrls: ['add-private-indexing-model-modal.component.scss'],
 })
 export class AddPrivateIndexingModelModalComponent {
-    
-    
+
+
     constructor(
         public translate: TranslateService,
-        public http: HttpClient, 
-        @Inject(MAT_DIALOG_DATA) public data: any, 
+        public http: HttpClient,
+        @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<AddPrivateIndexingModelModalComponent>,
         private notify: NotificationService) {
     }
@@ -24,7 +24,7 @@ export class AddPrivateIndexingModelModalComponent {
     ngOnInit(): void { }
 
     onSubmit() {
-        this.http.post("../rest/indexingModels", this.data.indexingModel).pipe(
+        this.http.post('../rest/indexingModels', this.data.indexingModel).pipe(
             tap((data: any) => {
                 this.data.indexingModel.id = data.id;
                 this.notify.success(this.translate.instant('lang.indexingModelAdded'));

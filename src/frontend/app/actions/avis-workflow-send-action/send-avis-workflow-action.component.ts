@@ -10,12 +10,12 @@ import { FunctionsService } from '@service/functions.service';
 import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 
 @Component({
-    templateUrl: "send-avis-workflow-action.component.html",
+    templateUrl: 'send-avis-workflow-action.component.html',
     styleUrls: ['send-avis-workflow-action.component.scss'],
 })
 export class SendAvisWorkflowComponent implements AfterViewInit {
 
-    
+
     loading: boolean = false;
 
     resourcesError: any[] = [];

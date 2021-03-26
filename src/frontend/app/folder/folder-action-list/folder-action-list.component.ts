@@ -20,7 +20,7 @@ import { PrivilegeService } from '@service/privileges.service';
 })
 export class FolderActionListComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;

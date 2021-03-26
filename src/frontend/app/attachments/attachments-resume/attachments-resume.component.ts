@@ -10,7 +10,7 @@ import { AttachmentPageComponent } from '../attachments-page/attachment-page.com
 
 @Component({
     selector: 'app-attachments-resume',
-    templateUrl: "attachments-resume.component.html",
+    templateUrl: 'attachments-resume.component.html',
     styleUrls: [
         'attachments-resume.component.scss',
     ]
@@ -18,7 +18,7 @@ import { AttachmentPageComponent } from '../attachments-page/attachment-page.com
 
 export class AttachmentsResumeComponent implements OnInit {
 
-    
+
 
     loading: boolean = true;
 
@@ -28,7 +28,7 @@ export class AttachmentsResumeComponent implements OnInit {
     @Output('goTo') goTo = new EventEmitter<string>();
 
     dialogRef: MatDialogRef<any>;
-    
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,

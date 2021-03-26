@@ -20,7 +20,7 @@ import { FoldersService } from '../folders.service';
 import { FunctionsService } from '@service/functions.service';
 import { merge, Observable, of, Subject, Subscription } from 'rxjs';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'folder-document-list.component.html',
@@ -172,9 +172,9 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
             this.initResultList();
 
         },
-            (err: any) => {
-                this.notify.handleErrors(err);
-            });
+        (err: any) => {
+            this.notify.handleErrors(err);
+        });
     }
 
     ngOnDestroy() {

@@ -44,5 +44,5 @@ export class EditorOptionComponent implements OnInit {
                 this.notify.error(err.error.errors);
             });
     }
-    
+
 }

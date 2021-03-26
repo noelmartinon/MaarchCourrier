@@ -17,7 +17,7 @@ export class PasswordModificationComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
     config: any = {};
 
-    
+
     loading: boolean = false;
 
     user: any = {};
@@ -206,7 +206,7 @@ export class PasswordModificationComponent implements OnInit {
 })
 export class InfoChangePasswordModalComponent {
 
-    
+
 
     constructor(
         public http: HttpClient,

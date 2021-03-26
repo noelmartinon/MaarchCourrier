@@ -8,7 +8,7 @@ import { SortPipe } from '../../../plugins/sorting.pipe';
 import { catchError, map, tap, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'export.component.html',
@@ -260,13 +260,11 @@ export class ExportComponent implements OnInit {
 
         this.http.get('../rest/customFields').pipe(
             map((data: any) => {
-                data.customFields = data.customFields.map((custom: any) => {
-                    return {
-                        value: 'custom_' + custom.id,
-                        label: custom.label,
-                        isFunction: true
-                    };
-                });
+                data.customFields = data.customFields.map((custom: any) => ({
+                    value: 'custom_' + custom.id,
+                    label: custom.label,
+                    isFunction: true
+                }));
                 return data;
             }),
             tap((data: any) => {

@@ -308,7 +308,7 @@ export class IndexingFormComponent implements OnInit {
 
             this.http.get('../rest/customFields').pipe(
                 tap((data: any) => {
-                    const withFormMode = data.customFields.filter((item: { mode: any; }) => item.mode === 'form');
+                    const withFormMode = data.customFields.filter((item: { mode: any }) => item.mode === 'form');
                     this.availableCustomFields = withFormMode.map((info: any) => {
                         info.identifier = 'indexingCustomField_' + info.id;
                         info.system = false;
@@ -320,12 +320,10 @@ export class IndexingFormComponent implements OnInit {
                         } else {
                             info.default_value = ['contact', 'banAutocomplete'].indexOf(info.type) > -1 ? [] : null;
                         }
-                        info.values = info.values.length > 0 ? info.values.map((custVal: any) => {
-                            return {
-                                id: custVal.key,
-                                label: custVal.label
-                            };
-                        }) : info.values;
+                        info.values = info.values.length > 0 ? info.values.map((custVal: any) => ({
+                            id: custVal.key,
+                            label: custVal.label
+                        })) : info.values;
                         return info;
                     });
                     this.availableCustomFieldsClone = JSON.parse(JSON.stringify(this.availableCustomFields));
@@ -493,7 +491,7 @@ export class IndexingFormComponent implements OnInit {
     }
 
     formatDatas(datas: any) {
-        let formatData: any = {};
+        const formatData: any = {};
         const regex = /indexingCustomField_[.]*/g;
 
         formatData['customFields'] = {};
@@ -576,7 +574,7 @@ export class IndexingFormComponent implements OnInit {
     }
 
     setDestinationField(elem: any) {
-        let route = this.adminMode || this.mode !== 'indexation' ? `../rest/indexingModels/entities` : `../rest/indexing/groups/${this.groupId}/entities`;
+        const route = this.adminMode || this.mode !== 'indexation' ? '../rest/indexingModels/entities' : `../rest/indexing/groups/${this.groupId}/entities`;
 
         return new Promise((resolve, reject) => {
             this.http.get(route).pipe(
@@ -640,17 +638,15 @@ export class IndexingFormComponent implements OnInit {
     }
 
     setInitiatorField(elem: any) {
-        elem.values = this.headerService.user.entities.map((entity: any) => {
-            return {
-                id: entity.id,
-                label: entity.entity_label
-            };
-        });
+        elem.values = this.headerService.user.entities.map((entity: any) => ({
+            id: entity.id,
+            label: entity.entity_label
+        }));
     }
 
     setCategoryField(elem: any) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/categories`).pipe(
+            this.http.get('../rest/categories').pipe(
                 tap((data: any) => {
                     elem.values = data.categories;
                     resolve(true);
@@ -661,7 +657,7 @@ export class IndexingFormComponent implements OnInit {
 
     setPriorityField(elem: any) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/priorities`).pipe(
+            this.http.get('../rest/priorities').pipe(
                 tap((data: any) => {
                     elem.values = data.priorities;
                     elem.event = 'calcLimitDateByPriority';
@@ -676,7 +672,7 @@ export class IndexingFormComponent implements OnInit {
 
     setDoctypeField(elem: any) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/doctypes`).pipe(
+            this.http.get('../rest/doctypes').pipe(
                 tap((data: any) => {
                     let arrValues: any[] = [];
                     data.structure.forEach((doctype: any) => {
@@ -698,15 +694,13 @@ export class IndexingFormComponent implements OnInit {
                                     isTitle: true,
                                     color: secondDoctype.css_style
                                 });
-                                arrValues = arrValues.concat(data.structure.filter((infoDoctype: any) => infoDoctype.doctypes_second_level_id === secondDoctype.doctypes_second_level_id && infoDoctype.description !== undefined).map((infoType: any) => {
-                                    return {
-                                        id: infoType.type_id,
-                                        label: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + infoType.description,
-                                        title: infoType.description,
-                                        disabled: false,
-                                        isTitle: false,
-                                    };
-                                }));
+                                arrValues = arrValues.concat(data.structure.filter((infoDoctype: any) => infoDoctype.doctypes_second_level_id === secondDoctype.doctypes_second_level_id && infoDoctype.description !== undefined).map((infoType: any) => ({
+                                    id: infoType.type_id,
+                                    label: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + infoType.description,
+                                    title: infoType.description,
+                                    disabled: false,
+                                    isTitle: false,
+                                })));
                             });
                         }
                     });
@@ -1007,7 +1001,7 @@ export class IndexingFormComponent implements OnInit {
     }
 
     initValidator(field: any) {
-        let valArr: ValidatorFn[] = [];
+        const valArr: ValidatorFn[] = [];
 
         const disabledState = !field.enabled || this.isAlwaysDisabledField(field);
         if (!disabledState) {
@@ -1029,7 +1023,7 @@ export class IndexingFormComponent implements OnInit {
         this.arrFormControl[field.identifier].setValidators(valArr);
 
         if (field.identifier === 'destination') {
-            let valArr: ValidatorFn[] = [];
+            const valArr: ValidatorFn[] = [];
             if (field.mandatory) {
                 valArr.push(Validators.required);
                 valArr.push(this.requireDestValidator({ 'isDest': '' }));
@@ -1207,7 +1201,7 @@ export class IndexingFormComponent implements OnInit {
         } else {
             this.fieldCategories.forEach(element => {
                 if (this['indexingModels_' + element].filter((field: any) => field.identifier === 'priority').length > 0) {
-                    this.currentPriorityColor = this['indexingModels_' + element].filter((field: any) => field.identifier === 'priority')[0].values.filter((fieldVal: any) => fieldVal.id === value).map((fieldVal: any) => fieldVal.color)[0]
+                    this.currentPriorityColor = this['indexingModels_' + element].filter((field: any) => field.identifier === 'priority')[0].values.filter((fieldVal: any) => fieldVal.id === value).map((fieldVal: any) => fieldVal.color)[0];
                 }
             });
         }

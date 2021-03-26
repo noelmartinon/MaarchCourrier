@@ -162,7 +162,7 @@ export class AttachmentPageComponent implements OnInit {
         if (!versionEnabled) {
             this.newVersion = false;
         }
-        return versionEnabled
+        return versionEnabled;
     }
 
     createNewVersion(mode: string = 'default') {
@@ -177,7 +177,7 @@ export class AttachmentPageComponent implements OnInit {
                 }
             }),
             filter(() => !this.functions.empty(this.attachment.encodedFile.value)),
-            exhaustMap(() => this.http.post(`../rest/attachments`, this.getAttachmentValues(true, mode))),
+            exhaustMap(() => this.http.post('../rest/attachments', this.getAttachmentValues(true, mode))),
             tap(async (data: any) => {
                 if (this.sendMassMode && mode === 'mailing') {
                     await this.generateMailling(data.id);

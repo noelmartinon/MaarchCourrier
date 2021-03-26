@@ -429,12 +429,10 @@ export class IndexingFieldsService {
                         } else {
                             info.default_value = info.type === 'banAutocomplete' ? [] : null;
                         }
-                        info.values = info.values.length > 0 ? info.values.map((custVal: any) => {
-                            return {
-                                id: custVal.key,
-                                label: custVal.label
-                            };
-                        }) : info.values;
+                        info.values = info.values.length > 0 ? info.values.map((custVal: any) => ({
+                            id: custVal.key,
+                            label: custVal.label
+                        })) : info.values;
                         return info;
                     });
                 }),
@@ -479,7 +477,7 @@ export class IndexingFieldsService {
 
     getRolesFields() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/roles`).pipe(
+            this.http.get('../rest/roles').pipe(
                 tap((data: any) => {
                     const fields: any[] = [];
                     data.roles.forEach((role: any) => {
@@ -494,7 +492,7 @@ export class IndexingFieldsService {
                         });
                     });
                     fields.push({
-                        identifier: `role_visa`,
+                        identifier: 'role_visa',
                         label: this.translate.instant('lang.visaUser'),
                         icon: 'fa-user-check',
                         type: 'select',
@@ -503,7 +501,7 @@ export class IndexingFieldsService {
                         enabled: true,
                     });
                     fields.push({
-                        identifier: `role_sign`,
+                        identifier: 'role_sign',
                         label: this.translate.instant('lang.signUser'),
                         icon: 'fa-user-tie',
                         type: 'select',

@@ -4,14 +4,14 @@ import { Routes, RouterModule } from '@angular/router';
 import { InstallerComponent } from './installer.component';
 
 const routes: Routes = [
-  {
-    path: '',
-    component: InstallerComponent
-  }
+    {
+        path: '',
+        component: InstallerComponent
+    }
 ];
 
 @NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule],
+    imports: [RouterModule.forChild(routes)],
+    exports: [RouterModule],
 })
 export class InstallerRoutingModule {}

@@ -106,20 +106,20 @@ export class HeaderService {
         this.headerMessageIcon = icon;
     }
 
-    resetSideNavSelection() { 
-            this.currentBasketInfo = {
-                ownerId: 0,
-                groupId: 0,
-                basketId: ''
-            };
-            this.foldersService.setFolder({ id: 0 });
-            this.sideBarForm = false;
-            this.showhHeaderPanel = true;
-            this.showMenuShortcut = true;
-            this.showMenuNav = true;
-            this.sideBarAdmin = false;
-            this.sideBarButton = null;
-            this.hideSideBar = true;
+    resetSideNavSelection() {
+        this.currentBasketInfo = {
+            ownerId: 0,
+            groupId: 0,
+            basketId: ''
+        };
+        this.foldersService.setFolder({ id: 0 });
+        this.sideBarForm = false;
+        this.showhHeaderPanel = true;
+        this.showMenuShortcut = true;
+        this.showMenuNav = true;
+        this.sideBarAdmin = false;
+        this.sideBarButton = null;
+        this.hideSideBar = true;
     }
 
     injectInSideBarLeft(template: TemplateRef<any>, viewContainerRef: ViewContainerRef, id: string = 'adminMenu', mode: string = '') {

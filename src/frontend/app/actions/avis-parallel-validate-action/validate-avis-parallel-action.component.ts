@@ -11,12 +11,12 @@ import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 import { HeaderService } from '@service/header.service';
 
 @Component({
-    templateUrl: "validate-avis-parallel-action.component.html",
+    templateUrl: 'validate-avis-parallel-action.component.html',
     styleUrls: ['validate-avis-parallel-action.component.scss'],
 })
 export class ValidateAvisParallelComponent implements OnInit, AfterViewInit {
 
-    
+
     loading: boolean = false;
 
     resourcesWarnings: any[] = [];
@@ -67,7 +67,7 @@ export class ValidateAvisParallelComponent implements OnInit, AfterViewInit {
                 if (!this.noResourceToProcess) {
                     this.ownerOpinion = data.resourcesInformations.success[0].avisUserAsk;
                     this.opinionContent = data.resourcesInformations.success[0].note;
-                    this.opinionLimitDate = new Date(data.resourcesInformations.success[0].opinionLimitDate)
+                    this.opinionLimitDate = new Date(data.resourcesInformations.success[0].opinionLimitDate);
                 }
             }),
             finalize(() => this.loading = false),

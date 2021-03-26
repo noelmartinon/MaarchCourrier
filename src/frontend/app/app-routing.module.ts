@@ -50,18 +50,18 @@ const routes: Routes = [
         canActivate: [AppGuard],
         canDeactivate: [AfterProcessGuard],
         component: ProcessComponent
-      },
-      {
+    },
+    {
         path: 'resources/:detailResId',
         canActivate: [AppGuard],
         canDeactivate: [AfterProcessGuard],
         component: ProcessComponent
-      },
-      {
+    },
+    {
         path: 'indexing/:groupId',
         canActivate: [AppGuard],
         component: IndexationComponent
-      },
+    },
     {
         path: '',
         redirectTo: 'home',

@@ -26,7 +26,7 @@ import { FilterToolComponent } from '@appRoot/search/filter-tool/filter-tool.com
 import { ContactResourceModalComponent } from '@appRoot/contact/contact-resource/modal/contact-resource-modal.component';
 import { PrivilegeService } from '@service/privileges.service';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     selector: 'app-search-result-list',

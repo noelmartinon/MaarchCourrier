@@ -70,7 +70,7 @@ export class RegisteredMailRecipientInputComponent implements OnInit {
     }
 
     getCountries() {
-        this.http.get(`../rest/registeredMail/countries`).pipe(
+        this.http.get('../rest/registeredMail/countries').pipe(
             tap((data: any) => {
                 this.countries = data.countries.map(
                     (item: any) => this.latinisePipe.transform(item.toUpperCase()));

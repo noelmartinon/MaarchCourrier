@@ -15,7 +15,7 @@ import { of } from 'rxjs';
 })
 export class ContactResourceComponent implements OnInit {
 
-    
+
 
     loading: boolean = true;
 
@@ -56,12 +56,10 @@ export class ContactResourceComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get('../rest/contactsCustomFields').pipe(
                 tap((data: any) => {
-                    this.customFields = data.customFields.map((custom: any) => {
-                        return {
-                            id: custom.id,
-                            label: custom.label
-                        };
-                    });
+                    this.customFields = data.customFields.map((custom: any) => ({
+                        id: custom.id,
+                        label: custom.label
+                    }));
                     resolve(true);
                 })
             ).subscribe();
@@ -71,14 +69,12 @@ export class ContactResourceComponent implements OnInit {
     loadContactsOfResource(resId: number, mode: string) {
         this.http.get(`../rest/resources/${resId}/contacts?type=${mode}`).pipe(
             tap((data: any) => {
-                this.contacts = data.contacts.map((contact: any) => {
-                    return {
-                        ...contact,
-                        civility: this.contactService.formatCivilityObject(contact.civility),
-                        fillingRate: this.contactService.formatFillingObject(contact.fillingRate),
-                        customFields: !this.functionsService.empty(contact.customFields) ? this.formatCustomField(contact.customFields) : [],
-                    };
-                });
+                this.contacts = data.contacts.map((contact: any) => ({
+                    ...contact,
+                    civility: this.contactService.formatCivilityObject(contact.civility),
+                    fillingRate: this.contactService.formatFillingObject(contact.fillingRate),
+                    customFields: !this.functionsService.empty(contact.customFields) ? this.formatCustomField(contact.customFields) : [],
+                }));
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {

@@ -37,14 +37,12 @@ export class ThesaurusModalComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get('../rest/tags').pipe(
                 tap((data: any) => {
-                    this.tags = data.tags.map((tag: any) => {
-                        return {
-                            id: tag.id,
-                            label: tag.label,
-                            parentId: tag.parentId,
-                            countResources: tag.countResources
-                        };
-                    });
+                    this.tags = data.tags.map((tag: any) => ({
+                        id: tag.id,
+                        label: tag.label,
+                        parentId: tag.parentId,
+                        countResources: tag.countResources
+                    }));
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -70,18 +68,16 @@ export class ThesaurusModalComponent implements OnInit {
     async getTagsTree() {
         await this.getTags();
 
-        const tagsTree = this.tags.map((tag: any) => {
-            return {
-                id: tag.id,
-                text: tag.label,
-                parent: this.functionsService.empty(tag.parentId) ? '#' : tag.parentId,
-                state: {
-                    opened: this.data.id == tag.id,
-                    selected: this.data.id == tag.id,
-                    disabled: !this.functionsService.empty(this.data.id)
-                }
-            };
-        });
+        const tagsTree = this.tags.map((tag: any) => ({
+            id: tag.id,
+            text: tag.label,
+            parent: this.functionsService.empty(tag.parentId) ? '#' : tag.parentId,
+            state: {
+                opened: this.data.id == tag.id,
+                selected: this.data.id == tag.id,
+                disabled: !this.functionsService.empty(this.data.id)
+            }
+        }));
 
         setTimeout(() => {
             $('#jstree')

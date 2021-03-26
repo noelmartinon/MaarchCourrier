@@ -114,14 +114,12 @@ export class ContactAutocompleteComponent implements OnInit {
                 switchMap((data: any) => this.getDatas(data)),
                 map((data: any) => {
                     data = data.filter((contact: any) => !this.singleMode || (contact.type !== 'entity' && contact.type !== 'contactGroup' && this.singleMode));
-                    data = data.map((contact: any) => {
-                        return {
-                            ...contact,
-                            civility: this.contactService.formatCivilityObject(contact.civility),
-                            fillingRate: this.contactService.formatFillingObject(contact.fillingRate),
-                            customFields: contact.customFields !== undefined ? this.formatCustomField(contact.customFields) : [],
-                        };
-                    });
+                    data = data.map((contact: any) => ({
+                        ...contact,
+                        civility: this.contactService.formatCivilityObject(contact.civility),
+                        fillingRate: this.contactService.formatFillingObject(contact.fillingRate),
+                        customFields: contact.customFields !== undefined ? this.formatCustomField(contact.customFields) : [],
+                    }));
                     return data;
                 }),
                 tap((data: any) => {
@@ -142,12 +140,10 @@ export class ContactAutocompleteComponent implements OnInit {
     getCustomFields() {
         this.http.get('../rest/contactsCustomFields').pipe(
             tap((data: any) => {
-                this.customFields = data.customFields.map((custom: any) => {
-                    return {
-                        id: custom.id,
-                        label: custom.label
-                    };
-                });
+                this.customFields = data.customFields.map((custom: any) => ({
+                    id: custom.id,
+                    label: custom.label
+                }));
             })
         ).subscribe();
     }
@@ -250,16 +246,14 @@ export class ContactAutocompleteComponent implements OnInit {
         if (item.type === 'contactGroup') {
             this.http.get('../rest/contactsGroups/' + item.id + '/correspondents?limit=none').pipe(
                 map((data: any) => {
-                    const contacts = data.correspondents.map((correspondent: any) => {
-                        return {
-                            id: correspondent.id,
-                            type: correspondent.type,
-                            lastname: correspondent.name,
-                            fillingRate: !this.functions.empty(correspondent.thresholdLevel) ? {
-                                color: this.contactService.getFillingColor(correspondent.thresholdLevel)
-                            } : ''
-                        };
-                    });
+                    const contacts = data.correspondents.map((correspondent: any) => ({
+                        id: correspondent.id,
+                        type: correspondent.type,
+                        lastname: correspondent.name,
+                        fillingRate: !this.functions.empty(correspondent.thresholdLevel) ? {
+                            color: this.contactService.getFillingColor(correspondent.thresholdLevel)
+                        } : ''
+                    }));
                     return contacts;
                 }),
                 tap((contacts: any) => {

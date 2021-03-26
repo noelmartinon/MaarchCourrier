@@ -120,7 +120,7 @@ export class PrerequisiteComponent implements OnInit {
     }
 
     getStepData() {
-        this.http.get(`../rest/installer/prerequisites`).pipe(
+        this.http.get('../rest/installer/prerequisites').pipe(
             tap((data: any) => {
                 this.prerequisites = data.prerequisites;
                 Object.keys(this.packagesList).forEach(group => {

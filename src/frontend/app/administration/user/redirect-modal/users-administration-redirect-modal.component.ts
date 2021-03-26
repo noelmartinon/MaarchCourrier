@@ -150,15 +150,13 @@ export class UsersAdministrationRedirectModalComponent implements OnInit {
 
     updateListinstances() {
         this.userDestDifflists.forEach((res: any, index: number) => {
-            this.userDestDifflists[index].listInstances = this.userDestDifflists[index].listInstances.map((item: any) => {
-                return {
-                    ...item,
-                    item_id: (item.item_mode === 'dest' && item.item_id === this.data.user.id) ? this.userDestDifflistsRedirectUserId : item.item_id
-                };
-            });
+            this.userDestDifflists[index].listInstances = this.userDestDifflists[index].listInstances.map((item: any) => ({
+                ...item,
+                item_id: (item.item_mode === 'dest' && item.item_id === this.data.user.id) ? this.userDestDifflistsRedirectUserId : item.item_id
+            }));
         });
         return new Promise((resolve) => {
-            this.http.put(`../rest/listinstances`, this.userDestDifflists).pipe(
+            this.http.put('../rest/listinstances', this.userDestDifflists).pipe(
                 tap((data: any) => {
                     if (data && data.hasOwnProperty('errors')) {
                         this.notify.error(data.errors);
@@ -176,15 +174,13 @@ export class UsersAdministrationRedirectModalComponent implements OnInit {
 
     updateVisaWorkflow() {
         this.userVisaWorkflowResources.forEach((res: any, index: number) => {
-            this.userVisaWorkflowResources[index].listInstances = this.userVisaWorkflowResources[index].listInstances.map((item: any) => {
-                return {
-                    ...item,
-                    item_id: (item.process_mode !== null && item.item_id === this.data.user.id) ? this.userVisaWorkflowResourcesRedirectUserId : item.item_id
-                };
-            });
+            this.userVisaWorkflowResources[index].listInstances = this.userVisaWorkflowResources[index].listInstances.map((item: any) => ({
+                ...item,
+                item_id: (item.process_mode !== null && item.item_id === this.data.user.id) ? this.userVisaWorkflowResourcesRedirectUserId : item.item_id
+            }));
         });
         return new Promise((resolve) => {
-            this.http.put(`../rest/circuits/visaCircuit`, { resources: this.userVisaWorkflowResources }).pipe(
+            this.http.put('../rest/circuits/visaCircuit', { resources: this.userVisaWorkflowResources }).pipe(
                 tap((data: any) => {
                     if (data && data.hasOwnProperty('errors')) {
                         this.notify.error(data.errors);

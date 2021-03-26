@@ -3,16 +3,27 @@
         <ng-container *ngIf="status === 'end' && authService.isAuth()">
             <ng-container *ngIf="!inApp; else elseInApp">
                 <div style="display: grid;grid-template-columns: 1fr auto;grid-gap:10px;padding-top: 5px;padding-bottom: 15px;align-items: center;">
-                    <app-maarch-message style="font-size:12px;" [content]="'Les informations ci-dessous seront envoyées :'"></app-maarch-message>
-                    <button mat-fab color="primary" [title]="'Envoyer à' + applicationName" (click)="sendToMaarch()">
+                    <app-maarch-message style="font-size:12px;" [content]="'lang.infosWillBeSent' | translate"></app-maarch-message>
+                    <button mat-fab color="primary" [title]="('lang.sendTo' | translate) + ' ' + authService.applicationName" (click)="sendToMaarch()">
                         <mat-icon class="far fa-paper-plane fa-2x"></mat-icon>
                     </button>
                 </div>
                 <mat-card>
                     <mat-card-content>
-                        <mat-form-field appearance="fill" *ngFor="let mail of displayMailInfo | keyvalue"
+                        <mat-form-field appearance="fill" *ngFor="let mail of displayResInfo | keyvalue: originalOrder"
                             style="font-size:12px;width: 100%;pointer-events: none;">
-                            <mat-label>{{mail.key}}</mat-label>
+                            <mat-label>{{ 'lang.' + mail.key | translate }}</mat-label>
+                            <input matInput [value]="mail.value" readonly [title]="mail.value">
+                        </mat-form-field>
+                        <hr/>
+                        <div style="padding-bottom: 10px;" *ngIf="attachments.length > 0">
+                            <button *ngFor="let attachment of attachments" [class.not-selected]="!attachment.selected" mat-stroked-button style="width:100%;overflow: hidden;text-overflow: ellipsis;" [title]="attachment.name" (click)="attachment.selected=!attachment.selected">
+                                <mat-icon class="fa fa-paperclip" [class.secondary]="attachment.selected"></mat-icon>&nbsp;<span [class.primary]="attachment.selected" >{{attachment.name}}</span>
+                            </button>
+                        </div>
+                        <mat-form-field appearance="fill" *ngFor="let mail of displayMailInfo | keyvalue: originalOrder"
+                            style="font-size:12px;width: 100%;pointer-events: none;">
+                            <mat-label>{{ 'lang.' + mail.key | translate }}</mat-label>
                             <input matInput [value]="mail.value" readonly [title]="mail.value">
                         </mat-form-field>
                     </mat-card-content>
@@ -21,14 +32,14 @@
             <ng-template #elseInApp>
                 <div class="status-app-content">
                     <i class="fas fa-check green" style="font-size: 70px;"></i>
-                    <div class="status-app-text primary">Courriel déjà présent dans <a [href]="authService.appUrl" target="_blank">{{authService.applicationName}}</a></div>
+                    <div class="status-app-text primary">{{ 'lang.alreadyPresent' | translate }} <a [href]="authService.appUrl" target="_blank">{{authService.applicationName}}</a></div>
                 </div>
             </ng-template>
         </ng-container>
         <ng-container *ngIf="status !== 'loading' && !authService.isAuth()">
             <div class="status-app-content">
                 <i class="fas fa-plug red" style="font-size: 70px;"></i>
-                <div class="status-app-text red">Veuilez vous connecter sur <a [href]="authService.appUrl" target="_blank">{{authService.applicationName}}</a></div>
+                <div class="status-app-text red">{{ 'lang.loginTo' | translate}} <a [href]="authService.appUrl" target="_blank">{{authService.applicationName}}</a></div>
             </div>
         </ng-container>
         <ng-container *ngIf="status === 'loading'">

@@ -4,12 +4,12 @@ import { TranslateService } from '@ngx-translate/core';
 import { catchError, tap, finalize, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { NotificationService } from '@service/notification/notification.service';
-import {FunctionsService} from "../../../service/functions.service";
+import {FunctionsService} from '../../../service/functions.service';
 
 
 @Component({
     selector: 'app-mail-resume',
-    templateUrl: "mail-resume.component.html",
+    templateUrl: 'mail-resume.component.html',
     styleUrls: [
         'mail-resume.component.scss',
     ]
@@ -17,7 +17,7 @@ import {FunctionsService} from "../../../service/functions.service";
 
 export class MailResumeComponent implements OnInit {
 
-    
+
 
     loading: boolean = true;
 
@@ -49,7 +49,7 @@ export class MailResumeComponent implements OnInit {
                     if (elem.type == 'aknowledgement_receipt' && this.functions.empty(elem.object)) {
                         object = this.translate.instant('lang.ARPaper');
                         type = 'aknowledgement_receipt';
-                    } else if (elem.type == 'aknowledgement_receipt' && elem.object.startsWith("[AR]")) {
+                    } else if (elem.type == 'aknowledgement_receipt' && elem.object.startsWith('[AR]')) {
                         object = this.translate.instant('lang.ARelectronic');
                         type = 'aknowledgement_receipt';
                     }
@@ -60,7 +60,7 @@ export class MailResumeComponent implements OnInit {
                         status: elem.status,
                         userInfo: elem.userInfo,
                         type: type
-                    }
+                    };
                 });
                 return data;
             }),

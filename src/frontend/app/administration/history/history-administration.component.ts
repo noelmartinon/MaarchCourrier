@@ -9,14 +9,14 @@ import { HeaderService } from '@service/header.service';
 
 @Component({
     selector: 'admin-history',
-    templateUrl: "history-administration.component.html",
+    templateUrl: 'history-administration.component.html',
     styleUrls: ['history-administration.component.scss']
 })
 export class HistoryAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
+
 
     startDateFilter: any = '';
     endDateFilter: any = '';
@@ -51,7 +51,7 @@ export class HistoryAdministrationComponent implements OnInit {
         this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.history').toLowerCase(), '', '');
 
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
-        
+
         if (this.privilegeService.hasCurrentUserPrivilege('view_history_batch')) {
             this.subMenus = [
                 {

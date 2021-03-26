@@ -11,7 +11,7 @@ import { of } from 'rxjs';
     styleUrls: ['add-visa-model-modal.component.scss'],
 })
 export class AddVisaModelModalComponent {
-    
+
 
     loading: boolean = false;
 
@@ -24,23 +24,21 @@ export class AddVisaModelModalComponent {
 
     constructor(
         public translate: TranslateService,
-        public http: HttpClient, 
-        @Inject(MAT_DIALOG_DATA) public data: any, 
+        public http: HttpClient,
+        @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<AddVisaModelModalComponent>,
         private notify: NotificationService) { }
 
     ngOnInit(): void {
-        this.template.items = this.data.visaWorkflow.map((item: any) => {
-            return {
-                id: item.item_id,
-                type: 'user',
-                mode: item.requested_signature ? 'sign' : 'visa'
-            }
-        }); 
+        this.template.items = this.data.visaWorkflow.map((item: any) => ({
+            id: item.item_id,
+            type: 'user',
+            mode: item.requested_signature ? 'sign' : 'visa'
+        }));
     }
 
     onSubmit() {
-        this.http.post(`../rest/listTemplates`, this.template).pipe(
+        this.http.post('../rest/listTemplates', this.template).pipe(
             tap((data: any) => {
                 this.template.id = data.id;
                 this.notify.success(this.translate.instant('lang.modelSaved'));

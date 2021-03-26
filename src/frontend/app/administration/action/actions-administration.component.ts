@@ -19,7 +19,7 @@ export class ActionsAdministrationComponent implements OnInit {
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
+
     search: string = null;
 
     actions: any[] = [];

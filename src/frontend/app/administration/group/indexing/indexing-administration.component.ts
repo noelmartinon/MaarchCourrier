@@ -8,7 +8,7 @@ import { ConfirmComponent } from '../../../../plugins/modal/confirm.component';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { of } from 'rxjs';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     selector: 'app-indexing-administration',
@@ -135,7 +135,9 @@ export class IndexingAdministrationComponent implements OnInit {
         $('#jstree_search').keyup( () => {
             const v: any = $('#jstree_search').val();
             this.emptyField = v === '' ? true : false;
-            if (to) { clearTimeout(to); }
+            if (to) {
+                clearTimeout(to);
+            }
             to = setTimeout(function () {
                 $('#jstree').jstree(true).search(v);
             }, 250);

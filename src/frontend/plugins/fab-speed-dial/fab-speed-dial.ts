@@ -1,6 +1,6 @@
 
-import { Component, Input, Output, EventEmitter, ViewEncapsulation, AfterContentInit, ElementRef, Inject, forwardRef, ContentChildren, QueryList, ContentChild, HostBinding, HostListener, Renderer2 } from "@angular/core";
-import { MatButton } from "@angular/material/button";
+import { Component, Input, Output, EventEmitter, ViewEncapsulation, AfterContentInit, ElementRef, Inject, forwardRef, ContentChildren, QueryList, ContentChild, HostBinding, HostListener, Renderer2 } from '@angular/core';
+import { MatButton } from '@angular/material/button';
 
 const Z_INDEX_ITEM: number = 23;
 
@@ -57,7 +57,7 @@ export class SmdFabSpeedDialActions implements AfterContentInit {
         this._buttons.toArray().forEach((button, i) => {
             this.renderer.addClass(button._getHostElement(), 'smd-fab-action-item');
             this.changeElementStyle(button._getHostElement(), 'z-index', '' + (Z_INDEX_ITEM - i));
-        })
+        });
     }
 
     show() {
@@ -75,7 +75,7 @@ export class SmdFabSpeedDialActions implements AfterContentInit {
                 this.changeElementStyle(button._getHostElement(), 'transition-delay', transitionDelay + 'ms');
                 this.changeElementStyle(button._getHostElement(), 'opacity', '1');
                 this.changeElementStyle(button._getHostElement(), 'transform', transform);
-            })
+            });
         }
     }
 
@@ -95,21 +95,21 @@ export class SmdFabSpeedDialActions implements AfterContentInit {
                 this.changeElementStyle(button._getHostElement(), 'transition-delay', transitionDelay + 'ms');
                 this.changeElementStyle(button._getHostElement(), 'opacity', opacity);
                 this.changeElementStyle(button._getHostElement(), 'transform', transform);
-            })
+            });
         }
     }
 
     private getTranslateFunction(value: string) {
-        let dir = this._parent.direction;
-        let translateFn = (dir == 'up' || dir == 'down') ? 'translateY' : 'translateX';
-        let sign = (dir == 'down' || dir == 'right') ? '-' : '';
+        const dir = this._parent.direction;
+        const translateFn = (dir == 'up' || dir == 'down') ? 'translateY' : 'translateX';
+        const sign = (dir == 'down' || dir == 'right') ? '-' : '';
         return translateFn + '(' + sign + value + ')';
     }
 
     private changeElementStyle(elem: any, style: string, value: string) {
         // FIXME - Find a way to create a "wrapper" around the action button(s) provided by the user, so we don't change it's style tag
         // FIXME - Find a way to create a "wrapper" around the action button(s) provided by the user, so we don't change it's style tag
-this.renderer.setStyle(elem, style, value);
+        this.renderer.setStyle(elem, style, value);
     }
 }
 
@@ -144,7 +144,7 @@ export class SmdFabSpeedDialComponent implements AfterContentInit {
     }
 
     set open(open: boolean) {
-        let previousOpen = this._open;
+        const previousOpen = this._open;
         this._open = open;
         if (previousOpen != this._open) {
             this.openChange.emit(this._open);
@@ -162,7 +162,7 @@ export class SmdFabSpeedDialComponent implements AfterContentInit {
     }
 
     set direction(direction: string) {
-        let previousDir = this._direction;
+        const previousDir = this._direction;
         this._direction = direction;
         if (previousDir != this.direction) {
             this._setElementClass(previousDir, false);
@@ -182,7 +182,7 @@ export class SmdFabSpeedDialComponent implements AfterContentInit {
     }
 
     set animationMode(animationMode: string) {
-        let previousAnimationMode = this._animationMode;
+        const previousAnimationMode = this._animationMode;
         this._animationMode = animationMode;
         if (previousAnimationMode != this._animationMode) {
             this._setElementClass(previousAnimationMode, false);
@@ -231,7 +231,7 @@ export class SmdFabSpeedDialComponent implements AfterContentInit {
         }
     }
 
-    private _setElementClass(elemClass:string , isAdd:boolean) {
+    private _setElementClass(elemClass: string , isAdd: boolean) {
         isAdd ? this.renderer.addClass(this.elementRef.nativeElement, `smd-${elemClass}`) : this.renderer.removeClass(this.elementRef.nativeElement, `smd-${elemClass}`);
     }
 }

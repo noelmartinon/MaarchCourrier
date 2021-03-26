@@ -154,11 +154,9 @@ export class CustomFieldsAdministrationComponent implements OnInit {
             exhaustMap(() => this.http.post('../rest/customFields', newCustomField)),
             tap((data: any) => {
                 newCustomField.id = data.customFieldId;
-                newCustomField.values = newCustomField.values.map((val: any) => {
-                    return {
-                        label : val
-                    };
-                });
+                newCustomField.values = newCustomField.values.map((val: any) => ({
+                    label : val
+                }));
                 this.customFields.push(newCustomField);
                 this.notify.success(this.translate.instant('lang.customFieldAdded'));
                 this.incrementCreation++;

@@ -33,7 +33,7 @@ class InstallerController
         }
 
         $phpVersion = phpversion();
-        $phpVersionValid = (version_compare(PHP_VERSION, '7.2') >= 0);
+        $phpVersionValid = (version_compare(PHP_VERSION, '7.3') >= 0);
 
         exec('whereis unoconv', $output, $return);
         $output = explode(':', $output[0]);
@@ -233,6 +233,11 @@ class InstallerController
             }
         }
 
+        $rootDirectories = scandir('.');
+        if (in_array($queryParams['customId'], $rootDirectories)) {
+            return $response->withStatus(400)->withJson(['errors' => "Unauthorized custom name"]);
+        }
+
         return $response->withStatus(204);
     }
 
@@ -282,6 +287,11 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
         } elseif (!preg_match('/^[a-zA-Z0-9_\-]*$/', $body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId has unauthorized characters']);
+        }
+
+        $rootDirectories = scandir('.');
+        if (in_array($body['customId'], $rootDirectories)) {
+            return $response->withStatus(400)->withJson(['errors' => "Unauthorized custom name"]);
         }
 
         if (is_dir("custom/{$body['customId']}")) {

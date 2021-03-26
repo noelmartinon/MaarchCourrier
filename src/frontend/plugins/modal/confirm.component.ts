@@ -13,7 +13,7 @@ export class ConfirmComponent {
     idModal: string = null;
 
     constructor(
-       public translate: TranslateService,
+        public translate: TranslateService,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<ConfirmComponent>,
         public headerService: HeaderService,

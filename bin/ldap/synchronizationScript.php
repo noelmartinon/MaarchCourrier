@@ -32,7 +32,7 @@ if (!empty($xmlfile->synchronizeEntities) && (string)$xmlfile->synchronizeEntiti
 }
 
 if ($synchronizeUsers) {
-    $maarchUsers = \User\models\UserModel::get(['select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'status']]);
+    $maarchUsers = \User\models\UserModel::get(['select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'status', 'mode']]);
     $ldapUsers = getUsersEntries($xmlfile);
     if (!empty($ldapUsers['errors'])) {
         writeLog(['message' => "[ERROR] {$ldapUsers['errors']}"]);
@@ -309,7 +309,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
 
     foreach ($ldapUsers as $user) {
         $user['userId'] = $user['user_id'];
-        if (!empty($maarchUsersLogin[$user['userId']])) {
+        if (!empty($maarchUsersLogin[$user['userId']]) && $maarchUsersLogin[$user['userId']]['status'] != 'DEL') {
             if ($maarchUsersLogin[$user['userId']]['status'] == 'SPD') {
                 $curlResponse = \SrcCore\models\CurlModel::exec([
                     'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $maarchUsersLogin[$user['user_id']]['id'] . '/status',
@@ -402,7 +402,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
     }
 
     foreach ($maarchUsers as $user) {
-        if (empty($ldapUsersLogin[$user['user_id']])) {
+        if (empty($ldapUsersLogin[$user['user_id']]) && $user['status'] != 'DEL' && $user['mode'] != 'rest') {
             $curlResponse = \SrcCore\models\CurlModel::exec([
                 'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $user['id'] . '/suspend',
                 'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],

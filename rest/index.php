@@ -695,5 +695,8 @@ $app->put('/registeredMails/import', \RegisteredMail\controllers\RegisteredMailC
 $app->put('/registeredMails/{resId}', \RegisteredMail\controllers\RegisteredMailController::class . ':update');
 
 $app->get('/plugins/outlook/manifest', \Outlook\controllers\OutlookController::class . ':generateManifest');
+$app->get('/plugins/outlook/configuration', \Outlook\controllers\OutlookController::class . ':getConfiguration');
+$app->put('/plugins/outlook/configuration', \Outlook\controllers\OutlookController::class . ':saveConfiguration');
+$app->put('/plugins/outlook/password', \Outlook\controllers\OutlookController::class . ':saveOutlookPassword');
 
 $app->run();

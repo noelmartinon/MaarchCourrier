@@ -74,13 +74,11 @@ export class ContactsGroupsListComponent implements OnInit {
 
             this.http.get('../rest/contactsGroups' + param)
                 .subscribe((data) => {
-                    this.contactsGroups = data['contactsGroups'].map((contactGroup: any) => {
-                        return {
-                            ...contactGroup,
-                            shared : contactGroup.entities.length > 0,
-                            allowed: !this.isLocked(contactGroup)
-                        };
-                    });
+                    this.contactsGroups = data['contactsGroups'].map((contactGroup: any) => ({
+                        ...contactGroup,
+                        shared : contactGroup.entities.length > 0,
+                        allowed: !this.isLocked(contactGroup)
+                    }));
                     setTimeout(() => {
                         this.adminService.setDataSource('admin_contacts_groups', this.contactsGroups, this.sort, this.paginator, this.filterColumns);
                     }, 0);
@@ -161,7 +159,7 @@ export class ContactsGroupsListComponent implements OnInit {
 
     goTo(element: any = null) {
         if (element === null) {
-            this.router.navigate([`/administration/contacts/contacts-groups/new`]);
+            this.router.navigate(['/administration/contacts/contacts-groups/new']);
         } else {
             if (this.contactGroupFormMode === 'modal') {
                 this.openContactsGroupModal(element);

@@ -64,7 +64,7 @@ export class DocserversComponent implements OnInit {
             path: this.stepFormGroup.controls['docserversPath'].value,
         };
 
-        this.http.get(`../rest/installer/docservers`, { params: info }).pipe(
+        this.http.get('../rest/installer/docservers', { params: info }).pipe(
             tap((data: any) => {
                 this.notify.success(this.translate.instant('lang.rightInformations'));
                 this.stepFormGroup.controls['stateStep'].setValue('success');

@@ -14,7 +14,7 @@ import { AppService } from '@service/app.service';
 
 export class DocserverAdministrationComponent implements OnInit {
 
-    
+
     loading: boolean = false;
     dataSource: any;
 

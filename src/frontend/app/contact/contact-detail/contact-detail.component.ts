@@ -27,7 +27,7 @@ export class ContactDetailComponent implements OnInit {
     @Output() afterSelectedEvent = new EventEmitter<any>();
     @Output() afterDeselectedEvent = new EventEmitter<any>();
 
-    
+
     loading: boolean = true;
 
     contactClone: any = {};
@@ -57,12 +57,10 @@ export class ContactDetailComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get('../rest/contactsCustomFields').pipe(
                 tap((data: any) => {
-                    this.customFields = data.customFields.map((custom: any) => {
-                        return {
-                            id: custom.id,
-                            label: custom.label
-                        };
-                    });
+                    this.customFields = data.customFields.map((custom: any) => ({
+                        id: custom.id,
+                        label: custom.label
+                    }));
                     resolve(true);
                 })
             ).subscribe();
@@ -137,7 +135,7 @@ export class ContactDetailComponent implements OnInit {
     }
 
     formatCustomField(data: any) {
-        let arrCustomFields: any[] = [];
+        const arrCustomFields: any[] = [];
 
         Object.keys(data).forEach(element => {
             arrCustomFields.push({
@@ -150,7 +148,7 @@ export class ContactDetailComponent implements OnInit {
     }
 
     goTo(contact: any) {
-        window.open(`https://www.google.com/maps/search/${contact.addressNumber}+${contact.addressStreet},+${contact.addressPostcode}+${contact.addressTown},+${contact.addressCountry}`, '_blank')
+        window.open(`https://www.google.com/maps/search/${contact.addressNumber}+${contact.addressStreet},+${contact.addressPostcode}+${contact.addressTown},+${contact.addressCountry}`, '_blank');
     }
 
     emptyOtherInfo(contact: any) {

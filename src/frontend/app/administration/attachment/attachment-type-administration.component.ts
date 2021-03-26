@@ -49,7 +49,7 @@ export class AttachmentTypeAdministrationComponent implements OnInit {
 
     ngOnInit(): void {
 
-    this.adminFormGroup = this._formBuilder.group(this.attachmentType);
+        this.adminFormGroup = this._formBuilder.group(this.attachmentType);
         this.loading = true;
         console.log(typeof this.attachmentType['signable'].value);
 
@@ -102,7 +102,7 @@ export class AttachmentTypeAdministrationComponent implements OnInit {
     }
 
     create() {
-        this.http.post(`../rest/attachmentsTypes`, this.formatData()).pipe(
+        this.http.post('../rest/attachmentsTypes', this.formatData()).pipe(
             tap(() => {
                 this.notify.success(this.translate.instant('lang.attachmentTypeAdded'));
                 this.router.navigate(['/administration/attachments/types']);

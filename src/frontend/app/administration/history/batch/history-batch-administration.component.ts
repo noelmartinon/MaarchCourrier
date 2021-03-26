@@ -15,14 +15,14 @@ import { LatinisePipe } from 'ngx-pipes';
 import { PrivilegeService } from '@service/privileges.service';
 
 @Component({
-    templateUrl: "history-batch-administration.component.html",
+    templateUrl: 'history-batch-administration.component.html',
     styleUrls: ['history-batch-administration.component.scss']
 })
 export class HistoryBatchAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
+
     loading: boolean = false;
 
     filtersChange = new EventEmitter();
@@ -142,12 +142,10 @@ export class HistoryBatchAdministrationComponent implements OnInit {
     }
 
     processPostData(data: any) {
-        data.history = data.history.map((item: any) => {
-            return {
-                ...item,
-                total_errors: item.total_errors === null ? 0 : item.total_errors
-            }
-        })
+        data.history = data.history.map((item: any) => ({
+            ...item,
+            total_errors: item.total_errors === null ? 0 : item.total_errors
+        }));
         return data;
     }
 
@@ -163,9 +161,9 @@ export class HistoryBatchAdministrationComponent implements OnInit {
             this.filterList = {};
             this.loadingFilters = true;
 
-            this.http.get("../rest/batchHistory/availableFilters").pipe(
+            this.http.get('../rest/batchHistory/availableFilters').pipe(
                 map((data: any) => {
-                    let returnData = { modules: [{}], totalErrors: [{}] };
+                    const returnData = { modules: [{}], totalErrors: [{}] };
                     returnData.modules = data.modules;
 
                     returnData.totalErrors = [
@@ -252,7 +250,7 @@ export class HistoryBatchAdministrationComponent implements OnInit {
 
     generateUrlFilter() {
         this.filterUrl = '';
-        let arrTmpUrl: any[] = [];
+        const arrTmpUrl: any[] = [];
         Object.keys(this.filterUsed).forEach((type: any) => {
             this.filterUsed[type].forEach((filter: any) => {
                 if (!this.functions.empty(filter.id)) {

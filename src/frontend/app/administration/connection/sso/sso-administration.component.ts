@@ -69,7 +69,7 @@ export class SsoAdministrationComponent implements OnInit {
     }
 
     getConnection() {
-        this.http.get(`../rest/configurations/admin_sso`).pipe(
+        this.http.get('../rest/configurations/admin_sso').pipe(
             tap((data: any) => {
                 this.sso = data.configuration.value;
                 this.ssoClone = JSON.parse(JSON.stringify(this.sso));
@@ -108,7 +108,7 @@ export class SsoAdministrationComponent implements OnInit {
 
             dialogRef.afterClosed().pipe(
                 filter((data: string) => data === 'ok'),
-                exhaustMap(() => this.http.put(`../rest/configurations/admin_sso`, this.formatData())),
+                exhaustMap(() => this.http.put('../rest/configurations/admin_sso', this.formatData())),
                 tap(() => {
                     this.notify.success(this.translate.instant('lang.dataUpdated'));
                     this.ssoClone = JSON.parse(JSON.stringify(this.sso));
@@ -119,7 +119,7 @@ export class SsoAdministrationComponent implements OnInit {
                 })
             ).subscribe();
         } else {
-            this.http.put(`../rest/configurations/admin_sso`, this.formatData()).pipe(
+            this.http.put('../rest/configurations/admin_sso', this.formatData()).pipe(
                 tap(() => {
                     this.notify.success(this.translate.instant('lang.dataUpdated'));
                     this.ssoClone = JSON.parse(JSON.stringify(this.sso));

@@ -51,14 +51,14 @@
                                     *ngIf="attachment['title'].valid && !isEmptyField(attachment['title'])"></i>
                             </div>
                         </div>
-                        <div class="attachment-form-item" *ngIf="resourceContacts.length > 1">
-                            <plugin-select-search [label]="'lang.selectContact' | translate"
+                        <div class="attachment-form-item">
+                            <plugin-select-search  *ngIf="resourceContacts.length > 1" [label]="'lang.selectContact' | translate"
                                 [placeholderLabel]="'lang.selectContact' | translate" [datas]="resourceContacts"
                                 [returnValue]="'object'" [formControlSelect]="selectedContact"
                                 (afterSelected)="selectContact($event)" style="width:100%;">
                             </plugin-select-search>
                             <div class="fieldState">
-                                <button mat-icon-button color="primary"
+                                <button *ngIf="canSendMass()" mat-icon-button color="primary"
                                     [title]="sendMassMode ? ('lang.disableMailing' | translate) : ('lang.enableMailing' | translate)"
                                     [class.active]="sendMassMode" (click)="toggleSendMass()">
                                     <mat-icon class="fas fa-mail-bulk"></mat-icon>
@@ -67,7 +67,7 @@
                             </div>
                         </div>
                         <div class="attachment-form-item" *ngIf="sendMassMode" style="display: block;">
-                            <div class="alert alert-info" role="alert" [innerHTML]="'lang.mailingMsg' | translate"></div>
+                            <app-maarch-message [content]="'lang.mailingMsg' | translate: {nbContacts: getNbContacts()}"></app-maarch-message>
                         </div>
                         <div class="attachment-form-item" *ngIf="!sendMassMode">
                             <app-contact-autocomplete *ngIf="!loadingContact" [control]="attachment['recipient']"

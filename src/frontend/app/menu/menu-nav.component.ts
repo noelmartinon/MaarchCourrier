@@ -10,7 +10,7 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class MenuNavComponent implements OnInit {
 
-    
+
     router: any;
     user: any = {};
 

@@ -8,7 +8,7 @@ import { AppService } from '@service/app.service';
 import { HeaderService } from '@service/header.service';
 import { AuthService } from '@service/auth.service';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'activate-user.component.html',
@@ -53,19 +53,19 @@ export class ActivateUserComponent implements OnInit {
         this.loading = true;
         if (this.headerService.user.status === 'ABS') {
             this.http.get('../rest/currentUser/profile')
-            .subscribe((data: any) => {
-                this.user = data;
+                .subscribe((data: any) => {
+                    this.user = data;
 
-                this.user.baskets.forEach((value: any, index: number) => {
-                    this.user.baskets[index]['disabled'] = false;
-                    this.user.redirectedBaskets.forEach((redirectedBasket: any) => {
-                        if (value.basket_id == redirectedBasket.basket_id && value.basket_owner == redirectedBasket.basket_owner) {
-                            this.user.baskets[index]['disabled'] = true;
-                        }
+                    this.user.baskets.forEach((value: any, index: number) => {
+                        this.user.baskets[index]['disabled'] = false;
+                        this.user.redirectedBaskets.forEach((redirectedBasket: any) => {
+                            if (value.basket_id == redirectedBasket.basket_id && value.basket_owner == redirectedBasket.basket_owner) {
+                                this.user.baskets[index]['disabled'] = true;
+                            }
+                        });
                     });
+                    this.loading = false;
                 });
-                this.loading = false;
-            });
         } else {
             this.router.navigate(['/home']);
         }

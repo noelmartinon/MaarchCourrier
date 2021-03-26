@@ -92,7 +92,7 @@ export class ActionPagesService {
             'name': 'sendToExternalSignatureBook',
             'component': 'sendExternalSignatoryBookAction',
             'category': 'externalSignatoryBook',
-            'description': this.translate.instant('sendExternalSignatoryBookAction',)
+            'description': this.translate.instant('sendExternalSignatoryBookAction', )
         },
         {
             'id': 'sendToExternalNoteBook',
@@ -212,7 +212,7 @@ export class ActionPagesService {
             'name': 'send_shipping',
             'component': 'sendShippingAction',
             'category': 'maileva',
-            'description': this.translate.instant('lang.sendMaileva',)
+            'description': this.translate.instant('lang.sendMaileva', )
         },
         {
             'id': 'no_confirm_status',
@@ -327,11 +327,11 @@ export class ActionPagesService {
                 if (obj1.label > obj2.label) {
                     return 1;
                 }
-            
+
                 if (obj1.label < obj2.label) {
                     return -1;
                 }
-            
+
                 return 0;
             });
         }

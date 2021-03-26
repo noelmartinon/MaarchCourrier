@@ -125,7 +125,7 @@ export class FolderInputComponent implements OnInit {
         this.controlAutocomplete.value.forEach((ids: any) => {
             this.http.get('../rest/folders/' + ids).pipe(
                 tap((data) => {
-                    for (var key in data) {
+                    for (const key in data) {
                         this.valuesToDisplay[data[key].id] = data[key].label;
                     }
                 })
@@ -175,13 +175,13 @@ export class FolderInputComponent implements OnInit {
     removeItem(index: number) {
 
         if (this.newIds.indexOf(this.controlAutocomplete.value[index]) === -1) {
-            let arrValue = this.controlAutocomplete.value;
+            const arrValue = this.controlAutocomplete.value;
             this.controlAutocomplete.value.splice(index, 1);
             this.controlAutocomplete.setValue(arrValue);
         } else {
             this.http.delete('../rest/folders/' + this.controlAutocomplete.value[index]).pipe(
                 tap((data: any) => {
-                    let arrValue = this.controlAutocomplete.value;
+                    const arrValue = this.controlAutocomplete.value;
                     this.controlAutocomplete.value.splice(index, 1);
                     this.controlAutocomplete.setValue(arrValue);
                 }),
@@ -200,7 +200,7 @@ export class FolderInputComponent implements OnInit {
 
         this.http.post('../rest/folders', { label: newElem[this.key] }).pipe(
             tap((data: any) => {
-                for (var key in data) {
+                for (const key in data) {
                     newElem['id'] = data[key];
                     this.newIds.push(data[key]);
                 }

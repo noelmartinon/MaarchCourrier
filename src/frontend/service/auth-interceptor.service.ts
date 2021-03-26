@@ -99,7 +99,7 @@ export class AuthInterceptor implements HttpInterceptor {
 
             // Handle response
             return next.handle(request).pipe(
-                /*map((data: any) => {
+                /* map((data: any) => {
                   console.log('can modify datas for each response');
                   return data;
                 }

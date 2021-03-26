@@ -99,7 +99,7 @@ export class SendToRecordManagementComponent implements OnInit {
             }),
             catchError((err: any) => {
                 if (!this.functions.empty(err.error.lang)) {
-                    this.criticalError = this.translate.instant('lang.' + err.error.lang)
+                    this.criticalError = this.translate.instant('lang.' + err.error.lang);
                 } else {
                     this.criticalError = err.error.errors;
                 }
@@ -132,12 +132,12 @@ export class SendToRecordManagementComponent implements OnInit {
                         let dd: any;
                         let mm: any;
                         let yyyy: any;
-    
+
                         today = new Date();
                         dd = today.getDate();
                         mm = today.getMonth() + 1;
                         yyyy = today.getFullYear();
-    
+
                         if (dd < 10) {
                             dd = '0' + dd;
                         }

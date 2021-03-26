@@ -232,13 +232,11 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
         this.optGroupList = this.sortPipe.transform(this.optGroupList, 'label');
         this.optGroupList.forEach(group => {
             tmpArr.push({ id: group.id, label: group.label, disabled: true });
-            tmpArr = tmpArr.concat(this.datas.filter(data => data[this.optGroupTarget] === group.id).map(data => {
-                return {
-                    ...data,
-                    title: data.label,
-                    label: '&nbsp;&nbsp;&nbsp' + data.label
-                };
-            }));
+            tmpArr = tmpArr.concat(this.datas.filter(data => data[this.optGroupTarget] === group.id).map(data => ({
+                ...data,
+                title: data.label,
+                label: '&nbsp;&nbsp;&nbsp' + data.label
+            })));
         });
 
         this.datas = tmpArr;

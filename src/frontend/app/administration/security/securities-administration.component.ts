@@ -10,7 +10,7 @@ import { AppService } from '@service/app.service';
 })
 export class SecuritiesAdministrationComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     passwordRules: any = {

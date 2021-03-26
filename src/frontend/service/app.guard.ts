@@ -91,7 +91,7 @@ export class AfterProcessGuard implements CanDeactivate<ProcessComponent> {
                 await component.saveModificationBeforeClose();
             }
         }
-        /*if(component.hasUnsavedData()){
+        /* if(component.hasUnsavedData()){
             if (confirm("You have unsaved changes! If you leave, your changes will be lost.")) {
                 return true;
             } else {

@@ -211,7 +211,7 @@ export class UsersImportComponent implements OnInit {
                     }
                 });
             }),
-            exhaustMap(() => this.http.put(`../rest/users/import`, { users: dataToSend })),
+            exhaustMap(() => this.http.put('../rest/users/import', { users: dataToSend })),
             tap((data: any) => {
                 let textModal = '';
                 if (data.warnings.count > 0) {

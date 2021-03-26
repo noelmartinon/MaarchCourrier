@@ -74,14 +74,12 @@ export class RegisteredMailListComponent implements OnInit {
 
         this.http.get('../rest/registeredMail/ranges').pipe(
             tap((data: any) => {
-                this.data = data['ranges'].map((item: any) => {
-                    return {
-                        ...item,
-                        statusLabel : this.translate.instant('lang.registeredMail_' + item.status),
-                        typeLabel : this.translate.instant('lang.registeredMail_' + item.registeredMailType),
-                        rangeNumber : `${item.rangeStart} - ${item.rangeEnd}`,
-                    };
-                });
+                this.data = data['ranges'].map((item: any) => ({
+                    ...item,
+                    statusLabel : this.translate.instant('lang.registeredMail_' + item.status),
+                    typeLabel : this.translate.instant('lang.registeredMail_' + item.registeredMailType),
+                    rangeNumber : `${item.rangeStart} - ${item.rangeEnd}`,
+                }));
                 this.loading = false;
                 setTimeout(() => {
                     this.adminService.setDataSource('admin_regitered_mail', this.data, this.sort, this.paginator, this.filterColumns);

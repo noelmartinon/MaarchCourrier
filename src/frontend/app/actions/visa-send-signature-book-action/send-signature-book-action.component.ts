@@ -213,7 +213,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
     }
 
     toggleIntegration(integrationId: string) {
-        this.http.put(`../rest/resourcesList/integrations`, { resources: this.data.resIds, integrations: { [integrationId]: !this.data.resource.integrations[integrationId] } }).pipe(
+        this.http.put('../rest/resourcesList/integrations', { resources: this.data.resIds, integrations: { [integrationId]: !this.data.resource.integrations[integrationId] } }).pipe(
             tap(async () => {
                 this.data.resource.integrations[integrationId] = !this.data.resource.integrations[integrationId];
                 await this.checkSignatureBook();

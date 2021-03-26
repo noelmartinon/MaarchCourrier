@@ -31,5 +31,5 @@ export class CustomMatPaginatorIntl extends MatPaginatorIntl {
         const nbPage = Math.ceil(length / pageSize);
 
         return `${this.translate.instant('lang.page')} ${page + 1} / ${nbPage}`;
-    }
+    };
 }

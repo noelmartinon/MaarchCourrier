@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 })
 export class ForgotPasswordComponent implements OnInit {
 
-    
+
     loadingForm: boolean = false;
     loading: boolean = false;
     newLogin: any = {

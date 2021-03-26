@@ -95,7 +95,7 @@ export class DiffusionModelAdministrationComponent implements OnInit {
                     this.notify.handleErrors(err);
                     return of(false);
                 })
-            ).subscribe()
+            ).subscribe();
         });
     }
 
@@ -162,24 +162,20 @@ export class DiffusionModelAdministrationComponent implements OnInit {
 
     formatCircuit() {
         if (this.diffusionModel.type === 'visaCircuit') {
-            this.diffusionModel.items = this.appVisaWorkflow.getWorkflow().map((item: any, index: number) => {
-                return {
-                    'id': item.item_id,
-                    'type': 'user',
-                    'mode': item.requested_signature ? 'sign' : 'visa',
-                    'sequence': index
-                };
-            });
+            this.diffusionModel.items = this.appVisaWorkflow.getWorkflow().map((item: any, index: number) => ({
+                'id': item.item_id,
+                'type': 'user',
+                'mode': item.requested_signature ? 'sign' : 'visa',
+                'sequence': index
+            }));
             return this.diffusionModel;
         } else {
-            this.diffusionModel.items = this.appAvisWorkflow.getWorkflow().map((item: any, index: number) => {
-                return {
-                    'id': item.item_id,
-                    'type': 'user',
-                    'mode': 'avis',
-                    'sequence': index
-                };
-            });
+            this.diffusionModel.items = this.appAvisWorkflow.getWorkflow().map((item: any, index: number) => ({
+                'id': item.item_id,
+                'type': 'user',
+                'mode': 'avis',
+                'sequence': index
+            }));
             return this.diffusionModel;
         }
     }

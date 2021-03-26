@@ -19,7 +19,7 @@ import { environment } from '../../../environments/environment';
 import { InputCorrespondentGroupComponent } from '../contact/group/inputCorrespondent/input-correspondent-group.component';
 import { AuthService } from '@service/auth.service';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'user-administration.component.html',
@@ -318,14 +318,12 @@ export class UserAdministrationComponent implements OnInit {
 
     initService() {
         if (this.maarchTree.rawData.length === 0) {
-            this.maarchTree.initData(this.user.allEntities.map((ent: any) => {
-                return {
-                    ...ent,
-                    parent_id : ent.parent,
-            };
-            }));
+            this.maarchTree.initData(this.user.allEntities.map((ent: any) => ({
+                ...ent,
+                parent_id : ent.parent,
+            })));
         }
-        /*if ($('.jstree-container-ul').length === 0) {
+        /* if ($('.jstree-container-ul').length === 0) {
             $('#jstree').jstree({
                 'checkbox': {
                     'three_state': false // no cascade selection
@@ -412,7 +410,7 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     resendActivationNotification() {
-        let r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.sendActivationNotification'));
+        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.sendActivationNotification'));
 
         if (r) {
             this.http.put('../rest/users/' + this.serialId + '/accountActivationNotification', {})
@@ -1004,7 +1002,7 @@ export class UserAdministrationComponent implements OnInit {
     styles: ['.mat-dialog-content{max-height: 65vh;width:600px;}']
 })
 export class UserAdministrationRedirectModalComponent {
-    
+
 
     redirectUser: String = '';
     processMode: String = '';

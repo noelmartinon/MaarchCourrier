@@ -93,12 +93,10 @@ export class ShippingAdministrationComponent implements OnInit {
                 this.http.get('../rest/administration/shippings/new')
                     .subscribe((data: any) => {
                         this.entities = data['entities'].map(
-                            (item: any) => {
-                                return {
-                                    ...item,
-                                    id : parseInt(item.id)
-                                };
-                            }
+                            (item: any) => ({
+                                ...item,
+                                id : parseInt(item.id)
+                            })
                         );
                         this.entitiesClone = JSON.parse(JSON.stringify(this.entities));
                         this.initEntitiesTree(this.entities);

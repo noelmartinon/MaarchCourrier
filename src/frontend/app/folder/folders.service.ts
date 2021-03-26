@@ -59,7 +59,7 @@ export class FoldersService {
     }
 
     getFolders() {
-        this.http.get("../rest/folders").pipe(
+        this.http.get('../rest/folders').pipe(
             tap((data: any) => {
                 this.folders = data.folders;
                 this.eventAction.next({type: 'initTree', content: ''});
@@ -79,7 +79,7 @@ export class FoldersService {
     getPinnedFolders() {
         this.loading = true;
 
-        this.http.get("../rest/pinnedFolders").pipe(
+        this.http.get('../rest/pinnedFolders').pipe(
             tap((data: any) => {
                 this.pinnedFolders = data.folders;
             }),

@@ -8,12 +8,12 @@ import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
-    templateUrl: "close-mail-with-attachments-or-notes-action.component.html",
+    templateUrl: 'close-mail-with-attachments-or-notes-action.component.html',
     styleUrls: ['close-mail-with-attachments-or-notes-action.component.scss'],
 })
 export class closeMailWithAttachmentsOrNotesActionComponent implements OnInit {
 
-    
+
     loading: boolean = false;
     loadingInit: boolean = false;
     resourcesInfo: any = {

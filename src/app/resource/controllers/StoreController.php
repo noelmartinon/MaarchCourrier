@@ -146,14 +146,14 @@ class StoreController
         }
     }
 
-    public static function setDisabledFields(array $args)
+    public static function setDisabledAndEmptyMandatoryFields(array $args)
     {
-        $disabledFields = IndexingModelFieldModel::get([
-            'select' => ['identifier', 'default_value'],
-            'where'  => ['model_id = ?', 'enabled = ?'],
-            'data'   => [$args['modelId'], 'false']
+        $fields = IndexingModelFieldModel::get([
+            'select' => ['identifier', 'default_value', 'enabled', 'mandatory'],
+            'where'  => ['model_id = ?', '(enabled = ? OR mandatory = ?)'],
+            'data'   => [$args['modelId'], 'false', 'true']
         ]);
-        foreach ($disabledFields as $field) {
+        foreach ($fields as $field) {
             $defaultValue = json_decode($field['default_value'], true);
             if ($defaultValue == "_TODAY") {
                 $defaultValue = date('d-m-Y');
@@ -161,12 +161,14 @@ class StoreController
                 $entity       = UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => ['entities.id']]);
                 $defaultValue = $entity['id'];
             }
-            if (strpos($field['identifier'], 'indexingCustomField_') !== false) {
-                $idCustom = explode("_", $field['identifier']);
-                $idCustom = $idCustom[1];
-                $args['customFields'][$idCustom] = $defaultValue;
-            } elseif ($field['identifier'] != 'initiator') {
-                $args[$field['identifier']] = $defaultValue;
+            if (empty($field['enabled']) || (!empty($field['mandatory']) && !isset($args[$field['identifier']]) && $defaultValue !== null)) {
+                if (strpos($field['identifier'], 'indexingCustomField_') !== false) {
+                    $idCustom = explode("_", $field['identifier']);
+                    $idCustom = $idCustom[1];
+                    $args['customFields'][$idCustom] = $defaultValue;
+                } elseif ($field['identifier'] != 'initiator') {
+                    $args[$field['identifier']] = $defaultValue;
+                }
             }
         }
         return $args;

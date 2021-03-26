@@ -16,16 +16,6 @@ import { NotificationService } from '@service/notification/notification.service'
     styleUrls: ['autocomplete.component.scss', '../../app/indexation/indexing-form/indexing-form.component.scss'],
 })
 export class PluginAutocomplete implements OnInit {
-    myControl = new FormControl();
-    loading = false;
-
-    listInfo: string;
-
-    type = {
-        user: 'fa-user',
-        entity: 'fa-sitemap'
-    };
-
     /**
      * Can be used for real input or discret input filter
      * @default default
@@ -106,6 +96,16 @@ export class PluginAutocomplete implements OnInit {
     @Output('triggerEvent') selectedOpt = new EventEmitter();
 
     @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
+
+    myControl = new FormControl();
+    loading = false;
+
+    listInfo: string;
+
+    type = {
+        user: 'fa-user',
+        entity: 'fa-sitemap'
+    };
 
     filteredOptions: Observable<string[]>;
     valuesToDisplay: any = {};
@@ -197,7 +197,7 @@ export class PluginAutocomplete implements OnInit {
 
     selectOpt(ev: any) {
         if (this.singleMode) {
-           // this.myControl.setValue(ev.option.value[this.key]);
+            // this.myControl.setValue(ev.option.value[this.key]);
         } else if (this.controlAutocomplete !== undefined) {
             this.setFormValue(ev.option.value);
         }
@@ -214,7 +214,7 @@ export class PluginAutocomplete implements OnInit {
         this.controlAutocomplete.value.forEach((ids: any) => {
             this.http.get('..' + this.manageDatas + '/' + ids).pipe(
                 tap((data) => {
-                    for (var key in data) {
+                    for (const key in data) {
                         this.valuesToDisplay[data[key].id] = data[key].label;
                     }
                 })
@@ -244,15 +244,6 @@ export class PluginAutocomplete implements OnInit {
         }
     }
 
-    private _filter(value: string): string[] {
-        if (typeof value === 'string') {
-            const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.options.filter((option: any) => this.latinisePipe.transform(option[this.key].toLowerCase()).includes(filterValue));
-        } else {
-            return this.options;
-        }
-    }
-
     unsetValue() {
         this.controlAutocomplete.setValue('');
         this.myControl.setValue('');
@@ -277,7 +268,7 @@ export class PluginAutocomplete implements OnInit {
                 filter((data: string) => data === 'ok'),
                 exhaustMap(() => this.http.post('..' + this.manageDatas, { label: newElem[this.key] })),
                 tap((data: any) => {
-                    for (var key in data) {
+                    for (const key in data) {
                         newElem['id'] = data[key];
                     }
                     this.setFormValue(newElem);
@@ -306,5 +297,14 @@ export class PluginAutocomplete implements OnInit {
     // workaround to use var in scope componenent
     displayFnWrapper() {
         return (offer: any) => this.displayFn(offer);
-     }
+    }
+
+    private _filter(value: string): string[] {
+        if (typeof value === 'string') {
+            const filterValue = this.latinisePipe.transform(value.toLowerCase());
+            return this.options.filter((option: any) => this.latinisePipe.transform(option[this.key].toLowerCase()).includes(filterValue));
+        } else {
+            return this.options;
+        }
+    }
 }

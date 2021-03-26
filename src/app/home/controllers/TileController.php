@@ -388,9 +388,16 @@ class TileController
             return ['errors' => 'User is not linked to this group'];
         }
 
+        $limit = 0;
+        if ($tile['view'] == 'list') {
+            $limit = 5;
+        }
+
         $resources = ResModel::getOnView([
-            'select' => ['res_id'],
-            'where'  => [PreparedClauseController::getPreparedClause(['userId' => $GLOBALS['id'], 'clause' => $basket['basket_clause']])]
+            'select'    => ['res_id'],
+            'where'     => [PreparedClauseController::getPreparedClause(['userId' => $GLOBALS['id'], 'clause' => $basket['basket_clause']])],
+            'orderBy'   => ['modification_date'],
+            'limit'     => $limit
         ]);
 
         TileController::getResourcesDetails($tile, $resources);
@@ -442,14 +449,33 @@ class TileController
                 } else {
                     $type = 'type_id';
                 }
-                $resources = ResModel::get([
-                    'select'  => ["COUNT({$type})", $type],
-                    'where'   => ['res_id in (?)'],
-                    'data'    => [$allResources],
-                    'groupBy' => [$type],
-                    'orderBy' => [$type]
-                ]);
-                $tile['resources'] = [];
+
+                $resources = [];
+                $chunkedResources = array_chunk($allResources, 5000);
+                foreach ($chunkedResources as $chunkedResource) {
+                    $chunkResources = ResModel::get([
+                        'select'    => ["COUNT({$type})", $type],
+                        'where'     => ['res_id in (?)'],
+                        'data'      => [$chunkedResource],
+                        'groupBy'   => [$type],
+                        'orderBy'   => [$type]
+                    ]);
+
+                    $resources = array_merge($resources, $chunkResources);
+                }
+
+                $tmpResources = [];
+                foreach ($resources as $resource) {
+                    if (empty($tmpResources[$resource[$type]])) {
+                        $tmpResources[$resource[$type]] = $resource['count'];
+                    } else {
+                        $tmpResources[$resource[$type]] += $resource['count'];
+                    }
+                }
+                $resources = [];
+                foreach ($tmpResources as $key => $tmpResource) {
+                    $resources[] = [$type => $key, 'count' => $tmpResource];
+                }
 
                 $dataResources = array_column($resources, $type);
                 if (!empty($dataResources)) {
@@ -465,6 +491,7 @@ class TileController
                     }
                 }
 
+                $tile['resources'] = [];
                 foreach ($resources as $resource) {
                     if ($type == 'status') {
                         $tile['resources'][] = ['name' => $dataResources[$resource['status']] ?? '', 'value' => $resource['count']];

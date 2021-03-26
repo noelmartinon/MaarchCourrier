@@ -76,12 +76,10 @@ export class ContactsParametersAdministrationComponent implements OnInit {
         this.http.get('../rest/contactsParameters')
             .subscribe((data: any) => {
                 this.contactsFilling = data.contactsFilling;
-                this.contactsParameters = data.contactsParameters.map((item: any) => {
-                    return {
-                        ...item,
-                        label : this.functionsService.empty(item.label) ? this.translate.instant('lang.contactsParameters_' + item.identifier) : item.label
-                    };
-                });
+                this.contactsParameters = data.contactsParameters.map((item: any) => ({
+                    ...item,
+                    label : this.functionsService.empty(item.label) ? this.translate.instant('lang.contactsParameters_' + item.identifier) : item.label
+                }));
 
                 this.loading = false;
                 setTimeout(() => {
@@ -103,12 +101,12 @@ export class ContactsParametersAdministrationComponent implements OnInit {
                             this.civilities[index][elementId].disable();
                         } else {
                             this.civilities[index][elementId].valueChanges
-                            .pipe(
-                                debounceTime(1000),
-                                tap(() => {
-                                    this.updateCivility(this.civilities[index]);
-                                }),
-                            ).subscribe();
+                                .pipe(
+                                    debounceTime(1000),
+                                    tap(() => {
+                                        this.updateCivility(this.civilities[index]);
+                                    }),
+                                ).subscribe();
                         }
                     });
                 });
@@ -146,7 +144,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
             label: 'label',
             abbreviation: 'abbreviation'
         };
-        this.http.post(`../rest/civilities`, newCivility).pipe(
+        this.http.post('../rest/civilities', newCivility).pipe(
             tap((data: any) => {
                 newCivility.id = data.id;
                 Object.keys(newCivility).forEach((elementId: any) => {
@@ -155,12 +153,12 @@ export class ContactsParametersAdministrationComponent implements OnInit {
                         newCivility[elementId].disable();
                     } else {
                         newCivility[elementId].valueChanges
-                        .pipe(
-                            debounceTime(1000),
-                            tap(() => {
-                                this.updateCivility(newCivility);
-                            }),
-                        ).subscribe();
+                            .pipe(
+                                debounceTime(1000),
+                                tap(() => {
+                                    this.updateCivility(newCivility);
+                                }),
+                            ).subscribe();
                     }
                 });
                 this.civilities.push(newCivility);
@@ -219,7 +217,5 @@ export class ContactsParametersAdministrationComponent implements OnInit {
         this.onSubmit();
     }
 
-    originalOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => {
-        return 0;
-    }
+    originalOrder = (a: KeyValue<string, any>, b: KeyValue<string, any>): number => 0;
 }

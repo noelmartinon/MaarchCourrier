@@ -9,7 +9,7 @@ import { AppService } from '@service/app.service';
 import { tap, catchError } from 'rxjs/operators';
 import { FunctionsService } from '@service/functions.service';
 import { FormControl } from '@angular/forms';
-import { ActionPagesService } from '@service/actionPages.service'
+import { ActionPagesService } from '@service/actionPages.service';
 import { of } from 'rxjs';
 
 
@@ -73,12 +73,10 @@ export class ActionAdministrationComponent implements OnInit {
                         this.selectActionPageId.setValue('confirm_status');
                         this.selectStatusId.setValue(this.action.id_status);
                         this.categoriesList = data.categoriesList;
-                        this.statuses = data.statuses.map((status: any) => {
-                            return {
-                                id: status.id,
-                                label: status.label_status
-                            };
-                        });
+                        this.statuses = data.statuses.map((status: any) => ({
+                            id: status.id,
+                            label: status.label_status
+                        }));
 
                         this.actionPages = this.actionPagesService.getAllActionPages();
                         this.actionPages.map(action => action.category).filter((cat, index, self) => self.indexOf(cat) === index).forEach(element => {
@@ -98,17 +96,15 @@ export class ActionAdministrationComponent implements OnInit {
                 this.http.get('../rest/actions/' + params['id'])
                     .subscribe(async (data: any) => {
                         this.action = data.action;
-                        let currentAction = this.actionPagesService.getActionPageByComponent(this.action.component);
+                        const currentAction = this.actionPagesService.getActionPageByComponent(this.action.component);
                         this.action.actionPageId = currentAction.id;
                         this.selectActionPageId.setValue(this.action.actionPageId);
                         this.selectStatusId.setValue(this.action.id_status);
                         this.categoriesList = data.categoriesList;
-                        this.statuses = data.statuses.map((status: any) => {
-                            return {
-                                id: status.id,
-                                label: status.label_status
-                            };
-                        });
+                        this.statuses = data.statuses.map((status: any) => ({
+                            id: status.id,
+                            label: status.label_status
+                        }));
                         this.actionPages = this.actionPagesService.getAllActionPages();
                         this.actionPages.map(action => action.category).filter((cat, index, self) => self.indexOf(cat) === index).forEach(element => {
                             this.group.push({

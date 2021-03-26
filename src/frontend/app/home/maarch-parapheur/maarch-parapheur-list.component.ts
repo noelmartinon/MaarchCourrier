@@ -22,7 +22,7 @@ export interface MPDocument {
 })
 export class MaarchParapheurListComponent implements OnInit, AfterViewInit {
 
-    
+
     loading: boolean = true;
 
     userList: MPDocument[] = [];

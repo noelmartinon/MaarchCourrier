@@ -61,12 +61,10 @@ export class DiffusionModelsAdministrationComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get('../rest/listTemplates').pipe(
                 map((data: any) => {
-                    data.listTemplates = data.listTemplates.filter((template: any) => template.entityId === null && ['visaCircuit', 'opinionCircuit'].indexOf(template.type) > -1).map((template: any) => {
-                        return {
-                            ...template,
-                            typeLabel: this.translate.instant('lang.' + template.type)
-                        };
-                    });
+                    data.listTemplates = data.listTemplates.filter((template: any) => template.entityId === null && ['visaCircuit', 'opinionCircuit'].indexOf(template.type) > -1).map((template: any) => ({
+                        ...template,
+                        typeLabel: this.translate.instant('lang.' + template.type)
+                    }));
                     return data.listTemplates;
                 }),
                 tap((listTemplates: any) => {

@@ -8,7 +8,7 @@ import { NotificationService } from '@service/notification/notification.service'
 
 @Component({
     selector: 'app-note-resume',
-    templateUrl: "note-resume.component.html",
+    templateUrl: 'note-resume.component.html',
     styleUrls: [
         'note-resume.component.scss',
     ]
@@ -16,7 +16,7 @@ import { NotificationService } from '@service/notification/notification.service'
 
 export class NoteResumeComponent implements OnInit {
 
-    
+
 
     loading: boolean = true;
 

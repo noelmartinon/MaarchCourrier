@@ -10,7 +10,7 @@ import { FunctionsService } from '@service/functions.service';
 import { MaarchTreeComponent } from '../../../plugins/tree/maarch-tree.component';
 import { of } from 'rxjs';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'send-alfresco-action.component.html',

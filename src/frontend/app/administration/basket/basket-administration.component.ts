@@ -11,7 +11,7 @@ import { NotificationService } from '@service/notification/notification.service'
 import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'basket-administration.component.html',
@@ -26,7 +26,7 @@ export class BasketAdministrationComponent implements OnInit {
 
     selectedIndex: number = 0;
 
-    
+
     loading: boolean = false;
 
     config: any = {};
@@ -333,7 +333,7 @@ export class BasketAdministrationComponent implements OnInit {
 })
 export class BasketAdministrationSettingsModalComponent implements OnInit {
 
-    
+
     allEntities: any[] = [];
 
     constructor(
@@ -472,7 +472,9 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
 
         let to: any = false;
         $('#jstree_search').keyup(function () {
-            if (to) { clearTimeout(to); }
+            if (to) {
+                clearTimeout(to);
+            }
             to = setTimeout(function () {
                 const v: any = $('#jstree_search').val();
                 $('#jstree').jstree(true).search(v);
@@ -534,7 +536,9 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
 
         let to: any = false;
         $('#jstree_search2').keyup(function () {
-            if (to) { clearTimeout(to); }
+            if (to) {
+                clearTimeout(to);
+            }
             to = setTimeout(function () {
                 const v: any = $('#jstree_search2').val();
                 $('#jstree2').jstree(true).search(v);
@@ -554,7 +558,7 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
 export class BasketAdministrationGroupListModalComponent implements OnInit {
 
     coreUrl: string;
-    
+
     actionAll: any = [];
     newBasketGroup: any = {};
 

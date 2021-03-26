@@ -37,7 +37,7 @@ export class ContactsGroupFormModalComponent implements OnInit{
     }
 
     onSubmit() {
-       this.appContactsGroupForm.onSubmit();
+        this.appContactsGroupForm.onSubmit();
     }
 
     isValid() {

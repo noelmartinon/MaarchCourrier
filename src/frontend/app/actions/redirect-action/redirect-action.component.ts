@@ -10,7 +10,7 @@ import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { FunctionsService } from '@service/functions.service';
 import { Observable, of } from 'rxjs';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'redirect-action.component.html',
@@ -98,16 +98,14 @@ export class RedirectActionComponent implements OnInit {
                     tap((data: any) => {
                         if (!this.functionsService.empty(data.field)) {
                             this.currentEntity = this.entities.filter((entity: any) => entity.serialId === data.field)[0];
-                            this.entities = this.entities.map((entity: any) => {
-                                return {
-                                    ...entity,
-                                    state : {
-                                        selected : false,
-                                        opened: false,
-                                        disabled: entity.state.disabled
-                                    }
-                                };
-                            });
+                            this.entities = this.entities.map((entity: any) => ({
+                                ...entity,
+                                state : {
+                                    selected : false,
+                                    opened: false,
+                                    disabled: entity.state.disabled
+                                }
+                            }));
                         } else {
                             if (this.entities.filter((entity: any) => entity.state.selected).length > 0) {
                                 this.currentEntity = this.entities.filter((entity: any) => entity.state.selected)[0];
@@ -152,7 +150,9 @@ export class RedirectActionComponent implements OnInit {
             });
             let to: any = false;
             $('#jstree_search').keyup(function () {
-                if (to) { clearTimeout(to); }
+                if (to) {
+                    clearTimeout(to);
+                }
                 to = setTimeout(function () {
                     const v: any = $('#jstree_search').val();
                     $('#jstree').jstree(true).search(v);

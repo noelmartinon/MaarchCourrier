@@ -176,9 +176,7 @@ export class AdministrationService {
                     setTimeout(() => {
                         this.dataSource.filter = filterValue;
                     }, 0);
-                    this.dataSource.filterPredicate = (template, filter: string) => {
-                        return this.functionsService.filterUnSensitive(template, filter, this.filterColumns);
-                    };
+                    this.dataSource.filterPredicate = (template, filter: string) => this.functionsService.filterUnSensitive(template, filter, this.filterColumns);
                 }),
             ).subscribe();
         this.filterColumns = filterColumns;

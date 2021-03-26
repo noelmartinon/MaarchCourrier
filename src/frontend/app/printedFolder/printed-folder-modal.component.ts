@@ -92,17 +92,15 @@ export class PrintedFolderModalComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get('../rest/resources/' + this.data.resId + '/attachments').pipe(
                 map((data: any) => {
-                    data.attachments = data.attachments.map((attachment: any) => {
-                        return {
-                            id: attachment.resId,
-                            label: attachment.title,
-                            chrono: !this.functions.empty(attachment.chrono) ? attachment.chrono : this.translate.instant('lang.undefined'),
-                            type: attachment.typeLabel,
-                            creationDate: attachment.creationDate,
-                            canConvert: attachment.canConvert,
-                            status: attachment.status
-                        };
-                    });
+                    data.attachments = data.attachments.map((attachment: any) => ({
+                        id: attachment.resId,
+                        label: attachment.title,
+                        chrono: !this.functions.empty(attachment.chrono) ? attachment.chrono : this.translate.instant('lang.undefined'),
+                        type: attachment.typeLabel,
+                        creationDate: attachment.creationDate,
+                        canConvert: attachment.canConvert,
+                        status: attachment.status
+                    }));
                     return data.attachments;
                 }),
                 tap((data) => {
@@ -148,19 +146,17 @@ export class PrintedFolderModalComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/resources/${resourceMaster.resId}/attachments`).pipe(
                 map((data: any) => {
-                    data.attachments = data.attachments.map((attachment: any) => {
-                        return {
-                            id: attachment.resId,
-                            label: attachment.title,
-                            resIdMaster : resourceMaster.resId,
-                            chronoMaster: resourceMaster.chrono,
-                            chrono: !this.functions.empty(attachment.chrono) ? attachment.chrono : this.translate.instant('lang.undefined'),
-                            type: attachment.typeLabel,
-                            creationDate: attachment.creationDate,
-                            canConvert: attachment.canConvert,
-                            status: attachment.status
-                        };
-                    });
+                    data.attachments = data.attachments.map((attachment: any) => ({
+                        id: attachment.resId,
+                        label: attachment.title,
+                        resIdMaster : resourceMaster.resId,
+                        chronoMaster: resourceMaster.chrono,
+                        chrono: !this.functions.empty(attachment.chrono) ? attachment.chrono : this.translate.instant('lang.undefined'),
+                        type: attachment.typeLabel,
+                        creationDate: attachment.creationDate,
+                        canConvert: attachment.canConvert,
+                        status: attachment.status
+                    }));
                     return data.attachments;
                 }),
                 tap((data) => {
@@ -180,15 +176,13 @@ export class PrintedFolderModalComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/resources/${this.data.resId}/emails?type=email`).pipe(
                 map((data: any) => {
-                    data.emails = data.emails.map((item: any) => {
-                        return {
-                            id: item.id,
-                            recipients: item.recipients,
-                            creationDate: item.creation_date,
-                            label: !this.functions.empty(item.object) ? item.object : `<i>${this.translate.instant('lang.emptySubject')}<i>`,
-                            canConvert: true
-                        };
-                    });
+                    data.emails = data.emails.map((item: any) => ({
+                        id: item.id,
+                        recipients: item.recipients,
+                        creationDate: item.creation_date,
+                        label: !this.functions.empty(item.object) ? item.object : `<i>${this.translate.instant('lang.emptySubject')}<i>`,
+                        canConvert: true
+                    }));
                     return data.emails;
                 }),
                 tap((data: any) => {
@@ -209,15 +203,13 @@ export class PrintedFolderModalComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/resources/${this.data.resId}/notes`).pipe(
                 map((data: any) => {
-                    data.notes = data.notes.map((item: any) => {
-                        return {
-                            id: item.id,
-                            creator: `${item.firstname} ${item.lastname}`,
-                            creationDate: item.creation_date,
-                            label: item.value,
-                            canConvert: true
-                        };
-                    });
+                    data.notes = data.notes.map((item: any) => ({
+                        id: item.id,
+                        creator: `${item.firstname} ${item.lastname}`,
+                        creationDate: item.creation_date,
+                        label: item.value,
+                        canConvert: true
+                    }));
                     return data.notes;
                 }),
                 tap((data: any) => {
@@ -289,7 +281,7 @@ export class PrintedFolderModalComponent implements OnInit {
     onSubmit() {
         this.isLoadingResults = true;
 
-        this.http.post(`../rest/resources/folderPrint`, this.formatPrintedFolder(), { responseType: 'blob' }).pipe(
+        this.http.post('../rest/resources/folderPrint', this.formatPrintedFolder(), { responseType: 'blob' }).pipe(
             tap((data: any) => {
                 const downloadLink = document.createElement('a');
                 downloadLink.href = window.URL.createObjectURL(data);

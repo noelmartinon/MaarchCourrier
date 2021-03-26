@@ -7,11 +7,11 @@ import { MatSidenav } from '@angular/material/sidenav';
 @Component({
     selector: 'header-left',
     styleUrls: ['header-left.component.scss'],
-    templateUrl: "header-left.component.html",
+    templateUrl: 'header-left.component.html',
 })
 export class HeaderLeftComponent implements OnInit {
 
-    
+
     dialogRef: MatDialogRef<any>;
     config: any = {};
 

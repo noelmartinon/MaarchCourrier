@@ -146,12 +146,10 @@ export class HistoryComponent implements OnInit {
     }
 
     processPostData(data: any) {
-        data.history = data.history.map((item: any) => {
-            return {
-                ...item,
-                userLabel : !this.functions.empty(item.userLabel) ? item.userLabel : this.translate.instant('lang.userDeleted')
-            };
-        });
+        data.history = data.history.map((item: any) => ({
+            ...item,
+            userLabel : !this.functions.empty(item.userLabel) ? item.userLabel : this.translate.instant('lang.userDeleted')
+        }));
         return data;
     }
 
@@ -190,12 +188,10 @@ export class HistoryComponent implements OnInit {
                         });
                     }
 
-                    data.systemActions = data.systemActions.map((syst: any) => {
-                        return {
-                            id: syst.id,
-                            label: !this.functions.empty(this.translate.instant('lang.' + syst.id)) ? this.translate.instant('lang.' + syst.id) : syst.id
-                        };
-                    });
+                    data.systemActions = data.systemActions.map((syst: any) => ({
+                        id: syst.id,
+                        label: !this.functions.empty(this.translate.instant('lang.' + syst.id)) ? this.translate.instant('lang.' + syst.id) : syst.id
+                    }));
                     return data;
                 }),
                 tap((data: any) => {

@@ -6,7 +6,7 @@ import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 import { NotesListComponent } from '../../notes/notes-list.component';
 import { AttachmentsListComponent } from '../../attachments/attachments-list.component';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     selector: 'app-panel-list',

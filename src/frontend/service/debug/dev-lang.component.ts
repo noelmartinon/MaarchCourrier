@@ -34,12 +34,10 @@ export class DevLangComponent implements OnInit {
                 this.allLang = data.langs;
 
                 Object.keys(this.allLang).forEach(langName => {
-                    this.missingLang[langName] = Object.keys(this.allLang.fr).filter((keyLang: any) => Object.keys(this.allLang[langName]).indexOf(keyLang) === -1).map((keyLang: any) => {
-                        return {
-                            id: keyLang,
-                            value: this.allLang.fr[keyLang] + '__TO_TRANSLATE'
-                        };
-                    });
+                    this.missingLang[langName] = Object.keys(this.allLang.fr).filter((keyLang: any) => Object.keys(this.allLang[langName]).indexOf(keyLang) === -1).map((keyLang: any) => ({
+                        id: keyLang,
+                        value: this.allLang.fr[keyLang] + '__TO_TRANSLATE'
+                    }));
                 });
             }),
             catchError((err: any) => {
@@ -58,7 +56,7 @@ export class DevLangComponent implements OnInit {
     }
 
     generateMissingLang(ignoreToTranslate = false) {
-        let newLang = {};
+        const newLang = {};
         let mergedLang = this.allLang[this.currentLang];
         const regex = /__TO_TRANSLATE$/g;
 

@@ -8,7 +8,7 @@ import { debounceTime, tap, catchError, exhaustMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 
-declare var tinymce: any;
+declare let tinymce: any;
 
 @Component({
     selector: 'app-parameters-customization',
@@ -42,12 +42,10 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
             logo: ['../rest/images?image=logo'],
         });
 
-        this.backgroundList = Array.from({ length: 16 }).map((_, i) => {
-            return {
-                filename: `${i + 1}.jpg`,
-                url: `assets/${i + 1}.jpg`,
-            };
-        });
+        this.backgroundList = Array.from({ length: 16 }).map((_, i) => ({
+            filename: `${i + 1}.jpg`,
+            url: `assets/${i + 1}.jpg`,
+        }));
     }
 
     async ngOnInit(): Promise<void> {

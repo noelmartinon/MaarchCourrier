@@ -8,7 +8,7 @@ import { tap, exhaustMap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
-    templateUrl: "close-and-index-action.component.html",
+    templateUrl: 'close-and-index-action.component.html',
     styleUrls: ['../close-mail-action/close-mail-action.component.scss'],
 })
 export class CloseAndIndexActionComponent implements OnInit {

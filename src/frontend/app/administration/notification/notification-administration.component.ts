@@ -18,7 +18,7 @@ export class NotificationAdministrationComponent implements OnInit {
         diffusionType_label: null
     };
     loading: boolean = false;
-    
+
 
     constructor(
         public translate: TranslateService,

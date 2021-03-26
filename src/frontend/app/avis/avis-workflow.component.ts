@@ -19,7 +19,7 @@ import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 })
 export class AvisWorkflowComponent implements OnInit {
 
-    
+
     avisWorkflow: any = {
         roles: ['sign', 'avis'],
         items: []
@@ -88,14 +88,12 @@ export class AvisWorkflowComponent implements OnInit {
 
     loadAvisRoles() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/roles`).pipe(
+            this.http.get('../rest/roles').pipe(
                 tap((data: any) => {
-                    this.availableRoles = data.roles.filter((role: any) => ['avis', 'avis_copy', 'avis_info'].indexOf(role.id) > -1).map((role: any) => {
-                        return {
-                            id: role.id,
-                            label: role.label
-                        }
-                    });
+                    this.availableRoles = data.roles.filter((role: any) => ['avis', 'avis_copy', 'avis_info'].indexOf(role.id) > -1).map((role: any) => ({
+                        id: role.id,
+                        label: role.label
+                    }));
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -118,12 +116,10 @@ export class AvisWorkflowComponent implements OnInit {
         this.http.get(`../rest/listTemplates/entities/${entityId}?type=opinionCircuit`)
             .subscribe((data: any) => {
                 if (data.listTemplates[0]) {
-                    this.avisWorkflow.items = data.listTemplates[0].items.map((item: any) => {
-                        return {
-                            ...item,
-                            item_entity: item.descriptionToDisplay,
-                        }
-                    });
+                    this.avisWorkflow.items = data.listTemplates[0].items.map((item: any) => ({
+                        ...item,
+                        item_entity: item.descriptionToDisplay,
+                    }));
                 }
                 this.avisWorkflowClone = JSON.parse(JSON.stringify(this.avisWorkflow.items));
                 this.loading = false;
@@ -132,17 +128,15 @@ export class AvisWorkflowComponent implements OnInit {
 
     loadAvisUsersList() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/autocomplete/users/circuit?circuit=opinion`).pipe(
+            this.http.get('../rest/autocomplete/users/circuit?circuit=opinion').pipe(
                 map((data: any) => {
-                    data = data.map((user: any) => {
-                        return {
-                            id: user.id,
-                            title: `${user.idToDisplay} (${user.otherInfo})`,
-                            label: user.idToDisplay,
-                            entity: user.otherInfo,
-                            type: 'user'
-                        }
-                    });
+                    data = data.map((user: any) => ({
+                        id: user.id,
+                        title: `${user.idToDisplay} (${user.otherInfo})`,
+                        label: user.idToDisplay,
+                        entity: user.otherInfo,
+                        type: 'user'
+                    }));
                     return data;
                 }),
                 tap((data) => {
@@ -168,25 +162,21 @@ export class AvisWorkflowComponent implements OnInit {
         }
 
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/availableCircuits?circuit=opinion`).pipe(
+            this.http.get('../rest/availableCircuits?circuit=opinion').pipe(
                 tap((data: any) => {
-                    this.avisTemplates.public = this.avisTemplates.public.concat(data.circuits.filter((item: any) => !item.private).map((item: any) => {
-                        return {
-                            id: item.id,
-                            title: item.title,
-                            label: item.title,
-                            type: 'entity'
-                        }
-                    }));
+                    this.avisTemplates.public = this.avisTemplates.public.concat(data.circuits.filter((item: any) => !item.private).map((item: any) => ({
+                        id: item.id,
+                        title: item.title,
+                        label: item.title,
+                        type: 'entity'
+                    })));
 
-                    this.avisTemplates.private = data.circuits.filter((item: any) => item.private).map((item: any) => {
-                        return {
-                            id: item.id,
-                            title: item.title,
-                            label: item.title,
-                            type: 'entity'
-                        }
-                    });
+                    this.avisTemplates.private = data.circuits.filter((item: any) => item.private).map((item: any) => ({
+                        id: item.id,
+                        title: item.title,
+                        label: item.title,
+                        type: 'entity'
+                    }));
                     this.filteredPublicModels = this.searchAvisUser.valueChanges
                         .pipe(
                             startWith(''),
@@ -279,7 +269,7 @@ export class AvisWorkflowComponent implements OnInit {
         this.loading = true;
         this.avisWorkflow.items = [];
         return new Promise((resolve, reject) => {
-            this.http.get("../rest/resources/" + resId + "/opinionCircuit").pipe(
+            this.http.get('../rest/resources/' + resId + '/opinionCircuit').pipe(
                 tap((data: any) => {
                     if (!this.functions.empty(data.itemsRemoved)) {
                         this.notify.error(this.translate.instant('lang.itemRemovedFromAvisTemplate') + ' : ' + data.itemsRemoved.join(', '));
@@ -294,7 +284,7 @@ export class AvisWorkflowComponent implements OnInit {
                                 difflist_type: this.mode === 'circuit' ? 'AVIS_CIRCUIT' : 'entity_id'
                             });
                     });
-                    this.avisWorkflowClone = JSON.parse(JSON.stringify(this.avisWorkflow.items))
+                    this.avisWorkflowClone = JSON.parse(JSON.stringify(this.avisWorkflow.items));
                 }),
                 finalize(() => {
                     this.loading = false;
@@ -314,7 +304,7 @@ export class AvisWorkflowComponent implements OnInit {
         this.loading = true;
         this.avisWorkflow.items = [];
         return new Promise((resolve, reject) => {
-            this.http.get("../rest/resources/" + resId + "/parallelOpinion")
+            this.http.get('../rest/resources/' + resId + '/parallelOpinion')
                 .subscribe((data: any) => {
                     data.forEach((element: any) => {
                         this.avisWorkflow.items.push(
@@ -336,7 +326,7 @@ export class AvisWorkflowComponent implements OnInit {
     loadDefaultWorkflow(resId: number) {
         this.loading = true;
         this.avisWorkflow.items = [];
-        this.http.get("../rest/resources/" + resId + "/defaultCircuit?circuit=opinion").pipe(
+        this.http.get('../rest/resources/' + resId + '/defaultCircuit?circuit=opinion').pipe(
             tap((data: any) => {
                 if (!this.functions.empty(data.itemsRemoved)) {
                     this.notify.error(this.translate.instant('lang.itemRemovedFromAvisTemplate') + ' : ' + data.itemsRemoved.join(', '));
@@ -352,7 +342,7 @@ export class AvisWorkflowComponent implements OnInit {
                             item_entity: element.descriptionToDisplay
                         });
                 });
-                this.avisWorkflowClone = JSON.parse(JSON.stringify(this.avisWorkflow.items))
+                this.avisWorkflowClone = JSON.parse(JSON.stringify(this.avisWorkflow.items));
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -404,7 +394,7 @@ export class AvisWorkflowComponent implements OnInit {
     }
 
     getLastAvisUser() {
-        let arrOnlyProcess = this.avisWorkflow.items.filter((item: any) => !this.functions.empty(item.process_date));
+        const arrOnlyProcess = this.avisWorkflow.items.filter((item: any) => !this.functions.empty(item.process_date));
 
         return !this.functions.empty(arrOnlyProcess[arrOnlyProcess.length - 1]) ? arrOnlyProcess[arrOnlyProcess.length - 1] : '';
     }
@@ -424,13 +414,11 @@ export class AvisWorkflowComponent implements OnInit {
                     })
                 ).subscribe();
             } else if (this.isValidWorkflow()) {
-                const arrAvis = resIds.map(resId => {
-                    return {
-                        resId: resId,
-                        listInstances: this.avisWorkflow.items
-                    }
-                });
-                this.http.put(`../rest/circuits/opinionCircuit`, { resources: arrAvis }).pipe(
+                const arrAvis = resIds.map(resId => ({
+                    resId: resId,
+                    listInstances: this.avisWorkflow.items
+                }));
+                this.http.put('../rest/circuits/opinionCircuit', { resources: arrAvis }).pipe(
                     tap((data: any) => {
                         this.avisWorkflowClone = JSON.parse(JSON.stringify(this.avisWorkflow.items));
                         this.notify.success(this.translate.instant('lang.avisWorkflowUpdated'));
@@ -469,18 +457,16 @@ export class AvisWorkflowComponent implements OnInit {
                 this.http.get(`../rest/listTemplates/${item.id}`).pipe(
                     tap((data: any) => {
                         this.avisWorkflow.items = this.avisWorkflow.items.concat(
-                            data.listTemplate.items.map((itemTemplate: any) => {
-                                return {
-                                    item_id: itemTemplate.item_id,
-                                    item_type: 'user',
-                                    labelToDisplay: itemTemplate.idToDisplay,
-                                    item_entity: itemTemplate.descriptionToDisplay,
-                                    item_mode: 'avis',
-                                    difflist_type: this.mode === 'circuit' ? 'AVIS_CIRCUIT' : 'entity_id',
-                                    hasPrivilege : itemTemplate.hasPrivilege,
-                                    isValid : itemTemplate.isValid
-                                }
-                            })
+                            data.listTemplate.items.map((itemTemplate: any) => ({
+                                item_id: itemTemplate.item_id,
+                                item_type: 'user',
+                                labelToDisplay: itemTemplate.idToDisplay,
+                                item_entity: itemTemplate.descriptionToDisplay,
+                                item_mode: 'avis',
+                                difflist_type: this.mode === 'circuit' ? 'AVIS_CIRCUIT' : 'entity_id',
+                                hasPrivilege : itemTemplate.hasPrivilege,
+                                isValid : itemTemplate.isValid
+                            }))
                         );
                         this.searchAvisUser.reset();
                         this.searchAvisUserInput.nativeElement.blur();
@@ -565,7 +551,7 @@ export class AvisWorkflowComponent implements OnInit {
 
     getMaarchParapheurUserAvatar(externalId: string, key: number) {
         if (!this.functions.empty(externalId)) {
-            this.http.get("../rest/maarchParapheur/user/" + externalId + "/picture")
+            this.http.get('../rest/maarchParapheur/user/' + externalId + '/picture')
                 .subscribe((data: any) => {
                     this.avisWorkflow.items[key].picture = data.picture;
                 }, (err: any) => {

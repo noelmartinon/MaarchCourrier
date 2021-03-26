@@ -37,7 +37,7 @@ export class VisaParametersComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get('../rest/parameters').pipe(
                 tap((data: any) => {
-                    let parameter = data.parameters.filter((item: { id: any; }) => item.id === 'minimumVisaRole')[0];
+                    let parameter = data.parameters.filter((item: { id: any }) => item.id === 'minimumVisaRole')[0];
                     this.visaParameters.controls['minimumVisaRole'].setValue(this.functions.empty(parameter) ? 0 : parameter.param_value_int);
 
                     if (this.visaParameters.controls['minimumVisaRole'].value === 0) {
@@ -46,7 +46,7 @@ export class VisaParametersComponent implements OnInit {
                         this.visaParameters.controls['minimumVisaRole'].enable();
                     }
 
-                    parameter = data.parameters.filter((item: { id: any; }) => item.id === 'maximumSignRole')[0];
+                    parameter = data.parameters.filter((item: { id: any }) => item.id === 'maximumSignRole')[0];
                     this.visaParameters.controls['maximumSignRole'].setValue(this.functions.empty(parameter) ? 0 : parameter.param_value_int);
 
                     if (this.visaParameters.controls['maximumSignRole'].value === 0) {
@@ -55,7 +55,7 @@ export class VisaParametersComponent implements OnInit {
                         this.visaParameters.controls['maximumSignRole'].enable();
                     }
 
-                    parameter = data.parameters.filter((item: { id: any; }) => item.id === 'workflowEndBySignatory')[0];
+                    parameter = data.parameters.filter((item: { id: any }) => item.id === 'workflowEndBySignatory')[0];
                     this.visaParameters.controls['workflowEndBySignatory'].setValue(this.functions.empty(parameter) ? 0 : parameter.param_value_int);
 
                     setTimeout(() => {
@@ -84,7 +84,7 @@ export class VisaParametersComponent implements OnInit {
         });
     }
 
-    saveParameter(id: string) {        
+    saveParameter(id: string) {
         if (Number.isSafeInteger(this.visaParameters.controls[id].value)) {
             if (Math.sign(this.visaParameters.controls[id].value) !== -1) {
                 if (!this.visaParameters.get(id).hasError('max')) {
@@ -100,7 +100,7 @@ export class VisaParametersComponent implements OnInit {
             } else {
                 this.visaParameters.controls[id].setValue(Math.abs(this.visaParameters.controls[id].value));
             }
-        }        
+        }
     }
 
     toggle(id: string) {

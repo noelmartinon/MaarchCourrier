@@ -146,12 +146,10 @@ export class RegisteredMailImportComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get('../rest/indexingModels').pipe(
                 map((data: any) => {
-                    data = data.indexingModels.filter((model: any) => model.category === 'registeredMail' && model.master === null).map((model: any) => {
-                        return {
-                            id: model.id,
-                            label: model.label
-                        };
-                    });
+                    data = data.indexingModels.filter((model: any) => model.category === 'registeredMail' && model.master === null).map((model: any) => ({
+                        id: model.id,
+                        label: model.label
+                    }));
                     return data;
                 }),
                 tap((data: any) => {
@@ -177,12 +175,10 @@ export class RegisteredMailImportComponent implements OnInit {
             this.http.get('../rest/registeredMail/sites').pipe(
                 tap((data) => {
                     if (data['sites'].length > 0) {
-                        this.contactColumns.filter((col: any) => col.id === 'registeredMail_issuingSite')[0].values = data['sites'].map((site: any) => {
-                            return {
-                                id: site.id,
-                                label: site.label
-                            };
-                        });
+                        this.contactColumns.filter((col: any) => col.id === 'registeredMail_issuingSite')[0].values = data['sites'].map((site: any) => ({
+                            id: site.id,
+                            label: site.label
+                        }));
                         resolve(true);
                     } else {
                         this.dialogRef.close();
@@ -240,7 +236,7 @@ export class RegisteredMailImportComponent implements OnInit {
         return this.contactColumns.map(col => col.id);
     }
 
-    /*initCustomFields() {
+    /* initCustomFields() {
         this.http.get(`../rest/contactsCustomFields`).pipe(
             map((data: any) => {
                 data = data.customFields.map(custom => {
@@ -435,7 +431,7 @@ export class RegisteredMailImportComponent implements OnInit {
                     }
                 });
             }),
-            exhaustMap(() => this.http.put(`../rest/registeredMails/import`, { registeredMails: dataToSend })),
+            exhaustMap(() => this.http.put('../rest/registeredMails/import', { registeredMails: dataToSend })),
             tap((data: any) => {
                 let textModal = '';
                 if (data.errors.count > 0) {

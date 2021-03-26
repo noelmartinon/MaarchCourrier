@@ -6,15 +6,15 @@ import { HttpClient } from '@angular/common/http';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { FunctionsService } from "../../../service/functions.service";
+import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
-    templateUrl: "interrupt-visa-action.component.html",
+    templateUrl: 'interrupt-visa-action.component.html',
     styleUrls: ['interrupt-visa-action.component.scss'],
 })
 export class InterruptVisaActionComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     resourcesWarnings: any[] = [];

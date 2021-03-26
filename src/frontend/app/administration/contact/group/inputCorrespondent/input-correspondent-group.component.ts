@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { FunctionsService } from '@service/functions.service';
@@ -7,7 +7,7 @@ import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { FormControl } from '@angular/forms';
 import { MatAutocompleteSelectedEvent, MatAutocomplete } from '@angular/material/autocomplete';
 import { Observable, of } from 'rxjs';
-import { catchError, filter, map, tap } from 'rxjs/operators';
+import { catchError, filter, finalize, map, tap } from 'rxjs/operators';
 import { NotificationService } from '@service/notification/notification.service';
 import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -20,7 +20,7 @@ import { SortPipe } from '@plugins/sorting.pipe';
     providers: [SortPipe]
 })
 
-export class InputCorrespondentGroupComponent implements OnInit, AfterViewInit {
+export class InputCorrespondentGroupComponent implements OnInit {
 
     @Input() id: string;
     @Input() type: string;
@@ -52,11 +52,13 @@ export class InputCorrespondentGroupComponent implements OnInit, AfterViewInit {
     async ngOnInit(): Promise<void> {
         await this.getAllCorrespondentsGroups();
         if (!this.functionsService.empty(this.id)) {
-            this.getCorrespondentsGroup();
+            await this.getCorrespondentsGroup();
         }
+        this.fixInitAC();
     }
 
-    ngAfterViewInit(): void {
+
+    fixInitAC() {
         this.correspondentGroupsForm.setValue(' ');
         setTimeout(() => {
             this.correspondentGroupsForm.setValue('');
@@ -80,24 +82,27 @@ export class InputCorrespondentGroupComponent implements OnInit, AfterViewInit {
 
     getCorrespondentsGroup() {
         this.correspondentGroups = [];
-        this.http.get('../rest/contactsGroupsCorrespondents', { params: { 'correspondentId': this.id, 'correspondentType': this.type } }).pipe(
-            tap((data: any) => {
-                data.contactsGroups.forEach((grp: any) => {
-                    this.correspondentGroups.push(grp);
-                    this.sortPipe.transform(this.correspondentGroups, 'label');
-                    const index = this.allCorrespondentGroups.map(cor => cor.id).indexOf(grp.id);
-                    if (index > -1) {
-                        this.allCorrespondentGroups.splice(index, 1);
-                    }
-                    this.allCorrespondentGroups = this.allCorrespondentGroups.filter((item: any) => item.canUpdateCorrespondents);
-                });
-                this.afterCorrespondentsGroupsLoaded.emit(this.correspondentGroups);
-            }),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+        return new Promise((resolve, reject) => {
+            this.http.get('../rest/contactsGroupsCorrespondents', { params: { 'correspondentId': this.id, 'correspondentType': this.type } }).pipe(
+                tap((data: any) => {
+                    data.contactsGroups.forEach((grp: any) => {
+                        this.correspondentGroups.push(grp);
+                        this.sortPipe.transform(this.correspondentGroups, 'label');
+                        const index = this.allCorrespondentGroups.map(cor => cor.id).indexOf(grp.id);
+                        if (index > -1) {
+                            this.allCorrespondentGroups.splice(index, 1);
+                        }
+                        this.allCorrespondentGroups = this.allCorrespondentGroups.filter((item: any) => item.canUpdateCorrespondents);
+                    });
+                    this.afterCorrespondentsGroupsLoaded.emit(this.correspondentGroups);
+                }),
+                finalize(() => resolve(true)),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     remove(item: any): void {

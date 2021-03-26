@@ -191,12 +191,10 @@ export class SentNumericPackagePageComponent implements OnInit {
                     this.numericPackageStatus = data.status.toUpperCase();
                     this.numericPackage.content = data.body;
                     this.reference = data.reference;
-                    this.messageReview = data.messageReview.map((item: any) => {
-                        return {
-                            date: this.functions.formatFrenchDateToObjectDate(item.substring(1, 19), '/'),
-                            content: item.substring(21),
-                        };
-                    });
+                    this.messageReview = data.messageReview.map((item: any) => ({
+                        date: this.functions.formatFrenchDateToObjectDate(item.substring(1, 19), '/'),
+                        content: item.substring(21),
+                    }));
                     this.messageReview = this.reversePipe.transform(this.messageReview);
 
                     if (data.disposition.tablename === 'res_letterbox') {
@@ -314,13 +312,11 @@ export class SentNumericPackagePageComponent implements OnInit {
                                 this.numericPackageAttachTool.document.list = [data[element]];
                             }
                         } else {
-                            this.numericPackageAttachTool[element].list = data[element].map((item: any) => {
-                                return {
-                                    ...item,
-                                    original: item.original !== undefined ? item.original : true,
-                                    title: item.chrono !== undefined ? `${item.chrono} - ${item.label} (${item.typeLabel})` : `${item.label} (${item.typeLabel})`
-                                };
-                            });
+                            this.numericPackageAttachTool[element].list = data[element].map((item: any) => ({
+                                ...item,
+                                original: item.original !== undefined ? item.original : true,
+                                title: item.chrono !== undefined ? `${item.chrono} - ${item.label} (${item.typeLabel})` : `${item.label} (${item.typeLabel})`
+                            }));
                         }
                     });
                     resolve(true);
@@ -347,13 +343,11 @@ export class SentNumericPackagePageComponent implements OnInit {
             distinctUntilChanged(),
             switchMap(data => this.http.get('../rest/autocomplete/contacts/m2m', { params: { 'search': data } })),
             tap((data: any) => {
-                data = data.map((contact: any) => {
-                    return {
-                        ...contact,
-                        address: this.contactService.formatContact(contact),
-                        label: this.contactService.formatContact(contact)
-                    };
-                });
+                data = data.map((contact: any) => ({
+                    ...contact,
+                    address: this.contactService.formatContact(contact),
+                    label: this.contactService.formatContact(contact)
+                }));
                 this.filteredEmails = of(data);
             }),
             catchError((err) => {
@@ -376,7 +370,7 @@ export class SentNumericPackagePageComponent implements OnInit {
     }
 
     initSignEmailModelsList() {
-        this.http.get(`../rest/currentUser/emailSignatures`).pipe(
+        this.http.get('../rest/currentUser/emailSignatures').pipe(
             tap((data: any) => {
                 this.availableSignEmailModels = data.emailSignatures;
             }),

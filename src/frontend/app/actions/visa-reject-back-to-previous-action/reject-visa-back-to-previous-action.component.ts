@@ -7,15 +7,15 @@ import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
-import {FunctionsService} from "../../../service/functions.service";
+import {FunctionsService} from '../../../service/functions.service';
 
 @Component({
-    templateUrl: "reject-visa-back-to-previous-action.component.html",
+    templateUrl: 'reject-visa-back-to-previous-action.component.html',
     styleUrls: ['reject-visa-back-to-previous-action.component.scss'],
 })
 export class RejectVisaBackToPrevousActionComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     resourcesWarnings: any[] = [];
@@ -28,8 +28,8 @@ export class RejectVisaBackToPrevousActionComponent implements OnInit {
 
     constructor(
         public translate: TranslateService,
-        public http: HttpClient, 
-        private notify: NotificationService, 
+        public http: HttpClient,
+        private notify: NotificationService,
         public dialogRef: MatDialogRef<RejectVisaBackToPrevousActionComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public functions: FunctionsService
@@ -52,7 +52,7 @@ export class RejectVisaBackToPrevousActionComponent implements OnInit {
                         this.resourcesWarnings = data.resourcesInformations.warning;
                     }
 
-                    if(!this.functions.empty(data.resourcesInformations.error)) {
+                    if (!this.functions.empty(data.resourcesInformations.error)) {
                         this.resourcesErrors = data.resourcesInformations.error;
                         this.noResourceToProcess = this.resourcesErrors.length === this.data.resIds.length;
                     }

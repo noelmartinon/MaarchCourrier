@@ -7,7 +7,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FunctionsService } from '@service/functions.service';
 import { of } from 'rxjs';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'folder-update.component.html',
@@ -15,7 +15,7 @@ declare var $: any;
 })
 export class FolderUpdateComponent implements OnInit {
 
-    
+
 
     folder: any = {
         id: 0,
@@ -153,7 +153,9 @@ export class FolderUpdateComponent implements OnInit {
             .jstree();
         let to: any = false;
         $('#jstree_searchFolders').keyup(function () {
-            if (to) { clearTimeout(to); }
+            if (to) {
+                clearTimeout(to);
+            }
             to = setTimeout(function () {
                 const v: any = $('#jstree_searchFolders').val();
                 $('#jstreeFolders').jstree(true).search(v);
@@ -188,7 +190,9 @@ export class FolderUpdateComponent implements OnInit {
             .jstree();
         let to: any = false;
         $('#jstree_search').keyup(function () {
-            if (to) { clearTimeout(to); }
+            if (to) {
+                clearTimeout(to);
+            }
             to = setTimeout(function () {
                 const v: any = $('#jstree_search').val();
                 $('#jstree').jstree(true).search(v);

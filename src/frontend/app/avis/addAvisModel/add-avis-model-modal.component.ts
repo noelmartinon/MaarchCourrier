@@ -11,9 +11,9 @@ import { of } from 'rxjs';
     styleUrls: ['add-avis-model-modal.component.scss'],
 })
 export class AddAvisModelModalComponent {
-    
 
-    loading:boolean = false;
+
+    loading: boolean = false;
 
     template: any = {
         id: 0,
@@ -24,23 +24,21 @@ export class AddAvisModelModalComponent {
 
     constructor(
         public translate: TranslateService,
-        public http: HttpClient, 
-        @Inject(MAT_DIALOG_DATA) public data: any, 
+        public http: HttpClient,
+        @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<AddAvisModelModalComponent>,
         private notify: NotificationService) { }
 
     ngOnInit(): void {
-        this.template.items = this.data.avisWorkflow.map((item: any) => {
-            return {
-                id: item.item_id,
-                type: 'user',
-                mode: 'avis'
-            }
-        }); 
+        this.template.items = this.data.avisWorkflow.map((item: any) => ({
+            id: item.item_id,
+            type: 'user',
+            mode: 'avis'
+        }));
     }
 
     onSubmit() {
-        this.http.post(`../rest/listTemplates`, this.template).pipe(
+        this.http.post('../rest/listTemplates', this.template).pipe(
             tap((data: any) => {
                 this.template.id = data.id;
                 this.notify.success(this.translate.instant('lang.modelSaved'));

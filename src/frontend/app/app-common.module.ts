@@ -2,13 +2,13 @@ import { CommonModule } from '@angular/common';
 
 import { NgModule } from '@angular/core';
 
-/*CORE IMPORTS*/
+/* CORE IMPORTS*/
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 
 
-/*PLUGINS IMPORTS*/
+/* PLUGINS IMPORTS*/
 import { AppServiceModule } from './app-service.module';
 import { NotificationModule } from '@service/notification/notification.module';
 
@@ -17,12 +17,12 @@ import { MaarchFlatTreeComponent } from '../plugins/tree/maarch-flat-tree.compon
 import { AutocompleteListComponent } from '../plugins/autocomplete-list/autocomplete-list.component';
 import { MessageBoxComponent } from '../plugins/messageBox/message-box.component';
 
-/*FRONT IMPORTS*/
+/* FRONT IMPORTS*/
 import { AppMaterialModule } from './app-material.module';
 
 import { SmdFabSpeedDialComponent, SmdFabSpeedDialTrigger, SmdFabSpeedDialActions, } from '../plugins/fab-speed-dial';
 
-/*MENU COMPONENT*/
+/* MENU COMPONENT*/
 import { HeaderRightComponent } from './header/header-right.component';
 import { HeaderLeftComponent } from './header/header-left.component';
 import { HeaderPanelComponent } from './header/header-panel.component';
@@ -40,11 +40,11 @@ import { FolderInputComponent } from '../app/folder/indexing/folder-input.compon
 import { IssuingSiteInputComponent } from '../app/administration/registered-mail/issuing-site/indexing/issuing-site-input.component';
 import { RegisteredMailRecipientInputComponent } from '../app/administration/registered-mail/indexing/recipient-input.component';
 
-/*MODAL*/
+/* MODAL*/
 import { AlertComponent } from '../plugins/modal/alert.component';
 import { ConfirmComponent } from '../plugins/modal/confirm.component';
 
-/*PLUGIN COMPONENT*/
+/* PLUGIN COMPONENT*/
 import { NotesListComponent } from './notes/notes-list.component';
 import { NoteEditorComponent } from './notes/note-editor.component';
 

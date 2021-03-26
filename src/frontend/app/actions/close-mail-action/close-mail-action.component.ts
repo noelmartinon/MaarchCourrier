@@ -45,12 +45,12 @@ export class CloseMailActionComponent implements OnInit {
             tap((data: any) => {
                 this.requiredFields = !this.functions.empty(data.action.parameters.requiredFields) ? data.action.parameters.requiredFields : [];
             }),
-            exhaustMap(() => this.http.get(`../rest/customFields`)),
+            exhaustMap(() => this.http.get('../rest/customFields')),
             tap((data: any) => this.customFields = data.customFields),
             tap(() => {
-                let emptyFields: Array<any> = [];
+                const emptyFields: Array<any> = [];
                 this.requiredFields.forEach((element: any) => {
-                    for (let key of Object.keys(this.data.resource.customFields)) {
+                    for (const key of Object.keys(this.data.resource.customFields)) {
                         if (element === 'indexingCustomField_' + key && this.functions.empty(this.data.resource.customFields[key])) {
                             emptyFields.push(this.customFields.filter(elem => elem.id == key)[0].label);
                         }

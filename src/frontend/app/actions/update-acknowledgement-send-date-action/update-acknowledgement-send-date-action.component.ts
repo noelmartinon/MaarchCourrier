@@ -8,18 +8,18 @@ import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
-    templateUrl: "update-acknowledgement-send-date-action.component.html",
+    templateUrl: 'update-acknowledgement-send-date-action.component.html',
     styleUrls: ['../close-mail-action/close-mail-action.component.scss'],
 })
 export class UpdateAcknowledgementSendDateActionComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
 
-    acknowledgementSendDate    : Date      = new Date();
-    acknowledgementSendDateEnd : Date      = new Date();
+    acknowledgementSendDate: Date      = new Date();
+    acknowledgementSendDateEnd: Date      = new Date();
 
     constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, public dialogRef: MatDialogRef<UpdateAcknowledgementSendDateActionComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
 

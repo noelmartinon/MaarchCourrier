@@ -8,7 +8,7 @@ import { startWith, map, tap, catchError } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { FunctionsService } from '@service/functions.service';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     selector: 'list-administration',
@@ -298,15 +298,13 @@ export class ListAdministrationComponent implements OnInit {
 
             this.http.get('../rest/customFields').pipe(
                 map((data: any) => {
-                    data.customFields = data.customFields.map((info: any) => {
-                        return {
-                            'value': 'indexingCustomField_' + info.id,
-                            'label': info.label,
-                            'sample': this.translate.instant('lang.customField') + info.id,
-                            'cssClasses': ['align_leftData'],
-                            'icon': 'fa-hashtag'
-                        };
-                    });
+                    data.customFields = data.customFields.map((info: any) => ({
+                        'value': 'indexingCustomField_' + info.id,
+                        'label': info.label,
+                        'sample': this.translate.instant('lang.customField') + info.id,
+                        'cssClasses': ['align_leftData'],
+                        'icon': 'fa-hashtag'
+                    }));
                     return data.customFields;
                 }),
                 tap((customs) => {

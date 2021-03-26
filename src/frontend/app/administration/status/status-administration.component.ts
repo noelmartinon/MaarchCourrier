@@ -12,7 +12,7 @@ import { AppService } from '@service/app.service';
 })
 export class StatusAdministrationComponent implements OnInit {
 
-    
+
 
     creationMode: boolean;
     statusIdAvailable: boolean;

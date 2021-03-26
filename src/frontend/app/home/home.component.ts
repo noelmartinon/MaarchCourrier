@@ -9,7 +9,7 @@ import { Router } from '@angular/router';
 import { FeatureTourService } from '@service/featureTour.service';
 import {DomSanitizer} from '@angular/platform-browser';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'home.component.html',

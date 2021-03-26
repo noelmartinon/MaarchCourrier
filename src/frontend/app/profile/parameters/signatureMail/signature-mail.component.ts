@@ -5,7 +5,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { FunctionsService } from '@service/functions.service';
 import { HeaderService } from '@service/header.service';
 
-declare var tinymce: any;
+declare let tinymce: any;
 
 @Component({
     selector: 'app-signature-mail',
@@ -78,7 +78,7 @@ export class MySignatureMailComponent implements OnInit {
 
     updateEmailSignature() {
         this.mailSignatureModel.htmlBody = tinymce.get('emailSignature').getContent();
-        var id = this.userEmailSignatures[this.mailSignatureModel.selected].id;
+        const id = this.userEmailSignatures[this.mailSignatureModel.selected].id;
 
         this.http.put('../rest/currentUser/emailSignature/' + id, this.mailSignatureModel)
             .subscribe((data: any) => {
@@ -93,10 +93,10 @@ export class MySignatureMailComponent implements OnInit {
     }
 
     deleteEmailSignature() {
-        let r = confirm(this.translate.instant('lang.confirmDeleteMailSignature'));
+        const r = confirm(this.translate.instant('lang.confirmDeleteMailSignature'));
 
         if (r) {
-            var id = this.userEmailSignatures[this.mailSignatureModel.selected].id;
+            const id = this.userEmailSignatures[this.mailSignatureModel.selected].id;
 
             this.http.delete('../rest/currentUser/emailSignature/' + id)
                 .subscribe((data: any) => {

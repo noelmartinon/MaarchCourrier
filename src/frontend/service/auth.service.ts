@@ -24,6 +24,7 @@ export class AuthService {
     mailServerOnline = false;
     changeKey: boolean = null;
     user: any = {};
+    maarchUrl: string = '';
     noInstall: boolean = false;
     private eventAction = new Subject<any>();
 
@@ -67,7 +68,7 @@ export class AuthService {
     }
 
     cleanCachedUrl() {
-        return this.localStorage.remove(`MaarchCourrierCachedUrl`);
+        return this.localStorage.remove('MaarchCourrierCachedUrl');
     }
 
     getUrl(id: number) {
@@ -105,7 +106,7 @@ export class AuthService {
 
     refreshToken() {
         return this.http
-            .get<any>(`../rest/authenticate/token`, { params: { refreshToken: this.getRefreshToken() } })
+            .get<any>('../rest/authenticate/token', { params: { refreshToken: this.getRefreshToken() } })
             .pipe(
                 tap((data) => {
                     // Update stored token
@@ -253,6 +254,7 @@ export class AuthService {
                         this.setEvent('authenticationInformations');
                         this.authMode = data.authMode;
                         this.authUri = data.authUri;
+                        this.maarchUrl = data.maarchUrl;
 
                         if (this.authMode === 'keycloak') {
                             const keycloakState = this.localStorage.get('keycloakState');

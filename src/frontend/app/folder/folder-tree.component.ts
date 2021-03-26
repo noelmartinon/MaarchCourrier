@@ -51,15 +51,15 @@ export class ItemFlatNode {
         trigger('hideShow', [
             transition(
                 ':enter', [
-                style({ height: '0px' }),
-                animate('200ms', style({ 'height': '30px' }))
-            ]
+                    style({ height: '0px' }),
+                    animate('200ms', style({ 'height': '30px' }))
+                ]
             ),
             transition(
                 ':leave', [
-                style({ height: '30px' }),
-                animate('200ms', style({ 'height': '0px' }))
-            ]
+                    style({ height: '30px' }),
+                    animate('200ms', style({ 'height': '0px' }))
+                ]
             )
         ]),
     ],
@@ -87,7 +87,9 @@ export class FolderTreeComponent implements OnInit, OnDestroy {
     @Output() refreshDocList = new EventEmitter<string>();
     @Output() refreshFolderList = new EventEmitter<string>();
 
-    get data(): ItemNode[] { return this.dataChange.value; }
+    get data(): ItemNode[] {
+        return this.dataChange.value;
+    }
 
     /** Map from flat node to nested node. This helps us finding the nested node to be modified */
     flatNodeMap = new Map<ItemFlatNode, ItemNode>();
@@ -132,7 +134,7 @@ export class FolderTreeComponent implements OnInit, OnDestroy {
         public foldersService: FoldersService,
         private functions: FunctionsService,
     ) {
-        // Event after process action 
+        // Event after process action
         this.subscription = this.foldersService.catchEvent().subscribe((result: any) => {
             if (result.type === 'initTree') {
                 const folders = this.flatToNestedObject(this.foldersService.getList());

@@ -65,9 +65,9 @@ export class InstallerComponent implements OnInit, AfterViewInit {
         $('.mat-step-icon').css('background-color', 'white');
         $('.mat-step-icon').css('color', '#135f7f');
         $('.mat-step-label').css('color', 'white');
-        /*$('.mat-step-label').css('opacity', '0.5');
+        /* $('.mat-step-label').css('opacity', '0.5');
         $('.mat-step-label-active').css('opacity', '1');*/
-        /*$('.mat-step-label-selected').css('font-size', '160%');
+        /* $('.mat-step-label-selected').css('font-size', '160%');
         $('.mat-step-label-selected').css('transition', 'all 0.2s');
         $('.mat-step-label').css('transition', 'all 0.2s');*/
     }

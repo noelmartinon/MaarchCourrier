@@ -69,7 +69,7 @@ export class DatabaseComponent implements OnInit {
     }
 
     getDataFiles() {
-        this.http.get(`../rest/installer/sqlDataFiles`).pipe(
+        this.http.get('../rest/installer/sqlDataFiles').pipe(
             tap((data: any) => {
                 this.dataFiles = data.dataFiles;
             }),
@@ -100,7 +100,7 @@ export class DatabaseComponent implements OnInit {
             name: this.stepFormGroup.controls['dbNameCtrl'].value
         };
 
-        this.http.get(`../rest/installer/databaseConnection`, { observe: 'response', params: info }).pipe(
+        this.http.get('../rest/installer/databaseConnection', { observe: 'response', params: info }).pipe(
             tap((data: any) => {
                 this.dbExist = data.status === 200;
                 this.notify.success(this.translate.instant('lang.rightInformations'));

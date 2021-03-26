@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class FastParaphComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     currentAccount: any = null;

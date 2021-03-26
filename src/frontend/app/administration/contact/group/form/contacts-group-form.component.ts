@@ -163,12 +163,10 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
         this.http.get('../rest/contactsGroups/' + contactGroupId + param).pipe(
             tap((data: any) => {
                 this.contactsGroup = data.contactsGroup;
-                data.entities = data.entities.map((entity: any) => {
-                    return {
-                        ...entity,
-                        id: parseInt(entity.id)
-                    };
-                });
+                data.entities = data.entities.map((entity: any) => ({
+                    ...entity,
+                    id: parseInt(entity.id)
+                }));
                 if (!this.canModifyGroupInfo) {
                     data.entities.forEach((entity: any) => {
                         entity.state.disabled = true;
@@ -196,12 +194,10 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
         const param = !this.allPerimeters ? '?profile=true' : '';
         this.http.get('../rest/contactsGroupsEntities' + param).pipe(
             map((data: any) => {
-                data.entities = data.entities.map((entity: any) => {
-                    return {
-                        ...entity,
-                        id: parseInt(entity.id)
-                    };
-                });
+                data.entities = data.entities.map((entity: any) => ({
+                    ...entity,
+                    id: parseInt(entity.id)
+                }));
                 return data.entities;
             }),
             tap((entities: any) => {
@@ -249,12 +245,10 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
     }
 
     processPostData(data: any) {
-        data.correspondents = data.correspondents.map((item: any) => {
-            return {
-                ...item,
-                address: !this.functionsService.empty(item.address) ? item.address : this.translate.instant('lang.addressNotSet')
-            };
-        });
+        data.correspondents = data.correspondents.map((item: any) => ({
+            ...item,
+            address: !this.functionsService.empty(item.address) ? item.address : this.translate.instant('lang.addressNotSet')
+        }));
 
         return data;
     }
@@ -332,12 +326,10 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
     }
 
     formatCorrespondents() {
-        return this.selection.selected.map((correspondent: any) => {
-            return {
-                type: correspondent.type,
-                id: correspondent.id
-            };
-        });
+        return this.selection.selected.map((correspondent: any) => ({
+            type: correspondent.type,
+            id: correspondent.id
+        }));
     }
 
     isValid() {
@@ -459,12 +451,10 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
     }
 
     formatRelatedCorrespondentsSelected() {
-        return this.relatedCorrespondentsSelected.selected.map((correspondent: any) => {
-            return {
-                type: correspondent.type,
-                id: correspondent.id
-            };
-        });
+        return this.relatedCorrespondentsSelected.selected.map((correspondent: any) => ({
+            type: correspondent.type,
+            id: correspondent.id
+        }));
     }
 
 
@@ -511,7 +501,7 @@ export class CorrespondentListHttpDao {
 
     getRepoIssues(sort: string, order: string, page: number, href: string, search: string): Observable<CorrespondentList> {
 
-        let offset = page * 10;
+        const offset = page * 10;
         const requestUrl = `${href}?limit=10&offset=${offset}&order=${order}&orderBy=${sort}&search=${search}`;
 
         return this.http.get<CorrespondentList>(requestUrl);

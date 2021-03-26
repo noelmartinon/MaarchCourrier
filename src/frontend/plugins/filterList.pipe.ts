@@ -12,7 +12,7 @@ export class FilterListPipe implements PipeTransform {
 
     transform(value: any, args: string, id: string): any {
         if (id !== undefined) {
-            let filter = args.toLocaleLowerCase();
+            const filter = args.toLocaleLowerCase();
             return filter ? value.filter((elem: any) => this.latinisePipe.transform(elem[id].toLocaleLowerCase()).indexOf(this.latinisePipe.transform(filter)) != -1) : value;
         } else {
             console.log('Init filter failed for values : ');

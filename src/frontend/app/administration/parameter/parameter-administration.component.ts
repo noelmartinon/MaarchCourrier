@@ -11,7 +11,7 @@ import { AppService } from '@service/app.service';
 })
 export class ParameterAdministrationComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     parameter: any = {};

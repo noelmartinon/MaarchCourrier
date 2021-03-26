@@ -13,7 +13,7 @@ import { AuthService } from '@service/auth.service';
 import { AbsModalComponent } from './absModal/abs-modal.component';
 import { MySignatureMailComponent } from './parameters/signatureMail/signature-mail.component';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'profile.component.html',
@@ -144,7 +144,7 @@ export class ProfileComponent implements OnInit {
     }
 
     delBasketRedirection(basket: any, i: number) {
-        let r = confirm(this.translate.instant('lang.confirmAction'));
+        const r = confirm(this.translate.instant('lang.confirmAction'));
 
         if (r) {
             this.http.delete('../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
@@ -159,7 +159,7 @@ export class ProfileComponent implements OnInit {
     }
 
     delBasketAssignRedirection(basket: any, i: number) {
-        let r = confirm(this.translate.instant('lang.confirmAction'));
+        const r = confirm(this.translate.instant('lang.confirmAction'));
 
         if (r) {
             this.http.delete('../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
@@ -227,9 +227,9 @@ export class ProfileComponent implements OnInit {
     changePasswd() {
         this.http.get('../rest/passwordRules')
             .subscribe((data: any) => {
-                let valArr: ValidatorFn[] = [];
-                let ruleTextArr: String[] = [];
-                let otherRuleTextArr: String[] = [];
+                const valArr: ValidatorFn[] = [];
+                const ruleTextArr: String[] = [];
+                const otherRuleTextArr: String[] = [];
 
                 valArr.push(Validators.required);
 

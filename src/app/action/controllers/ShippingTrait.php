@@ -311,7 +311,7 @@ trait ShippingTrait
             } else {
                 foreach ($contacts[$key] as $contact) {
                     $createRecipient = CurlModel::exec([
-                        'url'           => "{$mailevaConfig['uri']}/{$urlComplement}/sendings/{$sendingId}/recipients",
+                        'url'           => "{$mailevaConfig['uri']}/{$urlComplement}/v2/sendings/{$sendingId}/recipients",
                         'bearerAuth'    => ['token' => $token],
                         'headers'       => ['Content-Type: application/json'],
                         'method'        => 'POST',

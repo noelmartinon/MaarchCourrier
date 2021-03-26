@@ -65,16 +65,14 @@ export class NoteEditorComponent implements OnInit {
 
         this.searchTerm.valueChanges.pipe(
             debounceTime(300),
-            //distinctUntilChanged(),
+            // distinctUntilChanged(),
             tap((data: any) => {
                 if (data.length > 0) {
-                    let filterValue = this.latinisePipe.transform(data.toLowerCase());
-                    this.entitiesList = this.entities.filter( (item: any) => {
-                        return (
-                            this.latinisePipe.transform(item.entity_label.toLowerCase()).includes(filterValue) 
+                    const filterValue = this.latinisePipe.transform(data.toLowerCase());
+                    this.entitiesList = this.entities.filter( (item: any) => (
+                        this.latinisePipe.transform(item.entity_label.toLowerCase()).includes(filterValue)
                                 || this.latinisePipe.transform(item.entity_id.toLowerCase()).includes(filterValue)
-                            );
-                    });
+                    ));
                 } else {
                     this.entitiesList = this.entities;
                 }
@@ -151,7 +149,7 @@ export class NoteEditorComponent implements OnInit {
 
     getTemplatesNote() {
         if (this.templatesNote.length == 0) {
-            let params = {};
+            const params = {};
             if (!this.functions.empty(this.resIds) && this.resIds.length == 1) {
                 params['resId'] = this.resIds[0];
             }
@@ -166,7 +164,7 @@ export class NoteEditorComponent implements OnInit {
     getEntities() {
         return new Promise((resolve, reject) => {
             if (this.entities.length == 0) {
-                let params = {};
+                const params = {};
                 if (!this.functions.empty(this.resIds) && this.resIds.length == 1) {
                     params['resId'] = this.resIds[0];
                 }

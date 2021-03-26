@@ -58,25 +58,21 @@ export class IssuingSiteInputComponent implements OnInit {
 
     getIssuingSites() {
         this.loading = true;
-        this.http.get(`../rest/registeredMail/sites`).pipe(
+        this.http.get('../rest/registeredMail/sites').pipe(
             tap((data: any) => {
                 this.issuingSiteAddress = null;
                 if (this.functions.empty(this.headerService.user.entities)) {
-                    this.issuingSiteList = data['sites'].map((item: any) => {
-                        return {
-                            ...item,
-                            id: item.id,
-                            label: `${item.label} (${item.accountNumber})`
-                        };
-                    });
+                    this.issuingSiteList = data['sites'].map((item: any) => ({
+                        ...item,
+                        id: item.id,
+                        label: `${item.label} (${item.accountNumber})`
+                    }));
                 } else {
-                    this.issuingSiteList = data['sites'].filter((item: any) => item.entities.indexOf(this.headerService.user.entities[0].id) > -1).map((item: any) => {
-                        return {
-                            ...item,
-                            id: item.id,
-                            label: `${item.label} (${item.accountNumber})`
-                        };
-                    });
+                    this.issuingSiteList = data['sites'].filter((item: any) => item.entities.indexOf(this.headerService.user.entities[0].id) > -1).map((item: any) => ({
+                        ...item,
+                        id: item.id,
+                        label: `${item.label} (${item.accountNumber})`
+                    }));
                 }
             }),
             finalize(() => this.loading = false),

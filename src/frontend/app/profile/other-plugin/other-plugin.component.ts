@@ -3,6 +3,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from '@service/header.service';
 import { AddinOutlookConfigurationModalComponent } from './configuration/addin-outlook-configuration-modal.component';
 import { MatDialog } from '@angular/material/dialog';
+import { AuthService } from '@service/auth.service';
 
 @Component({
     selector: 'app-other-plugin',
@@ -17,6 +18,7 @@ export class ProfileOtherPluginComponent implements OnInit {
         public translate: TranslateService,
         public headerService: HeaderService,
         public dialog: MatDialog,
+        private authService: AuthService
     ) {}
 
     ngOnInit(): void { }
@@ -26,5 +28,9 @@ export class ProfileOtherPluginComponent implements OnInit {
             panelClass: 'maarch-modal',
             width: '99%',
         });
+    }
+
+    isAppSecure() {
+        return this.authService.maarchUrl.split(':')[0] === 'https';
     }
 }

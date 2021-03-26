@@ -66,7 +66,7 @@ class ResController extends ResourceControlController
         }
 
         $body = $request->getParsedBody();
-        $body = StoreController::setDisabledFields($body);
+        $body = StoreController::setDisabledAndEmptyMandatoryFields($body);
 
         $control = ResourceControlController::controlResource(['body' => $body]);
         if (!empty($control['errors'])) {
@@ -269,7 +269,7 @@ class ResController extends ResourceControlController
         }
 
         $body = $request->getParsedBody();
-        $body = StoreController::setDisabledFields($body);
+        $body = StoreController::setDisabledAndEmptyMandatoryFields($body);
         
         $queryParams = $request->getQueryParams();
 

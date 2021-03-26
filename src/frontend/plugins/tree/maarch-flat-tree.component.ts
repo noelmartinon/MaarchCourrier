@@ -125,21 +125,19 @@ export class MaarchFlatTreeComponent implements OnInit {
             this.setDefaultOpened();
         }
 
-        this.rawData = data.map((item: any) => {
-            return {
-                ...item,
-                parent_id: item.parent_id === '#' || item.parent_id === '' ? null : item.parent_id,
-                state: item.state !== undefined ? {
-                    selected: item.state.selected,
-                    opened: item.state.opened || this.defaultOpenedNodes.indexOf(item.id) > -1 || this.openState === 'all',
-                    disabled: item.state.disabled,
-                } : {
-                        selected: false,
-                        opened: this.defaultOpenedNodes.indexOf(item.id) > -1 || this.openState === 'all',
-                        disabled: false,
-                    }
-            };
-        });
+        this.rawData = data.map((item: any) => ({
+            ...item,
+            parent_id: item.parent_id === '#' || item.parent_id === '' ? null : item.parent_id,
+            state: item.state !== undefined ? {
+                selected: item.state.selected,
+                opened: item.state.opened || this.defaultOpenedNodes.indexOf(item.id) > -1 || this.openState === 'all',
+                disabled: item.state.disabled,
+            } : {
+                selected: false,
+                opened: this.defaultOpenedNodes.indexOf(item.id) > -1 || this.openState === 'all',
+                disabled: false,
+            }
+        }));
 
         // order data
         this.rawData = this.sortPipe.transform(this.rawData, 'text');

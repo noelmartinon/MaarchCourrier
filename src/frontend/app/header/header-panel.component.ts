@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
 })
 export class HeaderPanelComponent implements OnInit {
 
-    // 
+    //
 
     dialogRef: MatDialogRef<any>;
     config: any = {};

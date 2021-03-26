@@ -75,12 +75,10 @@ export class ContactDuplicateComponent implements OnInit {
             this.http.get('../rest/contactsParameters').pipe(
                 map((data: any) => {
                     const regex = /contactCustomField_[.]*/g;
-                    data.contactsParameters = data.contactsParameters.filter((field: any) => field.identifier.match(regex) === null).map((field: any) => {
-                        return {
-                            ...field,
-                            label: this.translate.instant('lang.contactsParameters_' + field.identifier)
-                        };
-                    });
+                    data.contactsParameters = data.contactsParameters.filter((field: any) => field.identifier.match(regex) === null).map((field: any) => ({
+                        ...field,
+                        label: this.translate.instant('lang.contactsParameters_' + field.identifier)
+                    }));
                     return data.contactsParameters;
                 }),
                 tap((fields: any) => {
@@ -88,13 +86,11 @@ export class ContactDuplicateComponent implements OnInit {
                 }),
                 exhaustMap(() => this.http.get('../rest/contactsCustomFields')),
                 map((data: any) => {
-                    data.customFields = data.customFields.map((field: any) => {
-                        return {
-                            ...field,
-                            id: `contactCustomField_${field.id}`,
-                            identifier: `contactCustomField_${field.id}`
-                        };
-                    });
+                    data.customFields = data.customFields.map((field: any) => ({
+                        ...field,
+                        id: `contactCustomField_${field.id}`,
+                        identifier: `contactCustomField_${field.id}`
+                    }));
                     return data.customFields;
                 }),
                 tap((fields: any) => {

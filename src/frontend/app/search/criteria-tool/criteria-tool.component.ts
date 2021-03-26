@@ -30,6 +30,26 @@ import { SortPipe } from '@plugins/sorting.pipe';
 })
 export class CriteriaToolComponent implements OnInit {
 
+    @Input() searchTerm: string = 'Foo';
+    @Input() defaultCriteria: any = [];
+    @Input() adminMode: boolean = false;
+    @Input() openedPanel: boolean = true;
+    @Input() isLoadingResult: boolean = false;
+    @Input() class: 'main' | 'secondary' = 'main';
+
+    @Output() searchUrlGenerated = new EventEmitter<any>();
+    @Output() loaded = new EventEmitter<any>();
+    @Output() afterGetSearchTemplates = new EventEmitter<any>();
+
+    @ViewChild('criteriaTool', { static: false }) criteriaTool: MatExpansionPanel;
+    @ViewChild('searchCriteriaInput', { static: false }) searchCriteriaInput: ElementRef;
+    @ViewChild('appFolderInput', { static: false }) appFolderInput: FolderInputComponent;
+    @ViewChild('appTagInput', { static: false }) appTagInput: TagInputComponent;
+    @ViewChild('appIssuingSiteInput', { static: false }) appIssuingSiteInput: IssuingSiteInputComponent;
+
+    @ViewChildren('appContactAutocomplete') appContactAutocomplete: QueryList<ContactAutocompleteComponent>;
+    @ViewChildren('pluginSelectAutocompleteSearch') pluginSelectAutocompleteSearch: QueryList<PluginSelectAutocompleteSearchComponent>;
+
     loading: boolean = true;
     criteria: any = [];
     searchTemplates: any;
@@ -55,26 +75,6 @@ export class CriteriaToolComponent implements OnInit {
             desc: 'lang.manualSearchInfo'
         },
     ];
-
-    @Input() searchTerm: string = 'Foo';
-    @Input() defaultCriteria: any = [];
-    @Input() adminMode: boolean = false;
-    @Input() openedPanel: boolean = true;
-    @Input() isLoadingResult: boolean = false;
-    @Input() class: 'main' | 'secondary' = 'main';
-
-    @Output() searchUrlGenerated = new EventEmitter<any>();
-    @Output() loaded = new EventEmitter<any>();
-    @Output() afterGetSearchTemplates = new EventEmitter<any>();
-
-    @ViewChild('criteriaTool', { static: false }) criteriaTool: MatExpansionPanel;
-    @ViewChild('searchCriteriaInput', { static: false }) searchCriteriaInput: ElementRef;
-    @ViewChild('appFolderInput', { static: false }) appFolderInput: FolderInputComponent;
-    @ViewChild('appTagInput', { static: false }) appTagInput: TagInputComponent;
-    @ViewChild('appIssuingSiteInput', { static: false }) appIssuingSiteInput: IssuingSiteInputComponent;
-
-    @ViewChildren('appContactAutocomplete') appContactAutocomplete: QueryList<ContactAutocompleteComponent>;
-    @ViewChildren('pluginSelectAutocompleteSearch') pluginSelectAutocompleteSearch: QueryList<PluginSelectAutocompleteSearchComponent>;
 
 
     constructor(
@@ -131,15 +131,6 @@ export class CriteriaToolComponent implements OnInit {
 
         if (!this.adminMode) {
             this.getSearchTemplates();
-        }
-    }
-
-    private _filter(value: string): string[] {
-        if (typeof value === 'string') {
-            const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.criteria.filter((option: any) => this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue));
-        } else {
-            return this.criteria;
         }
     }
 
@@ -378,7 +369,7 @@ export class CriteriaToolComponent implements OnInit {
 
     set_doctype_field(elem: any) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/doctypes`).pipe(
+            this.http.get('../rest/doctypes').pipe(
                 tap((data: any) => {
                     let arrValues: any[] = [];
                     data.structure.forEach((doctype: any) => {
@@ -400,15 +391,13 @@ export class CriteriaToolComponent implements OnInit {
                                     isTitle: true,
                                     color: secondDoctype.css_style
                                 });
-                                arrValues = arrValues.concat(data.structure.filter((infoDoctype: any) => infoDoctype.doctypes_second_level_id === secondDoctype.doctypes_second_level_id && infoDoctype.description !== undefined).map((infoType: any) => {
-                                    return {
-                                        id: infoType.type_id,
-                                        label: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + infoType.description,
-                                        title: infoType.description,
-                                        disabled: false,
-                                        isTitle: false,
-                                    };
-                                }));
+                                arrValues = arrValues.concat(data.structure.filter((infoDoctype: any) => infoDoctype.doctypes_second_level_id === secondDoctype.doctypes_second_level_id && infoDoctype.description !== undefined).map((infoType: any) => ({
+                                    id: infoType.type_id,
+                                    label: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + infoType.description,
+                                    title: infoType.description,
+                                    disabled: false,
+                                    isTitle: false,
+                                })));
                             });
                         }
                     });
@@ -426,7 +415,7 @@ export class CriteriaToolComponent implements OnInit {
 
     set_priority_field(elem: any) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/priorities`).pipe(
+            this.http.get('../rest/priorities').pipe(
                 tap((data: any) => {
                     elem.values = data.priorities;
                     resolve(true);
@@ -441,14 +430,12 @@ export class CriteriaToolComponent implements OnInit {
 
     set_status_field(elem: any) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/statuses`).pipe(
+            this.http.get('../rest/statuses').pipe(
                 tap((data: any) => {
-                    elem.values = data.statuses.map((val: any) => {
-                        return {
-                            id: val.identifier,
-                            label: val.label_status
-                        };
-                    });
+                    elem.values = data.statuses.map((val: any) => ({
+                        id: val.identifier,
+                        label: val.label_status
+                    }));
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -461,14 +448,12 @@ export class CriteriaToolComponent implements OnInit {
 
     set_category_field(elem: any) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/categories`).pipe(
+            this.http.get('../rest/categories').pipe(
                 tap((data: any) => {
-                    elem.values = data.categories.map((val: any) => {
-                        return {
-                            id: val.id,
-                            label: val.label
-                        };
-                    });
+                    elem.values = data.categories.map((val: any) => ({
+                        id: val.id,
+                        label: val.label
+                    }));
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -505,12 +490,10 @@ export class CriteriaToolComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get('../rest/groups').pipe(
                 tap((data: any) => {
-                    elem.values = data.groups.map((group: any) => {
-                        return {
-                            id: group.id,
-                            label: group.group_desc
-                        };
-                    });
+                    elem.values = data.groups.map((group: any) => ({
+                        id: group.id,
+                        label: group.group_desc
+                    }));
                     elem.values = this.sortPipe.transform(elem.values, 'label');
                     resolve(true);
                 }),
@@ -525,7 +508,7 @@ export class CriteriaToolComponent implements OnInit {
     set_destination_field(elem: any) {
         elem.values = [];
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/indexingModels/entities`).pipe(
+            this.http.get('../rest/indexingModels/entities').pipe(
                 tap((data: any) => {
                     let title = '';
                     elem.values = elem.values.concat(data.entities.map((entity: any) => {
@@ -554,7 +537,7 @@ export class CriteriaToolComponent implements OnInit {
     set_initiator_field(elem: any) {
         elem.values = [];
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/indexingModels/entities`).pipe(
+            this.http.get('../rest/indexingModels/entities').pipe(
                 tap((data: any) => {
                     let title = '';
                     elem.values = elem.values.concat(data.entities.map((entity: any) => {
@@ -582,14 +565,12 @@ export class CriteriaToolComponent implements OnInit {
 
     set_registeredMail_issuingSite_field(elem: any) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/registeredMail/sites`).pipe(
+            this.http.get('../rest/registeredMail/sites').pipe(
                 tap((data: any) => {
-                    elem.values = data['sites'].map((item: any) => {
-                        return {
-                            id: item.id,
-                            label: `${item.label} (${item.accountNumber})`
-                        };
-                    });
+                    elem.values = data['sites'].map((item: any) => ({
+                        id: item.id,
+                        label: `${item.label} (${item.accountNumber})`
+                    }));
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -609,7 +590,7 @@ export class CriteriaToolComponent implements OnInit {
 
     set_senderDepartment_field(elem: any) {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/departments`).pipe(
+            this.http.get('../rest/departments').pipe(
                 tap((data: any) => {
                     elem.values = [];
                     Object.keys(data.departments).forEach(key => {
@@ -631,7 +612,7 @@ export class CriteriaToolComponent implements OnInit {
 
 
     getSearchTemplates() {
-        this.http.get(`../rest/searchTemplates`).pipe(
+        this.http.get('../rest/searchTemplates').pipe(
             tap((data: any) => {
                 this.searchTemplates = data.searchTemplates;
                 this.afterGetSearchTemplates.emit(this.searchTemplates);
@@ -641,7 +622,7 @@ export class CriteriaToolComponent implements OnInit {
     }
 
     saveSearchTemplate() {
-        let query: any = [];
+        const query: any = [];
         this.currentCriteria.forEach((field: any, index: number) => {
             query.push({ 'identifier': field.identifier, 'values': field.control.value });
         });
@@ -732,6 +713,15 @@ export class CriteriaToolComponent implements OnInit {
         index = searchTemplate.query.map((field: any) => field.identifier).indexOf('meta');
         if (index > -1) {
             this.searchTermControl.setValue(searchTemplate.query[index].values);
+        }
+    }
+
+    private _filter(value: string): string[] {
+        if (typeof value === 'string') {
+            const filterValue = this.latinisePipe.transform(value.toLowerCase());
+            return this.criteria.filter((option: any) => this.latinisePipe.transform(option['label'].toLowerCase()).includes(filterValue));
+        } else {
+            return this.criteria;
         }
     }
 }

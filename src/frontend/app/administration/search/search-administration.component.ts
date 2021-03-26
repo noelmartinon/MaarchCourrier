@@ -10,7 +10,7 @@ import { AppService } from '@service/app.service';
 import { HeaderService } from '@service/header.service';
 import { FunctionsService } from '@service/functions.service';
 
-declare var $: any;
+declare let $: any;
 
 
 @Component({
@@ -270,15 +270,13 @@ export class SearchAdministrationComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get('../rest/customFields').pipe(
                 map((customData: any) => {
-                    customData.customFields = customData.customFields.map((info: any) => {
-                        return {
-                            'value': 'indexingCustomField_' + info.id,
-                            'label': info.label,
-                            'sample': this.translate.instant('lang.customField') + info.id,
-                            'cssClasses': ['align_leftData'],
-                            'icon': 'fa-hashtag'
-                        };
-                    });
+                    customData.customFields = customData.customFields.map((info: any) => ({
+                        'value': 'indexingCustomField_' + info.id,
+                        'label': info.label,
+                        'sample': this.translate.instant('lang.customField') + info.id,
+                        'cssClasses': ['align_leftData'],
+                        'icon': 'fa-hashtag'
+                    }));
                     return customData.customFields;
                 }),
                 tap((customs) => {

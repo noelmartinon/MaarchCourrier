@@ -20,7 +20,7 @@ import { of } from 'rxjs';
 })
 export class ActionsListComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;

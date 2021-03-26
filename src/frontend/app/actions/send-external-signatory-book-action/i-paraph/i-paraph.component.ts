@@ -10,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class IParaphComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     currentAccount: any = null;

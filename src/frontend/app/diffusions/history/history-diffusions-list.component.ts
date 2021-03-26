@@ -70,14 +70,12 @@ export class HistoryDiffusionsListComponent implements OnInit {
 
     initRoles() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/roles`).pipe(
+            this.http.get('../rest/roles').pipe(
                 map((data: any) => {
-                    data.roles = data.roles.map((role: any) => {
-                        return {
-                            ...role,
-                            id: role.id,
-                        };
-                    });
+                    data.roles = data.roles.map((role: any) => ({
+                        ...role,
+                        id: role.id,
+                    }));
                     return data.roles;
                 }),
                 tap((roles: any) => {

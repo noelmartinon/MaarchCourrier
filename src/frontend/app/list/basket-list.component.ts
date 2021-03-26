@@ -21,7 +21,7 @@ import { ActionsService } from '../actions/actions.service';
 import { ContactResourceModalComponent } from '../contact/contact-resource/modal/contact-resource-modal.component';
 import { merge, Observable, of, Subject, Subscription } from 'rxjs';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'basket-list.component.html',
@@ -159,9 +159,9 @@ export class BasketListComponent implements OnInit, OnDestroy {
             this.initResultList();
 
         },
-            (err: any) => {
-                this.notify.handleErrors(err);
-            });
+        (err: any) => {
+            this.notify.handleErrors(err);
+        });
     }
 
     ngOnDestroy() {

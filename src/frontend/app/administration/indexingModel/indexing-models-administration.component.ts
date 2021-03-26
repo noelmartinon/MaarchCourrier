@@ -57,9 +57,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
         this.loading = true;
 
         this.http.get('../rest/indexingModels?showDisabled=true').pipe(
-            map((data: any) => {
-                return data.indexingModels.filter((info: any) => info.private === false);
-            }),
+            map((data: any) => data.indexingModels.filter((info: any) => info.private === false)),
             tap((data: any) => {
                 this.indexingModels = data;
                 this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.indexingModels'));
@@ -123,7 +121,7 @@ export class IndexingModelsAdministrationComponent implements OnInit {
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.request('PUT', '../rest/indexingModels/' + indexingModel.id + '/enable')),
             tap((data: any) => {
-                for (let i in this.indexingModels) {
+                for (const i in this.indexingModels) {
                     if (this.indexingModels[i].id === indexingModel.id) {
                         this.indexingModels[i].enabled = true;
                     }

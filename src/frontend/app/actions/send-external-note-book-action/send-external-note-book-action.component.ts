@@ -8,7 +8,7 @@ import { map, tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
-    templateUrl: "send-external-note-book-action.component.html",
+    templateUrl: 'send-external-note-book-action.component.html',
     styleUrls: ['send-external-note-book-action.component.scss'],
 })
 export class SendExternalNoteBookActionComponent implements OnInit {
@@ -64,7 +64,7 @@ export class SendExternalNoteBookActionComponent implements OnInit {
         let realResSelected: string[];
         let datas: any;
 
-        realResSelected = this.additionalsInfos.mails.map((e: any) => { return e.res_id; });
+        realResSelected = this.additionalsInfos.mails.map((e: any) => e.res_id);
         datas = this.externalSignatoryBookDatas;
 
         this.http.put(this.data.processActionRoute, {resources : realResSelected, note : this.noteEditor.getNote(), data: datas}).pipe(

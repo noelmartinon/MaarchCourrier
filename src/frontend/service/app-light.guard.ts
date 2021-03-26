@@ -37,9 +37,7 @@ export class AppLightGuard implements CanActivate {
         return this.authService.getLoginInformations(state.url).pipe(
             exhaustMap(() => this.authService.getToken() !== null && state.url !== '/login' ? this.authService.getCurrentUserInfo() : of(false)),
             map(() => true),
-            catchError((err: any) => {
-                return of(true);
-            })
+            catchError((err: any) => of(true))
         );
     }
 }

@@ -9,7 +9,7 @@ import { PrivilegeService } from '@service/privileges.service';
 
 @Component({
     selector: 'app-history-workflow-resume',
-    templateUrl: "history-workflow-resume.component.html",
+    templateUrl: 'history-workflow-resume.component.html',
     styleUrls: [
         'history-workflow-resume.component.scss',
     ]
@@ -17,7 +17,7 @@ import { PrivilegeService } from '@service/privileges.service';
 
 export class HistoryWorkflowResumeComponent implements OnInit {
 
-    
+
 
     loading: boolean = true;
     disabledHistory: boolean = true;

@@ -179,13 +179,11 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
         this.http.get('../rest/indexing/fileInformations').pipe(
             tap((data: any) => {
-                this.allowedExtensions = data.informations.allowedFiles.map((ext: any) => {
-                    return {
-                        extension: '.' + ext.extension.toLowerCase(),
-                        mimeType: ext.mimeType,
-                        canConvert: ext.canConvert
-                    };
-                });
+                this.allowedExtensions = data.informations.allowedFiles.map((ext: any) => ({
+                    extension: '.' + ext.extension.toLowerCase(),
+                    mimeType: ext.mimeType,
+                    canConvert: ext.canConvert
+                }));
                 this.allowedExtensions = this.sortPipe.transform(this.allowedExtensions, 'extension');
 
                 this.maxFileSize = data.informations.maximumSize;
@@ -252,7 +250,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             src: this.base64ToArrayBuffer(this.base64)
         };
         if (!this.functions.empty(this.filename)) {
-            this.file.name = this.filename.substring(0, this.filename.lastIndexOf("."));
+            this.file.name = this.filename.substring(0, this.filename.lastIndexOf('.'));
             this.file.format = this.filename.split('.').pop();
         }
         this.loading = false;
@@ -339,9 +337,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     getBase64Document(buffer: ArrayBuffer) {
         const TYPED_ARRAY = new Uint8Array(buffer);
-        const STRING_CHAR = TYPED_ARRAY.reduce((data, byte) => {
-            return data + String.fromCharCode(byte);
-        }, '');
+        const STRING_CHAR = TYPED_ARRAY.reduce((data, byte) => data + String.fromCharCode(byte), '');
 
         return btoa(STRING_CHAR);
     }
@@ -402,7 +398,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     upload(data: any) {
-        const uploadURL = `../rest/convertedFile`;
+        const uploadURL = '../rest/convertedFile';
 
         return this.http.post<any>(uploadURL, data, {
             reportProgress: true,
@@ -454,7 +450,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                     const downloadProgress = Math.round(100 * event.loaded / event.total);
                     this.loadingInfo.percent = downloadProgress;
                     this.loadingInfo.mode = 'determinate';
-                    this.loadingInfo.message = ``;
+                    this.loadingInfo.message = '';
 
                     return { status: 'progressDownload', message: downloadProgress };
 
@@ -535,7 +531,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                         }
                         return data;
                     }),
-                    exhaustMap((data: any) => this.http.post(`../rest/convertedFile`, { name: `${data.name}.${data.format}`, base64: `${data.content}` })),
+                    exhaustMap((data: any) => this.http.post('../rest/convertedFile', { name: `${data.name}.${data.format}`, base64: `${data.content}` })),
                     tap((data: any) => {
                         resolve(data.encodedResource);
                     })
@@ -566,7 +562,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     isExtensionAllowed(file: any) {
         const fileExtension = '.' + file.name.toLowerCase().split('.').pop();
-        const allowedExtensions = this.resourceDatas?.inMailing ? this.allowedExtensions.filter(ext => this.allowedExtensionsMailing.indexOf(ext.extension.replace('.','')) > -1) : this.allowedExtensions
+        const allowedExtensions = this.resourceDatas?.inMailing ? this.allowedExtensions.filter(ext => this.allowedExtensionsMailing.indexOf(ext.extension.replace('.', '')) > -1) : this.allowedExtensions;
 
         if (allowedExtensions.filter(ext => ext.mimeType === file.type && ext.extension === fileExtension).length === 0) {
             this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.notAllowedExtension') + ' !', msg: this.translate.instant('lang.file') + ' : <b>' + file.name + '</b>, ' + this.translate.instant('lang.type') + ' : <b>' + file.type + '</b><br/><br/><u>' + this.translate.instant('lang.allowedExtensions') + '</u> : <br/>' + allowedExtensions.map(ext => ext.extension).filter((elem: any, index: any, self: any) => index === self.indexOf(elem)).join(', ') } });
@@ -786,7 +782,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             this.editor.options = {
                 objectType: 'attachmentCreation',
                 objectId: template.id,
-                docUrl: `rest/onlyOffice/mergedFile`,
+                docUrl: 'rest/onlyOffice/mergedFile',
                 dataToMerge: this.resourceDatas
             };
             this.editInProgress = true;
@@ -839,7 +835,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             this.editor.options = {
                 objectType: 'attachmentModification',
                 objectId: this.resId,
-                docUrl: `rest/onlyOffice/mergedFile`,
+                docUrl: 'rest/onlyOffice/mergedFile',
                 dataToMerge: this.resourceDatas
             };
             this.editInProgress = true;
@@ -878,7 +874,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             this.editor.options = {
                 objectType: 'resourceModification',
                 objectId: this.resId,
-                docUrl: `rest/onlyOffice/mergedFile`
+                docUrl: 'rest/onlyOffice/mergedFile'
             };
             this.editInProgress = true;
 
@@ -1040,9 +1036,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                             arrTypes = this.sortPipe.transform(arrTypes, 'label');
                         });
                     }),
-                    exhaustMap(() => {
-                        return this.http.get('../rest/currentUser/templates?target=attachments&type=office');
-                    }),
+                    exhaustMap(() => this.http.get('../rest/currentUser/templates?target=attachments&type=office')),
                     tap((data: any) => {
                         this.listTemplates = data.templates;
 
@@ -1125,7 +1119,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     loadTmpDocument(base64Content: string, format: string) {
         return new Promise((resolve, reject) => {
-            this.http.post(`../rest/convertedFile/encodedFile`, { format: format, encodedFile: base64Content }).pipe(
+            this.http.post('../rest/convertedFile/encodedFile', { format: format, encodedFile: base64Content }).pipe(
                 tap((data: any) => {
                     this.file = {
                         name: 'maarch',
@@ -1159,7 +1153,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                         src: null
                     };
                 }),
-                exhaustMap((data) => this.http.post(`../rest/convertedFile/encodedFile`, { format: data.format, encodedFile: data.content })),
+                exhaustMap((data) => this.http.post('../rest/convertedFile/encodedFile', { format: data.format, encodedFile: data.content })),
                 tap((data: any) => {
                     this.file.src = this.base64ToArrayBuffer(data.encodedResource);
                     this.closeEditor();

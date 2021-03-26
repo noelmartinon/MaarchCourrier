@@ -82,9 +82,9 @@ class ResourceListController
         $resIds = ResourceListController::getIdsWithOffsetAndLimit(['resources' => $rawResources, 'offset' => $data['offset'], 'limit' => $data['limit']]);
 
         $followedDocuments = UserFollowedResourceModel::get([
-        'select' => ['res_id'],
-            'where'  => ['user_id = ?'],
-            'data'   => [$GLOBALS['id']],
+            'select'    => ['res_id'],
+            'where'     => ['user_id = ?'],
+            'data'      => [$GLOBALS['id']],
         ]);
 
         $trackedMails = array_column($followedDocuments, 'res_id');

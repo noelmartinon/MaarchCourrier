@@ -117,16 +117,14 @@ export class IndexationComponent implements OnInit {
 
             this.http.get('../rest/indexing/groups/' + this.currentGroupId + '/actions').pipe(
                 map((data: any) => {
-                    data.actions = data.actions.map((action: any, index: number) => {
-                        return {
-                            id: action.id,
-                            label: action.label,
-                            component: action.component,
-                            enabled: action.enabled,
-                            default: index === 0 ? true : false,
-                            categoryUse: action.categories
-                        };
-                    });
+                    data.actions = data.actions.map((action: any, index: number) => ({
+                        id: action.id,
+                        label: action.label,
+                        component: action.component,
+                        enabled: action.enabled,
+                        default: index === 0 ? true : false,
+                        categoryUse: action.categories
+                    }));
                     return data;
                 }),
                 tap((data: any) => {
@@ -140,9 +138,9 @@ export class IndexationComponent implements OnInit {
                 })
             ).subscribe();
         },
-            (err: any) => {
-                this.notify.handleErrors(err);
-            });
+        (err: any) => {
+            this.notify.handleErrors(err);
+        });
     }
 
     isEmptyIndexingModels() {
@@ -171,14 +169,14 @@ export class IndexationComponent implements OnInit {
                     } else if (formatdatas['encodedFile'] === null && this.currentIndexingModel.category !== 'registeredMail') {
                         this.dialogRef = this.dialog.open(
                             ConfirmComponent, {
-                            panelClass: 'maarch-modal',
-                            autoFocus: false,
-                            disableClose: true,
-                            data: {
-                                title: this.translate.instant('lang.noFile'),
-                                msg: this.translate.instant('lang.noFileMsg')
+                                panelClass: 'maarch-modal',
+                                autoFocus: false,
+                                disableClose: true,
+                                data: {
+                                    title: this.translate.instant('lang.noFile'),
+                                    msg: this.translate.instant('lang.noFileMsg')
+                                }
                             }
-                        }
                         );
 
                         this.dialogRef.afterClosed().pipe(

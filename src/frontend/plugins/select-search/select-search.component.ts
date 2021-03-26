@@ -179,7 +179,7 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
             });
 
         let group = '';
-        let index = 1;
+        const index = 1;
         this.datasClone = JSON.parse(JSON.stringify(this.datas));
         this.datasClone.forEach((element: any, index: number) => {
             if (element.isTitle) {
@@ -217,10 +217,10 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
                 }
             });
             this.filteredDatas = this.formControlSearch.valueChanges
-            .pipe(
-                startWith(''),
-                map(value => this._filter(value))
-            );
+                .pipe(
+                    startWith(''),
+                    map(value => this._filter(value))
+                );
             this.isModelModified = false;
         }
     }
@@ -233,13 +233,11 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         this.optGroupList = this.sortPipe.transform(this.optGroupList, 'label');
         this.optGroupList.forEach(group => {
             tmpArr.push({ id: group.id, label: group.label, disabled: true });
-            tmpArr = tmpArr.concat(this.datas.filter(data => data[this.optGroupTarget] === group.id).map(data => {
-                return {
-                    ...data,
-                    title: data.label,
-                    label: '&nbsp;&nbsp;&nbsp' + data.label
-                };
-            }));
+            tmpArr = tmpArr.concat(this.datas.filter(data => data[this.optGroupTarget] === group.id).map(data => ({
+                ...data,
+                title: data.label,
+                label: '&nbsp;&nbsp;&nbsp' + data.label
+            })));
         });
 
         this.datas = tmpArr;

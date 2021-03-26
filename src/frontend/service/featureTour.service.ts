@@ -121,16 +121,16 @@ export class FeatureTourService {
                 }
             ).subscribe(
                 step => {
-                    /*Do something*/
+                    /* Do something*/
                     this.currentTour = this.tour.filter((item: any) => item.stepId.split('@')[0] === step.name)[0];
-                    const containerElement = document.getElementsByClassName('joyride-step__container') as HTMLCollectionOf<HTMLElement>
+                    const containerElement = document.getElementsByClassName('joyride-step__container') as HTMLCollectionOf<HTMLElement>;
                     containerElement[0].style.width = 'auto';
                     containerElement[0].style.height = 'auto';
                     document.getElementsByClassName('joyride-step__header')[0].innerHTML = `${this.currentTour.title}`;
                     document.getElementsByClassName('joyride-step__body')[0].innerHTML = `${this.currentTour.description}`;
                 },
                 error => {
-                    /*handle error*/
+                    /* handle error*/
                 },
                 () => {
                     if (this.currentTour === null) {

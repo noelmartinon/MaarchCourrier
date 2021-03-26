@@ -122,7 +122,7 @@ export class AlfrescoAdministrationComponent implements OnInit {
 
     getAvailableEntities() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/alfresco/availableEntities`).pipe(
+            this.http.get('../rest/alfresco/availableEntities').pipe(
                 tap((data: any) => {
                     this.availableEntities = data['availableEntities'];
                     resolve(true);
@@ -137,19 +137,17 @@ export class AlfrescoAdministrationComponent implements OnInit {
 
     getEntities() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/entities`).pipe(
+            this.http.get('../rest/entities').pipe(
                 map((data: any) => {
-                    data.entities = data.entities.map((entity: any) => {
-                        return {
-                            text: entity.entity_label,
-                            icon: entity.icon,
-                            parent_id: entity.parentSerialId,
-                            id: entity.serialId,
-                            state: {
-                                opened: true
-                            }
-                        };
-                    });
+                    data.entities = data.entities.map((entity: any) => ({
+                        text: entity.entity_label,
+                        icon: entity.icon,
+                        parent_id: entity.parentSerialId,
+                        id: entity.serialId,
+                        state: {
+                            opened: true
+                        }
+                    }));
                     return data.entities;
                 }),
                 tap((entities: any) => {
@@ -169,17 +167,15 @@ export class AlfrescoAdministrationComponent implements OnInit {
             if (this.creationMode) {
                 this.http.get('../rest/entities').pipe(
                     map((data: any) => {
-                        data.entities = data.entities.map((entity: any) => {
-                            return {
-                                text: entity.entity_label,
-                                icon: entity.icon,
-                                parent_id: entity.parentSerialId,
-                                id: entity.serialId,
-                                state: {
-                                    opened: true
-                                }
-                            };
-                        });
+                        data.entities = data.entities.map((entity: any) => ({
+                            text: entity.entity_label,
+                            icon: entity.icon,
+                            parent_id: entity.parentSerialId,
+                            id: entity.serialId,
+                            state: {
+                                opened: true
+                            }
+                        }));
                         return data.entities;
                     }),
                     tap((entities: any) => {
@@ -272,7 +268,7 @@ export class AlfrescoAdministrationComponent implements OnInit {
             };
         }
 
-        this.http.post(`../rest/alfresco/checkAccounts`, alfresco).pipe(
+        this.http.post('../rest/alfresco/checkAccounts', alfresco).pipe(
             tap(() => {
                 this.notify.success(this.translate.instant('lang.testSucceeded'));
             }),

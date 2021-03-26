@@ -38,7 +38,7 @@ class ConvertPdfController
         $extension = pathinfo($aArgs['fullFilename'], PATHINFO_EXTENSION);
         if (strtolower($extension) == 'html' || strtolower($extension) == 'htm') {
             $pdfFilepath = str_replace('.'.$extension, '', $aArgs['fullFilename']) . '.pdf';
-            $command = "wkhtmltopdf -B 10mm -L 10mm -R 10mm -T 10mm --load-error-handling ignore --load-media-error-handling ignore ".$aArgs['fullFilename']." ".$pdfFilepath;
+            $command = "wkhtmltopdf -B 10mm -L 10mm -R 10mm -T 10mm --load-error-handling ignore --load-media-error-handling ignore --encoding utf-8 ".$aArgs['fullFilename']." ".$pdfFilepath;
 
             // Check if xvfb-run is installed, and run wkhtmltopdf with it
             // Necessary when running in a headless debian server

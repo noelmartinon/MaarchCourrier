@@ -13,7 +13,7 @@ import {FunctionsService} from '@service/functions.service';
 import { of } from 'rxjs';
 import { AdministrationService } from '../administration.service';
 
-declare var tinymce: any;
+declare let tinymce: any;
 
 @Component({
     templateUrl: 'tags-administration.component.html'
@@ -22,7 +22,7 @@ export class TagsAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
+
     loading: boolean = true;
 
     resultsLength: number = 0;

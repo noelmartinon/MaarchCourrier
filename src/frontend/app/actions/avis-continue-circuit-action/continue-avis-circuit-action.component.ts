@@ -10,12 +10,12 @@ import { FunctionsService } from '@service/functions.service';
 import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 
 @Component({
-    templateUrl: "continue-avis-circuit-action.component.html",
+    templateUrl: 'continue-avis-circuit-action.component.html',
     styleUrls: ['continue-avis-circuit-action.component.scss'],
 })
 export class ContinueAvisCircuitActionComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     resourcesWarnings: any[] = [];
@@ -33,9 +33,9 @@ export class ContinueAvisCircuitActionComponent implements OnInit {
 
     constructor(
         public translate: TranslateService,
-        public http: HttpClient, 
-        private notify: NotificationService, 
-        public dialogRef: MatDialogRef<ContinueAvisCircuitActionComponent>, 
+        public http: HttpClient,
+        private notify: NotificationService,
+        public dialogRef: MatDialogRef<ContinueAvisCircuitActionComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public functions: FunctionsService) { }
 

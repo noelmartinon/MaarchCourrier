@@ -41,17 +41,17 @@ export class SaveAndPrintRegisteredMailActionComponent implements OnInit {
             tap((data: any) => {
                 this.data.resIds = [data.resId];
             }),
-            exhaustMap(() => this.http.put(this.data.indexActionRoute, { resource: this.data.resIds[0], note: this.noteEditor.getNote(), 
-                    data: {
-                        type: this.data.resource.registeredMail_type,
-                        warranty: this.data.resource.registeredMail_warranty,
-                        issuingSiteId: this.data.resource.registeredMail_issuingSite,
-                        letter: this.data.resource.registeredMail_letter,
-                        recipient: this.data.resource.registeredMail_recipient,
-                        reference: this.data.resource.registeredMail_reference,
-                        generated: true
-                    }
-                })
+            exhaustMap(() => this.http.put(this.data.indexActionRoute, { resource: this.data.resIds[0], note: this.noteEditor.getNote(),
+                data: {
+                    type: this.data.resource.registeredMail_type,
+                    warranty: this.data.resource.registeredMail_warranty,
+                    issuingSiteId: this.data.resource.registeredMail_issuingSite,
+                    letter: this.data.resource.registeredMail_letter,
+                    recipient: this.data.resource.registeredMail_recipient,
+                    reference: this.data.resource.registeredMail_reference,
+                    generated: true
+                }
+            })
             ),
             tap((data: any) => {
                 if (data && data.errors != null) {

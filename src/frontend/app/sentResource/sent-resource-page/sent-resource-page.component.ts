@@ -17,8 +17,8 @@ import { HeaderService } from '@service/header.service';
 import { Observable, of } from 'rxjs';
 import { SummarySheetComponent } from '../../list/summarySheet/summary-sheet.component';
 
-declare var $: any;
-declare var tinymce: any;
+declare let $: any;
+declare let tinymce: any;
 
 @Component({
     selector: 'app-sent-resource-page',
@@ -27,6 +27,10 @@ declare var tinymce: any;
     providers: [ContactService, AppService],
 })
 export class SentResourcePageComponent implements OnInit {
+
+    @ViewChild('recipientsField', { static: true }) recipientsField: ElementRef<HTMLInputElement>;
+    @ViewChild('copiesField', { static: false }) copiesField: ElementRef<HTMLInputElement>;
+    @ViewChild('invisibleCopiesField', { static: false }) invisibleCopiesField: ElementRef<HTMLInputElement>;
 
     loading: boolean = true;
 
@@ -91,10 +95,6 @@ export class SentResourcePageComponent implements OnInit {
     pdfMode: boolean = false;
     htmlMode: boolean = true;
     sendmailClone: any;
-
-    @ViewChild('recipientsField', { static: true }) recipientsField: ElementRef<HTMLInputElement>;
-    @ViewChild('copiesField', { static: false }) copiesField: ElementRef<HTMLInputElement>;
-    @ViewChild('invisibleCopiesField', { static: false }) invisibleCopiesField: ElementRef<HTMLInputElement>;
 
     constructor(
         public http: HttpClient,
@@ -218,12 +218,10 @@ export class SentResourcePageComponent implements OnInit {
         if (item.type === 'contactGroup') {
             this.http.get(`../rest/contactsGroups/${item.id}`).pipe(
                 map((data: any) => {
-                    data = data.contactsGroup.contacts.filter((contact: any) => !this.functions.empty(contact.email)).map((contact: any) => {
-                        return {
-                            label: contact.contact,
-                            email: contact.email
-                        };
-                    });
+                    data = data.contactsGroup.contacts.filter((contact: any) => !this.functions.empty(contact.email)).map((contact: any) => ({
+                        label: contact.contact,
+                        email: contact.email
+                    }));
                     return data;
                 }),
                 tap((data: any) => {
@@ -324,27 +322,21 @@ export class SentResourcePageComponent implements OnInit {
                 tap(async (data: any) => {
                     this.emailCreatorId = data.userId;
 
-                    this.recipients = data.recipients.map((item: any) => {
-                        return {
-                            label: item,
-                            email: item,
-                            badFormat: this.isBadEmailFormat(item)
-                        };
-                    });
-                    this.copies = data.cc.map((item: any) => {
-                        return {
-                            label: item,
-                            email: item,
-                            badFormat: this.isBadEmailFormat(item)
-                        };
-                    });
-                    this.invisibleCopies = data.cci.map((item: any) => {
-                        return {
-                            label: item,
-                            email: item,
-                            badFormat: this.isBadEmailFormat(item)
-                        };
-                    });
+                    this.recipients = data.recipients.map((item: any) => ({
+                        label: item,
+                        email: item,
+                        badFormat: this.isBadEmailFormat(item)
+                    }));
+                    this.copies = data.cc.map((item: any) => ({
+                        label: item,
+                        email: item,
+                        badFormat: this.isBadEmailFormat(item)
+                    }));
+                    this.invisibleCopies = data.cci.map((item: any) => ({
+                        label: item,
+                        email: item,
+                        badFormat: this.isBadEmailFormat(item)
+                    }));
 
                     this.showCopies = this.copies.length > 0;
                     this.showInvisibleCopies = this.invisibleCopies.length > 0;
@@ -463,11 +455,11 @@ export class SentResourcePageComponent implements OnInit {
         } else {
             this.currentSender = this.availableSenders.filter(sender => sender.entityId === this.headerService.user.entities[0].id).length > 0 ? this.availableSenders.filter(sender => sender.entityId === this.headerService.user.entities[0].id)[0] : this.availableSenders[0];
         }
-            if (!this.functions.empty(this.resourceData.senders)) {
-                this.resourceData.senders.forEach((sender: any) => {
-                    this.setSender(sender);
-                });
-            }
+        if (!this.functions.empty(this.resourceData.senders)) {
+            this.resourceData.senders.forEach((sender: any) => {
+                this.setSender(sender);
+            });
+        }
     }
 
     setSender(sender: any) {
@@ -622,7 +614,7 @@ export class SentResourcePageComponent implements OnInit {
     }
 
     initSignEmailModelsList() {
-        this.http.get(`../rest/currentUser/emailSignatures`).pipe(
+        this.http.get('../rest/currentUser/emailSignatures').pipe(
             tap((data: any) => {
                 this.availableSignEmailModels = data.emailSignatures;
             }),
@@ -667,7 +659,7 @@ export class SentResourcePageComponent implements OnInit {
             await this.createSummarySheet();
         }
 
-        this.http.post(`../rest/emails`, this.formatEmail()).pipe(
+        this.http.post('../rest/emails', this.formatEmail()).pipe(
             tap(() => {
                 if (this.emailStatus === 'DRAFT') {
                     // this.notify.success(this.translate.instant('lang.draftSaved'));
@@ -827,12 +819,10 @@ export class SentResourcePageComponent implements OnInit {
                 } else if (element === 'notes') {
                     objAttach[element] = this.emailAttach[element].map((item: any) => item.id);
                 } else {
-                    objAttach[element] = this.emailAttach[element].map((item: any) => {
-                        return {
-                            id: item.id,
-                            original: item.original
-                        };
-                    });
+                    objAttach[element] = this.emailAttach[element].map((item: any) => ({
+                        id: item.id,
+                        original: item.original
+                    }));
                 }
             }
         });
@@ -932,12 +922,11 @@ export class SentResourcePageComponent implements OnInit {
         let today: any;
         let dd: any;
         let mm: any;
-        let yyyy: any;
+        const yyyy: any = today.getFullYear();
 
         today = new Date();
         dd = today.getDate();
         mm = today.getMonth() + 1;
-        yyyy = today.getFullYear();
 
         if (dd < 10) {
             dd = '0' + dd;
@@ -976,7 +965,7 @@ export class SentResourcePageComponent implements OnInit {
     async createSummarySheet() {
         return new Promise(resolve => {
             this.http.post('../rest/resourcesList/summarySheets?mode=base64', {
-                units:     this.summarySheetUnits,
+                units: this.summarySheetUnits,
                 resources: [this.data.resId]
             })
                 .pipe(
@@ -1000,12 +989,11 @@ export class SentResourcePageComponent implements OnInit {
             let today: any;
             let dd: any;
             let mm: any;
-            let yyyy: any;
+            const  yyyy: any = today.getFullYear();
 
             today = new Date();
             dd = today.getDate();
             mm = today.getMonth() + 1;
-            yyyy = today.getFullYear();
 
             if (dd < 10) {
                 dd = '0' + dd;
@@ -1015,28 +1003,28 @@ export class SentResourcePageComponent implements OnInit {
             }
             today = dd + '-' + mm + '-' + yyyy;
             const title = this.translate.instant('lang.summarySheet') + ' ' + today;
-            this.http.post('../rest/attachments', {resIdMaster: this.data.resId, encodedFile: encodedDocument, type: 'summary_sheet', format: 'PDF', title: title})
-            .pipe(
-                tap((dataAttachment: any) => {
-                    this.emailAttach['summarySheet'] = undefined;
+            this.http.post('../rest/attachments', { resIdMaster: this.data.resId, encodedFile: encodedDocument, type: 'summary_sheet', format: 'PDF', title: title })
+                .pipe(
+                    tap((dataAttachment: any) => {
+                        this.emailAttach['summarySheet'] = undefined;
 
-                    this.emailAttach['attachments'].push({
-                        id:       dataAttachment.id,
-                        label:    title,
-                        format:   'pdf',
-                        title:    title,
-                        original: true
-                    });
-                    this.loading = false;
-                    resolve(true);
-                }),
-                catchError((err) => {
-                    this.notify.handleErrors(err);
-                    resolve(false);
-                    return of(false);
-                })
-            )
-            .subscribe();
+                        this.emailAttach['attachments'].push({
+                            id: dataAttachment.id,
+                            label: title,
+                            format: 'pdf',
+                            title: title,
+                            original: true
+                        });
+                        this.loading = false;
+                        resolve(true);
+                    }),
+                    catchError((err) => {
+                        this.notify.handleErrors(err);
+                        resolve(false);
+                        return of(false);
+                    })
+                )
+                .subscribe();
         });
     }
 }

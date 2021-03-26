@@ -115,15 +115,13 @@ export class IssuingSiteComponent implements OnInit {
                         entities: [data.site.entities]
                     });
 
-                    this.entities = this.entities.map((entity: any) => {
-                        return {
-                            ...entity,
-                            state: {
-                                opened: true,
-                                selected: data.site.entities.indexOf(entity.id) > -1
-                            }
-                        };
-                    });
+                    this.entities = this.entities.map((entity: any) => ({
+                        ...entity,
+                        state: {
+                            opened: true,
+                            selected: data.site.entities.indexOf(entity.id) > -1
+                        }
+                    }));
                     resolve(true);
                     this.loading = false;
                 }),
@@ -202,19 +200,17 @@ export class IssuingSiteComponent implements OnInit {
 
     getEntities() {
         return new Promise((resolve) => {
-            this.http.get(`../rest/entities`).pipe(
+            this.http.get('../rest/entities').pipe(
                 map((data: any) => {
-                    data.entities = data.entities.map((entity: any) => {
-                        return {
-                            text: entity.entity_label,
-                            icon: entity.icon,
-                            parent_id: entity.parentSerialId,
-                            id: entity.serialId,
-                            state: {
-                                opened: true,
-                            }
-                        };
-                    });
+                    data.entities = data.entities.map((entity: any) => ({
+                        text: entity.entity_label,
+                        icon: entity.icon,
+                        parent_id: entity.parentSerialId,
+                        id: entity.serialId,
+                        state: {
+                            opened: true,
+                        }
+                    }));
                     return data.entities;
                 }),
                 tap((entities: any) => {
@@ -230,7 +226,7 @@ export class IssuingSiteComponent implements OnInit {
     }
 
     getCountries() {
-        this.http.get(`../rest/registeredMail/countries`).pipe(
+        this.http.get('../rest/registeredMail/countries').pipe(
             tap((data: any) => {
                 this.countries = data.countries.map(
                     (item: any) => this.latinisePipe.transform(item.toUpperCase()));

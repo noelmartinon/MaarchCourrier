@@ -30,8 +30,8 @@ export class LifeCycleComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get('../rest/parameters').pipe(
                 tap((data: any) => {
-                    const bindDocumentFinalAction = data.parameters.filter((item: { id: any; }) => item.id === 'bindingDocumentFinalAction')[0].param_value_string;
-                    const nonBindDocumentFinalAction = data.parameters.filter((item: { id: any; }) => item.id === 'nonBindingDocumentFinalAction')[0].param_value_string;
+                    const bindDocumentFinalAction = data.parameters.filter((item: { id: any }) => item.id === 'bindingDocumentFinalAction')[0].param_value_string;
+                    const nonBindDocumentFinalAction = data.parameters.filter((item: { id: any }) => item.id === 'nonBindingDocumentFinalAction')[0].param_value_string;
                     this.documentFinalAction.controls['bindingDocumentFinalAction'].setValue(bindDocumentFinalAction);
                     this.documentFinalAction.controls['nonBindingDocumentFinalAction'].setValue(nonBindDocumentFinalAction);
 

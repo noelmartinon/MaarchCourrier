@@ -84,6 +84,6 @@ export class HeaderRightComponent implements OnInit {
     }
 
     goTo() {
-        this.router.navigate([`/search`], { queryParams: { value: this.searchTarget } });
+        this.router.navigate(['/search'], { queryParams: { value: this.searchTarget } });
     }
 }

@@ -18,7 +18,7 @@ import { FunctionsService } from '@service/functions.service';
 })
 export class FolderMenuComponent implements OnInit {
 
-    
+
 
     foldersList: any[] = [];
     pinnedFolder: boolean = true;
@@ -61,12 +61,10 @@ export class FolderMenuComponent implements OnInit {
             tap((data: any) => {
                 this.pinnedFolder = false;
                 this.foldersList = data.map(
-                    (info: any) => {
-                        return {
-                            id: info.id,
-                            label: info.idToDisplay
-                        }
-                    }
+                    (info: any) => ({
+                        id: info.id,
+                        label: info.idToDisplay
+                    })
                 );
                 this.loading = false;
             }),
@@ -139,7 +137,7 @@ export class FolderMenuComponent implements OnInit {
         this.dialogRef.afterClosed().pipe(
             filter((folderId: number) => !this.functions.empty(folderId)),
             tap((folderId: number) => {
-                this.classifyDocuments({ id: folderId })
+                this.classifyDocuments({ id: folderId });
             }),
             catchError((err) => {
                 this.notify.handleSoftErrors(err);

@@ -9,12 +9,12 @@ import { of } from 'rxjs';
 import { FunctionsService } from '@service/functions.service';
 
 @Component({
-    templateUrl: "give-avis-parallel-action.component.html",
+    templateUrl: 'give-avis-parallel-action.component.html',
     styleUrls: ['give-avis-parallel-action.component.scss'],
 })
 export class GiveAvisParallelActionComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     resourcesWarnings: any[] = [];

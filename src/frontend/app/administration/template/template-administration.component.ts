@@ -16,7 +16,7 @@ import { AlertComponent } from '../../../plugins/modal/alert.component';
 import { MaarchFlatTreeComponent } from '../../../plugins/tree/maarch-flat-tree.component';
 import { AuthService } from '@service/auth.service';
 
-declare var tinymce: any;
+declare let tinymce: any;
 
 @Component({
     templateUrl: 'template-administration.component.html',
@@ -241,19 +241,15 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
         this.attachmentTypesList = data.attachmentTypes;
         this.datasourcesList = data.datasources;
-        this.maarchTree.initData(data.entities.map(ent => {
-            return {
-                ...ent,
-                id : ent.serialId,
-            };
-        }));
+        this.maarchTree.initData(data.entities.map(ent => ({
+            ...ent,
+            id : ent.serialId,
+        })));
     }
 
     getBase64Document(buffer: ArrayBuffer) {
         const TYPED_ARRAY = new Uint8Array(buffer);
-        const STRING_CHAR = TYPED_ARRAY.reduce((data, byte) => {
-            return data + String.fromCharCode(byte);
-        }, '');
+        const STRING_CHAR = TYPED_ARRAY.reduce((data, byte) => data + String.fromCharCode(byte), '');
 
         return btoa(STRING_CHAR);
     }
@@ -316,7 +312,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
     editFile() {
         const editorOptions: any = {};
-        editorOptions.docUrl = `rest/onlyOffice/mergedFile`;
+        editorOptions.docUrl = 'rest/onlyOffice/mergedFile';
         if (this.creationMode) {
             if (this.template.target !== 'acknowledgementReceipt') {
                 if (!this.functionsService.empty(this.template.file.content)) {

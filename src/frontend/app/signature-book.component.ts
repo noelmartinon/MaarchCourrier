@@ -18,7 +18,7 @@ import { DocumentViewerComponent } from './viewer/document-viewer.component';
 import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { NotesListComponent } from './notes/notes-list.component';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'signature-book.component.html',
@@ -541,7 +541,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
             if (data === true) {
                 this.actionService.stopRefreshResourceLock();
-                if (!this.actionService.actionEnded) { 
+                if (!this.actionService.actionEnded) {
                     this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
                 }
                 const path = 'signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + resId;

@@ -142,12 +142,12 @@ export class AddressBanAutocompleteComponent implements OnInit {
     }
 
     removeItem(index: number) {
-        let arrValue = this.controlAutocomplete.value;
+        const arrValue = this.controlAutocomplete.value;
         this.controlAutocomplete.value.splice(index, 1);
         this.controlAutocomplete.setValue(arrValue);
     }
 
     goTo(item: any) {
-        window.open(`https://www.google.com/maps/search/${item.latitude},${item.longitude}`, '_blank')
+        window.open(`https://www.google.com/maps/search/${item.latitude},${item.longitude}`, '_blank');
     }
 }

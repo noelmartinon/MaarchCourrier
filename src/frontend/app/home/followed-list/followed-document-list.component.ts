@@ -21,7 +21,7 @@ import { MenuShortcutComponent } from '../../menu/menu-shortcut.component';
 import { FoldersService } from '../../folder/folders.service';
 import { of, merge, Subject, Subscription, Observable } from 'rxjs';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'followed-document-list.component.html',
@@ -149,9 +149,9 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
             this.initResultList();
 
         },
-            (err: any) => {
-                this.notify.handleErrors(err);
-            });
+        (err: any) => {
+            this.notify.handleErrors(err);
+        });
     }
 
     ngOnDestroy() {

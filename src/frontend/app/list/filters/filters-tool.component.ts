@@ -9,7 +9,7 @@ import { startWith, map } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
 import { Observable } from 'rxjs';
 
-declare var $: any;
+declare let $: any;
 
 export interface StateGroup {
     letter: string;
@@ -77,7 +77,7 @@ export class FiltersToolComponent implements OnInit {
 
             return opt.filter(item => this.latinisePipe.transform(item['label'].toLowerCase()).indexOf(this.latinisePipe.transform(filterValue)) !== -1);
         }
-    }
+    };
 
     private _filterGroup(value: string): StateGroup[] {
         if (value && typeof value === 'string') {

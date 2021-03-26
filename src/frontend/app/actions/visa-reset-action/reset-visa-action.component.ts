@@ -7,15 +7,15 @@ import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
-import { FunctionsService } from "../../../service/functions.service";
+import { FunctionsService } from '../../../service/functions.service';
 
 @Component({
-    templateUrl: "reset-visa-action.component.html",
+    templateUrl: 'reset-visa-action.component.html',
     styleUrls: ['reset-visa-action.component.scss'],
 })
 export class ResetVisaActionComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     resourcesWarnings: any[] = [];

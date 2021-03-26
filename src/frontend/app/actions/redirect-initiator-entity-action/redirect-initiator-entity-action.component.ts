@@ -8,12 +8,12 @@ import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
-    templateUrl: "redirect-initiator-entity-action.component.html",
+    templateUrl: 'redirect-initiator-entity-action.component.html',
     styleUrls: ['redirect-initiator-entity-action.component.scss'],
 })
 export class redirectInitiatorEntityActionComponent implements OnInit {
 
-    
+
     loading: boolean = false;
     loadingInit: boolean = false;
     resourcesInfo: any = {

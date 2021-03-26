@@ -8,7 +8,7 @@ import { HttpClient } from '@angular/common/http';
     styleUrls: ['contact-resource-modal.component.scss'],
 })
 export class ContactResourceModalComponent {
-    
+
 
     constructor(
         public translate: TranslateService,

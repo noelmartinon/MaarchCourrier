@@ -92,9 +92,9 @@ export class SendShippingActionComponent implements OnInit {
     }
 
     executeAction() {
-        let realResSelected: string[] = this.attachList.filter(attach => attach.type === 'attachment').map((e: any) => { return e.res_id_master; });
+        let realResSelected: string[] = this.attachList.filter(attach => attach.type === 'attachment').map((e: any) => e.res_id_master);
 
-        realResSelected = realResSelected.concat(this.attachList.filter(attach => attach.type === 'mail').map((e: any) => { return e.res_id; }));
+        realResSelected = realResSelected.concat(this.attachList.filter(attach => attach.type === 'mail').map((e: any) => e.res_id));
 
         this.http.put(this.data.processActionRoute, { resources: realResSelected, data: { shippingTemplateId: this.currentShipping.id }, note: this.noteEditor.getNote() }).pipe(
             tap((data: any) => {
@@ -113,7 +113,7 @@ export class SendShippingActionComponent implements OnInit {
     }
 
     toggleIntegration(integrationId: string) {
-        this.http.put(`../rest/resourcesList/integrations`, { resources: this.data.resIds, integrations: { [integrationId]: !this.data.resource.integrations[integrationId] } }).pipe(
+        this.http.put('../rest/resourcesList/integrations', { resources: this.data.resIds, integrations: { [integrationId]: !this.data.resource.integrations[integrationId] } }).pipe(
             tap(() => {
                 this.data.resource.integrations[integrationId] = !this.data.resource.integrations[integrationId];
                 this.checkShipping();

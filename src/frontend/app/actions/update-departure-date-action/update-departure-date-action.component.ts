@@ -8,16 +8,16 @@ import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 
 @Component({
-    templateUrl: "update-departure-date-action.component.html",
+    templateUrl: 'update-departure-date-action.component.html',
     styleUrls: ['update-departure-date-action.component.scss'],
 })
 export class UpdateDepartureDateActionComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
-    
+
     constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, public dialogRef: MatDialogRef<UpdateDepartureDateActionComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
     ngOnInit(): void { }

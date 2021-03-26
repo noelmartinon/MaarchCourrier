@@ -18,8 +18,8 @@ import { HeaderService } from '@service/header.service';
 import { of, Subject } from 'rxjs';
 import { NotificationService } from '@service/notification/notification.service';
 
-declare var $: any;
-declare var DocsAPI: any;
+declare let $: any;
+declare let DocsAPI: any;
 
 @Component({
     selector: 'onlyoffice-viewer',
@@ -168,7 +168,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
 
     getServerConfiguration() {
         return new Promise((resolve, reject) => {
-            this.http.get(`../rest/onlyOffice/configuration`).pipe(
+            this.http.get('../rest/onlyOffice/configuration').pipe(
                 tap((data: any) => {
                     if (data.enabled) {
 
@@ -205,7 +205,7 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
                 this.notify.error(`${this.translate.instant('lang.errorOnlyoffice1')}`);
                 this.triggerCloseEditor.emit();
             } else {
-                this.http.get(`../rest/onlyOffice/available`).pipe(
+                this.http.get('../rest/onlyOffice/available').pipe(
                     tap((data: any) => {
                         if (data.isAvailable) {
                             resolve(true);

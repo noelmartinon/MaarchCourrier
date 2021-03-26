@@ -10,12 +10,12 @@ import { FunctionsService } from '@service/functions.service';
 import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
 
 @Component({
-    templateUrl: "continue-visa-circuit-action.component.html",
+    templateUrl: 'continue-visa-circuit-action.component.html',
     styleUrls: ['continue-visa-circuit-action.component.scss'],
 })
 export class ContinueVisaCircuitActionComponent implements OnInit {
 
-    
+
     loading: boolean = false;
 
     resourcesMailing: any[] = [];
@@ -29,9 +29,9 @@ export class ContinueVisaCircuitActionComponent implements OnInit {
 
     constructor(
         public translate: TranslateService,
-        public http: HttpClient, 
-        private notify: NotificationService, 
-        public dialogRef: MatDialogRef<ContinueVisaCircuitActionComponent>, 
+        public http: HttpClient,
+        private notify: NotificationService,
+        public dialogRef: MatDialogRef<ContinueVisaCircuitActionComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public functions: FunctionsService) { }
 
@@ -47,27 +47,27 @@ export class ContinueVisaCircuitActionComponent implements OnInit {
 
         return new Promise((resolve, reject) => {
             this.http.post('../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkContinueVisaCircuit', { resources: this.data.resIds })
-            .subscribe((data: any) => {
-                if (!this.functions.empty(data.resourcesInformations.warning)) {
-                    this.resourcesWarnings = data.resourcesInformations.warning;
-                }
+                .subscribe((data: any) => {
+                    if (!this.functions.empty(data.resourcesInformations.warning)) {
+                        this.resourcesWarnings = data.resourcesInformations.warning;
+                    }
 
-                if(!this.functions.empty(data.resourcesInformations.error)) {
-                    this.resourcesErrors = data.resourcesInformations.error;
-                    this.noResourceToProcess = this.resourcesErrors.length === this.data.resIds.length;
-                }
-                if (data.resourcesInformations.success) {
-                    data.resourcesInformations.success.forEach((value: any) => {
-                        if (value.mailing) {
-                            this.resourcesMailing.push(value);
-                        }
-                    });
-                }
-                resolve(true);
-            }, (err: any) => {
-                this.notify.handleSoftErrors(err);
-                this.dialogRef.close();
-            });
+                    if (!this.functions.empty(data.resourcesInformations.error)) {
+                        this.resourcesErrors = data.resourcesInformations.error;
+                        this.noResourceToProcess = this.resourcesErrors.length === this.data.resIds.length;
+                    }
+                    if (data.resourcesInformations.success) {
+                        data.resourcesInformations.success.forEach((value: any) => {
+                            if (value.mailing) {
+                                this.resourcesMailing.push(value);
+                            }
+                        });
+                    }
+                    resolve(true);
+                }, (err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    this.dialogRef.close();
+                });
         });
     }
 

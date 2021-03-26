@@ -17,7 +17,7 @@ export class TemplatesAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
+
     search: string = null;
 
     templates: any[] = [];

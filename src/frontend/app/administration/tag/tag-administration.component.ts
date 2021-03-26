@@ -21,7 +21,7 @@ export class TagAdministrationComponent implements OnInit {
 
     id: string;
     creationMode: boolean;
-    
+
     loading: boolean = false;
     loadingTags: boolean = true;
     advancedMode: boolean = false;
@@ -116,7 +116,7 @@ export class TagAdministrationComponent implements OnInit {
     }
 
     createTag() {
-        this.http.post(`../rest/tags`, this.formatTag()).pipe(
+        this.http.post('../rest/tags', this.formatTag()).pipe(
             tap(() => {
                 this.notify.success(this.translate.instant('lang.tagAdded'));
                 this.router.navigate(['/administration/tags']);
@@ -146,15 +146,13 @@ export class TagAdministrationComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get('../rest/tags').pipe(
                 tap((data: any) => {
-                    this.tags = data.tags.map((tag: any) => {
-                        return {
-                            id: tag.id,
-                            label: tag.label,
-                            parentId: tag.parentId,
-                            countResources: tag.countResources,
-                            disabled: tag.id == this.id
-                        };
-                    });
+                    this.tags = data.tags.map((tag: any) => ({
+                        id: tag.id,
+                        label: tag.label,
+                        parentId: tag.parentId,
+                        countResources: tag.countResources,
+                        disabled: tag.id == this.id
+                    }));
                     resolve(true);
                 }),
                 finalize(() => this.loadingTags = false),
@@ -175,7 +173,7 @@ export class TagAdministrationComponent implements OnInit {
         const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.mergeWith')}  "${selectedTag.label}"`, msg: dialogMessage } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => this.http.put(`../rest/mergeTags`, { idMaster: selectedTag.id, idMerge: this.id })),
+            exhaustMap(() => this.http.put('../rest/mergeTags', { idMaster: selectedTag.id, idMerge: this.id })),
             tap(() => {
                 this.notify.success(this.translate.instant('lang.tagMerged'));
                 this.router.navigate([`/administration/tags/${selectedTag.id}`]);
@@ -229,19 +227,16 @@ export class TagAdministrationComponent implements OnInit {
             this.getChildrens(this.id);
         }
 
-        const tagsTree = this.tags.map((tag: any) => {
-            return {
-                id: tag.id,
-                text: tag.label,
-                parent: this.functions.empty(tag.parentId) ? '#' : tag.parentId,
-                state: {
-                    opened: this.tag.parentId.value == tag.id,
-                    selected: this.tag.parentId.value == tag.id,
-                    disabled : this.currTagChildren.indexOf(tag.id.toString()) > -1
-                }
-            };
-
-        });
+        const tagsTree = this.tags.map((tag: any) => ({
+            id: tag.id,
+            text: tag.label,
+            parent: this.functions.empty(tag.parentId) ? '#' : tag.parentId,
+            state: {
+                opened: this.tag.parentId.value == tag.id,
+                selected: this.tag.parentId.value == tag.id,
+                disabled : this.currTagChildren.indexOf(tag.id.toString()) > -1
+            }
+        }));
 
         setTimeout(() => {
             $('#jstree')
@@ -269,7 +264,9 @@ export class TagAdministrationComponent implements OnInit {
                 });
             let to: any = false;
             $('#jstree_search').keyup(function () {
-                if (to) { clearTimeout(to); }
+                if (to) {
+                    clearTimeout(to);
+                }
                 to = setTimeout(function () {
                     const v: any = $('#jstree_search').val();
                     $('#jstree').jstree(true).search(v);

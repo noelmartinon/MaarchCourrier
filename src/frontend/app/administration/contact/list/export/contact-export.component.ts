@@ -10,7 +10,7 @@ import { of } from 'rxjs';
 import { LocalStorageService } from '@service/local-storage.service';
 import { HeaderService } from '@service/header.service';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'contact-export.component.html',
@@ -19,7 +19,7 @@ declare var $: any;
 })
 export class ContactExportComponent implements OnInit {
 
-    
+
     loading: boolean = false;
     loadingExport: boolean = false;
 
@@ -76,12 +76,10 @@ export class ContactExportComponent implements OnInit {
             this.http.get('../rest/contactsParameters').pipe(
                 map((data: any) => {
                     const regex = /contactCustomField_[.]*/g;
-                    data.contactsParameters = data.contactsParameters.filter((field: any) => field.identifier.match(regex) === null).map((field: any) => {
-                        return {
-                            value: field.identifier,
-                            label: this.translate.instant('lang.contactsParameters_' + field.identifier)
-                        };
-                    });
+                    data.contactsParameters = data.contactsParameters.filter((field: any) => field.identifier.match(regex) === null).map((field: any) => ({
+                        value: field.identifier,
+                        label: this.translate.instant('lang.contactsParameters_' + field.identifier)
+                    }));
                     return data.contactsParameters;
                 }),
                 tap((fields: any) => {
@@ -89,12 +87,10 @@ export class ContactExportComponent implements OnInit {
                 }),
                 exhaustMap(() => this.http.get('../rest/contactsCustomFields')),
                 map((data: any) => {
-                    data.customFields = data.customFields.map((field: any) => {
-                        return {
-                            value: `contactCustomField_${field.id}`,
-                            label: field.label
-                        };
-                    });
+                    data.customFields = data.customFields.map((field: any) => ({
+                        value: `contactCustomField_${field.id}`,
+                        label: field.label
+                    }));
                     return data.customFields;
                 }),
                 tap((fields: any) => {

@@ -123,9 +123,7 @@ export class RedirectIndexingModelComponent implements OnInit {
     loadIndexingModels() {
         return new Promise((resolve) => {
             this.http.get('../rest/indexingModels').pipe(
-                map((data: any) => {
-                    return data.indexingModels.filter((info: any) => info.private === false);
-                }),
+                map((data: any) => data.indexingModels.filter((info: any) => info.private === false)),
                 tap((data: any) => {
                     this.indexingModels = data;
 
@@ -193,12 +191,10 @@ export class RedirectIndexingModelComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get('../rest/customFields').pipe(
                 tap((data: any) => {
-                    data.customFields = data.customFields.map((custom: any) => {
-                        return {
-                            identifier: 'indexingCustomField_' + custom.id,
-                            label: custom.label
-                        };
-                    });
+                    data.customFields = data.customFields.map((custom: any) => ({
+                        identifier: 'indexingCustomField_' + custom.id,
+                        label: custom.label
+                    }));
                     data.customFields.forEach((custom: any) => {
                         this.availableFields.push(custom);
                     });

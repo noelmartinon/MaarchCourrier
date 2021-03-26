@@ -131,7 +131,7 @@ export class DynamicDataSource implements DataSource<DynamicFlatNode> {
                                 this.rawData.push(element);
                             });
                             // TO DO : SAMPLE
-                            /*this.rawData.push({
+                            /* this.rawData.push({
                                 id: '432',
                                 label: 'cool',
                                 parent: node.item,
@@ -242,7 +242,7 @@ export class MaarchTreeComponent implements OnInit {
     isExpandable = (node: DynamicFlatNode) => node.expandable;
 
     hasChild = (_: number, _nodeData: DynamicFlatNode) =>
-        this.getData(_nodeData.item).children
+        this.getData(_nodeData.item).children;
 
     ngOnInit(): void {
         this.treeControl = new FlatTreeControl<DynamicFlatNode>(
@@ -250,7 +250,7 @@ export class MaarchTreeComponent implements OnInit {
             this.isExpandable
         );
         // SAMPLE
-        /*this.rawData = [
+        /* this.rawData = [
             {
                 id: '46',
                 label: 'bonjour',

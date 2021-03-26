@@ -62,23 +62,19 @@ export class TileCreateComponent implements OnInit {
 
     getTileTypes() {
         const tmpTileTypes = this.dashboardService.getTileTypes();
-        this.tileTypes = tmpTileTypes.map((tileType: any) => {
-            return {
-                id: tileType,
-                label: this.translate.instant('lang.' + tileType)
-            };
-        });
+        this.tileTypes = tmpTileTypes.map((tileType: any) => ({
+            id: tileType,
+            label: this.translate.instant('lang.' + tileType)
+        }));
     }
 
     getViews() {
         this.tileLabel = this.translate.instant('lang.' + this.selectedTileType);
         const tmpViews = this.dashboardService.getViewsByTileType(this.selectedTileType);
-        this.views = tmpViews.map((view: any) => {
-            return {
-                ...view,
-                label: this.translate.instant('lang.' + view.id)
-            };
-        });
+        this.views = tmpViews.map((view: any) => ({
+            ...view,
+            label: this.translate.instant('lang.' + view.id)
+        }));
         this.selectedView = this.views.length > 0 ? this.views[0].id : null;
 
         if (this.selectedTileType === 'basket') {
@@ -97,12 +93,10 @@ export class TileCreateComponent implements OnInit {
     getChartTypes() {
         if (this.chartTypes.length === 0) {
             this.chartTypes = this.dashboardService.getChartTypes();
-            this.chartTypes = this.chartTypes.map((type: any) => {
-                return {
-                    ...type,
-                    label: this.translate.instant('lang.chart_' + type.type)
-                };
-            });
+            this.chartTypes = this.chartTypes.map((type: any) => ({
+                ...type,
+                label: this.translate.instant('lang.chart_' + type.type)
+            }));
         }
     }
 
@@ -214,12 +208,10 @@ export class TileCreateComponent implements OnInit {
         if (this.menus.length === 0) {
             let arrMenus: any[] = [];
             let tmpMenus: any;
-            tmpMenus = this.privilegeService.getCurrentUserMenus().map((menu: any) => {
-                return {
-                    ...menu,
-                    label: this.translate.instant(menu.label)
-                };
-            });
+            tmpMenus = this.privilegeService.getCurrentUserMenus().map((menu: any) => ({
+                ...menu,
+                label: this.translate.instant(menu.label)
+            }));
             tmpMenus = this.sortPipe.transform(tmpMenus, 'label');
 
             if (tmpMenus.length > 0) {
@@ -234,12 +226,10 @@ export class TileCreateComponent implements OnInit {
                 arrMenus = arrMenus.concat(tmpMenus);
             }
 
-            tmpMenus = this.privilegeService.getAdministrations(this.headerService.user.privileges).map((menu: any) => {
-                return {
-                    ...menu,
-                    label: this.translate.instant(menu.label)
-                };
-            });
+            tmpMenus = this.privilegeService.getAdministrations(this.headerService.user.privileges).map((menu: any) => ({
+                ...menu,
+                label: this.translate.instant(menu.label)
+            }));
             tmpMenus = this.sortPipe.transform(tmpMenus, 'label');
             if (tmpMenus.length > 0) {
                 tmpMenus.unshift({
@@ -287,7 +277,7 @@ export class TileCreateComponent implements OnInit {
         };
         if (menu.id === 'indexing') {
             this.extraParams.groupId = menu.groups[0].id;
-            this.tileLabel =  menu.label + ' (' + menu.groups[0].label + ')'
+            this.tileLabel =  menu.label + ' (' + menu.groups[0].label + ')';
         }
     }
 

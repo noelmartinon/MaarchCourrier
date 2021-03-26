@@ -20,7 +20,7 @@ export class BasketsAdministrationComponent implements OnInit {
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
-    
+
     loading: boolean = false;
 
     baskets: any[] = [];

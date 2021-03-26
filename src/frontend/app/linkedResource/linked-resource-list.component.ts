@@ -15,7 +15,7 @@ import { ContactResourceModalComponent } from '../contact/contact-resource/modal
 import { of } from 'rxjs';
 import { PrivilegeService } from '@service/privileges.service';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     selector: 'app-linked-resource-list',
@@ -24,7 +24,7 @@ declare var $: any;
 })
 export class LinkedResourceListComponent implements OnInit {
 
-    
+
     loading: boolean = true;
 
     linkedResources: any[] = [];

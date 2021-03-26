@@ -105,7 +105,7 @@ export class SentResourceListComponent implements OnInit {
                             hasNote: false,
                             hasMainDoc: false,
                             canManage: true
-                        }
+                        };
                     });
                     return data;
                 }),
@@ -127,23 +127,21 @@ export class SentResourceListComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/resources/${this.resId}/emails?type=email`).pipe(
                 map((data: any) => {
-                    data.emails = data.emails.map((item: any) => {
-                        return {
-                            id: item.id,
-                            sender: item.sender.email,
-                            recipients: item.recipients,
-                            creationDate: item.creation_date,
-                            sendDate: item.send_date,
-                            type: 'email',
-                            typeColor: '#5bc0de',
-                            desc: !this.functions.empty(item.object) ? item.object : `<i>${this.translate.instant('lang.emptySubject')}<i>`,
-                            status: item.status,
-                            hasAttach: !this.functions.empty(item.document.attachments),
-                            hasNote: !this.functions.empty(item.document.notes),
-                            hasMainDoc: item.document.isLinked,
-                            canManage: true
-                        }
-                    });
+                    data.emails = data.emails.map((item: any) => ({
+                        id: item.id,
+                        sender: item.sender.email,
+                        recipients: item.recipients,
+                        creationDate: item.creation_date,
+                        sendDate: item.send_date,
+                        type: 'email',
+                        typeColor: '#5bc0de',
+                        desc: !this.functions.empty(item.object) ? item.object : `<i>${this.translate.instant('lang.emptySubject')}<i>`,
+                        status: item.status,
+                        hasAttach: !this.functions.empty(item.document.attachments),
+                        hasNote: !this.functions.empty(item.document.notes),
+                        hasMainDoc: item.document.isLinked,
+                        canManage: true
+                    }));
                     return data.emails;
                 }),
                 tap((data: any) => {
@@ -164,24 +162,22 @@ export class SentResourceListComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/resources/${this.resId}/messageExchanges`).pipe(
                 map((data: any) => {
-                    data.messageExchanges = data.messageExchanges.map((item: any) => {
-                        return {
-                            id: item.messageId,
-                            sender: item.sender,
-                            recipients: item.recipient,
-                            creationDate: item.creationDate,
-                            sendDate: item.receptionDate,
-                            operationDate: item.operationDate,
-                            type: 'm2m_ARCHIVETRANSFER',
-                            typeColor: '#F99830',
-                            desc: this.translate.instant('lang.m2m_ARCHIVETRANSFER'),
-                            status: item.status.toUpperCase(),
-                            hasAttach: false,
-                            hasNote: false,
-                            hasMainDoc: false,
-                            canManage: true
-                        }
-                    });
+                    data.messageExchanges = data.messageExchanges.map((item: any) => ({
+                        id: item.messageId,
+                        sender: item.sender,
+                        recipients: item.recipient,
+                        creationDate: item.creationDate,
+                        sendDate: item.receptionDate,
+                        operationDate: item.operationDate,
+                        type: 'm2m_ARCHIVETRANSFER',
+                        typeColor: '#F99830',
+                        desc: this.translate.instant('lang.m2m_ARCHIVETRANSFER'),
+                        status: item.status.toUpperCase(),
+                        hasAttach: false,
+                        hasNote: false,
+                        hasMainDoc: false,
+                        canManage: true
+                    }));
                     return data.messageExchanges;
                 }),
                 tap((data: any) => {
@@ -202,23 +198,21 @@ export class SentResourceListComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/resources/${this.resId}/shippings`).pipe(
                 map((data: any) => {
-                    data = data.map((item: any) => {
-                        return {
-                            id: item.id,
-                            sender: item.userLabel,
-                            recipients: item.recipients.map((recip: any) => recip.contactLabel),
-                            creationDate: item.creationDate,
-                            sendDate: item.creationDate,
-                            type: 'shipping',
-                            typeColor: '#9440D5',
-                            desc: this.functions.empty(item.chrono) ? this.translate.instant('lang.shipping') : `[${item.chrono}] ` + this.translate.instant('lang.shipping'),
-                            status: 'SENT',
-                            hasAttach: item.creationDate === 'attachment',
-                            hasNote: false,
-                            hasMainDoc: item.creationDate === 'resource',
-                            canManage: false
-                        }
-                    });
+                    data = data.map((item: any) => ({
+                        id: item.id,
+                        sender: item.userLabel,
+                        recipients: item.recipients.map((recip: any) => recip.contactLabel),
+                        creationDate: item.creationDate,
+                        sendDate: item.creationDate,
+                        type: 'shipping',
+                        typeColor: '#9440D5',
+                        desc: this.functions.empty(item.chrono) ? this.translate.instant('lang.shipping') : `[${item.chrono}] ` + this.translate.instant('lang.shipping'),
+                        status: 'SENT',
+                        hasAttach: item.creationDate === 'attachment',
+                        hasNote: false,
+                        hasMainDoc: item.creationDate === 'resource',
+                        canManage: false
+                    }));
                     return data;
                 }),
                 tap((data: any) => {
@@ -271,11 +265,11 @@ export class SentResourceListComponent implements OnInit {
         if (row.canManage || row.id === null) {
             const dialogRef = this.dialog.open(SentResourcePageComponent, {
                 panelClass: 'maarch-modal', width: '60vw', disableClose: true, data: {
-                    title: title, 
-                    resId: this.resId, 
-                    emailId: row.id, emailType: row.type, 
-                    currentUserId: this.currentUserId, 
-                    currentGroupId: this.currentGroupId, 
+                    title: title,
+                    resId: this.resId,
+                    emailId: row.id, emailType: row.type,
+                    currentUserId: this.currentUserId,
+                    currentGroupId: this.currentGroupId,
                     currentBasketId: this.currentBasketId,
                 }
             });
@@ -305,7 +299,7 @@ export class SentResourceListComponent implements OnInit {
         }
 
         if (row.canManage || row.id === null) {
-            const dialogRef = this.dialog.open(SentNumericPackagePageComponent, { panelClass: 'maarch-modal', width:'60vw', disableClose: true, data: { title: title, resId: this.resId, emailId: row.id } });
+            const dialogRef = this.dialog.open(SentNumericPackagePageComponent, { panelClass: 'maarch-modal', width: '60vw', disableClose: true, data: { title: title, resId: this.resId, emailId: row.id } });
 
             dialogRef.afterClosed().pipe(
                 filter((data: any) => data.state === 'success' || data === 'success'),
@@ -352,23 +346,21 @@ export class SentResourceListComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/resources/${this.resId}/emails?type=email`).pipe(
                 map((data: any) => {
-                    data.emails = data.emails.map((item: any) => {
-                        return {
-                            id: item.id,
-                            sender: item.sender.email,
-                            recipients: item.recipients,
-                            creationDate: item.creation_date,
-                            sendDate: item.send_date,
-                            type: 'email',
-                            typeColor: '#5bc0de',
-                            desc: !this.functions.empty(item.object) ? item.object : `<i>${this.translate.instant('lang.emptySubject')}<i>`,
-                            status: item.status,
-                            hasAttach: !this.functions.empty(item.document.attachments),
-                            hasNote: !this.functions.empty(item.document.notes),
-                            hasMainDoc: item.document.isLinked,
-                            canManage: true
-                        }
-                    });
+                    data.emails = data.emails.map((item: any) => ({
+                        id: item.id,
+                        sender: item.sender.email,
+                        recipients: item.recipients,
+                        creationDate: item.creation_date,
+                        sendDate: item.send_date,
+                        type: 'email',
+                        typeColor: '#5bc0de',
+                        desc: !this.functions.empty(item.object) ? item.object : `<i>${this.translate.instant('lang.emptySubject')}<i>`,
+                        status: item.status,
+                        hasAttach: !this.functions.empty(item.document.attachments),
+                        hasNote: !this.functions.empty(item.document.notes),
+                        hasMainDoc: item.document.isLinked,
+                        canManage: true
+                    }));
                     return data.emails;
                 }),
                 tap((data: any) => {

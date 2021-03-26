@@ -12,7 +12,7 @@ import { HeaderService } from '@service/header.service';
 })
 
 export class MySignatureBookComponent implements OnInit {
-    
+
     @Input() signatureModel: any;
     @Input() userSignatures: any[];
     @Input() externalIdMaarchParapheur: any;
@@ -33,7 +33,7 @@ export class MySignatureBookComponent implements OnInit {
             componentAfterUpload: (base64Content: any) => this.processAfterUpload(base64Content),
         };
     }
-    
+
     ngOnInit(): void {}
 
     clickOnUploader(id: string) {
@@ -62,7 +62,7 @@ export class MySignatureBookComponent implements OnInit {
     uploadSignatureTrigger(fileInput: any) {
         console.log(this.signatureModel);
         if (fileInput.target.files && fileInput.target.files[0]) {
-            var reader = new FileReader();
+            const reader = new FileReader();
 
             this.signatureModel.name = fileInput.target.files[0].name;
             this.signatureModel.size = fileInput.target.files[0].size;
@@ -83,7 +83,7 @@ export class MySignatureBookComponent implements OnInit {
 
     dndUploadSignature(event: any) {
         if (event.mouseEvent.dataTransfer.files && event.mouseEvent.dataTransfer.files[0]) {
-            var reader = new FileReader();
+            const reader = new FileReader();
 
             this.signatureModel.name = event.mouseEvent.dataTransfer.files[0].name;
             this.signatureModel.size = event.mouseEvent.dataTransfer.files[0].size;
@@ -129,7 +129,7 @@ export class MySignatureBookComponent implements OnInit {
     }
 
     deleteSignature(id: number) {
-        let r = confirm(this.translate.instant('lang.confirmDeleteSignature'));
+        const r = confirm(this.translate.instant('lang.confirmDeleteSignature'));
 
         if (r) {
             this.http.delete('../rest/users/' + this.headerService.user.id + '/signatures/' + id)
@@ -154,5 +154,5 @@ export class MySignatureBookComponent implements OnInit {
                 this.notify.handleErrors(err);
             });
     }
-    
+
 }

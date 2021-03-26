@@ -6,7 +6,7 @@ import { NotificationService } from '@service/notification/notification.service'
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '@service/app.service';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'print-separator.component.html',
@@ -14,7 +14,7 @@ declare var $: any;
 })
 export class PrintSeparatorComponent implements OnInit {
 
-    
+
     entities: any[] = [];
     entitiesChosen: any[] = [];
     loading: boolean = false;
@@ -86,7 +86,9 @@ export class PrintSeparatorComponent implements OnInit {
                 });
             let to: any = false;
             $('#jstree_search').keyup(function () {
-                if (to) { clearTimeout(to); }
+                if (to) {
+                    clearTimeout(to);
+                }
                 to = setTimeout(function () {
                     const v: any = $('#jstree_search').val();
                     $('#jstree').jstree(true).search(v);

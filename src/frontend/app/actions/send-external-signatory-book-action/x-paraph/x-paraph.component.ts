@@ -7,7 +7,7 @@ import { startWith, map } from 'rxjs/operators';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Observable } from 'rxjs';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     selector: 'app-x-paraph',

@@ -47,7 +47,7 @@ export class FollowedActionListComponent implements OnInit {
     @Input() totalRes: number;
     @Input() contextMode: boolean;
     @Input() currentFolderInfo: any;
-    @Input() currentResource: any = {}
+    @Input() currentResource: any = {};
 
     @Input() menuShortcut: MenuShortcutComponent;
 
