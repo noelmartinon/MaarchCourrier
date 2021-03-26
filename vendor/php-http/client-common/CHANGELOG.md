@@ -1,5 +1,17 @@
 # Change Log
 
+## 1.10.0 - 2019-11-18
+
+### Added
+
+- Support for Symfony 5
+
+## 1.9.1 - 2019-02-02
+
+### Added
+
+- Updated type hints in doc blocks.
+
 ## 1.9.0 - 2019-01-03
 
 ### Added

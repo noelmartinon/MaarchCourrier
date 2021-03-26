@@ -16,7 +16,7 @@
                             <input matInput [value]="mail.value" readonly [title]="mail.value">
                         </mat-form-field>
                         <hr/>
-                        <div style="padding-bottom: 10px;" *ngIf="attachments.length > 0">
+                        <div style="padding-bottom: 10px;" *ngIf="attachments.length > 0 && addinConfig.outlookPasswordSaved">
                             <button *ngFor="let attachment of attachments" [class.not-selected]="!attachment.selected" mat-stroked-button style="width:100%;overflow: hidden;text-overflow: ellipsis;" [title]="attachment.name" (click)="attachment.selected=!attachment.selected">
                                 <mat-icon class="fa fa-paperclip" [class.secondary]="attachment.selected"></mat-icon>&nbsp;<span [class.primary]="attachment.selected" >{{attachment.name}}</span>
                             </button>

@@ -2454,5 +2454,13 @@
     "modelId": "Indexing model identifier",
     "loginTo": "Please login to",
     "emailId": "Email identifier",
-    "infosWillBeSent": "The information below will be sent:"
+    "infosWillBeSent": "The information below will be sent:",
+    "configurePlugin": "Configure the module",
+    "addingOutlookPasswordMsg": "We need to store your <b> password </b> * for your <b> outlook </b> account in order to retrieve the <b> attachments </b> associated with the emails you inject into the application. <br/> <i> (You can skip this step if you don't need to retrieve email attachments) </i>",
+    "addingOutlookPasswordMsg2": "* The password will be used ONLY by this application and will not transit over the network",
+    "outlookAccount": "Outlook account",
+    "outlookPassword": "Outlook password",
+    "downloadManifestMsg": "This file allows you to make the link between your <b> outlook </b> application and your <b> maarch </b> application",
+    "mustSecureMaarchUrl": "The url defined in «<b> Administration </b>» 🠖 «<b> Parameters </b>» 🠖 «<b> Personalization </b>» 🠖 «<b> URL of the application </ b > » is not secure (<b> https </b>)",
+    "attachmentTypeOutlook": "Attachment type associated with the email"
 }

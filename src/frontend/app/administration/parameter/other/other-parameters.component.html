@@ -114,7 +114,7 @@
                 {{'lang.outlookSendingModule' | translate}}
             </mat-panel-title>
         </mat-expansion-panel-header>
-        <app-maarch-message [content]="'lang.outlookSendingModuleDesc' | translate"></app-maarch-message>
+        <app-maarch-message [content]="'lang.outlookSendingModuleDesc' | translate" style="margin-bottom: 10px;"></app-maarch-message>
         <plugin-select-search [id]="'indexingModelId'" [label]="'lang.indexingModel' | translate" [class]="''"
             [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="addinOutlookConf.indexingModelId"
             [datas]="indexingModels" [showLabel]="true" style="width:100%;">
@@ -126,6 +126,10 @@
         <plugin-select-search [id]="'statusId'" [label]="'lang.status' | translate" [class]="''"
             [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="addinOutlookConf.statusId"
             [datas]="statuses" [showLabel]="true" style="width:100%;">
+        </plugin-select-search>
+        <plugin-select-search [id]="'attachmentTypeId'" [label]="'lang.attachmentTypeOutlook' | translate" [class]="''"
+            [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="addinOutlookConf.attachmentTypeId"
+            [datas]="attachmentsTypes" [showLabel]="true" style="width:100%;">
         </plugin-select-search>
     </mat-expansion-panel>
 </mat-accordion>

@@ -28,50 +28,52 @@ use PHPUnit\Framework\TestCase;
  * @license     http://www.gnu.org/copyleft/lesser.html GNU-LGPL v3 (see LICENSE.TXT)
  * @link        https://github.com/tecnickcom/tc-lib-color
  */
-class SpotTest extends TestCase
+class SpotTest extends TestUtil
 {
-    protected $obj = null;
-
-    public function setUp()
+    protected function getTestObject()
     {
-        //$this->markTestSkipped(); // skip this test
-        $this->obj = new \Com\Tecnick\Color\Spot;
+        return new \Com\Tecnick\Color\Spot;
     }
 
     public function testGetSpotColors()
     {
-        $res = $this->obj->getSpotColors();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getSpotColors();
         $this->assertEquals(0, count($res));
     }
 
     public function testNormalizeSpotColorName()
     {
-        $res = $this->obj->normalizeSpotColorName('abc.FG12!-345');
+        $testObj = $this->getTestObject();
+        $res = $testObj->normalizeSpotColorName('abc.FG12!-345');
         $this->assertEquals('abcfg12345', $res);
     }
 
     public function testGetSpotColor()
     {
-        $res = $this->obj->getSpotColor('none');
+        $testObj = $this->getTestObject();
+        $res = $testObj->getSpotColor('none');
         $this->assertEquals('0.000000 0.000000 0.000000 0.000000 k'."\n", $res['color']->getPdfColor());
-        $res = $this->obj->getSpotColor('all');
+        $res = $testObj->getSpotColor('all');
         $this->assertEquals('1.000000 1.000000 1.000000 1.000000 k'."\n", $res['color']->getPdfColor());
-        $res = $this->obj->getSpotColor('red');
+        $res = $testObj->getSpotColor('red');
         $this->assertEquals('0.000000 1.000000 1.000000 0.000000 K'."\n", $res['color']->getPdfColor(true));
     }
 
     public function testGetSpotColorObj()
     {
-        $res = $this->obj->getSpotColorObj('none');
+        $testObj = $this->getTestObject();
+        $res = $testObj->getSpotColorObj('none');
         $this->assertEquals('0.000000 0.000000 0.000000 0.000000 k'."\n", $res->getPdfColor());
-        $res = $this->obj->getSpotColorObj('all');
+        $res = $testObj->getSpotColorObj('all');
         $this->assertEquals('1.000000 1.000000 1.000000 1.000000 k'."\n", $res->getPdfColor());
-        $res = $this->obj->getSpotColorObj('red');
+        $res = $testObj->getSpotColorObj('red');
         $this->assertEquals('0.000000 1.000000 1.000000 0.000000 K'."\n", $res->getPdfColor(true));
     }
 
     public function testAddSpotColor()
     {
+        $testObj = $this->getTestObject();
         $cmyk = new \Com\Tecnick\Color\Model\Cmyk(
             array(
                 'cyan'    => 0.666,
@@ -81,8 +83,8 @@ class SpotTest extends TestCase
                 'alpha'   => 0.85
             )
         );
-        $this->obj->addSpotColor('test', $cmyk);
-        $res = $this->obj->getSpotColors();
+        $testObj->addSpotColor('test', $cmyk);
+        $res = $testObj->getSpotColors();
         $this->assertArrayHasKey('test', $res);
         $this->assertEquals(1, $res['test']['i']);
         $this->assertEquals('test', $res['test']['name']);
@@ -98,8 +100,8 @@ class SpotTest extends TestCase
                 'alpha'   => 0.65
             )
         );
-        $this->obj->addSpotColor('test', $cmyk);
-        $res = $this->obj->getSpotColors();
+        $testObj->addSpotColor('test', $cmyk);
+        $res = $testObj->getSpotColors();
         $this->assertArrayHasKey('test', $res);
         $this->assertEquals(1, $res['test']['i']);
         $this->assertEquals('test', $res['test']['name']);
@@ -108,20 +110,23 @@ class SpotTest extends TestCase
 
     public function testGetPdfSpotObjectsEmpty()
     {
+        $testObj = $this->getTestObject();
         $obj = 1;
-        $res = $this->obj->getPdfSpotObjects($obj);
+        $res = $testObj->getPdfSpotObjects($obj);
         $this->assertEquals(1, $obj);
         $this->assertEquals('', $res);
     }
 
     public function testGetPdfSpotResourcesEmpty()
     {
-        $res = $this->obj->getPdfSpotResources();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getPdfSpotResources();
         $this->assertEquals('', $res);
     }
 
     public function testGetPdfSpotObjects()
     {
+        $testObj = $this->getTestObject();
         $cmyk = new \Com\Tecnick\Color\Model\Cmyk(
             array(
                 'cyan'    => 0.666,
@@ -131,14 +136,14 @@ class SpotTest extends TestCase
                 'alpha'   => 0.85
             )
         );
-        $this->obj->addSpotColor('test', $cmyk);
-        $this->obj->getSpotColor('cyan');
-        $this->obj->getSpotColor('magenta');
-        $this->obj->getSpotColor('yellow');
-        $this->obj->getSpotColor('key');
+        $testObj->addSpotColor('test', $cmyk);
+        $testObj->getSpotColor('cyan');
+        $testObj->getSpotColor('magenta');
+        $testObj->getSpotColor('yellow');
+        $testObj->getSpotColor('key');
 
         $obj = 1;
-        $res = $this->obj->getPdfSpotObjects($obj);
+        $res = $testObj->getPdfSpotObjects($obj);
         $this->assertEquals(6, $obj);
         $this->assertEquals(
             '2 0 obj'."\n"
@@ -164,7 +169,7 @@ class SpotTest extends TestCase
             $res
         );
 
-        $res = $this->obj->getPdfSpotResources();
+        $res = $testObj->getPdfSpotResources();
         $this->assertEquals('/ColorSpace << /CS1 2 0 R /CS2 3 0 R /CS3 4 0 R /CS4 5 0 R /CS5 6 0 R >>'."\n", $res);
     }
 }

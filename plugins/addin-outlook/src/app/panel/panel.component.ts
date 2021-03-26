@@ -69,7 +69,7 @@ export class PanelComponent implements OnInit {
         await this.getMailBody();
         await this.createContact();
         await this.createDocFromMail();
-        if (this.attachments.filter((attachment: any) => attachment.selected).length > 0) {
+        if (this.attachments.filter((attachment: any) => attachment.selected).length > 0 && this.addinConfig.outlookPasswordSaved) {
             this.createAttachments(this.resId);
         }
     }
@@ -203,23 +203,21 @@ export class PanelComponent implements OnInit {
 
     createAttachments(resId: number) {
         const objToSend = {
-            ewsUrl: Office.context.mailbox.ewsUrl,
+            resId: resId,
+            ewsUrl: Office.context.mailbox.ewsUrl.replace('https://', ''),
+            ewsVersion: `Exchange20${Office.context.diagnostics.version.split('.')[0]}`,
             emailId: Office.context.mailbox.item.itemId,
             userId: Office.context.mailbox.userProfile.emailAddress,
             attachments: this.attachments.map((attachment: any) => attachment.id)
         };
         return new Promise((resolve) => {
-            // FOR TEST
-            console.log(objToSend);
-            resolve(true);
-
-            /*this.http.post('../rest/???', objToSend).pipe(
+            this.http.put('../rest/plugins/outlook/attachments', objToSend).pipe(
                 finalize(() => resolve(true)),
                 catchError((err: any) => {
                     this.notificationService.handleErrors(err);
                     return of(false);
                 })
-            ).subscribe();*/
+            ).subscribe();
         });
     }
 

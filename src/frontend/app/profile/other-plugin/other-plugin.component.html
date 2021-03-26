@@ -6,5 +6,5 @@
     <div *ngIf="isAppSecure()">
         <button mat-raised-button color="primary" (click)="openAddinOutlookConfiguration()">{{ 'lang.configurePlugin' | translate }}...</button>
     </div>
-    <app-maarch-message *ngIf="!isAppSecure()" mode="danger" [content]="'Veuillez sécuriser votre application (<b>https</b>) avant de pouvoir utiliser cette extension.'"></app-maarch-message>
+    <app-maarch-message style="width: 600px;" *ngIf="!isAppSecure()" mode="danger" [content]="'lang.mustSecureMaarchUrl' | translate"></app-maarch-message>
 </div>

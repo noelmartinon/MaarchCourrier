@@ -698,5 +698,6 @@ $app->get('/plugins/outlook/manifest', \Outlook\controllers\OutlookController::c
 $app->get('/plugins/outlook/configuration', \Outlook\controllers\OutlookController::class . ':getConfiguration');
 $app->put('/plugins/outlook/configuration', \Outlook\controllers\OutlookController::class . ':saveConfiguration');
 $app->put('/plugins/outlook/password', \Outlook\controllers\OutlookController::class . ':saveOutlookPassword');
+$app->put('/plugins/outlook/attachments', \Outlook\controllers\OutlookController::class . ':saveEmailAttachments');
 
 $app->run();

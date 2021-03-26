@@ -55,9 +55,10 @@ export class OtherParametersComponent implements OnInit {
     };
 
     addinOutlookConf = {
-        indexingModelId: new FormControl(1, [Validators.required]),
-        typeId: new FormControl(200, [Validators.required]),
-        statusId: new FormControl(1, [Validators.required]),
+        indexingModelId: new FormControl(null, [Validators.required]),
+        typeId: new FormControl(null, [Validators.required]),
+        statusId: new FormControl(null, [Validators.required]),
+        attachmentTypeId: new FormControl(null, [Validators.required]),
     };
 
     watermark = {
@@ -229,6 +230,7 @@ export class OtherParametersComponent implements OnInit {
     indexingModels: any = [];
     doctypes: any = [];
     statuses: any = [];
+    attachmentsTypes: any = [];
 
     constructor(
         public translate: TranslateService,
@@ -242,6 +244,7 @@ export class OtherParametersComponent implements OnInit {
         this.getStatuses();
         this.getDoctypes();
         this.getIndexingModels();
+        this.getAttachmentTypes();
         await this.getWatermarkConfiguration();
         await this.getEditorsConfiguration();
         await this.getAddinOutlookConfConfiguration();
@@ -304,13 +307,17 @@ export class OtherParametersComponent implements OnInit {
     getAddinOutlookConfConfiguration() {
         return new Promise((resolve, reject) => {
             this.http.get('../rest/plugins/outlook/configuration').pipe(
-                tap((data: any) => {
-                    if (!this.functions.empty(data.configuration)) {
+                tap(async (data: any) => {
+                    if (!this.functions.empty(data.configuration) && Object.keys(data.configuration).length > 1) {
                         this.addinOutlookConf = {
                             indexingModelId: new FormControl(data.configuration.indexingModelId),
                             typeId: new FormControl(data.configuration.typeId),
                             statusId: new FormControl(data.configuration.statusId),
+                            attachmentTypeId: new FormControl(data.configuration.attachmentTypeId),
                         };
+                    } else {
+                        await this.setDefaultValues();
+                        this.saveAddinOutlookConf();
                     }
                     resolve(true);
                 })
@@ -480,7 +487,8 @@ export class OtherParametersComponent implements OnInit {
                         }
                     });
                     this.doctypes = arrValues;
-                    resolve(true);
+                    const defaultDoctype = arrValues.filter((struct: any) => !struct.disabled)[0].id;                    
+                    resolve(defaultDoctype);
                 })
             ).subscribe();
         });
@@ -491,7 +499,8 @@ export class OtherParametersComponent implements OnInit {
             this.http.get('../rest/indexingModels').pipe(
                 tap((data: any) => {
                     this.indexingModels = data.indexingModels.filter((info: any) => info.private === false);
-                    resolve(true);
+                    const defaultIndexingModel = data.indexingModels[0].id;
+                    resolve(defaultIndexingModel);
                 })
             ).subscribe();
         });
@@ -505,9 +514,39 @@ export class OtherParametersComponent implements OnInit {
                         id: status.identifier,
                         label: status.label_status
                     }));
-                    resolve(true);
+                    const defaultStatus = data.statuses[0].identifier;
+                    resolve(defaultStatus);
                 })
             ).subscribe();
+        });
+    }
+
+    getAttachmentTypes() {
+        return new Promise((resolve, reject) => {
+            this.http.get('../rest/attachmentsTypes').pipe(
+                tap((data: any) => {
+                    Object.keys(data.attachmentsTypes).forEach(templateType => {
+                        this.attachmentsTypes.push({
+                            id: data.attachmentsTypes[templateType].id,
+                            label: data.attachmentsTypes[templateType].label
+                        });
+                    });
+                    const defAttachment: any = Object.values(data.attachmentsTypes)[0];
+                    resolve(defAttachment.id);
+                })
+            ).subscribe();
+        });
+    }
+
+    setDefaultValues() {
+        return new Promise((resolve, reject) => {
+            Promise.all([this.getIndexingModels(), this.getDoctypes(), this.getStatuses(), this.getAttachmentTypes()]).then((data: any) => {
+                this.addinOutlookConf.indexingModelId.setValue(data[0]);
+                this.addinOutlookConf.typeId.setValue(data[1]);
+                this.addinOutlookConf.statusId.setValue(data[2]);
+                this.addinOutlookConf.attachmentTypeId.setValue(data[3]);
+                resolve(true);
+            });
         });
     }
 }

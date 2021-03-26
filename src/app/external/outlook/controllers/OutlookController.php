@@ -14,6 +14,7 @@
 
 namespace Outlook\controllers;
 
+use Attachment\models\AttachmentTypeModel;
 use Configuration\models\ConfigurationModel;
 use Doctype\models\DoctypeModel;
 use Group\controllers\PrivilegeController;
@@ -81,7 +82,6 @@ class OutlookController
     public function getConfiguration(Request $request, Response $response)
     {
         $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_addin_outlook']);
-
         $configuration['value'] = json_decode($configuration['value'], true);
 
         if (!empty($configuration['value']['indexingModelId'])) {
@@ -106,6 +106,17 @@ class OutlookController
             }
         }
 
+        if (!empty($configuration['value']['attachmentTypeId'])) {
+            $attachmentType = AttachmentTypeModel::getById(['id' => $configuration['value']['attachmentTypeId'], 'select' => ['label']]);
+            if (!empty($attachmentType)) {
+                $configuration['value']['attachmentTypeLabel'] = $attachmentType['label'];
+            }
+        }
+
+        $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['preferences']]);
+        $user['preferences'] = json_decode($user['preferences'], true);
+        $configuration['value']['outlookPasswordSaved'] = !empty($user['preferences']['outlookPassword']);
+
         return $response->withJson(['configuration' => $configuration['value']]);
     }
 
@@ -123,6 +134,8 @@ class OutlookController
             return $response->withStatus(400)->withJson(['errors' => 'Body typeId is empty or not an integer']);
         } elseif (!Validator::notEmpty()->intVal()->validate($body['statusId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body statusId is empty or not an integer']);
+        } elseif (!Validator::notEmpty()->intVal()->validate($body['attachmentTypeId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body attachmentTypeId is empty or not an integer']);
         }
 
         $model = IndexingModelModel::getById(['id' => $body['indexingModelId'], 'select' => ['master']]);
@@ -142,7 +155,12 @@ class OutlookController
             return $response->withStatus(400)->withJson(['errors' => 'Status does not exist']);
         }
 
-        $data = ['indexingModelId' => $body['indexingModelId'], 'typeId' => $body['typeId'], 'statusId' => $body['statusId']];
+        $attachmentType = AttachmentTypeModel::getById(['id' => $body['attachmentTypeId'], 'select' => [1]]);
+        if (empty($attachmentType)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Attachment type does not exist']);
+        }
+
+        $data = ['indexingModelId' => $body['indexingModelId'], 'typeId' => $body['typeId'], 'statusId' => $body['statusId'], 'attachmentTypeId' => $body['attachmentTypeId']];
         $data = json_encode($data, JSON_UNESCAPED_SLASHES);
         if (empty(ConfigurationModel::getByPrivilege(['privilege' => 'admin_addin_outlook', 'select' => [1]]))) {
             ConfigurationModel::create(['value' => $data, 'privilege' => 'admin_addin_outlook']);
@@ -167,6 +185,64 @@ class OutlookController
         $preferences['outlookPassword'] = PasswordModel::encrypt(['password' => $body['outlookPassword']]);
 
         UserModel::update(['set' => ['preferences' => json_encode($preferences)], 'where' => ['id = ?'], 'data' => [$GLOBALS['id']]]);
+
+        return $response->withStatus(204);
+    }
+
+    public function saveEmailAttachments(Request $request, Response $response, array $args)
+    {
+        $body = $request->getParsedBody();
+
+        if (!Validator::notEmpty()->validate($body['attachments'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body messages is empty']);
+        } elseif (!Validator::notEmpty()->stringType()->validate($body['emailId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body emailId is empty or no a string']);
+        } elseif (!Validator::notEmpty()->stringType()->validate($body['ewsUrl'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body ewsUrl is empty or no a string']);
+        } elseif (!Validator::notEmpty()->stringType()->validate($body['ewsVersion'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body ewsVersion is empty or no a string']);
+        } elseif (!Validator::notEmpty()->stringType()->validate($body['userId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body userId is empty or no a string']);
+        } elseif (!Validator::notEmpty()->intVal()->validate($body['resId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body resId is empty or not an integer']);
+        }
+
+        $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['mail', 'preferences']]);
+        $user['preferences'] = json_decode($user['preferences'], true);
+
+        if (empty($user['preferences']['outlookPassword'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'You have not set your outlook password']);
+        }
+
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_addin_outlook']);
+        $configuration['value'] = json_decode($configuration['value'], true);
+
+        if (empty($configuration['value']['attachmentTypeId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Attachment type configuration is missing']);
+        }
+        $attachmentType = AttachmentTypeModel::getById(['id' => $configuration['value']['attachmentTypeId'], 'select' => ['type_id']]);
+        if (empty($attachmentType)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Attachment type does not exist']);
+        }
+
+        $config = [
+            'url'            => $body['ewsUrl'],
+            'mail'           => $body['userId'],
+            'password'       => PasswordModel::decrypt(['cryptedPassword' => $user['preferences']['outlookPassword']]),
+            'version'        => $body['ewsVersion'],
+            'attachmentType' => $attachmentType['type_id']
+        ];
+
+        $errors = EWSController::getAttachments([
+            'config'        => $config,
+            'emailId'       => $body['emailId'],
+            'attachmentIds' => $body['attachments'],
+            'resId'         => $body['resId']
+        ]);
+
+        if (!empty($errors)) {
+            return $response->withStatus(400)->withJson(['errors' => $errors]);
+        }
 
         return $response->withStatus(204);
     }

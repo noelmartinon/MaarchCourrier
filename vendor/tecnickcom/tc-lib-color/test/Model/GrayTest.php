@@ -16,6 +16,7 @@
 namespace Test\Model;
 
 use PHPUnit\Framework\TestCase;
+use \Test\TestUtil;
 
 /**
  * Gray Color class test
@@ -28,14 +29,11 @@ use PHPUnit\Framework\TestCase;
  * @license     http://www.gnu.org/copyleft/lesser.html GNU-LGPL v3 (see LICENSE.TXT)
  * @link        https://github.com/tecnickcom/tc-lib-color
  */
-class GrayTest extends TestCase
+class GrayTest extends TestUtil
 {
-    protected $obj = null;
-
-    public function setUp()
+    protected function getTestObject()
     {
-        //$this->markTestSkipped(); // skip this test
-        $this->obj = new \Com\Tecnick\Color\Model\Gray(
+        return new \Com\Tecnick\Color\Model\Gray(
             array(
                 'gray'  => 0.75,
                 'alpha' => 0.85
@@ -45,55 +43,64 @@ class GrayTest extends TestCase
 
     public function testGetType()
     {
-        $res = $this->obj->getType();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getType();
         $this->assertEquals('GRAY', $res);
     }
 
     public function testGetNormalizedValue()
     {
-        $res = $this->obj->getNormalizedValue(0.5, 255);
+        $testObj = $this->getTestObject();
+        $res = $testObj->getNormalizedValue(0.5, 255);
         $this->assertEquals(128, $res);
     }
 
     public function testGetHexValue()
     {
-        $res = $this->obj->getHexValue(0.5, 255);
+        $testObj = $this->getTestObject();
+        $res = $testObj->getHexValue(0.5, 255);
         $this->assertEquals('80', $res);
     }
 
     public function testGetRgbaHexColor()
     {
-        $res = $this->obj->getRgbaHexColor();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getRgbaHexColor();
         $this->assertEquals('#bfbfbfd9', $res);
     }
 
     public function testGetRgbHexColor()
     {
-        $res = $this->obj->getRgbHexColor();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getRgbHexColor();
         $this->assertEquals('#bfbfbf', $res);
     }
 
     public function testGetArray()
     {
-        $res = $this->obj->getArray();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getArray();
         $this->assertEquals(array('G' => 0.75, 'A' => 0.85), $res);
     }
 
     public function testGetNormalizedArray()
     {
-        $res = $this->obj->getNormalizedArray(255);
+        $testObj = $this->getTestObject();
+        $res = $testObj->getNormalizedArray(255);
         $this->assertEquals(array('G' => 191, 'A' => 0.85), $res);
     }
 
     public function testGetCssColor()
     {
-        $res = $this->obj->getCssColor();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getCssColor();
         $this->assertEquals('rgba(75%,75%,75%,0.85)', $res);
     }
 
     public function testGetJsPdfColor()
     {
-        $res = $this->obj->getJsPdfColor();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getJsPdfColor();
         $this->assertEquals('["G",0.750000]', $res);
 
         $col = new \Com\Tecnick\Color\Model\Gray(
@@ -108,25 +115,28 @@ class GrayTest extends TestCase
 
     public function testGetComponentsString()
     {
-        $res = $this->obj->getComponentsString();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getComponentsString();
         $this->assertEquals('0.750000', $res);
     }
 
     public function testGetPdfColor()
     {
-        $res = $this->obj->getPdfColor();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getPdfColor();
         $this->assertEquals('0.750000 g'."\n", $res);
         
-        $res = $this->obj->getPdfColor(false);
+        $res = $testObj->getPdfColor(false);
         $this->assertEquals('0.750000 g'."\n", $res);
         
-        $res = $this->obj->getPdfColor(true);
+        $res = $testObj->getPdfColor(true);
         $this->assertEquals('0.750000 G'."\n", $res);
     }
 
     public function testToGrayArray()
     {
-        $res = $this->obj->toGrayArray();
+        $testObj = $this->getTestObject();
+        $res = $testObj->toGrayArray();
         $this->assertEquals(
             array(
                 'gray'  => 0.75,
@@ -138,7 +148,8 @@ class GrayTest extends TestCase
 
     public function testToRgbArray()
     {
-        $res = $this->obj->toRgbArray();
+        $testObj = $this->getTestObject();
+        $res = $testObj->toRgbArray();
         $this->assertEquals(
             array(
                 'red'   => 0.75,
@@ -152,7 +163,8 @@ class GrayTest extends TestCase
 
     public function testToHslArray()
     {
-        $res = $this->obj->toHslArray();
+        $testObj = $this->getTestObject();
+        $res = $testObj->toHslArray();
         $this->assertEquals(
             array(
                 'hue'        => 0,
@@ -166,7 +178,8 @@ class GrayTest extends TestCase
 
     public function testToCmykArray()
     {
-        $res = $this->obj->toCmykArray();
+        $testObj = $this->getTestObject();
+        $res = $testObj->toCmykArray();
         $this->assertEquals(
             array(
                 'cyan'    => 0,
@@ -181,8 +194,9 @@ class GrayTest extends TestCase
 
     public function testInvertColor()
     {
-        $this->obj->invertColor();
-        $res = $this->obj->toGrayArray();
+        $testObj = $this->getTestObject();
+        $testObj->invertColor();
+        $res = $testObj->toGrayArray();
         $this->assertEquals(
             array(
                 'gray'  => 0.25,

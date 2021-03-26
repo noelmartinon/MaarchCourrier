@@ -16,6 +16,7 @@
 namespace Test\Model;
 
 use PHPUnit\Framework\TestCase;
+use \Test\TestUtil;
 
 /**
  * Rgb Color class test
@@ -28,14 +29,11 @@ use PHPUnit\Framework\TestCase;
  * @license     http://www.gnu.org/copyleft/lesser.html GNU-LGPL v3 (see LICENSE.TXT)
  * @link        https://github.com/tecnickcom/tc-lib-color
  */
-class RgbTest extends TestCase
+class RgbTest extends TestUtil
 {
-    protected $obj = null;
-
-    public function setUp()
+    protected function getTestObject()
     {
-        //$this->markTestSkipped(); // skip this test
-        $this->obj = new \Com\Tecnick\Color\Model\Rgb(
+        return new \Com\Tecnick\Color\Model\Rgb(
             array(
                 'red'   => 0.25,
                 'green' => 0.50,
@@ -47,37 +45,43 @@ class RgbTest extends TestCase
 
     public function testGetType()
     {
-        $res = $this->obj->getType();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getType();
         $this->assertEquals('RGB', $res);
     }
 
     public function testGetNormalizedValue()
     {
-        $res = $this->obj->getNormalizedValue(0.5, 255);
+        $testObj = $this->getTestObject();
+        $res = $testObj->getNormalizedValue(0.5, 255);
         $this->assertEquals(128, $res);
     }
 
     public function testGetHexValue()
     {
-        $res = $this->obj->getHexValue(0.5, 255);
+        $testObj = $this->getTestObject();
+        $res = $testObj->getHexValue(0.5, 255);
         $this->assertEquals('80', $res);
     }
 
     public function testGetRgbaHexColor()
     {
-        $res = $this->obj->getRgbaHexColor();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getRgbaHexColor();
         $this->assertEquals('#4080bfd9', $res);
     }
 
     public function testGetRgbHexColor()
     {
-        $res = $this->obj->getRgbHexColor();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getRgbHexColor();
         $this->assertEquals('#4080bf', $res);
     }
 
     public function testGetArray()
     {
-        $res = $this->obj->getArray();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getArray();
         $this->assertEquals(
             array(
                 'R' => 0.25,
@@ -91,7 +95,8 @@ class RgbTest extends TestCase
 
     public function testGetNormalizedArray()
     {
-        $res = $this->obj->getNormalizedArray(255);
+        $testObj = $this->getTestObject();
+        $res = $testObj->getNormalizedArray(255);
         $this->assertEquals(
             array(
                 'R' => 64,
@@ -105,13 +110,15 @@ class RgbTest extends TestCase
 
     public function testGetCssColor()
     {
-        $res = $this->obj->getCssColor();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getCssColor();
         $this->assertEquals('rgba(25%,50%,75%,0.85)', $res);
     }
 
     public function testGetJsPdfColor()
     {
-        $res = $this->obj->getJsPdfColor();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getJsPdfColor();
         $this->assertEquals('["RGB",0.250000,0.500000,0.750000]', $res);
 
         $col = new \Com\Tecnick\Color\Model\Rgb(
@@ -128,65 +135,64 @@ class RgbTest extends TestCase
 
     public function testGetComponentsString()
     {
-        $res = $this->obj->getComponentsString();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getComponentsString();
         $this->assertEquals('0.250000 0.500000 0.750000', $res);
     }
 
     public function testGetPdfColor()
     {
-        $res = $this->obj->getPdfColor();
+        $testObj = $this->getTestObject();
+        $res = $testObj->getPdfColor();
         $this->assertEquals('0.250000 0.500000 0.750000 rg'."\n", $res);
 
-        $res = $this->obj->getPdfColor(false);
+        $res = $testObj->getPdfColor(false);
         $this->assertEquals('0.250000 0.500000 0.750000 rg'."\n", $res);
 
-        $res = $this->obj->getPdfColor(true);
+        $res = $testObj->getPdfColor(true);
         $this->assertEquals('0.250000 0.500000 0.750000 RG'."\n", $res);
     }
 
     public function testToGrayArray()
     {
-        $res = $this->obj->toGrayArray();
-        $this->assertEquals(
+        $testObj = $this->getTestObject();
+        $res = $testObj->toGrayArray();
+        $this->bcAssertEqualsWithDelta(
             array(
                 'gray'  => 0.465,
                 'alpha' => 0.85
             ),
-            $res,
-            '',
-            0.01
+            $res
         );
     }
 
     public function testToRgbArray()
     {
-        $res = $this->obj->toRgbArray();
-        $this->assertEquals(
+        $testObj = $this->getTestObject();
+        $res = $testObj->toRgbArray();
+        $this->bcAssertEqualsWithDelta(
             array(
                 'red'   => 0.25,
                 'green' => 0.50,
                 'blue'  => 0.75,
                 'alpha' => 0.85
             ),
-            $res,
-            '',
-            0.01
+            $res
         );
     }
 
     public function testToHslArray()
     {
-        $res = $this->obj->toHslArray();
-        $this->assertEquals(
+        $testObj = $this->getTestObject();
+        $res = $testObj->toHslArray();
+        $this->bcAssertEqualsWithDelta(
             array(
                 'hue'        => 0.583,
                 'saturation' => 0.5,
                 'lightness'  => 0.5,
                 'alpha'      => 0.85
             ),
-            $res,
-            '',
-            0.01
+            $res
         );
 
         $col = new \Com\Tecnick\Color\Model\Rgb(
@@ -198,16 +204,14 @@ class RgbTest extends TestCase
             )
         );
         $res = $col->toHslArray();
-        $this->assertEquals(
+        $this->bcAssertEqualsWithDelta(
             array(
                 'hue'        => 0,
                 'saturation' => 0,
                 'lightness'  => 0,
                 'alpha'      => 1
             ),
-            $res,
-            '',
-            0.01
+            $res
         );
 
         $col = new \Com\Tecnick\Color\Model\Rgb(
@@ -219,16 +223,14 @@ class RgbTest extends TestCase
             )
         );
         $res = $col->toHslArray();
-        $this->assertEquals(
+        $this->bcAssertEqualsWithDelta(
             array(
                 'hue'        => 0.416,
                 'saturation' => 0.500,
                 'lightness'  => 0.200,
                 'alpha'      => 1
             ),
-            $res,
-            '',
-            0.01
+            $res
         );
 
         $col = new \Com\Tecnick\Color\Model\Rgb(
@@ -240,16 +242,14 @@ class RgbTest extends TestCase
             )
         );
         $res = $col->toHslArray();
-        $this->assertEquals(
+        $this->bcAssertEqualsWithDelta(
             array(
                 'hue'        => 0.0833,
                 'saturation' => 0.500,
                 'lightness'  => 0.200,
                 'alpha'      => 1
             ),
-            $res,
-            '',
-            0.01
+            $res
         );
 
         $col = new \Com\Tecnick\Color\Model\Rgb(
@@ -261,23 +261,22 @@ class RgbTest extends TestCase
             )
         );
         $res = $col->toHslArray();
-        $this->assertEquals(
+        $this->bcAssertEqualsWithDelta(
             array(
                 'hue'        => 0.852,
                 'saturation' => 1,
                 'lightness'  => 0.55,
                 'alpha'      => 1
             ),
-            $res,
-            '',
-            0.01
+            $res
         );
     }
 
     public function testToCmykArray()
     {
-        $res = $this->obj->toCmykArray();
-        $this->assertEquals(
+        $testObj = $this->getTestObject();
+        $res = $testObj->toCmykArray();
+        $this->bcAssertEqualsWithDelta(
             array(
                 'cyan'    => 0.666,
                 'magenta' => 0.333,
@@ -285,9 +284,7 @@ class RgbTest extends TestCase
                 'key'     => 0.25,
                 'alpha'   => 0.85
             ),
-            $res,
-            '',
-            0.01
+            $res
         );
 
         $col = new \Com\Tecnick\Color\Model\Rgb(
@@ -299,7 +296,7 @@ class RgbTest extends TestCase
             )
         );
         $res = $col->toCmykArray();
-        $this->assertEquals(
+        $this->bcAssertEqualsWithDelta(
             array(
                 'cyan'    => 0,
                 'magenta' => 0,
@@ -307,26 +304,23 @@ class RgbTest extends TestCase
                 'key'     => 1,
                 'alpha'   => 1
             ),
-            $res,
-            '',
-            0.01
+            $res
         );
     }
 
     public function testInvertColor()
     {
-        $this->obj->invertColor();
-        $res = $this->obj->toRgbArray();
-        $this->assertEquals(
+        $testObj = $this->getTestObject();
+        $testObj->invertColor();
+        $res = $testObj->toRgbArray();
+        $this->bcAssertEqualsWithDelta(
             array(
                 'red'   => 0.75,
                 'green' => 0.50,
                 'blue'  => 0.25,
                 'alpha' => 0.85
             ),
-            $res,
-            '',
-            0.01
+            $res
         );
     }
 }
