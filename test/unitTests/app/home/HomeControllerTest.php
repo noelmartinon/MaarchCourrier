@@ -58,7 +58,6 @@ class HomeControllerTest extends TestCase
         foreach ($responseBody->documents as $document) {
             $this->assertIsInt($document->id);
             $this->assertNotEmpty($document->title);
-            $this->assertNotEmpty($document->reference);
             $this->assertNotEmpty($document->mode);
             $this->assertIsBool($document->owner);
         }

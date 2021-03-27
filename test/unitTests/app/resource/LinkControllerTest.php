@@ -26,8 +26,12 @@ class LinkControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
+        $fileContent = file_get_contents('test/unitTests/samples/test.txt');
+        $encodedFile = base64_encode($fileContent);
         $aArgs = [
             'modelId'           => 1,
+            'encodedFile'       => $encodedFile,
+            'format'            => 'txt',
             'status'            => 'NEW',
             'confidentiality'   => false,
             'documentDate'      => '2019-01-01 17:18:47',

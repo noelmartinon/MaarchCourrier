@@ -417,7 +417,7 @@ class EntityControllerTest extends TestCase
         $this->assertSame('user', $responseBody['entity']['listTemplate']['items']['dest'][0]['type']);
         $this->assertSame(0, $responseBody['entity']['listTemplate']['items']['dest'][0]['sequence']);
         $this->assertIsString($responseBody['entity']['listTemplate']['items']['dest'][0]['labelToDisplay']);
-        $this->assertEmpty($responseBody['entity']['listTemplate']['items']['dest'][0]['descriptionToDisplay']);
+        $this->assertNotEmpty($responseBody['entity']['listTemplate']['items']['dest'][0]['descriptionToDisplay']);
 
         $this->assertIsArray($responseBody['entity']['listTemplate']['items']['cc'][0]);
         $this->assertSame(13, $responseBody['entity']['listTemplate']['items']['cc'][0]['id']);
@@ -441,7 +441,7 @@ class EntityControllerTest extends TestCase
         $this->assertSame('sign', $responseBody['entity']['visaCircuit']['items'][0]['mode']);
         $this->assertSame(0, $responseBody['entity']['visaCircuit']['items'][0]['sequence']);
         $this->assertIsString($responseBody['entity']['visaCircuit']['items'][0]['idToDisplay']);
-        $this->assertEmpty($responseBody['entity']['visaCircuit']['items'][0]['descriptionToDisplay']);
+        $this->assertNotEmpty($responseBody['entity']['visaCircuit']['items'][0]['descriptionToDisplay']);
 
         $this->assertSame(false, $responseBody['entity']['hasChildren']);
         $this->assertSame(0, $responseBody['entity']['documents']);

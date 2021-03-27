@@ -372,12 +372,12 @@ class ContactControllerTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
 
-        $this->assertSame(6, $responseBody['realCount']);
-        $this->assertSame(6, $responseBody['returnedCount']);
+        $this->assertSame(4, $responseBody['realCount']);
+        $this->assertSame(4, $responseBody['returnedCount']);
 
         $this->assertIsArray($responseBody['contacts']);
         $this->assertNotEmpty($responseBody['contacts']);
-        $this->assertSame(6, count($responseBody['contacts']));
+        $this->assertSame(4, count($responseBody['contacts']));
 
         $dunderMifflinDuplicates = array_filter($responseBody['contacts'], function ($contact) {
             return $contact['company'] == 'Dunder Mifflin Paper Company Inc.';
@@ -845,7 +845,7 @@ class ContactControllerTest extends TestCase
         $this->assertSame('Charlie', $responseBody['contacts'][0]['firstname']);
         $this->assertSame('CHAPLIN', $responseBody['contacts'][0]['lastname']);
         $this->assertEmpty($responseBody['contacts'][0]['company']);
-        $this->assertSame('Ville de Maarch-les-bains', $responseBody['contacts'][0]['department']);
+        $this->assertSame('Ville de Maarch-les-Bains', $responseBody['contacts'][0]['department']);
         $this->assertEmpty($responseBody['contacts'][0]['function']);
         $this->assertEmpty($responseBody['contacts'][0]['addressNumber']);
         $this->assertEmpty($responseBody['contacts'][0]['addressStreet']);
@@ -854,7 +854,7 @@ class ContactControllerTest extends TestCase
         $this->assertEmpty($responseBody['contacts'][0]['addressPostcode']);
         $this->assertEmpty($responseBody['contacts'][0]['addressTown']);
         $this->assertEmpty($responseBody['contacts'][0]['addressCountry']);
-        $this->assertSame('support@maarch.fr', $responseBody['contacts'][0]['email']);
+        $this->assertSame('yourEmail@domain.com', $responseBody['contacts'][0]['email']);
         $this->assertEmpty($responseBody['contacts'][0]['phone']);
         $this->assertEmpty($responseBody['contacts'][0]['communicationMeans']);
         $this->assertEmpty($responseBody['contacts'][0]['notes']);
@@ -866,18 +866,18 @@ class ContactControllerTest extends TestCase
 
         $this->assertSame('entity', $responseBody['contacts'][1]['type']);
         $this->assertEmpty($responseBody['contacts'][1]['firstname']);
-        $this->assertSame('Ville de Maarch-les-bains', $responseBody['contacts'][1]['lastname']);
+        $this->assertSame('Ville de Maarch-les-Bains', $responseBody['contacts'][1]['lastname']);
         $this->assertEmpty($responseBody['contacts'][1]['company']);
         $this->assertEmpty($responseBody['contacts'][1]['department']);
         $this->assertEmpty($responseBody['contacts'][1]['function']);
         $this->assertEmpty($responseBody['contacts'][1]['addressNumber']);
-        $this->assertEmpty($responseBody['contacts'][1]['addressStreet']);
-        $this->assertEmpty($responseBody['contacts'][1]['addressAdditional1']);
+        $this->assertNotEmpty($responseBody['contacts'][1]['addressStreet']);
+        $this->assertNotEmpty($responseBody['contacts'][1]['addressAdditional1']);
         $this->assertEmpty($responseBody['contacts'][1]['addressAdditional2']);
-        $this->assertEmpty($responseBody['contacts'][1]['addressPostcode']);
-        $this->assertEmpty($responseBody['contacts'][1]['addressTown']);
-        $this->assertEmpty($responseBody['contacts'][1]['addressCountry']);
-        $this->assertSame('support@maarch.fr', $responseBody['contacts'][1]['email']);
+        $this->assertNotEmpty($responseBody['contacts'][1]['addressPostcode']);
+        $this->assertNotEmpty($responseBody['contacts'][1]['addressTown']);
+        $this->assertNotEmpty($responseBody['contacts'][1]['addressCountry']);
+        $this->assertSame('mairie@maarchlesbains.fr', $responseBody['contacts'][1]['email']);
         $this->assertEmpty($responseBody['contacts'][1]['phone']);
         $this->assertEmpty($responseBody['contacts'][1]['communicationMeans']);
         $this->assertEmpty($responseBody['contacts'][1]['notes']);

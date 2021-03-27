@@ -68,7 +68,7 @@ class DiffusionTypesControllerTest extends TestCase
                 $this->assertSame('Jean', $user['firstname']);
                 $this->assertSame('JONASZ', $user['lastname']);
                 $this->assertEmpty($user['phone']);
-                $this->assertSame('support@maarch.fr', $user['mail']);
+                $this->assertSame('yourEmail@domain.com', $user['mail']);
                 $this->assertSame('OK', $user['status']);
             }
 
@@ -101,7 +101,7 @@ class DiffusionTypesControllerTest extends TestCase
             $args['event']['table_name'] = 'notes';
             $args['event']['record_id'] = 1;
             $response = $diffusionTypesController->getItemsToNotify($args);
-            $this->assertIsNumeric($response);
+            $this->assertEmpty($response);
 
             $args['event']['table_name'] = 'listinstance';
             $args['event']['user_id'] = 19;
@@ -134,7 +134,7 @@ class DiffusionTypesControllerTest extends TestCase
                 $this->assertSame('Barbara', $user['firstname']);
                 $this->assertSame('BAIN', $user['lastname']);
                 $this->assertEmpty($user['phone']);
-                $this->assertSame('support@maarch.fr', $user['mail']);
+                $this->assertSame('yourEmail@domain.com', $user['mail']);
                 $this->assertSame('OK', $user['status']);
             }
 
@@ -147,7 +147,7 @@ class DiffusionTypesControllerTest extends TestCase
                 $this->assertSame('Barbara', $user['firstname']);
                 $this->assertSame('BAIN', $user['lastname']);
                 $this->assertEmpty($user['phone']);
-                $this->assertSame('support@maarch.fr', $user['mail']);
+                $this->assertSame('yourEmail@domain.com', $user['mail']);
                 $this->assertSame('OK', $user['status']);
             }
 
@@ -160,7 +160,7 @@ class DiffusionTypesControllerTest extends TestCase
                 $this->assertSame('Amanda', $user['firstname']);
                 $this->assertSame('ACKERMANN', $user['lastname']);
                 $this->assertEmpty($user['phone']);
-                $this->assertSame('support@maarch.fr', $user['mail']);
+                $this->assertSame('yourEmail@domain.com', $user['mail']);
                 $this->assertSame('OK', $user['status']);
             }
         }
@@ -184,7 +184,7 @@ class DiffusionTypesControllerTest extends TestCase
             $args['event']['table_name'] = 'notes';
             $args['event']['record_id'] = 1;
             $response = $diffusionTypesController->getItemsToNotify($args);
-            $this->assertIsInt($response);
+            $this->assertEmpty($response);
 
             $args['event']['table_name'] = 'listinstance';
             $args['event']['user_id'] = 19;
@@ -212,7 +212,7 @@ class DiffusionTypesControllerTest extends TestCase
             foreach ($response as $entity) {
                 $this->assertSame('PJS', $entity['entity_id']);
                 $this->assertSame('Y', $entity['enabled']);
-                $this->assertSame('support@maarch.fr', $entity['mail']);
+                $this->assertSame('mairie@maarchlesbains.fr', $entity['mail']);
             }
         }
 
@@ -235,7 +235,7 @@ class DiffusionTypesControllerTest extends TestCase
             $args['event']['table_name'] = 'notes';
             $args['event']['record_id'] = 1;
             $response = $diffusionTypesController->getItemsToNotify($args);
-            $this->assertIsInt($response);
+            $this->assertEmpty($response);
 
             $args['event']['table_name'] = 'listinstance';
             $args['event']['user_id'] = 19;
@@ -294,7 +294,7 @@ class DiffusionTypesControllerTest extends TestCase
             $args['event']['table_name'] = 'notes';
             $args['event']['record_id'] = 1;
             $response = $diffusionTypesController->getItemsToNotify($args);
-            $this->assertIsInt($response);
+            $this->assertEmpty($response);
 
             $args['event']['table_name'] = 'listinstance';
             $args['event']['user_id'] = 19;
@@ -353,7 +353,7 @@ class DiffusionTypesControllerTest extends TestCase
             $args['event']['table_name'] = 'notes';
             $args['event']['record_id'] = 1;
             $response = $diffusionTypesController->getItemsToNotify($args);
-            $this->assertIsInt($response);
+            $this->assertEmpty($response);
 
             $args['event']['table_name'] = 'listinstance';
             $args['event']['user_id'] = 19;
@@ -381,7 +381,7 @@ class DiffusionTypesControllerTest extends TestCase
         $this->assertSame('Katy', $user[0]['firstname']);
         $this->assertSame('KAAR', $user[0]['lastname']);
         $this->assertEmpty($user[0]['phone']);
-        $this->assertSame('support@maarch.fr', $user[0]['mail']);
+        $this->assertSame('yourEmail@domain.com', $user[0]['mail']);
         $this->assertSame('OK', $user[0]['status']);
 
         $this->assertSame(17, $user[1]['id']);
@@ -389,7 +389,7 @@ class DiffusionTypesControllerTest extends TestCase
         $this->assertSame('Martin', $user[1]['firstname']);
         $this->assertSame('MANFRED', $user[1]['lastname']);
         $this->assertEmpty($user[1]['phone']);
-        $this->assertSame('support@maarch.fr', $user[1]['mail']);
+        $this->assertSame('yourEmail@domain.com', $user[1]['mail']);
         $this->assertSame('OK', $user[1]['status']);
 
         $this->assertSame(19, $user[2]['id']);
@@ -397,7 +397,7 @@ class DiffusionTypesControllerTest extends TestCase
         $this->assertSame('Barbara', $user[2]['firstname']);
         $this->assertSame('BAIN', $user[2]['lastname']);
         $this->assertEmpty($user[2]['phone']);
-        $this->assertSame('support@maarch.fr', $user[2]['mail']);
+        $this->assertSame('yourEmail@domain.com', $user[2]['mail']);
         $this->assertSame('OK', $user[2]['status']);
 
         $args['request'] = 'others';
@@ -423,7 +423,7 @@ class DiffusionTypesControllerTest extends TestCase
         $this->assertSame('Denis', $user[0]['firstname']);
         $this->assertSame('DAULL', $user[0]['lastname']);
         $this->assertEmpty($user[0]['phone']);
-        $this->assertSame('support@maarch.fr', $user[0]['mail']);
+        $this->assertSame('yourEmail@domain.com', $user[0]['mail']);
         $this->assertSame('OK', $user[0]['status']);
 
         $this->assertSame(21, $user[1]['id']);
@@ -431,7 +431,7 @@ class DiffusionTypesControllerTest extends TestCase
         $this->assertSame('Bernard', $user[1]['firstname']);
         $this->assertSame('BLIER', $user[1]['lastname']);
         $this->assertEmpty($user[1]['phone']);
-        $this->assertSame('support@maarch.fr', $user[1]['mail']);
+        $this->assertSame('yourEmail@domain.com', $user[1]['mail']);
         $this->assertSame('OK', $user[1]['status']);
 
         $args['request'] = 'others';
@@ -457,7 +457,7 @@ class DiffusionTypesControllerTest extends TestCase
         $this->assertSame('Barbara', $user[0]['firstname']);
         $this->assertSame('BAIN', $user[0]['lastname']);
         $this->assertEmpty($user[0]['phone']);
-        $this->assertSame('support@maarch.fr', $user[0]['mail']);
+        $this->assertSame('yourEmail@domain.com', $user[0]['mail']);
         $this->assertSame('OK', $user[0]['status']);
         
         $this->assertSame(20, $user[1]['id']);
@@ -465,7 +465,7 @@ class DiffusionTypesControllerTest extends TestCase
         $this->assertSame('Jean', $user[1]['firstname']);
         $this->assertSame('JONASZ', $user[1]['lastname']);
         $this->assertEmpty($user[1]['phone']);
-        $this->assertSame('support@maarch.fr', $user[1]['mail']);
+        $this->assertSame('yourEmail@domain.com', $user[1]['mail']);
         $this->assertSame('OK', $user[1]['status']);
 
         $args['request'] = 'others';

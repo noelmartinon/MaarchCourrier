@@ -324,7 +324,7 @@ class ResourceListControllerTest extends TestCase
             'resources' => [1]
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
-        $response     = $resListController->setAction($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'basketId' => $myBasket['id'], 'groupId' => 2, 'actionId' => 400]);
+        $response     = $resListController->setAction($fullRequest, new \Slim\Http\Response(), ['userId' => $GLOBALS['id'], 'basketId' => $myBasket['id'], 'groupId' => 2, 'actionId' => 19]);
         $this->assertSame(403, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody());
         $this->assertSame('Resources out of perimeter', $responseBody->errors);

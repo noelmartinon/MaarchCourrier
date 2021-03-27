@@ -90,7 +90,7 @@ class FolderPrintControllerTest extends TestCase
         self::$emailId = \Email\controllers\EmailController::createEmail([
             'userId'    => $GLOBALS['id'],
             'data'      => [
-                'sender'        => ['email' => 'support@maarch.fr'],
+                'sender'        => ['email' => 'yourEmail@domain.com'],
                 'recipients'    => ['dev@maarch.org'],
                 'object'        => 'TU Folder Print Email',
                 'body'          => 'TU Folder Print Email' . '<a href="#">'._CLICK_HERE.'</a>',

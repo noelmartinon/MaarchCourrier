@@ -31,7 +31,7 @@ class SignatureBookControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
-        $fileContent = file_get_contents('install/templates/0000/0002_2059891324.docx');
+        $fileContent = file_get_contents('install/samples/templates/2021/03/0001/0001_742130848.docx');
         $encodedFile = base64_encode($fileContent);
 
         $argsMailNew = [
