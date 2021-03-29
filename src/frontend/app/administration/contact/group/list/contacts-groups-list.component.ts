@@ -68,6 +68,7 @@ export class ContactsGroupsListComponent implements OnInit {
     }
 
     getContactsGroups() {
+        this.adminService.clearFilter();
         this.selection.clear();
         return new Promise((resolve) => {
             const param = !this.allPerimeters ? '?profile=true' : '';
