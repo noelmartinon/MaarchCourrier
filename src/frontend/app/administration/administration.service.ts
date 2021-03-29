@@ -254,10 +254,4 @@ export class AdministrationService {
             return null;
         }
     }
-
-    clearFilter() {
-        if (this.localStorage.get(`filtersAdmin_${this.headerService.user.id}`) !== null) {
-            this.localStorage.remove(`filtersAdmin_${this.headerService.user.id}`);
-        }        
-    }
 }

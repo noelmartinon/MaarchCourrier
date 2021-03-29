@@ -11,6 +11,7 @@ import { AlertComponent } from '@plugins/modal/alert.component';
 import { FunctionsService } from './functions.service';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
+import { AdministrationService } from '@appRoot/administration/administration.service';
 
 @Injectable({
     providedIn: 'root'
@@ -37,6 +38,7 @@ export class AuthService {
         private functionsService: FunctionsService,
         public dialog: MatDialog,
         public translate: TranslateService,
+        public adminService: AdministrationService,
     ) { }
 
     catchEvent(): Observable<any> {
@@ -124,6 +126,7 @@ export class AuthService {
     }
 
     async logout(cleanUrl: boolean = true, forcePageLogin: boolean = false) {
+        this.clearFilters();
         if (['cas', 'keycloak', 'azure_saml'].indexOf(this.authMode) > -1 && !forcePageLogin) {
             this.SsoLogout(cleanUrl);
         } else {
@@ -322,5 +325,10 @@ export class AuthService {
                     })
                 );
         }
+    }
+
+    clearFilters() {
+        this.adminService.filters = {};
+        this.adminService.searchTerm.setValue('');
     }
 }

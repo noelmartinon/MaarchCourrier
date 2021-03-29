@@ -31,6 +31,9 @@ export class ContactsGroupsListComponent implements OnInit {
     @Input() showAddButton: boolean = true;
     @Input() inProfile: boolean;
 
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
+
     search: string = null;
 
     contactsGroups: any[] = [];
@@ -44,8 +47,6 @@ export class ContactsGroupsListComponent implements OnInit {
     filterColumns = ['label', 'description'];
     selection = new SelectionModel<Element>(true, []);
 
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,
@@ -68,7 +69,6 @@ export class ContactsGroupsListComponent implements OnInit {
     }
 
     getContactsGroups() {
-        this.adminService.clearFilter();
         this.selection.clear();
         return new Promise((resolve) => {
             const param = !this.allPerimeters ? '?profile=true' : '';
