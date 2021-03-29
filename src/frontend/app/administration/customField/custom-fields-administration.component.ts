@@ -241,6 +241,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
     switchSQLMode(custom: any) {
         custom.SQLMode = !custom.SQLMode;
+        const oldValues = custom.values;
         if (custom.SQLMode) {
             custom.values = {
                 key: 'id',
@@ -255,6 +256,10 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         } else {
             custom.values = [];
         }
+        if (!this.functionsService.empty(custom.oldValues)) {
+            custom.values = custom.oldValues;
+        }
+        custom.oldValues = oldValues;
     }
 
     getTables() {
