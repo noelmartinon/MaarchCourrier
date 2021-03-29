@@ -7,7 +7,6 @@ import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FormControl } from '@angular/forms';
-import { AppService } from '@service/app.service';
 import { FunctionsService } from '../../../service/functions.service';
 
 declare let tinymce: any;
