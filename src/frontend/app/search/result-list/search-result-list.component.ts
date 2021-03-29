@@ -199,6 +199,10 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
 
         this.listProperties = this.criteriaSearchService.initListsProperties(this.headerService.user.id);
 
+        if (!this.functions.empty(this.searchTerm)) {
+            this.listProperties.criteria.meta = this.criteria.meta;
+        }
+
         this.loading = false;
     }
 
