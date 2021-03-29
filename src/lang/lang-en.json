@@ -1431,7 +1431,7 @@
     "shippingModification": "Maileva shipping modification",
     "shippingNotEligible": "Ineligible mail(s) ",
     "shippingReadyToSend": "document(s) ready to be sent",
-    "shippingUnavailable": "<b>Warning </b> Shipping is not activated. Check the configuration file mailevaConfig.xml",
+    "shippingUnavailable": "<b>Warning </b> Shipping is not activated. Check the configuration in administration",
     "shippingUpdated": "Maileva shipping updated",
     "shippings": "Maileva shipping templates",
     "shippingDepositProofInformations": "Deposit proofs will be available in your Maileva account",
