@@ -7,7 +7,7 @@ import { switchMap, catchError, filter, exhaustMap, tap, debounceTime, distinctU
 import { FormControl } from '@angular/forms';
 import { FunctionsService } from '@service/functions.service';
 import { ContactService } from '@service/contact.service';
-import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { PrivilegeService } from '@service/privileges.service';
 import { HeaderService } from '@service/header.service';
 import { StripTagsPipe, ReversePipe } from 'ngx-pipes';
@@ -21,6 +21,8 @@ import { environment } from '../../../environments/environment';
     providers: [ContactService, StripTagsPipe, ReversePipe],
 })
 export class SentNumericPackagePageComponent implements OnInit {
+
+    @ViewChild('recipientsInput', { static: true }) recipientsInput: ElementRef<HTMLInputElement>;
 
     loading: boolean = true;
 
@@ -77,8 +79,6 @@ export class SentNumericPackagePageComponent implements OnInit {
     messageReview: any[] = [];
 
     maarch2maarchUrl: string = `https://docs.maarch.org/gitbook/html/MaarchCourrier/${environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1]}/guat/guat_exploitation/maarch2maarch.html`;
-
-    @ViewChild('recipientsInput', { static: true }) recipientsInput: ElementRef<HTMLInputElement>;
 
     constructor(
         public translate: TranslateService,
@@ -527,25 +527,7 @@ export class SentNumericPackagePageComponent implements OnInit {
             tap((data: any) => {
                 const downloadLink = document.createElement('a');
                 downloadLink.href = window.URL.createObjectURL(data);
-
-                let today: any;
-                let dd: any;
-                let mm: any;
-                let yyyy: any;
-
-                today = new Date();
-                dd = today.getDate();
-                mm = today.getMonth() + 1;
-                yyyy = today.getFullYear();
-
-                if (dd < 10) {
-                    dd = '0' + dd;
-                }
-                if (mm < 10) {
-                    mm = '0' + mm;
-                }
-                today = dd + '-' + mm + '-' + yyyy;
-                downloadLink.setAttribute('download', 'NumericPackage_' + today + '.zip');
+                downloadLink.setAttribute('download', this.functions.getFormatedFileName('NumericPackage', 'zip'));
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
             }),

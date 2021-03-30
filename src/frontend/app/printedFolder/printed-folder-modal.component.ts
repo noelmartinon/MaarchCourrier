@@ -6,7 +6,7 @@ import { NotificationService } from '@service/notification/notification.service'
 import { map, tap, catchError, finalize } from 'rxjs/operators';
 import { FunctionsService } from '@service/functions.service';
 import { FormControl } from '@angular/forms';
-import { SortPipe } from '../../plugins/sorting.pipe';
+import { SortPipe } from '@plugins/sorting.pipe';
 import { SummarySheetComponent } from '../list/summarySheet/summary-sheet.component';
 import { of } from 'rxjs';
 
@@ -285,24 +285,7 @@ export class PrintedFolderModalComponent implements OnInit {
             tap((data: any) => {
                 const downloadLink = document.createElement('a');
                 downloadLink.href = window.URL.createObjectURL(data);
-                let today: any;
-                let dd: any;
-                let mm: any;
-                let yyyy: any;
-
-                today = new Date();
-                dd = today.getDate();
-                mm = today.getMonth() + 1;
-                yyyy = today.getFullYear();
-
-                if (dd < 10) {
-                    dd = '0' + dd;
-                }
-                if (mm < 10) {
-                    mm = '0' + mm;
-                }
-                today = dd + '-' + mm + '-' + yyyy;
-                downloadLink.setAttribute('download', 'export_maarch_' + today + '.pdf');
+                downloadLink.setAttribute('download', this.functions.getFormatedFileName('export_maarch', 'pdf'));
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
             }),

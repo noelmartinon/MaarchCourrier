@@ -127,27 +127,10 @@ export class SendToRecordManagementComponent implements OnInit {
                     downloadLink.href = `data:application/zip;base64,${data.data.encodedFile}`;
                     if (this.data.resIds.length === 1) {
                         filenameDetail = this.data.resource.chrono.split(' ').join('_');
+                        downloadLink.setAttribute('download', 'seda_package_' + filenameDetail + '.zip');
                     } else {
-                        let today: any;
-                        let dd: any;
-                        let mm: any;
-                        let yyyy: any;
-
-                        today = new Date();
-                        dd = today.getDate();
-                        mm = today.getMonth() + 1;
-                        yyyy = today.getFullYear();
-
-                        if (dd < 10) {
-                            dd = '0' + dd;
-                        }
-                        if (mm < 10) {
-                            mm = '0' + mm;
-                        }
-                        filenameDetail = dd + '-' + mm + '-' + yyyy;
+                        downloadLink.setAttribute('download', this.functions.getFormatedFileName('seda_package', 'zip'));
                     }
-
-                    downloadLink.setAttribute('download', 'seda_package_' + filenameDetail + '.zip');
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
 

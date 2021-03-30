@@ -194,25 +194,7 @@ export class SummarySheetComponent implements OnInit {
                 if (data.type !== 'text/html') {
                     const downloadLink = document.createElement('a');
                     downloadLink.href = window.URL.createObjectURL(data);
-
-                    let today: any;
-                    let dd: any;
-                    let mm: any;
-                    let yyyy: any;
-
-                    today = new Date();
-                    dd = today.getDate();
-                    mm = today.getMonth() + 1;
-                    yyyy = today.getFullYear();
-
-                    if (dd < 10) {
-                        dd = '0' + dd;
-                    }
-                    if (mm < 10) {
-                        mm = '0' + mm;
-                    }
-                    today = dd + '-' + mm + '-' + yyyy;
-                    downloadLink.setAttribute('download', this.translate.instant('lang.summarySheetsAlt') + '_' + today + '.pdf');
+                    downloadLink.setAttribute('download', this.functions.getFormatedFileName(this.translate.instant('lang.summarySheetsAlt'), 'pdf'));
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
                 } else {

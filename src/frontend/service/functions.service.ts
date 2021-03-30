@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { LatinisePipe } from 'ngx-pipes';
 import { HeaderService } from './header.service';
-import { TimeLimitPipe } from '../plugins/timeLimit.pipe';
+import { DatePipe } from '@angular/common';
 
 @Injectable({
     providedIn: 'root'
@@ -13,6 +13,7 @@ export class FunctionsService {
         public translate: TranslateService,
         private headerService: HeaderService,
         private latinisePipe: LatinisePipe,
+        private datePipe: DatePipe
     ) { }
 
     empty(value: any) {
@@ -102,6 +103,13 @@ export class FunctionsService {
 
     formatSerializedDateToDateString(date: string) {
         return this.formatDateObjectToDateString(new Date(date));
+    }
+
+    getFormatedFileName(filename: string = 'maarch', ext: string = '', format: string = 'dd-MM-yyyy') {
+        const today = new Date();
+        const formatedDate = this.datePipe.transform(today, format);
+        const suffix = !this.empty(ext) ? `.${ext}` : '';
+        return `${filename}_${formatedDate}${suffix}`;
     }
 
     listSortingDataAccessor(data: any, sortHeaderId: any) {
