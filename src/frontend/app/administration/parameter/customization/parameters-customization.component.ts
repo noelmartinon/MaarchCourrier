@@ -42,7 +42,7 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
             logo: ['../rest/images?image=logo'],
         });
 
-        this.backgroundList = Array.from({ length: 16 }).map((_, i) => ({
+        this.backgroundList = Array.from({ length: 17 }).map((_, i) => ({
             filename: `${i + 1}.jpg`,
             url: `assets/${i + 1}.jpg`,
         }));
