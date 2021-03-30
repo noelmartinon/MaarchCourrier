@@ -50,7 +50,7 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
         }
     }
     $response = $next($request, $response);
-    
+
     return $response;
 });
 
@@ -423,6 +423,7 @@ $app->get('/resources/{resId}/isAllowed', \Resource\controllers\ResController::c
 $app->get('/resources/{resId}/items', \Resource\controllers\ResController::class . ':getItems');
 $app->get('/resources/{resId}/attachments', \Attachment\controllers\AttachmentController::class . ':getByResId');
 $app->get('/resources/{resId}/contacts', \Contact\controllers\ContactController::class . ':getByResId');
+$app->get('/resources/{resId}/recipients', \Resource\controllers\ResController::class . ':getRecipients');
 $app->get('/resources/{resId}/emails', \Email\controllers\EmailController::class . ':getByResId');
 $app->get('/resources/{resId}/notes', \Note\controllers\NoteController::class . ':getByResId');
 $app->get('/resources/{resId}/templates', \Template\controllers\TemplateController::class . ':getByResId');
