@@ -44,18 +44,18 @@ export class ContactsFormComponent implements OnInit {
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('appInputCorrespondentGroup', { static: false }) appInputCorrespondentGroup: InputCorrespondentGroupComponent;
 
-    countries: any = [];
-    countriesFilteredResult: Observable<string[]>;
-    countryControl = new FormControl();
-
-    loading: boolean = false;
-
     @Input() creationMode: boolean = true;
     @Input() contactId: number = null;
     @Input() actionButton: boolean = true;
     @Input() defaultName: string = '';
 
     @Output() onSubmitEvent = new EventEmitter<number>();
+
+    countries: any = [];
+    countriesFilteredResult: Observable<string[]>;
+    countryControl = new FormControl();
+
+    loading: boolean = false;
 
     maarch2maarchUrl: string = `https://docs.maarch.org/gitbook/html/MaarchCourrier/${environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1]}/guat/guat_exploitation/maarch2maarch.html`;
 
@@ -503,11 +503,6 @@ export class ContactsFormComponent implements OnInit {
                     );
             }
         });
-    }
-
-    private _filter(value: string): string[] {
-        const filterValue = value.toLowerCase();
-        return this.countries.filter((option: any) => option.toLowerCase().includes(filterValue));
     }
 
     selectCountry(ev: any) {
@@ -1111,5 +1106,10 @@ export class ContactsFormComponent implements OnInit {
                 target.control.setValue( splitStr.join('-'));
             }
         }, 100);
+    }
+
+    private _filter(value: string): string[] {
+        const filterValue = value.toLowerCase();
+        return this.countries.filter((option: any) => option.toLowerCase().includes(filterValue));
     }
 }

@@ -17,26 +17,22 @@ import { FunctionsService } from '@service/functions.service';
 })
 
 export class IssuingSiteInputComponent implements OnInit {
+    /**
+     * FormControl used when autocomplete is used in form and must be catched in a form control.
+     */
+    @Input() control: FormControl = new FormControl('');
+    @Input() registedMailType: string = null;
+    @Input() showResetOption: boolean = false;
+
+    @Output() afterSelected = new EventEmitter<string>();
+
+    @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
     loading: boolean = false;
 
     issuingSiteList: any[] = [];
 
     issuingSiteAddress: any = null;
-
-    /**
-     * FormControl used when autocomplete is used in form and must be catched in a form control.
-     */
-    @Input() control: FormControl = new FormControl('');
-
-    @Input() registedMailType: string = null;
-
-    @Input() showResetOption: boolean = false;
-
-
-    @Output() afterSelected = new EventEmitter<string>();
-
-    @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
     constructor(
         public http: HttpClient,

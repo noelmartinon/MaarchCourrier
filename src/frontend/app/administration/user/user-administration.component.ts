@@ -31,6 +31,8 @@ export class UserAdministrationComponent implements OnInit {
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
     @ViewChild('maarchTree', { static: false }) maarchTree: MaarchFlatTreeComponent;
     @ViewChild('appInputCorrespondentGroup', { static: false }) appInputCorrespondentGroup: InputCorrespondentGroupComponent;
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     loading: boolean = false;
     dialogRef: MatDialogRef<any>;
@@ -116,30 +118,8 @@ export class UserAdministrationComponent implements OnInit {
 
     appVersion: string = environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1];
 
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
-
     // Redirect Baskets
     selectionBaskets = new SelectionModel<Element>(true, []);
-
-    applyFilter(filterValue: string) {
-        filterValue = filterValue.trim();
-        filterValue = filterValue.toLowerCase();
-        this.dataSource.filter = filterValue;
-    }
-
-    masterToggleBaskets(event: any) {
-        if (event.checked) {
-            this.user.baskets.forEach((basket: any) => {
-                if (!basket.userToDisplay) {
-                    this.selectionBaskets.select(basket);
-                }
-            });
-        } else {
-            this.selectionBaskets.clear();
-        }
-    }
-
 
     constructor(
         public translate: TranslateService,
@@ -159,6 +139,24 @@ export class UserAdministrationComponent implements OnInit {
         window['angularUserAdministrationComponent'] = {
             componentAfterUpload: (base64Content: any) => this.processAfterUpload(base64Content),
         };
+    }
+
+    applyFilter(filterValue: string) {
+        filterValue = filterValue.trim();
+        filterValue = filterValue.toLowerCase();
+        this.dataSource.filter = filterValue;
+    }
+
+    masterToggleBaskets(event: any) {
+        if (event.checked) {
+            this.user.baskets.forEach((basket: any) => {
+                if (!basket.userToDisplay) {
+                    this.selectionBaskets.select(basket);
+                }
+            });
+        } else {
+            this.selectionBaskets.clear();
+        }
     }
 
     ngOnInit(): void {

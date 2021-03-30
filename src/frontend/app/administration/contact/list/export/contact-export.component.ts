@@ -19,6 +19,7 @@ declare let $: any;
 })
 export class ContactExportComponent implements OnInit {
 
+    @ViewChild('listFilter', { static: true }) private listFilter: any;
 
     loading: boolean = false;
     loadingExport: boolean = false;
@@ -52,9 +53,6 @@ export class ContactExportComponent implements OnInit {
             label: this.translate.instant('lang.communicationMean')
         }
     ];
-
-    @ViewChild('listFilter', { static: true }) private listFilter: any;
-
 
     constructor(
         public translate: TranslateService,
@@ -143,7 +141,7 @@ export class ContactExportComponent implements OnInit {
                     let today: any;
                     let dd: any;
                     let mm: any;
-                    let yyyy: any;
+                    let yyyy: any = '';
 
                     today = new Date();
                     dd = today.getDate();

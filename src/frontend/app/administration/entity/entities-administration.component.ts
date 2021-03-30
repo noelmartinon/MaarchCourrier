@@ -27,11 +27,19 @@ declare let $: any;
     styleUrls: ['entities-administration.component.scss']
 })
 export class EntitiesAdministrationComponent implements OnInit {
-    /* HEADER*/
-    titleHeader: string;
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
     @ViewChild('appInputCorrespondentGroup', { static: false }) appInputCorrespondentGroup: InputCorrespondentGroupComponent;
+    @ViewChild('paginatorUsers', { static: false }) paginatorUsers: MatPaginator;
+    @ViewChild('paginatorTemplates', { static: false }) paginatorTemplates: MatPaginator;
+    @ViewChild('tableUsers', { static: false }) sortUsers: MatSort;
+    @ViewChild('tableTemplates', { static: false }) sortTemplates: MatSort;
+    @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
+    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
+    @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
+
+    /* HEADER*/
+    titleHeader: string;
 
     dialogRef: MatDialogRef<any>;
 
@@ -65,14 +73,18 @@ export class EntitiesAdministrationComponent implements OnInit {
     addressBANCurrentDepartment: string = '75';
     departmentList: any[] = [];
 
+    constructor(
+        public translate: TranslateService,
+        public http: HttpClient,
+        private notify: NotificationService,
+        public dialog: MatDialog,
+        private headerService: HeaderService,
+        private router: Router,
+        public appService: AppService,
+        public functions: FunctionsService,
+        private viewContainerRef: ViewContainerRef
+    ) { }
 
-    @ViewChild('paginatorUsers', { static: false }) paginatorUsers: MatPaginator;
-    @ViewChild('paginatorTemplates', { static: false }) paginatorTemplates: MatPaginator;
-    @ViewChild('tableUsers', { static: false }) sortUsers: MatSort;
-    @ViewChild('tableTemplates', { static: false }) sortTemplates: MatSort;
-    @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
-    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
-    @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
     applyFilterUsers(filterValue: string) {
         filterValue = filterValue.trim();
         filterValue = filterValue.toLowerCase();
@@ -85,17 +97,6 @@ export class EntitiesAdministrationComponent implements OnInit {
         this.dataSourceTemplates.filter = filterValue;
     }
 
-    constructor(
-        public translate: TranslateService,
-        public http: HttpClient,
-        private notify: NotificationService,
-        public dialog: MatDialog,
-        private headerService: HeaderService,
-        private router: Router,
-        public appService: AppService,
-        public functions: FunctionsService,
-        private viewContainerRef: ViewContainerRef
-    ) { }
 
     async ngOnInit(): Promise<void> {
         this.headerService.setHeader(this.translate.instant('lang.administration') + ' ' + this.translate.instant('lang.entities'));

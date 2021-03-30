@@ -24,6 +24,8 @@ import { FormControl } from '@angular/forms';
 export class ContactsParametersAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     subMenus: any[] = [];
 
@@ -47,9 +49,6 @@ export class ContactsParametersAdministrationComponent implements OnInit {
 
     dataSource = new MatTableDataSource(this.contactsParameters);
     displayedColumns = ['label', 'mandatory', 'filling', 'searchable', 'displayable'];
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,

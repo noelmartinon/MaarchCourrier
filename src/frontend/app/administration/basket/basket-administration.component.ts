@@ -21,6 +21,8 @@ export class BasketAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     dialogRef: MatDialogRef<any>;
 
@@ -48,15 +50,6 @@ export class BasketAdministrationComponent implements OnInit {
     orderColumnsSelected: any[] = [{ 'column': 'res_id', 'order': 'asc' }];
     dataSource: any;
 
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
-    applyFilter(filterValue: string) {
-        filterValue = filterValue.trim();
-        filterValue = filterValue.toLowerCase();
-        this.dataSource.filter = filterValue;
-    }
-
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -68,6 +61,12 @@ export class BasketAdministrationComponent implements OnInit {
         public appService: AppService,
         private viewContainerRef: ViewContainerRef
     ) { }
+
+    applyFilter(filterValue: string) {
+        filterValue = filterValue.trim();
+        filterValue = filterValue.toLowerCase();
+        this.dataSource.filter = filterValue;
+    }
 
     ngOnInit(): void {
         this.loading = true;
@@ -333,6 +332,7 @@ export class BasketAdministrationComponent implements OnInit {
 })
 export class BasketAdministrationSettingsModalComponent implements OnInit {
 
+    @ViewChild('statusInput', { static: true }) statusInput: ElementRef;
 
     allEntities: any[] = [];
 
@@ -343,8 +343,6 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<BasketAdministrationSettingsModalComponent>) {
     }
-
-    @ViewChild('statusInput', { static: true }) statusInput: ElementRef;
 
     ngOnInit(): void {
         this.http.get('../rest/entities')

@@ -17,6 +17,8 @@ declare let $: any;
 })
 export class ListAdministrationComponent implements OnInit {
 
+    @Input('currentBasketGroup') private basketGroup: any;
+    @Output('refreshBasketGroup') refreshBasketGroup = new EventEmitter<any>();
 
     loading: boolean = false;
 
@@ -255,9 +257,6 @@ export class ListAdministrationComponent implements OnInit {
     };
     selectedProcessToolClone: string = null;
 
-    @Input('currentBasketGroup') private basketGroup: any;
-    @Output('refreshBasketGroup') refreshBasketGroup = new EventEmitter<any>();
-
     constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, private functions: FunctionsService) { }
 
     async ngOnInit(): Promise<void> {
@@ -413,17 +412,6 @@ export class ListAdministrationComponent implements OnInit {
             });
     }
 
-    private _filterData(value: any): string[] {
-        let filterValue = '';
-
-        if (typeof value === 'string') {
-            filterValue = value.toLowerCase();
-        } else if (value !== null) {
-            filterValue = value.label.toLowerCase();
-        }
-        return this.availableData.filter((option: any) => option.label.toLowerCase().includes(filterValue));
-    }
-
     checkModif() {
         if (JSON.stringify(this.displayedSecondaryData) === JSON.stringify(this.displayedSecondaryDataClone) && this.selectedListEvent === this.selectedListEventClone && JSON.stringify(this.selectedProcessTool) === JSON.stringify(this.selectedProcessToolClone) && JSON.stringify(this.selectedTemplateDisplayedSecondaryData) === JSON.stringify(this.selectedTemplateDisplayedSecondaryDataClone)) {
             return true;
@@ -463,5 +451,16 @@ export class ListAdministrationComponent implements OnInit {
         if (!state) {
             this.selectedProcessTool.canUpdateModel = state;
         }
+    }
+
+    private _filterData(value: any): string[] {
+        let filterValue = '';
+
+        if (typeof value === 'string') {
+            filterValue = value.toLowerCase();
+        } else if (value !== null) {
+            filterValue = value.label.toLowerCase();
+        }
+        return this.availableData.filter((option: any) => option.label.toLowerCase().includes(filterValue));
     }
 }

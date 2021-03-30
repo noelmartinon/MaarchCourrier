@@ -16,6 +16,8 @@ import { AdministrationService } from '../administration.service';
 export class StatusesAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     loading: boolean = false;
 
@@ -23,9 +25,6 @@ export class StatusesAdministrationComponent implements OnInit {
 
     displayedColumns = ['img_filename', 'id', 'label_status', 'identifier'];
     filterColumns = ['id', 'label_status'];
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,

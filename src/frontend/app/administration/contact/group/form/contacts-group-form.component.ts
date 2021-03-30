@@ -29,6 +29,12 @@ import { PrivilegeService } from '@service/privileges.service';
 })
 export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
 
+    @ViewChild('contactsGroupTreeTemplate', { static: true }) contactsGroupTreeTemplate: TemplateRef<any>;
+    @ViewChild('paginatorLinkedCorrespondents', { static: false }) paginatorLinkedCorrespondents: MatPaginator;
+    @ViewChild('sortLinkedCorrespondents', { static: false }) sortLinkedCorrespondents: MatSort;
+    @ViewChild('maarchTree', { static: false }) maarchTree: MaarchFlatTreeComponent;
+    @ViewChild('contactsGroupFormUp', { static: false }) contactsGroupFormUp: NgForm;
+
     @Input() contactGroupId: number = null;
     @Input() hideSaveButton: boolean = false;
     @Input() canAddCorrespondents: boolean = true;
@@ -37,6 +43,11 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
     @Input() contactIds: number[] = [];
 
     @Output() afterUpdate = new EventEmitter<any>();
+
+    filtersChange = new EventEmitter();
+    filterInputControl = new FormControl('');
+    searchCorrespondentInputControl = new FormControl('');
+
 
     creationMode: boolean = true;
     displayCorrespondents: boolean = true; // fix issue virtual scroll
@@ -67,15 +78,7 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
     dataSourceLinkedCorrespondents: CorrespondentListHttpDao | null;
     selection = new SelectionModel<Element>(true, []);
     private destroy$ = new Subject<boolean>();
-    filtersChange = new EventEmitter();
-    filterInputControl = new FormControl('');
-    searchCorrespondentInputControl = new FormControl('');
 
-    @ViewChild('contactsGroupTreeTemplate', { static: true }) contactsGroupTreeTemplate: TemplateRef<any>;
-    @ViewChild('paginatorLinkedCorrespondents', { static: false }) paginatorLinkedCorrespondents: MatPaginator;
-    @ViewChild('sortLinkedCorrespondents', { static: false }) sortLinkedCorrespondents: MatSort;
-    @ViewChild('maarchTree', { static: false }) maarchTree: MaarchFlatTreeComponent;
-    @ViewChild('contactsGroupFormUp', { static: false }) contactsGroupFormUp: NgForm;
 
     constructor(
         public translate: TranslateService,

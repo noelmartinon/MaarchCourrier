@@ -52,7 +52,7 @@ export class UsersExportComponent implements OnInit {
                     let today: any;
                     let dd: any;
                     let mm: any;
-                    let yyyy: any;
+                    let yyyy: any = '';
 
                     today = new Date();
                     dd = today.getDate();

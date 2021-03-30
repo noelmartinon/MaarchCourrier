@@ -17,13 +17,12 @@ declare let $: any;
 })
 export class IndexingAdministrationComponent implements OnInit {
 
-    mobileQuery: MediaQueryList;
-
-
-    loading: boolean = true;
-
     @Input() groupId: number;
     @Output() resfreshShortcut = new EventEmitter<string>();
+
+    mobileQuery: MediaQueryList;
+
+    loading: boolean = true;
 
     keywordEntities: any[] = [];
     actionList: any[] = [];
@@ -278,7 +277,7 @@ export class IndexingAdministrationComponent implements OnInit {
 
         this.http.put('../rest/groups/' + this.groupId + '/indexing', { actions: newActionListIds }).pipe(
             tap(() => {
-                const index = this.actionList.findIndex(action => action.id === actionOpt.id);
+                const index = this.actionList.findIndex(item => item.id === actionOpt.id);
                 const action = { ...this.actionList[index] };
                 this.indexingInfo.actions.push(action);
                 this.actionList.splice(index, 1);

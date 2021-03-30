@@ -21,6 +21,8 @@ import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
 export class AlfrescoListAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     alfrescoUrl: string = '';
 
@@ -32,10 +34,6 @@ export class AlfrescoListAdministrationComponent implements OnInit {
     filterColumns = ['label', 'entitiesLabel'];
 
     dialogRef: MatDialogRef<any>;
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
-
 
     constructor(
         public translate: TranslateService,

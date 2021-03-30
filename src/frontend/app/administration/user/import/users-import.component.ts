@@ -20,6 +20,8 @@ import { Papa } from 'ngx-papaparse';
 })
 export class UsersImportComponent implements OnInit {
 
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+
     loading: boolean = false;
     userColmuns: string[] = [
         'id',
@@ -40,8 +42,6 @@ export class UsersImportComponent implements OnInit {
     countAll: number = 0;
     countAdd: number = 0;
     countUp: number = 0;
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
 
     constructor(
         public translate: TranslateService,

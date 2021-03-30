@@ -21,7 +21,9 @@ import { PrivilegeService } from '@service/privileges.service';
 export class HistoryBatchAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-
+    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+    @ViewChild('tableHistoryListSort', { static: true }) sort: MatSort;
+    @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
     loading: boolean = false;
 
@@ -53,13 +55,9 @@ export class HistoryBatchAdministrationComponent implements OnInit {
 
     loadingFilters: boolean = true;
 
-    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-    @ViewChild('tableHistoryListSort', { static: true }) sort: MatSort;
-    @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
+    subMenus: any[] = [];
 
     private destroy$ = new Subject<boolean>();
-
-    subMenus: any[] = [];
 
     constructor(
         public translate: TranslateService,
@@ -267,6 +265,10 @@ export class HistoryBatchAdministrationComponent implements OnInit {
         }
     }
 
+    directSearchHistory() {
+        this.refreshDao();
+    }
+
     private filter(value: string, type: string): any[] {
         if (typeof value === 'string') {
             const filterValue = this.latinisePipe.transform(value.toLowerCase());
@@ -274,10 +276,6 @@ export class HistoryBatchAdministrationComponent implements OnInit {
         } else {
             return this.filterList[type];
         }
-    }
-
-    directSearchHistory() {
-        this.refreshDao();
     }
 }
 

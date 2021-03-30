@@ -23,6 +23,10 @@ import { AuthService } from '@service/auth.service';
 export class GroupAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
+    @ViewChild('paginatorBaskets', { static: false }) paginatorBaskets: MatPaginator;
+    @ViewChild('sortBaskets', { static: true }) sortBaskets: MatSort;
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild('sortUsers', { static: true }) sortUsers: MatSort;
 
     loading: boolean = false;
     paramsLoading: boolean = false;
@@ -44,23 +48,6 @@ export class GroupAdministrationComponent implements OnInit {
 
     authorizedGroupsUserParams: any[] = [];
     panelMode = 'keywordInfos';
-
-    @ViewChild('paginatorBaskets', { static: false }) paginatorBaskets: MatPaginator;
-    @ViewChild('sortBaskets', { static: true }) sortBaskets: MatSort;
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild('sortUsers', { static: true }) sortUsers: MatSort;
-
-
-    applyFilter(filterValue: string) {
-        filterValue = filterValue.trim();
-        filterValue = filterValue.toLowerCase();
-        this.usersDataSource.filter = filterValue;
-    }
-    applyBasketsFilter(filterValue: string) {
-        filterValue = filterValue.trim();
-        filterValue = filterValue.toLowerCase();
-        this.basketsDataSource.filter = filterValue;
-    }
 
     constructor(
         public translate: TranslateService,
@@ -430,5 +417,16 @@ export class GroupAdministrationComponent implements OnInit {
         if (user.allowed) {
             this.router.navigate(['/administration/users/' + user.id]);
         }
+    }
+
+    applyFilter(filterValue: string) {
+        filterValue = filterValue.trim();
+        filterValue = filterValue.toLowerCase();
+        this.usersDataSource.filter = filterValue;
+    }
+    applyBasketsFilter(filterValue: string) {
+        filterValue = filterValue.trim();
+        filterValue = filterValue.toLowerCase();
+        this.basketsDataSource.filter = filterValue;
     }
 }

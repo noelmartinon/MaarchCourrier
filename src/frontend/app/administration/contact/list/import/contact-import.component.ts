@@ -20,6 +20,8 @@ import { Papa } from 'ngx-papaparse';
 })
 export class ContactImportComponent implements OnInit {
 
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+
     loading: boolean = false;
 
     contactColumns: any[] = [
@@ -115,8 +117,6 @@ export class ContactImportComponent implements OnInit {
     countAll: number = 0;
     countAdd: number = 0;
     countUp: number = 0;
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
 
     constructor(
         public translate: TranslateService,

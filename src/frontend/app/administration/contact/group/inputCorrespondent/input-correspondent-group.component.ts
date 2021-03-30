@@ -22,6 +22,9 @@ import { SortPipe } from '@plugins/sorting.pipe';
 
 export class InputCorrespondentGroupComponent implements OnInit {
 
+    @ViewChild('correspondentGroupsInput') correspondentGroupsInput: ElementRef<HTMLInputElement>;
+    @ViewChild('auto') matAutocomplete: MatAutocomplete;
+
     @Input() id: string;
     @Input() type: string;
 
@@ -33,9 +36,6 @@ export class InputCorrespondentGroupComponent implements OnInit {
     filteredcorrespondentGroups: Observable<string[]>;
     correspondentGroups: any[] = [];
     allCorrespondentGroups: any[] = [];
-
-    @ViewChild('correspondentGroupsInput') correspondentGroupsInput: ElementRef<HTMLInputElement>;
-    @ViewChild('auto') matAutocomplete: MatAutocomplete;
 
     constructor(
         public translate: TranslateService,

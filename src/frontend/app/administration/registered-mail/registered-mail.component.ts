@@ -131,7 +131,7 @@ export class RegisteredMailComponent implements OnInit {
     }
 
     onlyNumbers(event) {
-        let k;
+        let k: number = 0;
         k = event.charCode;
         if (this.adminFormGroup.controls['rangeStart'].value === null && k === 48) {
             return false;

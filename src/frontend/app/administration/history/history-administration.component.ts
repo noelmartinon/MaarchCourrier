@@ -8,20 +8,17 @@ import { PrivilegeService } from '@service/privileges.service';
 import { HeaderService } from '@service/header.service';
 
 @Component({
-    selector: 'admin-history',
+    selector: 'app-admin-history',
     templateUrl: 'history-administration.component.html',
     styleUrls: ['history-administration.component.scss']
 })
 export class HistoryAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-
-
+    @ViewChild('appHistoryList', { static: false }) appHistoryList: HistoryComponent;
 
     startDateFilter: any = '';
     endDateFilter: any = '';
-
-    @ViewChild('appHistoryList', { static: false }) appHistoryList: HistoryComponent;
 
     subMenus: any[] = [
         {

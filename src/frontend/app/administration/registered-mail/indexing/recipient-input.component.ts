@@ -90,11 +90,6 @@ export class RegisteredMailRecipientInputComponent implements OnInit {
             );
     }
 
-    private _filter(value: string): string[] {
-        const filterValue = value.toLowerCase();
-        return this.countries.filter((option: any) => option.toLowerCase().includes(filterValue));
-    }
-
     initBanSearch() {
         this.http.get('../rest/ban/availableDepartments').pipe(
             tap((data: any) => {
@@ -220,5 +215,10 @@ export class RegisteredMailRecipientInputComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    private _filter(value: string): string[] {
+        const filterValue = value.toLowerCase();
+        return this.countries.filter((option: any) => option.toLowerCase().includes(filterValue));
     }
 }

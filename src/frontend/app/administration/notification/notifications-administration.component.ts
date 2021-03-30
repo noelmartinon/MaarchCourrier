@@ -19,6 +19,8 @@ export class NotificationsAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     notifications: any[] = [];
     loading: boolean = false;
@@ -46,9 +48,6 @@ export class NotificationsAdministrationComponent implements OnInit {
 
     displayedColumns = ['notification_id', 'description', 'is_enabled', 'notifications'];
     filterColumns = ['notification_id', 'description'];
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,

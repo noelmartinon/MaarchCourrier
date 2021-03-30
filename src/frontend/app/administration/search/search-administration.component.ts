@@ -410,17 +410,6 @@ export class SearchAdministrationComponent implements OnInit {
             });
     }
 
-    private _filterData(value: any): string[] {
-        let filterValue = '';
-
-        if (typeof value === 'string') {
-            filterValue = value.toLowerCase();
-        } else if (value !== null) {
-            filterValue = value.label.toLowerCase();
-        }
-        return this.availableData.filter((option: any) => option.label.toLowerCase().includes(filterValue));
-    }
-
     checkModif() {
         if (JSON.stringify(this.displayedSecondaryData) === JSON.stringify(this.displayedSecondaryDataClone) && this.selectedListEvent === this.selectedListEventClone && JSON.stringify(this.selectedProcessTool) === JSON.stringify(this.selectedProcessToolClone) && JSON.stringify(this.selectedTemplateDisplayedSecondaryData) === JSON.stringify(this.selectedTemplateDisplayedSecondaryDataClone)) {
             return true;
@@ -460,5 +449,16 @@ export class SearchAdministrationComponent implements OnInit {
         if (!state) {
             this.selectedProcessTool.canUpdateModel = state;
         }
+    }
+
+    private _filterData(value: any): string[] {
+        let filterValue = '';
+
+        if (typeof value === 'string') {
+            filterValue = value.toLowerCase();
+        } else if (value !== null) {
+            filterValue = value.label.toLowerCase();
+        }
+        return this.availableData.filter((option: any) => option.label.toLowerCase().includes(filterValue));
     }
 }

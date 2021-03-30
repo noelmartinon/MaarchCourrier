@@ -18,7 +18,8 @@ import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 export class DiffusionModelAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
-
+    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
+    @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
 
     loading: boolean = true;
 
@@ -42,9 +43,6 @@ export class DiffusionModelAdministrationComponent implements OnInit {
     ];
     creationMode: boolean;
     listDiffModified: boolean = false;
-
-    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
-    @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
 
     constructor(
         public translate: TranslateService,

@@ -20,6 +20,10 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class IssuingSiteListComponent implements OnInit {
 
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
+
     subMenus: any[] = [
         {
             icon: 'fas fa-dolly-flatbed',
@@ -35,8 +39,6 @@ export class IssuingSiteListComponent implements OnInit {
         },
     ];
 
-    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-
     parameters: any = {};
 
     loading: boolean = true;
@@ -45,9 +47,6 @@ export class IssuingSiteListComponent implements OnInit {
 
     displayedColumns = ['accountNumber', 'label', 'postOfficeLabel', 'actions'];
     filterColumns = ['accountNumber', 'label', 'postOfficeLabel'];
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,

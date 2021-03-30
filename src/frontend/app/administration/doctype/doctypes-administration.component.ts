@@ -19,6 +19,8 @@ export class DoctypesAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     dialogRef: MatDialogRef<any>;
     config: any = {};
@@ -43,8 +45,6 @@ export class DoctypesAdministrationComponent implements OnInit {
     conservationRules: any = [];
 
     displayedColumns = ['label', 'use', 'mandatory', 'column'];
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,

@@ -18,7 +18,8 @@ export class ActionsAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     search: string = null;
 
@@ -29,9 +30,6 @@ export class ActionsAdministrationComponent implements OnInit {
 
     displayedColumns = ['id', 'label_action', 'history', 'actions'];
     filterColumns = ['id', 'label_action'];
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,
