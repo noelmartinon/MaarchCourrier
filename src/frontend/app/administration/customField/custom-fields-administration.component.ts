@@ -237,6 +237,9 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     }
 
     isModified(customField: any, indexCustomField: number) {
+        if (!this.functionsService.empty(customField.oldValues)) {
+            this.customFieldsClone[indexCustomField].oldValues = customField.oldValues;
+        }
         if (JSON.stringify(customField) === JSON.stringify(this.customFieldsClone[indexCustomField]) || customField.label === '' || this.SQLMode || customField.mode === '') {
             return true;
         } else {
