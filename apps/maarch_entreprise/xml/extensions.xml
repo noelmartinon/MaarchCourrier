@@ -226,6 +226,16 @@
         <canConvert>false</canConvert>
     </FORMAT>
     <FORMAT>
+        <name>MSG</name>
+        <mime>application/vnd.ms-outlook</mime>
+        <canConvert>false</canConvert>
+    </FORMAT>
+    <FORMAT>
+        <name>MSG</name>
+        <mime></mime>
+        <canConvert>false</canConvert>
+    </FORMAT>
+    <FORMAT>
         <name>MHT</name>
         <mime>text/plain</mime>
         <canConvert>true</canConvert>
