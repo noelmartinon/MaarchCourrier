@@ -227,6 +227,11 @@
     </FORMAT>
     <FORMAT>
         <name>MSG</name>
+        <mime>application/msword</mime>
+        <canConvert>false</canConvert>
+    </FORMAT>
+    <FORMAT>
+        <name>MSG</name>
         <mime></mime>
         <canConvert>false</canConvert>
     </FORMAT>
