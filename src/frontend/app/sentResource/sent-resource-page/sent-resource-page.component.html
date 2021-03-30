@@ -216,6 +216,6 @@
             [disabled]="recipients.length === 0 || emailsubject.length > 256">{{'lang.send' | translate}}</button>
         <button mat-raised-button color="warn" (click)="deleteEmail()"
             *ngIf="data.emailId && data.emailType === 'email'"
-            [disabled]="headerService.user.id !== emailCreatorId">{{'lang.delete' | translate}}</button>
+            [disabled]="headerService.user.id !== emailCreatorId || emailStatus === 'SENT'">{{'lang.delete' | translate}}</button>
     </div>
 </div>
