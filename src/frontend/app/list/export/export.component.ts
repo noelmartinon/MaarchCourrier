@@ -7,8 +7,9 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { catchError, map, tap, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { FunctionsService } from '@service/functions.service';
 
-declare var $: any;
+declare let $: any;
 
 @Component({
     templateUrl: 'export.component.html',
@@ -16,6 +17,8 @@ declare var $: any;
     providers: [SortPipe],
 })
 export class ExportComponent implements OnInit {
+
+    @ViewChild('listFilter', { static: true }) private listFilter: any;
 
     loading: boolean = false;
     loadingExport: boolean = false;
@@ -231,53 +234,71 @@ export class ExportComponent implements OnInit {
     ];
     dataAvailableClone: any[] = [];
 
-    @ViewChild('listFilter', { static: true }) private listFilter: any;
+    constructor(
+        public translate: TranslateService,
+        public http: HttpClient,
+        private notify: NotificationService,
+        private functionsService: FunctionsService,
+        @Inject(MAT_DIALOG_DATA) public data: any, private sortPipe: SortPipe
+    ) { }
 
+    async ngOnInit(): Promise<void> {
+        await this.getCustomFields();
 
-    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, @Inject(MAT_DIALOG_DATA) public data: any, private sortPipe: SortPipe) { }
-
-    ngOnInit(): void {
         this.dataAvailableClone = JSON.parse(JSON.stringify(this.dataAvailable));
 
-        this.http.get('../rest/resourcesList/exportTemplate')
-            .subscribe((data: any) => {
-                this.exportModel.resources = this.data.selectedRes;
+        await this.getTemplateFields();
 
-                this.exportModelList = data.templates;
+        this.loading = false;
+    }
 
-                this.exportModel.data = data.templates.csv.data;
-                this.exportModel.data.forEach((value: any) => {
-                    this.dataAvailable.forEach((availableValue: any, index: number) => {
-                        if (value.value === availableValue.value) {
-                            this.dataAvailable.splice(index, 1);
-                        }
-                    });
-                });
-                this.loading = false;
-            }, (err: any) => {
-                this.notify.handleErrors(err);
-            });
-
-        this.http.get('../rest/customFields').pipe(
-            map((data: any) => {
-                data.customFields = data.customFields.map((custom: any) => {
-                    return {
+    getCustomFields() {
+        return new Promise((resolve) => {
+            this.http.get('../rest/customFields').pipe(
+                map((data: any) => {
+                    data.customFields = data.customFields.map((custom: any) => ({
                         value: 'custom_' + custom.id,
                         label: custom.label,
                         isFunction: true
-                    };
-                });
-                return data;
-            }),
-            tap((data: any) => {
-                this.dataAvailable = this.dataAvailable.concat(data.customFields);
-                this.dataAvailableClone = this.dataAvailableClone.concat(data.customFields);
-            }),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+                    }));
+                    return data;
+                }),
+                tap((data: any) => {
+                    this.dataAvailable = this.dataAvailable.concat(data.customFields);
+                }),
+                finalize(() => resolve(true)),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    getTemplateFields() {
+        return new Promise((resolve) => {
+            this.http.get('../rest/resourcesList/exportTemplate').pipe(
+                tap((data: any) => {
+                    this.exportModel.resources = this.data.selectedRes;
+
+                    this.exportModelList = data.templates;
+
+                    this.exportModel.data = data.templates.csv.data;
+                    this.exportModel.data.forEach((value: any) => {
+                        this.dataAvailable.forEach((availableValue: any, index: number) => {
+                            if (value.value === availableValue.value) {
+                                this.dataAvailable.splice(index, 1);
+                            }
+                        });
+                    });
+                }),
+                finalize(() => resolve(true)),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     drop(event: CdkDragDrop<string[]>) {
