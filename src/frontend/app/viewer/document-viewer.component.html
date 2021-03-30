@@ -93,7 +93,7 @@
             </div>
             <div>
                 <pdf-viewer *ngIf="file.src!==null" [src]="file.src" [render-text]="true" [autoresize]="true"
-                    [original-size]="false" [show-all]="true" (error)="onError($event)" style="width:100%;">
+                    [original-size]="false" [show-all]="true" (error)="onError($event)" style="width:100%;font-weight: initial;">
                 </pdf-viewer>
             </div>
 
