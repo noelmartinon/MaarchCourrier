@@ -163,6 +163,11 @@ INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, 
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (36, '', 'AGENT', 'MyBasket', 'N', 'Y', 'N');
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (1, '', 'AGENT', 'MyBasket', 'N', 'Y', 'N');
 INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (19, '', 'AGENT', 'MyBasket', 'N', 'Y', 'Y');
+INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (18, '', 'AGENT', 'outlook_mails', 'N', 'Y', 'Y');
+INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (18, '', 'DIRECTEUR', 'outlook_mails', 'N', 'Y', 'Y');
+INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (18, '', 'RESPONSABLE', 'outlook_mails', 'N', 'Y', 'Y');
+INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (18, '', 'COURRIER', 'outlook_mails', 'N', 'Y', 'Y');
+INSERT INTO actions_groupbaskets (id_action, where_clause, group_id, basket_id, used_in_basketlist, used_in_action_page, default_action_list) VALUES (18, '', 'RESP_COURRIER', 'outlook_mails', 'N', 'Y', 'Y');
 
 INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES (2, 'response_project', 'Projet de réponse', true, true, true, 'R', true, true, true);
 INSERT INTO attachment_types (id, type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES (3, 'signed_response', 'Réponse signée', false, true, false, '', true, true, true);
@@ -197,13 +202,15 @@ INSERT INTO baskets (id, coll_id, basket_id, basket_name, basket_desc, basket_cl
 INSERT INTO baskets (id, coll_id, basket_id, basket_name, basket_desc, basket_clause, is_visible, enabled, basket_order, color, basket_res_order, flag_notif) VALUES (22, 'letterbox_coll', 'AckArcBasket', 'Courriers archivés', 'Courriers archivés et acceptés dans le SAE', 'status=''REPLY_SEDA''', 'Y', 'Y', 21, NULL, 'res_id desc', 'N');
 INSERT INTO baskets (id, coll_id, basket_id, basket_name, basket_desc, basket_clause, is_visible, enabled, basket_order, color, basket_res_order, flag_notif) VALUES (4, 'letterbox_coll', 'MyBasket', 'Courriers à traiter', 'Bannette de traitement', 'status in (''NEW'', ''COU'', ''STDBY'', ''ENVDONE'') and dest_user = @user_id', 'Y', 'Y', 3, NULL, 'res_id desc', 'Y');
 INSERT INTO baskets (id, coll_id, basket_id, basket_name, basket_desc, basket_clause, is_visible, enabled, basket_order, color, basket_res_order, flag_notif) VALUES (10, 'letterbox_coll', 'SupAvisBasket', 'Avis : En attente de réponse', 'Courriers en attente d''avis', 'status=''EAVIS'' and ((dest_user = @user_id) OR (DEST_USER IN (select user_id from users_entities WHERE entity_id IN( @my_entities)) or DESTINATION in (@subentities[@my_entities]))) and res_id NOT IN (SELECT res_id FROM listinstance WHERE item_mode = ''avis'' and difflist_type = ''entity_id'' and process_date is not NULL and res_view_letterbox.res_id = res_id group by res_id) AND res_id IN (SELECT res_id FROM listinstance WHERE item_mode = ''avis'' and difflist_type = ''entity_id'' and process_date is NULL and res_view_letterbox.res_id = res_id group by res_id)', 'Y', 'Y', 9, NULL, 'res_id desc', 'N');
+INSERT INTO baskets (id, coll_id, basket_id, basket_name, basket_desc, basket_clause, is_visible, enabled, basket_order, color, basket_res_order, flag_notif) VALUES (25, 'letterbox_coll', 'outlook_mails', 'Courriels importés', 'Bannette des courriels importés de MS Outlook', 'status in (''OUT'') and typist = @user_id', 'Y', 'Y', 1, NULL, 'res_id desc', 'N');
 
+INSERT INTO configurations (id, privilege, value) VALUES (1, 'admin_email_server', '{"auth": true, "from": "test.maarch.courrier@maarch.org", "host": "smtp.globalsp.com", "port": 587, "type": "smtp", "user": "", "online": false, "secure": "tls", "charset": "utf-8", "password": ""}');
 INSERT INTO configurations (id, privilege, value) VALUES (2, 'admin_search', '{"listEvent": {"defaultTab": "dashboard"}, "listDisplay": {"subInfos": [{"icon": "fa-traffic-light", "value": "getPriority", "cssClasses": ["align_leftData"]}, {"icon": "fa-calendar", "value": "getCreationAndProcessLimitDates", "cssClasses": ["align_leftData"]}, {"icon": "fa-sitemap", "value": "getAssignee", "cssClasses": ["align_leftData"]}, {"icon": "fa-suitcase", "value": "getDoctype", "cssClasses": ["align_leftData"]}, {"icon": "fa-user", "value": "getRecipients", "cssClasses": ["align_leftData"]}, {"icon": "fa-book", "value": "getSenders", "cssClasses": ["align_leftData"]}], "templateColumns": 6}}');
 INSERT INTO configurations (id, privilege, value) VALUES (3, 'admin_sso', '{"url": "", "mapping": [{"ssoId": "", "maarchId": "login"}]}');
+INSERT INTO configurations (id, privilege, value) VALUES (4, 'admin_document_editors', '{"java": [], "onlyoffice": {"ssl": true, "uri": "onlyoffice.maarchcourrier.com", "port": "443", "token": "", "authorizationHeader": "Authorization"}}');
 INSERT INTO configurations (id, privilege, value) VALUES (5, 'admin_parameters_watermark', '{"font": "helvetica", "posX": 30, "posY": 35, "size": 10, "text": "Copie conforme de [alt_identifier] le [date_now] [hour_now]", "angle": 0, "color": [20, 192, 30], "enabled": true, "opacity": 0.5}');
 INSERT INTO configurations (id, privilege, value) VALUES (6, 'admin_shippings', '{"uri": "", "authUri": "", "enabled": false}');
-INSERT INTO configurations (id, privilege, value) VALUES (4, 'admin_document_editors', '{"java": [], "onlyoffice": {"ssl": true, "uri": "onlyoffice.maarchcourrier.com", "port": "443", "token": "", "authorizationHeader": "Authorization"}}');
-INSERT INTO configurations (id, privilege, value) VALUES (1, 'admin_email_server', '{"auth": true, "from": "test.maarch.courrier@maarch.org", "host": "smtp.globalsp.com", "port": 587, "type": "smtp", "user": "", "online": false, "secure": "tls", "charset": "utf-8", "password": ""}');
+INSERT INTO configurations (id, privilege, value) VALUES (7, 'admin_addin_outlook', '{"typeId": 1203, "statusId": 42, "indexingModelId": 8, "attachmentTypeId": 5}');
 
 INSERT INTO contacts (id, civility, firstname, lastname, company, department, function, address_number, address_street, address_additional1, address_additional2, address_postcode, address_town, address_country, email, phone, communication_means, notes, creator, creation_date, modification_date, enabled, custom_fields, external_id) VALUES (1, 1, 'Jean-Louis', 'ERCOLANI', 'MAARCH', '', 'Directeur Général', '11', 'Boulevard du Sud-Est', '', '', '99000', 'MAARCH LES BAINS', 'France', 'dev.maarch@maarch.org', '', NULL, 'Editeur du logiciel libre Maarch', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}', '{}');
 INSERT INTO contacts (id, civility, firstname, lastname, company, department, function, address_number, address_street, address_additional1, address_additional2, address_postcode, address_town, address_country, email, phone, communication_means, notes, creator, creation_date, modification_date, enabled, custom_fields, external_id) VALUES (4, 1, 'Nicolas', 'MARTIN', 'Préfecture de Maarch Les Bains', NULL, NULL, '13', 'RUE LA PREFECTURE', NULL, NULL, '99000', 'MAARCH LES BAINS', NULL, NULL, NULL, '{"url": "https://cchaplin:maarch@demo.maarchcourrier.com"}', NULL, 21, '2018-04-18 12:43:54.97424', '2020-03-24 15:06:58.16582', true, NULL, '{"m2m": "45239273100025/COU"}');
@@ -372,6 +379,7 @@ INSERT INTO doctypes (coll_id, type_id, description, enabled, doctypes_first_lev
 INSERT INTO doctypes (coll_id, type_id, description, enabled, doctypes_first_level_id, doctypes_second_level_id, retention_final_disposition, retention_rule, action_current_use, duration_current_use, process_delay, delay1, delay2, process_mode) VALUES ('', 1106, 'Travaux ERP', 'Y', 1, 11, 'destruction', 'compta_3_03', NULL, 365, 60, 14, 1, 'SVA');
 INSERT INTO doctypes (coll_id, type_id, description, enabled, doctypes_first_level_id, doctypes_second_level_id, retention_final_disposition, retention_rule, action_current_use, duration_current_use, process_delay, delay1, delay2, process_mode) VALUES ('', 1201, 'Appel téléphonique', 'Y', 1, 12, 'destruction', 'compta_3_03', NULL, 365, 21, 14, 1, 'NORMAL');
 INSERT INTO doctypes (coll_id, type_id, description, enabled, doctypes_first_level_id, doctypes_second_level_id, retention_final_disposition, retention_rule, action_current_use, duration_current_use, process_delay, delay1, delay2, process_mode) VALUES ('', 1202, 'Demande intervention voirie', 'Y', 1, 12, 'destruction', 'compta_3_03', NULL, 365, 21, 14, 1, 'NORMAL');
+INSERT INTO doctypes (coll_id, type_id, description, enabled, doctypes_first_level_id, doctypes_second_level_id, retention_final_disposition, retention_rule, action_current_use, duration_current_use, process_delay, delay1, delay2, process_mode) VALUES ('', 1203, 'Courriel importé', 'Y', 1, 12, 'destruction', 'compta_3_03', NULL, 365, 21, 14, 1, 'NORMAL');
 
 INSERT INTO doctypes_first_level (doctypes_first_level_id, doctypes_first_level_label, css_style, enabled) VALUES (1, 'COURRIERS', '#000000', 'Y');
 
@@ -535,6 +543,12 @@ INSERT INTO groupbasket (id, group_id, basket_id, list_display, list_event, list
 INSERT INTO groupbasket (id, group_id, basket_id, list_display, list_event, list_event_data) VALUES (7, 'ELU', 'DdeAvisBasket', '{"templateColumns":5,"subInfos":[{"value":"getPriority","label":"Priorit\u00e9","sample":"Urgent","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","label":"Cat\u00e9gorie","sample":"Courrier arriv\u00e9e","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","label":"Type de courrier","sample":"R\u00e9clamation","cssClasses":[],"icon":"fa-suitcase"},{"value":"getParallelOpinionsNumber","label":"Nombre d''avis donn\u00e9s","sample":"<b>3<\/b> avis donn\u00e9(s)","cssClasses":["align_rightData"],"icon":"fa-comment-alt"},{"value":"getOpinionLimitDate","label":"Date limite d''envoi des avis","sample":"01-01-2019","cssClasses":["align_rightData"],"icon":"fa-stopwatch"}]}', 'processDocument', '{"defaultTab": "notes", "canUpdateData": false, "canUpdateModel": false}');
 INSERT INTO groupbasket (id, group_id, basket_id, list_display, list_event, list_event_data) VALUES (14, 'RESPONSABLE', 'MyBasket', '{"templateColumns":7,"subInfos":[{"value":"getPriority","label":"Priorit\u00e9","sample":"Urgent","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","label":"Cat\u00e9gorie","sample":"Courrier arriv\u00e9e","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","label":"Type de courrier","sample":"R\u00e9clamation","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","label":"Attributaire (entit\u00e9 traitante)","sample":"Barbara BAIN (P\u00f4le Jeunesse et Sport)","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","label":"Destinataire","sample":"Patricia PETIT","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","label":"Exp\u00e9diteur","sample":"Alain DUBOIS (MAARCH)","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"},{"value":"getFolders","label":"Dossiers (emplacement fixe)","sample":"Litiges","cssClasses":["align_leftData"],"icon":"fa-folder"}]}', 'processDocument', '{"defaultTab": "dashboard", "canUpdateData": false, "canUpdateModel": false}');
 INSERT INTO groupbasket (id, group_id, basket_id, list_display, list_event, list_event_data) VALUES (18, 'RESPONSABLE', 'ParafBasket', '{"templateColumns":7,"subInfos":[{"value":"getPriority","label":"Priorit\u00e9","sample":"Urgent","cssClasses":[],"icon":"fa-traffic-light"},{"value":"getCategory","label":"Cat\u00e9gorie","sample":"Courrier arriv\u00e9e","cssClasses":[],"icon":"fa-exchange-alt"},{"value":"getDoctype","label":"Type de courrier","sample":"R\u00e9clamation","cssClasses":[],"icon":"fa-suitcase"},{"value":"getAssignee","label":"Attributaire (entit\u00e9 traitante)","sample":"Barbara BAIN (P\u00f4le Jeunesse et Sport)","cssClasses":[],"icon":"fa-sitemap"},{"value":"getRecipients","label":"Destinataire","sample":"Patricia PETIT","cssClasses":[],"icon":"fa-user"},{"value":"getSenders","label":"Exp\u00e9diteur","sample":"Alain DUBOIS (MAARCH)","cssClasses":[],"icon":"fa-book"},{"value":"getCreationAndProcessLimitDates","cssClasses":["align_rightData"],"icon":"fa-calendar"},{"value":"getFolders","label":"Dossiers (emplacement fixe)","sample":"Litiges","cssClasses":["align_leftData"],"icon":"fa-folder"}]}', 'signatureBookAction', '{"canUpdateDocuments": true}');
+INSERT INTO groupbasket (id, group_id, basket_id, list_display, list_event, list_event_data) VALUES (33, 'AGENT', 'outlook_mails', '{"templateColumns":0,"subInfos":[]}', 'processDocument', '{"defaultTab": "info", "canUpdateData": true, "canUpdateModel": true}');
+INSERT INTO groupbasket (id, group_id, basket_id, list_display, list_event, list_event_data) VALUES (34, 'DIRECTEUR', 'outlook_mails', '{"templateColumns":0,"subInfos":[]}', 'processDocument', '{"defaultTab": "info", "canUpdateData": true, "canUpdateModel": true}');
+INSERT INTO groupbasket (id, group_id, basket_id, list_display, list_event, list_event_data) VALUES (35, 'RESPONSABLE', 'outlook_mails', '{"templateColumns":0,"subInfos":[]}', 'processDocument', '{"defaultTab": "info", "canUpdateData": true, "canUpdateModel": true}');
+INSERT INTO groupbasket (id, group_id, basket_id, list_display, list_event, list_event_data) VALUES (36, 'COURRIER', 'outlook_mails', '{"templateColumns":0,"subInfos":[]}', 'processDocument', '{"defaultTab": "info", "canUpdateData": true, "canUpdateModel": true}');
+INSERT INTO groupbasket (id, group_id, basket_id, list_display, list_event, list_event_data) VALUES (37, 'RESP_COURRIER', 'outlook_mails', '{"templateColumns":0,"subInfos":[]}', 'processDocument', '{"defaultTab": "info", "canUpdateData": true, "canUpdateModel": true}');
+
 
 INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, entity_id, keyword, redirect_mode) VALUES (600, 'COURRIER', 'QualificationBasket', 18, '', 'ALL_ENTITIES', 'ENTITY');
 INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, entity_id, keyword, redirect_mode) VALUES (601, 'COURRIER', 'NumericBasket', 18, '', 'ALL_ENTITIES', 'ENTITY');
@@ -556,6 +570,16 @@ INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, ent
 INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, entity_id, keyword, redirect_mode) VALUES (679, 'AGENT', 'MyBasket', 1, '', 'SAME_LEVEL_ENTITIES', 'ENTITY');
 INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, entity_id, keyword, redirect_mode) VALUES (680, 'AGENT', 'MyBasket', 1, '', 'MY_PRIMARY_ENTITY', 'ENTITY');
 INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, entity_id, keyword, redirect_mode) VALUES (681, 'AGENT', 'MyBasket', 1, '', 'ENTITIES_JUST_UP', 'ENTITY');
+INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, entity_id, keyword, redirect_mode) VALUES (726, 'DIRECTEUR', 'outlook_mails', 18, '', 'ALL_ENTITIES', 'ENTITY');
+INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, entity_id, keyword, redirect_mode) VALUES (727, 'DIRECTEUR', 'outlook_mails', 18, '', 'ALL_ENTITIES', 'USERS');
+INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, entity_id, keyword, redirect_mode) VALUES (728, 'RESPONSABLE', 'outlook_mails', 18, '', 'ALL_ENTITIES', 'ENTITY');
+INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, entity_id, keyword, redirect_mode) VALUES (729, 'RESPONSABLE', 'outlook_mails', 18, '', 'ALL_ENTITIES', 'USERS');
+INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, entity_id, keyword, redirect_mode) VALUES (730, 'COURRIER', 'outlook_mails', 18, '', 'ALL_ENTITIES', 'ENTITY');
+INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, entity_id, keyword, redirect_mode) VALUES (731, 'COURRIER', 'outlook_mails', 18, '', 'ALL_ENTITIES', 'USERS');
+INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, entity_id, keyword, redirect_mode) VALUES (732, 'RESP_COURRIER', 'outlook_mails', 18, '', 'ALL_ENTITIES', 'ENTITY');
+INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, entity_id, keyword, redirect_mode) VALUES (733, 'RESP_COURRIER', 'outlook_mails', 18, '', 'ALL_ENTITIES', 'USERS');
+INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, entity_id, keyword, redirect_mode) VALUES (724, 'AGENT', 'outlook_mails', 18, '', 'ALL_ENTITIES', 'ENTITY');
+INSERT INTO groupbasket_redirect (system_id, group_id, basket_id, action_id, entity_id, keyword, redirect_mode) VALUES (725, 'AGENT', 'outlook_mails', 18, '', 'ALL_ENTITIES', 'USERS');
 
 INSERT INTO indexing_models (id, label, category, "default", owner, private, master, enabled, mandatory_file) VALUES (2, 'Courrier Départ', 'outgoing', false, 23, false, NULL, true, false);
 INSERT INTO indexing_models (id, label, category, "default", owner, private, master, enabled, mandatory_file) VALUES (3, 'Note Interne', 'internal', false, 23, false, NULL, true, false);
@@ -563,6 +587,7 @@ INSERT INTO indexing_models (id, label, category, "default", owner, private, mas
 INSERT INTO indexing_models (id, label, category, "default", owner, private, master, enabled, mandatory_file) VALUES (1, 'Courrier Arrivée', 'incoming', true, 23, false, NULL, true, true);
 INSERT INTO indexing_models (id, label, category, "default", owner, private, master, enabled, mandatory_file) VALUES (5, 'Exemple de données pré-enregistrées', 'incoming', false, 21, true, 1, true, true);
 INSERT INTO indexing_models (id, label, category, "default", owner, private, master, enabled, mandatory_file) VALUES (7, 'Demande de documents', 'outgoing', false, 16, true, 2, true, false);
+INSERT INTO indexing_models (id, label, category, "default", owner, private, master, enabled, mandatory_file) VALUES (8, 'Courriels importés', 'incoming', false, 23, false, NULL, true, false);
 
 INSERT INTO indexing_models_fields (id, model_id, identifier, mandatory, enabled, default_value, unit) VALUES (9, 2, 'doctype', true, true, NULL, 'mail');
 INSERT INTO indexing_models_fields (id, model_id, identifier, mandatory, enabled, default_value, unit) VALUES (10, 2, 'priority', true, true, NULL, 'mail');
@@ -627,6 +652,13 @@ INSERT INTO indexing_models_fields (id, model_id, identifier, mandatory, enabled
 INSERT INTO indexing_models_fields (id, model_id, identifier, mandatory, enabled, default_value, unit) VALUES (83, 7, 'processLimitDate', true, true, '"2021-06-18"', 'process');
 INSERT INTO indexing_models_fields (id, model_id, identifier, mandatory, enabled, default_value, unit) VALUES (84, 7, 'folders', false, true, '[16]', 'classifying');
 INSERT INTO indexing_models_fields (id, model_id, identifier, mandatory, enabled, default_value, unit) VALUES (85, 7, 'tags', false, true, '[4]', 'classifying');
+INSERT INTO indexing_models_fields (id, model_id, identifier, mandatory, enabled, default_value, unit) VALUES (86, 8, 'doctype', true, true, NULL, 'mail');
+INSERT INTO indexing_models_fields (id, model_id, identifier, mandatory, enabled, default_value, unit) VALUES (87, 8, 'documentDate', false, true, NULL, 'mail');
+INSERT INTO indexing_models_fields (id, model_id, identifier, mandatory, enabled, default_value, unit) VALUES (88, 8, 'priority', false, true, '"poiuytre1357nbvc"', 'mail');
+INSERT INTO indexing_models_fields (id, model_id, identifier, mandatory, enabled, default_value, unit) VALUES (89, 8, 'subject', true, true, NULL, 'mail');
+INSERT INTO indexing_models_fields (id, model_id, identifier, mandatory, enabled, default_value, unit) VALUES (90, 8, 'senders', false, true, NULL, 'contact');
+INSERT INTO indexing_models_fields (id, model_id, identifier, mandatory, enabled, default_value, unit) VALUES (91, 8, 'destination', false, true, '"#myPrimaryEntity"', 'process');
+INSERT INTO indexing_models_fields (id, model_id, identifier, mandatory, enabled, default_value, unit) VALUES (92, 8, 'processLimitDate', false, true, '"2021-05-13"', 'process');
 
 INSERT INTO list_templates (id, title, description, type, entity_id, owner) VALUES (1, 'Ville de Maarch-les-bains', 'Ville de Maarch-les-bains', 'diffusionList', 1, NULL);
 INSERT INTO list_templates (id, title, description, type, entity_id, owner) VALUES (2, 'Cabinet du Maire', 'Cabinet du Maire', 'diffusionList', 2, NULL);
@@ -810,6 +842,7 @@ INSERT INTO status (identifier, id, label_status, is_system, img_filename, maarc
 INSERT INTO status (identifier, id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES (39, 'REJ_SIGN', 'Signature refusée sur la tablette (MP)', 'Y', 'fm-letter-status-rejected', 'apps', 'Y', 'Y');
 INSERT INTO status (identifier, id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES (40, 'PND', 'AR Non distribué', 'Y', 'fm-letter-status-rejected', 'apps', 'Y', 'Y');
 INSERT INTO status (identifier, id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES (41, 'DSTRIBUTED', 'AR distribué', 'Y', 'fa-check', 'apps', 'Y', 'Y');
+INSERT INTO status (identifier, id, label_status, is_system, img_filename, maarch_module, can_be_searched, can_be_modified) VALUES (42, 'OUT', 'Courriels importés à qualifier', 'N', 'fm-letter-incoming', 'apps', 'Y', 'Y');
 
 INSERT INTO status_images (id, image_name) VALUES (1, 'fm-letter-status-new');
 INSERT INTO status_images (id, image_name) VALUES (2, 'fm-letter-status-inprogress');
@@ -2042,8 +2075,8 @@ WHERE 1=1;
 
 SELECT pg_catalog.setval('public.actions_id_seq', 537, true);
 SELECT pg_catalog.setval('public.attachment_types_id_seq', 10, false);
-SELECT pg_catalog.setval('public.baskets_id_seq', 24, true);
-SELECT pg_catalog.setval('public.configurations_id_seq', 6, true);
+SELECT pg_catalog.setval('public.baskets_id_seq', 25, true);
+SELECT pg_catalog.setval('public.configurations_id_seq', 7, true);
 SELECT pg_catalog.setval('public.contacts_civilities_id_seq', 6, true);
 SELECT pg_catalog.setval('public.contacts_custom_fields_list_id_seq', 1, false);
 SELECT pg_catalog.setval('public.contacts_filling_id_seq', 1, true);
@@ -2055,16 +2088,16 @@ SELECT pg_catalog.setval('public.custom_fields_id_seq', 6, false);
 SELECT pg_catalog.setval('public.docservers_id_seq', 12, true);
 SELECT pg_catalog.setval('public.doctypes_first_level_id_seq', 2, false);
 SELECT pg_catalog.setval('public.doctypes_second_level_id_seq', 13, false);
-SELECT pg_catalog.setval('public.doctypes_type_id_seq', 1203, false);
+SELECT pg_catalog.setval('public.doctypes_type_id_seq', 1204, false);
 SELECT pg_catalog.setval('public.emails_id_seq', 8, true);
 SELECT pg_catalog.setval('public.entities_folders_id_seq', 760, true);
 SELECT pg_catalog.setval('public.entities_id_seq', 20, true);
 SELECT pg_catalog.setval('public.exports_templates_id_seq', 2, true);
 SELECT pg_catalog.setval('public.folders_id_seq', 38, true);
-SELECT pg_catalog.setval('public.groupbasket_id_seq', 33, true);
-SELECT pg_catalog.setval('public.groupbasket_redirect_system_id_seq', 681, true);
-SELECT pg_catalog.setval('public.indexing_models_fields_id_seq', 85, true);
-SELECT pg_catalog.setval('public.indexing_models_id_seq', 7, true);
+SELECT pg_catalog.setval('public.groupbasket_id_seq', 38, true);
+SELECT pg_catalog.setval('public.groupbasket_redirect_system_id_seq', 725, true);
+SELECT pg_catalog.setval('public.indexing_models_fields_id_seq', 92, true);
+SELECT pg_catalog.setval('public.indexing_models_id_seq', 8, true);
 SELECT pg_catalog.setval('public.list_templates_id_seq', 1011, false);
 SELECT pg_catalog.setval('public.list_templates_items_id_seq', 44, true);
 SELECT pg_catalog.setval('public.notifications_seq', 101, false);
@@ -2076,7 +2109,7 @@ SELECT pg_catalog.setval('public.search_templates_id_seq', 2, true);
 SELECT pg_catalog.setval('public.security_security_id_seq', 612, true);
 SELECT pg_catalog.setval('public.shipping_templates_id_seq', 2, false);
 SELECT pg_catalog.setval('public.shippings_id_seq', 1, false);
-SELECT pg_catalog.setval('public.status_identifier_seq', 41, true);
+SELECT pg_catalog.setval('public.status_identifier_seq', 42, true);
 SELECT pg_catalog.setval('public.status_images_id_seq', 30, true);
 SELECT pg_catalog.setval('public.tags_id_seq', 13, true);
 SELECT pg_catalog.setval('public.templates_association_id_seq', 626, true);
