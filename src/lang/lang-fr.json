@@ -2439,7 +2439,7 @@
     "webInterface": "Interface web",
     "mustDeleteOtherTabsBeforeSendMassMode": "Veuillez supprimer les <b>autres onglets PJ</b> avant de passer en <b>publipostage</b>.",
     "outlookSendingModuleDesc": "Paramétrez le <b>modèle d'enregistrement</b>, <b>type de document</b> et le <b>statut du document</b> utilisé lors de la conversion de courriels en courriers",
-    "alreadyPresent": "Courriel déjà présent dans",
+    "alreadyPresent": "Courriel importé dans",
     "documentDate": "Date du document",
     "modelId": "Identifiant du modèle d'indexation",
     "loginTo": "Veuillez vous connecter sur",

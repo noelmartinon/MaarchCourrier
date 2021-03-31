@@ -2449,7 +2449,7 @@
     "webInterface": "Web interface",
     "mustDeleteOtherTabsBeforeSendMassMode": "Please remove <b> other PJ tabs </b> before switching to <b> direct mail </b>.",
     "outlookSendingModuleDesc": "Configure the <b> indexing model </b> and the <b> document type </b> used when converting emails to emails",
-    "alreadyPresent": "Email already present in",
+    "alreadyPresent": "Email imported into",
     "documentDate": "Document date",
     "modelId": "Indexing model identifier",
     "loginTo": "Please login to",
