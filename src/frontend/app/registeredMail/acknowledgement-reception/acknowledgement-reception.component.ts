@@ -19,6 +19,8 @@ import {MatDialog} from '@angular/material/dialog';
 
 export class AcknowledgementReceptionComponent implements OnInit {
 
+    @ViewChild('numberInput', { static: false }) numberInput: ElementRef;
+
     loading: boolean = false;
 
     today: Date = new Date();
@@ -41,8 +43,6 @@ export class AcknowledgementReceptionComponent implements OnInit {
         this.translate.instant('lang.returnReasonRejected'),
         this.translate.instant('lang.returnReasonUnknown')
     ];
-
-    @ViewChild('numberInput', { static: false }) numberInput: ElementRef;
 
     constructor(
         public http: HttpClient,

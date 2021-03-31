@@ -16,13 +16,6 @@ import { LatinisePipe } from 'ngx-pipes';
 })
 export class NoteEditorComponent implements OnInit {
 
-    notes: any;
-    loading: boolean = false;
-    templatesNote: any = [];
-    entities: any = [];
-
-    entitiesRestriction: string[] = [];
-
     @Input() title: string = this.translate.instant('lang.addNote');
     @Input() content: string = '';
     @Input() resIds: any[];
@@ -34,6 +27,14 @@ export class NoteEditorComponent implements OnInit {
     @Input() defaultRestriction: boolean;
     @Input() disableRestriction: boolean = false;
     @Output() refreshNotes = new EventEmitter<string>();
+
+    notes: any;
+    loading: boolean = false;
+    templatesNote: any = [];
+    entities: any = [];
+
+    entitiesRestriction: string[] = [];
+
 
     searchTerm: FormControl = new FormControl();
     entitiesList: any[] = [];

@@ -17,14 +17,13 @@ import {FunctionsService} from '../../../service/functions.service';
 
 export class MailResumeComponent implements OnInit {
 
-
+    @Input('resId') resId: number = null;
+    @Output('goTo') goTo = new EventEmitter<string>();
 
     loading: boolean = true;
 
     mails: any[] = [];
 
-    @Input('resId') resId: number = null;
-    @Output('goTo') goTo = new EventEmitter<string>();
 
     constructor(
         public translate: TranslateService,

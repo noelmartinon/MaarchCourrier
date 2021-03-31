@@ -13,11 +13,11 @@ import { tap } from 'rxjs/operators';
 })
 export class UseradminComponent implements OnInit {
 
+    @Output() tiggerInstall = new EventEmitter<string>();
+
     stepFormGroup: FormGroup;
 
     hide: boolean = true;
-
-    @Output() tiggerInstall = new EventEmitter<string>();
 
     constructor(
         public translate: TranslateService,

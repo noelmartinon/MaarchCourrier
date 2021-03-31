@@ -19,8 +19,6 @@ import { IndexingFormComponent } from '../indexing-form/indexing-form.component'
 })
 export class SelectIndexingModelComponent implements OnInit {
 
-    loading: boolean = true;
-
     @Input() defaultIndexingModelId: number = null;
     @Input() indexingModels: any = [];
     @Input() indexingForm: IndexingFormComponent;
@@ -28,6 +26,9 @@ export class SelectIndexingModelComponent implements OnInit {
 
     @Output() afterListModelsLoaded = new EventEmitter<any>();
     @Output() afterSelectedListModel = new EventEmitter<any>();
+
+    loading: boolean = true;
+
 
     currentIndexingModel: any = {};
 

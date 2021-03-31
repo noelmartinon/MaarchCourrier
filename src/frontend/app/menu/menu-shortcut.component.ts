@@ -8,7 +8,7 @@ import { PrivilegeService } from '@service/privileges.service';
 import { HeaderService } from '@service/header.service';
 
 @Component({
-    selector: 'menu-shortcut',
+    selector: 'app-menu-shortcut',
     styleUrls: ['menu-shortcut.component.scss'],
     templateUrl: 'menu-shortcut.component.html',
 })

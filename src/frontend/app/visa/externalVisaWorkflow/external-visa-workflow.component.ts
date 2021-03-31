@@ -18,6 +18,12 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class ExternalVisaWorkflowComponent implements OnInit {
 
+    @Input() injectDatas: any;
+    @Input() adminMode: boolean;
+    @Input() resId: number = null;
+
+    @Output() workflowUpdated = new EventEmitter<any>();
+
     visaWorkflow: any = {
         roles: ['sign', 'visa'],
         items: []
@@ -33,13 +39,6 @@ export class ExternalVisaWorkflowComponent implements OnInit {
 
     loading: boolean = false;
     data: any;
-
-    @Input() injectDatas: any;
-    @Input() adminMode: boolean;
-    @Input() resId: number = null;
-
-    @Output() workflowUpdated = new EventEmitter<any>();
-
 
     searchVisaSignUser = new FormControl();
 

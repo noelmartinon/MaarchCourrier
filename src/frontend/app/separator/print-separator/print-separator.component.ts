@@ -14,6 +14,8 @@ declare let $: any;
 })
 export class PrintSeparatorComponent implements OnInit {
 
+    @ViewChild('snav', { static: true }) sidenavLeft: MatSidenav;
+    @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
 
     entities: any[] = [];
     entitiesChosen: any[] = [];
@@ -29,9 +31,6 @@ export class PrintSeparatorComponent implements OnInit {
         target: 'entities',
         entities: []
     };
-
-    @ViewChild('snav', { static: true }) sidenavLeft: MatSidenav;
-    @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
 
     constructor(
         public translate: TranslateService,

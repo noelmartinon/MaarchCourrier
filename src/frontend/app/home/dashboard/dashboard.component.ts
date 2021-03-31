@@ -21,10 +21,11 @@ import { ColorEvent } from 'ngx-color';
 })
 export class DashboardComponent implements OnInit, AfterViewInit {
 
+    @ViewChildren('tileComponent') tileComponent: QueryList<any>;
+
     tiles: any = [];
     hoveredTool: boolean = false;
 
-    @ViewChildren('tileComponent') tileComponent: QueryList<any>;
 
     constructor(
         public translate: TranslateService,

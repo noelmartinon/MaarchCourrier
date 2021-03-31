@@ -1,4 +1,4 @@
-import { Component, Inject, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
@@ -10,7 +10,7 @@ import { of } from 'rxjs';
     templateUrl: 'add-visa-model-modal.component.html',
     styleUrls: ['add-visa-model-modal.component.scss'],
 })
-export class AddVisaModelModalComponent {
+export class AddVisaModelModalComponent implements OnInit {
 
 
     loading: boolean = false;

@@ -14,9 +14,9 @@ import { catchError, tap } from 'rxjs/operators';
 })
 export class DocserversComponent implements OnInit {
 
-    stepFormGroup: FormGroup;
-
     @Output() nextStep = new EventEmitter<string>();
+
+    stepFormGroup: FormGroup;
 
     constructor(
         public translate: TranslateService,

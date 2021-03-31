@@ -18,11 +18,12 @@ import { moveItemInArray, CdkDragDrop, transferArrayItem } from '@angular/cdk/dr
 
 export class FieldListComponent implements OnInit {
 
-    loading: boolean = false;
-
     @Input() dataCustomFields: any[];
 
     @Input() dataFields: any[];
+
+    loading: boolean = false;
+
 
     constructor(
         public translate: TranslateService,

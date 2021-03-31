@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -10,7 +10,7 @@ import { of } from 'rxjs';
     templateUrl: 'add-private-indexing-model-modal.component.html',
     styleUrls: ['add-private-indexing-model-modal.component.scss'],
 })
-export class AddPrivateIndexingModelModalComponent {
+export class AddPrivateIndexingModelModalComponent implements OnInit {
 
 
     constructor(

@@ -19,6 +19,15 @@ import { SentNumericPackagePageComponent } from './sent-numeric-package-page/sen
 })
 export class SentResourceListComponent implements OnInit {
 
+    @Input('resId') resId: number = null;
+    @Input() currentUserId: number = null;
+    @Input() currentGroupId: number = null;
+    @Input() currentBasketId: number = null;
+
+    @Output() reloadBadgeSentResource = new EventEmitter<string>();
+
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
+
     loading: boolean = true;
 
     dataSource: any;
@@ -32,14 +41,6 @@ export class SentResourceListComponent implements OnInit {
     filterTypes: any[] = [];
 
 
-    @Input('resId') resId: number = null;
-    @Input() currentUserId: number = null;
-    @Input() currentGroupId: number = null;
-    @Input() currentBasketId: number = null;
-
-    @Output() reloadBadgeSentResource = new EventEmitter<string>();
-
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,

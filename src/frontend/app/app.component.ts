@@ -29,14 +29,15 @@ export const myCustomTooltipDefaults: MatTooltipDefaultOptions = {
     ],
 })
 export class AppComponent implements OnInit, AfterViewInit {
-    debugMode: boolean = false;
-    loading: boolean = true;
+
     @ViewChild('snavLeft', { static: false }) snavLeft: MatSidenav;
 
     @HostListener('window:resize', ['$event'])
-    onResize() {
-        this.appService.setScreenWidth(window.innerWidth);
-    }
+
+    debugMode: boolean = false;
+    loading: boolean = true;
+
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -58,6 +59,10 @@ export class AppComponent implements OnInit, AfterViewInit {
         if (!environment.production) {
             this.debugMode = true;
         }
+    }
+
+    onResize() {
+        this.appService.setScreenWidth(window.innerWidth);
     }
 
     async ngOnInit() {

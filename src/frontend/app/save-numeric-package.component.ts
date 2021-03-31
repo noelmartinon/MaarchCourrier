@@ -13,6 +13,8 @@ declare let $: any;
 })
 export class SaveNumericPackageComponent implements OnInit {
 
+    @ViewChild('snav', { static: true }) sidenavLeft: MatSidenav;
+
     numericPackage: any = {
         base64: '',
         name: '',
@@ -24,7 +26,6 @@ export class SaveNumericPackageComponent implements OnInit {
 
     loading: boolean = false;
 
-    @ViewChild('snav', { static: true }) sidenavLeft: MatSidenav;
 
     constructor(
         public translate: TranslateService,

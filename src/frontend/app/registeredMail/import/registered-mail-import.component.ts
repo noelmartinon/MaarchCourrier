@@ -21,6 +21,8 @@ import { IndexingFieldsService } from '@service/indexing-fields.service';
 })
 export class RegisteredMailImportComponent implements OnInit {
 
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+
     loading: boolean = false;
 
     registeredMailFields: string[] = ['registeredMail_issuingSite', 'registeredMail_warranty', 'registeredMail_type', 'departureDate', 'registeredMail_letter'];
@@ -105,8 +107,6 @@ export class RegisteredMailImportComponent implements OnInit {
     countAll: number = 0;
     countAdd: number = 0;
     countUp: number = 0;
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
 
     constructor(
         public translate: TranslateService,

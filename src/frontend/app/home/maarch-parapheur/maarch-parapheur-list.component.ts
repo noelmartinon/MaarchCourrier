@@ -22,6 +22,7 @@ export interface MPDocument {
 })
 export class MaarchParapheurListComponent implements OnInit, AfterViewInit {
 
+    @Output() triggerEvent = new EventEmitter<string>();
 
     loading: boolean = true;
 
@@ -31,8 +32,6 @@ export class MaarchParapheurListComponent implements OnInit, AfterViewInit {
 
     displayedColumns: string[] = ['id', 'title'];
     maarchParapheurUrl: string = '';
-
-    @Output() triggerEvent = new EventEmitter<string>();
 
     constructor(public translate: TranslateService, public http: HttpClient, public dialog: MatDialog, private notify: NotificationService, private headerService: HeaderService) {
         this.dataSource = new MatTableDataSource(this.userList);

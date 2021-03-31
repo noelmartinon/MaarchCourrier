@@ -3,8 +3,8 @@
         [fixedInViewport]="appService.getViewMode()" [opened]="appService.getViewMode() || headerService.hideSideBar ? false : true"
         autoFocus="false" style="overflow-x:hidden;" [class.sideBarForm]="headerService.sideBarForm && !appService.getViewMode()" [class.sideBarFormMobile]="appService.getViewMode() && headerService.sideBarForm" [ngStyle]="{'width': appService.getViewMode() ? '80%' : '350px'}">
         <app-header-panel *ngIf="headerService.showhHeaderPanel && !headerService.hideSideBar"></app-header-panel>
-        <menu-shortcut *ngIf="headerService.showMenuShortcut && !headerService.hideSideBar"></menu-shortcut>
-        <menu-nav *ngIf="headerService.showMenuShortcut && !headerService.hideSideBar"></menu-nav>
+        <app-menu-shortcut *ngIf="headerService.showMenuShortcut && !headerService.hideSideBar"></app-menu-shortcut>
+        <app-menu-nav *ngIf="headerService.showMenuShortcut && !headerService.hideSideBar"></app-menu-nav>
         <ng-container *ngIf="!headerService.sideBarAdmin && !headerService.hideSideBar">
             <app-basket-home #basketHome></app-basket-home>
             <mat-divider></mat-divider>

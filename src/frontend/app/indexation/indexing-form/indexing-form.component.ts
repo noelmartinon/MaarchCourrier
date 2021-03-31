@@ -25,8 +25,6 @@ import { RegisteredMailRecipientInputComponent } from '../../administration/regi
 
 export class IndexingFormComponent implements OnInit {
 
-    loading: boolean = true;
-
     @Input() indexingFormId: number;
     @Input() resId: number = null;
     @Input() groupId: number;
@@ -43,6 +41,9 @@ export class IndexingFormComponent implements OnInit {
     @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
     @ViewChild('appIssuingSiteInput', { static: false }) appIssuingSiteInput: IssuingSiteInputComponent;
     @ViewChild('appRegisteredMailRecipientInput', { static: false }) appRegisteredMailRecipientInput: RegisteredMailRecipientInputComponent;
+
+    loading: boolean = true;
+
 
     fieldCategories: any[] = ['mail', 'contact', 'process', 'classifying'];
 

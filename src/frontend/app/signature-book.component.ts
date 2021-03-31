@@ -26,6 +26,10 @@ declare let $: any;
 })
 export class SignatureBookComponent implements OnInit, OnDestroy {
 
+    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
+    @ViewChild('appDocumentViewer', { static: false }) appDocumentViewer: DocumentViewerComponent;
+    @ViewChild('appNotesList', { static: false }) appNotesList: NotesListComponent;
+
     resId: number;
     basketId: number;
     groupId: number;
@@ -89,10 +93,6 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
             count: 0
         }
     ];
-
-    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
-    @ViewChild('appDocumentViewer', { static: false }) appDocumentViewer: DocumentViewerComponent;
-    @ViewChild('appNotesList', { static: false }) appNotesList: NotesListComponent;
 
     constructor(
         public translate: TranslateService,

@@ -23,6 +23,13 @@ export class ToolsListComponent implements OnInit {
 
     @ViewChild(MatAutocompleteTrigger, { static: true }) autocomplete: MatAutocompleteTrigger;
 
+    @Input('listProperties') listProperties: any;
+    @Input('currentBasketInfo') currentBasketInfo: any;
+
+    @Input('snavR') sidenavRight: MatSidenav;
+    @Input('selectedRes') selectedRes: any;
+    @Input('totalRes') totalRes: number;
+
     priorities: any[] = [];
     categories: any[] = [];
     entitiesList: any[] = [];
@@ -33,13 +40,6 @@ export class ToolsListComponent implements OnInit {
     stateGroupOptions: Observable<StateGroup[]>;
 
     isLoading: boolean = false;
-
-    @Input('listProperties') listProperties: any;
-    @Input('currentBasketInfo') currentBasketInfo: any;
-
-    @Input('snavR') sidenavRight: MatSidenav;
-    @Input('selectedRes') selectedRes: any;
-    @Input('totalRes') totalRes: number;
 
     constructor(public translate: TranslateService, public http: HttpClient, public dialog: MatDialog) { }
 

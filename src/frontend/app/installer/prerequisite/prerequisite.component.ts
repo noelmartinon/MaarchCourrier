@@ -14,6 +14,8 @@ import { catchError, tap } from 'rxjs/operators';
 })
 export class PrerequisiteComponent implements OnInit {
 
+    @ViewChildren('packageItem') packageItem: QueryList<any>;
+
     stepFormGroup: FormGroup;
 
     prerequisites: any = {};
@@ -102,8 +104,6 @@ export class PrerequisiteComponent implements OnInit {
     };
 
     docMaarchUrl: string = `https://docs.maarch.org/gitbook/html/MaarchCourrier/${environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1]}/guat/guat_prerequisites/home.html`;
-
-    @ViewChildren('packageItem') packageItem: QueryList<any>;
 
     constructor(
         public translate: TranslateService,

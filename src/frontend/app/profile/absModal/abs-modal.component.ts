@@ -15,12 +15,13 @@ import { AuthService } from '@service/auth.service';
 })
 export class AbsModalComponent implements OnInit {
 
+    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
+
     loading: boolean = false;
 
     userId: number = 0;
     baskets: any[] = [];
 
-    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
 
     constructor(
         public translate: TranslateService,
