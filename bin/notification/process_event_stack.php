@@ -28,7 +28,7 @@ while ($state != 'END') {
         case 'LOAD_NOTIFICATIONS':
             Bt_writeLog(['level' => 'INFO', 'message' => 'Loading configuration for notification id '.$notificationId]);
             $notification = \Notification\models\NotificationModel::getByNotificationId(['notificationId' => $notificationId, 'select' => ['*']]);
-            if ($notification === false) {
+            if (empty($notification)) {
                 Bt_exitBatch(1, "Notification '".$notificationId."' not found");
             }
             if ($notification['is_enabled'] === 'N') {
@@ -106,7 +106,7 @@ while ($state != 'END') {
                     foreach ($recipients as $key => $recipient) {
                         $user_id = $recipient['user_id'];
                         Bt_writeLog(['level' => 'INFO', 'message' => 'Recipient '.$user_id]);
-                        
+
                         if (($recipient['status'] == 'SPD' && (empty($parameter) || $parameter['param_value_int'] == 0)) || $recipient['status'] == 'DEL') {
                             Bt_writeLog(['level' => 'INFO', 'message' => $user_id.' is disabled or deleted, this notification will not be send']);
                             unset($recipients[$key]);
