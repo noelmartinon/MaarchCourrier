@@ -49,7 +49,7 @@ foreach ($customs as $custom) {
                 $values = [];
                 if (!empty($value->values_list)) {
                     foreach ($value->values_list->value as $valueList) {
-                        $values[] = (string)$valueList->label;
+                        $values[(string)$valueList->id] = (string)$valueList->label;
                     }
                 }
                 if (!empty($value->table) && !empty($value->table->table_name) && !empty($value->table->foreign_label)) {
@@ -73,7 +73,7 @@ foreach ($customs as $custom) {
                 $fieldId = \CustomField\models\CustomFieldModel::create([
                     'label'     => $label,
                     'type'      => $type,
-                    'values'    => empty($values) ? '[]' : json_encode($values)
+                    'values'    => empty($values) ? '[]' : json_encode(array_values($values))
                 ]);
 
                 if (!empty($indexingModelsId)) {
@@ -102,6 +102,9 @@ foreach ($customs as $custom) {
                 ]);
 
                 foreach ($resources as $resource) {
+                    if (!empty($values[$resource[$column]])) {
+                        $resource[$column] = $values[$resource[$column]];
+                    }
                     $valueColumn = json_encode($resource[$column]);
                     $valueColumn = str_replace("'", "''", $valueColumn);
                     $resId = $resource['res_id'];
