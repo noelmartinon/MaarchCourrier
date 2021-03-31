@@ -43,10 +43,8 @@ export class MenuShortcutComponent implements OnInit {
     gotToMenu(shortcut: any) {
         if (shortcut.id === 'indexing') {
             this.router.navigate([shortcut.route + '/' + shortcut.groups[0].id]);
-        } else if (shortcut.angular === true) {
-            this.router.navigate([shortcut.route]);
         } else {
-            location.href = shortcut.route;
+            this.router.navigate([shortcut.route]);
         }
     }
 }

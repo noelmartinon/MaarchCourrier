@@ -89,11 +89,7 @@ export class AdministrationComponent implements OnInit, AfterViewInit {
     }
 
     goToSpecifiedAdministration(service: any): void {
-        if (service.angular === true) {
-            this.router.navigate([service.route]);
-        } else {
-            window.location.assign(service.route);
-        }
+        this.router.navigate([service.route]);
     }
 
     getNbShortcuts() {

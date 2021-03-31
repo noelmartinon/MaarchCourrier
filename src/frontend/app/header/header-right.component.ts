@@ -48,7 +48,7 @@ export class HeaderRightComponent implements OnInit {
         if (shortcut.id === 'indexing' && shortcut.groups.length > 1) {
             this.config = { panelClass: 'maarch-modal', data: { indexingGroups: shortcut.groups, link: shortcut.route } };
             this.dialogRef = this.dialog.open(IndexingGroupModalComponent, this.config);
-        } else if (shortcut.angular === true) {
+        } else {
             const component = shortcut.route.split('__');
 
             if (component.length === 2) {
@@ -63,8 +63,6 @@ export class HeaderRightComponent implements OnInit {
             } else {
                 this.router.navigate([shortcut.route]);
             }
-        } else {
-            location.href = shortcut.route;
         }
     }
 

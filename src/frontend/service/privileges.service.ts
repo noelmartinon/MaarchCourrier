@@ -2,30 +2,28 @@ import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { HeaderService } from './header.service';
 
-interface menu {
+interface Menu {
     'id': string; // identifier
     'label': string; // title
     'comment': string; // description
     'route': string; // navigate to interface
     'style': string; // icon used interface
     'unit': string; // category of administration
-    'angular': boolean; // to navigate in V1 <=>V2
     'groups'?: any[]; // groups of indexation if id === 'indexing'
     'shortcut': boolean; // show in panel
 }
 
-interface administration {
+interface Administration {
     'id': string; // identifier
     'label': string; // title
     'comment': string; // description
     'route': string; // navigate to interface
     'style': string; // icone used interface
     'unit': 'organisation' | 'classement' | 'production' | 'supervision'; // category of administration
-    'angular': boolean; // to navigate in V1 <=>V2
     'hasParams': boolean;
 }
 
-interface privilege {
+interface Privilege {
     'id': string; // identifier
     'label': string; // title
     'unit': string; // category of administration
@@ -35,7 +33,7 @@ interface privilege {
 @Injectable()
 export class PrivilegeService {
 
-    private administrations: administration[] = [
+    private administrations: Administration[] = [
         {
             'id': 'admin_users',
             'label': 'lang.users',
@@ -43,7 +41,6 @@ export class PrivilegeService {
             'route': '/administration/users',
             'unit': 'organisation',
             'style': 'fa fa-user',
-            'angular': true,
             'hasParams': true
         },
         {
@@ -53,7 +50,6 @@ export class PrivilegeService {
             'route': '/administration/groups',
             'unit': 'organisation',
             'style': 'fa fa-users',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -63,7 +59,6 @@ export class PrivilegeService {
             'route': '/administration/entities',
             'unit': 'organisation',
             'style': 'fa fa-sitemap',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -73,7 +68,6 @@ export class PrivilegeService {
             'route': '/administration/diffusionModels',
             'unit': 'organisation',
             'style': 'fa fa-th-list',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -83,7 +77,6 @@ export class PrivilegeService {
             'route': '/administration/doctypes',
             'unit': 'classement',
             'style': 'fa fa-suitcase',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -93,7 +86,6 @@ export class PrivilegeService {
             'route': '/administration/tags',
             'unit': 'classement',
             'style': 'fa fa-tags',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -103,7 +95,6 @@ export class PrivilegeService {
             'route': '/administration/baskets',
             'unit': 'production',
             'style': 'fa fa-inbox',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -113,7 +104,6 @@ export class PrivilegeService {
             'route': '/administration/statuses',
             'unit': 'production',
             'style': 'fa fa-check-circle',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -123,7 +113,6 @@ export class PrivilegeService {
             'route': '/administration/actions',
             'unit': 'production',
             'style': 'fa fa-exchange-alt',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -133,7 +122,6 @@ export class PrivilegeService {
             'route': '/administration/contacts',
             'unit': 'production',
             'style': 'fa fa-address-book',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -143,7 +131,6 @@ export class PrivilegeService {
             'route': '/administration/priorities',
             'unit': 'production',
             'style': 'fa fa-clock',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -153,7 +140,6 @@ export class PrivilegeService {
             'route': '/administration/templates',
             'unit': 'production',
             'style': 'fa fa-file-alt',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -163,7 +149,6 @@ export class PrivilegeService {
             'route': '/administration/indexingModels',
             'unit': 'production',
             'style': 'fab fa-wpforms',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -173,7 +158,6 @@ export class PrivilegeService {
             'route': '/administration/customFields',
             'unit': 'production',
             'style': 'fa fa-code',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -183,7 +167,6 @@ export class PrivilegeService {
             'route': '/administration/notifications',
             'unit': 'production',
             'style': 'fa fa-bell',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -193,7 +176,6 @@ export class PrivilegeService {
             'route': '/administration/update-status',
             'unit': 'supervision',
             'style': 'fa fa-envelope-square',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -203,7 +185,6 @@ export class PrivilegeService {
             'route': '/administration/docservers',
             'unit': 'supervision',
             'style': 'fa fa-hdd',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -213,7 +194,6 @@ export class PrivilegeService {
             'route': '/administration/parameters',
             'unit': 'supervision',
             'style': 'fa fa-wrench',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -223,7 +203,6 @@ export class PrivilegeService {
             'route': '/administration/securities',
             'unit': 'supervision',
             'style': 'fa fa-lock',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -233,7 +212,6 @@ export class PrivilegeService {
             'route': '/administration/sendmail',
             'unit': 'supervision',
             'style': 'fa fa-mail-bulk',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -243,7 +221,6 @@ export class PrivilegeService {
             'route': '/administration/shippings',
             'unit': 'supervision',
             'style': 'fa fa-shipping-fast',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -253,7 +230,6 @@ export class PrivilegeService {
             'route': '/administration/history',
             'unit': 'supervision',
             'style': 'fa fa-history',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -263,7 +239,6 @@ export class PrivilegeService {
             'route': '/administration/history-batch',
             'unit': 'supervision',
             'style': 'fa fa-history',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -273,7 +248,6 @@ export class PrivilegeService {
             'route': '/administration/versions-update',
             'unit': 'supervision',
             'style': 'fa fa-sync',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -283,7 +257,6 @@ export class PrivilegeService {
             'route': '/administration/alfresco',
             'unit': 'supervision',
             'style': 'alfresco',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -293,7 +266,6 @@ export class PrivilegeService {
             'route': '/administration/registeredMails',
             'unit': 'supervision',
             'style': 'fas fa-dolly-flatbed',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -303,7 +275,6 @@ export class PrivilegeService {
             'route': '/administration/search',
             'unit': 'supervision',
             'style': 'fas fa-search',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -313,7 +284,6 @@ export class PrivilegeService {
             'route': '/administration/connections/sso',
             'unit': 'supervision',
             'style': 'fas fa-plug',
-            'angular': true,
             'hasParams': false
         },
         {
@@ -323,12 +293,11 @@ export class PrivilegeService {
             'route': '/administration/attachments/types',
             'unit': 'supervision',
             'style': 'fas fa-paperclip',
-            'angular': true,
             'hasParams': false
         },
     ];
 
-    private privileges: privilege[] = [
+    private privileges: Privilege[] = [
         {
             'id': 'view_doc_history',
             'label': 'lang.viewDocHistory',
@@ -529,7 +498,7 @@ export class PrivilegeService {
         },
     ];
 
-    private menus: menu[] = [
+    private menus: Menu[] = [
         {
             'id': 'admin',
             'label': 'lang.administration',
@@ -537,7 +506,6 @@ export class PrivilegeService {
             'route': '/administration',
             'style': 'fa fa-cogs',
             'unit': 'application',
-            'angular': true,
             'shortcut': true
         },
         {
@@ -547,7 +515,6 @@ export class PrivilegeService {
             'route': '/search',
             'style': 'fa fa-search',
             'unit': 'application',
-            'angular': true,
             'shortcut': true
         },
         {
@@ -557,7 +524,6 @@ export class PrivilegeService {
             'route': '/separators/print',
             'style': 'fa fa-print',
             'unit': 'entities',
-            'angular': true,
             'shortcut': false
         },
         {
@@ -567,7 +533,6 @@ export class PrivilegeService {
             'route': '/saveNumericPackage',
             'style': 'fa fa-file-archive',
             'unit': 'sendmail',
-            'angular': true,
             'shortcut': false
         },
         {
@@ -577,7 +542,6 @@ export class PrivilegeService {
             'route': '/registeredMail/acknowledgement',
             'style': 'fa fa-barcode',
             'unit': 'registeredMails',
-            'angular': true,
             'shortcut': false
         },
         {
@@ -587,7 +551,6 @@ export class PrivilegeService {
             'route': 'RegisteredMailImportComponent__modal',
             'style': 'fas fa-dolly-flatbed',
             'unit': 'registeredMails',
-            'angular': true,
             'shortcut': false
         },
         {
@@ -597,12 +560,11 @@ export class PrivilegeService {
             'route': '/install',
             'style': 'far fa-window-restore',
             'unit': 'application',
-            'angular': true,
             'shortcut': false
         }
     ];
 
-    shortcuts: any[] = [
+    private shortcuts: any[] = [
         {
             'id': 'followed',
             'label': 'lang.followedMail',
@@ -610,7 +572,6 @@ export class PrivilegeService {
             'route': '/followed',
             'style': 'fas fa-star',
             'unit': 'application',
-            'angular': true,
             'shortcut': true
         }
     ];
@@ -660,11 +621,11 @@ export class PrivilegeService {
     }
 
 
-    getPrivilegesByUnit(unit: string): Array<privilege> {
+    getPrivilegesByUnit(unit: string): Array<Privilege> {
         return this.privileges.filter(elem => elem.unit === unit);
     }
 
-    getMenus(ids: string[] = null): Array<menu> {
+    getMenus(ids: string[] = null): Array<Menu> {
         if (ids !== null) {
             return this.menus.filter(elem => ids.indexOf(elem.id) > -1);
         } else {
@@ -673,7 +634,7 @@ export class PrivilegeService {
     }
 
     getCurrentUserMenus(ids: string[] = null) {
-        let menus: menu[];
+        let menus: Menu[];
         if (ids !== null) {
             menus = this.menus.filter(elem => ids.indexOf(elem.id) > -1 && this.headerService.user.privileges.indexOf(elem.id) > -1);
         } else {
@@ -697,7 +658,6 @@ export class PrivilegeService {
                 'route': '/indexing/' + indexingGroups[0].id,
                 'style': 'fa fa-file-medical',
                 'unit': 'application',
-                'angular': true,
                 'shortcut': true,
                 'groups': indexingGroups
             };
@@ -707,7 +667,7 @@ export class PrivilegeService {
         return menus;
     }
 
-    getMenusByUnit(unit: string): Array<menu> {
+    getMenusByUnit(unit: string): Array<Menu> {
         return this.menus.filter(elem => elem.unit === unit);
     }
 
@@ -724,7 +684,6 @@ export class PrivilegeService {
                 'route': '/followed',
                 'style': 'fas fa-star',
                 'unit': 'application',
-                'angular': true,
                 'shortcut': true
             }
         ];
@@ -748,7 +707,6 @@ export class PrivilegeService {
                 'route': '/indexing',
                 'style': 'fa fa-file-medical',
                 'unit': 'application',
-                'angular': true,
                 'shortcut': true,
                 'groups': indexingGroups
             };
@@ -756,7 +714,7 @@ export class PrivilegeService {
         }
     }
 
-    getAdministrations(ids: string[] = null): Array<administration> {
+    getAdministrations(ids: string[] = null): Array<Administration> {
         if (ids !== null) {
             return this.administrations.filter(elem => ids.indexOf(elem.id) > -1);
         } else {
@@ -764,7 +722,7 @@ export class PrivilegeService {
         }
     }
 
-    getCurrentUserAdministrationsByUnit(unit: string): Array<administration> {
+    getCurrentUserAdministrationsByUnit(unit: string): Array<Administration> {
         if (this.hasCurrentUserPrivilege('view_history') && this.hasCurrentUserPrivilege('view_history_batch')) {
             return this.administrations.filter(elem => elem.unit === unit).filter(elem => this.headerService.user.privileges.indexOf(elem.id) > -1).filter(priv => priv.id !== 'view_history_batch');
         } else {
