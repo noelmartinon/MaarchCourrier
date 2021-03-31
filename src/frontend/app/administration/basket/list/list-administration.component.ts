@@ -320,7 +320,11 @@ export class ListAdministrationComponent implements OnInit {
     }
 
     toggleData() {
-        this.dataControl.disabled ? this.dataControl.enable() : this.dataControl.disable();
+        if (this.dataControl.disabled) {
+            this.dataControl.enable();
+        } else {
+            this.dataControl.disable();
+        }
 
         if (this.displayMode === 'label') {
             this.displayMode = 'sample';
@@ -396,20 +400,25 @@ export class ListAdministrationComponent implements OnInit {
             subInfos: this.displayedSecondaryData
         };
 
-        this.http.put('../rest/baskets/' + this.basketGroup.basket_id + '/groups/' + this.basketGroup.group_id, { 'list_display': objToSend, 'list_event': this.selectedListEvent, 'list_event_data': this.selectedProcessTool })
-            .subscribe(() => {
-                this.displayedSecondaryDataClone = JSON.parse(JSON.stringify(this.displayedSecondaryData));
-                this.basketGroup.list_display = this.displayedSecondaryData;
+        this.http.put('../rest/baskets/' + this.basketGroup.basket_id + '/groups/' + this.basketGroup.group_id, { 'list_display': objToSend, 'list_event': this.selectedListEvent, 'list_event_data': this.selectedProcessTool }).pipe(
+            tap(() => {
+                this.basketGroup.list_display = objToSend;
                 this.basketGroup.list_event = this.selectedListEvent;
-                this.selectedListEventClone = this.selectedListEvent;
                 this.basketGroup.list_event_data = this.selectedProcessTool;
+
+                this.displayedSecondaryDataClone = JSON.parse(JSON.stringify(this.displayedSecondaryData));
+                this.selectedListEventClone = this.selectedListEvent;
                 this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));
                 this.selectedTemplateDisplayedSecondaryDataClone = JSON.parse(JSON.stringify(this.selectedTemplateDisplayedSecondaryData));
+
                 this.notify.success(this.translate.instant('lang.modificationsProcessed'));
                 this.refreshBasketGroup.emit(this.basketGroup);
-            }, (err) => {
-                this.notify.error(err.error.errors);
-            });
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     checkModif() {
