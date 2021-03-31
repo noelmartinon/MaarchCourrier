@@ -18,14 +18,12 @@ import { AttachmentPageComponent } from '../attachments-page/attachment-page.com
 
 export class AttachmentsResumeComponent implements OnInit {
 
-
+    @Input('resId') resId: number = null;
+    @Output('goTo') goTo = new EventEmitter<string>();
 
     loading: boolean = true;
 
     attachments: any[] = [];
-
-    @Input('resId') resId: number = null;
-    @Output('goTo') goTo = new EventEmitter<string>();
 
     dialogRef: MatDialogRef<any>;
 

@@ -6,7 +6,7 @@
         <menu-shortcut *ngIf="headerService.showMenuShortcut && !headerService.hideSideBar"></menu-shortcut>
         <menu-nav *ngIf="headerService.showMenuShortcut && !headerService.hideSideBar"></menu-nav>
         <ng-container *ngIf="!headerService.sideBarAdmin && !headerService.hideSideBar">
-            <basket-home #basketHome></basket-home>
+            <app-basket-home #basketHome></app-basket-home>
             <mat-divider></mat-divider>
             <panel-folder #panelFolder></panel-folder>
         </ng-container>

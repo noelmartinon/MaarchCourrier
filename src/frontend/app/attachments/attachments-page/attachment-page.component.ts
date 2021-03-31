@@ -26,6 +26,8 @@ import { FunctionsService } from '@service/functions.service';
 
 export class AttachmentPageComponent implements OnInit {
 
+    @ViewChild('appAttachmentViewer', { static: false }) appAttachmentViewer: DocumentViewerComponent;
+
     loading: boolean = true;
     sendMassMode: boolean = false;
     sendingData: boolean = false;
@@ -42,8 +44,6 @@ export class AttachmentPageComponent implements OnInit {
     editMode: boolean = false;
 
     now: Date = new Date();
-
-    @ViewChild('appAttachmentViewer', { static: false }) appAttachmentViewer: DocumentViewerComponent;
 
     constructor(
         public translate: TranslateService,

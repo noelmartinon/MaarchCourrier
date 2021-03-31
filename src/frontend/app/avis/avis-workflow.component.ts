@@ -19,6 +19,13 @@ import { ConfirmComponent } from '../../plugins/modal/confirm.component';
 })
 export class AvisWorkflowComponent implements OnInit {
 
+    @Input('injectDatas') injectDatas: any;
+    @Input('adminMode') adminMode: boolean;
+    @Input('resId') resId: number = null;
+    @Input('showListModels') showListModels: boolean = true;
+    @Input('mode') mode: 'parallel' | 'circuit' = 'circuit';
+
+    @ViewChild('searchAvisUserInput', { static: false }) searchAvisUserInput: ElementRef;
 
     avisWorkflow: any = {
         roles: ['sign', 'avis'],
@@ -40,16 +47,6 @@ export class AvisWorkflowComponent implements OnInit {
     loading: boolean = false;
     avisModelListNotLoaded: boolean = true;
     data: any;
-
-    @Input('injectDatas') injectDatas: any;
-    @Input('adminMode') adminMode: boolean;
-    @Input('resId') resId: number = null;
-
-    @Input('showListModels') showListModels: boolean = true;
-
-    @Input('mode') mode: 'parallel' | 'circuit' = 'circuit';
-
-    @ViewChild('searchAvisUserInput', { static: false }) searchAvisUserInput: ElementRef;
 
     searchAvisUser = new FormControl();
 
@@ -234,33 +231,6 @@ export class AvisWorkflowComponent implements OnInit {
             this.searchAvisUser.reset();
 
             this.avisModelListNotLoaded = false;
-        }
-    }
-
-    private _filter(value: string): string[] {
-        if (typeof value === 'string') {
-            const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.signAvisUsers.filter((option: any) => this.latinisePipe.transform(option['title'].toLowerCase()).includes(filterValue));
-        } else {
-            return this.signAvisUsers;
-        }
-    }
-
-    private _filterPrivateModel(value: string): string[] {
-        if (typeof value === 'string') {
-            const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.avisTemplates.private.filter((option: any) => this.latinisePipe.transform(option['title'].toLowerCase()).includes(filterValue));
-        } else {
-            return this.avisTemplates.private;
-        }
-    }
-
-    private _filterPublicModel(value: string): string[] {
-        if (typeof value === 'string') {
-            const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.avisTemplates.public.filter((option: any) => this.latinisePipe.transform(option['title'].toLowerCase()).includes(filterValue));
-        } else {
-            return this.avisTemplates.public;
         }
     }
 
@@ -565,6 +535,33 @@ export class AvisWorkflowComponent implements OnInit {
             return false;
         } else {
             return true;
+        }
+    }
+
+    private _filter(value: string): string[] {
+        if (typeof value === 'string') {
+            const filterValue = this.latinisePipe.transform(value.toLowerCase());
+            return this.signAvisUsers.filter((option: any) => this.latinisePipe.transform(option['title'].toLowerCase()).includes(filterValue));
+        } else {
+            return this.signAvisUsers;
+        }
+    }
+
+    private _filterPrivateModel(value: string): string[] {
+        if (typeof value === 'string') {
+            const filterValue = this.latinisePipe.transform(value.toLowerCase());
+            return this.avisTemplates.private.filter((option: any) => this.latinisePipe.transform(option['title'].toLowerCase()).includes(filterValue));
+        } else {
+            return this.avisTemplates.private;
+        }
+    }
+
+    private _filterPublicModel(value: string): string[] {
+        if (typeof value === 'string') {
+            const filterValue = this.latinisePipe.transform(value.toLowerCase());
+            return this.avisTemplates.public.filter((option: any) => this.latinisePipe.transform(option['title'].toLowerCase()).includes(filterValue));
+        } else {
+            return this.avisTemplates.public;
         }
     }
 }

@@ -25,6 +25,10 @@ import { ContactAutocompleteComponent } from '../../contact/autocomplete/contact
 
 export class AttachmentCreateComponent implements OnInit {
 
+    @Input('resId') resId: number = null;
+
+    @ViewChildren('appDocumentViewer') appDocumentViewer: QueryList<DocumentViewerComponent>;
+    @ViewChildren('contactAutocomplete') contactAutocomplete: ContactAutocompleteComponent;
 
     loading: boolean = true;
 
@@ -55,12 +59,6 @@ export class AttachmentCreateComponent implements OnInit {
     loadingContact: boolean = false;
 
     defaultType: any = null;
-
-    @Input('resId') resId: number = null;
-
-
-    @ViewChildren('appDocumentViewer') appDocumentViewer: QueryList<DocumentViewerComponent>;
-    @ViewChildren('contactAutocomplete') contactAutocomplete: ContactAutocompleteComponent;
 
     constructor(
         public translate: TranslateService,
