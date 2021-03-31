@@ -39,10 +39,10 @@
                 </mat-option>
             </mat-select>
         </mat-form-field>
-        <plugin-select-search *ngIf="selectedTileType === 'shortcut'" [appearance]="'outline'" [showLabel]="true"
+        <app-plugin-select-search *ngIf="selectedTileType === 'shortcut'" [appearance]="'outline'" [showLabel]="true"
             [class]="''" [label]="'lang.navigation' | translate" [datas]="menus" [formControlSelect]="menusControl"  [returnValue]="'object'" [dataKey]="'id'"
             (afterSelected)="setMenu($event)">
-        </plugin-select-search>
+        </app-plugin-select-search>
         <mat-form-field appearance="outline" *ngIf="extraParams.privilegeId === 'indexing'">
             <mat-label>{{'lang.group' | translate}}</mat-label>
             <mat-select [compareWith]="this.compareGroups" [(ngModel)]="extraParams.groupId" (selectionChange)="setIndexingGroup($event.value)">
@@ -51,10 +51,10 @@
                 </mat-option>
             </mat-select>
         </mat-form-field>
-        <plugin-select-search *ngIf="selectedTileType === 'searchTemplate'" [appearance]="'outline'" [showLabel]="true"
+        <app-plugin-select-search *ngIf="selectedTileType === 'searchTemplate'" [appearance]="'outline'" [showLabel]="true"
             [class]="''" [label]="'lang.model' | translate" [datas]="searchTemplates" [formControlSelect]="searchTemplatesControl"  [returnValue]="'object'" [dataKey]="'id'"
             (afterSelected)="setSearchTemplate($event)">
-        </plugin-select-search>
+        </app-plugin-select-search>
         <mat-form-field appearance="outline" *ngIf="views.length > 0">
             <mat-label>{{'lang.chartView' | translate}}</mat-label>
             <mat-select [(ngModel)]="selectedView" (selectionChange)="resetExtraParams()">

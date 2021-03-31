@@ -134,10 +134,10 @@
                                     <sup color="primary" class="searchInAttachments">({{num}})</sup>
                                 </ng-container>&nbsp;:&nbsp;
                             </span>
-                            <plugin-select-search [id]="field.identifier" [showResetOption]="true"
+                            <app-plugin-select-search [id]="field.identifier" [showResetOption]="true"
                                 [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="field.control"
                                 [datas]="field.values" [returnValue]="'object'" [multiple]="true" style="width:100%;">
-                            </plugin-select-search>
+                            </app-plugin-select-search>
                         </ng-container>
                         <ng-container *ngIf="['selectAutocomplete'].indexOf(field.type) > -1">
                             <span class="criteria-label">

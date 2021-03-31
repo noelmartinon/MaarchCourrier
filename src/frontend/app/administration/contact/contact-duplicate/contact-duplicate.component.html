@@ -32,10 +32,10 @@
                                     {{'lang.criteriaSearch' | translate}}
                                 </mat-panel-title>
                             </mat-expansion-panel-header>
-                            <plugin-select-search [label]="'lang.addCriteria' | translate" [formControlSelect]="addCriteriaSelect"
+                            <app-plugin-select-search [label]="'lang.addCriteria' | translate" [formControlSelect]="addCriteriaSelect"
                                 [placeholderLabel]="'lang.addCriteria' | translate" [datas]="contactFields"
                                 (afterSelected)="addCriteria($event)">
-                            </plugin-select-search>
+                            </app-plugin-select-search>
                             <mat-divider style="margin-top:20px;margin-bottom:20px;"></mat-divider>
                             <mat-chip-list class="checkbox-selected-list">
                                 <mat-chip *ngFor="let field of currentFieldsSearch; let i = index" selected

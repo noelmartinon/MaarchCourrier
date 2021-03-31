@@ -14,29 +14,29 @@
     <ng-container *ngIf="natures.length != 0">
         <div class="form-group" style="margin-top: 10px">
             <div class="col-sm-12">
-                <plugin-select-search [showLabel]="true" [class]="''" [label]="'lang.natureIxbusParapheur' | translate"
+                <app-plugin-select-search [showLabel]="true" [class]="''" [label]="'lang.natureIxbusParapheur' | translate"
                                       [placeholderLabel]="'lang.natureIxbusParapheur' | translate" [formControlSelect]="selectNature"
                                       [datas]="natures" (afterSelected)="ixbusDatas.nature = selectNature.value;changeModel(selectNature.value)"
                                       style="width:100%;" [required]="true">
-                </plugin-select-search>
+                </app-plugin-select-search>
             </div>
         </div>
         <div class="form-group" style="margin-top: 10px">
             <div class="col-sm-12">
-                <plugin-select-search [showLabel]="true" [class]="''" [label]="'lang.workflowModelIxbus' | translate"
+                <app-plugin-select-search [showLabel]="true" [class]="''" [label]="'lang.workflowModelIxbus' | translate"
                                       [placeholderLabel]="'lang.workflowModelIxbus' | translate" [formControlSelect]="selectWorkflow"
                                       [datas]="messagesModel" (afterSelected)="ixbusDatas.messageModel = selectWorkflow.value"
                                       style="width:100%;" [required]="true">
-                </plugin-select-search>
+                </app-plugin-select-search>
             </div>
         </div>
         <div class="form-group" style="margin-top: 10px">
             <div class="col-sm-12">
-                <plugin-select-search [showLabel]="true" [class]="''" [label]="'lang.loginIxbus' | translate"
+                <app-plugin-select-search [showLabel]="true" [class]="''" [label]="'lang.loginIxbus' | translate"
                                       [placeholderLabel]="'lang.loginIxbus' | translate" [formControlSelect]="selectUser"
                                       [datas]="users" (afterSelected)="ixbusDatas.userId = selectUser.value"
                                       style="width:100%;" [required]="true">
-                </plugin-select-search>
+                </app-plugin-select-search>
             </div>
         </div>
         <mat-radio-group id="handwrittenSignature" name="handwrittenSignature" [(ngModel)]="ixbusDatas.signatureMode"

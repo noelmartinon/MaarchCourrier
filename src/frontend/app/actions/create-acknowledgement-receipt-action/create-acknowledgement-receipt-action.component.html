@@ -25,17 +25,17 @@
                             <input matInput [(ngModel)]="emailsubject" maxlength="100">
                         </mat-form-field>
                         <div class="models">
-                            <plugin-select-search *ngIf="availableEmailModels.length > 0" [label]="'lang.emailModel' | translate"
+                            <app-plugin-select-search *ngIf="availableEmailModels.length > 0" [label]="'lang.emailModel' | translate"
                                 [placeholderLabel]="'lang.emailModel' | translate" [datas]="availableEmailModels"
                                 [formControlSelect]="templateEmailListForm"
                                 (afterSelected)="mergeEmailTemplate($event)">
-                            </plugin-select-search>
+                            </app-plugin-select-search>
 
-                            <plugin-select-search #templateList *ngIf="availableSignEmailModels.length > 0"
+                            <app-plugin-select-search #templateList *ngIf="availableSignEmailModels.length > 0"
                                 [label]="'lang.emailSignatures' | translate" [placeholderLabel]="'lang.emailSignatures' | translate"
                                 [datas]="availableSignEmailModels" [formControlSelect]="emailSignListForm"
                                 (afterSelected)="mergeSignEmailTemplate($event)">
-                            </plugin-select-search>
+                            </app-plugin-select-search>
                         </div>
                         <textarea style="padding-top: 10px;" name="emailSignature" id="emailSignature"
                             [(ngModel)]="emailContent"></textarea>

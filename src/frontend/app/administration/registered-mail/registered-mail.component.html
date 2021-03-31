@@ -27,10 +27,10 @@
                                 <mat-label>{{'lang.trackerNumber' | translate}}</mat-label>
                                 <input matInput formControlName="trackerNumber">
                             </mat-form-field>
-                            <plugin-select-search [showLabel]="true" [label]="'lang.registeredMailType' | translate"
+                            <app-plugin-select-search [showLabel]="true" [label]="'lang.registeredMailType' | translate"
                                 [placeholderLabel]="'lang.registeredMailType' | translate" [datas]="registeredMailType"
                                 [class]="''" [formControlSelect]="adminFormGroup.controls['registeredMailType']">
-                            </plugin-select-search>
+                            </app-plugin-select-search>
                             <div style="display: grid;grid-template-columns: 1fr 1fr;grid-gap: 20px;">
                                 <mat-form-field>
                                     <mat-label>{{'lang.registeredMailStart' | translate}}</mat-label>

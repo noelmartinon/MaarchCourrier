@@ -99,12 +99,12 @@
                                         <mat-icon color="primary" class="fas fa-database">
                                         </mat-icon>
                                     </button>
-                                    <plugin-select-search [id]="field.identifier"
+                                    <app-plugin-select-search [id]="field.identifier"
                                         [showResetOption]="adminMode || !field.mandatory" [label]="field.label"
                                         [placeholderLabel]="!adminMode ? ('lang.chooseValue' | translate) : ('lang.defaultValue' | translate)"
                                         [formControlSelect]="arrFormControl[field.identifier]" [datas]="field.values"
                                         (afterSelected)="launchEvent($event, field)" style="width:100%;">
-                                    </plugin-select-search>
+                                    </app-plugin-select-search>
                                 </ng-container>
                                 <ng-container *ngIf="field.type === 'date'">
                                     <button mat-button color="primary" *ngIf="field.SQLMode && adminMode" matPrefix

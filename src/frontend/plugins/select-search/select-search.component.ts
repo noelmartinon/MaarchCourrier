@@ -1,5 +1,5 @@
 import {
-    AfterViewInit, ChangeDetectorRef,
+    AfterViewInit,
     Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, QueryList,
     ViewChild,
     Renderer2,
@@ -18,7 +18,7 @@ import { SortPipe } from '../../plugins/sorting.pipe';
 import { FunctionsService } from '@service/functions.service';
 
 @Component({
-    selector: 'plugin-select-search',
+    selector: 'app-plugin-select-search',
     templateUrl: 'select-search.component.html',
     styleUrls: ['select-search.component.scss', '../../app/indexation/indexing-form/indexing-form.component.scss'],
     providers: [SortPipe]
@@ -82,6 +82,10 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     datasClone: any = [];
     isModelModified: boolean = false;
 
+    formControlSearch = new FormControl();
+
+    selected: any[] = [];
+
     /** Reference to the MatSelect options */
     public _options: QueryList<MatOption>;
 
@@ -97,27 +101,25 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
     /** Subject that emits when the component has been destroyed. */
     private _onDestroy = new Subject<void>();
 
-    formControlSearch = new FormControl();
-
-    selected: any[] = [];
-
     /** Current search value */
     get value(): string {
         return this._value;
     }
     private _value: string;
 
-    onChange: Function = (_: any) => { };
-    onTouched: Function = (_: any) => { };
+
 
     constructor(
         public translate: TranslateService,
         private latinisePipe: LatinisePipe,
-        private changeDetectorRef: ChangeDetectorRef,
         private renderer: Renderer2,
         public appService: AppService,
         public functions: FunctionsService,
-        private sortPipe: SortPipe) { }
+        private sortPipe: SortPipe
+    ) { }
+
+    onChange: Function = (_: any) => { };
+    onTouched: Function = (_: any) => { };
 
     ngOnInit() {
         if (this.multiple) {
@@ -179,9 +181,9 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
             });
 
         let group = '';
-        const index = 1;
+        let index = 1;
         this.datasClone = JSON.parse(JSON.stringify(this.datas));
-        this.datasClone.forEach((element: any, index: number) => {
+        this.datasClone.forEach((element: any) => {
             if (element.isTitle) {
                 group = `group_${index}`;
                 element.id = group;
@@ -329,6 +331,47 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
 
     }
 
+    launchEvent(ev: any) {
+        if (this.selected.length > 0) {
+            const ids = new Set(this.formControlSelect.value.map(d => d.id));
+            const merged = [...this.formControlSelect.value, ...this.selected.filter(d => !ids.has(d.id))];
+            this.formControlSelect.setValue(merged);
+        }
+
+        if (this.afterSelected !== undefined) {
+            this.afterSelected.emit(ev.value);
+        }
+    }
+
+    selectChange(ev: any) {
+        if (this.multiple && ev.isUserInput) {
+            if (ev.source._selected) {
+                this.selected = this.formControlSelect.value;
+            } else {
+                this.selected = this.selected.length > 0 ? this.selected.filter((val: any) => val.id !== ev.source.value.id) : [];
+            }
+        }
+    }
+
+    getErrorMsg(error: any) {
+        if (error.required !== undefined) {
+            return this.translate.instant('lang.requiredField');
+        } else if (error.pattern !== undefined || error.email !== undefined) {
+            return this.translate.instant('lang.badFormat');
+        } else {
+            return 'unknow validator';
+        }
+    }
+
+    getFirstDataLabel() {
+        return this.formControlSelect.value[0].label.replace(/&nbsp;/g, '');
+        // return this.returnValue === 'id' ? this.formControlSelect.value[0].label.replace(/\u00a0/g, '') : this.formControlSelect.value.map((item: any) => item !== null ? item.label : this.translate.instant('lang.emptyValue'))[0];
+    }
+
+    emptyData() {
+        return this.returnValue === 'id' ? null : { id: null, label: this.translate.instant('lang.emptyValue') };
+    }
+
     /**
      * Sets the overlay class  to correct offsetY
      * so that the selected option is at the position of the select box when opening
@@ -403,46 +446,5 @@ export class PluginSelectSearchComponent implements OnInit, OnDestroy, AfterView
         } else {
             return this.datas;
         }
-    }
-
-    launchEvent(ev: any) {
-        if (this.selected.length > 0) {
-            const ids = new Set(this.formControlSelect.value.map(d => d.id));
-            const merged = [...this.formControlSelect.value, ...this.selected.filter(d => !ids.has(d.id))];
-            this.formControlSelect.setValue(merged);
-        }
-
-        if (this.afterSelected !== undefined) {
-            this.afterSelected.emit(ev.value);
-        }
-    }
-
-    selectChange(ev: any) {
-        if (this.multiple && ev.isUserInput) {
-            if (ev.source._selected) {
-                this.selected = this.formControlSelect.value;
-            } else {
-                this.selected = this.selected.length > 0 ? this.selected.filter((val: any) => val.id !== ev.source.value.id) : [];
-            }
-        }
-    }
-
-    getErrorMsg(error: any) {
-        if (error.required !== undefined) {
-            return this.translate.instant('lang.requiredField');
-        } else if (error.pattern !== undefined || error.email !== undefined) {
-            return this.translate.instant('lang.badFormat');
-        } else {
-            return 'unknow validator';
-        }
-    }
-
-    getFirstDataLabel() {
-        return this.formControlSelect.value[0].label.replace(/&nbsp;/g, '');
-        // return this.returnValue === 'id' ? this.formControlSelect.value[0].label.replace(/\u00a0/g, '') : this.formControlSelect.value.map((item: any) => item !== null ? item.label : this.translate.instant('lang.emptyValue'))[0];
-    }
-
-    emptyData() {
-        return this.returnValue === 'id' ? null : { id: null, label: this.translate.instant('lang.emptyValue') };
     }
 }

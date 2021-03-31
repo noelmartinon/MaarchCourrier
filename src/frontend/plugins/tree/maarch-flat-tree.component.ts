@@ -49,6 +49,11 @@ export class MaarchFlatTreeComponent implements OnInit {
     pendingChildOf: any = {};
     temp: any = {};
 
+    constructor(
+        private sortPipe: SortPipe,
+        private latinisePipe: LatinisePipe,
+    ) { }
+
     @HostListener('document:keydown.Shift', ['$event']) onKeydownHandler(event: KeyboardEvent) {
         if (this.selectionPropagation) {
             this.holdShift = true;
@@ -57,11 +62,6 @@ export class MaarchFlatTreeComponent implements OnInit {
     @HostListener('document:keyup.Shift', ['$event']) onKeyupHandler(event: KeyboardEvent) {
         this.holdShift = false;
     }
-
-    constructor(
-        private sortPipe: SortPipe,
-        private latinisePipe: LatinisePipe,
-    ) { }
 
     ngOnInit(): void {
         // SAMPLE
@@ -143,9 +143,9 @@ export class MaarchFlatTreeComponent implements OnInit {
         this.rawData = this.sortPipe.transform(this.rawData, 'text');
 
         // Convert flat data to nested data
-        let FlatToNested, flatToNested;
-        FlatToNested = require('flat-to-nested');
-        flatToNested = new FlatToNested({
+        const flatToNestedObj = require('flat-to-nested');
+
+        const flatToNested = new flatToNestedObj({
             id: 'id',
             parent: 'parent_id',
             children: 'children',

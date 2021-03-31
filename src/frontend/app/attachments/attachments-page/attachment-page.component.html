@@ -32,10 +32,10 @@
                             </div>
                         </div>
                         <div class="attachment-form-item">
-                            <plugin-select-search [label]="this.translate.instant('lang.type')" [placeholderLabel]="this.translate.instant('lang.type')"
+                            <app-plugin-select-search [label]="this.translate.instant('lang.type')" [placeholderLabel]="this.translate.instant('lang.type')"
                                 [formControlSelect]="attachment['type']" [datas]="attachmentsTypes"
                                 (afterSelected)="getAttachType($event)" style="width:100%;">
-                            </plugin-select-search>
+                            </app-plugin-select-search>
                             <div class="fieldState">
                                 <i class="fas fa-asterisk fieldRequired"
                                     *ngIf="attachment['type'].hasError('required') && attachment['type'].untouched"></i>

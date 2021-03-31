@@ -29,11 +29,11 @@
             <div style="display: flex;">
                 <div
                     style="margin-right:20px;align-items: center;justify-content: center;text-align: center;display: flex;">
-                    <plugin-select-search #templateList *ngIf="listTemplates.length > 0" [label]="'lang.chooseModel' | translate"
+                    <app-plugin-select-search #templateList *ngIf="listTemplates.length > 0" [label]="'lang.chooseModel' | translate"
                         [placeholderLabel]="'lang.chooseModel' | translate" [datas]="listTemplates" [class]="'input-form-filled'"
                         [formControlSelect]="templateListForm" (afterSelected)="editTemplate($event)"
                         style="width: 240px;text-align: left;font-weight:normal;font-size: 13px;">
-                    </plugin-select-search>
+                    </app-plugin-select-search>
                 </div>
                 <button mat-button (click)="docToUpload.click()" class="button-form-primary-alt"
                     style="align-items: center;justify-content: center;text-align: center;display: flex;">{{'lang.chooseFile' | translate}}</button>
