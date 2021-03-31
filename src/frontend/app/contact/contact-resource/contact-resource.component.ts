@@ -15,25 +15,22 @@ import { of } from 'rxjs';
 })
 export class ContactResourceComponent implements OnInit {
 
-
-
-    loading: boolean = true;
-
-    contacts: any = [];
-
-    customFields: any[] = [];
-
     /**
      * Ressource identifier to load contact List
      */
     @Input() resId: number = null;
 
     /**
-     * [Filter to load specific contact Type]
-     * use with @resId
-     */
+      * [Filter to load specific contact Type]
+      * use with @resId
+      */
     @Input() mode: 'recipients' | 'senders' = 'recipients';
 
+    loading: boolean = true;
+
+    contacts: any = [];
+
+    customFields: any[] = [];
 
     constructor(
         public translate: TranslateService,

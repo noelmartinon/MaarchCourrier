@@ -20,11 +20,21 @@ import { PrivilegeService } from '@service/privileges.service';
 })
 export class FolderActionListComponent implements OnInit {
 
+    @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
+
+    @Input() selectedRes: any;
+    @Input() totalRes: number;
+    @Input() contextMode: boolean;
+    @Input() currentFolderInfo: any;
+    @Input() currentResource: any = {};
+
+    @Output() refreshEvent = new EventEmitter<string>();
+    @Output() refreshPanelFolders = new EventEmitter<string>();
+    @Output() triggerEvent = new EventEmitter<string>();
+
+    dialogRef: MatDialogRef<any>;
 
     loading: boolean = false;
-
-    @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
-    @Output() triggerEvent = new EventEmitter<string>();
 
     contextMenuPosition = { x: '0px', y: '0px' };
     contextMenuTitle = '';
@@ -43,16 +53,6 @@ export class FolderActionListComponent implements OnInit {
         list: []
     };
 
-    @Input() selectedRes: any;
-    @Input() totalRes: number;
-    @Input() contextMode: boolean;
-    @Input() currentFolderInfo: any;
-    @Input() currentResource: any = {};
-
-
-    @Output() refreshEvent = new EventEmitter<string>();
-    @Output() refreshPanelFolders = new EventEmitter<string>();
-
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -63,8 +63,6 @@ export class FolderActionListComponent implements OnInit {
         private foldersService: FoldersService,
         public privilegeService: PrivilegeService,
     ) { }
-
-    dialogRef: MatDialogRef<any>;
 
     ngOnInit(): void { }
 

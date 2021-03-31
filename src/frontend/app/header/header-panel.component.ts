@@ -8,20 +8,17 @@ import { AppService } from '@service/app.service';
 import { Router } from '@angular/router';
 
 @Component({
-    selector: 'header-panel',
+    selector: 'app-header-panel',
     styleUrls: ['header-panel.component.scss'],
     templateUrl: 'header-panel.component.html',
 })
 export class HeaderPanelComponent implements OnInit {
 
-    //
+    @Input() navButton: any = null;
+    @Input() snavLeft: MatSidenav;
 
     dialogRef: MatDialogRef<any>;
     config: any = {};
-
-
-    @Input() navButton: any = null;
-    @Input() snavLeft: MatSidenav;
 
     constructor(
         public translate: TranslateService,

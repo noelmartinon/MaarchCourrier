@@ -6,7 +6,7 @@ import { ActionsService } from '../../actions/actions.service';
 import { Subscription } from 'rxjs';
 
 @Component({
-    selector: 'panel-folder',
+    selector: 'app-panel-folder',
     templateUrl: 'panel-folder.component.html',
     styleUrls: ['panel-folder.component.scss'],
 })

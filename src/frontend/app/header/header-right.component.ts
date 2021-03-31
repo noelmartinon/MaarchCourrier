@@ -14,11 +14,13 @@ import { RegisteredMailImportComponent } from '@appRoot/registeredMail/import/re
 
 
 @Component({
-    selector: 'header-right',
+    selector: 'app-header-right',
     styleUrls: ['header-right.component.scss'],
     templateUrl: 'header-right.component.html',
 })
 export class HeaderRightComponent implements OnInit {
+
+    @ViewChild('searchInput', { static: false }) searchInput: MatInput;
 
     dialogRef: MatDialogRef<any>;
     config: any = {};
@@ -26,8 +28,6 @@ export class HeaderRightComponent implements OnInit {
     searchTarget: string = '';
 
     hideSearch: boolean = true;
-
-    @ViewChild('searchInput', { static: false }) searchInput: MatInput;
 
     constructor(
         public translate: TranslateService,

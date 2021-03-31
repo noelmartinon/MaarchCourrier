@@ -69,5 +69,5 @@
         <mat-icon class="fa fa-folder-minus fa-2x"></mat-icon>
         <span>{{'lang.removeFromFolder' | translate}}</span>
     </button>
-    <folder-menu [resIds]="selectedRes" (refreshList)="refreshDaoAfterAction()" (refreshFolders)="refreshFolders()"></folder-menu>
+    <app-folder-menu [resIds]="selectedRes" (refreshList)="refreshDaoAfterAction()" (refreshFolders)="refreshFolders()"></app-folder-menu>
 </mat-menu>

@@ -15,6 +15,15 @@ import { HeaderService } from '@service/header.service';
 })
 export class HistoryDiffusionsListComponent implements OnInit {
 
+    /**
+     * Ressource identifier to load listinstance (Incompatible with templateId)
+     */
+    @Input() resId: number = null;
+
+    /**
+      * Expand all roles
+      */
+    @Input() expanded: boolean = true;
 
     roles: any = [];
     loading: boolean = true;
@@ -23,18 +32,6 @@ export class HistoryDiffusionsListComponent implements OnInit {
     userDestList: any[] = [];
 
     diffListHistory: any[] = [];
-
-
-    /**
-     * Ressource identifier to load listinstance (Incompatible with templateId)
-     */
-    @Input() resId: number = null;
-
-    /**
-     * Expand all roles
-     */
-    @Input() expanded: boolean = true;
-
 
     constructor(
         public translate: TranslateService,

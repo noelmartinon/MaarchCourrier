@@ -20,6 +20,12 @@ import { PrivilegeService } from '@service/privileges.service';
 })
 export class HistoryComponent implements OnInit {
 
+    @Input() resId: number = null;
+
+    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+    @ViewChild('tableHistoryListSort', { static: true }) sort: MatSort;
+    @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
+
     loading: boolean = false;
 
     fullHistoryMode: boolean = true;
@@ -54,12 +60,6 @@ export class HistoryComponent implements OnInit {
     };
 
     loadingFilters: boolean = true;
-
-    @Input() resId: number = null;
-
-    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-    @ViewChild('tableHistoryListSort', { static: true }) sort: MatSort;
-    @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
     private destroy$ = new Subject<boolean>();
 
@@ -285,6 +285,10 @@ export class HistoryComponent implements OnInit {
         }
     }
 
+    directSearchHistory() {
+        this.refreshDao();
+    }
+
     private filter(value: string, type: string): any[] {
         if (typeof value === 'string') {
             const filterValue = this.latinisePipe.transform(value.toLowerCase());
@@ -292,10 +296,6 @@ export class HistoryComponent implements OnInit {
         } else {
             return this.filterList[type];
         }
-    }
-
-    directSearchHistory() {
-        this.refreshDao();
     }
 }
 

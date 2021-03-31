@@ -18,6 +18,14 @@ import { debounceTime, filter, distinctUntilChanged, tap, switchMap, exhaustMap,
 
 export class AddressBanAutocompleteComponent implements OnInit {
 
+    /**
+     * FormControl used when autocomplete is used in form and must be catched in a form control.
+     */
+    @Input('control') controlAutocomplete: FormControl;
+    @Input('admin') adminMode: boolean;
+
+    @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
+
     loading: boolean = false;
 
     key: string = 'address';
@@ -32,15 +40,6 @@ export class AddressBanAutocompleteComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
     addressBANCurrentDepartment: string = '75';
     departmentList: any[] = [];
-
-
-    /**
-     * FormControl used when autocomplete is used in form and must be catched in a form control.
-     */
-    @Input('control') controlAutocomplete: FormControl;
-    @Input('admin') adminMode: boolean;
-
-    @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
     constructor(
         public translate: TranslateService,
