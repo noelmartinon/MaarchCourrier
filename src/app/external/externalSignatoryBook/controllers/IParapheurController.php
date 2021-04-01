@@ -26,6 +26,7 @@ use Resource\controllers\StoreController;
 use Resource\models\ResModel;
 use SrcCore\models\CurlModel;
 use SrcCore\models\DatabaseModel;
+use SrcCore\models\TextFormatModel;
 use User\models\UserModel;
 
 /**
@@ -88,7 +89,7 @@ class IParapheurController
         // Retrieve the annexes of the attachment to sign (other attachments and the original document)
         $annexes = [];
         $annexes['letterbox'] = ResModel::get([
-            'select' => ['res_id', 'path', 'filename', 'docserver_id', 'format', 'category_id', 'external_id', 'integrations'],
+            'select' => ['res_id', 'path', 'filename', 'docserver_id', 'format', 'category_id', 'external_id', 'integrations', 'subject'],
             'where'  => ['res_id = ?'],
             'data'   => [$aArgs['resIdMaster']]
         ]);
@@ -100,7 +101,7 @@ class IParapheurController
         }
 
         $attachments = AttachmentModel::get([
-            'select' => ['res_id', 'docserver_id', 'path', 'filename', 'format', 'attachment_type', 'fingerprint'],
+            'select' => ['res_id', 'docserver_id', 'path', 'filename', 'format', 'attachment_type', 'fingerprint', 'title'],
             'where'  => ['res_id_master = ?', 'attachment_type not in (?)', "status NOT IN ('DEL','OBS', 'FRZ', 'TMP', 'SEND_MASS')", "in_signature_book = 'true'"],
             'data'   => [$aArgs['resIdMaster'], ['signed_response']]
         ]);
@@ -128,6 +129,7 @@ class IParapheurController
         $attachmentToFreeze = [];
         foreach ($attachments as $attachment) {
             $resId     = $attachment['res_id'];
+            $title     = $attachment['title'];
             $collId    = 'attachments_coll';
             $dossierId = $resId . '_' . rand(0001, 9999);
 
@@ -138,7 +140,8 @@ class IParapheurController
                 'annexes'      => $annexes,
                 'sousType'     => $sousType,
                 'config'       => $aArgs['config'],
-                'dossierId'    => $dossierId
+                'dossierId'    => $dossierId,
+                'title'        => $title
             ]);
 
             if (!empty($response['error'])) {
@@ -154,6 +157,7 @@ class IParapheurController
             $externalId              = json_decode($annexes['letterbox'][0]['external_id'], true);
             if ($mainDocumentIntegration['inSignatureBook'] && empty($externalId['signatureBookId'])) {
                 $resId     = $annexes['letterbox'][0]['res_id'];
+                $title     = $annexes['letterbox'][0]['subject'];
                 $collId    = 'letterbox_coll';
                 $dossierId = $resId . '_' . rand(0001, 9999);
                 unset($annexes['letterbox']);
@@ -165,7 +169,8 @@ class IParapheurController
                     'annexes'      => $annexes,
                     'sousType'     => $sousType,
                     'config'       => $aArgs['config'],
-                    'dossierId'    => $dossierId
+                    'dossierId'    => $dossierId,
+                    'title'        => $title
                 ]);
     
                 if (!empty($response['error'])) {
@@ -188,7 +193,7 @@ class IParapheurController
         }
         $attachmentPath     = DocserverModel::getByDocserverId(['docserverId' => $adrInfo['docserver_id'], 'select' => ['path_template']]);
         $attachmentFilePath = $attachmentPath['path_template'] . str_replace('#', '/', $adrInfo['path']) . $adrInfo['filename'];
-        $dossierTitre       = 'Projet courrier numéro ' . $aArgs['resId'];
+        $dossierTitre       = 'Courrier : '. TextFormatModel::formatFilename(['filename' => $aArgs['title'], 'maxLength' => 250]) .' Référence : '. $aArgs['resId'];
 
         $mainResource = ResModel::getById(['resId' => $aArgs['resIdMaster'], 'select' => ['process_limit_date']]);
         if (empty($mainResource['process_limit_date'])) {
