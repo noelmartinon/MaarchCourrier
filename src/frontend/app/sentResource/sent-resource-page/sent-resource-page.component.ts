@@ -919,14 +919,10 @@ export class SentResourcePageComponent implements OnInit {
         if (keyVal !== 'summarySheet') {
             return;
         }
-        let today: any;
-        let dd: any;
-        let mm: any;
+        let today: any = new Date();
+        let dd = today.getDate();
+        let mm = today.getMonth() + 1;
         const yyyy: any = today.getFullYear();
-
-        today = new Date();
-        dd = today.getDate();
-        mm = today.getMonth() + 1;
 
         if (dd < 10) {
             dd = '0' + dd;
@@ -986,14 +982,10 @@ export class SentResourcePageComponent implements OnInit {
 
     async saveSummarySheet(encodedDocument: any) {
         return new Promise(resolve => {
-            let today: any;
-            let dd: any;
-            let mm: any;
-            const  yyyy: any = today.getFullYear();
-
-            today = new Date();
-            dd = today.getDate();
-            mm = today.getMonth() + 1;
+            let today: any = new Date();
+            let dd = today.getDate();
+            let mm = today.getMonth() + 1;
+            const yyyy: any = today.getFullYear();
 
             if (dd < 10) {
                 dd = '0' + dd;

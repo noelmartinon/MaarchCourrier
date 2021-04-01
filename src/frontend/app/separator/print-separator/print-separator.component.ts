@@ -150,15 +150,10 @@ export class PrintSeparatorComponent implements OnInit {
         const url = `data:application/pdf;base64,${this.docData}`;
         a.href = url;
 
-        let today: any;
-        let dd: any;
-        let mm: any;
-        let yyyy: any;
-
-        today = new Date();
-        dd = today.getDate();
-        mm = today.getMonth() + 1;
-        yyyy = today.getFullYear();
+        let today: any = new Date();
+        let dd = today.getDate();
+        let mm = today.getMonth() + 1;
+        const yyyy: any = today.getFullYear();
 
         if (dd < 10) {
             dd = '0' + dd;
