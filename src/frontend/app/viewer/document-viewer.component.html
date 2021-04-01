@@ -109,9 +109,9 @@
     </ng-template>
 </ng-container>
 <ng-container *ngIf="editInProgress && editor.mode === 'onlyoffice'">
-    <onlyoffice-viewer #onlyofficeViewer style="height:100%;width:100%;" [params]="editor.options" [file]="file"
+    <app-onlyoffice-viewer #onlyofficeViewer style="height:100%;width:100%;" [params]="editor.options" [file]="file"
         [editMode]="true" (triggerAfterUpdatedDoc)="triggerEvent.emit()"
-        (triggerCloseEditor)="closeEditor()" (triggerModifiedDocument)="isDocModified = true"></onlyoffice-viewer>
+        (triggerCloseEditor)="closeEditor()" (triggerModifiedDocument)="isDocModified = true"></app-onlyoffice-viewer>
 </ng-container>
 <ng-container *ngIf="editInProgress && editor.mode === 'collaboraOnline'">
     <app-collabora-online-viewer #collaboraOnlineViewer style="height:100%;width:100%;" [params]="editor.options" [file]="file"
