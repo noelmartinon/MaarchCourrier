@@ -30,7 +30,7 @@ export class VisaWorkflowComponent implements OnInit {
     @Input() showListModels: boolean = true;
     @Input() showComment: boolean = true;
 
-    @Input() delegatedUser: boolean;
+    @Input() delegatedUser: number;
 
     @Output() workflowUpdated = new EventEmitter<any>();
     @ViewChild('searchVisaSignUserInput', { static: false }) searchVisaSignUserInput: ElementRef;
@@ -258,7 +258,7 @@ export class VisaWorkflowComponent implements OnInit {
                                     currentRole: element.requested_signature ? 'sign' : 'visa'
                                 });
                         });
-
+                        console.log(this.visaWorkflow.items);
                         this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
                     }
                     this.hasHistory = data.hasHistory;
