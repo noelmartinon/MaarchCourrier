@@ -30,6 +30,8 @@ export class VisaWorkflowComponent implements OnInit {
     @Input() showListModels: boolean = true;
     @Input() showComment: boolean = true;
 
+    @Input() delegatedUser: boolean;
+
     @Output() workflowUpdated = new EventEmitter<any>();
     @ViewChild('searchVisaSignUserInput', { static: false }) searchVisaSignUserInput: ElementRef;
 

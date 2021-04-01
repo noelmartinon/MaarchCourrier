@@ -127,7 +127,7 @@
             <div *ngIf="headerTab == 'visaCircuit'" class="contentShow" style="width:98%;overflow-x: hidden;">
                 <app-visa-workflow #appVisaWorkflow [resId]="resId"
                     [adminMode]="privilegeService.hasCurrentUserPrivilege('config_visa_workflow')"
-                    [target]="'signatureBook'"></app-visa-workflow>
+                    [target]="'signatureBook'" [delegatedUser]="delegatedUser"></app-visa-workflow>
             </div>
             <div *ngIf="headerTab == 'history'" class="contentShow" style="width:98%;">
                 <app-history-list #appHistoryList [resId]="resId"></app-history-list>
