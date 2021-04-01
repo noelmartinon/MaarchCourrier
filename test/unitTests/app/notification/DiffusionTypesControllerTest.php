@@ -101,7 +101,7 @@ class DiffusionTypesControllerTest extends TestCase
             $args['event']['table_name'] = 'notes';
             $args['event']['record_id'] = 1;
             $response = $diffusionTypesController->getItemsToNotify($args);
-            $this->assertEmpty($response);
+            $this->assertIsNumeric($response);
 
             $args['event']['table_name'] = 'listinstance';
             $args['event']['user_id'] = 19;
@@ -184,7 +184,7 @@ class DiffusionTypesControllerTest extends TestCase
             $args['event']['table_name'] = 'notes';
             $args['event']['record_id'] = 1;
             $response = $diffusionTypesController->getItemsToNotify($args);
-            $this->assertEmpty($response);
+            $this->assertIsInt($response);
 
             $args['event']['table_name'] = 'listinstance';
             $args['event']['user_id'] = 19;
@@ -235,7 +235,7 @@ class DiffusionTypesControllerTest extends TestCase
             $args['event']['table_name'] = 'notes';
             $args['event']['record_id'] = 1;
             $response = $diffusionTypesController->getItemsToNotify($args);
-            $this->assertEmpty($response);
+            $this->assertIsInt($response);
 
             $args['event']['table_name'] = 'listinstance';
             $args['event']['user_id'] = 19;
@@ -294,7 +294,7 @@ class DiffusionTypesControllerTest extends TestCase
             $args['event']['table_name'] = 'notes';
             $args['event']['record_id'] = 1;
             $response = $diffusionTypesController->getItemsToNotify($args);
-            $this->assertEmpty($response);
+            $this->assertIsInt($response);
 
             $args['event']['table_name'] = 'listinstance';
             $args['event']['user_id'] = 19;
@@ -353,7 +353,7 @@ class DiffusionTypesControllerTest extends TestCase
             $args['event']['table_name'] = 'notes';
             $args['event']['record_id'] = 1;
             $response = $diffusionTypesController->getItemsToNotify($args);
-            $this->assertEmpty($response);
+            $this->assertIsInt($response);
 
             $args['event']['table_name'] = 'listinstance';
             $args['event']['user_id'] = 19;

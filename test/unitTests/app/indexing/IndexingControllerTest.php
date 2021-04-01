@@ -180,7 +180,7 @@ class IndexingControllerTest extends TestCase
         $this->assertNotEmpty($responseBody->informations->allowedFiles);
         foreach ($responseBody->informations->allowedFiles as $value) {
             $this->assertNotEmpty($value->extension);
-            $this->assertNotEmpty($value->mimeType);
+            $this->assertIsString($value->mimeType);
             $this->assertIsBool($value->canConvert);
         }
     }
