@@ -33,6 +33,18 @@ interface Privilege {
 @Injectable()
 export class PrivilegeService {
 
+    shortcuts: any[] = [
+        {
+            'id': 'followed',
+            'label': 'lang.followedMail',
+            'comment': 'lang.followedMail',
+            'route': '/followed',
+            'style': 'fas fa-star',
+            'unit': 'application',
+            'shortcut': true
+        }
+    ];
+
     private administrations: Administration[] = [
         {
             'id': 'admin_users',
@@ -561,18 +573,6 @@ export class PrivilegeService {
             'style': 'far fa-window-restore',
             'unit': 'application',
             'shortcut': false
-        }
-    ];
-
-    private shortcuts: any[] = [
-        {
-            'id': 'followed',
-            'label': 'lang.followedMail',
-            'comment': 'lang.followedMail',
-            'route': '/followed',
-            'style': 'fas fa-star',
-            'unit': 'application',
-            'shortcut': true
         }
     ];
 
