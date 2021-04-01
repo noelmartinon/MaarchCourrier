@@ -1,6 +1,6 @@
 composer.lock
 installed.lck
-apps/maarch_entreprise/xml/config.json
+config/config.json
 apps/maarch_entreprise/xml/log4php.xml
 *.log
 test/unitTests/build/

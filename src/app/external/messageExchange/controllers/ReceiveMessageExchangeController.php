@@ -66,7 +66,7 @@ class ReceiveMessageExchangeController
 
         $sDataObject = $res['content'];
         $sDataObject = json_decode($sDataObject);
-        
+
         $acknowledgementReturn = self::sendAcknowledgement(["dataObject" => $sDataObject]);
         if (!empty($acknowledgementReturn['error'])) {
             return $response->withStatus(400)->withJson(["errors" => $acknowledgementReturn['error']]);
@@ -180,7 +180,7 @@ class ReceiveMessageExchangeController
 
     public static function readXmlConfig()
     {
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/m2m_config.xml']);
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'config/m2m_config.xml']);
 
         $aDefaultConfig = [];
         if (!empty($loadedXml)) {
@@ -260,7 +260,7 @@ class ReceiveMessageExchangeController
                     'collId'    => 'letterbox_coll',
                     'version'   => 1
                 ]);
-    
+
                 $customId = CoreConfigModel::getCustomId();
                 $customId = empty($customId) ? 'null' : $customId;
                 exec("php src/app/convert/scripts/FullTextScript.php --customId {$customId} --resId {$storeResource} --collId letterbox_coll --userId {$GLOBALS['id']} > /dev/null &");
@@ -282,7 +282,7 @@ class ReceiveMessageExchangeController
         } else {
             $contactCommunicationValue = $transferringAgencyMetadata->Communication[0]->value;
         }
-        
+
         if (filter_var($contactCommunicationValue, FILTER_VALIDATE_EMAIL)) {
             $aCommunicationMeans['email'] = $contactCommunicationValue;
             $whereAlreadyExist = "communication_means->>'email' = ?";
@@ -340,7 +340,7 @@ class ReceiveMessageExchangeController
                     "user_id"    => $aArgs['userId'],
                     "note_text"  => $value->value
                 ]);
-    
+
                 HistoryController::add([
                     'tableName' => 'notes',
                     'recordId'  => $aArgs['resId'],
@@ -348,7 +348,7 @@ class ReceiveMessageExchangeController
                     'eventId'   => 'noteadd',
                     'info'       => _NOTE_ADDED
                 ]);
-    
+
                 $countNote++;
             }
         }

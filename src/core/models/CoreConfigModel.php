@@ -61,10 +61,10 @@ class CoreConfigModel
     public static function getConfigPath()
     {
         $customId = CoreConfigModel::getCustomId();
-        if (!empty($customId) && is_file("custom/{$customId}/apps/maarch_entreprise/xml/config.json")) {
-            $path = "custom/{$customId}/apps/maarch_entreprise/xml/config.json";
+        if (!empty($customId) && is_file("custom/{$customId}/config/config.json")) {
+            $path = "custom/{$customId}/config/config.json";
         } else {
-            $path = 'apps/maarch_entreprise/xml/config.json';
+            $path = 'config/config.json';
         }
 
         return $path;
@@ -78,7 +78,7 @@ class CoreConfigModel
             return $applicationName;
         }
 
-        $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $file = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
 
         if (!empty($file['config']['applicationName'])) {
             $applicationName = $file['config']['applicationName'];
@@ -101,7 +101,7 @@ class CoreConfigModel
     {
         $availableLanguages = ['en', 'fr', 'nl'];
 
-        $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $file = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
 
         if ($file) {
             $lang = $file['config']['lang'];
@@ -142,7 +142,7 @@ class CoreConfigModel
     {
         $timezone = 'Europe/Paris';
 
-        $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $file = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
 
         if ($file) {
             if (!empty($file['config']['timezone'])) {
@@ -208,7 +208,7 @@ class CoreConfigModel
 
     public static function getLoggingMethod()
     {
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/login_method.xml']);
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'config/login_method.xml']);
 
         $loggingMethod = [];
         if ($loadedXml) {
@@ -321,10 +321,10 @@ class CoreConfigModel
             $customId = $aArgs['customId'];
         }
 
-        if (file_exists("custom/{$customId}/apps/maarch_entreprise/xml/keycloakConfig.xml")) {
-            $path = "custom/{$customId}/apps/maarch_entreprise/xml/keycloakConfig.xml";
+        if (file_exists("custom/{$customId}/config/keycloakConfig.xml")) {
+            $path = "custom/{$customId}/config/keycloakConfig.xml";
         } else {
-            $path = 'apps/maarch_entreprise/xml/keycloakConfig.xml';
+            $path = 'config/keycloakConfig.xml';
         }
 
         $keycloakConfig = [];

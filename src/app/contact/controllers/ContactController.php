@@ -581,7 +581,7 @@ class ContactController
             }
         }
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/m2m_config.xml']);
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'config/m2m_config.xml']);
 
         $annuaryEnabled = true;
         if (!$loadedXml) {

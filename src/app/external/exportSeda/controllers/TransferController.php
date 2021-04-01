@@ -20,7 +20,7 @@ class TransferController
 {
     public static function transfer($target, $messageId, $type = null)
     {
-        $config         = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $config         = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
         $adapter        = '';
         $res['status']  = 0;
         $res['content'] = '';

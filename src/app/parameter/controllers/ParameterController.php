@@ -179,12 +179,12 @@ class ParameterController
                 unset($tmpFileName);
             }
         } elseif (in_array($args['id'], ['applicationName', 'maarchUrl'])) {
-            $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+            $config = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
             $config['config'][$args['id']] = $body[$args['id']];
-            if (file_exists("custom/{$customId}/apps/maarch_entreprise/xml/config.json")) {
-                $fp = fopen("custom/{$customId}/apps/maarch_entreprise/xml/config.json", 'w');
+            if (file_exists("custom/{$customId}/config/config.json")) {
+                $fp = fopen("custom/{$customId}/config/config.json", 'w');
             } else {
-                $fp = fopen("apps/maarch_entreprise/xml/config.json", 'w');
+                $fp = fopen("config/config.json", 'w');
             }
             fwrite($fp, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
             fclose($fp);
@@ -214,13 +214,13 @@ class ParameterController
                 }
                 ParameterModel::create(['id' => $args['id']]);
             }
-    
+
             $check = (empty($body['param_value_int']) || Validator::intVal()->validate($body['param_value_int']));
             $check = $check && (empty($body['param_value_string']) || Validator::stringType()->validate($body['param_value_string']));
             if (!$check) {
                 return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
             }
-    
+
             $body['id'] = $args['id'];
             ParameterModel::update($body);
         }

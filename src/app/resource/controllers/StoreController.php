@@ -481,7 +481,7 @@ class StoreController
         ValidatorModel::notEmpty($args, ['extension']);
         ValidatorModel::stringType($args, ['extension', 'type']);
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/extensions.xml']);
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'config/extensions.xml']);
         if ($loadedXml) {
             foreach ($loadedXml->FORMAT as $value) {
                 if (strtolower((string)$value->name) == strtolower($args['extension']) && (strtolower((string)$value->mime) == strtolower($args['type']) || (empty((string)$value->mime) && empty($args['type'])))) {
@@ -497,7 +497,7 @@ class StoreController
     {
         $allowedFiles = [];
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/extensions.xml']);
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'config/extensions.xml']);
         if ($loadedXml) {
             foreach ($loadedXml->FORMAT as $value) {
                 $allowedFiles[] = [
