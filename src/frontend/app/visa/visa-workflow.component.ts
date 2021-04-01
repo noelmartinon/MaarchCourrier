@@ -258,7 +258,6 @@ export class VisaWorkflowComponent implements OnInit {
                                     currentRole: element.requested_signature ? 'sign' : 'visa'
                                 });
                         });
-                        console.log(this.visaWorkflow.items);
                         this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
                     }
                     this.hasHistory = data.hasHistory;
