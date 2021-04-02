@@ -48,7 +48,7 @@ class AuthenticationController
         $hashedPath = md5($path);
 
         $appName   = CoreConfigModel::getApplicationName();
-        $configFile = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $configFile = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
         $maarchUrl = $configFile['config']['maarchUrl'] ?? '';
 
         $parameter = ParameterModel::getById(['id' => 'loginpage_message', 'select' => ['param_value_string']]);
@@ -58,7 +58,7 @@ class AuthenticationController
         $loggingMethod = CoreConfigModel::getLoggingMethod();
         $authUri = null;
         if ($loggingMethod['id'] == 'cas') {
-            $casConfiguration = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/cas_config.xml']);
+            $casConfiguration = CoreConfigModel::getXmlLoaded(['path' => 'config/cas_config.xml']);
             $hostname         = (string)$casConfiguration->WEB_CAS_URL;
             $port             = (string)$casConfiguration->WEB_CAS_PORT;
             $uri              = (string)$casConfiguration->WEB_CAS_CONTEXT;
@@ -73,7 +73,7 @@ class AuthenticationController
             $ssoConfiguration = !empty($ssoConfiguration['value']) ? json_decode($ssoConfiguration['value'], true) : null;
             $authUri          = $ssoConfiguration['url'] ?? null;
         } elseif ($loggingMethod['id'] == 'openam') {
-            $configuration  = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/openAM.json']);
+            $configuration  = CoreConfigModel::getJsonLoaded(['path' => 'config/openAM.json']);
             $authUri        = $configuration['connectionUrl'] ?? null;
         }
 
@@ -479,7 +479,7 @@ class AuthenticationController
 
     private static function casConnection()
     {
-        $casConfiguration = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/cas_config.xml']);
+        $casConfiguration = CoreConfigModel::getXmlLoaded(['path' => 'config/cas_config.xml']);
 
         $version = (string)$casConfiguration->CAS_VERSION;
         $hostname = (string)$casConfiguration->WEB_CAS_URL;
@@ -519,7 +519,7 @@ class AuthenticationController
 
     private static function casDisconnection()
     {
-        $casConfiguration = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/cas_config.xml']);
+        $casConfiguration = CoreConfigModel::getXmlLoaded(['path' => 'config/cas_config.xml']);
 
         $version = (string)$casConfiguration->CAS_VERSION;
         $hostname = (string)$casConfiguration->WEB_CAS_URL;
@@ -631,8 +631,7 @@ class AuthenticationController
 
     private static function openAMConnection()
     {
-        //TODO OpenAM 13
-        $configuration = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/openAM.json']);
+        $configuration = CoreConfigModel::getJsonLoaded(['path' => 'config/openAM.json']);
 
         if (empty($configuration['attributeUrl']) || empty($configuration['cookieName']) || empty($configuration['attributeName'])) {
             return ['errors' => 'OpenAM configuration missing'];
@@ -725,7 +724,7 @@ class AuthenticationController
     {
         $sessionTime = AuthenticationController::MAX_DURATION_TOKEN;
 
-        $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $file = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
         if ($file) {
             if (!empty($file['config']['cookieTime'])) {
                 if ($sessionTime > (int)$file['config']['cookieTime']) {
@@ -750,7 +749,7 @@ class AuthenticationController
     {
         $sessionTime = AuthenticationController::MAX_DURATION_TOKEN;
 
-        $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $file = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
         if ($file) {
             $sessionTime = (int)$file['config']['cookieTime'];
         }

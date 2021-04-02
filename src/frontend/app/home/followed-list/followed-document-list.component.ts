@@ -29,6 +29,18 @@ declare let $: any;
 })
 export class FollowedDocumentListComponent implements OnInit, OnDestroy {
 
+    @ViewChild('actionsListContext', { static: true }) actionsList: FollowedActionListComponent;
+    @ViewChild('appPanelList', { static: true }) appPanelList: PanelListComponent;
+    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+    @ViewChild('tableBasketListSort', { static: true }) sort: MatSort;
+    @ViewChild('basketHome', { static: true }) basketHome: BasketHomeComponent;
+    @ViewChild('menuShortcut', { static: true }) menuShortcut: MenuShortcutComponent;
+    @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
+
+    subscription: Subscription;
+
+    currentSelectedChrono: string = '';
+
     loading: boolean = false;
     docUrl: string = '';
     public innerHtml: SafeHtml;
@@ -46,8 +58,6 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
     dragInit: boolean = true;
 
     dialogRef: MatDialogRef<any>;
-
-    @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
 
     displayedColumnsBasket: string[] = ['resId'];
 
@@ -85,18 +95,6 @@ export class FollowedDocumentListComponent implements OnInit, OnDestroy {
     };
 
     private destroy$ = new Subject<boolean>();
-    subscription: Subscription;
-
-    @ViewChild('actionsListContext', { static: true }) actionsList: FollowedActionListComponent;
-    @ViewChild('appPanelList', { static: true }) appPanelList: PanelListComponent;
-
-    currentSelectedChrono: string = '';
-
-    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-    @ViewChild('tableBasketListSort', { static: true }) sort: MatSort;
-    @ViewChild('basketHome', { static: true }) basketHome: BasketHomeComponent;
-
-    @ViewChild('menuShortcut', { static: true }) menuShortcut: MenuShortcutComponent;
 
     constructor(
         public translate: TranslateService,

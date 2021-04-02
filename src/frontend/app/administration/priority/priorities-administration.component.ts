@@ -17,7 +17,8 @@ export class PrioritiesAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     loading: boolean = false;
 
@@ -25,10 +26,6 @@ export class PrioritiesAdministrationComponent implements OnInit {
     prioritiesOrder: any[] = [];
     displayedColumns = ['id', 'label', 'delays', 'actions'];
     filterColumns = ['id', 'label', 'delays'];
-
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,

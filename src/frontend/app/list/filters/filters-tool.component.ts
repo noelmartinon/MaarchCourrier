@@ -24,6 +24,18 @@ export interface StateGroup {
 })
 export class FiltersToolComponent implements OnInit {
 
+    @ViewChild(MatAutocompleteTrigger, { static: true }) autocomplete: MatAutocompleteTrigger;
+
+    @Input() listProperties: any;
+    @Input() title: string;
+    @Input() routeDatas: string;
+    @Input() selectedRes: any;
+    @Input() totalRes: number;
+
+    @Output() refreshEvent = new EventEmitter<string>();
+    @Output() refreshEventAfterAction = new EventEmitter<string>();
+    @Output() toggleAllRes = new EventEmitter<string>();
+
     stateForm: FormGroup = this.fb.group({
         stateGroup: '',
     });
@@ -41,8 +53,6 @@ export class FiltersToolComponent implements OnInit {
         { 'id': 'type_label' }
     ];
 
-    @ViewChild(MatAutocompleteTrigger, { static: true }) autocomplete: MatAutocompleteTrigger;
-
     priorities: any[] = [];
     categories: any[] = [];
     entitiesList: any[] = [];
@@ -54,39 +64,10 @@ export class FiltersToolComponent implements OnInit {
 
     isLoading: boolean = false;
 
-    @Input() listProperties: any;
-    @Input() title: string;
-    @Input() routeDatas: string;
-    @Input() selectedRes: any;
-    @Input() totalRes: number;
-
-    @Output() refreshEvent = new EventEmitter<string>();
-    @Output() refreshEventAfterAction = new EventEmitter<string>();
-    @Output() toggleAllRes = new EventEmitter<string>();
-
     constructor(public translate: TranslateService, public http: HttpClient, private filtersListService: FiltersListService, private fb: FormBuilder, private latinisePipe: LatinisePipe, public dialog: MatDialog) { }
 
     ngOnInit(): void {
 
-    }
-
-    private _filter = (opt: string[], value: string): string[] => {
-
-        if (typeof value === 'string') {
-            const filterValue = value.toLowerCase();
-
-            return opt.filter(item => this.latinisePipe.transform(item['label'].toLowerCase()).indexOf(this.latinisePipe.transform(filterValue)) !== -1);
-        }
-    };
-
-    private _filterGroup(value: string): StateGroup[] {
-        if (value && typeof value === 'string') {
-            return this.stateGroups
-                .map(group => ({ letter: group.letter, names: this._filter(group.names, value) }))
-                .filter(group => group.names.length > 0);
-        }
-
-        return this.stateGroups;
     }
 
     changeOrderDir() {
@@ -306,5 +287,24 @@ export class FiltersToolComponent implements OnInit {
                 startWith(''),
                 map((value: any) => this._filterGroup(value))
             );
+    }
+
+    private _filter = (opt: string[], value: string): string[] => {
+
+        if (typeof value === 'string') {
+            const filterValue = value.toLowerCase();
+
+            return opt.filter(item => this.latinisePipe.transform(item['label'].toLowerCase()).indexOf(this.latinisePipe.transform(filterValue)) !== -1);
+        }
+    };
+
+    private _filterGroup(value: string): StateGroup[] {
+        if (value && typeof value === 'string') {
+            return this.stateGroups
+                .map(group => ({ letter: group.letter, names: this._filter(group.names, value) }))
+                .filter(group => group.names.length > 0);
+        }
+
+        return this.stateGroups;
     }
 }

@@ -11,17 +11,13 @@ import { ActionsService } from '../actions/actions.service';
 import { of, Subscription } from 'rxjs';
 
 @Component({
-    selector: 'basket-home',
+    selector: 'app-basket-home',
     templateUrl: 'basket-home.component.html',
     styleUrls: ['basket-home.component.scss'],
 })
 export class BasketHomeComponent implements OnInit, OnDestroy {
 
 
-    loading: boolean = true;
-    hoverEditGroupOrder: boolean = false;
-
-    homeData: any = null;
     @Input() currentBasketInfo: any = {
         ownerId: 0,
         groupId: 0,
@@ -29,7 +25,14 @@ export class BasketHomeComponent implements OnInit, OnDestroy {
     };
     @Input() snavL: MatSidenav;
     @Output() refreshEvent = new EventEmitter<string>();
+
     @ViewChild('basketPanel', { static: true }) basketPanel: MatExpansionPanel;
+
+    loading: boolean = true;
+    hoverEditGroupOrder: boolean = false;
+
+    homeData: any = null;
+
     editOrderGroups: boolean = false;
     subscription: Subscription;
 

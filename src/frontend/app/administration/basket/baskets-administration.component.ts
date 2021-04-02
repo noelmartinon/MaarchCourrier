@@ -19,7 +19,8 @@ export class BasketsAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     loading: boolean = false;
 
@@ -28,9 +29,6 @@ export class BasketsAdministrationComponent implements OnInit {
 
     displayedColumns = ['basket_id', 'basket_name', 'basket_desc', 'actions'];
     filterColumns = ['basket_id', 'basket_name', 'basket_desc'];
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,

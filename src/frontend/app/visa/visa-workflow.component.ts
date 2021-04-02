@@ -13,6 +13,7 @@ import { AddVisaModelModalComponent } from './addVisaModel/add-visa-model-modal.
 import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { ActivatedRoute } from '@angular/router';
 import { PrivilegeService } from '@service/privileges.service';
+import { HeaderService } from '@service/header.service';
 
 @Component({
     selector: 'app-visa-workflow',
@@ -66,7 +67,8 @@ export class VisaWorkflowComponent implements OnInit {
         public dialog: MatDialog,
         private scanPipe: ScanPipe,
         private route: ActivatedRoute,
-        private privilegeService: PrivilegeService
+        private privilegeService: PrivilegeService,
+        public headerService: HeaderService
     ) {
         // ngOnInit is not called if navigating in the same component : must be in constructor for this case
         this.route.params.subscribe(params => {
@@ -256,7 +258,6 @@ export class VisaWorkflowComponent implements OnInit {
                                     currentRole: element.requested_signature ? 'sign' : 'visa'
                                 });
                         });
-
                         this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
                     }
                     this.hasHistory = data.hasHistory;

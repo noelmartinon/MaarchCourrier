@@ -20,6 +20,9 @@ import { FeatureTourService } from '@service/featureTour.service';
 })
 export class AdministrationComponent implements OnInit, AfterViewInit {
 
+    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
+    @ViewChild('searchServiceInput', { static: true }) searchServiceInput: ElementRef;
+
     loading: boolean = false;
 
     shortcutsAdmin: any[] = [];
@@ -32,9 +35,6 @@ export class AdministrationComponent implements OnInit, AfterViewInit {
 
     administrations: any[] = [];
     filteredAdministrations: Observable<string[]>;
-
-    @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
-    @ViewChild('searchServiceInput', { static: true }) searchServiceInput: ElementRef;
 
     constructor(
         public translate: TranslateService,
@@ -89,20 +89,7 @@ export class AdministrationComponent implements OnInit, AfterViewInit {
     }
 
     goToSpecifiedAdministration(service: any): void {
-        if (service.angular === true) {
-            this.router.navigate([service.route]);
-        } else {
-            window.location.assign(service.route);
-        }
-    }
-
-    private _filter(value: string, type: string): string[] {
-        if (typeof value === 'string') {
-            const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this[type].filter((option: any) => this.latinisePipe.transform(this.translate.instant(option['label']).toLowerCase()).includes(filterValue));
-        } else {
-            return this[type];
-        }
+        this.router.navigate([service.route]);
     }
 
     getNbShortcuts() {
@@ -123,5 +110,14 @@ export class AdministrationComponent implements OnInit, AfterViewInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    private _filter(value: string, type: string): string[] {
+        if (typeof value === 'string') {
+            const filterValue = this.latinisePipe.transform(value.toLowerCase());
+            return this[type].filter((option: any) => this.latinisePipe.transform(this.translate.instant(option['label']).toLowerCase()).includes(filterValue));
+        } else {
+            return this[type];
+        }
     }
 }

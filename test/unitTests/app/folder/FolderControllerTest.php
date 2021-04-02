@@ -579,7 +579,7 @@ class FolderControllerTest extends TestCase
         $response     = $folderController->get($request, new \Slim\Http\Response());
         $responseBody = json_decode((string)$response->getBody());
 
-        $this->assertEmpty($responseBody->folders);
+        $this->assertNotEmpty($responseBody->folders);
     }
 
     public function testUnpinFolder()

@@ -123,10 +123,9 @@ class BasketControllerTest extends TestCase
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($aArgs, $request);
 
-        $response     = $basketController->createGroup($fullRequest, new \Slim\Http\Response(), ['id' => 'TEST-BASKET123']);
-        $responseBody = json_decode((string)$response->getBody());
+        $response = $basketController->createGroup($fullRequest, new \Slim\Http\Response(), ['id' => 'TEST-BASKET123']);
 
-        $this->assertSame('success', $responseBody->success);
+        $this->assertSame(204, $response->getStatusCode());
 
         //  READ
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);

@@ -25,10 +25,10 @@
                 <div style="height:100%;overflow: auto;">
                     <div class="attachment-form col-md-3 col-sm-12" *ngIf="!loading">
                         <div class="attachment-form-item">
-                            <plugin-select-search [label]="'lang.type' | translate" [placeholderLabel]="'lang.type' | translate"
+                            <app-plugin-select-search [label]="'lang.type' | translate" [placeholderLabel]="'lang.type' | translate"
                                 [formControlSelect]="attachment['type']" [datas]="attachmentsTypes"
                                 (afterSelected)="getAttachType($event, i)" style="width:100%;">
-                            </plugin-select-search>
+                            </app-plugin-select-search>
                             <div class="fieldState">
                                 <i class="fas fa-asterisk fieldRequired"
                                     *ngIf="attachment['type'].hasError('required') && attachment['type'].untouched"></i>
@@ -52,11 +52,11 @@
                             </div>
                         </div>
                         <div class="attachment-form-item">
-                            <plugin-select-search  *ngIf="resourceContacts.length > 1" [label]="'lang.selectContact' | translate"
+                            <app-plugin-select-search  *ngIf="resourceContacts.length > 1" [label]="'lang.selectContact' | translate"
                                 [placeholderLabel]="'lang.selectContact' | translate" [datas]="resourceContacts"
                                 [returnValue]="'object'" [formControlSelect]="selectedContact"
                                 (afterSelected)="selectContact($event)" style="width:100%;">
-                            </plugin-select-search>
+                            </app-plugin-select-search>
                             <div class="fieldState">
                                 <button *ngIf="canSendMass()" mat-icon-button color="primary"
                                     [title]="sendMassMode ? ('lang.disableMailing' | translate) : ('lang.enableMailing' | translate)"

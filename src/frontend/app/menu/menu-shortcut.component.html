@@ -12,21 +12,21 @@
                 </button>
             </span>
             <span style="flex:1;text-align: left;padding: 5px;position: relative;" *ngIf="shortcut.id=='indexing' && shortcut.groups.length>1">
-                <smd-fab-speed-dial #myFab direction="down" animationMode="fling" fixed="false" (mouseenter)="myFab.open = true"
+                <app-smd-fab-speed-dial #myFab direction="down" animationMode="fling" fixed="false" (mouseenter)="myFab.open = true"
                     (mouseleave)="myFab.open = false">
-                    <smd-fab-trigger spin="true">
+                    <app-smd-fab-trigger spin="true">
                         <button color="default" mat-fab>
                             <mat-icon style="font-size:22px;" class="fa {{shortcut.style}} spin360"></mat-icon>
                         </button>
-                    </smd-fab-trigger>
+                    </app-smd-fab-trigger>
 
-                    <smd-fab-actions>
+                    <app-smd-fab-actions>
                         <button [id]="shortcut.id" color="primary" mat-mini-fab (click)="onSpeedDialFabClicked(group,shortcut)" *ngFor="let group of shortcut.groups | sortBy : 'label' ">
                             <span class="speedDialLabel" color="primary" style="display:none;position: absolute;margin-left: 20px;margin-top: -5px;">{{group.label | shorten: 20: '...'}}</span>
                             <mat-icon class="fa fa-plus"></mat-icon>
                         </button>
-                    </smd-fab-actions>
-                </smd-fab-speed-dial>
+                    </app-smd-fab-actions>
+                </app-smd-fab-speed-dial>
             </span>
         </ng-container>
     </div>

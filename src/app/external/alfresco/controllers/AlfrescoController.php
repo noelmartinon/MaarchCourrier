@@ -590,7 +590,7 @@ class AlfrescoController
         if ($fileContent === false) {
             return ['errors' => 'Document not found on docserver'];
         }
-        $alfrescoParameters = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/alfresco.json']);
+        $alfrescoParameters = CoreConfigModel::getJsonLoaded(['path' => 'config/alfresco.json']);
         if (empty($alfrescoParameters)) {
             return ['errors' => 'Alfresco mapping file does not exist'];
         }

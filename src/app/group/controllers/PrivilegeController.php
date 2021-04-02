@@ -38,7 +38,7 @@ class PrivilegeController
 
 
         if (in_array($args['privilegeId'], ['create_custom', 'admin_update_control'])) {
-            $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+            $config = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
             if (!empty($config['config']['lockAdvancedPrivileges'])) {
                 return $response->withStatus(403)->withJson(['errors' => 'Privilege forbidden']);
             }
@@ -166,7 +166,7 @@ class PrivilegeController
         ValidatorModel::intVal($args, ['userId']);
 
         if (in_array($args['privilegeId'], ['create_custom', 'admin_update_control'])) {
-            $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+            $file = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
             if (!empty($file['config']['lockAdvancedPrivileges'])) {
                 return false;
             }
@@ -208,7 +208,7 @@ class PrivilegeController
         $privilegesStoredInDB = PrivilegeModel::getByUser(['id' => $args['userId']]);
         $privilegesStoredInDB = array_column($privilegesStoredInDB, 'service_id');
 
-        $file   = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $file   = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
         $isLock = !empty($file['config']['lockAdvancedPrivileges']);
         foreach (['create_custom', 'admin_update_control'] as $advancedPrivilege) {
             $key = array_search($advancedPrivilege, $privilegesStoredInDB);
@@ -397,7 +397,7 @@ class PrivilegeController
 
     public static function isAdvancedPrivilegesLocked()
     {
-        $file = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $file = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
 
         return !empty($file['config']['lockAdvancedPrivileges']);
     }

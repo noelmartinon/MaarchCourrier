@@ -18,6 +18,8 @@ import { LatinisePipe } from 'ngx-pipes';
 })
 export class IssuingSiteComponent implements OnInit {
 
+    @ViewChild('maarchTree', { static: true }) maarchTree: MaarchFlatTreeComponent;
+
     creationMode: boolean;
     loading: boolean = true;
 
@@ -37,8 +39,6 @@ export class IssuingSiteComponent implements OnInit {
     addressBANFilteredResult: Observable<string[]>;
     addressBANCurrentDepartment: string = '75';
     departmentList: any[] = [];
-
-    @ViewChild('maarchTree', { static: true }) maarchTree: MaarchFlatTreeComponent;
 
     constructor(
         public translate: TranslateService,
@@ -156,11 +156,6 @@ export class IssuingSiteComponent implements OnInit {
             );
     }
 
-    private _filter(value: string): string[] {
-        const filterValue = value.toLowerCase();
-        return this.countries.filter(option => option.toLowerCase().includes(filterValue));
-    }
-
     initAutocompleteAddressBan() {
         this.addressBANInfo = this.translate.instant('lang.autocompleteInfo');
         this.addressBANResult = [];
@@ -263,5 +258,10 @@ export class IssuingSiteComponent implements OnInit {
                     this.notify.handleSoftErrors(err);
                 });
         }
+    }
+
+    private _filter(value: string): string[] {
+        const filterValue = value.toLowerCase();
+        return this.countries.filter(option => option.toLowerCase().includes(filterValue));
     }
 }

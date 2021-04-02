@@ -54,7 +54,7 @@ class ExportSedaScript
         $GLOBALS['login'] = $currentUser['user_id'];
         $GLOBALS['id']    = $args['data']['userId'];
 
-        $path = 'apps/maarch_entreprise/xml/config.json';
+        $path = 'config/config.json';
         if (!empty($args['data']['customId']) && file_exists("custom/{$args['data']['customId']}/{$path}")) {
             $path = "custom/{$args['data']['customId']}/{$path}";
         }

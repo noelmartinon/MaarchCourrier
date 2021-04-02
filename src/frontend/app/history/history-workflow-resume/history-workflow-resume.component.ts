@@ -17,15 +17,13 @@ import { PrivilegeService } from '@service/privileges.service';
 
 export class HistoryWorkflowResumeComponent implements OnInit {
 
-
+    @Input('resId') resId: number = null;
+    @Output('goTo') goTo = new EventEmitter<string>();
 
     loading: boolean = true;
     disabledHistory: boolean = true;
 
     histories: any[] = [];
-
-    @Input('resId') resId: number = null;
-    @Output('goTo') goTo = new EventEmitter<string>();
 
     constructor(
         public translate: TranslateService,

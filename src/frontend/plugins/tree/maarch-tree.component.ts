@@ -4,11 +4,10 @@ import {
     DataSource
 } from '@angular/cdk/collections';
 import { FlatTreeControl } from '@angular/cdk/tree';
-import { Component, Injectable, Input, OnInit, EventEmitter, Output, OnDestroy } from '@angular/core';
+import { Component, Injectable, Input, OnInit, EventEmitter, Output } from '@angular/core';
 import { BehaviorSubject, merge, Observable } from 'rxjs';
 import { map, tap, filter, finalize } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
-import { trigger, transition, style, animate, state } from '@angular/animations';
 
 /** Flat node with expandable and level information */
 export class DynamicFlatNode {
@@ -149,7 +148,7 @@ export class DynamicDataSource implements DataSource<DynamicFlatNode> {
                             const folders = this.rawData.map((elem: any) => elem.id);
 
                             this.rawData.forEach((element: any) => {
-                                const node = {
+                                const nodeItem = {
                                     id: element.id,
                                     childrens: this.rawData
                                         .filter((elem: any) => elem.parent === element.id)
@@ -158,7 +157,7 @@ export class DynamicDataSource implements DataSource<DynamicFlatNode> {
                                 if (
                                     this.rawData.filter((elem: any) => elem.parent === element.id).length > 0
                                 ) {
-                                    this._database.setData(node);
+                                    this._database.setData(nodeItem);
                                 }
 
                             });
@@ -227,15 +226,14 @@ export class MaarchTreeComponent implements OnInit {
     @Output() afterSelectNode = new EventEmitter<any>();
     @Output() afterDeselectNode = new EventEmitter<any>();
 
+    treeControl: FlatTreeControl<DynamicFlatNode>;
+    dataSource: DynamicDataSource;
+
     constructor(
         private database: DynamicDatabase,
         private httpClient: HttpClient
     ) {
     }
-
-    treeControl: FlatTreeControl<DynamicFlatNode>;
-
-    dataSource: DynamicDataSource;
 
     getLevel = (node: DynamicFlatNode) => node.level;
 

@@ -199,7 +199,7 @@ class ConfigurationController
         if (!Validator::email()->notEmpty()->validate($args['from'])) {
             return ['errors' => 'Configuration from is missing or not well formatted', 'code' => 400];
         }
-        
+
         if (in_array($args['type'], ['smtp', 'mail'])) {
             $check = Validator::stringType()->notEmpty()->validate($args['host']);
             $check = $check && Validator::intVal()->notEmpty()->validate($args['port']);
@@ -271,7 +271,7 @@ class ConfigurationController
 
         $body = $request->getParsedBody();
         $body = $body['configuration'];
-        
+
         if (empty($body)) {
             return $response->withStatus(400)->withJson(['errors' => 'Body is empty']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['basketToRedirect'] ?? null)) {
@@ -317,7 +317,7 @@ class ConfigurationController
         }
 
         $customId    = CoreConfigModel::getCustomId();
-        $defaultPath = "apps/maarch_entreprise/xml/m2m_config.xml";
+        $defaultPath = "config/m2m_config.xml";
         if (!empty($customId)) {
             $path = "custom/{$customId}/{$defaultPath}";
             if (!file_exists($path)) {

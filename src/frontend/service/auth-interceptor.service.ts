@@ -65,31 +65,6 @@ export class AuthInterceptor implements HttpInterceptor {
         });
     }
 
-    private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
-        if (!this.isRefreshing) {
-            this.isRefreshing = true;
-            this.refreshTokenSubject.next(null);
-
-            return this.authService.refreshToken().pipe(
-                switchMap((data: any) => {
-                    this.isRefreshing = false;
-                    this.refreshTokenSubject.next(data.token);
-                    request = this.addAuthHeader(request);
-                    return next.handle(request);
-                })
-            );
-        } else {
-            return this.refreshTokenSubject.pipe(
-                filter((token) => token != null),
-                take(1),
-                switchMap(() => {
-                    request = this.addAuthHeader(request);
-                    return next.handle(request);
-                })
-            );
-        }
-    }
-
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<any> {
         if (this.byPassToken.filter(url => request.url.indexOf(url.route) > -1 && url.method.indexOf(request.method) > -1).length > 0) {
             return next.handle(request);
@@ -122,6 +97,31 @@ export class AuthInterceptor implements HttpInterceptor {
                         });
                         return Promise.reject(response);
                     }
+                })
+            );
+        }
+    }
+
+    private handle401Error(request: HttpRequest<any>, next: HttpHandler) {
+        if (!this.isRefreshing) {
+            this.isRefreshing = true;
+            this.refreshTokenSubject.next(null);
+
+            return this.authService.refreshToken().pipe(
+                switchMap((data: any) => {
+                    this.isRefreshing = false;
+                    this.refreshTokenSubject.next(data.token);
+                    request = this.addAuthHeader(request);
+                    return next.handle(request);
+                })
+            );
+        } else {
+            return this.refreshTokenSubject.pipe(
+                filter((token) => token != null),
+                take(1),
+                switchMap(() => {
+                    request = this.addAuthHeader(request);
+                    return next.handle(request);
                 })
             );
         }

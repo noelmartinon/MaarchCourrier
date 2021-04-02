@@ -15,8 +15,6 @@ declare let $: any;
 })
 export class FolderUpdateComponent implements OnInit {
 
-
-
     folder: any = {
         id: 0,
         label: '',
@@ -34,12 +32,6 @@ export class FolderUpdateComponent implements OnInit {
     holdShift: boolean = false;
 
     entities: any[] = [];
-    @HostListener('document:keydown.Shift', ['$event']) onKeydownHandler(event: KeyboardEvent) {
-        this.holdShift = true;
-    }
-    @HostListener('document:keyup', ['$event']) onKeyupHandler(event: KeyboardEvent) {
-        this.holdShift = false;
-    }
 
     constructor(
         public translate: TranslateService,
@@ -49,6 +41,13 @@ export class FolderUpdateComponent implements OnInit {
         public functions: FunctionsService,
         @Inject(MAT_DIALOG_DATA) public data: any
     ) { }
+
+    @HostListener('document:keydown.Shift', ['$event']) onKeydownHandler(event: KeyboardEvent) {
+        this.holdShift = true;
+    }
+    @HostListener('document:keyup', ['$event']) onKeyupHandler(event: KeyboardEvent) {
+        this.holdShift = false;
+    }
 
     ngOnInit(): void {
         this.getFolder();

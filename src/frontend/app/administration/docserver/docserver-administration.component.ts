@@ -14,15 +14,14 @@ import { AppService } from '@service/app.service';
 
 export class DocserverAdministrationComponent implements OnInit {
 
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     loading: boolean = false;
     dataSource: any;
 
     docserver: any = { coll_id: 'letterbox_coll', docserver_type_id: 'DOC', limitSizeFormatted: '50' };
     docserversTypes: any = [];
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,

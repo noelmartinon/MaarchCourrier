@@ -258,7 +258,7 @@ class InstallerController
                 continue;
             }
 
-            $path = "custom/{$custom}/apps/maarch_entreprise/xml/config.json";
+            $path = "custom/{$custom}/config/config.json";
             if (!file_exists($path)) {
                 continue;
             }
@@ -296,7 +296,7 @@ class InstallerController
 
         if (is_dir("custom/{$body['customId']}")) {
             return $response->withStatus(400)->withJson(['errors' => 'Custom with this name already exists']);
-        } elseif (!@mkdir("custom/{$body['customId']}/apps/maarch_entreprise/xml", 0755, true)) {
+        } elseif (!@mkdir("custom/{$body['customId']}/config", 0755, true)) {
             return $response->withStatus(400)->withJson(['errors' => 'Custom folder creation failed']);
         }
 
@@ -316,7 +316,7 @@ class InstallerController
         fwrite($fp, json_encode($customFile, JSON_PRETTY_PRINT));
         fclose($fp);
 
-        $config = file_get_contents('apps/maarch_entreprise/xml/config.json.default');
+        $config = file_get_contents('config/config.json.default');
         $config = json_decode($config, true);
         $config['config']['lang']                   = $body['lang'] ?? 'fr';
         $config['config']['applicationName']        = $body['applicationName'] ?? $body['customId'];
@@ -327,7 +327,7 @@ class InstallerController
         $config['config']['maarchUrl']              = '';
         $config['config']['lockAdvancedPrivileges'] = true;
 
-        $fp = fopen("custom/{$body['customId']}/apps/maarch_entreprise/xml/config.json", 'w');
+        $fp = fopen("custom/{$body['customId']}/config/config.json", 'w');
         fwrite($fp, json_encode($config, JSON_PRETTY_PRINT));
         fclose($fp);
 
@@ -365,7 +365,7 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
         } elseif (!is_file("custom/{$body['customId']}/initializing.lck")) {
             return $response->withStatus(403)->withJson(['errors' => 'Custom is already installed']);
-        } elseif (!is_file("custom/{$body['customId']}/apps/maarch_entreprise/xml/config.json")) {
+        } elseif (!is_file("custom/{$body['customId']}/config/config.json")) {
             return $response->withStatus(400)->withJson(['errors' => 'Custom does not exist']);
         }
 
@@ -421,7 +421,7 @@ class InstallerController
             }
         }
 
-        $configFile = CoreConfigModel::getJsonLoaded(['path' => "custom/{$body['customId']}/apps/maarch_entreprise/xml/config.json"]);
+        $configFile = CoreConfigModel::getJsonLoaded(['path' => "custom/{$body['customId']}/config/config.json"]);
         $configFile['database'] = [
             [
                 "server"    => $body['server'],
@@ -433,7 +433,7 @@ class InstallerController
             ]
         ];
 
-        $fp = fopen("custom/{$body['customId']}/apps/maarch_entreprise/xml/config.json", 'w');
+        $fp = fopen("custom/{$body['customId']}/config/config.json", 'w');
         fwrite($fp, json_encode($configFile, JSON_PRETTY_PRINT));
         fclose($fp);
 
@@ -454,7 +454,7 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
         } elseif (!is_file("custom/{$body['customId']}/initializing.lck")) {
             return $response->withStatus(403)->withJson(['errors' => 'Custom is already installed']);
-        } elseif (!is_file("custom/{$body['customId']}/apps/maarch_entreprise/xml/config.json")) {
+        } elseif (!is_file("custom/{$body['customId']}/config/config.json")) {
             return $response->withStatus(400)->withJson(['errors' => 'Custom does not exist']);
         } elseif (strpbrk($body['path'], '"\'<>|*:?') !== false) {
             return $response->withStatus(400)->withJson(['errors' => 'Body path is not valid']);
@@ -496,7 +496,7 @@ class InstallerController
             }
         }
 
-        $templatesPath = "{$body['path']}/{$body['customId']}/templates/0000";
+        $templatesPath = "{$body['path']}/{$body['customId']}/templates/2021/03/0001";
         if (is_dir($templatesPath)) {
             if (!is_readable($templatesPath) || !is_writable($templatesPath)) {
                 return $response->withStatus(400)->withJson(['errors' => "Docserver {$templatesPath} is not readable or writable"]);
@@ -505,13 +505,13 @@ class InstallerController
             return $response->withJson(['success' => "Docservers created but templates folder creation failed"]);
         }
 
-        $templatesToCopy =  scandir('install/templates/0000');
+        $templatesToCopy =  scandir('install/samples/templates/2021/03/0001');
         foreach ($templatesToCopy as $templateToCopy) {
             if ($templateToCopy == '.' || $templateToCopy == '..') {
                 continue;
             }
 
-            copy("install/templates/0000/{$templateToCopy}", "{$templatesPath}/{$templateToCopy}");
+            copy("install/samples/templates/2021/03/0001/{$templateToCopy}", "{$templatesPath}/{$templateToCopy}");
         }
 
         DatabasePDO::reset();

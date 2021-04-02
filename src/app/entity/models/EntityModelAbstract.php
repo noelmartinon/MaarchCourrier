@@ -301,7 +301,7 @@ abstract class EntityModelAbstract
         foreach ($aReturn as $value) {
             $entities = array_merge($entities, EntityModel::getEntityChildren(['entityId' => $value['entity_id']]));
         }
-        
+
         return array_unique($entities);
     }
 
@@ -424,7 +424,7 @@ abstract class EntityModelAbstract
     {
         $types = [];
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/entities/xml/typentity.xml']);
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'config/typentity.xml']);
         if ($loadedXml) {
             foreach ($loadedXml->TYPE as $value) {
                 $types[] = [
@@ -442,7 +442,7 @@ abstract class EntityModelAbstract
     {
         $roles = [];
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/entities/xml/roles.xml']);
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'config/roles.xml']);
         if ($loadedXml) {
             foreach ($loadedXml->ROLES->ROLE as $value) {
                 $roles[] = [

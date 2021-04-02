@@ -271,7 +271,7 @@ class EmailController
             'sendDate'      => $rawEmail['send_date'],
             'document'      => $document
         ];
-        
+
         return $response->withJson($email);
     }
 
@@ -790,7 +790,7 @@ class EmailController
                 }
             }
 
-            $emailsEntities = CoreConfigModel::getXmlLoaded(['path' => 'modules/sendmail/xml/externalMailsEntities.xml']);
+            $emailsEntities = CoreConfigModel::getXmlLoaded(['path' => 'config/externalMailsEntities.xml']);
             if (!empty($emailsEntities)) {
                 $userEntities = array_column($entities, 'entity_id');
                 foreach ($emailsEntities->externalEntityMail as $entityMail) {

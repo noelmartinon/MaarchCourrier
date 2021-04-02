@@ -32,10 +32,10 @@ class DatabasePDO
             $customId = CoreConfigModel::getCustomId();
         }
 
-        if (!empty($customId) && file_exists("custom/{$customId}/apps/maarch_entreprise/xml/config.json")) {
-            $path = "custom/{$customId}/apps/maarch_entreprise/xml/config.json";
+        if (!empty($customId) && file_exists("custom/{$customId}/config/config.json")) {
+            $path = "custom/{$customId}/config/config.json";
         } else {
-            $path = 'apps/maarch_entreprise/xml/config.json';
+            $path = 'config/config.json';
         }
 
         if (!file_exists($path)) {

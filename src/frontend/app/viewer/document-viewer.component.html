@@ -29,11 +29,11 @@
             <div style="display: flex;">
                 <div
                     style="margin-right:20px;align-items: center;justify-content: center;text-align: center;display: flex;">
-                    <plugin-select-search #templateList *ngIf="listTemplates.length > 0" [label]="'lang.chooseModel' | translate"
+                    <app-plugin-select-search #templateList *ngIf="listTemplates.length > 0" [label]="'lang.chooseModel' | translate"
                         [placeholderLabel]="'lang.chooseModel' | translate" [datas]="listTemplates" [class]="'input-form-filled'"
                         [formControlSelect]="templateListForm" (afterSelected)="editTemplate($event)"
                         style="width: 240px;text-align: left;font-weight:normal;font-size: 13px;">
-                    </plugin-select-search>
+                    </app-plugin-select-search>
                 </div>
                 <button mat-button (click)="docToUpload.click()" class="button-form-primary-alt"
                     style="align-items: center;justify-content: center;text-align: center;display: flex;">{{'lang.chooseFile' | translate}}</button>
@@ -93,7 +93,7 @@
             </div>
             <div>
                 <pdf-viewer *ngIf="file.src!==null" [src]="file.src" [render-text]="true" [autoresize]="true"
-                    [original-size]="false" [show-all]="true" (error)="onError($event)" style="width:100%;">
+                    [original-size]="false" [show-all]="true" (error)="onError($event)" style="width:100%;font-weight: initial;">
                 </pdf-viewer>
             </div>
 
@@ -109,9 +109,9 @@
     </ng-template>
 </ng-container>
 <ng-container *ngIf="editInProgress && editor.mode === 'onlyoffice'">
-    <onlyoffice-viewer #onlyofficeViewer style="height:100%;width:100%;" [params]="editor.options" [file]="file"
+    <app-onlyoffice-viewer #onlyofficeViewer style="height:100%;width:100%;" [params]="editor.options" [file]="file"
         [editMode]="true" (triggerAfterUpdatedDoc)="triggerEvent.emit()"
-        (triggerCloseEditor)="closeEditor()" (triggerModifiedDocument)="isDocModified = true"></onlyoffice-viewer>
+        (triggerCloseEditor)="closeEditor()" (triggerModifiedDocument)="isDocModified = true"></app-onlyoffice-viewer>
 </ng-container>
 <ng-container *ngIf="editInProgress && editor.mode === 'collaboraOnline'">
     <app-collabora-online-viewer #collaboraOnlineViewer style="height:100%;width:100%;" [params]="editor.options" [file]="file"

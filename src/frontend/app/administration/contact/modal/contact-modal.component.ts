@@ -14,13 +14,13 @@ declare let $: any;
 })
 export class ContactModalComponent implements OnInit{
 
+    @ViewChild('drawer', { static: true }) drawer: MatSidenav;
+
     creationMode: boolean = true;
     canUpdate: boolean = false;
     contact: any = null;
     mode: 'update' | 'read' = 'read';
     loadedDocument: boolean = false;
-
-    @ViewChild('drawer', { static: true }) drawer: MatSidenav;
 
     constructor(
         public translate: TranslateService,

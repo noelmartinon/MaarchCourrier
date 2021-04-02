@@ -28,6 +28,20 @@ declare let $: any;
 })
 export class FolderDocumentListComponent implements OnInit, OnDestroy {
 
+    @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
+
+    @ViewChild('actionsListContext', { static: true }) actionsList: FolderActionListComponent;
+    @ViewChild('appPanelList', { static: true }) appPanelList: PanelListComponent;
+
+    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+    @ViewChild('tableBasketListSort', { static: true }) sort: MatSort;
+    @ViewChild('basketHome', { static: true }) basketHome: BasketHomeComponent;
+
+    subscription: Subscription;
+
+    currentSelectedChrono: string = '';
+
+
     loading: boolean = false;
     docUrl: string = '';
     public innerHtml: SafeHtml;
@@ -45,8 +59,6 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
     dragInit: boolean = true;
 
     dialogRef: MatDialogRef<any>;
-
-    @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
 
     displayedColumnsBasket: string[] = ['resId'];
 
@@ -85,16 +97,6 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
     folderInfoOpened: boolean = false;
 
     private destroy$ = new Subject<boolean>();
-    subscription: Subscription;
-
-    @ViewChild('actionsListContext', { static: true }) actionsList: FolderActionListComponent;
-    @ViewChild('appPanelList', { static: true }) appPanelList: PanelListComponent;
-
-    currentSelectedChrono: string = '';
-
-    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-    @ViewChild('tableBasketListSort', { static: true }) sort: MatSort;
-    @ViewChild('basketHome', { static: true }) basketHome: BasketHomeComponent;
 
     constructor(
         public translate: TranslateService,

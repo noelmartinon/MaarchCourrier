@@ -19,6 +19,8 @@ import { of } from 'rxjs';
 export class ShippingsAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     shippingConf: any = {
         enabled: new FormControl(false),
@@ -32,10 +34,6 @@ export class ShippingsAdministrationComponent implements OnInit {
 
     displayedColumns = ['label', 'description', 'accountid', 'actions'];
     filterColumns = ['label', 'description', 'accountid'];
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
-
 
     constructor(
         public translate: TranslateService,

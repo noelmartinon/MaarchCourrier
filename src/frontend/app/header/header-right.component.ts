@@ -14,11 +14,13 @@ import { RegisteredMailImportComponent } from '@appRoot/registeredMail/import/re
 
 
 @Component({
-    selector: 'header-right',
+    selector: 'app-header-right',
     styleUrls: ['header-right.component.scss'],
     templateUrl: 'header-right.component.html',
 })
 export class HeaderRightComponent implements OnInit {
+
+    @ViewChild('searchInput', { static: false }) searchInput: MatInput;
 
     dialogRef: MatDialogRef<any>;
     config: any = {};
@@ -26,8 +28,6 @@ export class HeaderRightComponent implements OnInit {
     searchTarget: string = '';
 
     hideSearch: boolean = true;
-
-    @ViewChild('searchInput', { static: false }) searchInput: MatInput;
 
     constructor(
         public translate: TranslateService,
@@ -48,7 +48,7 @@ export class HeaderRightComponent implements OnInit {
         if (shortcut.id === 'indexing' && shortcut.groups.length > 1) {
             this.config = { panelClass: 'maarch-modal', data: { indexingGroups: shortcut.groups, link: shortcut.route } };
             this.dialogRef = this.dialog.open(IndexingGroupModalComponent, this.config);
-        } else if (shortcut.angular === true) {
+        } else {
             const component = shortcut.route.split('__');
 
             if (component.length === 2) {
@@ -63,8 +63,6 @@ export class HeaderRightComponent implements OnInit {
             } else {
                 this.router.navigate([shortcut.route]);
             }
-        } else {
-            location.href = shortcut.route;
         }
     }
 

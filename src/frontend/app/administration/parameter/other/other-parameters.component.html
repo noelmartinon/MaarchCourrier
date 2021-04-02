@@ -58,10 +58,10 @@
             </div>
             <div
                 style="padding-top: 1.25em;width: 100%;display: grid;grid-template-columns: 1fr 1fr auto;grid-gap: 10px;">
-                <plugin-select-search [id]="'font'" [label]="'lang.font' | translate" [class]="''"
+                <app-plugin-select-search [id]="'font'" [label]="'lang.font' | translate" [class]="''"
                     [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="watermark.font"
                     [datas]="fonts" [showLabel]="true" style="width:100%;">
-                </plugin-select-search>
+                </app-plugin-select-search>
                 <mat-form-field>
                     <mat-label>{{'lang.size' |translate}}</mat-label>
                     <input matInput type="number" [formControl]="watermark.size">
@@ -115,21 +115,21 @@
             </mat-panel-title>
         </mat-expansion-panel-header>
         <app-maarch-message [content]="'lang.outlookSendingModuleDesc' | translate" style="margin-bottom: 10px;"></app-maarch-message>
-        <plugin-select-search [id]="'indexingModelId'" [label]="'lang.indexingModel' | translate" [class]="''"
+        <app-plugin-select-search [id]="'indexingModelId'" [label]="'lang.indexingModel' | translate" [class]="''"
             [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="addinOutlookConf.indexingModelId"
             [datas]="indexingModels" [showLabel]="true" style="width:100%;">
-        </plugin-select-search>
-        <plugin-select-search [id]="'typeId'" [label]="'lang.typeId' | translate" [class]="''"
+        </app-plugin-select-search>
+        <app-plugin-select-search [id]="'typeId'" [label]="'lang.typeId' | translate" [class]="''"
             [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="addinOutlookConf.typeId"
             [datas]="doctypes" [showLabel]="true" style="width:100%;">
-        </plugin-select-search>
-        <plugin-select-search [id]="'statusId'" [label]="'lang.status' | translate" [class]="''"
+        </app-plugin-select-search>
+        <app-plugin-select-search [id]="'statusId'" [label]="'lang.status' | translate" [class]="''"
             [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="addinOutlookConf.statusId"
             [datas]="statuses" [showLabel]="true" style="width:100%;">
-        </plugin-select-search>
-        <plugin-select-search [id]="'attachmentTypeId'" [label]="'lang.attachmentTypeOutlook' | translate" [class]="''"
+        </app-plugin-select-search>
+        <app-plugin-select-search [id]="'attachmentTypeId'" [label]="'lang.attachmentTypeOutlook' | translate" [class]="''"
             [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="addinOutlookConf.attachmentTypeId"
             [datas]="attachmentsTypes" [showLabel]="true" style="width:100%;">
-        </plugin-select-search>
+        </app-plugin-select-search>
     </mat-expansion-panel>
 </mat-accordion>

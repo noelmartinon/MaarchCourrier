@@ -34,7 +34,7 @@ class TextFormatModel
     public static function formatFilename(array $args)
     {
         if (!empty($args['maxLength'])) {
-            $args['filename'] = substr($args['filename'], 0, $args['maxLength']);
+            $args['filename'] = mb_substr($args['filename'], 0, $args['maxLength']);
         }
         return preg_replace(utf8_decode('@[\\/:*?"<>|]@i'), '_', $args['filename']);
     }

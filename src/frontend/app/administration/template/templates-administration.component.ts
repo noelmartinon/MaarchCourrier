@@ -16,7 +16,8 @@ import { AdministrationService } from '../administration.service';
 export class TemplatesAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     search: string = null;
 
@@ -27,9 +28,6 @@ export class TemplatesAdministrationComponent implements OnInit {
 
     displayedColumns = ['template_id', 'template_label', 'template_comment', 'template_type', 'template_target', 'actions'];
     filterColumns = ['template_label', 'template_comment', 'template_type', 'template_target'];
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,

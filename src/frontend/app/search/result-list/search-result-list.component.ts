@@ -46,6 +46,18 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
 
     @Output() loadingResult = new EventEmitter<boolean>();
 
+    @ViewChild('filterTemplate', { static: true }) filterTemplate: TemplateRef<any>;
+    @ViewChild('toolTemplate', { static: true }) toolTemplate: TemplateRef<any>;
+    @ViewChild('panelTemplate', { static: true }) panelTemplate: TemplateRef<any>;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild('actionsListContext', { static: false }) actionsList: FolderActionListComponent;
+    @ViewChild('appPanelList', { static: false }) appPanelList: PanelListComponent;
+    @ViewChild('appFilterToolAdvSearch', { static: false }) appFilterToolAdvSearch: FilterToolComponent;
+
+    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+    @ViewChild('tableBasketListSort', { static: true }) sort: MatSort;
+    @ViewChild('basketHome', { static: true }) basketHome: BasketHomeComponent;
+
     loading: boolean = true;
     initSearch: boolean = false;
     docUrl: string = '';
@@ -104,7 +116,6 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
     };
     folderInfoOpened: boolean = false;
 
-    private destroy$ = new Subject<boolean>();
     subscription: Subscription;
 
     displayColsOrder = [
@@ -120,22 +131,13 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
         { 'id': 'typeLabel' }
     ];
 
-    @ViewChild('filterTemplate', { static: true }) filterTemplate: TemplateRef<any>;
-    @ViewChild('toolTemplate', { static: true }) toolTemplate: TemplateRef<any>;
-    @ViewChild('panelTemplate', { static: true }) panelTemplate: TemplateRef<any>;
-    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-    @ViewChild('actionsListContext', { static: false }) actionsList: FolderActionListComponent;
-    @ViewChild('appPanelList', { static: false }) appPanelList: PanelListComponent;
-    @ViewChild('appFilterToolAdvSearch', { static: false }) appFilterToolAdvSearch: FilterToolComponent;
-
 
     currentSelectedChrono: string = '';
     templateColumns: number = 7;
 
-    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-    @ViewChild('tableBasketListSort', { static: true }) sort: MatSort;
-    @ViewChild('basketHome', { static: true }) basketHome: BasketHomeComponent;
     paginatorLength: any;
+    private destroy$ = new Subject<boolean>();
+
 
     constructor(
         private _activatedRoute: ActivatedRoute,
@@ -198,6 +200,11 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
         }
 
         this.listProperties = this.criteriaSearchService.initListsProperties(this.headerService.user.id);
+
+        if (!this.functions.empty(this.searchTerm)) {
+            this.listProperties.criteria = {};
+            this.listProperties.criteria.meta = this.criteria.meta;
+        }
 
         this.loading = false;
     }

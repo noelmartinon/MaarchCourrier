@@ -15,6 +15,15 @@ declare let $: any;
 })
 export class PanelListComponent implements OnInit {
 
+    @Output() refreshBadgeNotes = new EventEmitter<string>();
+    @Output() refreshBadgeAttachments = new EventEmitter<string>();
+
+    @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
+    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
+    @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
+    @ViewChild('appNotesList', { static: false }) appNotesList: NotesListComponent;
+    @ViewChild('appAttachmentsList', { static: false }) appAttachmentsList: AttachmentsListComponent;
+
     loading: boolean = false;
 
     selectedDiffusionTab: number = 0;
@@ -26,15 +35,6 @@ export class PanelListComponent implements OnInit {
     mode: string;
     icon: string;
     currentResource: any = {};
-
-    @Output() refreshBadgeNotes = new EventEmitter<string>();
-    @Output() refreshBadgeAttachments = new EventEmitter<string>();
-
-    @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
-    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
-    @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
-    @ViewChild('appNotesList', { static: false }) appNotesList: NotesListComponent;
-    @ViewChild('appAttachmentsList', { static: false }) appAttachmentsList: AttachmentsListComponent;
 
     constructor(public translate: TranslateService) { }
 

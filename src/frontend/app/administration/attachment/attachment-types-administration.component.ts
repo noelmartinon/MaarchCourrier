@@ -19,6 +19,8 @@ import { AdministrationService } from '../administration.service';
 export class AttachmentTypesAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     loading: boolean = true;
 
@@ -26,10 +28,6 @@ export class AttachmentTypesAdministrationComponent implements OnInit {
     resultsLength: number = 0;
     displayedColumns = ['id', 'typeId', 'label', 'actions'];
     filterColumns = ['typeId', 'label'];
-
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,

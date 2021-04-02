@@ -40,6 +40,16 @@ import { NotesListComponent } from '@appRoot/notes/notes-list.component';
 })
 export class ProcessComponent implements OnInit, OnDestroy {
 
+    @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+
+    @ViewChild('appDocumentViewer', { static: false }) appDocumentViewer: DocumentViewerComponent;
+    @ViewChild('indexingForm', { static: false }) indexingForm: IndexingFormComponent;
+    @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
+    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
+    @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
+    @ViewChild('appNotesList', { static: false }) appNotesList: NotesListComponent;
+
     loading: boolean = true;
 
     detailMode: boolean = false;
@@ -143,16 +153,6 @@ export class ProcessComponent implements OnInit, OnDestroy {
         }
     };
 
-
-    @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
-    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-
-    @ViewChild('appDocumentViewer', { static: false }) appDocumentViewer: DocumentViewerComponent;
-    @ViewChild('indexingForm', { static: false }) indexingForm: IndexingFormComponent;
-    @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
-    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
-    @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
-    @ViewChild('appNotesList', { static: false }) appNotesList: NotesListComponent;
     senderLightInfo: any = { 'displayName': null, 'fillingRate': null };
     hasContact: boolean = false;
 

@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-    selector: 'custom-snackbar',
+    selector: 'app-custom-snackbar',
     templateUrl: 'notification.service.html',
     styleUrls: ['notification.service.scss'],
 })

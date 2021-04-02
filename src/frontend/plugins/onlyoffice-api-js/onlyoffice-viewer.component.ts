@@ -22,13 +22,11 @@ declare let $: any;
 declare let DocsAPI: any;
 
 @Component({
-    selector: 'onlyoffice-viewer',
+    selector: 'app-onlyoffice-viewer',
     templateUrl: 'onlyoffice-viewer.component.html',
     styleUrls: ['onlyoffice-viewer.component.scss'],
 })
 export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnDestroy {
-
-    loading: boolean = true;
 
     @Input() editMode: boolean = false;
     @Input() file: any = {};
@@ -38,6 +36,8 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
     @Output() triggerAfterUpdatedDoc = new EventEmitter<string>();
     @Output() triggerCloseEditor = new EventEmitter<string>();
     @Output() triggerModifiedDocument = new EventEmitter<string>();
+
+    loading: boolean = true;
 
     editorConfig: any;
     docEditor: any;
@@ -70,9 +70,17 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
         'csv',
     ];
 
-    private eventAction = new Subject<any>();
     dialogRef: MatDialogRef<any>;
 
+    private eventAction = new Subject<any>();
+
+    constructor(
+        public translate: TranslateService,
+        public http: HttpClient,
+        public dialog: MatDialog,
+        private notify: NotificationService,
+        public headerService: HeaderService
+    ) { }
 
     @HostListener('window:message', ['$event'])
     onMessage(e: any) {
@@ -84,8 +92,6 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
             this.triggerModifiedDocument.emit();
         }
     }
-
-    constructor(public translate: TranslateService, public http: HttpClient, public dialog: MatDialog, private notify: NotificationService, public headerService: HeaderService) { }
 
     quit() {
         this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.close'), msg: this.translate.instant('lang.confirmCloseEditor') } });

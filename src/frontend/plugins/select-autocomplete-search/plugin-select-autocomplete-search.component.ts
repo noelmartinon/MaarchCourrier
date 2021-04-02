@@ -18,7 +18,7 @@ import { FunctionsService } from '@service/functions.service';
 import { HttpClient } from '@angular/common/http';
 
 @Component({
-    selector: 'plugin-select-autocomplete-search',
+    selector: 'app-plugin-select-autocomplete-search',
     templateUrl: 'plugin-select-autocomplete-search.component.html',
     styleUrls: ['plugin-select-autocomplete-search.component.scss', '../../app/indexation/indexing-form/indexing-form.component.scss'],
     providers: [SortPipe]
@@ -85,6 +85,10 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
 
     @ViewChild('test', { static: true }) matSelect: MatSelect;
 
+    formControlSearch = new FormControl();
+    noResult: boolean = null;
+    loadingSearch: boolean = null;
+
     public filteredDatas: Observable<string[]>;
 
     public filteredDatasMulti: ReplaySubject<any[]> = new ReplaySubject<any[]>(1);
@@ -104,18 +108,11 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
     /** Subject that emits when the component has been destroyed. */
     private _onDestroy = new Subject<void>();
 
-    formControlSearch = new FormControl();
-    noResult: boolean = null;
-    loadingSearch: boolean = null;
-
     /** Current search value */
     get value(): string {
         return this._value;
     }
     private _value: string;
-
-    onChange: Function = (_: any) => { };
-    onTouched: Function = (_: any) => { };
 
     constructor(
         public http: HttpClient,
@@ -126,6 +123,10 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
         public appService: AppService,
         public functions: FunctionsService,
         private sortPipe: SortPipe) { }
+
+
+    onChange: Function = (_: any) => { };
+    onTouched: Function = (_: any) => { };
 
     ngOnInit() {
         if (this.optGroupList !== null) {
@@ -195,16 +196,16 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
                     let unselectedDatasSearch = [];
                     let selectedDatasId = [];
 
-                    if (!this.functions.empty(this.formControlSelect.value)) {
+                    if (!this.functions.empty(this.formControlSelect.value)) {
                         selectedDatasId = this.returnValue === 'id' ? this.formControlSelect.value : this.formControlSelect.value.map((item: any) => item !== null ? item.id : null);
                     }
 
-                    selectedDatas = this.datas.filter((val: any) =>  selectedDatasId.indexOf(val.id) > -1);
-                    unselectedDatasSearch = data.filter((val: any) =>  selectedDatasId.indexOf(val.id) === -1);
+                    selectedDatas = this.datas.filter((val: any) => selectedDatasId.indexOf(val.id) > -1);
+                    unselectedDatasSearch = data.filter((val: any) => selectedDatasId.indexOf(val.id) === -1);
 
                     this.datas = selectedDatas.concat(unselectedDatasSearch);
                     this.filteredDatas = of(this.datas);
-                    this.noResult = this.datas.filter((val: any) =>  this.formControlSelect.value.indexOf(val.id) === -1).length === 0;
+                    this.noResult = this.datas.filter((val: any) => this.formControlSelect.value.indexOf(val.id) === -1).length === 0;
                     this.loadingSearch = false;
                     // this.loading = false;
                 })
@@ -216,10 +217,10 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
 
     resetACDatas() {
         if (this.returnValue === 'id') {
-            this.datas = this.datas.filter((val: any) =>  this.formControlSelect.value.indexOf(val.id) > -1);
+            this.datas = this.datas.filter((val: any) => this.formControlSelect.value.indexOf(val.id) > -1);
 
         } else {
-            this.datas = this.datas.filter((val: any) =>  this.formControlSelect.value.map((item: any) =>  item !== null ? item.id : null).indexOf(val.id) > -1);
+            this.datas = this.datas.filter((val: any) => this.formControlSelect.value.map((item: any) => item !== null ? item.id : null).indexOf(val.id) > -1);
         }
         this.filteredDatas = of(this.datas);
     }
@@ -329,10 +330,75 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
 
     }
 
+    launchEvent(ev: any) {
+        if (this.afterSelected !== undefined) {
+            this.afterSelected.emit(this.datas.filter((val: any) => val.id === ev.value)[0]);
+        }
+    }
+
+    getErrorMsg(error: any) {
+        if (error.required !== undefined) {
+            return this.translate.instant('lang.requiredField');
+        } else if (error.pattern !== undefined || error.email !== undefined) {
+            return this.translate.instant('lang.badFormat');
+        } else {
+            return 'unknow validator';
+        }
+    }
+
+    getDatas(data: string) {
+        const arrayObs: any = [];
+        const test: any = [];
+        this.routeDatas.forEach(element => {
+            arrayObs.push(this.http.get('..' + element, { params: { 'search': data } }));
+        });
+
+        return forkJoin(arrayObs).pipe(
+            map(items => {
+                items.forEach((element: any) => {
+                    element.forEach((element2: any) => {
+                        let obj = {
+                            id: element2.id,
+                            label: element2.idToDisplay
+                        };
+                        if (this.extraModel.length > 0) {
+                            const extraObj = this.getExtraDatas(element2);
+                            obj = { ...obj, ...extraObj };
+                        }
+                        test.push(obj);
+                    });
+                });
+                return test;
+            })
+        );
+    }
+
+    getExtraDatas(element: any) {
+        const obj = {};
+        Object.keys(element).forEach(key => {
+            if (this.extraModel.indexOf(key) > -1) {
+                obj[key] = element[key];
+            }
+        });
+        return obj;
+    }
+
+    getFirstDataLabel() {
+        return this.returnValue === 'id' ? this.formControlSelect.value[0].label : this.formControlSelect.value.map((item: any) => item !== null ? item.label : this.translate.instant('lang.emptyValue'))[0];
+    }
+
+    getDataLabel(data: any) {
+        return this.returnValue === 'id' ? this.datas.filter((item: any) => item.id === data)[0].label : this.datas.filter((item: any) => item.id === data.id)[0].label;
+    }
+
+    setDatas(value: any) {
+        this.datas = value;
+    }
+
     /**
-     * Sets the overlay class  to correct offsetY
-     * so that the selected option is at the position of the select box when opening
-     */
+ * Sets the overlay class  to correct offsetY
+ * so that the selected option is at the position of the select box when opening
+ */
     private setOverlayClass() {
         if (this.overlayClassSet) {
             return;
@@ -400,70 +466,5 @@ export class PluginSelectAutocompleteSearchComponent implements OnInit, OnDestro
         } else {
             return this.datas;
         }
-    }
-
-    launchEvent(ev: any) {
-        if (this.afterSelected !== undefined) {
-            this.afterSelected.emit(this.datas.filter((val: any) =>  val.id === ev.value)[0]);
-        }
-    }
-
-    getErrorMsg(error: any) {
-        if (error.required !== undefined) {
-            return this.translate.instant('lang.requiredField');
-        } else if (error.pattern !== undefined || error.email !== undefined) {
-            return this.translate.instant('lang.badFormat');
-        } else {
-            return 'unknow validator';
-        }
-    }
-
-    getDatas(data: string) {
-        const arrayObs: any = [];
-        const test: any = [];
-        this.routeDatas.forEach(element => {
-            arrayObs.push(this.http.get('..' + element, { params: { 'search': data } }));
-        });
-
-        return forkJoin(arrayObs).pipe(
-            map(items => {
-                items.forEach((element: any) => {
-                    element.forEach((element2: any) => {
-                        let obj = {
-                            id: element2.id,
-                            label: element2.idToDisplay
-                        };
-                        if (this.extraModel.length > 0) {
-                            const extraObj = this.getExtraDatas(element2);
-                            obj = {...obj, ...extraObj};
-                        }
-                        test.push(obj);
-                    });
-                });
-                return test;
-            })
-        );
-    }
-
-    getExtraDatas(element: any) {
-        const obj = {};
-        Object.keys(element).forEach(key => {
-            if (this.extraModel.indexOf(key) > -1) {
-                obj[key] = element[key];
-            }
-        });
-        return obj;
-    }
-
-    getFirstDataLabel() {
-        return this.returnValue === 'id' ? this.formControlSelect.value[0].label : this.formControlSelect.value.map((item: any) => item !== null ? item.label : this.translate.instant('lang.emptyValue'))[0];
-    }
-
-    getDataLabel(data: any) {
-        return this.returnValue === 'id' ? this.datas.filter((item: any) => item.id === data)[0].label : this.datas.filter((item: any) => item.id === data.id)[0].label;
-    }
-
-    setDatas(value: any) {
-        this.datas = value;
     }
 }

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/member-ordering */
 import { Component, OnInit, ViewChild, Input, Renderer2, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
@@ -66,6 +67,23 @@ export class ItemFlatNode {
 })
 export class FolderTreeComponent implements OnInit, OnDestroy {
 
+    @ViewChild('itemValue', { static: true }) itemValue: MatInput;
+    @ViewChild('autocomplete', { static: false }) autocomplete: PluginAutocomplete;
+    @ViewChild('tree', { static: true }) tree: any;
+
+    @Input() selectedId: number;
+
+    @Output() refreshDocList = new EventEmitter<string>();
+    @Output() refreshFolderList = new EventEmitter<string>();
+
+    subscription: Subscription;
+
+    /** Map from flat node to nested node. This helps us finding the nested node to be modified */
+    flatNodeMap = new Map<ItemFlatNode, ItemNode>();
+
+    /** Map from nested node to flattened node. This helps us to keep the same object for selection */
+    nestedNodeMap = new Map<ItemNode, ItemFlatNode>();
+
     loading: boolean = true;
 
     searchTerm: FormControl = new FormControl();
@@ -76,26 +94,9 @@ export class FolderTreeComponent implements OnInit, OnDestroy {
     createItemNode: boolean = false;
     dataChange = new BehaviorSubject<ItemNode[]>([]);
 
-    @Input() selectedId: number;
-    @ViewChild('itemValue', { static: true }) itemValue: MatInput;
-    @ViewChild('autocomplete', { static: false }) autocomplete: PluginAutocomplete;
-
-    subscription: Subscription;
-
-    @ViewChild('tree', { static: true }) tree: any;
-
-    @Output() refreshDocList = new EventEmitter<string>();
-    @Output() refreshFolderList = new EventEmitter<string>();
-
     get data(): ItemNode[] {
         return this.dataChange.value;
     }
-
-    /** Map from flat node to nested node. This helps us finding the nested node to be modified */
-    flatNodeMap = new Map<ItemFlatNode, ItemNode>();
-
-    /** Map from nested node to flattened node. This helps us to keep the same object for selection */
-    nestedNodeMap = new Map<ItemNode, ItemFlatNode>();
 
     private transformer = (node: ItemNode, level: number) => {
         const existingNode = this.nestedNodeMap.get(node);
@@ -351,21 +352,6 @@ export class FolderTreeComponent implements OnInit, OnDestroy {
         ).subscribe();
     }
 
-    private getParentNode(node: any) {
-        const currentLevel = node.level;
-        if (currentLevel < 1) {
-            return null;
-        }
-        const startIndex = this.treeControl.dataNodes.indexOf(node) - 1;
-        for (let i = startIndex; i >= 0; i--) {
-            const currentNode = this.treeControl.dataNodes[i];
-            if (currentNode.level < currentLevel) {
-                return this.flatNodeMap.get(currentNode);
-            }
-        }
-        return null;
-    }
-
     drop(ev: any, node: any) {
         this.foldersService.classifyDocument(ev, node);
     }
@@ -441,5 +427,20 @@ export class FolderTreeComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         // unsubscribe to ensure no memory leaks
         this.subscription.unsubscribe();
+    }
+
+    private getParentNode(node: any) {
+        const currentLevel = node.level;
+        if (currentLevel < 1) {
+            return null;
+        }
+        const startIndex = this.treeControl.dataNodes.indexOf(node) - 1;
+        for (let i = startIndex; i >= 0; i--) {
+            const currentNode = this.treeControl.dataNodes[i];
+            if (currentNode.level < currentLevel) {
+                return this.flatNodeMap.get(currentNode);
+            }
+        }
+        return null;
     }
 }

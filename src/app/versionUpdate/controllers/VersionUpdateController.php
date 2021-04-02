@@ -230,7 +230,7 @@ class VersionUpdateController
         }
 
         if (!empty($args['sqlFiles'])) {
-            $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+            $config = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
 
             $actualTime = date("dmY-His");
             $tablesToSave = '';

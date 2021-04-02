@@ -294,7 +294,7 @@ class CustomFieldController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $whiteList = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/customFieldsWhiteList.json']);
+        $whiteList = CoreConfigModel::getJsonLoaded(['path' => 'config/customFieldsWhiteList.json']);
         $allowedTables = [];
         foreach ($whiteList as $table) {
             $columns = CoreConfigModel::getColumns(['table' => $table]);
@@ -332,7 +332,7 @@ class CustomFieldController
         if (stripos($body['values']['key'], 'password') !== false || stripos($body['values']['key'], 'token') !== false) {
             return ['errors' => 'Body values[key] is not allowed'];
         }
-        $allowedTables = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/customFieldsWhiteList.json']);
+        $allowedTables = CoreConfigModel::getJsonLoaded(['path' => 'config/customFieldsWhiteList.json']);
         if (!in_array($body['values']['table'], $allowedTables)) {
             return ['errors' => 'Body values[table] is not allowed'];
         }

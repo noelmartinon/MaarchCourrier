@@ -28,10 +28,10 @@
         <div class="bg-head">
             <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
                 <div class="bg-head-title-label">
-                    <header-left></header-left>
+                    <app-header-left></app-header-left>
                 </div>
                 <div class="bg-head-title-tool">
-                    <header-right></header-right>
+                    <app-header-right></app-header-right>
                 </div>
             </div>
             <div class="bg-head-content" [class.fullContainer]="appService.getViewMode()">
@@ -173,7 +173,7 @@
                                     <mat-select id="diffusion_properties" name="diffusion_properties"
                                         title="{{'lang.memberDiffTypeUsers' | translate}}" placeholder="{{'lang.memberDiffTypeUsers' | translate}}"
                                         required multiple [(ngModel)]="notification.diffusion_properties">
-                                        <mat-option *ngFor="let user of notification.data.users" [value]="user.id">
+                                        <mat-option *ngFor="let user of notification.data.users | sortBy: 'label'" [value]="user.id">
                                             {{user.label}}
                                         </mat-option>
                                     </mat-select>

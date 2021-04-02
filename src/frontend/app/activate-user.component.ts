@@ -29,15 +29,6 @@ export class ActivateUserComponent implements OnInit {
     // Redirect Baskets
     selectionBaskets = new SelectionModel<Element>(true, []);
     myBasketExpansionPanel: boolean = false;
-    masterToggleBaskets(event: any) {
-        if (event.checked) {
-            this.user.redirectedBaskets.forEach((basket: any) => {
-                this.selectionBaskets.select(basket);
-            });
-        } else {
-            this.selectionBaskets.clear();
-        }
-    }
 
     constructor(
         public translate: TranslateService,
@@ -68,6 +59,16 @@ export class ActivateUserComponent implements OnInit {
                 });
         } else {
             this.router.navigate(['/home']);
+        }
+    }
+
+    masterToggleBaskets(event: any) {
+        if (event.checked) {
+            this.user.redirectedBaskets.forEach((basket: any) => {
+                this.selectionBaskets.select(basket);
+            });
+        } else {
+            this.selectionBaskets.clear();
         }
     }
 

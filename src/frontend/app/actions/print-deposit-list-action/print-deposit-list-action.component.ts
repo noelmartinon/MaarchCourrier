@@ -13,6 +13,7 @@ import {FunctionsService} from '@service/functions.service';
     styleUrls: ['print-deposit-list-action.component.scss'],
 })
 export class PrintDepositListActionComponent implements OnInit {
+    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
 
     loading: boolean = false;
     loadingInit: boolean = false;
@@ -21,7 +22,6 @@ export class PrintDepositListActionComponent implements OnInit {
     canGenerate: any = [];
     cannotGenerate: any = [];
 
-    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
     loadingExport: boolean;
 
     constructor(
@@ -75,24 +75,7 @@ export class PrintDepositListActionComponent implements OnInit {
 
                 if (!this.functions.empty(data.data.encodedFile)) {
                     downloadLink.href = `data:application/pdf;base64,${data.data.encodedFile}`;
-                    let today: any;
-                    let dd: any;
-                    let mm: any;
-                    let yyyy: any;
-
-                    today = new Date();
-                    dd = today.getDate();
-                    mm = today.getMonth() + 1;
-                    yyyy = today.getFullYear();
-
-                    if (dd < 10) {
-                        dd = '0' + dd;
-                    }
-                    if (mm < 10) {
-                        mm = '0' + mm;
-                    }
-                    today = dd + '-' + mm + '-' + yyyy;
-                    downloadLink.setAttribute('download', 'descriptif_pli_' + today + '.pdf');
+                    downloadLink.setAttribute('download', this.functions.getFormatedFileName('descriptif_pli', 'pdf'));
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
                     this.dialogRef.close(this.canGenerate);

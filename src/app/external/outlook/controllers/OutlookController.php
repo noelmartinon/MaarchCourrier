@@ -32,7 +32,7 @@ class OutlookController
 {
     public function generateManifest(Request $request, Response $response)
     {
-        $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $config = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
         $appName = $config['config']['applicationName'];
         $maarchUrl = $config['config']['maarchUrl'];
 

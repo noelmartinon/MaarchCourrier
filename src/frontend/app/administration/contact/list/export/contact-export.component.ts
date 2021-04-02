@@ -9,6 +9,7 @@ import { catchError, map, tap, finalize, exhaustMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { LocalStorageService } from '@service/local-storage.service';
 import { HeaderService } from '@service/header.service';
+import { FunctionsService } from '@service/functions.service';
 
 declare let $: any;
 
@@ -19,6 +20,7 @@ declare let $: any;
 })
 export class ContactExportComponent implements OnInit {
 
+    @ViewChild('listFilter', { static: true }) private listFilter: any;
 
     loading: boolean = false;
     loadingExport: boolean = false;
@@ -53,9 +55,6 @@ export class ContactExportComponent implements OnInit {
         }
     ];
 
-    @ViewChild('listFilter', { static: true }) private listFilter: any;
-
-
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -63,7 +62,8 @@ export class ContactExportComponent implements OnInit {
         @Inject(MAT_DIALOG_DATA) public data: any,
         private sortPipe: SortPipe,
         private localStorage: LocalStorageService,
-        private headerService: HeaderService
+        private headerService: HeaderService,
+        private functionsService: FunctionsService
     ) { }
 
     async ngOnInit(): Promise<void> {
@@ -140,24 +140,7 @@ export class ContactExportComponent implements OnInit {
                 if (data.type !== 'text/html') {
                     const downloadLink = document.createElement('a');
                     downloadLink.href = window.URL.createObjectURL(data);
-                    let today: any;
-                    let dd: any;
-                    let mm: any;
-                    let yyyy: any;
-
-                    today = new Date();
-                    dd = today.getDate();
-                    mm = today.getMonth() + 1;
-                    yyyy = today.getFullYear();
-
-                    if (dd < 10) {
-                        dd = '0' + dd;
-                    }
-                    if (mm < 10) {
-                        mm = '0' + mm;
-                    }
-                    today = dd + '-' + mm + '-' + yyyy;
-                    downloadLink.setAttribute('download', 'export_contact_maarch_' + today + '.' + this.exportModel.format.toLowerCase());
+                    downloadLink.setAttribute('download', this.functionsService.getFormatedFileName('export_contact_maarch', this.exportModel.format.toLowerCase()));
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
                 } else {

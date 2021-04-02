@@ -3,10 +3,10 @@
         <div class="bg-head">
             <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
                 <div class="bg-head-title-label">
-                    <header-left></header-left>
+                    <app-header-left></app-header-left>
                 </div>
                 <div class="bg-head-title-tool">
-                    <header-right></header-right>
+                    <app-header-right></app-header-right>
                 </div>
             </div>
             <div class="bg-head-content" [class.fullContainer]="appService.getViewMode()">
@@ -47,11 +47,11 @@
                         <div *ngIf="!creationMode && !tag.canMerge.value" class="alert-message alert-message-danger" style="min-width: 100%;">
                             {{'lang.cannotMergeTags' | translate}}
                         </div>
-                        <plugin-select-search *ngIf="!loadingTags && tag.canMerge.value && !creationMode"
+                        <app-plugin-select-search *ngIf="!loadingTags && tag.canMerge.value && !creationMode"
                             [label]="'lang.mergeTagWith' | translate" [placeholderLabel]="'lang.mergeTagWith' | translate"
                             [formControlSelect]="selectMergeTag" [datas]="tags" (afterOpened)="getTags()"
                             (afterSelected)="mergeTag($event)" style="width:100%;">
-                        </plugin-select-search>
+                        </app-plugin-select-search>
                         <div class="text-center">
                             <button mat-raised-button [disabled]="!tagFormGroup.valid"
                                 color="primary">{{'lang.validate' | translate}}</button>

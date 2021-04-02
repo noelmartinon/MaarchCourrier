@@ -95,7 +95,7 @@ trait PreProcessActionSEDATrait
         $bindingDocument    = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'bindingDocumentFinalAction']);
         $nonBindingDocument = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'nonBindingDocumentFinalAction']);
 
-        $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $config = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
         if (empty($config['exportSeda']['senderOrgRegNumber'])) {
             return $response->withStatus(400)->withJson(['errors' => 'No senderOrgRegNumber found in config.json', 'lang' => 'noSenderOrgRegNumber']);
         }
@@ -153,7 +153,7 @@ trait PreProcessActionSEDATrait
                 $resourcesInformations['errors'][] = ['alt_identifier' => $resources[$resId]['alt_identifier'], 'res_id' => $resId, 'reason' => 'retentionRuleFrozen'];
                 continue;
             }
-    
+
             if (!empty($resAcknowledgement[$resId])) {
                 $resourcesInformations['errors'][] = ['alt_identifier' => $resources[$resId]['alt_identifier'], 'res_id' => $resId, 'reason' => 'recordManagement_alreadySent'];
                 continue;
@@ -187,7 +187,7 @@ trait PreProcessActionSEDATrait
                 $resourcesInformations['errors'][] = ['alt_identifier' => $resources[$resId]['alt_identifier'], 'res_id' => $resId, 'reason' => 'noProducerService'];
                 continue;
             }
-    
+
             $archivalData = SedaController::initArchivalData([
                 'resource'           => $resources[$resId],
                 'attachments'        => $resAttachments[$resId] ?? [],
@@ -196,7 +196,7 @@ trait PreProcessActionSEDATrait
                 'doctype'            => $doctypesData[$typeId],
                 'massAction'         => $massAction
             ]);
-    
+
             if (!empty($archivalData['errors'])) {
                 $resourcesInformations['errors'][] = ['alt_identifier' => $resources[$resId]['alt_identifier'], 'res_id' => $resId, 'reason' => $archivalData['errors']];
                 continue;
@@ -204,7 +204,7 @@ trait PreProcessActionSEDATrait
                 $archivalData['archivalData']['data']['metadata'] = ['subject' => $resources[$resId]['subject'], 'alt_identifier' => $resources[$resId]['alt_identifier']];
                 $resourcesInformations['success'][$resId] = $archivalData['archivalData'];
             }
-    
+
             $unitIdentifier = MessageExchangeModel::getUnitIdentifierByResId(['select' => ['message_id'], 'resId' => (string)$resId]);
             if (!empty($unitIdentifier[0]['message_id'])) {
                 MessageExchangeModel::delete(['where' => ['message_id = ?'], 'data' => [$unitIdentifier[0]['message_id']]]);
@@ -263,13 +263,13 @@ trait PreProcessActionSEDATrait
                 $resourcesInformations['errors'][] = ['alt_identifier' => $altIdentifiers[$resId], 'res_id' => $resId, 'reason' => 'docserverDoesNotExists'];
                 continue;
             }
-    
+
             $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $acknowledgement['path']) . $acknowledgement['filename'];
             if (!file_exists($pathToDocument)) {
                 $resourcesInformations['errors'][] = ['alt_identifier' => $altIdentifiers[$resId], 'res_id' => $resId, 'reason' => 'fileDoesNotExists'];
                 continue;
             }
-    
+
             $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
             $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
             if (empty($acknowledgement['fingerprint'])) {
@@ -280,7 +280,7 @@ trait PreProcessActionSEDATrait
                 $resourcesInformations['errors'][] = ['alt_identifier' => $altIdentifiers[$resId], 'res_id' => $resId, 'reason' => 'fingerprintsDoNotMatch'];
                 continue;
             }
-            
+
             $acknowledgementXml = @simplexml_load_file($pathToDocument);
             if (empty($acknowledgementXml)) {
                 $resourcesInformations['errors'][] = ['alt_identifier' => $altIdentifiers[$resId], 'res_id' => $resId, 'reason' => 'recordManagement_acknowledgementNotReadable'];
@@ -349,13 +349,13 @@ trait PreProcessActionSEDATrait
                 $resourcesInformations['errors'][] = ['alt_identifier' => $altIdentifiers[$resId], 'res_id' => $resId, 'reason' => 'docserverDoesNotExists'];
                 continue;
             }
-    
+
             $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $reply['path']) . $reply['filename'];
             if (!file_exists($pathToDocument)) {
                 $resourcesInformations['errors'][] = ['alt_identifier' => $altIdentifiers[$resId], 'res_id' => $resId, 'reason' => 'fileDoesNotExists'];
                 continue;
             }
-    
+
             $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
             $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
             if (empty($reply['fingerprint'])) {
@@ -366,7 +366,7 @@ trait PreProcessActionSEDATrait
                 $resourcesInformations['errors'][] = ['alt_identifier' => $altIdentifiers[$resId], 'res_id' => $resId, 'reason' => 'fingerprintsDoNotMatch'];
                 continue;
             }
-            
+
             $replyXml = @simplexml_load_file($pathToDocument);
             if (empty($replyXml)) {
                 $resourcesInformations['errors'][] = ['alt_identifier' => $altIdentifiers[$resId], 'res_id' => $resId, 'reason' => 'recordManagement_replyNotReadable'];

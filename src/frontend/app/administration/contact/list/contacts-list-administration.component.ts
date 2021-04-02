@@ -23,7 +23,7 @@ import { LatinisePipe } from 'ngx-pipes';
 import { ContactService } from '@service/contact.service';
 
 @Component({
-    selector: 'contact-list',
+    selector: 'app-contact-list',
     templateUrl: 'contacts-list-administration.component.html',
     styleUrls: ['contacts-list-administration.component.scss'],
     providers: [ContactService]
@@ -32,6 +32,10 @@ export class ContactsListAdministrationComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+    @ViewChild('tableContactListSort', { static: true }) sort: MatSort;
+    @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
+    @ViewChildren(MatMenuTrigger) contextMenus: any;
 
     subMenus: any[] = [];
 
@@ -57,17 +61,9 @@ export class ContactsListAdministrationComponent implements OnInit {
     filterCorrespondentsGroups = new FormControl();
     filteredCorrespondentsGroups: Observable<string[]>;
 
-
-    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-    @ViewChild('tableContactListSort', { static: true }) sort: MatSort;
-
-    private destroy$ = new Subject<boolean>();
-
     contextMenuPosition = { x: '0px', y: '0px' };
 
-    @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
-    @ViewChildren(MatMenuTrigger) contextMenus: any;
-
+    private destroy$ = new Subject<boolean>();
 
     constructor(
         public translate: TranslateService,
@@ -169,11 +165,6 @@ export class ContactsListAdministrationComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
-    }
-
-    private _filter(value: string): string[] {
-        const filterValue = this.latinisePipe.transform(value.toLowerCase());
-        return this.correspondentsGroups.filter((option: any) => this.latinisePipe.transform(this.translate.instant(option['label']).toLowerCase()).includes(filterValue));
     }
 
     processPostData(data: any) {
@@ -377,6 +368,11 @@ export class ContactsListAdministrationComponent implements OnInit {
         // prevents default
         return false;
     }
+
+    private _filter(value: string): string[] {
+        const filterValue = this.latinisePipe.transform(value.toLowerCase());
+        return this.correspondentsGroups.filter((option: any) => this.latinisePipe.transform(this.translate.instant(option['label']).toLowerCase()).includes(filterValue));
+    }
 }
 
 export interface ContactList {
@@ -399,7 +395,7 @@ export class ContactListHttpDao {
     templateUrl: 'contacts-list-administration-redirect-modal.component.html',
     styleUrls: [],
 })
-export class ContactsListAdministrationRedirectModalComponent {
+export class ContactsListAdministrationRedirectModalComponent implements OnInit {
 
     modalTitle: string = this.translate.instant('lang.confirmAction');
     redirectContact: number;
@@ -413,9 +409,7 @@ export class ContactsListAdministrationRedirectModalComponent {
         private notify: NotificationService) {
     }
 
-    ngOnInit(): void {
-
-    }
+    ngOnInit(): void {}
 
     setRedirectUser(contact: any) {
         this.redirectContact = contact.id;

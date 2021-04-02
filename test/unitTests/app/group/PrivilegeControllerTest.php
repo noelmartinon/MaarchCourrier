@@ -367,6 +367,8 @@ class PrivilegeControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
+        $fileContent = file_get_contents('test/unitTests/samples/test.txt');
+        $encodedFile = base64_encode($fileContent);
         $argsMailNew = [
             'modelId'          => 1,
             'status'           => 'NEW',
@@ -382,6 +384,7 @@ class PrivilegeControllerTest extends TestCase
             'typist'           => 19,
             'priority'         => 'poiuytre1357nbvc',
             'followed'         => true,
+            'encodedFile'      => $encodedFile,
             'diffusionList'    => [
                 [
                     'id'   => 11,
@@ -443,7 +446,7 @@ class PrivilegeControllerTest extends TestCase
         $response = $privilegeController::canUpdateResource(['userId' => $GLOBALS['id'], 'resId' => self::$resId]);
 
         $this->assertIsBool($response);
-        $this->assertSame(false, $response);
+        $this->assertSame(true, $response);
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
@@ -473,8 +476,8 @@ class PrivilegeControllerTest extends TestCase
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
         $args = [
-            'privilegeId'      => 'entities_print_sep_mlb',
-            'id'    => self::$id
+            'privilegeId' => 'entities_print_sep_mlb',
+            'id'          => self::$id
         ];
 
         $response     = $privilegeController->removePrivilege($request, new \Slim\Http\Response(), $args);

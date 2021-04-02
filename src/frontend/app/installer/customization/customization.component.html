@@ -18,6 +18,9 @@
                     <ng-container *ngIf="stepFormGroup.controls['customId'].errors?.pattern">
                         {{'lang.onlySpecialCharAllowed' | translate:{value1: '"_", "-"'} }}
                     </ng-container>
+                    <ng-container *ngIf="stepFormGroup.controls['customId'].errors?.minlength">
+                        {{'lang.invalidLengthCustomName' | translate:{value1: '2'} }}
+                    </ng-container>
                 </mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline">

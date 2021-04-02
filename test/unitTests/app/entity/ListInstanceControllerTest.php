@@ -25,10 +25,13 @@ class ListInstanceControllerTest extends TestCase
         $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'POST']);
         $request        = \Slim\Http\Request::createFromEnvironment($environment);
 
-
+        $fileContent = file_get_contents('test/unitTests/samples/test.txt');
+        $encodedFile = base64_encode($fileContent);
         $aArgs = [
             'modelId'           => 1,
             'status'            => 'NEW',
+            'encodedFile'       => $encodedFile,
+            'format'            => 'txt',
             'confidentiality'   => false,
             'documentDate'      => '2019-01-01 17:18:47',
             'arrivalDate'       => '2019-01-01 17:18:47',
@@ -393,7 +396,7 @@ class ListInstanceControllerTest extends TestCase
         $this->assertSame('user', $responseBody['circuit'][0]['item_type']);
         $this->assertSame('Patricia', $responseBody['circuit'][0]['item_firstname']);
         $this->assertSame('PETIT', $responseBody['circuit'][0]['item_lastname']);
-        $this->assertSame('Ville de Maarch-les-bains', $responseBody['circuit'][0]['item_entity']);
+        $this->assertSame('Ville de Maarch-les-Bains', $responseBody['circuit'][0]['item_entity']);
         $this->assertSame(0, $responseBody['circuit'][0]['viewed']);
         $this->assertEmpty($responseBody['circuit'][0]['process_date']);
         $this->assertEmpty($responseBody['circuit'][0]['process_comment']);
@@ -437,7 +440,7 @@ class ListInstanceControllerTest extends TestCase
         $this->assertSame('user', $responseBody[0]['item_type']);
         $this->assertSame('Patricia', $responseBody[0]['item_firstname']);
         $this->assertSame('PETIT', $responseBody[0]['item_lastname']);
-        $this->assertSame('Ville de Maarch-les-bains', $responseBody[0]['item_entity']);
+        $this->assertSame('Ville de Maarch-les-Bains', $responseBody[0]['item_entity']);
         $this->assertSame(0, $responseBody[0]['viewed']);
         $this->assertEmpty($responseBody[0]['process_date']);
         $this->assertEmpty($responseBody[0]['process_comment']);

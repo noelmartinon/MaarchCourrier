@@ -17,10 +17,6 @@ import { NoteEditorComponent } from './note-editor.component';
 })
 export class NotesListComponent implements OnInit {
 
-    notes: any[] = [];
-    loading: boolean = true;
-    resIds: number[] = [];
-
     @Input() injectDatas: any;
 
     @Input() resId: number = null;
@@ -29,6 +25,10 @@ export class NotesListComponent implements OnInit {
     @Output() reloadBadgeNotes = new EventEmitter<string>();
 
     @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
+    notes: any[] = [];
+    loading: boolean = true;
+    resIds: number[] = [];
+
 
     dialogRef: MatDialogRef<any>;
 

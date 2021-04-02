@@ -8,7 +8,7 @@ import { PrivilegeService } from '@service/privileges.service';
 import { HeaderService } from '@service/header.service';
 
 @Component({
-    selector: 'menu-shortcut',
+    selector: 'app-menu-shortcut',
     styleUrls: ['menu-shortcut.component.scss'],
     templateUrl: 'menu-shortcut.component.html',
 })
@@ -43,10 +43,8 @@ export class MenuShortcutComponent implements OnInit {
     gotToMenu(shortcut: any) {
         if (shortcut.id === 'indexing') {
             this.router.navigate([shortcut.route + '/' + shortcut.groups[0].id]);
-        } else if (shortcut.angular === true) {
-            this.router.navigate([shortcut.route]);
         } else {
-            location.href = shortcut.route;
+            this.router.navigate([shortcut.route]);
         }
     }
 }

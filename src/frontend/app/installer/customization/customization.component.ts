@@ -40,7 +40,7 @@ export class CustomizationComponent implements OnInit {
         public http: HttpClient,
         private installerService: InstallerService
     ) {
-        const valIdentifier: ValidatorFn[] = [Validators.pattern(/^[a-zA-Z0-9_\-]*$/), Validators.required];
+        const valIdentifier: ValidatorFn[] = [Validators.pattern(/^[a-zA-Z0-9_\-]*$/), Validators.required, Validators.minLength(3)];
 
         this.stepFormGroup = this._formBuilder.group({
             firstCtrl: ['success', Validators.required],
@@ -51,7 +51,7 @@ export class CustomizationComponent implements OnInit {
             bodyLoginBackground: ['assets/bodylogin.jpg'],
             uploadedLogo: ['../rest/images?image=logo'],
         });
-        this.backgroundList = Array.from({ length: 16 }).map((_, i) => ({
+        this.backgroundList = Array.from({ length: 17 }).map((_, i) => ({
             filename: `${i + 1}.jpg`,
             url: `assets/${i + 1}.jpg`,
         }));

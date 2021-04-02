@@ -24,6 +24,14 @@ import { FunctionsService } from '@service/functions.service';
 
 export class FolderInputComponent implements OnInit {
 
+    /**
+     * FormControl used when autocomplete is used in form and must be catched in a form control.
+     */
+    @Input('control') controlAutocomplete: FormControl;
+
+    @Input() returnValue: 'id' | 'object' = 'id';
+
+    @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
     loading: boolean = false;
 
@@ -41,15 +49,6 @@ export class FolderInputComponent implements OnInit {
 
 
     tmpObject: any = null;
-
-    /**
-     * FormControl used when autocomplete is used in form and must be catched in a form control.
-     */
-    @Input('control') controlAutocomplete: FormControl;
-
-    @Input() returnValue: 'id' | 'object' = 'id';
-
-    @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
     constructor(
         public translate: TranslateService,
@@ -157,15 +156,6 @@ export class FolderInputComponent implements OnInit {
         this.listInfo = this.translate.instant('lang.autocompleteInfo');
     }
 
-    private _filter(value: string): string[] {
-        if (typeof value === 'string') {
-            const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.options.filter((option: any) => this.latinisePipe.transform(option[this.key].toLowerCase()).includes(filterValue));
-        } else {
-            return this.options;
-        }
-    }
-
     unsetValue() {
         this.controlAutocomplete.setValue('');
         this.myControl.setValue('');
@@ -216,5 +206,14 @@ export class FolderInputComponent implements OnInit {
 
     getFolderLabel(data: any) {
         return this.returnValue === 'id' ? this.valuesToDisplay[data] : this.valuesToDisplay[data.id];
+    }
+
+    private _filter(value: string): string[] {
+        if (typeof value === 'string') {
+            const filterValue = this.latinisePipe.transform(value.toLowerCase());
+            return this.options.filter((option: any) => this.latinisePipe.transform(option[this.key].toLowerCase()).includes(filterValue));
+        } else {
+            return this.options;
+        }
     }
 }

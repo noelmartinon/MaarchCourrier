@@ -46,7 +46,7 @@ class AttachmentTypeController
         return $response->withJson(['attachmentsTypes' => $attachmentsTypes]);
     }
 
-    public function getBydId(Request $request, Response $response, array $args)
+    public function getById(Request $request, Response $response, array $args)
     {
         $attachmentType = AttachmentTypeModel::getById(['select' => ['*'], 'id' => $args['id']]);
         if (empty($attachmentType)) {
@@ -83,6 +83,11 @@ class AttachmentTypeController
             return $response->withStatus(400)->withJson(['errors' => 'Body typeId is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['label'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body label is empty or not a string']);
+        }
+
+        $type = AttachmentTypeModel::getByTypeId(['typeId' => $body['typeId'], 'select' => [1]]);
+        if (!empty($type)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body typeId is already used by another type']);
         }
 
         $id = AttachmentTypeModel::create([

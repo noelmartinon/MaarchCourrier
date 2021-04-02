@@ -22,7 +22,8 @@ import { AdministrationService } from '../administration.service';
 export class IndexingModelsAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     search: string = null;
 
@@ -32,9 +33,6 @@ export class IndexingModelsAdministrationComponent implements OnInit {
 
     displayedColumns = ['id', 'category', 'label', 'private', 'default', 'enabled', 'actions'];
     filterColumns = ['id', 'label'];
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     dialogRef: MatDialogRef<any>;
 

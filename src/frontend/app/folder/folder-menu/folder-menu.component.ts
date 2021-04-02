@@ -12,24 +12,22 @@ import { FolderCreateModalComponent } from '../folder-create-modal/folder-create
 import { FunctionsService } from '@service/functions.service';
 
 @Component({
-    selector: 'folder-menu',
+    selector: 'app-folder-menu',
     templateUrl: 'folder-menu.component.html',
     styleUrls: ['folder-menu.component.scss'],
 })
 export class FolderMenuComponent implements OnInit {
-
-
-
-    foldersList: any[] = [];
-    pinnedFolder: boolean = true;
-
-    loading: boolean = true;
 
     @Input('resIds') resIds: number[];
     @Input('currentFolders') currentFoldersList: any[];
 
     @Output('refreshFolders') refreshFolders = new EventEmitter<string>();
     @Output('refreshList') refreshList = new EventEmitter<string>();
+
+    foldersList: any[] = [];
+    pinnedFolder: boolean = true;
+
+    loading: boolean = true;
 
     searchTerm: FormControl = new FormControl();
 

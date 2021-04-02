@@ -20,7 +20,7 @@ import { MessageBoxComponent } from '../plugins/messageBox/message-box.component
 /* FRONT IMPORTS*/
 import { AppMaterialModule } from './app-material.module';
 
-import { SmdFabSpeedDialComponent, SmdFabSpeedDialTrigger, SmdFabSpeedDialActions, } from '../plugins/fab-speed-dial';
+import { SmdFabSpeedDialComponent, SmdFabSpeedDialTriggerComponent, SmdFabSpeedDialActionsComponent } from '../plugins/fab-speed-dial';
 
 /* MENU COMPONENT*/
 import { HeaderRightComponent } from './header/header-right.component';
@@ -114,8 +114,8 @@ import { ColorGithubModule } from 'ngx-color/github';
         IndexingGroupModalComponent,
         RegisteredMailImportComponent,
         SmdFabSpeedDialComponent,
-        SmdFabSpeedDialTrigger,
-        SmdFabSpeedDialActions,
+        SmdFabSpeedDialTriggerComponent,
+        SmdFabSpeedDialActionsComponent,
         IndexingFormComponent,
         TagInputComponent,
         FolderInputComponent,
@@ -172,8 +172,8 @@ import { ColorGithubModule } from 'ngx-color/github';
         AppServiceModule,
         NotificationModule,
         SmdFabSpeedDialComponent,
-        SmdFabSpeedDialTrigger,
-        SmdFabSpeedDialActions,
+        SmdFabSpeedDialTriggerComponent,
+        SmdFabSpeedDialActionsComponent,
         DragDropModule,
         PluginAutocomplete,
         FieldListComponent,

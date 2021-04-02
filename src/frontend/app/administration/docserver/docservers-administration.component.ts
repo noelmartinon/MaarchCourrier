@@ -14,7 +14,8 @@ import { AppService } from '@service/app.service';
 export class DocserversAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     loading: boolean = false;
     dataSource: any;
@@ -22,9 +23,6 @@ export class DocserversAdministrationComponent implements OnInit {
     docservers: any = [];
     docserversClone: any = [];
     docserversTypes: any = {};
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,

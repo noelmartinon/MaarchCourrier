@@ -33,6 +33,22 @@ interface DisplayContactList {
 
 export class ContactAutocompleteComponent implements OnInit {
 
+    /**
+     * FormControl used when autocomplete is used in form and must be catched in a form control.
+     */
+    @Input('control') controlAutocomplete: FormControl = new FormControl();
+
+    @Input() id: string = 'contact-autocomplete';
+    @Input() exclusion: string = '';
+
+    @Input() singleMode: boolean = false;
+    @Input() inputMode: boolean = false;
+
+    @Output() retrieveDocumentEvent = new EventEmitter<string>();
+    @Output() afterSelected = new EventEmitter<any>();
+
+    @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
+
     loading: boolean = false;
     loadingValues: boolean = true;
 
@@ -55,23 +71,6 @@ export class ContactAutocompleteComponent implements OnInit {
     dialogRef: MatDialogRef<any>;
     newIds: number[] = [];
     customFields: any[] = [];
-
-
-    /**
-     * FormControl used when autocomplete is used in form and must be catched in a form control.
-     */
-    @Input('control') controlAutocomplete: FormControl = new FormControl();
-
-    @Input() id: string = 'contact-autocomplete';
-    @Input() exclusion: string = '';
-
-    @Input() singleMode: boolean = false;
-    @Input() inputMode: boolean = false;
-
-    @Output() retrieveDocumentEvent = new EventEmitter<string>();
-    @Output() afterSelected = new EventEmitter<any>();
-
-    @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
     constructor(
         public translate: TranslateService,
@@ -297,15 +296,6 @@ export class ContactAutocompleteComponent implements OnInit {
         this.myControl.setValue('');
     }
 
-    private _filter(value: string): string[] {
-        if (typeof value === 'string') {
-            const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.options.filter((option: any) => this.latinisePipe.transform(option[this.key].toLowerCase()).includes(filterValue));
-        } else {
-            return this.options;
-        }
-    }
-
     unsetValue() {
         this.controlAutocomplete.setValue('');
         this.myControl.setValue('');
@@ -397,5 +387,14 @@ export class ContactAutocompleteComponent implements OnInit {
 
     resetInputValue() {
         this.myControl.setValue('');
+    }
+
+    private _filter(value: string): string[] {
+        if (typeof value === 'string') {
+            const filterValue = this.latinisePipe.transform(value.toLowerCase());
+            return this.options.filter((option: any) => this.latinisePipe.transform(option[this.key].toLowerCase()).includes(filterValue));
+        } else {
+            return this.options;
+        }
     }
 }

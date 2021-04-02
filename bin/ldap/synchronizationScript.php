@@ -100,9 +100,9 @@ function initialize($customId)
     $GLOBALS['user'] = (string)$xmlfile->userWS;
     $GLOBALS['password'] = (string)$xmlfile->passwordWS;
 
-    $path = 'apps/maarch_entreprise/xml/config.json';
+    $path = 'config/config.json';
     if (!empty($customId)) {
-        $path = "custom/{$customId}/apps/maarch_entreprise/xml/config.json";
+        $path = "custom/{$customId}/config/config.json";
     }
     $file = file_get_contents($path);
     $file = json_decode($file, true);

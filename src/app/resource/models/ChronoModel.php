@@ -29,7 +29,7 @@ class ChronoModel
         $elements = [];
         $chronoNumber = [];
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/chrono.xml']);
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'config/chrono.xml']);
         if ($loadedXml) {
             foreach ($loadedXml->CHRONO as $chrono) {
                 if ($chrono->id == $aArgs['id']) {

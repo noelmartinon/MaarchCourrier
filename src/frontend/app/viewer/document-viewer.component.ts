@@ -33,6 +33,10 @@ import { LocalStorageService } from '@service/local-storage.service';
 
 export class DocumentViewerComponent implements OnInit, OnDestroy {
 
+    @ViewChild('templateList', { static: true }) templateList: PluginSelectSearchComponent;
+    @ViewChild('onlyofficeViewer', { static: false }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
+    @ViewChild('collaboraOnlineViewer', { static: false }) collaboraOnlineViewer: CollaboraOnlineViewerComponent;
+
     /**
      * document name stored in server (in tmp folder)
      */
@@ -76,6 +80,16 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
      */
     @Input() title: string = '';
 
+    /**
+     * To load specific attachment type in template list (to create document)
+     */
+    @Input() attachType: string = null;
+
+    /**
+      * Event emitter
+      */
+    @Output() triggerEvent = new EventEmitter<string>();
+
 
     /**
      * Use in resourceDatas.inMailing = true
@@ -94,15 +108,6 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         'ots',
         'csv',
     ];
-    /**
-     * To load specific attachment type in template list (to create document)
-     */
-    @Input() attachType: string = null;
-
-    /**
-     * Event emitter
-     */
-    @Output() triggerEvent = new EventEmitter<string>();
 
     loading: boolean = true;
     noConvertedFound: boolean = false;
@@ -151,10 +156,6 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     };
 
     isDocModified: boolean = false;
-
-    @ViewChild('templateList', { static: true }) templateList: PluginSelectSearchComponent;
-    @ViewChild('onlyofficeViewer', { static: false }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
-    @ViewChild('collaboraOnlineViewer', { static: false }) collaboraOnlineViewer: CollaboraOnlineViewerComponent;
 
     docToUploadValue: any;
 
@@ -564,7 +565,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         const fileExtension = '.' + file.name.toLowerCase().split('.').pop();
         const allowedExtensions = this.resourceDatas?.inMailing ? this.allowedExtensions.filter(ext => this.allowedExtensionsMailing.indexOf(ext.extension.replace('.', '')) > -1) : this.allowedExtensions;
 
-        if (allowedExtensions.filter(ext => ext.mimeType === file.type && ext.extension === fileExtension).length === 0) {
+        if (allowedExtensions.filter(ext => (ext.mimeType === file.type || (this.functions.empty(ext.mimeType) && this.functions.empty(file.type))) && ext.extension === fileExtension).length === 0) {
             this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.notAllowedExtension') + ' !', msg: this.translate.instant('lang.file') + ' : <b>' + file.name + '</b>, ' + this.translate.instant('lang.type') + ' : <b>' + file.type + '</b><br/><br/><u>' + this.translate.instant('lang.allowedExtensions') + '</u> : <br/>' + allowedExtensions.map(ext => ext.extension).filter((elem: any, index: any, self: any) => index === self.indexOf(elem)).join(', ') } });
             return false;
         } else if (file.size > this.maxFileSize && this.maxFileSize > 0) {

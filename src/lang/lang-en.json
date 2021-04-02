@@ -1431,7 +1431,7 @@
     "shippingModification": "Maileva shipping modification",
     "shippingNotEligible": "Ineligible mail(s) ",
     "shippingReadyToSend": "document(s) ready to be sent",
-    "shippingUnavailable": "<b>Warning </b> Shipping is not activated. Check the configuration file mailevaConfig.xml",
+    "shippingUnavailable": "<b>Warning </b> Shipping is not activated. Check the configuration in administration",
     "shippingUpdated": "Maileva shipping updated",
     "shippings": "Maileva shipping templates",
     "shippingDepositProofInformations": "Deposit proofs will be available in your Maileva account",
@@ -1771,7 +1771,7 @@
     "prerequisite": "Prerequisites",
     "customization": "Personalization",
     "alfresco": "Alfresco",
-    "instanceId": "instance identifier",
+    "instanceId": "Instance identifier",
     "dbSample": "Dataset",
     "chooseLogo": "Choose your logo",
     "stepEmptyDb": "This database already exists but seems empty.",
@@ -1827,6 +1827,7 @@
     "onlyExtensionsAllowed": "Only \"<b> {{value1}} </b>\" extensions are allowed",
     "customAlreadyExist": "This custom already seems to exist.",
     "invalidCustomName": "Unauthorized name",
+    "invalidLengthCustomName": "Custom name must contains at least {{value1}} letters",
     "onlySpecialCharAllowed": "Only special characters {{value1}} are allowed.",
     "dbNotEmpty": "This database already exists and is not empty",
     "stepMailServer": "Mail server",
@@ -2449,7 +2450,7 @@
     "webInterface": "Web interface",
     "mustDeleteOtherTabsBeforeSendMassMode": "Please remove <b> other PJ tabs </b> before switching to <b> direct mail </b>.",
     "outlookSendingModuleDesc": "Configure the <b> indexing model </b> and the <b> document type </b> used when converting emails to emails",
-    "alreadyPresent": "Email already present in",
+    "alreadyPresent": "Email imported into",
     "documentDate": "Document date",
     "modelId": "Indexing model identifier",
     "loginTo": "Please login to",
@@ -2462,5 +2463,6 @@
     "outlookPassword": "Outlook password",
     "downloadManifestMsg": "This file allows you to make the link between your <b> outlook </b> application and your <b> maarch </b> application",
     "mustSecureMaarchUrl": "The url defined in «<b> Administration </b>» 🠖 «<b> Parameters </b>» 🠖 «<b> Personalization </b>» 🠖 «<b> URL of the application </ b > » is not secure (<b> https </b>)",
-    "attachmentTypeOutlook": "Attachment type associated with the email"
+    "attachmentTypeOutlook": "Attachment type associated with the email",
+    "signInsteadOf": "You approve / sign instead of"
 }

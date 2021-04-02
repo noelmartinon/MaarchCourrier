@@ -7,6 +7,7 @@ import { catchError, tap, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { LocalStorageService } from '@service/local-storage.service';
 import { HeaderService } from '@service/header.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     templateUrl: 'users-export.component.html',
@@ -34,7 +35,8 @@ export class UsersExportComponent implements OnInit {
         public dialogRef: MatDialogRef<UsersExportComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         private localStorage: LocalStorageService,
-        private headerService: HeaderService
+        private headerService: HeaderService,
+        private functionsService: FunctionsService
     ) { }
 
     async ngOnInit(): Promise<void> {
@@ -49,24 +51,7 @@ export class UsersExportComponent implements OnInit {
                 if (data.type !== 'text/html') {
                     const downloadLink = document.createElement('a');
                     downloadLink.href = window.URL.createObjectURL(data);
-                    let today: any;
-                    let dd: any;
-                    let mm: any;
-                    let yyyy: any;
-
-                    today = new Date();
-                    dd = today.getDate();
-                    mm = today.getMonth() + 1;
-                    yyyy = today.getFullYear();
-
-                    if (dd < 10) {
-                        dd = '0' + dd;
-                    }
-                    if (mm < 10) {
-                        mm = '0' + mm;
-                    }
-                    today = dd + '-' + mm + '-' + yyyy;
-                    downloadLink.setAttribute('download', 'export_users_maarch_' + today + '.' + this.exportModel.format.toLowerCase());
+                    downloadLink.setAttribute('download', this.functionsService.getFormatedFileName('export_users_maarch', this.exportModel.format.toLowerCase()));
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
                     this.dialogRef.close();

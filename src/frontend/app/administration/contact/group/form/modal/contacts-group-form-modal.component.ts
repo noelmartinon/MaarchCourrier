@@ -9,6 +9,8 @@ import { ContactsGroupFormComponent } from '../contacts-group-form.component';
 })
 export class ContactsGroupFormModalComponent implements OnInit{
 
+    @ViewChild('appContactsGroupForm', { static: false }) appContactsGroupForm: ContactsGroupFormComponent;
+
     loading: boolean = false;
 
     modalTitle: string = '';
@@ -17,9 +19,6 @@ export class ContactsGroupFormModalComponent implements OnInit{
     canModifyGroupInfo: boolean = true;
     allPerimeters: boolean = true;
     contactIds: number[] = [];
-
-    @ViewChild('appContactsGroupForm', { static: false }) appContactsGroupForm: ContactsGroupFormComponent;
-
 
     constructor(
         @Inject(MAT_DIALOG_DATA) public data: any,

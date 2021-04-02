@@ -24,6 +24,11 @@ declare let $: any;
 })
 export class LinkedResourceListComponent implements OnInit {
 
+    @Input() resId: number;
+    @Output() reloadBadgeLinkedResources = new EventEmitter<string>();
+
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     loading: boolean = true;
 
@@ -33,11 +38,6 @@ export class LinkedResourceListComponent implements OnInit {
 
     thumbnailUrl: string = '';
 
-    @Input() resId: number;
-    @Output() reloadBadgeLinkedResources = new EventEmitter<string>();
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,

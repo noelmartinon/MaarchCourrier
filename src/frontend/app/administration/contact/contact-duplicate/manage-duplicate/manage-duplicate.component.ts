@@ -16,13 +16,12 @@ import { NotificationService } from '@service/notification/notification.service'
 })
 export class ManageDuplicateComponent implements OnInit {
 
-    loading: boolean = false;
+    @ViewChildren('appContactDetail') appContactDetail: QueryList<ContactDetailComponent>;
 
+    loading: boolean = false;
 
     contactSelected: number = null;
     contactsExcluded: number[] = [];
-
-    @ViewChildren('appContactDetail') appContactDetail: QueryList<ContactDetailComponent>;
 
     constructor(
         public translate: TranslateService,

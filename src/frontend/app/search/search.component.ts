@@ -17,6 +17,12 @@ import { NotificationService } from '@service/notification/notification.service'
 })
 export class SearchComponent implements OnInit {
 
+    @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
+
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild('appSearchResultList', { static: false }) appSearchResultList: SearchResultListComponent;
+    @ViewChild('appCriteriaTool', { static: true }) appCriteriaTool: CriteriaToolComponent;
+
     searchTerm: string = '';
     searchTemplateId: string = null;
 
@@ -24,12 +30,6 @@ export class SearchComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
     loadingResult: boolean = false;
-
-    @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
-
-    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-    @ViewChild('appSearchResultList', { static: false }) appSearchResultList: SearchResultListComponent;
-    @ViewChild('appCriteriaTool', { static: true }) appCriteriaTool: CriteriaToolComponent;
 
     constructor(
         _activatedRoute: ActivatedRoute,

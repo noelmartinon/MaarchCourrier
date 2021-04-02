@@ -11,15 +11,14 @@ import { take, tap } from 'rxjs/operators';
 })
 export class TemplateFileEditorModalComponent implements OnInit {
 
+    @ViewChild('onlyofficeViewer', { static: false }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
+    @ViewChild('collaboraOnlineViewer', { static: false }) collaboraOnlineViewer: CollaboraOnlineViewerComponent;
 
     loading: boolean = false;
     editorOptions: any = null;
     file: any = null;
     editorType: any = null;
     documentIsModified: boolean = false;
-
-    @ViewChild('onlyofficeViewer', { static: false }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
-    @ViewChild('collaboraOnlineViewer', { static: false }) collaboraOnlineViewer: CollaboraOnlineViewerComponent;
 
     constructor(public translate: TranslateService, public dialogRef: MatDialogRef<TemplateFileEditorModalComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
 

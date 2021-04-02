@@ -25,6 +25,10 @@ import { ContactAutocompleteComponent } from '../../contact/autocomplete/contact
 
 export class AttachmentCreateComponent implements OnInit {
 
+    @Input('resId') resId: number = null;
+
+    @ViewChildren('appDocumentViewer') appDocumentViewer: QueryList<DocumentViewerComponent>;
+    @ViewChildren('contactAutocomplete') contactAutocomplete: ContactAutocompleteComponent;
 
     loading: boolean = true;
 
@@ -55,12 +59,6 @@ export class AttachmentCreateComponent implements OnInit {
     loadingContact: boolean = false;
 
     defaultType: any = null;
-
-    @Input('resId') resId: number = null;
-
-
-    @ViewChildren('appDocumentViewer') appDocumentViewer: QueryList<DocumentViewerComponent>;
-    @ViewChildren('contactAutocomplete') contactAutocomplete: ContactAutocompleteComponent;
 
     constructor(
         public translate: TranslateService,
@@ -126,15 +124,13 @@ export class AttachmentCreateComponent implements OnInit {
                     let contact: any = '';
                     if (data.categoryId === 'outgoing') {
                         if (!this.functions.empty(data.recipients) && data.recipients.length > 0) {
-                            data.recipients = data.recipients.filter((contact: any) => contact.type !== 'entity');
-                            await this.getContacts(data.recipients);
-                            contact = !this.functions.empty(data.recipients) ? [{ id: this.resourceContacts[0].id, type: this.resourceContacts[0].type }] : '';
+                            await this.getCorrespondents('recipients');
+                            contact = !this.functions.empty(this.resourceContacts) ? [{ id: this.resourceContacts[0].id, type: this.resourceContacts[0].type }] : '';
                         }
                     } else {
                         if (!this.functions.empty(data.senders) && data.senders.length > 0) {
-                            data.senders = data.senders.filter((contact: any) => contact.type !== 'entity');
-                            await this.getContacts(data.senders);
-                            contact = !this.functions.empty(data.senders) ? [{ id: this.resourceContacts[0].id, type: this.resourceContacts[0].type }] : '';
+                            await this.getCorrespondents('senders');
+                            contact = !this.functions.empty(this.resourceContacts) ? [{ id: this.resourceContacts[0].id, type: this.resourceContacts[0].type }] : '';
                         }
                     }
 
@@ -156,12 +152,46 @@ export class AttachmentCreateComponent implements OnInit {
                     if (this.canSendMass()) {
                         this.toggleSendMass();
                     }
-
                     resolve(true);
                 }),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);
                     this.dialogRef.close('');
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    async getCorrespondents(type) {
+        this.resourceContacts = [];
+        return new Promise((resolve, reject) => {
+            this.http.get(`../rest/resources/${this.data.resIdMaster}/contacts?type=${type}`).pipe(
+                tap((correspondents: any) => {
+                    var correspondents = correspondents.contacts.filter((contact: any) => contact.type !== 'entity');
+
+                    correspondents.forEach((elem) => {
+                        if (elem.type === 'contact') {
+                            this.resourceContacts.push({
+                                id: elem.id,
+                                type: 'contact',
+                                label: this.contactService.formatContact(elem)
+                            });
+                        } else if (elem.type === 'user') {
+                            this.resourceContacts.push({
+                                id: elem.id,
+                                type: 'user',
+                                label: `${elem.firstname} ${elem.lastname}`
+                            });
+                        }
+                    });
+
+                    this.resourceContacts = this.sortPipe.transform(this.resourceContacts, 'label');
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    resolve(false);
                     return of(false);
                 })
             ).subscribe();

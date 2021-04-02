@@ -581,7 +581,7 @@ class ContactController
             }
         }
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/m2m_config.xml']);
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'config/m2m_config.xml']);
 
         $annuaryEnabled = true;
         if (!$loadedXml) {
@@ -624,7 +624,7 @@ class ContactController
                 'data'  => [$contactParameter['id']]
             ]);
         }
-        
+
         ContactFillingModel::update($data['contactsFilling']);
 
         return $response->withJson(['success' => 'success']);
@@ -1421,31 +1421,32 @@ class ContactController
                 ];
 
                 $contact = [
-                    'type'               => 'contact',
-                    'civility'           => $civility,
-                    'firstname'          => $contactRaw['firstname'],
-                    'lastname'           => $contactRaw['lastname'],
-                    'company'            => $contactRaw['company'],
-                    'department'         => $contactRaw['department'],
-                    'function'           => $contactRaw['function'],
-                    'addressNumber'      => $contactRaw['address_number'],
-                    'addressStreet'      => $contactRaw['address_street'],
-                    'addressAdditional1' => $contactRaw['address_additional1'],
-                    'addressAdditional2' => $contactRaw['address_additional2'],
-                    'addressPostcode'    => $contactRaw['address_postcode'],
-                    'addressTown'        => $contactRaw['address_town'],
-                    'addressCountry'     => $contactRaw['address_country'],
-                    'email'              => $contactRaw['email'],
-                    'phone'              => $contactRaw['phone'],
-                    'communicationMeans' => null,
-                    'notes'              => $contactRaw['notes'],
-                    'creator'            => $contactRaw['creator'],
-                    'creatorLabel'       => UserModel::getLabelledUserById(['id' => $contactRaw['creator']]),
-                    'enabled'            => $contactRaw['enabled'],
-                    'creationDate'       => $contactRaw['creation_date'],
-                    'modificationDate'   => $contactRaw['modification_date'],
-                    'customFields'       => !empty($contactRaw['custom_fields']) ? json_decode($contactRaw['custom_fields'], true) : null,
-                    'externalId'         => json_decode($contactRaw['external_id'], true)
+                    'id'                    => $resourceContact['item_id'],
+                    'type'                  => 'contact',
+                    'civility'              => $civility,
+                    'firstname'             => $contactRaw['firstname'],
+                    'lastname'              => $contactRaw['lastname'],
+                    'company'               => $contactRaw['company'],
+                    'department'            => $contactRaw['department'],
+                    'function'              => $contactRaw['function'],
+                    'addressNumber'         => $contactRaw['address_number'],
+                    'addressStreet'         => $contactRaw['address_street'],
+                    'addressAdditional1'    => $contactRaw['address_additional1'],
+                    'addressAdditional2'    => $contactRaw['address_additional2'],
+                    'addressPostcode'       => $contactRaw['address_postcode'],
+                    'addressTown'           => $contactRaw['address_town'],
+                    'addressCountry'        => $contactRaw['address_country'],
+                    'email'                 => $contactRaw['email'],
+                    'phone'                 => $contactRaw['phone'],
+                    'communicationMeans'    => null,
+                    'notes'                 => $contactRaw['notes'],
+                    'creator'               => $contactRaw['creator'],
+                    'creatorLabel'          => UserModel::getLabelledUserById(['id' => $contactRaw['creator']]),
+                    'enabled'               => $contactRaw['enabled'],
+                    'creationDate'          => $contactRaw['creation_date'],
+                    'modificationDate'      => $contactRaw['modification_date'],
+                    'customFields'          => !empty($contactRaw['custom_fields']) ? json_decode($contactRaw['custom_fields'], true) : null,
+                    'externalId'            => json_decode($contactRaw['external_id'], true)
                 ];
 
                 if (!empty($contactRaw['communication_means'])) {
@@ -1472,30 +1473,31 @@ class ContactController
                 $nonPrimaryEntities = implode(', ', $userEntities);
 
                 $contact = [
-                    'type'               => 'user',
-                    'firstname'          => $user['firstname'],
-                    'lastname'           => $user['lastname'],
-                    'company'            => null,
-                    'department'         => $primaryEntity['entity_label'],
-                    'function'           => null,
-                    'addressNumber'      => null,
-                    'addressStreet'      => null,
-                    'addressAdditional1' => $nonPrimaryEntities,
-                    'addressAdditional2' => null,
-                    'addressPostcode'    => null,
-                    'addressTown'        => null,
-                    'addressCountry'     => null,
-                    'email'              => $user['mail'],
-                    'phone'              => $phone,
-                    'communicationMeans' => null,
-                    'notes'              => null,
-                    'creator'            => null,
-                    'creatorLabel'       => null,
-                    'enabled'            => $user['status'] != 'SPD',
-                    'creationDate'       => null,
-                    'modificationDate'   => null,
-                    'customFields'       => null,
-                    'externalId'         => null
+                    'id'                    => $resourceContact['item_id'],
+                    'type'                  => 'user',
+                    'firstname'             => $user['firstname'],
+                    'lastname'              => $user['lastname'],
+                    'company'               => null,
+                    'department'            => $primaryEntity['entity_label'],
+                    'function'              => null,
+                    'addressNumber'         => null,
+                    'addressStreet'         => null,
+                    'addressAdditional1'    => $nonPrimaryEntities,
+                    'addressAdditional2'    => null,
+                    'addressPostcode'       => null,
+                    'addressTown'           => null,
+                    'addressCountry'        => null,
+                    'email'                 => $user['mail'],
+                    'phone'                 => $phone,
+                    'communicationMeans'    => null,
+                    'notes'                 => null,
+                    'creator'               => null,
+                    'creatorLabel'          => null,
+                    'enabled'               => $user['status'] != 'SPD',
+                    'creationDate'          => null,
+                    'modificationDate'      => null,
+                    'customFields'          => null,
+                    'externalId'            => null
                 ];
             } elseif ($resourceContact['type'] == 'entity') {
                 $entity = EntityModel::getById([
@@ -1507,30 +1509,31 @@ class ContactController
                 ]);
 
                 $contact = [
-                    'type'               => 'entity',
-                    'firstname'          => null,
-                    'lastname'           => $entity['entity_label'],
-                    'company'            => null,
-                    'department'         => null,
-                    'function'           => null,
-                    'addressNumber'      => $entity['address_number'],
-                    'addressStreet'      => $entity['address_street'],
-                    'addressAdditional1' => $entity['address_additional1'],
-                    'addressAdditional2' => $entity['address_additional2'],
-                    'addressPostcode'    => $entity['address_postcode'],
-                    'addressTown'        => $entity['address_town'],
-                    'addressCountry'     => $entity['address_country'],
-                    'email'              => $entity['email'],
-                    'phone'              => null,
-                    'communicationMeans' => null,
-                    'notes'              => null,
-                    'creator'            => null,
-                    'creatorLabel'       => null,
-                    'enabled'            => $entity['enabled'] == 'Y',
-                    'creationDate'       => null,
-                    'modificationDate'   => null,
-                    'customFields'       => null,
-                    'externalId'         => null
+                    'id'                    => $resourceContact['item_id'],
+                    'type'                  => 'entity',
+                    'firstname'             => null,
+                    'lastname'              => $entity['entity_label'],
+                    'company'               => null,
+                    'department'            => null,
+                    'function'              => null,
+                    'addressNumber'         => $entity['address_number'],
+                    'addressStreet'         => $entity['address_street'],
+                    'addressAdditional1'    => $entity['address_additional1'],
+                    'addressAdditional2'    => $entity['address_additional2'],
+                    'addressPostcode'       => $entity['address_postcode'],
+                    'addressTown'           => $entity['address_town'],
+                    'addressCountry'        => $entity['address_country'],
+                    'email'                 => $entity['email'],
+                    'phone'                 => null,
+                    'communicationMeans'    => null,
+                    'notes'                 => null,
+                    'creator'               => null,
+                    'creatorLabel'          => null,
+                    'enabled'               => $entity['enabled'] == 'Y',
+                    'creationDate'          => null,
+                    'modificationDate'      => null,
+                    'customFields'          => null,
+                    'externalId'            => null
                 ];
             }
 
@@ -1626,7 +1629,7 @@ class ContactController
         } elseif (!empty($body['phone']) && !preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $body['phone'])) {
             return ['errors' => 'Body phone is not valid'];
         }
-        
+
         $lengthFields = [
             'firstname',
             'lastname',

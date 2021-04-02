@@ -19,6 +19,8 @@ import { of } from 'rxjs';
 export class DiffusionModelsAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     loading: boolean = false;
 
@@ -27,9 +29,6 @@ export class DiffusionModelsAdministrationComponent implements OnInit {
 
     displayedColumns = ['title', 'description', 'typeLabel', 'actions'];
     filterColumns = ['title', 'description', 'typeLabel'];
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,

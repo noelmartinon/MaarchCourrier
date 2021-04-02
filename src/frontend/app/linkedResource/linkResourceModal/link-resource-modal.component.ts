@@ -13,9 +13,10 @@ import { SearchResultListComponent } from '@appRoot/search/result-list/search-re
 })
 export class LinkResourceModalComponent implements OnInit {
 
+    @ViewChild('appSearchResultList', { static: false }) appSearchResultList: SearchResultListComponent;
+
     searchUrl: string = '';
 
-    @ViewChild('appSearchResultList', { static: false }) appSearchResultList: SearchResultListComponent;
 
     constructor(
         public translate: TranslateService,

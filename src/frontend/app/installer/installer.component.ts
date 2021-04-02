@@ -28,9 +28,10 @@ import { PrivilegeService } from '@service/privileges.service';
 })
 export class InstallerComponent implements OnInit, AfterViewInit {
 
-    loading: boolean = true;
     @ViewChildren('stepContent') stepContent: any;
     @ViewChild('stepper', { static: false }) stepper: MatStepper;
+
+    loading: boolean = true;
 
     constructor(
         public translate: TranslateService,

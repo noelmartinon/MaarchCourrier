@@ -19,6 +19,8 @@ import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 })
 export class TagAdministrationComponent implements OnInit {
 
+    @ViewChild('linkedTagInput') linkedTagInput: ElementRef<HTMLInputElement>;
+
     id: string;
     creationMode: boolean;
 
@@ -45,8 +47,6 @@ export class TagAdministrationComponent implements OnInit {
     tagFormGroup = new FormGroup(this.tag);
 
     currTagChildren: any = [];
-
-    @ViewChild('linkedTagInput') linkedTagInput: ElementRef<HTMLInputElement>;
 
     constructor(
         public translate: TranslateService,
@@ -193,14 +193,6 @@ export class TagAdministrationComponent implements OnInit {
             map((fruit: string | null) => fruit ? this._filter(fruit) : this.tags.slice()));
     }
 
-    private _filter(value: string): string[] {
-        let filterValue = value;
-        if (typeof value === 'string') {
-            filterValue = value.toLowerCase();
-        }
-        return this.tags.filter(tag => tag.label.toLowerCase().indexOf(filterValue) > -1);
-    }
-
     isSelected(tag: any) {
         return this.tag.links.value.filter((tagItem: any) => tagItem == tag.id).length > 0;
     }
@@ -284,5 +276,13 @@ export class TagAdministrationComponent implements OnInit {
 
     getTagLabel(id: any) {
         return this.tags.filter((tag: any) => tag.id == id)[0].label;
+    }
+
+    private _filter(value: string): string[] {
+        let filterValue = value;
+        if (typeof value === 'string') {
+            filterValue = value.toLowerCase();
+        }
+        return this.tags.filter(tag => tag.label.toLowerCase().indexOf(filterValue) > -1);
     }
 }

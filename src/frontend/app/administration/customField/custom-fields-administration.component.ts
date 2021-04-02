@@ -237,6 +237,9 @@ export class CustomFieldsAdministrationComponent implements OnInit {
     }
 
     isModified(customField: any, indexCustomField: number) {
+        if (!this.functionsService.empty(customField.oldValues)) {
+            this.customFieldsClone[indexCustomField].oldValues = customField.oldValues;
+        }
         if (JSON.stringify(customField) === JSON.stringify(this.customFieldsClone[indexCustomField]) || customField.label === '' || this.SQLMode || customField.mode === '') {
             return true;
         } else {
@@ -246,6 +249,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
 
     switchSQLMode(custom: any) {
         custom.SQLMode = !custom.SQLMode;
+        const oldValues = custom.values;
         if (custom.SQLMode) {
             custom.values = {
                 key: 'id',
@@ -260,6 +264,10 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         } else {
             custom.values = [];
         }
+        if (!this.functionsService.empty(custom.oldValues)) {
+            custom.values = custom.oldValues;
+        }
+        custom.oldValues = oldValues;
     }
 
     getTables() {

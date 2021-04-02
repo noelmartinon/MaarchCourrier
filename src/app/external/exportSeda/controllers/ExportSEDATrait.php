@@ -89,7 +89,7 @@ trait ExportSEDATrait
             $bindingDocument    = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'bindingDocumentFinalAction']);
             $nonBindingDocument = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'nonBindingDocumentFinalAction']);
 
-            $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+            $config = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
 
             if (count($args['resources']) > 1 && $args['data']['actionMode'] == 'download') {
                 $tmpPath     = CoreConfigModel::getTmpPath();
@@ -142,7 +142,7 @@ trait ExportSEDATrait
                 return ['errors' => [$value . ' is empty']];
             }
         }
-        
+
         if ($args['data']['actionMode'] == 'download') {
             $sedaPackage = ExportSedaTrait::makeSedaPackage([
                 'resource'               => $resource,
@@ -160,7 +160,7 @@ trait ExportSEDATrait
                 if ($zip->open($zipFilename, \ZipArchive::CREATE) === true) {
                     $zip->addFile($sedaPackage['encodedFilePath'], 'sedaPackage' . $resource['res_id'] . '.zip');
                     $zip->close();
-    
+
                     $zipPath = $zipFilename;
                 } else {
                     return ['errors' => ['Cannot open zip file ' . $zipFilename]];
@@ -173,7 +173,7 @@ trait ExportSEDATrait
             return ['data' => ['encodedFile' => $encodedContent]];
         } else {
             $customId = CoreConfigModel::getCustomId();
-            
+
             static $massData;
             if ($massData === null) {
                 $massData = [
@@ -463,7 +463,7 @@ trait ExportSEDATrait
         $units[] = ['unit' => 'diffusionList',               'label' => _DIFFUSION_LIST];
         $units[] = ['unit' => 'visaWorkflow',                'label' => _VISA_WORKFLOW];
         $units[] = ['unit' => 'opinionWorkflow',             'label' => _AVIS_WORKFLOW];
-        
+
         $tmpIds = [$args['resId']];
         $data   = [];
         foreach ($units as $unit) {
@@ -554,7 +554,7 @@ trait ExportSEDATrait
         $data = [];
         $data['messageObject'] = self::array2object($args["data"]["messageObject"]);
         $data['type'] = $args["data"]["type"];
-        
+
         $informationsToSend = SendMessageController::generateSedaFile($data);
         return $informationsToSend;
     }
@@ -622,7 +622,7 @@ trait ExportSEDATrait
         if (!file_exists($fullFilePath)) {
             return ['errors' => "getDocumentFromEncodedZip : No document was found in Zip"];
         }
-        
+
         $content = file_get_contents($fullFilePath);
         $xmlfile = simplexml_load_file($fullFilePath);
         unlink($zipDocumentOnTmp);
@@ -661,7 +661,7 @@ trait ExportSEDATrait
         if (!empty($acknowledgement['fingerprint']) && $acknowledgement['fingerprint'] != $fingerprint) {
             return ['errors' => ['Fingerprint does not match']];
         }
-        
+
         $acknowledgementXml = @simplexml_load_file($pathToDocument);
         if (empty($acknowledgementXml)) {
             return ['errors' => ['Acknowledgement is not readable']];
@@ -709,7 +709,7 @@ trait ExportSEDATrait
         if (!empty($reply['fingerprint']) && $reply['fingerprint'] != $fingerprint) {
             return ['errors' => ['Fingerprint does not match']];
         }
-        
+
         $replyXml = @simplexml_load_file($pathToDocument);
         if (empty($replyXml)) {
             return ['errors' => ['Reply is not readable']];

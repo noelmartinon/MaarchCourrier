@@ -16,6 +16,8 @@ import { catchError, tap } from 'rxjs/operators';
 })
 export class DatabaseComponent implements OnInit {
 
+    @Output() nextStep = new EventEmitter<string>();
+
     stepFormGroup: FormGroup;
     hide: boolean = true;
 
@@ -23,8 +25,6 @@ export class DatabaseComponent implements OnInit {
     dbExist: boolean = false;
 
     dataFiles: string[] = [];
-
-    @Output() nextStep = new EventEmitter<string>();
 
     constructor(
         public translate: TranslateService,

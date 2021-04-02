@@ -29,6 +29,18 @@ declare let $: any;
 })
 export class BasketListComponent implements OnInit, OnDestroy {
 
+    @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
+    @ViewChild('actionsListContext', { static: true }) actionsList: ActionsListComponent;
+    @ViewChild('filtersTool', { static: true }) filtersTool: FiltersToolComponent;
+    @ViewChild('appPanelList', { static: true }) appPanelList: PanelListComponent;
+    @ViewChild('tableBasketListSort', { static: true }) sort: MatSort;
+    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
+
+    subscription: Subscription;
+    subscription2: Subscription;
+
+    currentSelectedChrono: string = '';
+
     loading: boolean = false;
     docUrl: string = '';
     public innerHtml: SafeHtml;
@@ -43,8 +55,6 @@ export class BasketListComponent implements OnInit, OnDestroy {
     filtersChange = new EventEmitter();
 
     dragInit: boolean = true;
-
-    @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
 
     templateColumns: number = 7;
     displayedColumnsBasket: string[] = ['resId'];
@@ -84,17 +94,6 @@ export class BasketListComponent implements OnInit, OnDestroy {
     displayFolderTags: boolean = false;
 
     private destroy$ = new Subject<boolean>();
-    subscription: Subscription;
-    subscription2: Subscription;
-
-    @ViewChild('actionsListContext', { static: true }) actionsList: ActionsListComponent;
-    @ViewChild('filtersTool', { static: true }) filtersTool: FiltersToolComponent;
-    @ViewChild('appPanelList', { static: true }) appPanelList: PanelListComponent;
-
-    currentSelectedChrono: string = '';
-
-    @ViewChild(MatPaginator, { static: true }) paginator: MatPaginator;
-    @ViewChild('tableBasketListSort', { static: true }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,

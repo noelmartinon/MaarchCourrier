@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ViewContainerRef, TemplateRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewContainerRef, TemplateRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
@@ -28,15 +28,16 @@ import { SelectIndexingModelComponent } from './select-indexing-model/select-ind
     ],
     providers: [ActionsService, SortPipe],
 })
-export class IndexationComponent implements OnInit {
-
-    loading: boolean = false;
+export class IndexationComponent implements OnInit, OnDestroy {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
 
     @ViewChild('appSelectIndexingModel', { static: false }) appSelectIndexingModel: SelectIndexingModelComponent;
     @ViewChild('indexingForm', { static: false }) indexingForm: IndexingFormComponent;
     @ViewChild('appDocumentViewer', { static: false }) appDocumentViewer: DocumentViewerComponent;
+
+    loading: boolean = false;
+
 
     indexingModels: any[] = [];
     currentIndexingModel: any = {};

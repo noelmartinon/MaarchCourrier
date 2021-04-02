@@ -1,4 +1,4 @@
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -6,15 +6,15 @@ import { Subscription } from 'rxjs';
 import { FoldersService } from '../folders.service';
 
 @Component({
-    selector: 'folder-pinned',
+    selector: 'app-folder-pinned',
     templateUrl: 'folder-pinned.component.html',
     styleUrls: ['folder-pinned.component.scss'],
 })
-export class FolderPinnedComponent implements OnInit {
-
-    subscription: Subscription;
+export class FolderPinnedComponent implements OnInit, OnDestroy {
 
     @Input('noInit') noInit: boolean = false;
+
+    subscription: Subscription;
 
     constructor(
         public translate: TranslateService,

@@ -50,7 +50,7 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
         }
     }
     $response = $next($request, $response);
-    
+
     return $response;
 });
 
@@ -100,7 +100,7 @@ $app->get('/attachmentsInformations', \Attachment\controllers\AttachmentControll
 //AttachmentsTypes
 $app->get('/attachmentsTypes', \Attachment\controllers\AttachmentTypeController::class . ':get');
 $app->post('/attachmentsTypes', \Attachment\controllers\AttachmentTypeController::class . ':create');
-$app->get('/attachmentsTypes/{id}', \Attachment\controllers\AttachmentTypeController::class . ':getBydId');
+$app->get('/attachmentsTypes/{id}', \Attachment\controllers\AttachmentTypeController::class . ':getById');
 $app->put('/attachmentsTypes/{id}', \Attachment\controllers\AttachmentTypeController::class . ':update');
 $app->delete('/attachmentsTypes/{id}', \Attachment\controllers\AttachmentTypeController::class . ':delete');
 

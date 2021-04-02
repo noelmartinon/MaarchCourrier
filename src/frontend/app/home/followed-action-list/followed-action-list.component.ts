@@ -20,10 +20,22 @@ import { PrivilegeService } from '@service/privileges.service';
 })
 export class FollowedActionListComponent implements OnInit {
 
-    loading: boolean = false;
-
     @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
+
+    @Input() selectedRes: any;
+    @Input() totalRes: number;
+    @Input() contextMode: boolean;
+    @Input() currentFolderInfo: any;
+    @Input() currentResource: any = {};
+    @Input() menuShortcut: MenuShortcutComponent;
+
+    @Output() refreshEvent = new EventEmitter<string>();
+    @Output() refreshPanelFolders = new EventEmitter<string>();
     @Output() triggerEvent = new EventEmitter<string>();
+
+    dialogRef: MatDialogRef<any>;
+
+    loading: boolean = false;
 
     contextMenuPosition = { x: '0px', y: '0px' };
     contextMenuTitle = '';
@@ -43,17 +55,6 @@ export class FollowedActionListComponent implements OnInit {
         list: []
     };
 
-    @Input() selectedRes: any;
-    @Input() totalRes: number;
-    @Input() contextMode: boolean;
-    @Input() currentFolderInfo: any;
-    @Input() currentResource: any = {};
-
-    @Input() menuShortcut: MenuShortcutComponent;
-
-    @Output() refreshEvent = new EventEmitter<string>();
-    @Output() refreshPanelFolders = new EventEmitter<string>();
-
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -63,8 +64,6 @@ export class FollowedActionListComponent implements OnInit {
         private headerService: HeaderService,
         public privilegeService: PrivilegeService,
     ) { }
-
-    dialogRef: MatDialogRef<any>;
 
     ngOnInit(): void {}
 

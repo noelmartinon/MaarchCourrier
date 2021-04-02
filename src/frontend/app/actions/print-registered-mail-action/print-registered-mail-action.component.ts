@@ -47,26 +47,10 @@ export class PrintRegisteredMailActionComponent implements OnInit {
                             downloadLink.href = `data:application/pdf;base64,${encodedFile}`;
                             if (this.data.resIds.length === 1) {
                                 filenameDetail = this.data.resource.chrono.split(' ').join('_');
+                                downloadLink.setAttribute('download', 'recommande_' + filenameDetail + '.pdf');
                             } else {
-                                let today: any;
-                                let dd: any;
-                                let mm: any;
-                                let yyyy: any;
-
-                                today = new Date();
-                                dd = today.getDate();
-                                mm = today.getMonth() + 1;
-                                yyyy = today.getFullYear();
-
-                                if (dd < 10) {
-                                    dd = '0' + dd;
-                                }
-                                if (mm < 10) {
-                                    mm = '0' + mm;
-                                }
-                                filenameDetail = dd + '-' + mm + '-' + yyyy;
+                                downloadLink.setAttribute('download', this.functions.getFormatedFileName('recommande', 'pdf'));
                             }
-                            downloadLink.setAttribute('download', 'recommande_' + filenameDetail + '.pdf');
                             document.body.appendChild(downloadLink);
                             downloadLink.click();
                             this.dialogRef.close(this.data.resIds);

@@ -231,6 +231,8 @@ class ResControllerTest extends TestCase
             'doctype'      => 102,
             'modelId'      => 1,
             'status'       => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'customFields' => 'wrong format'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -243,6 +245,8 @@ class ResControllerTest extends TestCase
             'doctype'      => 102,
             'modelId'      => 1,
             'status'       => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'customFields' => [1000]
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -255,6 +259,8 @@ class ResControllerTest extends TestCase
             'doctype' => 102,
             'modelId' => 1,
             'status'  => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'folders' => 'wrong format'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -267,6 +273,8 @@ class ResControllerTest extends TestCase
             'doctype' => 102,
             'modelId' => 1,
             'status'  => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'folders' => [100000]
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -279,6 +287,8 @@ class ResControllerTest extends TestCase
             'doctype' => 102,
             'modelId' => 1,
             'status'  => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'tags'    => 'wrong format'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -291,6 +301,8 @@ class ResControllerTest extends TestCase
             'doctype' => 102,
             'modelId' => 1,
             'status'  => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'tags'    => [100000]
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -303,6 +315,8 @@ class ResControllerTest extends TestCase
             'doctype' => 102,
             'modelId' => 1,
             'status'  => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'senders' => 'wrong format'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -315,6 +329,8 @@ class ResControllerTest extends TestCase
             'doctype' => 102,
             'modelId' => 1,
             'status'  => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'senders' => ['wrong format']
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -327,6 +343,8 @@ class ResControllerTest extends TestCase
             'doctype' => 102,
             'modelId' => 1,
             'status'  => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'senders' => [['type' => 'alien']]
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -339,6 +357,8 @@ class ResControllerTest extends TestCase
             'doctype' => 102,
             'modelId' => 1,
             'status'  => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'senders' => [['type' => 'user', 'id' => 1000]]
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -351,6 +371,8 @@ class ResControllerTest extends TestCase
             'doctype' => 102,
             'modelId' => 1,
             'status'  => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'recipients' => 'wrong format'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -363,6 +385,8 @@ class ResControllerTest extends TestCase
             'doctype' => 102,
             'modelId' => 1,
             'status'  => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'recipients' => ['wrong format']
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -375,6 +399,8 @@ class ResControllerTest extends TestCase
             'doctype' => 102,
             'modelId' => 1,
             'status'  => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'recipients' => [['type' => 'alien']]
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -387,6 +413,8 @@ class ResControllerTest extends TestCase
             'doctype' => 102,
             'modelId' => 1,
             'status'  => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'recipients' => [['type' => 'user', 'id' => 1000]]
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -399,6 +427,8 @@ class ResControllerTest extends TestCase
             'doctype'      => 102,
             'modelId'      => 1,
             'status'       => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'documentDate' => 'wrong format'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -415,6 +445,8 @@ class ResControllerTest extends TestCase
             'doctype'      => 102,
             'modelId'      => 1,
             'status'       => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'documentDate' => $dateInTheFuture
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -427,6 +459,8 @@ class ResControllerTest extends TestCase
             'doctype'     => 102,
             'modelId'     => 1,
             'status'      => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'arrivalDate' => 'wrong format'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -439,6 +473,8 @@ class ResControllerTest extends TestCase
             'doctype'     => 102,
             'modelId'     => 1,
             'status'      => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'arrivalDate' => $dateInTheFuture
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -451,6 +487,8 @@ class ResControllerTest extends TestCase
             'doctype'       => 102,
             'modelId'       => 1,
             'status'        => 'NEW',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'departureDate' => 'wrong format'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -464,6 +502,8 @@ class ResControllerTest extends TestCase
             'modelId'       => 1,
             'status'        => 'NEW',
             'documentDate'  => '2020-02-01',
+            'encodedFile' => $encodedFile,
+            'format'        => 'txt',
             'departureDate' => '2020-01-01'
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($body, $request);
@@ -490,6 +530,8 @@ class ResControllerTest extends TestCase
             'typist'        => 19,
             'priority'      => 'poiuytre1357nbvc',
             'senders'       => [['type' => 'contact', 'id' => 1], ['type' => 'user', 'id' => 21], ['type' => 'entity', 'id' => 1]],
+            'encodedFile'   => $encodedFile,
+            'format'        => 'txt',
             'diffusionList' => [
                 ['id' => 19, 'mode' => 'dest']
             ]
@@ -635,7 +677,7 @@ class ResControllerTest extends TestCase
             'typist'           => 19,
             'priority'         => 'poiuytre1357nbvc',
             'senders'          => [['type' => 'contact', 'id' => 1], ['type' => 'user', 'id' => 21], ['type' => 'entity', 'id' => 1]],
-            'recipients'       => [['type' => 'contact', 'id' => 2]],
+            'recipients'       => [['type' => 'contact', 'id' => 1]],
             'tags'             => [$tag],
             'folders'          => [$folder],
         ];
@@ -2140,7 +2182,7 @@ class ResControllerTest extends TestCase
                 'priority'      => $value[1],
                 'diffusionList' => [['id' => 19, 'type' => 'user', 'mode' => 'dest'], ['id' => 20, 'type' => 'user', 'mode' => 'cc']],
                 'senders'       => [['type' => 'contact', 'id' => 1], ['type' => 'user', 'id' => 21], ['type' => 'entity', 'id' => 1]],
-                'recipients'    => [['type' => 'contact', 'id' => 2], ['type' => 'user', 'id' => 19], ['type' => 'entity', 'id' => 2]],
+                'recipients'    => [['type' => 'contact', 'id' => 5], ['type' => 'user', 'id' => 19], ['type' => 'entity', 'id' => 5]],
                 'tags'          => [1, 2],
                 'folders'       => [1, 2],
                 'customFields'  => [4 => 'référence externe']

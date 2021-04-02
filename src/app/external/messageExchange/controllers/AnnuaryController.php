@@ -172,7 +172,7 @@ class AnnuaryController
 
     public static function getAnnuaries()
     {
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/m2m_config.xml']);
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'config/m2m_config.xml']);
 
         if (!$loadedXml) {
             return ['success' => _M2M_ANNUARY_IS_NOT_SET];
@@ -247,7 +247,7 @@ class AnnuaryController
             if (!$authenticated) {
                 return ['errors' => _M2M_LDAP_AUTHENTICATION_FAILED . ' : ' . ldap_error($ldap)];
             }
-            
+
             $search  = @ldap_search($ldap, "{$annuary['baseDN']}", "(destinationIndicator={$siret})", ['ou']);
             $entries = ldap_get_entries($ldap, $search);
 
@@ -267,7 +267,7 @@ class AnnuaryController
                 } else {
                     $info['labeledURI'] = $communicationMeans;
                 }
-                
+
                 $info['objectclass'] = ['organizationalUnit', 'top', 'labeledURIObject'];
 
                 $added = @ldap_add($ldap, "ou={$organization},{$annuary['baseDN']}", $info);

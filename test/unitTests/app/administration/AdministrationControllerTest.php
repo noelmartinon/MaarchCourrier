@@ -24,15 +24,27 @@ class AdministrationControllerTest extends TestCase
 
         $administrationController = new \Administration\controllers\AdministrationController();
         $response         = $administrationController->getDetails($request, new \Slim\Http\Response());
-        $responseBody     = json_decode((string)$response->getBody());
+        $responseBody     = json_decode((string)$response->getBody(), true);
 
-        $this->assertNotNull($responseBody->count);
-        $this->assertIsInt($responseBody->count->users);
-        $this->assertIsInt($responseBody->count->groups);
-        $this->assertIsInt($responseBody->count->entities);
+        $this->assertNotNull($responseBody['count']);
+        $this->assertIsInt($responseBody['count']['users']);
+        $this->assertIsInt($responseBody['count']['groups']);
+        $this->assertIsInt($responseBody['count']['entities']);
+
+        $nbUsersNotRoot = $responseBody['count']['users'];
 
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];
+
+        $administrationController = new \Administration\controllers\AdministrationController();
+        $response         = $administrationController->getDetails($request, new \Slim\Http\Response());
+        $responseBody     = json_decode((string)$response->getBody(), true);
+
+        $this->assertNotNull($responseBody['count']);
+        $this->assertIsInt($responseBody['count']['users']);
+        $this->assertIsInt($responseBody['count']['groups']);
+        $this->assertIsInt($responseBody['count']['entities']);
+        $this->assertTrue($nbUsersNotRoot < $responseBody['count']['users']);
     }
 }

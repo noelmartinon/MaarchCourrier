@@ -669,8 +669,8 @@ class TemplateControllerTest extends TestCase
         $this->assertIsArray($responseBody['templates']);
         $this->assertNotEmpty($responseBody['templates']);
 
-        $this->assertSame(1042, $responseBody['templates'][0]['id']);
-        $this->assertSame('PR - Demande de Place en crèche', $responseBody['templates'][0]['label']);
+        $this->assertSame(1048, $responseBody['templates'][0]['id']);
+        $this->assertSame('PR - Générique (Visa externe)', $responseBody['templates'][0]['label']);
         $this->assertSame('docx', $responseBody['templates'][0]['extension']);
         $this->assertSame(false, $responseBody['templates'][0]['exists']);
         $this->assertSame('response_project', $responseBody['templates'][0]['attachmentType']);
@@ -713,8 +713,8 @@ class TemplateControllerTest extends TestCase
         $this->assertIsArray($responseBody['templates']);
         $this->assertNotEmpty($responseBody['templates']);
 
-        $this->assertSame(1046, $responseBody['templates'][0]['id']);
-        $this->assertSame('TEST TEMPLATE UPDATE', $responseBody['templates'][0]['label']);
+        $this->assertSame(20, $responseBody['templates'][0]['id']);
+        $this->assertSame("Courriel d'accompagnement", $responseBody['templates'][0]['label']);
 
 
         // Fail

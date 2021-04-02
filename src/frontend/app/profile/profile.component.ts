@@ -23,6 +23,14 @@ export class ProfileComponent implements OnInit {
 
     @ViewChild(MySignatureMailComponent) MySignatureMailComponent: MySignatureMailComponent;
 
+    @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
+    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+
+    @ViewChildren(MatExpansionPanel) viewPanels: QueryList<MatExpansionPanel>;
+
+    // Redirect Baskets
+    myBasketExpansionPanel: boolean = false;
+
     dialogRef: MatDialogRef<any>;
 
     highlightMe: boolean = false;
@@ -71,13 +79,6 @@ export class ProfileComponent implements OnInit {
     loading: boolean = false;
     selectedIndex: number = 0;
     loadingSign: boolean = false;
-
-    @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
-    @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
-
-    // Redirect Baskets
-    myBasketExpansionPanel: boolean = false;
-    @ViewChildren(MatExpansionPanel) viewPanels: QueryList<MatExpansionPanel>;
 
     constructor(
         public translate: TranslateService,

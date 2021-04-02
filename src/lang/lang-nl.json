@@ -1628,7 +1628,7 @@
     "saveAndClose": "Save and close__TO_TRANSLATE",
     "opinionCircuit": "Opinion circuit__TO_TRANSLATE",
     "visaCircuit": "Visa circuit__TO_TRANSLATE",
-    "shippingUnavailable": "<b>Warning </b> Shipping is not activated. Check the configuration file mailevaConfig.xml__TO_TRANSLATE",
+    "shippingUnavailable": "<b>Warning </b> Shipping is not activated. Check the configuration in administration__TO_TRANSLATE",
     "diffNoDestmsg": "No <b>assignee</b> defined, you <b>can't</b> modify the diffusion list.__TO_TRANSLATE",
     "noDest": "No <b>assignee</b> defined__TO_TRANSLATE",
     "noPrivileges": "Insufficient privileges__TO_TRANSLATE",

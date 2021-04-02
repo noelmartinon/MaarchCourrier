@@ -18,6 +18,69 @@ import { HeaderService } from '@service/header.service';
 })
 export class DiffusionsListComponent implements OnInit {
 
+    /**
+     * Ressource identifier to load listinstance (Incompatible with templateId)
+     */
+    @Input() resId: number = null;
+
+    /**
+      * Add previous dest in copy (Only compatible with resId)
+      */
+    @Input() keepDestForRedirection: boolean = false;
+
+    /**
+      * Entity identifier to load listModel of entity (Incompatible with resId)
+      */
+    @Input() entityId: any = null;
+
+    /**
+      * To specify the context to load listModel
+      */
+    @Input() selfDest: boolean = false;
+
+    /**
+      * To specify the context to load listModel
+      */
+    @Input() category: string = '';
+
+    /**
+      * For manage current loaded list
+      */
+    @Input() adminMode: boolean = false;
+
+    /**
+      * Ids of related allowed entities perimeters
+      */
+    @Input() allowedEntities: number[] = [];
+
+    /**
+      * Expand all roles
+      */
+    @Input() expanded: boolean = false;
+
+    /**
+      * Custom diffusion to display
+      */
+    @Input() customDiffusion: any[] = [];
+
+    /**
+      * To load privilege of current list management
+      * @param indexation
+      * @param details
+      * @param process
+      * @param redirect
+      */
+    @Input() target: string = '';
+
+    /**
+      * FormControl to use this component in form
+      */
+    @Input() diffFormControl: FormControl;
+
+    /**
+      * Catch external event after select an element in autocomplete
+      */
+    @Output() triggerEvent = new EventEmitter();
 
     roles: any = [];
     loading: boolean = true;
@@ -33,70 +96,6 @@ export class DiffusionsListComponent implements OnInit {
 
     hasNoDest: boolean = false;
     keepDiffusionRoleInOutgoingIndexation: boolean = false;
-
-    /**
-     * Ressource identifier to load listinstance (Incompatible with templateId)
-     */
-    @Input() resId: number = null;
-
-    /**
-     * Add previous dest in copy (Only compatible with resId)
-     */
-    @Input() keepDestForRedirection: boolean = false;
-
-    /**
-     * Entity identifier to load listModel of entity (Incompatible with resId)
-     */
-    @Input() entityId: any = null;
-
-    /**
-     * To specify the context to load listModel
-     */
-    @Input() selfDest: boolean = false;
-
-    /**
-     * To specify the context to load listModel
-     */
-    @Input() category: string = '';
-
-    /**
-     * For manage current loaded list
-     */
-    @Input() adminMode: boolean = false;
-
-    /**
-     * Ids of related allowed entities perimeters
-     */
-    @Input() allowedEntities: number[] = [];
-
-    /**
-     * Expand all roles
-     */
-    @Input() expanded: boolean = false;
-
-    /**
-     * Custom diffusion to display
-     */
-    @Input() customDiffusion: any[] = [];
-
-    /**
-     * To load privilege of current list management
-     * @param indexation
-     * @param details
-     * @param process
-     * @param redirect
-     */
-    @Input() target: string = '';
-
-    /**
-     * FormControl to use this component in form
-     */
-    @Input() diffFormControl: FormControl;
-
-    /**
-     * Catch external event after select an element in autocomplete
-     */
-    @Output() triggerEvent = new EventEmitter();
 
     constructor(
         public translate: TranslateService,

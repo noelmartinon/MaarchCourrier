@@ -22,11 +22,11 @@ import { AdministrationService } from '../../administration.service';
 })
 export class SsoAdministrationComponent implements OnInit {
 
-    loading: boolean = true;
-
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
+
+    loading: boolean = true;
 
     subMenus: any[] = [
         {

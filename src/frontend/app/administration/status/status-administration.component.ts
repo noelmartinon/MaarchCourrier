@@ -31,11 +31,6 @@ export class StatusAdministrationComponent implements OnInit {
 
     statusId = new FormControl('', [Validators.required, Validators.pattern(/^[\w.-]*$/)]);
 
-    getErrorMessage() {
-        return this.statusId.hasError('required') ? this.translate.instant('lang.enterValue') :
-            this.statusId.hasError('pattern') ? this.translate.instant('lang.patternId') : '';
-    }
-
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -90,6 +85,11 @@ export class StatusAdministrationComponent implements OnInit {
                     });
             }
         });
+    }
+
+    getErrorMessage() {
+        return this.statusId.hasError('required') ? this.translate.instant('lang.enterValue') :
+            this.statusId.hasError('pattern') ? this.translate.instant('lang.patternId') : '';
     }
 
     isAvailable() {

@@ -24,10 +24,10 @@
         </div>
         <div style="width: 100%;">
             <ng-container *ngIf="privilegeService.hasCurrentUserPrivilege('admin_baskets'); else elseNoAdminBaskets">
-                <plugin-select-search [id]="'basketToRedirect'" [label]="'lang.redirectToBasketAfterIndexing' | translate" [class]="''"
+                <app-plugin-select-search [id]="'basketToRedirect'" [label]="'lang.redirectToBasketAfterIndexing' | translate" [class]="''"
                     [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="basketToRedirect"
                     [datas]="baskets" [showLabel]="true" style="width:100%;">
-                </plugin-select-search>
+                </app-plugin-select-search>
             </ng-container>
             <ng-template #elseNoAdminBaskets>
                 <mat-form-field>
@@ -45,26 +45,26 @@
         <div style="width: 100%;">
             <app-maarch-message [content]="'lang.setDefaultMetadata' | translate">
             </app-maarch-message>
-            <plugin-select-search [id]="'typeId'" [label]="'lang.typeId' | translate" [class]="''"
+            <app-plugin-select-search [id]="'typeId'" [label]="'lang.typeId' | translate" [class]="''"
                 [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="metadata.typeId"
                 [datas]="doctypes" [showLabel]="true" style="width:100%;">
-            </plugin-select-search>
-            <plugin-select-search [id]="'statusId'" [label]="'lang.status' | translate" [class]="''"
+            </app-plugin-select-search>
+            <app-plugin-select-search [id]="'statusId'" [label]="'lang.status' | translate" [class]="''"
                 [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="metadata.statusId"
                 [datas]="statuses" [showLabel]="true" style="width:100%;">
-            </plugin-select-search>
-            <plugin-select-search [id]="'priorityId'" [label]="'lang.priority' | translate" [class]="''"
+            </app-plugin-select-search>
+            <app-plugin-select-search [id]="'priorityId'" [label]="'lang.priority' | translate" [class]="''"
                 [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="metadata.priorityId"
                 [datas]="priorities" [showLabel]="true" style="width:100%;">
-            </plugin-select-search>
-            <plugin-select-search [id]="'indexingModelId'" [label]="'lang.indexingModel' | translate" [class]="''"
+            </app-plugin-select-search>
+            <app-plugin-select-search [id]="'indexingModelId'" [label]="'lang.indexingModel' | translate" [class]="''"
                 [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="metadata.indexingModelId"
                 [datas]="indexingModels" [showLabel]="true" style="width:100%;">
-            </plugin-select-search>
-            <plugin-select-search [id]="'attachmentTypeId'" [label]="'lang.attachmentType' | translate" [class]="''"
+            </app-plugin-select-search>
+            <app-plugin-select-search [id]="'attachmentTypeId'" [label]="'lang.attachmentType' | translate" [class]="''"
                 [placeholderLabel]="'lang.chooseValue' | translate" [formControlSelect]="metadata.attachmentTypeId"
                 [datas]="attachmentsTypes" [showLabel]="true" style="width:100%;">
-            </plugin-select-search>
+            </app-plugin-select-search>
         </div>
     </div>
     <mat-slide-toggle style="height:40px;" color="primary" [formControl]="annuary.enabled">

@@ -122,16 +122,16 @@
             </mat-list>
         </div>
         <div class="models" *ngIf="canManageMail()">
-            <plugin-select-search *ngIf="availableEmailModels.length > 0" [label]="'lang.emailModel' | translate"
+            <app-plugin-select-search *ngIf="availableEmailModels.length > 0" [label]="'lang.emailModel' | translate"
                 [placeholderLabel]="'lang.emailModel' | translate" [datas]="availableEmailModels"
                 [formControlSelect]="templateEmailListForm" (afterSelected)="mergeEmailTemplate($event)">
-            </plugin-select-search>
+            </app-plugin-select-search>
 
-            <plugin-select-search #templateList *ngIf="availableSignEmailModels.length > 0"
+            <app-plugin-select-search #templateList *ngIf="availableSignEmailModels.length > 0"
                 [label]="'lang.emailSignatures' | translate" [placeholderLabel]="'lang.emailSignatures' | translate"
                 [datas]="availableSignEmailModels" [formControlSelect]="emailSignListForm"
                 (afterSelected)="mergeSignEmailTemplate($event)">
-            </plugin-select-search>
+            </app-plugin-select-search>
         </div>
         <mat-divider></mat-divider>
         <div class="row" style="margin: 0;padding-top: 10px;" *ngIf="!canManageMail()">

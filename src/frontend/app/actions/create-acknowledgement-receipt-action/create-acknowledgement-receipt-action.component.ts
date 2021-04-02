@@ -7,8 +7,7 @@ import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FormControl } from '@angular/forms';
-import { AppService } from '@service/app.service';
-import { FunctionsService } from '../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 
 declare let tinymce: any;
 
@@ -17,6 +16,8 @@ declare let tinymce: any;
     styleUrls: ['create-acknowledgement-receipt-action.component.scss'],
 })
 export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDestroy {
+
+    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
 
     loading: boolean = false;
     loadingInit: boolean = false;
@@ -43,7 +44,6 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
     manualAR: boolean = false;
     arMode: 'auto' | 'manual' | 'both' = 'auto';
 
-    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
     loadingExport: boolean;
 
     constructor(
@@ -103,12 +103,12 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
             };
         }
         this.http.put(this.data.processActionRoute, { resources: this.realResSelected, note: this.noteEditor.getNote(), data }).pipe(
-            tap((data: any) => {
-                if (data && data.data != null) {
-                    this.downloadAcknowledgementReceipt(data.data);
+            tap((res: any) => {
+                if (res && res.data != null) {
+                    this.downloadAcknowledgementReceipt(res.data);
                 }
-                if (data && data.errors != null) {
-                    this.notify.error(data.errors);
+                if (res && res.errors != null) {
+                    this.notify.error(res.errors);
                 }
                 this.dialogRef.close(this.realResSelected);
             }),
@@ -123,27 +123,10 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
     downloadAcknowledgementReceipt(data: any) {
         this.loadingExport = true;
         this.http.post('../rest/acknowledgementReceipts', { 'resources': data }, { responseType: 'blob' })
-            .subscribe((data) => {
+            .subscribe((dataFile) => {
                 const downloadLink = document.createElement('a');
-                downloadLink.href = window.URL.createObjectURL(data);
-                let today: any;
-                let dd: any;
-                let mm: any;
-                let yyyy: any;
-
-                today = new Date();
-                dd = today.getDate();
-                mm = today.getMonth() + 1;
-                yyyy = today.getFullYear();
-
-                if (dd < 10) {
-                    dd = '0' + dd;
-                }
-                if (mm < 10) {
-                    mm = '0' + mm;
-                }
-                today = dd + '-' + mm + '-' + yyyy;
-                downloadLink.setAttribute('download', 'acknowledgement_receipt_maarch_' + today + '.pdf');
+                downloadLink.href = window.URL.createObjectURL(dataFile);
+                downloadLink.setAttribute('download', this.functions.getFormatedFileName('acknowledgement_receipt_maarch', 'pdf'));
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
                 this.loadingExport = false;
@@ -154,7 +137,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
 
     toggleArManual(state: boolean) {
         if (state) {
-            if (this.currentMode != 'mode=manual') {
+            if (this.currentMode !== 'mode=manual') {
                 this.currentMode = 'mode=manual';
                 this.checkAcknowledgementReceipt();
             }

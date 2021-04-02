@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 
 @Component({
-    selector: 'menu-nav',
+    selector: 'app-menu-nav',
     templateUrl: 'menuNav.component.html',
 })
 export class MenuNavComponent implements OnInit {

@@ -69,28 +69,28 @@ class SedaController
                 'limit'     => 1
             ]);
             $document = $convertedDocument[0] ?? $document;
-    
+
             $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
             if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
                 return ['errors' => 'Docserver does not exist'];
             }
-    
+
             $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $document['path']) . $document['filename'];
             if (!file_exists($pathToDocument)) {
                 return ['errors' => 'Document not found on docserver'];
             }
-    
+
             $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
             $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
             if (empty($convertedDocument) && empty($document['fingerprint'])) {
                 ResModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$args['resource']['res_id']]]);
                 $document['fingerprint'] = $fingerprint;
             }
-    
+
             if ($document['fingerprint'] != $fingerprint) {
                 return ['errors' => 'Fingerprints do not match'];
             }
-    
+
             $fileContent = file_exists($pathToDocument);
             if ($fileContent === false) {
                 return ['errors' => 'Document not found on docserver'];
@@ -108,7 +108,7 @@ class SedaController
                 $return['archiveUnits'][0]['filePath'] = $pathToDocument;
             }
         }
-        
+
         $attachments = $args['attachments'];
         foreach ($attachments as $attachment) {
             $tmpAttachment = [
@@ -355,11 +355,11 @@ class SedaController
 
         $retentionRules = [];
 
-        $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $config = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
         if (empty($config['exportSeda']['sae'])) {
             return $response->withJson(['retentionRules' => $retentionRules]);
         }
-        
+
         if (strtolower($config['exportSeda']['sae']) == 'maarchrm') {
             $curlResponse = CurlModel::exec([
                 'url'     => rtrim($config['exportSeda']['urlSAEService'], '/') . '/recordsManagement/retentionRule/Index',
@@ -455,7 +455,7 @@ class SedaController
                 'eventId'   => 'resourceModification',
             ]);
         }
-        
+
         return $response->withStatus(204);
     }
 
@@ -488,7 +488,7 @@ class SedaController
 
         $freeze = $body['freeze'] ? 'true' : 'false';
         $info   = $body['freeze'] ? _FREEZE_RETENTION_RULE : _UNFREEZE_RETENTION_RULE;
-        
+
         ResModel::update([
             'set'   => [
                 'retention_frozen' => $freeze,
@@ -507,7 +507,7 @@ class SedaController
                 'eventId'   => 'resourceModification',
             ]);
         }
-        
+
         return $response->withStatus(204);
     }
 }

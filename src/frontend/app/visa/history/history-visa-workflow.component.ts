@@ -15,12 +15,13 @@ import { MatDialog } from '@angular/material/dialog';
 })
 export class HistoryVisaWorkflowComponent implements OnInit {
 
+    @Input() resId: number = null;
+
     visaWorkflowHistory: any[] = [];
 
     loading: boolean = false;
     data: any;
 
-    @Input() resId: number = null;
 
     constructor(
         public translate: TranslateService,

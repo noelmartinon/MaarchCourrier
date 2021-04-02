@@ -26,7 +26,7 @@ class AdapterEmailController
         $res['status'] = 0;
         $res['content'] = '';
 
-        $config = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $config = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
         $gec    = strtolower($config['exportSeda']['M2M']['gec']);
 
         if ($gec == 'maarch_courrier') {

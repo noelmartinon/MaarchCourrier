@@ -15,6 +15,8 @@ import { AdministrationService } from '../administration.service';
 export class ParametersAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     parameters: any = {};
 
@@ -25,9 +27,6 @@ export class ParametersAdministrationComponent implements OnInit {
 
     hiddenParameters = ['homepage_message', 'loginpage_message', 'traffic_record_summary_sheet', 'bindingDocumentFinalAction',
         'nonBindingDocumentFinalAction', 'minimumVisaRole', 'maximumSignRole', 'workflowEndBySignatory'];
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,
