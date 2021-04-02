@@ -5,12 +5,12 @@ import { MatButton } from '@angular/material/button';
 const Z_INDEX_ITEM: number = 23;
 
 @Component({
-    selector: 'smd-fab-trigger',
+    selector: 'app-smd-fab-trigger',
     template: `
         <ng-content select="[md-fab], [mat-fab]"></ng-content>
     `
 })
-export class SmdFabSpeedDialTrigger {
+export class SmdFabSpeedDialTriggerComponent {
 
     /**
      * Whether this trigger should spin (360dg) while opening the speed dial
@@ -32,12 +32,12 @@ export class SmdFabSpeedDialTrigger {
 }
 
 @Component({
-    selector: 'smd-fab-actions',
+    selector: 'app-smd-fab-actions',
     template: `
         <ng-content select="[md-mini-fab], [mat-mini-fab]"></ng-content>
     `
 })
-export class SmdFabSpeedDialActions implements AfterContentInit {
+export class SmdFabSpeedDialActionsComponent implements AfterContentInit {
 
     @ContentChildren(MatButton) _buttons: QueryList<MatButton>;
 
@@ -53,19 +53,12 @@ export class SmdFabSpeedDialActions implements AfterContentInit {
         this.initButtonStates();
     }
 
-    private initButtonStates() {
-        this._buttons.toArray().forEach((button, i) => {
-            this.renderer.addClass(button._getHostElement(), 'smd-fab-action-item');
-            this.changeElementStyle(button._getHostElement(), 'z-index', '' + (Z_INDEX_ITEM - i));
-        });
-    }
-
     show() {
         if (this._buttons) {
             this._buttons.toArray().forEach((button, i) => {
                 let transitionDelay = 0;
                 let transform;
-                if (this._parent.animationMode == 'scale') {
+                if (this._parent.animationMode === 'scale') {
                     // Incremental transition delay of 65ms for each action button
                     transitionDelay = 3 + (65 * i);
                     transform = 'scale(1)';
@@ -85,7 +78,7 @@ export class SmdFabSpeedDialActions implements AfterContentInit {
                 let opacity = '1';
                 let transitionDelay = 0;
                 let transform;
-                if (this._parent.animationMode == 'scale') {
+                if (this._parent.animationMode === 'scale') {
                     transitionDelay = 3 - (65 * i);
                     transform = 'scale(0)';
                     opacity = '0';
@@ -99,10 +92,17 @@ export class SmdFabSpeedDialActions implements AfterContentInit {
         }
     }
 
+    private initButtonStates() {
+        this._buttons.toArray().forEach((button, i) => {
+            this.renderer.addClass(button._getHostElement(), 'smd-fab-action-item');
+            this.changeElementStyle(button._getHostElement(), 'z-index', '' + (Z_INDEX_ITEM - i));
+        });
+    }
+
     private getTranslateFunction(value: string) {
         const dir = this._parent.direction;
-        const translateFn = (dir == 'up' || dir == 'down') ? 'translateY' : 'translateX';
-        const sign = (dir == 'down' || dir == 'right') ? '-' : '';
+        const translateFn = (dir === 'up' || dir === 'down') ? 'translateY' : 'translateX';
+        const sign = (dir === 'down' || dir === 'right') ? '-' : '';
         return translateFn + '(' + sign + value + ')';
     }
 
@@ -114,21 +114,17 @@ export class SmdFabSpeedDialActions implements AfterContentInit {
 }
 
 @Component({
-    selector: 'smd-fab-speed-dial',
+    selector: 'app-smd-fab-speed-dial',
     template: `
         <div class="smd-fab-speed-dial-container">
-            <ng-content select="smd-fab-trigger"></ng-content>
-            <ng-content select="smd-fab-actions"></ng-content>
+            <ng-content select="app-smd-fab-trigger"></ng-content>
+            <ng-content select="app-smd-fab-actions"></ng-content>
         </div>
     `,
     styleUrls: ['fab-speed-dial.scss'],
     encapsulation: ViewEncapsulation.None
 })
 export class SmdFabSpeedDialComponent implements AfterContentInit {
-    private isInitialized: boolean = false;
-    private _direction: string = 'up';
-    private _open: boolean = false;
-    private _animationMode: string = 'fling';
 
     /**
      * Whether this speed dial is fixed on screen (user cannot change it by clicking)
@@ -146,7 +142,7 @@ export class SmdFabSpeedDialComponent implements AfterContentInit {
     set open(open: boolean) {
         const previousOpen = this._open;
         this._open = open;
-        if (previousOpen != this._open) {
+        if (previousOpen !== this._open) {
             this.openChange.emit(this._open);
             if (this.isInitialized) {
                 this.setActionsVisibility();
@@ -164,7 +160,7 @@ export class SmdFabSpeedDialComponent implements AfterContentInit {
     set direction(direction: string) {
         const previousDir = this._direction;
         this._direction = direction;
-        if (previousDir != this.direction) {
+        if (previousDir !== this.direction) {
             this._setElementClass(previousDir, false);
             this._setElementClass(this.direction, true);
 
@@ -184,7 +180,7 @@ export class SmdFabSpeedDialComponent implements AfterContentInit {
     set animationMode(animationMode: string) {
         const previousAnimationMode = this._animationMode;
         this._animationMode = animationMode;
-        if (previousAnimationMode != this._animationMode) {
+        if (previousAnimationMode !== this._animationMode) {
             this._setElementClass(previousAnimationMode, false);
             this._setElementClass(this.animationMode, true);
 
@@ -197,9 +193,21 @@ export class SmdFabSpeedDialComponent implements AfterContentInit {
 
     @Output() openChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-    @ContentChild(SmdFabSpeedDialActions, { static: true }) _childActions: SmdFabSpeedDialActions;
+    @ContentChild(SmdFabSpeedDialActionsComponent, { static: true }) _childActions: SmdFabSpeedDialActionsComponent;
+
+    private isInitialized: boolean = false;
+    private _direction: string = 'up';
+    private _open: boolean = false;
+    private _animationMode: string = 'fling';
 
     constructor(private elementRef: ElementRef, private renderer: Renderer2) {
+    }
+
+    @HostListener('click')
+    _onClick() {
+        if (!this.fixed && this.open) {
+            this.open = false;
+        }
     }
 
     ngAfterContentInit(): void {
@@ -216,13 +224,6 @@ export class SmdFabSpeedDialComponent implements AfterContentInit {
         this.open = !this.open;
     }
 
-    @HostListener('click')
-    _onClick() {
-        if (!this.fixed && this.open) {
-            this.open = false;
-        }
-    }
-
     setActionsVisibility() {
         if (this.open) {
             this._childActions.show();
@@ -232,6 +233,10 @@ export class SmdFabSpeedDialComponent implements AfterContentInit {
     }
 
     private _setElementClass(elemClass: string , isAdd: boolean) {
-        isAdd ? this.renderer.addClass(this.elementRef.nativeElement, `smd-${elemClass}`) : this.renderer.removeClass(this.elementRef.nativeElement, `smd-${elemClass}`);
+        if (isAdd) {
+            this.renderer.addClass(this.elementRef.nativeElement, `smd-${elemClass}`);
+        } else {
+            this.renderer.removeClass(this.elementRef.nativeElement, `smd-${elemClass}`);
+        }
     }
 }

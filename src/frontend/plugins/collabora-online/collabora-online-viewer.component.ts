@@ -18,8 +18,6 @@ declare let $: any;
 })
 export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
-    loading: boolean = true;
-
     @Input() editMode: boolean = false;
     @Input() file: any = {};
     @Input() params: any = {};
@@ -27,6 +25,10 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
     @Output() triggerAfterUpdatedDoc = new EventEmitter<string>();
     @Output() triggerCloseEditor = new EventEmitter<string>();
     @Output() triggerModifiedDocument = new EventEmitter<string>();
+
+    @ViewChild('collaboraFrame', { static: false }) collaboraFrame: any;
+
+    loading: boolean = true;
 
     editorConfig: any;
     key: number = 0;
@@ -52,13 +54,20 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
         'csv',
     ];
 
-    private eventAction = new Subject<any>();
     dialogRef: MatDialogRef<any>;
 
     editorUrl: any = '';
     token: any = '';
 
-    @ViewChild('collaboraFrame', { static: false }) collaboraFrame: any;
+    private eventAction = new Subject<any>();
+
+    constructor(
+        public translate: TranslateService,
+        public http: HttpClient,
+        public dialog: MatDialog,
+        private notify: NotificationService,
+        private sanitizer: DomSanitizer,
+        public headerService: HeaderService) { }
 
     @HostListener('window:message', ['$event'])
     onMessage(e: any) {
@@ -84,14 +93,6 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
             this.collaboraFrame.nativeElement.contentWindow.postMessage(JSON.stringify(message), '*');
         }
     }
-
-    constructor(
-        public translate: TranslateService,
-        public http: HttpClient,
-        public dialog: MatDialog,
-        private notify: NotificationService,
-        private sanitizer: DomSanitizer,
-        public headerService: HeaderService) { }
 
     quit() {
         this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.close'), msg: this.translate.instant('lang.confirmCloseEditor') } });
