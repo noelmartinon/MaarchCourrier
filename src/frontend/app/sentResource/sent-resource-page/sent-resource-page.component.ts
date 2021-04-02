@@ -919,19 +919,7 @@ export class SentResourcePageComponent implements OnInit {
         if (keyVal !== 'summarySheet') {
             return;
         }
-        let today: any = new Date();
-        let dd = today.getDate();
-        let mm = today.getMonth() + 1;
-        const yyyy: any = today.getFullYear();
-
-        if (dd < 10) {
-            dd = '0' + dd;
-        }
-        if (mm < 10) {
-            mm = '0' + mm;
-        }
-        today = dd + '-' + mm + '-' + yyyy;
-        const title = this.translate.instant('lang.summarySheet') + ' ' + today;
+        const title = this.functions.getFormatedFileName(this.translate.instant('lang.summarySheet'));
 
         const dialogRef = this.dialog.open(SummarySheetComponent, {
             panelClass: 'maarch-full-height-modal',
@@ -982,19 +970,7 @@ export class SentResourcePageComponent implements OnInit {
 
     async saveSummarySheet(encodedDocument: any) {
         return new Promise(resolve => {
-            let today: any = new Date();
-            let dd = today.getDate();
-            let mm = today.getMonth() + 1;
-            const yyyy: any = today.getFullYear();
-
-            if (dd < 10) {
-                dd = '0' + dd;
-            }
-            if (mm < 10) {
-                mm = '0' + mm;
-            }
-            today = dd + '-' + mm + '-' + yyyy;
-            const title = this.translate.instant('lang.summarySheet') + ' ' + today;
+            const title = this.functions.getFormatedFileName(this.translate.instant('lang.summarySheet'));
             this.http.post('../rest/attachments', { resIdMaster: this.data.resId, encodedFile: encodedDocument, type: 'summary_sheet', format: 'PDF', title: title })
                 .pipe(
                     tap((dataAttachment: any) => {
