@@ -31,7 +31,7 @@
                     </ul>
                 </div>
     
-                <app-visa-workflow *ngIf="data.resIds.length == 1" [adminMode]="false" [resId]="data.resIds[0]" #appVisaWorkflow>
+                <app-visa-workflow *ngIf="data.resIds.length == 1" [adminMode]="false" [resId]="data.resIds[0]" [target]="'action'" #appVisaWorkflow>
                 </app-visa-workflow>
             </div>
             <div class="col-md-12">
