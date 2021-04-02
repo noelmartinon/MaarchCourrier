@@ -51,7 +51,7 @@ export class VisaWorkflowComponent implements OnInit {
     @Input('showComment') showComment: boolean = true;
 
     @Input('linkedToMaarchParapheur') linkedToMaarchParapheur: boolean = false;
-
+    @Input() delegatedUser: number;
     @Output() workflowUpdated = new EventEmitter<any>();
 
     @ViewChild('searchVisaSignUserInput', { static: false }) searchVisaSignUserInput: ElementRef;

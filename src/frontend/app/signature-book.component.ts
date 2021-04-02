@@ -30,6 +30,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     basketId: number;
     groupId: number;
     userId: number;
+    delegatedUser: number;
 
     signatureBook: any = {
         consigne: '',
@@ -138,7 +139,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                     }
                     this.signatureBook = data;
                     this.canUpdateDocument = data.canUpdateDocuments;
-
+                    this.delegatedUser = this.signatureBook.listinstance.item_id !== this.headerService.user.id ? this.signatureBook.listinstance.item_id : null;
                     this.headerTab = 'document';
                     this.leftSelectedThumbnail = 0;
                     this.rightSelectedThumbnail = 0;

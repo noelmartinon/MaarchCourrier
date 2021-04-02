@@ -103,6 +103,9 @@
                         <mat-form-field>
                             <input matInput class="comment" maxlength="255" [disabled]="!adminMode || diffusion.process_date != null || (target === 'signatureBook' && getCurrentVisaUserIndex() === i)" [placeholder]="'lang.visaNote' | translate" [(ngModel)]="diffusion.process_comment">
                         </mat-form-field>
+                        <p *ngIf="delegatedUser === diffusion.item_id && functions.empty(diffusion.process_date)" style="color: red;">
+                            {{'lang.signInsteadOf' | translate}} <b>{{diffusion.labelToDisplay}}</b>
+                        </p>
                     </div>
                     <div *ngIf="diffusion.requested_signature && diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) === -1" class="workflowLineProcessDate"
                         title='{{diffusion.process_date | fullDate}}'
