@@ -2464,5 +2464,5 @@
     "downloadManifestMsg": "This file allows you to make the link between your <b> outlook </b> application and your <b> maarch </b> application",
     "mustSecureMaarchUrl": "The url defined in «<b> Administration </b>» 🠖 «<b> Parameters </b>» 🠖 «<b> Personalization </b>» 🠖 «<b> URL of the application </ b > » is not secure (<b> https </b>)",
     "attachmentTypeOutlook": "Attachment type associated with the email",
-    "signInsteadOf": "You approve / sign instead of"
+    "signInsteadOf": "You act as"
 }

@@ -55,7 +55,7 @@
             [class.notDraggable]="!canManageUser(diffusion, i)" [class.notEditable]="!adminMode"
             [class.processed]="diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) === -1"
             [class.interrupt]="diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) > -1">
-            <mat-icon *ngIf="getCurrentVisaUserIndex() === i && (!adminMode || target === 'signatureBook')"
+            <mat-icon *ngIf="getCurrentVisaUserIndex() === i && (!adminMode || target === 'signatureBook' || target === 'action')"
                 class="fa fa-chevron-right fa-2x" mat-list-icon color="accent">
             </mat-icon>
             <mat-icon class="fa fa-2x" [class.avatar]="!functions.empty(diffusion.picture)"
@@ -95,13 +95,13 @@
                         {{diffusion.item_entity}}
                     </div>
                     <div class="workflowLineSubLabel"
-                        *ngIf="(showComment && ((adminMode && functions.empty(diffusion.process_date)) || (getCurrentVisaUserIndex() === i && !functions.empty(diffusion.process_comment)))) && diffusion.hasPrivilege && diffusion.isValid">
+                        *ngIf="(showComment && ((adminMode && functions.empty(diffusion.process_date)) || (getCurrentVisaUserIndex() === i && !functions.empty(diffusion.process_comment)))) && diffusion.hasPrivilege && diffusion.isValid || target === 'action'">
                         <mat-form-field>
                             <input matInput class="comment" maxlength="255"
                                 [disabled]="!adminMode || diffusion.process_date != null || (target === 'signatureBook' && getCurrentVisaUserIndex() === i)"
                                 [placeholder]="'lang.visaNote' | translate" [(ngModel)]="diffusion.process_comment">
                         </mat-form-field>
-                        <p *ngIf="getCurrentVisaUserIndex() === i && target === 'signatureBook' && diffusion.item_id !== headerService.user.id" style="color: red;">
+                        <p *ngIf="getCurrentVisaUserIndex() === i && (target === 'signatureBook' || target === 'action') && diffusion.item_id !== headerService.user.id" style="color: red;">
                             {{'lang.signInsteadOf' | translate}} <b>{{diffusion.labelToDisplay}}</b>
                         </p>
                     </div>
