@@ -59,7 +59,7 @@ export class SaveAndPrintRegisteredMailActionComponent implements OnInit {
                 } else {
                     const downloadLink = document.createElement('a');
                     downloadLink.href = `data:application/pdf;base64,${data.fileContent}`;
-                    downloadLink.setAttribute('download', 'recommande_' + data.registeredMailNumber.split(' ').join('_') + '.pdf');
+                    downloadLink.setAttribute('download', this.translate.instant('lang.registeredMail') + '_' + data.registeredMailNumber.split(' ').join('_') + '.pdf');
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
                     this.dialogRef.close(this.data.resIds);

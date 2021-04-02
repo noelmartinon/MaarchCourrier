@@ -2304,6 +2304,7 @@
     "savePrintRegisteredMail": "Enregistrer et imprimer le recommandé",
     "saveIndexRegisteredMail": "Enregistrer le recommandé et lancer l'indexation",
     "printRegisteredMail": "Imprimer le recommandé",
+    "depositList": "Descriptif de pli",
     "printDepositList": "Imprimer le descriptif de pli",
     "sendToRecordManagement": "Envoyer dans un système d'archivage électronique",
     "checkReplyRecordManagement": "Vérification de la réponse au transfert du système d'archivage électronique",

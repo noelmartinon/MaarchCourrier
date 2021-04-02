@@ -47,9 +47,9 @@ export class PrintRegisteredMailActionComponent implements OnInit {
                             downloadLink.href = `data:application/pdf;base64,${encodedFile}`;
                             if (this.data.resIds.length === 1) {
                                 filenameDetail = this.data.resource.chrono.split(' ').join('_');
-                                downloadLink.setAttribute('download', 'recommande_' + filenameDetail + '.pdf');
+                                downloadLink.setAttribute('download', this.translate.instant('lang.registeredMail') + '_' + filenameDetail + '.pdf');
                             } else {
-                                downloadLink.setAttribute('download', this.functions.getFormatedFileName('recommande', 'pdf'));
+                                downloadLink.setAttribute('download', this.functions.getFormatedFileName(this.translate.instant('lang.registeredMail'), 'pdf'));
                             }
                             document.body.appendChild(downloadLink);
                             downloadLink.click();
