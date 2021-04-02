@@ -1442,7 +1442,7 @@
     "shippingModification": "Modification du modèle d'envoi Maileva",
     "shippingNotEligible": "Courrier(s) non éligible(s)",
     "shippingReadyToSend": "document(s) prêt(s) à l'envoi",
-    "shippingUnavailable": "<b>Attention !</b> Maileva n'est pas activé. Veuillez vérifier votre configuration dans l'administration",
+    "shippingUnavailable": "<b>Attention !</b> Maileva n'est pas activé. Veuillez vérifier votre configuration dans <b>Administration</b> > <b>Modèles d'envois postaux Maileva</b>",
     "shippingDepositProofInformations": "Les preuves de dépôts seront disponibles dans l'espace client Maileva",
     "shippingInvalidEntityAddress": "L'adresse de votre entité primaire est incomplète pour un envoi \"recommandé\"",
     "shippingUpdated": "Modèle d'envoi Maileva modifié",
