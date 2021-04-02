@@ -144,7 +144,7 @@ abstract class NotificationModelAbstract
             $events[$key]['id'] = (string)$event['id'];
         }
 
-        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/notifications/xml/event_type.xml']);
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'config/event_type.xml']);
         if ($loadedXml) {
             foreach ($loadedXml->event_type as $eventType) {
                 $events[] = [
