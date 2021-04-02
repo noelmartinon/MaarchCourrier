@@ -101,7 +101,7 @@
                                 [disabled]="!adminMode || diffusion.process_date != null || (target === 'signatureBook' && getCurrentVisaUserIndex() === i)"
                                 [placeholder]="'lang.visaNote' | translate" [(ngModel)]="diffusion.process_comment">
                         </mat-form-field>
-                        <p *ngIf="delegatedUser === diffusion.item_id && functions.empty(diffusion.process_date)" style="color: red;">
+                        <p *ngIf="getCurrentVisaUserIndex() === i && target === 'signatureBook' && diffusion.item_id !== headerService.user.id" style="color: red;">
                             {{'lang.signInsteadOf' | translate}} <b>{{diffusion.labelToDisplay}}</b>
                         </p>
                     </div>
