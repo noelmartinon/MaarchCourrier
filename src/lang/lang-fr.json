@@ -2198,5 +2198,6 @@
     "minimumVisaUser": "Nombre minimum de Viseur",
     "maximumSignUser": "Nombre maximum de Signataire",
     "workflowEndBySignatory": "Le circuit doit se terminer par un Signataire",
-    "mandatoryFile": "Fichier obligatoire"
+    "mandatoryFile": "Fichier obligatoire",
+    "signInsteadOf": "Vous visez / signez à la place de"
 }

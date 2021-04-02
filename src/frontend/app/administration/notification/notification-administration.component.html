@@ -173,7 +173,7 @@
                                     <mat-select id="diffusion_properties" name="diffusion_properties"
                                         title="{{'lang.memberDiffTypeUsers' | translate}}" placeholder="{{'lang.memberDiffTypeUsers' | translate}}"
                                         required multiple [(ngModel)]="notification.diffusion_properties">
-                                        <mat-option *ngFor="let user of notification.data.users" [value]="user.id">
+                                        <mat-option *ngFor="let user of notification.data.users | sortBy: 'label'" [value]="user.id">
                                             {{user.label}}
                                         </mat-option>
                                     </mat-select>
