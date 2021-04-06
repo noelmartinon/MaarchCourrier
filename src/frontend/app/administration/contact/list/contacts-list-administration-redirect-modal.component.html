@@ -17,10 +17,10 @@
                             {{'lang.reaffectContactRedirect' | translate}}
                         </mat-radio-button>
                     </mat-radio-group>
-                    <plugin-autocomplete *ngIf="this.processMode == 'reaffect'"
-                        [labelPlaceholder]="'lang.contactReplacement' | translate" [labelList]="'lang.availableContacts' | translate"
+                    <app-plugin-autocomplete *ngIf="this.processMode == 'reaffect'"
+                        [labelPlaceholder]="'lang.contactReplacement' | translate"
                         [routeDatas]="['/rest/autocomplete/contacts']" [targetSearchKey]="'contact'"
-                        (triggerEvent)="setRedirectUser($event)" singleMode required></plugin-autocomplete>
+                        (triggerEvent)="setRedirectUser($event)" singleMode required></app-plugin-autocomplete>
 
                     <div *ngIf="this.processMode" class="alert-message alert-message-info" role="alert">
                         <span *ngIf="this.processMode == 'delete'"><em>{{'lang.deleteContactInformations' | translate}}</em></span>

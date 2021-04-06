@@ -48,7 +48,7 @@ import { ConfirmComponent } from '../plugins/modal/confirm.component';
 import { NotesListComponent } from './notes/notes-list.component';
 import { NoteEditorComponent } from './notes/note-editor.component';
 
-import { PluginAutocomplete } from '../plugins/autocomplete/autocomplete.component';
+import { PluginAutocompleteComponent } from '../plugins/autocomplete/autocomplete.component';
 import { PluginSelectSearchComponent } from '../plugins/select-search/select-search.component';
 import { PluginSelectAutocompleteSearchComponent } from '../plugins/select-autocomplete-search/plugin-select-autocomplete-search.component';
 
@@ -124,7 +124,7 @@ import { ColorGithubModule } from 'ngx-color/github';
         MessageBoxComponent,
         AlertComponent,
         ConfirmComponent,
-        PluginAutocomplete,
+        PluginAutocompleteComponent,
         FieldListComponent,
         PluginSelectSearchComponent,
         PluginSelectAutocompleteSearchComponent,
@@ -175,7 +175,7 @@ import { ColorGithubModule } from 'ngx-color/github';
         SmdFabSpeedDialTriggerComponent,
         SmdFabSpeedDialActionsComponent,
         DragDropModule,
-        PluginAutocomplete,
+        PluginAutocompleteComponent,
         FieldListComponent,
         PluginSelectSearchComponent,
         PluginSelectAutocompleteSearchComponent,

@@ -11,14 +11,14 @@
                 <span id="selectAll" *ngIf="!selectionBaskets.hasValue()">
                     {{'lang.selectAll' | translate}}
                 </span>
-                <plugin-autocomplete *ngIf="selectionBaskets.hasValue()"
+                <app-plugin-autocomplete *ngIf="selectionBaskets.hasValue()"
                     [labelPlaceholder]="'lang.redirectBaskets' | translate"
                     [routeDatas]="['/rest/autocomplete/users']"
                     [targetSearchKey]="'idToDisplay'"
                     [subInfoKey]="'descriptionToDisplay'"
                     [disableItems]="[headerService.user.id]"
                     (triggerEvent)="addBasketRedirection($event)"
-                    appearance="outline"></plugin-autocomplete>
+                    appearance="outline"></app-plugin-autocomplete>
             </p>
         </mat-list-item>
         <mat-divider></mat-divider>
@@ -92,7 +92,7 @@
                                 style="font-weight:normal">{{basket.group_desc}}</span>
                         </h4>
                         <p mat-line>
-                            <plugin-autocomplete
+                            <app-plugin-autocomplete
                                 *ngIf="basket.redirectMode"
                                 [labelPlaceholder]="('lang.redirectBasket' | translate) + ': '+basket.basket_name"
                                 [routeDatas]="['/rest/autocomplete/users']"
@@ -100,7 +100,7 @@
                                 [subInfoKey]="'descriptionToDisplay'"
                                 [disableItems]="[headerService.user.id]"
                                 (triggerEvent)="reassignBasketRedirection($event,basket,i)"
-                                appearance="outline"></plugin-autocomplete>
+                                appearance="outline"></app-plugin-autocomplete>
                             <mat-form-field *ngIf="!basket.redirectMode">
                                 <input type="text" color="warn" matInput disabled
                                     value="{{'lang.assignBy' | translate}} {{basket.userToDisplay}}">

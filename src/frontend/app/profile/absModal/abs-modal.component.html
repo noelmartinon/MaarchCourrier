@@ -33,10 +33,10 @@
         </mat-list>
 
         <div style="position: sticky;bottom: -10px;background: white;">
-            <plugin-autocomplete *ngIf="basketSelected()" [labelPlaceholder]="'lang.redirectBaskets' | translate"
+            <app-plugin-autocomplete *ngIf="basketSelected()" [labelPlaceholder]="'lang.redirectBaskets' | translate"
                 [routeDatas]="['/rest/autocomplete/users']" [targetSearchKey]="'idToDisplay'"
                 [subInfoKey]="'descriptionToDisplay'" [disableItems]="[headerService.user.id]"
-                (triggerEvent)="addBasketRedirection($event)" appearance="outline"></plugin-autocomplete>
+                (triggerEvent)="addBasketRedirection($event)" appearance="outline"></app-plugin-autocomplete>
         </div>
     </div>
     <span class="divider-modal"></span>

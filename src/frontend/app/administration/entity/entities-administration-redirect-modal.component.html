@@ -29,10 +29,10 @@
                 </mat-list-item>
             </mat-list>
         </div>
-        <plugin-autocomplete [labelPlaceholder]="'lang.chooseEntity' | translate" [labelList]="'lang.availableEntities' | translate"
+        <app-plugin-autocomplete [labelPlaceholder]="'lang.chooseEntity' | translate"
             [routeDatas]="['/rest/autocomplete/entities']" [targetSearchKey]="'idToDisplay'"
             [subInfoKey]="'descriptionToDisplay'" (triggerEvent)="setRedirectEntity($event)" singleMode required>
-        </plugin-autocomplete>
+        </app-plugin-autocomplete>
     </mat-dialog-content>
     <span class="divider-modal"></span>
     <mat-dialog-actions>

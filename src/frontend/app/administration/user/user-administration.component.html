@@ -318,14 +318,14 @@
                                                 <mat-icon class="fa fa-check"></mat-icon>
                                             </button>
                                             <mat-menu #menu="matMenu" style="width:200px !important;">
-                                                <plugin-autocomplete [labelPlaceholder]="'lang.redirectBaskets' | translate"
+                                                <app-plugin-autocomplete [labelPlaceholder]="'lang.redirectBaskets' | translate"
                                                     [routeDatas]="['/rest/autocomplete/users']"
                                                     [targetSearchKey]="'idToDisplay'"
                                                     [subInfoKey]="'descriptionToDisplay'"
                                                     [disableItems]="[user.id]"
                                                     [styles]="['no-margin']"
                                                     (triggerEvent)="addBasketRedirection($event)" appearance="outline">
-                                                </plugin-autocomplete>
+                                                </app-plugin-autocomplete>
                                             </mat-menu>
                                         </p>
                                     </mat-list-item>
@@ -397,13 +397,13 @@
                                                             style="font-weight:normal">{{basket.group_desc}}</span>
                                                     </h4>
                                                     <p mat-line>
-                                                        <plugin-autocomplete *ngIf="basket.userToDisplay == null"
+                                                        <app-plugin-autocomplete *ngIf="basket.userToDisplay == null"
                                                             [labelPlaceholder]="'lang.redirectBaskets' | translate"
                                                             [routeDatas]="['/rest/autocomplete/users']"
                                                             [targetSearchKey]="'idToDisplay'"
                                                             [subInfoKey]="'descriptionToDisplay'"
                                                             (triggerEvent)="reassignBasketRedirection($event,basket,i)"
-                                                            appearance="outline"></plugin-autocomplete>
+                                                            appearance="outline"></app-plugin-autocomplete>
                                                         <mat-form-field>
                                                             <input type="text" color="warn" matInput disabled
                                                                 value="{{'lang.assignBy' | translate}} {{basket.userToDisplay}}">

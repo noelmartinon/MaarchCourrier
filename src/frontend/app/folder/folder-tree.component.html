@@ -1,9 +1,9 @@
 <ng-container *ngIf="!loading; else elseTemplate">
     <div class="folderTools">
         <div class="filter">
-            <plugin-autocomplete #autocomplete [size]="'small'" [labelPlaceholder]="'lang.searchFolder' | translate"
+            <app-plugin-autocomplete #autocomplete [size]="'small'" [labelPlaceholder]="'lang.searchFolder' | translate"
                 [routeDatas]="['/rest/autocomplete/folders']" [targetSearchKey]="'idToDisplay'"
-                (triggerEvent)="goTo($event)" appearance="outline"></plugin-autocomplete>
+                (triggerEvent)="goTo($event)" appearance="outline"></app-plugin-autocomplete>
         </div>
         <div>
             <button mat-icon-button color="primary" title="{{'lang.addRootFolder' | translate}}" (click)="openCreateFolderModal()">
