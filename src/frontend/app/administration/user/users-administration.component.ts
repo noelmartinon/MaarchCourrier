@@ -11,9 +11,10 @@ import { FunctionsService } from '@service/functions.service';
 import { of } from 'rxjs';
 import { UsersImportComponent } from './import/users-import.component';
 import { UsersExportComponent } from './export/users-export.component';
-import { catchError, filter, tap } from 'rxjs/operators';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
 import { AdministrationService } from '../administration.service';
 import { UsersAdministrationRedirectModalComponent } from './redirect-modal/users-administration-redirect-modal.component';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
 
 @Component({
     templateUrl: 'users-administration.component.html',
@@ -22,6 +23,8 @@ import { UsersAdministrationRedirectModalComponent } from './redirect-modal/user
 export class UsersAdministrationComponent implements OnInit {
 
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
+    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
+    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     dialogRef: MatDialogRef<any>;
 
@@ -43,9 +46,6 @@ export class UsersAdministrationComponent implements OnInit {
 
     displayedColumns = ['id', 'user_id', 'lastname', 'firstname', 'status', 'mail', 'actions'];
     filterColumns = ['id', 'user_id', 'lastname', 'firstname', 'mail'];
-
-    @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
-    @ViewChild(MatSort, { static: false }) sort: MatSort;
 
     constructor(
         public translate: TranslateService,
@@ -103,19 +103,21 @@ export class UsersAdministrationComponent implements OnInit {
     }
 
     activateUser(user: any) {
-        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.authorize') + ' « ' + user.user_id + ' »');
-
-        if (r) {
-            user.status = 'OK';
-            this.http.put('../rest/users/' + user.id, user)
-                .subscribe(() => {
-                    this.notify.success(this.translate.instant('lang.userAuthorized'));
-                    this.updateQuota(user, 'activate');
-                }, (err) => {
-                    user.status = 'SPD';
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.authorize')} « ${user.user_id } »`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => user.status = 'OK'),
+            exhaustMap(() => this.http.put('../rest/users/' + user.id, user)),
+            tap(() => {
+                this.notify.success(this.translate.instant('lang.userAuthorized'));
+                this.updateQuota(user, 'activate');
+            }),
+            catchError((err: any) => {
+                user.status = 'SPD';
+                this.notify.error(err.error.errors);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     updateQuota(user: any, mode: string) {

@@ -18,6 +18,9 @@ import { MaarchFlatTreeComponent } from '../../../plugins/tree/maarch-flat-tree.
 import { environment } from '../../../environments/environment';
 import { InputCorrespondentGroupComponent } from '../contact/group/inputCorrespondent/input-correspondent-group.component';
 import { AuthService } from '@service/auth.service';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 declare let $: any;
 
@@ -286,20 +289,22 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     unlinkMaarchParapheurAccount() {
-        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.unlinkAccount'));
-
-        if (r) {
-            this.http.put('../rest/users/' + this.serialId + '/unlinkToMaarchParapheur', {})
-                .subscribe(() => {
-                    this.user.canCreateMaarchParapheurUser = true;
-                    this.maarchParapheurLink.login = '';
-                    this.maarchParapheurLink.picture = '';
-                    this.notify.success(this.translate.instant('lang.accountUnlinked'));
-                    this.maarchParapheurConnectionStatus = true;
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.unlinkAccount')}`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.put('../rest/users/' + this.serialId + '/unlinkToMaarchParapheur', {})),
+            tap(() => {
+                this.user.canCreateMaarchParapheurUser = true;
+                this.maarchParapheurLink.login = '';
+                this.maarchParapheurLink.picture = '';
+                this.notify.success(this.translate.instant('lang.accountUnlinked'));
+                this.maarchParapheurConnectionStatus = true;
+            }),
+            catchError((err: any) => {
+                this.notify.error(err.error.errors);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     toogleRedirect(basket: any) {
@@ -408,16 +413,18 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     resendActivationNotification() {
-        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.sendActivationNotification'));
-
-        if (r) {
-            this.http.put('../rest/users/' + this.serialId + '/accountActivationNotification', {})
-                .subscribe((data: any) => {
-                    this.notify.success(this.translate.instant('lang.activationNotificationSend'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.sendActivationNotification')}`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.put('../rest/users/' + this.serialId + '/accountActivationNotification', {})),
+            tap(() => {
+                this.notify.success(this.translate.instant('lang.activationNotificationSend'));
+            }),
+            catchError((err: any) => {
+                this.notify.error(err.error.errors);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     toggleGroup(group: any) {
@@ -596,17 +603,19 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     deleteSignature(signature: any) {
-        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + signature.signature_label + ' »');
-
-        if (r) {
-            this.http.delete('../rest/users/' + this.serialId + '/signatures/' + signature.id)
-                .subscribe((data: any) => {
-                    this.user.signatures = data.signatures;
-                    this.notify.success(this.translate.instant('lang.signDeleted'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.delete')} « ${signature.signature_label} »`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/users/' + this.serialId + '/signatures/' + signature.id)),
+            tap((data: any) => {
+                this.user.signatures = data.signatures;
+                this.notify.success(this.translate.instant('lang.signDeleted'));
+            }),
+            catchError((err: any) => {
+                this.notify.error(err.error.errors);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     test(event: any) {
@@ -631,7 +640,6 @@ export class UserAdministrationComponent implements OnInit {
 
     addBasketRedirection(newUser: any) {
         const basketsRedirect: any[] = [];
-
         this.selectionBaskets.selected.forEach((elem: any) => {
             basketsRedirect.push(
                 {
@@ -642,72 +650,79 @@ export class UserAdministrationComponent implements OnInit {
                 }
             );
         });
-
-        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.redirectBasket'));
-
-        if (r) {
-            this.http.post('../rest/users/' + this.serialId + '/redirectedBaskets', basketsRedirect)
-                .subscribe((data: any) => {
-                    this.user.baskets = data['baskets'];
-                    this.user.redirectedBaskets = data['redirectedBaskets'];
-                    this.selectionBaskets.clear();
-                    this.notify.success(this.translate.instant('lang.basketUpdated'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.redirectBasket')}`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.post('../rest/users/' + this.serialId + '/redirectedBaskets', basketsRedirect)),
+            tap((data: any) => {
+                this.user.baskets = data['baskets'];
+                this.user.redirectedBaskets = data['redirectedBaskets'];
+                this.selectionBaskets.clear();
+                this.notify.success(this.translate.instant('lang.basketUpdated'));
+            }),
+            catchError((err: any) => {
+                this.notify.error(err.error.errors);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     reassignBasketRedirection(newUser: any, basket: any, i: number) {
-        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.redirectBasket'));
-
-        if (r) {
-            this.http.post('../rest/users/' + this.serialId + '/redirectedBaskets', [
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.redirectBasket')}`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.post('../rest/users/' + this.serialId + '/redirectedBaskets', [
                 {
                     'actual_user_id': newUser.serialId,
                     'basket_id': basket.basket_id,
                     'group_id': basket.group_id,
                     'originalOwner': basket.owner_user_id,
                 }
-            ])
-                .subscribe((data: any) => {
-                    this.user.baskets = data['baskets'];
-                    this.user.assignedBaskets.splice(i, 1);
-                    this.notify.success(this.translate.instant('lang.basketUpdated'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+            ])),
+            tap((data: any) => {
+                this.user.baskets = data['baskets'];
+                this.user.assignedBaskets.splice(i, 1);
+                this.notify.success(this.translate.instant('lang.basketUpdated'));
+            }),
+            catchError((err: any) => {
+                this.notify.error(err.error.errors);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     delBasketRedirection(basket: any, i: number) {
-        const r = confirm(this.translate.instant('lang.confirmAction'));
-
-        if (r) {
-            this.http.delete('../rest/users/' + this.serialId + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
-                .subscribe((data: any) => {
-                    this.user.baskets = data['baskets'];
-                    this.user.redirectedBaskets.splice(i, 1);
-                    this.notify.success(this.translate.instant('lang.basketUpdated'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.deleteRedirection')}`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/users/' + this.serialId + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)),
+            tap((data: any) => {
+                this.user.baskets = data['baskets'];
+                this.user.redirectedBaskets.splice(i, 1);
+                this.notify.success(this.translate.instant('lang.basketUpdated'));
+            }),
+            catchError((err: any) => {
+                this.notify.error(err.error.errors);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     delBasketAssignRedirection(basket: any, i: number) {
-        const r = confirm(this.translate.instant('lang.confirmAction'));
-
-        if (r) {
-            this.http.delete('../rest/users/' + this.serialId + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
-                .subscribe((data: any) => {
-                    this.user.baskets = data['baskets'];
-                    this.user.assignedBaskets.splice(i, 1);
-                    this.notify.success(this.translate.instant('lang.basketUpdated'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.deleteAssignation')}`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/users/' + this.serialId + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)),
+            tap((data: any) => {
+                this.user.baskets = data['baskets'];
+                this.user.assignedBaskets.splice(i, 1);
+                this.notify.success(this.translate.instant('lang.basketUpdated'));
+            }),
+            catchError((err: any) => {
+                this.notify.error(err.error.errors);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     toggleBasket(state: boolean) {
@@ -909,18 +924,15 @@ export class UserAdministrationComponent implements OnInit {
 
     onSubmit() {
         if (this.creationMode) {
-            let r = true;
-
             this.http.get('../rest/users/' + this.user.userId + '/status')
                 .subscribe((data: any) => {
                     let deletedUser = false;
                     if (data.status && data.status === 'DEL') {
-                        r = confirm(this.translate.instant('lang.reactivateUserDeleted'));
-                        deletedUser = true;
-                    }
-                    if (r) {
-                        this.http.post('../rest/users', this.user)
-                            .subscribe((result: any) => {
+                        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.reactivateUserDeleted')}`, msg: this.translate.instant('lang.confirmAction') } });
+                        dialogRef.afterClosed().pipe(
+                            filter((response: string) => response === 'ok'),
+                            exhaustMap(() => this.http.post('../rest/users', this.user)),
+                            tap((result: any) => {
                                 if (deletedUser) {
                                     this.notify.success(this.translate.instant('lang.userUpdated'));
                                 } else {
@@ -928,9 +940,13 @@ export class UserAdministrationComponent implements OnInit {
                                 }
                                 this.appInputCorrespondentGroup.linkGrpAfterCreation(result.id, 'user');
                                 this.router.navigate(['/administration/users/' + result.id]);
-                            }, (err: any) => {
-                                this.notify.handleSoftErrors(err);
-                            });
+                            }),
+                            catchError((err: any) => {
+                                this.notify.error(err.error.errors);
+                                return of(false);
+                            })
+                        ).subscribe();
+                        deletedUser = true;
                     }
                 }, (err: any) => {
                     this.notify.error(err.error.errors);
@@ -963,18 +979,20 @@ export class UserAdministrationComponent implements OnInit {
     }
 
     sendToMaarchParapheur() {
-        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.createUserInMaarchParapheur'));
-
-        if (r) {
-            this.http.put('../rest/users/' + this.serialId + '/maarchParapheur', '')
-                .subscribe((data: any) => {
-                    this.notify.success(this.translate.instant('lang.userCreatedInMaarchParapheur'));
-                    this.user.external_id['maarchParapheur'] = data.externalId;
-                    this.user.canCreateMaarchParapheurUser = false;
-                }, (err: any) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.createUserInMaarchParapheur')}`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.put('../rest/users/' + this.serialId + '/maarchParapheur', '')),
+            tap((data: any) => {
+                this.notify.success(this.translate.instant('lang.userCreatedInMaarchParapheur'));
+                this.user.external_id['maarchParapheur'] = data.externalId;
+                this.user.canCreateMaarchParapheurUser = false;
+            }),
+            catchError((err: any) => {
+                this.notify.error(err.error.errors);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     setLowerUserId() {
