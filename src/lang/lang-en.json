@@ -2466,5 +2466,6 @@
     "attachmentTypeOutlook": "Attachment type associated with the email",
     "signInsteadOf": "You act as",
     "depositList": "Deposit list",
-    "attachmentTypeIdAlreadyUsed": "This id is already used"
+    "attachmentTypeIdAlreadyUsed": "This id is already used",
+    "toogleShippingConf": "Activate / deactivate the Maileva sending template"
 }

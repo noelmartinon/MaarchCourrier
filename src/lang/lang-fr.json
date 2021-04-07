@@ -2463,5 +2463,6 @@
     "deletePriorityConfirm": "Suppression de la priorité",
     "deleteShippingConfirm": "Suppression du modèle d'envoi Maileva",
     "deleteLastAttachmentSignatureBook": "Attention, ceci est votre dernière pièce jointe pour ce courrier, voulez-vous vraiment la supprimer ?",
-    "deleteAttachmentSignatureBook": "Voulez-vous vraiment supprimer la pièce jointe ?"
+    "deleteAttachmentSignatureBook": "Voulez-vous vraiment supprimer la pièce jointe ?",
+    "toogleShippingConf": "Activer / désactiver le modèle d'envoi Maileva"
 }
