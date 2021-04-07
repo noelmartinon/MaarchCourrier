@@ -2467,5 +2467,6 @@
     "signInsteadOf": "You act as",
     "depositList": "Deposit list",
     "attachmentTypeIdAlreadyUsed": "This id is already used",
-    "toogleShippingConf": "Activate / deactivate the Maileva sending template"
+    "toogleShippingConf": "Activate / deactivate the Maileva sending template",
+    "infoResId": "The keyword <b> @resId </b> is available to target the document being processed"
 }

@@ -2464,5 +2464,6 @@
     "deleteShippingConfirm": "Suppression du modèle d'envoi Maileva",
     "deleteLastAttachmentSignatureBook": "Attention, ceci est votre dernière pièce jointe pour ce courrier, voulez-vous vraiment la supprimer ?",
     "deleteAttachmentSignatureBook": "Voulez-vous vraiment supprimer la pièce jointe ?",
-    "toogleShippingConf": "Activer / désactiver le modèle d'envoi Maileva"
+    "toogleShippingConf": "Activer / désactiver le modèle d'envoi Maileva",
+    "infoResId": "Le mot-clé <b>@resId</b> est disponible pour cibler le document en cours de traitement"
 }
