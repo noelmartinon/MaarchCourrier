@@ -16,6 +16,7 @@ import { PrivilegeService } from '@service/privileges.service';
 import { HeaderService } from '@service/header.service';
 import { Observable, of } from 'rxjs';
 import { SummarySheetComponent } from '../../list/summarySheet/summary-sheet.component';
+import { DocumentViewerModalComponent } from '@appRoot/viewer/modal/document-viewer-modal.component';
 
 declare let $: any;
 declare let tinymce: any;
@@ -994,5 +995,19 @@ export class SentResourcePageComponent implements OnInit {
                 )
                 .subscribe();
         });
+    }
+
+    openEmailAttach(type: string, attach: any): void {
+        if (type === 'attachments') {
+            this.http.get(`../rest/attachments/${attach.id}/content?mode=base64`).pipe(
+                tap((data: any) => {
+                    this.dialog.open(DocumentViewerModalComponent, { autoFocus: false, panelClass: 'maarch-full-height-modal', data: { title: `${attach.label}`, base64: data.encodedDocument, filename: data.filename } });
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        }
     }
 }
