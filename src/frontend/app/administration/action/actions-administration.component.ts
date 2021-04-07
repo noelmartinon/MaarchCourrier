@@ -9,6 +9,11 @@ import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { MatDialog } from '@angular/material/dialog';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+
 
 @Component({
     templateUrl: 'actions-administration.component.html'
@@ -39,7 +44,8 @@ export class ActionsAdministrationComponent implements OnInit {
         public appService: AppService,
         public adminService: AdministrationService,
         public functions: FunctionsService,
-        private viewContainerRef: ViewContainerRef
+        private viewContainerRef: ViewContainerRef,
+        public dialog: MatDialog
     ) { }
 
     ngOnInit(): void {
@@ -61,17 +67,19 @@ export class ActionsAdministrationComponent implements OnInit {
     }
 
     deleteAction(action: any) {
-        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + action.label_action + ' »');
-
-        if (r) {
-            this.http.delete('../rest/actions/' + action.id)
-                .subscribe((data: any) => {
-                    this.actions = data.actions;
-                    this.adminService.setDataSource('admin_actions', this.actions, this.sort, this.paginator, this.filterColumns);
-                    this.notify.success(this.translate.instant('lang.actionDeleted'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.delete')} «${action.label_action}»`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/actions/' + action.id)),
+            tap((data: any) => {
+                this.actions = data.actions;
+                this.adminService.setDataSource('admin_actions', this.actions, this.sort, this.paginator, this.filterColumns);
+                this.notify.success(this.translate.instant('lang.actionDeleted'));
+            }),
+            catchError((err: any) => {
+                this.notify.error(err.error.errors);
+                return of(false);
+            })
+        ).subscribe();
     }
 }
