@@ -19,6 +19,7 @@ import { SortPipe } from '../../plugins/sorting.pipe';
 import { FunctionsService } from '@service/functions.service';
 import { of, Subscription } from 'rxjs';
 import { SelectIndexingModelComponent } from './select-indexing-model/select-indexing-model.component';
+import { IndexationAttachmentsListComponent } from '@appRoot/attachments/indexation/indexation-attachments-list.component';
 
 @Component({
     templateUrl: 'indexation.component.html',
@@ -36,6 +37,7 @@ export class IndexationComponent implements OnInit {
 
     @ViewChild('appSelectIndexingModel', { static: false }) appSelectIndexingModel: SelectIndexingModelComponent;
     @ViewChild('indexingForm', { static: false }) indexingForm: IndexingFormComponent;
+    @ViewChild('appIndexationAttachmentsList', { static: false }) appIndexationAttachmentsList: IndexationAttachmentsListComponent;
     @ViewChild('appDocumentViewer', { static: false }) appDocumentViewer: DocumentViewerComponent;
 
     indexingModels: any[] = [];
@@ -82,6 +84,9 @@ export class IndexationComponent implements OnInit {
 
         // Event after process action
         this.subscription = this.actionService.catchAction().subscribe(resIds => {
+
+            this.appIndexationAttachmentsList.saveAttachments(resIds[0]);
+
             if (['closeAndIndexAction', 'saveAndIndexRegisteredMailAction'].indexOf(this.selectedAction.component) > -1) {
                 this.appDocumentViewer.templateListForm.reset();
                 this.appDocumentViewer.file = {
@@ -150,7 +155,7 @@ export class IndexationComponent implements OnInit {
     }
 
     onSubmit() {
-        if (this.indexingForm.isValidForm()) {
+        if (this.indexingForm.isValidForm() && this.appIndexationAttachmentsList.isValid()) {
             this.actionService.loading = true;
             const formatdatas = this.indexingForm.formatDatas(this.indexingForm.getDatas());
 

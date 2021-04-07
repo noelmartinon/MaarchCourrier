@@ -7,6 +7,37 @@
     }
 }
 
+.bg-head-content {
+    background-color: var(--maarch-color-primary);
+    padding-left: 50px;
+    padding-right: 50px;
+    padding-bottom: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.attach-button {
+    border-bottom: solid 1px #ffffff4d;
+    border-radius: 0px;
+    color: white;
+}
+
+.count-badge {
+    background-color: var(--maarch-color-secondary);
+    font-weight: bold;
+    font-size: 12px;
+    padding: 3px;
+    border-radius: 3px;
+}
+
+.count-badge-empty {
+    opacity: 0.5;
+    background-color: grey;
+    font-size: 12px;
+    padding: 3px;
+    border-radius: 3px;
+}
+
 .document-container {
     flex: 1;
 
