@@ -2465,5 +2465,6 @@
     "mustSecureMaarchUrl": "The url defined in «<b> Administration </b>» 🠖 «<b> Parameters </b>» 🠖 «<b> Personalization </b>» 🠖 «<b> URL of the application </ b > » is not secure (<b> https </b>)",
     "attachmentTypeOutlook": "Attachment type associated with the email",
     "signInsteadOf": "You act as",
-    "depositList": "Deposit list"
+    "depositList": "Deposit list",
+    "attachmentTypeIdAlreadyUsed": "This id is already used"
 }

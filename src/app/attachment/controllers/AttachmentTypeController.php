@@ -87,7 +87,7 @@ class AttachmentTypeController
 
         $type = AttachmentTypeModel::getByTypeId(['typeId' => $body['typeId'], 'select' => [1]]);
         if (!empty($type)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body typeId is already used by another type']);
+            return $response->withStatus(400)->withJson(['errors' => 'Body typeId is already used by another type', 'lang' => 'attachmentTypeIdAlreadyUsed']);
         }
 
         $id = AttachmentTypeModel::create([
