@@ -3,9 +3,11 @@ import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
 import { HttpClient } from '@angular/common/http';
 import { FormControl } from '@angular/forms';
-import { startWith, map } from 'rxjs/operators';
+import { startWith, map, exhaustMap, filter, tap, catchError } from 'rxjs/operators';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { MatDialog } from '@angular/material/dialog';
 
 declare let $: any;
 
@@ -15,6 +17,9 @@ declare let $: any;
     styleUrls: ['x-paraph.component.scss'],
 })
 export class XParaphComponent implements OnInit {
+
+    @Input() additionalsInfos: any;
+    @Input() externalSignatoryBookDatas: any;
 
     loading: boolean = false;
 
@@ -28,10 +33,12 @@ export class XParaphComponent implements OnInit {
     usersCtrl = new FormControl();
     filteredUsers: Observable<any[]>;
 
-    @Input() additionalsInfos: any;
-    @Input() externalSignatoryBookDatas: any;
-
-    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService) { }
+    constructor(
+        public translate: TranslateService,
+        public http: HttpClient,
+        private notify: NotificationService,
+        public dialog: MatDialog
+    ) { }
 
     ngOnInit(): void { }
 
@@ -91,14 +98,6 @@ export class XParaphComponent implements OnInit {
         this.currentWorkflow.splice(index, 1);
     }
 
-    private _filterUsers(value: string): any[] {
-
-        if (typeof value === 'string') {
-            const filterValue = value.toLowerCase();
-            return this.usersWorkflowList.filter(user => user.displayName.toLowerCase().indexOf(filterValue) !== -1);
-        }
-    }
-
     isValidParaph() {
         if (this.additionalsInfos.attachments.length > 0 && this.currentWorkflow.length > 0 && this.currentAccount.login !== '' && this.currentAccount.siret !== '') {
             return true;
@@ -150,18 +149,19 @@ export class XParaphComponent implements OnInit {
     }
 
     removeAccount(index: number) {
-        const r = confirm(this.translate.instant('lang.confirmDeleteAccount'));
-
-        if (r) {
-            this.http.delete('../rest/xParaphAccount?siret=' + this.additionalsInfos.accounts[index].siret + '&login=' + this.additionalsInfos.accounts[index].login)
-                .subscribe((data: any) => {
-                    this.additionalsInfos.accounts.splice(index, 1);
-                    this.notify.success(this.translate.instant('lang.accountDeleted'));
-                }, (err: any) => {
-                    this.notify.handleErrors(err);
-                    this.loading = false;
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.confirmDeleteAccount')}`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/xParaphAccount?siret=' + this.additionalsInfos.accounts[index].siret + '&login=' + this.additionalsInfos.accounts[index].login)),
+            tap(() => {
+                this.additionalsInfos.accounts.splice(index, 1);
+                this.notify.success(this.translate.instant('lang.accountDeleted'));
+            }),
+            catchError((err: any) => {
+                this.notify.error(err.error.errors);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     initNewAccount() {
@@ -173,6 +173,13 @@ export class XParaphComponent implements OnInit {
         setTimeout(() => {
             $('#newAccountLogin').focus();
         }, 0);
+    }
 
+    private _filterUsers(value: string): any[] {
+
+        if (typeof value === 'string') {
+            const filterValue = value.toLowerCase();
+            return this.usersWorkflowList.filter(user => user.displayName.toLowerCase().indexOf(filterValue) !== -1);
+        }
     }
 }

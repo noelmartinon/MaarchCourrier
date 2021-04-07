@@ -12,6 +12,9 @@ import { FunctionsService } from '@service/functions.service';
 import { AuthService } from '@service/auth.service';
 import { AbsModalComponent } from './absModal/abs-modal.component';
 import { MySignatureMailComponent } from './parameters/signatureMail/signature-mail.component';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 declare let $: any;
 
@@ -91,7 +94,7 @@ export class ProfileComponent implements OnInit {
         public headerService: HeaderService,
         public appService: AppService,
         private viewContainerRef: ViewContainerRef,
-        private functions: FunctionsService
+        private functions: FunctionsService,
     ) {}
 
     initComponents(event: any) {
@@ -145,33 +148,37 @@ export class ProfileComponent implements OnInit {
     }
 
     delBasketRedirection(basket: any, i: number) {
-        const r = confirm(this.translate.instant('lang.confirmAction'));
-
-        if (r) {
-            this.http.delete('../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
-                .subscribe((data: any) => {
-                    this.user.baskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
-                    this.user.redirectedBaskets.splice(i, 1);
-                    this.notify.success(this.translate.instant('lang.basketUpdated'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.deleteRedirection')}`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)),
+            tap((data: any) => {
+                this.user.baskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
+                this.user.redirectedBaskets.splice(i, 1);
+                this.notify.success(this.translate.instant('lang.basketUpdated'));
+            }),
+            catchError((err: any) => {
+                this.notify.error(err.error.errors);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     delBasketAssignRedirection(basket: any, i: number) {
-        const r = confirm(this.translate.instant('lang.confirmAction'));
-
-        if (r) {
-            this.http.delete('../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
-                .subscribe((data: any) => {
-                    this.user.baskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
-                    this.user.assignedBaskets.splice(i, 1);
-                    this.notify.success(this.translate.instant('lang.basketUpdated'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.deleteAssignation')}`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)),
+            tap((data: any) => {
+                this.user.baskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
+                this.user.assignedBaskets.splice(i, 1);
+                this.notify.success(this.translate.instant('lang.basketUpdated'));
+            }),
+            catchError((err: any) => {
+                this.notify.error(err.error.errors);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     openAbsModal() {
