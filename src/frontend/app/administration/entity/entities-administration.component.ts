@@ -335,46 +335,51 @@ export class EntitiesAdministrationComponent implements OnInit {
         if (this.currentEntity.parent_entity_id === '#') {
             this.currentEntity.parent_entity_id = '';
         }
-
-        let r = true;
         if (this.currentEntity.parent_entity_id === '' || this.functions.empty(this.currentEntity.parent_entity_id)) {
-            r = confirm(this.translate.instant('lang.entityWithoutParentMessage'));
-        }
-
-        if (r) {
-            if (this.creationMode) {
-                if (this.functions.empty(this.currentEntity.producerService)) {
-                    this.currentEntity.producerService = this.currentEntity.entity_id;
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.createNewEntity')}`, msg: this.translate.instant('lang.entityWithoutParentMessage') } });
+            dialogRef.afterClosed().subscribe((response: any) => {
+                if (response) {
+                    this.saveEntityBody();
                 }
-                this.http.post('../rest/entities', this.currentEntity)
-                    .subscribe((data: any) => {
-                        this.appInputCorrespondentGroup.linkGrpAfterCreation(data.id, 'entity');
-                        this.currentEntity.listTemplate = [];
-                        this.entities = data['entities'];
-                        this.creationMode = false;
-                        this.newEntity = true;
-                        $('#jstree').jstree(true).settings.core.data = this.entities;
-                        // $('#jstree').jstree(true).settings.select_node = this.currentEntity;
-                        $('#jstree').jstree(true).refresh();
-                        $('#jstree').on('refresh.jstree', (e: any) => {
-                            $('#jstree').jstree('deselect_all');
-                            $('#jstree').jstree('select_node', this.currentEntity.entity_id);
-                        });
-                        this.notify.success(this.translate.instant('lang.entityAdded'));
-                    }, (err) => {
-                        this.notify.error(err.error.errors);
-                    });
-            } else {
-                this.http.put('../rest/entities/' + this.currentEntity.entity_id, this.currentEntity)
-                    .subscribe((data: any) => {
-                        this.entities = data['entities'];
-                        $('#jstree').jstree(true).settings.core.data = this.entities;
-                        $('#jstree').jstree('refresh');
-                        this.notify.success(this.translate.instant('lang.entityUpdated'));
-                    }, (err) => {
-                        this.notify.error(err.error.errors);
-                    });
+            });
+        } else {
+            this.saveEntityBody();
+        }
+    }
+
+    saveEntityBody() {
+        if (this.creationMode) {
+            if (this.functions.empty(this.currentEntity.producerService)) {
+                this.currentEntity.producerService = this.currentEntity.entity_id;
             }
+            this.http.post('../rest/entities', this.currentEntity)
+                .subscribe((data: any) => {
+                    this.appInputCorrespondentGroup.linkGrpAfterCreation(data.id, 'entity');
+                    this.currentEntity.listTemplate = [];
+                    this.entities = data['entities'];
+                    this.creationMode = false;
+                    this.newEntity = true;
+                    $('#jstree').jstree(true).settings.core.data = this.entities;
+                    // $('#jstree').jstree(true).settings.select_node = this.currentEntity;
+                    $('#jstree').jstree(true).refresh();
+                    $('#jstree').on('refresh.jstree', (e: any) => {
+                        $('#jstree').jstree('deselect_all');
+                        $('#jstree').jstree('select_node', this.currentEntity.entity_id);
+                    });
+                    this.notify.success(this.translate.instant('lang.entityAdded'));
+                }, (err) => {
+                    this.notify.error(err.error.errors);
+                });
+        } else {
+            this.http.put('../rest/entities/' + this.currentEntity.entity_id, this.currentEntity)
+                .subscribe((data: any) => {
+                    this.entities = data['entities'];
+                    $('#jstree').jstree(true).settings.core.data = this.entities;
+                    $('#jstree').jstree('refresh');
+                    this.notify.success(this.translate.instant('lang.entityUpdated'));
+                }, (err) => {
+                    this.notify.error(err.error.errors);
+                });
         }
     }
 
@@ -459,48 +464,47 @@ export class EntitiesAdministrationComponent implements OnInit {
                 this.dialogRef = null;
             });
         } else {
-            const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + this.currentEntity.entity_label + ' »');
-
-            if (r) {
-                if (this.currentEntity.listTemplate.id) {
-                    this.http.delete('../rest/listTemplates/' + this.currentEntity.listTemplate.id)
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.delete')} « ${this.currentEntity.entity_label} »`, msg: this.translate.instant('lang.confirmAction') } });
+            dialogRef.afterClosed().subscribe((response: any) => {
+                if (response) {
+                    if (this.currentEntity.listTemplate.id) {
+                        this.http.delete('../rest/listTemplates/' + this.currentEntity.listTemplate.id)
+                            .subscribe((data: any) => {
+                                this.currentEntity.listTemplate.id = data.id;
+                                this.http.get('../rest/listTemplates/types/entity_id/roles')
+                                    .subscribe((dataTemplates: any) => {
+                                        this.listTemplateRoles = dataTemplates['roles'];
+                                    }, (err) => {
+                                        this.notify.error(err.error.errors);
+                                    });
+                            }, (err) => {
+                                this.notify.error(err.error.errors);
+                            });
+                    }
+                    if (this.idVisaCircuit) {
+                        this.http.delete('../rest/listTemplates/' + this.idVisaCircuit)
+                            .subscribe(() => {
+                                this.idVisaCircuit = null;
+                            }, (err) => {
+                                this.notify.error(err.error.errors);
+                            });
+                    }
+                    this.http.delete('../rest/entities/' + this.currentEntity.entity_id)
                         .subscribe((data: any) => {
-                            this.currentEntity.listTemplate.id = data.id;
-                            this.http.get('../rest/listTemplates/types/entity_id/roles')
-                                .subscribe((dataTemplates: any) => {
-                                    this.listTemplateRoles = dataTemplates['roles'];
-                                }, (err) => {
-                                    this.notify.error(err.error.errors);
-                                });
-                        }, (err) => {
+                            this.entities = data['entities'];
+                            $('#jstree').jstree(true).settings.core.data = this.entities;
+                            $('#jstree').jstree('refresh');
+                            this.sidenavRight.close();
+                            if (typeof data['deleted'] !== 'undefined' && !data['deleted']) {
+                                this.notify.success(this.translate.instant('lang.entityDeletedButAnnuaryUnreachable'));
+                            } else {
+                                this.notify.success(this.translate.instant('lang.entityDeleted'));
+                            }
+                        }, (err: any) => {
                             this.notify.error(err.error.errors);
                         });
                 }
-
-                if (this.idVisaCircuit) {
-                    this.http.delete('../rest/listTemplates/' + this.idVisaCircuit)
-                        .subscribe(() => {
-                            this.idVisaCircuit = null;
-                        }, (err) => {
-                            this.notify.error(err.error.errors);
-                        });
-                }
-
-                this.http.delete('../rest/entities/' + this.currentEntity.entity_id)
-                    .subscribe((data: any) => {
-                        this.entities = data['entities'];
-                        $('#jstree').jstree(true).settings.core.data = this.entities;
-                        $('#jstree').jstree('refresh');
-                        this.sidenavRight.close();
-                        if (typeof data['deleted'] !== 'undefined' && !data['deleted']) {
-                            this.notify.success(this.translate.instant('lang.entityDeletedButAnnuaryUnreachable'));
-                        } else {
-                            this.notify.success(this.translate.instant('lang.entityDeleted'));
-                        }
-                    }, (err: any) => {
-                        this.notify.error(err.error.errors);
-                    });
-            }
+            });
         }
 
     }

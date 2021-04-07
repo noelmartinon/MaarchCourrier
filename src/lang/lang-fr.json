@@ -2461,5 +2461,7 @@
     "deleteNotificationConfirm": "Supprimer la notification",
     "deleteParameterConfirm": "Suppression du paramètre",
     "deletePriorityConfirm": "Suppression de la priorité",
-    "deleteShippingConfirm": "Suppression du modèle d'envoi Maileva"
+    "deleteShippingConfirm": "Suppression du modèle d'envoi Maileva",
+    "deleteLastAttachmentSignatureBook": "Attention, ceci est votre dernière pièce jointe pour ce courrier, voulez-vous vraiment la supprimer ?",
+    "deleteAttachmentSignatureBook": "Voulez-vous vraiment supprimer la pièce jointe ?"
 }

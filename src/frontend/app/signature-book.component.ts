@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
-import { tap, catchError, filter } from 'rxjs/operators';
+import { tap, catchError, filter, exhaustMap } from 'rxjs/operators';
 import { PrivilegeService } from '@service/privileges.service';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AttachmentCreateComponent } from './attachments/attachment-create/attachment-create.component';
@@ -397,23 +397,19 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
     delAttachment(attachment: any) {
         if (this.canUpdateDocument) {
-            let r = false;
-            if (this.signatureBook.attachments.length <= 1) {
-                r = confirm('Attention, ceci est votre dernière pièce jointe pour ce courrier, voulez-vous vraiment la supprimer ?');
-            } else {
-                r = confirm('Voulez-vous vraiment supprimer la pièce jointe ?');
-            }
-            if (r) {
-                this.http.delete('../rest/attachments/' + attachment.res_id).pipe(
-                    tap(() => {
-                        this.refreshAttachments('del');
-                    }),
-                    catchError((err: any) => {
-                        this.notify.handleErrors(err);
-                        return of(false);
-                    })
-                ).subscribe();
-            }
+            const title = this.signatureBook.attachments.length <= 1 ? this.translate.instant('lang.deleteLastAttachmentSignatureBook') : this.translate.instant('lang.deleteAttachmentSignatureBook');
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.DEL')}`, msg: title } });
+            dialogRef.afterClosed().pipe(
+                filter((data: string) => data === 'ok'),
+                exhaustMap(() => this.http.delete('../rest/attachments/' + attachment.res_id)),
+                tap(() => {
+                    this.refreshAttachments('del');
+                }),
+                catchError((err: any) => {
+                    this.notify.error(err.error.errors);
+                    return of(false);
+                })
+            ).subscribe();
         }
     }
 
