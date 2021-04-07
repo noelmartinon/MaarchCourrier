@@ -43,6 +43,9 @@ class CustomFieldController
             $customFields[$key]['SQLMode'] = !empty($customFields[$key]['values']['table']);
             if (empty($queryParams['admin']) || !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_custom_fields', 'userId' => $GLOBALS['id']])) {
                 if (!empty($customFields[$key]['values']['table'])) {
+                    if (!empty($queryParams['resId']) && is_numeric($queryParams['resId'])) {
+                        $customFields[$key]['values']['resId'] = $queryParams['resId'];
+                    }
                     $customFields[$key]['values'] = CustomFieldModel::getValuesSQL($customFields[$key]['values']);
                     if (in_array($customField['type'], ['select', 'radio', 'checkbox'])) {
                         foreach ($customFields[$key]['values'] as $iKey => $sValue) {
@@ -369,10 +372,9 @@ class CustomFieldController
         if ($body['type'] == 'integer' && !in_array($columns[$body['values']['key']], self::NUMERIC_TYPES)) {
             return ['errors' => 'Body values[label] column is not an integer', 'lang' => 'invalidColumnType'];
         }
-        if (stripos($body['values']['clause'], 'select') !== false) {
-            return ['errors' => 'Clause is not valid', 'lang' => 'invalidClause'];
-        }
+
         try {
+            $body['values']['resId'] = 100;
             CustomFieldModel::getValuesSQL($body['values']);
         } catch (\Exception $e) {
             return ['errors' => 'Clause is not valid', 'lang' => 'invalidClause'];

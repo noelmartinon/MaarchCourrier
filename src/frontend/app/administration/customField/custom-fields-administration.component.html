@@ -102,8 +102,7 @@
                                             </mat-expansion-panel>
                                         </div>
                                     </div>
-                                    <div *ngIf="custom.SQLMode" class="col-md-12"
-                                        style="display: flex;align-items: center;">
+                                    <div *ngIf="custom.SQLMode" class="col-md-12" style="display: flex;align-items: center;">
                                         <div>
                                             <button mat-mini-fab color="primary" (click)="switchSQLMode(custom)">
                                                 <mat-icon class="fas fa-list-ol" style="height: auto;"></mat-icon>
@@ -124,7 +123,7 @@
                                                             <mat-select [(ngModel)]="custom.values.table" required>
                                                                 <mat-option *ngFor="let table of availableTables | keyvalue"
                                                                     [value]="table.key">
-                                                                    {{table.key}} 
+                                                                    {{table.key}}
                                                                     <ng-container *ngIf="!functionsService.empty('lang.' + table.key | translate)">
                                                                         ({{'lang.' + table.key | translate}})
                                                                     </ng-container>
@@ -175,6 +174,7 @@
                                                 </div>
                                             </mat-expansion-panel>
                                         </div>
+                                        <div style="flex:1;">Le mot-clé @resId est disponible pour cibler le document en cours de traitement</div>
                                     </div>
                                     <div class="col-md-12 text-center">
                                         <button mat-raised-button color="primary"

@@ -765,6 +765,9 @@ class ExportController
             $line .= "{$customValues[0]['latitude']},{$customValues[0]['longitude']}";
             $customValues = $line;
         } elseif (!empty($values['table']) && in_array($field['type'], ['radio', 'select', 'checkbox'])) {
+            if (!empty($args['resId'])) {
+                $values['resId'] = $args['resId'];
+            }
             $values = CustomFieldModel::getValuesSQL($values);
 
             $values = array_column($values, 'label', 'key');

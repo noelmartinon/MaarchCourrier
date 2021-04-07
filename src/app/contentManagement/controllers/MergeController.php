@@ -334,6 +334,9 @@ class MergeController
                 }
 
                 if (!empty($rawValues['table']) && in_array($customFieldsTypes[$customId], ['radio', 'select', 'checkbox'])) {
+                    if (!empty($args['resId'])) {
+                        $rawValues['resId'] = $args['resId'];
+                    }
                     $rawValues = CustomFieldModel::getValuesSQL($rawValues);
                     $rawValues = array_column($rawValues, 'label', 'key');
                     if (is_array($custom)) {
@@ -533,11 +536,11 @@ class MergeController
         $datasources['datetime'][0]['date'] = date('d-m-Y');
         $datasources['datetime'][0]['time'] = date('H:i:s.u');
         $datasources['datetime'][0]['timestamp'] = time();
-        
+
         $TBS = new \clsTinyButStrong;
         $TBS->NoErr = true;
         $TBS->LoadTemplate($pathToTemplate);
-        
+
         foreach ($datasources as $name => $datasource) {
             if (!is_array($datasource)) {
                 $TBS->MergeField($name, $datasource);
@@ -547,7 +550,7 @@ class MergeController
         }
 
         $TBS->Show(TBS_NOTHING);
-        
+
         $myContent = $TBS->Source;
         return $myContent;
     }
