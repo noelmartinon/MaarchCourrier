@@ -32,11 +32,8 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     @ViewChild('snavLeft', { static: false }) snavLeft: MatSidenav;
 
-    @HostListener('window:resize', ['$event'])
-
     debugMode: boolean = false;
     loading: boolean = true;
-
 
     constructor(
         public translate: TranslateService,
@@ -61,7 +58,9 @@ export class AppComponent implements OnInit, AfterViewInit {
         }
     }
 
+    @HostListener('window:resize', ['$event'])
     onResize() {
+        console.log('what');
         this.appService.setScreenWidth(window.innerWidth);
     }
 
