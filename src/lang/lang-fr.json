@@ -2456,5 +2456,10 @@
     "mustSecureMaarchUrl": "L'url définie dans «<b>Administration</b>» 🠖 «<b>Paramètres</b>» 🠖 «<b>Personnalisation</b>» 🠖 «<b>URL de l'application</b>» n'est pas sécurisé (<b>https</b>)",
     "attachmentTypeOutlook": "Type de pièce jointe associé au courriel",
     "signInsteadOf": "Vous agissez en tant que",
-    "attachmentTypeIdAlreadyUsed": "Cet identifiant est déjà utilisé"
+    "attachmentTypeIdAlreadyUsed": "Cet identifiant est déjà utilisé",
+    "deleteGroupConfirm": "Supprimer le groupe",
+    "deleteNotificationConfirm": "Supprimer la notification",
+    "deleteParameterConfirm": "Suppression du paramètre",
+    "deletePriorityConfirm": "Suppression de la priorité",
+    "deleteShippingConfirm": "Suppression du modèle d'envoi Maileva"
 }

@@ -9,8 +9,10 @@ import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { of } from 'rxjs';
-import { catchError, finalize, tap } from 'rxjs/operators';
+import { catchError, exhaustMap, filter, finalize, tap } from 'rxjs/operators';
 import { AdministrationService } from '../administration.service';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
     templateUrl: 'notifications-administration.component.html'
@@ -57,7 +59,8 @@ export class NotificationsAdministrationComponent implements OnInit {
         public appService: AppService,
         public functions: FunctionsService,
         public adminService: AdministrationService,
-        private viewContainerRef: ViewContainerRef
+        private viewContainerRef: ViewContainerRef,
+        public dialog: MatDialog,
     ) { }
 
     ngOnInit(): void {
@@ -80,21 +83,23 @@ export class NotificationsAdministrationComponent implements OnInit {
     }
 
     deleteNotification(notification: any) {
-        const r = confirm(this.translate.instant('lang.deleteMsg'));
-
-        if (r) {
-            this.http.delete('../rest/notifications/' + notification.notification_sid)
-                .subscribe((data: any) => {
-                    this.notifications = data.notifications;
-                    setTimeout(() => {
-                        this.adminService.setDataSource('admin_notif', this.notifications, this.sort, this.paginator, this.filterColumns);
-                    }, 0);
-                    this.sidenavRight.close();
-                    this.notify.success(this.translate.instant('lang.notificationDeleted'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.deleteNotificationConfirm')} « ${notification.description} »`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/notifications/' + notification.notification_sid)),
+            tap((data: any) => {
+                this.notifications = data.notifications;
+                setTimeout(() => {
+                    this.adminService.setDataSource('admin_notif', this.notifications, this.sort, this.paginator, this.filterColumns);
+                }, 0);
+                this.sidenavRight.close();
+                this.notify.success(this.translate.instant('lang.notificationDeleted'));
+            }),
+            catchError((err: any) => {
+                this.notify.error(err.error.errors);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     loadCron() {
