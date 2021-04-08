@@ -20,11 +20,11 @@
                     <mat-spinner style="margin:auto;"></mat-spinner>
                 </div>
                 <mat-card *ngIf="!loading" class="card-app-content">
-                    <div class="alert-message alert-message-info" style="min-width: 100%;margin: 0px;">
-                        <input class="input-recipient" [(ngModel)]="recipientTest"/>&nbsp;<span [innerHTML]="'lang.recipientServerTestMsg' | translate"></span>
-                    </div>
                     <mat-tab-group>
                         <mat-tab label="{{'lang.informations' | translate}}">
+                            <div class="alert-message alert-message-info" style="min-width: 100%;margin: 0px;">
+                                <input class="input-recipient" [(ngModel)]="recipientTest"/>&nbsp;<span [innerHTML]="'lang.recipientServerTestMsg' | translate"></span>
+                            </div>
                             <form (ngSubmit)="onSubmit()" #sendmailForm="ngForm">
                                 <div class="form-group">
                                     <div class="col-md-12" style="margin-bottom: 20px;">
@@ -114,6 +114,11 @@
                                         (click)="cancelModification()">{{'lang.cancel' | translate}}</button>
                                 </div>
                             </form>
+                        </mat-tab>
+                        <mat-tab label="{{'lang.globalMailSignatures' | translate}}">
+                            <ng-template matTabContent>
+                                <app-mail-signatures-administration></app-mail-signatures-administration>
+                            </ng-template>
                         </mat-tab>
                     </mat-tab-group>
                 </mat-card>

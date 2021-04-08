@@ -89,6 +89,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { RegisteredMailImportComponent } from '@appRoot/registeredMail/import/registered-mail-import.component';
 import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-tool.component';
 import { ColorGithubModule } from 'ngx-color/github';
+import { MailSignaturesAdministrationComponent } from './administration/sendmail/mailSignatures/mail-signatures-administration.component';
 
 
 @NgModule({
@@ -155,7 +156,8 @@ import { ColorGithubModule } from 'ngx-color/github';
         ContactsGroupFormModalComponent,
         ContactsGroupMergeModalComponent,
         ContactsFormModalComponent,
-        InputCorrespondentGroupComponent
+        InputCorrespondentGroupComponent,
+        MailSignaturesAdministrationComponent
     ],
     exports: [
         CommonModule,
@@ -210,7 +212,8 @@ import { ColorGithubModule } from 'ngx-color/github';
         CriteriaToolComponent,
         InputCorrespondentGroupComponent,
         MessageBoxComponent,
-        ColorGithubModule
+        ColorGithubModule,
+        MailSignaturesAdministrationComponent
     ],
     providers: [],
     entryComponents: [
