@@ -13,9 +13,9 @@ import { of } from 'rxjs';
 })
 export class SaveAndPrintRegisteredMailActionComponent implements OnInit {
 
-    loading: boolean = false;
-
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
+
+    loading: boolean = false;
 
     constructor(
         public translate: TranslateService,

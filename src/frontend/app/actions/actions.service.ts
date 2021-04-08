@@ -22,7 +22,7 @@ import { SendExternalSignatoryBookActionComponent } from './send-external-signat
 import { SendExternalNoteBookActionComponent } from './send-external-note-book-action/send-external-note-book-action.component';
 import { RedirectActionComponent } from './redirect-action/redirect-action.component';
 import { SendShippingActionComponent } from './send-shipping-action/send-shipping-action.component';
-import { redirectInitiatorEntityActionComponent } from './redirect-initiator-entity-action/redirect-initiator-entity-action.component';
+import { RedirectInitiatorEntityActionComponent } from './redirect-initiator-entity-action/redirect-initiator-entity-action.component';
 import { closeMailWithAttachmentsOrNotesActionComponent } from './close-mail-with-attachments-or-notes-action/close-mail-with-attachments-or-notes-action.component';
 import { Router } from '@angular/router';
 import { SendSignatureBookActionComponent } from './visa-send-signature-book-action/send-signature-book-action.component';
@@ -195,7 +195,7 @@ export class ActionsService implements OnDestroy {
                 tap((data: any) => {
                     let msgWarn = this.translate.instant('lang.warnLockRes') + ' : ' + data.lockers.join(', ');
 
-                    if (data.countLockedResources != resIds.length) {
+                    if (data.countLockedResources !== resIds.length) {
                         msgWarn += this.translate.instant('lang.warnLockRes2') + '.';
                     }
 
@@ -203,7 +203,7 @@ export class ActionsService implements OnDestroy {
                         alert(data.countLockedResources + ' ' + msgWarn);
                     }
 
-                    if (data.countLockedResources != resIds.length) {
+                    if (data.countLockedResources !== resIds.length) {
                         this.currentResIds = data.resourcesToProcess;
                         resolve(true);
                     } else {
@@ -379,7 +379,7 @@ export class ActionsService implements OnDestroy {
     }
 
     redirectInitiatorEntityAction(options: any = null) {
-        const dialogRef = this.dialog.open(redirectInitiatorEntityActionComponent, {
+        const dialogRef = this.dialog.open(RedirectInitiatorEntityActionComponent, {
             panelClass: 'maarch-modal',
             disableClose: true,
             width: '500px',

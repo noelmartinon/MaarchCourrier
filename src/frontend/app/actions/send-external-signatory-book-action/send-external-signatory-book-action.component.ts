@@ -18,6 +18,13 @@ import { of } from 'rxjs';
 })
 export class SendExternalSignatoryBookActionComponent implements OnInit {
 
+    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
+
+    @ViewChild('xParaph', { static: false }) xParaph: XParaphComponent;
+    @ViewChild('maarchParapheur', { static: false }) maarchParapheur: MaarchParaphComponent;
+    @ViewChild('fastParapheur', { static: false }) fastParapheur: FastParaphComponent;
+    @ViewChild('iParapheur', { static: false }) iParapheur: IParaphComponent;
+    @ViewChild('ixbus', { static: false }) ixbus: IxbusParaphComponent;
 
     loading: boolean = false;
 
@@ -45,14 +52,6 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
     errors: any;
 
     mainDocumentSigned: boolean = false;
-
-    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
-
-    @ViewChild('xParaph', { static: false }) xParaph: XParaphComponent;
-    @ViewChild('maarchParapheur', { static: false }) maarchParapheur: MaarchParaphComponent;
-    @ViewChild('fastParapheur', { static: false }) fastParapheur: FastParaphComponent;
-    @ViewChild('iParapheur', { static: false }) iParapheur: IParaphComponent;
-    @ViewChild('ixbus', { static: false }) ixbus: IxbusParaphComponent;
 
     constructor(
         public translate: TranslateService,
@@ -116,11 +115,8 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
     }
 
     executeAction() {
-        let realResSelected: string[];
-        let datas: any;
-
-        realResSelected = this[this.signatoryBookEnabled].getRessources();
-        datas = this[this.signatoryBookEnabled].getDatas();
+        const realResSelected: string[] = this[this.signatoryBookEnabled].getRessources();
+        const datas: any = this[this.signatoryBookEnabled].getDatas();
 
         this.http.put(this.data.processActionRoute, { resources: realResSelected, note: this.noteEditor.getNote(), data: datas }).pipe(
             tap((data: any) => {

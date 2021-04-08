@@ -14,6 +14,8 @@ import { FunctionsService } from '@service/functions.service';
 })
 export class SendShippingActionComponent implements OnInit {
 
+    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
+
     loading: boolean = false;
 
     shippings: any[] = [{
@@ -44,8 +46,6 @@ export class SendShippingActionComponent implements OnInit {
     };
     fatalError: any = '';
     invalidEntityAddress: boolean = false;
-
-    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
 
     constructor(
         public translate: TranslateService,

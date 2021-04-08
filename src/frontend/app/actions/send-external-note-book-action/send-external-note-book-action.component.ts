@@ -13,6 +13,8 @@ import { of } from 'rxjs';
 })
 export class SendExternalNoteBookActionComponent implements OnInit {
 
+    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
+
     loading: boolean = false;
     additionalsInfos: any = {
         users: [],
@@ -25,9 +27,13 @@ export class SendExternalNoteBookActionComponent implements OnInit {
     };
     errors: any;
 
-    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
-
-    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, public dialogRef: MatDialogRef<SendExternalNoteBookActionComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
+    constructor(
+        public translate: TranslateService,
+        public http: HttpClient,
+        private notify: NotificationService,
+        public dialogRef: MatDialogRef<SendExternalNoteBookActionComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: any
+    ) { }
 
     ngOnInit(): void {
         this.loading = true;
@@ -61,11 +67,8 @@ export class SendExternalNoteBookActionComponent implements OnInit {
     }
 
     executeAction() {
-        let realResSelected: string[];
-        let datas: any;
-
-        realResSelected = this.additionalsInfos.mails.map((e: any) => e.res_id);
-        datas = this.externalSignatoryBookDatas;
+        const realResSelected: string [] = this.additionalsInfos.mails.map((e: any) => e.res_id);
+        const datas: any = this.externalSignatoryBookDatas;
 
         this.http.put(this.data.processActionRoute, {resources : realResSelected, note : this.noteEditor.getNote(), data: datas}).pipe(
             tap((data: any) => {
@@ -85,7 +88,7 @@ export class SendExternalNoteBookActionComponent implements OnInit {
     }
 
     checkValidAction() {
-        if (this.additionalsInfos.mails.length == 0 || !this.externalSignatoryBookDatas.processingUser || this.additionalsInfos.users.length == 0) {
+        if (this.additionalsInfos.mails.length === 0 || !this.externalSignatoryBookDatas.processingUser || this.additionalsInfos.users.length == 0) {
             return true;
         } else {
             return false;

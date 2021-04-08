@@ -20,11 +20,22 @@ import { of } from 'rxjs';
 })
 export class ActionsListComponent implements OnInit {
 
-
-    loading: boolean = false;
-
     @ViewChild(MatMenuTrigger, { static: false }) contextMenu: MatMenuTrigger;
     @Output() triggerEvent = new EventEmitter<string>();
+
+    @Input('selectedRes') selectedRes: any;
+    @Input('totalRes') totalRes: number;
+    @Input('contextMode') contextMode: boolean;
+    @Input('currentBasketInfo') currentBasketInfo: any;
+    @Input('currentResource') currentResource: any = {};
+
+    @Output('refreshEvent') refreshEvent = new EventEmitter<string>();
+    @Output('refreshEventAfterAction') refreshEventAfterAction = new EventEmitter<string>();
+    @Output('refreshPanelFolders') refreshPanelFolders = new EventEmitter<string>();
+
+    dialogRef: MatDialogRef<any>;
+
+    loading: boolean = false;
 
     contextMenuPosition = { x: '0px', y: '0px' };
     contextMenuTitle = '';
@@ -40,15 +51,6 @@ export class ActionsListComponent implements OnInit {
 
     actionsList: any[] = [];
 
-    @Input('selectedRes') selectedRes: any;
-    @Input('totalRes') totalRes: number;
-    @Input('contextMode') contextMode: boolean;
-    @Input('currentBasketInfo') currentBasketInfo: any;
-    @Input('currentResource') currentResource: any = {};
-
-    @Output('refreshEvent') refreshEvent = new EventEmitter<string>();
-    @Output('refreshEventAfterAction') refreshEventAfterAction = new EventEmitter<string>();
-    @Output('refreshPanelFolders') refreshPanelFolders = new EventEmitter<string>();
 
     constructor(
         public translate: TranslateService,
@@ -61,8 +63,6 @@ export class ActionsListComponent implements OnInit {
         private functionService: FunctionsService,
         public privilegeService: PrivilegeService,
     ) { }
-
-    dialogRef: MatDialogRef<any>;
 
     ngOnInit(): void { }
 
@@ -111,7 +111,7 @@ export class ActionsListComponent implements OnInit {
 
     loadActionList() {
 
-        if (JSON.stringify(this.basketInfo) != JSON.stringify(this.currentBasketInfo)) {
+        if (JSON.stringify(this.basketInfo) !== JSON.stringify(this.currentBasketInfo)) {
 
             this.basketInfo = JSON.parse(JSON.stringify(this.currentBasketInfo));
 

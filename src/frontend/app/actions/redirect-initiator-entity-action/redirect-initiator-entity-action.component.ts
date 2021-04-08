@@ -11,8 +11,9 @@ import { of } from 'rxjs';
     templateUrl: 'redirect-initiator-entity-action.component.html',
     styleUrls: ['redirect-initiator-entity-action.component.scss'],
 })
-export class redirectInitiatorEntityActionComponent implements OnInit {
+export class RedirectInitiatorEntityActionComponent implements OnInit {
 
+    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
 
     loading: boolean = false;
     loadingInit: boolean = false;
@@ -21,10 +22,9 @@ export class redirectInitiatorEntityActionComponent implements OnInit {
         withoutEntity: []
     };
 
-    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
     loadingExport: boolean;
 
-    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, public dialogRef: MatDialogRef<redirectInitiatorEntityActionComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
+    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, public dialogRef: MatDialogRef<RedirectInitiatorEntityActionComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
     ngOnInit(): void {
         this.loadingInit = true;

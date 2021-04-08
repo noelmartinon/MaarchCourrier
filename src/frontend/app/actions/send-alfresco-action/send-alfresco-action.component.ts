@@ -18,6 +18,9 @@ declare let $: any;
 })
 export class SendAlfrescoActionComponent implements OnInit {
 
+    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
+    @ViewChild('maarchTree', { static: false }) maarchTree: MaarchTreeComponent;
+
     loading: boolean = false;
 
     errors: any;
@@ -31,9 +34,6 @@ export class SendAlfrescoActionComponent implements OnInit {
 
     resourcesErrors: any[] = [];
     noResourceToProcess: boolean = null;
-
-    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
-    @ViewChild('maarchTree', { static: false }) maarchTree: MaarchTreeComponent;
 
     constructor(
         public translate: TranslateService,

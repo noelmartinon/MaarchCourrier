@@ -8,8 +8,6 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 })
 export class ViewDocActionComponent implements OnInit {
 
-
-
     constructor(
         public translate: TranslateService,
         @Inject(MAT_DIALOG_DATA) public data: any

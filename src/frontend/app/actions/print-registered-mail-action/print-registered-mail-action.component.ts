@@ -14,9 +14,9 @@ import { FunctionsService } from '@service/functions.service';
 })
 export class PrintRegisteredMailActionComponent implements OnInit {
 
-    loading: boolean = false;
-
     @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
+
+    loading: boolean = false;
 
     constructor(
         public translate: TranslateService,

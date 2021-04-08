@@ -15,12 +15,12 @@ import { catchError, finalize, tap } from 'rxjs/operators';
 })
 export class CheckReplyRecordManagementComponent implements OnInit {
 
+    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
+
     loading: boolean = false;
     checking: boolean = true;
     resourcesErrors: any[] = [];
     selectedRes: number[] = [];
-
-    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
 
     constructor(
         public translate: TranslateService,

@@ -15,6 +15,8 @@ import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 })
 export class ContinueAvisCircuitActionComponent implements OnInit {
 
+    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
+    @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
 
     loading: boolean = false;
 
@@ -27,9 +29,6 @@ export class ContinueAvisCircuitActionComponent implements OnInit {
     opinionLimitDate: string | Date = null;
 
     noResourceToProcess: boolean = null;
-
-    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
-    @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
 
     constructor(
         public translate: TranslateService,

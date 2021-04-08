@@ -24,6 +24,8 @@ import { catchError, finalize, tap } from 'rxjs/operators';
 })
 export class SendToRecordManagementComponent implements OnInit {
 
+    @ViewChild(MatPaginator) paginator: MatPaginator;
+
     loading: boolean = false;
     checking: boolean = true;
 
@@ -46,8 +48,6 @@ export class SendToRecordManagementComponent implements OnInit {
     archives: any[] = [];
     folders: any = [];
     linkedResources: any = [];
-
-    @ViewChild(MatPaginator) paginator: MatPaginator;
 
     constructor(
         public translate: TranslateService,

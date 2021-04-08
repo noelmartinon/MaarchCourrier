@@ -16,6 +16,8 @@ import { HeaderService } from '@service/header.service';
 })
 export class ValidateAvisParallelComponent implements OnInit, AfterViewInit {
 
+    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
+    @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
 
     loading: boolean = false;
 
@@ -32,9 +34,6 @@ export class ValidateAvisParallelComponent implements OnInit, AfterViewInit {
     today: Date = new Date();
 
     availableRoles: any[] = [];
-
-    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
-    @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
 
     constructor(
         public translate: TranslateService,

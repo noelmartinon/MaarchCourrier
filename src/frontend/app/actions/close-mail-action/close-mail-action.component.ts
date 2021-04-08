@@ -14,9 +14,9 @@ import { NoteEditorComponent } from '@appRoot/notes/note-editor.component';
 })
 export class CloseMailActionComponent implements OnInit {
 
-    loading: boolean = false;
-
     @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
+
+    loading: boolean = false;
     emptyMandatoryFields: Array<any> = [];
     canCloseResIds: Array<any> = [];
     customFields: Array<any> = [];

@@ -13,6 +13,7 @@ import { of } from 'rxjs';
 })
 export class closeMailWithAttachmentsOrNotesActionComponent implements OnInit {
 
+    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
 
     loading: boolean = false;
     loadingInit: boolean = false;
@@ -21,7 +22,6 @@ export class closeMailWithAttachmentsOrNotesActionComponent implements OnInit {
         withoutEntity: []
     };
 
-    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
     loadingExport: boolean;
 
     constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, public dialogRef: MatDialogRef<closeMailWithAttachmentsOrNotesActionComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }

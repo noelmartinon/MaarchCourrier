@@ -15,6 +15,9 @@ import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
 })
 export class SendSignatureBookActionComponent implements AfterViewInit {
 
+    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
+    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
+
     loading: boolean = true;
 
     resourcesMailing: any[] = [];
@@ -35,9 +38,6 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
     atLeastOneSign: any = false;
     lastOneIsSign: any = false;
     lastOneMustBeSignatory: any = false;
-
-    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
-    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
 
     constructor(
         public translate: TranslateService,

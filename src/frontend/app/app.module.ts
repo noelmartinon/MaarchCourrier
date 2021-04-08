@@ -63,7 +63,7 @@ import { FastParaphComponent } from './actions/send-external-signatory-book-acti
 import { ViewDocActionComponent } from './actions/view-doc-action/view-doc-action.component';
 import { RedirectActionComponent } from './actions/redirect-action/redirect-action.component';
 import { SendShippingActionComponent } from './actions/send-shipping-action/send-shipping-action.component';
-import { redirectInitiatorEntityActionComponent } from './actions/redirect-initiator-entity-action/redirect-initiator-entity-action.component';
+import { RedirectInitiatorEntityActionComponent } from './actions/redirect-initiator-entity-action/redirect-initiator-entity-action.component';
 import { closeMailWithAttachmentsOrNotesActionComponent } from './actions/close-mail-with-attachments-or-notes-action/close-mail-with-attachments-or-notes-action.component';
 import { SendSignatureBookActionComponent } from './actions/visa-send-signature-book-action/send-signature-book-action.component';
 import { ContinueVisaCircuitActionComponent } from './actions/visa-continue-circuit-action/continue-visa-circuit-action.component';
@@ -261,7 +261,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         ViewDocActionComponent,
         RedirectActionComponent,
         SendShippingActionComponent,
-        redirectInitiatorEntityActionComponent,
+        RedirectInitiatorEntityActionComponent,
         closeMailWithAttachmentsOrNotesActionComponent,
         SendSignatureBookActionComponent,
         ContinueVisaCircuitActionComponent,
@@ -339,7 +339,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         ValidateAvisParallelComponent,
         RedirectActionComponent,
         SendShippingActionComponent,
-        redirectInitiatorEntityActionComponent,
+        RedirectInitiatorEntityActionComponent,
         closeMailWithAttachmentsOrNotesActionComponent,
         SendSignatureBookActionComponent,
         SendAlfrescoActionComponent,
