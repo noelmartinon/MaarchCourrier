@@ -21,7 +21,6 @@ use Doctype\models\SecondLevelModel;
 use Doctype\models\DoctypeModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use Template\models\TemplateModel;
 
 class FirstLevelController
 {
