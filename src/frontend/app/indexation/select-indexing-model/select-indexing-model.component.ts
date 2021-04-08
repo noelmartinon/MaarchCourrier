@@ -1,15 +1,16 @@
-import { Component, OnInit, Input, ViewEncapsulation, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '@service/notification/notification.service';
 import { TranslateService } from '@ngx-translate/core';
-import { SortPipe } from '../../../plugins/sorting.pipe';
+import { SortPipe } from '@plugins/sorting.pipe';
 import { finalize, catchError, exhaustMap, filter, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { AddPrivateIndexingModelModalComponent } from '../private-indexing-model/add-private-indexing-model-modal.component';
 import { HeaderService } from '@service/header.service';
 import { IndexingFormComponent } from '../indexing-form/indexing-form.component';
+import {PrivilegeService} from '@service/privileges.service';
 
 @Component({
     selector: 'app-select-indexing-model',
@@ -35,10 +36,11 @@ export class SelectIndexingModelComponent implements OnInit {
     constructor(
         public translate: TranslateService,
         private http: HttpClient,
-        private headerService: HeaderService,
+        public headerService: HeaderService,
         private notify: NotificationService,
         private sortPipe: SortPipe,
         private dialog: MatDialog,
+        public privilegeService: PrivilegeService
     ) { }
 
     ngOnInit(): void {

@@ -92,7 +92,7 @@
     "addOpinion": "Give your opinion",
     "addOpinionReason": "Please fill the opinion reason",
     "addPerson": "Add a person",
-    "addPrivateIndexingModelMsg": "This model will be <b>private</b> and will be a copy of the model",
+    "addPrivateIndexingModelMsg": "This model will be <b>{{perimeter}}</b> and will be a copy of the model",
     "addPrivateIndexingModelMsg2": "with the values <b>currently filled</b>.",
     "addRootFolder": "New root folder",
     "addSecondLevel": "Add second level",
@@ -2468,5 +2468,6 @@
     "depositList": "Deposit list",
     "attachmentTypeIdAlreadyUsed": "This id is already used",
     "toogleShippingConf": "Activate / deactivate the Maileva sending template",
-    "infoResId": "The keyword <b> @resId </b> is available to target the document being processed"
+    "infoResId": "The keyword <b> @resId </b> is available to target the document being processed",
+    "createPublicIndexingModels": "Create public indexing models in the indexing page"
 }

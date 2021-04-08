@@ -1231,7 +1231,7 @@
     "file": "File__TO_TRANSLATE",
     "DownloadConvertedFile": "Download converted file__TO_TRANSLATE",
     "linkNewAction": "Link new action__TO_TRANSLATE",
-    "addPrivateIndexingModelMsg": "This model will be <b>private</b> and will keep as model__TO_TRANSLATE",
+    "addPrivateIndexingModelMsg": "This model will be <b>{{perimeter}}</b> and will keep as model__TO_TRANSLATE",
     "addPrivateIndexingModelMsg2": "with <b>actual</b> values.__TO_TRANSLATE",
     "privateIndexingModelCreation": "Private indexing model creation__TO_TRANSLATE",
     "createPrivateIndexingModel": "Create an indexing model with current datas__TO_TRANSLATE",

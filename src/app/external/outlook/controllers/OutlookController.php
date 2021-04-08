@@ -142,7 +142,7 @@ class OutlookController
         if (empty($model)) {
             return $response->withStatus(400)->withJson(['errors' => 'Indexing model does not exist']);
         } elseif (!empty($model['master'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Indexing model is not a public model']);
+            return $response->withStatus(400)->withJson(['errors' => 'Indexing model is not a master model']);
         }
 
         $type = DoctypeModel::getById(['id' => $body['typeId'], 'select' => [1]]);

@@ -25,17 +25,21 @@
                 *ngFor="let indexingModel of indexingModels | filterList:listFilter.value:'label'; let i=index">
                 <button mat-menu-item (click)="selectIndexingModel(indexingModel)" [title]="indexingModel.label"
                     [class.listModels-menu-selected]="indexingModel.id === currentIndexingModel.id"
-                    [class.private]="indexingModel.private" style="display: flex;align-items: center;">
-                    <div *ngIf="!indexingModel.private" style="flex:1;">
+                    [class.private]="indexingModel.master !== null" style="display: flex;align-items: center;">
+                    <div *ngIf="indexingModel.master === null" style="flex:1;">
                         {{indexingModel.label | shorten: 45: '...'}}
                         {{indexingModel.default ? '(' + this.translate.instant('lang.default') + ')': ''}}
                     </div>
-                    <div *ngIf="indexingModel.private" style="flex:1;">
+                    <div *ngIf="indexingModel.master !== null && indexingModel.private" style="flex:1;">
                         {{indexingModel.label | shorten: 45: '...'}}&nbsp;<span
                             class="listModels-menu-badge">{{'lang.private' | translate}}</span>
                     </div>
+                    <div *ngIf="indexingModel.master !== null && !indexingModel.private" style="flex:1;">
+                        {{indexingModel.label | shorten: 45: '...'}}&nbsp;<span
+                            class="listModels-menu-badge">{{'lang.public' | translate}}</span>
+                    </div>
                     <button mat-icon-button class="listModels-menu-delete"
-                        *ngIf="indexingModel.id !== currentIndexingModel.id && indexingModel.private"
+                        *ngIf="indexingModel.id !== currentIndexingModel.id && ((indexingModel.private && indexingModel.owner === headerService.user.id) || (!indexingModel.private && indexingModel.master !== null && privilegeService.hasCurrentUserPrivilege('create_public_indexing_models')))"
                         [title]="this.translate.instant('lang.delete')"
                         (click)="$event.stopPropagation();deletePrivateIndexingModel(indexingModel.id, i)">
                         <mat-icon class="fa fa-trash" color="warn">

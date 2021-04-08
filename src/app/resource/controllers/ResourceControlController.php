@@ -64,7 +64,7 @@ class ResourceControlController
         } elseif (!$indexingModel['enabled']) {
             return ['errors' => 'Body modelId is disabled'];
         } elseif (!empty($indexingModel['master'])) {
-            return ['errors' => 'Body modelId is not public'];
+            return ['errors' => 'Body modelId is not a master model'];
         } elseif (empty($body['encodedFile']) && $indexingModel['mandatory_file']) {
             return ['errors' => 'File is mandatory for this indexing model'];
         }
@@ -146,7 +146,7 @@ class ResourceControlController
             } elseif (!$indexingModel['enabled']) {
                 return ['errors' => 'Body modelId is disabled'];
             } elseif (!empty($indexingModel['master'])) {
-                return ['errors' => 'Body modelId is not public'];
+                return ['errors' => 'Body modelId is not a master model'];
             } elseif (empty($resource['filename']) && $indexingModel['mandatory_file']) {
                 return ['errors' => 'File is mandatory for this indexing model'];
             }
