@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSidenav } from '@angular/material/sidenav';
 import { Observable } from 'rxjs';
 import { ExportComponent } from '../export/export.component';
 import { SummarySheetComponent } from '../summarySheet/summary-sheet.component';
@@ -23,12 +22,11 @@ export class ToolsListComponent implements OnInit {
 
     @ViewChild(MatAutocompleteTrigger, { static: true }) autocomplete: MatAutocompleteTrigger;
 
-    @Input('listProperties') listProperties: any;
-    @Input('currentBasketInfo') currentBasketInfo: any;
+    @Input() listProperties: any;
+    @Input() currentBasketInfo: any;
 
-    @Input('snavR') sidenavRight: MatSidenav;
-    @Input('selectedRes') selectedRes: any;
-    @Input('totalRes') totalRes: number;
+    @Input() selectedRes: any;
+    @Input() totalRes: number;
 
     priorities: any[] = [];
     categories: any[] = [];
@@ -41,11 +39,13 @@ export class ToolsListComponent implements OnInit {
 
     isLoading: boolean = false;
 
-    constructor(public translate: TranslateService, public http: HttpClient, public dialog: MatDialog) { }
+    constructor(
+        public translate: TranslateService,
+        public http: HttpClient,
+        public dialog: MatDialog
+    ) { }
 
-    ngOnInit(): void {
-
-    }
+    ngOnInit(): void { }
 
     openExport(): void {
         this.dialog.open(ExportComponent, {

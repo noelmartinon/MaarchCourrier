@@ -2,7 +2,6 @@ import { Component, OnInit, Input, ViewChild, ElementRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
-import { HeaderService } from '@service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AppService } from '@service/app.service';
 import { SortPipe } from '../../../plugins/sorting.pipe';
@@ -29,7 +28,7 @@ export class TagInputComponent implements OnInit {
     /**
      * FormControl used when autocomplete is used in form and must be catched in a form control.
      */
-    @Input('control') controlAutocomplete: FormControl;
+    @Input() control: FormControl;
 
     @Input() returnValue: 'id' | 'object' = 'id';
 
@@ -59,7 +58,6 @@ export class TagInputComponent implements OnInit {
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
-        private headerService: HeaderService,
         public appService: AppService,
         private latinisePipe: LatinisePipe,
         private privilegeService: PrivilegeService,
@@ -69,7 +67,7 @@ export class TagInputComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.controlAutocomplete.valueChanges
+        this.control.valueChanges
             .pipe(
                 tap((data: any) => {
                     if (this.returnValue === 'object') {
@@ -88,7 +86,7 @@ export class TagInputComponent implements OnInit {
                     }
                 })
             ).subscribe();
-        this.controlAutocomplete.setValue(this.controlAutocomplete.value === null || this.controlAutocomplete.value === '' ? [] : this.controlAutocomplete.value);
+        this.control.setValue(this.control.value === null || this.control.value === '' ? [] : this.control.value);
         this.canAdd = this.privilegeService.hasCurrentUserPrivilege('manage_tags_application');
         this.initAutocompleteRoute();
     }
@@ -127,7 +125,7 @@ export class TagInputComponent implements OnInit {
     }
 
     initFormValue() {
-        this.controlAutocomplete.value.forEach((ids: any) => {
+        this.control.value.forEach((ids: any) => {
             this.http.get('../rest/tags/' + ids).pipe(
                 tap((data: any) => {
                     this.valuesToDisplay[data.id] = data.label;
@@ -137,11 +135,11 @@ export class TagInputComponent implements OnInit {
     }
 
     setFormValue(item: any) {
-        const isSelected = this.returnValue === 'id' ? this.controlAutocomplete.value.indexOf(item['id']) > -1 : this.controlAutocomplete.value.map((val: any) => val.id).indexOf(item['id']) > -1;
+        const isSelected = this.returnValue === 'id' ? this.control.value.indexOf(item['id']) > -1 : this.control.value.map((val: any) => val.id).indexOf(item['id']) > -1;
         if (!isSelected) {
             let arrvalue = [];
-            if (this.controlAutocomplete.value !== null) {
-                arrvalue = this.controlAutocomplete.value;
+            if (this.control.value !== null) {
+                arrvalue = this.control.value;
             }
             if (this.returnValue === 'id') {
                 arrvalue.push(item['id']);
@@ -151,7 +149,7 @@ export class TagInputComponent implements OnInit {
                     label: item['idToDisplay']
                 });
             }
-            this.controlAutocomplete.setValue(arrvalue);
+            this.control.setValue(arrvalue);
         }
     }
 
@@ -161,23 +159,23 @@ export class TagInputComponent implements OnInit {
     }
 
     unsetValue() {
-        this.controlAutocomplete.setValue('');
+        this.control.setValue('');
         this.myControl.setValue('');
         this.myControl.enable();
     }
 
     removeItem(index: number) {
 
-        if (this.newIds.indexOf(this.controlAutocomplete.value[index]) === -1) {
-            const arrValue = this.controlAutocomplete.value;
-            this.controlAutocomplete.value.splice(index, 1);
-            this.controlAutocomplete.setValue(arrValue);
+        if (this.newIds.indexOf(this.control.value[index]) === -1) {
+            const arrValue = this.control.value;
+            this.control.value.splice(index, 1);
+            this.control.setValue(arrValue);
         } else {
-            this.http.delete('../rest/tags/' + this.controlAutocomplete.value[index]).pipe(
+            this.http.delete('../rest/tags/' + this.control.value[index]).pipe(
                 tap((data: any) => {
-                    const arrValue = this.controlAutocomplete.value;
-                    this.controlAutocomplete.value.splice(index, 1);
-                    this.controlAutocomplete.setValue(arrValue);
+                    const arrValue = this.control.value;
+                    this.control.value.splice(index, 1);
+                    this.control.setValue(arrValue);
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
@@ -194,10 +192,10 @@ export class TagInputComponent implements OnInit {
 
         this.http.post('../rest/tags', { label: newElem[this.key] }).pipe(
             tap((data: any) => {
-                for (const key in data) {
+                Object.keys(data).forEach(key => {
                     newElem['id'] = data[key];
                     this.newIds.push(data[key]);
-                }
+                });
                 this.setFormValue(newElem);
                 this.myControl.setValue('');
             }),

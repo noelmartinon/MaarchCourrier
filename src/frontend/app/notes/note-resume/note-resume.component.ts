@@ -16,14 +16,12 @@ import { NotificationService } from '@service/notification/notification.service'
 
 export class NoteResumeComponent implements OnInit {
 
-
+    @Input() resId: number = null;
+    @Output() goTo = new EventEmitter<string>();
 
     loading: boolean = true;
 
     notes: any[] = [];
-
-    @Input('resId') resId: number = null;
-    @Output('goTo') goTo = new EventEmitter<string>();
 
     constructor(
         public translate: TranslateService,

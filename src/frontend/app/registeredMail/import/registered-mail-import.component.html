@@ -33,7 +33,7 @@
             <input type="file" name="files[]" #uploadFile id="uploadFile" (change)="uploadCsv($event)" accept=".csv"
                 style="display: none;">
             <div *ngIf="csvData.length === 0" appUploadFileDragDrop (click)="uploadFile.click()"
-                (onFileDropped)="dndUploadFile($event)" class="dndFile">
+                (fileDropped)="dndUploadFile($event)" class="dndFile">
                 <div>
                     {{'lang.dndFileCsvDesc' | translate}}
                     <!--<mat-form-field appearance="outline" style="font-size:14px;" (click)="$event.stopPropagation()">
