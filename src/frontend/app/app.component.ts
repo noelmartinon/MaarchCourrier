@@ -60,7 +60,6 @@ export class AppComponent implements OnInit, AfterViewInit {
 
     @HostListener('window:resize', ['$event'])
     onResize() {
-        console.log('what');
         this.appService.setScreenWidth(window.innerWidth);
     }
 
