@@ -95,7 +95,7 @@ export class TechnicalInformationComponent implements OnInit {
             }),
             exhaustMap(() => this.http.get('../rest/customFields')),
             tap((data: any) => {
-                data.customFields.filter((item: { mode: any }) => item.mode === 'technical').map((info: any) => {
+                data.customFields.filter((item: { mode: any }) => (item.mode === 'technical' || item.mode === 'technicalImmuable')).map((info: any) => {
                     this.customs[info.id] = {
                         label : info.label,
                         type : info.type

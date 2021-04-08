@@ -436,7 +436,7 @@ CREATE TABLE listinstance
 )
 WITH (OIDS=FALSE);
 
-CREATE TABLE difflist_types 
+CREATE TABLE difflist_types
 (
   difflist_type_id character varying(50) NOT NULL,
   difflist_type_label character varying(100) NOT NULL,
@@ -494,7 +494,7 @@ CREATE TABLE folders
 (
   id serial NOT NULL,
   label character varying(255) NOT NULL,
-  public boolean NOT NULL,   
+  public boolean NOT NULL,
   user_id INTEGER NOT NULL,
   parent_id INTEGER,
   level INTEGER NOT NULL,
@@ -1179,10 +1179,10 @@ CREATE TABLE message_exchange
   schema text,
   type text NOT NULL,
   status text NOT NULL,
-  
+
   date timestamp NOT NULL,
   reference text NOT NULL,
-  
+
   account_id integer,
   sender_org_identifier text NOT NULL,
   sender_org_name text,
@@ -1193,20 +1193,20 @@ CREATE TABLE message_exchange
   reply_code text,
   operation_date timestamp,
   reception_date timestamp,
-  
+
   related_reference text,
   request_reference text,
   reply_reference text,
   derogation boolean,
-  
+
   data_object_count integer,
   size numeric,
-  
+
   data text,
-  
+
   active boolean,
   archived boolean,
-  
+
   res_id_master numeric default NULL,
 
   docserver_id character varying(32) DEFAULT NULL,
@@ -1363,7 +1363,7 @@ CONSTRAINT acknowledgement_receipts_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);
 
-CREATE TYPE custom_fields_modes AS ENUM ('form', 'technical');
+CREATE TYPE custom_fields_modes AS ENUM ('form', 'technical', 'technicalImmuable');
 
 CREATE TABLE custom_fields
 (

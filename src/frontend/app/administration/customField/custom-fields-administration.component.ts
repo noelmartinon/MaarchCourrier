@@ -74,6 +74,10 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         {
             'label' : 'displayAsTechnicalData',
             'value' : 'technical'
+        },
+        {
+            'label' : 'displayAsImmuableTechnicalData',
+            'value' : 'technicalImmuable'
         }
     ];
 
