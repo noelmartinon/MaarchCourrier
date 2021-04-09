@@ -377,6 +377,9 @@ class CustomFieldController
         if ($body['type'] == 'integer' && !in_array($columns[$body['values']['key']], self::NUMERIC_TYPES)) {
             return ['errors' => 'Body values[label] column is not an integer', 'lang' => 'invalidColumnType'];
         }
+        if (stripos($body['values']['clause'], 'select') !== false) {
+            return ['errors' => 'Clause is not valid', 'lang' => 'invalidClause'];
+        }
 
         try {
             $body['values']['resId'] = 100;
