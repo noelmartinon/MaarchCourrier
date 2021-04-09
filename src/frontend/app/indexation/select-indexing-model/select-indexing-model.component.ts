@@ -35,7 +35,7 @@ export class SelectIndexingModelComponent implements OnInit {
 
     constructor(
         private http: HttpClient,
-        private headerService: HeaderService,
+        public headerService: HeaderService,
         private notify: NotificationService,
         private sortPipe: SortPipe,
         private dialog: MatDialog,
@@ -114,7 +114,7 @@ export class SelectIndexingModelComponent implements OnInit {
             category: this.indexingForm.getCategory(),
             label: '',
             owner: this.headerService.user.id,
-            private: true,
+            private: false,
             fields: fields,
             master: this.currentIndexingModel.master !== null ? this.currentIndexingModel.master : this.currentIndexingModel.id
         };

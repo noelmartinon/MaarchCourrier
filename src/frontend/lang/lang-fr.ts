@@ -66,7 +66,7 @@ export const LANG_FR = {
     "addOpinion":                                  "Donner votre avis",
     "addOpinionReason":                            "Veuillez renseigner le motif de l'avis",
     "addPerson":                                   "Ajouter une personne",
-    "addPrivateIndexingModelMsg":                  "Ce modèle sera <b>privé</b> et prendra comme base le modèle",
+    "addPrivateIndexingModelMsg":                  "Ce modèle sera <b>public</b> et prendra comme base le modèle",
     "addPrivateIndexingModelMsg2":                 "avec les valeurs renseignées <b>actuellement</b>.",
     "address":                                     "Adresse",
     "addRootFolder":                               "Nouveau dossier racine",

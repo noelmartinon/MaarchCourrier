@@ -64,7 +64,7 @@ class ResourceControlController
         } elseif (!$indexingModel['enabled']) {
             return ['errors' => 'Body modelId is disabled'];
         } elseif (!empty($indexingModel['master'])) {
-            return ['errors' => 'Body modelId is not public'];
+            return ['errors' => 'Body modelId is not a master model'];
         }
 
         $control = ResourceControlController::controlFileData(['body' => $body]);
@@ -144,7 +144,7 @@ class ResourceControlController
             } elseif (!$indexingModel['enabled']) {
                 return ['errors' => 'Body modelId is disabled'];
             } elseif (!empty($indexingModel['master'])) {
-                return ['errors' => 'Body modelId is not public'];
+                return ['errors' => 'Body modelId is not a master model'];
             }
         }
 
