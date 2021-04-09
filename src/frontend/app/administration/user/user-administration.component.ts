@@ -301,7 +301,7 @@ export class UserAdministrationComponent implements OnInit {
                 this.maarchParapheurConnectionStatus = true;
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -421,7 +421,7 @@ export class UserAdministrationComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.activationNotificationSend'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -612,7 +612,7 @@ export class UserAdministrationComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.signDeleted'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -661,7 +661,7 @@ export class UserAdministrationComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.basketUpdated'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -685,7 +685,7 @@ export class UserAdministrationComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.basketUpdated'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -702,7 +702,7 @@ export class UserAdministrationComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.basketUpdated'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -719,7 +719,7 @@ export class UserAdministrationComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.basketUpdated'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -989,7 +989,7 @@ export class UserAdministrationComponent implements OnInit {
                 this.user.canCreateMaarchParapheurUser = false;
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();

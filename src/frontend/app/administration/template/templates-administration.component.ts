@@ -79,7 +79,7 @@ export class TemplatesAdministrationComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.templateDeleted'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();

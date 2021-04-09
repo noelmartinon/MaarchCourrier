@@ -106,7 +106,7 @@ export class UsersAdministrationComponent implements OnInit {
         const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.authorize')} « ${user.user_id } »`, msg: this.translate.instant('lang.confirmAction') } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
-            exhaustMap(() => user.status = 'OK'),
+            tap(() => user.status = 'OK'),
             exhaustMap(() => this.http.put('../rest/users/' + user.id, user)),
             tap(() => {
                 this.notify.success(this.translate.instant('lang.userAuthorized'));
@@ -114,7 +114,7 @@ export class UsersAdministrationComponent implements OnInit {
             }),
             catchError((err: any) => {
                 user.status = 'SPD';
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();

@@ -398,7 +398,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     delAttachment(attachment: any) {
         if (this.canUpdateDocument) {
             const title = this.signatureBook.attachments.length <= 1 ? this.translate.instant('lang.deleteLastAttachmentSignatureBook') : this.translate.instant('lang.deleteAttachmentSignatureBook');
-            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.DEL')}`, msg: title } });
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.delete')}`, msg: title } });
             dialogRef.afterClosed().pipe(
                 filter((data: string) => data === 'ok'),
                 exhaustMap(() => this.http.delete('../rest/attachments/' + attachment.res_id)),
@@ -406,7 +406,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                     this.refreshAttachments('del');
                 }),
                 catchError((err: any) => {
-                    this.notify.error(err.error.errors);
+                    this.notify.handleSoftErrors(err);
                     return of(false);
                 })
             ).subscribe();

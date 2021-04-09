@@ -497,7 +497,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                     this.router.navigate(['/administration/templates/' + data.id]);
                 }),
                 catchError((err: any) => {
-                    this.notify.error(err.error.errors);
+                    this.notify.handleSoftErrors(err);
                     return of(false);
                 })
             ).subscribe();

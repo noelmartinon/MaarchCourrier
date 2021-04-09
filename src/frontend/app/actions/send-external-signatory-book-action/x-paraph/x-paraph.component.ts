@@ -158,7 +158,7 @@ export class XParaphComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.accountDeleted'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();

@@ -356,7 +356,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.firstLevelDeleted'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -376,7 +376,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.secondLevelDeleted'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -409,7 +409,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                                     $('#jstree').jstree('select_node', this.doctypes[0]);
                                     this.notify.success(this.translate.instant('lang.documentTypeDeleted'));
                                 }, (err) => {
-                                    this.notify.error(err.error.errors);
+                                    this.notify.handleSoftErrors(err);
                                 });
                         }
                         this.dialogRef = null;
@@ -417,7 +417,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                 }
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();

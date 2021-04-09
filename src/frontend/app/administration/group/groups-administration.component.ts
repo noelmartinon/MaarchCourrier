@@ -74,7 +74,7 @@ export class GroupsAdministrationComponent implements OnInit {
                 filter((data: string) => data === 'ok'),
                 exhaustMap(async () => this.deleteGroup(group)),
                 catchError((err: any) => {
-                    this.notify.error(err.error.errors);
+                    this.notify.handleSoftErrors(err);
                     return of(false);
                 })
             ).subscribe();

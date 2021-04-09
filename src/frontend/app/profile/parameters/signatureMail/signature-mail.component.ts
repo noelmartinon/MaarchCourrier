@@ -98,10 +98,11 @@ export class MySignatureMailComponent implements OnInit {
     }
 
     deleteEmailSignature() {
-        const id = this.userEmailSignatures[this.mailSignatureModel.selected].id;
+        let id: any = null;
         const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.confirmDeleteMailSignature')}`, msg: this.translate.instant('lang.confirmAction') } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
+            tap(() => id = this.userEmailSignatures[this.mailSignatureModel.selected].id),
             exhaustMap(() => this.http.delete('../rest/currentUser/emailSignature/' + id)),
             tap((data: any) => {
                 this.userEmailSignatures = data.emailSignatures;
@@ -114,7 +115,7 @@ export class MySignatureMailComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.emailSignatureDeleted'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();

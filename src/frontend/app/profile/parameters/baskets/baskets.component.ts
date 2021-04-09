@@ -72,7 +72,7 @@ export class MyBasketsComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.basketUpdated'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -96,7 +96,7 @@ export class MyBasketsComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.basketUpdated'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -113,7 +113,7 @@ export class MyBasketsComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.basketUpdated'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
@@ -130,7 +130,7 @@ export class MyBasketsComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.basketUpdated'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();

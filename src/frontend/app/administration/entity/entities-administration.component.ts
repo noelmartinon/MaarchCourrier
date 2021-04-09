@@ -352,8 +352,8 @@ export class EntitiesAdministrationComponent implements OnInit {
             if (this.functions.empty(this.currentEntity.producerService)) {
                 this.currentEntity.producerService = this.currentEntity.entity_id;
             }
-            this.http.post('../rest/entities', this.currentEntity)
-                .subscribe((data: any) => {
+            this.http.post('../rest/entities', this.currentEntity).pipe(
+                tap((data: any) => {
                     this.appInputCorrespondentGroup.linkGrpAfterCreation(data.id, 'entity');
                     this.currentEntity.listTemplate = [];
                     this.entities = data['entities'];
@@ -367,19 +367,25 @@ export class EntitiesAdministrationComponent implements OnInit {
                         $('#jstree').jstree('select_node', this.currentEntity.entity_id);
                     });
                     this.notify.success(this.translate.instant('lang.entityAdded'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
         } else {
-            this.http.put('../rest/entities/' + this.currentEntity.entity_id, this.currentEntity)
-                .subscribe((data: any) => {
+            this.http.put('../rest/entities/' + this.currentEntity.entity_id, this.currentEntity).pipe(
+                tap((data: any) => {
                     this.entities = data['entities'];
                     $('#jstree').jstree(true).settings.core.data = this.entities;
                     $('#jstree').jstree('refresh');
                     this.notify.success(this.translate.instant('lang.entityUpdated'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
         }
     }
 
@@ -422,18 +428,24 @@ export class EntitiesAdministrationComponent implements OnInit {
             this.dialogRef.afterClosed().subscribe((result: any) => {
                 if (result) {
                     if (this.currentEntity.listTemplate.id) {
-                        this.http.delete('../rest/listTemplates/' + this.currentEntity.listTemplate.id)
-                            .subscribe((data: any) => {
+                        this.http.delete('../rest/listTemplates/' + this.currentEntity.listTemplate.id).pipe(
+                            tap((data: any) => {
                                 this.currentEntity.listTemplate.id = data.id;
-                                this.http.get('../rest/listTemplates/types/entity_id/roles')
-                                    .subscribe((dataTemplates: any) => {
+                                this.http.get('../rest/listTemplates/types/entity_id/roles').pipe(
+                                    tap((dataTemplates: any) => {
                                         this.listTemplateRoles = dataTemplates['roles'];
-                                    }, (err) => {
-                                        this.notify.error(err.error.errors);
-                                    });
-                            }, (err) => {
-                                this.notify.error(err.error.errors);
-                            });
+                                    }),
+                                    catchError((err: any) => {
+                                        this.notify.handleSoftErrors(err);
+                                        return of(false);
+                                    })
+                                ).subscribe();
+                            }),
+                            catchError((err: any) => {
+                                this.notify.handleSoftErrors(err);
+                                return of(false);
+                            })
+                        ).subscribe();
                     }
 
                     if (this.idVisaCircuit) {
@@ -441,7 +453,7 @@ export class EntitiesAdministrationComponent implements OnInit {
                             .subscribe(() => {
                                 this.idVisaCircuit = null;
                             }, (err) => {
-                                this.notify.error(err.error.errors);
+                                this.notify.handleSoftErrors(err);
                             });
                     }
 
@@ -458,36 +470,46 @@ export class EntitiesAdministrationComponent implements OnInit {
                                 this.notify.success(this.translate.instant('lang.entityDeleted'));
                             }
                         }, (err) => {
-                            this.notify.error(err.error.errors);
+                            this.notify.handleSoftErrors(err);
                         });
                 }
                 this.dialogRef = null;
             });
         } else {
             const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.delete')} « ${this.currentEntity.entity_label} »`, msg: this.translate.instant('lang.confirmAction') } });
-            dialogRef.afterClosed().subscribe((response: any) => {
-                if (response) {
+            dialogRef.afterClosed().pipe(
+                filter((response: string) => response === 'ok'),
+                tap(() => {
                     if (this.currentEntity.listTemplate.id) {
-                        this.http.delete('../rest/listTemplates/' + this.currentEntity.listTemplate.id)
-                            .subscribe((data: any) => {
+                        this.http.delete('../rest/listTemplates/' + this.currentEntity.listTemplate.id).pipe(
+                            tap((data: any) => {
                                 this.currentEntity.listTemplate.id = data.id;
-                                this.http.get('../rest/listTemplates/types/entity_id/roles')
-                                    .subscribe((dataTemplates: any) => {
+                                this.http.get('../rest/listTemplates/types/entity_id/roles').pipe(
+                                    tap((dataTemplates: any) => {
                                         this.listTemplateRoles = dataTemplates['roles'];
-                                    }, (err) => {
-                                        this.notify.error(err.error.errors);
-                                    });
-                            }, (err) => {
-                                this.notify.error(err.error.errors);
-                            });
+                                    }),
+                                    catchError((err: any) => {
+                                        this.notify.handleSoftErrors(err);
+                                        return of(false);
+                                    })
+                                ).subscribe();
+                            }),
+                            catchError((err: any) => {
+                                this.notify.handleSoftErrors(err);
+                                return of(false);
+                            })
+                        ).subscribe();
                     }
                     if (this.idVisaCircuit) {
-                        this.http.delete('../rest/listTemplates/' + this.idVisaCircuit)
-                            .subscribe(() => {
+                        this.http.delete('../rest/listTemplates/' + this.idVisaCircuit).pipe(
+                            tap(() => {
                                 this.idVisaCircuit = null;
-                            }, (err) => {
-                                this.notify.error(err.error.errors);
-                            });
+                            }),
+                            catchError((err: any) => {
+                                this.notify.handleSoftErrors(err);
+                                return of(false);
+                            })
+                        ).subscribe();
                     }
                     this.http.delete('../rest/entities/' + this.currentEntity.entity_id)
                         .subscribe((data: any) => {
@@ -501,10 +523,14 @@ export class EntitiesAdministrationComponent implements OnInit {
                                 this.notify.success(this.translate.instant('lang.entityDeleted'));
                             }
                         }, (err: any) => {
-                            this.notify.error(err.error.errors);
+                            this.notify.handleSoftErrors(err);
                         });
-                }
-            });
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
         }
 
     }

@@ -79,7 +79,7 @@ export class PrioritiesAdministrationComponent implements OnInit {
                 this.notify.success(this.translate.instant('lang.priorityDeleted'));
             }),
             catchError((err: any) => {
-                this.notify.error(err.error.errors);
+                this.notify.handleSoftErrors(err);
                 return of(false);
             })
         ).subscribe();
