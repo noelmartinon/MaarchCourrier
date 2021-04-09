@@ -8,6 +8,7 @@ import { tap, exhaustMap, catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { HeaderService } from '@service/header.service';
 import { AuthService } from '@service/auth.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     templateUrl: 'abs-modal.component.html',
@@ -22,6 +23,9 @@ export class AbsModalComponent implements OnInit {
     userId: number = 0;
     baskets: any[] = [];
 
+    today: Date = new Date();
+    startDate: Date = null;
+    endDate: Date = null;
 
     constructor(
         public translate: TranslateService,
@@ -30,6 +34,7 @@ export class AbsModalComponent implements OnInit {
         public headerService: HeaderService,
         public dialogRef: MatDialogRef<AbsModalComponent>,
         private authService: AuthService,
+        public functions: FunctionsService,
         @Inject(MAT_DIALOG_DATA) public data: any
     ) { }
 
@@ -163,8 +168,12 @@ export class AbsModalComponent implements OnInit {
     }
 
     activateAbsence() {
+        const absenceDate: any = {
+            startDate: this.functions.formatDateObjectToDateString(this.startDate),
+            endDate: this.functions.formatDateObjectToDateString(this.endDate)
+        };
         return new Promise((resolve, reject) => {
-            this.http.put('../rest/users/' + this.data.user.id + '/status', { 'status': 'ABS' }).pipe(
+            this.http.put('../rest/users/' + this.data.user.id + '/status', { 'status': 'ABS', 'absenceDate': absenceDate }).pipe(
                 tap((data: any) => {
                     this.authService.logout();
                     resolve(true);
