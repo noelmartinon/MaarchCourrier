@@ -17,7 +17,7 @@ import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
 import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 import { Observable, of } from 'rxjs';
-import {EntitiesExportComponent} from './export/entities-export.component';
+import { EntitiesExportComponent } from './export/entities-export.component';
 import { FormControl } from '@angular/forms';
 import { InputCorrespondentGroupComponent } from '../contact/group/inputCorrespondent/input-correspondent-group.component';
 

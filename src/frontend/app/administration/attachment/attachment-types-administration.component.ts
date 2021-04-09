@@ -9,7 +9,7 @@ import { AppService } from '@service/app.service';
 import { tap, finalize, filter, exhaustMap, catchError, map } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
-import {FunctionsService} from '@service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 import { of } from 'rxjs';
 import { AdministrationService } from '../administration.service';
 

@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild, EventEmitter, Input, Output} from '@angular/core';
+import { Component, OnInit, ViewChild, EventEmitter, Input, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';

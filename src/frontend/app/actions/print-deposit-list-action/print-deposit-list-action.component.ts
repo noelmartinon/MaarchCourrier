@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import {FunctionsService} from '@service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     templateUrl: 'print-deposit-list-action.component.html',

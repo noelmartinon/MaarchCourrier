@@ -5,7 +5,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { NotificationService } from '@service/notification/notification.service';
 import { tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import {PrivilegeService} from '@service/privileges.service';
+import { PrivilegeService } from '@service/privileges.service';
 
 @Component({
     templateUrl: 'add-private-indexing-model-modal.component.html',
