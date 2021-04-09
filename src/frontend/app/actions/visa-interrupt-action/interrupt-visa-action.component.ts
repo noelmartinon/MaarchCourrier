@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { FunctionsService } from '../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     templateUrl: 'interrupt-visa-action.component.html',
@@ -14,6 +14,7 @@ import { FunctionsService } from '../../../service/functions.service';
 })
 export class InterruptVisaActionComponent implements OnInit {
 
+    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
 
     loading: boolean = false;
 
@@ -21,8 +22,6 @@ export class InterruptVisaActionComponent implements OnInit {
     resourcesErrors: any[] = [];
 
     noResourceToProcess: boolean = null;
-
-    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
 
     constructor(
         public translate: TranslateService,

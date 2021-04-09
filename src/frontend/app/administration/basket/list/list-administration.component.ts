@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
 import { FormControl } from '@angular/forms';
-import {CdkDragDrop, moveItemInArray, transferArrayItem} from '@angular/cdk/drag-drop';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { startWith, map, tap, catchError } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { FunctionsService } from '@service/functions.service';
@@ -11,7 +11,7 @@ import { FunctionsService } from '@service/functions.service';
 declare let $: any;
 
 @Component({
-    selector: 'list-administration',
+    selector: 'app-list-administration',
     templateUrl: 'list-administration.component.html',
     styleUrls: ['list-administration.component.scss'],
 })

@@ -8,7 +8,7 @@ import { DocumentViewerModalComponent } from './modal/document-viewer-modal.comp
 import { EcplOnlyofficeViewerComponent } from '../../plugins/onlyoffice-api-js/onlyoffice-viewer.component';
 
 import { PdfViewerModule } from 'ng2-pdf-viewer';
-import {CollaboraOnlineViewerComponent} from '../../plugins/collabora-online/collabora-online-viewer.component';
+import { CollaboraOnlineViewerComponent } from '../../plugins/collabora-online/collabora-online-viewer.component';
 
 import { InternationalizationModule } from '@service/translate/internationalization.module';
 import { TranslateService } from '@ngx-translate/core';

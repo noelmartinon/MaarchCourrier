@@ -362,6 +362,9 @@ class SummarySheetController
                         $label = $customFields[$customFieldsId];
                         $rawValues = json_decode($customFieldsRawValues[$customFieldsId], true);
                         if (!empty($rawValues['table']) && in_array($customFieldsRawTypes[$customFieldsId], ['radio', 'select', 'checkbox'])) {
+                            if (!empty($resource['res_id'])) {
+                                $rawValues['resId'] = $resource['res_id'];
+                            }
                             $rawValues = CustomFieldModel::getValuesSQL($rawValues);
 
                             $rawValues = array_column($rawValues, 'label', 'key');

@@ -9,6 +9,8 @@ import { HttpClient } from '@angular/common/http';
 })
 export class FastParaphComponent implements OnInit {
 
+    @Input() additionalsInfos: any;
+    @Input() externalSignatoryBookDatas: any;
 
     loading: boolean = false;
 
@@ -19,9 +21,6 @@ export class FastParaphComponent implements OnInit {
         resId: 0,
         editable: true
     };
-
-    @Input() additionalsInfos: any;
-    @Input() externalSignatoryBookDatas: any;
 
     constructor(public translate: TranslateService, public http: HttpClient) { }
 

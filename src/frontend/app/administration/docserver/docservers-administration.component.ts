@@ -6,7 +6,10 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
-
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
 @Component({
     templateUrl: 'docservers-administration.component.html'
 })
@@ -30,7 +33,8 @@ export class DocserversAdministrationComponent implements OnInit {
         private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
-        private viewContainerRef: ViewContainerRef
+        private viewContainerRef: ViewContainerRef,
+        public dialog: MatDialog
     ) { }
 
     ngOnInit(): void {
@@ -84,21 +88,20 @@ export class DocserversAdministrationComponent implements OnInit {
     }
 
     delete(docserver: any, i: number) {
-        let r = null;
-        if (docserver.actual_size_number === 0) {
-            r = confirm(this.translate.instant('lang.delete') + ' ?');
-        } else {
-            r = confirm(this.translate.instant('lang.docserverdeleteWarning'));
-        }
+        const title: string = docserver.actual_size_number === 0 ? this.translate.instant('lang.delete') + ' ?' : this.translate.instant('lang.docserverdeleteWarning');
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirmAction'), msg: title } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/docservers/' + docserver.id)),
+            tap(() => {
+                this.docservers[docserver.docserver_type_id].splice(i, 1);
+                this.notify.success(this.translate.instant('lang.docserverDeleted'));
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
 
-        if (r) {
-            this.http.delete('../rest/docservers/' + docserver.id)
-                .subscribe(() => {
-                    this.docservers[docserver.docserver_type_id].splice(i, 1);
-                    this.notify.success(this.translate.instant('lang.docserverDeleted'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
     }
 }

@@ -18,10 +18,10 @@
                     </div>
                     <div>
                         <div class="col-md-12" style="padding-top: 10px;" *ngIf="additionalsInfos.users.length != 0">
-                            <plugin-autocomplete [labelPlaceholder]="'lang.userMaarchParapheur' | translate"
+                            <app-plugin-autocomplete [labelPlaceholder]="'lang.userMaarchParapheur' | translate"
                                 [datas]="additionalsInfos.users" [targetSearchKey]="'displayName'" [subInfoKey]="'email'"
                                 (triggerEvent)="setVal($event)" [singleMode]="true" appearance="outline">
-                            </plugin-autocomplete>
+                            </app-plugin-autocomplete>
                         </div>
                         <div class="col-md-12" *ngIf="additionalsInfos.users.length == 0">
                             {{'lang.noUserDefinedInMaarchParapheur' | translate}}

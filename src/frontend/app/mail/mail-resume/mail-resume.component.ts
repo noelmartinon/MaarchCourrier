@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { catchError, tap, finalize, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { NotificationService } from '@service/notification/notification.service';
-import {FunctionsService} from '../../../service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 
 
 @Component({
@@ -17,13 +17,12 @@ import {FunctionsService} from '../../../service/functions.service';
 
 export class MailResumeComponent implements OnInit {
 
-    @Input('resId') resId: number = null;
-    @Output('goTo') goTo = new EventEmitter<string>();
+    @Input() resId: number = null;
+    @Output() goTo = new EventEmitter<string>();
 
     loading: boolean = true;
 
     mails: any[] = [];
-
 
     constructor(
         public translate: TranslateService,

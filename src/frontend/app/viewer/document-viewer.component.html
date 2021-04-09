@@ -23,7 +23,7 @@
             <div style="padding-top: 10px;">{{loadingInfo.message}}</div>
         </div>
         <div *ngIf="file.content === null && !loading" class="view-doc-container" appUploadFileDragDrop
-            (onFileDropped)="dndUploadFile($event)" [disabled]="!editMode">
+            (fileDropped)="dndUploadFile($event)" [disabled]="!editMode">
             <i class="fa fa-file-upload upload-icon"></i><br />
             {{'lang.dragAndDrop' | translate}}<br />{{'lang.or' | translate}}
             <div style="display: flex;">
@@ -40,7 +40,7 @@
             </div>
         </div>
         <input type="file" #docToUpload [ngModel]="docToUploadValue" name="files[]" (change)="uploadTrigger($event)" style="display:none;">
-        <div style="display: block;width:100%;" appUploadFileDragDrop (onFileDropped)="dndUploadFile($event)"
+        <div style="display: block;width:100%;" appUploadFileDragDrop (fileDropped)="dndUploadFile($event)"
             [disabled]="!editMode">
             <div *ngIf="!loading && file.content !== null && !hideTools" class="viewer-tools">
                 <button mat-icon-button (click)="downloadOriginalFile()" [matTooltip]="'lang.downloadOriginalFile' | translate">
@@ -99,7 +99,7 @@
 
         </div>
         <div *ngIf="file.content !== null && noConvertedFound" class="no-doc-container" appUploadFileDragDrop
-            (onFileDropped)="dndUploadFile($event)" [disabled]="!editMode">
+            (fileDropped)="dndUploadFile($event)" [disabled]="!editMode">
             <div class="loaded-file"><i class="fa fa-file"></i>&nbsp;<a
                     (click)="downloadOriginalFile()">{{file.name}}</a>&nbsp;<b>{{'lang.loaded' | translate}}</b></div>
 

@@ -4,6 +4,10 @@ import { NotificationService } from '@service/notification/notification.service'
 import { TranslateService } from '@ngx-translate/core';
 import { FunctionsService } from '@service/functions.service';
 import { HeaderService } from '@service/header.service';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { MatDialog } from '@angular/material/dialog';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
     selector: 'app-signature-book',
@@ -27,7 +31,7 @@ export class MySignatureBookComponent implements OnInit {
         private notify: NotificationService,
         public functionsService: FunctionsService,
         public headerService: HeaderService,
-
+        public dialog: MatDialog
     ){
         window['angularProfileComponent'] = {
             componentAfterUpload: (base64Content: any) => this.processAfterUpload(base64Content),
@@ -129,18 +133,20 @@ export class MySignatureBookComponent implements OnInit {
     }
 
     deleteSignature(id: number) {
-        const r = confirm(this.translate.instant('lang.confirmDeleteSignature'));
-
-        if (r) {
-            this.http.delete('../rest/users/' + this.headerService.user.id + '/signatures/' + id)
-                .subscribe((data: any) => {
-                    this.headerService.user.signatures = data.signatures;
-                    this.userSignatures = data.signatures;
-                    this.notify.success(this.translate.instant('lang.signatureDeleted'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.confirmDeleteSignature')}`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/users/' + this.headerService.user.id + '/signatures/' + id)),
+            tap((data: any) => {
+                this.headerService.user.signatures = data.signatures;
+                this.userSignatures = data.signatures;
+                this.notify.success(this.translate.instant('lang.signatureDeleted'));
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     syncMP() {

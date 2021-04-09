@@ -15,10 +15,10 @@ import { SearchResultListComponent } from '@appRoot/search/result-list/search-re
 })
 export class ReconcileActionComponent implements OnInit {
 
-    loading: boolean = false;
-
     @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
     @ViewChild('appSearchResultList', { static: false }) appSearchResultList: SearchResultListComponent;
+
+    loading: boolean = false;
 
     searchUrl: string = '';
     resourcesErrors: any[] = [];

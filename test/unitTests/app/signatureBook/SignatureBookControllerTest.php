@@ -668,6 +668,46 @@ class SignatureBookControllerTest extends TestCase
         $this->assertIsInt($responseBody['id']);
         self::$signedAttachmentId = $responseBody['id'];
 
+        // Test Get
+        $attachmentController = new \Attachment\controllers\AttachmentController();
+        $environment    = \Slim\Http\Environment::mock(['REQUEST_METHOD' => 'GET']);
+        $request        = \Slim\Http\Request::createFromEnvironment($environment);
+
+        $response = $attachmentController->getById($request, new \Slim\Http\Response(), ['id' => self::$attachmentId]);
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertIsArray($responseBody);
+
+        $this->assertSame('Nulle pierre ne peut être polie sans friction, nul homme ne peut parfaire son expérience sans épreuve.', $responseBody['title']);
+        $this->assertSame('response_project', $responseBody['type']);
+        $this->assertSame('SIGN', $responseBody['status']);
+        $this->assertSame(1, $responseBody['relation']);
+
+        $response = $attachmentController->getById($request, new \Slim\Http\Response(), ['id' => self::$signedAttachmentId]);
+        $responseBody = json_decode((string)$response->getBody(), true);
+        $this->assertIsArray($responseBody);
+
+        $this->assertSame('Nulle pierre ne peut être polie sans friction, nul homme ne peut parfaire son expérience sans épreuve.', $responseBody['title']);
+        $this->assertSame('signed_response', $responseBody['type']);
+        $this->assertSame('A_TRA', $responseBody['status']);
+        $this->assertSame(1, $responseBody['relation']);
+
+        $response = $attachmentController->getByResId($request, new \Slim\Http\Response(), ['resId' => self::$resId]);
+        $response = json_decode((string)$response->getBody(), true);
+
+        $this->assertNotNull($response['attachments']);
+        $this->assertIsArray($response['attachments']);
+
+        $this->assertIsBool($response['mailevaEnabled']);
+
+        $userLabel = \User\models\UserModel::getLabelledUserById(['id' => $GLOBALS['id']]);
+        foreach ($response['attachments'] as $value) {
+            if ($value['resId'] == self::$signedAttachmentId) {
+                $this->assertSame($userLabel, $value['signatory']);
+                $this->assertNotEmpty($value['signDate']);
+                break;
+            }
+        }
+
         $GLOBALS['login'] = 'superadmin';
         $userInfo = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
         $GLOBALS['id'] = $userInfo['id'];

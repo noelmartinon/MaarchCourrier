@@ -15,6 +15,8 @@ import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
 })
 export class SendAvisWorkflowComponent implements AfterViewInit {
 
+    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
+    @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
 
     loading: boolean = false;
 
@@ -25,9 +27,6 @@ export class SendAvisWorkflowComponent implements AfterViewInit {
     opinionLimitDate: Date = null;
 
     today: Date = new Date();
-
-    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
-    @ViewChild('appAvisWorkflow', { static: false }) appAvisWorkflow: AvisWorkflowComponent;
 
     constructor(
         public translate: TranslateService,

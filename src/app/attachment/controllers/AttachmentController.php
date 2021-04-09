@@ -327,7 +327,7 @@ class AttachmentController
 
         $queryParams = $request->getQueryParams();
         if (!empty($queryParams['limit']) && !Validator::intVal()->validate($queryParams['limit'])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Query limit is not an integer']);
+            return $response->withStatus(400)->withJson(['errors' => 'Query limit is not an integer']);
         }
 
         $excludeAttachmentTypes = ['signed_response'];
@@ -470,7 +470,7 @@ class AttachmentController
             'limit'     => 1
         ]);
         if (empty($attachment[0])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Attachment not found']);
+            return $response->withStatus(400)->withJson(['errors' => 'Attachment not found']);
         }
 
         if (!ResController::hasRightByResId(['resId' => [$attachment[0]['res_id_master']], 'userId' => $GLOBALS['id']])) {
@@ -522,7 +522,7 @@ class AttachmentController
     public function getThumbnailContentByPage(Request $request, Response $response, array $args)
     {
         if (!Validator::intVal()->validate($args['id'])) {
-            return $response->withStatus(403)->withJson(['errors' => 'id param is not an integer']);
+            return $response->withStatus(400)->withJson(['errors' => 'id param is not an integer']);
         }
 
         $document = AttachmentModel::getById(['select' => ['res_id_master'], 'id' => $args['id']]);
@@ -621,7 +621,7 @@ class AttachmentController
             'limit'     => 1
         ]);
         if (empty($attachment[0])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Attachment not found']);
+            return $response->withStatus(400)->withJson(['errors' => 'Attachment not found']);
         }
         $attachment = $attachment[0];
         if (!ResController::hasRightByResId(['resId' => [$attachment['res_id_master']], 'userId' => $GLOBALS['id']])) {
@@ -721,7 +721,7 @@ class AttachmentController
             'limit'  => 1
         ]);
         if (empty($attachment[0])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Attachment not found']);
+            return $response->withStatus(400)->withJson(['errors' => 'Attachment not found']);
         }
 
         if (!ResController::hasRightByResId(['resId' => [$attachment[0]['res_id_master']], 'userId' => $GLOBALS['id']])) {
@@ -827,7 +827,7 @@ class AttachmentController
         $attachment = $attachment[0];
 
         if (!ResController::hasRightByResId(['resId' => [$attachment['resIdMaster']], 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Attachment out of perimeter']);
+            return $response->withStatus(403)->withJson(['errors' => 'Attachment out of perimeter']);
         }
 
         return $response->withJson($attachment);

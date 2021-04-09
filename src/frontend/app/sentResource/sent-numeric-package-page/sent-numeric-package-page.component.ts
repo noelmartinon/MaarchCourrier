@@ -487,7 +487,7 @@ export class SentNumericPackagePageComponent implements OnInit {
             } else if (this.numericPackage.mainExchangeDoc.type === 'notes') {
                 typeDoc = 'notes';
             }
-            numericPackage.joinFile = [parseInt(this.numericPackage.mainExchangeDoc.id)];
+            numericPackage.joinFile = [parseInt(this.numericPackage.mainExchangeDoc.id, 10)];
             numericPackage.mainExchangeDoc = `${typeDoc}__${this.numericPackage.mainExchangeDoc.id}`;
         }
         numericPackage.object = this.numericPackage.object;

@@ -7,7 +7,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FunctionsService } from '@service/functions.service';
 import { tap } from 'rxjs/operators';
 import { DomSanitizer } from '@angular/platform-browser';
-import {PrivilegeService} from '@service/privileges.service';
+import { PrivilegeService } from '@service/privileges.service';
 
 @Component({
     templateUrl: 'summary-sheet.component.html',

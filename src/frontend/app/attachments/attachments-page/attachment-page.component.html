@@ -59,7 +59,7 @@
                             </div>
                         </div>
                         <div class="attachment-form-item" *ngIf="sendMassMode" style="display: block;">
-                            <div class="alert alert-info" role="alert" [innerHTML]="this.translate.instant('lang.mailingMsg')"></div>
+                            <app-maarch-message [content]="'lang.mailingMsg' | translate: {nbContacts: getNbContacts()}"></app-maarch-message>
                         </div>
                         <div class="attachment-form-item" *ngIf="!sendMassMode">
                             <app-contact-autocomplete [control]="attachment['recipient']" style="width:100%;" [singleMode]="true">

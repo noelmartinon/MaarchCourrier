@@ -2118,7 +2118,7 @@ SELECT pg_catalog.setval('public.entities_id_seq', 20, true);
 SELECT pg_catalog.setval('public.exports_templates_id_seq', 2, true);
 SELECT pg_catalog.setval('public.folders_id_seq', 38, true);
 SELECT pg_catalog.setval('public.groupbasket_id_seq', 38, true);
-SELECT pg_catalog.setval('public.groupbasket_redirect_system_id_seq', 725, true);
+SELECT pg_catalog.setval('public.groupbasket_redirect_system_id_seq', 734, true);
 SELECT pg_catalog.setval('public.indexing_models_fields_id_seq', 92, true);
 SELECT pg_catalog.setval('public.indexing_models_id_seq', 8, true);
 SELECT pg_catalog.setval('public.list_templates_id_seq', 1011, false);

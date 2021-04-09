@@ -1,10 +1,10 @@
 <div class="mat-dialog-content-container">
   <h1 mat-dialog-title>{{'lang.linkAccount' | translate}}</h1>
   <mat-dialog-content>
-    <plugin-autocomplete [labelPlaceholder]="'lang.searchUserInMaarchParapheur' | translate"
+    <app-plugin-autocomplete [labelPlaceholder]="'lang.searchUserInMaarchParapheur' | translate"
       [routeDatas]="['/rest/autocomplete/maarchParapheurUsers?exludeAlreadyConnected=true']"
       [targetSearchKey]="'idToDisplay'" [subInfoKey]="'email'" (triggerEvent)="selectUser($event)" appearance="outline">
-    </plugin-autocomplete>
+    </app-plugin-autocomplete>
     <mat-list *ngIf="externalUser.inMaarchParapheur">
       <mat-list-item>
         <mat-icon class="avatarAccount" color="primary" mat-list-icon

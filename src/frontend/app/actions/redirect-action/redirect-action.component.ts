@@ -18,6 +18,9 @@ declare let $: any;
 })
 export class RedirectActionComponent implements OnInit {
 
+    @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
+    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
+
     loading: boolean = false;
 
     entities: any[] = [];
@@ -40,9 +43,6 @@ export class RedirectActionComponent implements OnInit {
     userRedirectCtrl = new FormControl();
     filteredUserRedirect: Observable<any[]>;
     isDestinationChanging: boolean = false;
-
-    @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
-    @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
 
     constructor(
         public translate: TranslateService,
@@ -252,13 +252,6 @@ export class RedirectActionComponent implements OnInit {
         $('.searchUserRedirect').blur();
     }
 
-    private _filterUserRedirect(value: string): any[] {
-        if (typeof value === 'string') {
-            const filterValue = value.toLowerCase();
-            return this.userListRedirect.filter(user => user.labelToDisplay.toLowerCase().indexOf(filterValue) >= 0);
-        }
-    }
-
     selectEntity(entity: any, initLoad: boolean = false) {
         this.currentEntity = entity;
         this.appDiffusionsList.loadListModel(entity.serialId, initLoad);
@@ -310,6 +303,13 @@ export class RedirectActionComponent implements OnInit {
             return false;
         } else {
             return true;
+        }
+    }
+
+    private _filterUserRedirect(value: string): any[] {
+        if (typeof value === 'string') {
+            const filterValue = value.toLowerCase();
+            return this.userListRedirect.filter(user => user.labelToDisplay.toLowerCase().indexOf(filterValue) >= 0);
         }
     }
 }

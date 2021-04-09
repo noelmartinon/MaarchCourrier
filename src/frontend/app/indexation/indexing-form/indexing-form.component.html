@@ -187,11 +187,11 @@
                                     </mat-chip-list>
                                 </ng-container>
                                 <!--<ng-container *ngIf="field.type === 'autocomplete'">
-                                    <plugin-autocomplete [labelPlaceholder]="'lang.searchValue' | translate"
+                                    <app-plugin-autocomplete [labelPlaceholder]="'lang.searchValue' | translate"
                                         [routeDatas]="[field.values[0]]" [targetSearchKey]="'idToDisplay'"
                                         [size]="'small'" [control]="arrFormControl[field.identifier]"
                                         [manageDatas]="!adminMode ? field.values[1] : undefined" style="width:100%;">
-                                    </plugin-autocomplete>
+                                    </app-plugin-autocomplete>
                                 </ng-container>-->
                                 <ng-container *ngIf="['senders','recipients'].indexOf(field.identifier) > -1">
                                     <app-contact-autocomplete [id]="field.identifier"

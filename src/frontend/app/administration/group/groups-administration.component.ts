@@ -10,6 +10,9 @@ import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
 
 @Component({
     templateUrl: 'groups-administration.component.html'
@@ -66,11 +69,15 @@ export class GroupsAdministrationComponent implements OnInit {
 
     preDelete(group: any) {
         if (group.users.length === 0) {
-            const r = confirm(this.translate.instant('lang.reallyWantToDeleteThisGroup'));
-
-            if (r) {
-                this.deleteGroup(group);
-            }
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.deleteGroupConfirm')} « ${group.group_desc} »`, msg: this.translate.instant('lang.confirmAction') } });
+            dialogRef.afterClosed().pipe(
+                filter((data: string) => data === 'ok'),
+                exhaustMap(async () => this.deleteGroup(group)),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
         } else {
             this.groupsForAssign = [];
             this.groups.forEach((tmpGroup) => {

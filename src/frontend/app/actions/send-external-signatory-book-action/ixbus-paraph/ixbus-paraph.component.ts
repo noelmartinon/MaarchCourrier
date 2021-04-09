@@ -12,6 +12,9 @@ import { HeaderService } from '@service/header.service';
 })
 export class IxbusParaphComponent implements OnInit {
 
+    @Input() additionalsInfos: any;
+    @Input() externalSignatoryBookDatas: any;
+
     loading: boolean = true;
 
     currentAccount: any = null;
@@ -34,9 +37,6 @@ export class IxbusParaphComponent implements OnInit {
     selectNature = new FormControl();
     selectWorkflow = new FormControl();
     selectUser = new FormControl();
-
-    @Input() additionalsInfos: any;
-    @Input() externalSignatoryBookDatas: any;
 
     constructor(
         public translate: TranslateService,

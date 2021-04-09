@@ -7,7 +7,7 @@ import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 import { Router } from '@angular/router';
 import { FeatureTourService } from '@service/featureTour.service';
-import {DomSanitizer} from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
 
 declare let $: any;
 

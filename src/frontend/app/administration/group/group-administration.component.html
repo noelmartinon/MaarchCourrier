@@ -177,11 +177,10 @@
                         <mat-tab label="{{'lang.relatedUsers' | translate}}" *ngIf="!creationMode">
                             <div class="row" style="margin:0px;">
                                 <div class="col-md-12" *ngIf="group.canAdminUsers" style="padding:5px;">
-                                    <plugin-autocomplete [labelPlaceholder]="'lang.linkUser' | translate"
-                                        [labelList]="'lang.availableUsers' | translate"
+                                    <app-plugin-autocomplete [labelPlaceholder]="'lang.linkUser' | translate"
                                         [routeDatas]="['/rest/autocomplete/users/administration']"
                                         [targetSearchKey]="'idToDisplay'" (triggerEvent)="linkUser($event)">
-                                    </plugin-autocomplete>
+                                    </app-plugin-autocomplete>
                                     <hr />
                                 </div>
                                 <div class="col-md-6 col-xs-6">

@@ -8,8 +8,10 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSort } from '@angular/material/sort';
 import { AppService } from '@service/app.service';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+
 
 @Component({
     templateUrl: 'doctypes-administration.component.html'
@@ -337,83 +339,88 @@ export class DoctypesAdministrationComponent implements OnInit {
     }
 
     removeFirstLevel() {
-        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + this.currentFirstLevel.doctypes_first_level_label + ' »');
-
-        if (r) {
-            this.http.delete('../rest/doctypes/firstLevel/' + this.currentFirstLevel.doctypes_first_level_id)
-                .subscribe((data: any) => {
-                    this.resetDatas();
-                    this.readMode();
-                    this.doctypes = data['doctypeTree'];
-                    this.refreshTree();
-                    if (this.doctypes[0]) {
-                        $('#jstree').jstree('select_node', this.doctypes[0]);
-                    } else if (this.sidenavRight.opened === true) {
-                        this.sidenavRight.close();
-                    }
-                    this.notify.success(this.translate.instant('lang.firstLevelDeleted'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.delete')} « ${this.currentFirstLevel.doctypes_first_level_label} »`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/doctypes/firstLevel/' + this.currentFirstLevel.doctypes_first_level_id)),
+            tap((data: any) => {
+                this.resetDatas();
+                this.readMode();
+                this.doctypes = data['doctypeTree'];
+                this.refreshTree();
+                if (this.doctypes[0]) {
+                    $('#jstree').jstree('select_node', this.doctypes[0]);
+                } else if (this.sidenavRight.opened === true) {
+                    this.sidenavRight.close();
+                }
+                this.notify.success(this.translate.instant('lang.firstLevelDeleted'));
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     removeSecondLevel() {
-        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + this.currentSecondLevel.doctypes_second_level_label + ' »');
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.delete')} « ${this.currentSecondLevel.doctypes_second_level_label} »`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/doctypes/secondLevel/' + this.currentSecondLevel.doctypes_second_level_id)),
+            tap((data: any) => {
+                this.resetDatas();
+                this.readMode();
+                this.doctypes = data['doctypeTree'];
+                this.refreshTree();
+                $('#jstree').jstree('select_node', this.doctypes[0]);
+                this.notify.success(this.translate.instant('lang.secondLevelDeleted'));
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
 
-        if (r) {
-            this.http.delete('../rest/doctypes/secondLevel/' + this.currentSecondLevel.doctypes_second_level_id)
-                .subscribe((data: any) => {
+    removeType() {
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.delete')} « ${this.currentType.description} »`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/doctypes/types/' + this.currentType.type_id)),
+            tap((data: any) => {
+                if (data.deleted === 0) {
                     this.resetDatas();
                     this.readMode();
                     this.doctypes = data['doctypeTree'];
                     this.refreshTree();
                     $('#jstree').jstree('select_node', this.doctypes[0]);
-                    this.notify.success(this.translate.instant('lang.secondLevelDeleted'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
-    }
-
-    removeType() {
-        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + this.currentType.description + ' »');
-
-        if (r) {
-            this.http.delete('../rest/doctypes/types/' + this.currentType.type_id)
-                .subscribe((data: any) => {
-                    if (data.deleted === 0) {
-                        this.resetDatas();
-                        this.readMode();
-                        this.doctypes = data['doctypeTree'];
-                        this.refreshTree();
-                        $('#jstree').jstree('select_node', this.doctypes[0]);
-                        this.notify.success(this.translate.instant('lang.documentTypeDeleted'));
-                    } else {
-                        this.config = { panelClass: 'maarch-modal', data: { count: data.deleted, types: data.doctypes } };
-                        this.dialogRef = this.dialog.open(DoctypesAdministrationRedirectModalComponent, this.config);
-                        this.dialogRef.afterClosed().subscribe((result: any) => {
-                            if (result) {
-                                this.http.put('../rest/doctypes/types/' + this.currentType.type_id + '/redirect', result)
-                                    .subscribe((dataDoctypes: any) => {
-                                        this.resetDatas();
-                                        this.readMode();
-                                        this.doctypes = dataDoctypes['doctypeTree'];
-                                        this.refreshTree();
-                                        $('#jstree').jstree('select_node', this.doctypes[0]);
-                                        this.notify.success(this.translate.instant('lang.documentTypeDeleted'));
-                                    }, (err) => {
-                                        this.notify.error(err.error.errors);
-                                    });
-                            }
-                            this.dialogRef = null;
-                        });
-                    }
-
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+                    this.notify.success(this.translate.instant('lang.documentTypeDeleted'));
+                } else {
+                    this.config = { panelClass: 'maarch-modal', data: { count: data.deleted, types: data.doctypes } };
+                    this.dialogRef = this.dialog.open(DoctypesAdministrationRedirectModalComponent, this.config);
+                    this.dialogRef.afterClosed().subscribe((result: any) => {
+                        if (result) {
+                            this.http.put('../rest/doctypes/types/' + this.currentType.type_id + '/redirect', result)
+                                .subscribe((dataDoctypes: any) => {
+                                    this.resetDatas();
+                                    this.readMode();
+                                    this.doctypes = dataDoctypes['doctypeTree'];
+                                    this.refreshTree();
+                                    $('#jstree').jstree('select_node', this.doctypes[0]);
+                                    this.notify.success(this.translate.instant('lang.documentTypeDeleted'));
+                                }, (err) => {
+                                    this.notify.handleSoftErrors(err);
+                                });
+                        }
+                        this.dialogRef = null;
+                    });
+                }
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     prepareDoctypeAdd(mode: any) {

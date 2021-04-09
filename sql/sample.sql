@@ -45,7 +45,7 @@ INSERT INTO adr_attachments (id, res_id, type, docserver_id, path, filename, fin
 INSERT INTO adr_attachments (id, res_id, type, docserver_id, path, filename, fingerprint) VALUES (4, 2, 'TNL', 'TNL_ATTACH', '2021/03/0001/', '0002_364203118.png', NULL);
 INSERT INTO adr_attachments (id, res_id, type, docserver_id, path, filename, fingerprint) VALUES (6, 3, 'PDF', 'CONVERT_ATTACH', '2021/03/0001/', '0003_746912755.pdf', '6d2be666576f3b884af5417fd3e0b940d1c1ee3c84fda829ad431d4867d26070');
 
-Select setval('adr_attachments_id_seq', (select max(res_id)+2 from adr_attachments), false);
+Select setval('adr_attachments_id_seq', (select max(id)+2 from adr_attachments), false);
 
 TRUNCATE TABLE listinstance;
 ALTER SEQUENCE listinstance_id_seq restart WITH 1;

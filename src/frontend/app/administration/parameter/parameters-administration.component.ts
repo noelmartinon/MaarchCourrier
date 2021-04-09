@@ -8,6 +8,10 @@ import { MatSort } from '@angular/material/sort';
 import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { MatDialog } from '@angular/material/dialog';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
     templateUrl: 'parameters-administration.component.html'
@@ -36,7 +40,8 @@ export class ParametersAdministrationComponent implements OnInit {
         public appService: AppService,
         public functions: FunctionsService,
         public adminService: AdministrationService,
-        private viewContainerRef: ViewContainerRef
+        private viewContainerRef: ViewContainerRef,
+        public dialog: MatDialog
     ) { }
 
     ngOnInit(): void {
@@ -57,17 +62,19 @@ export class ParametersAdministrationComponent implements OnInit {
     }
 
     deleteParameter(paramId: string) {
-        const r = confirm(this.translate.instant('lang.deleteMsg'));
-
-        if (r) {
-            this.http.delete('../rest/parameters/' + paramId)
-                .subscribe((data: any) => {
-                    this.parameters = data.parameters.filter((item: any) => this.hiddenParameters.indexOf(item.id) === -1);
-                    this.adminService.setDataSource('admin_parameters', this.parameters, this.sort, this.paginator, this.filterColumns);
-                    this.notify.success(this.translate.instant('lang.parameterDeleted'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.deleteParameterConfirm')}`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/parameters/' + paramId)),
+            tap((data: any) => {
+                this.parameters = data.parameters.filter((item: any) => this.hiddenParameters.indexOf(item.id) === -1);
+                this.adminService.setDataSource('admin_parameters', this.parameters, this.sort, this.paginator, this.filterColumns);
+                this.notify.success(this.translate.instant('lang.parameterDeleted'));
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 }

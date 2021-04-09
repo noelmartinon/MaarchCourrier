@@ -307,14 +307,13 @@ export class IndexingFormComponent implements OnInit {
     initCustomFields() {
         return new Promise((resolve, reject) => {
 
-            this.http.get('../rest/customFields').pipe(
+            this.http.get(`../rest/customFields?resId=${this.resId}`).pipe(
                 tap((data: any) => {
                     const withFormMode = data.customFields.filter((item: { mode: any }) => item.mode === 'form');
                     this.availableCustomFields = withFormMode.map((info: any) => {
                         info.identifier = 'indexingCustomField_' + info.id;
                         info.system = false;
                         info.enabled = true;
-                        info.SQLMode = info.SQLMode;
 
                         if (['integer', 'string', 'date'].indexOf(info.type) > -1 && !this.functions.empty(info.values)) {
                             info.default_value = info.values[0].key;

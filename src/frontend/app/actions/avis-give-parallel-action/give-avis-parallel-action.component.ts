@@ -14,6 +14,7 @@ import { FunctionsService } from '@service/functions.service';
 })
 export class GiveAvisParallelActionComponent implements OnInit {
 
+    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
 
     loading: boolean = false;
 
@@ -26,8 +27,6 @@ export class GiveAvisParallelActionComponent implements OnInit {
 
     ownerOpinion: string = '';
     opinionContent: string = '';
-
-    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
 
     constructor(
         public translate: TranslateService,

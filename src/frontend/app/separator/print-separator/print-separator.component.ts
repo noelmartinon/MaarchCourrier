@@ -5,6 +5,7 @@ import { HeaderService } from '@service/header.service';
 import { NotificationService } from '@service/notification/notification.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '@service/app.service';
+import { FunctionsService } from '@service/functions.service';
 
 declare let $: any;
 
@@ -37,7 +38,8 @@ export class PrintSeparatorComponent implements OnInit {
         public http: HttpClient,
         private notify: NotificationService,
         private headerService: HeaderService,
-        public appService: AppService
+        public appService: AppService,
+        public functions: FunctionsService
     ) {
         (<any>window).pdfWorkerSrc = 'pdfjs/pdf.worker.min.js';
     }
@@ -149,21 +151,7 @@ export class PrintSeparatorComponent implements OnInit {
 
         const url = `data:application/pdf;base64,${this.docData}`;
         a.href = url;
-
-        let today: any = new Date();
-        let dd = today.getDate();
-        let mm = today.getMonth() + 1;
-        const yyyy: any = today.getFullYear();
-
-        if (dd < 10) {
-            dd = '0' + dd;
-        }
-        if (mm < 10) {
-            mm = '0' + mm;
-        }
-        today = dd + '-' + mm + '-' + yyyy;
-
-        a.download = this.translate.instant('lang.separators') + '_' + today + '.pdf';
+        a.download = this.functions.getFormatedFileName(this.translate.instant('lang.separators'), 'pdf');
         a.click();
         window.URL.revokeObjectURL(url);
     }

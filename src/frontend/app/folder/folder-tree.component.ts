@@ -14,7 +14,7 @@ import { Router } from '@angular/router';
 import { FolderUpdateComponent } from './folder-update/folder-update.component';
 import { FoldersService } from './folders.service';
 import { FormControl } from '@angular/forms';
-import { PluginAutocomplete } from '../../plugins/autocomplete/autocomplete.component';
+import { PluginAutocompleteComponent } from '../../plugins/autocomplete/autocomplete.component';
 import { HeaderService } from '@service/header.service';
 import { FolderCreateModalComponent } from './folder-create-modal/folder-create-modal.component';
 import { FunctionsService } from '@service/functions.service';
@@ -68,7 +68,7 @@ export class ItemFlatNode {
 export class FolderTreeComponent implements OnInit, OnDestroy {
 
     @ViewChild('itemValue', { static: true }) itemValue: MatInput;
-    @ViewChild('autocomplete', { static: false }) autocomplete: PluginAutocomplete;
+    @ViewChild('autocomplete', { static: false }) autocomplete: PluginAutocompleteComponent;
     @ViewChild('tree', { static: true }) tree: any;
 
     @Input() selectedId: number;

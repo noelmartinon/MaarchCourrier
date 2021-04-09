@@ -8,6 +8,10 @@ import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { MatDialog } from '@angular/material/dialog';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
     templateUrl: 'templates-administration.component.html'
@@ -37,7 +41,8 @@ export class TemplatesAdministrationComponent implements OnInit {
         public appService: AppService,
         public functions: FunctionsService,
         public adminService: AdministrationService,
-        private viewContainerRef: ViewContainerRef
+        private viewContainerRef: ViewContainerRef,
+        public dialog: MatDialog
     ) { }
 
     ngOnInit(): void {
@@ -60,23 +65,23 @@ export class TemplatesAdministrationComponent implements OnInit {
     }
 
     deleteTemplate(template: any) {
-        const r = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + template.template_label + ' »');
-
-        if (r) {
-            this.http.delete('../rest/templates/' + template.template_id)
-                .subscribe(() => {
-                    for (const i in this.templates) {
-                        if (this.templates[i].template_id === template.template_id) {
-                            this.templates.splice(Number(i), 1);
-                        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.delete')} « ${template.template_label} »`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/templates/' + template.template_id)),
+            tap(() => {
+                for (const i in this.templates) {
+                    if (this.templates[i].template_id === template.template_id) {
+                        this.templates.splice(Number(i), 1);
                     }
-                    this.adminService.setDataSource('admin_templates', this.templates, this.sort, this.paginator, this.filterColumns);
-
-                    this.notify.success(this.translate.instant('lang.templateDeleted'));
-
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+                }
+                this.adminService.setDataSource('admin_templates', this.templates, this.sort, this.paginator, this.filterColumns);
+                this.notify.success(this.translate.instant('lang.templateDeleted'));
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 }

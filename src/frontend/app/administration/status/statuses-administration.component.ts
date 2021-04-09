@@ -8,6 +8,10 @@ import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { MatDialog } from '@angular/material/dialog';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
     templateUrl: 'statuses-administration.component.html',
@@ -34,7 +38,8 @@ export class StatusesAdministrationComponent implements OnInit {
         public appService: AppService,
         public functions: FunctionsService,
         public adminService: AdministrationService,
-        private viewContainerRef: ViewContainerRef
+        private viewContainerRef: ViewContainerRef,
+        public dialog: MatDialog
     ) { }
 
     ngOnInit(): void {
@@ -58,18 +63,20 @@ export class StatusesAdministrationComponent implements OnInit {
     }
 
     deleteStatus(status: any) {
-        const resp = confirm(this.translate.instant('lang.confirmAction') + ' ' + this.translate.instant('lang.delete') + ' « ' + status.id + ' »');
-        if (resp) {
-            this.http.delete('../rest/statuses/' + status.identifier)
-                .subscribe((data: any) => {
-                    this.statuses = data.statuses;
-                    this.adminService.setDataSource('admin_status', this.statuses, this.sort, this.paginator, this.filterColumns);
-                    this.notify.success(this.translate.instant('lang.statusDeleted'));
-
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.delete')} « ${status.id} »`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/statuses/' + status.identifier)),
+            tap((data: any) => {
+                this.statuses = data.statuses;
+                this.adminService.setDataSource('admin_status', this.statuses, this.sort, this.paginator, this.filterColumns);
+                this.notify.success(this.translate.instant('lang.statusDeleted'));
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
 }

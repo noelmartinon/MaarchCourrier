@@ -10,6 +10,8 @@ import { HttpClient } from '@angular/common/http';
 })
 export class IParaphComponent implements OnInit {
 
+    @Input() additionalsInfos: any;
+    @Input() externalSignatoryBookDatas: any;
 
     loading: boolean = false;
 
@@ -20,9 +22,6 @@ export class IParaphComponent implements OnInit {
         resId: 0,
         editable: true
     };
-
-    @Input() additionalsInfos: any;
-    @Input() externalSignatoryBookDatas: any;
 
     constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService) { }
 

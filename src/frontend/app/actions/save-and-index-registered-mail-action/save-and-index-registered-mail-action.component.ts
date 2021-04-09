@@ -13,10 +13,9 @@ import { of } from 'rxjs';
 })
 export class SaveAndIndexRegisteredMailActionComponent implements OnInit {
 
+    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
 
     loading: boolean = false;
-
-    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
 
     constructor(
         public translate: TranslateService,

@@ -13,12 +13,17 @@ import { of } from 'rxjs';
 })
 export class DisabledBasketPersistenceActionComponent implements OnInit {
 
+    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
 
     loading: boolean = false;
 
-    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
-
-    constructor(public translate: TranslateService, public http: HttpClient, private notify: NotificationService, public dialogRef: MatDialogRef<DisabledBasketPersistenceActionComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
+    constructor(
+        public translate: TranslateService,
+        public http: HttpClient,
+        private notify: NotificationService,
+        public dialogRef: MatDialogRef<DisabledBasketPersistenceActionComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: any
+    ) { }
 
     ngOnInit(): void { }
 

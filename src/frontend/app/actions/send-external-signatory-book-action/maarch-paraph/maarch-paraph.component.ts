@@ -16,6 +16,12 @@ import { ExternalVisaWorkflowComponent } from '@appRoot/visa/externalVisaWorkflo
 })
 export class MaarchParaphComponent implements OnInit {
 
+    @ViewChild('appExternalVisaWorkflow', { static: true }) appExternalVisaWorkflow: ExternalVisaWorkflowComponent;
+
+    @Input() resourcesToSign: any[] = [];
+    @Input() additionalsInfos: any;
+    @Input() externalSignatoryBookDatas: any;
+
     loading: boolean = false;
 
     currentAccount: any = null;
@@ -27,12 +33,6 @@ export class MaarchParaphComponent implements OnInit {
         resId: 0,
         editable: true
     };
-
-    @ViewChild('appExternalVisaWorkflow', { static: true }) appExternalVisaWorkflow: ExternalVisaWorkflowComponent;
-
-    @Input() resourcesToSign: any[] = [];
-    @Input() additionalsInfos: any;
-    @Input() externalSignatoryBookDatas: any;
 
     constructor(
         public translate: TranslateService,

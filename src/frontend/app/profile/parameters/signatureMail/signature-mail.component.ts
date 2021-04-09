@@ -4,6 +4,10 @@ import { NotificationService } from '@service/notification/notification.service'
 import { TranslateService } from '@ngx-translate/core';
 import { FunctionsService } from '@service/functions.service';
 import { HeaderService } from '@service/header.service';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { MatDialog } from '@angular/material/dialog';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 declare let tinymce: any;
 
@@ -24,6 +28,7 @@ export class MySignatureMailComponent implements OnInit {
         private notify: NotificationService,
         public functionsService: FunctionsService,
         public headerService: HeaderService,
+        public dialog: MatDialog
     ){}
 
     ngOnInit(): void {}
@@ -93,27 +98,27 @@ export class MySignatureMailComponent implements OnInit {
     }
 
     deleteEmailSignature() {
-        const r = confirm(this.translate.instant('lang.confirmDeleteMailSignature'));
-
-        if (r) {
-            const id = this.userEmailSignatures[this.mailSignatureModel.selected].id;
-
-            this.http.delete('../rest/currentUser/emailSignature/' + id)
-                .subscribe((data: any) => {
-                    if (data.errors) {
-                        this.notify.error(data.errors);
-                    } else {
-                        this.userEmailSignatures = data.emailSignatures;
-                        this.mailSignatureModel = {
-                            selected: -1,
-                            htmlBody: '',
-                            title: '',
-                        };
-                        tinymce.get('emailSignature').setContent('');
-                        this.notify.success(this.translate.instant('lang.emailSignatureDeleted'));
-                    }
-                });
-        }
+        let id: any = null;
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.confirmDeleteMailSignature')}`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            tap(() => id = this.userEmailSignatures[this.mailSignatureModel.selected].id),
+            exhaustMap(() => this.http.delete('../rest/currentUser/emailSignature/' + id)),
+            tap((data: any) => {
+                this.userEmailSignatures = data.emailSignatures;
+                this.mailSignatureModel = {
+                    selected: -1,
+                    htmlBody: '',
+                    title: '',
+                };
+                tinymce.get('emailSignature').setContent('');
+                this.notify.success(this.translate.instant('lang.emailSignatureDeleted'));
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     resetEmailSignature() {

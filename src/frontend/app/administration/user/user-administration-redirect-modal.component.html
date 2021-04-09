@@ -22,10 +22,10 @@
                         {{'lang.reaffectUserRedirect' | translate}}
                     </mat-radio-button>
                 </mat-radio-group>
-                <plugin-autocomplete *ngIf="this.processMode == 'reaffect'" [labelPlaceholder]="'lang.userReplacement' | translate"
-                    [labelList]="'lang.availableUsers' | translate" [routeDatas]="['/rest/autocomplete/users']"
+                <app-plugin-autocomplete *ngIf="this.processMode == 'reaffect'" [labelPlaceholder]="'lang.userReplacement' | translate"
+                    [routeDatas]="['/rest/autocomplete/users']"
                     [targetSearchKey]="'idToDisplay'" [subInfoKey]="'descriptionToDisplay'"
-                    (triggerEvent)="setRedirectUser($event)" singleMode required></plugin-autocomplete>
+                    (triggerEvent)="setRedirectUser($event)" singleMode required></app-plugin-autocomplete>
 
                 <div class="alert-message alert-message-info" role="alert" style="max-width: inherit;">
                     <span *ngIf="this.processMode == ''"><em>{{'lang.doNothingRedirectInformations' | translate}}</em></span>

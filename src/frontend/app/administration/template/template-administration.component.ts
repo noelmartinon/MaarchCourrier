@@ -7,7 +7,7 @@ import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dial
 import { MatSidenav } from '@angular/material/sidenav';
 import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
-import { filter, tap, catchError } from 'rxjs/operators';
+import { filter, tap, catchError, exhaustMap } from 'rxjs/operators';
 import { FunctionsService } from '@service/functions.service';
 import { of } from 'rxjs';
 import { TemplateFileEditorModalComponent } from './templateFileEditorModal/template-file-editor-modal.component';
@@ -15,6 +15,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { AlertComponent } from '../../../plugins/modal/alert.component';
 import { MaarchFlatTreeComponent } from '../../../plugins/tree/maarch-flat-tree.component';
 import { AuthService } from '@service/auth.service';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
 
 declare let tinymce: any;
 
@@ -487,17 +488,19 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
     duplicateTemplate() {
         if (!this.lockFound && this.template.target !== 'acknowledgementReceipt') {
-            const r = confirm(this.translate.instant('lang.confirmDuplicate'));
-
-            if (r) {
-                this.http.post('../rest/templates/' + this.template.id + '/duplicate', { 'id': this.template.id })
-                    .subscribe((data: any) => {
-                        this.notify.success(this.translate.instant('lang.templateDuplicated'));
-                        this.router.navigate(['/administration/templates/' + data.id]);
-                    }, (err) => {
-                        this.notify.error(err.error.errors);
-                    });
-            }
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.duplicate')} « ${this.template.label} »`, msg: this.translate.instant('lang.confirmAction') } });
+            dialogRef.afterClosed().pipe(
+                filter((data: string) => data === 'ok'),
+                exhaustMap(() => this.http.post('../rest/templates/' + this.template.id + '/duplicate', { 'id': this.template.id })),
+                tap((data: any) => {
+                    this.notify.success(this.translate.instant('lang.templateDuplicated'));
+                    this.router.navigate(['/administration/templates/' + data.id]);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
         }
     }
 

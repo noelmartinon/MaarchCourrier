@@ -285,7 +285,7 @@ export class PrintedFolderModalComponent implements OnInit {
             tap((data: any) => {
                 const downloadLink = document.createElement('a');
                 downloadLink.href = window.URL.createObjectURL(data);
-                downloadLink.setAttribute('download', this.functions.getFormatedFileName('export_maarch', 'pdf'));
+                downloadLink.setAttribute('download', this.functions.getFormatedFileName(this.translate.instant('lang.printedFolder'), 'pdf'));
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
             }),

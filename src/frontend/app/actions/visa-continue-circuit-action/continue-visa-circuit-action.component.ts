@@ -15,6 +15,8 @@ import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
 })
 export class ContinueVisaCircuitActionComponent implements OnInit {
 
+    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
+    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
 
     loading: boolean = false;
 
@@ -23,9 +25,6 @@ export class ContinueVisaCircuitActionComponent implements OnInit {
     resourcesErrors: any[] = [];
 
     noResourceToProcess: boolean = null;
-
-    @ViewChild('noteEditor', { static: true }) noteEditor: NoteEditorComponent;
-    @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
 
     constructor(
         public translate: TranslateService,

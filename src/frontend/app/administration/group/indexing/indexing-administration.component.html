@@ -17,8 +17,8 @@
             </div>
             <mat-hint class="infoActions" [innerHTML]="'lang.actionsInfo' | translate">
             </mat-hint>
-            <plugin-autocomplete [labelPlaceholder]="'lang.linkNewAction' | translate"  [datas]="actionList" [targetSearchKey]="'label_action'"
-                (triggerEvent)="addAction($event)" appearance="outline"></plugin-autocomplete>
+            <app-plugin-autocomplete [labelPlaceholder]="'lang.linkNewAction' | translate"  [datas]="actionList" [targetSearchKey]="'label_action'"
+                (triggerEvent)="addAction($event)" appearance="outline"></app-plugin-autocomplete>
             <mat-list cdkDropList [cdkDropListData]="indexingInfo.actions" (cdkDropListDropped)="drop($event)"
                 class="selectedActionList" role="list">
                 <mat-list-item class="selectedAction" role="listitem"

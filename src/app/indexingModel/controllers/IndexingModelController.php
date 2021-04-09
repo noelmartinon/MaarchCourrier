@@ -212,9 +212,12 @@ class IndexingModelController
             $body['private']       = empty($body['private']) ? 'false' : 'true';
             $defaultModel          = IndexingModelModel::get(['select' => [1], 'where' => ['"default" = ?'], 'data' => ['true']]);
             $body['default']       = empty($defaultModel) ? 'true' : 'false';
+        } elseif (PrivilegeController::hasPrivilege(['privilegeId' => 'create_public_indexing_models', 'userId' => $GLOBALS['id']])) {
+            $body['private'] = empty($body['private']) ? 'false' : 'true';
+            $body['default'] = 'false';
         } else {
-            $body['private']       = 'true';
-            $body['default']       = 'false';
+            $body['private'] = 'true';
+            $body['default'] = 'false';
         }
 
         $modelId = IndexingModelModel::create([
@@ -310,10 +313,10 @@ class IndexingModelController
             return $response->withStatus(400)->withJson(['errors' => "Mandatory 'subject' field is missing"]);
         }
 
-        $model = IndexingModelModel::getById(['select' => ['owner', 'private'], 'id' => $args['id']]);
+        $model = IndexingModelModel::getById(['select' => ['owner', 'master'], 'id' => $args['id']]);
         if (empty($model)) {
             return $response->withStatus(400)->withJson(['errors' => 'Model not found']);
-        } elseif ($model['private']) {
+        } elseif (!empty($model['master'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Model out of perimeter']);
         }
 
@@ -473,12 +476,14 @@ class IndexingModelController
         if (!Validator::intVal()->notEmpty()->validate($args['id'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Param id is empty or not an integer']);
         }
-        $model = IndexingModelModel::getById(['select' => ['owner', 'private', '"default"', 'label'], 'id' => $args['id']]);
+        $model = IndexingModelModel::getById(['select' => ['owner', 'private', '"default"', 'label', 'master'], 'id' => $args['id']]);
         if (empty($model)) {
             return $response->withStatus(400)->withJson(['errors' => 'Model not found']);
-        } elseif ($model['private'] && $model['owner'] != $GLOBALS['id']) {
+        } elseif (!empty($model['master']) && $model['private'] && $model['owner'] != $GLOBALS['id']) {
             return $response->withStatus(400)->withJson(['errors' => 'Model out of perimeter']);
-        } elseif (!$model['private'] && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_indexing_models', 'userId' => $GLOBALS['id']])) {
+        } elseif (!empty($model['master']) && empty($model['private']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'create_public_indexing_models', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Model out of perimeter']);
+        } elseif (empty($model['master']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_indexing_models', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(400)->withJson(['errors' => 'Model out of perimeter']);
         } elseif ($model['default']) {
             return $response->withStatus(400)->withJson(['errors' => 'Default model can not be deleted']);

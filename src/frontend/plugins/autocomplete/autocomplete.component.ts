@@ -11,11 +11,11 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { NotificationService } from '@service/notification/notification.service';
 
 @Component({
-    selector: 'plugin-autocomplete',
+    selector: 'app-plugin-autocomplete',
     templateUrl: 'autocomplete.component.html',
     styleUrls: ['autocomplete.component.scss', '../../app/indexation/indexing-form/indexing-form.component.scss'],
 })
-export class PluginAutocomplete implements OnInit {
+export class PluginAutocompleteComponent implements OnInit {
     /**
      * Can be used for real input or discret input filter
      * @default default
@@ -43,7 +43,7 @@ export class PluginAutocomplete implements OnInit {
     /**
      * Datas of options in autocomplete. Incompatible with @routeDatas
      */
-    @Input('datas') options: any;
+    @Input() datas: any;
 
     /**
      * Route datas used in async autocomplete. Incompatible with @datas
@@ -53,17 +53,12 @@ export class PluginAutocomplete implements OnInit {
     /**
      * Placeholder used in input
      */
-    @Input('labelPlaceholder') placeholder: string;
-
-    /**
-     * DEPRECATED
-     */
-    @Input('labelList') optGroupLabel: string;
+    @Input() labelPlaceholder: string;
 
     /**
      * Key of targeted info used when typing in input (ex : $data[0] = {id: 1, label: 'Jean Dupond'}; targetSearchKey => label)
      */
-    @Input('targetSearchKey') key: string;
+    @Input() targetSearchKey: string;
 
     /**
      * Key of sub info in display (ex : $data[0] = {id: 1, label: 'Jean Dupond', entity: 'Pôle social'}; subInfoKey => entity)
@@ -73,7 +68,7 @@ export class PluginAutocomplete implements OnInit {
     /**
      * FormControl used when autocomplete is used in form and must be catched in a form control.
      */
-    @Input('control') controlAutocomplete: FormControl;
+    @Input() control: FormControl;
 
     /**
      * Route used for set values / adding / deleting item in BDD (DataModel must return id and label)
@@ -93,7 +88,7 @@ export class PluginAutocomplete implements OnInit {
     /**
      * Catch external event after select an element in autocomplete
      */
-    @Output('triggerEvent') selectedOpt = new EventEmitter();
+    @Output() triggerEvent = new EventEmitter();
 
     @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
@@ -123,11 +118,10 @@ export class PluginAutocomplete implements OnInit {
     ngOnInit() {
         this.appearance = this.appearance === undefined ? 'legacy' : 'outline';
         this.singleMode = this.singleMode === undefined ? false : true;
-        this.optGroupLabel = this.optGroupLabel === undefined ? this.translate.instant('lang.availableValues') : this.optGroupLabel;
-        this.placeholder = this.placeholder === undefined ? this.translate.instant('lang.chooseValue') : this.placeholder;
+        this.labelPlaceholder = this.labelPlaceholder === undefined ? this.translate.instant('lang.chooseValue') : this.labelPlaceholder;
 
-        if (this.controlAutocomplete !== undefined) {
-            this.controlAutocomplete.setValue(this.controlAutocomplete.value === null || this.controlAutocomplete.value === '' ? [] : this.controlAutocomplete.value);
+        if (this.control !== undefined) {
+            this.control.setValue(this.control.value === null || this.control.value === '' ? [] : this.control.value);
             this.initFormValue();
         }
 
@@ -151,7 +145,7 @@ export class PluginAutocomplete implements OnInit {
 
     initAutocompleteRoute() {
         this.listInfo = this.translate.instant('lang.autocompleteInfo');
-        this.options = [];
+        this.datas = [];
         this.myControl.valueChanges
             .pipe(
                 debounceTime(300),
@@ -169,8 +163,8 @@ export class PluginAutocomplete implements OnInit {
                     } else {
                         this.listInfo = '';
                     }
-                    this.options = data;
-                    this.filteredOptions = of(this.options);
+                    this.datas = data;
+                    this.filteredOptions = of(this.datas);
                     this.loading = false;
                 })
             ).subscribe();
@@ -198,39 +192,39 @@ export class PluginAutocomplete implements OnInit {
     selectOpt(ev: any) {
         if (this.singleMode) {
             // this.myControl.setValue(ev.option.value[this.key]);
-        } else if (this.controlAutocomplete !== undefined) {
+        } else if (this.control !== undefined) {
             this.setFormValue(ev.option.value);
         }
 
-        if (this.selectedOpt !== undefined) {
+        if (this.triggerEvent !== undefined) {
             this.resetAutocomplete();
             this.autoCompleteInput.nativeElement.blur();
-            this.selectedOpt.emit(ev.option.value);
+            this.triggerEvent.emit(ev.option.value);
         }
     }
 
     initFormValue() {
 
-        this.controlAutocomplete.value.forEach((ids: any) => {
+        this.control.value.forEach((ids: any) => {
             this.http.get('..' + this.manageDatas + '/' + ids).pipe(
                 tap((data) => {
-                    for (const key in data) {
+                    Object.keys(data).forEach(key => {
                         this.valuesToDisplay[data[key].id] = data[key].label;
-                    }
+                    });
                 })
             ).subscribe();
         });
     }
 
     setFormValue(item: any) {
-        if (this.controlAutocomplete.value.indexOf(item['id']) === -1) {
+        if (this.control.value.indexOf(item['id']) === -1) {
             let arrvalue = [];
-            if (this.controlAutocomplete.value !== null) {
-                arrvalue = this.controlAutocomplete.value;
+            if (this.control.value !== null) {
+                arrvalue = this.control.value;
             }
             arrvalue.push(item['id']);
-            this.valuesToDisplay[item['id']] = item[this.key];
-            this.controlAutocomplete.setValue(arrvalue);
+            this.valuesToDisplay[item['id']] = item[this.targetSearchKey];
+            this.control.setValue(arrvalue);
         }
     }
 
@@ -239,38 +233,38 @@ export class PluginAutocomplete implements OnInit {
             this.myControl.setValue('');
         }
         if (this.routeDatas !== undefined) {
-            this.options = [];
+            this.datas = [];
             this.listInfo = this.translate.instant('lang.autocompleteInfo');
         }
     }
 
     unsetValue() {
-        this.controlAutocomplete.setValue('');
+        this.control.setValue('');
         this.myControl.setValue('');
         this.myControl.enable();
     }
 
     removeItem(index: number) {
-        const arrValue = this.controlAutocomplete.value;
+        const arrValue = this.control.value;
         arrValue.splice(index, 1);
-        this.controlAutocomplete.setValue(arrValue);
+        this.control.setValue(arrValue);
     }
 
     addItem() {
         if (this.manageDatas !== undefined) {
             const newElem = {};
 
-            newElem[this.key] = this.myControl.value;
+            newElem[this.targetSearchKey] = this.myControl.value;
 
-            this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirm'), msg: 'Voulez-vous créer cet élément <b>' + newElem[this.key] + '</b>&nbsp;?' } });
+            this.dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirm'), msg: 'Voulez-vous créer cet élément <b>' + newElem[this.targetSearchKey] + '</b>&nbsp;?' } });
 
             this.dialogRef.afterClosed().pipe(
                 filter((data: string) => data === 'ok'),
-                exhaustMap(() => this.http.post('..' + this.manageDatas, { label: newElem[this.key] })),
+                exhaustMap(() => this.http.post('..' + this.manageDatas, { label: newElem[this.targetSearchKey] })),
                 tap((data: any) => {
-                    for (const key in data) {
+                    Object.keys(data).forEach(key => {
                         newElem['id'] = data[key];
-                    }
+                    });
                     this.setFormValue(newElem);
                     this.notify.success(this.translate.instant('lang.elementAdded'));
                 }),
@@ -291,7 +285,7 @@ export class PluginAutocomplete implements OnInit {
     }
 
     displayFn(option: any): string {
-        return option ? option[this.key] : option;
+        return option ? option[this.targetSearchKey] : option;
     }
 
     // workaround to use var in scope componenent
@@ -302,9 +296,9 @@ export class PluginAutocomplete implements OnInit {
     private _filter(value: string): string[] {
         if (typeof value === 'string') {
             const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.options.filter((option: any) => this.latinisePipe.transform(option[this.key].toLowerCase()).includes(filterValue));
+            return this.datas.filter((option: any) => this.latinisePipe.transform(option[this.targetSearchKey].toLowerCase()).includes(filterValue));
         } else {
-            return this.options;
+            return this.datas;
         }
     }
 }

@@ -9,6 +9,10 @@ import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { AdministrationService } from '../administration.service';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { MatDialog } from '@angular/material/dialog';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 @Component({
     templateUrl: 'priorities-administration.component.html'
@@ -35,7 +39,8 @@ export class PrioritiesAdministrationComponent implements OnInit {
         public appService: AppService,
         public functions: FunctionsService,
         public adminService: AdministrationService,
-        private viewContainerRef: ViewContainerRef
+        private viewContainerRef: ViewContainerRef,
+        public dialog: MatDialog
     ) { }
 
     ngOnInit(): void {
@@ -64,18 +69,20 @@ export class PrioritiesAdministrationComponent implements OnInit {
     }
 
     deletePriority(id: string) {
-        const r = confirm(this.translate.instant('lang.deleteMsg'));
-
-        if (r) {
-            this.http.delete('../rest/priorities/' + id)
-                .subscribe((data: any) => {
-                    this.priorities = data['priorities'];
-                    this.adminService.setDataSource('admin_priorities', this.priorities, this.sort, this.paginator, this.filterColumns);
-                    this.notify.success(this.translate.instant('lang.priorityDeleted'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.deletePriorityConfirm')}`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/priorities/' + id)),
+            tap((data: any) => {
+                this.priorities = data['priorities'];
+                this.adminService.setDataSource('admin_priorities', this.priorities, this.sort, this.paginator, this.filterColumns);
+                this.notify.success(this.translate.instant('lang.priorityDeleted'));
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     updatePrioritiesOrder() {

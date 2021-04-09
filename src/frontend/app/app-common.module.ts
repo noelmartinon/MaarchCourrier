@@ -48,7 +48,7 @@ import { ConfirmComponent } from '../plugins/modal/confirm.component';
 import { NotesListComponent } from './notes/notes-list.component';
 import { NoteEditorComponent } from './notes/note-editor.component';
 
-import { PluginAutocomplete } from '../plugins/autocomplete/autocomplete.component';
+import { PluginAutocompleteComponent } from '../plugins/autocomplete/autocomplete.component';
 import { PluginSelectSearchComponent } from '../plugins/select-search/select-search.component';
 import { PluginSelectAutocompleteSearchComponent } from '../plugins/select-autocomplete-search/plugin-select-autocomplete-search.component';
 
@@ -89,6 +89,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { RegisteredMailImportComponent } from '@appRoot/registeredMail/import/registered-mail-import.component';
 import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-tool.component';
 import { ColorGithubModule } from 'ngx-color/github';
+import { MailSignaturesAdministrationComponent } from './administration/sendmail/mailSignatures/mail-signatures-administration.component';
 
 
 @NgModule({
@@ -124,7 +125,7 @@ import { ColorGithubModule } from 'ngx-color/github';
         MessageBoxComponent,
         AlertComponent,
         ConfirmComponent,
-        PluginAutocomplete,
+        PluginAutocompleteComponent,
         FieldListComponent,
         PluginSelectSearchComponent,
         PluginSelectAutocompleteSearchComponent,
@@ -155,7 +156,8 @@ import { ColorGithubModule } from 'ngx-color/github';
         ContactsGroupFormModalComponent,
         ContactsGroupMergeModalComponent,
         ContactsFormModalComponent,
-        InputCorrespondentGroupComponent
+        InputCorrespondentGroupComponent,
+        MailSignaturesAdministrationComponent
     ],
     exports: [
         CommonModule,
@@ -175,7 +177,7 @@ import { ColorGithubModule } from 'ngx-color/github';
         SmdFabSpeedDialTriggerComponent,
         SmdFabSpeedDialActionsComponent,
         DragDropModule,
-        PluginAutocomplete,
+        PluginAutocompleteComponent,
         FieldListComponent,
         PluginSelectSearchComponent,
         PluginSelectAutocompleteSearchComponent,
@@ -210,7 +212,8 @@ import { ColorGithubModule } from 'ngx-color/github';
         CriteriaToolComponent,
         InputCorrespondentGroupComponent,
         MessageBoxComponent,
-        ColorGithubModule
+        ColorGithubModule,
+        MailSignaturesAdministrationComponent
     ],
     providers: [],
     entryComponents: [

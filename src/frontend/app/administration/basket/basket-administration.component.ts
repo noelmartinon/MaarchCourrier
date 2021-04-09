@@ -10,6 +10,9 @@ import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
 import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
+import { of } from 'rxjs';
 
 declare let $: any;
 
@@ -227,23 +230,25 @@ export class BasketAdministrationComponent implements OnInit {
     }
 
     unlinkGroup(groupIndex: any) {
-        const r = confirm(this.translate.instant('lang.unlinkGroup') + ' ?');
-
-        if (r) {
-            this.http.delete('../rest/baskets/' + this.id + '/groups/' + this.basketGroups[groupIndex].group_id)
-                .subscribe(() => {
-                    this.allGroups.forEach((tmpGroup: any) => {
-                        if (tmpGroup.group_id === this.basketGroups[groupIndex].group_id) {
-                            tmpGroup.isUsed = false;
-                        }
-                    });
-                    this.basketGroups.splice(groupIndex, 1);
-                    this.notify.success(this.translate.instant('lang.basketUpdated'));
-                    this.selectedIndex = 0;
-                }, (err) => {
-                    this.notify.error(err.error.errors);
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.unlinkGroup') + ' ?', msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.delete('../rest/baskets/' + this.id + '/groups/' + this.basketGroups[groupIndex].group_id)),
+            tap(() => {
+                this.allGroups.forEach((tmpGroup: any) => {
+                    if (tmpGroup.group_id === this.basketGroups[groupIndex].group_id) {
+                        tmpGroup.isUsed = false;
+                    }
                 });
-        }
+                this.basketGroups.splice(groupIndex, 1);
+                this.notify.success(this.translate.instant('lang.basketUpdated'));
+                this.selectedIndex = 0;
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     linkGroup() {
@@ -308,17 +313,19 @@ export class BasketAdministrationComponent implements OnInit {
     }
 
     unlinkAction(group: any, action: any) {
-        const r = confirm(this.translate.instant('lang.unlinkAction') + ' ?');
-
-        if (r) {
-            action.checked = false;
-            this.http.put('../rest/baskets/' + this.id + '/groups/' + group.group_id + '/actions', { 'groupActions': group.groupActions })
-                .subscribe(() => {
-                    this.notify.success(this.translate.instant('lang.actionsGroupBasketUpdated'));
-                }, (err) => {
-                    this.notify.error(err.error.errors);
-                });
-        }
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.unlinkAction') + ' ?', msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.http.put('../rest/baskets/' + this.id + '/groups/' + group.group_id + '/actions', { 'groupActions': group.groupActions })),
+            tap(() => {
+                action.checked = false;
+                this.notify.success(this.translate.instant('lang.actionsGroupBasketUpdated'));
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     updateGroupInfo(group: any, ev: any) {

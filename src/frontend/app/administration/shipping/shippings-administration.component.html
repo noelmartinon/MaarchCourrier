@@ -2,7 +2,7 @@
     <ng-template #adminMenuTemplate>
         <mat-nav-list>
             <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
-            <a mat-list-item disableRipple="true" matTooltip="{{'lang.basketNotification' | translate}}">
+            <a mat-list-item disableRipple="true" matTooltip="{{'lang.toogleShippingConf' | translate}}">
                 <mat-icon color="primary" mat-list-icon>
                     <mat-slide-toggle #toggleConf [formControl]="shippingConf.enabled" color="primary" style="position: absolute;"></mat-slide-toggle>
                 </mat-icon>

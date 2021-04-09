@@ -102,8 +102,7 @@
                                             </mat-expansion-panel>
                                         </div>
                                     </div>
-                                    <div *ngIf="custom.SQLMode" class="col-md-12"
-                                        style="display: flex;align-items: center;">
+                                    <div *ngIf="custom.SQLMode" class="col-md-12" style="display: flex;align-items: center;">
                                         <div>
                                             <button mat-mini-fab color="primary" (click)="switchSQLMode(custom)">
                                                 <mat-icon class="fas fa-list-ol" style="height: auto;"></mat-icon>
@@ -124,7 +123,7 @@
                                                             <mat-select [(ngModel)]="custom.values.table" required>
                                                                 <mat-option *ngFor="let table of availableTables | keyvalue"
                                                                     [value]="table.key">
-                                                                    {{table.key}} 
+                                                                    {{table.key}}
                                                                     <ng-container *ngIf="!functionsService.empty('lang.' + table.key | translate)">
                                                                         ({{'lang.' + table.key | translate}})
                                                                     </ng-container>
@@ -174,6 +173,8 @@
                                                     </mat-form-field>
                                                 </div>
                                             </mat-expansion-panel>
+                                            <div class="alert-message alert-message-info" style="margin-top: 5px; margin-left: 5px;" role="alert" [innerHTML]="'lang.infoResId' | translate">
+                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-12 text-center">

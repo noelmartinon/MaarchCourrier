@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NotificationService } from '@service/notification/notification.service';
-import {FunctionsService} from '@service/functions.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     selector: 'app-visa-parameters',

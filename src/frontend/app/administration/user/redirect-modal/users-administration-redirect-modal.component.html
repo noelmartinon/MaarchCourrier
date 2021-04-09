@@ -11,10 +11,10 @@
 
                 <div *ngFor="let redirectModel of userDestTemplates; index as i" id="{{redirectModel.object_id}}"
                     class="form-group">
-                    <plugin-autocomplete [labelPlaceholder]="('lang.newDest' | translate) + ' : ' + redirectModel.title"
-                        [labelList]="('lang.availableUsers' | translate)" [routeDatas]="['/rest/autocomplete/users?inEntity=' + redirectModel.entity_id]"
+                    <app-plugin-autocomplete [labelPlaceholder]="('lang.newDest' | translate) + ' : ' + redirectModel.title"
+                        [routeDatas]="['/rest/autocomplete/users?inEntity=' + redirectModel.entity_id]"
                         [targetSearchKey]="'idToDisplay'" [subInfoKey]="'descriptionToDisplay'"
-                        (triggerEvent)="setRedirectUserListModels(i, $event)" singleMode required></plugin-autocomplete>
+                        (triggerEvent)="setRedirectUserListModels(i, $event)" singleMode required></app-plugin-autocomplete>
                 </div>
             </ng-container>
             <ng-container *ngIf="userDestDifflists.length > 0">
@@ -25,10 +25,10 @@
                 </div>
 
                 <div id="{{data.user.user_id}}" class="form-group">
-                    <plugin-autocomplete [labelPlaceholder]="('lang.newDestRes' | translate)" [labelList]="('lang.availableUsers' | translate)"
+                    <app-plugin-autocomplete [labelPlaceholder]="('lang.newDestRes' | translate)"
                         [routeDatas]="['/rest/autocomplete/users']" [targetSearchKey]="'idToDisplay'"
                         [subInfoKey]="'descriptionToDisplay'" (triggerEvent)="setRedirectUserRes($event)" singleMode
-                        required></plugin-autocomplete>
+                        required></app-plugin-autocomplete>
                 </div>
             </ng-container>
             <ng-container *ngIf="userVisaWorkflowResources.length > 0">
@@ -38,10 +38,10 @@
                         [innerHTML]="'lang.chooseNewVisaUser' | translate"></span> :
                 </div>
                 <div id="{{data.user.user_id}}" class="form-group">
-                    <plugin-autocomplete [labelPlaceholder]="('lang.newDestRes' | translate)" [labelList]="('lang.availableUsers' | translate)"
+                    <app-plugin-autocomplete [labelPlaceholder]="('lang.newDestRes' | translate)"
                         [routeDatas]="['/rest/autocomplete/users/circuit']" [targetSearchKey]="'idToDisplay'"
                         [subInfoKey]="'descriptionToDisplay'" (triggerEvent)="setRedirectUserVisaWorkflowRes($event)" singleMode
-                        required></plugin-autocomplete>
+                        required></app-plugin-autocomplete>
                 </div>
             </ng-container>
             <ng-container *ngIf="userDestTemplates.length === 0 && userDestDifflists.length === 0 && userVisaWorkflowResources.length === 0">
