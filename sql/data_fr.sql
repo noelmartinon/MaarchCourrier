@@ -1005,7 +1005,7 @@ INSERT INTO status_images (image_name) VALUES ('fa-lightbulb');
 ------------
 TRUNCATE TABLE parameters;
 INSERT INTO parameters (id, param_value_string, param_value_int, param_value_date) VALUES ('work_batch_autoimport_id', NULL, 1, NULL);
-INSERT INTO parameters (id, param_value_string, param_value_int, param_value_date) VALUES ('database_version', '20.10.9', NULL, NULL);
+INSERT INTO parameters (id, param_value_string, param_value_int, param_value_date) VALUES ('database_version', '20.10.10', NULL, NULL);
 INSERT INTO parameters (id, param_value_string, param_value_int, param_value_date) VALUES ('user_quota', '', 0, NULL);
 INSERT INTO parameters (id, description, param_value_string, param_value_int, param_value_date) VALUES ('defaultDepartment', 'Département par défaut sélectionné dans les autocomplétions de la Base Adresse Nationale', NULL, 75, NULL);
 INSERT INTO parameters (id, description, param_value_string) VALUES ('homepage_message', 'Texte apparaissant dans la bannière sur la page d''accueil, mettre un espace pour supprimer la bannière.', '<p>D&eacute;couvrez <strong>Maarch Courrier 20.10</strong> avec <a title="notre guide de visite" href="https://docs.maarch.org/" target="_blank"><span style="color:#f99830;"><strong>notre guide de visite en ligne</strong></span></a>.</p>');
