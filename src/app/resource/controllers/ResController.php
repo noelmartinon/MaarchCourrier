@@ -1202,7 +1202,9 @@ class ResController extends ResourceControlController
                 $customFields[$immuabledTechnicalCustom['id']] = $values[0]['key'] ?? null;
             }
         }
-        ResModel::update(['set' => ['custom_fields' => json_encode($customFields)], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
+        if (!empty($customFields)) {
+            ResModel::update(['set' => ['custom_fields' => json_encode($customFields)], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
+        }
 
         return true;
     }
