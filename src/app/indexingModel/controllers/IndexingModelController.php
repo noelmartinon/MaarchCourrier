@@ -184,7 +184,7 @@ class IndexingModelController
                 foreach ($body['fields'] as $value) {
                     if (($field['identifier'] == 'destination' && $value['identifier'] == 'diffusionList')
                             || ($value['identifier'] == $field['identifier'] && $value['mandatory'] == $field['mandatory'] && $value['unit'] == $field['unit'])) {
-                        if (!$field['enabled']) {
+                        if (!$field['enabled'] && $field['identifier'] == $value['identifier']) {
                             $value = $field;
                         }
                         if ($field['identifier'] == 'destination' && $value['identifier'] == 'diffusionList') {
