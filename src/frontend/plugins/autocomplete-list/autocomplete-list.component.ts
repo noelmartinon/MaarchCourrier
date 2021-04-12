@@ -17,10 +17,6 @@ import { Observable } from 'rxjs';
     styleUrls: ['autocomplete-list.component.scss'],
 })
 export class AutocompleteListComponent implements OnInit {
-    inputFormControl = new FormControl();
-    loading = false;
-
-    listInfo: string;
 
     /**
      * Appearance of input
@@ -65,6 +61,11 @@ export class AutocompleteListComponent implements OnInit {
 
     @ViewChild('acInput') acInput: ElementRef<HTMLInputElement>;
     @ViewChild('auto') matAutocomplete: MatAutocomplete;
+
+    inputFormControl = new FormControl();
+    loading = false;
+
+    listInfo: string;
 
     filteredOptions: Observable<string[]>;
     valuesToDisplay: any = {};
