@@ -162,6 +162,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
                     label : val
                 }));
                 this.customFields.push(newCustomField);
+                this.customFieldsClone = JSON.parse(JSON.stringify(this.customFields));
                 this.notify.success(this.translate.instant('lang.customFieldAdded'));
                 this.incrementCreation++;
             }),
@@ -271,7 +272,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         if (!this.functionsService.empty(custom.oldValues)) {
             custom.values = custom.oldValues;
         }
-        custom.oldValues = oldValues;
+        custom.oldValues =  oldValues;
     }
 
     getTables() {
@@ -295,6 +296,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
             column: column
 
         });
+        console.log('field', field);
     }
 
     removeColumnLabel(field: any, index: number) {
