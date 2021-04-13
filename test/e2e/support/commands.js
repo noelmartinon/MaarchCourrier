@@ -23,11 +23,13 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+import 'cypress-file-upload';
+
 Cypress.Commands.add("login", () => {
     cy.visit('/')
     cy.wait(1000)
-    cy.get('#alertComponentClose')
-        .click()
+    /*cy.get('#alertComponentClose')
+        .click()*/
     cy.get('#login')
         .type('bblier')
     cy.get('#password')
