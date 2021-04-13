@@ -555,6 +555,38 @@ class MergeController
         return $myContent;
     }
 
+    public static function mergeGlobalEmailSignature(array $args)
+    {
+        $tmpPath        = CoreConfigModel::getTmpPath();
+        $pathToTemplate = $tmpPath . 'tmp_template_' . rand() . '_' . rand() . '.html';
+
+        $handle = fopen($pathToTemplate, 'w');
+        if (fwrite($handle, $args['content']) === false) {
+            return false;
+        }
+        fclose($handle);
+
+        $datasources['users'] = [UserModel::getById(['select' => ['firstname', 'lastname', 'mail', 'phone', 'initials'], 'id' => $GLOBALS['id']])];
+        $datasources['userPrimaryEntity'] = [UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => ['entities.*', 'users_entities.user_role as role']])];
+
+        $TBS = new \clsTinyButStrong;
+        $TBS->NoErr = true;
+        $TBS->LoadTemplate($pathToTemplate);
+
+        foreach ($datasources as $name => $datasource) {
+            if (!is_array($datasource)) {
+                $TBS->MergeField($name, $datasource);
+            } else {
+                $TBS->MergeBlock($name, 'array', $datasource);
+            }
+        }
+
+        $TBS->Show(TBS_NOTHING);
+
+        $myContent = $TBS->Source;
+        return $myContent;
+    }
+
     public static function mergeAction(array $args)
     {
         ValidatorModel::notEmpty($args, ['resId', 'type']);

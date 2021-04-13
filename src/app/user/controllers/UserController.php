@@ -21,6 +21,7 @@ use Configuration\models\ConfigurationModel;
 use Contact\models\ContactGroupListModel;
 use Contact\models\ContactGroupModel;
 use ContentManagement\controllers\DocumentEditorController;
+use ContentManagement\controllers\MergeController;
 use Docserver\controllers\DocserverController;
 use Docserver\models\DocserverModel;
 use Email\controllers\EmailController;
@@ -589,7 +590,6 @@ class UserController
         $user['featureTour']        = json_decode($user['feature_tour'], true);
         unset($user['feature_tour']);
         $user['signatures']         = UserSignatureModel::getByUserSerialId(['userSerialid' => $user['id']]);
-        $user['emailSignatures']    = UserEmailSignatureModel::getByUserId(['userId' => $GLOBALS['id']]);
         $user['groups']             = UserModel::getGroupsById(['id' => $GLOBALS['id']]);
         $user['entities']           = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity'], 'orderBy' => ['users_entities.primary_entity DESC']]);
         $user['baskets']            = BasketModel::getBasketsByLogin(['login' => $user['user_id']]);
@@ -1996,10 +1996,73 @@ class UserController
             $signatures[] = [
                 'id'      => $signature['id'],
                 'label'   => $signature['title'],
+                'public'  => false
             ];
         }
 
+        $globalEmailSignatures = ConfigurationModel::getByPrivilege(['privilege' => 'admin_organization_email_signatures', 'select' => ['value']]);
+        $value = json_decode($globalEmailSignatures['value'], true);
+        if (!empty($value['signatures'])) {
+            foreach ($value['signatures'] as $key => $globalEmailSignature) {
+                $signatures[] = [
+                    'id'      => $key,
+                    'label'   => $globalEmailSignature['label'],
+                    'public'  => true
+                ];
+            }
+        }
+
         return $response->withJson(['emailSignatures' => $signatures]);
+    }
+
+    public function getCurrentUserEmailSignaturesList(Request $request, Response $response)
+    {
+        $signatureModels = UserEmailSignatureModel::getByUserId(['userId' => $GLOBALS['id']]);
+
+        $signatures = [];
+
+        foreach ($signatureModels as $signature) {
+            $signatures[] = [
+                'id'      => $signature['id'],
+                'label'   => $signature['title'],
+                'content' => $signature['html_body'],
+                'public'  => false
+            ];
+        }
+
+        $globalEmailSignatures = ConfigurationModel::getByPrivilege(['privilege' => 'admin_organization_email_signatures', 'select' => ['value']]);
+        $value = json_decode($globalEmailSignatures['value'], true);
+        if (!empty($value['signatures'])) {
+            foreach ($value['signatures'] as $key => $globalEmailSignature) {
+                $signatures[] = [
+                    'id'      => $key,
+                    'label'   => $globalEmailSignature['label'],
+                    'content' => MergeController::mergeGlobalEmailSignature(['content' => $globalEmailSignature['content']]),
+                    'public'  => true
+                ];
+            }
+        }
+
+        return $response->withJson(['emailSignatures' => $signatures]);
+    }
+
+    public function getGlobalEmailSignatureById(Request $request, Response $response, array $args)
+    {
+        if (!Validator::intVal()->validate($args['id'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body param id is empty or not an integer']);
+        }
+
+        $globalEmailSignatures = ConfigurationModel::getByPrivilege(['privilege' => 'admin_organization_email_signatures', 'select' => ['value']]);
+        $value = json_decode($globalEmailSignatures['value'], true);
+        if (!empty($value['signatures'])) {
+            $signature = [
+                'id'      => $args['id'],
+                'label'   => $value['signatures'][$args['id']]['label'],
+                'content' => MergeController::mergeGlobalEmailSignature(['content' => $value['signatures'][$args['id']]['content']])
+            ];
+        }
+
+        return $response->withJson(['emailSignature' => $signature]);
     }
 
     public function getCurrentUserEmailSignatureById(Request $request, Response $response, array $args)

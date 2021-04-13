@@ -613,7 +613,9 @@ $app->delete('/currentUser/emailSignature/{id}', \User\controllers\UserControlle
 $app->put('/currentUser/groups/{groupId}/baskets/{basketId}', \User\controllers\UserController::class . ':updateCurrentUserBasketPreferences');
 $app->get('/currentUser/templates', \User\controllers\UserController::class . ':getTemplates');
 $app->get('/currentUser/emailSignatures', \User\controllers\UserController::class . ':getCurrentUserEmailSignatures');
+$app->get('/currentUser/emailSignaturesList', \User\controllers\UserController::class . ':getCurrentUserEmailSignaturesList');
 $app->get('/currentUser/emailSignatures/{id}', \User\controllers\UserController::class . ':getCurrentUserEmailSignatureById');
+$app->get('/currentUser/globalEmailSignatures/{id}', \User\controllers\UserController::class . ':getGlobalEmailSignatureById');
 $app->get('/currentUser/availableEmails', \Email\controllers\EmailController::class . ':getAvailableEmails');
 
 //Notifications
