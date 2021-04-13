@@ -188,6 +188,9 @@
                             <ng-template mat-tab-label>
                                 <span style="color:#135f7f">{{'lang.attachment' | translate}}</span>
                             </ng-template>
+                            <div style="position: absolute;right: 20px;top: -55px;width:40px;height:40px;">
+                                <app-tools-informations style="position:fixed;z-index:1;" [resId]="attachment['resIdMaster'].value"></app-tools-informations>
+                            </div>
                             <app-document-viewer #appAttachmentViewer style="display:block;height:100%;width:100%;overflow: auto;" [editMode]="editMode"
                                 [resId]="data.resId" [resIdMaster]="attachment['resIdMaster'].value" [mode]="'attachment'"
                                 [format]="attachment['format'].value" [attachType]="attachment['type'].value"

@@ -20,6 +20,7 @@ import { SentNumericPackagePageComponent } from './sent-numeric-package-page/sen
 export class SentResourceListComponent implements OnInit {
 
     @Input('resId') resId: number = null;
+    @Input() editMode: boolean = true;
     @Input() currentUserId: number = null;
     @Input() currentGroupId: number = null;
     @Input() currentBasketId: number = null;

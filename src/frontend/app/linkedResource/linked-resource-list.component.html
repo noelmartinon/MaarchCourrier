@@ -59,7 +59,7 @@
                         [class.undefined]="row.subject == ('lang.undefined' | translate)"
                         title="{{row.subject}}">{{row.subject | shorten: 150: '...'}}</span>
                     <span class="main-info-data">
-                        <button *ngIf="privilegeService.hasCurrentUserPrivilege('add_links')" mat-icon-button color="warn" [title]="'lang.unlink' | translate"
+                        <button *ngIf="editMode" mat-icon-button color="warn" [title]="'lang.unlink' | translate"
                             (click)="$event.stopPropagation();unlinkResource(row)">
                             <mat-icon class="fa fa-unlink fa-2x" aria-hidden="true"></mat-icon>
                         </button>
@@ -67,10 +67,10 @@
                 </div>
             </mat-cell>
         </ng-container>
-        <mat-row *matRowDef="let row; columns: displayedColumns;" routerLink="/resources/{{row.resId}}" (mouseenter)="viewThumbnail(row);"
-            (mouseleave)="closeThumbnail();" style="cursor: pointer;"></mat-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;" (click)="goTo(row.resId)" (mouseenter)="viewThumbnail(row);"
+            (mouseleave)="closeThumbnail();" [class.can-click]="canAccessResources"></mat-row>
     </mat-table>
-    <button *ngIf="privilegeService.hasCurrentUserPrivilege('add_links')" mat-fab class="linkRes" color="primary" [title]="'lang.linkResource' | translate" (click)="openSearchResourceModal()">
+    <button *ngIf="editMode" mat-fab class="linkRes" color="primary" [title]="'lang.linkResource' | translate" (click)="openSearchResourceModal()">
         <mat-icon class="fa fa-link" style="height:auto;"></mat-icon>
     </button>
 </ng-template>

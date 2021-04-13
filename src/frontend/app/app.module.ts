@@ -86,6 +86,7 @@ import { CheckAcknowledgmentRecordManagementComponent } from './actions/check-ac
 
 // PROCESS
 import { ProcessComponent } from './process/process.component';
+import { ToolsInformationsComponent } from './process/tools-informations/tools-informations.component';
 import { IndexationComponent } from './indexation/indexation.component';
 import { IndexationAttachmentsListComponent } from './attachments/indexation/indexation-attachments-list.component';
 import { LinkResourceModalComponent } from './linkedResource/linkResourceModal/link-resource-modal.component';
@@ -185,6 +186,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         TileCreateComponent,
         TileDashboardComponent,
         ProcessComponent,
+        ToolsInformationsComponent,
         IndexationComponent,
         IndexationAttachmentsListComponent,
         LinkResourceModalComponent,
