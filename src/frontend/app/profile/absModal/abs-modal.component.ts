@@ -168,12 +168,24 @@ export class AbsModalComponent implements OnInit {
     }
 
     activateAbsence() {
+        const redirectedBaskets: any[] = [];
+        this.baskets.filter((item: any) => item.userToDisplay !== null).forEach((elem: any) => {
+            redirectedBaskets.push(
+                {
+                    actual_user_id: elem.actual_user_id,
+                    basket_id: elem.basket_id,
+                    group_id: elem.groupSerialId,
+                    originalOwner: null
+                }
+            );
+
+        });
         const absenceDate: any = {
             startDate: this.functions.formatDateObjectToDateString(this.startDate),
             endDate: this.functions.formatDateObjectToDateString(this.endDate)
         };
         return new Promise((resolve, reject) => {
-            this.http.put('../rest/users/' + this.data.user.id + '/status', { 'status': 'ABS', 'absenceDate': absenceDate }).pipe(
+            this.http.put('../rest/users/' + this.data.user.id + '/absence', {absenceDate, redirectedBaskets}).pipe(
                 tap((data: any) => {
                     this.authService.logout();
                     resolve(true);
