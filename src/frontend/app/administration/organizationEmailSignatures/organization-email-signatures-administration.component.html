@@ -20,6 +20,7 @@
                     <mat-spinner style="margin:auto;"></mat-spinner>
                 </div>
                 <mat-card *ngIf="!loading" class="card-app-content">
+                    <app-maarch-message [content]="'lang.organizationEmailSignaturesDesc' | translate: {url : docUrl}"></app-maarch-message>
                     <app-mail-signatures-administration mode="public"></app-mail-signatures-administration>
                 </mat-card>
             </div>
