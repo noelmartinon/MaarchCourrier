@@ -3,11 +3,14 @@ import { Injectable } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, CanDeactivate } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { map, catchError, exhaustMap, filter } from 'rxjs/operators';
+import { map, catchError, exhaustMap, filter, tap } from 'rxjs/operators';
 import { HeaderService } from './header.service';
 import { ProcessComponent } from '../app/process/process.component';
 import { AuthService } from './auth.service';
 import { TranslateService } from '@ngx-translate/core';
+import { NotificationService } from './notification/notification.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
 
 @Injectable({
     providedIn: 'root'
@@ -19,7 +22,7 @@ export class AppGuard implements CanActivate {
         public http: HttpClient,
         private router: Router,
         private authService: AuthService,
-        public headerService: HeaderService,
+        public headerService: HeaderService
     ) { }
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<any> {
@@ -79,25 +82,42 @@ export class AppGuard implements CanActivate {
     providedIn: 'root'
 })
 export class AfterProcessGuard implements CanDeactivate<ProcessComponent> {
-    constructor(public translate: TranslateService) { }
+    constructor(
+        public translate: TranslateService,
+        private notify: NotificationService,
+        public dialog: MatDialog
+    ) { }
 
     async canDeactivate(component: ProcessComponent, currentRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Promise<boolean> {
         /* if (nextState.url !== '/login' && !component.isActionEnded() && !component.detailMode) {
             component.actionService.unlockResource(component.currentUserId, component.currentGroupId, component.currentBasketId, [component.currentResourceInformations.resId]);
         }*/
-
         if ((component.isToolModified() && !component.isModalOpen()) || (component.appDocumentViewer !== undefined && component.appDocumentViewer.isEditingTemplate())) {
-            if (confirm(this.translate.instant('lang.saveModifiedData'))) {
+            const value = await this.getConfirmation();
+            if (value) {
                 await component.saveModificationBeforeClose();
-            }
-        }
-        /* if(component.hasUnsavedData()){
-            if (confirm("You have unsaved changes! If you leave, your changes will be lost.")) {
+                this.notify.success(this.translate.instant('lang.modificationSaved'));
                 return true;
             } else {
                 return false;
             }
-        }*/
-        return true;
+        } else {
+            return true;
+        }
+    }
+
+    getConfirmation() {
+        return new Promise((resolve) => {
+            const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirm'), msg: this.translate.instant('lang.saveModifiedData'), buttonValidate: this.translate.instant('lang.yes'), buttonCancel: this.translate.instant('lang.no') } });
+            dialogRef.afterClosed().pipe(
+                tap((data: string) => {
+                    resolve(data);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 }
