@@ -179,7 +179,7 @@
                             <ng-template mat-tab-label>
                                 <span style="color:green">{{'lang.signedAttachment' | translate}}</span>
                             </ng-template>
-                            <app-document-viewer #appDocumentViewer style="display:block;height:100%;width:100%;overflow: auto;" [editMode]="false"
+                            <app-document-viewer #appDocumentViewer style="display:block;height:100%;width:100%;overflow: auto;text-align: left;" [editMode]="false"
                                 [resId]="attachment.signedResponse.value" [mode]="'attachment'"
                                 [title]="attachment.chrono.value + ' - ' + attachment.title.value + ' (' + this.translate.instant('lang.signed') + ')'">
                             </app-document-viewer>
@@ -188,15 +188,15 @@
                             <ng-template mat-tab-label>
                                 <span style="color:#135f7f">{{'lang.attachment' | translate}}</span>
                             </ng-template>
-                            <div style="position: absolute;right: 20px;top: -55px;width:40px;height:40px;">
-                                <app-tools-informations style="position:fixed;z-index:1;" [resId]="attachment['resIdMaster'].value"></app-tools-informations>
-                            </div>
                             <app-document-viewer #appAttachmentViewer style="display:block;height:100%;width:100%;overflow: auto;" [editMode]="editMode"
                                 [resId]="data.resId" [resIdMaster]="attachment['resIdMaster'].value" [mode]="'attachment'"
                                 [format]="attachment['format'].value" [attachType]="attachment['type'].value"
                                 (triggerEvent)="setDatasViewer($event)"
                                 [title]="attachment.chrono.value + ' - ' + attachment.title.value">
                             </app-document-viewer>
+                            <div style="position: absolute;right: 20px;top: -55px;width:40px;height:40px;">
+                                <app-tools-informations style="position:fixed;z-index:1;" [resId]="attachment['resIdMaster'].value"></app-tools-informations>
+                            </div>
                         </mat-tab>
                         <mat-tab label="{{'lang.attachment' | translate}} ({{'lang.version' | translate}} {{version.relation}})"
                             *ngFor="let version of versions">
