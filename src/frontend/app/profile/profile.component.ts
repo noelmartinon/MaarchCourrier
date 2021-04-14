@@ -11,7 +11,6 @@ import { AppService } from '@service/app.service';
 import { FunctionsService } from '@service/functions.service';
 import { AuthService } from '@service/auth.service';
 import { AbsModalComponent } from './absModal/abs-modal.component';
-import { MySignatureMailComponent } from './parameters/signatureMail/signature-mail.component';
 import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
@@ -23,8 +22,6 @@ declare let $: any;
     styleUrls: ['profile.component.css']
 })
 export class ProfileComponent implements OnInit {
-
-    @ViewChild(MySignatureMailComponent) MySignatureMailComponent: MySignatureMailComponent;
 
     @ViewChild('snav2', { static: true }) sidenavRight: MatSidenav;
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
@@ -105,7 +102,6 @@ export class ProfileComponent implements OnInit {
             }
         } else if (event.index == 1) {
             this.sidenavRight.close();
-            this.initMce();
         } else if (!this.appService.getViewMode()) {
             this.sidenavRight.open();
         }
@@ -132,10 +128,6 @@ export class ProfileComponent implements OnInit {
                 });
                 this.loading = false;
             });
-    }
-
-    initMce() {
-        this.MySignatureMailComponent.initMce();
     }
 
     displayPassword() {

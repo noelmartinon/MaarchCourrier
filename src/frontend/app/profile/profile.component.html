@@ -237,11 +237,9 @@
                                             {{'lang.mySignMailDesc' | translate}}
                                         </mat-panel-description>
                                     </mat-expansion-panel-header>
-                                    <app-signature-mail 
-                                        [mailSignatureModel]="mailSignatureModel" 
-                                        [userEmailSignatures]="user.emailSignatures">
-                                    </app-signature-mail>
-                                    <!--<app-mail-signatures-administration></app-mail-signatures-administration>-->
+                                    <ng-template matExpansionPanelContent>
+                                        <app-mail-signatures-administration mode="private"></app-mail-signatures-administration>
+                                    </ng-template>
                                 </mat-expansion-panel>
                                 <mat-expansion-panel>
                                     <mat-expansion-panel-header>

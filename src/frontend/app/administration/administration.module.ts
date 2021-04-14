@@ -53,6 +53,8 @@ import { PriorityAdministrationComponent } from './priority/priority-administrat
 import { SecuritiesAdministrationComponent } from './security/securities-administration.component';
 import { SendmailAdministrationComponent } from './sendmail/sendmail-administration.component';
 import { CheckMailServerModalComponent } from './sendmail/checkMailServer/check-mail-server-modal.component';
+import { OrganizationEmailSignaturesAdministrationComponent } from './organizationEmailSignatures/organization-email-signatures-administration.component';
+
 import { ShippingAdministrationComponent } from './shipping/shipping-administration.component';
 import { ShippingsAdministrationComponent } from './shipping/shippings-administration.component';
 import { StatusAdministrationComponent } from './status/status-administration.component';
@@ -142,6 +144,7 @@ import { MaarchToMaarchParametersComponent } from '@appRoot/administration/param
         PriorityAdministrationComponent,
         SecuritiesAdministrationComponent,
         SendmailAdministrationComponent,
+        OrganizationEmailSignaturesAdministrationComponent,
         CheckMailServerModalComponent,
         ShippingAdministrationComponent,
         ShippingsAdministrationComponent,

@@ -18,7 +18,7 @@ declare let tinymce: any;
 })
 export class MailSignaturesAdministrationComponent implements OnInit, OnDestroy {
 
-    @Input() mode: 'user' | 'public' = 'user';
+    @Input() mode: 'private' | 'public' = 'private';
 
     loading: boolean = false;
     addMode: boolean = false;
@@ -43,10 +43,9 @@ export class MailSignaturesAdministrationComponent implements OnInit, OnDestroy 
     ) { }
 
     ngOnInit(): void {
-        this.route = this.mode === 'user' ? '../rest/currentUser/emailSignature' : '../rest/administration/emailSignature';
+        this.route = this.mode === 'private' ? '../rest/currentUser/emailSignatures' : '../rest/configurations/admin_organization_email_signatures';
 
         this.getSignatures();
-        // this.initMce();
     }
 
     ngOnDestroy(): void {
@@ -57,11 +56,20 @@ export class MailSignaturesAdministrationComponent implements OnInit, OnDestroy 
         return new Promise((resolve) => {
             this.http.get(this.route).pipe(
                 map((data: any) => {
-                    data = data.emailSignatures.map((sign: any) => ({
-                        id: sign.id,
-                        label: sign.title,
-                        content: sign.html_body
-                    }));
+                    if (this.mode === 'public') {
+                        data = data.configuration.value.signatures.map((sign: any, index: number) => ({
+                            id: index + 1,
+                            label: sign.label,
+                            content: sign.content
+                        }));
+                    } else {
+                        data = data.emailSignatures.map((sign: any) => ({
+                            id: sign.id,
+                            label: sign.label,
+                            content: sign.content,
+                            public: sign.public
+                        }));
+                    }
                     return data;
                 }),
                 tap((data: any) => {
@@ -129,21 +137,23 @@ export class MailSignaturesAdministrationComponent implements OnInit, OnDestroy 
     }
 
     createSignature() {
+        if (this.mode === 'public') {
+            this.createPublicSignature();
+        } else {
+            this.createPrivateSignature();
+        }
+    }
+
+    createPublicSignature() {
+        this.newSignature.id = this.signatures.length + 1;
         this.newSignature.content = tinymce.get('emailSignature').getContent();
 
-        // FOR TEST
-        this.newSignature.id = 12;
-        this.signatures.push(this.newSignature);
-        this.signaturesClone = JSON.parse(JSON.stringify(this.signatures));
-        this.addMode = false;
-        this.newSignature = {
-            label: '',
-            content: ''
-        };
+        const formatedSignatures = this.signatures.map((sign: any) => this.formatSignature(sign));
 
-        /* this.http.post(this.route, this.formatSignature(this.newSignature)).pipe(
+        formatedSignatures.push(this.newSignature);
+
+        this.http.put(this.route, {signatures : formatedSignatures}).pipe(
             tap((data: any) => {
-                this.newSignature.id = data.id
                 this.signatures.push(this.newSignature);
                 this.addMode = false;
                 this.signaturesClone = JSON.parse(JSON.stringify(this.signatures));
@@ -151,39 +161,93 @@ export class MailSignaturesAdministrationComponent implements OnInit, OnDestroy 
                     label: '',
                     content: ''
                 };
+                this.notify.success(this.translate.instant('lang.signatureAdded'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
             })
-        ).subscribe();*/
+        ).subscribe();
     }
 
-    saveSignature(index: number) {
-        this.signatures[index].content = tinymce.get('emailSignature' + this.signatures[index].id).getContent();
+    createPrivateSignature() {
+        this.newSignature.content = tinymce.get('emailSignature').getContent();
 
-        // FOR TEST
-        this.signatures[index].editMode = false;
-        this.signaturesClone[index] = JSON.parse(JSON.stringify(this.signatures[index]));
-
-        /* this.http.put(this.route + this.signatures[index].id, this.formatSignature(signature)).pipe(
+        this.http.post(this.route, this.formatSignature(this.newSignature)).pipe(
             tap((data: any) => {
-                this.newSignature.id = data.id
+                this.newSignature.id =  data.id;
                 this.signatures.push(this.newSignature);
                 this.addMode = false;
+                this.signaturesClone = JSON.parse(JSON.stringify(this.signatures));
                 this.newSignature = {
                     label: '',
                     content: ''
                 };
+                this.notify.success(this.translate.instant('lang.signatureAdded'));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
                 return of(false);
             })
-        ).subscribe();*/
+        ).subscribe();
     }
 
+    saveSignature(index: number) {
+        if (this.mode === 'public') {
+            this.savePublicSignature(index);
+        } else {
+            this.savePrivateSignature(index);
+        }
+        this.signatures[index].content = tinymce.get('emailSignature' + this.signatures[index].id).getContent();
+    }
+
+    savePublicSignature(index: number) {
+        this.signatures[index].content = tinymce.get('emailSignature' + this.signatures[index].id).getContent();
+
+        const formatedSignatures = this.signatures.map((sign: any) => this.formatSignature(sign));
+
+        this.http.put(this.route, {signatures : formatedSignatures}).pipe(
+            tap(() => {
+                this.notify.success(this.translate.instant('lang.signatureUpdated'));
+                tinymce.remove('textarea#emailSignature' + this.signatures[index].id);
+                this.signatures[index].editMode = false;
+                this.signaturesClone = JSON.parse(JSON.stringify(this.signatures));
+            }),
+            catchError((err: any) => {
+                this.signatures = JSON.parse(JSON.stringify(this.signaturesClone));
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    savePrivateSignature(index: number) {
+        this.signatures[index].content = tinymce.get('emailSignature' + this.signatures[index].id).getContent();
+
+        const formatedSignatures = this.signatures.map((sign: any) => this.formatSignature(sign));
+
+        this.http.put(this.route + this.signatures[index].id, formatedSignatures).pipe(
+            tap(() => {
+                this.signaturesClone = JSON.parse(JSON.stringify(this.signatures));
+            }),
+            catchError((err: any) => {
+                this.signatures = JSON.parse(JSON.stringify(this.signaturesClone));
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+
     deleteSignature(index: number) {
+        if (this.mode === 'public') {
+            this.deletePublicSignature(index);
+        } else {
+            this.deletePrivateSignature(index);
+        }
+    }
+
+    deletePrivateSignature(index: number) {
         const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.delete')} "${this.signatures[index].label}"`, msg: this.translate.instant('lang.confirmAction') } });
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
@@ -194,6 +258,26 @@ export class MailSignaturesAdministrationComponent implements OnInit, OnDestroy 
                 this.notify.success(this.translate.instant('lang.signatureDeleted'));
             }),
             catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    deletePublicSignature(index: number) {
+        const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.delete')} "${this.signatures[index].label}"`, msg: this.translate.instant('lang.confirmAction') } });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            tap(() => {
+                this.signatures.splice(index, 1);
+            }),
+            exhaustMap(() => this.http.put(this.route, {signatures : this.signatures})),
+            tap(() => {
+                this.signaturesClone.splice(index, 1);
+                this.notify.success(this.translate.instant('lang.signatureDeleted'));
+            }),
+            catchError((err: any) => {
+                this.signatures =  JSON.parse(JSON.stringify(this.signaturesClone));
                 this.notify.handleSoftErrors(err);
                 return of(false);
             })

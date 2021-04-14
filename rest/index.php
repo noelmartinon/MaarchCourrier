@@ -607,7 +607,7 @@ $app->get('/currentUser/profile', \User\controllers\UserController::class . ':ge
 $app->put('/currentUser/profile', \User\controllers\UserController::class . ':updateProfile');
 $app->put('/currentUser/profile/preferences', \User\controllers\UserController::class . ':updateCurrentUserPreferences');
 $app->put('/currentUser/profile/featureTour', \User\controllers\UserController::class . ':updateCurrentUserFeatureTour');
-$app->post('/currentUser/emailSignature', \User\controllers\UserController::class . ':createCurrentUserEmailSignature');
+$app->post('/currentUser/emailSignatures', \User\controllers\UserController::class . ':createCurrentUserEmailSignature');
 $app->put('/currentUser/emailSignature/{id}', \User\controllers\UserController::class . ':updateCurrentUserEmailSignature');
 $app->delete('/currentUser/emailSignature/{id}', \User\controllers\UserController::class . ':deleteCurrentUserEmailSignature');
 $app->put('/currentUser/groups/{groupId}/baskets/{basketId}', \User\controllers\UserController::class . ':updateCurrentUserBasketPreferences');
