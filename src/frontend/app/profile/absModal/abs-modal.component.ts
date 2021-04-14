@@ -27,6 +27,8 @@ export class AbsModalComponent implements OnInit {
     startDate: Date = null;
     endDate: Date = null;
 
+    showCalendar: boolean = false;
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,

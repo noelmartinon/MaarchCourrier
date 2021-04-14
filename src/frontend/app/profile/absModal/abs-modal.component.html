@@ -5,8 +5,16 @@
             <mat-spinner style="margin:auto;"></mat-spinner>
         </div>
         <mat-list>
-            <div mat-subheader>{{ 'lang.absencePeriod' | translate }}</div>
             <mat-list-item>
+                <button mat-button color="primary" matSuffix
+                    style="width: 100%; align-items:center; font-size: 16px;"
+                        (click)="$event.stopPropagation(); showCalendar = !showCalendar;" [title]="'lang.absencePeriod' | translate">
+                    <mat-icon inline="true" color="primary" class="fa fa-calendar-week" style="margin-bottom: 5px;">
+                    </mat-icon>
+                        {{ 'lang.absencePeriod' | translate }}
+                </button>
+            </mat-list-item>
+            <mat-list-item  *ngIf="showCalendar">
                 <mat-form-field class="input-form input-date" floatLabel="never" (click)="picker.open()"
                     style="cursor:pointer;">
                     <mat-date-range-input [rangePicker]="picker" [min]="today">
@@ -62,7 +70,7 @@
     </div>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
-        <button mat-raised-button mat-button color="primary" [disabled]="loading"
+        <button mat-raised-button mat-button color="primary" [disabled]="loading || !startDate || !endDate"
             (click)="onSubmit()">{{'lang.validate' | translate}}</button>
         <button mat-raised-button mat-button [disabled]="loading"
             [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
