@@ -208,7 +208,9 @@ export class AbsModalComponent implements OnInit {
                 default:
                     this.http.put('../rest/users/' + this.data.user.id + '/absence', {absenceDate, redirectedBaskets}).pipe(
                         tap(() => {
-                            if (this.startDate === new Date()) {
+                            const today = this.functions.formatDateObjectToDateString(new Date());
+                            const startDate = this.functions.formatDateObjectToDateString(this.startDate);
+                            if (startDate === today) {
                                 this.authService.logout();
                             }
                             resolve(true);
