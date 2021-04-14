@@ -272,7 +272,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         if (!this.functionsService.empty(custom.oldValues)) {
             custom.values = custom.oldValues;
         }
-        custom.oldValues =  oldValues;
+        custom.oldValues = oldValues;
     }
 
     getTables() {
@@ -296,7 +296,6 @@ export class CustomFieldsAdministrationComponent implements OnInit {
             column: column
 
         });
-        console.log('field', field);
     }
 
     removeColumnLabel(field: any, index: number) {
