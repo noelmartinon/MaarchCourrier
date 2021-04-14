@@ -781,7 +781,7 @@ class UserController
 
         $body = $request->getParsedBody();
 
-        $result = UserController::redirectBasket(['redirectedBasket' => $body['redirectedBaskets'], 'userId' => $args['id']]);
+        $result = UserController::redirectBasket(['redirectedBasket' => $body['redirectedBaskets'], 'userId' => $args['id'], 'login' => $GLOBALS['login']]);
         if (!empty($result)) {
             return $response->withStatus(400)->withJson(['errors' => $result['errors']]);
         }
@@ -2127,6 +2127,9 @@ class UserController
             }
         }
 
+        if (empty($body['redirectedBaskets'])) {
+            $body['redirectedBaskets'] = [];
+        }
         $absence = ['absenceDate' => $body['absenceDate'], 'redirectedBaskets' => $body['redirectedBaskets']];
         UserModel::update(['set' => ['absence' => json_encode($absence)], 'where' => ['id = ?'], 'data' => [$args['id']]]);
 
@@ -2156,17 +2159,22 @@ class UserController
                     ]);
 
                     HistoryController::add([
-                        'tableName'    => 'redirected_baskets',
-                        'recordId'     => $absentUser['user_id'],
-                        'eventType'    => 'DEL',
-                        'eventId'      => 'basketRedirection',
-                        'info'         => _BASKET_REDIRECTION_SUPPRESSION . " {$absentUser['user_id']} : " . $redirectedBasket['basket_id']
+                        'tableName' => 'redirected_baskets',
+                        'recordId'  => $absentUser['user_id'],
+                        'eventType' => 'DEL',
+                        'eventId'   => 'basketRedirection',
+                        'info'      => _BASKET_REDIRECTION_SUPPRESSION . " {$absentUser['user_id']} : " . $redirectedBasket['basket_id'],
+                        'userId'    => !empty($GLOBALS['id']) ? $GLOBALS['id'] : $absentUser['id']
                     ]);
                 }
             }
         }
 
-        $futureAbsentUsers = UserModel::get(['select' => ['id', 'absence'], 'where' => ['absence is not null', 'status = ?'], 'data' => ['OK']]);
+        $futureAbsentUsers = UserModel::get([
+            'select' => ['id', 'absence', 'user_id'],
+            'where'  => ['absence is not null', 'status = ?'],
+            'data'   => ['OK']
+        ]);
         foreach ($futureAbsentUsers as $absentUser) {
             $absentUser['absence'] = json_decode($absentUser['absence'], true);
             $absenceStartDate = new \DateTime($absentUser['absence']['absenceDate']['startDate']);
@@ -2174,19 +2182,23 @@ class UserController
             if ($today > $absenceStartDate) {
                 UserModel::update(['set' => ['status' => 'ABS'], 'where' => ['id = ?'], 'data' => [$absentUser['id']]]);
 
-                UserController::redirectBasket([
-                    'redirectedBaskets' => $absentUser['absence']['redirectedBaskets'],
-                    'userId'            => $absentUser['id']
-                ]);
+                if (!empty($absentUser['absence']['redirectedBaskets'])) {
+                    UserController::redirectBasket([
+                        'redirectedBaskets' => $absentUser['absence']['redirectedBaskets'],
+                        'userId'            => $absentUser['id'],
+                        'login'             => $absentUser['user_id']
+                    ]);
+                }
             }
         }
     }
 
     private static function redirectBasket(array $args)
     {
-        ValidatorModel::notEmpty($args, ['redirectedBaskets', 'userId']);
+        ValidatorModel::notEmpty($args, ['redirectedBaskets', 'userId', 'login']);
         ValidatorModel::arrayType($args, ['redirectedBaskets']);
         ValidatorModel::intType($args, ['userId']);
+        ValidatorModel::stringType($args, ['login']);
 
         DatabaseModel::beginTransaction();
         foreach ($args['redirectedBaskets'] as $key => $value) {
@@ -2232,10 +2244,11 @@ class UserController
                 ]);
                 HistoryController::add([
                     'tableName' => 'redirected_baskets',
-                    'recordId'  => $GLOBALS['login'],
+                    'recordId'  => $args['login'],
                     'eventType' => 'UP',
                     'eventId'   => 'basketRedirection',
-                    'info'      => _BASKET_REDIRECTION . " {$value['basket_id']} {$value['actual_user_id']}"
+                    'info'      => _BASKET_REDIRECTION . " {$value['basket_id']} {$value['actual_user_id']}",
+                    'userId'    => !empty($GLOBALS['id']) ? $GLOBALS['id'] : $args['userId']
                 ]);
                 unset($args['redirectedBaskets'][$key]);
             }
@@ -2251,10 +2264,11 @@ class UserController
                 ]);
                 HistoryController::add([
                     'tableName' => 'redirected_baskets',
-                    'recordId'  => $GLOBALS['login'],
+                    'recordId'  => $args['login'],
                     'eventType' => 'UP',
                     'eventId'   => 'basketRedirection',
-                    'info'      => _BASKET_REDIRECTION . " {$value['basket_id']} {$args['userId']} => {$value['actual_user_id']}"
+                    'info'      => _BASKET_REDIRECTION . " {$value['basket_id']} {$args['userId']} => {$value['actual_user_id']}",
+                    'userId'    => !empty($GLOBALS['id']) ? $GLOBALS['id'] : $args['userId']
                 ]);
             }
         }
