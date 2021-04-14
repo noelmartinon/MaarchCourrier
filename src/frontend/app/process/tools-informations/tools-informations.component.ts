@@ -66,13 +66,6 @@ export class ToolsInformationsComponent implements OnInit {
             label: this.translate.instant('lang.avis'),
             display: false,
             count : 0
-        },
-        {
-            id: 'info',
-            icon: 'fas fa-info-circle',
-            label: this.translate.instant('lang.informations'),
-            display: false,
-            count : 0
         }
     ];
     constructor(

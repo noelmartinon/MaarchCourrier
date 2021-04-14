@@ -2,10 +2,12 @@
     <mat-icon class="fas fa-info-circle" style="height: auto;font-size: 23px;"></mat-icon>
 </button>
 <mat-menu #menu="matMenu" [class]="'devToolListMenu'">
-    <button mat-menu-item *ngFor="let infoTool of infoTools" (click)="toggleModal(infoTool)" [disabled]="infoTool.display">
+    <button mat-menu-item *ngFor="let infoTool of infoTools" (click)="toggleModal(infoTool)" [disabled]="infoTool.display" style="display: flex;align-items: center;">
         <mat-icon color="primary" [class]="infoTool.icon" style="height: auto;"></mat-icon>
+        <span style="flex:1;">
+            {{infoTool.label}}
+        </span>
         <i *ngIf="infoTool.count > 0" class="fas fa-circle haveContent"></i>
-        <span>{{infoTool.label}}</span>
     </button>
 </mat-menu>
 <ng-container *ngFor="let modal of infoTools; let i=index">
@@ -41,13 +43,6 @@
                 [resId]="resId"
                 [adminMode]="false">
             </app-avis-workflow>
-            <app-attachments-list *ngIf="modal.id === 'attachments'" #appAttachmentsList
-                [resId]="resId">
-            </app-attachments-list>
-            <app-indexing-form *ngIf="modal.id === 'info'" #indexingForm [groupId]="currentGroupId"
-                [indexingFormId]="currentResourceInformations.modelId" [resId]="resId"
-                [mode]="'process'" [canEdit]="false" [hideDiffusionList]="true">
-            </app-indexing-form>
         </div>
     </div>
 </ng-container>
