@@ -27,6 +27,7 @@ export class AbsModalComponent implements OnInit {
     startDate: Date = null;
     endDate: Date = null;
 
+    redirectedBaskets: any[] = [];
     showCalendar: boolean = false;
 
     constructor(
@@ -40,7 +41,8 @@ export class AbsModalComponent implements OnInit {
         @Inject(MAT_DIALOG_DATA) public data: any
     ) { }
 
-    ngOnInit(): void {
+    async ngOnInit(): Promise<void> {
+        await this.getAbsenceInfo();
         this.getBasketInfo();
     }
 
@@ -188,7 +190,7 @@ export class AbsModalComponent implements OnInit {
         });
         const absenceDate: any = {
             startDate: this.functions.formatDateObjectToDateString(this.startDate),
-            endDate: this.functions.formatDateObjectToDateString(this.endDate)
+            endDate: this.functions.formatDateObjectToDateString(this.endDate, true)
         };
         return new Promise((resolve, reject) => {
             switch (this.startDate) {
@@ -212,6 +214,8 @@ export class AbsModalComponent implements OnInit {
                             const startDate = this.functions.formatDateObjectToDateString(this.startDate);
                             if (startDate === today) {
                                 this.authService.logout();
+                            } else {
+                                this.notify.success(this.translate.instant('lang.absenceDateSaved'));
                             }
                             resolve(true);
                         }),
@@ -246,5 +250,25 @@ export class AbsModalComponent implements OnInit {
 
     oneOrMoreSelected() {
         return this.baskets.filter((item: any) => item.selected).length > 0 && !this.allSelected();
+    }
+
+    getAbsenceInfo() {
+        this.http.get('../rest/currentUser/profile').pipe(
+            tap((data: any) => {
+                if (data.absence) {
+                    const absenceDate: any = data.absence.absenceDate;
+                    this.redirectedBaskets = (data.absence.redirectedBaskets).map((basket: any) => basket.basket_id);
+                    this.startDate = new Date(this.functions.formatFrenchDateToTechnicalDate(absenceDate.startDate));
+                    this.endDate = new Date(this.functions.formatFrenchDateToTechnicalDate(absenceDate.endDate));
+                    if (this.startDate && this.endDate) {
+                        this.showCalendar = true;
+                    }
+                }
+            }),
+            catchError((err) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 }

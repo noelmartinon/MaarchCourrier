@@ -2471,5 +2471,7 @@
     "createPublicIndexingModels": "Créer et supprimer des modèles d'enregistrement publics depuis la page d'enregistrement",
     "absencePeriod": "Définir une plage d'absence",
     "organizationEmailSignatures": "Signatures mail d'organisation",
-    "organizationEmailSignaturesDesc": "Les signatures seront disponibles pour <b>tous</b> les utilisateurs de l'application.<br/>Vous pouvez utiliser des <b>variables de fusion</b> utilisateur et entité primaire (<a href=\"{{url}}\" target=\"_blank\">plus d'informations</a>)."
+    "organizationEmailSignaturesDesc": "Les signatures seront disponibles pour <b>tous</b> les utilisateurs de l'application.<br/>Vous pouvez utiliser des <b>variables de fusion</b> utilisateur et entité primaire (<a href=\"{{url}}\" target=\"_blank\">plus d'informations</a>).",
+    "absenceDateSaved": "Plage d'absence définie",
+    "absenceDate": "Période d'absence"
 }

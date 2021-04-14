@@ -9,12 +9,15 @@
                 <button mat-button color="primary" matSuffix
                     style="width: 100%; align-items:center; font-size: 16px;"
                         (click)="$event.stopPropagation(); showCalendar = !showCalendar;" [title]="'lang.absencePeriod' | translate">
-                    <mat-icon inline="true" color="primary" class="fa fa-calendar-week" style="margin-bottom: 5px;">
+                    <mat-icon inline="true" color="primary" class="far fa-calendar-alt" style="margin-bottom: 5px;">
                     </mat-icon>
                         {{ 'lang.absencePeriod' | translate }}
                 </button>
             </mat-list-item>
-            <mat-list-item  *ngIf="showCalendar">
+        </mat-list>
+        <mat-list *ngIf="showCalendar">
+            <div mat-subheader>{{'lang.absenceDate' | translate}}</div>
+            <mat-list-item>
                 <mat-form-field class="input-form input-date" floatLabel="never" (click)="picker.open()"
                     style="cursor:pointer;">
                     <mat-date-range-input [rangePicker]="picker" [min]="today">
@@ -24,7 +27,7 @@
                     <mat-datepicker-toggle *ngIf="!startDate || !endDate; else elseBlock" matSuffix [for]="picker"></mat-datepicker-toggle>
                     <ng-template #elseBlock>
                         <button mat-button color="warn" matSuffix mat-icon-button
-                        (click)="$event.stopPropagation();startDate = endDate = null;" [title]="'lang.eraseValue' | translate">
+                        (click)="$event.stopPropagation();startDate = endDate = null; showCalendar = false;" [title]="'lang.eraseValue' | translate">
                         <mat-icon color="warn" class="fa fa-calendar-times">
                         </mat-icon>
                         </button>
@@ -37,14 +40,14 @@
             <div mat-subheader>{{'lang.basketsToRedirect' | translate}} :</div>
             <mat-list-item >
                 <mat-icon mat-list-icon style="display: flex;align-items: center;justify-content: center;">
-                    <mat-checkbox color="primary" (change)="toggleAll()" [indeterminate]="oneOrMoreSelected()" [checked]="allSelected()"></mat-checkbox>
+                    <mat-checkbox color="primary" (change)="toggleAll()" [indeterminate]="oneOrMoreSelected()"></mat-checkbox>
                 </mat-icon>
                 <div mat-line style="cursor:pointer;font-size: 12px;font-style: italic;color:#666" (click)="toggleAll()">{{'lang.selectAll' | translate}}</div>
             </mat-list-item>
             <ng-container *ngFor="let basket of baskets;let i = index">
                 <mat-list-item>
                     <mat-icon mat-list-icon style="display: flex;align-items: center;justify-content: center;">
-                        <mat-checkbox color="primary" [(ngModel)]="basket.selected" *ngIf="!isRedirectedBasket(basket)">
+                        <mat-checkbox [checked]="this.redirectedBaskets.includes(basket.basket_id)" color="primary" [(ngModel)]="basket.selected" *ngIf="!isRedirectedBasket(basket)">
                         </mat-checkbox>
                         <button *ngIf="isRedirectedBasket(basket)" mat-button color="warn" matSuffix mat-icon-button aria-label="Clear"
                             (click)="delBasketRedirection(basket)" [title]="'lang.deleteRedirection' | translate">
