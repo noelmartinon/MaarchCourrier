@@ -59,9 +59,13 @@ export class AbsModalComponent implements OnInit {
 
     async onSubmit() {
         this.loading = true;
-        const res = await this.redirectBaskets();
-        if (res) {
+        if (this.startDate !== new Date()) {
             await this.activateAbsence();
+        } else {
+            const res = await this.redirectBaskets();
+            if (res) {
+                await this.activateAbsence();
+            }
         }
         this.loading = false;
         this.dialogRef.close();
@@ -187,17 +191,36 @@ export class AbsModalComponent implements OnInit {
             endDate: this.functions.formatDateObjectToDateString(this.endDate)
         };
         return new Promise((resolve, reject) => {
-            this.http.put('../rest/users/' + this.data.user.id + '/absence', {absenceDate, redirectedBaskets}).pipe(
-                tap((data: any) => {
-                    this.authService.logout();
-                    resolve(true);
-                }),
-                catchError((err: any) => {
-                    this.notify.handleErrors(err);
-                    resolve(false);
-                    return of(false);
-                })
-            ).subscribe();
+            switch (this.startDate) {
+                case null:
+                    this.http.put('../rest/users/' + this.data.user.id + '/status', {'status': 'ABS'}).pipe(
+                        tap(() => {
+                            this.authService.logout();
+                            resolve(true);
+                        }),
+                        catchError((err: any) => {
+                            this.notify.handleErrors(err);
+                            resolve(false);
+                            return of(false);
+                        })
+                    ).subscribe();
+                    break;
+                default:
+                    this.http.put('../rest/users/' + this.data.user.id + '/absence', {absenceDate, redirectedBaskets}).pipe(
+                        tap(() => {
+                            if (this.startDate === new Date()) {
+                                this.authService.logout();
+                            }
+                            resolve(true);
+                        }),
+                        catchError((err: any) => {
+                            this.notify.handleErrors(err);
+                            resolve(false);
+                            return of(false);
+                        })
+                    ).subscribe();
+                    break;
+            }
         });
     }
 
