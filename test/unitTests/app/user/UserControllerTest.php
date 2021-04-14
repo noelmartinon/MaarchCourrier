@@ -911,7 +911,7 @@ class UserControllerTest extends TestCase
         $response     = $userController->updateStatus($fullRequest, new \Slim\Http\Response(), ['id' => self::$id]);
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Bad Request', $responseBody['errors']);
+        $this->assertSame('Body status is empty or not a string', $responseBody['errors']);
 
         $GLOBALS['login'] = 'bbain';
         $userInfo          = \User\models\UserModel::getByLogin(['login' => $GLOBALS['login'], 'select' => ['id']]);
