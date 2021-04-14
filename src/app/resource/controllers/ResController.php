@@ -843,7 +843,7 @@ class ResController extends ResourceControlController
         }
         $formattedData['linkedResources'] = count($linkedResources);
 
-        $attachments = AttachmentModel::get(['select' => ['count(1)'], 'where' => ['res_id_master = ?', 'status in (?)'], 'data' => [$args['resId'], ['TRA', 'A_TRA', 'FRZ']]]);
+        $attachments = AttachmentModel::get(['select' => ['count(1)'], 'where' => ['res_id_master = ?', 'status in (?)', 'attachment_type <> ?'], 'data' => [$args['resId'], ['TRA', 'A_TRA', 'FRZ'], 'summary_sheet']]);
         $formattedData['attachments'] = $attachments[0]['count'];
 
         $formattedData['diffusionList'] = 0;
@@ -1202,7 +1202,9 @@ class ResController extends ResourceControlController
                 $customFields[$immuabledTechnicalCustom['id']] = $values[0]['key'] ?? null;
             }
         }
-        ResModel::update(['set' => ['custom_fields' => json_encode($customFields)], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
+        if (!empty($customFields)) {
+            ResModel::update(['set' => ['custom_fields' => json_encode($customFields)], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
+        }
 
         return true;
     }

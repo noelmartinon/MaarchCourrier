@@ -227,6 +227,15 @@ export class PrivilegeService {
             'hasParams': false
         },
         {
+            'id': 'admin_organization_email_signatures',
+            'label': 'lang.organizationEmailSignatures',
+            'comment': 'lang.organizationEmailSignatures',
+            'route': '/administration/organizationEmailSignatures',
+            'unit': 'supervision',
+            'style': 'fas fa-signature',
+            'hasParams': false
+        },
+        {
             'id': 'admin_shippings',
             'label': 'lang.mailevaAdmin',
             'comment': 'lang.mailevaAdminDesc',

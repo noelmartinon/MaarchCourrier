@@ -57,6 +57,7 @@ import { SearchAdministrationComponent } from './search/search-administration.co
 import { SsoAdministrationComponent } from './connection/sso/sso-administration.component';
 import { AttachmentTypeAdministrationComponent } from './attachment/attachment-type-administration.component';
 import { AttachmentTypesAdministrationComponent } from './attachment/attachment-types-administration.component';
+import { OrganizationEmailSignaturesAdministrationComponent } from './organizationEmailSignatures/organization-email-signatures-administration.component';
 
 
 @NgModule({
@@ -113,6 +114,7 @@ import { AttachmentTypesAdministrationComponent } from './attachment/attachment-
             { path: 'administration/templates/:id', canActivate: [AppGuard], component: TemplateAdministrationComponent },
             { path: 'administration/securities', canActivate: [AppGuard], component: SecuritiesAdministrationComponent },
             { path: 'administration/sendmail', canActivate: [AppGuard], component: SendmailAdministrationComponent },
+            { path: 'administration/organizationEmailSignatures', canActivate: [AppGuard], component: OrganizationEmailSignaturesAdministrationComponent },
             { path: 'administration/shippings', canActivate: [AppGuard], component: ShippingsAdministrationComponent },
             { path: 'administration/shippings/new', canActivate: [AppGuard], component: ShippingAdministrationComponent },
             { path: 'administration/shippings/:id', canActivate: [AppGuard], component: ShippingAdministrationComponent },

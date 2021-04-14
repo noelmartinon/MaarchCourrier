@@ -2468,6 +2468,7 @@
     "deleteAttachmentSignatureBook": "Voulez-vous vraiment supprimer la pièce jointe ?",
     "toogleShippingConf": "Activer / désactiver les envois postaux Maileva",
     "infoResId": "Le mot-clé <b>@resId</b> est disponible pour cibler le document en cours de traitement",
-    "createPublicIndexingModels": "Créer des modèles d'enregistrement public depuis la page d'enregistrement",
-    "globalMailSignatures": "Signatures d'entreprise"
+    "createPublicIndexingModels": "Créer et supprimer des modèles d'enregistrement publics depuis la page d'enregistrement",
+    "absencePeriod": "Définir une plage d'absence",
+    "organizationEmailSignatures": "Signatures mail d'organisation"
 }

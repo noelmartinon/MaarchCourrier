@@ -586,6 +586,7 @@ $app->post('/users/{id}/redirectedBaskets', \User\controllers\UserController::cl
 $app->delete('/users/{id}/redirectedBaskets', \User\controllers\UserController::class . ':deleteRedirectedBasket');
 $app->put('/users/{id}/baskets', \User\controllers\UserController::class . ':updateBasketsDisplay');
 $app->put('/users/{id}/accountActivationNotification', \User\controllers\UserController::class . ':sendAccountActivationNotification');
+$app->put('/users/{id}/absence', \User\controllers\UserController::class . ':setAbsenceRange');
 
 $app->post('/password', \User\controllers\UserController::class . ':forgotPassword');
 $app->put('/password', \User\controllers\UserController::class . ':passwordInitialization');
@@ -606,13 +607,15 @@ $app->get('/currentUser/profile', \User\controllers\UserController::class . ':ge
 $app->put('/currentUser/profile', \User\controllers\UserController::class . ':updateProfile');
 $app->put('/currentUser/profile/preferences', \User\controllers\UserController::class . ':updateCurrentUserPreferences');
 $app->put('/currentUser/profile/featureTour', \User\controllers\UserController::class . ':updateCurrentUserFeatureTour');
-$app->post('/currentUser/emailSignature', \User\controllers\UserController::class . ':createCurrentUserEmailSignature');
+$app->post('/currentUser/emailSignatures', \User\controllers\UserController::class . ':createCurrentUserEmailSignature');
 $app->put('/currentUser/emailSignature/{id}', \User\controllers\UserController::class . ':updateCurrentUserEmailSignature');
 $app->delete('/currentUser/emailSignature/{id}', \User\controllers\UserController::class . ':deleteCurrentUserEmailSignature');
 $app->put('/currentUser/groups/{groupId}/baskets/{basketId}', \User\controllers\UserController::class . ':updateCurrentUserBasketPreferences');
 $app->get('/currentUser/templates', \User\controllers\UserController::class . ':getTemplates');
 $app->get('/currentUser/emailSignatures', \User\controllers\UserController::class . ':getCurrentUserEmailSignatures');
+$app->get('/currentUser/emailSignaturesList', \User\controllers\UserController::class . ':getCurrentUserEmailSignaturesList');
 $app->get('/currentUser/emailSignatures/{id}', \User\controllers\UserController::class . ':getCurrentUserEmailSignatureById');
+$app->get('/currentUser/globalEmailSignatures/{id}', \User\controllers\UserController::class . ':getGlobalEmailSignatureById');
 $app->get('/currentUser/availableEmails', \Email\controllers\EmailController::class . ':getAvailableEmails');
 
 //Notifications

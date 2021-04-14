@@ -168,24 +168,14 @@ export class AttachmentCreateComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get(`../rest/resources/${this.data.resIdMaster}/contacts?type=${type}`).pipe(
                 tap((correspondents: any) => {
-                    var correspondents = correspondents.contacts.filter((contact: any) => contact.type !== 'entity');
-
-                    correspondents.forEach((elem) => {
-                        if (elem.type === 'contact') {
-                            this.resourceContacts.push({
-                                id: elem.id,
-                                type: 'contact',
-                                label: this.contactService.formatContact(elem)
-                            });
-                        } else if (elem.type === 'user') {
-                            this.resourceContacts.push({
-                                id: elem.id,
-                                type: 'user',
-                                label: `${elem.firstname} ${elem.lastname}`
-                            });
-                        }
+                    correspondents = correspondents.contacts.filter((contact: any) => contact.type !== 'entity').map((item: any) => ({
+                        id: item.id,
+                        type: item.type,
+                        label: item.type === 'contact' ? this.contactService.formatContact(item) : `${item.firstname} ${item.lastname}`
+                    }));
+                    correspondents.forEach((element: any) => {
+                        this.resourceContacts.push(element);
                     });
-
                     this.resourceContacts = this.sortPipe.transform(this.resourceContacts, 'label');
                     resolve(true);
                 }),

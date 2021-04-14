@@ -30,12 +30,16 @@ describe('Indexing document EE', () => {
     cy.get('[title="Pôle Jeunesse et Sport"]')
       .click({force: true});
     cy.wait(500)
+    cy.fixture('sample.pdf').then(fileContent => {
+      cy.get('input[type="file"]').attachFile({
+          fileContent: fileContent.toString(),
+          fileName: 'sample.pdf',
+          mimeType: 'application/pdf'
+      });
+    });
+    cy.wait(500)
     cy.get('.mat-button-wrapper')
       .contains('Valider')
-      .click()
-    cy.wait(500)  
-    cy.get('.mat-button-wrapper')
-      .contains('Ok')
       .click()
     cy.wait(500)
     cy.get('[placeholder="Ajouter une annotation"]')
@@ -43,7 +47,7 @@ describe('Indexing document EE', () => {
     cy.get('.mat-dialog-content-container .mat-button-wrapper')
       .contains('Valider')
       .click()
-    cy.wait(500)
+    cy.wait(1000)
     cy.url().should('include', '/resources/')
   })
 })

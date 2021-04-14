@@ -14,6 +14,7 @@ import { FunctionsService } from '@service/functions.service';
 import { ContactResourceModalComponent } from '../contact/contact-resource/modal/contact-resource-modal.component';
 import { of } from 'rxjs';
 import { PrivilegeService } from '@service/privileges.service';
+import { Router } from '@angular/router';
 
 declare let $: any;
 
@@ -24,6 +25,8 @@ declare let $: any;
 })
 export class LinkedResourceListComponent implements OnInit {
 
+    @Input() editMode: boolean = true;
+    @Input() canAccessResources: boolean = true;
     @Input() resId: number;
     @Output() reloadBadgeLinkedResources = new EventEmitter<string>();
 
@@ -42,6 +45,7 @@ export class LinkedResourceListComponent implements OnInit {
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
+        private router: Router,
         private notify: NotificationService,
         public appService: AppService,
         public dialog: MatDialog,
@@ -51,6 +55,7 @@ export class LinkedResourceListComponent implements OnInit {
 
     ngOnInit(): void {
         this.loading = true;
+        this.editMode = this.editMode ? this.editMode && this.privilegeService.hasCurrentUserPrivilege('add_links') : false;
         this.initLinkedResources();
     }
 
@@ -128,7 +133,7 @@ export class LinkedResourceListComponent implements OnInit {
     }
 
     viewThumbnail(row: any) {
-        if (row.hasDocument) {
+        if (row.hasDocument && this.canAccessResources) {
             this.thumbnailUrl = '../rest/resources/' + row.resId + '/thumbnail';
             $('#viewThumbnail').show();
         }
@@ -155,5 +160,11 @@ export class LinkedResourceListComponent implements OnInit {
 
     openContact(row: any, mode: string) {
         this.dialog.open(ContactResourceModalComponent, { panelClass: 'maarch-modal', data: { title: `${row.chrono} - ${row.subject}`, mode: mode, resId: row.resId } });
+    }
+
+    goTo(resId: number) {
+        if (this.canAccessResources) {
+            this.router.navigate([`/resources/${resId}`]);
+        }
     }
 }

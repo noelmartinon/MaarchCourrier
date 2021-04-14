@@ -21,6 +21,7 @@ use Configuration\models\ConfigurationModel;
 use Contact\models\ContactGroupListModel;
 use Contact\models\ContactGroupModel;
 use ContentManagement\controllers\DocumentEditorController;
+use ContentManagement\controllers\MergeController;
 use Docserver\controllers\DocserverController;
 use Docserver\models\DocserverModel;
 use Email\controllers\EmailController;
@@ -125,9 +126,10 @@ class UserController
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
         }
 
-        $user = UserModel::getById(['id' => $args['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'status', 'phone', 'mail', 'initials', 'mode', 'authorized_api', 'external_id']]);
+        $user = UserModel::getById(['id' => $args['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'status', 'phone', 'mail', 'initials', 'mode', 'authorized_api', 'external_id', 'absence']]);
         $user['external_id']        = json_decode($user['external_id'], true);
         $user['authorizedApi']      = json_decode($user['authorized_api'], true);
+        $user['absence']            = json_decode($user['absence'], true);
         unset($user['authorized_api']);
 
         if ($GLOBALS['id'] == $args['id'] || PrivilegeController::hasPrivilege(['privilegeId' => 'view_personal_data', 'userId' => $GLOBALS['id']])) {
@@ -581,14 +583,13 @@ class UserController
 
     public function getProfile(Request $request, Response $response)
     {
-        $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'initials', 'preferences', 'external_id', 'status', 'mode', 'feature_tour']]);
+        $user = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'initials', 'preferences', 'external_id', 'status', 'mode', 'feature_tour', 'absence']]);
         $user['external_id']        = json_decode($user['external_id'], true);
         $user['preferences']        = json_decode($user['preferences'], true);
         unset($user['preferences']['outlookPassword']);
         $user['featureTour']        = json_decode($user['feature_tour'], true);
         unset($user['feature_tour']);
         $user['signatures']         = UserSignatureModel::getByUserSerialId(['userSerialid' => $user['id']]);
-        $user['emailSignatures']    = UserEmailSignatureModel::getByUserId(['userId' => $GLOBALS['id']]);
         $user['groups']             = UserModel::getGroupsById(['id' => $GLOBALS['id']]);
         $user['entities']           = UserModel::getEntitiesById(['id' => $GLOBALS['id'], 'select' => ['entities.id', 'users_entities.entity_id', 'entities.entity_label', 'users_entities.user_role', 'users_entities.primary_entity'], 'orderBy' => ['users_entities.primary_entity DESC']]);
         $user['baskets']            = BasketModel::getBasketsByLogin(['login' => $user['user_id']]);
@@ -601,6 +602,7 @@ class UserController
         $user['lockAdvancedPrivileges'] = PrivilegeController::isAdvancedPrivilegesLocked();
         $userFollowed = UserFollowedResourceModel::get(['select' => ['count(1) as nb'], 'where' => ['user_id = ?'], 'data' => [$GLOBALS['id']]]);
         $user['nbFollowedResources'] = $userFollowed[0]['nb'];
+        $user['absence'] = json_decode($user['absence'], true);
 
         $loggingMethod = CoreConfigModel::getLoggingMethod();
         if (in_array($loggingMethod['id'], self::ALTERNATIVES_CONNECTIONS_METHODS)) {
@@ -770,89 +772,21 @@ class UserController
         return $response->withJson(['success' => 'success']);
     }
 
-    public function setRedirectedBaskets(Request $request, Response $response, array $aArgs)
+    public function setRedirectedBaskets(Request $request, Response $response, array $args)
     {
-        $error = $this->hasUsersRights(['id' => $aArgs['id'], 'himself' => true]);
+        $error = $this->hasUsersRights(['id' => $args['id'], 'himself' => true]);
         if (!empty($error['error'])) {
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
         }
 
-        $data = $request->getParams();
+        $body = $request->getParsedBody();
 
-        DatabaseModel::beginTransaction();
-        foreach ($data as $key => $value) {
-            if (empty($value['actual_user_id']) || empty($value['basket_id']) || empty($value['group_id'])) {
-                DatabaseModel::rollbackTransaction();
-                return $response->withStatus(400)->withJson(['errors' => 'Some data are empty']);
-            }
-
-            if (empty($value['originalOwner'])) {
-                $userBasketPreference = UserBasketPreferenceModel::get([
-                    'select' => ['display'],
-                    'where'  => ['basket_id =?', 'group_serial_id = ?', 'user_serial_id = ?'],
-                    'data'   => [$value['basket_id'], $value['group_id'], $aArgs['id']]
-                ]);
-                if (empty($userBasketPreference[0]['display'])) {
-                    unset($data[$key]);
-                    continue;
-                }
-            }
-
-            $check = UserModel::getById(['id' => $value['actual_user_id'], 'select' => ['1']]);
-            if (empty($check)) {
-                DatabaseModel::rollbackTransaction();
-                return $response->withStatus(400)->withJson(['errors' => 'User not found']);
-            }
-
-            $check = RedirectBasketModel::get([
-                'select' => [1],
-                'where'  => ['actual_user_id = ?', 'owner_user_id = ?', 'basket_id = ?', 'group_id = ?'],
-                'data'   => [$value['actual_user_id'], $aArgs['id'], $value['basket_id'], $value['group_id']]
-            ]);
-            if (!empty($check)) {
-                DatabaseModel::rollbackTransaction();
-                return $response->withStatus(400)->withJson(['errors' => 'Redirection already exist']);
-            }
-
-            if (!empty($value['originalOwner'])) {
-                RedirectBasketModel::update([
-                    'actual_user_id'    => $value['actual_user_id'],
-                    'basket_id'         => $value['basket_id'],
-                    'group_id'          => $value['group_id'],
-                    'owner_user_id'     => $value['originalOwner']
-                ]);
-                HistoryController::add([
-                    'tableName'    => 'redirected_baskets',
-                    'recordId'     => $GLOBALS['login'],
-                    'eventType'    => 'UP',
-                    'eventId'      => 'basketRedirection',
-                    'info'         => _BASKET_REDIRECTION . " {$value['basket_id']} {$value['actual_user_id']}"
-                ]);
-                unset($data[$key]);
-            }
+        $result = UserController::redirectBasket(['redirectedBasket' => $body['redirectedBaskets'], 'userId' => $args['id'], 'login' => $GLOBALS['login']]);
+        if (!empty($result)) {
+            return $response->withStatus(400)->withJson(['errors' => $result['errors']]);
         }
 
-        if (!empty($data)) {
-            foreach ($data as $value) {
-                RedirectBasketModel::create([
-                    'actual_user_id'    => $value['actual_user_id'],
-                    'basket_id'         => $value['basket_id'],
-                    'group_id'          => $value['group_id'],
-                    'owner_user_id'     => $aArgs['id']
-                ]);
-                HistoryController::add([
-                    'tableName'    => 'redirected_baskets',
-                    'recordId'     => $GLOBALS['login'],
-                    'eventType'    => 'UP',
-                    'eventId'      => 'basketRedirection',
-                    'info'         => _BASKET_REDIRECTION . " {$value['basket_id']} {$aArgs['id']} => {$value['actual_user_id']}"
-                ]);
-            }
-        }
-
-        DatabaseModel::commitTransaction();
-
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id']]);
+        $user = UserModel::getById(['id' => $args['id'], 'select' => ['user_id']]);
 
         $userBaskets = BasketModel::getBasketsByLogin(['login' => $user['user_id']]);
 
@@ -866,7 +800,7 @@ class UserController
         }
 
         return $response->withJson([
-            'redirectedBaskets' => RedirectBasketModel::getRedirectedBasketsByUserId(['userId' => $aArgs['id']]),
+            'redirectedBaskets' => RedirectBasketModel::getRedirectedBasketsByUserId(['userId' => $args['id']]),
             'baskets'           => $userBaskets
         ]);
     }
@@ -882,8 +816,7 @@ class UserController
 
         DatabaseModel::beginTransaction();
 
-        $check = Validator::notEmpty()->arrayType()->validate($data['redirectedBasketIds']);
-        if (!$check) {
+        if (!Validator::notEmpty()->arrayType()->validate($data['redirectedBasketIds'])) {
             DatabaseModel::rollbackTransaction();
             return $response->withStatus(400)->withJson(['errors' => 'RedirectedBasketIds is empty or not an array']);
         }
@@ -2055,18 +1988,75 @@ class UserController
 
     public function getCurrentUserEmailSignatures(Request $request, Response $response)
     {
-        $signatureModels = UserEmailSignatureModel::getByUserId(['userId' => $GLOBALS['id']]);
+        $signatures = UserController::getSignatures(['withContent' => true]);
 
+        return $response->withJson(['emailSignatures' => $signatures['signatures']]);
+    }
+
+    public function getCurrentUserEmailSignaturesList(Request $request, Response $response)
+    {
+        $signatures = UserController::getSignatures(['withContent' => false]);
+
+        return $response->withJson(['emailSignatures' => $signatures['signatures']]);
+    }
+
+    public static function getSignatures($args = [])
+    {
         $signatures = [];
-
+        
+        $signatureModels = UserEmailSignatureModel::getByUserId(['userId' => $GLOBALS['id']]);
         foreach ($signatureModels as $signature) {
-            $signatures[] = [
-                'id'      => $signature['id'],
-                'label'   => $signature['title'],
+            $signatureTmp = [
+                'id'     => $signature['id'],
+                'label'  => $signature['title'],
+                'public' => false
+            ];
+
+            if ($args['withContent']) {
+                $signatureTmp['content'] = $signature['html_body'];
+            }
+
+            $signatures[] = $signatureTmp;
+        }
+
+        $globalEmailSignatures = ConfigurationModel::getByPrivilege(['privilege' => 'admin_organization_email_signatures', 'select' => ['value']]);
+        $value = json_decode($globalEmailSignatures['value'], true);
+        if (!empty($value['signatures'])) {
+            foreach ($value['signatures'] as $key => $globalEmailSignature) {
+                $signatureTmp = [
+                    'id'     => $key,
+                    'label'  => $globalEmailSignature['label'],
+                    'public' => true
+                ];
+
+                if ($args['withContent']) {
+                    $signatureTmp['content'] = MergeController::mergeGlobalEmailSignature(['content' => $globalEmailSignature['content']]);
+                }
+
+                $signatures[] = $signatureTmp;
+            }
+        }
+
+        return ['signatures' => $signatures];
+    }
+
+    public function getGlobalEmailSignatureById(Request $request, Response $response, array $args)
+    {
+        if (!Validator::intVal()->validate($args['id'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body param id is empty or not an integer']);
+        }
+
+        $globalEmailSignatures = ConfigurationModel::getByPrivilege(['privilege' => 'admin_organization_email_signatures', 'select' => ['value']]);
+        $value = json_decode($globalEmailSignatures['value'], true);
+        if (!empty($value['signatures'])) {
+            $signature = [
+                'id'      => $args['id'],
+                'label'   => $value['signatures'][$args['id']]['label'],
+                'content' => MergeController::mergeGlobalEmailSignature(['content' => $value['signatures'][$args['id']]['content']])
             ];
         }
 
-        return $response->withJson(['emailSignatures' => $signatures]);
+        return $response->withJson(['emailSignature' => $signature]);
     }
 
     public function getCurrentUserEmailSignatureById(Request $request, Response $response, array $args)
@@ -2099,5 +2089,186 @@ class UserController
         $isRoot = ($user['mode'] == 'root_visible' || $user['mode'] == 'root_invisible');
 
         return $isRoot;
+    }
+
+    public function setAbsenceRange(Request $request, Response $response, array $args)
+    {
+        $error = $this->hasUsersRights(['id' => $args['id'], 'himself' => true]);
+        if (!empty($error['error'])) {
+            return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
+        }
+
+        $body = $request->getParsedBody();
+
+        if (!Validator::arrayType()->notEmpty()->validate($body['absenceDate'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body absenceDate is empty or not an array']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['absenceDate']['endDate'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body absence[endDate] is empty or not a string']);
+        }
+
+        foreach ($body['redirectedBaskets'] as $key => $value) {
+            if (!Validator::intType()->notEmpty()->validate($value['actual_user_id'])) {
+                return $response->withStatus(400)->withJson(['errors' => "Body redirectedBaskets[$key][actual_user_id] is empty or not an integer"]);
+            } elseif (!Validator::intType()->notEmpty()->validate($value['group_id'])) {
+                return $response->withStatus(400)->withJson(['errors' => "Body redirectedBaskets[$key][group_id] is empty or not an integer"]);
+            } elseif (!Validator::stringType()->notEmpty()->validate($value['basket_id'])) {
+                return $response->withStatus(400)->withJson(['errors' => "Body redirectedBaskets[$key][basket_id] is empty or not an integer"]);
+            }
+
+            $check = UserModel::getById(['id' => $value['actual_user_id'], 'select' => ['1']]);
+            if (empty($check)) {
+                return $response->withStatus(400)->withJson(['errors' => 'User not found']);
+            }
+        }
+
+        if (empty($body['redirectedBaskets'])) {
+            $body['redirectedBaskets'] = [];
+        }
+        $absence = ['absenceDate' => $body['absenceDate'], 'redirectedBaskets' => $body['redirectedBaskets']];
+        UserModel::update(['set' => ['absence' => json_encode($absence)], 'where' => ['id = ?'], 'data' => [$args['id']]]);
+
+        $absenceStartDate = new \DateTime($body['absenceDate']['startDate']);
+        $today = new \DateTime();
+        if ($absenceStartDate <= $today) {
+            UserController::setAbsences();
+        }
+
+        return $response->withStatus(204);
+    }
+
+    public static function setAbsences()
+    {
+        $absentUsers = UserModel::get(['select' => ['id', 'absence', 'user_id'], 'where' => ['absence is not null', 'status = ?'], 'data' => ['ABS']]);
+        foreach ($absentUsers as $absentUser) {
+            $absentUser['absence'] = json_decode($absentUser['absence'], true);
+            $absenceEndDate = new \DateTime($absentUser['absence']['absenceDate']['endDate']);
+            $today = new \DateTime();
+            if ($today > $absenceEndDate) {
+                UserModel::update(['set' => ['absence' => null, 'status' => 'OK'], 'where' => ['id = ?'], 'data' => [$absentUser['id']]]);
+
+                foreach ($absentUser['absence']['redirectedBaskets'] as $redirectedBasket) {
+                    RedirectBasketModel::delete([
+                        'where' => ['actual_user_id = ?', 'basket_id = ?', 'group_id = ?', 'owner_user_id = ?'],
+                        'data'  => [$redirectedBasket['actual_user_id'], $redirectedBasket['basket_id'], $redirectedBasket['group_id'], $absentUser['id']]
+                    ]);
+
+                    HistoryController::add([
+                        'tableName' => 'redirected_baskets',
+                        'recordId'  => $absentUser['user_id'],
+                        'eventType' => 'DEL',
+                        'eventId'   => 'basketRedirection',
+                        'info'      => _BASKET_REDIRECTION_SUPPRESSION . " {$absentUser['user_id']} : " . $redirectedBasket['basket_id'],
+                        'userId'    => !empty($GLOBALS['id']) ? $GLOBALS['id'] : $absentUser['id']
+                    ]);
+                }
+            }
+        }
+
+        $futureAbsentUsers = UserModel::get([
+            'select' => ['id', 'absence', 'user_id'],
+            'where'  => ['absence is not null', 'status = ?'],
+            'data'   => ['OK']
+        ]);
+        foreach ($futureAbsentUsers as $absentUser) {
+            $absentUser['absence'] = json_decode($absentUser['absence'], true);
+            $absenceStartDate = new \DateTime($absentUser['absence']['absenceDate']['startDate']);
+            $today = new \DateTime();
+            if ($today > $absenceStartDate) {
+                UserModel::update(['set' => ['status' => 'ABS'], 'where' => ['id = ?'], 'data' => [$absentUser['id']]]);
+
+                if (!empty($absentUser['absence']['redirectedBaskets'])) {
+                    UserController::redirectBasket([
+                        'redirectedBaskets' => $absentUser['absence']['redirectedBaskets'],
+                        'userId'            => $absentUser['id'],
+                        'login'             => $absentUser['user_id']
+                    ]);
+                }
+            }
+        }
+    }
+
+    private static function redirectBasket(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['redirectedBaskets', 'userId', 'login']);
+        ValidatorModel::arrayType($args, ['redirectedBaskets']);
+        ValidatorModel::intType($args, ['userId']);
+        ValidatorModel::stringType($args, ['login']);
+
+        DatabaseModel::beginTransaction();
+        foreach ($args['redirectedBaskets'] as $key => $value) {
+            if (empty($value['actual_user_id']) || empty($value['basket_id']) || empty($value['group_id'])) {
+                DatabaseModel::rollbackTransaction();
+                return ['errors' => 'Some data are empty'];
+            }
+
+            $check = UserModel::getById(['id' => $value['actual_user_id'], 'select' => ['1']]);
+            if (empty($check)) {
+                DatabaseModel::rollbackTransaction();
+                return ['errors' => 'User not found'];
+            }
+
+            if (empty($value['originalOwner'])) {
+                $userBasketPreference = UserBasketPreferenceModel::get([
+                    'select' => ['display'],
+                    'where'  => ['basket_id =?', 'group_serial_id = ?', 'user_serial_id = ?'],
+                    'data'   => [$value['basket_id'], $value['group_id'], $args['userId']]
+                ]);
+                if (empty($userBasketPreference[0]['display'])) {
+                    unset($args['redirectedBaskets'][$key]);
+                    continue;
+                }
+            }
+
+            $check = RedirectBasketModel::get([
+                'select' => [1],
+                'where'  => ['actual_user_id = ?', 'owner_user_id = ?', 'basket_id = ?', 'group_id = ?'],
+                'data'   => [$value['actual_user_id'], $args['userId'], $value['basket_id'], $value['group_id']]
+            ]);
+            if (!empty($check)) {
+                DatabaseModel::rollbackTransaction();
+                return ['errors' => 'Redirection already exist'];
+            }
+
+            if (!empty($value['originalOwner'])) {
+                RedirectBasketModel::update([
+                    'actual_user_id' => $value['actual_user_id'],
+                    'basket_id'      => $value['basket_id'],
+                    'group_id'       => $value['group_id'],
+                    'owner_user_id'  => $value['originalOwner']
+                ]);
+                HistoryController::add([
+                    'tableName' => 'redirected_baskets',
+                    'recordId'  => $args['login'],
+                    'eventType' => 'UP',
+                    'eventId'   => 'basketRedirection',
+                    'info'      => _BASKET_REDIRECTION . " {$value['basket_id']} {$value['actual_user_id']}",
+                    'userId'    => !empty($GLOBALS['id']) ? $GLOBALS['id'] : $args['userId']
+                ]);
+                unset($args['redirectedBaskets'][$key]);
+            }
+        }
+
+        if (!empty($args['redirectedBaskets'])) {
+            foreach ($args['redirectedBaskets'] as $value) {
+                RedirectBasketModel::create([
+                    'actual_user_id' => $value['actual_user_id'],
+                    'basket_id'      => $value['basket_id'],
+                    'group_id'       => $value['group_id'],
+                    'owner_user_id'  => $args['userId']
+                ]);
+                HistoryController::add([
+                    'tableName' => 'redirected_baskets',
+                    'recordId'  => $args['login'],
+                    'eventType' => 'UP',
+                    'eventId'   => 'basketRedirection',
+                    'info'      => _BASKET_REDIRECTION . " {$value['basket_id']} {$args['userId']} => {$value['actual_user_id']}",
+                    'userId'    => !empty($GLOBALS['id']) ? $GLOBALS['id'] : $args['userId']
+                ]);
+            }
+        }
+
+        DatabaseModel::commitTransaction();
+
+        return true;
     }
 }

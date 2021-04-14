@@ -25,7 +25,7 @@ class AttachmentTypeController
 {
     public function get(Request $request, Response $response)
     {
-        $rawAttachmentsTypes = AttachmentTypeModel::get(['select' => ['*']]);
+        $rawAttachmentsTypes = AttachmentTypeModel::get(['select' => ['*'], 'where' => ['type_id <> ?'], 'data' => ['summary_sheet']]);
 
         $attachmentsTypes = [];
         foreach ($rawAttachmentsTypes as $rawAttachmentsType) {

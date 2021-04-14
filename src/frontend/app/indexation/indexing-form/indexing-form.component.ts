@@ -28,7 +28,7 @@ export class IndexingFormComponent implements OnInit {
     @Input() indexingFormId: number;
     @Input() resId: number = null;
     @Input() groupId: number;
-    @Input('admin') adminMode: boolean;
+    @Input() adminMode: boolean = false;
     @Input() canEdit: boolean = true;
     @Input() mode: string = 'indexation';
 
@@ -273,7 +273,6 @@ export class IndexingFormComponent implements OnInit {
     }
 
     async ngOnInit(): Promise<void> {
-        this.adminMode === undefined ? this.adminMode = false : this.adminMode = true;
 
         this.availableFieldsClone = JSON.parse(JSON.stringify(this.availableFields));
 
@@ -1023,17 +1022,17 @@ export class IndexingFormComponent implements OnInit {
         this.arrFormControl[field.identifier].setValidators(valArr);
 
         if (field.identifier === 'destination') {
-            const valArr: ValidatorFn[] = [];
+            const valArrDest: ValidatorFn[] = [];
             if (field.mandatory) {
-                valArr.push(Validators.required);
-                valArr.push(this.requireDestValidator({ 'isDest': '' }));
+                valArrDest.push(Validators.required);
+                valArrDest.push(this.requireDestValidator({ 'isDest': '' }));
             } else {
-                valArr.push(this.requireDestValidatorOrEmpty({ 'isDest': '' }));
+                valArrDest.push(this.requireDestValidatorOrEmpty({ 'isDest': '' }));
             }
 
             this.arrFormControl['diffusionList'] = new FormControl({ value: null, disabled: false });
 
-            this.arrFormControl['diffusionList'].setValidators(valArr);
+            this.arrFormControl['diffusionList'].setValidators(valArrDest);
 
             this.arrFormControl['diffusionList'].setValue([]);
 
@@ -1200,8 +1199,8 @@ export class IndexingFormComponent implements OnInit {
             this.currentPriorityColor = field.values.filter((fieldVal: any) => fieldVal.id === value).map((fieldVal: any) => fieldVal.color)[0];
         } else {
             this.fieldCategories.forEach(element => {
-                if (this['indexingModels_' + element].filter((field: any) => field.identifier === 'priority').length > 0) {
-                    this.currentPriorityColor = this['indexingModels_' + element].filter((field: any) => field.identifier === 'priority')[0].values.filter((fieldVal: any) => fieldVal.id === value).map((fieldVal: any) => fieldVal.color)[0];
+                if (this['indexingModels_' + element].filter((fieldItem: any) => fieldItem.identifier === 'priority').length > 0) {
+                    this.currentPriorityColor = this['indexingModels_' + element].filter((fieldItem: any) => fieldItem.identifier === 'priority')[0].values.filter((fieldVal: any) => fieldVal.id === value).map((fieldVal: any) => fieldVal.color)[0];
                 }
             });
         }

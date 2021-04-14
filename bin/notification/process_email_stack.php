@@ -46,6 +46,14 @@ fclose($lockFile);
 
 setBatchNumber();
 
+$language = \SrcCore\models\CoreConfigModel::getLanguage();
+
+if (file_exists("custom/{$customID}/src/core/lang/lang-{$language}.php")) {
+    require_once("custom/{$customID}/src/core/lang/lang-{$language}.php");
+}
+require_once("src/core/lang/lang-{$language}.php");
+
+\User\controllers\UserController::setAbsences();
 
 //=========================================================================================================================================
 //FIRST STEP

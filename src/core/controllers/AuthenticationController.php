@@ -28,6 +28,7 @@ use SrcCore\models\CurlModel;
 use SrcCore\models\PasswordModel;
 use SrcCore\models\ValidatorModel;
 use Stevenmaguire\OAuth2\Client\Provider\Keycloak;
+use User\controllers\UserController;
 use User\models\UserModel;
 
 class AuthenticationController
@@ -336,6 +337,7 @@ class AuthenticationController
             return $response->withStatus(403)->withJson(['errors' => 'Logging method unauthorized']);
         }
 
+        UserController::setAbsences();
         $user = UserModel::getByLowerLogin(['login' => $login, 'select' => ['id', 'refresh_token', 'user_id']]);
 
         $GLOBALS['id'] = $user['id'];

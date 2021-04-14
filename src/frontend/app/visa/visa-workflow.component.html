@@ -101,9 +101,6 @@
                                 [disabled]="!adminMode || diffusion.process_date != null || (target === 'signatureBook' && getCurrentVisaUserIndex() === i)"
                                 [placeholder]="'lang.visaNote' | translate" [(ngModel)]="diffusion.process_comment">
                         </mat-form-field>
-                        <p *ngIf="getCurrentVisaUserIndex() === i && (target === 'signatureBook' || target === 'action') && diffusion.item_id !== headerService.user.id" style="color: red;">
-                            {{'lang.signInsteadOf' | translate}} <b>{{diffusion.labelToDisplay}}</b>
-                        </p>
                     </div>
                     <div *ngIf="diffusion.requested_signature && diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) === -1"
                         class="workflowLineProcessDate" title='{{diffusion.process_date | fullDate}}' color="accent">
@@ -128,6 +125,9 @@
                 <div *ngIf="!diffusion.isValid" class="invalid invalidMsg">
                     {{'lang.userNotValid' | translate}}
                 </div>
+            </div>
+            <div mat-line class="workflowLine" *ngIf="getCurrentVisaUserIndex() === i && (target === 'signatureBook' || target === 'action') && diffusion.item_id !== headerService.user.id" style="color: red;font-size: 12px;padding-bottom: 5px;">
+                {{'lang.signInsteadOf' | translate}}&nbsp;<b style="overflow: hidden;text-overflow: ellipsis;" [title]="diffusion.labelToDisplay">{{diffusion.labelToDisplay}}</b>
             </div>
             <button mat-icon-button *ngIf="canManageUser(diffusion, i)" (click)="deleteItem(i)">
                 <mat-icon class="fa fa-times" color="warn"></mat-icon>

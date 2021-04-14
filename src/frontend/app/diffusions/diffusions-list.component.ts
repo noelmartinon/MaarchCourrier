@@ -326,8 +326,6 @@ export class DiffusionsListComponent implements OnInit {
         }
         this.loading = false;
         this.listinstanceClone = JSON.parse(JSON.stringify(this.getCurrentListinstance()));
-        console.log(this.diffList);
-
     }
 
     saveListinstance() {

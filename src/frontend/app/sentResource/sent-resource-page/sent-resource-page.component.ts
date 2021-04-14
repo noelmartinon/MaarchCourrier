@@ -615,7 +615,7 @@ export class SentResourcePageComponent implements OnInit {
     }
 
     initSignEmailModelsList() {
-        this.http.get('../rest/currentUser/emailSignatures').pipe(
+        this.http.get('../rest/currentUser/emailSignaturesList').pipe(
             tap((data: any) => {
                 this.availableSignEmailModels = data.emailSignatures;
             }),

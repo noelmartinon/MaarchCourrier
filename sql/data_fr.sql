@@ -211,6 +211,7 @@ INSERT INTO configurations (id, privilege, value) VALUES (4, 'admin_document_edi
 INSERT INTO configurations (id, privilege, value) VALUES (5, 'admin_parameters_watermark', '{"font": "helvetica", "posX": 30, "posY": 35, "size": 10, "text": "Copie conforme de [alt_identifier] le [date_now] [hour_now]", "angle": 0, "color": [20, 192, 30], "enabled": true, "opacity": 0.5}');
 INSERT INTO configurations (id, privilege, value) VALUES (6, 'admin_shippings', '{"uri": "", "authUri": "", "enabled": false}');
 INSERT INTO configurations (id, privilege, value) VALUES (7, 'admin_addin_outlook', '{"typeId": 1203, "statusId": 42, "indexingModelId": 8, "attachmentTypeId": 5}');
+INSERT INTO configurations (id, privilege, value) VALUES (8, 'admin_organization_email_signatures', '{"signatures": [{"label": "Signature Principale", "content": "<b>Bonjour</b>"}]}');
 
 INSERT INTO contacts (id, civility, firstname, lastname, company, department, function, address_number, address_street, address_additional1, address_additional2, address_postcode, address_town, address_country, email, phone, communication_means, notes, creator, creation_date, modification_date, enabled, custom_fields, external_id) VALUES (1, 1, 'Jean-Louis', 'ERCOLANI', 'MAARCH', '', 'Directeur Général', '11', 'Boulevard du Sud-Est', '', '', '99000', 'MAARCH LES BAINS', 'France', 'dev.maarch@maarch.org', '', NULL, 'Editeur du logiciel libre Maarch', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}', '{}');
 INSERT INTO contacts (id, civility, firstname, lastname, company, department, function, address_number, address_street, address_additional1, address_additional2, address_postcode, address_town, address_country, email, phone, communication_means, notes, creator, creation_date, modification_date, enabled, custom_fields, external_id) VALUES (4, 1, 'Nicolas', 'MARTIN', 'Préfecture de Maarch Les Bains', NULL, NULL, '13', 'RUE LA PREFECTURE', NULL, NULL, '99000', 'MAARCH LES BAINS', NULL, NULL, NULL, '{"url": "https://cchaplin:maarch@demo.maarchcourrier.com"}', NULL, 21, '2018-04-18 12:43:54.97424', '2020-03-24 15:06:58.16582', true, NULL, '{"m2m": "45239273100025/COU"}');
@@ -2099,7 +2100,7 @@ WHERE 1=1;
 SELECT pg_catalog.setval('public.actions_id_seq', 537, true);
 SELECT pg_catalog.setval('public.attachment_types_id_seq', 10, false);
 SELECT pg_catalog.setval('public.baskets_id_seq', 25, true);
-SELECT pg_catalog.setval('public.configurations_id_seq', 7, true);
+SELECT pg_catalog.setval('public.configurations_id_seq', 8, true);
 SELECT pg_catalog.setval('public.contacts_civilities_id_seq', 6, true);
 SELECT pg_catalog.setval('public.contacts_custom_fields_list_id_seq', 1, false);
 SELECT pg_catalog.setval('public.contacts_filling_id_seq', 1, true);

@@ -162,6 +162,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
                     label : val
                 }));
                 this.customFields.push(newCustomField);
+                this.customFieldsClone = JSON.parse(JSON.stringify(this.customFields));
                 this.notify.success(this.translate.instant('lang.customFieldAdded'));
                 this.incrementCreation++;
             }),

@@ -8,6 +8,7 @@ import { tap, exhaustMap, catchError, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { HeaderService } from '@service/header.service';
 import { AuthService } from '@service/auth.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     templateUrl: 'abs-modal.component.html',
@@ -22,6 +23,11 @@ export class AbsModalComponent implements OnInit {
     userId: number = 0;
     baskets: any[] = [];
 
+    today: Date = new Date();
+    startDate: Date = null;
+    endDate: Date = null;
+
+    showCalendar: boolean = false;
 
     constructor(
         public translate: TranslateService,
@@ -30,6 +36,7 @@ export class AbsModalComponent implements OnInit {
         public headerService: HeaderService,
         public dialogRef: MatDialogRef<AbsModalComponent>,
         private authService: AuthService,
+        public functions: FunctionsService,
         @Inject(MAT_DIALOG_DATA) public data: any
     ) { }
 
@@ -52,9 +59,13 @@ export class AbsModalComponent implements OnInit {
 
     async onSubmit() {
         this.loading = true;
-        const res = await this.redirectBaskets();
-        if (res) {
+        if (this.startDate !== new Date()) {
             await this.activateAbsence();
+        } else {
+            const res = await this.redirectBaskets();
+            if (res) {
+                await this.activateAbsence();
+            }
         }
         this.loading = false;
         this.dialogRef.close();
@@ -163,18 +174,55 @@ export class AbsModalComponent implements OnInit {
     }
 
     activateAbsence() {
+        const redirectedBaskets: any[] = [];
+        this.baskets.filter((item: any) => item.userToDisplay !== null).forEach((elem: any) => {
+            redirectedBaskets.push(
+                {
+                    actual_user_id: elem.actual_user_id,
+                    basket_id: elem.basket_id,
+                    group_id: elem.groupSerialId,
+                    originalOwner: null
+                }
+            );
+
+        });
+        const absenceDate: any = {
+            startDate: this.functions.formatDateObjectToDateString(this.startDate),
+            endDate: this.functions.formatDateObjectToDateString(this.endDate)
+        };
         return new Promise((resolve, reject) => {
-            this.http.put('../rest/users/' + this.data.user.id + '/status', { 'status': 'ABS' }).pipe(
-                tap((data: any) => {
-                    this.authService.logout();
-                    resolve(true);
-                }),
-                catchError((err: any) => {
-                    this.notify.handleErrors(err);
-                    resolve(false);
-                    return of(false);
-                })
-            ).subscribe();
+            switch (this.startDate) {
+                case null:
+                    this.http.put('../rest/users/' + this.data.user.id + '/status', {'status': 'ABS'}).pipe(
+                        tap(() => {
+                            this.authService.logout();
+                            resolve(true);
+                        }),
+                        catchError((err: any) => {
+                            this.notify.handleErrors(err);
+                            resolve(false);
+                            return of(false);
+                        })
+                    ).subscribe();
+                    break;
+                default:
+                    this.http.put('../rest/users/' + this.data.user.id + '/absence', {absenceDate, redirectedBaskets}).pipe(
+                        tap(() => {
+                            const today = this.functions.formatDateObjectToDateString(new Date());
+                            const startDate = this.functions.formatDateObjectToDateString(this.startDate);
+                            if (startDate === today) {
+                                this.authService.logout();
+                            }
+                            resolve(true);
+                        }),
+                        catchError((err: any) => {
+                            this.notify.handleErrors(err);
+                            resolve(false);
+                            return of(false);
+                        })
+                    ).subscribe();
+                    break;
+            }
         });
     }
 

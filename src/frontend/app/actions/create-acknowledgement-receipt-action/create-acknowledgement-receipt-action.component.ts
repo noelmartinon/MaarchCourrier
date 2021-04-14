@@ -256,7 +256,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
 
     initSignEmailModelsList() {
         if (this.availableSignEmailModels.length === 0  && this.data.resIds.length === 1) {
-            this.http.get('../rest/currentUser/emailSignatures').pipe(
+            this.http.get('../rest/currentUser/emailSignaturesList').pipe(
                 tap((data: any) => {
                     this.availableSignEmailModels = data.emailSignatures;
                 }),

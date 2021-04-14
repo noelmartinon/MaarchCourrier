@@ -232,6 +232,7 @@ CREATE TABLE users
   authorized_api jsonb NOT NULL DEFAULT '[]',
   external_id jsonb DEFAULT '{}',
   feature_tour jsonb NOT NULL DEFAULT '[]',
+  absence jsonb,
   CONSTRAINT users_pkey PRIMARY KEY (user_id),
   CONSTRAINT users_id_key UNIQUE (id)
 )
