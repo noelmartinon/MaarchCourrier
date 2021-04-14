@@ -89,7 +89,7 @@ class IndexingModelController
                         $user = UserModel::getById(['id' => $item['id'], 'select' => ['firstname', 'lastname', 'status']]);
                         $userEntities = UserModel::getEntitiesById(['id' => $item['id'], 'select' => ['entities.id']]);
                         $userEntities = array_column($userEntities, 'id');
-                        if ($item['mode'] == 'dest' && !empty($destination) && !in_array($destination, $userEntities)) {
+                        if ($item['mode'] == 'dest' && !empty($destination) && !in_array($destination, $userEntities) && $destination != '"#myPrimaryEntity"') {
                             unset($fields[$key]['default_value'][$itemKey]);
                             continue;
                         }
