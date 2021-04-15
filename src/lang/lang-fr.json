@@ -2471,5 +2471,6 @@
     "organizationEmailSignatures": "Signatures mail d'organisation",
     "organizationEmailSignaturesDesc": "Les signatures seront disponibles pour <b>tous</b> les utilisateurs de l'application.<br/>Vous pouvez utiliser des <b>variables de fusion</b> utilisateur et entité primaire (<a href=\"{{url}}\" target=\"_blank\">plus d'informations</a>).",
     "absenceDateSaved": "Plage d'absence définie",
-    "absenceDate": "Période d'absence"
+    "absenceDate": "Période d'absence",
+    "res_letterbox": "Ressources"
 }
