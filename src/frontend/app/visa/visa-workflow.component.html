@@ -76,7 +76,7 @@
                 [class.fa-thumbs-up]="diffusion.process_date != null && [lang.visaWorkflowInterrupted, lang.hasInterruptedWorkflow].indexOf(diffusion.process_comment) === -1"
                 [class.fa-hand-paper]="diffusion.process_date != null && diffusion.process_comment === lang.hasInterruptedWorkflow"
                 [class.fa-times]="diffusion.process_date != null && diffusion.process_comment === lang.visaWorkflowInterrupted"
-                
+
                 [class.valid]="diffusion.process_date != null && [lang.visaWorkflowInterrupted, lang.hasInterruptedWorkflow].indexOf(diffusion.process_comment) === -1"
                 [class.invalid]="diffusion.process_date != null && [lang.visaWorkflowInterrupted, lang.hasInterruptedWorkflow].indexOf(diffusion.process_comment) > -1"
 
@@ -107,7 +107,7 @@
                     <button class="currentRoleButton" [color]="diffusion.requested_signature ? 'primary': '' "
                         [disabled]="!canManageUser(diffusion, i)" mat-raised-button
                         title="{{lang[diffusion.currentRole+'User']}}"
-                        (click)="changeRole(i)">{{diffusion.process_date === null ? (diffusion.requested_signature ? lang.signUser : lang.visaUser) : (diffusion.signatory ? lang.signUser : lang.visaUser)}}</button>
+                        (click)="changeRole(i)">{{functions.empty(diffusion.process_date) ? (diffusion.requested_signature ? lang.signUser : lang.visaUser) : (diffusion.signatory ? lang.signUser : lang.visaUser)}}</button>
                 </div>
                 <div *ngIf="!diffusion.hasPrivilege" class="invalid">
                     {{lang.noPrivileges}}

@@ -181,29 +181,29 @@ class ListInstanceController
 
         DatabaseModel::beginTransaction();
 
-        foreach ($args['data'] as $ListInstanceByRes) {
-            if (empty($ListInstanceByRes['resId'])) {
+        foreach ($args['data'] as $listInstanceByRes) {
+            if (empty($listInstanceByRes['resId'])) {
                 DatabaseModel::rollbackTransaction();
                 return ['errors' => 'resId is empty', 'code' => 400];
             }
 
-            if (!Validator::intVal()->validate($ListInstanceByRes['resId']) || !ResController::hasRightByResId(['resId' => [$ListInstanceByRes['resId']], 'userId' => $args['userId']])) {
+            if (!Validator::intVal()->validate($listInstanceByRes['resId']) || !ResController::hasRightByResId(['resId' => [$listInstanceByRes['resId']], 'userId' => $args['userId']])) {
                 DatabaseModel::rollbackTransaction();
                 return ['errors' => 'Document out of perimeter', 'code' => 403];
             }
 
-            if (empty($ListInstanceByRes['listInstances'])) {
+            if (empty($listInstanceByRes['listInstances'])) {
                 continue;
             }
 
             $listInstances = ListInstanceModel::get([
                 'select'    => ['*'],
                 'where'     => ['res_id = ?', 'difflist_type = ?'],
-                'data'      => [$ListInstanceByRes['resId'], 'entity_id']
+                'data'      => [$listInstanceByRes['resId'], 'entity_id']
             ]);
 
             $recipientFound = false;
-            foreach ($ListInstanceByRes['listInstances'] as $instance) {
+            foreach ($listInstanceByRes['listInstances'] as $instance) {
                 if ($instance['item_mode'] == 'dest') {
                     $recipientFound = true;
                 }
@@ -215,10 +215,11 @@ class ListInstanceController
 
             ListInstanceModel::delete([
                 'where' => ['res_id = ?', 'difflist_type = ?'],
-                'data'  => [$ListInstanceByRes['resId'], 'entity_id']
+                'data'  => [$listInstanceByRes['resId'], 'entity_id']
             ]);
 
-            foreach ($ListInstanceByRes['listInstances'] as $key => $instance) {
+            $hasCopy = false;
+            foreach ($listInstanceByRes['listInstances'] as $key => $instance) {
                 $listControl = ['item_id', 'item_type', 'item_mode'];
                 foreach ($listControl as $itemControl) {
                     if (empty($instance[$itemControl])) {
@@ -263,7 +264,7 @@ class ListInstanceController
                                 if (!PrivilegeController::hasPrivilege(['privilegeId' => 'update_diffusion_process', 'userId' => $args['userId']])) {
                                     DatabaseModel::rollbackTransaction();
                                     return ['errors' => 'Privilege forbidden : update assignee', 'code' => 403];
-                                } elseif (!PrivilegeController::isResourceInProcess(['userId' => $args['userId'], 'resId' => $ListInstanceByRes['resId']])) {
+                                } elseif (!PrivilegeController::isResourceInProcess(['userId' => $args['userId'], 'resId' => $listInstanceByRes['resId']])) {
                                     DatabaseModel::rollbackTransaction();
                                     return ['errors' => 'Privilege forbidden : update assignee', 'code' => 403];
                                 }
@@ -272,8 +273,12 @@ class ListInstanceController
                     }
                 }
 
+                if ($instance['item_mode'] == 'cc') {
+                    $hasCopy = true;
+                }
+
                 ListInstanceModel::create([
-                    'res_id'                => $ListInstanceByRes['resId'],
+                    'res_id'                => $listInstanceByRes['resId'],
                     'sequence'              => $key,
                     'item_id'               => $instance['item_id'],
                     'item_type'             => $instance['item_type'],
@@ -287,31 +292,63 @@ class ListInstanceController
                 ]);
 
                 if ($instance['item_mode'] == 'dest') {
-                    $set = ['dest_user' => $instance['item_id']];
-                    $changeDestination = true;
-                    $entities = UserEntityModel::get(['select' => ['entity_id', 'primary_entity'], 'where' => ['user_id = ?'], 'data' => [$instance['item_id']]]);
-                    $resource = ResModel::getById(['select' => ['destination'], 'resId' => $ListInstanceByRes['resId']]);
-                    foreach ($entities as $entity) {
-                        if ($entity['entity_id'] == $resource['destination']) {
-                            $changeDestination = false;
+                    $set          = ['dest_user' => $instance['item_id']];
+                    $entities     = UserEntityModel::get(['select' => ['entity_id', 'primary_entity'], 'where' => ['user_id = ?'], 'data' => [$instance['item_id']]]);
+                    $entitiesId   = array_column($entities, 'entity_id');
+                    $userEntities = [];
+                    if (!empty($entitiesId)) {
+                        $userEntities = EntityModel::get(['select' => ['id', 'entity_id'], 'where' => ['entity_id in (?)'], 'data' => [$entitiesId]]);
+                    }
+                    $userEntities = array_column($userEntities, 'entity_id', 'id');
+                    if (!empty($userEntities[$listInstanceByRes['destination']])) {
+                        $set['destination'] = $userEntities[$listInstanceByRes['destination']];
+                    } else {
+                        $changeDestination = true;
+                        $resource          = ResModel::getById(['select' => ['destination'], 'resId' => $listInstanceByRes['resId']]);
+                        foreach ($entities as $entity) {
+                            if ($entity['entity_id'] == $resource['destination']) {
+                                $changeDestination = false;
+                            }
+                            if ($entity['primary_entity'] == 'Y') {
+                                $destPrimaryEntity = $entity['entity_id'];
+                            }
                         }
-                        if ($entity['primary_entity'] == 'Y') {
-                            $destPrimaryEntity = $entity['entity_id'];
+                        if ($changeDestination && !empty($destPrimaryEntity)) {
+                            $set['destination'] = $destPrimaryEntity;
                         }
                     }
-                    if ($changeDestination && !empty($destPrimaryEntity)) {
-                        $set['destination'] = $destPrimaryEntity;
+
+                    $resource = ResModel::getById(['select' => ['dest_user'], 'resId' => $listInstanceByRes['resId']]);
+                    if ($resource['dest_user'] != $instance['item_id']) {
+                        HistoryController::add([
+                            'tableName' => 'res_letterbox',
+                            'recordId'  => $listInstanceByRes['resId'],
+                            'eventType' => 'UP',
+                            'info'      => _UPDATE_LISTINSTANCE_DEST,
+                            'moduleId'  => 'listinstance',
+                            'eventId'   => 'diffdestuser',
+                        ]);
                     }
 
                     ResModel::update([
                         'set'   => $set,
                         'where' => ['res_id = ?'],
-                        'data'  => [$ListInstanceByRes['resId']]
+                        'data'  => [$listInstanceByRes['resId']]
                     ]);
                 }
             }
+            if ($hasCopy) {
+                HistoryController::add([
+                    'tableName' => 'res_letterbox',
+                    'recordId'  => $listInstanceByRes['resId'],
+                    'eventType' => 'UP',
+                    'info'      => _UPDATE_LISTINSTANCE,
+                    'moduleId'  => 'listinstance',
+                    'eventId'   => 'diffcopy',
+                ]);
+            }
 
-            $listInstanceHistoryId = ListInstanceHistoryModel::create(['resId' => $ListInstanceByRes['resId'], 'userId' => $args['userId']]);
+            $listInstanceHistoryId = ListInstanceHistoryModel::create(['resId' => $listInstanceByRes['resId'], 'userId' => $args['userId']]);
             foreach ($listInstances as $listInstance) {
                 ListInstanceHistoryDetailModel::create([
                     'listinstance_history_id'   => $listInstanceHistoryId,
@@ -383,6 +420,8 @@ class ListInstanceController
             }
             $listInstances =  array_values($listInstances);
 
+            $hasVisa = false;
+            $hasSign = false;
             foreach ($resource['listInstances'] as $key => $listInstance) {
                 if (!empty($listInstance['process_date'])) {
                     continue;
@@ -433,6 +472,33 @@ class ListInstanceController
                     'requested_signature'   => $listInstance['requested_signature'] ?? false,
                     'signatory'             => $listInstance['signatory'] ?? false,
                 ];
+
+                if ($args['type'] == 'visaCircuit' && $listInstance['item_mode'] == 'visa') {
+                    $hasVisa = true;
+                } elseif ($args['type'] == 'visaCircuit' && $listInstance['item_mode'] == 'sign') {
+                    $hasSign = true;
+                }
+            }
+
+            if ($hasVisa) {
+                HistoryController::add([
+                    'tableName' => 'res_letterbox',
+                    'recordId'  => $resource['resId'],
+                    'eventType' => 'UP',
+                    'info'      => _UPDATE_VISA_CIRCUIT,
+                    'moduleId'  => 'listinstance',
+                    'eventId'   => 'diffvisauser',
+                ]);
+            }
+            if ($hasSign) {
+                HistoryController::add([
+                    'tableName' => 'res_letterbox',
+                    'recordId'  => $resource['resId'],
+                    'eventType' => 'UP',
+                    'info'      => _UPDATE_VISA_CIRCUIT,
+                    'moduleId'  => 'listinstance',
+                    'eventId'   => 'diffsignuser',
+                ]);
             }
 
             foreach ($listInstances as $key => $listInstance) {

@@ -1742,5 +1742,6 @@ export const LANG_EN = {
     "indexingModelReplaceToDelete": "To delete this model you have to replace it by another.",
     "indexingModelFieldsReset": "The following fields are not in the selected model and will be reset for all mails : ",
     "indexingModelReassign": "Reassign indexing model",
-    "youCannotUnsign": "You do not have the right to <b>unsign</b> this document. You must be the person who signed this document."
+    "youCannotUnsign": "You do not have the right to <b>unsign</b> this document. You must be the person who signed this document.",
+    "arContentIsEmpty": "AR content is empty"
 };

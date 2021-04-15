@@ -624,10 +624,6 @@ class FolderController
         ValidatorModel::intVal($args, ['folderId']);
         ValidatorModel::arrayType($args, ['entities']);
 
-        if (empty($args['entities'])) {
-            $args['entities'] = [0];
-        }
-
         $folder = FolderController::getScopeFolders(['login' => $GLOBALS['userId'], 'folderId' => $args['folderId'], 'edition' => true]);
         if (empty($folder[0])) {
             return false;
@@ -640,11 +636,14 @@ class FolderController
             return true;
         }
 
-        $children = FolderModel::getWithEntities([
-            'select' => ['distinct (folders.id)', 'edition', 'user_id', 'keyword', 'entity_id', 'parent_id'],
-            'where'  => ['parent_id = ?', '(entity_id in (?) OR entity_id is null)'],
-            'data'   => [$args['folderId'], $args['entities']]
-        ]);
+        $children = [];
+        if (!empty($args['entities'])) {
+            $children = FolderModel::getWithEntities([
+                'select' => ['distinct (folders.id)', 'edition', 'user_id', 'keyword', 'entity_id', 'parent_id'],
+                'where'  => ['parent_id = ?', '(entity_id in (?) OR entity_id is null)'],
+                'data'   => [$args['folderId'], $args['entities']]
+            ]);
+        }
 
         $allEntitiesCanDelete = true;
         foreach ($children as $key => $child) {

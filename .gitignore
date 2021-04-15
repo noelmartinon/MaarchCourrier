@@ -6,3 +6,4 @@ apps/maarch_entreprise/xml/log4php.xml
 *.log
 test/unitTests/build/
 modules/visa/xml/remoteSignatoryBooks.xml
+custom

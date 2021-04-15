@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, Inject, ViewChild, AfterViewInit } from '@angular/core';
 import { LANG } from '../../translate.component';
 import { NotificationService } from '../../notification.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -10,7 +10,7 @@ import { FunctionsService } from '../../../service/functions.service';
 import { VisaWorkflowComponent } from '../../visa/visa-workflow.component';
 
 @Component({
-    templateUrl: "send-signature-book-action.component.html",
+    templateUrl: 'send-signature-book-action.component.html',
     styleUrls: ['send-signature-book-action.component.scss'],
 })
 export class SendSignatureBookActionComponent implements AfterViewInit {
@@ -41,31 +41,11 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
 
     async ngAfterViewInit(): Promise<void> {
         if (this.data.resIds.length === 0) {
-            if (this.data.resource.encodedFile === null) {
-                this.noResourceToProcess = true;
-                this.resourcesError = [
-                    {
-                        alt_identifier : this.lang.currentIndexingMail,
-                        reason : 'noDocumentToSend'
-                    }
-                ];
-            } else if (!this.functions.empty(this.data.resource.destination)) {
-                this.noResourceToProcess = false;
-                await this.appVisaWorkflow.loadListModel(this.data.resource.destination);
-            }
-            this.loading = false;
-        } else if (this.data.resIds.length > 0) {
-            await this.checkSignatureBook();
-            this.loading = false;
-        } else {
-            this.loading = false;
+            // Indexing page
+            this.checkSignatureBookInIndexingPage();
         }
-        if (this.data.resIds.length === 1) {
-            await this.appVisaWorkflow.loadWorkflow(this.data.resIds[0]);
-            if (this.appVisaWorkflow.emptyWorkflow()) {
-                this.appVisaWorkflow.loadDefaultWorkflow(this.data.resIds[0]);
-            }
-        }
+        this.initVisaWorkflow();
+        this.loading = false;
     }
 
     async onSubmit() {
@@ -112,25 +92,13 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
         });
     }
 
-    toggleIntegration(integrationId: string) {
-        this.http.put(`../../rest/resourcesList/integrations`, {resources : this.data.resIds, integrations : { [integrationId] : !this.data.resource.integrations[integrationId]}}).pipe(
-            tap(() => {
-                this.data.resource.integrations[integrationId] = !this.data.resource.integrations[integrationId];
-                this.checkSignatureBook();
-            }),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
-    }
 
     indexDocument() {
         this.data.resource['integrations'] = {
-            inSignatureBook : true
+            inSignatureBook: true
         };
 
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.http.post('../../rest/resources', this.data.resource).pipe(
                 tap((data: any) => {
                     this.data.resIds = [data.resId];
@@ -180,6 +148,76 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    async initVisaWorkflow() {
+        if (this.data.resIds.length === 0) {
+            // Indexing page
+            if (!this.functions.empty(this.data.resource.destination) && !this.noResourceToProcess) {
+                this.noResourceToProcess = false;
+                await this.appVisaWorkflow.loadListModel(this.data.resource.destination);
+            }
+        } else if (this.data.resIds.length > 1) {
+            // List page
+            await this.checkSignatureBook();
+        } else {
+            // Process page
+            await this.checkSignatureBook();
+            if (!this.noResourceToProcess) {
+                await this.appVisaWorkflow.loadWorkflow(this.data.resIds[0]);
+                await this.loadWorkflowEntity();
+            }
+        }
+    }
+
+    async loadWorkflowEntity() {
+
+        if (this.appVisaWorkflow !== undefined) {
+            if (this.appVisaWorkflow.emptyWorkflow()) {
+                await this.appVisaWorkflow.loadDefaultWorkflow(this.data.resIds[0]);
+            }
+        } else {
+            // issue component undefined ??
+            setTimeout(async () => {
+                if (this.appVisaWorkflow.emptyWorkflow()) {
+                    await this.appVisaWorkflow.loadDefaultWorkflow(this.data.resIds[0]);
+                }
+            }, 100);
+        }
+    }
+
+    checkSignatureBookInIndexingPage() {
+        if (this.data.resource.encodedFile === null) {
+            this.noResourceToProcess = true;
+            this.resourcesError = [
+                {
+                    alt_identifier: this.lang.currentIndexingMail,
+                    reason: 'noDocumentToSend'
+                }
+            ];
+        }
+    }
+
+    toggleIntegration(integrationId: string) {
+        this.http.put(`../../rest/resourcesList/integrations`, { resources: this.data.resIds, integrations: { [integrationId]: !this.data.resource.integrations[integrationId] } }).pipe(
+            tap(async () => {
+                this.data.resource.integrations[integrationId] = !this.data.resource.integrations[integrationId];
+                await this.checkSignatureBook();
+                setTimeout(async () => {
+                    await this.appVisaWorkflow.loadWorkflow(this.data.resIds[0]);
+                    this.loadWorkflowEntity();
+                }, 100);
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    async afterAttachmentToggle() {
+        await this.checkSignatureBook();
+        this.loadWorkflowEntity();
     }
 
     isValidAction() {

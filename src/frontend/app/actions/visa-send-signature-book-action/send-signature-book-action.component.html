@@ -48,7 +48,7 @@
             <mat-sidenav position='end' [opened]="data.resIds.length === 1 && noResourceToProcess" mode="side"
                 style="overflow-x:hidden;" autoFocus="false" [ngStyle]="{'width': '400px'}">
                 <app-attachments-list *ngIf="data.resIds.length === 1 && noResourceToProcess" [resId]="data.resIds[0]"
-                    (afterActionAttachment)="checkSignatureBook()"></app-attachments-list>
+                    (afterActionAttachment)="afterAttachmentToggle()"></app-attachments-list>
             </mat-sidenav>
         </mat-sidenav-container>
     </div>

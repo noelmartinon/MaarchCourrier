@@ -34,8 +34,6 @@ use Resource\models\ResourceContactModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
-use Template\controllers\DatasourceController;
-use Template\models\TemplateModel;
 use User\models\UserModel;
 
 include_once('vendor/tinybutstrong/opentbs/tbs_plugin_opentbs.php');
@@ -78,7 +76,13 @@ class MergeController
         if (!empty($args['path'])) {
             if ($extension == 'odt') {
                 $tbs->LoadTemplate($args['path'], OPENTBS_ALREADY_UTF8);
-            //  $tbs->LoadTemplate("{$args['path']}#content.xml;styles.xml", OPENTBS_ALREADY_UTF8);
+                if ($tbs->Plugin(OPENTBS_FILEEXISTS, 'styles.xml')) {
+                    $tbs->LoadTemplate('#styles.xml', OPENTBS_ALREADY_UTF8);
+                    foreach ($dataToBeMerge as $key => $value) {
+                        $tbs->MergeField($key, $value);
+                    }
+                }
+                $tbs->PlugIn(OPENTBS_SELECT_MAIN);
             } elseif ($extension == 'docx') {
                 $tbs->LoadTemplate($args['path'], OPENTBS_ALREADY_UTF8);
                 $templates = ['word/header1.xml', 'word/header2.xml', 'word/header3.xml', 'word/footer1.xml', 'word/footer2.xml', 'word/footer3.xml'];
@@ -446,6 +450,16 @@ class MergeController
         if (!empty($args['path'])) {
             if ($extension == 'odt') {
                 $tbs->LoadTemplate($args['path'], OPENTBS_ALREADY_UTF8);
+                if ($tbs->Plugin(OPENTBS_FILEEXISTS, 'styles.xml')) {
+                    $tbs->LoadTemplate('#styles.xml', OPENTBS_ALREADY_UTF8);
+                    if ($args['type'] == 'resource') {
+                        $tbs->MergeField('res_letterbox', ['alt_identifier' => $args['chrono']]);
+                    } elseif ($args['type'] == 'attachment') {
+                        $tbs->MergeField('attachment', ['chrono' => $args['chrono']]);
+                    }
+                    $tbs->MergeField('attachments', ['chronoBarCode' => $barcodeFile, 'chronoQrCode' => $qrcodeFile]);
+                }
+                $tbs->PlugIn(OPENTBS_SELECT_MAIN);
             } elseif ($extension == 'docx') {
                 $tbs->LoadTemplate($args['path'], OPENTBS_ALREADY_UTF8);
                 $templates = ['word/header1.xml', 'word/header2.xml', 'word/header3.xml', 'word/footer1.xml', 'word/footer2.xml', 'word/footer3.xml'];

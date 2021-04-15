@@ -200,6 +200,10 @@ foreach ($customs as $custom) {
 
         foreach ($contactInfo as $key => $item) {
             $contactInfo[$key] = (str_replace("\t", " ", $contactInfo[$key]));
+            if (!in_array($key, ['communication_means', 'external_id'])) {
+                $contactInfo[$key] = (str_replace("\\", " ", $contactInfo[$key]));
+                $contactInfo[$key] = (str_replace("\"", " ", $contactInfo[$key]));
+            }
             $contactInfo[$key] = $contactInfo[$key] ?? "NULL";
             if (empty($contactInfo[$key])) {
                 $contactInfo[$key] = "NULL";
@@ -215,7 +219,7 @@ foreach ($customs as $custom) {
             . $contactInfo['firstname'] . $contactInfoSeparator
             . $contactInfo['lastname'] . $contactInfoSeparator
             . $contactInfo['company'] . $contactInfoSeparator
-            . $contactInfo['departement'] . $contactInfoSeparator
+            . $contactInfo['department'] . $contactInfoSeparator
             . $contactInfo['function'] . $contactInfoSeparator
             . $contactInfo['address_number'] . $contactInfoSeparator
             . $contactInfo['address_street'] . $contactInfoSeparator
