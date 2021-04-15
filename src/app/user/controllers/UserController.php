@@ -781,8 +781,8 @@ class UserController
 
         $body = $request->getParsedBody();
 
-        $result = UserController::redirectBasket(['redirectedBasket' => $body['redirectedBaskets'], 'userId' => $args['id'], 'login' => $GLOBALS['login']]);
-        if (!empty($result)) {
+        $result = UserController::redirectBasket(['redirectedBaskets' => $body, 'userId' => $args['id'], 'login' => $GLOBALS['login']]);
+        if (!empty($result['errors'])) {
             return $response->withStatus(400)->withJson(['errors' => $result['errors']]);
         }
 

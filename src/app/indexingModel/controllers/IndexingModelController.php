@@ -209,9 +209,11 @@ class IndexingModelController
         $body['mandatoryFile'] = empty($body['mandatoryFile']) ? 'false' : 'true';
 
         if (PrivilegeController::hasPrivilege(['privilegeId' => 'admin_indexing_models', 'userId' => $GLOBALS['id']])) {
-            $body['private']       = empty($body['private']) ? 'false' : 'true';
-            $defaultModel          = IndexingModelModel::get(['select' => [1], 'where' => ['"default" = ?'], 'data' => ['true']]);
-            $body['default']       = empty($defaultModel) ? 'true' : 'false';
+            $body['private'] = empty($body['private']) ? 'false' : 'true';
+            if ($body['default']) {
+                IndexingModelModel::update(['set' => ['"default"' => 'false'], 'where' => ['"default" = ?'], 'data' => ['true']]);
+            }
+            $body['default'] = empty($body['default']) ? 'false' : 'true';
         } elseif (PrivilegeController::hasPrivilege(['privilegeId' => 'create_public_indexing_models', 'userId' => $GLOBALS['id']])) {
             $body['private'] = empty($body['private']) ? 'false' : 'true';
             $body['default'] = 'false';
