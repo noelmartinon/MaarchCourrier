@@ -107,7 +107,7 @@
                 (click)="$event.stopPropagation();currentEmailAttachTool=keyVal.key;openSummarySheetModal(keyVal.key)"
                 [matMenuTriggerFor]="emailAttachListMenu">
                 <mat-icon class="{{emailAttachTool[keyVal.key].icon}}"
-                    [class.activeButton]="(keyVal.key === 'document' && emailAttach.document.isLinked) || (keyVal.key !== 'document' && emailAttach[keyVal.key].length > 0)"
+                    [class.activeButton]="(keyVal.key === 'document' && emailAttach.document.isLinked) || (keyVal.key !== 'document' && emailAttach[keyVal.key] && emailAttach[keyVal.key].length > 0)"
                     color="primary"></mat-icon>
             </button>
             <mat-menu #emailAttachListMenu="matMenu" [class]="'attachListMenu'">
