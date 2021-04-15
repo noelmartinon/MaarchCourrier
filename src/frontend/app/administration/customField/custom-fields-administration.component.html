@@ -171,10 +171,9 @@
                                                         <textarea matInput [(ngModel)]="custom.values.clause"
                                                             placeholder="Ex. status='OK'" required></textarea>
                                                     </mat-form-field>
+                                                    <app-maarch-message [content]="'lang.infoResId' | translate"></app-maarch-message>
                                                 </div>
                                             </mat-expansion-panel>
-                                            <div class="alert-message alert-message-info" style="margin-top: 5px; margin-left: 5px;" role="alert" [innerHTML]="'lang.infoResId' | translate">
-                                            </div>
                                         </div>
                                     </div>
                                     <div class="col-md-12 text-center">
