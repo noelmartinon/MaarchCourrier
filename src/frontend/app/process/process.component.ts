@@ -561,30 +561,11 @@ export class ProcessComponent implements OnInit, OnDestroy {
         if (this.indexingForm.isValidForm()) {
             this.actionService.loading = true;
             if (this.isToolModified()) {
-                const dialogRef = this.openConfirmModification();
-                dialogRef.afterClosed().pipe(
-                    tap((data: string) => {
-                        if (data !== 'ok') {
-                            this.refreshTool();
-                            this.actionService.loading = false;
-                        }
-                    }),
-                    tap(async (data: string) => {
-                        if (data === 'ok') {
-                            await this.saveTool();
-                        }
-                        if (this.appDocumentViewer.isEditingTemplate()) {
-                            await this.appDocumentViewer.saveMainDocument();
-                        }
-
-                        this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false);
-                    }),
-                    catchError((err: any) => {
-                        this.notify.handleSoftErrors(err);
-                        this.actionService.loading = false;
-                        return of(false);
-                    })
-                ).subscribe();
+                await this.saveTool();
+                if (this.appDocumentViewer.isEditingTemplate()) {
+                    await this.appDocumentViewer.saveMainDocument();
+                }
+                this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false);
             } else {
                 if (this.appDocumentViewer.isEditingTemplate()) {
                     await this.appDocumentViewer.saveMainDocument();
