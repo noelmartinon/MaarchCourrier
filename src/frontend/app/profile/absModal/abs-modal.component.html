@@ -47,7 +47,7 @@
             <ng-container *ngFor="let basket of baskets;let i = index">
                 <mat-list-item>
                     <mat-icon mat-list-icon style="display: flex;align-items: center;justify-content: center;">
-                        <mat-checkbox [checked]="this.redirectedBaskets.includes(basket.basket_id)" color="primary" [(ngModel)]="basket.selected" *ngIf="!isRedirectedBasket(basket)">
+                        <mat-checkbox [checked]="checkIfExist(basket, 'id')" color="primary" [(ngModel)]="basket.selected" *ngIf="!isRedirectedBasket(basket)">
                         </mat-checkbox>
                         <button *ngIf="isRedirectedBasket(basket)" mat-button color="warn" matSuffix mat-icon-button aria-label="Clear"
                             (click)="delBasketRedirection(basket)" [title]="'lang.deleteRedirection' | translate">
@@ -56,8 +56,8 @@
                     </mat-icon>
                     <div mat-line style="cursor: pointer;" (click)="basket.selected=!basket.selected">{{basket.basket_name}} <span class="label label-primary"
                             style="font-weight:normal">{{basket.group_desc}}</span></div>
-                    <div mat-line *ngIf="isRedirectedBasket(basket)" color="warn"> 
-                        <i class="far fa-paper-plane"></i>&nbsp;{{'lang.redirectedTo' | translate}} {{basket.userToDisplay}}
+                    <div mat-line *ngIf="isRedirectedBasket(basket) || checkIfExist(basket, 'user')" color="warn"> 
+                        <i class="far fa-paper-plane"></i>&nbsp;{{'lang.redirectedTo' | translate}} {{isRedirectedBasket(basket) ? basket.userToDisplay : checkIfExist(basket, 'user')}}
                     </div>
                 </mat-list-item>
                 <mat-divider></mat-divider>

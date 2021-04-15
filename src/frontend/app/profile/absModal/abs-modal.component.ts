@@ -183,6 +183,7 @@ export class AbsModalComponent implements OnInit {
                     actual_user_id: elem.actual_user_id,
                     basket_id: elem.basket_id,
                     group_id: elem.groupSerialId,
+                    userToDisplay: elem.userToDisplay,
                     originalOwner: null
                 }
             );
@@ -257,7 +258,10 @@ export class AbsModalComponent implements OnInit {
             tap((data: any) => {
                 if (data.absence) {
                     const absenceDate: any = data.absence.absenceDate;
-                    this.redirectedBaskets = (data.absence.redirectedBaskets).map((basket: any) => basket.basket_id);
+                    this.redirectedBaskets = (data.absence.redirectedBaskets).map((basket: any) => ({
+                        basketId: basket.basket_id,
+                        userToDisplay: basket.userToDisplay
+                    }));
                     this.startDate = new Date(this.functions.formatFrenchDateToTechnicalDate(absenceDate.startDate));
                     this.endDate = new Date(this.functions.formatFrenchDateToTechnicalDate(absenceDate.endDate));
                     if (this.startDate && this.endDate) {
@@ -270,5 +274,14 @@ export class AbsModalComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    checkIfExist(basket: any, field: string) {
+        if (field === 'user') {
+            return this.redirectedBaskets.filter((item: any) => item.basketId === basket.basket_id && item.userToDisplay !== null).map((el) => el.userToDisplay).toString();
+        }
+        if (field === 'id') {
+            return this.redirectedBaskets.find((item: any) => item.basketId === basket.basket_id);
+        }
     }
 }
