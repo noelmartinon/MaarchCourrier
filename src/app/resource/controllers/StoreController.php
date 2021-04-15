@@ -366,7 +366,7 @@ class StoreController
                 }
             }
             $customFields = json_decode($resource['custom_fields'], true);
-            $technicalCustoms = CustomFieldModel::get(['select' => ['id'], 'where' => ['mode in (?)'], 'data' => [['technical', 'technicalImmuable']]]);
+            $technicalCustoms = CustomFieldModel::get(['select' => ['id'], 'where' => ['mode in (?)'], 'data' => [['technical']]]);
             $technicalCustoms = array_column($technicalCustoms, 'id');
             foreach ($technicalCustoms as $technicalCustom) {
                 if (!empty($customFields[$technicalCustom])) {

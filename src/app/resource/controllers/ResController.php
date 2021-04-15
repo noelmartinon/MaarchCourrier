@@ -1192,14 +1192,14 @@ class ResController extends ResourceControlController
         $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['custom_fields']]);
         $customFields = json_decode($resource['custom_fields'], true);
 
-        $immuabledTechnicalCustoms = CustomFieldModel::get(['select' => ['id', 'values'], 'where' => ['mode = ?'], 'data' => ['technicalImmuable']]);
-        foreach ($immuabledTechnicalCustoms as $immuabledTechnicalCustom) {
-            $immuabledTechnicalCustom['values'] = json_decode($immuabledTechnicalCustom['values'], true);
+        $immutableTechnicalCustoms = CustomFieldModel::get(['select' => ['id', 'values'], 'where' => ['mode = ?'], 'data' => ['technical']]);
+        foreach ($immutableTechnicalCustoms as $immutableTechnicalCustom) {
+            $immutableTechnicalCustom['values'] = json_decode($immutableTechnicalCustom['values'], true);
 
-            if (!empty($immuabledTechnicalCustom['values']['table'])) {
-                $immuabledTechnicalCustom['values']['resId'] = $args['resId'];
-                $values = CustomFieldModel::getValuesSQL($immuabledTechnicalCustom['values']);
-                $customFields[$immuabledTechnicalCustom['id']] = $values[0]['key'] ?? null;
+            if (!empty($immutableTechnicalCustom['values']['table'])) {
+                $immutableTechnicalCustom['values']['resId'] = $args['resId'];
+                $values = CustomFieldModel::getValuesSQL($immutableTechnicalCustom['values']);
+                $customFields[$immutableTechnicalCustom['id']] = $values[0]['key'] ?? null;
             }
         }
         if (!empty($customFields)) {
