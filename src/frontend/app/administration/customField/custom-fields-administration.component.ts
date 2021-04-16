@@ -275,7 +275,11 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         this.http.get('../rest/customFieldsWhiteList').pipe(
             tap((data: any) => {
                 data.allowedTables.forEach((table: any) => {
-                    this.availableTables[table.name] = table.columns;
+                    this.translate.get('lang.' + table.name).subscribe((lang: string) => {
+                        if (!lang.includes('lang.')) {
+                            this.availableTables[table.name] = table.columns;
+                        }
+                    });
                 });
             }),
             catchError((err: any) => {
