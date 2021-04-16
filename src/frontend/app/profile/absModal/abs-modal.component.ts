@@ -68,7 +68,7 @@ export class AbsModalComponent implements OnInit {
 
     async onSubmit() {
         this.loading = true;
-        if (this.startDate !== new Date()) {
+        if (this.startDate && this.startDate !== new Date()) {
             await this.activateAbsence();
         } else {
             const res = await this.redirectBaskets();
@@ -184,56 +184,68 @@ export class AbsModalComponent implements OnInit {
 
     activateAbsence() {
         const redirectedBaskets: any[] = [];
-        this.baskets.filter((item: any) => item.userToDisplay !== null).forEach((elem: any) => {
-            redirectedBaskets.push(
-                {
-                    actual_user_id: elem.actual_user_id,
-                    basket_id: elem.basket_id,
-                    group_id: elem.groupSerialId,
-                    userToDisplay: elem.userToDisplay,
-                    originalOwner: null
-                }
-            );
-
-        });
-        const absenceDate: any = {
-            startDate: this.functions.formatDateObjectToDateString(this.startDate),
-            endDate: this.functions.formatDateObjectToDateString(this.endDate, true)
+        let absenceDate: any =  {
+            startDate: null,
+            endDate: null
         };
+        if (!this.isAbsScheduled) {
+            this.baskets.filter((item: any) => item.userToDisplay !== null).forEach((elem: any) => {
+                redirectedBaskets.push(
+                    {
+                        actual_user_id: elem.actual_user_id,
+                        basket_id: elem.basket_id,
+                        group_id: elem.groupSerialId,
+                        userToDisplay: elem.userToDisplay,
+                        originalOwner: null
+                    }
+                );
+            });
+            absenceDate = {
+                startDate: this.functions.formatDateObjectToDateString(this.startDate),
+                endDate: this.functions.formatDateObjectToDateString(this.endDate, true)
+            };
+        }
         return new Promise((resolve, reject) => {
-            switch (this.startDate) {
-                case null:
-                    this.http.put('../rest/users/' + this.data.user.id + '/status', { 'status': 'ABS' }).pipe(
-                        tap(() => {
-                            this.authService.logout();
-                            resolve(true);
-                        }),
-                        catchError((err: any) => {
-                            this.notify.handleErrors(err);
-                            resolve(false);
-                            return of(false);
-                        })
-                    ).subscribe();
-                    break;
-                default:
-                    this.http.put('../rest/users/' + this.data.user.id + '/absence', { absenceDate, redirectedBaskets }).pipe(
-                        tap(() => {
+            if ((!this.startDate && this.isAbsScheduled) || this.startDate) {
+                this.http.put('../rest/users/' + this.data.user.id + '/absence', { absenceDate, redirectedBaskets }).pipe(
+                    tap(() => {
+                        if (this.isAbsScheduled) {
+                            this.notify.success(this.translate.instant('lang.absOff'));
+                            this.isAbsScheduled = false;
+                            this.headerService.user.status = 'OK';
+                            this.authService.setEvent('absOff');
+                        } else {
                             const today = this.functions.formatDateObjectToDateString(new Date());
                             const startDate = this.functions.formatDateObjectToDateString(this.startDate);
                             if (startDate === today) {
                                 this.authService.logout();
                             } else {
                                 this.notify.success(this.translate.instant('lang.absenceDateSaved'));
+                                this.authService.setEvent('isAbsScheduled');
                             }
-                            resolve(true);
-                        }),
-                        catchError((err: any) => {
-                            this.notify.handleErrors(err);
-                            resolve(false);
-                            return of(false);
-                        })
-                    ).subscribe();
-                    break;
+                        }
+                        resolve(true);
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleErrors(err);
+                        resolve(false);
+                        return of(false);
+                    })
+                ).subscribe();
+            } else {
+                this.http.put('../rest/users/' + this.data.user.id + '/status', { 'status': 'ABS' }).pipe(
+                    tap(() => {
+                        if (!this.isAbsScheduled) {
+                            this.authService.logout();
+                        }
+                        resolve(true);
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleErrors(err);
+                        resolve(false);
+                        return of(false);
+                    })
+                ).subscribe();
             }
         });
     }
@@ -293,7 +305,7 @@ export class AbsModalComponent implements OnInit {
         this.startDate = null;
         this.endDate = null;
         this.redirectedBaskets = [];
-        // this.onSubmit();
+        this.onSubmit();
     }
 
     checkIfExist(basket: any, field: string) {
