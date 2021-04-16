@@ -2473,6 +2473,6 @@
     "absenceDateSaved": "Plage d'absence définie",
     "absenceDate": "Période d'absence",
     "res_letterbox": "Ressources",
-    "cancelSchedule": "Annuler la plannification",
-    "absScheduleMsg": "Vous avez plannifié votre absence du <b>{{startDate}}</b> au <b>{{endDate}}</b>"
+    "cancelSchedule": "Annuler la planification",
+    "absScheduleMsg": "Vous avez planifié votre absence du <b>{{startDate}}</b> au <b>{{endDate}}</b>"
 }
