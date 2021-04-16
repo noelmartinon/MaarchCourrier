@@ -20,8 +20,11 @@ export class AbsModalComponent implements OnInit {
 
     loading: boolean = false;
 
+    isAbsScheduled: boolean = false;
+
     userId: number = 0;
     baskets: any[] = [];
+    basketsClone: any[] = [];
 
     today: Date = new Date();
     startDate: Date = null;
@@ -42,20 +45,24 @@ export class AbsModalComponent implements OnInit {
     ) { }
 
     async ngOnInit(): Promise<void> {
-        await this.getAbsenceInfo();
-        this.getBasketInfo();
+        await this.getBasketInfo();
+        this.getAbsenceInfo();
     }
 
     getBasketInfo() {
-        let objBasket = {};
-        this.data.user.baskets.filter((basket: any) => !basket.basketSearch).forEach((basket: any) => {
-            objBasket = { ...basket };
+        return new Promise(async (resolve, reject) => {
+            let objBasket = {};
+            this.data.user.baskets.filter((basket: any) => !basket.basketSearch).forEach((basket: any) => {
+                objBasket = { ...basket };
 
-            const redirBasket = this.data.user.redirectedBaskets.find((redBask: any) => redBask.basket_id === basket.basket_id && redBask.group_id === basket.groupSerialId);
-            if (redirBasket !== undefined) {
-                objBasket['actual_user_id'] = redirBasket.actual_user_id;
-            }
-            this.baskets.push(objBasket);
+                const redirBasket = this.data.user.redirectedBaskets.find((redBask: any) => redBask.basket_id === basket.basket_id && redBask.group_id === basket.groupSerialId);
+                if (redirBasket !== undefined) {
+                    objBasket['actual_user_id'] = redirBasket.actual_user_id;
+                }
+                this.baskets.push(objBasket);
+            });
+            this.basketsClone = JSON.parse(JSON.stringify(this.baskets));
+            resolve(true);
         });
     }
 
@@ -196,7 +203,7 @@ export class AbsModalComponent implements OnInit {
         return new Promise((resolve, reject) => {
             switch (this.startDate) {
                 case null:
-                    this.http.put('../rest/users/' + this.data.user.id + '/status', {'status': 'ABS'}).pipe(
+                    this.http.put('../rest/users/' + this.data.user.id + '/status', { 'status': 'ABS' }).pipe(
                         tap(() => {
                             this.authService.logout();
                             resolve(true);
@@ -209,7 +216,7 @@ export class AbsModalComponent implements OnInit {
                     ).subscribe();
                     break;
                 default:
-                    this.http.put('../rest/users/' + this.data.user.id + '/absence', {absenceDate, redirectedBaskets}).pipe(
+                    this.http.put('../rest/users/' + this.data.user.id + '/absence', { absenceDate, redirectedBaskets }).pipe(
                         tap(() => {
                             const today = this.functions.formatDateObjectToDateString(new Date());
                             const startDate = this.functions.formatDateObjectToDateString(this.startDate);
@@ -257,16 +264,22 @@ export class AbsModalComponent implements OnInit {
         this.http.get('../rest/currentUser/profile').pipe(
             tap((data: any) => {
                 if (data.absence) {
+                    this.isAbsScheduled = true;
                     const absenceDate: any = data.absence.absenceDate;
-                    this.redirectedBaskets = (data.absence.redirectedBaskets).map((basket: any) => ({
-                        basketId: basket.basket_id,
-                        userToDisplay: basket.userToDisplay
-                    }));
+                    data.absence.redirectedBaskets.forEach((basket: any) => {
+                        this.baskets.find((basketItem: any) => basketItem.basket_id === basket.basket_id && basketItem.groupSerialId === basket.group_id).selected = true;
+                        const user = {
+                            serialId: basket.actual_user_id,
+                            idToDisplay: basket.userToDisplay,
+                        };
+                        this.addBasketRedirection(user);
+                    });
                     this.startDate = new Date(this.functions.formatFrenchDateToTechnicalDate(absenceDate.startDate));
                     this.endDate = new Date(this.functions.formatFrenchDateToTechnicalDate(absenceDate.endDate));
                     if (this.startDate && this.endDate) {
                         this.showCalendar = true;
                     }
+                    this.basketsClone = JSON.parse(JSON.stringify(this.baskets));
                 }
             }),
             catchError((err) => {
@@ -276,6 +289,13 @@ export class AbsModalComponent implements OnInit {
         ).subscribe();
     }
 
+    cancelSchedule() {
+        this.startDate = null;
+        this.endDate = null;
+        this.redirectedBaskets = [];
+        // this.onSubmit();
+    }
+
     checkIfExist(basket: any, field: string) {
         if (field === 'user') {
             return this.redirectedBaskets.filter((item: any) => item.basketId === basket.basket_id && item.userToDisplay !== null).map((el) => el.userToDisplay).toString();
@@ -283,5 +303,17 @@ export class AbsModalComponent implements OnInit {
         if (field === 'id') {
             return this.redirectedBaskets.find((item: any) => item.basketId === basket.basket_id);
         }
+    }
+
+    isModified() {
+        const baskets =  this.baskets.map((basket: any) => ({
+            ...basket,
+            selected : false,
+        }));
+        const basketsClone =  this.basketsClone.map((basket: any) => ({
+            ...basket,
+            selected : false,
+        }));
+        return !(JSON.stringify(baskets) === JSON.stringify(basketsClone));
     }
 }

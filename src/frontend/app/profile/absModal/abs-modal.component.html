@@ -4,7 +4,8 @@
         <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
             <mat-spinner style="margin:auto;"></mat-spinner>
         </div>
-        <mat-list>
+        <app-maarch-message *ngIf="isAbsScheduled" [content]="'lang.absScheduleMsg' | translate : {startDate : functions.formatDateObjectToDateString(startDate), endDate: functions.formatDateObjectToDateString(endDate)}"></app-maarch-message>
+        <mat-list *ngIf="!showCalendar && !isAbsScheduled">
             <mat-list-item>
                 <button mat-button color="primary" matSuffix
                     style="width: 100%; align-items:center; font-size: 16px;"
@@ -15,7 +16,7 @@
                 </button>
             </mat-list-item>
         </mat-list>
-        <mat-list *ngIf="showCalendar">
+        <mat-list *ngIf="showCalendar && !isAbsScheduled">
             <div mat-subheader>{{'lang.absenceDate' | translate}}</div>
             <mat-list-item>
                 <mat-form-field class="input-form input-date" floatLabel="never" (click)="picker.open()"
@@ -54,7 +55,7 @@
                             <mat-icon color="warn" class="fa fa-times"></mat-icon>
                         </button>
                     </mat-icon>
-                    <div mat-line style="cursor: pointer;" (click)="basket.selected=!basket.selected">{{basket.basket_name}} <span class="label label-primary"
+                    <div mat-line style="cursor: pointer;" (click)="!isRedirectedBasket(basket) ? basket.selected=!basket.selected : false">{{basket.basket_name}} <span class="label label-primary"
                             style="font-weight:normal">{{basket.group_desc}}</span></div>
                     <div mat-line *ngIf="isRedirectedBasket(basket) || checkIfExist(basket, 'user')" color="warn"> 
                         <i class="far fa-paper-plane"></i>&nbsp;{{'lang.redirectedTo' | translate}} {{isRedirectedBasket(basket) ? basket.userToDisplay : checkIfExist(basket, 'user')}}
@@ -73,9 +74,13 @@
     </div>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
-        <button mat-raised-button mat-button color="primary" [disabled]="loading || (startDate && !endDate) || (!startDate && endDate)"
+        <button mat-raised-button *ngIf="isAbsScheduled && !isModified()" mat-button color="warn"
+            (click)="cancelSchedule()">{{'lang.cancelSchedule' | translate}}</button>
+        <button mat-raised-button mat-button *ngIf="isAbsScheduled && isModified()" color="primary" [disabled]="loading || (startDate && !endDate) || (!startDate && endDate)"
+            (click)="onSubmit()">{{'lang.update' | translate}}</button>
+        <button mat-raised-button mat-button *ngIf="!isAbsScheduled && isModified()" color="primary" [disabled]="loading || (startDate && !endDate) || (!startDate && endDate)"
             (click)="onSubmit()">{{'lang.validate' | translate}}</button>
         <button mat-raised-button mat-button [disabled]="loading"
-            [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
+            [mat-dialog-close]="">{{'lang.close' | translate}}</button>
     </div>
 </div>
