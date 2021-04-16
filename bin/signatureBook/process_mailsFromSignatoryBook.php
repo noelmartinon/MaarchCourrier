@@ -301,20 +301,34 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
         $historyInfo = 'La signature de la pièce jointe '.$resId.' (res_attachments) a été validée dans le parapheur externe' . $additionalHistoryInfo;
     } elseif ($value['status'] == 'refused') {
         if (!empty($value['encodedFile'])) {
-            Bt_writeLog(['level' => 'INFO', 'message' => 'Create refused Attachment']);
-            Bt_createAttachment([
-                'resIdMaster'     => $value['res_id_master'],
-                'title'           => '[REFUSE] ' . $value['title'],
-                'chrono'          => $value['identifier'],
-                'recipientId'     => $value['recipient_id'],
-                'recipientType'   => $value['recipient_type'],
-                'typist'          => $value['typist'],
-                'format'          => $value['format'],
-                'type'            => $value['attachment_type'],
-                'status'          => 'A_TRA',
-                'encodedFile'     => $value['encodedFile'],
-                'inSignatureBook' => false
+            $adrPdf = \Convert\models\AdrModel::getAttachments([
+                'select'  => ['path', 'filename', 'docserver_id'],
+                'where'   => ['res_id = ?', 'type = ?'],
+                'data'    => [$resId, 'PDF']
             ]);
+    
+            $docserver = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $adrPdf[0]['docserver_id'], 'select' => ['path_template']]);
+            if (!empty($docserver['path_template']) && file_exists($docserver['path_template'])) {
+                $pathToPdf = $docserver['path_template'] . $adrPdf[0]['path'] . $adrPdf[0]['filename'];
+                $pathToPdf = str_replace('#', '/', $pathToPdf);
+                $hashedOriginalFile = md5(base64_encode(file_get_contents($pathToPdf)));
+            }
+            if ($hashedOriginalFile != md5($value['encodedFile'])) {
+                Bt_writeLog(['level' => 'INFO', 'message' => 'Create refused Attachment']);
+                Bt_createAttachment([
+                    'resIdMaster'     => $value['res_id_master'],
+                    'title'           => '[REFUSE] ' . $value['title'],
+                    'chrono'          => $value['identifier'],
+                    'recipientId'     => $value['recipient_id'],
+                    'recipientType'   => $value['recipient_type'],
+                    'typist'          => $value['typist'],
+                    'format'          => $value['format'],
+                    'type'            => $value['attachment_type'],
+                    'status'          => 'A_TRA',
+                    'encodedFile'     => $value['encodedFile'],
+                    'inSignatureBook' => false
+                ]);
+            }
         }
         Bt_writeLog(['level' => 'INFO', 'message' => 'Document refused']);
         \Entity\models\ListInstanceModel::update([
