@@ -319,8 +319,7 @@ export class AbsModalComponent implements OnInit {
     checkIfExist(basket: any, field: string) {
         if (field === 'user') {
             return this.redirectedBaskets.filter((item: any) => item.basketId === basket.basket_id && item.userToDisplay !== null).map((el) => el.userToDisplay).toString();
-        }
-        if (field === 'id') {
+        } else if (field === 'id') {
             return this.redirectedBaskets.find((item: any) => item.basketId === basket.basket_id);
         }
     }
