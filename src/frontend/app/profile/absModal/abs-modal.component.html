@@ -4,7 +4,7 @@
         <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
             <mat-spinner style="margin:auto;"></mat-spinner>
         </div>
-        <app-maarch-message *ngIf="isAbsScheduled" [content]="'lang.absScheduleMsg' | translate : {startDate : functions.formatDateObjectToDateString(startDate), endDate: functions.formatDateObjectToDateString(endDate)}"></app-maarch-message>
+        <app-maarch-message *ngIf="isAbsScheduled" [mode]="'success'" [content]="'lang.absScheduleMsg' | translate : {startDate : functions.formatDateObjectToDateString(startDate), endDate: functions.formatDateObjectToDateString(endDate)}"></app-maarch-message>
         <mat-list *ngIf="!showCalendar && !isAbsScheduled">
             <mat-list-item>
                 <button mat-button color="primary" matSuffix
