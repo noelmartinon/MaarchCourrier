@@ -2475,5 +2475,5 @@
     "cancelSchedule": "Annuler la planification",
     "absScheduleMsg": "Vous avez planifié votre absence du <b>{{startDate}}</b> au <b>{{endDate}}</b>",
     "deactivateAbsence": "Annuler / Modifier mon absence",
-    "hostError": "Impossible de résoudre l'hôte :"
+    "saeError": "Impossible de récupérer les règles de conservation"
 }

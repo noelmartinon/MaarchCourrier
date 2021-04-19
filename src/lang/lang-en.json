@@ -2472,5 +2472,5 @@
     "createPublicIndexingModels": "Create and delete public indexing models in the indexing page",
     "absencePeriod": "Period of absence",
     "deactivateAbsence": "Cancel / Modify my absence",
-    "hostError": "Could not resolve host :"
+    "saeError": "Unable to retrieve retention rules"
 }
