@@ -2475,6 +2475,6 @@
     "res_letterbox": "Ressources",
     "cancelSchedule": "Annuler la planification",
     "absScheduleMsg": "Vous avez planifié votre absence du <b>{{startDate}}</b> au <b>{{endDate}}</b>",
-    "deactivateAbsence": "Désactiver / modifier mon absence",
+    "deactivateAbsence": "Annuler / Modifier mon absence",
     "editAbsPeriod": "Modifier la plage d'absence"
 }
