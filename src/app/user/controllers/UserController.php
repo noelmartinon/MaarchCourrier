@@ -2211,7 +2211,7 @@ class UserController
     {
         ValidatorModel::notEmpty($args, ['redirectedBaskets', 'userId', 'login']);
         ValidatorModel::arrayType($args, ['redirectedBaskets']);
-        ValidatorModel::intType($args, ['userId']);
+        ValidatorModel::intVal($args, ['userId']);
         ValidatorModel::stringType($args, ['login']);
 
         DatabaseModel::beginTransaction();

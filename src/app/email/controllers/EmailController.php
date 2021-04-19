@@ -598,7 +598,7 @@ class EmailController
 
         $phpmailer = new PHPMailer();
 
-        $emailFrom = empty($configuration['from']) ? $email['sender']['email'] : $configuration['from'];
+        $emailFrom = !empty($email['sender']['email']) ? $email['sender']['email'] : $configuration['from'];
         if (empty($email['sender']['entityId'])) {
             // Usefull for old sendmail server which doesn't support accent encoding
             $setFrom = TextFormatModel::normalize(['string' => "{$user['firstname']} {$user['lastname']}"]);
@@ -751,11 +751,17 @@ class EmailController
                 'orderBy'   => ['event_date DESC'],
                 'limit'     => 1
             ]);
-            if (!empty($history[0]['info'])) {
-                return ['errors' => $history[0]['info']];
+
+            $errors = !empty($history[0]['info']) ? $history[0]['info'] : $phpmailer->ErrorInfo;
+
+            // If we cannot override from with the sender email address, we try sending the email with the from in the configuration
+            if (strpos($errors, 'Client does not have permissions to send as this sender') !== false && $email['sender']['email'] != $configuration['from']) {
+                EmailModel::update(['set' => ['sender' => json_encode(['email' => $configuration['from']])], 'where' => ['id = ?'], 'data' => [$args['emailId']]]);
+
+                return EmailController::sendEmail(['emailId' => $args['emailId'], 'userId' => $args['userId']]);
             }
 
-            return ['errors' => $phpmailer->ErrorInfo];
+            return ['errors' => $errors];
         }
 
         return ['success' => 'success'];
