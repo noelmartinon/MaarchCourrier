@@ -2476,5 +2476,6 @@
     "cancelSchedule": "Annuler la planification",
     "absScheduleMsg": "Vous avez planifié votre absence du <b>{{startDate}}</b> au <b>{{endDate}}</b>",
     "deactivateAbsence": "Annuler / Modifier mon absence",
-    "editAbsPeriod": "Modifier la plage d'absence"
+    "editAbsPeriod": "Modifier la plage d'absence",
+    "hostError": "Impossible de résoudre l'hôte :"
 }

@@ -43,8 +43,10 @@ export class DoctypesAdministrationComponent implements OnInit {
     newSecondLevel: any = false;
     newFirstLevel: any = false;
     emptyField: boolean = true;
-
+    hasError: boolean = false;
     conservationRules: any = [];
+
+    archivalError: string = '';
 
     displayedColumns = ['label', 'use', 'mandatory', 'column'];
 
@@ -156,7 +158,7 @@ export class DoctypesAdministrationComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get('../rest/archival/retentionRules').pipe(
                 tap((data: any) => {
-                    if (data.retentionRules.length != 0) {
+                    if (data.retentionRules.length !== 0) {
                         this.conservationRules = data.retentionRules;
                     } else {
                         this.conservationRules = [];
@@ -164,7 +166,11 @@ export class DoctypesAdministrationComponent implements OnInit {
                     resolve(true);
                 }),
                 catchError((err: any) => {
-                    this.notify.handleErrors(err);
+                    this.hasError = true;
+                    this.archivalError = err.error.errors;
+                    const index: number = this.archivalError.indexOf(':');
+                    this.archivalError = this.archivalError.slice(index + 1, this.archivalError.length);
+                    this.archivalError = this.translate.instant('lang.hostError') + this.archivalError.substr(this.archivalError.indexOf(':') + 1);
                     return of(false);
                 })
             ).subscribe();

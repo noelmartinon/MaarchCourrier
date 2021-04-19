@@ -2472,5 +2472,6 @@
     "createPublicIndexingModels": "Create and delete public indexing models in the indexing page",
     "absencePeriod": "Period of absence",
     "deactivateAbsence": "Cancel / Modify my absence",
-    "editAbsPeriod": "Modify the absence period"
+    "editAbsPeriod": "Modify the absence period",
+    "hostError": "Could not resolve host :"
 }
