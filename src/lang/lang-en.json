@@ -2470,5 +2470,7 @@
     "toogleShippingConf": "Activate / deactivate Maileva postal deliveries",
     "infoResId": "The keyword <b> @resId </b> is available to target the document being processed",
     "createPublicIndexingModels": "Create and delete public indexing models in the indexing page",
-    "absencePeriod": "Period of absence"
+    "absencePeriod": "Period of absence",
+    "deactivateAbsence": "Deactivate / modify my absence",
+    "editAbsPeriod": "Modify the absence period"
 }

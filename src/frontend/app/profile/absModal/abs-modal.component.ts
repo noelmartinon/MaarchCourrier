@@ -21,6 +21,8 @@ export class AbsModalComponent implements OnInit {
     loading: boolean = false;
 
     isAbsScheduled: boolean = false;
+    canceled: boolean = false;
+    valueChanged: boolean = false;
 
     userId: number = 0;
     baskets: any[] = [];
@@ -46,7 +48,7 @@ export class AbsModalComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         await this.getBasketInfo();
-        this.getAbsenceInfo();
+        await this.getAbsenceInfo();
     }
 
     getBasketInfo() {
@@ -206,18 +208,22 @@ export class AbsModalComponent implements OnInit {
             };
         }
         return new Promise((resolve, reject) => {
-            if ((!this.startDate && this.isAbsScheduled) || this.startDate) {
+            if ((this.startDate && (redirectedBaskets.length > 0 || redirectedBaskets.length === 0)) || this.canceled) {
                 this.http.put('../rest/users/' + this.data.user.id + '/absence', { absenceDate, redirectedBaskets }).pipe(
                     tap(() => {
+                        const today = this.functions.formatDateObjectToDateString(new Date());
+                        const startDate = this.functions.formatDateObjectToDateString(this.startDate);
                         if (this.isAbsScheduled) {
-                            this.notify.success(this.translate.instant('lang.absOff'));
-                            this.isAbsScheduled = false;
-                            this.headerService.user.status = 'OK';
-                            this.authService.setEvent('absOff');
+                            if ((!this.startDate || (today === startDate)) && !this.canceled) {
+                                this.authService.logout();
+                            } else {
+                                this.notify.success(this.translate.instant('lang.absOff'));
+                                this.isAbsScheduled = false;
+                                this.headerService.user.status = 'OK';
+                                this.authService.setEvent('absOff');
+                            }
                         } else {
-                            const today = this.functions.formatDateObjectToDateString(new Date());
-                            const startDate = this.functions.formatDateObjectToDateString(this.startDate);
-                            if (startDate === today) {
+                            if (startDate === today || !this.startDate) {
                                 this.authService.logout();
                             } else {
                                 this.notify.success(this.translate.instant('lang.absenceDateSaved'));
@@ -232,12 +238,10 @@ export class AbsModalComponent implements OnInit {
                         return of(false);
                     })
                 ).subscribe();
-            } else {
+            } else if (!this.startDate && !this.endDate && !this.canceled) {
                 this.http.put('../rest/users/' + this.data.user.id + '/status', { 'status': 'ABS' }).pipe(
                     tap(() => {
-                        if (!this.isAbsScheduled) {
-                            this.authService.logout();
-                        }
+                        this.authService.logout();
                         resolve(true);
                     }),
                     catchError((err: any) => {
@@ -273,35 +277,39 @@ export class AbsModalComponent implements OnInit {
     }
 
     getAbsenceInfo() {
-        this.http.get('../rest/currentUser/profile').pipe(
-            tap((data: any) => {
-                if (data.absence) {
-                    this.isAbsScheduled = true;
-                    const absenceDate: any = data.absence.absenceDate;
-                    data.absence.redirectedBaskets.forEach((basket: any) => {
-                        this.baskets.find((basketItem: any) => basketItem.basket_id === basket.basket_id && basketItem.groupSerialId === basket.group_id).selected = true;
-                        const user = {
-                            serialId: basket.actual_user_id,
-                            idToDisplay: basket.userToDisplay,
-                        };
-                        this.addBasketRedirection(user);
-                    });
-                    this.startDate = new Date(this.functions.formatFrenchDateToTechnicalDate(absenceDate.startDate));
-                    this.endDate = new Date(this.functions.formatFrenchDateToTechnicalDate(absenceDate.endDate));
-                    if (this.startDate && this.endDate) {
-                        this.showCalendar = true;
+        return new Promise((resolve) => {
+            this.http.get('../rest/currentUser/profile').pipe(
+                tap((data: any) => {
+                    if (data.absence) {
+                        this.isAbsScheduled = true;
+                        const absenceDate: any = data.absence.absenceDate;
+                        data.absence.redirectedBaskets.forEach((basket: any) => {
+                            this.baskets.find((basketItem: any) => basketItem.basket_id === basket.basket_id && basketItem.groupSerialId === basket.group_id).selected = true;
+                            const user = {
+                                serialId: basket.actual_user_id,
+                                idToDisplay: basket.userToDisplay,
+                            };
+                            this.addBasketRedirection(user);
+                        });
+                        this.startDate = new Date(this.functions.formatFrenchDateToTechnicalDate(absenceDate.startDate));
+                        this.endDate = new Date(this.functions.formatFrenchDateToTechnicalDate(absenceDate.endDate));
+                        this.basketsClone = JSON.parse(JSON.stringify(this.baskets));
                     }
-                    this.basketsClone = JSON.parse(JSON.stringify(this.baskets));
-                }
-            }),
-            catchError((err) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+                    resolve(true);
+                }),
+                catchError((err) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
-    cancelSchedule() {
+    async cancelSchedule() {
+        this.baskets.filter((item: any) => item.userToDisplay !== null).forEach((elem: any) => {
+            this.delBasketRedirection(elem);
+        });
+        await this.redirectBaskets();
         this.startDate = null;
         this.endDate = null;
         this.redirectedBaskets = [];
@@ -326,6 +334,13 @@ export class AbsModalComponent implements OnInit {
             ...basket,
             selected : false,
         }));
-        return !(JSON.stringify(baskets) === JSON.stringify(basketsClone));
+        return !(JSON.stringify(baskets) === JSON.stringify(basketsClone)) || this.valueChanged;
+    }
+
+    changeValues(event: any) {
+        event.stopPropagation();
+        this.startDate = this.endDate = null;
+        this.showCalendar = false;
+        this.valueChanged = true;
     }
 }
