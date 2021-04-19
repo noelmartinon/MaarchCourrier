@@ -1364,7 +1364,7 @@ CONSTRAINT acknowledgement_receipts_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);
 
-CREATE TYPE custom_fields_modes AS ENUM ('form', 'technical', 'technicalImmuable');
+CREATE TYPE custom_fields_modes AS ENUM ('form', 'technical');
 
 CREATE TABLE custom_fields
 (

@@ -2123,12 +2123,10 @@
     "ssoEnabled": "SSO authentication enabled",
     "casEnabled": "CAS authentication enabled",
     "displayAsTechnicalData": "Display as technical data",
-    "displayAsImmuableTechnicalData": "Display as immuable technical data",
     "displayInForm": "Show in form",
     "formDescription": "Allows this field to be used in record templates",
     "technicalInformations": "Technical informations",
     "technicalDescription": "This type is persistent and does not need to be associated with a record template",
-    "technicalImmuableDescription": "This type is persistent and does not need to be associated with a record template",
     "displayMode": "Display mode",
     "connections": "Connections",
     "connectionsDesc": "Administer the application's connection modes",
@@ -2472,5 +2470,8 @@
     "toogleShippingConf": "Activate / deactivate Maileva postal deliveries",
     "infoResId": "The keyword <b> @resId </b> is available to target the document being processed",
     "createPublicIndexingModels": "Create and delete public indexing models in the indexing page",
-    "absencePeriod": "Period of absence"
+    "absencePeriod": "Period of absence",
+    "deactivateAbsence": "Cancel / Modify my absence",
+    "editAbsPeriod": "Modify the absence period",
+    "hostError": "Could not resolve host :"
 }

@@ -566,7 +566,7 @@ class MergeController
         }
         fclose($handle);
 
-        $datasources['users'] = [UserModel::getById(['select' => ['firstname', 'lastname', 'mail', 'phone', 'initials'], 'id' => $GLOBALS['id']])];
+        $datasources['user'] = [UserModel::getById(['select' => ['firstname', 'lastname', 'mail', 'phone', 'initials'], 'id' => $GLOBALS['id']])];
         $datasources['userPrimaryEntity'] = [UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => ['entities.*', 'users_entities.user_role as role']])];
 
         $TBS = new \clsTinyButStrong;

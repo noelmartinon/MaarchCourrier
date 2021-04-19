@@ -31,7 +31,7 @@ describe('Indexing document EE', () => {
       .click({force: true});
     cy.wait(500)
     cy.fixture('sample.pdf').then(fileContent => {
-      cy.get('input[type="file"]').attachFile({
+      cy.get('#inputFileMainDoc').attachFile({
           fileContent: fileContent.toString(),
           fileName: 'sample.pdf',
           mimeType: 'application/pdf'

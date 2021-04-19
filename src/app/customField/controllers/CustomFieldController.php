@@ -91,10 +91,8 @@ class CustomFieldController
             return $response->withStatus(400)->withJson(['errors' => 'Body type is empty, not a string or value is incorrect']);
         } elseif (!empty($body['values']) && !Validator::arrayType()->notEmpty()->validate($body['values'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body values is not an array']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['mode']) || !in_array($body['mode'], ['form', 'technical', 'technicalImmuable'])) {
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['mode']) || !in_array($body['mode'], ['form', 'technical'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body mode is empty, not a string or value is incorrect']);
-        } elseif ($body['mode'] == 'technicalImmuable' && !in_array($body['type'], ['string', 'integer', 'date'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body mode is not compatible with this type']);
         }
 
         $fields = CustomFieldModel::get(['select' => [1], 'where' => ['label = ?'], 'data' => [$body['label']]]);
@@ -146,16 +144,13 @@ class CustomFieldController
             return $response->withStatus(400)->withJson(['errors' => 'Body label is empty or not a string']);
         } elseif (!empty($body['values']) && !Validator::arrayType()->notEmpty()->validate($body['values'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body values is not an array']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['mode']) || !in_array($body['mode'], ['form', 'technical', 'technicalImmuable'])) {
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['mode']) || !in_array($body['mode'], ['form', 'technical'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body mode is empty, not a string or value is incorrect']);
         }
 
         $field = CustomFieldModel::getById(['select' => ['type', 'values', 'mode', 'id'], 'id' => $args['id']]);
         if (empty($field)) {
             return $response->withStatus(400)->withJson(['errors' => 'Custom field not found']);
-        }
-        if ($body['mode'] == 'technicalImmuable' && !in_array($field['type'], ['string', 'integer', 'date'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body mode is not compatible with this type']);
         }
 
         $fields = CustomFieldModel::get(['select' => [1], 'where' => ['label = ?', 'id != ?'], 'data' => [$body['label'], $args['id']]]);
@@ -190,7 +185,7 @@ class CustomFieldController
 
         $values = json_decode($field['values'], true);
 
-        if (count($body['values']) < count($values)) {
+        if (count($body['values']) < count($values) && $body['SQLMode'] == !empty($values['table'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Not enough values sent']);
         }
 
@@ -215,7 +210,7 @@ class CustomFieldController
             $newValues = $body['values'];
         }
 
-        if ($field['mode'] == 'form' && ($body['mode'] == 'technical' || $body['mode'] == 'technicalImmuable')) {
+        if ($field['mode'] == 'form' && $body['mode'] == 'technical') {
             IndexingModelFieldModel::delete(['where' => ['identifier = ?'], 'data' => ['indexingCustomField_' . $args['id']]]);
         }
 

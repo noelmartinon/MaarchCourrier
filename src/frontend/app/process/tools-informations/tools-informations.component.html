@@ -1,4 +1,4 @@
-<button mat-mini-fab cdkDrag [matMenuTriggerFor]="menu" color="primary" [title]="'lang.mailInformations' | translate">
+<button mat-mini-fab cdkDrag [matMenuTriggerFor]="menu" color="primary" [title]="'lang.mailInformations' | translate" cdkDragBoundary="html">
     <mat-icon class="fas fa-info-circle" style="height: auto;font-size: 23px;"></mat-icon>
 </button>
 <mat-menu #menu="matMenu" [class]="'devToolListMenu'">
@@ -11,7 +11,7 @@
     </button>
 </mat-menu>
 <ng-container *ngFor="let modal of infoTools; let i=index">
-    <div class="modal-module {{modal.id}} largeModal" cdkDrag *ngIf="modal.display === true">
+    <div class="modal-module {{modal.id}} largeModal" cdkDrag *ngIf="modal.display === true" cdkDragBoundary="html">
         <div class="modal-module-title" cdkDragHandle>
             <span>
                 {{modal.label}}

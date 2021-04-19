@@ -1,11 +1,12 @@
 <mat-sidenav-container autosize class="maarch-container">
     <ng-template #adminMenuTemplate>
-        <mat-nav-list>
+        <mat-nav-list *ngIf="!loading">
             <h3 mat-subheader>{{'lang.actions' | translate}}</h3>
             <a mat-list-item (click)="openAbsModal()">
-                <mat-icon color="warn" mat-list-icon class="fa fa-plane"></mat-icon>
+                <mat-icon *ngIf="!haveAbsScheduled" color="warn" mat-list-icon class="fa fa-plane"></mat-icon>
+                <mat-icon *ngIf="haveAbsScheduled" color="warn" mat-list-icon class="fa fa-plane-slash"></mat-icon>
                 <p mat-line>
-                    {{'lang.activateMyAbs' | translate}}
+                    {{ (!haveAbsScheduled ? 'lang.activateMyAbs' : 'lang.deactivateAbsence') | translate}}
                 </p>
             </a>
             <a *ngIf="user.canModifyPassword" mat-list-item (click)="changePasswd();">

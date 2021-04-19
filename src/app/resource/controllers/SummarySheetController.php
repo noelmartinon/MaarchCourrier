@@ -844,29 +844,31 @@ class SummarySheetController
                     $workflow = MaarchParapheurController::getDocumentWorkflow(['config' => $config, 'documentId' => $document['id']]);
 
                     $users = [];
-                    foreach ($workflow as $item) {
-                        $mode = '';
-                        if ($item['mode'] == 'sign') {
-                            switch ($item['signatureMode']) {
-                                case 'stamp': $mode = _STAMP; break;
-                                case 'eidas': $mode = _EIDAS; break;
-                                case 'inca_card': $mode = _INCA_CARD; break;
-                                case 'inca_card_eidas': $mode = _INCA_CARD_EIDAS; break;
-                                case 'rgs_2stars_timestamped': $mode = _RGS_2STARS_TIMESTAMPED; break;
-                                case 'rgs_2stars': $mode = _RGS_2STARS; break;
+                    if (!empty($workflow)) {
+                        foreach ($workflow as $item) {
+                            $mode = '';
+                            if ($item['mode'] == 'sign') {
+                                switch ($item['signatureMode']) {
+                                    case 'stamp': $mode = _STAMP; break;
+                                    case 'eidas': $mode = _EIDAS; break;
+                                    case 'inca_card': $mode = _INCA_CARD; break;
+                                    case 'inca_card_eidas': $mode = _INCA_CARD_EIDAS; break;
+                                    case 'rgs_2stars_timestamped': $mode = _RGS_2STARS_TIMESTAMPED; break;
+                                    case 'rgs_2stars': $mode = _RGS_2STARS; break;
+                                }
+                            } elseif ($item['mode'] == 'visa') {
+                                $mode = _VISA_USER_MIN;
                             }
-                        } elseif ($item['mode'] == 'visa') {
-                            $mode = _VISA_USER_MIN;
-                        }
-                        $label = $item['userDisplay'] . ' (' . $mode . ')';
-                        if (!empty($item['status'])) {
-                            if ($item['status'] == 'VAL') {
-                                $label .= ', ' . _MAARCH_PARAPHEUR_STATUS_VAL;
-                            } elseif ($item['status'] == 'REF') {
-                                $label .= ', ' . _MAARCH_PARAPHEUR_STATUS_REF;
+                            $label = $item['userDisplay'] . ' (' . $mode . ')';
+                            if (!empty($item['status'])) {
+                                if ($item['status'] == 'VAL') {
+                                    $label .= ', ' . _MAARCH_PARAPHEUR_STATUS_VAL;
+                                } elseif ($item['status'] == 'REF') {
+                                    $label .= ', ' . _MAARCH_PARAPHEUR_STATUS_REF;
+                                }
                             }
+                            $users[] = ['user' => $label, 'date' => $item['processDate']];
                         }
-                        $users[] = ['user' => $label, 'date' => $item['processDate']];
                     }
 
                     if (!empty($users)) {

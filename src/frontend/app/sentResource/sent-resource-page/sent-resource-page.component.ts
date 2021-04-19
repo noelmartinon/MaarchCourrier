@@ -278,11 +278,16 @@ export class SentResourcePageComponent implements OnInit {
         ).subscribe();
     }
 
-    mergeSignEmailTemplate(templateId: any) {
+    mergeSignEmailTemplate(template: any) {
 
         this.emailSignListForm.reset();
 
-        this.http.get(`../rest/currentUser/emailSignatures/${templateId}`).pipe(
+        let route = '../rest/currentUser/emailSignatures/';
+        if (template.public) {
+            route = '../rest/currentUser/globalEmailSignatures/';
+        }
+
+        this.http.get(`${route}${template.id}`).pipe(
             tap((data: any) => {
                 const div = document.createElement('div');
 

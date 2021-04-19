@@ -781,8 +781,8 @@ class UserController
 
         $body = $request->getParsedBody();
 
-        $result = UserController::redirectBasket(['redirectedBasket' => $body['redirectedBaskets'], 'userId' => $args['id'], 'login' => $GLOBALS['login']]);
-        if (!empty($result)) {
+        $result = UserController::redirectBasket(['redirectedBaskets' => $body, 'userId' => $args['id'], 'login' => $GLOBALS['login']]);
+        if (!empty($result['errors'])) {
             return $response->withStatus(400)->withJson(['errors' => $result['errors']]);
         }
 
@@ -878,36 +878,43 @@ class UserController
         return $response->withJson(['status' => $user['status']]);
     }
 
-    public function updateStatus(Request $request, Response $response, array $aArgs)
+    public function updateStatus(Request $request, Response $response, array $args)
     {
-        $error = $this->hasUsersRights(['id' => $aArgs['id'], 'himself' => true]);
+        $error = $this->hasUsersRights(['id' => $args['id'], 'himself' => true]);
         if (!empty($error['error'])) {
             return $response->withStatus($error['status'])->withJson(['errors' => $error['error']]);
         }
 
-        $data = $request->getParams();
+        $body = $request->getParsedBody();
 
-        $check = Validator::stringType()->notEmpty()->validate($data['status']);
-        $check = $check && ($data['status'] == 'OK' || $data['status'] == 'ABS');
-        if (!$check) {
-            return $response->withStatus(400)->withJson(['errors' => 'Bad Request']);
+        if (!Validator::stringType()->notEmpty()->validate($body['status'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body status is empty or not a string']);
+        } elseif ($body['status'] != 'OK' && $body['status'] != 'ABS') {
+            return $response->withStatus(400)->withJson(['errors' => 'Body status can only be OK or ABS']);
         }
 
-        UserModel::updateStatus(['id' => $aArgs['id'], 'status' => $data['status']]);
+        $user = UserModel::getById(['id' => $args['id'], 'select' => ['status']]);
 
-        $user = UserModel::getById(['id' => $aArgs['id'], 'select' => ['user_id', 'firstname', 'lastname']]);
-        $message = "{$user['firstname']} {$user['lastname']} ";
-        $message .= ($data['status'] == 'ABS' ? _GO_ON_VACATION : _BACK_FROM_VACATION);
+        $set = ['status' => $body['status']];
+        if ($user['status'] == 'ABS' && $body['status'] == 'OK') {
+            $set['absence'] = null;
+        }
+
+        UserModel::update(['set' => $set, 'where' => ['id = ?'], 'data' => [$args['id']]]);
+
+        $message = UserModel::getLabelledUserById(['id' => $args['id']]);
+        $message .= ' ';
+        $message .= ($body['status'] == 'ABS' ? _GO_ON_VACATION : _BACK_FROM_VACATION);
 
         HistoryController::add([
             'tableName'    => 'users',
-            'recordId'     => $aArgs['id'],
-            'eventType'    => $data['status'] == 'ABS' ? 'ABS' : 'PRE',
+            'recordId'     => $args['id'],
+            'eventType'    => $body['status'] == 'ABS' ? 'ABS' : 'PRE',
             'eventId'      => 'userabs',
             'info'         => $message
         ]);
 
-        return $response->withJson(['user' => UserModel::getById(['id' => $aArgs['id'], 'select' => ['status']])]);
+        return $response->withJson(['user' => UserModel::getById(['id' => $args['id'], 'select' => ['status']])]);
     }
 
     public function getImageContent(Request $request, Response $response, array $aArgs)
@@ -2100,6 +2107,19 @@ class UserController
 
         $body = $request->getParsedBody();
 
+        $userAbsence = UserModel::getById(['id' => $args['id'], 'select' => ['absence']]);
+        $userAbsence = json_decode($userAbsence['absence'], true);
+
+        if (!empty($userAbsence['absenceDate']['startDate'])) {
+            $absenceStartDate = new \DateTime($userAbsence['absenceDate']['startDate']);
+            $today = new \DateTime();
+
+            if ($today < $absenceStartDate && empty($body['absenceDate']['startDate']) && empty($body['absenceDate']['endDate']) && empty($body['redirectedBaskets'])) {
+                UserModel::update(['set' => ['absence' => null], 'where' => ['id = ?'], 'data' => [$args['id']]]);
+                return $response->withStatus(204);
+            }
+        }
+
         if (!Validator::arrayType()->notEmpty()->validate($body['absenceDate'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body absenceDate is empty or not an array']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['absenceDate']['endDate'])) {
@@ -2191,7 +2211,7 @@ class UserController
     {
         ValidatorModel::notEmpty($args, ['redirectedBaskets', 'userId', 'login']);
         ValidatorModel::arrayType($args, ['redirectedBaskets']);
-        ValidatorModel::intType($args, ['userId']);
+        ValidatorModel::intVal($args, ['userId']);
         ValidatorModel::stringType($args, ['login']);
 
         DatabaseModel::beginTransaction();

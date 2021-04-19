@@ -19,7 +19,6 @@ use Contact\models\ContactCivilityModel;
 use Contact\models\ContactCustomFieldListModel;
 use Contact\models\ContactFillingModel;
 use Contact\models\ContactGroupListModel;
-use Contact\models\ContactGroupModel;
 use Contact\models\ContactModel;
 use Contact\models\ContactParameterModel;
 use Entity\models\EntityModel;

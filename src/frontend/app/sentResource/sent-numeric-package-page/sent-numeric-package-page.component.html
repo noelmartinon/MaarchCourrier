@@ -129,7 +129,7 @@
 
             <app-plugin-select-search #templateList *ngIf="availableSignEmailModels.length > 0"
                 [label]="'lang.emailSignatures' | translate" [placeholderLabel]="'lang.emailSignatures' | translate"
-                [datas]="availableSignEmailModels" [formControlSelect]="emailSignListForm"
+                [datas]="availableSignEmailModels" [formControlSelect]="emailSignListForm" returnValue="object"
                 (afterSelected)="mergeSignEmailTemplate($event)">
             </app-plugin-select-search>
         </div>

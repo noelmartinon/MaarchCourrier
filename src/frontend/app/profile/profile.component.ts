@@ -13,7 +13,7 @@ import { AuthService } from '@service/auth.service';
 import { AbsModalComponent } from './absModal/abs-modal.component';
 import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { of, Subscription } from 'rxjs';
 
 declare let $: any;
 
@@ -32,6 +32,8 @@ export class ProfileComponent implements OnInit {
     myBasketExpansionPanel: boolean = false;
 
     dialogRef: MatDialogRef<any>;
+
+    subscription: Subscription;
 
     highlightMe: boolean = false;
     user: any = {
@@ -80,6 +82,8 @@ export class ProfileComponent implements OnInit {
     selectedIndex: number = 0;
     loadingSign: boolean = false;
 
+    haveAbsScheduled: boolean = false;
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -92,15 +96,23 @@ export class ProfileComponent implements OnInit {
         public appService: AppService,
         private viewContainerRef: ViewContainerRef,
         private functions: FunctionsService,
-    ) {}
+    ) {
+        this.subscription = this.authService.catchEvent().subscribe((result: any) => {
+            if (result === 'isAbsScheduled') {
+                this.haveAbsScheduled = result === 'isAbsScheduled' ? true : false;
+            } else if (result === 'absOff') {
+                this.haveAbsScheduled = false;
+            }
+        });
+    }
 
     initComponents(event: any) {
         this.selectedIndex = event.index;
-        if (event.index == 2) {
+        if (event.index === 2) {
             if (!this.appService.getViewMode()) {
                 this.sidenavRight.open();
             }
-        } else if (event.index == 1) {
+        } else if (event.index === 1) {
             this.sidenavRight.close();
         } else if (!this.appService.getViewMode()) {
             this.sidenavRight.open();
@@ -115,8 +127,11 @@ export class ProfileComponent implements OnInit {
 
         this.http.get('../rest/currentUser/profile')
             .subscribe((data: any) => {
+                if (data.absence) {
+                    const startDate: string = data.absence.absenceDate.startDate;
+                    this.haveAbsScheduled = startDate !== this.functions.formatDateObjectToDateString(new Date()) ? true : false;
+                }
                 this.user = data;
-
                 this.user.baskets = this.user.baskets.filter((basket: any) => !basket.basketSearch);
                 this.user.baskets.forEach((value: any, index: number) => {
                     this.user.baskets[index]['disabled'] = false;
