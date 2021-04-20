@@ -464,6 +464,10 @@ class TileController
                     $resources = array_merge($resources, $chunkResources);
                 }
 
+                if (!empty($tile['parameters']['chartMode']) && $tile['parameters']['chartMode'] == 'creationDate') {
+                    $type = "date_trunc";
+                }
+
                 $tmpResources = [];
                 foreach ($resources as $resource) {
                     if (empty($tmpResources[$resource[$type]])) {
