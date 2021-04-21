@@ -46,10 +46,14 @@
                 <button mat-icon-button (click)="downloadOriginalFile()" [matTooltip]="'lang.downloadOriginalFile' | translate">
                     <mat-icon class="fa fa-download"></mat-icon>
                 </button>
-                <button [disabled]="!functions.empty(file.subinfos) && file.subinfos.signedDocVersions" [class.disabledButton]="!functions.empty(file.subinfos) && file.subinfos.signedDocVersions" *ngIf="editMode && resId !== null && !noConvertedFound" mat-button (click)="editResource()"
-                    [matTooltip]="functions.empty(file.subinfos) || (!functions.empty(file.subinfos) && !file.subinfos.signedDocVersions) ? '' : ('lang.documentSignedMsg' | translate)">
-                    {{'lang.editDocument' | translate}}
-                </button>
+                <ng-container *ngIf="editMode && resId !== null && !noConvertedFound">
+                    <div class="divider"></div>
+                    <button [disabled]="!functions.empty(file.subinfos) && file.subinfos.signedDocVersions" [class.disabledButton]="!functions.empty(file.subinfos) && file.subinfos.signedDocVersions" mat-button (click)="editResource()"
+                        [matTooltip]="functions.empty(file.subinfos) || (!functions.empty(file.subinfos) && !file.subinfos.signedDocVersions) ? '' : ('lang.documentSignedMsg' | translate)">
+                        <i class="fa fa-edit" style="font-size: 14px;padding-right: 5px;"></i><span>{{'lang.editDocument' | translate}}</span>
+                    </button>
+                </ng-container>
+                <div class="divider"></div>
                 <button mat-icon-button [matMenuTriggerFor]="menuOptions">
                     <mat-icon class="fas fa-chevron-down"></mat-icon>
                 </button>
