@@ -299,7 +299,7 @@ export class VisaWorkflowComponent implements OnInit {
                                 {
                                     ...element,
                                     difflist_type: 'VISA_CIRCUIT',
-                                    currentRole: element.requested_signature ? 'sign' : 'visa'
+                                    currentRole: this.getCurrentRole(element)
                                 });
                         });
 
@@ -660,6 +660,18 @@ export class VisaWorkflowComponent implements OnInit {
             }
         } else {
             return false;
+        }
+    }
+
+    getCurrentRole(item: any) {
+        if (this.functions.empty(item.process_date)) {
+            return item.requested_signature ? 'sign' : 'visa';
+        } else {
+            if (['A terminé le circuit'].indexOf(item.process_comment) > -1 || ['Circuit interrompu'].indexOf(item.process_comment) > -1) {
+                return item.requested_signature ? 'sign' : 'visa';
+            } else {
+                return item.signatory ? 'sign' : 'visa';
+            }
         }
     }
 }
