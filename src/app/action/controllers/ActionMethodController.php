@@ -147,6 +147,17 @@ class ActionMethodController
                         NoteEntityModel::create(['item_id' => $entity, 'note_id' => $noteId]);
                     }
                 }
+
+                if (!empty($noteId)) {
+                    HistoryController::add([
+                        'tableName' => "notes",
+                        'recordId'  => $noteId,
+                        'eventType' => "ADD",
+                        'info'      => _NOTE_ADDED . " (" . $noteId . ")",
+                        'moduleId'  => 'notes',
+                        'eventId'   => 'noteadd'
+                    ]);
+                }
             }
 
             if ($action['history'] == 'Y') {
