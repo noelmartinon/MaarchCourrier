@@ -12,9 +12,7 @@ export class SelectPageComponent implements OnInit {
 
     constructor() { }
 
-    ngOnInit() {
-        console.log(this.paginator);
-    }
+    ngOnInit() { }
 
     counter(i: number) {
         return new Array(i);
