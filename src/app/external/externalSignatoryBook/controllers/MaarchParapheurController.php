@@ -280,7 +280,7 @@ class MaarchParapheurController
                         $nonSignableAttachments[] = [
                             'encodedDocument' => $encodedZipDocument,
                             'title'           => $value['title'],
-                            'reference'       => $value['identifier']
+                            'reference'       => $value['identifier'] ?? ""
                         ];
                         unset($attachments[$key]);
                     }
@@ -326,7 +326,7 @@ class MaarchParapheurController
                         $attachmentsData = [[
                             'encodedDocument' => $encodedMainZipFile,
                             'title'           => $mainResource[0]['subject'],
-                            'reference'       => $mainResource[0]['alt_identifier']
+                            'reference'       => $mainResource[0]['alt_identifier'] ?? ""
                         ]];
                     }
                     $summarySheetEncodedZip = MaarchParapheurController::createZip(['filepath' => $summarySheetFilePath, 'filename' => "summarySheet.pdf"]);
@@ -378,7 +378,7 @@ class MaarchParapheurController
 
                     $bodyData = [
                         'title'             => $value['title'],
-                        'reference'         => $value['identifier'],
+                        'reference'         => $value['identifier'] ?? "",
                         'encodedDocument'   => $encodedZipDocument,
                         'sender'            => trim($sender['firstname'] . ' ' .$sender['lastname']),
                         'deadline'          => $processLimitDate,
@@ -407,8 +407,8 @@ class MaarchParapheurController
                     ]);
 
 
-                    if (!empty($response['errors'])) {
-                        return ['error' => 'Error during processing in MaarchParapheur : ' . $response['errors']];
+                    if (!empty($response['response']['errors']) || !empty($response['errors'])) {
+                        return ['error' => 'Error during processing in MaarchParapheur : ' . $response['response']['errors'] ?? $response['errors']];
                     }
         
                     $attachmentToFreeze[$collId][$resId] = $response['response']['id'];
@@ -460,7 +460,7 @@ class MaarchParapheurController
 
                     $bodyData = [
                         'title'             => $mainResource[0]['subject'],
-                        'reference'         => $mainResource[0]['alt_identifier'],
+                        'reference'         => $mainResource[0]['alt_identifier'] ?? "",
                         'encodedDocument'   => $encodedMainZipFile,
                         'sender'            => trim($sender['firstname'] . ' ' .$sender['lastname']),
                         'deadline'          => $processLimitDate,
@@ -487,8 +487,8 @@ class MaarchParapheurController
                         ]
                     ]);
 
-                    if (!empty($response['errors'])) {
-                        return ['error' => 'Error during processing in MaarchParapheur : ' . $response['errors']];
+                    if (!empty($response['response']['errors']) || !empty($response['errors'])) {
+                        return ['error' => 'Error during processing in MaarchParapheur : ' . $response['response']['errors'] ?? $response['errors']];
                     }
         
                     $attachmentToFreeze['letterbox_coll'][$integratedResource[0]['res_id']] = $response['response']['id'];
@@ -500,7 +500,7 @@ class MaarchParapheurController
             $workflow = [['userId' => $processingUser, 'mode' => 'note']];
             $bodyData = [
                 'title'            => $mainResource[0]['subject'],
-                'reference'        => $mainResource[0]['alt_identifier'],
+                'reference'        => $mainResource[0]['alt_identifier'] ?? "",
                 'encodedDocument'  => $encodedMainZipFile,
                 'sender'           => trim($sender['firstname'] . ' ' .$sender['lastname']),
                 'deadline'         => $processLimitDate,
