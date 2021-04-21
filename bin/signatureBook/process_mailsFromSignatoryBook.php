@@ -311,7 +311,9 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
             if (!empty($docserver['path_template']) && file_exists($docserver['path_template'])) {
                 $pathToPdf = $docserver['path_template'] . $adrPdf[0]['path'] . $adrPdf[0]['filename'];
                 $pathToPdf = str_replace('#', '/', $pathToPdf);
-                $hashedOriginalFile = md5(base64_encode(file_get_contents($pathToPdf)));
+                if (is_readable($pathToPdf)) {
+                    $hashedOriginalFile = md5(base64_encode(file_get_contents($pathToPdf)));
+                }
             }
             if ($hashedOriginalFile != md5($value['encodedFile'])) {
                 Bt_writeLog(['level' => 'INFO', 'message' => 'Create refused Attachment']);
