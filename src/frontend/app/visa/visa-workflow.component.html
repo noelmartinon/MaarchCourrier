@@ -116,7 +116,7 @@
                             [color]="((functions.empty(diffusion.process_date) && diffusion.requested_signature) || diffusion.signatory) ? 'primary': '' "
                             [disabled]="!canManageUser(diffusion, i)" mat-raised-button
                             title="{{'lang.' + diffusion.currentRole + 'User' | translate}}"
-                            (click)="changeRole(i)">{{((functions.empty(diffusion.process_date) && diffusion.requested_signature) || diffusion.signatory) ? ('lang.signUser' | translate) : ('lang.visaUser' | translate)}}</button>
+                            (click)="changeRole(i)">{{'lang.' + diffusion.currentRole + 'User' | translate}}</button>
                     </ng-container>
                 </div>
                 <div *ngIf="!diffusion.hasPrivilege" class="invalid">
