@@ -2,7 +2,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Injectable, Component, Inject } from '@angular/core';
 import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
-// import { TranslateService } from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'custom-snackbar',
@@ -24,7 +24,8 @@ export class NotificationService {
 
     constructor(
         private router: Router,
-        public snackBar: MatSnackBar
+        public snackBar: MatSnackBar,
+        public translate: TranslateService
     ) { }
 
     success(message: string) {
@@ -52,6 +53,34 @@ export class NotificationService {
         if (err.error !== undefined) {
             if (err.error.errors !== undefined) {
                 this.error(err.error.errors, err.url);
+            } else if (err.error.exception !== undefined) {
+                this.error(err.error.exception[0].message, err.url);
+            } else if (err.error.error !== undefined) {
+                if (err.error.error[0] !== undefined) {
+                    this.error(err.error.error[0].message, err.url);
+                } else {
+                    this.error(err.error.error.message, err.url);
+                }
+            } else {
+                this.error(`${err.status} : ${err.statusText}`, err.url);
+            }
+        } else {
+            this.error(err);
+        }
+    }
+
+    handleSoftErrors(err: any) {
+        if (err.error !== undefined) {
+            if (err.error.errors !== undefined) {
+                if (err.error.lang !== undefined) {
+                    this.error(this.translate.instant('lang.' + err.error.lang));
+                } else if (err.error.errors === 'Document out of perimeter' || err.error.errors === 'Resource out of perimeter') {
+                    this.error(this.translate.instant('lang.documentOutOfPerimeter'));
+                } else if (err.error.errors === 'Resources out of perimeter') {
+                    this.error(this.translate.instant('lang.documentsOutOfPerimeter'));
+                } else {
+                    this.error(err.error.errors, err.url);
+                }
             } else if (err.error.exception !== undefined) {
                 this.error(err.error.exception[0].message, err.url);
             } else if (err.error.error !== undefined) {

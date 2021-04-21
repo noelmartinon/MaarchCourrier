@@ -214,7 +214,7 @@ export class PanelComponent implements OnInit {
             this.http.put('../rest/plugins/outlook/attachments', objToSend).pipe(
                 finalize(() => resolve(true)),
                 catchError((err: any) => {
-                    this.notificationService.handleErrors(err);
+                    this.notificationService.handleSoftErrors(this.translate.instant('lang.' + err.error.lang))
                     return of(false);
                 })
             ).subscribe();
