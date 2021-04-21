@@ -26,7 +26,7 @@ export class PanelComponent implements OnInit {
     contactInfos: any = {};
     userInfos: any;
     mailBody: any;
-    attachments: any = [];
+    attachments: any[] = [];
     contactId: number;
 
     addinConfig: any = {}
@@ -66,10 +66,11 @@ export class PanelComponent implements OnInit {
 
     async sendToMaarch() {
         this.status = 'loading';
+        this.attachments = this.attachments.filter((attachment: any) => attachment.selected);
         await this.getMailBody();
         await this.createContact();
         await this.createDocFromMail();
-        if (this.attachments.filter((attachment: any) => attachment.selected).length > 0 && this.addinConfig.outlookPasswordSaved) {
+        if (this.attachments.length > 0 && this.addinConfig.outlookPasswordSaved) {
             this.createAttachments(this.resId);
         }
     }
@@ -189,7 +190,6 @@ export class PanelComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.post('../rest/contacts', this.contactInfos).pipe(
                 tap((data: any) => {
-                    // console.log(data.id);
                     this.contactId = data.id;
                     resolve(true);
                 }),
