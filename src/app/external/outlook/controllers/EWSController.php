@@ -48,7 +48,10 @@ class EWSController {
         try {
             $response = $client->GetItem($request);
         } catch (\Exception $e) {
-            return ['Error when getting attachments'];
+            if ($e->getCode() == 401) {
+                return ['errors' => 'Outlook password is wrong', 'lang' => 'outlookPasswordWrong'];
+            }
+            return ['errors' => 'Error when getting attachments', 'lang' => 'outlookGetAttachmentsImpossible'];
         }
         // Iterate over the results, printing any error messages or receiving attachments.
         $responseMessages = $response->ResponseMessages->GetItemResponseMessage;

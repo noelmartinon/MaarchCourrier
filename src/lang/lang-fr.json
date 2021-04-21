@@ -2475,5 +2475,8 @@
     "cancelSchedule": "Annuler la planification",
     "absScheduleMsg": "Vous avez planifié votre absence du <b>{{startDate}}</b> au <b>{{endDate}}</b>",
     "deactivateAbsence": "Annuler / Modifier mon absence",
-    "saeError": "Impossible de récupérer les règles de conservation"
+    "saeError": "Impossible de récupérer les règles de conservation",
+    "outlookPasswordRequired": "Mot de passe outlook non configuré",
+    "outlookPasswordWrong": "Mauvais mot de passe outlook",
+    "outlookGetAttachmentsImpossible": "Impossible de récupérer les pièces jointes"
 }
