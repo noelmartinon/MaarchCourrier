@@ -2,6 +2,7 @@
 
 namespace Outlook\controllers;
 
+use History\models\BatchHistoryModel;
 use jamesiarmes\PhpEws\Client;
 use jamesiarmes\PhpEws\Request\GetAttachmentType;
 use jamesiarmes\PhpEws\Request\GetItemType;
@@ -51,6 +52,7 @@ class EWSController {
             if ($e->getCode() == 401) {
                 return ['errors' => 'Outlook password is wrong', 'lang' => 'outlookPasswordWrong'];
             }
+            BatchHistoryModel::create(['info' => 'Get outlook attachments error :' . $e->getMessage(), 'module_name' => 'outlook']);
             return ['errors' => 'Error when getting attachments', 'lang' => 'outlookGetAttachmentsImpossible'];
         }
         // Iterate over the results, printing any error messages or receiving attachments.
