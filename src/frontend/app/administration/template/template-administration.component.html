@@ -141,7 +141,7 @@
                                             <mat-form-field>
                                                 <input matInput name="subject" [(ngModel)]="options.acknowledgementReceiptFromMail"
                                                     title="{{'lang.email' | translate}}" type="text"
-                                                    placeholder="{{'lang.email' | translate}}" maxlength="255">
+                                                    placeholder="{{'lang.email' | translate}}" maxlength="255" required pattern="(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)">
                                             </mat-form-field>
                                         </div>
                                     </div>
