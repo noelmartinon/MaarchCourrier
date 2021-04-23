@@ -100,11 +100,6 @@ export class AfterProcessGuard implements CanDeactivate<ProcessComponent> {
             const value = await this.getConfirmation();
             if (value) {
                 await component.saveModificationBeforeClose();
-                if (nextState.url === '/login') {
-                    component.logoutTrigger = true;
-                    await component.unlockResource();
-                    this.authService.redirectAfterLogout(true);
-                }
             }
             if (nextState.url === '/login') {
                 component.logoutTrigger = true;
