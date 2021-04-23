@@ -253,15 +253,20 @@ export class ActionsService implements OnDestroy {
     }
 
     unlockResource(userId: number = this.currentUserId, groupId: number = this.currentGroupId, basketId: number = this.currentBasketId, resIds: number[] = this.currentResIds) {
-        if (resIds.length > 0) {
-            console.debug(`Unlock resources : ${resIds}`);
-            this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/unlock`, { resources: resIds }).pipe(
-                catchError((err: any) => {
-                    this.notify.handleErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
-        }
+        return new Promise((resolve) => {
+            if (resIds.length > 0) {
+                console.debug(`Unlock resources : ${resIds}`);
+                this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/unlock`, { resources: resIds }).pipe(
+                    tap(() => {
+                        resolve(true);
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            }
+        });
     }
 
     stopRefreshResourceLock() {

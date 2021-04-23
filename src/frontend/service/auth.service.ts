@@ -131,15 +131,11 @@ export class AuthService {
             this.SsoLogout(cleanUrl);
         } else {
             // AVOID UNLOCK ON DESROY COMPONENT
-            if (['process', 'signatureBook'].indexOf(this.router.url.split('/')[1]) > -1) {
-                this.router.navigate(['/home']);
-                setTimeout(() => {
-                    this.redirectAfterLogout(cleanUrl);
-                    this.router.navigate(['/login']);
-                }, 500);
+            if (['process'].indexOf(this.router.url.split('/')[1]) > -1) {
+                this.router.navigate(['/login']);
             } else {
-                this.redirectAfterLogout(cleanUrl);
                 await this.router.navigate(['/login']);
+                this.redirectAfterLogout(cleanUrl);
             }
         }
     }
