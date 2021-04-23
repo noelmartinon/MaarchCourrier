@@ -88,7 +88,7 @@ define('_TEMPLATE_UPDATED', 'Modèle de document modifié');
 define('_TEMPLATE_DELETED', 'Modèle de document supprimé');
 define('_TO_CC', 'En copie');
 define('_TO_SIGN', 'Pour signature');
-define('_UPDATE_STATUS', 'Modification du statut');
+define('_UPDATE_STATUS', 'Modification du statut : De "{1}" vers "{2}"');
 define('_USER_ID_ALREADY_EXISTS', 'L\'identifiant utilisateur existe déjà');
 define('_USER_CREATED', 'Utilisateur ajouté');
 define('_USER_UPDATED', 'Utilisateur modifié');
@@ -163,6 +163,7 @@ define('_LOGIN', 'Connexion de l\'utilisateur');
 
 // ADMINISTRATION
 define('_USERS', 'Utilisateurs');
+define('_ADMINISTRATION', 'Administration');
 define('_GROUPS', 'Groupes d\'utilisateurs');
 define('_ENTITIES', 'Entités');
 define('_DOCTYPES', 'Typologies de courriers');
