@@ -157,6 +157,15 @@ class ActionMethodController
                         'moduleId'  => 'notes',
                         'eventId'   => 'noteadd'
                     ]);
+
+                    HistoryController::add([
+                        'tableName' => 'res_letterbox',
+                        'recordId'  => $resource,
+                        'eventType' => 'ADD',
+                        'info'      => _NOTE_ADDED,
+                        'moduleId'  => 'resource',
+                        'eventId'   => 'resourceModification'
+                    ]);
                 }
             }
 

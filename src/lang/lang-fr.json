@@ -2477,7 +2477,7 @@
     "deactivateAbsence": "Annuler / Modifier mon absence",
     "saeError": "Impossible de récupérer les règles de conservation",
     "outlookPasswordRequired": "Mot de passe outlook non configuré",
-    "outlookPasswordWrong": "Mauvais mot de passe outlook",
+    "outlookPasswordWrong": "Impossible de récupérer les pièces jointes : mauvais mot de passe outlook sauvegardé dans votre profil",
     "outlookGetAttachmentsImpossible": "Impossible de récupérer les pièces jointes",
     "expAddress": "Adresse expéditrice",
     "manual": "Manuelle",
