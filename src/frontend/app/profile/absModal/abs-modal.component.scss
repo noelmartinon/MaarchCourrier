@@ -9,3 +9,13 @@
     z-index: 1;
     overflow: hidden;
 }
+
+::ng-deep.mat-form-field-appearance-outline {
+    font-size: 11px;
+    font-weight: bold;
+}
+
+::ng-deep.mat-form-field-appearance-outline .mat-form-field-outline {
+    color: var(--maarch-color-primary);
+    opacity: 0.3;
+  }
