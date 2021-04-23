@@ -37,9 +37,10 @@
                             {{'lang.selected' | translate}}</small>
                     </div>
                     <div class="table-head-tool">
-                        <span>
+                        <span style="position: relative;">
                             <mat-paginator #paginatorResultList [length]="resultsLength" [pageSizeOptions]="[10, 25, 50, 100, 150]"
                                 class="paginatorResultList"></mat-paginator>
+                            <app-select-page [paginator]="paginatorResultList"></app-select-page>
                         </span>
                         <span>
                             <app-followed-action-list #actionsList [contextMode]="false" [currentFolderInfo]="folderInfo"

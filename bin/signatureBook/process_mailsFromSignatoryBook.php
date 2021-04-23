@@ -204,7 +204,7 @@ if ($configRemoteSignatoryBook['id'] == 'ixbus') {
 
 Bt_writeLog(['level' => 'INFO', 'message' => 'Retrieve mails sent to remote signatory book']);
 $resources = \Resource\models\ResModel::get([
-    'select' => ['res_id', 'external_id->>\'signatureBookId\' as external_id', 'subject', 'typist', 'version'],
+    'select' => ['res_id', 'external_id->>\'signatureBookId\' as external_id', 'subject', 'typist', 'version', 'alt_identifier'],
     'where' => ['external_id->>\'signatureBookId\' IS NOT NULL', 'external_id->>\'signatureBookId\' <> \'\'']
 ]);
 
@@ -237,6 +237,7 @@ $nbMailsRetrieved = 0;
 foreach ($retrievedMails['noVersion'] as $resId => $value) {
     Bt_writeLog(['level' => 'INFO', 'message' => 'Update res_attachments : ' . $resId . '. ExternalId : ' . $value['external_id']]);
 
+    $historyIdentifier = $value['identifier'] ?? $resId . ' (res_attachments)';
     if (!empty($value['log'])) {
         Bt_writeLog(['level' => 'INFO', 'message' => 'Create log Attachment']);
         Bt_createAttachment([
@@ -298,7 +299,7 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
         }
         Bt_validatedMail(['status' => $status, 'resId' => $value['res_id_master']]);
 
-        $historyInfo = 'La signature de la pièce jointe '.$resId.' (res_attachments) a été validée dans le parapheur externe' . $additionalHistoryInfo;
+        $historyInfo = 'La signature de la pièce jointe ' . $historyIdentifier . ' a été validée dans le parapheur externe' . $additionalHistoryInfo;
     } elseif ($value['status'] == 'refused') {
         if (!empty($value['encodedFile'])) {
             $adrPdf = \Convert\models\AdrModel::getAttachments([
@@ -311,7 +312,9 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
             if (!empty($docserver['path_template']) && file_exists($docserver['path_template'])) {
                 $pathToPdf = $docserver['path_template'] . $adrPdf[0]['path'] . $adrPdf[0]['filename'];
                 $pathToPdf = str_replace('#', '/', $pathToPdf);
-                $hashedOriginalFile = md5(base64_encode(file_get_contents($pathToPdf)));
+                if (is_readable($pathToPdf)) {
+                    $hashedOriginalFile = md5(base64_encode(file_get_contents($pathToPdf)));
+                }
             }
             if ($hashedOriginalFile != md5($value['encodedFile'])) {
                 Bt_writeLog(['level' => 'INFO', 'message' => 'Create refused Attachment']);
@@ -348,7 +351,7 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
             'data' => [$value['res_id_master']]
         ]);
     
-        $historyInfo = 'La signature de la pièce jointe '.$resId.' (res_attachments) a été refusée dans le parapheur externe' . $additionalHistoryInfo;
+        $historyInfo = 'La signature de la pièce jointe ' . $historyIdentifier . ' a été refusée dans le parapheur externe' . $additionalHistoryInfo;
     }
     if (in_array($value['status'], ['validated', 'refused'])) {
         Bt_createNote(['notes' => $value['notes'], 'resId' => $value['res_id_master']]);
@@ -373,6 +376,7 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
 
 foreach ($retrievedMails['resLetterbox'] as $resId => $value) {
     Bt_writeLog(['level' => 'INFO', 'message' => 'Update res_letterbox : ' . $resId . '. SignatoryBookId : ' . $value['external_id']]);
+    $historyIdentifier = $value['alt_identifier'] ?? $resId . ' (res_letterbox)';
 
     if (!empty($value['encodedFile'])) {
         Bt_writeLog(['level' => 'INFO', 'message' => 'Create document in res_letterbox']);
@@ -417,14 +421,14 @@ foreach ($retrievedMails['resLetterbox'] as $resId => $value) {
             if ($value['status'] == 'validatedNote') {
                 $status = $validatedStatusAnnot;
             }
-            $history = 'Le document '.$resId.' (res_letterbox) a été validé dans le parapheur externe' . $additionalHistoryInfo;
+            $history = 'Le document ' . $historyIdentifier . ' a été validé dans le parapheur externe' . $additionalHistoryInfo;
         } elseif (in_array($value['status'], ['refusedNote', 'refused'])) {
             Bt_writeLog(['level' => 'INFO', 'message' => 'Document refused']);
             $status = $refusedStatus;
             if ($value['status'] == 'refusedNote') {
                 $status = $refusedStatusAnnot;
             }
-            $history = 'Le document '.$resId.' (res_letterbox) a été refusé dans le parapheur externe' . $additionalHistoryInfo;
+            $history = 'Le document ' . $historyIdentifier . ' a été refusé dans le parapheur externe' . $additionalHistoryInfo;
         }
         Bt_history([
             'table_name' => 'res_letterbox',

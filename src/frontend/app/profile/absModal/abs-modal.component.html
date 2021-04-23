@@ -4,19 +4,19 @@
         <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
             <mat-spinner style="margin:auto;"></mat-spinner>
         </div>
-        <app-maarch-message *ngIf="isAbsScheduled && !showCalendar && (startDate && endDate)" [content]="'lang.absScheduleMsg' | translate : {startDate : functions.formatDateObjectToDateString(startDate), endDate: functions.formatDateObjectToDateString(endDate)}"></app-maarch-message>
-        <mat-list>
+        <app-maarch-message *ngIf="isAbsScheduled" [mode]="'success'" [content]="'lang.absScheduleMsg' | translate : {startDate : functions.formatDateObjectToDateString(startDate), endDate: functions.formatDateObjectToDateString(endDate)}"></app-maarch-message>
+        <mat-list *ngIf="!showCalendar && !isAbsScheduled">
             <mat-list-item>
                 <button mat-button color="primary" matSuffix
                     style="width: 100%; align-items:center; font-size: 16px;"
-                        (click)="$event.stopPropagation(); showCalendar = !showCalendar;" [title]="(!isAbsScheduled ? 'lang.absencePeriod' : 'lang.editAbsPeriod') | translate">
-                    <mat-icon inline="true" color="primary" class="far fa-2x" [ngClass]="[!isAbsScheduled ? 'fa-calendar-alt' : 'fa-edit']" style="margin-bottom: 5px;">
+                        (click)="$event.stopPropagation(); showCalendar = !showCalendar;" [title]="'lang.absencePeriod' | translate">
+                    <mat-icon inline="true" color="primary" class="far fa-calendar-alt" style="margin-bottom: 5px;">
                     </mat-icon>
-                        {{ ( !isAbsScheduled ? 'lang.absencePeriod' : 'lang.editAbsPeriod') | translate }}
+                        {{ 'lang.absencePeriod' | translate }}
                 </button>
             </mat-list-item>
         </mat-list>
-        <mat-list *ngIf="showCalendar">
+        <mat-list *ngIf="showCalendar && !isAbsScheduled">
             <div mat-subheader>{{'lang.absenceDate' | translate}}</div>
             <mat-list-item>
                 <mat-form-field class="input-form input-date" floatLabel="never" (click)="picker.open()"
@@ -74,11 +74,11 @@
     </div>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
-        <button mat-raised-button *ngIf="isAbsScheduled" mat-button color="warn"
+        <button mat-raised-button *ngIf="isAbsScheduled && !isModified()" mat-button color="warn"
             (click)="canceled = true; cancelSchedule()">{{'lang.cancelSchedule' | translate}}</button>
         <button mat-raised-button mat-button *ngIf="isAbsScheduled && isModified()" color="primary" [disabled]="loading || (startDate && !endDate) || (!startDate && endDate)"
             (click)="isAbsScheduled = false; onSubmit()">{{'lang.update' | translate}}</button>
-        <button mat-raised-button mat-button *ngIf="(!isAbsScheduled && isModified()) || (!isAbsScheduled && startDate) || (!isAbsScheduled && !startDate && !endDate)" color="primary" [disabled]="loading || (startDate && !endDate) || (!startDate && endDate) || (!startDate && !endDate)"
+        <button mat-raised-button mat-button *ngIf="(!isAbsScheduled && isModified()) || (!isAbsScheduled && startDate) || (!isAbsScheduled && !startDate && !endDate)" color="primary" [disabled]="loading || (startDate && !endDate) || (!startDate && endDate)"
             (click)="onSubmit()">{{'lang.validate' | translate}}</button>
         <button mat-raised-button mat-button [disabled]="loading"
             [mat-dialog-close]="">{{'lang.close' | translate}}</button>

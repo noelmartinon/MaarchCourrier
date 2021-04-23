@@ -332,15 +332,6 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
             ).subscribe(data => this.data = data);
     }
 
-    goToPage(page: number) {
-        this.paginator.pageIndex = page;
-        this.paginator.page.next({
-            pageIndex: page,
-            pageSize: this.paginator.pageSize,
-            length: this.paginator.length
-        });
-    }
-
     goTo(row: any) {
         // this.criteriaSearchService.filterMode = false;
         if (this.docUrl === '../rest/resources/' + row.resId + '/content' && this.sidenavRight.opened) {
@@ -761,10 +752,6 @@ export class SearchResultListComponent implements OnInit, OnDestroy {
 
     getSelectedResources() {
         return this.selectedRes;
-    }
-
-    counter(i: number) {
-        return new Array(i);
     }
 }
 export interface BasketList {

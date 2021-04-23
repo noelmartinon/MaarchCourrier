@@ -2472,10 +2472,14 @@
     "organizationEmailSignaturesDesc": "Les signatures seront disponibles pour <b>tous</b> les utilisateurs de l'application.<br/>Vous pouvez utiliser des <b>variables de fusion</b> utilisateur et entité primaire (<a href=\"{{url}}\" target=\"_blank\">plus d'informations</a>).",
     "absenceDateSaved": "Plage d'absence définie",
     "absenceDate": "Période d'absence",
-    "res_letterbox": "Ressources",
     "cancelSchedule": "Annuler la planification",
     "absScheduleMsg": "Vous avez planifié votre absence du <b>{{startDate}}</b> au <b>{{endDate}}</b>",
     "deactivateAbsence": "Annuler / Modifier mon absence",
-    "editAbsPeriod": "Modifier la plage d'absence",
-    "hostError": "Impossible de résoudre l'hôte :"
+    "saeError": "Impossible de récupérer les règles de conservation",
+    "outlookPasswordRequired": "Mot de passe outlook non configuré",
+    "outlookPasswordWrong": "Mauvais mot de passe outlook",
+    "outlookGetAttachmentsImpossible": "Impossible de récupérer les pièces jointes",
+    "expAddress": "Adresse expéditrice",
+    "manual": "Manuelle",
+    "mailServer": "Serveur de messagerie"
 }

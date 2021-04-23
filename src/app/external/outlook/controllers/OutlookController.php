@@ -211,7 +211,7 @@ class OutlookController
         $user['preferences'] = json_decode($user['preferences'], true);
 
         if (empty($user['preferences']['outlookPassword'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'You have not set your outlook password']);
+            return $response->withStatus(400)->withJson(['errors' => 'You have not set your outlook password', 'lang' => 'outlookPasswordRequired']);
         }
 
         $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_addin_outlook']);
@@ -241,7 +241,11 @@ class OutlookController
         ]);
 
         if (!empty($errors)) {
-            return $response->withStatus(400)->withJson(['errors' => $errors]);
+            if (!empty($errors['lang'])) {
+                return $response->withStatus(400)->withJson(['errors' => $errors['errors'], 'lang' => $errors['lang']]);
+            } else {
+                return $response->withStatus(400)->withJson(['errors' => $errors]);
+            }
         }
 
         return $response->withStatus(204);

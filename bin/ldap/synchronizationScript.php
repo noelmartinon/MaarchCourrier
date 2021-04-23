@@ -339,32 +339,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
                     writeLog(['message' => "[ERROR] Update user [{$maarchUsersLogin[$user['user_id']]['user_id']}] failed : {$curlResponse['response']['errors']}"]);
                     continue;
                 }
-                if (!empty($user['entityId'])) {
-                    $entityExists = \Entity\models\EntityModel::getByEntityId(['entityId' => $user['entityId'], 'select' => [1]]);
-                    if (empty($entityExists) && !empty($user['defaultEntity'])) {
-                        $curlResponse = \SrcCore\models\CurlModel::exec([
-                            'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $maarchUsersLogin[$user['user_id']]['id'] . '/entities',
-                            'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
-                            'headers'       => ['content-type:application/json'],
-                            'method'        => 'POST',
-                            'body'          => json_encode(['entityId' => $user['defaultEntity']])
-                        ]);
-                        if ($curlResponse['code'] != 200) {
-                            writeLog(['message' => "[ERROR] Add entity to user [{$maarchUsersLogin[$user['user_id']]['user_id']}] failed : {$curlResponse['response']['errors']}"]);
-                        }
-                    } elseif (!empty($entityExists) && !\User\models\UserModel::hasEntity(['id' => $maarchUsersLogin[$user['user_id']]['id'], 'entityId' => $user['entityId']])) {
-                        $curlResponse = \SrcCore\models\CurlModel::exec([
-                            'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $maarchUsersLogin[$user['user_id']]['id'] . '/entities',
-                            'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
-                            'headers'       => ['content-type:application/json'],
-                            'method'        => 'POST',
-                            'body'          => json_encode(['entityId' => $user['entityId']])
-                        ]);
-                        if ($curlResponse['code'] != 200) {
-                            writeLog(['message' => "[ERROR] Add entity to user [{$maarchUsersLogin[$user['user_id']]['user_id']}] failed : {$curlResponse['response']['errors']}"]);
-                        }
-                    }
-                }
+                userAddEntity($maarchUsersLogin[$user['user_id']]['id'], $user);
             }
         } else {
             $control = controlUser($user);
@@ -385,19 +360,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
                 continue;
             }
 
-            if (!empty($user['entityId'])) {
-                $curlResponse = \SrcCore\models\CurlModel::exec([
-                    'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $curlResponse['response']['id'] . '/entities',
-                    'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
-                    'headers'       => ['content-type:application/json'],
-                    'method'        => 'POST',
-                    'body'          => json_encode(['entityId' => $user['entityId']])
-                ]);
-                if ($curlResponse['code'] != 200) {
-                    writeLog(['message' => "[ERROR] Add entity to user [{$maarchUsersLogin[$user['user_id']]['user_id']}] failed : {$curlResponse['response']['errors']}"]);
-                    continue;
-                }
-            }
+            userAddEntity($curlResponse['response']['id'], $user);
         }
     }
 
@@ -520,4 +483,37 @@ function controlUser(array $user)
     }
 
     return true;
+}
+
+function userAddEntity($userId, $user)
+{
+    $entityId = null;
+    if (!empty($user['entityId'])) {
+        $entityExists = \Entity\models\EntityModel::getByEntityId(['entityId' => $user['entityId'], 'select' => [1]]);
+    }
+    if (!empty($user['defaultEntity'])) {
+        $defaultEntityExists = \Entity\models\EntityModel::getByEntityId(['entityId' => $user['defaultEntity'], 'select' => [1]]);
+    }
+
+    if(!empty($entityExists)) {
+        $entityId = $user['entityId'];
+    } elseif (!empty($defaultEntityExists)) {
+        $entityId = $user['defaultEntity'];
+    }
+
+    if(!empty($entityId)) {
+        $curlResponse = \SrcCore\models\CurlModel::exec([
+            'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $userId . '/entities',
+            'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
+            'headers'       => ['content-type:application/json'],
+            'method'        => 'POST',
+            'body'          => json_encode(['entityId' => $entityId])
+        ]);
+        if ($curlResponse['code'] != 200) {
+            writeLog(['message' => "[ERROR] Add entity to user failed : {$curlResponse['response']['errors']}"]);
+        }
+    }
+    else{
+        writeLog(['message' => "[ERROR] Add entity to user failed : {Entity not found}"]);
+    }
 }

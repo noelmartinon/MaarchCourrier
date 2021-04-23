@@ -211,7 +211,7 @@ INSERT INTO configurations (id, privilege, value) VALUES (4, 'admin_document_edi
 INSERT INTO configurations (id, privilege, value) VALUES (5, 'admin_parameters_watermark', '{"font": "helvetica", "posX": 30, "posY": 35, "size": 10, "text": "Copie conforme de [alt_identifier] le [date_now] [hour_now]", "angle": 0, "color": [20, 192, 30], "enabled": true, "opacity": 0.5}');
 INSERT INTO configurations (id, privilege, value) VALUES (6, 'admin_shippings', '{"uri": "", "authUri": "", "enabled": false}');
 INSERT INTO configurations (id, privilege, value) VALUES (7, 'admin_addin_outlook', '{"typeId": 1203, "statusId": 42, "indexingModelId": 8, "attachmentTypeId": 5}');
-INSERT INTO configurations (id, privilege, value) VALUES (8, 'admin_organization_email_signatures', '{"signatures": [{"label": "Signature Organisation", "content": "<div style=\"font-family: Calibri, Helvetica, sans-serif, EmojiFont, EmojiSymbols; font-size: 16px; background-color: #ffffff; margin-top: 0px; margin-bottom: 0px;\"><span style=\"font-family: Muli, sans-serif, serif, EmojiFont; color: #0ebcff; font-size: small;\"><span style=\"font-size: 11pt; background-color: transparent;\"><strong>[user.firstname] </strong></span></span><span style=\"color: #0ebcff; font-family: Muli, sans-serif, serif, EmojiFont; font-size: 14.6667px; font-weight: bold;\">[user.lastname]</span></div>\n<div style=\"font-family: Calibri, Helvetica, sans-serif, EmojiFont, EmojiSymbols; font-size: 16px; background-color: #ffffff; margin-top: 0px; margin-bottom: 0px;\"><span style=\"font-family: Muli, sans-serif, serif, EmojiFont; color: #0ebcff; font-size: small;\"><span style=\"font-size: 11pt; background-color: transparent;\"><span style=\"color: #0ebcff; font-family: Muli, sans-serif, serif, EmojiFont;\"><span style=\"font-size: 14.6667px;\"><strong>[userPrimaryEntity.entity_label]</strong></span></span></span></span></div>\n<div style=\"font-family: Calibri, Helvetica, sans-serif, EmojiFont, EmojiSymbols; font-size: 16px; background-color: #ffffff; margin-top: 0px; margin-bottom: 0px;\"><span style=\"background-color: transparent; font-size: 11pt; font-family: Muli, sans-serif, serif, EmojiFont; color: #6f6e81;\">[user.phone]</span></div>\n<div style=\"font-family: Calibri, Helvetica, sans-serif, EmojiFont, EmojiSymbols; font-size: 16px; background-color: #ffffff; margin-top: 0px; margin-bottom: 0px;\"><span style=\"font-family: Muli, sans-serif, serif, EmojiFont; color: #6f6e81; font-size: small;\"><span style=\"font-size: 11pt; background-color: transparent;\">[userPrimaryEntity.address_number] [userPrimaryEntity.address_street], [userPrimaryEntity.address_postcode] [userPrimaryEntity.address_town]</span></span></div>\n<div style=\"font-family: Calibri, Helvetica, sans-serif, EmojiFont, EmojiSymbols; font-size: 16px; background-color: #ffffff; margin-top: 0px; margin-bottom: 0px;\">&nbsp;</div>"}]}');
+INSERT INTO configurations (id, privilege, value) VALUES (8, 'admin_organization_email_signatures', '{"signatures": [{"label": "Signature Organisation", "content": "<div><span><span><strong>[user.firstname] </strong></span></span><span>[user.lastname]</span></div>\\n<div><span><span><span><span><strong>[userPrimaryEntity.entity_label]</strong></span></span></span></span></div>\\n<div><span>[user.phone]</span></div>\\n<div><span><span>[userPrimaryEntity.address_number] [userPrimaryEntity.address_street], [userPrimaryEntity.address_postcode] [userPrimaryEntity.address_town]</span></span></div>\\n<div>&nbsp;</div>"}]}');
 
 INSERT INTO contacts (id, civility, firstname, lastname, company, department, function, address_number, address_street, address_additional1, address_additional2, address_postcode, address_town, address_country, email, phone, communication_means, notes, creator, creation_date, modification_date, enabled, custom_fields, external_id) VALUES (1, 1, 'Jean-Louis', 'ERCOLANI', 'MAARCH', '', 'Directeur Général', '11', 'Boulevard du Sud-Est', '', '', '99000', 'MAARCH LES BAINS', 'France', 'dev.maarch@maarch.org', '', NULL, 'Editeur du logiciel libre Maarch', 21, '2015-04-24 12:43:54.97424', '2016-07-25 16:28:38.498185', true, '{}', '{}');
 INSERT INTO contacts (id, civility, firstname, lastname, company, department, function, address_number, address_street, address_additional1, address_additional2, address_postcode, address_town, address_country, email, phone, communication_means, notes, creator, creation_date, modification_date, enabled, custom_fields, external_id) VALUES (4, 1, 'Nicolas', 'MARTIN', 'Préfecture de Maarch Les Bains', NULL, NULL, '13', 'RUE LA PREFECTURE', NULL, NULL, '99000', 'MAARCH LES BAINS', NULL, NULL, NULL, '{"url": "https://cchaplin:maarch@demo.maarchcourrier.com"}', NULL, 21, '2018-04-18 12:43:54.97424', '2020-03-24 15:06:58.16582', true, NULL, '{"m2m": "45239273100025/COU"}');
@@ -396,59 +396,6 @@ INSERT INTO doctypes_second_level (doctypes_second_level_id, doctypes_second_lev
 INSERT INTO doctypes_second_level (doctypes_second_level_id, doctypes_second_level_label, doctypes_first_level_id, css_style, enabled) VALUES (10, '10. Urbanisme', 1, '#000000', 'Y');
 INSERT INTO doctypes_second_level (doctypes_second_level_id, doctypes_second_level_label, doctypes_first_level_id, css_style, enabled) VALUES (11, '11. Silence vaut acceptation', 1, '#000000', 'Y');
 INSERT INTO doctypes_second_level (doctypes_second_level_id, doctypes_second_level_label, doctypes_first_level_id, css_style, enabled) VALUES (12, '12. Formulaires', 1, '#000000', 'Y');
-
-INSERT INTO emails (id, user_id, sender, recipients, cc, cci, object, body, document, is_html, status, message_exchange_id, creation_date, send_date) VALUES (1, 16, '{"email":"mairie@maarchlesbains.fr","entityId":10}', '["bernard.pascontent@gmail.com"]', '[]', '[]', '[AR] Autres demandes d''interventions', '<div id="write" class="is-node"><br /><hr /><span style="color: #236fa1;">H&ocirc;tel de ville</span><br /><span style="color: #236fa1;">Place de la Libert&eacute;</span><br /><span style="color: #236fa1;">99000 Maarch-les-bains</span>
-<p>&nbsp;</p>
-<p><span style="color: #236fa1;"><strong>Accus&eacute; de r&eacute;ception</strong></span></p>
-<p>Service instructeur : <strong>Pôle Technique</strong> <br />Courriel : mairie@maarchlesbains.fr</p>
-<p>Maarch-les-Bains, le jeudi 25 mars 2021</p>
-<hr />
-<p>Bonjour,</p>
-<p>Votre demande concernant :</p>
-<p><strong>Autres demandes d''interventions</strong></p>
-<p>&agrave; bien &eacute;t&eacute; r&eacute;ceptionn&eacute;e par nos services le 24-03-2021.</p>
-<p><br />La r&eacute;f&eacute;rence de votre dossier est : <strong>MAARCH/2021A/1</strong></p>
-<p>Le pr&eacute;sent accus&eacute; de r&eacute;ception atteste de la r&eacute;ception de votre demande. Il ne pr&eacute;juge pas de la conformit&eacute; de son contenu qui d&eacute;pend entre autres de l''&eacute;tude des pi&egrave;ces fournies.</p>
-<p>Si l''instruction de votre demande n&eacute;cessite des informations ou des pi&egrave;ces compl&eacute;mentaires, nos services vous en ferons la demande</p>
-<p>&nbsp;</p>
-<p>Nous vous conseillons de conserver ce message jusqu''&agrave; la fin du traitement de votre dossier.</p>
-<p>&nbsp;</p>
-<p>Pôle Technique</p>
-<p>Ville de Maarch-les-Bains</p>
-<p>&nbsp;</p>
-</div>', '{"id":100,"isLinked":false,"original":true}', true, 'ERROR', NULL, '2021-03-25 15:15:27.86941', NULL);
-INSERT INTO emails (id, user_id, sender, recipients, cc, cci, object, body, document, is_html, status, message_exchange_id, creation_date, send_date) VALUES (2, 16, '{"email":"mairie@maarchlesbains.fr","entityId":10}', '["bernard.pascontent@gmail.com"]', '[]', '[]', '[AR] Demande d''interventions', '<div id="write" class="is-node"><br /><hr /><span style="color: #236fa1;">H&ocirc;tel de ville</span><br /><span style="color: #236fa1;">Place de la Libert&eacute;</span><br /><span style="color: #236fa1;">99000 Maarch-les-bains</span>
-<p>&nbsp;</p>
-<p><span style="color: #236fa1;"><strong>Accus&eacute; de r&eacute;ception</strong></span></p>
-<p>Service instructeur : <strong>Pôle Technique</strong> <br />Courriel : mairie@maarchlesbains.fr</p>
-<p>Maarch-les-Bains, le jeudi 25 mars 2021</p>
-<hr />
-<p>Bonjour,</p>
-<p>Votre demande concernant :</p>
-<p><strong>Demande d''interventions</strong></p>
-<p>&agrave; bien &eacute;t&eacute; r&eacute;ceptionn&eacute;e par nos services le 24-03-2021.</p>
-<p><br />La r&eacute;f&eacute;rence de votre dossier est : <strong>MAARCH/2021A/2</strong></p>
-<p>Le pr&eacute;sent accus&eacute; de r&eacute;ception atteste de la r&eacute;ception de votre demande. Il ne pr&eacute;juge pas de la conformit&eacute; de son contenu qui d&eacute;pend entre autres de l''&eacute;tude des pi&egrave;ces fournies.</p>
-<p>Si l''instruction de votre demande n&eacute;cessite des informations ou des pi&egrave;ces compl&eacute;mentaires, nos services vous en ferons la demande</p>
-<p>&nbsp;</p>
-<p>Nous vous conseillons de conserver ce message jusqu''&agrave; la fin du traitement de votre dossier.</p>
-<p>&nbsp;</p>
-<p>Pôle Technique</p>
-<p>Ville de Maarch-les-Bains</p>
-<p>&nbsp;</p>
-</div>', '{"id":101,"isLinked":false,"original":true}', true, 'ERROR', NULL, '2021-03-25 15:25:08.437715', NULL);
-INSERT INTO emails (id, user_id, sender, recipients, cc, cci, object, body, document, is_html, status, message_exchange_id, creation_date, send_date) VALUES (7, 4, '{"email":"mairie@maarchlesbains.fr","entityId":9}', '["bernard.pascontent@gmail.com"]', '[]', '[]', '[MAARCH/2021A/2] Demande d''interventions', '<div id="write" class="is-node"><br /><hr /><span style="color: #236fa1;">H&ocirc;tel de ville</span><br /><span style="color: #236fa1;">Place de la Libert&eacute;</span><br /><span style="color: #236fa1;">99000 Maarch-les-bains</span>
-<p>Nancy NATALY<br />Responsable Pole Social<br />P&ocirc;le Social<br /><br />T&eacute;l&eacute;phone : &nbsp;&nbsp; &nbsp;01 47 24 51 59<br />Courriel : &nbsp;&nbsp; &nbsp;yourEmail@domain.com</p>
-<p>Maarch-les-Bains, le vendredi 26 mars 2021</p>
-<hr />
-<p>Bonjour,</p>
-<p>Veuillez trouver en pi&egrave;ce jointe &agrave; ce courriel notre r&eacute;ponse &agrave; votre demande du 24-03-2021.</p>
-<p>Mon courriel</p>
-<p>Bien cordialement.</p>
-<p>Nancy NATALY<br />Responsable Pole Social<br />P&ocirc;le Social<br /><br /></p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-</div>', '{"id":101,"isLinked":false,"original":false,"attachments":[{"id":2,"original":true}]}', true, 'SENT', NULL, '2021-03-26 17:26:26.171782', '2021-03-26 17:28:17.875132');
 
 INSERT INTO entities (id, entity_id, entity_label, short_label, entity_full_name, enabled, address_number, address_street, address_additional1, address_additional2, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type, ldap_id, producer_service, folder_import, external_id) VALUES (1, 'VILLE', 'Ville de Maarch-les-Bains', 'Ville de Maarch-les-Bains', NULL, 'Y', '', 'Place de la liberté', 'Hôtel de Ville', NULL, '99000', 'Maarch-les-Bains', 'FRANCE', 'mairie@maarchlesbains.fr', '45239273100025/VILLE', '', 'Direction', NULL, NULL, NULL, '{}');
 INSERT INTO entities (id, entity_id, entity_label, short_label, entity_full_name, enabled, address_number, address_street, address_additional1, address_additional2, address_postcode, address_town, address_country, email, business_id, parent_entity_id, entity_type, ldap_id, producer_service, folder_import, external_id) VALUES (2, 'CAB', 'Cabinet du Maire', 'Cabinet du Maire', NULL, 'Y', '', 'Place de la liberté', 'Hôtel de Ville', NULL, '99000', 'Maarch-les-Bains', 'FRANCE', 'mairie@maarchlesbains.fr', '45239273100025/CAB', 'VILLE', 'Direction', NULL, NULL, NULL, '{}');

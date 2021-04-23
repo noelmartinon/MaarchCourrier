@@ -90,6 +90,7 @@ import { RegisteredMailImportComponent } from '@appRoot/registeredMail/import/re
 import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-tool.component';
 import { ColorGithubModule } from 'ngx-color/github';
 import { MailSignaturesAdministrationComponent } from './administration/organizationEmailSignatures/mailSignatures/mail-signatures-administration.component';
+import { SelectPageComponent } from '@plugins/list/select-page/select-page.component';
 
 
 @NgModule({
@@ -157,7 +158,8 @@ import { MailSignaturesAdministrationComponent } from './administration/organiza
         ContactsGroupMergeModalComponent,
         ContactsFormModalComponent,
         InputCorrespondentGroupComponent,
-        MailSignaturesAdministrationComponent
+        MailSignaturesAdministrationComponent,
+        SelectPageComponent
     ],
     exports: [
         CommonModule,
@@ -213,7 +215,8 @@ import { MailSignaturesAdministrationComponent } from './administration/organiza
         InputCorrespondentGroupComponent,
         MessageBoxComponent,
         ColorGithubModule,
-        MailSignaturesAdministrationComponent
+        MailSignaturesAdministrationComponent,
+        SelectPageComponent
     ],
     providers: [],
     entryComponents: [

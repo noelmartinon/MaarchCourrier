@@ -90,6 +90,27 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
     documentImported: boolean = false;
 
+    acknowledgementReceiptFrom = [
+        {
+            id: 'manual',
+            label : this.translate.instant('lang.manual')
+        },
+        {
+            id: 'destination',
+            label : this.translate.instant('lang.destination')
+        },
+        {
+            id: 'mailServer',
+            label : this.translate.instant('lang.mailServer')
+        },
+        {
+            id: 'user',
+            label : this.translate.instant('lang.user')
+        }
+    ];
+
+    options: any = {};
+
     constructor(
         public http: HttpClient,
         private sanitizer: DomSanitizer,
@@ -156,6 +177,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                                 this.getViewTemplateContent();
                             }
                         }
+                        this.options = data.template.options;
 
                         this.headerService.setHeader(this.translate.instant('lang.templateModification'), this.template.template_label);
                         this.loading = false;
@@ -566,6 +588,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
     formatTemplate() {
         const template = { ...this.template };
+        template.option = {...this.options };
         template.entities = this.maarchTree.getSelectedNodes().map(ent => ent.entity_id);
         return template;
     }
@@ -597,6 +620,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
     }
 
     updateTemplateType() {
+        this.options = {};
         this.template.file = {
             name: '',
             type: '',
@@ -615,6 +639,9 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
             this.template.type = 'TXT';
             this.availableTypes = ['TXT'];
         } else if (this.template.target === 'acknowledgementReceipt') {
+            this.options = {
+                acknowledgementReceiptFrom : 'destination'
+            };
             this.template.file = {
                 electronic: {
                     name: '',
@@ -672,11 +699,22 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
         }
     }
 
+    setOption(id: string, value: string, reset: boolean = false) {
+        if (reset) {
+            this.options = {};
+        }
+        this.options[id] = value;
+    }
+
     ngOnDestroy() {
         tinymce.remove('textarea');
         if (this.intervalLockFile) {
             clearInterval(this.intervalLockFile);
         }
+    }
+
+    emptyOptions() {
+        return Object.keys(this.options).length === 0;
     }
 }
 @Component({

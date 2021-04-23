@@ -88,10 +88,7 @@
         <span style="position: relative;">
             <mat-paginator #paginatorResultList [length]="paginatorLength" [pageSizeOptions]="[10, 25, 50, 100, 150]"
              class="paginatorResultList"></mat-paginator>
-            <div *ngIf="paginatorResultList.getNumberOfPages() > 0" [matMenuTriggerFor]="page" class="pageList"></div>
-            <mat-menu #page="matMenu">
-                <button mat-menu-item *ngFor="let count of counter(paginatorResultList.getNumberOfPages());let i=index" (click)="goToPage(i)">{{i+1}}</button>
-            </mat-menu>
+            <app-select-page [paginator]="paginatorResultList"></app-select-page>
         </span>
         <span>
             <span>

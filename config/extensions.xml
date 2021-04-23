@@ -176,6 +176,11 @@
         <canConvert>true</canConvert>
     </FORMAT>
     <FORMAT>
+        <name>XML</name>
+        <mime>text/xml</mime>
+        <canConvert>true</canConvert>
+    </FORMAT>
+    <FORMAT>
         <name>TXT</name>
         <mime>text/plain</mime>
         <canConvert>true</canConvert>

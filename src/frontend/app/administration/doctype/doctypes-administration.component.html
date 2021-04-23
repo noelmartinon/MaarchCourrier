@@ -268,6 +268,7 @@
                                 </div>
                             </mat-expansion-panel>
                             <mat-expansion-panel>
+                                <app-maarch-message *ngIf="hasError" [mode]="'danger'" [content]="archivalError"></app-maarch-message>
                                 <mat-expansion-panel-header>
                                     <mat-panel-title>
                                         {{'lang.archival' | translate}}
@@ -302,7 +303,6 @@
                                         </mat-form-field>
                                     </div>
                                 </div>
-                                <app-maarch-message *ngIf="hasError" [mode]="'danger'" [content]="archivalError"></app-maarch-message>
                             </mat-expansion-panel>
                         </mat-accordion>
 

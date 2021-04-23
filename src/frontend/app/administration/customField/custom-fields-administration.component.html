@@ -124,7 +124,7 @@
                                                                 <mat-option *ngFor="let table of availableTables | keyvalue"
                                                                     [value]="table.key">
                                                                     {{table.key}}
-                                                                    <ng-container *ngIf="!functionsService.empty('lang.' + table.key | translate)">
+                                                                    <ng-container *ngIf="!functionsService.empty('lang.' + table.key | translate) && !checkIfUntranslated(table.key)">
                                                                         ({{'lang.' + table.key | translate}})
                                                                     </ng-container>
                                                                 </mat-option>
