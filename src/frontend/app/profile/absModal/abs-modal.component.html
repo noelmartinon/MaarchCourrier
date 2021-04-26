@@ -66,7 +66,7 @@
         </mat-list>
 
         <div style="position: sticky;bottom: -10px;background: white;">
-            <app-plugin-autocomplete *ngIf="basketSelected()" [labelPlaceholder]="'lang.redirectBaskets' | translate"
+            <app-plugin-autocomplete class="pluginAutocomplete" *ngIf="basketSelected()" [labelPlaceholder]="'lang.redirectBaskets' | translate"
                 [routeDatas]="['/rest/autocomplete/users']" [targetSearchKey]="'idToDisplay'"
                 [subInfoKey]="'descriptionToDisplay'" [disableItems]="[headerService.user.id]"
                 (triggerEvent)="addBasketRedirection($event)" appearance="outline"></app-plugin-autocomplete>
