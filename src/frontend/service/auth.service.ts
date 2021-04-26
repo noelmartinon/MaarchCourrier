@@ -130,7 +130,7 @@ export class AuthService {
         if (['cas', 'keycloak', 'azure_saml'].indexOf(this.authMode) > -1 && !forcePageLogin) {
             this.SsoLogout(cleanUrl);
         } else {
-            // AVOID UNLOCK ON DESROY COMPONENT
+            // HANDLE LOGOUT IN GUARD FOR PROCESS
             if (['process'].indexOf(this.router.url.split('/')[1]) > -1) {
                 this.router.navigate(['/login']);
             } else {
