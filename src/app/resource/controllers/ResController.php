@@ -1046,9 +1046,16 @@ class ResController extends ResourceControlController
 
         $resources = array_unique($args['resId']);
 
-        $authorizedResources = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId']]);
+        $authorizedResources = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId'], 'mode' => 'groups']);
+        if (count($authorizedResources) != count($resources)) {
+            $authorizedResources = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId'], 'mode' => 'baskets']);
+            if (count($authorizedResources) != count($resources)) {
+                $authorizedResources = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId'], 'mode' => 'folders']);
+                return count($authorizedResources) == count($resources);
+            }
+        }
 
-        return count($authorizedResources) == count($resources);
+        return true;
     }
 
     public static function getAuthorizedResources(array $args)
@@ -1062,7 +1069,7 @@ class ResController extends ResourceControlController
         }
 
         $user = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
-        $userDataClause = SearchController::getUserDataClause(['userId' => $args['userId'], 'login' => $user['user_id']]);
+        $userDataClause = SearchController::getUserDataClause(['userId' => $args['userId'], 'login' => $user['user_id'], 'mode' => $args['mode']]);
 
         $data = [$args['resources']];
         $data = array_merge($data, $userDataClause['searchData']);
