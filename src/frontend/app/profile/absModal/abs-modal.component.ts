@@ -279,8 +279,7 @@ export class AbsModalComponent implements OnInit {
     }
 
     oneOrMoreSelected() {
-        const basketRedirected: number = this.baskets.filter((basket: any) => this.isRedirectedBasket(basket)).length;
-        return (this.baskets.filter((item: any) => item.selected).length > 0 || basketRedirected >= 1) && !this.allSelected();
+        return this.baskets.filter((item: any) => item.selected).length > 0 && !this.allSelected();
     }
 
     getAbsenceInfo() {
