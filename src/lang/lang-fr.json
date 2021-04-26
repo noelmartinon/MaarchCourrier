@@ -142,8 +142,8 @@
     "approvedUserDate": "Visé",
     "april": "Avril",
     "aprilShort": "Avr.",
-    "arAlreadyGenerated": "accusé(s) de réception déjà généré(s)",
-    "arAlreadySend": "accusé(s) de réception déjà envoyé(s)",
+    "arAlreadyGenerated": "accusé(s) de réception <b>déjà généré(s)</b>",
+    "arAlreadySend": "accusé(s) de réception <b>déjà envoyé(s)</b>",
     "arGenWithModelMessage": "Les fiches de liaisons seront générées avec les champs définis dans le modèle d'enregistrement du courrier.",
     "archival": "Archivage",
     "archivalAgency": "Service d'archive destinataire",
@@ -252,7 +252,7 @@
     "canManageFolder": "Droit de modification / suppression du dossier",
     "canNotDeleteIndexingModel": "Ce modèle ne peut pas être supprimé car il a été utilisé pour enregistrer au moins un courrier",
     "canNotMakeAction": "Impossible de faire l'action sur les courriers suivants",
-    "canNotSendAr": "accusé(s) de réception impossible à envoyer",
+    "canNotSendAr": "accusé(s) de réception <b>impossible</b> à envoyer",
     "canNotUpdateApplication": "Certains fichiers de l'application sont modifiés sur le serveur. Impossible de mettre à jour l'application",
     "canUpdateData": "Pouvoir modifier les métadonnées du courrier",
     "cancel": "Annuler",
@@ -1283,8 +1283,8 @@
     "quotaExceeded": "Quota dépassé",
     "radioInput": "Liste à choix unique",
     "reactivateUserDeleted": "L'identifiant renseigné est attribué à un utilisateur supprimé. Voulez-vous le réactiver ?",
-    "readyToGeneratePaperAr": "accusé(s) de réception papier prêt(s) à être généré(s)",
-    "readyToSendElectronicAr": "accusé(s) de réception électronique prêt(s) à être envoyé(s)",
+    "readyToGeneratePaperAr": "<b>{{nb}}</b> accusé(s) de réception <b>papier</b> prêt(s) à être généré(s)",
+    "readyToSendElectronicAr": "<b>{{nb}}</b> accusé(s) de réception <b>électronique</b> prêt(s) à être envoyé(s)",
     "reaffect": "Réaffecter",
     "reaffectContactInformations": "Les différents liens entre le contact et les courriers, pièce-jointes ou accusés de réception seront réaffectés au nouveau contact choisi.",
     "reaffectContactRedirect": "Réaffecter à un contact",
@@ -2481,5 +2481,6 @@
     "outlookGetAttachmentsImpossible": "Impossible de récupérer les pièces jointes",
     "expAddress": "Adresse expéditrice",
     "manual": "Manuelle",
-    "mailServer": "Serveur de messagerie"
+    "mailServer": "Serveur de messagerie",
+    "canAddCopies": "Pouvoir ajouter des personnes en copie (CC / CCI)"
 }
