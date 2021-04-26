@@ -16,7 +16,7 @@ export class MessageBoxComponent implements OnInit {
     /**
      * Content of alert box
      */
-    @Input() content: string = '';
+    @Input() content: string = null;
 
     constructor( ) { }
 
