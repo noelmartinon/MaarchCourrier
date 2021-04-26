@@ -262,12 +262,18 @@ abstract class EntityModelAbstract
         ValidatorModel::notEmpty($args, ['id']);
         ValidatorModel::intVal($args, ['id']);
 
-        $entityInfo = EntityModel::getById([
-            'select' => ['entity_id'],
-            'id'     => [$args['id']]
+        $allEntities = DatabaseModel::select([
+            'select'    => ['id', 'parent_entity_id'],
+            'table'     => ['entities'],
+            'where'     => ['parent_entity_id IS NOT NULL AND parent_entity_id <> \'\''],
         ]);
 
-        $entities = EntityModel::getEntityChildren(['entityId' => $entityInfo['entity_id']]);
+        $orderedEntities = [];
+        foreach ($allEntities as $value) {
+            $orderedEntities[$value['parent_entity_id']][] = $value['id'];
+        }
+
+        $entities = EntityModel::getEntityChildrenLoop(['entityId' => $args['id'], 'entities' => $orderedEntities]);
 
         return $entities;
     }
