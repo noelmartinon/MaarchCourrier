@@ -700,7 +700,7 @@ class ActionMethodController
 
 
         $listInstances = ListInstanceModel::get([
-            'select'   => ['listinstance_id'],
+            'select'   => ['listinstance_id', 'item_id'],
             'where'    => ['res_id = ?', 'difflist_type = ?', 'process_date is null'],
             'data'     => [$args['resId'], 'VISA_CIRCUIT'],
             'orderBy' => ['listinstance_id'],
@@ -710,11 +710,12 @@ class ActionMethodController
         if (!empty($listInstances[0])) {
             $listInstances = $listInstances[0];
 
+            $set = ['process_date' => 'CURRENT_TIMESTAMP', 'process_comment' => _HAS_INTERRUPTED_WORKFLOW];
+            if ($listInstances['item_id'] != $GLOBALS['id']) {
+                $set['delegate'] = $GLOBALS['id'];
+            }
             ListInstanceModel::update([
-                'set'   => [
-                    'process_date' => 'CURRENT_TIMESTAMP',
-                    'process_comment' => _HAS_INTERRUPTED_WORKFLOW
-                ],
+                'set'   => $set,
                 'where' => ['listinstance_id = ?'],
                 'data'  => [$listInstances['listinstance_id']]
             ]);
