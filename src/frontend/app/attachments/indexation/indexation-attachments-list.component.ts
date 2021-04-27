@@ -56,7 +56,7 @@ export class IndexationAttachmentsListComponent implements OnInit {
             this.http.get('../rest/attachmentsTypes').pipe(
                 tap((data: any) => {
                     Object.keys(data.attachmentsTypes).forEach(templateType => {
-                        if (data.attachmentsTypes[templateType].visible) {
+                        if (data.attachmentsTypes[templateType].show) {
                             this.attachmentsTypes.push({
                                 ...data.attachmentsTypes[templateType],
                                 id: templateType
