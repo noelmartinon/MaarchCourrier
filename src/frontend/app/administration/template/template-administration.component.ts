@@ -588,7 +588,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
     formatTemplate() {
         const template = { ...this.template };
-        template.option = {...this.options };
+        template.options = {...this.options };
         template.entities = this.maarchTree.getSelectedNodes().map(ent => ent.entity_id);
         return template;
     }

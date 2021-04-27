@@ -379,7 +379,16 @@ class PreProcessActionController
             }
         }
 
-        return $response->withJson(['sendEmail' => $sendEmail, 'sendPaper' => $sendPaper, 'sendList' => $sendList,  'noSendAR' => $noSendAR, 'alreadySend' => $alreadySend, 'alreadyGenerated' => $alreadyGenerated, 'mode' => $mode]);
+        return $response->withJson([
+            'sendEmail'        => $sendEmail,
+            'sendPaper'        => $sendPaper,
+            'sendList'         => $sendList,
+            'noSendAR'         => $noSendAR,
+            'alreadySend'      => $alreadySend,
+            'alreadyGenerated' => $alreadyGenerated,
+            'mode'             => $mode,
+            'canAddCopies'     => !empty($parameters['canAddCopies'])
+        ]);
     }
 
     public function checkExternalSignatoryBook(Request $request, Response $response, array $aArgs)
