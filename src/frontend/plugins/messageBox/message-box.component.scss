@@ -1,3 +1,5 @@
+@import '../../css/vars.scss';
+
 .content {
     border-radius: 5px;
     margin-top: 10px;
@@ -7,20 +9,20 @@
 
     &-success {
         background-color: #F4FDF0;
-        border-color: var(--maarch-color-success);
-        color: var(--maarch-color-success-dark);
+        border-color: $accent;
+        color: darken($accent, 10%);
     }
 
     &-danger {
         background-color: #8e3e521a;
-        border-color: var(--maarch-color-danger);
-        color: var(--maarch-color-danger-dark);
+        border-color: $warn;
+        color: darken($warn, 10%);
     }
 
     &-info {
         background-color: #f4f8fa;
-        border-color: var(--maarch-color-primary);
-        color: var(--maarch-color-primary-dark);
+        border-color: $primary;
+        color: darken($primary, 10%);
     }
 
     &-default {

@@ -8,7 +8,7 @@
 }
 
 .bg-head-content {
-    background-color: var(--maarch-color-primary);
+    background-color: $primary;
     padding-left: 50px;
     padding-right: 50px;
     padding-bottom: 10px;
@@ -23,7 +23,7 @@
 }
 
 .count-badge {
-    background-color: var(--maarch-color-secondary);
+    background-color: $secondary;
     font-weight: bold;
     font-size: 12px;
     padding: 3px;

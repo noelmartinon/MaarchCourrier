@@ -8,3 +8,5 @@ apps/maarch_entreprise/xml/log4php.xml
 test/unitTests/build/
 modules/visa/xml/remoteSignatoryBooks.xml
 package-lock.json
+custom
+afdTMA
