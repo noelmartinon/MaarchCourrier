@@ -110,6 +110,14 @@ class CustomFieldModel
         ValidatorModel::notEmpty($args, ['key', 'label', 'table', 'clause']);
         ValidatorModel::stringType($args, ['key', 'table', 'clause']);
         ValidatorModel::arrayType($args, ['label']);
+        ValidatorModel::intVal($args, ['resId']);
+
+       if (preg_match('/@resId/', $args['clause'])) {
+           if (empty($args['resId'])) {
+               return [];
+           }
+           $args['clause'] = str_replace('@resId', $args['resId'], $args['clause']);
+       }
 
         $select = array_column($args['label'], 'column');
         $select[] = $args['key'];

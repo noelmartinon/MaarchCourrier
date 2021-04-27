@@ -22,10 +22,10 @@
             <div class="attachment-name" [title]="attachment.file.name">
                 <i class="fa fa-paperclip"></i> {{attachment.file.name}}
             </div>
-            <app-plugin-select-search [class]="''" appearance="outline" [label]="'lang.type' | translate"
+            <plugin-select-search [class]="''" appearance="outline" [label]="'lang.type' | translate"
                 [formControlSelect]="attachment['type']" [datas]="attachmentsTypes" style="width:100%;" showLabel="true"
                 required="true">
-            </app-plugin-select-search>
+            </plugin-select-search>
             <mat-form-field appearance="outline">
                 <mat-label>{{'lang.subject' | translate}} *</mat-label>
                 <input matInput [formControl]="attachment['subject']" maxlength="255">

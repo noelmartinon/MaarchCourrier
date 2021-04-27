@@ -155,6 +155,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
             tap((data: any) => {
                 newCustomField.id = data.customFieldId;
                 this.customFields.push(newCustomField);
+                this.customFieldsClone = JSON.parse(JSON.stringify(this.customFields));
                 this.notify.success(this.translate.instant('lang.customFieldAdded'));
                 this.incrementCreation++;
             }),

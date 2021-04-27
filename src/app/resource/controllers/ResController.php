@@ -22,6 +22,7 @@ use Basket\models\GroupBasketModel;
 use Basket\models\RedirectBasketModel;
 use Convert\controllers\ConvertPdfController;
 use Convert\controllers\ConvertThumbnailController;
+use CustomField\models\CustomFieldModel;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
@@ -270,7 +271,7 @@ class ResController extends ResourceControlController
 
         $body = $request->getParsedBody();
         $body = StoreController::setDisabledFields($body);
-        
+
         $queryParams = $request->getQueryParams();
 
         $onlyDocument = !empty($queryParams['onlyDocument']);
@@ -500,7 +501,7 @@ class ResController extends ResourceControlController
             ]);
 
             $signatoryId = $listInstance[0]['item_id'] ?? $creatorId;
-    
+
             return $response->withJson([
                 'encodedDocument'   => base64_encode($fileContent),
                 'originalFormat'    => $originalFormat,
@@ -535,7 +536,7 @@ class ResController extends ResourceControlController
         }
 
         $canConvert = ConvertPdfController::canConvert(['extension' => $resource['format']]);
-        
+
         $convertedDocuments = AdrModel::getDocuments([
             'select'    => ['type', 'version'],
             'where'     => ['res_id = ?', 'type in (?)'],
@@ -1119,6 +1120,24 @@ class ResController extends ResourceControlController
                 ResourceContactModel::create(['res_id' => $args['resId'], 'item_id' => $recipient['id'], 'type' => $recipient['type'], 'mode' => 'recipient']);
             }
         }
+
+        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['custom_fields']]);
+        $customFields = json_decode($resource['custom_fields'], true);
+
+        $immutableTechnicalCustoms = CustomFieldModel::get(['select' => ['id', 'values'], 'where' => ['mode = ?'], 'data' => ['technical']]);
+        foreach ($immutableTechnicalCustoms as $immutableTechnicalCustom) {
+           $immutableTechnicalCustom['values'] = json_decode($immutableTechnicalCustom['values'], true);
+
+           if (!empty($immutableTechnicalCustom['values']['table'])) {
+               $immutableTechnicalCustom['values']['resId'] = $args['resId'];
+               $values = CustomFieldModel::getValuesSQL($immutableTechnicalCustom['values']);
+               $customFields[$immutableTechnicalCustom['id']] = $values[0]['key'] ?? null;
+           }
+        }
+        if (!empty($customFields)) {
+           ResModel::update(['set' => ['custom_fields' => json_encode($customFields)], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
+        }
+
 
         return true;
     }

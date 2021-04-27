@@ -187,7 +187,7 @@ class ResourceControlController
         if (empty($body['modelId'])) {
             $body['modelId'] = $resource['model_id'];
         }
-        $control = ResourceControlController::controlIndexingModelFields(['body' => $body, 'isUpdating' => true]);
+        $control = ResourceControlController::controlIndexingModelFields(['body' => $body, 'isUpdating' => true, 'resId' => $args['resId']]);
         if (!empty($control['errors'])) {
             return ['errors' => $control['errors']];
         }
@@ -491,7 +491,7 @@ class ResourceControlController
             if (!Validator::stringType()->validate($body['priority'])) {
                 return ['errors' => "Body priority is not a string"];
             }
-            
+
             $priority = PriorityModel::getById(['id' => $body['priority'], 'select' => [1]]);
             if (empty($priority)) {
                 return ['errors' => "Body priority does not exist"];
