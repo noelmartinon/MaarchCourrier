@@ -1112,6 +1112,8 @@ export class ActionsService implements OnDestroy {
     sendToRecordManagementAction(options: any = null) {
         const dialogRef = this.dialog.open(SendToRecordManagementComponent, {
             panelClass: 'maarch-modal',
+            maxWidth: '100%',
+            width: '100% !important',
             autoFocus: false,
             disableClose: true,
             data: this.setDatasActionToSend()
