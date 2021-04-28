@@ -395,6 +395,8 @@ class PreProcessActionController
             }
         }
 
+        $emailSenders = array_unique($emailSenders);
+
         return $response->withJson([
             'sendEmail'        => $sendEmail,
             'sendPaper'        => $sendPaper,
