@@ -124,10 +124,12 @@ foreach ($customs as $custom) {
     ]);
 
     foreach ($thesaurusResList as $item) {
-        ResourceTagModel::create([
-            'res_id' => $item['res_id'],
-            'tag_id' => $thesaurusIds[$item['thesaurus_id']]
-        ]);
+        if (!empty($thesaurusIds[$item['thesaurus_id']])) {
+            ResourceTagModel::create([
+                'res_id' => $item['res_id'],
+                'tag_id' => $thesaurusIds[$item['thesaurus_id']]
+            ]);
+        }
     }
 
     // Get all empty tags
