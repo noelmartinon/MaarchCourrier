@@ -3,7 +3,7 @@
   "version": "21.03.1",
   "description": "MaarchCourrier",
   "scripts": {
-    "build-prod": "ng build --prod",
+    "build-prod": "ng build --prod --output-hashing none",
     "build-watch": "ng build --watch",
     "build-prod-addin-outlook": "ng build --project \"addin-outlook\" --prod",
     "build-addin-outlook": "ng build --project \"addin-outlook\"",
