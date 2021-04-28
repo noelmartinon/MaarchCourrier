@@ -269,7 +269,13 @@ export class AbsModalComponent implements OnInit {
     }
 
     allSelected() {
-        return this.baskets.filter((item: any) => item.selected).length === this.baskets.filter((item: any) => !this.isRedirectedBasket(item)).length;
+        const basketsNotSelected: number = this.baskets.filter((basket: any) => !this.isRedirectedBasket(basket)).length;
+        const hasRedirectedBasket: boolean = this.baskets.filter((basket: any) => this.isRedirectedBasket(basket)).length >= 1;
+        if (hasRedirectedBasket) {
+            return hasRedirectedBasket && basketsNotSelected === this.baskets.filter((item: any) => item.selected).length;
+        } else {
+            return this.baskets.filter((item: any) => item.selected).length === this.baskets.filter((item: any) => !this.isRedirectedBasket(item)).length;
+        }
     }
 
     oneOrMoreSelected() {

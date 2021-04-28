@@ -51,7 +51,7 @@ export class UpdateStatusAdministrationComponent implements OnInit {
             body['chrono'] = this.chronoList;
         }
 
-        this.http.put('../rest/res/resource/status', body)
+        this.http.put('../rest/res/resource/status?admin=true', body)
             .subscribe(() => {
                 this.resId = '';
                 this.chrono = '';

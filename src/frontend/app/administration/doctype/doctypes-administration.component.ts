@@ -167,7 +167,9 @@ export class DoctypesAdministrationComponent implements OnInit {
                 }),
                 catchError((err: any) => {
                     this.hasError = true;
-                    this.archivalError = this.translate.instant('lang.saeError');
+                    this.archivalError = err.error.errors;
+                    const index: number = this.archivalError.indexOf(':');
+                    this.archivalError = `(${this.archivalError.slice(index + 1, this.archivalError.length).replace(/^[\s]/, '')})`;
                     return of(false);
                 })
             ).subscribe();

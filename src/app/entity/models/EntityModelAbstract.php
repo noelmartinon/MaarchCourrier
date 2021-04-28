@@ -231,16 +231,31 @@ abstract class EntityModelAbstract
         ValidatorModel::notEmpty($aArgs, ['entityId']);
         ValidatorModel::stringType($aArgs, ['entityId']);
 
-        $aReturn = DatabaseModel::select([
-            'select'    => ['entity_id'],
+        $allEntities = DatabaseModel::select([
+            'select'    => ['entity_id', 'parent_entity_id'],
             'table'     => ['entities'],
-            'where'     => ['parent_entity_id = ?'],
-            'data'      => [$aArgs['entityId']]
+            'where'     => ['parent_entity_id IS NOT NULL AND parent_entity_id <> \'\''],
         ]);
 
+        $orderedEntities = [];
+        foreach ($allEntities as $value) {
+            $orderedEntities[$value['parent_entity_id']][] = $value['entity_id'];
+        }
+
+        $entities = EntityModel::getEntityChildrenLoop(['entityId' => $aArgs['entityId'], 'entities' => $orderedEntities]);
+
+        return $entities;
+    }
+
+    public static function getEntityChildrenLoop(array $aArgs)
+    {
         $entities = [$aArgs['entityId']];
-        foreach ($aReturn as $value) {
-            $entities = array_merge($entities, EntityModel::getEntityChildren(['entityId' => $value['entity_id']]));
+        if (!empty($aArgs['entities']) && array_key_exists($aArgs['entityId'], $aArgs['entities'])) {
+            $childrenEntities = $aArgs['entities'][$aArgs['entityId']];
+            unset($aArgs['entities'][$aArgs['entityId']]);
+            foreach ($childrenEntities as $child) {
+                $entities = array_merge($entities, EntityModel::getEntityChildrenLoop(['entityId' => $child, 'entities' => $aArgs['entities']]));
+            }
         }
 
         return $entities;
@@ -251,17 +266,18 @@ abstract class EntityModelAbstract
         ValidatorModel::notEmpty($args, ['id']);
         ValidatorModel::intVal($args, ['id']);
 
-        $aReturn = DatabaseModel::select([
-            'select'    => ['id'],
+        $allEntities = DatabaseModel::select([
+            'select'    => ['id', 'parent_entity_id'],
             'table'     => ['entities'],
-            'where'     => ['parent_entity_id in (select entity_id from entities where id = ?)'],
-            'data'      => [$args['id']]
+            'where'     => ['parent_entity_id IS NOT NULL AND parent_entity_id <> \'\''],
         ]);
 
-        $entities = [$args['id']];
-        foreach ($aReturn as $value) {
-            $entities = array_merge($entities, EntityModel::getEntityChildrenById(['id' => $value['id']]));
+        $orderedEntities = [];
+        foreach ($allEntities as $value) {
+            $orderedEntities[$value['parent_entity_id']][] = $value['id'];
         }
+
+        $entities = EntityModel::getEntityChildrenLoop(['entityId' => $args['id'], 'entities' => $orderedEntities]);
 
         return $entities;
     }

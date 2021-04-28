@@ -70,6 +70,7 @@ class TemplateController
         if (empty($template)) {
             return $response->withStatus(400)->withJson(['errors' => 'Template does not exist']);
         }
+        $template['options'] = json_decode($template['options'], true);
 
         $rawLinkedEntities = TemplateAssociationModel::get(['select' => ['value_field'], 'where' => ['template_id = ?'], 'data' => [$template['template_id']]]);
         $linkedEntities = [];
@@ -132,6 +133,19 @@ class TemplateController
             'template_target'           => $body['target'],
             'template_attachment_type'  => $body['template_attachment_type']
         ];
+        if (!empty($body['options'])) {
+            if (!empty($body['options']['acknowledgementReceiptFrom']) && !in_array($body['options']['acknowledgementReceiptFrom'], ['manual', 'destination', 'mailServer', 'user' ])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body options[acknowledgementReceiptFrom] is invalid']);
+            }
+            $options = ['acknowledgementReceiptFrom' => $body['options']['acknowledgementReceiptFrom']];
+            if ($body['options']['acknowledgementReceiptFrom'] == 'manual') {
+                if (!Validator::stringType()->notEmpty()->validate($body['options']['acknowledgementReceiptFromMail'])) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Body options[acknowledgementReceiptFromMail] is empty or not a string']);
+                }
+                $options['acknowledgementReceiptFromMail'] = $body['options']['acknowledgementReceiptFromMail'];
+            }
+            $template['options'] = json_encode($options);
+        }
         if ($body['type'] == 'TXT' || $body['type'] == 'HTML' || ($body['type'] == 'OFFICE_HTML' && !empty($body['file']['electronic']['content']))) {
             $template['template_content'] = $body['type'] == 'OFFICE_HTML' ? $body['file']['electronic']['content'] : $body['file']['content'];
         }
@@ -226,6 +240,19 @@ class TemplateController
             'template_attachment_type'  => $body['template_attachment_type'],
             'subject'                   => $subject
         ];
+        if (!empty($body['options'])) {
+            if (!empty($body['options']['acknowledgementReceiptFrom']) && !in_array($body['options']['acknowledgementReceiptFrom'], ['manual', 'destination', 'mailServer', 'user' ])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body options[acknowledgementReceiptFrom] is invalid']);
+            }
+            $options = ['acknowledgementReceiptFrom' => $body['options']['acknowledgementReceiptFrom']];
+            if ($body['options']['acknowledgementReceiptFrom'] == 'manual') {
+                if (!Validator::stringType()->notEmpty()->validate($body['options']['acknowledgementReceiptFromMail'])) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Body options[acknowledgementReceiptFromMail] is empty or not a string']);
+                }
+                $options['acknowledgementReceiptFromMail'] = $body['options']['acknowledgementReceiptFromMail'];
+            }
+            $template['options'] = json_encode($options);
+        }
         if ($body['type'] == 'TXT' || $body['type'] == 'HTML' || ($body['type'] == 'OFFICE_HTML' && !empty($body['file']['electronic']['content']))) {
             $template['template_content'] = $body['type'] == 'OFFICE_HTML' ? $body['file']['electronic']['content'] : $body['file']['content'];
         }

@@ -309,6 +309,7 @@ foreach ($retrievedMails['noVersion'] as $resId => $value) {
             ]);
     
             $docserver = \Docserver\models\DocserverModel::getByDocserverId(['docserverId' => $adrPdf[0]['docserver_id'], 'select' => ['path_template']]);
+            $hashedOriginalFile = '';
             if (!empty($docserver['path_template']) && file_exists($docserver['path_template'])) {
                 $pathToPdf = $docserver['path_template'] . $adrPdf[0]['path'] . $adrPdf[0]['filename'];
                 $pathToPdf = str_replace('#', '/', $pathToPdf);

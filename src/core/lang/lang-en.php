@@ -88,7 +88,7 @@ define('_TEMPLATE_UPDATED', 'Template updated');
 define('_TEMPLATE_DELETED', 'Template deleted');
 define('_TO_CC', 'Copy');
 define('_TO_SIGN', 'For signature');
-define('_UPDATE_STATUS', 'Status update');
+define('_UPDATE_STATUS', 'Status updated : From "{1}" to "{2}"');
 define('_USER_ID_ALREADY_EXISTS', 'The user id already exists');
 define('_USER_CREATED', 'User added');
 define('_USER_UPDATED', 'User updated');
@@ -163,6 +163,7 @@ define('_LOGIN', 'User connection');
 
 // ADMINISTRATION
 define('_USERS', 'Users');
+define('_ADMINISTRATION', 'Administration');
 define('_GROUPS', 'Users groups');
 define('_ENTITIES', 'Entities');
 define('_DOCTYPES', 'File plan');

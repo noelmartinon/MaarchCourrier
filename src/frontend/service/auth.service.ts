@@ -130,16 +130,12 @@ export class AuthService {
         if (['cas', 'keycloak', 'azure_saml'].indexOf(this.authMode) > -1 && !forcePageLogin) {
             this.SsoLogout(cleanUrl);
         } else {
-            // AVOID UNLOCK ON DESROY COMPONENT
-            if (['process', 'signatureBook'].indexOf(this.router.url.split('/')[1]) > -1) {
-                this.router.navigate(['/home']);
-                setTimeout(() => {
-                    this.redirectAfterLogout(cleanUrl);
-                    this.router.navigate(['/login']);
-                }, 500);
+            // HANDLE LOGOUT IN GUARD FOR PROCESS
+            if (['process'].indexOf(this.router.url.split('/')[1]) > -1) {
+                this.router.navigate(['/login']);
             } else {
-                this.redirectAfterLogout(cleanUrl);
                 await this.router.navigate(['/login']);
+                this.redirectAfterLogout(cleanUrl);
             }
         }
     }

@@ -4,7 +4,7 @@
         <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
             <mat-spinner style="margin:auto;"></mat-spinner>
         </div>
-        <app-maarch-message *ngIf="isAbsScheduled" [mode]="'success'" [content]="'lang.absScheduleMsg' | translate : {startDate : functions.formatDateObjectToDateString(startDate), endDate: functions.formatDateObjectToDateString(endDate)}"></app-maarch-message>
+        <app-maarch-message *ngIf="isAbsScheduled && startDate" [mode]="'success'" [content]="'lang.absScheduleMsg' | translate : {startDate : functions.formatDateObjectToDateString(startDate, false, 'dd/mm/yyyy'), endDate: functions.formatDateObjectToDateString(endDate, false, 'dd/mm/yyyy')}"></app-maarch-message>
         <mat-list *ngIf="!showCalendar && !isAbsScheduled">
             <mat-list-item>
                 <button mat-button color="primary" matSuffix
@@ -41,7 +41,7 @@
             <div mat-subheader>{{'lang.basketsToRedirect' | translate}} :</div>
             <mat-list-item >
                 <mat-icon mat-list-icon style="display: flex;align-items: center;justify-content: center;">
-                    <mat-checkbox color="primary" (change)="toggleAll()" [indeterminate]="oneOrMoreSelected()"></mat-checkbox>
+                    <mat-checkbox [checked]="allSelected()" color="primary" (change)="toggleAll()" [indeterminate]="oneOrMoreSelected()"></mat-checkbox>
                 </mat-icon>
                 <div mat-line style="cursor:pointer;font-size: 12px;font-style: italic;color:#666" (click)="toggleAll()">{{'lang.selectAll' | translate}}</div>
             </mat-list-item>
@@ -66,7 +66,7 @@
         </mat-list>
 
         <div style="position: sticky;bottom: -10px;background: white;">
-            <app-plugin-autocomplete *ngIf="basketSelected()" [labelPlaceholder]="'lang.redirectBaskets' | translate"
+            <app-plugin-autocomplete class="pluginAutocomplete" *ngIf="basketSelected()" [labelPlaceholder]="'lang.redirectBaskets' | translate"
                 [routeDatas]="['/rest/autocomplete/users']" [targetSearchKey]="'idToDisplay'"
                 [subInfoKey]="'descriptionToDisplay'" [disableItems]="[headerService.user.id]"
                 (triggerEvent)="addBasketRedirection($event)" appearance="outline"></app-plugin-autocomplete>

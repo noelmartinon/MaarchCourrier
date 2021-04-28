@@ -368,16 +368,27 @@ class ResController extends ResourceControlController
 
     public function updateStatus(Request $request, Response $response)
     {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'update_status_mail', 'userId' =>  $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
         $data = $request->getParams();
 
         if (empty($data['status'])) {
             $data['status'] = 'COU';
         }
-        if (empty(StatusModel::getById(['id' => $data['status']]))) {
+
+        $statusInfo = StatusModel::getById(['id' => $data['status'], 'select' => ['label_status']]);
+        if (empty($statusInfo)) {
             return $response->withStatus(400)->withJson(['errors' => _STATUS_NOT_FOUND]);
         }
         if (empty($data['historyMessage'])) {
             $data['historyMessage'] = _UPDATE_STATUS;
+            $data['historyMessage'] = str_replace("{2}", $statusInfo['label_status'], $data['historyMessage']);
+
+            if ($data['admin'] == 'true') {
+                $data['historyMessage'] = '[' . _ADMINISTRATION . '] ' . $data['historyMessage'];
+            }
         }
 
         $check = Validator::arrayType()->notEmpty()->validate($data['chrono']) || Validator::arrayType()->notEmpty()->validate($data['resId']);
@@ -398,9 +409,9 @@ class ResController extends ResourceControlController
         $identifiers = !empty($data['chrono']) ? $data['chrono'] : $data['resId'];
         foreach ($identifiers as $id) {
             if (!empty($data['chrono'])) {
-                $document = ResModel::getByAltIdentifier(['altIdentifier' => $id, 'select' => ['res_id']]);
+                $document = ResModel::getByAltIdentifier(['altIdentifier' => trim($id), 'select' => ['res_id', 'status']]);
             } else {
-                $document = ResModel::getById(['resId' => $id, 'select' => ['res_id']]);
+                $document = ResModel::getById(['resId' => $id, 'select' => ['res_id', 'status']]);
             }
             if (empty($document)) {
                 return $response->withStatus(400)->withJson(['errors' => _DOCUMENT_NOT_FOUND]);
@@ -414,6 +425,9 @@ class ResController extends ResourceControlController
             } else {
                 ResModel::update(['set' => ['status' => $data['status'], 'closing_date' => $closingDate], 'where' => ['res_id = ?', 'closing_date is null'], 'data' => [$document['res_id']]]);
             }
+
+            $statusInfo = StatusModel::getById(['id' => $document['status'], 'select' => ['label_status']]);
+            $data['historyMessage'] = str_replace("{1}", $statusInfo['label_status'], $data['historyMessage']);
 
             HistoryController::add([
                 'tableName' => 'res_letterbox',
@@ -1115,9 +1129,16 @@ class ResController extends ResourceControlController
 
         $resources = array_unique($args['resId']);
 
-        $authorizedResources = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId']]);
+        $authorizedResources = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId'], 'mode' => 'groups']);
+        if (count($authorizedResources) != count($resources)) {
+            $authorizedResources = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId'], 'mode' => 'baskets']);
+            if (count($authorizedResources) != count($resources)) {
+                $authorizedResources = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId'], 'mode' => 'folders']);
+                return count($authorizedResources) == count($resources);
+            }
+        }
 
-        return count($authorizedResources) == count($resources);
+        return true;
     }
 
     public static function getAuthorizedResources(array $args)
@@ -1131,7 +1152,7 @@ class ResController extends ResourceControlController
         }
 
         $user = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
-        $userDataClause = SearchController::getUserDataClause(['userId' => $args['userId'], 'login' => $user['user_id']]);
+        $userDataClause = SearchController::getUserDataClause(['userId' => $args['userId'], 'login' => $user['user_id'], 'mode' => $args['mode']]);
 
         $data = [$args['resources']];
         $data = array_merge($data, $userDataClause['searchData']);

@@ -163,7 +163,7 @@ export class ActionsService implements OnDestroy {
             if (this.lockMode) {
                 const res: any = await this.canExecuteAction(resIds);
                 if (res === true) {
-                    if (['viewDoc', 'documentDetails', 'signatureBookAction', 'processDocument'].indexOf(action.component) > -1) {
+                    if (['viewDoc', 'documentDetails', 'signatureBookAction', 'processDocument'].indexOf(action.component) > -1 || action.component === 'noConfirmAction') {
                         this[action.component](action.data);
                     } else {
                         try {
@@ -253,15 +253,20 @@ export class ActionsService implements OnDestroy {
     }
 
     unlockResource(userId: number = this.currentUserId, groupId: number = this.currentGroupId, basketId: number = this.currentBasketId, resIds: number[] = this.currentResIds) {
-        if (resIds.length > 0) {
-            console.debug(`Unlock resources : ${resIds}`);
-            this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/unlock`, { resources: resIds }).pipe(
-                catchError((err: any) => {
-                    this.notify.handleErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
-        }
+        return new Promise((resolve) => {
+            if (resIds.length > 0) {
+                console.debug(`Unlock resources : ${resIds}`);
+                this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/unlock`, { resources: resIds }).pipe(
+                    tap(() => {
+                        resolve(true);
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            }
+        });
     }
 
     stopRefreshResourceLock() {
@@ -1107,6 +1112,8 @@ export class ActionsService implements OnDestroy {
     sendToRecordManagementAction(options: any = null) {
         const dialogRef = this.dialog.open(SendToRecordManagementComponent, {
             panelClass: 'maarch-modal',
+            maxWidth: '100%',
+            width: '100% !important',
             autoFocus: false,
             disableClose: true,
             data: this.setDatasActionToSend()

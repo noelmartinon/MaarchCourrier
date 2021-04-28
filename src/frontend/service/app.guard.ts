@@ -11,6 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from './notification/notification.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { ActionsService } from '@appRoot/actions/actions.service';
 
 @Injectable({
     providedIn: 'root'
@@ -85,8 +86,11 @@ export class AfterProcessGuard implements CanDeactivate<ProcessComponent> {
     constructor(
         public translate: TranslateService,
         private notify: NotificationService,
-        public dialog: MatDialog
-    ) { }
+        public dialog: MatDialog,
+        public authService: AuthService,
+        public actionService: ActionsService,
+        public router: Router
+    ) {}
 
     async canDeactivate(component: ProcessComponent, currentRoute: ActivatedRouteSnapshot, currentState: RouterStateSnapshot, nextState: RouterStateSnapshot): Promise<boolean> {
         /* if (nextState.url !== '/login' && !component.isActionEnded() && !component.detailMode) {
@@ -96,12 +100,20 @@ export class AfterProcessGuard implements CanDeactivate<ProcessComponent> {
             const value = await this.getConfirmation();
             if (value) {
                 await component.saveModificationBeforeClose();
-                this.notify.success(this.translate.instant('lang.modificationSaved'));
-                return true;
-            } else {
-                return false;
             }
+            if (nextState.url === '/login') {
+                component.logoutTrigger = true;
+                await component.unlockResource();
+                this.authService.redirectAfterLogout(true);
+            }
+            return true;
+
         } else {
+            if (nextState.url === '/login') {
+                component.logoutTrigger = true;
+                await component.unlockResource();
+                this.authService.redirectAfterLogout(true);
+            }
             return true;
         }
     }

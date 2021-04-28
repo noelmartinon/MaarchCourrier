@@ -72,7 +72,7 @@ class AcknowledgementReceiptModel
     {
         ValidatorModel::notEmpty($aArgs, ['resId', 'type', 'format', 'userId', 'contactId', 'docserverId', 'path', 'filename', 'fingerprint']);
         ValidatorModel::intVal($aArgs, ['resId', 'userId']);
-        ValidatorModel::stringType($aArgs, ['type', 'format', 'docserverId', 'path', 'filename', 'fingerprint']);
+        ValidatorModel::stringType($aArgs, ['type', 'format', 'docserverId', 'path', 'filename', 'fingerprint', 'cc', 'cci']);
 
         $nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'acknowledgement_receipts_id_seq']);
 
@@ -89,7 +89,9 @@ class AcknowledgementReceiptModel
                 'docserver_id'          => $aArgs['docserverId'],
                 'path'                  => $aArgs['path'],
                 'filename'              => $aArgs['filename'],
-                'fingerprint'           => $aArgs['fingerprint']
+                'fingerprint'           => $aArgs['fingerprint'],
+                'cc'                    => $aArgs['cc'],
+                'cci'                   => $aArgs['cci'],
             ]
         ]);
 

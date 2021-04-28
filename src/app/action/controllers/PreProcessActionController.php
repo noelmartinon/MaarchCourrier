@@ -235,6 +235,7 @@ class PreProcessActionController
         }
         $data['resources'] = $resourcesForProcess;
 
+        $emailSenders = [];
         foreach ($data['resources'] as $resId) {
             $resource = ResModel::getById(['select' => ['res_id', 'category_id', 'alt_identifier', 'type_id', 'destination'], 'resId' => $resId]);
 
@@ -271,15 +272,15 @@ class PreProcessActionController
             } else {
                 $templateAttachmentType = 'simple';
             }
-            
+
+            $entity   = EntityModel::getByEntityId(['select' => ['id', 'entity_label', 'email'], 'entityId' => $resource['destination']]);
+            $template = TemplateModel::getWithAssociation([
+                'select'    => ['template_content', 'template_path', 'template_file_name', 'options'],
+                'where'     => ['template_target = ?', 'template_attachment_type = ?', 'value_field = ?'],
+                'data'      => ['acknowledgementReceipt', $templateAttachmentType, $resource['destination']]
+            ]);
+            $acknowledgementOptions = !empty($template[0]) ? json_decode($template[0]['options'], true) : null;
             if ($currentMode == 'auto') {
-                $entity   = EntityModel::getByEntityId(['select' => ['entity_label'], 'entityId' => $resource['destination']]);
-                $template = TemplateModel::getWithAssociation([
-                    'select'    => ['template_content', 'template_path', 'template_file_name'],
-                    'where'     => ['template_target = ?', 'template_attachment_type = ?', 'value_field = ?'],
-                    'data'      => ['acknowledgementReceipt', $templateAttachmentType, $resource['destination']]
-                ]);
-    
                 if (empty($template[0])) {
                     $noSendAR['number'] += 1;
                     $noSendAR['list'][] = ['resId' => $resId, 'alt_identifier' => $resource['alt_identifier'], 'info' => _NO_TEMPLATE . ' \'' . $templateAttachmentType . '\' ' . _FOR_ENTITY . ' ' .$entity['entity_label'] ];
@@ -367,6 +368,21 @@ class PreProcessActionController
 
             if ($email > 0) {
                 $sendEmail += $email;
+
+                if (!empty($acknowledgementOptions)) {
+                    if ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'user') {
+                        $currentUser = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['mail']]);
+                        $emailSenders[] = ['entityId' => null, 'email' => $currentUser['mail'], 'label' => UserModel::getLabelledUserById(['id' => $GLOBALS['id']])];
+                    } elseif ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'destination' && !empty($entity['email'])) {
+                        $emailSenders[] = ['entityId' => $entity['id'], 'email' => $entity['email'], 'label' => $entity['entity_label']];
+                    } elseif ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'mailServer') {
+                        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_email_server', 'select' => ['value']]);
+                        $configuration = json_decode($configuration['value'], true);
+                        $emailSenders[] = ['entityId' => null, 'email' => $configuration['from'], 'label' => ''];
+                    } elseif ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'manual') {
+                        $emailSenders[] = ['entityId' => null, 'email' => $acknowledgementOptions['acknowledgementReceiptFromMail'], 'label' => ''];
+                    }
+                }
             }
             if ($paper > 0) {
                 $sendPaper += $paper;
@@ -379,7 +395,19 @@ class PreProcessActionController
             }
         }
 
-        return $response->withJson(['sendEmail' => $sendEmail, 'sendPaper' => $sendPaper, 'sendList' => $sendList,  'noSendAR' => $noSendAR, 'alreadySend' => $alreadySend, 'alreadyGenerated' => $alreadyGenerated, 'mode' => $mode]);
+        $emailSenders = array_unique($emailSenders);
+
+        return $response->withJson([
+            'sendEmail'        => $sendEmail,
+            'sendPaper'        => $sendPaper,
+            'sendList'         => $sendList,
+            'noSendAR'         => $noSendAR,
+            'alreadySend'      => $alreadySend,
+            'alreadyGenerated' => $alreadyGenerated,
+            'mode'             => $mode,
+            'canAddCopies'     => !empty($parameters['canAddCopies']),
+            'emailSenders'     => $emailSenders
+        ]);
     }
 
     public function checkExternalSignatoryBook(Request $request, Response $response, array $aArgs)

@@ -91,6 +91,12 @@
                                     </mat-select>
                                 </mat-form-field>
                             </div>
+                            <div class="col-sm-12">
+                                <mat-slide-toggle name="canAddCopies" title="{{'lang.canAddCopies' | translate}}"
+                                    id="canAddCopies" color="primary" [(ngModel)]="canAddCopies"
+                                    [checked]="canAddCopies">
+                                    {{'lang.canAddCopies' | translate}}</mat-slide-toggle>
+                            </div>
                         </div>
                         <div class="form-group" *ngIf="action.actionPageId!='reconcile'">
                             <div class="col-sm-12">

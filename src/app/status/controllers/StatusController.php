@@ -163,7 +163,7 @@ class StatusController
 
     protected static function manageValue($request)
     {
-        foreach ($request  as $key => $value) {
+        foreach ($request as $key => $value) {
             if (in_array($key, ['is_system', 'can_be_searched', 'can_be_modified'])) {
                 if (empty($value)) {
                     $request[$key] = 'N';

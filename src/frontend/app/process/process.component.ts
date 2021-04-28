@@ -28,6 +28,7 @@ import { PrintedFolderModalComponent } from '../printedFolder/printed-folder-mod
 import { of, Subscription } from 'rxjs';
 import { TechnicalInformationComponent } from '@appRoot/indexation/technical-information/technical-information.component';
 import { NotesListComponent } from '@appRoot/notes/notes-list.component';
+import { AuthService } from '@service/auth.service';
 
 
 @Component({
@@ -59,6 +60,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
     currentUserId: number = null;
     currentBasketId: number = null;
     currentGroupId: number = null;
+
+    logoutTrigger: boolean = false;
 
     selectedAction: any = {
         id: 0,
@@ -176,7 +179,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
         private contactService: ContactService,
         private router: Router,
         public privilegeService: PrivilegeService,
-        public functions: FunctionsService
+        public functions: FunctionsService,
+        public authService: AuthService
     ) {
 
         // ngOnInit does not call if navigate in the same component route : must be in constructor for this case
@@ -679,11 +683,11 @@ export class ProcessComponent implements OnInit, OnDestroy {
         return this.modalModule.map(module => module.id).indexOf(tool) > -1;
     }
 
-    ngOnDestroy() {
-        if (!this.detailMode) {
+    async ngOnDestroy() {
+        if (!this.detailMode && !this.logoutTrigger) {
             this.actionService.stopRefreshResourceLock();
             if (!this.actionService.actionEnded) {
-                this.actionService.unlockResource(this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId]);
+                await this.actionService.unlockResource(this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId]);
             }
         }
         // unsubscribe to ensure no memory leaks
@@ -691,7 +695,6 @@ export class ProcessComponent implements OnInit, OnDestroy {
     }
 
     changeTab(tabId: string) {
-
         if (this.isToolModified() && !this.isModalOpen()) {
             const dialogRef = this.openConfirmModification();
 
@@ -911,5 +914,16 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     openPrintedFolderPrompt() {
         this.dialog.open(PrintedFolderModalComponent, { panelClass: 'maarch-modal', data: { resId: this.currentResourceInformations.resId } });
+    }
+
+    async unlockResource() {
+        if (!this.detailMode && !this.logoutTrigger) {
+            this.actionService.stopRefreshResourceLock();
+            if (!this.actionService.actionEnded) {
+                await this.actionService.unlockResource(this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId]);
+            }
+        }
+        // unsubscribe to ensure no memory leaks
+        this.subscription.unsubscribe();
     }
 }

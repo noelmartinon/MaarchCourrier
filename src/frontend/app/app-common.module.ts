@@ -91,6 +91,9 @@ import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-to
 import { ColorGithubModule } from 'ngx-color/github';
 import { MailSignaturesAdministrationComponent } from './administration/organizationEmailSignatures/mailSignatures/mail-signatures-administration.component';
 import { SelectPageComponent } from '@plugins/list/select-page/select-page.component';
+import { MailEditorComponent } from '@plugins/mail-editor/mail-editor.component';
+import { SelectWithFilterComponent } from '@plugins/select-with-filter/select-with-filter.component';
+import { FilterComponent } from '@plugins/select-with-filter/filter/filter.component';
 
 
 @NgModule({
@@ -159,7 +162,10 @@ import { SelectPageComponent } from '@plugins/list/select-page/select-page.compo
         ContactsFormModalComponent,
         InputCorrespondentGroupComponent,
         MailSignaturesAdministrationComponent,
-        SelectPageComponent
+        SelectPageComponent,
+        MailEditorComponent,
+        SelectWithFilterComponent,
+        FilterComponent
     ],
     exports: [
         CommonModule,
@@ -216,7 +222,10 @@ import { SelectPageComponent } from '@plugins/list/select-page/select-page.compo
         MessageBoxComponent,
         ColorGithubModule,
         MailSignaturesAdministrationComponent,
-        SelectPageComponent
+        SelectPageComponent,
+        MailEditorComponent,
+        SelectWithFilterComponent,
+        FilterComponent
     ],
     providers: [],
     entryComponents: [
