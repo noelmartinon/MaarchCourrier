@@ -76,8 +76,9 @@ export class FunctionsService {
     formatDateObjectToDateString(date: Date, limitMode: boolean = false, format: string = 'dd-mm-yyyy') {
         if (date !== null) {
             const formatDate: any[] = [];
-            const delimiter: number = format !== 'dd-mm-yyyy' ? format.indexOf('/') : format.indexOf('-');
-            format.split(format[delimiter]).forEach((element: any) => {
+            const regex = /[^a-zA-Z0-9]/g ;
+            const delimiter: string = format.trim().match(regex)[0];
+            format.split(delimiter).forEach((element: any) => {
                 if (element === 'dd') {
                     let day: any = date.getDate();
                     day = ('00' + day).slice(-2);
@@ -96,7 +97,7 @@ export class FunctionsService {
             if (limitMode) {
                 limit = ' 23:59:59';
             }
-            return `${formatDate.join(format[delimiter])}${limit}`;
+            return `${formatDate.join(delimiter)}${limit}`;
         } else {
             return date;
         }
