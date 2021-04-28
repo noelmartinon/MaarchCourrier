@@ -163,7 +163,7 @@ export class ActionsService implements OnDestroy {
             if (this.lockMode) {
                 const res: any = await this.canExecuteAction(resIds);
                 if (res === true) {
-                    if (['viewDoc', 'documentDetails', 'signatureBookAction', 'processDocument'].indexOf(action.component) > -1) {
+                    if (['viewDoc', 'documentDetails', 'signatureBookAction', 'processDocument'].indexOf(action.component) > -1 || action.component === 'noConfirmAction') {
                         this[action.component](action.data);
                     } else {
                         try {
