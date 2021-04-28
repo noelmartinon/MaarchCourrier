@@ -43,7 +43,8 @@ export class MailEditorComponent implements OnInit, OnDestroy {
     @Input() subjectPrefix: string = null;
 
 
-    @Input() availableSenders: any[] = [];
+    @Input() availableSenders: any[];
+    @Input() currentSender: any;
 
     @Input() readonly: boolean = null;
 
@@ -59,7 +60,6 @@ export class MailEditorComponent implements OnInit, OnDestroy {
     showCopies: boolean = false;
     showInvisibleCopies: boolean = false;
 
-    currentSender: any = {};
     recipients: any[] = [];
     copies: any[] = [];
     invisibleCopies: any[] = [];
@@ -77,6 +77,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
     availableEmailModels: any[] = [];
     availableSignEmailModels: any[] = [];
 
+    currentEmailAttachTool: string = '';
     emailAttachTool: any = {
         document: {
             icon: 'fa fa-file',
@@ -119,7 +120,8 @@ export class MailEditorComponent implements OnInit, OnDestroy {
             this.setReadonly();
         }
 
-        if (this.availableSenders.length === 0) {
+        if (!this.availableSenders) {
+            this.currentSender = {};
             await this.getAvailableSenders();
         }
 
@@ -381,6 +383,10 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         this.currentSender = sender;
     }
 
+    getSender() {
+        return this.currentSender;
+    }
+
     setRecipients(recipients: any) {
         this.recipients = recipients;
     }
@@ -415,7 +421,10 @@ export class MailEditorComponent implements OnInit, OnDestroy {
     }
 
     getCopies() {
-        return this.copies;
+        return this.copies.map((item: any) => {
+            delete item.badFormat;
+            return item;
+        });
     }
 
     setInvisibleCopies(invisibleCopies: any) {
@@ -424,7 +433,10 @@ export class MailEditorComponent implements OnInit, OnDestroy {
     }
 
     getInvisibleCopies() {
-        return this.invisibleCopies;
+        return this.invisibleCopies.map((item: any) => {
+            delete item.badFormat;
+            return item;
+        });
     }
 
     isSelectedAttachMail(item: any, type: string) {
@@ -963,7 +975,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
             cc: this.showCopies ? this.copies.map(copy => copy.email) : [],
             cci: this.showInvisibleCopies ? this.invisibleCopies.map((invCopy => invCopy.email)) : [],
             object: this.subjectPrefix !== null ? this.subjectPrefix + ' ' + this.emailSubject : this.emailSubject,
-            body: this.htmlMode ? tinymce.get('emailSignature').getContent() : tinymce.get('emailSignature').getContent({ format: 'text' }),
+            body: this.htmlMode ? tinymce.get('emailSignature')?.getContent() : tinymce.get('emailSignature')?.getContent({ format: 'text' }),
             isHtml: true,
             status: this.emailStatus
         };

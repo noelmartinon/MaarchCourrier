@@ -52,10 +52,12 @@
 
                 <app-mail-editor #appMailEditor
                     *ngIf="!manualAR && realResSelected.length > 0"
+                    [availableSenders]="senders"
+                    [currentSender]="senders[0]"
                     [recipientDisabled]="true"
                     [recipientHide]="data.resIds.length > 1"
                     [recipientDisabled]="true"
-                    [senderDisabled]="true"
+                    [senderDisabled]="senders.length === 1"
                     [cCDisabled]="!canAddCopies"
                     [cCIDisabled]="!canAddCopies"
                     [attachmentsHide]="true"
@@ -70,9 +72,11 @@
                 </div>
                 <app-mail-editor #appMailEditor
                     *ngIf="manualAR && realResSelected.length > 0"
+                    [availableSenders]="senders"
+                    [currentSender]="senders[0]"
                     [recipientDisabled]="true"
                     [recipientHide]="data.resIds.length > 1"
-                    [senderDisabled]="true"
+                    [senderDisabled]="senders.length === 1"
                     [cCDisabled]="!canAddCopies"
                     [cCIDisabled]="!canAddCopies"
                     [attachmentsHide]="true"

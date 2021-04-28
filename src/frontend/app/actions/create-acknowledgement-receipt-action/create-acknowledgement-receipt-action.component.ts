@@ -36,6 +36,8 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit {
     arMode: 'auto' | 'manual' | 'both' = 'auto';
     canAddCopies: boolean  = false;
 
+    senders: any[] = [];
+
     loadingExport: boolean;
 
     constructor(
@@ -70,6 +72,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit {
                     this.realResSelected = data.sendList;
                     this.arMode = data.mode;
                     this.canAddCopies = data.canAddCopies;
+                    this.senders = data.emailSenders;
                     if (this.arMode === 'manual') {
                         this.toggleArManual(true);
                     }
@@ -92,7 +95,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit {
     }
 
     executeAction() {
-        let data = null;
+        let data = {};
         const emaildata = this.appMailEditor.formatEmail();
         if (this.manualAR) {
             if (this.functions.empty(emaildata.body)) {
@@ -105,9 +108,9 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit {
                 content : emaildata.body,
                 manual  : true
             };
-            if (this.canAddCopies) {
-                data = {...data, cc : this.appMailEditor.getCopies(), cci : this.appMailEditor.getInvisibleCopies()};
-            }
+        }
+        if (this.canAddCopies) {
+            data = {...data, sender : this.appMailEditor.getSender(), cc : this.appMailEditor.getCopies(), cci : this.appMailEditor.getInvisibleCopies()};
         }
         this.http.put(this.data.processActionRoute, { resources: this.realResSelected, note: this.noteEditor.getNote(), data }).pipe(
             tap((res: any) => {
