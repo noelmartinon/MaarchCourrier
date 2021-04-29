@@ -1131,9 +1131,13 @@ class ResController extends ResourceControlController
 
         $authorizedResources = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId'], 'mode' => 'groups']);
         if (count($authorizedResources) != count($resources)) {
-            $authorizedResources = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId'], 'mode' => 'baskets']);
+            $authorizedResourcesBasket = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId'], 'mode' => 'baskets']);
+            $authorizedResources = array_merge($authorizedResources, $authorizedResourcesBasket);
+            $authorizedResources = array_unique($authorizedResources);
             if (count($authorizedResources) != count($resources)) {
-                $authorizedResources = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId'], 'mode' => 'folders']);
+                $authorizedResourcesFolders = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId'], 'mode' => 'folders']);
+                $authorizedResources = array_merge($authorizedResources, $authorizedResourcesFolders);
+                $authorizedResources = array_unique($authorizedResources);
                 return count($authorizedResources) == count($resources);
             }
         }
