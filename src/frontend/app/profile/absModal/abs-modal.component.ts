@@ -60,6 +60,7 @@ export class AbsModalComponent implements OnInit {
                 const redirBasket = this.data.user.redirectedBaskets.find((redBask: any) => redBask.basket_id === basket.basket_id && redBask.group_id === basket.groupSerialId);
                 if (redirBasket !== undefined) {
                     objBasket['actual_user_id'] = redirBasket.actual_user_id;
+                    objBasket['userToDisplay'] = redirBasket.userToDisplay !== null ? redirBasket.userToDisplay : null;
                 }
                 this.baskets.push(objBasket);
             });
@@ -102,6 +103,10 @@ export class AbsModalComponent implements OnInit {
     delBasketRedirection(basket: any) {
         basket.actual_user_id = null;
         basket.userToDisplay = null;
+        const basetToDelRedirection: any = this.data.user.redirectedBaskets.filter((item: any) => item.basket_id === basket.basket_id);
+        if (basetToDelRedirection.length === 1) {
+            basetToDelRedirection[0].userToDisplay = null;
+        }
     }
 
     redirectBaskets() {
@@ -312,12 +317,11 @@ export class AbsModalComponent implements OnInit {
     }
 
     async cancelSchedule() {
+        this.startDate = null;
+        this.endDate = null;
         this.baskets.filter((item: any) => item.userToDisplay !== null).forEach((elem: any) => {
             this.delBasketRedirection(elem);
         });
-        await this.redirectBaskets();
-        this.startDate = null;
-        this.endDate = null;
         this.redirectedBaskets = [];
         this.onSubmit();
     }

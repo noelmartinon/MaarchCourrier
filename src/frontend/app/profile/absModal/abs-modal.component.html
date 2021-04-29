@@ -74,11 +74,11 @@
     </div>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
-        <button mat-raised-button *ngIf="isAbsScheduled && !isModified()" mat-button color="warn"
+        <button mat-raised-button *ngIf="!loading && isAbsScheduled && !isModified()" mat-button color="warn"
             (click)="canceled = true; cancelSchedule()">{{'lang.cancelSchedule' | translate}}</button>
         <button mat-raised-button mat-button *ngIf="isAbsScheduled && isModified()" color="primary" [disabled]="loading || (startDate && !endDate) || (!startDate && endDate)"
             (click)="isAbsScheduled = false; onSubmit()">{{'lang.update' | translate}}</button>
-        <button mat-raised-button mat-button *ngIf="(!isAbsScheduled && isModified()) || (!isAbsScheduled && startDate) || (!isAbsScheduled && !startDate && !endDate)" color="primary" [disabled]="loading || (startDate && !endDate) || (!startDate && endDate)"
+        <button mat-raised-button mat-button *ngIf="!loading && ((!isAbsScheduled && isModified()) || (!isAbsScheduled && startDate) || (!isAbsScheduled && !startDate && !endDate))" color="primary" [disabled]="loading || (startDate && !endDate) || (!startDate && endDate)"
             (click)="onSubmit()">{{'lang.validate' | translate}}</button>
         <button mat-raised-button mat-button [disabled]="loading"
             [mat-dialog-close]="">{{'lang.close' | translate}}</button>

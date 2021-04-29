@@ -224,7 +224,7 @@
                                             {{'lang.myBasketsDesc' | translate}}
                                         </mat-panel-description>
                                     </mat-expansion-panel-header>
-                                    <app-my-baskets [userBaskets]="user.baskets" [redirectedBaskets]="user.redirectedBaskets" [assignedBaskets]="user.assignedBaskets">
+                                    <app-my-baskets [userBaskets]="user.baskets" [redirectedBaskets]="user.redirectedBaskets" [assignedBaskets]="user.assignedBaskets" (redirectedBasketsEvent)="toggleRedirection($event)">
                                     </app-my-baskets>
                                 </mat-expansion-panel>
                                 <mat-expansion-panel>
