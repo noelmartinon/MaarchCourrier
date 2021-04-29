@@ -27,6 +27,7 @@ use CustomField\models\CustomFieldModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
 use Doctype\models\DoctypeModel;
+use Email\controllers\EmailController;
 use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use ExternalSignatoryBook\controllers\IxbusController;
@@ -395,7 +396,17 @@ class PreProcessActionController
             }
         }
 
-        $emailSenders = array_unique($emailSenders);
+        $emailSenders = array_values(array_unique($emailSenders, SORT_REGULAR));
+
+        $availableEmails = EmailController::getAvailableEmailsByUserId(['userId' => $args['userId']]);
+        $emails = array_column($availableEmails, 'email');
+        $entities = array_column($availableEmails, 'entityId');
+
+        foreach ($emailSenders as $key => $emailSender) {
+            if (!in_array($emailSender['email'], $emails) || !in_array($emailSender['entityId'], $entities)) {
+                unset($emailSenders[$key]);
+            }
+        }
 
         return $response->withJson([
             'sendEmail'        => $sendEmail,

@@ -195,7 +195,9 @@ trait AcknowledgementReceiptTrait
         }
 
         $emailSender = [];
-        if (!empty($acknowledgementOptions)) {
+        if (!empty($args['data']['sender'])) {
+            $emailSender = $args['data']['sender'];
+        } elseif (!empty($acknowledgementOptions)) {
             if ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'user') {
                 $emailSender = ['email' => $currentUser['mail']];
             } elseif ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'destination' && !empty($entity['email'])) {
