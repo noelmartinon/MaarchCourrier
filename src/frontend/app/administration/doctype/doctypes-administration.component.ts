@@ -41,6 +41,9 @@ export class DoctypesAdministrationComponent implements OnInit {
 
     conservationRules: any = [];
 
+    hasError: boolean = false;
+    archivalError: string = '';
+
     displayedColumns = ['label', 'use', 'mandatory', 'column'];
     @ViewChild(MatPaginator, { static: false }) paginator: MatPaginator;
     @ViewChild(MatSort, { static: false }) sort: MatSort;
@@ -158,7 +161,10 @@ export class DoctypesAdministrationComponent implements OnInit {
                     resolve(true);
                 }),
                 catchError((err: any) => {
-                    this.notify.handleErrors(err);
+                    this.hasError = true;
+                    this.archivalError = err.error.errors;
+                    const index: number = this.archivalError.indexOf(':');
+                    this.archivalError = `(${this.archivalError.slice(index + 1, this.archivalError.length).replace(/^[\s]/, '')})`;
                     return of(false);
                 })
             ).subscribe();

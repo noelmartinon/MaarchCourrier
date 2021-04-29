@@ -2191,5 +2191,6 @@
     "minimumVisaUser": "Minimum number of Approver",
     "maximumSignUser": "Maximum number of Signatory",
     "workflowEndBySignatory": "Workflow has to end with a Signatory",
-    "signInsteadOf": "You act as"
+    "signInsteadOf": "You act as",
+    "saeError": "Unable to retrieve retention rules"
 }
