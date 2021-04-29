@@ -1,5 +1,6 @@
 <div class="tile-title" [title]="'lang.' + tile.type | translate" [style.background-color]="tile.color" style="color: white;">
     {{!onError ? tile.label: ('lang.error' | translate)}}
+    <mat-icon *ngIf="!loading && onError" fontSet="fas" fontIcon="fa-info-circle fa-2x"></mat-icon>
 </div>
 <ng-container *ngIf="loading">
     <mat-progress-bar color="primary" mode="indeterminate" class="loader">
@@ -10,21 +11,21 @@
     <app-tile-view-list *ngIf="view==='list'"
         [displayColumns]="['contactLabel','subject','creationDate']"
         [tile]="tile"
-        [resources]="resources" 
-        [icon]="tile.icon" 
-        [route]="route" 
-        [viewDocRoute]="viewDocRoute" 
+        [resources]="resources"
+        [icon]="tile.icon"
+        [route]="route"
+        [viewDocRoute]="viewDocRoute"
         style="display: flex;flex: 1;overflow: auto;">
     </app-tile-view-list>
-    <app-tile-view-summary *ngIf="view==='summary'" 
-        [route]="route" 
-        [countResources]="countResources" 
+    <app-tile-view-summary *ngIf="view==='summary'"
+        [route]="route"
+        [countResources]="countResources"
         [icon]="tile.icon"
         [tile]="tile"
         [resourceLabel]="tile.type==='shortcut' ? tile.label : ('lang.mails' | translate)"
         style="display: flex;flex: 1;overflow: auto;">
     </app-tile-view-summary>
-    <app-tile-view-chart *ngIf="view==='chart'" 
+    <app-tile-view-chart *ngIf="view==='chart'"
         [route]="route"
         [resources]="resources"
         [tile]="tile"
@@ -34,5 +35,5 @@
     </app-tile-view-chart>
 </ng-container>
 <ng-container *ngIf="!loading && onError">
-    <i class="far fa-frown tile-icon-error" color="warn"></i>
+    <i class="far fa-frown tile-icon-error" color="warn" [title]="errorMessage"></i>
 </ng-container>
