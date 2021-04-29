@@ -32,6 +32,7 @@ use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use ExternalSignatoryBook\controllers\IxbusController;
 use ExternalSignatoryBook\controllers\MaarchParapheurController;
+use Group\controllers\PrivilegeController;
 use Group\models\GroupModel;
 use IndexingModel\models\IndexingModelFieldModel;
 use Note\models\NoteModel;
@@ -236,6 +237,8 @@ class PreProcessActionController
         }
         $data['resources'] = $resourcesForProcess;
 
+        $currentUser = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['mail']]);
+
         $emailSenders = [];
         foreach ($data['resources'] as $resId) {
             $resource = ResModel::getById(['select' => ['res_id', 'category_id', 'alt_identifier', 'type_id', 'destination'], 'resId' => $resId]);
@@ -372,7 +375,6 @@ class PreProcessActionController
 
                 if (!empty($acknowledgementOptions)) {
                     if ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'user') {
-                        $currentUser = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['mail']]);
                         $emailSenders[] = ['entityId' => null, 'email' => $currentUser['mail'], 'label' => UserModel::getLabelledUserById(['id' => $GLOBALS['id']])];
                     } elseif ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'destination' && !empty($entity['email'])) {
                         $emailSenders[] = ['entityId' => $entity['id'], 'email' => $entity['email'], 'label' => $entity['entity_label']];
@@ -398,13 +400,21 @@ class PreProcessActionController
 
         $emailSenders = array_values(array_unique($emailSenders, SORT_REGULAR));
 
-        $availableEmails = EmailController::getAvailableEmailsByUserId(['userId' => $args['userId']]);
-        $emails = array_column($availableEmails, 'email');
-        $entities = array_column($availableEmails, 'entityId');
+        if (empty($emailSenders) && !empty($sendEmail)) {
+            return $response->withStatus(400)->withJson(['errors' => 'No senders set for emails']);
+        }
+        if ($currentMode == 'manual') {
+            if (empty($entity['email']) || !PrivilegeController::hasPrivilege(['privilegeId' => 'use_mail_services', 'userId' => $GLOBALS['id']])) {
+                $emailSenders = [['email' => $currentUser['mail']]];
+            } else {
+                $availableEmails = EmailController::getAvailableEmailsByUserId(['userId' => $GLOBALS['id']]);
+                $entities = array_column($availableEmails, 'entityId');
 
-        foreach ($emailSenders as $key => $emailSender) {
-            if (!in_array($emailSender['email'], $emails) || !in_array($emailSender['entityId'], $entities)) {
-                unset($emailSenders[$key]);
+                if (!in_array($entity['id'], $entities)) {
+                    $emailSenders = [['email' => $currentUser['mail']]];
+                } else {
+                    $emailSenders = [['email' => $entity['email'], 'entityId' => $entity['id']]];
+                }
             }
         }
 
