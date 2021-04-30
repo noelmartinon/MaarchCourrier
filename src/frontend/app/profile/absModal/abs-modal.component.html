@@ -58,7 +58,7 @@
                     <div mat-line style="cursor: pointer;" (click)="!isRedirectedBasket(basket) ? basket.selected=!basket.selected : false">{{basket.basket_name}} <span class="label label-primary"
                             style="font-weight:normal">{{basket.group_desc}}</span></div>
                     <div mat-line *ngIf="isRedirectedBasket(basket) || checkIfExist(basket, 'user')" color="warn"> 
-                        <i class="far fa-paper-plane"></i>&nbsp;{{'lang.redirectedTo' | translate}} {{isRedirectedBasket(basket) ? basket.userToDisplay : checkIfExist(basket, 'user')}}
+                        <i class="far fa-paper-plane"></i>&nbsp;{{'lang.willBeRedirected' | translate}} {{isRedirectedBasket(basket) ? basket.userToDisplay : checkIfExist(basket, 'user')}}
                     </div>
                 </mat-list-item>
                 <mat-divider></mat-divider>
