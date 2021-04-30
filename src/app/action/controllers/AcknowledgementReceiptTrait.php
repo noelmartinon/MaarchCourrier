@@ -13,6 +13,7 @@
 namespace Action\controllers;
 
 use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
+use Configuration\models\ConfigurationModel;
 use Contact\models\ContactModel;
 use ContentManagement\controllers\MergeController;
 use Convert\controllers\ConvertPdfController;
@@ -79,12 +80,13 @@ trait AcknowledgementReceiptTrait
             $templateAttachmentType = 'simple';
         }
 
+        $template = TemplateModel::getWithAssociation([
+            'select'    => ['template_content', 'template_path', 'template_file_name', 'options'],
+            'where'     => ['template_target = ?', 'template_attachment_type = ?', 'value_field = ?'],
+            'data'      => ['acknowledgementReceipt', $templateAttachmentType, $resource['destination']]
+        ]);
+        $acknowledgementOptions = !empty($template[0]) ? json_decode($template[0]['options'], true) : null;
         if (!$args['data']['manual']) {
-            $template = TemplateModel::getWithAssociation([
-                'select'    => ['template_content', 'template_path', 'template_file_name'],
-                'where'     => ['template_target = ?', 'template_attachment_type = ?', 'value_field = ?'],
-                'data'      => ['acknowledgementReceipt', $templateAttachmentType, $resource['destination']]
-            ]);
             if (empty($template[0])) {
                 return [];
             }
@@ -167,7 +169,9 @@ trait AcknowledgementReceiptTrait
                 'docserverId'       => 'ACKNOWLEDGEMENT_RECEIPTS',
                 'path'              => $storeResult['directory'],
                 'filename'          => $storeResult['file_destination_name'],
-                'fingerprint'       => $storeResult['fingerPrint']
+                'fingerprint'       => $storeResult['fingerPrint'],
+                'cc'                => !empty($args['data']['cc']) ? json_encode($args['data']['cc']) : '[]',
+                'cci'               => !empty($args['data']['cci']) ? json_encode($args['data']['cci']) : '[]'
             ]);
 
             if (!empty($contact['email'])) {
@@ -183,16 +187,33 @@ trait AcknowledgementReceiptTrait
             $entity = EntityModel::getByEntityId(['entityId' => $resource['destination'], 'select' => ['email', 'id']]);
         }
 
-        if (empty($entity['email']) || !PrivilegeController::hasPrivilege(['privilegeId' => 'use_mail_services', 'userId' =>  $currentUser['id']])) {
-            $emailSender = ['email' => $currentUser['mail']];
+        $emailSender = [];
+        if (!empty($args['data']['sender'])) {
+            $emailSender = $args['data']['sender'];
+        } elseif (!empty($acknowledgementOptions)) {
+            if ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'user') {
+                $emailSender = ['email' => $currentUser['mail']];
+            } elseif ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'destination' && !empty($entity['email'])) {
+                $emailSender = ['email' => $entity['email'], 'entityId' => $entity['id']];
+            } elseif ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'mailServer') {
+                $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_email_server', 'select' => ['value']]);
+                $configuration = json_decode($configuration['value'], true);
+                $emailSender = ['email' => $configuration['from']];
+            } elseif ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'manual') {
+                $emailSender = ['email' => $acknowledgementOptions['acknowledgementReceiptFromMail']];
+            }
         } else {
-            $availableEmails = EmailController::getAvailableEmailsByUserId(['userId' => $currentUser['id']]);
-            $entities = array_column($availableEmails, 'entityId');
-
-            if (!in_array($entity['id'], $entities)) {
+            if (empty($entity['email']) || !PrivilegeController::hasPrivilege(['privilegeId' => 'use_mail_services', 'userId' => $currentUser['id']])) {
                 $emailSender = ['email' => $currentUser['mail']];
             } else {
-                $emailSender = ['email' => $entity['email'], 'entityId' => $entity['id']];
+                $availableEmails = EmailController::getAvailableEmailsByUserId(['userId' => $currentUser['id']]);
+                $entities = array_column($availableEmails, 'entityId');
+
+                if (!in_array($entity['id'], $entities)) {
+                    $emailSender = ['email' => $currentUser['mail']];
+                } else {
+                    $emailSender = ['email' => $entity['email'], 'entityId' => $entity['id']];
+                }
             }
         }
 
@@ -206,7 +227,9 @@ trait AcknowledgementReceiptTrait
                     'body'          => base64_decode($email['encodedHtml']),
                     'document'      => ['id' => $args['resId'], 'isLinked' => false, 'original' => true],
                     'isHtml'        => true,
-                    'status'        => 'TO_SEND'
+                    'status'        => 'TO_SEND',
+                    'cc'            => !empty($args['data']['cc']) ? array_column($args['data']['cc'], 'email') : '[]',
+                    'cci'           => !empty($args['data']['cci']) ? array_column($args['data']['cci'], 'email') : '[]'
                 ],
                 'options'   => [
                     'acknowledgementReceiptId' => $email['id']

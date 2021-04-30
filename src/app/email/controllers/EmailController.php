@@ -69,7 +69,7 @@ class EmailController
         ValidatorModel::intVal($args, ['userId']);
         ValidatorModel::arrayType($args, ['data', 'options']);
 
-        $check = EmailController::controlCreateEmail(['userId' => $args['userId'], 'data' => $args['data']]);
+        $check = EmailController::controlCreateEmail(['userId' => $args['userId'], 'data' => $args['data'], 'isAcknowledgementReceipt' => !empty($args['options']['acknowledgementReceiptId'])]);
         if (!empty($check['errors'])) {
             return ['errors' => $check['errors'], 'code' => $check['code']];
         }
@@ -833,7 +833,7 @@ class EmailController
             return ['errors' => 'Data object is not a string or is more than 255 characters', 'code' => 400];
         }
 
-        if (!empty($args['data']['sender']['email'])) {
+        if (!empty($args['data']['sender']['email']) && empty($args['isAcknowledgementReceipt'])) {
             $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_email_server', 'select' => ['value']]);
             $configuration = json_decode($configuration['value'], true);
 

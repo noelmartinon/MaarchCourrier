@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '20.10.11' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '20.10.12' WHERE id = 'database_version';
 
 DROP VIEW IF EXISTS res_view_letterbox;
 
@@ -381,6 +381,16 @@ ALTER TABLE listinstance_history_details DROP COLUMN IF EXISTS requested_signatu
 ALTER TABLE listinstance_history_details ADD COLUMN requested_signature boolean default false;
 ALTER TABLE listinstance_history_details DROP COLUMN IF EXISTS signatory;
 ALTER TABLE listinstance_history_details ADD COLUMN signatory BOOLEAN DEFAULT FALSE;
+
+ALTER TABLE templates DROP COLUMN IF EXISTS options;
+ALTER TABLE templates ADD COLUMN options JSONB DEFAULT '{}';
+UPDATE templates SET options = '{"acknowledgementReceiptFrom": "destination"}' WHERE template_target = 'acknowledgementReceipt';
+
+ALTER TABLE acknowledgement_receipts DROP COLUMN IF EXISTS cc;
+ALTER TABLE acknowledgement_receipts ADD COLUMN cc JSONB DEFAULT '[]';
+ALTER TABLE acknowledgement_receipts DROP COLUMN IF EXISTS cci;
+ALTER TABLE acknowledgement_receipts ADD COLUMN cci JSONB DEFAULT '[]';
+
 
 /* ORDER ON CHRONO */
 CREATE OR REPLACE FUNCTION order_alphanum(text) RETURNS text AS $$

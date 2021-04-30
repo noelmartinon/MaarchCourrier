@@ -35,7 +35,7 @@ class AcknowledgementReceiptController
         }
 
         $acknowledgementReceiptsModel = AcknowledgementReceiptModel::get([
-            'select' => ['id', 'res_id', 'type', 'format', 'user_id', 'creation_date', 'send_date', 'contact_id'],
+            'select' => ['id', 'res_id', 'type', 'format', 'user_id', 'creation_date', 'send_date', 'contact_id', 'cc', 'cci'],
             'where'  => ['res_id = ?'],
             'data'   => [$args['resId']]
         ]);
@@ -56,7 +56,9 @@ class AcknowledgementReceiptController
                 'userLabel'    => $userLabel,
                 'creationDate' => $acknowledgementReceipt['creation_date'],
                 'sendDate'     => $acknowledgementReceipt['send_date'],
-                'contact'      => $contact
+                'contact'      => $contact,
+                'cc'           => json_decode($acknowledgementReceipt['cc'], true),
+                'cci'          => json_decode($acknowledgementReceipt['cci'], true),
             ];
         }
 
@@ -70,7 +72,7 @@ class AcknowledgementReceiptController
         }
 
         $acknowledgementReceipt = AcknowledgementReceiptModel::getByIds([
-            'select'  => ['id', 'res_id', 'type', 'format', 'user_id', 'creation_date', 'send_date', 'contact_id'],
+            'select'  => ['id', 'res_id', 'type', 'format', 'user_id', 'creation_date', 'send_date', 'contact_id', 'cc', 'cci'],
             'ids'     => [$args['id']]
         ]);
 
@@ -97,6 +99,8 @@ class AcknowledgementReceiptController
             'creationDate' => $acknowledgementReceipt['creation_date'],
             'sendDate'     => $acknowledgementReceipt['send_date'],
             'contact'      => $contact,
+            'cc'           => json_decode($acknowledgementReceipt['cc'], true),
+            'cci'          => json_decode($acknowledgementReceipt['cci'], true),
         ];
 
         return $response->withJson(['acknowledgementReceipt' => $acknowledgementReceipt]);

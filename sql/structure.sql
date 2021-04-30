@@ -723,6 +723,7 @@ CREATE TABLE templates
   template_target character varying(255),
   template_attachment_type character varying(255) DEFAULT NULL::character varying,
   subject character varying(255),
+  options jsonb DEFAULT '{}',
   CONSTRAINT templates_pkey PRIMARY KEY (template_id)
 )
 WITH (OIDS=FALSE);
@@ -1338,19 +1339,21 @@ WITH (OIDS=FALSE);
 
 CREATE TABLE acknowledgement_receipts
 (
-id serial NOT NULL,
-res_id INTEGER NOT NULL,
-type CHARACTER VARYING(16) NOT NULL,
-format CHARACTER VARYING(8) NOT NULL,
-user_id INTEGER NOT NULL,
-contact_id INTEGER NOT NULL,
-creation_date timestamp without time zone NOT NULL,
-send_date timestamp without time zone,
-docserver_id CHARACTER VARYING(128) NOT NULL,
-path CHARACTER VARYING(256) NOT NULL,
-filename CHARACTER VARYING(256) NOT NULL,
-fingerprint CHARACTER VARYING(256) NOT NULL,
-CONSTRAINT acknowledgement_receipts_pkey PRIMARY KEY (id)
+    id serial NOT NULL,
+    res_id INTEGER NOT NULL,
+    type CHARACTER VARYING(16) NOT NULL,
+    format CHARACTER VARYING(8) NOT NULL,
+    user_id INTEGER NOT NULL,
+    contact_id INTEGER NOT NULL,
+    creation_date timestamp without time zone NOT NULL,
+    send_date timestamp without time zone,
+    docserver_id CHARACTER VARYING(128) NOT NULL,
+    path CHARACTER VARYING(256) NOT NULL,
+    filename CHARACTER VARYING(256) NOT NULL,
+    fingerprint CHARACTER VARYING(256) NOT NULL,
+    cc jsonb DEFAULT '[]',
+    cci jsonb DEFAULT '[]',
+    CONSTRAINT acknowledgement_receipts_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);
 
