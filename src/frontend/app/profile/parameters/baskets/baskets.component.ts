@@ -132,7 +132,6 @@ export class MyBasketsComponent implements OnInit {
                 this.userBaskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
                 this.redirectedBaskets.splice(i, 1);
                 this.notify.success(this.translate.instant('lang.basketUpdated'));
-                this.redirectedBasketsEvent.emit(this.redirectedBaskets);
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);

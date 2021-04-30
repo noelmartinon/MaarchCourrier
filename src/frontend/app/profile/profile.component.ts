@@ -119,40 +119,30 @@ export class ProfileComponent implements OnInit {
         }
     }
 
-    async ngOnInit(): Promise<void> {
+    ngOnInit(): void {
         this.headerService.setHeader(this.translate.instant('lang.myProfile'));
         this.headerService.injectInSideBarLeft(this.adminMenuTemplate, this.viewContainerRef, 'adminMenu');
-        this.loading = true;
-        await this.getProfileInfos();
-    }
 
-    getProfileInfos() {
-        return new Promise((resolve) => {
-            this.http.get('../rest/currentUser/profile').pipe(
-                tap((data: any) => {
-                    if (data.absence) {
-                        const startDate: string = data.absence.absenceDate.startDate;
-                        this.haveAbsScheduled = startDate !== this.functions.formatDateObjectToDateString(new Date()) ? true : false;
-                    }
-                    this.user = data;
-                    this.user.baskets = this.user.baskets.filter((basket: any) => !basket.basketSearch);
-                    this.user.baskets.forEach((value: any, index: number) => {
-                        this.user.baskets[index]['disabled'] = false;
-                        this.user.redirectedBaskets.forEach((value2: any) => {
-                            if (value.basket_id == value2.basket_id && value.basket_owner == value2.basket_owner) {
-                                this.user.baskets[index]['disabled'] = true;
-                            }
-                        });
+        this.loading = true;
+
+        this.http.get('../rest/currentUser/profile')
+            .subscribe((data: any) => {
+                if (data.absence) {
+                    const startDate: string = data.absence.absenceDate.startDate;
+                    this.haveAbsScheduled = startDate !== this.functions.formatDateObjectToDateString(new Date()) ? true : false;
+                }
+                this.user = data;
+                this.user.baskets = this.user.baskets.filter((basket: any) => !basket.basketSearch);
+                this.user.baskets.forEach((value: any, index: number) => {
+                    this.user.baskets[index]['disabled'] = false;
+                    this.user.redirectedBaskets.forEach((value2: any) => {
+                        if (value.basket_id == value2.basket_id && value.basket_owner == value2.basket_owner) {
+                            this.user.baskets[index]['disabled'] = true;
+                        }
                     });
-                    this.loading = false;
-                    resolve(true);
-                }),
-                catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
-        });
+                });
+                this.loading = false;
+            });
     }
 
     displayPassword() {
@@ -378,6 +368,9 @@ export class ProfileComponent implements OnInit {
     }
 
     toggleRedirection(value: any) {
+        value.forEach((val: any) => {
+            this.user.baskets.find((item: any) => val.basket_id === item.basket_id && val.group_id === item.groupSerialId).userToDisplay = val.userToDisplay;
+        });
         this.user.redirectedBaskets = value;
     }
 }

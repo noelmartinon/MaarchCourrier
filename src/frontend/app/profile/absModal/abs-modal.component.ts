@@ -319,9 +319,6 @@ export class AbsModalComponent implements OnInit {
     async cancelSchedule() {
         this.startDate = null;
         this.endDate = null;
-        this.baskets.filter((item: any) => item.userToDisplay !== null).forEach((elem: any) => {
-            this.delBasketRedirection(elem);
-        });
         this.redirectedBaskets = [];
         this.onSubmit();
     }
