@@ -1,5 +1,5 @@
-<div class="tile-title" [title]="'lang.' + tile.type | translate" [style.background-color]="tile.color" style="color: white;">
-    {{!onError ? tile.label: ('lang.error' | translate)}}
+<div class="tile-title" [title]="!onError ? ('lang.' + tile.type | translate) : errorMessage" [style.background-color]="tile.color" style="color: white;">
+    {{!onError ? tile.label: ('lang.error' | translate) + ' ' + ('lang.' + tile.type | translate)}}
     <mat-icon *ngIf="!loading && onError" fontSet="fas" fontIcon="fa-info-circle fa-2x"></mat-icon>
 </div>
 <ng-container *ngIf="loading">
