@@ -1,6 +1,6 @@
 <form>
-    <input type="hidden" [formControl]="controlAutocomplete">
-    <mat-form-field floatLabel="never" class="input-form" *ngIf="!controlAutocomplete.disabled">
+    <input type="hidden" [formControl]="control">
+    <mat-form-field floatLabel="never" class="input-form" *ngIf="!control.disabled">
         <mat-icon color="primary" class="fa fa-search" matPrefix style="padding-left: 20px;font-size: 15px;"></mat-icon>
         <input type="text" #autoCompleteInput [placeholder]="'lang.searchFolder' | translate" matInput [formControl]="myControl"
             [matAutocomplete]="auto" (click)="$event.stopPropagation()" (focus)="resetAutocomplete()">
@@ -22,16 +22,16 @@
         </mat-autocomplete>
     </mat-form-field>
     <div class="itemList">
-        <mat-chip-list *ngIf="controlAutocomplete.value.length > 0" class="mat-chip-list-stacked itemChip" color="default">
-            <mat-chip *ngFor="let item of controlAutocomplete.value;let i=index"
-                color="default" [removable]="!controlAutocomplete.disabled" (removed)="removeItem(i)" class="listAutocomplete">
+        <mat-chip-list *ngIf="control.value.length > 0" class="mat-chip-list-stacked itemChip" color="default">
+            <mat-chip *ngFor="let item of control.value;let i=index"
+                color="default" [removable]="!control.disabled" (removed)="removeItem(i)" class="listAutocomplete">
                 <span style="display: flex;flex: 1;align-items: center;" [title]="getFolderLabel(item)">
                     <i class="fa fa-folder-open" style="padding-right:5px;"></i>&nbsp;{{getFolderLabel(item)}}
                 </span>
-                <mat-icon matChipRemove class="fa fa-times" *ngIf="!controlAutocomplete.disabled"></mat-icon>
+                <mat-icon matChipRemove class="fa fa-times" *ngIf="!control.disabled"></mat-icon>
             </mat-chip>
         </mat-chip-list>
-        <div class="noResult" *ngIf="controlAutocomplete.value.length === 0">
+        <div class="noResult" *ngIf="control.value.length === 0">
             {{'lang.noSelectedFolder' | translate}}
         </div>
     </div>
