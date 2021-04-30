@@ -1844,7 +1844,7 @@
     "customAlreadyExist": "Ce custom semble déjà exister.",
     "invalidCustomName": "Ce nom n'est pas autorisé",
     "invalidLengthCustomName": "Le nom de l'instance doit contenir au moins {{value1}} caractères",
-    "onlySpecialCharAllowed": "Seuls les caractères spéciaux {{value1}} sont autorisés.",
+    "onlySpecialCharAllowed": "Seuls les minuscules et les caractères spéciaux {{value1}} sont autorisés.",
     "dbNotEmpty": "Cette base de données existe déjà et n'est pas vide",
     "stepMailServer": "Serveur de messagerie",
     "stepMailServer_desc": "Configurez votre serveur de messagerie afin de prévenir les utilisateurs par courriel des différents échanges survenus dans l'application.<br/>Cette étape peut être passée et être configurée plus tard.",

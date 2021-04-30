@@ -1828,7 +1828,7 @@
     "customAlreadyExist": "This custom already seems to exist.",
     "invalidCustomName": "Unauthorized name",
     "invalidLengthCustomName": "Custom name must contains at least {{value1}} letters",
-    "onlySpecialCharAllowed": "Only special characters {{value1}} are allowed.",
+    "onlySpecialCharAllowed": "Only lower cases and special characters {{value1}} are allowed.",
     "dbNotEmpty": "This database already exists and is not empty",
     "stepMailServer": "Mail server",
     "stepMailServer_desc": "Configure your mail server to notify users by email of the the application activities. <br/> This step can be skipped and can be configured later.",

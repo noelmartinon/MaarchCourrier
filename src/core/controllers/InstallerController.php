@@ -216,7 +216,7 @@ class InstallerController
 
         if (!Validator::stringType()->notEmpty()->validate($queryParams['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Queryparams customId is empty or not a string']);
-        } elseif (!preg_match('/^[a-zA-Z0-9_\-]*$/', $queryParams['customId'])) {
+        } elseif (!preg_match('/^[a-z0-9_\-]*$/', $queryParams['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Queryparams customId has unauthorized characters']);
         }
 
@@ -285,7 +285,7 @@ class InstallerController
 
         if (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
-        } elseif (!preg_match('/^[a-zA-Z0-9_\-]*$/', $body['customId'])) {
+        } elseif (!preg_match('/^[a-z0-9_\-]*$/', $body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId has unauthorized characters']);
         }
 
@@ -539,7 +539,7 @@ class InstallerController
             return $response->withStatus(400)->withJson(['errors' => 'Body logo is empty']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
-        } elseif (!preg_match('/^[a-zA-Z0-9_\-]*$/', $body['customId'])) {
+        } elseif (!preg_match('/^[a-z0-9_\-]*$/', $body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId has unauthorized characters']);
         } elseif (!is_file("custom/{$body['customId']}/initializing.lck")) {
             return $response->withStatus(403)->withJson(['errors' => 'Custom is already installed']);
@@ -612,7 +612,7 @@ class InstallerController
 
         if (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
-        } elseif (!preg_match('/^[a-zA-Z0-9_\-]*$/', $body['customId'])) {
+        } elseif (!preg_match('/^[a-z0-9_\-]*$/', $body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId has unauthorized characters']);
         } elseif (!is_file("custom/{$body['customId']}/initializing.lck")) {
             return $response->withStatus(403)->withJson(['errors' => 'Custom is already installed']);
@@ -679,7 +679,7 @@ class InstallerController
 
         if (!Validator::stringType()->notEmpty()->validate($body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId is empty or not a string']);
-        } elseif (!preg_match('/^[a-zA-Z0-9_\-]*$/', $body['customId'])) {
+        } elseif (!preg_match('/^[a-z0-9_\-]*$/', $body['customId'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body customId has unauthorized characters']);
         } elseif (!is_file("custom/{$body['customId']}/initializing.lck")) {
             return $response->withStatus(403)->withJson(['errors' => 'Custom is already installed']);
