@@ -2200,5 +2200,9 @@
     "workflowEndBySignatory": "Le circuit doit se terminer par un Signataire",
     "mandatoryFile": "Fichier obligatoire",
     "signInsteadOf": "Vous agissez en tant que",
-    "saeError": "Impossible de récupérer les règles de conservation"
+    "saeError": "Impossible de récupérer les règles de conservation",
+    "expAddress": "Adresse expéditrice",
+    "manual": "Manuelle",
+    "mailServer": "Serveur de messagerie",
+    "canAddCopies": "Pouvoir ajouter des personnes en copie (CC / CCI)"
 }

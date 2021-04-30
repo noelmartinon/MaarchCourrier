@@ -16,7 +16,7 @@ import { AlertComponent } from '../../../plugins/modal/alert.component';
 import { MaarchFlatTreeComponent } from '../../../plugins/tree/maarch-flat-tree.component';
 import { AuthService } from '@service/auth.service';
 
-declare var tinymce: any;
+declare let tinymce: any;
 
 @Component({
     templateUrl: 'template-administration.component.html',
@@ -89,6 +89,26 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
     documentImported: boolean = false;
 
+    acknowledgementReceiptFrom = [
+        {
+            id: 'manual',
+            label : this.translate.instant('lang.manual')
+        },
+        {
+            id: 'destination',
+            label : this.translate.instant('lang.destination')
+        },
+        {
+            id: 'mailServer',
+            label : this.translate.instant('lang.mailServer')
+        },
+        {
+            id: 'user',
+            label : this.translate.instant('lang.user')
+        }
+    ];
+
+    options: any = {};
 
     constructor(
         public http: HttpClient,
@@ -242,19 +262,15 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
         this.attachmentTypesList = data.attachmentTypes;
         this.datasourcesList = data.datasources;
-        this.maarchTree.initData(data.entities.map(ent => {
-            return {
-                ...ent,
-                id : ent.serialId,
-            };
-        }));
+        this.maarchTree.initData(data.entities.map(ent => ({
+            ...ent,
+            id : ent.serialId,
+        })));
     }
 
     getBase64Document(buffer: ArrayBuffer) {
         const TYPED_ARRAY = new Uint8Array(buffer);
-        const STRING_CHAR = TYPED_ARRAY.reduce((data, byte) => {
-            return data + String.fromCharCode(byte);
-        }, '');
+        const STRING_CHAR = TYPED_ARRAY.reduce((data, byte) => data + String.fromCharCode(byte), '');
 
         return btoa(STRING_CHAR);
     }
@@ -317,7 +333,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
     editFile() {
         const editorOptions: any = {};
-        editorOptions.docUrl = `rest/onlyOffice/mergedFile`;
+        editorOptions.docUrl = 'rest/onlyOffice/mergedFile';
         if (this.creationMode) {
             if (this.template.target !== 'acknowledgementReceipt') {
                 if (!this.functionsService.empty(this.template.file.content)) {
@@ -390,7 +406,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                 editorOptions.objectType = 'templateModification';
                 editorOptions.objectId = this.template.id;
             }
-            editorOptions.authToken = this.authService.getToken(),
+            editorOptions.authToken = this.authService.getToken();
             this.launchJavaEditor(editorOptions);
         } else if (this.headerService.user.preferences.documentEdition !== 'java') {
             this.launchIntegratedEditor(editorOptions, this.headerService.user.preferences.documentEdition);
@@ -613,6 +629,9 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
             this.template.type = 'TXT';
             this.availableTypes = ['TXT'];
         } else if (this.template.target === 'acknowledgementReceipt') {
+            this.options = {
+                acknowledgementReceiptFrom : 'destination'
+            };
             this.template.file = {
                 electronic: {
                     name: '',
@@ -670,11 +689,22 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
         }
     }
 
+    setOption(id: string, value: string, reset: boolean = false) {
+        if (reset) {
+            this.options = {};
+        }
+        this.options[id] = value;
+    }
+
     ngOnDestroy() {
         tinymce.remove('textarea');
         if (this.intervalLockFile) {
             clearInterval(this.intervalLockFile);
         }
+    }
+
+    emptyOptions() {
+        return Object.keys(this.options).length === 0;
     }
 }
 @Component({
@@ -682,7 +712,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
     styleUrls: ['template-administration-checkEntities-modal.scss']
 })
 export class TemplateAdministrationCheckEntitiesModalComponent {
-    
+
 
     constructor(public http: HttpClient, @Inject(MAT_DIALOG_DATA) public data: any, public dialogRef: MatDialogRef<TemplateAdministrationCheckEntitiesModalComponent>) {
     }

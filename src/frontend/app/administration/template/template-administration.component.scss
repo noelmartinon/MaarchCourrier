@@ -1,3 +1,5 @@
+@import '../../../css/vars.scss';
+
 .mat-list-item.disabled {
     opacity: 0.5;
     cursor: default;
@@ -14,5 +16,47 @@
         display: flex !important;
         align-items: center;
         justify-content: center;
+    }
+}
+
+.alert-message {
+    max-width: none;
+}
+
+.options {
+    display: flex;
+    margin-top: 20px;
+    border-radius: 5px;
+    border: solid 1px #e0e0e0;
+    position: relative;
+    padding: 18px;
+    padding-bottom: 0px;
+    width: 100%;
+    margin-bottom: 10px;
+
+    .title {
+        white-space: pre;
+        overflow: hidden;
+        max-width: 85%;
+        text-overflow: ellipsis;
+        z-index: 1;
+        font-size: 10px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        position: absolute;
+        top: -8px;
+        left: 10px;
+        padding: 0px;
+        margin: 0px;
+        color: $primary;
+
+        &-divider {
+            position: absolute;
+            width: 99%;
+            z-index: -1;
+            top: 7px;
+            background: white;
+            height: 1px;
+        }
     }
 }
