@@ -99,7 +99,7 @@ class ConvertPdfController
         }
 
         $convertedFile = ConvertPdfController::convertInPdf(['fullFilename' => $aArgs['fullFilename']]);
-        
+
         $docInfo = pathinfo($aArgs['fullFilename']);
         $tmpPath = CoreConfigModel::getTmpPath();
         if (!file_exists($tmpPath.$docInfo["filename"].'.pdf')) {
@@ -149,7 +149,7 @@ class ConvertPdfController
         $tmpPath = CoreConfigModel::getTmpPath();
         $fileNameOnTmp = rand() . $docInfo["filename"];
 
-        copy($pathToDocument, $tmpPath.$fileNameOnTmp.'.'.$docInfo["extension"]);
+        copy($pathToDocument, $tmpPath.$fileNameOnTmp .'.'. strtolower($docInfo["extension"]));
 
         if (strtolower($docInfo["extension"]) != 'pdf') {
             $convertedFile = ConvertPdfController::convertInPdf(['fullFilename' => $tmpPath.$fileNameOnTmp.'.'.$docInfo["extension"]]);
@@ -322,7 +322,7 @@ class ConvertPdfController
         if (!Validator::notEmpty()->validate($body['base64'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body base64 is empty']);
         }
-        
+
         $file     = base64_decode($body['base64']);
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($file);
@@ -333,7 +333,7 @@ class ConvertPdfController
             if ($body['context'] == 'scan') {
                 $tmpPath = CoreConfigModel::getTmpPath();
                 $tmpFilename = 'scan_converting' . rand() . '.pdf';
-        
+
                 file_put_contents($tmpPath . $tmpFilename, $file);
                 $return['tmpFilename'] = $tmpFilename;
             } else {
@@ -345,7 +345,7 @@ class ConvertPdfController
             $maxFilesizeMo = ini_get('upload_max_filesize');
             $uploadMaxFilesize = StoreController::getBytesSizeFromPhpIni(['size' => $maxFilesizeMo]);
             $canConvert    = ConvertPdfController::canConvert(['extension' => $ext]);
-    
+
             if (!$fileAccepted) {
                 return $response->withStatus(400)->withJson(['errors' => 'File type not allowed. Extension : ' . $ext . '. Mime Type : ' . $mimeType . '.']);
             } elseif ($size > $uploadMaxFilesize) {
@@ -354,7 +354,7 @@ class ConvertPdfController
             } elseif (!$canConvert) {
                 return $response->withStatus(400)->withJson(['errors' => 'File accepted but can not be converted in pdf']);
             }
-    
+
             $convertion = ConvertPdfController::convertFromEncodedResource(['encodedResource' => $body['base64'], 'context' => $body['context'], 'extension' => $ext]);
             if (empty($convertion['errors'])) {
                 return $response->withJson($convertion);
@@ -375,7 +375,7 @@ class ConvertPdfController
         $resource = file_get_contents("{$tmpPath}{$args['filename']}");
         $extension = pathinfo("{$tmpPath}{$args['filename']}", PATHINFO_EXTENSION);
         $mimeType = mime_content_type("{$tmpPath}{$args['filename']}");
-        
+
         unlink("{$tmpPath}{$args['filename']}");
         $encodedResource = base64_encode($resource);
 
@@ -383,7 +383,7 @@ class ConvertPdfController
 
         $encodedFiles['type'] = $mimeType;
         $encodedFiles['extension'] = $extension;
-        
+
         $queryParams = $request->getQueryParams();
         if (!empty($queryParams['convert'])) {
             if (ConvertPdfController::canConvert(['extension' => $extension])) {
