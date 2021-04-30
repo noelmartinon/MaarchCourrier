@@ -71,7 +71,11 @@ export class MyBasketsComponent implements OnInit {
             tap((data: any) => {
                 this.userBaskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
                 this.redirectedBaskets = data['redirectedBaskets'];
-                this.redirectedBasketsEvent.emit(this.redirectedBaskets);
+                const objToSend: any = {
+                    event: 'add',
+                    redirectedBaskets: this.redirectedBaskets
+                };
+                this.redirectedBasketsEvent.emit(objToSend);
                 this.selectionBaskets.clear();
                 this.notify.success(this.translate.instant('lang.basketUpdated'));
             }),
@@ -131,6 +135,12 @@ export class MyBasketsComponent implements OnInit {
             tap((data: any) => {
                 this.userBaskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
                 this.redirectedBaskets.splice(i, 1);
+                const objToSend: any = {
+                    event: 'del',
+                    baskeToDel: [basket],
+                    redirectedBaskets: this.redirectedBaskets
+                };
+                this.redirectedBasketsEvent.emit(objToSend);
                 this.notify.success(this.translate.instant('lang.basketUpdated'));
             }),
             catchError((err: any) => {
