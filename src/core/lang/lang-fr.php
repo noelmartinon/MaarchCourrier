@@ -473,3 +473,5 @@ define('_STAMP', 'Griffe');
 
 define('_SIGNED', 'Signé');
 define('_VALIDATED', 'Validé');
+
+define('_NO_SENDER_EMAIL', "Aucune adresse d'expéditeur");

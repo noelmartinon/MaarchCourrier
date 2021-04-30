@@ -371,20 +371,27 @@ class PreProcessActionController
             }
 
             if ($email > 0) {
-                $sendEmail += $email;
-
+                $emailSender = null;
                 if (!empty($acknowledgementOptions)) {
                     if ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'user') {
-                        $emailSenders[] = ['entityId' => null, 'email' => $currentUser['mail'], 'label' => UserModel::getLabelledUserById(['id' => $GLOBALS['id']])];
+                        $emailSender = ['entityId' => null, 'email' => $currentUser['mail'], 'label' => UserModel::getLabelledUserById(['id' => $GLOBALS['id']])];
                     } elseif ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'destination' && !empty($entity['email'])) {
-                        $emailSenders[] = ['entityId' => $entity['id'], 'email' => $entity['email'], 'label' => $entity['entity_label']];
+                        $emailSender = ['entityId' => $entity['id'], 'email' => $entity['email'], 'label' => $entity['entity_label']];
                     } elseif ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'mailServer') {
                         $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_email_server', 'select' => ['value']]);
                         $configuration = json_decode($configuration['value'], true);
-                        $emailSenders[] = ['entityId' => null, 'email' => $configuration['from'], 'label' => ''];
+                        $emailSender = ['entityId' => null, 'email' => $configuration['from'], 'label' => ''];
                     } elseif ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'manual') {
-                        $emailSenders[] = ['entityId' => null, 'email' => $acknowledgementOptions['acknowledgementReceiptFromMail'], 'label' => ''];
+                        $emailSender = ['entityId' => null, 'email' => $acknowledgementOptions['acknowledgementReceiptFromMail'], 'label' => ''];
                     }
+                }
+                if (!empty($emailSender)) {
+                    $emailSenders[] = $emailSender;
+                    $sendEmail += $email;
+                } elseif (empty($emailSender) && $currentMode != 'manual') {
+                    $noSendAR['number'] += 1;
+                    $noSendAR['list'][] = ['resId' => $resId, 'alt_identifier' => $resource['alt_identifier'], 'info' => _NO_SENDER_EMAIL];
+                    continue;
                 }
             }
             if ($paper > 0) {
@@ -400,9 +407,6 @@ class PreProcessActionController
 
         $emailSenders = array_values(array_unique($emailSenders, SORT_REGULAR));
 
-        if (empty($emailSenders) && !empty($sendEmail)) {
-            return $response->withStatus(400)->withJson(['errors' => 'No senders set for emails']);
-        }
         if ($currentMode == 'manual') {
             if (empty($entity['email']) || !PrivilegeController::hasPrivilege(['privilegeId' => 'use_mail_services', 'userId' => $GLOBALS['id']])) {
                 $emailSenders = [['email' => $currentUser['mail']]];
