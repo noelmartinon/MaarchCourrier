@@ -2466,7 +2466,7 @@
     "deleteAttachmentSignatureBook": "Voulez-vous vraiment supprimer la pièce jointe ?",
     "toogleShippingConf": "Activer / désactiver les envois postaux Maileva",
     "infoResId": "Vous pouvez remplir automatiquement ce champ en utilisant le mot-clé <b>@resId</b> pour cibler une ressource du document en cours de traitement",
-    "createPublicIndexingModels": "Créer et supprimer des modèles d'enregistrement publics depuis le formulaire d'enregistrement",
+    "createPublicIndexingModels": "Créer et supprimer des modèles d'enregistrement publics depuis le formulaire de méta données",
     "absencePeriod": "Définir une plage d'absence",
     "organizationEmailSignatures": "Signatures mail d'organisation",
     "organizationEmailSignaturesDesc": "Les signatures seront disponibles pour <b>tous</b> les utilisateurs de l'application.<br/>Vous pouvez utiliser des <b>variables de fusion</b> utilisateur et entité primaire (<a href=\"{{url}}\" target=\"_blank\">plus d'informations</a>).",
