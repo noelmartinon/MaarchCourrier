@@ -291,7 +291,7 @@ export class PrintedFolderModalComponent implements OnInit {
             }),
             finalize(() => this.isLoadingResults = false),
             catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
+                this.notify.handleBlobErrors(err);
                 return of(false);
             })
         ).subscribe();

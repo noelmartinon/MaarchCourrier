@@ -421,7 +421,7 @@ export class FolderDocumentListComponent implements OnInit, OnDestroy {
                 newWindow.document.title = row.chrono;
             }),
             catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
+                this.notify.handleBlobErrors(err);
                 return of(false);
             })
         ).subscribe();

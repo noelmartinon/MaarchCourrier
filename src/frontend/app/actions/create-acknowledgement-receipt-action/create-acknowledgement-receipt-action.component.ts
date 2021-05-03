@@ -141,7 +141,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit {
                 downloadLink.click();
                 this.loadingExport = false;
             }, (err: any) => {
-                this.notify.handleErrors(err);
+                this.notify.handleBlobErrors(err);
             });
     }
 

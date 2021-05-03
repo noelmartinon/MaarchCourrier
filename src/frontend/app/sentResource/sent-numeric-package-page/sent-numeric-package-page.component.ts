@@ -537,7 +537,7 @@ export class SentNumericPackagePageComponent implements OnInit {
                 downloadLink.click();
             }),
             catchError((err) => {
-                this.notify.handleSoftErrors(err);
+                this.notify.handleBlobErrors(err);
                 return of(false);
             })
         ).subscribe();

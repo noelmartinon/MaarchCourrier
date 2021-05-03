@@ -61,7 +61,7 @@ export class UsersExportComponent implements OnInit {
             }),
             finalize(() => this.loadingExport = false),
             catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
+                this.notify.handleBlobErrors(err);
                 return of(false);
             })
         ).subscribe();

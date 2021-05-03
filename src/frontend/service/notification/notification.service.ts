@@ -115,6 +115,16 @@ export class NotificationService {
         }
     }
 
+    handleBlobErrors(err: any) {
+        console.log(err);
+        const blob = err.error, reader = new FileReader();
+        reader.onload = (res) => {
+            const msg = JSON.parse(res.target.result as string);
+            this.error(`${err.status} : ${msg.errors}`, err.url);
+        };
+        reader.readAsText(blob);
+    }
+
     getMessageDuration(message: string, minimumDuration: number) {
         const duration = (message.length / 25) * 1000;
         const maxDuration = 10000;
