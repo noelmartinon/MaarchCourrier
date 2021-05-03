@@ -27,10 +27,12 @@ use CustomField\models\CustomFieldModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
 use Doctype\models\DoctypeModel;
+use Email\controllers\EmailController;
 use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
 use ExternalSignatoryBook\controllers\IxbusController;
 use ExternalSignatoryBook\controllers\MaarchParapheurController;
+use Group\controllers\PrivilegeController;
 use Group\models\GroupModel;
 use IndexingModel\models\IndexingModelFieldModel;
 use Note\models\NoteModel;
@@ -235,6 +237,8 @@ class PreProcessActionController
         }
         $data['resources'] = $resourcesForProcess;
 
+        $currentUser = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['mail']]);
+
         $emailSenders = [];
         foreach ($data['resources'] as $resId) {
             $resource = ResModel::getById(['select' => ['res_id', 'category_id', 'alt_identifier', 'type_id', 'destination'], 'resId' => $resId]);
@@ -367,21 +371,27 @@ class PreProcessActionController
             }
 
             if ($email > 0) {
-                $sendEmail += $email;
-
+                $emailSender = null;
                 if (!empty($acknowledgementOptions)) {
                     if ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'user') {
-                        $currentUser = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['mail']]);
-                        $emailSenders[] = ['entityId' => null, 'email' => $currentUser['mail'], 'label' => UserModel::getLabelledUserById(['id' => $GLOBALS['id']])];
+                        $emailSender = ['entityId' => null, 'email' => $currentUser['mail'], 'label' => UserModel::getLabelledUserById(['id' => $GLOBALS['id']])];
                     } elseif ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'destination' && !empty($entity['email'])) {
-                        $emailSenders[] = ['entityId' => $entity['id'], 'email' => $entity['email'], 'label' => $entity['entity_label']];
+                        $emailSender = ['entityId' => $entity['id'], 'email' => $entity['email'], 'label' => $entity['entity_label']];
                     } elseif ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'mailServer') {
                         $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_email_server', 'select' => ['value']]);
                         $configuration = json_decode($configuration['value'], true);
-                        $emailSenders[] = ['entityId' => null, 'email' => $configuration['from'], 'label' => ''];
+                        $emailSender = ['entityId' => null, 'email' => $configuration['from'], 'label' => ''];
                     } elseif ($acknowledgementOptions['acknowledgementReceiptFrom'] == 'manual') {
-                        $emailSenders[] = ['entityId' => null, 'email' => $acknowledgementOptions['acknowledgementReceiptFromMail'], 'label' => ''];
+                        $emailSender = ['entityId' => null, 'email' => $acknowledgementOptions['acknowledgementReceiptFromMail'], 'label' => ''];
                     }
+                }
+                if (!empty($emailSender)) {
+                    $emailSenders[] = $emailSender;
+                    $sendEmail += $email;
+                } elseif (empty($emailSender) && $currentMode != 'manual') {
+                    $noSendAR['number'] += 1;
+                    $noSendAR['list'][] = ['resId' => $resId, 'alt_identifier' => $resource['alt_identifier'], 'info' => _NO_SENDER_EMAIL];
+                    continue;
                 }
             }
             if ($paper > 0) {
@@ -395,7 +405,22 @@ class PreProcessActionController
             }
         }
 
-        $emailSenders = array_unique($emailSenders);
+        $emailSenders = array_values(array_unique($emailSenders, SORT_REGULAR));
+
+        if ($currentMode == 'manual') {
+            if (empty($entity['email']) || !PrivilegeController::hasPrivilege(['privilegeId' => 'use_mail_services', 'userId' => $GLOBALS['id']])) {
+                $emailSenders = [['email' => $currentUser['mail']]];
+            } else {
+                $availableEmails = EmailController::getAvailableEmailsByUserId(['userId' => $GLOBALS['id']]);
+                $entities = array_column($availableEmails, 'entityId');
+
+                if (!in_array($entity['id'], $entities)) {
+                    $emailSenders = [['email' => $currentUser['mail']]];
+                } else {
+                    $emailSenders = [['email' => $entity['email'], 'entityId' => $entity['id']]];
+                }
+            }
+        }
 
         return $response->withJson([
             'sendEmail'        => $sendEmail,

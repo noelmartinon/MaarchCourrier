@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '@service/notification/notification.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -9,6 +9,7 @@ import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { MatDialog } from '@angular/material/dialog';
 import { catchError, exhaustMap, filter, tap } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { AuthService } from '@service/auth.service';
 
 @Component({
     selector: 'app-my-baskets',
@@ -21,6 +22,8 @@ export class MyBasketsComponent implements OnInit {
     @Input() userBaskets: any[];
     @Input() redirectedBaskets: any[];
     @Input() assignedBaskets: any[];
+
+    @Output() redirectedBasketsEvent = new EventEmitter<any>();
 
     selectionBaskets = new SelectionModel<Element>(true, []);
 
@@ -68,6 +71,11 @@ export class MyBasketsComponent implements OnInit {
             tap((data: any) => {
                 this.userBaskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
                 this.redirectedBaskets = data['redirectedBaskets'];
+                const objToSend: any = {
+                    event: 'add',
+                    redirectedBaskets: this.redirectedBaskets
+                };
+                this.redirectedBasketsEvent.emit(objToSend);
                 this.selectionBaskets.clear();
                 this.notify.success(this.translate.instant('lang.basketUpdated'));
             }),
@@ -127,6 +135,12 @@ export class MyBasketsComponent implements OnInit {
             tap((data: any) => {
                 this.userBaskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
                 this.redirectedBaskets.splice(i, 1);
+                const objToSend: any = {
+                    event: 'del',
+                    baskeToDel: [basket],
+                    redirectedBaskets: this.redirectedBaskets
+                };
+                this.redirectedBasketsEvent.emit(objToSend);
                 this.notify.success(this.translate.instant('lang.basketUpdated'));
             }),
             catchError((err: any) => {

@@ -1844,7 +1844,7 @@
     "customAlreadyExist": "Ce custom semble déjà exister.",
     "invalidCustomName": "Ce nom n'est pas autorisé",
     "invalidLengthCustomName": "Le nom de l'instance doit contenir au moins {{value1}} caractères",
-    "onlySpecialCharAllowed": "Seuls les caractères spéciaux {{value1}} sont autorisés.",
+    "onlySpecialCharAllowed": "Seuls les minuscules et les caractères spéciaux {{value1}} sont autorisés.",
     "dbNotEmpty": "Cette base de données existe déjà et n'est pas vide",
     "stepMailServer": "Serveur de messagerie",
     "stepMailServer_desc": "Configurez votre serveur de messagerie afin de prévenir les utilisateurs par courriel des différents échanges survenus dans l'application.<br/>Cette étape peut être passée et être configurée plus tard.",
@@ -2466,7 +2466,7 @@
     "deleteAttachmentSignatureBook": "Voulez-vous vraiment supprimer la pièce jointe ?",
     "toogleShippingConf": "Activer / désactiver les envois postaux Maileva",
     "infoResId": "Vous pouvez remplir automatiquement ce champ en utilisant le mot-clé <b>@resId</b> pour cibler une ressource du document en cours de traitement",
-    "createPublicIndexingModels": "Créer et supprimer des modèles d'enregistrement publics depuis la page d'enregistrement",
+    "createPublicIndexingModels": "Créer et supprimer des modèles d'enregistrement publics depuis le formulaire d'enregistrement",
     "absencePeriod": "Définir une plage d'absence",
     "organizationEmailSignatures": "Signatures mail d'organisation",
     "organizationEmailSignaturesDesc": "Les signatures seront disponibles pour <b>tous</b> les utilisateurs de l'application.<br/>Vous pouvez utiliser des <b>variables de fusion</b> utilisateur et entité primaire (<a href=\"{{url}}\" target=\"_blank\">plus d'informations</a>).",
@@ -2483,5 +2483,7 @@
     "manual": "Manuelle",
     "mailServer": "Serveur de messagerie",
     "canAddCopies": "Pouvoir ajouter des personnes en copie (CC / CCI)",
-    "isRequired": "est requis"
+    "isRequired": "est requis",
+    "willBeRedirected": "Sera redirigée à",
+    "redirectedFromProfile": "Les bannettes <b>actuellement redirigées</b> sont reprises en redirection pour l'absence"
 }

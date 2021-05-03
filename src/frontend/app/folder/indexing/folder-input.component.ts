@@ -8,7 +8,7 @@ import { AppService } from '@service/app.service';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { FormControl } from '@angular/forms';
 import { Observable, of } from 'rxjs';
-import { debounceTime, filter, distinctUntilChanged, tap, switchMap, exhaustMap, catchError } from 'rxjs/operators';
+import { debounceTime, filter, distinctUntilChanged, tap, switchMap, catchError } from 'rxjs/operators';
 import { LatinisePipe } from 'ngx-pipes';
 import { FunctionsService } from '@service/functions.service';
 
@@ -27,7 +27,7 @@ export class FolderInputComponent implements OnInit {
     /**
      * FormControl used when autocomplete is used in form and must be catched in a form control.
      */
-    @Input('control') controlAutocomplete: FormControl;
+    @Input() control: FormControl;
 
     @Input() returnValue: 'id' | 'object' = 'id';
 
@@ -64,7 +64,7 @@ export class FolderInputComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.controlAutocomplete.valueChanges
+        this.control.valueChanges
             .pipe(
                 tap((data: any) => {
                     if (this.returnValue === 'object') {
@@ -83,7 +83,7 @@ export class FolderInputComponent implements OnInit {
                     }
                 })
             ).subscribe();
-        this.controlAutocomplete.setValue(this.controlAutocomplete.value === null || this.controlAutocomplete.value === '' ? [] : this.controlAutocomplete.value);
+        this.control.setValue(this.control.value === null || this.control.value === '' ? [] : this.control.value);
         this.initAutocompleteRoute();
     }
 
@@ -121,23 +121,23 @@ export class FolderInputComponent implements OnInit {
     }
 
     initFormValue() {
-        this.controlAutocomplete.value.forEach((ids: any) => {
+        this.control.value.forEach((ids: any) => {
             this.http.get('../rest/folders/' + ids).pipe(
                 tap((data) => {
-                    for (const key in data) {
+                    Object.keys(data).forEach(key => {
                         this.valuesToDisplay[data[key].id] = data[key].label;
-                    }
+                    });
                 })
             ).subscribe();
         });
     }
 
     setFormValue(item: any) {
-        const isSelected = this.returnValue === 'id' ? this.controlAutocomplete.value.indexOf(item['id']) > -1 : this.controlAutocomplete.value.map((val: any) => val.id).indexOf(item['id']) > -1;
+        const isSelected = this.returnValue === 'id' ? this.control.value.indexOf(item['id']) > -1 : this.control.value.map((val: any) => val.id).indexOf(item['id']) > -1;
         if (!isSelected) {
             let arrvalue = [];
-            if (this.controlAutocomplete.value !== null) {
-                arrvalue = this.controlAutocomplete.value;
+            if (this.control.value !== null) {
+                arrvalue = this.control.value;
             }
             if (this.returnValue === 'id') {
                 arrvalue.push(item['id']);
@@ -147,7 +147,7 @@ export class FolderInputComponent implements OnInit {
                     label: item['idToDisplay']
                 });
             }
-            this.controlAutocomplete.setValue(arrvalue);
+            this.control.setValue(arrvalue);
         }
     }
 
@@ -157,23 +157,23 @@ export class FolderInputComponent implements OnInit {
     }
 
     unsetValue() {
-        this.controlAutocomplete.setValue('');
+        this.control.setValue('');
         this.myControl.setValue('');
         this.myControl.enable();
     }
 
     removeItem(index: number) {
 
-        if (this.newIds.indexOf(this.controlAutocomplete.value[index]) === -1) {
-            const arrValue = this.controlAutocomplete.value;
-            this.controlAutocomplete.value.splice(index, 1);
-            this.controlAutocomplete.setValue(arrValue);
+        if (this.newIds.indexOf(this.control.value[index]) === -1) {
+            const arrValue = this.control.value;
+            this.control.value.splice(index, 1);
+            this.control.setValue(arrValue);
         } else {
-            this.http.delete('../rest/folders/' + this.controlAutocomplete.value[index]).pipe(
+            this.http.delete('../rest/folders/' + this.control.value[index]).pipe(
                 tap((data: any) => {
-                    const arrValue = this.controlAutocomplete.value;
-                    this.controlAutocomplete.value.splice(index, 1);
-                    this.controlAutocomplete.setValue(arrValue);
+                    const arrValue = this.control.value;
+                    this.control.value.splice(index, 1);
+                    this.control.setValue(arrValue);
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
@@ -190,10 +190,10 @@ export class FolderInputComponent implements OnInit {
 
         this.http.post('../rest/folders', { label: newElem[this.key] }).pipe(
             tap((data: any) => {
-                for (const key in data) {
+                Object.keys(data).forEach(key => {
                     newElem['id'] = data[key];
                     this.newIds.push(data[key]);
-                }
+                });
                 this.setFormValue(newElem);
                 this.myControl.setValue('');
             }),

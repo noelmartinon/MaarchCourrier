@@ -159,6 +159,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     docToUploadValue: any;
 
+    logoutTrigger: boolean = false;
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -1105,7 +1107,12 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 exhaustMap((data) => this.http.put(`../rest/resources/${this.resId}?onlyDocument=true`, data)),
                 tap(() => {
                     this.closeEditor();
-                    this.loadRessource(this.resId);
+                    this.authService.catchEvent().subscribe((res: string) => {
+                        this.logoutTrigger = res === 'login' ? true : false;
+                        if (!this.logoutTrigger) {
+                            this.loadRessource(this.resId);
+                        }
+                    });
                     resolve(true);
                 }),
                 finalize(() => this.loading = false),

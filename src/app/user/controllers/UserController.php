@@ -2270,17 +2270,10 @@ class UserController
 
         if (!empty($args['redirectedBaskets'])) {
             foreach ($args['redirectedBaskets'] as $value) {
-                $alreadyRedirected = RedirectBasketModel::get([
-                    'select' => [1],
-                    'where'  => ['owner_user_id = ?', 'basket_id = ?', 'group_id = ?'],
-                    'data'   => [$args['userId'], $value['basket_id'], $value['group_id']]
+                RedirectBasketModel::delete([
+                    'where' => ['basket_id = ?', 'group_id = ?', 'owner_user_id = ?'],
+                    'data'  => [$value['basket_id'], $value['group_id'], $args['userId']]
                 ]);
-                if (!empty($alreadyRedirected)) {
-                    RedirectBasketModel::delete([
-                        'where' => ['basket_id = ?', 'group_id = ?', 'owner_user_id = ?'],
-                        'data'  => [$value['basket_id'], $value['group_id'], $args['userId']]
-                    ]);
-                }
                 RedirectBasketModel::create([
                     'actual_user_id' => $value['actual_user_id'],
                     'basket_id'      => $value['basket_id'],

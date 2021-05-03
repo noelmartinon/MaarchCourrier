@@ -38,6 +38,7 @@
             </mat-list-item>
         </mat-list>
         <mat-list>
+            <app-maarch-message *ngIf="!isAbsScheduled && data.user.redirectedBaskets.length > 0" [mode]="'info'" [content]="'lang.redirectedFromProfile' | translate"></app-maarch-message>
             <div mat-subheader>{{'lang.basketsToRedirect' | translate}} :</div>
             <mat-list-item >
                 <mat-icon mat-list-icon style="display: flex;align-items: center;justify-content: center;">
@@ -58,7 +59,7 @@
                     <div mat-line style="cursor: pointer;" (click)="!isRedirectedBasket(basket) ? basket.selected=!basket.selected : false">{{basket.basket_name}} <span class="label label-primary"
                             style="font-weight:normal">{{basket.group_desc}}</span></div>
                     <div mat-line *ngIf="isRedirectedBasket(basket) || checkIfExist(basket, 'user')" color="warn"> 
-                        <i class="far fa-paper-plane"></i>&nbsp;{{'lang.redirectedTo' | translate}} {{isRedirectedBasket(basket) ? basket.userToDisplay : checkIfExist(basket, 'user')}}
+                        <i class="far fa-paper-plane"></i>&nbsp;{{'lang.willBeRedirected' | translate}} {{isRedirectedBasket(basket) ? basket.userToDisplay : checkIfExist(basket, 'user')}}
                     </div>
                 </mat-list-item>
                 <mat-divider></mat-divider>
@@ -74,11 +75,11 @@
     </div>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
-        <button mat-raised-button *ngIf="isAbsScheduled && !isModified()" mat-button color="warn"
+        <button mat-raised-button *ngIf="!loading && isAbsScheduled && !isModified()" mat-button color="warn"
             (click)="canceled = true; cancelSchedule()">{{'lang.cancelSchedule' | translate}}</button>
         <button mat-raised-button mat-button *ngIf="isAbsScheduled && isModified()" color="primary" [disabled]="loading || (startDate && !endDate) || (!startDate && endDate)"
             (click)="isAbsScheduled = false; onSubmit()">{{'lang.update' | translate}}</button>
-        <button mat-raised-button mat-button *ngIf="(!isAbsScheduled && isModified()) || (!isAbsScheduled && startDate) || (!isAbsScheduled && !startDate && !endDate)" color="primary" [disabled]="loading || (startDate && !endDate) || (!startDate && endDate)"
+        <button mat-raised-button mat-button *ngIf="!loading && ((!isAbsScheduled && isModified()) || (!isAbsScheduled && startDate) || (!isAbsScheduled && !startDate && !endDate))" color="primary" [disabled]="loading || (startDate && !endDate) || (!startDate && endDate)"
             (click)="onSubmit()">{{'lang.validate' | translate}}</button>
         <button mat-raised-button mat-button [disabled]="loading"
             [mat-dialog-close]="">{{'lang.close' | translate}}</button>

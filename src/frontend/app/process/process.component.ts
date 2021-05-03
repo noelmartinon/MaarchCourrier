@@ -325,30 +325,32 @@ export class ProcessComponent implements OnInit, OnDestroy {
     }
 
     loadResource(redirectDefautlTool: boolean = true) {
-        this.http.get(`../rest/resources/${this.currentResourceInformations.resId}?light=true`).pipe(
-            tap((data: any) => {
-                this.currentResourceInformations = data;
-                this.resourceFollowed = data.followed;
-                this.resourceBinded = data.binding;
-                this.resourceFreezed = data.retentionFrozen;
-                if (this.currentResourceInformations.categoryId !== 'outgoing') {
-                    this.loadSenders();
-                } else {
-                    this.loadRecipients();
-                }
-                if (redirectDefautlTool) {
-                    this.setEditDataPrivilege();
-                }
+        if (!this.logoutTrigger) {
+            this.http.get(`../rest/resources/${this.currentResourceInformations.resId}?light=true`).pipe(
+                tap((data: any) => {
+                    this.currentResourceInformations = data;
+                    this.resourceFollowed = data.followed;
+                    this.resourceBinded = data.binding;
+                    this.resourceFreezed = data.retentionFrozen;
+                    if (this.currentResourceInformations.categoryId !== 'outgoing') {
+                        this.loadSenders();
+                    } else {
+                        this.loadRecipients();
+                    }
+                    if (redirectDefautlTool) {
+                        this.setEditDataPrivilege();
+                    }
 
-                this.loadAvaibleIntegrations(data.integrations);
-                this.headerService.setHeader(this.detailMode ? this.translate.instant('lang.detailDoc') : this.translate.instant('lang.eventProcessDoc'), this.translate.instant('lang.' + this.currentResourceInformations.categoryId));
-            }),
-            finalize(() => this.loading = false),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+                    this.loadAvaibleIntegrations(data.integrations);
+                    this.headerService.setHeader(this.detailMode ? this.translate.instant('lang.detailDoc') : this.translate.instant('lang.eventProcessDoc'), this.translate.instant('lang.' + this.currentResourceInformations.categoryId));
+                }),
+                finalize(() => this.loading = false),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        }
     }
 
     setEditDataPrivilege() {

@@ -149,7 +149,7 @@ class ConvertPdfController
         $tmpPath = CoreConfigModel::getTmpPath();
         $fileNameOnTmp = rand() . $docInfo["filename"];
 
-        copy($pathToDocument, $tmpPath.$fileNameOnTmp.'.'.$docInfo["extension"]);
+        copy($pathToDocument, $tmpPath.$fileNameOnTmp .'.'. strtolower($docInfo["extension"]));
 
         if (strtolower($docInfo["extension"]) != 'pdf') {
             $convertedFile = ConvertPdfController::convertInPdf(['fullFilename' => $tmpPath.$fileNameOnTmp.'.'.$docInfo["extension"]]);

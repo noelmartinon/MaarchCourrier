@@ -63,7 +63,7 @@ class StoreController
                     'collId'            => 'letterbox_coll',
                     'docserverTypeId'   => 'DOC',
                     'encodedResource'   => base64_encode($fileContent),
-                    'format'            => $args['format']
+                    'format'            => strtolower($args['format'])
                 ]);
                 if (!empty($storeResult['errors'])) {
                     return ['errors' => '[storeResource] ' . $storeResult['errors']];
@@ -119,7 +119,7 @@ class StoreController
                     'collId'            => 'attachments_coll',
                     'docserverTypeId'   => 'DOC',
                     'encodedResource'   => base64_encode($fileContent),
-                    'format'            => $args['format']
+                    'format'            => strtolower($args['format'])
                 ]);
                 if (!empty($storeResult['errors'])) {
                     return ['errors' => '[storeAttachment] ' . $storeResult['errors']];

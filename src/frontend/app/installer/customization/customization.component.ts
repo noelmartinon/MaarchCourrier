@@ -40,7 +40,7 @@ export class CustomizationComponent implements OnInit {
         public http: HttpClient,
         private installerService: InstallerService
     ) {
-        const valIdentifier: ValidatorFn[] = [Validators.pattern(/^[a-zA-Z0-9_\-]*$/), Validators.required, Validators.minLength(3)];
+        const valIdentifier: ValidatorFn[] = [Validators.pattern(/^[a-z0-9_\-]*$/), Validators.required, Validators.minLength(3)];
 
         this.stepFormGroup = this._formBuilder.group({
             firstCtrl: ['success', Validators.required],

@@ -366,4 +366,15 @@ export class ProfileComponent implements OnInit {
             return '';
         }
     }
+
+    toggleRedirection(value: any) {
+        if (value.event === 'add') {
+            value.redirectedBaskets.forEach((val: any) => {
+                this.user.baskets.find((item: any) => val.basket_id === item.basket_id && val.group_id === item.groupSerialId).userToDisplay = val.userToDisplay;
+            });
+        } else if (value.event === 'del') {
+            this.user.baskets.find((item: any) => value.baskeToDel[0].basket_id === item.basket_id && value.baskeToDel[0].group_id === item.groupSerialId).userToDisplay = null;
+        }
+        this.user.redirectedBaskets = value.redirectedBaskets;
+    }
 }

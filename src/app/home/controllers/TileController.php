@@ -305,7 +305,7 @@ class TileController
                 'where'  => ['basket_id = ?', 'group_id = ?'],
                 'data'   => [$basket['basket_id'], $group['group_id']]
             ]);
-            
+
             $tile['basketRoute'] = null;
             if ($groupBasket[0]['list_event'] == 'processDocument') {
                 $tile['basketRoute'] = '/process/users/:userId/groups/:groupId/baskets/:basketId/resId/:resId';
