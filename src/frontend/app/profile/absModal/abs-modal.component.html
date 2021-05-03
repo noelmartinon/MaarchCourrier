@@ -38,6 +38,7 @@
             </mat-list-item>
         </mat-list>
         <mat-list>
+            <app-maarch-message *ngIf="!isAbsScheduled && data.user.redirectedBaskets.length > 0" [mode]="'info'" [content]="'lang.redirectedFromProfile' | translate"></app-maarch-message>
             <div mat-subheader>{{'lang.basketsToRedirect' | translate}} :</div>
             <mat-list-item >
                 <mat-icon mat-list-icon style="display: flex;align-items: center;justify-content: center;">

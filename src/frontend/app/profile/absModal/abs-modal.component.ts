@@ -103,10 +103,6 @@ export class AbsModalComponent implements OnInit {
     delBasketRedirection(basket: any) {
         basket.actual_user_id = null;
         basket.userToDisplay = null;
-        const basetToDelRedirection: any = this.data.user.redirectedBaskets.filter((item: any) => item.basket_id === basket.basket_id);
-        if (basetToDelRedirection.length === 1) {
-            basetToDelRedirection[0].userToDisplay = null;
-        }
     }
 
     redirectBaskets() {
