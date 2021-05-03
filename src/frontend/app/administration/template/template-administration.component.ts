@@ -712,10 +712,6 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
             clearInterval(this.intervalLockFile);
         }
     }
-
-    emptyOptions() {
-        return Object.keys(this.options).length === 0;
-    }
 }
 @Component({
     templateUrl: 'template-administration-checkEntities-modal.component.html',
