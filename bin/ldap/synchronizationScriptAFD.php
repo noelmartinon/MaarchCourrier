@@ -16,62 +16,70 @@ chdir('../..');
 
 require 'vendor/autoload.php';
 
-$customId = null;
-if (!empty($argv[1]) && $argv[1] == '--customId' && !empty($argv[2])) {
-    $customId = $argv[2];
-}
+main($argv);
 
-$xmlfile = initialize($customId);
-$synchronizeUsers = false;
-if (!empty($xmlfile->synchronizeUsers) && (string)$xmlfile->synchronizeUsers == 'true') {
-    $synchronizeUsers = true;
-}
-$synchronizeEntities = false;
-if (!empty($xmlfile->synchronizeEntities) && (string)$xmlfile->synchronizeEntities == 'true') {
-    $synchronizeEntities = true;
-}
-
-if ($synchronizeUsers) {
-    $maarchUsers = \User\models\UserModel::get(['select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'status']]);
-    $ldapUsers = getUsersEntries($xmlfile);
-    if (!empty($ldapUsers['errors'])) {
-        writeLog(['message' => "[ERROR] {$ldapUsers['errors']}"]);
-        $synchronizeUsers = false;
-        $ldapUsers = null;
+function main($argv)
+{
+    $customId = null;
+    if (!empty($argv[1]) && $argv[1] == '--customId' && !empty($argv[2])) {
+        $customId = $argv[2];
+        $GLOBALS['customId'] = $customId;
     }
-}
-if ($synchronizeEntities) {
-    $maarchEntities = \Entity\models\EntityModel::get(['select' => ['id', 'entity_id', 'entity_label', 'short_label', 'entity_type', 'parent_entity_id']]);
-    $ldapEntities = getEntitiesEntries($xmlfile);
-    if (!empty($ldapEntities['errors'])) {
-        writeLog(['message' => "[ERROR] {$ldapEntities['errors']}"]);
-        $synchronizeEntities = false;
-        $ldapEntities = null;
+    
+    $xmlfile = initialize($customId);
+    $synchronizeUsers = false;
+    if (!empty($xmlfile->synchronizeUsers) && (string)$xmlfile->synchronizeUsers == 'true') {
+        $synchronizeUsers = true;
     }
-}
-
-if (!empty($ldapUsers)) {
-    foreach ($ldapUsers as $key => $ldapUser) {
-        if (!empty($ldapUser['entityId'])) {
-            if (!empty($ldapEntities)) {
-                foreach ($ldapEntities as $ldapEntity) {
-                    if ($ldapEntity['dn'] == $ldapUser['entityId']) {
-                        $ldapUsers[$key]['entityId'] = $ldapEntity['entity_id'];
-                        break;
+    $synchronizeEntities = false;
+    if (!empty($xmlfile->synchronizeEntities) && (string)$xmlfile->synchronizeEntities == 'true') {
+        $synchronizeEntities = true;
+    }
+    
+    if ($synchronizeUsers) {
+        $maarchUsers = \User\models\UserModel::get(['select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'status']]);
+        $ldapUsers = getUsersEntries($xmlfile);
+        if (!empty($ldapUsers['errors'])) {
+            writeLog(['message' => "[ERROR] {$ldapUsers['errors']}"]);
+            $synchronizeUsers = false;
+            $ldapUsers = null;
+        }
+    }
+    if ($synchronizeEntities) {
+        $maarchEntities = \Entity\models\EntityModel::get(['select' => ['id', 'entity_id', 'entity_label', 'short_label', 'entity_type', 'parent_entity_id']]);
+        $ldapEntities = getEntitiesEntries($xmlfile);
+        if (!empty($ldapEntities['errors'])) {
+            writeLog(['message' => "[ERROR] {$ldapEntities['errors']}"]);
+            $synchronizeEntities = false;
+            $ldapEntities = null;
+        }
+    }
+    
+    if (!empty($ldapUsers)) {
+        foreach ($ldapUsers as $key => $ldapUser) {
+            if (!empty($ldapUser['entityId'])) {
+                if (!empty($ldapEntities)) {
+                    foreach ($ldapEntities as $ldapEntity) {
+                        if ($ldapEntity['dn'] == $ldapUser['entityId']) {
+                            $ldapUsers[$key]['entityId'] = $ldapEntity['entity_id'];
+                            break;
+                        }
                     }
+                } else {
+                    $ldapUsers[$key]['entityId'] = null;
                 }
-            } else {
-                $ldapUsers[$key]['entityId'] = null;
             }
         }
     }
-}
-
-if ($synchronizeUsers) {
-    synchronizeUsers($ldapUsers, $maarchUsers);
-}
-if ($synchronizeEntities) {
-    synchronizeEntities($ldapEntities, $maarchEntities);
+    
+    if ($synchronizeUsers) {
+        synchronizeUsers($ldapUsers, $maarchUsers);
+    }
+    if ($synchronizeEntities) {
+        synchronizeEntities($ldapEntities, $maarchEntities);
+    }
+    
+    sendDiff($xmlfile, $ldapEntities, $ldapUsers);
 }
 
 function initialize($customId)
@@ -91,16 +99,12 @@ function initialize($customId)
     $file = file_get_contents($path);
     $xmlfile = simplexml_load_file($path);
 
-if (false === $xmlfile) {
-    $errors = libxml_get_errors();
-    echo 'Errors are '.var_export($errors, true);
-    throw new \Exception('invalid XML');
-}
-
-    if (empty($xmlfile) || empty($xmlfile->config->ldap)) {
-        writeLog(['message' => "[ERROR] No ldap configurations"]);
-        exit();
+    if (false === $xmlfile) {
+        $errors = libxml_get_errors();
+        echo 'Errors are '.var_export($errors, true);
+        throw new \Exception('invalid XML');
     }
+
     if (empty((string)$xmlfile->userWS) || empty((string)$xmlfile->passwordWS)) {
         writeLog(['message' => "[ERROR] Rest user informations are missing"]);
         exit();
@@ -125,7 +129,7 @@ if (false === $xmlfile) {
 
 function getUsersEntries($xmlfile)
 {
-    $xmlldap = simplexml_load_file('bin/ldap/ldap_users.xml');
+    $xmlldap = simplexml_load_file((string)$xmlfile->xmlUserPath);
 
     if (false === $xmlldap) {
         $errors = libxml_get_errors();
@@ -134,9 +138,6 @@ function getUsersEntries($xmlfile)
     }
     $json = json_encode($xmlldap);
     $array = json_decode($json,TRUE);
-
-    $login = (string)$xmlfile->config->ldap->login_admin;
-    $password = (string)$xmlfile->config->ldap->pass;
 
     if (empty($xmlfile->mapping->user->user_id)) {
         return ['errors' => 'No mapping configurations (user_id)'];
@@ -150,16 +151,6 @@ function getUsersEntries($xmlfile)
         'entityId'      => (string)$xmlfile->mapping->user->user_entity ?? null
     ];
     $defaultEntity = (string)$xmlfile->mapping->user->defaultEntity ?? null;
-
-    foreach ($xmlfile->filter->dn as $valueDN) {
-        if ((string)$valueDN['type'] == 'users') {
-            $dn = (string)$valueDN['id'];
-            $filters = empty((string)$valueDN->user) ? null : (string)$valueDN->user;
-        }
-    }
-    if (empty($dn)) {
-        return ['errors' => 'No DN found'];
-    }
 
     $entries = $array;
     $ldapEntries = [];
@@ -187,7 +178,7 @@ function getUsersEntries($xmlfile)
 
 function getEntitiesEntries($xmlfile)
 {
-    $xmlldap = simplexml_load_file('bin/ldap/ldap_entities.xml');
+    $xmlldap = simplexml_load_file((string)$xmlfile->xmlEntityPath);
 
     if (false === $xmlldap) {
         $errors = libxml_get_errors();
@@ -196,9 +187,6 @@ function getEntitiesEntries($xmlfile)
     }
     $json = json_encode($xmlldap);
     $array = json_decode($json,TRUE);
-
-    $login = (string)$xmlfile->config->ldap->login_admin;
-    $password = (string)$xmlfile->config->ldap->pass;
 
     if (empty($xmlfile->mapping->entity->entity_id)) {
         return ['errors' => 'No mapping configurations (entity_id)'];
@@ -302,18 +290,19 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
         }
     }
 
+    
     foreach ($maarchUsers as $user) {
-        if (empty($ldapUsersLogin[$user['user_id']])) {
-            $curlResponse = \SrcCore\models\CurlModel::execSimple([
-                'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $user['id'] . '/suspend',
-                'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
-                'headers'       => ['content-type:application/json'],
-                'method'        => 'PUT'
-            ]);
-            if ($curlResponse['code'] != 204) {
-                writeLog(['message' => "[ERROR] Delete user failed  : {$curlResponse['response']['errors']}"]);
-            }
-        }
+        // if (empty($ldapUsersLogin[$user['user_id']])) {
+        //     $curlResponse = \SrcCore\models\CurlModel::execSimple([
+        //         'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $user['id'] . '/suspend',
+        //         'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
+        //         'headers'       => ['content-type:application/json'],
+        //         'method'        => 'PUT'
+        //     ]);
+        //     if ($curlResponse['code'] != 204) {
+        //         writeLog(['message' => "[ERROR] Delete user failed  : {$curlResponse['response']['errors']}"]);
+        //     }
+        // }
     }
 
     return true;
@@ -366,15 +355,15 @@ function synchronizeEntities(array $ldapEntities, array $maarchEntities)
 
     foreach ($maarchEntities as $entity) {
         if (empty($ldapEntitiesId[$entity['entity_id']])) {
-            $curlResponse = \SrcCore\models\CurlModel::execSimple([
-                'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/entities/' . $entity['entity_id'],
-                'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
-                'headers'       => ['content-type:application/json'],
-                'method'        => 'DELETE'
-            ]);
-            if ($curlResponse['code'] != 200) {
-                writeLog(['message' => "[ERROR] Delete entity failed : {$curlResponse['response']['errors']}"]);
-            }
+            // $curlResponse = \SrcCore\models\CurlModel::execSimple([
+            //     'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/entities/' . $entity['entity_id'],
+            //     'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
+            //     'headers'       => ['content-type:application/json'],
+            //     'method'        => 'DELETE'
+            // ]);
+            // if ($curlResponse['code'] != 200) {
+            //     writeLog(['message' => "[ERROR] Delete entity failed : {$curlResponse['response']['errors']}"]);
+            // }
         }
     }
 
@@ -448,4 +437,135 @@ function userAddEntity($userId, $user)
     else{
         writeLog(['message' => "[ERROR] Add entity to user failed : {Entity not found}"]);
     }
+}
+
+function sendMail($email)
+{
+    $configuration = \Configuration\models\ConfigurationModel::getByPrivilege(['privilege' => 'admin_email_server', 'select' => ['value']]);
+    $configuration = json_decode($configuration['value'], true);
+
+    if (empty($configuration)) {
+        writeLog(['message' => 'Configuration admin_email_server is missing']);
+        return false;
+    }
+    
+    $phpmailer = new \PHPMailer\PHPMailer\PHPMailer();
+    $phpmailer->setFrom($configuration['from'], $configuration['from']);
+    if (in_array($configuration['type'], ['smtp', 'mail'])) {
+        if ($configuration['type'] == 'smtp') {
+            $phpmailer->isSMTP();
+        } elseif ($configuration['type'] == 'mail') {
+            $phpmailer->isMail();
+        }
+
+        $phpmailer->Host = $configuration['host'];
+        $phpmailer->Port = $configuration['port'];
+        $phpmailer->SMTPAutoTLS = false;
+        if (!empty($configuration['secure'])) {
+            $phpmailer->SMTPSecure = $configuration['secure'];
+        }
+        $phpmailer->SMTPAuth = $configuration['auth'];
+        if ($configuration['auth']) {
+            $phpmailer->Username = $configuration['user'];
+            if (!empty($configuration['password'])) {
+                $phpmailer->Password = \SrcCore\models\PasswordModel::decrypt(['cryptedPassword' => $configuration['password']]);
+            }
+        }
+    } elseif ($configuration['type'] == 'sendmail') {
+        $phpmailer->isSendmail();
+    } elseif ($configuration['type'] == 'qmail') {
+        $phpmailer->isQmail();
+    }
+
+    $phpmailer->CharSet = $configuration['charset'];
+    $phpmailer->addAddress($email['recipient']);
+    $phpmailer->isHTML(true);
+    $phpmailer->Timeout = 30;
+
+    $phpmailer->Subject = $email['subject'];
+    $phpmailer->Body = $email['html_body'];
+    if (empty($email['html_body'])) {
+        writeLog(['message' => '0 users et 0 entity to delete']);
+        return false;
+    }
+
+    $isSent = $phpmailer->send();
+    if ($isSent) {
+        $exec_result = 'SENT';
+        writeLog(['message' => 'notification sent']);
+    } else {
+        $err++;
+        writeLog(['message' => 'SENDING EMAIL ERROR ! (' . $phpmailer->ErrorInfo.')']);
+        return false;
+    }
+    return true;
+}
+
+function sendDiff($xmlfile, $ldapEntities, $ldapUsers)
+{
+
+    $email['subject'] = (string)$xmlfile->mailing->subject;
+    if(empty($email['subject']))
+    {
+        writeLog(['message' => 'mailing subject empty, please check the ldap config file.']);
+        return false;
+    }
+
+    $email['recipient'] = (string)$xmlfile->mailing->dest;
+    if(empty($email['subject']))
+    {
+        writeLog(['message' => 'mailing dest empty, please check the ldap config file.']);
+        return false;
+    }
+
+    $finalMaarchUsers = \User\models\UserModel::get(['select' => ['user_id', 'firstname', 'lastname', 'phone', 'mail', 'status']]);
+    $finalMaarchEntities = \Entity\models\EntityModel::get(['select' => ['entity_id', 'entity_label', 'short_label', 'entity_type', 'parent_entity_id']]);
+    
+    $bodyUser = "";
+    $bodyEntity = "";
+    $compare = false;
+    $tabulation = '<tr>';
+  
+    foreach ($finalMaarchUsers as $value) {
+        $compare = true;
+        foreach ($ldapUsers as $v) {
+            if($value['user_id'] == $v['user_id'])  $compare = false;
+        }
+        if($compare){
+            $bodyUser .= '<tr>';
+            $bodyUser .= '<td>'.$value['user_id'].'</td>';
+            $bodyUser .= '<td>'.$value['firstname'].'</td>';
+            $bodyUser .= '<td>'.' '.$value['lastname'].'</td>';
+            $bodyUser .= '</tr>';
+        }
+    }
+
+    foreach ($finalMaarchEntities as $key => $value) {
+        $compare = true;
+        foreach ($ldapEntities as $v) {
+            if($value['entity_id'] == $v['entity_id']) $compare = false;
+        }
+        if($compare){
+            $bodyEntity .= '<tr>';
+            $bodyEntity .= '<td>'.$value['entity_id'].'</td>';
+            $bodyEntity .= '<td>'.$value['entity_label'].'</td>';
+            $bodyEntity .= '</tr>';
+        }
+    }
+
+    if($bodyUser){
+        $email['html_body'] .= '<h3>Liste utilisateurs non présent dans le fichier ldap</h3> <br>';
+        $email['html_body'] .= '<table>'.$bodyUser.'</table>';
+    }
+    if($bodyEntity){
+        $email['html_body'] .= '<h3>Liste entitées non présentes dans le fichier ldap</h3> <br>';
+        $email['html_body'] .= '<table>'.$bodyEntity.'</table>';
+    }
+
+    if(! $bodyEntity && ! $bodyUser)
+    {
+        $email['html_body'] = "Aucune suppression prévue";
+    }
+
+    return sendMail($email);
 }
