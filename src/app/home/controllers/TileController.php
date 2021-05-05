@@ -725,7 +725,7 @@ class TileController
         $query = [];
         foreach ($rawQuery as $value) {
             $definedVars = get_defined_vars();
-            if (!empty($value['values'][0]) && array_key_exists('id', $definedVars['value']['values'][0]) && !in_array($value['identifier'], ['recipients', 'senders']) && strpos($value['identifier'], 'role_') === false) {
+            if (!empty($value['values'][0]) && is_array($value['values'][0]) && array_key_exists('id', $definedVars['value']['values'][0]) && !in_array($value['identifier'], ['recipients', 'senders']) && strpos($value['identifier'], 'role_') === false) {
                 $value['values'] = array_column($value['values'], 'id');
             } else {
                 if (!empty($value['values']['start'])) {
