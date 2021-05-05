@@ -1,6 +1,6 @@
 <div class="mat-dialog-content-container">
     <h1 mat-dialog-title>{{'lang.activateMyAbs' | translate}}</h1>
-    <div mat-dialog-content>
+    <div mat-dialog-content style="display: flex; flex-direction: column;">
         <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
             <mat-spinner style="margin:auto;"></mat-spinner>
         </div>
@@ -8,7 +8,7 @@
         <mat-list *ngIf="!showCalendar && !isAbsScheduled">
             <mat-list-item>
                 <button mat-button color="primary" matSuffix
-                    style="width: 100%; align-items:center; font-size: 16px;"
+                    style="width: 100%; align-items:center; font-size: 16px; background: white;"
                         (click)="$event.stopPropagation(); showCalendar = !showCalendar;" [title]="'lang.absencePeriod' | translate">
                     <mat-icon inline="true" color="primary" class="far fa-calendar-alt" style="margin-bottom: 5px;">
                     </mat-icon>
@@ -37,7 +37,7 @@
                 </mat-form-field>
             </mat-list-item>
         </mat-list>
-        <mat-list>
+        <mat-list style="flex: 1; overflow: auto;">
             <app-maarch-message *ngIf="!isAbsScheduled && data.user.redirectedBaskets.length > 0" [mode]="'info'" [content]="'lang.redirectedFromProfile' | translate"></app-maarch-message>
             <div mat-subheader>{{'lang.basketsToRedirect' | translate}} :</div>
             <mat-list-item >
