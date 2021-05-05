@@ -111,17 +111,18 @@ logs:
     - apt-get update -y
     - apt install -y curl
   script:
-    - if [[ $CI_COMMIT_MESSAGE == "FEAT"* ]]; then \
-        ISSUE_ID=`echo $CI_COMMIT_MESSAGE | grep -o 'FEAT \#[0-9]*' | grep -o '[0-9]*'`; \
-        echo "found feat !"; \
-      else \
-        if [[ $CI_COMMIT_MESSAGE == "FIX"* ]]; then \
-          ISSUE_ID=`echo $CI_COMMIT_MESSAGE | grep -o 'FIX \#[0-9]*' | grep -o '[0-9]*'`; \
-          echo "found fix !"; \
-        else \
-          echo "noting found :("; \
-        fi; \
-      fi
+#    - if [[ $CI_COMMIT_MESSAGE == "FEAT"* ]]; then \
+#        ISSUE_ID=`echo $CI_COMMIT_MESSAGE | grep -o 'FEAT \#[0-9]*' | grep -o '[0-9]*'`; \
+#        echo "found feat !"; \
+#      else \
+#        if [[ $CI_COMMIT_MESSAGE == "FIX"* ]]; then \
+#          ISSUE_ID=`echo $CI_COMMIT_MESSAGE | grep -o 'FIX \#[0-9]*' | grep -o '[0-9]*'`; \
+#          echo "found fix !"; \
+#        else \
+#          echo "noting found :("; \
+#        fi; \
+#      fi
+    - ISSUE_ID=`echo $CI_COMMIT_MESSAGE | grep -o 'FEAT \#[0-9]*' | grep -o '[0-9]*'`;
     - echo $ISSUE_ID
     - NOTE_MESSAGE="Commit ajouté sur la branche $CI_COMMIT_REF_NAME de $CI_PROJECT_NAME"
     - COMMIT_URL="$CI_PROJECT_URL/commit/$CI_COMMIT_SHA"
