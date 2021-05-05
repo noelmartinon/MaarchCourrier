@@ -120,7 +120,6 @@ logs:
           echo "found fix !"; \
         else \
           echo "noting found :("; \
-#          exit 1; \
         fi; \
       fi
     - echo $ISSUE_ID
