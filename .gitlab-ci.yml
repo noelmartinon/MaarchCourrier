@@ -111,7 +111,7 @@ logs:
     - apt-get update -y
     - apt install -y curl
   script:
-    - ISSUE_ID=`echo $CI_COMMIT_MESSAGE | grep -o 'FIX \#[0-9]*' | grep -o '[0-9]*'`
+    - ISSUE_ID=`echo $CI_COMMIT_MESSAGE | grep -o 'FEAT \#[0-9]*' | grep -o '[0-9]*'`
     - NOTE_MESSAGE="Commit ajouté sur la branche $CI_COMMIT_REF_NAME de $CI_PROJECT_NAME"
     - COMMIT_URL="$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA"
     - echo $ISSUE_ID
