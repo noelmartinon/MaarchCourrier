@@ -111,14 +111,25 @@ logs:
     - apt-get update -y
     - apt install -y curl
   script:
-    - ISSUE_ID=`echo $CI_COMMIT_MESSAGE | grep -o 'FEAT \#[0-9]*' | grep -o '[0-9]*'`
-    - NOTE_MESSAGE="Commit ajouté sur la branche $CI_COMMIT_REF_NAME de $CI_PROJECT_NAME"
-    - COMMIT_URL="$CI_PROJECT_URL/-/commit/$CI_COMMIT_SHA"
+    - if [[ $CI_COMMIT_MESSAGE == "FEAT"* ]]; then \
+        ISSUE_ID=`echo $CI_COMMIT_MESSAGE | grep -o 'FEAT \#[0-9]*' | grep -o '[0-9]*'`; \
+        echo "found feat !"; \
+      else \
+        if [[ $CI_COMMIT_MESSAGE == "FIX"* ]]; then \
+          ISSUE_ID=`echo $CI_COMMIT_MESSAGE | grep -o 'FIX \#[0-9]*' | grep -o '[0-9]*'`; \
+          echo "found fix !"; \
+        else \
+          echo "noting found :("; \
+#          exit 1; \
+        fi; \
+      fi
     - echo $ISSUE_ID
+    - NOTE_MESSAGE="Commit ajouté sur la branche $CI_COMMIT_REF_NAME de $CI_PROJECT_NAME"
+    - COMMIT_URL="$CI_PROJECT_URL/commit/$CI_COMMIT_SHA"
     - echo $NOTE_MESSAGE
     - echo $CI_COMMIT_MESSAGE
     - echo $COMMIT_URL
-    - NOTE=$(printf "$NOTE_MESSAGE \n $CI_COMMIT_MESSAGE \n $COMMIT_URL")
+    - NOTE="$NOTE_MESSAGE \n $CI_COMMIT_MESSAGE \n $COMMIT_URL"
     - echo "$NOTE"
     - BODY="{\"issue\":{\"notes\":\"$NOTE\",\"private_notes\":true}}"
     - echo "$BODY"
