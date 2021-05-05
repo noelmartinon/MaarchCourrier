@@ -52,10 +52,10 @@ trait AcknowledgementReceiptTrait
 
         if ($args['data']['manual']) {
             $contentToSend = $args['data']['content'] ?? null;
-            $subjectToSend = !empty($args['data']['subject']) ? $args['data']['subject'] : $subjectResource;
+            $subjectToSend = !empty($args['data']['subject']) ? $args['data']['subject'] : '[AR] ' . $subjectResource;
         } else {
             $contentToSend = null;
-            $subjectToSend = $subjectResource;
+            $subjectToSend = '[AR] ' . $subjectResource;
         }
 
         $contactsToProcess = ResourceContactModel::get([
@@ -230,7 +230,7 @@ trait AcknowledgementReceiptTrait
                 'data'      => [
                     'sender'        => $emailSender,
                     'recipients'    => [$email['email']],
-                    'object'        => '[AR] ' . substr($subjectToSend, 0, 100),
+                    'object'        => substr($subjectToSend, 0, 100),
                     'body'          => base64_decode($email['encodedHtml']),
                     'document'      => ['id' => $args['resId'], 'isLinked' => false, 'original' => true],
                     'isHtml'        => true,
