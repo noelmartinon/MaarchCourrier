@@ -129,7 +129,7 @@ logs:
     - COMMIT_URL="$CI_PROJECT_URL/commit/$CI_COMMIT_SHA"
     - echo $NOTE_MESSAGE
     - echo "$CI_COMMIT_MESSAGE"
-    - $CI_COMMIT_MESSAGE=$(echo $CI_COMMIT_MESSAGE) # Remove the line returns
+    - CI_COMMIT_MESSAGE=$(echo $CI_COMMIT_MESSAGE) # Remove the line returns
     - echo "$CI_COMMIT_MESSAGE"
     - echo $COMMIT_URL
     - NOTE="$NOTE_MESSAGE \n $CI_COMMIT_MESSAGE \n $COMMIT_URL"
