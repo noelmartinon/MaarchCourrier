@@ -16,7 +16,7 @@
                 <mat-icon matPrefix [class]="data.value.icon" color="primary" style="width: 35px;text-align: center;">
                 </mat-icon>
                 <mat-label>{{'lang.'+data.key | translate}}</mat-label>
-                <input matInput [value]="data.value.value" readonly>
+                <input matInput [title]="data.value.value" [value]="data.value.value" readonly>
             </mat-form-field>
         </ng-container>
         <mat-accordion *ngIf="!isEmptyCustom()">

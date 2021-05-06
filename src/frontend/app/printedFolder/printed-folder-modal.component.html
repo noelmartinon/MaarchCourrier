@@ -63,12 +63,12 @@
                                             *ngIf="!functions.empty(element.chrono)">
                                             {{element.chrono}}
                                         </div>
-                                        <div color="primary"
+                                        <div color="primary" [title]="element.recipients"
                                             style="flex:1;display: flex;font-size: 80%;white-space: pre;padding-right: 10px;"
                                             *ngIf="!functions.empty(element.recipients)">
                                             {{'lang.for' | translate | ucfirst}} : {{element.recipients}}
                                         </div>
-                                        <div *ngIf="!functions.empty(element.creator)" color="primary"
+                                        <div *ngIf="!functions.empty(element.creator)" color="primary" [title]="element.creator"
                                             style="flex:1;font-size: 80%;padding-right: 10px;">
                                             {{element.creator}}
                                         </div>
