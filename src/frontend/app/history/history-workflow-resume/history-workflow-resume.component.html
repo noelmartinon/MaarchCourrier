@@ -12,7 +12,7 @@
             <div class="info">
                 {{history.info | shorten: 110: '...'}}
             </div>
-            <div class="date">
+            <div class="date" [title]="history.userLabel">
                 {{history.userLabel}}
             </div>
         </div>

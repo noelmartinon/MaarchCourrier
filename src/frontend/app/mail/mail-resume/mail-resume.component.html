@@ -19,7 +19,7 @@
         <div class="info" [class.arType]="mail.type === 'aknowledgement_receipt'" [innerHTML]="mail.object | shorten: 110: '...'">    
         </div>
 
-        <div class="date">
+        <div class="date" [title]="mail.userInfo">
             {{mail.userInfo}}
         </div>
     </div>

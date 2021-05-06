@@ -11,7 +11,7 @@
         <div class="info" [title]="note.value">
             {{note.value | shorten: 110: '...'}}
         </div>
-        <div class="date">
+        <div class="date" [title]="note.firstname + ' ' + note.lastname">
             {{note.firstname}} {{note.lastname}}
         </div>
     </div>

@@ -155,7 +155,7 @@
                     <mat-header-cell *matHeaderCellDef mat-sort-header style="flex:3;">
                         {{'lang.correspondent' | translate}}
                     </mat-header-cell>
-                    <mat-cell *matCellDef="let element" style="flex:3;"> {{element.name}} </mat-cell>
+                    <mat-cell [title]="element.name" *matCellDef="let element" style="flex:3;"> {{element.name}} </mat-cell>
                 </ng-container>
                 <ng-container matColumnDef="address">
                     <mat-header-cell *matHeaderCellDef mat-sort-header disabled style="flex:3;">
