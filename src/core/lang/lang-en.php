@@ -507,4 +507,4 @@ define('_TARGET_RESOURCE_HAS_NO_FILE', 'Target resource has no file');
 define('_SIGNED', 'Signed');
 define('_VALIDATED', 'Validated');
 
-define('_NO_SENDER_EMAIL', "No sender email");
+define('_NO_SENDER_EMAIL', "No email set to send electronic AR");
