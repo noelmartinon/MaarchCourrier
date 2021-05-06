@@ -467,4 +467,4 @@ define('_STAMP', 'Stamp');
 define('_SIGNED', 'Signed');
 define('_VALIDATED', 'Validated');
 
-define('_NO_SENDER_EMAIL', "No sender email");
+define('_NO_SENDER_EMAIL', "No email set to send electronic AR");

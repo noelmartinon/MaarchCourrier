@@ -385,7 +385,7 @@ class PreProcessActionController
                         $emailSender = ['entityId' => null, 'email' => $acknowledgementOptions['acknowledgementReceiptFromMail'], 'label' => ''];
                     }
                 }
-                if (!empty($emailSender)) {
+                if (!empty($emailSender) || $currentMode == 'manual') {
                     $emailSenders[] = $emailSender;
                     $sendEmail += $email;
                 } elseif (empty($emailSender) && $currentMode != 'manual') {
