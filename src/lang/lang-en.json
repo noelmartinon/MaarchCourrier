@@ -2494,5 +2494,5 @@
     "mailServer": "Mail server",
     "canAddCopies": "Be able to add people in copy (CC / CCI)",
     "willBeRedirected": "Will be redirected to",
-    "redirectedFromProfile": "The <b>currently redirected</b> baskets are resumed in redirection for the absence"
+    "redirectedFromProfile": "The <b>currently redirected</b> baskets will be redirected by default"
 }
