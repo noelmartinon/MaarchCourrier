@@ -2195,6 +2195,10 @@ class UserController
             $today = new \DateTime();
             if ($today > $absenceStartDate) {
                 UserModel::update(['set' => ['status' => 'ABS'], 'where' => ['id = ?'], 'data' => [$absentUser['id']]]);
+                RedirectBasketModel::delete([
+                    'where' => ['owner_user_id = ?'],
+                    'data'  => [$absentUser['id']]
+                ]);
 
                 if (!empty($absentUser['absence']['redirectedBaskets'])) {
                     UserController::redirectBasket([
