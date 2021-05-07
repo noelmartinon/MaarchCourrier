@@ -160,6 +160,7 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
             await this.getConfiguration();
 
             this.loading = false;
+            this.triggerModifiedDocument.emit();
         }
     }
 

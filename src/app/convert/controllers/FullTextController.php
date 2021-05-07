@@ -49,7 +49,7 @@ class FullTextController
         }
 
         if (empty($document)) {
-            return ['errors' => 'Converted document does not exist'];
+            return ['success' => 'success'];
         }
 
         $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
@@ -153,7 +153,7 @@ class FullTextController
         return $fileContent;
     }
 
-    public static function getFailedIndexes(array $args)
+    public static function getFailedAndWithoutIndexes(array $args)
     {
         ValidatorModel::notEmpty($args, ['collId']);
         ValidatorModel::stringType($args, ['collId']);
@@ -161,15 +161,14 @@ class FullTextController
         if ($args['collId'] == 'letterbox_coll') {
             $resIds = ResModel::get([
                 'select'    => ['res_id'],
-                'table'     => ['res_letterbox'],
-                'where'     => ['status NOT IN (?)', 'fulltext_result = ?'],
+                'where'     => ['status NOT IN (?)', '(fulltext_result = ? OR fulltext_result is NULL)'],
                 'data'      => [['DEL'],'ERROR'],
                 'orderBy'   => ['res_id DESC'],
             ]);
         } else {
             $resIds = AttachmentModel::get([
                 'select'    => ['res_id'],
-                'where'     => ['status NOT IN (?)', 'fulltext_result = ?'],
+                'where'     => ['status NOT IN (?)', '(fulltext_result = ? OR fulltext_result is NULL)'],
                 'data'      => [['DEL','OBS','TMP'], 'ERROR'],
                 'orderBy'   => ['res_id DESC'],
             ]);

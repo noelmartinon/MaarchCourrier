@@ -192,7 +192,7 @@ export class ProfileComponent implements OnInit {
         this.dialog.open(AbsModalComponent, {
             panelClass: 'maarch-modal',
             disableClose: true,
-            // width: '500px',
+            width: this.user.baskets.length === 0 ? 'auto' : '700px',
             data: {
                 user: this.user
             }

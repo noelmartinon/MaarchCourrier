@@ -440,10 +440,10 @@ export class AttachmentCreateComponent implements OnInit {
             format: new FormControl({ value: '', disabled: false }, [Validators.required])
         });
         this.attachFormGroup.push(new FormGroup(this.attachments[this.attachments.length - 1]));
-        this.indexTab = this.attachments.length - 1;
         setTimeout(() => {
+            this.indexTab = this.attachments.length - 1;
             this.getAttachType(this.defaultType, this.indexTab);
-        }, 800);
+        }, 700);
     }
 
     updateFile(index: number) {
@@ -467,10 +467,15 @@ export class AttachmentCreateComponent implements OnInit {
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             tap(() => {
-                this.indexTab = 0;
-                this.asyncIndexTab = this.indexTab;
+                const attachLength: number = this.attachments.length - 1;
                 this.attachments.splice(i, 1);
                 this.attachFormGroup.splice(i, 1);
+                if (i === attachLength) {
+                    this.indexTab = this.attachments.length - 1;
+                } else if (i === this.asyncIndexTab) {
+                    this.indexTab = i;
+                }
+                this.asyncIndexTab = this.indexTab;
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

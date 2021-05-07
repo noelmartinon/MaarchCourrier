@@ -60,7 +60,6 @@ export class AbsModalComponent implements OnInit {
                 const redirBasket = this.data.user.redirectedBaskets.find((redBask: any) => redBask.basket_id === basket.basket_id && redBask.group_id === basket.groupSerialId);
                 if (redirBasket !== undefined) {
                     objBasket['actual_user_id'] = redirBasket.actual_user_id;
-                    objBasket['userToDisplay'] = redirBasket.userToDisplay !== null ? redirBasket.userToDisplay : null;
                 }
                 this.baskets.push(objBasket);
             });
@@ -71,7 +70,9 @@ export class AbsModalComponent implements OnInit {
 
     async onSubmit() {
         this.loading = true;
-        if (this.startDate && this.startDate !== new Date()) {
+        const today = this.functions.formatDateObjectToDateString(new Date());
+        const startDate = this.functions.formatDateObjectToDateString(this.startDate);
+        if (this.startDate && startDate !== today) {
             await this.activateAbsence();
         } else {
             const res = await this.redirectBaskets();
@@ -84,7 +85,13 @@ export class AbsModalComponent implements OnInit {
     }
 
     isRedirectedBasket(basket: any) {
-        return basket.userToDisplay !== null;
+        if (!this.isAbsScheduled) {
+            return basket.userToDisplay !== null;
+        } else {
+            const checkAfterSchedule: any[] = this.redirectedBaskets.filter((item: any) => item.basket_id === basket.basket_id);
+            const checkInCurrentRedirection: any[] = this.data.user.redirectedBaskets.filter((item: any) => item.basket_id === basket.basket_id);
+            return basket.userToDisplay !== null && (checkAfterSchedule.length === 1 || checkInCurrentRedirection.length === 0);
+        }
     }
 
     addBasketRedirection(newUser: any) {
@@ -220,6 +227,8 @@ export class AbsModalComponent implements OnInit {
                             } else {
                                 this.notify.success(this.translate.instant('lang.absOff'));
                                 this.isAbsScheduled = false;
+                                this.startDate = null;
+                                this.endDate = null;
                                 this.headerService.user.status = 'OK';
                                 this.authService.setEvent('absOff');
                             }
@@ -301,6 +310,7 @@ export class AbsModalComponent implements OnInit {
                         this.startDate = new Date(this.functions.formatFrenchDateToTechnicalDate(absenceDate.startDate));
                         this.endDate = new Date(this.functions.formatFrenchDateToTechnicalDate(absenceDate.endDate));
                         this.basketsClone = JSON.parse(JSON.stringify(this.baskets));
+                        this.redirectedBaskets = data.absence.redirectedBaskets;
                     }
                     resolve(true);
                 }),
@@ -313,8 +323,6 @@ export class AbsModalComponent implements OnInit {
     }
 
     async cancelSchedule() {
-        this.startDate = null;
-        this.endDate = null;
         this.redirectedBaskets = [];
         this.onSubmit();
     }

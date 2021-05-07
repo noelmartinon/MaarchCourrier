@@ -203,7 +203,7 @@ export class SummarySheetComponent implements OnInit {
 
                 this.loading = false;
             }, (err: any) => {
-                this.notify.handleErrors(err);
+                this.notify.handleBlobErrors(err);
             });
     }
 

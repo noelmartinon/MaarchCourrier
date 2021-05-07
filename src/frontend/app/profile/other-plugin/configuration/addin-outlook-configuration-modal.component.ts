@@ -34,7 +34,7 @@ export class AddinOutlookConfigurationModalComponent implements OnInit {
                 downloadLink.click();
             }),
             catchError((err: any) => {
-                this.notify.handleErrors(err);
+                this.notify.handleBlobErrors(err);
                 this.dialogRef.close();
                 return of(false);
             })

@@ -18,7 +18,7 @@
                 [class.fa-user]="contact.type ==='user'" [title]="'lang.contact_' + contact.type | translate">
             </div>
             <mat-card-title *ngIf="!functionsService.empty(contact.firstname) || !functionsService.empty(contact.lastname)"
-                [title]="contact.civility.label + ' ' + contact.firstname + ' ' + contact.lastname">
+                [title]="(contact.civility.label ? contact.civility.label + ' ' : '') + contact.firstname + ' ' + contact.lastname">
                 <sup style="color: #666;"
                     *ngIf="!functionsService.empty(contact.civility)" [class.newData]="isNewValue('civility')">{{contact.civility.abbreviation}}&nbsp;</sup>{{contact.firstname}}
                 {{contact.lastname}}

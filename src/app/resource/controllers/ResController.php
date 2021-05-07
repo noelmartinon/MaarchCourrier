@@ -94,11 +94,10 @@ class ResController extends ResourceControlController
                 'collId'    => 'letterbox_coll',
                 'version'   => 1
             ]);
-
-            $customId = CoreConfigModel::getCustomId();
-            $customId = empty($customId) ? 'null' : $customId;
-            exec("php src/app/convert/scripts/FullTextScript.php --customId {$customId} --resId {$resId} --collId letterbox_coll --userId {$GLOBALS['id']} > /dev/null &");
         }
+        $customId = CoreConfigModel::getCustomId();
+        $customId = empty($customId) ? 'null' : $customId;
+        exec("php src/app/convert/scripts/FullTextScript.php --customId {$customId} --resId {$resId} --collId letterbox_coll --userId {$GLOBALS['id']} > /dev/null &");
 
         HistoryController::add([
             'tableName' => 'res_letterbox',

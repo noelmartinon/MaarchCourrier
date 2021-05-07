@@ -212,10 +212,10 @@ export class SentNumericPackagePageComponent implements OnInit {
                         this.numericPackageAttach = this.numericPackageAttach.concat(this.numericPackageAttachTool['attachments'].list.filter((item: any) => data.attachments.indexOf(item.id.toString()) > -1));
                     } else {
                         this.numericPackage.mainExchangeDoc = {
-                            ...this.numericPackageAttachTool['attachments'].list.filter((item: any) => item.id === data.disposition.res_id)[0],
+                            ...this.numericPackageAttachTool['attachments'].list.filter((item: any) => item.id == data.disposition.res_id)[0],
                             type: 'attachments'
                         };
-                        this.numericPackageAttach = this.numericPackageAttach.concat(this.numericPackageAttachTool['attachments'].list.filter((item: any) => data.attachments.indexOf(item.id.toString()) > -1 && item.id !== data.disposition.res_id));
+                        this.numericPackageAttach = this.numericPackageAttach.concat(this.numericPackageAttachTool['attachments'].list.filter((item: any) => data.attachments.indexOf(item.id.toString()) > -1 && item.id != data.disposition.res_id));
 
                     }
 
@@ -537,7 +537,7 @@ export class SentNumericPackagePageComponent implements OnInit {
                 downloadLink.click();
             }),
             catchError((err) => {
-                this.notify.handleSoftErrors(err);
+                this.notify.handleBlobErrors(err);
                 return of(false);
             })
         ).subscribe();

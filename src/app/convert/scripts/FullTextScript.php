@@ -25,14 +25,15 @@ use User\models\UserModel;
 
 // SAMPLE COMMANDS :
 // (in root app)
-// Launch index fulltext for specific document(for res_letterbox) : php src/app/convert/scripts/FullTextScript.php --customId yourcustom --collId letterbox_coll --userId 10
-// Launch reindex failed fulltext (for res_letterbox) : php src/app/convert/scripts/FullTextScript.php --customId yourcustom --collId letterbox_coll --mode reindex
+// Launch index fulltext for specific document (for res_letterbox) : php src/app/convert/scripts/FullTextScript.php --customId yourcustom --collId letterbox_coll --userId 10
+// Launch reindex fulltext for failed and no indexes documents (for res_letterbox) : php src/app/convert/scripts/FullTextScript.php --customId yourcustom --collId letterbox_coll --userId 10 --mode reindex
+// Launch reindex fulltext for all documents (for res_letterbox) : php src/app/convert/scripts/FullTextScript.php --customId yourcustom --collId letterbox_coll --userId 10 --mode reindex-full
 
 // ARGS
 // --customId    : instance id;
 // --collId      : letterbox_coll / attachments_coll / attachments_version_col;
 // --userId      : technical identifer user (for saving log);
-// --mode        : 'reindex' => usefull to re analyse failed fulltext result;
+// --mode        : 'reindex' - 'reindex-full' => usefull to re analyse fulltext result;
 
 
 FullTextScript::initalize($argv);
@@ -50,22 +51,22 @@ class FullTextScript
             $cmd = array_search('--customId', $args);
             $customId = $args[$cmd+1];
         }
-        
+
         if (array_search('--resId', $args) > 0) {
             $cmd = array_search('--resId', $args);
             $resId = $args[$cmd+1];
         }
-        
+
         if (array_search('--collId', $args) > 0) {
             $cmd = array_search('--collId', $args);
             $collId = $args[$cmd+1];
         }
-        
+
         if (array_search('--userId', $args) > 0) {
             $cmd = array_search('--userId', $args);
             $userId = $args[$cmd+1];
         }
-        
+
         if (array_search('--mode', $args) > 0) {
             $cmd = array_search('--mode', $args);
             $mode = $args[$cmd+1];
@@ -75,7 +76,7 @@ class FullTextScript
             if (empty($mode)) {
                 FullTextScript::index(['customId' => $customId, 'resId' => $resId, 'collId' => $collId, 'userId' => $userId]);
             } else {
-                FullTextScript::reindex(['customId' => $customId, 'collId' => $collId, 'userId' => $userId]);
+                FullTextScript::reindex(['customId' => $customId, 'collId' => $collId, 'userId' => $userId, 'mode' => $mode]);
             }
         }
     }
@@ -121,18 +122,33 @@ class FullTextScript
         DatabasePDO::reset();
         new DatabasePDO(['customId' => $args['customId']]);
 
-        $currentUser = UserModel::getByLogin(['login' => $args['userId'], 'select' => ['id']]);
+        $currentUser = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
+        $GLOBALS['login'] = $currentUser['user_id'];
 
-        $GLOBALS['login'] = $args['userId'];
+        if ($args['mode'] == 'reindex') {
+            $resIdsToReindex = FullTextController::getFailedAndWithoutIndexes(['collId' => $args['collId']]);
+        } else {
+            if ($args['collId'] == 'letterbox_coll') {
+                $resIdsToReindex = ResModel::get([
+                    'select'    => ['res_id'],
+                    'where'     => ['status NOT IN (?)'],
+                    'data'      => [['DEL']]
+                ]);
+            } else {
+                $resIdsToReindex = AttachmentModel::get([
+                    'select'    => ['res_id'],
+                    'where'     => ['status NOT IN (?)'],
+                    'data'      => [['DEL','OBS','TMP']]
+                ]);
+            }
+        }
 
-        $resIdsToReindex = FullTextController::getFailedIndexes(['collId' => $args['collId']]);
-       
         if (count($resIdsToReindex) == 0) {
             echo "No result to process.\n";
         } else {
             foreach ($resIdsToReindex as $resId) {
                 echo "Re index for res_id : {$resId['res_id']} in progress...\n";
-                FullTextScript::index(['customId' => $args['customId'], 'resId' => $resId['res_id'], 'collId' => $args['collId'], 'userId' => $currentUser['id']]);
+                FullTextScript::index(['customId' => $args['customId'], 'resId' => $resId['res_id'], 'collId' => $args['collId'], 'userId' => $args['userId']]);
                 echo "Done !\n\n";
             }
         }
