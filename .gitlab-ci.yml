@@ -107,6 +107,8 @@ logs:
   stage: logs
   except:
     - schedules
+    - tags
+    - master
   before_script:
     - apt-get update -y
     - apt install -y curl
