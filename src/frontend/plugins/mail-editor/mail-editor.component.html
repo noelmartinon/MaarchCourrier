@@ -31,7 +31,7 @@
             <input [formControl]="recipientsInput" #recipientsField [matChipInputFor]="recipientsList"
                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
                 (matChipInputTokenEnd)="add($event, 'recipients')" [matAutocomplete]="autoEmails"
-                (focus)="resetAutocomplete()" (paste)="onPaste($event,'recipients')" [disabled]="recipientDisabled">
+                (focus)="resetAutocomplete()" (paste)="onPaste($event,'recipients')" [readonly]="recipientDisabled" [attr.disabled]="recipientDisabled">
         </mat-chip-list>
         <mat-autocomplete #autoEmails="matAutocomplete" (optionSelected)="addEmail($event.option.value, 'recipients')">
             <mat-option *ngFor="let option of filteredEmails | async" [value]="option">
