@@ -410,10 +410,9 @@ export class AttachmentCreateComponent implements OnInit {
             format: new FormControl({ value: '', disabled: false }, [Validators.required])
         });
         this.attachFormGroup.push(new FormGroup(this.attachments[this.attachments.length - 1]));
-        this.indexTab = this.attachments.length - 1;
         setTimeout(() => {
-            this.getAttachType('response_project', this.indexTab);
-        }, 800);
+            this.getAttachType('response_project', this.attachments.length - 1);
+        }, 250);
     }
 
     updateFile(index: number) {
@@ -451,6 +450,7 @@ export class AttachmentCreateComponent implements OnInit {
     }
 
     getAttachType(attachType: any, i: number) {
+        this.indexTab = i;
         this.appDocumentViewer.toArray()[i].loadTemplatesByResId(this.data.resIdMaster, attachType);
     }
 
