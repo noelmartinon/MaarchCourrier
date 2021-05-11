@@ -372,7 +372,14 @@ class MaarchParapheurController
                                 }
                             }
 
-                            $workflow[(int)$step['sequence']] = ['userId' => $step['externalId'], 'mode' => $step['action'], 'signatureMode' => $step['signatureMode'] ?? null, 'signaturePositions' => $signaturePositions, 'datePositions' => $datePositions];
+                            $workflow[(int)$step['sequence']] = [
+                                'userId'               => $step['externalId'] ?? null,
+                                'mode'                 => $step['action'],
+                                'signatureMode'        => $step['signatureMode'] ?? null,
+                                'signaturePositions'   => $signaturePositions,
+                                'datePositions'        => $datePositions,
+                                'externalInformations' => $step['externalInformations'] ?? null
+                            ];
                         }
                     }
 
@@ -454,7 +461,14 @@ class MaarchParapheurController
                                     $datePositions = $step['datePositions'];
                                 }
                             }
-                            $workflow[(int)$step['sequence']] = ['userId' => $step['externalId'], 'mode' => $step['action'], 'signatureMode' => $step['signatureMode'] ?? null, 'signaturePositions' => $signaturePositions, 'datePositions' => $datePositions];
+                            $workflow[(int)$step['sequence']] = [
+                                'userId'               => $step['externalId'] ?? null,
+                                'mode'                 => $step['action'],
+                                'signatureMode'        => $step['signatureMode'] ?? null,
+                                'signaturePositions'   => $signaturePositions,
+                                'datePositions'        => $datePositions,
+                                'externalInformations' => $step['externalInformations'] ?? null
+                            ];
                         }
                     }
 

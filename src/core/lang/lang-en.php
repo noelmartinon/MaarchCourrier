@@ -463,6 +463,8 @@ define('_EIDAS', 'Eidas');
 define('_RGS_2STARS', 'RGS** key');
 define('_RGS_2STARS_TIMESTAMPED', 'RGS** key + timestamped');
 define('_STAMP', 'Stamp');
+define('_OTP_SIGN_YOUSIGN', 'Signatory (YouSign)');
+define('_OTP_VISA_YOUSIGN', 'Approval (YouSign)');
 
 define('_SIGNED', 'Signed');
 define('_VALIDATED', 'Validated');

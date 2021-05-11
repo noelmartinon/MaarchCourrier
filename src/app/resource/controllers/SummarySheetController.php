@@ -993,6 +993,8 @@ class SummarySheetController
                                     case 'inca_card_eidas': $mode = _INCA_CARD_EIDAS; break;
                                     case 'rgs_2stars_timestamped': $mode = _RGS_2STARS_TIMESTAMPED; break;
                                     case 'rgs_2stars': $mode = _RGS_2STARS; break;
+                                    case 'otp_sign_yousign': $mode = _OTP_SIGN_YOUSIGN; break;
+                                    case 'otp_visa_yousign': $mode = _OTP_VISA_YOUSIGN; break;
                                 }
                             } elseif ($item['mode'] == 'visa') {
                                 $mode = _VISA_USER_MIN;

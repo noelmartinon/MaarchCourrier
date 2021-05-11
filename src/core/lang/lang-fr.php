@@ -470,6 +470,8 @@ define('_EIDAS', 'Cachet');
 define('_RGS_2STARS', 'Clé RGS**');
 define('_RGS_2STARS_TIMESTAMPED', 'Clé RGS** + horodatage');
 define('_STAMP', 'Griffe');
+define('_OTP_SIGN_YOUSIGN', 'Signataire (YouSign)');
+define('_OTP_VISA_YOUSIGN', 'Viseur (YouSign)');
 
 define('_SIGNED', 'Signé');
 define('_VALIDATED', 'Validé');
