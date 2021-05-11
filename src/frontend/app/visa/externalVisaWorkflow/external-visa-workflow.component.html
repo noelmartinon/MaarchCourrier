@@ -1,4 +1,9 @@
 <mat-list *ngIf="!loading">
+    <button *ngIf="adminMode" mat-raised-button mat-button color="primary" [title]="'lang.addOtpUser' | translate" 
+        style="margin: 10px; display: flex;" (click)="openCreateUserOtp()">
+        <mat-icon class="fas fa-user-plus" style="width: auto;height: auto;"></mat-icon>
+        {{'lang.addOtpUser' | translate}}
+    </button>
     <app-plugin-autocomplete *ngIf="adminMode" [labelPlaceholder]="'lang.addPerson' | translate"
         [routeDatas]="['/rest/autocomplete/maarchParapheurUsers']" [targetSearchKey]="'idToDisplay'"
         [subInfoKey]="'email'" (triggerEvent)="addItemToWorkflow($event)" appearance="outline">

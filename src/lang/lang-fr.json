@@ -2496,5 +2496,10 @@
     "clientId": "Client ID",
     "clientSecret": "Client Secret",
     "siteUrl": "URL de l'espace Sharepoint Online",
-    "office365sharepointDesc": "<a href=\"https://www.office.com/\" target=\"_blank\"> Office 365 </a> est la suite bureautique en ligne de Microsoft. L'édtion se fait via Sharepoint Online."
+    "office365sharepointDesc": "<a href=\"https://www.office.com/\" target=\"_blank\"> Office 365 </a> est la suite bureautique en ligne de Microsoft. L'édtion se fait via Sharepoint Online.",
+    "addOtpUser": "Ajouter un utilisateur OTP",
+    "securityMode": "Mode d'envoi du code de sécurité",
+    "sms": "SMS",
+    "securityModeInfo": "L'utilisateur sera notifié par <b>mail</b> et recevra un <b>code de sécurité</b> par <b>{{mode}}</b> au moment de son tour dans le circuit.",
+    "frFormatPhone": "Format: +33XXXXXXXXX"
 }

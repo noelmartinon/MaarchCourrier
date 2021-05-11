@@ -2505,5 +2505,10 @@
     "clientId": "Client ID",
     "clientSecret": "Client Secret",
     "siteUrl": "Sharepoint Online site URL",
-    "office365sharepointDesc": "<a href=\"https://www.office.com/\" target=\"_blank\"> Office 365 </a> is the online office suite from Microsoft. The editing is done via Sharepoint Online."
+    "office365sharepointDesc": "<a href=\"https://www.office.com/\" target=\"_blank\"> Office 365 </a> is the online office suite from Microsoft. The editing is done via Sharepoint Online.",
+    "addOtpUser": "Add OTP user",
+    "securityMode": "Mode of sending the security code",
+    "sms": "SMS",
+    "securityModeInfo": "The user will be notified by <b> mail </b> and will receive a <b> security code </b> by <b> {{mode}} </b> at the time of his turn in the workflow.",
+    "frFormatPhone": "Format: +33XXXXXXXXX"
 }

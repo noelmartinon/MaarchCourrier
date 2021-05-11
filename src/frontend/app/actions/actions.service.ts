@@ -1202,4 +1202,22 @@ export class ActionsService implements OnDestroy {
             })
         ).subscribe();
     }
+
+    getUserOtpIcon(id: string): Promise<string> {
+        return new Promise((resolve) => {
+            this.http.get(`assets/${id}.png`, { responseType: 'blob' }).pipe(
+                tap((response: any) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(response);
+                    reader.onloadend = () => {
+                        resolve(reader.result as any);
+                    };
+                }),
+                catchError(err => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
 }
