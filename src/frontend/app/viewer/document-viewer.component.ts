@@ -1108,7 +1108,6 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 tap(() => {
                     this.closeEditor();
                     this.authService.catchEvent().subscribe((res: string) => {
-                        this.logoutTrigger = res === 'login' ? true : false;
                         if (res === 'login') {
                             this.logoutTrigger = true;
                         }
