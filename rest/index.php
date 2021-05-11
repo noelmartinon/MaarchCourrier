@@ -641,6 +641,7 @@ $app->get('/messageExchangesInitialization', \MessageExchange\controllers\SendMe
 
 //ExternalSignatoryBooks
 $app->get('/documents/{id}/maarchParapheurWorkflow', \ExternalSignatoryBook\controllers\MaarchParapheurController::class . ':getWorkflow');
+$app->get('/maarchParapheurOtp', \ExternalSignatoryBook\controllers\MaarchParapheurController::class . ':getOtpList');
 $app->get('/maarchParapheur/user/{id}/picture', \ExternalSignatoryBook\controllers\MaarchParapheurController::class . ':getUserPicture');
 $app->get('/externalSignatureBooks/enabled', \ExternalSignatoryBook\controllers\ExternalSignatureBookController::class . ':getEnabledSignatureBook');
 $app->get('/externalSummary/{resId}', \ExternalSummary\controllers\SummaryController::class . ':getByResId');

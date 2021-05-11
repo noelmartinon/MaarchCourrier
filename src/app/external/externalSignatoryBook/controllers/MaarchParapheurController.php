@@ -1201,6 +1201,51 @@ class MaarchParapheurController
         return $response->withJson($curlResponse['response']);
     }
 
+    public function getOtpList(Request $request, Response $response, array $args)
+    {
+        $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'modules/visa/xml/remoteSignatoryBooks.xml']);
+        if (empty($loadedXml)) {
+            return $response->withStatus(400)->withJson(['errors' => 'SignatoryBooks configuration file missing']);
+        }
+
+        $url      = '';
+        $userId   = '';
+        $password = '';
+        foreach ($loadedXml->signatoryBook as $value) {
+            if ($value->id == "maarchParapheur") {
+                $url      = rtrim($value->url, '/');
+                $userId   = $value->userId;
+                $password = $value->password;
+                break;
+            }
+        }
+
+        if (empty($url)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Maarch Parapheur configuration missing']);
+        }
+
+        $curlResponse = CurlModel::exec([
+            'url'           => rtrim($url, '/') . "/rest/otp",
+            'basicAuth'     => ['user' => $userId, 'password' => $password],
+            'headers'       => ['content-type:application/json'],
+            'method'        => 'GET'
+        ]);
+
+        if ($curlResponse['code'] != '200') {
+            if (!empty($curlResponse['response']['errors'])) {
+                $errors =  $curlResponse['response']['errors'];
+            } else {
+                $errors =  $curlResponse['errors'];
+            }
+            if (empty($errors)) {
+                $errors = 'An error occured. Please check your configuration file.';
+            }
+            return $response->withStatus(400)->withJson(['errors' => $errors]);
+        }
+
+        return $response->withJson($curlResponse['response']);
+    }
+
     public static function userExists($args)
     {
         ValidatorModel::notEmpty($args, ['userId']);
