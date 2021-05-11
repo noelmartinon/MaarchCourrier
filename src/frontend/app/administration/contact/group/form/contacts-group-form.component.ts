@@ -6,7 +6,7 @@ import { NotificationService } from '@service/notification/notification.service'
 import { HeaderService } from '@service/header.service';
 import { FormControl, NgForm } from '@angular/forms';
 import { debounceTime, switchMap, distinctUntilChanged, filter, tap, map, catchError, takeUntil, startWith, exhaustMap } from 'rxjs/operators';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { SelectionModel } from '@angular/cdk/collections';
@@ -48,6 +48,7 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
     filterInputControl = new FormControl('');
     searchCorrespondentInputControl = new FormControl('');
 
+    pageSize: number = 10;
 
     creationMode: boolean = true;
     displayCorrespondents: boolean = true; // fix issue virtual scroll
@@ -225,7 +226,7 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
                 switchMap(() => {
                     this.loadingLinkedCorrespondents = true;
                     return this.dataSourceLinkedCorrespondents!.getRepoIssues(
-                        this.sortLinkedCorrespondents.active, this.sortLinkedCorrespondents.direction, this.paginatorLinkedCorrespondents.pageIndex, '../rest/contactsGroups/' + this.contactsGroup.id + '/correspondents', this.filterInputControl.value);
+                        this.sortLinkedCorrespondents.active, this.sortLinkedCorrespondents.direction, this.paginatorLinkedCorrespondents.pageIndex, '../rest/contactsGroups/' + this.contactsGroup.id + '/correspondents', this.filterInputControl.value, this.pageSize);
                 }),
                 map(data => {
                     this.loadingLinkedCorrespondents = false;
@@ -492,6 +493,10 @@ export class ContactsGroupFormComponent implements OnInit, AfterViewInit {
             })
         ).subscribe();
     }
+
+    handlePageEvent(event: PageEvent) {
+        this.pageSize = event.pageSize;
+    }
 }
 export interface CorrespondentList {
     correspondents: any[];
@@ -502,10 +507,10 @@ export class CorrespondentListHttpDao {
 
     constructor(private http: HttpClient) { }
 
-    getRepoIssues(sort: string, order: string, page: number, href: string, search: string): Observable<CorrespondentList> {
+    getRepoIssues(sort: string, order: string, page: number, href: string, search: string, pageSize: number): Observable<CorrespondentList> {
 
         const offset = page * 10;
-        const requestUrl = `${href}?limit=10&offset=${offset}&order=${order}&orderBy=${sort}&search=${search}`;
+        const requestUrl = `${href}?limit=${pageSize}&offset=${offset}&order=${order}&orderBy=${sort}&search=${search}`;
 
         return this.http.get<CorrespondentList>(requestUrl);
     }
