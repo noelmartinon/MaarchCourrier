@@ -444,7 +444,7 @@ class ResourceListController
         if (!array_key_exists($action['component'], ActionMethodController::COMPONENTS_ACTIONS)) {
             return $response->withStatus(400)->withJson(['errors' => 'Action method does not exist']);
         }
-        $parameters = json_decode($action['parameters'], true);
+        $action['parameters'] = json_decode($action['parameters'], true);
         $actionRequiredFields = $parameters['requiredFields'] ?? [];
 
         $user   = UserModel::getById(['id' => $aArgs['userId'], 'select' => ['user_id']]);
@@ -483,7 +483,7 @@ class ResourceListController
         $body['data'] = empty($body['data']) ? [] : $body['data'];
         $body['note'] = empty($body['note']) ? [] : $body['note'];
 
-        $method = ActionMethodController::COMPONENTS_ACTIONS[$action['component']];
+        $method          = ActionMethodController::COMPONENTS_ACTIONS[$action['component']];
         $methodResponses = [];
         foreach ($resourcesForAction as $key => $resId) {
             if (!empty($actionRequiredFields)) {
@@ -506,7 +506,7 @@ class ResourceListController
             }
 
             if (!empty($method)) {
-                $methodResponse = ActionMethodController::$method(['resId' => $resId, 'data' => $body['data'], 'note' => $body['note'], 'parameters' => $parameters]);
+                $methodResponse = ActionMethodController::$method(['resId' => $resId, 'data' => $body['data'], 'note' => $body['note'], 'action' => $action, 'resources' => $resourcesForAction]);
 
                 if (!empty($methodResponse['errors'])) {
                     if (empty($methodResponses['errors'])) {
@@ -525,7 +525,13 @@ class ResourceListController
         }
         $historic = empty($methodResponse['history']) ? '' : $methodResponse['history'];
         if (!empty($resourcesForAction)) {
-            ActionMethodController::terminateAction(['id' => $aArgs['actionId'], 'resources' => $resourcesForAction, 'basketName' => $basket['basket_name'], 'note' => $body['note'], 'history' => $historic]);
+            ActionMethodController::terminateAction(['id' => $aArgs['actionId'], 'resources' => $resourcesForAction, 'basketName' => $basket['basket_name'], 'note' => $body['note'], 'history' => $historic, 'finishInScript' => !empty($methodResponse['postscript'])]);
+        }
+
+        if (!empty($methodResponse['postscript'])) {
+            $base64Args = base64_encode(json_encode($methodResponse['args']));
+            exec("php {$methodResponse['postscript']} --encodedData {$base64Args} > /dev/null &");
+            unset($methodResponse['postscript']);
         }
 
         if (!empty($methodResponses)) {

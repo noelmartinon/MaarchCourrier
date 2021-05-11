@@ -102,6 +102,25 @@ export class AuthService {
         this.localStorage.remove('MaarchCourrierRefreshToken');
     }
 
+    refreshToken() {
+        return this.http
+            .get<any>(`../rest/authenticate/token`, { params: { refreshToken: this.getRefreshToken() } })
+            .pipe(
+                tap((data) => {
+                    // Update stored token
+                    this.setToken(data.token);
+
+                    // Update user info
+                    this.updateUserInfo(data.token);
+                }),
+                catchError((error) => {
+                    this.logout(false, true);
+                    this.notify.error(this.translate.instant('lang.sessionExpired'));
+                    return of(false);
+                })
+            );
+    }
+
     async logout(cleanUrl: boolean = true, forcePageLogin: boolean = false) {
         if (['cas', 'keycloak', 'azure_saml'].indexOf(this.authMode) > -1 && !forcePageLogin) {
             this.SsoLogout(cleanUrl);

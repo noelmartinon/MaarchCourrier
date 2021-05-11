@@ -32,6 +32,7 @@ class CurlModel
             CURLOPT_URL => $curlConfig['url'],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_CONNECTTIMEOUT  => 10
         ];
 
         if (empty($aArgs['multipleObject'])) {
@@ -122,7 +123,8 @@ class CurlModel
                 'Content-length: ' . strlen($aArgs['xmlPostString']),
             ],
             CURLOPT_SSL_VERIFYHOST  => false,
-            CURLOPT_SSL_VERIFYPEER  => false
+            CURLOPT_SSL_VERIFYPEER  => false,
+            CURLOPT_CONNECTTIMEOUT  => 10
         ];
 
         if (!empty($aArgs['soapAction'])) {
@@ -201,7 +203,7 @@ class CurlModel
 
         $args['isXml'] = $args['isXml'] ?? false;
 
-        $opts = [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true, CURLOPT_SSL_VERIFYPEER => false];
+        $opts = [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true, CURLOPT_SSL_VERIFYPEER => false, CURLOPT_CONNECTTIMEOUT => 10];
 
         //Headers
         if (!empty($args['headers'])) {
@@ -250,6 +252,8 @@ class CurlModel
             $opts[CURLOPT_POST] = true;
         } elseif ($args['method'] == 'PUT' || $args['method'] == 'PATCH' || $args['method'] == 'DELETE') {
             $opts[CURLOPT_CUSTOMREQUEST] = $args['method'];
+        } elseif (!empty($args['customRequest'])) {
+            $opts[CURLOPT_CUSTOMREQUEST] = $args['customRequest'];
         }
 
         //Url
@@ -322,11 +326,11 @@ class CurlModel
     public static function makeCurlFile(array $aArgs)
     {
         ValidatorModel::notEmpty($aArgs, ['path']);
-        ValidatorModel::stringType($aArgs, ['path']);
+        ValidatorModel::stringType($aArgs, ['path', 'name']);
 
         $mime = mime_content_type($aArgs['path']);
         $info = pathinfo($aArgs['path']);
-        $name = $info['basename'];
+        $name = $aArgs['name'] ?? $info['basename'];
         $output = new \CURLFile($aArgs['path'], $mime, $name);
 
         return $output;

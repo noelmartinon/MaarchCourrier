@@ -1,5 +1,9 @@
 @import '../../../css/vars.scss';
 
+.mat-dialog-content-container {
+    min-height: 500px;
+}
+
 .highlight {
     font-size: 110%;
 }

@@ -54,6 +54,10 @@ class IndexingModelController
         }
 
         $models = IndexingModelModel::get(['where' => $where, 'data' => [$GLOBALS['id'], 'false']]);
+        foreach ($models as $key => $model) {
+            $models[$key]['mandatoryFile'] = $model['mandatory_file'];
+            unset($models[$key]['mandatory_file']);
+        }
 
         return $response->withJson(['indexingModels' => $models]);
     }
@@ -85,7 +89,7 @@ class IndexingModelController
                         $user = UserModel::getById(['id' => $item['id'], 'select' => ['firstname', 'lastname', 'status']]);
                         $userEntities = UserModel::getEntitiesById(['id' => $item['id'], 'select' => ['entities.id']]);
                         $userEntities = array_column($userEntities, 'id');
-                        if ($item['mode'] == 'dest' && !empty($destination) && !in_array($destination, $userEntities)) {
+                        if ($item['mode'] == 'dest' && !empty($destination) && !in_array($destination, $userEntities) && $destination != '"#myPrimaryEntity"') {
                             unset($fields[$key]['default_value'][$itemKey]);
                             continue;
                         }
@@ -100,7 +104,9 @@ class IndexingModelController
                 $fields[$key]['default_value'] = array_values($fields[$key]['default_value']);
             }
         }
-        $model['fields'] = $fields;
+        $model['fields']        = $fields;
+        $model['mandatoryFile'] = $model['mandatory_file'];
+        unset($model['mandatory_file']);
 
         if (!empty($queryParams['used']) && $queryParams['used'] == 'true') {
             $resources = ResModel::get([
@@ -178,7 +184,7 @@ class IndexingModelController
                 foreach ($body['fields'] as $value) {
                     if (($field['identifier'] == 'destination' && $value['identifier'] == 'diffusionList')
                             || ($value['identifier'] == $field['identifier'] && $value['mandatory'] == $field['mandatory'] && $value['unit'] == $field['unit'])) {
-                        if (!$field['enabled']) {
+                        if (!$field['enabled'] && $field['identifier'] == $value['identifier']) {
                             $value = $field;
                         }
                         if ($field['identifier'] == 'destination' && $value['identifier'] == 'diffusionList') {
@@ -198,11 +204,13 @@ class IndexingModelController
                 }
             }
             $body['fields'] = $arrayTmp;
+            $body['mandatoryFile'] = $masterModel['mandatory_file'];
         }
+        $body['mandatoryFile'] = empty($body['mandatoryFile']) ? 'false' : 'true';
 
         if (PrivilegeController::hasPrivilege(['privilegeId' => 'admin_indexing_models', 'userId' => $GLOBALS['id']])) {
             $body['private'] = empty($body['private']) ? 'false' : 'true';
-            $defaultModel = IndexingModelModel::get(['select' => [1], 'where' => ['"default" = ?'], 'data' => ['true']]);
+            $defaultModel    = IndexingModelModel::get(['select' => [1], 'where' => ['"default" = ?'], 'data' => ['true']]);
             $body['default'] = empty($defaultModel) ? 'true' : 'false';
         } else {
             $body['private'] = 'true';
@@ -210,12 +218,13 @@ class IndexingModelController
         }
 
         $modelId = IndexingModelModel::create([
-            'label'     => $body['label'],
-            'category'  => $body['category'],
-            'default'   => $body['default'],
-            'owner'     => $GLOBALS['id'],
-            'private'   => $body['private'],
-            'master'    => $master
+            'label'         => $body['label'],
+            'category'      => $body['category'],
+            'default'       => $body['default'],
+            'owner'         => $GLOBALS['id'],
+            'private'       => $body['private'],
+            'mandatoryFile' => $body['mandatoryFile'],
+            'master'        => $master
         ]);
 
         foreach ($body['fields'] as $field) {
@@ -273,6 +282,8 @@ class IndexingModelController
             return $response->withStatus(400)->withJson(['errors' => "Body category is empty or not a string"]);
         } elseif (!Validator::boolType()->validate($body['default'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body default is empty or not a boolean']);
+        } elseif (!Validator::boolType()->validate($body['mandatoryFile'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body mandatoryFile is empty or not a boolean']);
         }
 
         $foundDoctype = false;
@@ -314,7 +325,8 @@ class IndexingModelController
             'set'   => [
                 'label'     => $body['label'],
                 'category'  => $body['category'],
-                '"default"' => $body['default'] ? 'true' : 'false'
+                '"default"' => $body['default'] ? 'true' : 'false',
+                'mandatory_file' => empty($body['mandatoryFile']) ? 'false' : 'true'
             ],
             'where' => ['id = ?'],
             'data'  => [$args['id']]
@@ -386,6 +398,13 @@ class IndexingModelController
                     'eventId'   => 'indexingModelModification',
                 ]);
             }
+            IndexingModelModel::update([
+                'set'   => [
+                    'mandatory_file' => empty($body['mandatoryFile']) ? 'false' : 'true'
+                ],
+                'where' => ['master = ?'],
+                'data'  => [$args['id']]
+            ]);
         }
 
         $allResourcesUsingModel = ResModel::get(['select' => ['res_id'], 'where' => ['model_id = ?'], 'data' => [$args['id']]]);

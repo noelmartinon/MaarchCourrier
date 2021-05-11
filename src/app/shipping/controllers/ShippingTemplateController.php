@@ -105,6 +105,9 @@ class ShippingTemplateController
 
         $body['options']  = json_encode($body['options']);
         $body['fee']      = json_encode($body['fee']);
+        foreach ($body['entities'] as $key => $entity) {
+            $body['entities'][$key] = (string)$entity;
+        }
         $body['entities'] = json_encode($body['entities']);
         $body['account']  = json_encode($body['account']);
 

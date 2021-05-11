@@ -32,7 +32,7 @@ if (!empty($xmlfile->synchronizeEntities) && (string)$xmlfile->synchronizeEntiti
 }
 
 if ($synchronizeUsers) {
-    $maarchUsers = \User\models\UserModel::get(['select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'status']]);
+    $maarchUsers = \User\models\UserModel::get(['select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'status', 'mode']]);
     $ldapUsers = getUsersEntries($xmlfile);
     if (!empty($ldapUsers['errors'])) {
         writeLog(['message' => "[ERROR] {$ldapUsers['errors']}"]);
@@ -120,6 +120,8 @@ function getUsersEntries($xmlfile)
     $domain = (string)$xmlfile->config->ldap->domain;
     $ssl = (string)$xmlfile->config->ldap->ssl;
     $uri = ($ssl == 'true' ? "LDAPS://{$domain}" : $domain);
+    $prefix = (string)$xmlfile->config->ldap->prefix_login;
+    $suffix = (string)$xmlfile->config->ldap->suffix_login;
 
     $login = (string)$xmlfile->config->ldap->login_admin;
     $password = (string)$xmlfile->config->ldap->pass;
@@ -155,7 +157,10 @@ function getUsersEntries($xmlfile)
     ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
     ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 10);
 
-    $authenticated = @ldap_bind($ldap, $login, $password);
+    $ldapLogin = (!empty($prefix) ? $prefix . '\\' . $login : $login);
+    $ldapLogin = (!empty($suffix) ? $ldapLogin . $suffix : $ldapLogin);
+
+    $authenticated = @ldap_bind($ldap, $ldapLogin, $password);
     if (!$authenticated) {
         return ['errors' => 'Ldap bind failed : Authentication failed'];
     }
@@ -202,6 +207,8 @@ function getEntitiesEntries($xmlfile)
     $domain = (string)$xmlfile->config->ldap->domain;
     $ssl = (string)$xmlfile->config->ldap->ssl;
     $uri = ($ssl == 'true' ? "LDAPS://{$domain}" : $domain);
+    $prefix = (string)$xmlfile->config->ldap->prefix_login;
+    $suffix = (string)$xmlfile->config->ldap->suffix_login;
 
     $login = (string)$xmlfile->config->ldap->login_admin;
     $password = (string)$xmlfile->config->ldap->pass;
@@ -233,7 +240,10 @@ function getEntitiesEntries($xmlfile)
     ldap_set_option($ldap, LDAP_OPT_REFERRALS, 0);
     ldap_set_option($ldap, LDAP_OPT_NETWORK_TIMEOUT, 10);
 
-    $authenticated = @ldap_bind($ldap, $login, $password);
+    $ldapLogin = (!empty($prefix) ? $prefix . '\\' . $login : $login);
+    $ldapLogin = (!empty($suffix) ? $ldapLogin . $suffix : $ldapLogin);
+
+    $authenticated = @ldap_bind($ldap, $ldapLogin, $password);
     if (!$authenticated) {
         return ['errors' => 'Ldap bind failed : Authentication failed'];
     }
@@ -299,7 +309,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
 
     foreach ($ldapUsers as $user) {
         $user['userId'] = $user['user_id'];
-        if (!empty($maarchUsersLogin[$user['userId']])) {
+        if (!empty($maarchUsersLogin[$user['userId']]) && $maarchUsersLogin[$user['userId']]['status'] != 'DEL') {
             if ($maarchUsersLogin[$user['userId']]['status'] == 'SPD') {
                 $curlResponse = \SrcCore\models\CurlModel::execSimple([
                     'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $maarchUsersLogin[$user['user_id']]['id'] . '/status',
@@ -309,7 +319,8 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
                     'body'          => json_encode(['status' => 'OK'])
                 ]);
                 if ($curlResponse['code'] != 200) {
-                    writeLog(['message' => "[ERROR] Update user status failed : {$curlResponse['response']['errors']}"]);
+                    writeLog(['message' => "[ERROR] Update user [{$maarchUsersLogin[$user['user_id']]['user_id']}] status failed : {$curlResponse['response']['errors']}"]);
+                    continue;
                 }
             }
             if ($user['firstname'] != $maarchUsersLogin[$user['user_id']]['firstname']
@@ -325,36 +336,18 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
                     'body'          => json_encode($user)
                 ]);
                 if ($curlResponse['code'] != 204) {
-                    writeLog(['message' => "[ERROR] Update user failed : {$curlResponse['response']['errors']}"]);
+                    writeLog(['message' => "[ERROR] Update user [{$maarchUsersLogin[$user['user_id']]['user_id']}] failed : {$curlResponse['response']['errors']}"]);
+                    continue;
                 }
-                if (!empty($user['entityId'])) {
-                    $entityExists = \Entity\models\EntityModel::getByEntityId(['entityId' => $user['entityId'], 'select' => [1]]);
-                    if (empty($entityExists) && !empty($user['defaultEntity'])) {
-                        $curlResponse = \SrcCore\models\CurlModel::execSimple([
-                            'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $maarchUsersLogin[$user['user_id']]['id'] . '/entities',
-                            'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
-                            'headers'       => ['content-type:application/json'],
-                            'method'        => 'POST',
-                            'body'          => json_encode(['entityId' => $user['defaultEntity']])
-                        ]);
-                        if ($curlResponse['code'] != 200) {
-                            writeLog(['message' => "[ERROR] Add entity to user failed : {$curlResponse['response']['errors']}"]);
-                        }
-                    } elseif (!empty($entityExists) && !\User\models\UserModel::hasEntity(['id' => $maarchUsersLogin[$user['user_id']]['id'], 'entityId' => $user['entityId']])) {
-                        $curlResponse = \SrcCore\models\CurlModel::execSimple([
-                            'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $maarchUsersLogin[$user['user_id']]['id'] . '/entities',
-                            'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
-                            'headers'       => ['content-type:application/json'],
-                            'method'        => 'POST',
-                            'body'          => json_encode(['entityId' => $user['entityId']])
-                        ]);
-                        if ($curlResponse['code'] != 200) {
-                            writeLog(['message' => "[ERROR] Add entity to user failed : {$curlResponse['response']['errors']}"]);
-                        }
-                    }
-                }
+                userAddEntity($maarchUsersLogin[$user['user_id']]['id'], $user);
             }
         } else {
+            $control = controlUser($user);
+            if (!empty($control['errors'])) {
+                writeLog(['message' => "[ERROR] Control create user [{$maarchUsersLogin[$user['user_id']]['user_id']}] failed : {$control['errors']}"]);
+                continue;
+            }
+
             $curlResponse = \SrcCore\models\CurlModel::execSimple([
                 'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users',
                 'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
@@ -363,26 +356,16 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
                 'body'          => json_encode($user)
             ]);
             if ($curlResponse['code'] != 200) {
-                writeLog(['message' => "[ERROR] Create user failed : {$curlResponse['response']['errors']}"]);
+                writeLog(['message' => "[ERROR] Create user [{$maarchUsersLogin[$user['user_id']]['user_id']}] failed : {$curlResponse['response']['errors']}"]);
+                continue;
             }
 
-            if (!empty($user['entityId'])) {
-                $curlResponse = \SrcCore\models\CurlModel::execSimple([
-                    'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $curlResponse['response']['id'] . '/entities',
-                    'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
-                    'headers'       => ['content-type:application/json'],
-                    'method'        => 'POST',
-                    'body'          => json_encode(['entityId' => $user['entityId']])
-                ]);
-                if ($curlResponse['code'] != 200) {
-                    writeLog(['message' => "[ERROR] Add entity to user failed : {$curlResponse['response']['errors']}"]);
-                }
-            }
+            userAddEntity($curlResponse['response']['id'], $user);
         }
     }
 
     foreach ($maarchUsers as $user) {
-        if (empty($ldapUsersLogin[$user['user_id']])) {
+        if (empty($ldapUsersLogin[$user['user_id']]) && $user['status'] != 'DEL' && $user['mode'] != 'rest') {
             $curlResponse = \SrcCore\models\CurlModel::execSimple([
                 'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $user['id'] . '/suspend',
                 'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
@@ -390,7 +373,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
                 'method'        => 'PUT'
             ]);
             if ($curlResponse['code'] != 204) {
-                writeLog(['message' => "[ERROR] Delete user failed  : {$curlResponse['response']['errors']}"]);
+                writeLog(['message' => "[ERROR] Suspend user [{$maarchUsersLogin[$user['user_id']]['user_id']}] failed  : {$curlResponse['response']['errors']}"]);
             }
         }
     }
@@ -482,5 +465,55 @@ function writeLog(array $args)
             'eventType' => 'synchronizationLddap',
             'eventId'   => $args['message']
         ]);
+    }
+}
+
+function controlUser(array $user)
+{
+    if (!\Respect\Validation\Validator::stringType()->length(1, 128)->notEmpty()->validate($user['userId'] ?? null) || !preg_match("/^[\w.@-]*$/", $user['userId'])) {
+        return ['errors' => 'Body userId is empty, not a string or not valid'];
+    } elseif (!\Respect\Validation\Validator::stringType()->length(1, 255)->notEmpty()->validate($user['firstname'] ?? null)) {
+        return ['errors' => 'Body firstname is empty or not a string'];
+    } elseif (!\Respect\Validation\Validator::stringType()->length(1, 255)->notEmpty()->validate($user['lastname'] ?? null)) {
+        return ['errors' => 'Body lastname is empty or not a string'];
+    } elseif (!\Respect\Validation\Validator::stringType()->length(1, 255)->notEmpty()->validate($user['mail'] ?? null) || !filter_var($user['mail'], FILTER_VALIDATE_EMAIL)) {
+        return ['errors' => 'Body mail is empty or not valid'];
+    } elseif (!empty($user['phone']) && (!preg_match("/\+?((|\ |\.|\(|\)|\-)?(\d)*)*\d$/", $user['phone']) || !\Respect\Validation\Validator::stringType()->length(0, 32)->validate($user['phone'] ?? ''))) {
+        return ['errors' => 'Body phone is not valid'];
+    }
+
+    return true;
+}
+
+function userAddEntity($userId, $user)
+{
+    $entityId = null;
+    if (!empty($user['entityId'])) {
+        $entityExists = \Entity\models\EntityModel::getByEntityId(['entityId' => $user['entityId'], 'select' => [1]]);
+    }
+    if (!empty($user['defaultEntity'])) {
+        $defaultEntityExists = \Entity\models\EntityModel::getByEntityId(['entityId' => $user['defaultEntity'], 'select' => [1]]);
+    }
+
+    if(!empty($entityExists)) {
+        $entityId = $user['entityId'];
+    } elseif (!empty($defaultEntityExists)) {
+        $entityId = $user['defaultEntity'];
+    }
+
+    if(!empty($entityId)) {
+        $curlResponse = \SrcCore\models\CurlModel::execSimple([
+            'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $userId . '/entities',
+            'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
+            'headers'       => ['content-type:application/json'],
+            'method'        => 'POST',
+            'body'          => json_encode(['entityId' => $entityId])
+        ]);
+        if ($curlResponse['code'] != 200) {
+            writeLog(['message' => "[ERROR] Add entity to user failed : {$curlResponse['response']['errors']}"]);
+        }
+    }
+    else{
+        writeLog(['message' => "[ERROR] Add entity to user failed : {Entity not found}"]);
     }
 }

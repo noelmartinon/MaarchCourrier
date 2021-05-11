@@ -18,6 +18,24 @@ use SrcCore\models\ValidatorModel;
 
 abstract class PrivilegeModelAbstract
 {
+    public static function get(array $args)
+    {
+        ValidatorModel::arrayType($args, ['select', 'where', 'data', 'orderBy']);
+        ValidatorModel::intType($args, ['limit', 'offset']);
+
+        $privileges = DatabaseModel::select([
+            'select'    => $args['select'] ?? ['*'],
+            'table'     => ['usergroups_services'],
+            'where'     => $args['where'] ?? [],
+            'data'      => $args['data'] ?? [],
+            'order_by'  => $args['orderBy'] ?? [],
+            'offset'    => $args['offset'] ?? 0,
+            'limit'     => $args['limit'] ?? 0
+        ]);
+
+        return $privileges;
+    }
+
     public static function getByUser(array $args)
     {
         ValidatorModel::notEmpty($args, ['id']);

@@ -25,9 +25,9 @@ while ($state != 'END') {
         /**********************************************************************/
         case 'LOAD_NOTIFICATIONS':
             Bt_writeLog(['level' => 'INFO', 'message' => 'Loading configuration for notification id '.$notificationId]);
-            
+
             $notification = \Notification\models\NotificationModel::getByNotificationId(['notificationId' => $notificationId, 'select' => ['*']]);
-            if ($notification === false) {
+            if (empty($notification)) {
                 Bt_exitBatch(1, "Notification '".$notificationId."' not found");
             }
             if ($notification['is_enabled'] === 'N') {
@@ -236,7 +236,7 @@ while ($state != 'END') {
                             }
                             Bt_writeLog(['level' => 'INFO', 'message' => count($attachments).' attachment(s) added']);
                         }
-                    
+
                         Bt_writeLog(['level' => 'INFO', 'message' => '... adding e-mail to email stack']);
 
                         $arrayPDO = [

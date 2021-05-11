@@ -22,6 +22,7 @@ use Convert\controllers\ConvertThumbnailController;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
+use Email\models\EmailModel;
 use Group\controllers\PrivilegeController;
 use History\controllers\HistoryController;
 use Resource\controllers\ResController;
@@ -36,6 +37,7 @@ use Slim\Http\Response;
 use SrcCore\controllers\CoreController;
 use SrcCore\controllers\UrlController;
 use SrcCore\models\CoreConfigModel;
+use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
 
@@ -258,6 +260,38 @@ class AttachmentController
             'where' => ['res_id = ? or origin_id = ?'],
             'data'  => [$idToDelete, $idToDelete]
         ]);
+
+        $emails = EmailModel::get([
+            'select' => ['id', 'document'],
+            'where'  => ["status = 'DRAFT'", "document->>'id' = ?::varchar"],
+            'data'   => [$attachment['res_id_master']]
+        ]);
+        foreach ($emails as $key => $email) {
+            $emails[$key]['document'] = json_decode($email['document'], true);
+        }
+
+        $emails = array_filter($emails, function($email) { return !empty($email['document']['attachments']); });
+        $emails = array_filter($emails, function ($email) use ($attachment) {
+            $attachmentFound = false;
+            foreach ($email['document']['attachments'] as $value) {
+                if ($value['id'] == $attachment['res_id'] || $value['id'] == $attachment['origin_id']) {
+                    $attachmentFound = true;
+                }
+            }
+            return $attachmentFound;
+        });
+
+        foreach ($emails as $key => $email) {
+            $emails[$key]['document']['attachments'] = array_filter($emails[$key]['document']['attachments'], function ($element) use ($attachment){
+                return $element['id'] != $attachment['res_id'] && $element['id'] != $attachment['origin_id'];
+            });
+            $emails[$key]['document']['attachments'] = array_values($emails[$key]['document']['attachments']);
+            EmailModel::update([
+                'set'   => ['document' => json_encode($emails[$key]['document'])],
+                'where' => ['id = ?'],
+                'data'  => [$emails[$key]['id']]
+            ]);
+        }
 
         HistoryController::add([
             'tableName' => 'res_attachments',
@@ -551,6 +585,7 @@ class AttachmentController
 
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($fileContent);
+        $filename = TextFormatModel::formatFilename(['filename' => $attachment['title'], 'maxLength' => 250]);
 
         if ($data['mode'] == 'base64') {
             if ($attachment['attachment_type'] == 'signed_response') {
@@ -564,6 +599,7 @@ class AttachmentController
             return $response->withJson([
                 'encodedDocument' => base64_encode($fileContent),
                 'originalFormat'  => $attachment['format'],
+                'filename'        => $filename . '.' . $attachment['format'],
                 'mimeType'        => $mimeType,
                 'signatoryId'     => $signatoryId
             ]);
@@ -571,7 +607,7 @@ class AttachmentController
             $pathInfo = pathinfo($pathToDocument);
 
             $response->write($fileContent);
-            $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.{$pathInfo['extension']}");
+            $response = $response->withAddedHeader('Content-Disposition', "inline; filename={$filename}.{$pathInfo['extension']}");
             return $response->withHeader('Content-Type', $mimeType);
         }
     }
@@ -583,10 +619,10 @@ class AttachmentController
         }
 
         $attachment = AttachmentModel::get([
-            'select'    => ['res_id', 'docserver_id', 'path', 'filename', 'res_id_master', 'title', 'fingerprint'],
-            'where'     => ['res_id = ?', 'status not in (?)'],
-            'data'      => [$args['id'], ['DEL']],
-            'limit'     => 1
+            'select' => ['res_id', 'docserver_id', 'path', 'filename', 'res_id_master', 'title', 'fingerprint', 'relation'],
+            'where'  => ['res_id = ?', 'status not in (?)'],
+            'data'   => [$args['id'], ['DEL']],
+            'limit'  => 1
         ]);
         if (empty($attachment[0])) {
             return $response->withStatus(403)->withJson(['errors' => 'Attachment not found']);
@@ -600,9 +636,9 @@ class AttachmentController
         $id = $attachmentTodisplay['res_id'];
 
         $document['docserver_id'] = $attachmentTodisplay['docserver_id'];
-        $document['path'] = $attachmentTodisplay['path'];
-        $document['filename'] = $attachmentTodisplay['filename'];
-        $document['fingerprint'] = $attachmentTodisplay['fingerprint'];
+        $document['path']         = $attachmentTodisplay['path'];
+        $document['filename']     = $attachmentTodisplay['filename'];
+        $document['fingerprint']  = $attachmentTodisplay['fingerprint'];
 
         $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
         if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
@@ -636,7 +672,20 @@ class AttachmentController
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($fileContent);
         $pathInfo = pathinfo($pathToDocument);
-        $data = $request->getQueryParams();
+        $data     = $request->getQueryParams();
+        $filename = TextFormatModel::formatFilename(['filename' => $attachmentTodisplay['title'], 'maxLength' => 250]);
+        if ($attachmentTodisplay['relation'] > 1) {
+            $filename .= '_V' . $attachmentTodisplay['relation'];
+        } else {
+            $attachmentVersion = AttachmentModel::get([
+                'select'    => [1],
+                'where'     => ['origin_id = ?', 'status not in (?)'],
+                'data'      => [$args['id'], ['DEL']]
+            ]);
+            if (!empty($attachmentVersion)) {
+                $filename .= '_V1';
+            }
+        }
         
         HistoryController::add([
             'tableName' => 'res_attachments',
@@ -657,10 +706,10 @@ class AttachmentController
         ]);
 
         if ($data['mode'] == 'base64') {
-            return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'extension' => $pathInfo['extension'], 'mimeType' => $mimeType]);
+            return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'extension' => $pathInfo['extension'], 'mimeType' => $mimeType, 'filename' => $filename.'.'.$pathInfo['extension']]);
         } else {
             $response->write($fileContent);
-            $response = $response->withAddedHeader('Content-Disposition', "attachment; filename=maarch.{$pathInfo['extension']}");
+            $response = $response->withAddedHeader('Content-Disposition', "attachment; filename={$filename}.{$pathInfo['extension']}");
             return $response->withHeader('Content-Type', $mimeType);
         }
     }
@@ -753,7 +802,7 @@ class AttachmentController
         $encodedDocument = base64_encode($fileContent);
 
         if (!empty($document['title'])) {
-            $document['title'] = preg_replace(utf8_decode('@[\\/:*?"<>|]@i'), '_', substr($document['title'], 0, 30));
+            $document['title'] = TextFormatModel::formatFilename(['filename' => $document['title'], 'maxLength' => 30]);
         }
 
         $pathInfo = pathinfo($pathToDocument);

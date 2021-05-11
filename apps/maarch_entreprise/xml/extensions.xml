@@ -21,6 +21,16 @@
         <canConvert>true</canConvert>
     </FORMAT>
     <FORMAT>
+        <name>DOC</name>
+        <mime>application/vnd.openxmlformats-officedocument.wordprocessingml.document</mime>
+        <canConvert>true</canConvert>
+    </FORMAT>
+    <FORMAT>
+        <name>DOC</name>
+        <mime>application/zip</mime>
+        <canConvert>true</canConvert>
+    </FORMAT>
+    <FORMAT>
         <name>XLS</name>
         <mime>application/msexcel</mime>
         <canConvert>true</canConvert>
@@ -208,6 +218,21 @@
     <FORMAT>
         <name>MSG</name>
         <mime>application/CDFV2-corrupt</mime>
+        <canConvert>false</canConvert>
+    </FORMAT>
+    <FORMAT>
+        <name>MSG</name>
+        <mime>application/vnd.ms-outlook</mime>
+        <canConvert>false</canConvert>
+    </FORMAT>
+    <FORMAT>
+        <name>MSG</name>
+        <mime>application/msword</mime>
+        <canConvert>false</canConvert>
+    </FORMAT>
+    <FORMAT>
+        <name>MSG</name>
+        <mime></mime>
         <canConvert>false</canConvert>
     </FORMAT>
     <FORMAT>

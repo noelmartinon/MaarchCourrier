@@ -164,7 +164,7 @@ class StoreController
                 $idCustom = explode("_", $field['identifier']);
                 $idCustom = $idCustom[1];
                 $args['customFields'][$idCustom] = $defaultValue;
-            } else {
+            } elseif ($field['identifier'] != 'initiator') {
                 $args[$field['identifier']] = $defaultValue;
             }
         }
@@ -473,13 +473,13 @@ class StoreController
 
     public static function isFileAllowed(array $args)
     {
-        ValidatorModel::notEmpty($args, ['extension', 'type']);
+        ValidatorModel::notEmpty($args, ['extension']);
         ValidatorModel::stringType($args, ['extension', 'type']);
 
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/extensions.xml']);
         if ($loadedXml) {
             foreach ($loadedXml->FORMAT as $value) {
-                if (strtolower((string)$value->name) == strtolower($args['extension']) && strtolower((string)$value->mime) == strtolower($args['type'])) {
+                if (strtolower((string)$value->name) == strtolower($args['extension']) && (strtolower((string)$value->mime) == strtolower($args['type']) || (empty((string)$value->mime) && empty($args['type'])))) {
                     return true;
                 }
             }

@@ -1819,6 +1819,7 @@
     "install_curl_desc": "Tool to transfer data from or to a server, using some protocols",
     "onlyExtensionsAllowed": "Only \"<b> {{value1}} </b>\" extensions are allowed",
     "customAlreadyExist": "This custom already seems to exist.",
+    "invalidCustomName": "Unauthorized name",
     "onlySpecialCharAllowed": "Only special characters {{value1}} are allowed.",
     "dbNotEmpty": "This database already exists and is not empty",
     "stepMailServer": "Mail server",
@@ -2184,5 +2185,11 @@
     "confirmRescanTitle": "Registered mail not distributed",
     "confirmRescanToDistributed": "This registered mail was already scanned «Not distributed». Do you want to rescan it to «Distributed» ?",
     "confirmRescanToNotDistributed": "This registered mail was already scanned «Distributed». Do you want to rescan it to «Not distributed» ?",
-    "selectReturnReason": "Please select a return reason"
+    "selectReturnReason": "Please select a return reason",
+    "arContentIsEmpty": "AR content is empty",
+    "lastNotSignatory": "The last user in the workflow is not a signatory",
+    "minimumVisaUser": "Minimum number of Approver",
+    "maximumSignUser": "Maximum number of Signatory",
+    "workflowEndBySignatory": "Workflow has to end with a Signatory",
+    "signInsteadOf": "You act as"
 }

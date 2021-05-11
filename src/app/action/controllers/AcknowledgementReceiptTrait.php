@@ -40,9 +40,9 @@ trait AcknowledgementReceiptTrait
         if (empty($resource) || $resource['category_id'] != 'incoming') {
             return [];
         }
-        if ($args['data']['manual'] && $args['parameters']['mode'] == 'auto') {
+        if ($args['data']['manual'] && $args['action']['parameters']['mode'] == 'auto') {
             return [];
-        } elseif (!$args['data']['manual'] && $args['parameters']['mode'] == 'manual') {
+        } elseif (!$args['data']['manual'] && $args['action']['parameters']['mode'] == 'manual') {
             return [];
         }
 
@@ -135,7 +135,7 @@ trait AcknowledgementReceiptTrait
                     $extension = pathinfo($pathToDocument, PATHINFO_EXTENSION);
                     $encodedDocument = ConvertPdfController::convertFromEncodedResource(['encodedResource' => $mergedDocument['encodedDocument'], 'extension' => $extension]);
                 } else {
-                    $encodedDocument = ConvertPdfController::convertFromEncodedResource(['encodedResource' => base64_encode($contentToSend), 'extension' => 'txt']);
+                    $encodedDocument = ConvertPdfController::convertFromEncodedResource(['encodedResource' => base64_encode($contentToSend), 'extension' => 'html']);
                 }
                 $mergedDocument['encodedDocument'] = $encodedDocument["encodedResource"];
                 $format = 'pdf';
@@ -189,7 +189,7 @@ trait AcknowledgementReceiptTrait
             $availableEmails = EmailController::getAvailableEmailsByUserId(['userId' => $currentUser['id']]);
             $entities = array_column($availableEmails, 'entityId');
 
-            if (!in_array( $entity['id'], $entities)) {
+            if (!in_array($entity['id'], $entities)) {
                 $emailSender = ['email' => $currentUser['mail']];
             } else {
                 $emailSender = ['email' => $entity['email'], 'entityId' => $entity['id']];

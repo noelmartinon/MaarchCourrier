@@ -75,7 +75,7 @@ class ParameterController
 
     public function getById(Request $request, Response $response, array $aArgs)
     {
-        if (!in_array($aArgs['id'], ['minimumVisaRole', 'maximumSignRole']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_parameters', 'userId' => $GLOBALS['id']])) {
+        if (!in_array($aArgs['id'], ['minimumVisaRole', 'maximumSignRole', 'workflowEndBySignatory']) && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_parameters', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 

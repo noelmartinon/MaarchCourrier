@@ -414,6 +414,7 @@ export class ProfileComponent implements OnInit {
             .subscribe((data: any) => {
                 this.user = data;
 
+                this.user.baskets = this.user.baskets.filter((basket: any) => !basket.basketSearch);
                 this.user.baskets.forEach((value: any, index: number) => {
                     this.user.baskets[index]['disabled'] = false;
                     this.user.redirectedBaskets.forEach((value2: any) => {
@@ -533,7 +534,7 @@ export class ProfileComponent implements OnInit {
         if (r) {
             this.http.post('../rest/users/' + this.user.id + '/redirectedBaskets', basketsRedirect)
                 .subscribe((data: any) => {
-                    this.user.baskets = data['baskets'];
+                    this.user.baskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
                     this.user.redirectedBaskets = data['redirectedBaskets'];
                     this.selectionBaskets.clear();
                     this.notify.success(this.translate.instant('lang.basketUpdated'));
@@ -549,7 +550,7 @@ export class ProfileComponent implements OnInit {
         if (r) {
             this.http.delete('../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
                 .subscribe((data: any) => {
-                    this.user.baskets = data['baskets'];
+                    this.user.baskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
                     this.user.redirectedBaskets.splice(i, 1);
                     this.notify.success(this.translate.instant('lang.basketUpdated'));
                 }, (err) => {
@@ -564,7 +565,7 @@ export class ProfileComponent implements OnInit {
         if (r) {
             this.http.delete('../rest/users/' + this.user.id + '/redirectedBaskets?redirectedBasketIds[]=' + basket.id)
                 .subscribe((data: any) => {
-                    this.user.baskets = data['baskets'];
+                    this.user.baskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
                     this.user.assignedBaskets.splice(i, 1);
                     this.notify.success(this.translate.instant('lang.basketUpdated'));
                 }, (err) => {
@@ -586,7 +587,7 @@ export class ProfileComponent implements OnInit {
                 }
             ])
                 .subscribe((data: any) => {
-                    this.user.baskets = data['baskets'];
+                    this.user.baskets = data['baskets'].filter((basketItem: any) => !basketItem.basketSearch);
                     this.user.assignedBaskets.splice(i, 1);
                     this.notify.success(this.translate.instant('lang.basketUpdated'));
                 }, (err) => {

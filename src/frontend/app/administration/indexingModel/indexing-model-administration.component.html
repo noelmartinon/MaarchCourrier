@@ -36,10 +36,23 @@
                                 <input matInput name="label" [(ngModel)]="indexingModel.label">
                             </mat-form-field>
                         </div>
-                        <div class="defaultModel">
+                    </div>
+                    <div class="options">
+                        <div class="title" >
+                            {{'lang.options' | translate}}
+                            <div class="title-divider"></div>
+                        </div>
+                        <div class="col-sm-6" style="white-space:nowrap;text-align:center;">
                             <mat-slide-toggle color="primary" name="default" [(ngModel)]="indexingModel.default">
                                 {{'lang.defaultModel' | translate}}
                             </mat-slide-toggle>
+                        </div>
+                        <div class="col-sm-6" style="white-space:nowrap;text-align:center;">
+                            <div>
+                                <mat-slide-toggle color="primary" name="mandatoryFile" [(ngModel)]="indexingModel.mandatoryFile">
+                                    {{'lang.mandatoryFile' | translate}}
+                                </mat-slide-toggle>
+                            </div>
                         </div>
                     </div>
                     <mat-tab-group>

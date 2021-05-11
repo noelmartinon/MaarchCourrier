@@ -1,16 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { NotificationService } from '@service/notification/notification.service';
 import { TranslateService } from '@ngx-translate/core';
 import { finalize } from 'rxjs/operators';
-import { AuthService } from '@service/auth.service';
+import { HeaderService } from '@service/header.service';
 
 @Component({
     templateUrl: 'reset-password.component.html',
     styleUrls: ['reset-password.component.scss'],
 })
-export class ResetPasswordComponent implements OnInit {
+export class ResetPasswordComponent implements OnInit, AfterViewInit {
 
     
     loadingForm: boolean = false;
@@ -52,7 +52,7 @@ export class ResetPasswordComponent implements OnInit {
         private route: ActivatedRoute,
         public http: HttpClient,
         public notificationService: NotificationService,
-        private authService: AuthService,
+        private headerService: HeaderService,
     ) {
         this.route.queryParams.subscribe(params => {
             this.token = params.token;
@@ -60,7 +60,13 @@ export class ResetPasswordComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        this.headerService.hideSideBar = true;
         this.getPassRules();
+    }
+
+    ngAfterViewInit(): void {
+        // FIX lang not loaded yet
+        this.labelButton = this.translate.instant('lang.update');
     }
 
 

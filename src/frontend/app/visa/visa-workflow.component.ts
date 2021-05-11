@@ -13,6 +13,7 @@ import { AddVisaModelModalComponent } from './addVisaModel/add-visa-model-modal.
 import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { ActivatedRoute } from '@angular/router';
 import { PrivilegeService } from '@service/privileges.service';
+import { HeaderService } from '@service/header.service';
 
 @Component({
     selector: 'app-visa-workflow',
@@ -51,7 +52,6 @@ export class VisaWorkflowComponent implements OnInit {
     @Input('showComment') showComment: boolean = true;
 
     @Input('linkedToMaarchParapheur') linkedToMaarchParapheur: boolean = false;
-
     @Output() workflowUpdated = new EventEmitter<any>();
 
     @ViewChild('searchVisaSignUserInput', { static: false }) searchVisaSignUserInput: ElementRef;
@@ -69,7 +69,8 @@ export class VisaWorkflowComponent implements OnInit {
         public dialog: MatDialog,
         private scanPipe: ScanPipe,
         private route: ActivatedRoute,
-        private privilegeService: PrivilegeService
+        private privilegeService: PrivilegeService,
+        public headerService: HeaderService
     ) {
         // ngOnInit is not called if navigating in the same component : must be in constructor for this case
         this.route.params.subscribe(params => {
@@ -102,7 +103,7 @@ export class VisaWorkflowComponent implements OnInit {
         if (event.previousContainer === event.container) {
             if (this.canManageUser(this.visaWorkflow.items[event.currentIndex], event.currentIndex)) {
                 moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-                this.workflowUpdated.emit(event.container);
+                this.workflowUpdated.emit(event.container.data);
             } else {
                 this.notify.error(this.translate.instant('lang.moveVisaUserErr', { value1: this.visaWorkflow.items[event.previousIndex].labelToDisplay }));
             }
@@ -298,7 +299,7 @@ export class VisaWorkflowComponent implements OnInit {
                                 {
                                     ...element,
                                     difflist_type: 'VISA_CIRCUIT',
-                                    currentRole: element.requested_signature ? 'sign' : 'visa'
+                                    currentRole: this.getCurrentRole(element)
                                 });
                         });
 
@@ -321,25 +322,31 @@ export class VisaWorkflowComponent implements OnInit {
     loadDefaultWorkflow(resId: number) {
         this.loading = true;
         this.visaWorkflow.items = [];
-        this.http.get('../rest/resources/' + resId + '/defaultCircuit?circuit=visaCircuit').pipe(
-            filter((data: any) => !this.functions.empty(data.circuit)),
-            tap((data: any) => {
-                data.circuit.items.forEach((element: any) => {
-                    this.visaWorkflow.items.push(
-                        {
-                            ...element,
-                            requested_signature: element.item_mode !== 'visa',
-                            difflist_type: 'VISA_CIRCUIT'
-                        });
-                });
-                this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
-            }),
-            finalize(() => this.loading = false),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+        return new Promise((resolve) => {
+            this.http.get('../rest/resources/' + resId + '/defaultCircuit?circuit=visaCircuit').pipe(
+                filter((data: any) => !this.functions.empty(data.circuit)),
+                tap((data: any) => {
+                    data.circuit.items.forEach((element: any) => {
+                        this.visaWorkflow.items.push(
+                            {
+                                ...element,
+                                requested_signature: element.item_mode !== 'visa',
+                                difflist_type: 'VISA_CIRCUIT'
+                            });
+                    });
+                    this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
+                    this.workflowUpdated.emit(this.visaWorkflow.items);
+                }),
+                finalize(() => {
+                    this.loading = false
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     loadWorkflowMaarchParapheur(attachmentId: number, type: string) {
@@ -653,6 +660,18 @@ export class VisaWorkflowComponent implements OnInit {
             }
         } else {
             return false;
+        }
+    }
+
+    getCurrentRole(item: any) {
+        if (this.functions.empty(item.process_date)) {
+            return item.requested_signature ? 'sign' : 'visa';
+        } else {
+            if (['A terminé le circuit'].indexOf(item.process_comment) > -1 || ['Circuit interrompu'].indexOf(item.process_comment) > -1) {
+                return item.requested_signature ? 'sign' : 'visa';
+            } else {
+                return item.signatory ? 'sign' : 'visa';
+            }
         }
     }
 }

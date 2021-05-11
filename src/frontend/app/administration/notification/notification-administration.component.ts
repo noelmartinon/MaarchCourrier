@@ -116,4 +116,9 @@ export class NotificationAdministrationComponent implements OnInit {
     isNumber(val: any) {
         return $.isNumeric(val);
     }
+
+    updateDiffusionType(type: any) {
+        this.notification.diffusion_type = type;
+        this.notification.diffusion_properties = [];
+    }
 }

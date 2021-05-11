@@ -6,7 +6,7 @@
         "description" : "Documentation de l'API Maarch Courrier V20.10",
         "contact" : {
             "name" : "Maarch",
-            "email" : "info@maarch.org"
+            "email" : "dev.maarch@maarch.org"
         }
     },
     "basePath" : "/rest",

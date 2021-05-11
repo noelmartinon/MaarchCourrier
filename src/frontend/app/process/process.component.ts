@@ -12,7 +12,7 @@ import { FiltersListService } from '@service/filtersList.service';
 import { Overlay } from '@angular/cdk/overlay';
 import { AppService } from '@service/app.service';
 import { ActionsService } from '../actions/actions.service';
-import { tap, catchError, map, finalize, filter } from 'rxjs/operators';
+import { tap, catchError, map, finalize, filter, take } from 'rxjs/operators';
 import { DocumentViewerComponent } from '../viewer/document-viewer.component';
 import { IndexingFormComponent } from '../indexation/indexing-form/indexing-form.component';
 import { ConfirmComponent } from '../../plugins/modal/confirm.component';
@@ -44,6 +44,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     detailMode: boolean = false;
     isMailing: boolean = false;
+    isFromSearch: boolean = false;
     actionsList: any[] = [];
     currentUserId: number = null;
     currentBasketId: number = null;
@@ -125,7 +126,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     modalModule: any[] = [];
 
-    currentTool: string ;
+    currentTool: string = 'dashboard';
 
     subscription: Subscription;
 
@@ -290,6 +291,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     async initDetailPage(params: any) {
         this._activatedRoute.queryParamMap.subscribe((paramMap: ParamMap) => {
             this.isMailing = !this.functions.empty(paramMap.get('isMailing'));
+            this.isFromSearch = !this.functions.empty(paramMap.get('fromSearch'));
         });
 
         this.detailMode = true;
@@ -349,19 +351,21 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     setEditDataPrivilege() {
         if (this.detailMode) {
-            this.http.get('../rest/search/configuration').pipe(
-                tap((myData: any) => {
-                    if (myData.configuration.listEvent.defaultTab == null) {
-                        this.currentTool = 'dashboard';
-                    } else {
-                        this.currentTool = myData.configuration.listEvent.defaultTab;
-                    }
-                }),
-                catchError((err: any) => {
-                    this.notify.handleErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
+            if (this.isFromSearch) {
+                this.http.get('../rest/search/configuration').pipe(
+                    tap((myData: any) => {
+                        if (myData.configuration.listEvent.defaultTab == null) {
+                            this.currentTool = 'dashboard';
+                        } else {
+                            this.currentTool = myData.configuration.listEvent.defaultTab;
+                        }
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            }
             this.canEditData = this.privilegeService.hasCurrentUserPrivilege('edit_resource') && this.currentResourceInformations.statusAlterable && this.functions.empty(this.currentResourceInformations.registeredMail_deposit_id);
             if (this.isMailing && this.isToolEnabled('attachments')) {
                 this.currentTool = 'attachments';
@@ -786,10 +790,19 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     async saveTool() {
         if (this.currentTool === 'info' && this.indexingForm !== undefined) {
-            await this.indexingForm.saveData();
-            setTimeout(() => {
-                this.loadResource(false);
-            }, 400);
+            this.appDocumentViewer.getFile().pipe(
+                take(1),
+                tap(async (data: any) => {
+                    if (this.functions.empty(data.contentView) && this.indexingForm.mandatoryFile) {
+                        this.notify.error(this.translate.instant('lang.mandatoryFile'));
+                    } else {
+                        await this.indexingForm.saveData();
+                        setTimeout(() => {
+                            this.loadResource(false);
+                        }, 400);
+                    }
+                })
+            ).subscribe();
         } else if (this.currentTool === 'diffusionList' && this.appDiffusionsList !== undefined) {
             await this.appDiffusionsList.saveListinstance();
             this.loadBadges();

@@ -28,7 +28,6 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
     @ViewChild('adminMenuTemplate', { static: true }) adminMenuTemplate: TemplateRef<any>;
     @ViewChild('maarchTree', { static: true }) maarchTree: MaarchFlatTreeComponent;
 
-    
     loading: boolean = false;
 
     creationMode: boolean;
@@ -149,12 +148,13 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                             this.template.file.name = data.template.template_file_name;
                             this.getViewTemplateContent();
                         } else if (this.template.target === 'acknowledgementReceipt') {
+                            this.template.file.electronic.content = data.template.template_content;
+
                             if (!this.functionsService.empty(data.template.template_file_name)) {
                                 this.template.file.paper.format = data.template.template_file_name.split('.').pop();
+                                this.template.file.paper.name = data.template.template_file_name;
+                                this.getViewTemplateContent();
                             }
-                            this.template.file.paper.name = data.template.template_file_name;
-                            this.template.file.electronic.content = data.template.template_content;
-                            this.getViewTemplateContent();
                         }
 
                         this.headerService.setHeader(this.translate.instant('lang.templateModification'), this.template.template_label);
@@ -210,6 +210,14 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                 theme_styles: 'Header 1=header1;Header 2=header2;Header 3=header3;Table Row=tableRow1',
                 setup: (ed: any) => {
                     ed.on('keyup', (e: any) => {
+                        if (this.template.type === 'HTML' && tinymce.get('templateHtml') != null) {
+                            this.template.file.content = tinymce.get('templateHtml').getContent();
+                        }
+                        if (this.template.type === 'OFFICE_HTML' && tinymce.get('templateOfficeHtml') != null) {
+                            this.template.file.electronic.content = tinymce.get('templateOfficeHtml').getContent();
+                        }
+                    });
+                    ed.on('change', (e: any) => {
                         if (this.template.type === 'HTML' && tinymce.get('templateHtml') != null) {
                             this.template.file.content = tinymce.get('templateHtml').getContent();
                         }

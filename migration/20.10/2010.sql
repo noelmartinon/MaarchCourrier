@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '20.10.4' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '20.10.11' WHERE id = 'database_version';
 
 DROP VIEW IF EXISTS res_view_letterbox;
 
@@ -49,6 +49,8 @@ END$$;
 /*INDEXING_MODELS_FIELDS*/
 ALTER TABLE indexing_models_fields DROP COLUMN IF EXISTS enabled;
 ALTER TABLE indexing_models_fields ADD COLUMN enabled BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE indexing_models DROP COLUMN IF EXISTS mandatory_file;
+ALTER TABLE indexing_models ADD COLUMN mandatory_file BOOLEAN NOT NULL DEFAULT FALSE;
 
 /* CONTACTS GROUPS */
 ALTER TABLE contacts_groups DROP COLUMN IF EXISTS entity_owner;
@@ -359,6 +361,8 @@ DELETE FROM parameters WHERE id = 'minimumVisaRole';
 INSERT INTO parameters (id, description, param_value_int) VALUES ('minimumVisaRole', 'Nombre minimum de viseur dans les circuits de visa (0 pour désactiver)', 0);
 DELETE FROM parameters WHERE id = 'maximumSignRole';
 INSERT INTO parameters (id, description, param_value_int) VALUES ('maximumSignRole', 'Nombre maximum de signataires dans les circuits de visa (0 pour désactiver)', 0);
+DELETE FROM parameters WHERE id = 'workflowEndBySignatory';
+INSERT INTO parameters (id, description, param_value_int) VALUES ('workflowEndBySignatory', 'Si activé (1), le dernier utilisateur du circuit de visa doit être Signataire (0 pour désactiver)', 0);
 
 UPDATE history_batch SET total_errors = 0 WHERE total_errors IS NULL;
 
@@ -372,6 +376,11 @@ DO $$ BEGIN
         INSERT INTO parameters (id, param_value_string) VALUES ('loginpage_message', '');
     END IF;
 END$$;
+
+ALTER TABLE listinstance_history_details DROP COLUMN IF EXISTS requested_signature;
+ALTER TABLE listinstance_history_details ADD COLUMN requested_signature boolean default false;
+ALTER TABLE listinstance_history_details DROP COLUMN IF EXISTS signatory;
+ALTER TABLE listinstance_history_details ADD COLUMN signatory BOOLEAN DEFAULT FALSE;
 
 /* ORDER ON CHRONO */
 CREATE OR REPLACE FUNCTION order_alphanum(text) RETURNS text AS $$

@@ -27,7 +27,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
     thumbnailUrl: string;
     docUrl: string = '';
     homeData: any;
-    homeMessage: string;
+    homeMessage: any;
     dataSource: any;
     currentDate: string = '';
     nbMpDocs: number = 0;
@@ -67,7 +67,7 @@ export class HomeComponent implements OnInit, AfterViewInit {
         this.http.get('../rest/home')
             .subscribe((data: any) => {
                 this.homeData = data;
-                this.homeMessage = data['homeMessage'];
+                this.homeMessage = this.sanitizer.bypassSecurityTrustHtml(data['homeMessage']);
             });
     }
 

@@ -35,7 +35,8 @@ export class IndexingModelAdministrationComponent implements OnInit {
         category: 'incoming',
         default: false,
         owner: 0,
-        private: false
+        private: false,
+        mandatoryFile: false
     };
 
     indexingModelClone: any;

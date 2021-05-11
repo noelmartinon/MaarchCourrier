@@ -136,6 +136,18 @@ class ActionController
                 }
                 $parameters['requiredFields'] = $requiredFields;
             }
+            if (!empty($parameters['succesStatus'])) {
+                $status = StatusModel::getById(['select' => [1], 'id' => $parameters['succesStatus']]);
+                if (empty($status)) {
+                    unset($parameters['succesStatus']);
+                }
+            }
+            if (!empty($parameters['errorStatus'])) {
+                $status = StatusModel::getById(['select' => [1], 'id' => $parameters['errorStatus']]);
+                if (empty($status)) {
+                    unset($parameters['errorStatus']);
+                }
+            }
         }
 
         $id = ActionModel::create([

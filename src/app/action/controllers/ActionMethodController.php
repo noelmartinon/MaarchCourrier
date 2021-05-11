@@ -19,6 +19,7 @@ use Action\models\ResMarkAsReadModel;
 use Alfresco\controllers\AlfrescoController;
 use Attachment\controllers\AttachmentController;
 use Attachment\models\AttachmentModel;
+use Basket\models\BasketModel;
 use Convert\controllers\ConvertPdfController;
 use Convert\models\AdrModel;
 use Docserver\controllers\DocserverController;
@@ -106,9 +107,18 @@ class ActionMethodController
 
         $set = ['locker_user_id' => null, 'locker_time' => null, 'modification_date' => 'CURRENT_TIMESTAMP'];
 
-        $action = ActionModel::getById(['id' => $args['id'], 'select' => ['label_action', 'id_status', 'history']]);
-        if (!empty($action['id_status']) && $action['id_status'] != '_NOSTATUS_') {
-            $set['status'] = $action['id_status'];
+        $action = ActionModel::getById(['id' => $args['id'], 'select' => ['label_action', 'id_status', 'history', 'parameters']]);
+        $action['parameters'] = json_decode($action['parameters'], true);
+
+        if (empty($args['finishInScript'])) {
+            $status = !empty($action['parameters']['successStatus']) ? $action['parameters']['successStatus'] : $action['id_status'];
+            if (!empty($status) && $status != '_NOSTATUS_') {
+                $set['status'] = $status;
+            }
+        } else {
+            if (!empty($action['id_status']) && $action['id_status'] != '_NOSTATUS_') {
+                $set['status'] = $action['id_status'];
+            }
         }
 
         ResModel::update([
@@ -116,6 +126,13 @@ class ActionMethodController
             'where' => ['res_id in (?)'],
             'data'  => [$args['resources']]
         ]);
+
+        $resLetterboxData = ResModel::get([
+            'select' => ['external_id', 'destination', 'res_id'],
+            'where'  => ['res_id in (?)'],
+            'data'   => [$args['resources']]
+        ]);
+        $resLetterboxData = array_column($resLetterboxData, null, 'res_id');
 
         foreach ($args['resources'] as $resource) {
             if (!empty(trim($args['note']['content']))) {
@@ -129,6 +146,26 @@ class ActionMethodController
                     foreach ($args['note']['entities'] as $entity) {
                         NoteEntityModel::create(['item_id' => $entity, 'note_id' => $noteId]);
                     }
+                }
+
+                if (!empty($noteId)) {
+                    HistoryController::add([
+                        'tableName' => "notes",
+                        'recordId'  => $noteId,
+                        'eventType' => "ADD",
+                        'info'      => _NOTE_ADDED . " (" . $noteId . ")",
+                        'moduleId'  => 'notes',
+                        'eventId'   => 'noteadd'
+                    ]);
+
+                    HistoryController::add([
+                        'tableName' => 'res_letterbox',
+                        'recordId'  => $resource,
+                        'eventType' => 'ADD',
+                        'info'      => _NOTE_ADDED,
+                        'moduleId'  => 'resource',
+                        'eventId'   => 'resourceModification'
+                    ]);
                 }
             }
 
@@ -144,7 +181,7 @@ class ActionMethodController
                     'eventId'   => $args['id']
                 ]);
 
-                MessageExchangeReviewController::sendMessageExchangeReview(['res_id' => $resource, 'action_id' => $args['id'], 'userId' => $GLOBALS['login']]);
+                MessageExchangeReviewController::sendMessageExchangeReview(['resource' => $resLetterboxData[$resource], 'action_id' => $args['id'], 'userId' => $GLOBALS['login']]);
             }
         }
 
@@ -240,20 +277,29 @@ class ActionMethodController
         return true;
     }
 
-    public static function resMarkAsReadAction(array $aArgs)
+    public static function resMarkAsReadAction(array $args)
     {
-        ValidatorModel::notEmpty($aArgs, ['resId', 'data']);
-        ValidatorModel::intVal($aArgs, ['resId']);
+        ValidatorModel::notEmpty($args, ['resId', 'data']);
+        ValidatorModel::intVal($args, ['resId']);
+
+        $basket['basket_id'] = 0;
+        if (is_numeric($args['data']['basketId'])) {
+            $basket = BasketModel::getById(['id' => $args['data']['basketId'], 'select' => ['basket_id']]);
+        }
 
         ResMarkAsReadModel::delete([
-            'where' => ['res_id = ?', 'user_id = ?', 'basket_id = ?'],
-            'data'  => [$aArgs['resId'], $GLOBALS['id'], $aArgs['data']['basketId']]
+            'where' => ['res_id = ?', 'user_id = ?', '(basket_id = ? OR basket_id = ?)'],
+            'data'  => [$args['resId'], $GLOBALS['id'], $args['data']['basketId'], $basket['basket_id']]
         ]);
 
+        if (empty($basket['basket_id'])) {
+            $basket['basket_id'] = $args['data']['basketId'];
+        }
+
         ResMarkAsReadModel::create([
-            'res_id'    => $aArgs['resId'],
+            'res_id'    => $args['resId'],
             'user_id'   => $GLOBALS['id'],
-            'basket_id' => $aArgs['data']['basketId']
+            'basket_id' => $basket['basket_id']
         ]);
 
         return true;
@@ -273,7 +319,11 @@ class ActionMethodController
         }
 
         $listInstances = array_merge($listInstances, $args['data']['listInstances']);
-        $controller = ListInstanceController::updateListInstance(['data' => [['resId' => $args['resId'], 'listInstances' => $listInstances]], 'userId' => $GLOBALS['id'], 'fullRight' => true]);
+        $controller = ListInstanceController::updateListInstance([
+            'data'      => [['resId' => $args['resId'], 'listInstances' => $listInstances, 'destination' => $args['data']['destination']]],
+            'userId'    => $GLOBALS['id'],
+            'fullRight' => true
+        ]);
         if (!empty($controller['errors'])) {
             return ['errors' => [$controller['errors']]];
         }
@@ -335,7 +385,7 @@ class ActionMethodController
             'select'    => ['requested_signature', 'item_mode'],
             'where'     => ['res_id = ?', 'difflist_type = ?', 'process_date is null'],
             'data'      => [$args['resId'], 'VISA_CIRCUIT'],
-            'orderBy'   => ['listinstance_id'],
+            'orderBy'   => ['listinstance_id']
         ]);
         if (empty($circuit)) {
             return ['errors' => ['No available circuit']];
@@ -343,9 +393,11 @@ class ActionMethodController
 
         $minimumVisaRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'minimumVisaRole']);
         $maximumSignRole = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'maximumSignRole']);
+        $workflowEndBySignatory = ParameterModel::getById(['select' => ['param_value_int'], 'id' => 'workflowEndBySignatory']);
 
         $minimumVisaRole = !empty($minimumVisaRole['param_value_int']) ? $minimumVisaRole['param_value_int'] : 0;
         $maximumSignRole = !empty($maximumSignRole['param_value_int']) ? $maximumSignRole['param_value_int'] : 0;
+        $workflowEndBySignatory = !empty($workflowEndBySignatory['param_value_int']);
 
         $nbVisaRole = 0;
         $nbSignRole = 0;
@@ -361,6 +413,13 @@ class ActionMethodController
         }
         if ($maximumSignRole != 0 && $nbSignRole > $maximumSignRole) {
             return ['errors' => ['Circuit have too many sign users']];
+        }
+
+        if ($workflowEndBySignatory) {
+            $last = count($circuit) - 1;
+            if ($circuit[$last]['requested_signature'] == false) {
+                return ['errors' => 'Circuit last user is not a signatory'];
+            }
         }
 
         $resource       = ResModel::getById(['select' => ['integrations'], 'resId' => $args['resId']]);
@@ -618,7 +677,7 @@ class ActionMethodController
 
 
         $listInstances = ListInstanceModel::get([
-            'select'   => ['listinstance_id'],
+            'select'   => ['listinstance_id', 'item_id'],
             'where'    => ['res_id = ?', 'difflist_type = ?', 'process_date is null'],
             'data'     => [$args['resId'], 'VISA_CIRCUIT'],
             'orderBy' => ['listinstance_id'],
@@ -628,11 +687,12 @@ class ActionMethodController
         if (!empty($listInstances[0])) {
             $listInstances = $listInstances[0];
 
+            $set = ['process_date' => 'CURRENT_TIMESTAMP', 'process_comment' => _HAS_INTERRUPTED_WORKFLOW];
+            if ($listInstances['item_id'] != $GLOBALS['id']) {
+                $set['delegate'] = $GLOBALS['id'];
+            }
             ListInstanceModel::update([
-                'set'   => [
-                    'process_date' => 'CURRENT_TIMESTAMP',
-                    'process_comment' => _HAS_INTERRUPTED_WORKFLOW
-                ],
+                'set'   => $set,
                 'where' => ['listinstance_id = ?'],
                 'data'  => [$listInstances['listinstance_id']]
             ]);

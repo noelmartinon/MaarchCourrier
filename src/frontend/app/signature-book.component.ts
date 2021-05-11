@@ -138,7 +138,6 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                     }
                     this.signatureBook = data;
                     this.canUpdateDocument = data.canUpdateDocuments;
-
                     this.headerTab = 'document';
                     this.leftSelectedThumbnail = 0;
                     this.rightSelectedThumbnail = 0;
@@ -272,6 +271,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
             this.loadBadges();
         } else if (this.headerTab === 'notes' && this.appNotesList !== undefined) {
             this.appNotesList.addNote();
+            this.loadBadges();
         }
     }
 

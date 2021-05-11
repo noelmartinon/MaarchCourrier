@@ -8,6 +8,7 @@ import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FormControl } from '@angular/forms';
 import { AppService } from '@service/app.service';
+import { FunctionsService } from '../../../service/functions.service';
 
 declare var tinymce: any;
 
@@ -50,6 +51,7 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
         public http: HttpClient, 
         private notify: NotificationService, 
         public dialogRef: MatDialogRef<CreateAcknowledgementReceiptActionComponent>, 
+        public functions: FunctionsService,
         @Inject(MAT_DIALOG_DATA) public data: any) { }
 
     ngOnInit(): void {
@@ -65,18 +67,14 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
                 this.realResSelected = data.sendList;
                 this.loadingInit = false;
                 this.arMode = data.mode;
-                this.arModeInit(this.arMode);
+                if (this.arMode === 'manual') {
+                    this.toggleArManual(true);
+                }
             }, (err) => {
                 this.notify.error(err.error.errors);
                 this.dialogRef.close();
                 this.loadingInit = false;
             });
-    }
-
-    arModeInit(mode : string) {
-        if (mode === 'manual') {
-            this.toggleArManual(true);
-        }
     }
 
     onSubmit() {
@@ -93,6 +91,11 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
     executeAction() {
         let data = null;
         if (this.manualAR) {
+            if (this.functions.empty(tinymce.get('emailSignature').getContent())) {
+                this.notify.error(this.translate.instant('lang.arContentIsEmpty'));
+                this.loading = false;
+                return false;
+            }
             data = {
                 subject : this.emailsubject,
                 content : tinymce.get('emailSignature').getContent(),
@@ -151,8 +154,10 @@ export class CreateAcknowledgementReceiptActionComponent implements OnInit, OnDe
 
     toggleArManual(state: boolean) {
         if (state) {
-            this.currentMode = 'mode=manual';
-            this.checkAcknowledgementReceipt();
+            if (this.currentMode != 'mode=manual') {
+                this.currentMode = 'mode=manual';
+                this.checkAcknowledgementReceipt();
+            }
             this.manualAR = true;
             if (this.data.resIds.length === 1) {
                 this.emailsubject = this.data.resource.subject;

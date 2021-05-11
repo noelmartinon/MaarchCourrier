@@ -50,6 +50,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\PreparedClauseController;
 use SrcCore\models\CoreConfigModel;
+use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
 use Status\models\StatusModel;
 use Tag\models\ResourceTagModel;
@@ -432,7 +433,7 @@ class ResController extends ResourceControlController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $document = ResModel::getById(['select' => ['filename', 'format', 'typist'], 'resId' => $aArgs['resId']]);
+        $document = ResModel::getById(['select' => ['filename', 'format', 'typist', 'subject'], 'resId' => $aArgs['resId']]);
         if (empty($document)) {
             return $response->withStatus(400)->withJson(['errors' => 'Document does not exist']);
         } elseif (empty($document['filename'])) {
@@ -440,6 +441,7 @@ class ResController extends ResourceControlController
         }
         $originalFormat = $document['format'];
         $creatorId      = $document['typist'];
+        $subject        = $document['subject'];
 
         $convertedDocument = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['resId'], 'collId' => 'letterbox_coll']);
         if (!empty($convertedDocument['errors'])) {
@@ -486,6 +488,7 @@ class ResController extends ResourceControlController
 
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($fileContent);
+        $filename = TextFormatModel::formatFilename(['filename' => $subject, 'maxLength' => 250]);
 
         if ($data['mode'] == 'base64') {
             $listInstance = ListInstanceModel::get([
@@ -501,6 +504,7 @@ class ResController extends ResourceControlController
             return $response->withJson([
                 'encodedDocument'   => base64_encode($fileContent),
                 'originalFormat'    => $originalFormat,
+                'filename'          => $filename . '.' . $originalFormat,
                 'mimeType'          => $mimeType,
                 'originalCreatorId' => $creatorId,
                 'signatoryId'       => $signatoryId
@@ -510,7 +514,7 @@ class ResController extends ResourceControlController
 
             $response->write($fileContent);
             $contentDisposition = $data['mode'] == 'view' ? 'inline' : 'attachment';
-            $response = $response->withAddedHeader('Content-Disposition', "{$contentDisposition}; filename=maarch.{$pathInfo['extension']}");
+            $response = $response->withAddedHeader('Content-Disposition', "{$contentDisposition}; filename={$filename}.{$pathInfo['extension']}");
             return $response->withHeader('Content-Type', $mimeType);
         }
     }
@@ -564,7 +568,7 @@ class ResController extends ResourceControlController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['version', 'filename']]);
+        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['version', 'filename', 'subject']]);
         if (empty($resource['filename'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Document has no file']);
         } elseif (!Validator::intVal()->validate($args['version']) || $args['version'] > $resource['version'] || $args['version'] < 1) {
@@ -572,6 +576,7 @@ class ResController extends ResourceControlController
         }
 
         $queryParams = $request->getQueryParams();
+        $subject     = $resource['subject'];
 
         $type = 'PDF';
         if (!empty($queryParams['type']) && in_array($queryParams['type'], ['PDF', 'SIGN', 'NOTE'])) {
@@ -621,7 +626,9 @@ class ResController extends ResourceControlController
             return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
         }
 
-        return $response->withJson(['encodedDocument' => base64_encode($fileContent)]);
+        $pathInfo = pathinfo($pathToDocument);
+        $filename = TextFormatModel::formatFilename(['filename' => $subject, 'maxLength' => 250]);
+        return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'filename' => $filename.'_V'.$args['version'].'.'.$pathInfo['extension']]);
     }
 
     public function getOriginalFileContent(Request $request, Response $response, array $args)
@@ -630,7 +637,7 @@ class ResController extends ResourceControlController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename', 'category_id', 'version', 'fingerprint'], 'resId' => $args['resId']]);
+        $document = ResModel::getById(['select' => ['docserver_id', 'path', 'filename', 'category_id', 'version', 'fingerprint', 'subject'], 'resId' => $args['resId']]);
         if (empty($document)) {
             return $response->withStatus(400)->withJson(['errors' => 'Document does not exist']);
         }
@@ -638,6 +645,7 @@ class ResController extends ResourceControlController
         if (empty($document['filename'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Document has no file']);
         }
+        $subject = $document['subject'];
 
         $convertedDocument = AdrModel::getDocuments([
             'select'    => ['docserver_id', 'path', 'filename', 'fingerprint'],
@@ -673,7 +681,6 @@ class ResController extends ResourceControlController
             return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
         }
 
-
         HistoryController::add([
             'tableName' => 'res_letterbox',
             'recordId'  => $args['resId'],
@@ -686,13 +693,14 @@ class ResController extends ResourceControlController
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($fileContent);
         $pathInfo = pathinfo($pathToDocument);
-        $data = $request->getQueryParams();
+        $data     = $request->getQueryParams();
+        $filename = TextFormatModel::formatFilename(['filename' => $subject, 'maxLength' => 250]);
 
         if ($data['mode'] == 'base64') {
-            return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'extension' => $pathInfo['extension'], 'mimeType' => $mimeType]);
+            return $response->withJson(['encodedDocument' => base64_encode($fileContent), 'extension' => $pathInfo['extension'], 'mimeType' => $mimeType, 'filename' => $filename.'.'.$pathInfo['extension']]);
         } else {
             $response->write($fileContent);
-            $response = $response->withAddedHeader('Content-Disposition', "attachment; filename=maarch.{$pathInfo['extension']}");
+            $response = $response->withAddedHeader('Content-Disposition', "attachment; filename={$filename}.{$pathInfo['extension']}");
             return $response->withHeader('Content-Type', $mimeType);
         }
     }
@@ -1021,7 +1029,7 @@ class ResController extends ResourceControlController
         $encodedDocument = base64_encode($fileContent);
 
         if (!empty($document['subject'])) {
-            $document['subject'] = preg_replace(utf8_decode('@[\\/:*?"<>|]@i'), '_', substr($document['subject'], 0, 30));
+            $document['subject'] = TextFormatModel::formatFilename(['filename' => $document['subject'], 'maxLength' => 30]);
         }
 
         $pathInfo = pathinfo($pathToDocument);
@@ -1038,9 +1046,16 @@ class ResController extends ResourceControlController
 
         $resources = array_unique($args['resId']);
 
-        $authorizedResources = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId']]);
+        $authorizedResources = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId'], 'mode' => 'groups']);
+        if (count($authorizedResources) != count($resources)) {
+            $authorizedResources = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId'], 'mode' => 'baskets']);
+            if (count($authorizedResources) != count($resources)) {
+                $authorizedResources = ResController::getAuthorizedResources(['resources' => $resources, 'userId' => $args['userId'], 'mode' => 'folders']);
+                return count($authorizedResources) == count($resources);
+            }
+        }
 
-        return count($authorizedResources) == count($resources);
+        return true;
     }
 
     public static function getAuthorizedResources(array $args)
@@ -1054,7 +1069,7 @@ class ResController extends ResourceControlController
         }
 
         $user = UserModel::getById(['id' => $args['userId'], 'select' => ['user_id']]);
-        $userDataClause = SearchController::getUserDataClause(['userId' => $args['userId'], 'login' => $user['user_id']]);
+        $userDataClause = SearchController::getUserDataClause(['userId' => $args['userId'], 'login' => $user['user_id'], 'mode' => $args['mode']]);
 
         $data = [$args['resources']];
         $data = array_merge($data, $userDataClause['searchData']);
@@ -1318,7 +1333,7 @@ class ResController extends ResourceControlController
 
         $resource = ResModel::getById([
             'resId'  => $args['resId'],
-            'select' => ['format', 'fingerprint', 'filesize', 'fulltext_result', 'creation_date', 'filename', 'docserver_id', 'path']
+            'select' => ['format', 'fingerprint', 'filesize', 'fulltext_result', 'creation_date', 'filename', 'docserver_id', 'path', 'typist']
         ]);
 
         if (!empty($resource['docserver_id'])) {
@@ -1328,6 +1343,7 @@ class ResController extends ResourceControlController
             $resource['docserverPathFile'] = str_replace('#', '/', $resource['docserverPathFile']);
         }
 
+        $resource['typistLabel'] = UserModel::getLabelledUserById(['id' => $resource['typist']]);
         $resource['creationDate'] = $resource['creation_date'];
         unset($resource['creation_date']);
 

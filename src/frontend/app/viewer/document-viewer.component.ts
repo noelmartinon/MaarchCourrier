@@ -43,6 +43,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
      */
     @Input() base64: any = null;
     @Input() format: string = null;
+    @Input() filename: string = null;
 
     /**
      * Target of resource (document or attachment)
@@ -233,6 +234,10 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             content: this.base64,
             src: this.base64ToArrayBuffer(this.base64)
         };
+        if (!this.functions.empty(this.filename)) {
+            this.file.name = this.filename.substring(0, this.filename.lastIndexOf("."));
+            this.file.format = this.filename.split('.').pop();
+        }
         this.loading = false;
     }
 
@@ -288,7 +293,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
             reader.onload = (value: any) => {
                 this.file.content = this.getBase64Document(value.target.result);
-                this.triggerEvent.emit();
+                this.triggerEvent.emit('uploadFile');
                 if (this.file.type !== 'application/pdf') {
                     this.convertDocument(this.file);
                 } else {
@@ -536,7 +541,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     isExtensionAllowed(file: any) {
         const fileExtension = '.' + file.name.toLowerCase().split('.').pop();
-        if (this.allowedExtensions.filter(ext => ext.mimeType === file.type && ext.extension === fileExtension).length === 0) {
+
+        if (this.allowedExtensions.filter(ext => (ext.mimeType === file.type || (this.functions.empty(ext.mimeType) && this.functions.empty(file.type))) && ext.extension === fileExtension).length === 0) {
             this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.notAllowedExtension') + ' !', msg: this.translate.instant('lang.file') + ' : <b>' + file.name + '</b>, ' + this.translate.instant('lang.type') + ' : <b>' + file.type + '</b><br/><br/><u>' + this.translate.instant('lang.allowedExtensions') + '</u> : <br/>' + this.allowedExtensions.map(ext => ext.extension).filter((elem: any, index: any, self: any) => index === self.indexOf(elem)).join(', ') } });
             return false;
         } else if (file.size > this.maxFileSize && this.maxFileSize > 0) {
@@ -558,7 +564,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             this.http.get(this.file.content).pipe(
                 tap((data: any) => {
                     downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
-                    downloadLink.setAttribute('download', this.file.name);
+                    downloadLink.setAttribute('download', data.filename);
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
                 }),
@@ -602,7 +608,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 (data: any) => {
                     if (data.encodedDocument) {
                         this.file.contentMode = 'route';
-                        this.file.name = `${resId}.${data.originalFormat}`;
+                        this.file.name = `${data.filename}`;
                         this.file.format = data.originalFormat;
                         this.file.creatorId = data.originalCreatorId;
                         this.file.signatoryId = data.signatoryId;
@@ -644,7 +650,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                     (data: any) => {
                         if (data.encodedDocument) {
                             this.file.contentMode = 'route';
-                            this.file.name = `${resId}.${data.originalFormat}`;
+                            this.file.name = `${data.filename}`;
                             this.file.format = data.originalFormat;
                             this.file.signatoryId = data.signatoryId;
                             this.file.content = `../rest/resources/${resId}/originalContent?mode=base64`;
@@ -863,7 +869,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             this.editor.options = {
                 objectType: 'resourceModification',
                 objectId: this.resId,
-                cookie: document.cookie
+                cookie: document.cookie,
+                authToken: this.authService.getToken()
             };
             this.editInProgress = true;
 
@@ -1150,8 +1157,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
         this.http.get(`../rest/resources/${this.resId}/content/${version}?type=${type}`).pipe(
             tap((data: any) => {
-
-                this.dialog.open(DocumentViewerModalComponent, { autoFocus: false, panelClass: 'maarch-full-height-modal', data: { title: `${title}`, base64: data.encodedDocument } });
+                this.dialog.open(DocumentViewerModalComponent, { autoFocus: false, panelClass: 'maarch-full-height-modal', data: { title: `${title}`, base64: data.encodedDocument, filename: data.filename } });
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);

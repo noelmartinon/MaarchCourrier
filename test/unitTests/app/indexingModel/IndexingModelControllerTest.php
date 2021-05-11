@@ -48,7 +48,8 @@ class IndexingModelControllerTest extends TestCase
                     'default_value' => 'massala',
                     'unit'          => 'contact'
                 ]
-            ]
+            ],
+            'mandatoryFile' => false
         ];
         $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
 
@@ -71,6 +72,7 @@ class IndexingModelControllerTest extends TestCase
         $this->assertSame('mon model d indexation', $responseBody->indexingModel->label);
         $this->assertSame(false, $responseBody->indexingModel->default);
         $this->assertSame(false, $responseBody->indexingModel->private);
+        $this->assertSame(false, $responseBody->indexingModel->mandatoryFile);
         $this->assertSame('subject', $responseBody->indexingModel->fields[0]->identifier);
         $this->assertSame(true, $responseBody->indexingModel->fields[0]->mandatory);
         $this->assertSame(true, $responseBody->indexingModel->fields[0]->enabled);
@@ -261,7 +263,8 @@ class IndexingModelControllerTest extends TestCase
                     'default_value' => 'chicken',
                     'unit'          => 'classement'
                 ]
-            ]
+            ],
+            'mandatoryFile' => false
         ];
 
         $fullRequest = \httpRequestCustom::addContentInBody($args, $request);
@@ -281,6 +284,7 @@ class IndexingModelControllerTest extends TestCase
         $this->assertSame('mon model d indexation modifié', $responseBody->indexingModel->label);
         $this->assertSame(false, $responseBody->indexingModel->default);
         $this->assertSame(false, $responseBody->indexingModel->private);
+        $this->assertSame(false, $responseBody->indexingModel->mandatoryFile);
         $this->assertSame('subject', $responseBody->indexingModel->fields[0]->identifier);
         $this->assertSame(true, $responseBody->indexingModel->fields[0]->mandatory);
         $this->assertSame(true, $responseBody->indexingModel->fields[0]->enabled);

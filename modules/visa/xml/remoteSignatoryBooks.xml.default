@@ -9,12 +9,8 @@
     </signatoryBook>
     <signatoryBook>
         <id>ixbus</id>
-        <userId></userId>
-        <password></password>
+        <tokenAPI></tokenAPI>
         <url></url>
-        <organizationId>9</organizationId>
-        <ixbusIdEtatRefused>14</ixbusIdEtatRefused>
-        <ixbusIdEtatValidated>2</ixbusIdEtatValidated>
     </signatoryBook>
     <signatoryBook>
         <id>iParapheur</id>

@@ -161,7 +161,9 @@ class FolderModelAbstract
             'left_join' => ['folders.id = entities_folders.folder_id', 'folders.id = resources_folders.folder_id'],
             'where'     => empty($args['where']) ? [] : $args['where'],
             'data'      => empty($args['data']) ? [] : $args['data'],
-            'groupBy'   => empty($args['groupBy']) ? [] : $args['groupBy']
+            'groupBy'   => empty($args['groupBy']) ? [] : $args['groupBy'],
+            'order_by'  => empty($args['orderBy']) ? [] : $args['orderBy'],
+            'limit'     => empty($args['limit']) ? 0 : $args['limit'],
         ]);
 
         return $folders;

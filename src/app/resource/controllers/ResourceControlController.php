@@ -58,13 +58,15 @@ class ResourceControlController
             return ['errors' => 'Body doctype does not exist'];
         }
 
-        $indexingModel = IndexingModelModel::getById(['id' => $body['modelId'], 'select' => ['master', 'enabled']]);
+        $indexingModel = IndexingModelModel::getById(['id' => $body['modelId'], 'select' => ['master', 'enabled', 'mandatory_file']]);
         if (empty($indexingModel)) {
             return ['errors' => 'Body modelId does not exist'];
         } elseif (!$indexingModel['enabled']) {
             return ['errors' => 'Body modelId is disabled'];
         } elseif (!empty($indexingModel['master'])) {
             return ['errors' => 'Body modelId is not public'];
+        } elseif (empty($body['encodedFile']) && $indexingModel['mandatory_file']) {
+            return ['errors' => 'File is mandatory for this indexing model'];
         }
 
         $control = ResourceControlController::controlFileData(['body' => $body]);
@@ -125,7 +127,7 @@ class ResourceControlController
             return ['errors' => 'Body is not set or empty'];
         }
 
-        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['status', 'model_id', 'format', 'initiator', 'external_id->>\'signatureBookId\' as signaturebookid']]);
+        $resource = ResModel::getById(['resId' => $args['resId'], 'select' => ['status', 'model_id', 'format', 'initiator', 'external_id->>\'signatureBookId\' as signaturebookid', 'filename']]);
         if (empty($resource['status'])) {
             return ['errors' => 'Resource status is empty. It can not be modified'];
         }
@@ -138,13 +140,15 @@ class ResourceControlController
             if (!PrivilegeController::isResourceInProcess(['userId' => $GLOBALS['id'], 'resId' => $args['resId'], 'canUpdateData' => true, 'canUpdateModel' => true])) {
                 return ['errors' => 'Model can not be modified'];
             }
-            $indexingModel = IndexingModelModel::getById(['id' => $body['modelId'], 'select' => ['master', 'enabled']]);
+            $indexingModel = IndexingModelModel::getById(['id' => $body['modelId'], 'select' => ['master', 'enabled', 'mandatory_file']]);
             if (empty($indexingModel)) {
                 return ['errors' => 'Body modelId does not exist'];
             } elseif (!$indexingModel['enabled']) {
                 return ['errors' => 'Body modelId is disabled'];
             } elseif (!empty($indexingModel['master'])) {
                 return ['errors' => 'Body modelId is not public'];
+            } elseif (empty($resource['filename']) && $indexingModel['mandatory_file']) {
+                return ['errors' => 'File is mandatory for this indexing model'];
             }
         }
 
@@ -291,6 +295,8 @@ class ResourceControlController
             foreach ($body['senders'] as $key => $sender) {
                 if (!Validator::arrayType()->notEmpty()->validate($sender)) {
                     return ['errors' => "Body senders[{$key}] is not an array"];
+                } elseif (!Validator::intVal()->notEmpty()->validate($sender['id'])) {
+                    return ['errors' => "Body senders[{$key}][id] is empty or not an integer"];
                 }
                 if ($sender['type'] == 'contact') {
                     $senderItem = ContactModel::getById(['id' => $sender['id'], 'select' => [1]]);
@@ -313,6 +319,8 @@ class ResourceControlController
             foreach ($body['recipients'] as $key => $recipient) {
                 if (!Validator::arrayType()->notEmpty()->validate($recipient)) {
                     return ['errors' => "Body recipients[{$key}] is not an array"];
+                } elseif (!Validator::intVal()->notEmpty()->validate($recipient['id'])) {
+                    return ['errors' => "Body recipients[{$key}][id] is empty or not an integer"];
                 }
                 if ($recipient['type'] == 'contact') {
                     $recipientItem = ContactModel::getById(['id' => $recipient['id'], 'select' => [1]]);
@@ -334,6 +342,11 @@ class ResourceControlController
             }
             $destFound = false;
             foreach ($body['diffusionList'] as $key => $diffusion) {
+                if (!Validator::arrayType()->notEmpty()->validate($diffusion)) {
+                    return ['errors' => "Body diffusionList[{$key}] is not an array"];
+                } elseif (!Validator::intVal()->notEmpty()->validate($diffusion['id'])) {
+                    return ['errors' => "Body diffusionList[{$key}][id] is empty or not an integer"];
+                }
                 if ($diffusion['mode'] == 'dest') {
                     if ($destFound) {
                         return ['errors' => "Body diffusionList has multiple dest"];
@@ -504,12 +517,10 @@ class ResourceControlController
             foreach ($groups as $group) {
                 $group['indexation_parameters'] = json_decode($group['indexation_parameters'], true);
                 foreach ($group['indexation_parameters']['keywords'] as $keywordValue) {
-                    if (strpos($clauseToProcess, IndexingController::KEYWORDS[$keywordValue]) === false) {
-                        if (!empty($clauseToProcess)) {
-                            $clauseToProcess .= ', ';
-                        }
-                        $clauseToProcess .= IndexingController::KEYWORDS[$keywordValue];
+                    if (!empty($clauseToProcess)) {
+                        $clauseToProcess .= ', ';
                     }
+                    $clauseToProcess .= IndexingController::KEYWORDS[$keywordValue];
                 }
                 $allowedEntities = array_merge($allowedEntities, $group['indexation_parameters']['entities']);
                 $allowedEntities = array_unique($allowedEntities);

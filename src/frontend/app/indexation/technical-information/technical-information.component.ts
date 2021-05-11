@@ -7,7 +7,7 @@ import { FunctionsService } from '@service/functions.service';
 import { catchError, exhaustMap, tap } from 'rxjs/operators';
 import { NotificationService } from '@service/notification/notification.service';
 import { of } from 'rxjs';
-import { DatePipe } from '@angular/common';
+import { DatePipe, KeyValue } from '@angular/common';
 
 
 @Component({
@@ -18,36 +18,41 @@ export class TechnicalInformationComponent implements OnInit {
 
     loading: boolean = false;
 
-    techData: any = {
-        format: {
-            label: 'fileFormat',
+    techData: {[key: string]: any} = {
+        initiator: {
+            label: 'initiator',
             value: '',
-            icon: 'far fa-file-archive'
-        },
-        size: {
-            label: 'filesize',
-            value: '',
-            icon: 'fas fa-cubes'
+            icon: 'fas fa-user'
         },
         creationDate: {
             label: 'creationDate',
             value: '',
             icon: 'fas fa-calendar-day'
         },
-        fingerprint: {
-            label: 'fingerprint',
+        size: {
+            label: 'filesize',
             value: '',
-            icon: 'fas fa-fingerprint'
+            icon: 'fas fa-cubes'
+        },
+        format: {
+            label: 'fileFormat',
+            value: '',
+            icon: 'far fa-file-archive'
+        },
+        filename: {
+            label: 'filename',
+            value: '',
+            icon: 'fas fa-quote-right'
         },
         docserverPathFile: {
             label: 'docserverPathFile',
             value: '',
             icon: 'fas fa-terminal'
         },
-        filename: {
-            label: 'filename',
+        fingerprint: {
+            label: 'fingerprint',
             value: '',
-            icon: 'fas fa-quote-right'
+            icon: 'fas fa-fingerprint'
         },
         fulltext: {
             label: 'fulltext',
@@ -79,14 +84,14 @@ export class TechnicalInformationComponent implements OnInit {
         this.http.get(`../rest/resources/${this.data.resId}/fileInformation`).pipe(
             tap((data: any) => {
                 this.techData.format.value = data.information.format,
-                    this.techData.fingerprint.value = data.information.fingerprint,
-                    this.techData.size.value = this.functions.formatBytes(data.information.filesize),
-                    this.techData.fulltext.value = data.information.fulltext_result,
-                    this.techData.docserverPathFile.value = data.information.docserverPathFile,
-                    this.techData.filename.value = data.information.filename,
-                    this.techData.creationDate.value = this.datePipe.transform(data.information.creationDate, 'dd/MM/y HH:mm') ,
-                    this.loading = false;
-
+                this.techData.fingerprint.value = data.information.fingerprint,
+                this.techData.size.value = this.functions.formatBytes(data.information.filesize),
+                this.techData.fulltext.value = data.information.fulltext_result,
+                this.techData.docserverPathFile.value = data.information.docserverPathFile,
+                this.techData.filename.value = data.information.filename,
+                this.techData.initiator.value = data.information.typistLabel,
+                this.techData.creationDate.value = this.datePipe.transform(data.information.creationDate, 'dd/MM/y HH:mm') ,
+                this.loading = false;
             }),
             exhaustMap(() => this.http.get('../rest/customFields')),
             tap((data: any) => {
@@ -118,5 +123,9 @@ export class TechnicalInformationComponent implements OnInit {
 
     isEmptyCustom() {
         return Object.keys(this.customsData).length === 0;
+    }
+
+    originalOrder = (a: KeyValue<string,any>, b: KeyValue<string,any>): number => {
+        return 0;
     }
 }
