@@ -436,10 +436,16 @@ export class AttachmentCreateComponent implements OnInit {
         dialogRef.afterClosed().pipe(
             filter((data: string) => data === 'ok'),
             tap(() => {
-                this.indexTab = 0;
-                this.asyncIndexTab = this.indexTab;
+                const attachLength: number = this.attachments.length - 1;
                 this.attachments.splice(i, 1);
                 this.attachFormGroup.splice(i, 1);
+                if (i === attachLength || this.asyncIndexTab === attachLength) {
+                    this.indexTab = this.attachments.length - 1;
+                } else if (i === this.asyncIndexTab) {
+                    this.indexTab = i;
+                }
+                this.asyncIndexTab = this.indexTab;
+
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -451,6 +457,7 @@ export class AttachmentCreateComponent implements OnInit {
 
     getAttachType(attachType: any, i: number) {
         this.indexTab = i;
+        this.asyncIndexTab = this.indexTab;
         this.appDocumentViewer.toArray()[i].loadTemplatesByResId(this.data.resIdMaster, attachType);
     }
 
