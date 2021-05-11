@@ -2485,5 +2485,7 @@
     "canAddCopies": "Pouvoir ajouter des personnes en copie (CC / CCI)",
     "isRequired": "est requis",
     "willBeRedirected": "Sera redirigée à",
-    "redirectedFromProfile": "Les bannettes <b>actuellement redirigées</b> seront redirigées par défaut"
+    "redirectedFromProfile": "Les bannettes <b>actuellement redirigées</b> seront redirigées par défaut",
+    "systemTechnicalFields": "Champs techniques \"Système\"",
+    "customTechnicalFields": "Champs techniques personnalisés"
 }

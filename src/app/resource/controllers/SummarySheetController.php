@@ -17,6 +17,7 @@ namespace Resource\controllers;
 use Attachment\models\AttachmentModel;
 use Contact\controllers\ContactController;
 use CustomField\models\CustomFieldModel;
+use Docserver\models\DocserverModel;
 use Endroid\QrCode\QrCode;
 use Entity\models\EntityModel;
 use Entity\models\ListInstanceModel;
@@ -114,6 +115,8 @@ class SummarySheetController
                             $select[] = $item;
                         }
                     }
+                } elseif ($unit['unit'] == 'systemTechnicalFields') {
+                    $select = array_merge($select, ['format', 'fingerprint', 'filesize', 'creation_date', 'filename', 'docserver_id', 'path', 'typist']);
                 } elseif ($unit['unit'] == 'diffusionList') {
                     if (in_array('destination', $fieldsIdentifier)) {
                         $select[] = 'destination';
@@ -399,6 +402,141 @@ class SummarySheetController
                         $nextLine = ($nextLine + 1) % 2;
                         $pdf->MultiCell($widthNotes, 30, $label . " : {$value}", 1, 'L', false, $nextLine, '', '', true, 0, true);
                         $pdf->SetFont('', '', 10);
+                    }
+                }
+            } elseif ($unit['unit'] == 'systemTechnicalFields') {
+                if (PrivilegeController::hasPrivilege(['privilegeId' => 'view_technical_infos', 'userId' => $GLOBALS['id']])) {
+                    if (!empty($resource['docserver_id'])) {
+                        $docserver = DocserverModel::getByDocserverId(['docserverId' => $resource['docserver_id'], 'select' => ['path_template']]);
+                        $docserverPathFile = $docserver['path_template'] . $resource['path'];
+                        $docserverPathFile = str_replace('//', '/', $docserverPathFile);
+                        $docserverPathFile = str_replace('#', '/', $docserverPathFile);
+                    }
+            
+                    $typistLabel  = UserModel::getLabelledUserById(['id' => $resource['typist']]);
+                    $fulltextInfo = ResModel::getById(['select' => ['fulltext_result'], 'resId' => $resource['res_id']]);
+
+                    $pdf->SetY($pdf->GetY() + 40);
+                    if (($pdf->GetY() + 57) > $bottomHeight) {
+                        $pdf->AddPage();
+                    }
+                    $pdf->SetFont('', 'B', 11);
+                    $pdf->Cell(0, 15, $unit['label'], 0, 2, 'L', false);
+                    $pdf->SetY($pdf->GetY() + 2);
+    
+                    $pdf->SetFont('', '', 10);
+                    $pdf->MultiCell($widthNotes, 30, _TYPIST . " : {$typistLabel}", 1, 'L', false, 0, '', '', true, 0, true);
+
+                    $creationDate = TextFormatModel::formatDate($resource['creation_date'], 'd-m-Y');
+                    $pdf->MultiCell($widthNotes, 30, _CREATION_DATE . " : {$creationDate}", 1, 'L', false, 1, '', '', true, 0, true);
+    
+                    $nextLine = 1;
+                    if (!empty($resource['filesize'])) {
+                        $resource['filesize'] = StoreController::getFormattedSizeFromBytes(['size' => $resource['filesize']]);
+                        $nextLine = ($nextLine + 1) % 2;
+                        $pdf->MultiCell($widthNotes, 30, _SIZE . " : {$resource['filesize']}", 1, 'L', false, $nextLine, '', '', true, 0, true);
+                    }
+                    if (!empty($resource['format'])) {
+                        $resource['format'] = strtoupper($resource['format']);
+                        $nextLine = ($nextLine + 1) % 2;
+                        $pdf->MultiCell($widthNotes, 30, _FORMAT . " : {$resource['format']}", 1, 'L', false, $nextLine, '', '', true, 0, true);
+                    }
+                    if (!empty($resource['filename'])) {
+                        $nextLine = ($nextLine + 1) % 2;
+                        $pdf->MultiCell($widthNotes, 30, _FILENAME . " : {$resource['filename']}", 1, 'L', false, $nextLine, '', '', true, 0, true);
+                    }
+                    if (!empty($docserverPathFile)) {
+                        $nextLine = ($nextLine + 1) % 2;
+                        $pdf->MultiCell($widthNotes, 30, _DOCSERVER_PATH_FILE . " : {$docserverPathFile}", 1, 'L', false, $nextLine, '', '', true, 0, true);
+                    }
+                    if (!empty($resource['fingerprint'])) {
+                        $pdf->SetFont('', '', 8);
+                        $nextLine = ($nextLine + 1) % 2;
+                        $pdf->MultiCell($widthNotes, 30, _FINGERPRINT . " : {$resource['fingerprint']}", 1, 'L', false, $nextLine, '', '', true, 0, true);
+                        $pdf->SetFont('', '', 10);
+                    }
+                    if (!empty($fulltextInfo['fulltext_result'])) {
+                        $nextLine = ($nextLine + 1) % 2;
+                        $fulltextResult = $fulltextInfo['fulltext_result'] == 'SUCCESS' ? _SUCCESS : _ERROR;
+                        $pdf->MultiCell($widthNotes, 30, _FULLTEXT . " : {$fulltextResult}", 1, 'L', false, $nextLine, '', '', true, 0, true);
+                    }
+                }
+            } elseif ($unit['unit'] == 'customTechnicalFields') {
+                if (PrivilegeController::hasPrivilege(['privilegeId' => 'view_technical_infos', 'userId' => $GLOBALS['id']])) {
+                    $customFieldsValues = ResModel::get([
+                        'select' => ['custom_fields'],
+                        'where'  => ['res_id = ?'],
+                        'data'   => [$resource['res_id']]
+                    ]);
+                    // Get all the ids of technical custom fields
+                    $customFields    = CustomFieldModel::get(['where' => ['mode = ?'], 'data' => ['technical'], 'orderBy' => ['label']]);
+                    $customFieldsIds = array_column($customFields, 'id');
+    
+                    if (!empty($customFieldsIds)) {
+                        $customFieldsRawValues = array_column($customFields, 'values', 'id');
+                        $customFieldsRawTypes = array_column($customFields, 'type', 'id');
+                        $customFields = array_column($customFields, 'label', 'id');
+    
+                        $customFieldsValues = $customFieldsValues[0]['custom_fields'] ?? null;
+                        $customFieldsValues = json_decode($customFieldsValues, true);
+                    }
+    
+                    $pdf->SetY($pdf->GetY() + 40);
+                    if (($pdf->GetY() + 57) > $bottomHeight) {
+                        $pdf->AddPage();
+                    }
+                    $pdf->SetFont('', 'B', 11);
+                    $pdf->Cell(0, 15, $unit['label'], 0, 2, 'L', false);
+                    $pdf->SetY($pdf->GetY() + 2);
+                    $pdf->SetFont('', '', 10);
+    
+                    $nextLine = 1;
+                    if (!empty($customFieldsIds)) {
+                        $fieldsType = CustomFieldModel::get(['select' => ['type', 'id'], 'where' => ['id in (?)'], 'data' => [$customFieldsIds]]);
+                        $fieldsType = array_column($fieldsType, 'type', 'id');
+    
+                        foreach ($customFieldsIds as $customFieldsId) {
+                            $label = $customFields[$customFieldsId];
+                            $rawValues = json_decode($customFieldsRawValues[$customFieldsId], true);
+                            if (!empty($rawValues['table']) && in_array($customFieldsRawTypes[$customFieldsId], ['radio', 'select', 'checkbox'])) {
+                                if (!empty($resource['res_id'])) {
+                                    $rawValues['resId'] = $resource['res_id'];
+                                }
+                                $rawValues = CustomFieldModel::getValuesSQL($rawValues);
+    
+                                $rawValues = array_column($rawValues, 'label', 'key');
+                                if (is_array($customFieldsValues[$customFieldsId])) {
+                                    foreach ($customFieldsValues[$customFieldsId] as $key => $value) {
+                                        $customFieldsValues[$customFieldsId][$key] = $rawValues[$value];
+                                    }
+                                } else {
+                                    $customFieldsValues[$customFieldsId] = $rawValues[$customFieldsValues[$customFieldsId]];
+                                }
+                            }
+                            if (is_array($customFieldsValues[$customFieldsId])) {
+                                $customValue = "";
+                                if (!empty($customFieldsValues[$customFieldsId])) {
+                                    if ($fieldsType[$customFieldsId] == 'banAutocomplete') {
+                                        $customValue = "{$customFieldsValues[$customFieldsId][0]['addressNumber']} {$customFieldsValues[$customFieldsId][0]['addressStreet']} {$customFieldsValues[$customFieldsId][0]['addressTown']} ({$customFieldsValues[$customFieldsId][0]['addressPostcode']})";
+                                    } elseif ($fieldsType[$customFieldsId] == 'contact') {
+                                        $customValues = ContactController::getContactCustomField(['contacts' => $customFieldsValues[$customFieldsId]]);
+                                        $customValue = count($customValues) > 2 ? count($customValues) . ' ' . _CONTACTS : implode(", ", $customValues);
+                                        if (count($customValues) < 3) {
+                                            $pdf->SetFont('', '', 8);
+                                        }
+                                    } else {
+                                        $customValue = implode(',', $customFieldsValues[$customFieldsId]);
+                                    }
+                                }
+                                $value = !empty($customValue) ? '<b>' . $customValue . '</b>' : '<i>' . _UNDEFINED . '</i>';
+                            } else {
+                                $value = $customFieldsValues[$customFieldsId] ? '<b>' . $customFieldsValues[$customFieldsId] . '</b>' : '<i>' . _UNDEFINED . '</i>';
+                            }
+    
+                            $nextLine = ($nextLine + 1) % 2;
+                            $pdf->MultiCell($widthNotes, 30, $label . " : {$value}", 1, 'L', false, $nextLine, '', '', true, 0, true);
+                            $pdf->SetFont('', '', 10);
+                        }
                     }
                 }
             } elseif ($unit['unit'] == 'senderRecipientInformations') {

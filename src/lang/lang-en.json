@@ -2494,5 +2494,7 @@
     "mailServer": "Mail server",
     "canAddCopies": "Be able to add people in copy (CC / CCI)",
     "willBeRedirected": "Will be redirected to",
-    "redirectedFromProfile": "The <b>currently redirected</b> baskets will be redirected by default"
+    "redirectedFromProfile": "The <b>currently redirected</b> baskets will be redirected by default",
+    "systemTechnicalFields": "System technical fields",
+    "customTechnicalFields": "Custom technical fields"
 }
