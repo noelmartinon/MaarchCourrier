@@ -1,4 +1,4 @@
-<ng-container *ngIf="editInProgress && editor.mode !== 'onlyoffice' && editor.mode !== 'collaboraOnline'">
+<ng-container *ngIf="editInProgress && editor.mode !== 'onlyoffice' && editor.mode !== 'collaboraOnline' && editor.mode !== 'office365sharepoint'">
     <div class="editInProgress">
         <i class="fas fa-file-word bounce"></i>
         <div>
@@ -125,12 +125,21 @@
         <mat-spinner style="margin:auto;"></mat-spinner>
     </div>
 </ng-container>
-<button mat-fab *ngIf="isDocModified && mode === 'mainDocument' && resId !== null" color="accent"
+<ng-container *ngIf="editInProgress && editor.mode === 'office365sharepoint'">
+    <app-office-sharepoint-viewer #officeSharepointViewer style="height:100%;width:100%;" [params]="editor.options" [file]="file"
+        [editMode]="true" (triggerAfterUpdatedDoc)="triggerEvent.emit()"
+        (triggerCloseEditor)="closeEditor()" (triggerModifiedDocument)="isDocModified = true"
+        (triggerDocumentDownload)="mode === 'mainDocument' && resId !== null ? saveMainDocument() : saveTmpDocument()"></app-office-sharepoint-viewer>
+    <div *ngIf="officeSharepointViewer.isSaving" class="example-loading-shade">
+        <mat-spinner style="margin:auto;"></mat-spinner>
+    </div>
+</ng-container>
+<button mat-fab *ngIf="isDocModified && mode === 'mainDocument' && resId !== null && editor.mode !== 'office365sharepoint'" color="accent"
     [title]="'lang.saveModifications' | translate" style="position: absolute;z-index: 3;bottom: 40px;right: 60px;"
     (click)="saveMainDocument()">
     <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
 </button>
-<button mat-fab *ngIf="isDocModified && mode === 'attachment'" color="accent"
+<button mat-fab *ngIf="isDocModified && mode === 'attachment' && editor.mode !== 'office365sharepoint'" color="accent"
     [title]="'lang.saveModifications' | translate" style="position: absolute;z-index: 3;bottom: 40px;right: 60px;"
     (click)="saveTmpDocument()">
     <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>

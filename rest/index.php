@@ -703,4 +703,8 @@ $app->put('/plugins/outlook/configuration', \Outlook\controllers\OutlookControll
 $app->put('/plugins/outlook/password', \Outlook\controllers\OutlookController::class . ':saveOutlookPassword');
 $app->put('/plugins/outlook/attachments', \Outlook\controllers\OutlookController::class . ':saveEmailAttachments');
 
+$app->post('/office365', \ContentManagement\controllers\Office365SharepointController::class . ':sendDocument');
+$app->get('/office365/{id}', \ContentManagement\controllers\Office365SharepointController::class . ':getFileContent');
+$app->delete('/office365/{id}', \ContentManagement\controllers\Office365SharepointController::class . ':deleteFile');
+
 $app->run();

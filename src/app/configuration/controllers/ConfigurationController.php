@@ -17,6 +17,7 @@ namespace Configuration\controllers;
 use Attachment\models\AttachmentTypeModel;
 use Basket\models\BasketModel;
 use Configuration\models\ConfigurationModel;
+use ContentManagement\controllers\Office365SharepointController;
 use Doctype\models\DoctypeModel;
 use Group\controllers\PrivilegeController;
 use History\controllers\HistoryController;
@@ -159,6 +160,22 @@ class ConfigurationController
                     } elseif (!Validator::boolType()->validate($editor['ssl'] ?? null)) {
                         return $response->withStatus(400)->withJson(['errors' => "Body collaboraonline['ssl'] is not set or not a boolean"]);
                     }
+                } elseif ($key == 'office365sharepoint') {
+                    if (!Validator::notEmpty()->stringType()->validate($editor['tenantId'] ?? null)) {
+                        return $response->withStatus(400)->withJson(['errors' => "Body office365sharepoint['tenantId'] is empty or not a string"]);
+                    } elseif (!Validator::notEmpty()->stringType()->validate($editor['clientId'] ?? null)) {
+                        return $response->withStatus(400)->withJson(['errors' => "Body office365sharepoint['clientId'] is empty or not a string"]);
+                    } elseif (!Validator::notEmpty()->stringType()->validate($editor['clientSecret'] ?? null)) {
+                        return $response->withStatus(400)->withJson(['errors' => "Body office365sharepoint['clientSecret'] is empty or not a string"]);
+                    } elseif (!Validator::notEmpty()->stringType()->validate($editor['siteUrl'] ?? null)) {
+                        return $response->withStatus(400)->withJson(['errors' => "Body office365sharepoint['siteUrl'] is empty or not a string"]);
+                    }
+                    $data[$key]['siteId'] = Office365SharepointController::getSiteId([
+                        'tenantId'     => $editor['tenantId'],
+                        'clientId'     => $editor['clientId'],
+                        'clientSecret' => $editor['clientSecret'],
+                        'siteUrl'      => $editor['siteUrl']
+                    ]);
                 }
             }
         } elseif ($args['privilege'] == 'admin_shippings') {

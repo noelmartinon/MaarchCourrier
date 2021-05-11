@@ -2496,5 +2496,14 @@
     "willBeRedirected": "Will be redirected to",
     "redirectedFromProfile": "The <b>currently redirected</b> baskets will be redirected by default",
     "systemTechnicalFields": "System technical fields",
-    "customTechnicalFields": "Custom technical fields"
+    "customTechnicalFields": "Custom technical fields",
+    "getDocument": "Get the document",
+    "office365SharepointNotEnabled": "L'édition avec Office 365 via Sharepoint Online n'est pas activé dans <b>Administration</b> > <b>Paramètres</b> > <b>Autres</b>",
+    "documentEditor_office365sharepoint": "Utilise la suite Office 365 en éditant les documents dans un espace Sharepoint Online",
+    "officeSharepointEditDenied": "ne peut pas être édité avec Office 365",
+    "tenantId": "Tenant ID",
+    "clientId": "Client ID",
+    "clientSecret": "Client Secret",
+    "siteUrl": "Sharepoint Online site URL",
+    "office365sharepointDesc": "<a href=\"https://www.office.com/\" target=\"_blank\"> Office 365 </a> is the online office suite from Microsoft. The editing is done via Sharepoint Online."
 }

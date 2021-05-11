@@ -5,21 +5,22 @@ import { NotificationService } from '@service/notification/notification.service'
 import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 import { tap, catchError, filter, map, exhaustMap, take, finalize } from 'rxjs/operators';
-import { ConfirmComponent } from '../../plugins/modal/confirm.component';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { AlertComponent } from '../../plugins/modal/alert.component';
-import { SortPipe } from '../../plugins/sorting.pipe';
-import { PluginSelectSearchComponent } from '../../plugins/select-search/select-search.component';
+import { AlertComponent } from '@plugins/modal/alert.component';
+import { SortPipe } from '@plugins/sorting.pipe';
+import { PluginSelectSearchComponent } from '@plugins/select-search/select-search.component';
 import { FormControl } from '@angular/forms';
-import { EcplOnlyofficeViewerComponent } from '../../plugins/onlyoffice-api-js/onlyoffice-viewer.component';
+import { EcplOnlyofficeViewerComponent } from '@plugins/onlyoffice-api-js/onlyoffice-viewer.component';
 import { FunctionsService } from '@service/functions.service';
 import { DocumentViewerModalComponent } from './modal/document-viewer-modal.component';
 import { PrivilegeService } from '@service/privileges.service';
 import { VisaWorkflowModalComponent } from '../visa/modal/visa-workflow-modal.component';
 import { of } from 'rxjs';
-import { CollaboraOnlineViewerComponent } from '../../plugins/collabora-online/collabora-online-viewer.component';
+import { CollaboraOnlineViewerComponent } from '@plugins/collabora-online/collabora-online-viewer.component';
 import { AuthService } from '@service/auth.service';
 import { LocalStorageService } from '@service/local-storage.service';
+import { Office365SharepointViewerComponent } from '@plugins/office365-sharepoint/office365-sharepoint-viewer.component';
 
 @Component({
     selector: 'app-document-viewer',
@@ -36,6 +37,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     @ViewChild('templateList', { static: true }) templateList: PluginSelectSearchComponent;
     @ViewChild('onlyofficeViewer', { static: false }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
     @ViewChild('collaboraOnlineViewer', { static: false }) collaboraOnlineViewer: CollaboraOnlineViewerComponent;
+    @ViewChild('officeSharepointViewer', { static: false }) officeSharepointViewer: Office365SharepointViewerComponent;
 
     /**
      * document name stored in server (in tmp folder)
@@ -513,6 +515,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             return this.onlyofficeViewer.getFile();
         } else if (this.editor.mode === 'collaboraOnline' && this.collaboraOnlineViewer !== undefined) {
             return this.collaboraOnlineViewer.getFile();
+        } else if (this.editor.mode === 'office365sharepoint' && this.officeSharepointViewer !== undefined) {
+            return this.officeSharepointViewer.getFile();
         } else {
             const objFile = JSON.parse(JSON.stringify(this.file));
             objFile.content = objFile.contentMode === 'route' ? null : objFile.content;
@@ -522,7 +526,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     getFilePdf() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             if (!this.functions.empty(this.file.src)) {
                 resolve(this.getBase64Document(this.file.src));
             } else {
@@ -798,6 +802,14 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 objectId: template.id,
                 dataToMerge: this.resourceDatas
             };
+        } else if (this.editor.mode === 'office365sharepoint') {
+            this.editor.async = true;
+            this.editInProgress = true;
+            this.editor.options = {
+                objectType: this.mode === 'attachment' ? 'attachmentCreation' : 'resourceCreation',
+                objectId: template.id,
+                dataToMerge: this.resourceDatas
+            };
         } else {
             this.editor.async = true;
             this.editor.options = {
@@ -851,6 +863,14 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 objectId: this.resId,
                 dataToMerge: this.resourceDatas
             };
+        } else if (this.editor.mode === 'office365sharepoint') {
+            this.editor.async = false;
+            this.editInProgress = true;
+            this.editor.options = {
+                objectType: 'attachmentModification',
+                objectId: this.resId,
+                dataToMerge: this.resourceDatas
+            };
         } else {
             this.editor.async = true;
             this.editor.options = {
@@ -883,6 +903,14 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
         } else if (this.editor.mode === 'collaboraOnline') {
             this.editor.async = false;
+            this.editor.options = {
+                objectType: 'resourceModification',
+                objectId: this.resId,
+                dataToMerge: this.resourceDatas
+            };
+            this.editInProgress = true;
+        } else if (this.editor.mode === 'office365sharepoint') {
+            this.editor.async = true;
             this.editor.options = {
                 objectType: 'resourceModification',
                 objectId: this.resId,
@@ -938,6 +966,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             return this.onlyofficeViewer !== undefined;
         } else if (this.editor.mode === 'collaboraOnline') {
             return this.collaboraOnlineViewer !== undefined;
+        }  else if (this.editor.mode === 'office365sharepoint') {
+            return this.officeSharepointViewer !== undefined;
         } else {
             return this.editInProgress;
         }
@@ -1089,6 +1119,9 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         } else if (this.headerService.user.preferences.documentEdition === 'collaboraonline') {
             this.editor.mode = 'collaboraOnline';
             this.editor.async = false;
+        } else if (this.headerService.user.preferences.documentEdition === 'office365sharepoint') {
+            this.editor.mode = 'office365sharepoint';
+            this.editor.async = true;
         }
     }
 
@@ -1153,7 +1186,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     saveTmpDocument() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             this.getFile().pipe(
                 tap((data: any) => {
                     this.file = {

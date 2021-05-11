@@ -21,7 +21,7 @@ use SrcCore\models\ValidatorModel;
 
 class DocumentEditorController
 {
-    const DOCUMENT_EDITION_METHODS = ['java', 'onlyoffice', 'collaboraonline'];
+    const DOCUMENT_EDITION_METHODS = ['java', 'onlyoffice', 'collaboraonline', 'office365sharepoint'];
 
     public static function get(Request $request, Response $response)
     {

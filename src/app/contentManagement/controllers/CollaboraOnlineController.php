@@ -495,7 +495,7 @@ class CollaboraOnlineController
         ];
     }
 
-    private static function getDocument(array $args)
+    public static function getDocument(array $args)
     {
         ValidatorModel::notEmpty($args, ['id', 'type']);
         ValidatorModel::stringType($args, ['type', 'format', 'path']);
