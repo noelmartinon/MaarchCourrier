@@ -2133,7 +2133,7 @@
     "ssoConnections": "SSO connections",
     "sso": "SSO",
     "docserverPathFile": "Path to stored file",
-    "showTechnicalInformations": "Display the technical information of the courier on the processing page / detail sheet",
+    "showTechnicalInformations": "Display the technical information of the courier",
     "setBindingDocument": "Define the commitment of a document",
     "freezeRetentionRule": "Freeze the current useful life of a document",
     "unfreezeRetentionRule": "Unfreeze the current useful life of a document",

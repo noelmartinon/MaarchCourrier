@@ -2141,7 +2141,7 @@
     "ssoConnections": "Connexions SSO__TO_TRANSLATE",
     "sso": "SSO__TO_TRANSLATE",
     "docserverPathFile": "Chemin du fichier stocké__TO_TRANSLATE",
-    "showTechnicalInformations": "Afficher les informations techniques du courrier sur la page de traitement / fiche détaillée__TO_TRANSLATE",
+    "showTechnicalInformations": "Afficher les informations techniques du courrier",
     "setBindingDocument": "Définir l'engagement d'un document__TO_TRANSLATE",
     "freezeRetentionRule": "Geler la durée d'utilité courante d'un document__TO_TRANSLATE",
     "unfreezeRetentionRule": "Dégeler la durée d'utilité courante d'un document__TO_TRANSLATE",

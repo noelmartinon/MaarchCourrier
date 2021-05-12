@@ -2143,7 +2143,7 @@
     "ssoConnections": "Connexions SSO",
     "sso": "SSO",
     "docserverPathFile": "Chemin du fichier stocké",
-    "showTechnicalInformations": "Afficher les informations techniques du courrier sur la page de traitement / fiche détaillée",
+    "showTechnicalInformations": "Afficher les informations techniques du courrier",
     "setBindingDocument": "Définir l'engagement d'un document",
     "freezeRetentionRule": "Geler la durée d'utilité courante d'un document",
     "unfreezeRetentionRule": "Dégeler la durée d'utilité courante d'un document",
