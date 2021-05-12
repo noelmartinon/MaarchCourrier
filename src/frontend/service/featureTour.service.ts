@@ -87,7 +87,7 @@ export class FeatureTourService {
             stepId: 'notifTour4@administration/notifications',
             title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.translate.instant('lang.notifTour4Title')}</b>`,
             description: this.translate.instant('lang.notifTour4Description'),
-            redirectToAdmin: true,
+            redirectToAdmin: false,
         },
     ];
 
@@ -123,7 +123,7 @@ export class FeatureTourService {
                 step => {
                     /*Do something*/
                     this.currentTour = this.tour.filter((item: any) => item.stepId.split('@')[0] === step.name)[0];
-                    const containerElement = document.getElementsByClassName('joyride-step__container') as HTMLCollectionOf<HTMLElement>
+                    const containerElement = document.getElementsByClassName('joyride-step__container') as HTMLCollectionOf<HTMLElement>;
                     containerElement[0].style.width = 'auto';
                     containerElement[0].style.height = 'auto';
                     document.getElementsByClassName('joyride-step__header')[0].innerHTML = `${this.currentTour.title}`;
