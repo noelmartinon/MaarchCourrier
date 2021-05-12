@@ -51,6 +51,12 @@ export class OtherParametersComponent implements OnInit {
             ssl: new FormControl(false),
             uri: new FormControl('192.168.0.11', [Validators.required]),
             port: new FormControl(9980, [Validators.required]),
+        },
+        office365sharepoint: {
+            tenantId: new FormControl('abc-123456789-efd', [Validators.required]),
+            clientId: new FormControl('abc-123456789-efd', [Validators.required]),
+            clientSecret: new FormControl('abc-123456789-efd'),
+            siteUrl: new FormControl('https://exemple.sharepoint.com/sites/example', [Validators.required]),
         }
     };
 
@@ -335,7 +341,9 @@ export class OtherParametersComponent implements OnInit {
                         Object.keys(data[confId]).forEach(itemId => {
                             console.log(confId, itemId);
 
-                            this.editorsConf[confId][itemId].setValue(data[confId][itemId]);
+                            if (!this.functions.empty(this.editorsConf[confId][itemId])) {
+                                this.editorsConf[confId][itemId].setValue(data[confId][itemId]);
+                            }
                         });
                     });
                     resolve(true);

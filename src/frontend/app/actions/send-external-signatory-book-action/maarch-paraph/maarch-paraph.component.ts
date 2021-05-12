@@ -78,6 +78,7 @@ export class MaarchParaphComponent implements OnInit {
                         'signatureMode': element.role,
                         'signaturePositions': resource.signaturePositions !== undefined ? resource.signaturePositions.filter((item: any) => item.sequence === index) : [],
                         'datePositions': resource.datePositions !== undefined ? resource.datePositions.filter((item: any) => item.sequence === index) : [],
+                        'externalInformations': element.hasOwnProperty('externalInformations') ? element.externalInformations : null
                     }
                 );
             });

@@ -7,7 +7,7 @@ import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '@service/app.service';
 import { Observable, merge, Subject, of as observableOf, of } from 'rxjs';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { takeUntil, startWith, switchMap, map, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { ConfirmComponent } from '../../../../plugins/modal/confirm.component';
@@ -62,6 +62,8 @@ export class ContactsListAdministrationComponent implements OnInit {
     filteredCorrespondentsGroups: Observable<string[]>;
 
     contextMenuPosition = { x: '0px', y: '0px' };
+
+    pageSize: number = 10;
 
     private destroy$ = new Subject<boolean>();
 
@@ -119,7 +121,7 @@ export class ContactsListAdministrationComponent implements OnInit {
                     this.search = this.adminService.getFilter('field');
                     this.isLoadingResults = true;
                     return this.resultListDatabase!.getRepoIssues(
-                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.routeUrl, this.search);
+                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.routeUrl, this.search, this.pageSize);
                 }),
                 map(data => {
                     this.isLoadingResults = false;
@@ -369,6 +371,10 @@ export class ContactsListAdministrationComponent implements OnInit {
         return false;
     }
 
+    handlePageEvent(event: PageEvent) {
+        this.pageSize = event.pageSize;
+    }
+
     private _filter(value: string): string[] {
         const filterValue = this.latinisePipe.transform(value.toLowerCase());
         return this.correspondentsGroups.filter((option: any) => this.latinisePipe.transform(this.translate.instant(option['label']).toLowerCase()).includes(filterValue));
@@ -380,14 +386,12 @@ export interface ContactList {
     count: number;
 }
 export class ContactListHttpDao {
-
     constructor(private http: HttpClient) { }
 
-    getRepoIssues(sort: string, order: string, page: number, href: string, search: string): Observable<ContactList> {
+    getRepoIssues(sort: string, order: string, page: number, href: string, search: string, pageSize: number): Observable<ContactList> {
 
         const offset = page * 10;
-        const requestUrl = `${href}?limit=10&offset=${offset}&order=${order}&orderBy=${sort}&search=${search}`;
-
+        const requestUrl = `${href}?limit=${pageSize}&offset=${offset}&order=${order}&orderBy=${sort}&search=${search}`;
         return this.http.get<ContactList>(requestUrl);
     }
 }

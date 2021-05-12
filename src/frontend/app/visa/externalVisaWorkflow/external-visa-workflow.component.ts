@@ -9,6 +9,8 @@ import { FormControl } from '@angular/forms';
 import { ScanPipe } from 'ngx-pipes';
 import { Observable, of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
+import { CreateUserOtpComponent } from './createUserOtp/create-user-otp.component';
+import { ActionsService } from '@appRoot/actions/actions.service';
 
 @Component({
     selector: 'app-external-visa-workflow',
@@ -49,7 +51,8 @@ export class ExternalVisaWorkflowComponent implements OnInit {
         public http: HttpClient,
         private notify: NotificationService,
         public functions: FunctionsService,
-        public dialog: MatDialog
+        public dialog: MatDialog,
+        public actionService: ActionsService
     ) { }
 
     ngOnInit(): void { }
@@ -201,7 +204,11 @@ export class ExternalVisaWorkflowComponent implements OnInit {
     }
 
     checkExternalSignatoryBook() {
-        return this.visaWorkflow.items.filter((item: any) => this.functions.empty(item.externalId)).map((item: any) => item.labelToDisplay);
+        if (this.visaWorkflow.items.find((item: any) => item.hasOwnProperty('externalInformations'))) {
+            return true;
+        } else {
+            return this.visaWorkflow.items.filter((item: any) => this.functions.empty(item.externalId)).map((item: any) => item.labelToDisplay);
+        }
     }
 
     saveVisaWorkflow(resIds: number[] = [this.resId]) {
@@ -332,5 +339,34 @@ export class ExternalVisaWorkflowComponent implements OnInit {
         } else {
             return true;
         }
+    }
+
+    openCreateUserOtp() {
+        const dialogRef = this.dialog.open(CreateUserOtpComponent, {
+            panelClass: 'maarch-modal',
+            disableClose: true,
+            width: '500px',
+        });
+
+        dialogRef.afterClosed().pipe(
+            tap(async (data: any) => {
+                if (data) {
+                    const user = {
+                        item_id: null,
+                        item_type: 'userOtp',
+                        labelToDisplay: `${data.otp.firstname} ${data.otp.lastname}`,
+                        picture: await this.actionService.getUserOtpIcon(data.otp.source.type),
+                        hasPrivilege: true,
+                        isValid: true,
+                        role: data.otp.role,
+                        externalId: {
+                            maarchParapheur: null
+                        },
+                        externalInformations: data.otp
+                    };
+                    this.visaWorkflow.items.push(user);
+                }
+            })
+        ).subscribe();
     }
 }

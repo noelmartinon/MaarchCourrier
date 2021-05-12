@@ -163,14 +163,14 @@ class FullTextController
                 'select'    => ['res_id'],
                 'where'     => ['status NOT IN (?)', '(fulltext_result = ? OR fulltext_result is NULL)'],
                 'data'      => [['DEL'],'ERROR'],
-                'orderBy'   => ['res_id DESC'],
+                'orderBy'   => ['res_id ASC'],
             ]);
         } else {
             $resIds = AttachmentModel::get([
                 'select'    => ['res_id'],
                 'where'     => ['status NOT IN (?)', '(fulltext_result = ? OR fulltext_result is NULL)'],
                 'data'      => [['DEL','OBS','TMP'], 'ERROR'],
-                'orderBy'   => ['res_id DESC'],
+                'orderBy'   => ['res_id ASC'],
             ]);
         }
         return $resIds;

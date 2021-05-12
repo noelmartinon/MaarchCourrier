@@ -463,8 +463,19 @@ define('_EIDAS', 'Eidas');
 define('_RGS_2STARS', 'RGS** key');
 define('_RGS_2STARS_TIMESTAMPED', 'RGS** key + timestamped');
 define('_STAMP', 'Stamp');
+define('_OTP_SIGN_YOUSIGN', 'Signatory (YouSign)');
+define('_OTP_VISA_YOUSIGN', 'Approval (YouSign)');
 
 define('_SIGNED', 'Signed');
 define('_VALIDATED', 'Validated');
 
 define('_NO_SENDER_EMAIL', "No email set to send electronic AR");
+
+define('_SIZE', "Size");
+define('_FILENAME', "Filename");
+define('_DOCSERVER_PATH_FILE', "Docserver path file");
+define('_FINGERPRINT', "Fingerprint");
+define('_FULLTEXT', "Fulltext");
+define('_CREATION_DATE', "Creation date");
+define('_SUCCESS', "Success");
+define('_ERROR', "Error");

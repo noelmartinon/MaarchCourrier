@@ -441,9 +441,8 @@ export class AttachmentCreateComponent implements OnInit {
         });
         this.attachFormGroup.push(new FormGroup(this.attachments[this.attachments.length - 1]));
         setTimeout(() => {
-            this.indexTab = this.attachments.length - 1;
-            this.getAttachType(this.defaultType, this.indexTab);
-        }, 700);
+            this.getAttachType(this.defaultType, this.attachments.length - 1);
+        }, 250);
     }
 
     updateFile(index: number) {
@@ -470,7 +469,7 @@ export class AttachmentCreateComponent implements OnInit {
                 const attachLength: number = this.attachments.length - 1;
                 this.attachments.splice(i, 1);
                 this.attachFormGroup.splice(i, 1);
-                if (i === attachLength) {
+                if (i === attachLength || this.asyncIndexTab === attachLength) {
                     this.indexTab = this.attachments.length - 1;
                 } else if (i === this.asyncIndexTab) {
                     this.indexTab = i;
@@ -486,6 +485,8 @@ export class AttachmentCreateComponent implements OnInit {
     }
 
     getAttachType(attachType: any, i: number) {
+        this.indexTab = i;
+        this.asyncIndexTab = this.indexTab;
         this.appDocumentViewer.toArray()[i].loadTemplatesByResId(this.data.resIdMaster, attachType);
     }
 

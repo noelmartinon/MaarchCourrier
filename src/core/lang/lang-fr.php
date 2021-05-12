@@ -470,8 +470,19 @@ define('_EIDAS', 'Cachet');
 define('_RGS_2STARS', 'Clé RGS**');
 define('_RGS_2STARS_TIMESTAMPED', 'Clé RGS** + horodatage');
 define('_STAMP', 'Griffe');
+define('_OTP_SIGN_YOUSIGN', 'Signataire (YouSign)');
+define('_OTP_VISA_YOUSIGN', 'Viseur (YouSign)');
 
 define('_SIGNED', 'Signé');
 define('_VALIDATED', 'Validé');
 
 define('_NO_SENDER_EMAIL', "Aucun courriel défini pour envoyer les AR électronique");
+
+define('_SIZE', "Taille");
+define('_FILENAME', "Nom du fichier");
+define('_DOCSERVER_PATH_FILE', "Chemin du fichier stocké");
+define('_FINGERPRINT', "Empreinte numérique");
+define('_FULLTEXT', "Plein texte");
+define('_CREATION_DATE', "Date de création");
+define('_SUCCESS', "Réussi");
+define('_ERROR', "Erreur");

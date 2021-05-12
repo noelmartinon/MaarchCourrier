@@ -9,6 +9,12 @@
         <app-collabora-online-viewer *ngIf="editorType === 'collaboraonline'" #collaboraOnlineViewer style="height:100%;width:100%;" [params]="editorOptions" [file]="file"
                                      [editMode]="true" (triggerAfterUpdatedDoc)="close()"
                                          (triggerCloseEditor)="dialogRef.close('');" (triggerModifiedDocument)="documentIsModified = true"></app-collabora-online-viewer>
+        <div *ngIf="editorType === 'office365sharepoint'" class="office-sharepoint-container">
+            <app-office-sharepoint-viewer #officeSharepointViewer style="height:100%;width:100%;" [params]="editorOptions" [file]="file"
+                      [editMode]="true" (triggerAfterUpdatedDoc)="close()"
+                      (triggerCloseEditor)="dialogRef.close('')" (triggerModifiedDocument)="documentIsModified = true"
+                      (triggerDocumentDownload)="close()"></app-office-sharepoint-viewer>
+        </div>
     </mat-dialog-content>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">

@@ -113,11 +113,15 @@ class CurlModel
         ValidatorModel::notEmpty($args, ['url', 'method']);
         ValidatorModel::stringType($args, ['url', 'method', 'cookie']);
         ValidatorModel::arrayType($args, ['headers', 'queryParams', 'basicAuth', 'bearerAuth']);
-        ValidatorModel::boolType($args, ['isXml']);
+        ValidatorModel::boolType($args, ['isXml', 'followRedirect']);
 
         $args['isXml'] = $args['isXml'] ?? false;
 
         $opts = [CURLOPT_RETURNTRANSFER => true, CURLOPT_HEADER => true, CURLOPT_SSL_VERIFYPEER => false, CURLOPT_CONNECTTIMEOUT => 10];
+
+        if (!empty($args['followRedirect'])) {
+            $opts[CURLOPT_FOLLOWLOCATION] = true;
+        }
 
         //Headers
         if (!empty($args['headers'])) {
@@ -188,6 +192,8 @@ class CurlModel
         if (empty($args['noLogs'])) {
             if (in_array('Accept: application/zip', $args['headers'])) {
                 $logResponse = 'Zip file content';
+            } elseif (!empty($args['fileResponse'])) {
+                $logResponse = 'File content';
             } else {
                 $logResponse = $response;
             }
@@ -206,7 +212,7 @@ class CurlModel
             $response = simplexml_load_string($response);
         } elseif (in_array('Accept: application/zip', $args['headers'])) {
             $response = trim($response);
-        } else {
+        } elseif(empty($args['fileResponse'])) {
             $response = json_decode($response, true);
         }
 

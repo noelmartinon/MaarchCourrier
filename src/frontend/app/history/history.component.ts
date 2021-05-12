@@ -5,7 +5,7 @@ import { NotificationService } from '@service/notification/notification.service'
 import { HeaderService } from '@service/header.service';
 import { Observable, merge, Subject, of as observableOf, of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { takeUntil, startWith, switchMap, map, catchError, tap, finalize } from 'rxjs/operators';
 import { FormControl } from '@angular/forms';
@@ -60,6 +60,8 @@ export class HistoryComponent implements OnInit {
     };
 
     loadingFilters: boolean = true;
+
+    pageSize: number = 10;
 
     private destroy$ = new Subject<boolean>();
 
@@ -129,7 +131,7 @@ export class HistoryComponent implements OnInit {
                         searchValue = '&search=' + this.searchHistory.value;
                     }
                     return this.resultListDatabase!.getRepoIssues(
-                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.routeUrl, this.filterUrl, this.extraParamUrl, searchValue);
+                        this.sort.active, this.sort.direction, this.paginator.pageIndex, this.routeUrl, this.filterUrl, this.extraParamUrl, searchValue, this.pageSize);
                 }),
                 map(data => {
                     this.isLoadingResults = false;
@@ -289,6 +291,10 @@ export class HistoryComponent implements OnInit {
         this.refreshDao();
     }
 
+    handlePageEvent(event: PageEvent) {
+        this.pageSize = event.pageSize;
+    }
+
     private filter(value: string, type: string): any[] {
         if (typeof value === 'string') {
             const filterValue = this.latinisePipe.transform(value.toLowerCase());
@@ -307,10 +313,10 @@ export class HistoryListHttpDao {
 
     constructor(private http: HttpClient) { }
 
-    getRepoIssues(sort: string, order: string, page: number, href: string, search: string, extraParamUrl: string, directSearchValue: string): Observable<HistoryList> {
+    getRepoIssues(sort: string, order: string, page: number, href: string, search: string, extraParamUrl: string, directSearchValue: string, pageSize: number): Observable<HistoryList> {
 
         const offset = page * 10;
-        const requestUrl = `${href}?limit=10&offset=${offset}&order=${order}&orderBy=${sort}${search}${extraParamUrl}${directSearchValue}`;
+        const requestUrl = `${href}?limit=${pageSize}&offset=${offset}&order=${order}&orderBy=${sort}${search}${extraParamUrl}${directSearchValue}`;
 
         return this.http.get<HistoryList>(requestUrl);
     }

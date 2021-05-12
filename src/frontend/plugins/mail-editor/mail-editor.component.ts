@@ -69,7 +69,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
     emailSubject: string = '';
     emailStatus: string = 'WAITING';
 
-    recipientsInput: FormControl = new FormControl();
+    recipientsInput: FormControl = new FormControl({disabled: this.recipientDisabled});
     filteredEmails: Observable<string[]>;
 
     emailSignListForm = new FormControl();
@@ -115,7 +115,6 @@ export class MailEditorComponent implements OnInit, OnDestroy {
     ) { }
 
     async ngOnInit() {
-
         if (this.readonly) {
             this.setReadonly();
         }

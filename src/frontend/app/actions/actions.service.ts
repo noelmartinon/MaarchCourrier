@@ -163,7 +163,7 @@ export class ActionsService implements OnDestroy {
             if (this.lockMode) {
                 const res: any = await this.canExecuteAction(resIds);
                 if (res === true) {
-                    if (['viewDoc', 'documentDetails', 'signatureBookAction', 'processDocument'].indexOf(action.component) > -1 || action.component === 'noConfirmAction') {
+                    if (['viewDoc', 'documentDetails', 'signatureBookAction', 'processDocument', 'noConfirmAction'].indexOf(action.component) > -1) {
                         this[action.component](action.data);
                     } else {
                         try {
@@ -1201,5 +1201,23 @@ export class ActionsService implements OnDestroy {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    getUserOtpIcon(id: string): Promise<string> {
+        return new Promise((resolve) => {
+            this.http.get(`assets/${id}.png`, { responseType: 'blob' }).pipe(
+                tap((response: any) => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(response);
+                    reader.onloadend = () => {
+                        resolve(reader.result as any);
+                    };
+                }),
+                catchError(err => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 }

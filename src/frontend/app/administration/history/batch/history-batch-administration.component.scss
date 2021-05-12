@@ -60,3 +60,9 @@
     color: var(--maarch-color-danger);
     font-weight: bold;
 }
+
+.noResult {
+    ::ng-deep.pageList {
+        left: 0px;
+    }
+}

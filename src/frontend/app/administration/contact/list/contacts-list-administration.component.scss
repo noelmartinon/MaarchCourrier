@@ -59,3 +59,9 @@
     font-style: italic; 
     opacity: 0.5;
 }
+
+.noResult {
+    ::ng-deep.pageList {
+        left: 0px;
+    }
+}

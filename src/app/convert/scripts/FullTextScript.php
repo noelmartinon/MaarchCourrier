@@ -132,13 +132,15 @@ class FullTextScript
                 $resIdsToReindex = ResModel::get([
                     'select'    => ['res_id'],
                     'where'     => ['status NOT IN (?)'],
-                    'data'      => [['DEL']]
+                    'data'      => [['DEL']],
+                    'orderBy'   => ['res_id ASC'],
                 ]);
             } else {
                 $resIdsToReindex = AttachmentModel::get([
                     'select'    => ['res_id'],
                     'where'     => ['status NOT IN (?)'],
-                    'data'      => [['DEL','OBS','TMP']]
+                    'data'      => [['DEL','OBS','TMP']],
+                    'orderBy'   => ['res_id ASC'],
                 ]);
             }
         }
@@ -147,9 +149,12 @@ class FullTextScript
             echo "No result to process.\n";
         } else {
             foreach ($resIdsToReindex as $resId) {
-                echo "Re index for res_id : {$resId['res_id']} in progress...\n";
-                FullTextScript::index(['customId' => $args['customId'], 'resId' => $resId['res_id'], 'collId' => $args['collId'], 'userId' => $args['userId']]);
-                echo "Done !\n\n";
+                echo "\nRe index for res_id : {$resId['res_id']} in progress...\n";
+                $result = FullTextScript::index(['customId' => $args['customId'], 'resId' => $resId['res_id'], 'collId' => $args['collId'], 'userId' => $args['userId']]);
+                echo "Done !\n";
+                if (!empty($result['errors'])) {
+                    echo "Full Text failed : {$result['errors']}\n";
+                }
             }
         }
     }
