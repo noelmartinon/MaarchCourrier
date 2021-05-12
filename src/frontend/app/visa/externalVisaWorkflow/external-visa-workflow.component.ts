@@ -350,24 +350,19 @@ export class ExternalVisaWorkflowComponent implements OnInit {
 
         dialogRef.afterClosed().pipe(
             tap(async (data: any) => {
-                if (data.otp) {
+                if (data) {
                     const user = {
-                        'id': null,
-                        'processingUser': null,
-                        'userId': null,
-                        'labelToDisplay': `${data.otp.firstname} ${data.otp.lastname}`,
-                        'requested_signature': true,
-                        'process_date': null,
-                        'picture': await this.actionService.getUserOtpIcon(data.otp.type),
-                        'hasPrivilege': true,
-                        'isValid': true,
-                        'delegatedBy': null,
-                        'role': data.otp.role,
-                        'status': 'OK',
-                        'externalId': {
+                        item_id: null,
+                        item_type: 'userOtp',
+                        labelToDisplay: `${data.otp.firstname} ${data.otp.lastname}`,
+                        picture: await this.actionService.getUserOtpIcon(data.otp.source.type),
+                        hasPrivilege: true,
+                        isValid: true,
+                        role: data.otp.role,
+                        externalId: {
                             maarchParapheur: null
                         },
-                        'externalInformations': data.otp
+                        externalInformations: data.otp
                     };
                     this.visaWorkflow.items.push(user);
                 }

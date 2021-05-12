@@ -2500,6 +2500,10 @@
     "addOtpUser": "Ajouter un utilisateur OTP",
     "securityMode": "Mode d'envoi du code de sécurité",
     "sms": "SMS",
-    "securityModeInfo": "L'utilisateur sera notifié par <b>mail</b> et recevra un <b>code de sécurité</b> par <b>{{mode}}</b> au moment de son tour dans le circuit.",
-    "frFormatPhone": "Format: +33XXXXXXXXX"
+    "securityModeInfo": "L'utilisateur sera notifié par <b>courriel</b> et recevra un <b>code de sécurité</b> par <b>{{mode}}</b> au moment de son tour dans le circuit.",
+    "frFormatPhone": "Format: +33XXXXXXXXX",
+    "youSign": "Yousign",
+    "otp_visa_yousign": "Viseur (yousign)",
+    "otp_sign_yousign": "Signataire (yousign)",
+    "source": "Source"
 }

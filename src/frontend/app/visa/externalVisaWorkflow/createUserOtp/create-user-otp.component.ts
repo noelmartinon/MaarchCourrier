@@ -18,14 +18,28 @@ import { MatDialogRef } from '@angular/material/dialog';
 export class CreateUserOtpComponent implements OnInit {
 
     // For TEST
-    sampleRoles: any[] = [
+
+    sources: any[] = [
         {
-            id: 'visa',
-            label: this.translate.instant('lang.visa')
+            id: 1,
+            label: 'Yousign 1',
+            type: 'yousign'
         },
         {
-            id: 'stamp',
-            label: this.translate.instant('lang.stamp')
+            id: 2,
+            label: 'Yousign 2',
+            type: 'yousign'
+        }
+    ];
+
+    sampleRoles: any[] = [
+        {
+            id: 'otp_visa_yousign',
+            label: this.translate.instant('lang.otp_visa_yousign')
+        },
+        {
+            id: 'otp_sign_yousign',
+            label: this.translate.instant('lang.otp_sign_yousign')
         }
     ];
 
@@ -41,7 +55,7 @@ export class CreateUserOtpComponent implements OnInit {
     ];
 
     userOTP: any = {
-        type: 'yousign',
+        source: this.sources[0],
         firstname: '',
         lastname: '',
         email: '',
@@ -54,11 +68,29 @@ export class CreateUserOtpComponent implements OnInit {
         public translate: TranslateService,
         public http: HttpClient,
         public functions: FunctionsService,
-        private dialogRef: MatDialogRef<CreateUserOtpComponent>
+        private dialogRef: MatDialogRef<CreateUserOtpComponent>,
+        public notify: NotificationService
 
     ) { }
 
-    ngOnInit(): void {}
+    async ngOnInit(): Promise<void> {
+        // await this.getConfig();
+    }
+
+    getConfig() {
+        return new Promise((resolve) => {
+            this.http.get('../rest/maarchParapheurOtp').pipe(
+                tap((data: any) => {
+                    console.log(data);
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
 
     addOtpUser() {
         this.dialogRef.close({otp: this.userOTP});

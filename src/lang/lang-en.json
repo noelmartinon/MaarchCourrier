@@ -2509,6 +2509,8 @@
     "addOtpUser": "Add OTP user",
     "securityMode": "Mode of sending the security code",
     "sms": "SMS",
-    "securityModeInfo": "The user will be notified by <b> mail </b> and will receive a <b> security code </b> by <b> {{mode}} </b> at the time of his turn in the workflow.",
-    "frFormatPhone": "Format: +33XXXXXXXXX"
+    "securityModeInfo": "The user will be notified by <b>email</b> and will receive a <b> security code </b> by <b> {{mode}} </b> at the time of his turn in the workflow.",
+    "frFormatPhone": "Format: +33XXXXXXXXX",
+    "youSign": "Yousign",
+    "source": "Source"
 }
