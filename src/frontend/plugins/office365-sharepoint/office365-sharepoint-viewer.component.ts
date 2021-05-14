@@ -89,7 +89,9 @@ export class Office365SharepointViewerComponent implements OnInit, AfterViewInit
 
         this.triggerCloseEditor.emit();
 
-        this.deleteDocument();
+        setTimeout(() => {
+            this.deleteDocument();
+        }, 10000);
     }
 
     canLaunchOffice365Sharepoint() {
@@ -170,18 +172,16 @@ export class Office365SharepointViewerComponent implements OnInit, AfterViewInit
 
     deleteDocument() {
         return new Promise((resolve) => {
-            setTimeout(() => {
-                this.http.delete('../rest/office365/' + this.documentId).pipe(
-                    tap(() => {
-                        resolve(true);
-                    }),
-                    catchError((err) => {
-                        this.notify.handleErrors(err);
-                        this.triggerCloseEditor.emit();
-                        return of(false);
-                    }),
-                ).subscribe();
-            }, 10000);
+            this.http.delete('../rest/office365/' + this.documentId).pipe(
+                tap(() => {
+                    resolve(true);
+                }),
+                catchError((err) => {
+                    this.notify.handleErrors(err);
+                    this.triggerCloseEditor.emit();
+                    return of(false);
+                }),
+            ).subscribe();
         });
     }
 
