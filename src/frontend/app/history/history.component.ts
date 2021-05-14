@@ -315,7 +315,7 @@ export class HistoryListHttpDao {
 
     getRepoIssues(sort: string, order: string, page: number, href: string, search: string, extraParamUrl: string, directSearchValue: string, pageSize: number): Observable<HistoryList> {
 
-        const offset = page * 10;
+        const offset = page * pageSize;
         const requestUrl = `${href}?limit=${pageSize}&offset=${offset}&order=${order}&orderBy=${sort}${search}${extraParamUrl}${directSearchValue}`;
 
         return this.http.get<HistoryList>(requestUrl);

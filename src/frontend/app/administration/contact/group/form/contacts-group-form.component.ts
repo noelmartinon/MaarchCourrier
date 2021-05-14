@@ -509,7 +509,7 @@ export class CorrespondentListHttpDao {
 
     getRepoIssues(sort: string, order: string, page: number, href: string, search: string, pageSize: number): Observable<CorrespondentList> {
 
-        const offset = page * 10;
+        const offset = page * pageSize;
         const requestUrl = `${href}?limit=${pageSize}&offset=${offset}&order=${order}&orderBy=${sort}&search=${search}`;
 
         return this.http.get<CorrespondentList>(requestUrl);
