@@ -57,70 +57,76 @@ class Office365SharepointController
             return $response->withStatus(400)->withJson(['errors' => 'Body data is not a string']);
         }
 
-        $document = CollaboraOnlineController::getDocument([
-            'id'     => $body['resId'],
-            'type'   => $body['type'],
-            'format' => $body['format'],
-            'path'   => $body['path']
-        ]);
-
-        if (!empty($document['errors'])) {
-            return $response->withStatus($document['code'])->withJson(['errors' => $document['errors']]);
-        }
-
-        if (!empty($document['docserver_id'])) {
-            $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
-            if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
-                return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);
-            }
-        } else {
-            $docserver['path_template'] = '';
-        }
-
-        $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $document['path']) . $document['filename'];
-        if (!file_exists($pathToDocument)) {
-            return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
-        }
-
-        if ($body['type'] == 'resourceModification' || $body['type'] == 'attachmentModification') {
-            $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
-            $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
-
-            if (empty($document['fingerprint']) && $body['type'] == 'resourceModification') {
-                ResModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$args['id']]]);
-                $document['fingerprint'] = $fingerprint;
-            } elseif (empty($document['fingerprint']) && $body['type'] == 'attachmentModification') {
-                AttachmentModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$args['id']]]);
-                $document['fingerprint'] = $fingerprint;
-            }
-
-            if ($document['fingerprint'] != $fingerprint) {
-                return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
-            }
-        }
-
-        if ($body['type'] == 'resourceCreation' || $body['type'] == 'attachmentCreation') {
-            $dataToMerge = ['userId' => $GLOBALS['id']];
-            if (!empty($tokenCheckResult['data']) && is_array($tokenCheckResult['data'])) {
-                $dataToMerge = array_merge($dataToMerge, $tokenCheckResult['data']);
-            }
-
-            $mergedDocument = MergeController::mergeDocument([
-                'path' => $pathToDocument,
-                'data' => $dataToMerge
+        if (empty($body['encodedContent'])) {
+            $document = CollaboraOnlineController::getDocument([
+                'id'     => $body['resId'],
+                'type'   => $body['type'],
+                'format' => $body['format'],
+                'path'   => $body['path']
             ]);
-            $content = $mergedDocument['encodedDocument'];
-        } else {
-            $fileContent = file_get_contents($pathToDocument);
-            if ($fileContent === false) {
-                return $response->withStatus(404)->withJson(['errors' => 'Document not found']);
+
+            if (!empty($document['errors'])) {
+                return $response->withStatus($document['code'])->withJson(['errors' => $document['errors']]);
             }
 
-            $content = base64_encode($fileContent);
+            if (!empty($document['docserver_id'])) {
+                $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
+                if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Docserver does not exist']);
+                }
+            } else {
+                $docserver['path_template'] = '';
+            }
+
+            $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $document['path']) . $document['filename'];
+            if (!file_exists($pathToDocument)) {
+                return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
+            }
+
+            if ($body['type'] == 'resourceModification' || $body['type'] == 'attachmentModification') {
+                $docserverType = DocserverTypeModel::getById(['id' => $docserver['docserver_type_id'], 'select' => ['fingerprint_mode']]);
+                $fingerprint = StoreController::getFingerPrint(['filePath' => $pathToDocument, 'mode' => $docserverType['fingerprint_mode']]);
+
+                if (empty($document['fingerprint']) && $body['type'] == 'resourceModification') {
+                    ResModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$args['id']]]);
+                    $document['fingerprint'] = $fingerprint;
+                } elseif (empty($document['fingerprint']) && $body['type'] == 'attachmentModification') {
+                    AttachmentModel::update(['set' => ['fingerprint' => $fingerprint], 'where' => ['res_id = ?'], 'data' => [$args['id']]]);
+                    $document['fingerprint'] = $fingerprint;
+                }
+
+                if ($document['fingerprint'] != $fingerprint) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Fingerprints do not match']);
+                }
+            }
+
+            if ($body['type'] == 'resourceCreation' || $body['type'] == 'attachmentCreation') {
+                $dataToMerge = ['userId' => $GLOBALS['id']];
+                if (!empty($tokenCheckResult['data']) && is_array($tokenCheckResult['data'])) {
+                    $dataToMerge = array_merge($dataToMerge, $tokenCheckResult['data']);
+                }
+
+                $mergedDocument = MergeController::mergeDocument([
+                    'path' => $pathToDocument,
+                    'data' => $dataToMerge
+                ]);
+                $content = $mergedDocument['encodedDocument'];
+            } else {
+                $fileContent = file_get_contents($pathToDocument);
+                if ($fileContent === false) {
+                    return $response->withStatus(404)->withJson(['errors' => 'Document not found']);
+                }
+
+                $content = base64_encode($fileContent);
+            }
+            $pathInfo = pathinfo($pathToDocument);
+        } else {
+            $content = $body['encodedContent'];
+            $pathInfo['extension'] = $body['format'];
         }
         $fileContent = base64_decode($content);
         $fileSize = strlen($fileContent);
-        $pathInfo = pathinfo($pathToDocument);
+
         $filename = "maarch_{$GLOBALS['login']}_" . rand() . ".{$pathInfo['extension']}";
 
         $accessToken = Office365SharepointController::getAuthenticationToken(['configuration' => $configuration]);
@@ -143,12 +149,13 @@ class Office365SharepointController
 
         $id = $sendResult['response']['id'];
 
+        $body = json_encode(['item' => ['@microsoft.graph.conflictBehavior' => 'replace']]);
         $sendResult = CurlModel::exec([
             'url'        => 'https://graph.microsoft.com/v1.0/sites/' . $configuration['siteId'] . '/drive/items/' . $id . '/createUploadSession',
             'bearerAuth' => ['token' => $accessToken],
-            'headers'    => ['Content-Type: application/json'],
+            'headers'    => ['Content-Type: application/json', 'Content-Length: ' . strlen($body)],
             'method'     => 'POST',
-            'body'       => ['item' => ['@microsoft.graph.conflictBehavior' => 'replace']]
+            'body'       => $body
         ]);
 
         if ($sendResult['code'] != 200) {

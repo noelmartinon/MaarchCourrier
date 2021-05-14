@@ -67,6 +67,16 @@ export class Office365SharepointViewerComponent implements OnInit, AfterViewInit
         this.key = this.generateUniqueId(10);
 
         if (this.canLaunchOffice365Sharepoint()) {
+            this.params.objectPath = undefined;
+            if (typeof this.params.objectId === 'string' && (this.params.objectType === 'templateModification' || this.params.objectType === 'templateCreation')) {
+                this.params.objectPath = this.params.objectId;
+                this.params.objectId = this.key;
+            } else if (typeof this.params.objectId === 'string' && this.params.objectType === 'encodedResource') {
+                this.params.content = this.params.objectId;
+                this.params.objectId = this.key;
+                this.params.objectType = 'templateEncoded';
+            }
+
             await this.sendDocument();
             this.loading = false;
         }
@@ -107,7 +117,7 @@ export class Office365SharepointViewerComponent implements OnInit, AfterViewInit
                     this.eventAction.next(this.file);
                     setTimeout(() => {
                         this.deleteDocument();
-                    }, 1000);
+                    }, 10000);
                     resolve(true);
                 }),
                 catchError((err) => {
@@ -141,10 +151,12 @@ export class Office365SharepointViewerComponent implements OnInit, AfterViewInit
                 format: this.file.format,
                 path: this.params.objectPath,
                 data: this.params.dataToMerge,
+                encodedContent: this.params.content
             }).pipe(
                 tap((data: any) => {
                     this.documentId = data.documentId;
                     this.documentWebUrl = data.webUrl;
+                    this.openDocument();
                     resolve(true);
                 }),
                 catchError((err) => {
@@ -158,16 +170,18 @@ export class Office365SharepointViewerComponent implements OnInit, AfterViewInit
 
     deleteDocument() {
         return new Promise((resolve) => {
-            this.http.delete('../rest/office365/' + this.documentId).pipe(
-                tap(() => {
-                    resolve(true);
-                }),
-                catchError((err) => {
-                    this.notify.handleErrors(err);
-                    this.triggerCloseEditor.emit();
-                    return of(false);
-                }),
-            ).subscribe();
+            setTimeout(() => {
+                this.http.delete('../rest/office365/' + this.documentId).pipe(
+                    tap(() => {
+                        resolve(true);
+                    }),
+                    catchError((err) => {
+                        this.notify.handleErrors(err);
+                        this.triggerCloseEditor.emit();
+                        return of(false);
+                    }),
+                ).subscribe();
+            }, 10000);
         });
     }
 
