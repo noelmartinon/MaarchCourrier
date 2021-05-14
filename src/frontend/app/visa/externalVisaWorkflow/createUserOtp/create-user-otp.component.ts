@@ -55,13 +55,14 @@ export class CreateUserOtpComponent implements OnInit {
     ];
 
     userOTP: any = {
-        source: this.sources[0],
         firstname: '',
         lastname: '',
         email: '',
         phone: '',
         role: '',
-        mode: ''
+        security: '',
+        sourceId: this.sources[0].id,
+        type: this.sources[0].type
     };
 
     constructor(
@@ -101,8 +102,8 @@ export class CreateUserOtpComponent implements OnInit {
     }
 
     validFormat() {
-        const phoneRegex = /^((\+)33)[1-9](\d{2}){4}$/g;
-        const emailReegex = /\S+@\S+\.\S+/;
+        const phoneRegex = /^(\+33)[1-9]{9}$/;
+        const emailReegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,4}$/;
         return (this.userOTP.phone.length > 1 && this.userOTP.phone.trim().match(phoneRegex) !== null) && (this.userOTP.email.length > 1 && this.userOTP.email.trim().match(emailReegex) !== null);
     }
 }

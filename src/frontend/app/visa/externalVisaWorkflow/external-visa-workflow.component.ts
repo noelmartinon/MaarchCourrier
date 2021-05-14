@@ -355,7 +355,7 @@ export class ExternalVisaWorkflowComponent implements OnInit {
                         item_id: null,
                         item_type: 'userOtp',
                         labelToDisplay: `${data.otp.firstname} ${data.otp.lastname}`,
-                        picture: await this.actionService.getUserOtpIcon(data.otp.source.type),
+                        picture: await this.actionService.getUserOtpIcon(data.otp.type),
                         hasPrivilege: true,
                         isValid: true,
                         role: data.otp.role,
