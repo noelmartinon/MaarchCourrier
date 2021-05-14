@@ -5,9 +5,9 @@
             <mat-spinner style="margin:auto;"></mat-spinner>
         </div>
         <div *ngIf="!loading" class="userForm">
-            <mat-form-field appearance="fill" *ngIf="sources.length >= 1">
+            <mat-form-field appearance="fill">
                 <mat-label>{{ 'lang.source' | translate }}</mat-label>
-                <mat-select #source [value]="userOTP.sourceId" required>
+                <mat-select #source [(ngModel)]="userOTP.sourceId" (selectionChange)="setCurrentSource($event.value)" required>
                     <mat-option *ngFor="let source of sources" [value]="source.id" >
                         {{ source.label }}
                     </mat-option>
@@ -28,21 +28,21 @@
             </mat-form-field>
             <mat-form-field appearance="fill">
                 <mat-label>{{'lang.email' | translate}}</mat-label>
-                <input matInput #email type="email" [(ngModel)]="userOTP.email" pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,4}$" required>
+                <input matInput #email type="email" [(ngModel)]="userOTP.email" pattern="(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)" required>
             </mat-form-field>
             <mat-form-field appearance="fill">
                 <mat-label>{{'lang.role' | translate}}</mat-label>
                 <mat-select #role [(ngModel)]="userOTP.role" required>
-                    <mat-option *ngFor="let role of sampleRoles" [value]="role.id" >
+                    <mat-option *ngFor="let role of roles" [value]="role.id" >
                         {{ role.label }}
                     </mat-option>
                 </mat-select>
             </mat-form-field>
             <mat-form-field appearance="fill">
                 <mat-label>{{ 'lang.securityMode' | translate }}</mat-label>
-                <mat-select #securityMode [(ngModel)]="userOTP.security" required>
-                    <mat-option *ngFor="let mode of securityModes" [value]="mode.id" >
-                        {{ mode.label }}
+                <mat-select #securityMode [(ngModel)]="userOTP.security"required>
+                    <mat-option *ngFor="let mode of currentSource" [value]="mode" >
+                        {{ 'lang.' + mode | translate }}
                     </mat-option>
                 </mat-select>
             </mat-form-field>

@@ -46,6 +46,8 @@ export class ExternalVisaWorkflowComponent implements OnInit {
 
     loadedInConstructor: boolean = false;
 
+    otpConfig: number = 0;
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -55,7 +57,9 @@ export class ExternalVisaWorkflowComponent implements OnInit {
         public actionService: ActionsService
     ) { }
 
-    ngOnInit(): void { }
+    async ngOnInit(): Promise<void> {
+        await this.getOtpConfig();
+    }
 
     drop(event: CdkDragDrop<string[]>) {
         if (event.previousContainer === event.container) {
@@ -368,5 +372,22 @@ export class ExternalVisaWorkflowComponent implements OnInit {
                 }
             })
         ).subscribe();
+    }
+
+    getOtpConfig() {
+        return new Promise((resolve) => {
+            this.http.get('../rest/maarchParapheurOtp').pipe(
+                tap((data: any) => {
+                    if (data) {
+                        this.otpConfig = data.otp.length;
+                    }
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 }

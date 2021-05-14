@@ -1,14 +1,11 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { FunctionsService } from '@service/functions.service';
 import { tap, catchError } from 'rxjs/operators';
-import { FormControl } from '@angular/forms';
-import { ScanPipe } from 'ngx-pipes';
-import { Observable, of } from 'rxjs';
 import { MatDialogRef } from '@angular/material/dialog';
+import { of } from 'rxjs';
 
 @Component({
     templateUrl: 'create-user-otp.component.html',
@@ -17,22 +14,11 @@ import { MatDialogRef } from '@angular/material/dialog';
 
 export class CreateUserOtpComponent implements OnInit {
 
-    // For TEST
+    sources: any[] = [];
 
-    sources: any[] = [
-        {
-            id: 1,
-            label: 'Yousign 1',
-            type: 'yousign'
-        },
-        {
-            id: 2,
-            label: 'Yousign 2',
-            type: 'yousign'
-        }
-    ];
+    currentSource: any[] = [];
 
-    sampleRoles: any[] = [
+    roles: any[] = [
         {
             id: 'otp_visa_yousign',
             label: this.translate.instant('lang.otp_visa_yousign')
@@ -61,8 +47,8 @@ export class CreateUserOtpComponent implements OnInit {
         phone: '',
         role: '',
         security: '',
-        sourceId: this.sources[0].id,
-        type: this.sources[0].type
+        sourceId: '',
+        type: ''
     };
 
     constructor(
@@ -75,14 +61,16 @@ export class CreateUserOtpComponent implements OnInit {
     ) { }
 
     async ngOnInit(): Promise<void> {
-        // await this.getConfig();
+        await this.getConfig();
     }
 
     getConfig() {
         return new Promise((resolve) => {
             this.http.get('../rest/maarchParapheurOtp').pipe(
                 tap((data: any) => {
-                    console.log(data);
+                    if (data) {
+                        this.sources = data.otp;
+                    }
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -103,7 +91,13 @@ export class CreateUserOtpComponent implements OnInit {
 
     validFormat() {
         const phoneRegex = /^(\+33)[1-9]{9}$/;
-        const emailReegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9._-]+\.[a-zA-Z]{2,4}$/;
+        const emailReegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
         return (this.userOTP.phone.length > 1 && this.userOTP.phone.trim().match(phoneRegex) !== null) && (this.userOTP.email.length > 1 && this.userOTP.email.trim().match(emailReegex) !== null);
+    }
+
+    setCurrentSource(id: any) {
+        const selectedSource: any = this.sources.filter((item: any) => item.id === id)[0];
+        this.userOTP.type = selectedSource.type;
+        this.currentSource = selectedSource.securityModes;
     }
 }
