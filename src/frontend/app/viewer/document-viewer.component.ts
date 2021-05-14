@@ -538,6 +538,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                         }
                         return data;
                     }),
+                    filter((data: any) => !this.functions.empty(data.content)),
                     exhaustMap((data: any) => this.http.post('../rest/convertedFile', { name: `${data.name}.${data.format}`, base64: `${data.content}` })),
                     tap((data: any) => {
                         resolve(data.encodedResource);
