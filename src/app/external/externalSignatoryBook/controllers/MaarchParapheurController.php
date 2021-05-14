@@ -1225,7 +1225,7 @@ class MaarchParapheurController
         }
 
         $curlResponse = CurlModel::exec([
-            'url'           => rtrim($url, '/') . "/rest/otp",
+            'url'           => rtrim($url, '/') . "/rest/connectors",
             'basicAuth'     => ['user' => $userId, 'password' => $password],
             'headers'       => ['content-type:application/json'],
             'method'        => 'GET'
