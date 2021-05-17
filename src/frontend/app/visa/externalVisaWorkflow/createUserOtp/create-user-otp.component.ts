@@ -51,6 +51,8 @@ export class CreateUserOtpComponent implements OnInit {
         type: ''
     };
 
+    loading: boolean = true;
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -70,7 +72,11 @@ export class CreateUserOtpComponent implements OnInit {
                 tap((data: any) => {
                     if (data) {
                         this.sources = data.otp;
+                        this.userOTP.sourceId = this.sources[0].id;
+                        this.userOTP.type = this.sources[0].type;
+                        this.setCurrentSource(this.sources[0].id);
                     }
+                    this.loading = false;
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -99,5 +105,6 @@ export class CreateUserOtpComponent implements OnInit {
         const selectedSource: any = this.sources.filter((item: any) => item.id === id)[0];
         this.userOTP.type = selectedSource.type;
         this.currentSource = selectedSource.securityModes;
+        this.userOTP.security = this.currentSource[0];
     }
 }

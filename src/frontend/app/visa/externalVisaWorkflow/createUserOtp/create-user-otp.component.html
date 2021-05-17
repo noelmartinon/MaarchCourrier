@@ -5,7 +5,7 @@
             <mat-spinner style="margin:auto;"></mat-spinner>
         </div>
         <div *ngIf="!loading" class="userForm">
-            <mat-form-field appearance="fill">
+            <mat-form-field *ngIf="sources.length > 1" appearance="fill">
                 <mat-label>{{ 'lang.source' | translate }}</mat-label>
                 <mat-select #source [(ngModel)]="userOTP.sourceId" (selectionChange)="setCurrentSource($event.value)" required>
                     <mat-option *ngFor="let source of sources" [value]="source.id" >
@@ -38,7 +38,7 @@
                     </mat-option>
                 </mat-select>
             </mat-form-field>
-            <mat-form-field appearance="fill">
+            <mat-form-field *ngIf="currentSource.length > 1" appearance="fill">
                 <mat-label>{{ 'lang.securityMode' | translate }}</mat-label>
                 <mat-select #securityMode [(ngModel)]="userOTP.security"required>
                     <mat-option *ngFor="let mode of currentSource" [value]="mode" >
