@@ -1,5 +1,5 @@
 <mat-list *ngIf="!loading">
-    <button *ngIf="adminMode" mat-raised-button mat-button color="primary" [title]="'lang.addOtpUser' | translate" 
+    <button *ngIf="adminMode && otpConfig > 0" mat-raised-button mat-button color="primary" [title]="'lang.addOtpUser' | translate" 
         style="margin: 10px; display: flex;" (click)="openCreateUserOtp()">
         <mat-icon class="fas fa-user-plus" style="width: auto;height: auto;"></mat-icon>
         {{'lang.addOtpUser' | translate}}

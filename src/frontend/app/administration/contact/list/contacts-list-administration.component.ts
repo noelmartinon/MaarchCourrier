@@ -390,7 +390,7 @@ export class ContactListHttpDao {
 
     getRepoIssues(sort: string, order: string, page: number, href: string, search: string, pageSize: number): Observable<ContactList> {
 
-        const offset = page * 10;
+        const offset = page * pageSize;
         const requestUrl = `${href}?limit=${pageSize}&offset=${offset}&order=${order}&orderBy=${sort}&search=${search}`;
         return this.http.get<ContactList>(requestUrl);
     }

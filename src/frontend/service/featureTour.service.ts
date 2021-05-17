@@ -41,13 +41,6 @@ export class FeatureTourService {
             redirectToAdmin: false,
         },
         {
-            type: 'email',
-            stepId: 'emailTour2@administration/sendmail',
-            title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.translate.instant('lang.emailTour2Title')}</b>`,
-            description: this.translate.instant('lang.emailTour2Description'),
-            redirectToAdmin: false,
-        },
-        {
             type: 'notification',
             stepId: 'admin_notif@administration',
             title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.translate.instant('lang.admin_notifTitle')}</b>`,
@@ -87,7 +80,7 @@ export class FeatureTourService {
             stepId: 'notifTour4@administration/notifications',
             title: `<i class="far fa-question-circle" color="primary"></i>&nbsp;<b color="primary">${this.translate.instant('lang.notifTour4Title')}</b>`,
             description: this.translate.instant('lang.notifTour4Description'),
-            redirectToAdmin: true,
+            redirectToAdmin: false,
         },
     ];
 
