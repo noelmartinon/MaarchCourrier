@@ -96,7 +96,7 @@ export class CreateUserOtpComponent implements OnInit {
     }
 
     validFormat() {
-        const phoneRegex = /^(\+33)[1-9]{9}$/;
+        const phoneRegex = /^((\+)33)[1-9](\d{2}){4}$/;
         const emailReegex = /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
         return (this.userOTP.phone.length > 1 && this.userOTP.phone.trim().match(phoneRegex) !== null) && (this.userOTP.email.length > 1 && this.userOTP.email.trim().match(emailReegex) !== null);
     }
