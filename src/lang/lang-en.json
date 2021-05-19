@@ -2506,7 +2506,7 @@
     "clientSecret": "Client Secret",
     "siteUrl": "Sharepoint Online site URL",
     "office365sharepointDesc": "<a href=\"https://www.office.com/\" target=\"_blank\"> Office 365 </a> is the online office suite from Microsoft. The editing is done via Sharepoint Online.",
-    "addOtpUser": "Add OTP user",
+    "addOtp": "Add external user",
     "securityMode": "Mode of sending the security code",
     "sms": "SMS",
     "securityModeInfo": "The user will be notified by <b>email</b> and will receive a <b> security code </b> by <b> {{mode}} </b> at the time of his turn in the workflow.",

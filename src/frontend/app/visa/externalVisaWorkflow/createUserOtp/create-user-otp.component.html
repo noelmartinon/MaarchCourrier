@@ -1,5 +1,5 @@
 <div class="mat-dialog-content-container">
-    <h1 mat-dialog-title>{{'lang.addOtpUser' | translate}}</h1>
+    <h1 mat-dialog-title>{{(data === null ? 'lang.addOtp' : 'lang.updateOtp') | translate}}</h1>
     <div mat-dialog-content>
         <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
             <mat-spinner style="margin:auto;"></mat-spinner>
@@ -42,7 +42,7 @@
             <mat-form-field>
                 <input matInput style="display: none;">
                 <mat-radio-group #role style="display: inline-flex;flex-direction: row;" [(ngModel)]="userOTP.role" required>
-                    <mat-radio-button *ngFor="let role of roles" [value]="role.id" style="margin-left: 10px;">
+                    <mat-radio-button *ngFor="let role of availableRoles" [value]="role.id" style="margin-left: 10px;" color="primary">
                         {{ role.label }}
                     </mat-radio-button>
                 </mat-radio-group >
@@ -52,7 +52,7 @@
     </div>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
-        <button mat-raised-button mat-button color="primary" [disabled]="loading || !isValidForm()" (click)="addOtpUser()">{{'lang.validate' | translate}}</button>
+        <button mat-raised-button mat-button color="primary" [disabled]="loading || !isValidForm()" (click)="addOtpUser()">{{ (this.data === null ? 'lang.validate' : 'lang.update') | translate}}</button>
         <button mat-raised-button mat-button [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
     </div>
 </div>
