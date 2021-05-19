@@ -23,6 +23,7 @@ use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\controllers\LogsController;
 use SrcCore\models\CurlModel;
 use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
@@ -149,13 +150,13 @@ class Office365SharepointController
 
         $id = $sendResult['response']['id'];
 
-        $body = json_encode(['item' => ['@microsoft.graph.conflictBehavior' => 'replace']]);
+        $requestBody = json_encode(['item' => ['@microsoft.graph.conflictBehavior' => 'replace']]);
         $sendResult = CurlModel::exec([
             'url'        => 'https://graph.microsoft.com/v1.0/sites/' . $configuration['siteId'] . '/drive/items/' . $id . '/createUploadSession',
             'bearerAuth' => ['token' => $accessToken],
-            'headers'    => ['Content-Type: application/json', 'Content-Length: ' . strlen($body)],
+            'headers'    => ['Content-Type: application/json', 'Content-Length: ' . strlen($requestBody)],
             'method'     => 'POST',
-            'body'       => $body
+            'body'       => $requestBody
         ]);
 
         if ($sendResult['code'] != 200) {
@@ -179,7 +180,7 @@ class Office365SharepointController
 
         $currentUser = UserModel::getById(['id' => $GLOBALS['id'], 'select' => ['mail']]);
 
-        $body = [
+        $requestBody = [
             'requireSignIn'  => true,
             'sendInvitation' => false,
             'roles'          => ['read', 'write'],
@@ -194,11 +195,41 @@ class Office365SharepointController
             'bearerAuth' => ['token' => $accessToken],
             'headers'    => ['Content-Type: application/json'],
             'method'     => 'POST',
-            'body'       => json_encode($body)
+            'body'       => json_encode($requestBody)
         ]);
 
         if ($result['code'] != 200) {
             return $response->withStatus(400)->withJson(['errors' => 'Could not share the document with user', 'sharepointError' => $result['response']['error']]);
+        }
+
+        // Delete all the other files created by the user, if there are any
+        $result = CurlModel::exec([
+            'url'        => 'https://graph.microsoft.com/v1.0/sites/' . $configuration['siteId'] . '/drive/root/children',
+            'bearerAuth' => ['token' => $accessToken],
+            'method'     => 'GET'
+        ]);
+
+        if ($result['code'] == 200) {
+            foreach ($result['response']['value'] as $child) {
+                if ($child['id'] != $id && strpos($child['name'], 'maarch_' . $GLOBALS['login']) !== false) {
+                    Office365SharepointController::deleteFile([
+                        'configuration' => $configuration,
+                        'token'         => $accessToken,
+                        'documentId'    => $child['id'],
+                        'resId'         => $body['resId']
+                    ]);
+                }
+            }
+        } else {
+            LogsController::add([
+                'isTech'    => true,
+                'moduleId'  => 'resource',
+                'level'     => 'ERROR',
+                'tableName' => 'letterbox_coll',
+                'recordId'  => $args['resId'],
+                'eventType' => "Failed to get document list " . json_encode($result['response']['error']),
+                'eventId'   => "resId : {$args['resId']}"
+            ]);
         }
 
         return $response->withJson(['webUrl' => $webUrl, 'documentId' => $id]);
@@ -245,7 +276,7 @@ class Office365SharepointController
         return $response->withJson(['content' => base64_encode($content)]);
     }
 
-    public function deleteFile(Request $request, Response $response, array $args)
+    public function delete(Request $request, Response $response, array $args)
     {
         $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_document_editors', 'select' => ['value']]);
         $configuration = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
@@ -259,21 +290,18 @@ class Office365SharepointController
             return $response->withStatus(400)->withJson(['errors' => 'Argument id is empty or not a string']);
         }
 
+        $body = $request->getParsedBody();
+        if (!Validator::intVal()->notEmpty()->validate($body['resId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body resId is empty or not an integer']);
+        }
+
         $accessToken = Office365SharepointController::getAuthenticationToken(['configuration' => $configuration]);
 
         if (!empty($accessToken['errors'])) {
             return $response->withStatus(400)->withJson(['errors' => $accessToken['errors']]);
         }
 
-        $result = CurlModel::exec([
-            'url'        => 'https://graph.microsoft.com/v1.0/sites/' . $configuration['siteId'] . '/drive/items/' . $args['id'],
-            'bearerAuth' => ['token' => $accessToken],
-            'method'     => 'DELETE'
-        ]);
-
-        if ($result['code'] != 204) {
-            return $response->withStatus(400)->withJson(['errors' => 'Could not delete document in Sharepoint', 'sharepointError' => $result['response']['error']]);
-        }
+        Office365SharepointController::deleteFile(['configuration' => $configuration, 'token' => $accessToken, 'documentId' => $args['id'], 'resId' => $body['resId']]);
 
         return $response->withStatus(204);
     }
@@ -349,5 +377,33 @@ class Office365SharepointController
         }
 
         return $curlResponse['response']['access_token'];
+    }
+
+    private static function deleteFile(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['configuration', 'token', 'documentId', 'resId']);
+        ValidatorModel::stringType($args, ['token', 'documentId']);
+        ValidatorModel::arrayType($args, ['configuration']);
+        ValidatorModel::intVal($args, ['resId']);
+
+        $configuration = $args['configuration'];
+
+        $result = CurlModel::exec([
+            'url'        => 'https://graph.microsoft.com/v1.0/sites/' . $configuration['siteId'] . '/drive/items/' . $args['documentId'],
+            'bearerAuth' => ['token' => $args['token']],
+            'method'     => 'DELETE'
+        ]);
+
+        if ($result['code'] != 204) {
+            LogsController::add([
+                'isTech'    => true,
+                'moduleId'  => 'resource',
+                'level'     => 'ERROR',
+                'tableName' => 'letterbox_coll',
+                'recordId'  => $args['resId'],
+                'eventType' => "Failed to delete document {$args['documentId']} : " . json_encode($result['response']['error']),
+                'eventId'   => "resId : {$args['resId']}"
+            ]);
+        }
     }
 }

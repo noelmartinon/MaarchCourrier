@@ -172,7 +172,7 @@ export class Office365SharepointViewerComponent implements OnInit, AfterViewInit
 
     deleteDocument() {
         return new Promise((resolve) => {
-            this.http.delete('../rest/office365/' + this.documentId).pipe(
+            this.http.request('DELETE', '../rest/office365/' + this.documentId, {body: {resId: this.params.objectId}}).pipe(
                 tap(() => {
                     resolve(true);
                 }),

@@ -2488,7 +2488,7 @@
     "redirectedFromProfile": "Les bannettes <b>actuellement redirigées</b> seront redirigées par défaut",
     "systemTechnicalFields": "Champs techniques \"Système\"",
     "customTechnicalFields": "Champs techniques personnalisés",
-    "getDocument": "Récupérer le document",
+    "getDocument": "Valider l'édition",
     "office365SharepointNotEnabled": "L'édition avec Office 365 via Sharepoint Online n'est pas activé dans <b>Administration</b> > <b>Paramètres</b> > <b>Autres</b>",
     "documentEditor_office365sharepoint": "Utilise la suite Office 365 en éditant les documents dans un espace Sharepoint Online",
     "officeSharepointEditDenied": "ne peut pas être édité avec Office 365",
