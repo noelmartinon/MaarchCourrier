@@ -500,7 +500,7 @@ class ListInstanceController
                 if ($listInstance['item_type'] == 'user_id') {
                     $user = UserModel::getByLogin(['login' => $listInstance['item_id'], 'select' => ['id'], 'noDeleted' => true]);
                     $listInstance['item_id'] = $user['id'] ?? null;
-                } else {
+                } elseif ($listInstance['item_type'] == 'user') {
                     $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['id'], 'noDeleted' => true]);
                 }
                 $listInstance['item_type'] = 'user_id';
