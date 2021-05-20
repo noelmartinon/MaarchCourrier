@@ -53,8 +53,8 @@
         <mat-list-item disableRipple *ngFor="let diffusion of visaWorkflow.items;let i=index" cdkDrag
             class="columns workflow" [cdkDragDisabled]="!canManageUser(diffusion, i)"
             [class.notDraggable]="!canManageUser(diffusion, i)" [class.notEditable]="!adminMode"
-            [class.processed]="diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) === -1"
-            [class.interrupt]="diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) > -1">
+            [class.processed]="diffusion.process_date != null && (!stringIncludes(diffusion.process_comment, 'lang.hasInterruptedWorkflow' | translate) && !stringIncludes(diffusion.process_comment, 'lang.visaWorkflowInterrupted' | translate))"
+            [class.interrupt]="diffusion.process_date != null && (stringIncludes(diffusion.process_comment, 'lang.hasInterruptedWorkflow' | translate) || stringIncludes(diffusion.process_comment, 'lang.visaWorkflowInterrupted' | translate))">
             <mat-icon *ngIf="getCurrentVisaUserIndex() === i && (!adminMode || target === 'signatureBook' || target === 'action')"
                 class="fa fa-chevron-right fa-2x" mat-list-icon color="accent">
             </mat-icon>
@@ -73,11 +73,11 @@
                 <mat-icon mat-list-icon class="fa-2x fa"
                     [title]="diffusion.process_comment !== null ? diffusion.process_comment : ''"
                     [class.fa-hourglass]="diffusion.process_date == null"
-                    [class.fa-thumbs-up]="diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) === -1"
-                    [class.fa-hand-paper]="diffusion.process_date != null && diffusion.process_comment === ('lang.hasInterruptedWorkflow' | translate)"
-                    [class.fa-times]="diffusion.process_date != null && diffusion.process_comment === ('lang.visaWorkflowInterrupted' | translate)"
-                    [class.valid]="diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) === -1"
-                    [class.invalid]="diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) > -1"
+                    [class.fa-thumbs-up]="diffusion.process_date != null && !stringIncludes(diffusion.process_comment, 'lang.hasInterruptedWorkflow' | translate) && !stringIncludes(diffusion.process_comment, 'lang.visaWorkflowInterrupted' | translate)"
+                    [class.fa-hand-paper]="diffusion.process_date != null && stringIncludes(diffusion.process_comment, 'lang.hasInterruptedWorkflow' | translate)"
+                    [class.fa-times]="diffusion.process_date != null && stringIncludes(diffusion.process_comment, 'lang.visaWorkflowInterrupted' | translate)"
+                    [class.valid]="diffusion.process_date != null && !stringIncludes(diffusion.process_comment, 'lang.hasInterruptedWorkflow' | translate) && !stringIncludes(diffusion.process_comment, 'lang.visaWorkflowInterrupted' | translate)"
+                    [class.invalid]="diffusion.process_date != null && (stringIncludes(diffusion.process_comment, 'lang.hasInterruptedWorkflow' | translate) || stringIncludes(diffusion.process_comment, 'lang.visaWorkflowInterrupted' | translate))"
                     style="opacity:0.5;"></mat-icon>
             </ng-container>
             <div mat-line class="workflowLine">
@@ -102,11 +102,11 @@
                                 [placeholder]="'lang.visaNote' | translate" [(ngModel)]="diffusion.process_comment">
                         </mat-form-field>
                     </div>
-                    <div *ngIf="diffusion.requested_signature && diffusion.process_date != null && ['lang.visaWorkflowInterrupted' | translate, 'lang.hasInterruptedWorkflow' | translate].indexOf(diffusion.process_comment) === -1"
+                    <div *ngIf="diffusion.process_date != null && !stringIncludes(diffusion.process_comment, 'lang.visaWorkflowInterrupted' | translate) && !stringIncludes(diffusion.process_comment, 'lang.hasInterruptedWorkflow' | translate)"
                         class="workflowLineProcessDate" title='{{diffusion.process_date | fullDate}}' color="accent">
                         {{((functions.empty(diffusion.process_date) && diffusion.requested_signature) || diffusion.signatory) ? ('lang.signedUserDate' | translate) : ('lang.approvedUserDate' | translate)}} {{diffusion.process_date
                                                 | timeAgo : 'full'}}</div>
-                    <div *ngIf="diffusion.process_date != null && ['A terminé le circuit'].indexOf(diffusion.process_comment) > -1"
+                    <div *ngIf="diffusion.process_date != null && stringIncludes(diffusion.process_comment, 'lang.hasInterruptedWorkflow' | translate)"
                         class="workflowLineProcessDate" title='{{diffusion.process_date | fullDate}}' color="warn">
                         {{'lang.interrupted' | translate}} {{diffusion.process_date | timeAgo : 'full'}}</div>
                 </div>
