@@ -21,11 +21,11 @@ export class CreateUserOtpComponent implements OnInit {
     availableRoles: any[] = [
         {
             id: 'visa',
-            label: this.translate.instant('lang.otp_visa_yousign')
+            label: this.translate.instant('lang.visaUser')
         },
         {
             id: 'sign',
-            label: this.translate.instant('lang.otp_sign_yousign')
+            label: this.translate.instant('lang.signUser')
         }
     ];
 
@@ -74,7 +74,7 @@ export class CreateUserOtpComponent implements OnInit {
                 tap((data: any) => {
                     if (data) {
                         this.sources = data.otp;
-                        this.setCurrentSource(this.sources[0].id);
+                        this.setCurrentSource(this.data !== null ? this.data.sourceId : this.sources[0].id);
                         if (this.data === null) {
                             this.userOTP.sourceId = this.sources[0].id;
                             this.userOTP.type = this.sources[0].type;

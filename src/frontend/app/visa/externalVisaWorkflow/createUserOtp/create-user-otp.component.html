@@ -42,7 +42,7 @@
             <mat-form-field>
                 <input matInput style="display: none;">
                 <mat-radio-group #role style="display: inline-flex;flex-direction: row;" [(ngModel)]="userOTP.role" required>
-                    <mat-radio-button *ngFor="let role of availableRoles" [value]="role.id" style="margin-left: 10px;" color="primary">
+                    <mat-radio-button *ngFor="let role of availableRoles" [value]="role.id" style="margin-right: 20px;" color="primary">
                         {{ role.label }}
                     </mat-radio-button>
                 </mat-radio-group >
