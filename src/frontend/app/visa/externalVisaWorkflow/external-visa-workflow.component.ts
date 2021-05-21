@@ -9,7 +9,7 @@ import { FormControl } from '@angular/forms';
 import { ScanPipe } from 'ngx-pipes';
 import { Observable, of } from 'rxjs';
 import { MatDialog } from '@angular/material/dialog';
-import { CreateUserOtpComponent } from './createUserOtp/create-user-otp.component';
+import { CreateExternalUserComponent } from './createExternalUser/create-external-user.component';
 import { ActionsService } from '@appRoot/actions/actions.service';
 
 @Component({
@@ -358,7 +358,7 @@ export class ExternalVisaWorkflowComponent implements OnInit {
                 role: item.role,
                 availableRoles: item.externalInformations.availableRoles
             };
-            const dialogRef = this.dialog.open(CreateUserOtpComponent, {
+            const dialogRef = this.dialog.open(CreateExternalUserComponent, {
                 panelClass: 'maarch-modal',
                 disableClose: true,
                 width: '500px',

@@ -8,11 +8,11 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { of } from 'rxjs';
 
 @Component({
-    templateUrl: 'create-user-otp.component.html',
-    styleUrls: ['create-user-otp.component.scss'],
+    templateUrl: 'create-external-user.component.html',
+    styleUrls: ['create-external-user.component.scss'],
 })
 
-export class CreateUserOtpComponent implements OnInit {
+export class CreateExternalUserComponent implements OnInit {
 
     sources: any[] = [];
 
@@ -58,7 +58,7 @@ export class CreateUserOtpComponent implements OnInit {
         public translate: TranslateService,
         public http: HttpClient,
         public functions: FunctionsService,
-        private dialogRef: MatDialogRef<CreateUserOtpComponent>,
+        private dialogRef: MatDialogRef<CreateExternalUserComponent>,
         public notify: NotificationService,
         @Inject(MAT_DIALOG_DATA) public data: any
 

@@ -46,7 +46,7 @@
                     style="opacity:0.5;"></mat-icon>
             </ng-container>
             <div mat-line class="workflowLine">
-                <div class="workflowLineContainer" (click)="openCreateUserOtp(diffusion)">
+                <div class="workflowLineContainer">
                     <div class="workflowLineLabel" [class.unauthorized]="!diffusion.hasPrivilege || !diffusion.isValid" [title]="diffusion.labelToDisplay">
                         {{diffusion.labelToDisplay}}
                         <ng-container *ngIf="diffusion.process_date != null && diffusion.delegatedBy !== null">
@@ -70,6 +70,10 @@
                 </div>
                 <div *ngIf="diffusion.hasPrivilege && diffusion.isValid">
                     <ng-container>
+                        <button mat-icon-button *ngIf="canManageUser() && diffusion.item_id === null" 
+                            (click)="openCreateUserOtp(diffusion)" [title]="'lang.updateOtp' | translate">
+                            <mat-icon class="fas fa-edit" color="primary"></mat-icon>
+                        </button>
                         <button class="currentRoleButton" [class.readonly]="!adminMode" [color]="diffusion.role === 'visa' ? 'default':'primary'" mat-raised-button
                             title="{{'lang.' + diffusion.role | translate}}"
                             [matMenuTriggerFor]="rolesMenu" [disabled]="!adminMode">{{'lang.' + diffusion.role + (diffusion.role === 'sign' ? 'User' : '') | translate}}</button>

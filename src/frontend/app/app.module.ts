@@ -138,7 +138,7 @@ import { SignatureBookComponent } from './signature-book.component';
 import { VisaWorkflowModalComponent } from './visa/modal/visa-workflow-modal.component';
 import { ExternalVisaWorkflowComponent } from './visa/externalVisaWorkflow/external-visa-workflow.component';
 import { ProfileContactsGroupsComponent } from './profile/contacts-groups/profile-contacts-groups.component';
-import { CreateUserOtpComponent } from './visa/externalVisaWorkflow/createUserOtp/create-user-otp.component';
+import { CreateExternalUserComponent } from './visa/externalVisaWorkflow/createExternalUser/create-external-user.component';
 
 import { EditorOptionComponent } from './profile/parameters/editorOption/editor-option.component';
 import { BasketColorComponent } from './profile/parameters/basketsColor/basket-color.component';
@@ -295,7 +295,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         ProfileHistoryComponent,
         ProfileOtherPluginComponent,
         AddinOutlookConfigurationModalComponent,
-        CreateUserOtpComponent
+        CreateExternalUserComponent
     ],
     exports : [
         SharedModule
