@@ -110,7 +110,7 @@ export class CreateExternalUserComponent implements OnInit {
     setCurrentSource(id: any) {
         const selectedSource: any = this.sources.filter((item: any) => item.id === id)[0];
         this.userOTP.type = selectedSource.type;
-        this.currentSource = selectedSource.securityModes;
+        this.currentSource = [... new Set(selectedSource.securityModes)];
         this.userOTP.security = this.currentSource[0];
     }
 }
