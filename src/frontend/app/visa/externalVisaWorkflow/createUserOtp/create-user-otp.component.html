@@ -1,5 +1,5 @@
 <div class="mat-dialog-content-container">
-    <h1 mat-dialog-title>{{'lang.addOtpUser' | translate}}</h1>
+    <h1 mat-dialog-title>{{(data === null ? 'lang.addOtp' : 'lang.updateOtp') | translate}}</h1>
     <div mat-dialog-content>
         <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
             <mat-spinner style="margin:auto;"></mat-spinner>
@@ -15,11 +15,11 @@
             </mat-form-field>
             <mat-form-field appearance="fill">
                 <mat-label>{{'lang.firstname' | translate}}</mat-label>
-                <input matInput #firstname type="text" [(ngModel)]="userOTP.firstname" required>
+                <input matInput #firstname type="text" maxlength="128" [(ngModel)]="userOTP.firstname" required>
             </mat-form-field>
             <mat-form-field appearance="fill">
                 <mat-label>{{'lang.lastname' | translate}}</mat-label>
-                <input matInput #lastname type="text" [(ngModel)]="userOTP.lastname"  required>
+                <input matInput #lastname type="text" maxlength="128" [(ngModel)]="userOTP.lastname"  required>
             </mat-form-field>
             <mat-form-field appearance="fill">
                 <mat-label>{{'lang.phoneNumber' | translate}}</mat-label>
@@ -30,14 +30,6 @@
                 <mat-label>{{'lang.email' | translate}}</mat-label>
                 <input matInput #email type="email" [(ngModel)]="userOTP.email" pattern="(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)" required>
             </mat-form-field>
-            <mat-form-field appearance="fill">
-                <mat-label>{{'lang.role' | translate}}</mat-label>
-                <mat-select #role [(ngModel)]="userOTP.role" required>
-                    <mat-option *ngFor="let role of roles" [value]="role.id" >
-                        {{ role.label }}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
             <mat-form-field *ngIf="currentSource.length > 1" appearance="fill">
                 <mat-label>{{ 'lang.securityMode' | translate }}</mat-label>
                 <mat-select #securityMode [(ngModel)]="userOTP.security"required>
@@ -46,13 +38,21 @@
                     </mat-option>
                 </mat-select>
             </mat-form-field>
-            <span class="divider-modal"></span>
+            <mat-label>{{'lang.role' | translate}}</mat-label>
+            <mat-form-field>
+                <input matInput style="display: none;">
+                <mat-radio-group #role style="display: inline-flex;flex-direction: row;" [(ngModel)]="userOTP.role" required>
+                    <mat-radio-button *ngFor="let role of availableRoles" [value]="role.id" style="margin-right: 20px;" color="primary">
+                        {{ role.label }}
+                    </mat-radio-button>
+                </mat-radio-group >
+            </mat-form-field>
             <app-maarch-message *ngIf="userOTP.security" [mode]="'info'" [content]="'lang.securityModeInfo' | translate : {mode: userOTP.security}"></app-maarch-message>
         </div>
     </div>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
-        <button mat-raised-button mat-button color="primary" [disabled]="loading || !isValidForm()" (click)="addOtpUser()">{{'lang.validate' | translate}}</button>
+        <button mat-raised-button mat-button color="primary" [disabled]="loading || !isValidForm()" (click)="addOtpUser()">{{ (this.data === null ? 'lang.validate' : 'lang.update') | translate}}</button>
         <button mat-raised-button mat-button [mat-dialog-close]="">{{'lang.cancel' | translate}}</button>
     </div>
 </div>

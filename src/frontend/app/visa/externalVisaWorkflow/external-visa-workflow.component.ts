@@ -345,33 +345,52 @@ export class ExternalVisaWorkflowComponent implements OnInit {
         }
     }
 
-    openCreateUserOtp() {
-        const dialogRef = this.dialog.open(CreateUserOtpComponent, {
-            panelClass: 'maarch-modal',
-            disableClose: true,
-            width: '500px',
-        });
-
-        dialogRef.afterClosed().pipe(
-            tap(async (data: any) => {
-                if (data) {
-                    const user = {
-                        item_id: null,
-                        item_type: 'userOtp',
-                        labelToDisplay: `${data.otp.firstname} ${data.otp.lastname}`,
-                        picture: await this.actionService.getUserOtpIcon(data.otp.type),
-                        hasPrivilege: true,
-                        isValid: true,
-                        role: data.otp.role,
-                        externalId: {
-                            maarchParapheur: null
-                        },
-                        externalInformations: data.otp
-                    };
-                    this.visaWorkflow.items.push(user);
-                }
-            })
-        ).subscribe();
+    openCreateUserOtp(item: any = null) {
+        if (this.adminMode && (item === null || (item && item.item_id === null))) {
+            const objToSend: any = item === null || (item && item.item_id) !== null ? null : {
+                firstname: item.externalInformations.firstname,
+                lastname: item.externalInformations.lastname,
+                email: item.externalInformations.email,
+                phone: item.externalInformations.phone,
+                security: item.externalInformations.security,
+                sourceId: item.externalInformations.sourceId,
+                type: item.externalInformations.type,
+                role: item.role,
+                availableRoles: item.externalInformations.availableRoles
+            };
+            const dialogRef = this.dialog.open(CreateUserOtpComponent, {
+                panelClass: 'maarch-modal',
+                disableClose: true,
+                width: '500px',
+                data: objToSend
+            });
+            dialogRef.afterClosed().pipe(
+                tap(async (data: any) => {
+                    if (data) {
+                        const user = {
+                            item_id: null,
+                            item_type: 'userOtp',
+                            labelToDisplay: `${data.otp.firstname} ${data.otp.lastname}`,
+                            picture: await this.actionService.getUserOtpIcon(data.otp.type),
+                            hasPrivilege: true,
+                            isValid: true,
+                            externalId: {
+                                maarchParapheur: null
+                            },
+                            externalInformations: data.otp,
+                            role: data.otp.role,
+                            availableRoles: data.otp.availableRoles
+                        };
+                        if (objToSend !== null) {
+                            this.visaWorkflow.items[this.visaWorkflow.items.indexOf(item)] = user;
+                            this.notify.success(this.translate.instant('lang.modificationSaved'));
+                        } else {
+                            this.visaWorkflow.items.push(user);
+                        }
+                    }
+                })
+            ).subscribe();
+        }
     }
 
     getOtpConfig() {

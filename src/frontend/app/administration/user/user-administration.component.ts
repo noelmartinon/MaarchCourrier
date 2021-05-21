@@ -926,27 +926,26 @@ export class UserAdministrationComponent implements OnInit {
         if (this.creationMode) {
             this.http.get('../rest/users/' + this.user.userId + '/status')
                 .subscribe((data: any) => {
-                    let deletedUser = false;
                     if (data.status && data.status === 'DEL') {
                         const dialogRef = this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: `${this.translate.instant('lang.reactivateUserDeleted')}`, msg: this.translate.instant('lang.confirmAction') } });
                         dialogRef.afterClosed().pipe(
                             filter((response: string) => response === 'ok'),
                             exhaustMap(() => this.http.post('../rest/users', this.user)),
                             tap((result: any) => {
-                                if (deletedUser) {
-                                    this.notify.success(this.translate.instant('lang.userUpdated'));
-                                } else {
-                                    this.notify.success(this.translate.instant('lang.userAdded'));
-                                }
-                                this.appInputCorrespondentGroup.linkGrpAfterCreation(result.id, 'user');
-                                this.router.navigate(['/administration/users/' + result.id]);
+                                this.subscribeUserCreation(true, result.id);
                             }),
                             catchError((err: any) => {
                                 this.notify.error(err.error.errors);
                                 return of(false);
                             })
                         ).subscribe();
-                        deletedUser = true;
+                    } else {
+                        this.http.post('../rest/users', this.user)
+                            .subscribe((result: any) => {
+                                this.subscribeUserCreation(false, result.id);
+                            }, (err: any) => {
+                                this.notify.handleSoftErrors(err);
+                            });
                     }
                 }, (err: any) => {
                     this.notify.error(err.error.errors);
@@ -968,6 +967,16 @@ export class UserAdministrationComponent implements OnInit {
                     this.notify.handleSoftErrors(err);
                 });
         }
+    }
+
+    subscribeUserCreation(deletedUser: boolean, userId: any) {
+        if (deletedUser) {
+            this.notify.success(this.translate.instant('lang.userUpdated'));
+        } else {
+            this.notify.success(this.translate.instant('lang.userAdded'));
+        }
+        this.appInputCorrespondentGroup.linkGrpAfterCreation(userId, 'user');
+        this.router.navigate(['/administration/users/' + userId]);
     }
 
     setUserModeLogin(event: any) {

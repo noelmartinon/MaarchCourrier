@@ -2,7 +2,7 @@
     <button *ngIf="adminMode && otpConfig > 0" mat-raised-button mat-button color="primary" [title]="'lang.addOtpUser' | translate" 
         style="margin: 10px; display: flex;" (click)="openCreateUserOtp()">
         <mat-icon class="fas fa-user-plus" style="width: auto;height: auto;"></mat-icon>
-        {{'lang.addOtpUser' | translate}}
+        {{'lang.addOtp' | translate}}
     </button>
     <app-plugin-autocomplete *ngIf="adminMode" [labelPlaceholder]="'lang.addPerson' | translate"
         [routeDatas]="['/rest/autocomplete/maarchParapheurUsers']" [targetSearchKey]="'idToDisplay'"
@@ -46,8 +46,8 @@
                     style="opacity:0.5;"></mat-icon>
             </ng-container>
             <div mat-line class="workflowLine">
-                <div class="workflowLineContainer">
-                    <div class="workflowLineLabel" [class.unauthorized]="!diffusion.hasPrivilege || !diffusion.isValid">
+                <div class="workflowLineContainer" (click)="openCreateUserOtp(diffusion)">
+                    <div class="workflowLineLabel" [class.unauthorized]="!diffusion.hasPrivilege || !diffusion.isValid" [title]="diffusion.labelToDisplay">
                         {{diffusion.labelToDisplay}}
                         <ng-container *ngIf="diffusion.process_date != null && diffusion.delegatedBy !== null">
                             <mat-icon mat-list-icon class="fas fa-exclamation-circle"
@@ -72,10 +72,10 @@
                     <ng-container>
                         <button class="currentRoleButton" [class.readonly]="!adminMode" [color]="diffusion.role === 'visa' ? 'default':'primary'" mat-raised-button
                             title="{{'lang.' + diffusion.role | translate}}"
-                            [matMenuTriggerFor]="rolesMenu" [disabled]="!adminMode">{{'lang.' + diffusion.role | translate}}</button>
+                            [matMenuTriggerFor]="rolesMenu" [disabled]="!adminMode">{{'lang.' + diffusion.role + (diffusion.role === 'sign' ? 'User' : '') | translate}}</button>
                         <mat-menu #rolesMenu="matMenu">
                             <ng-container *ngFor="let role of diffusion.availableRoles">
-                                <button mat-menu-item (click)="diffusion.role=role" [class.selected]="diffusion.role===role" [disabled]="!isValidRole(i,role,diffusion.role)">{{'lang.'+ role | translate}}</button>
+                                <button mat-menu-item (click)="diffusion.role=role" [class.selected]="diffusion.role===role" [disabled]="!isValidRole(i,role,diffusion.role)">{{'lang.'+ role + (role === 'sign' ? 'User' : '') | translate}}</button>
                             </ng-container>
                         </mat-menu>
                     </ng-container>

@@ -706,6 +706,6 @@ $app->put('/plugins/outlook/attachments', \Outlook\controllers\OutlookController
 
 $app->post('/office365', \ContentManagement\controllers\Office365SharepointController::class . ':sendDocument');
 $app->get('/office365/{id}', \ContentManagement\controllers\Office365SharepointController::class . ':getFileContent');
-$app->delete('/office365/{id}', \ContentManagement\controllers\Office365SharepointController::class . ':deleteFile');
+$app->delete('/office365/{id}', \ContentManagement\controllers\Office365SharepointController::class . ':delete');
 
 $app->run();

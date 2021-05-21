@@ -486,3 +486,5 @@ define('_FULLTEXT', "Plein texte");
 define('_CREATION_DATE', "Date de création");
 define('_SUCCESS', "Réussi");
 define('_ERROR', "Erreur");
+
+define('_VIA_ACTION', "via l'action");
