@@ -2506,5 +2506,9 @@
     "otp_visa_yousign": "Viseur (yousign)",
     "otp_sign_yousign": "Signataire (yousign)",
     "source": "Source",
-    "updateOtp": "Modifier l'utilisateur externe"
+    "updateOtp": "Modifier l'utilisateur externe",
+    "suggestedCorrespondents": "Correspondant(s) suggéré(s)",
+    "searchCorrespondent": "Rechercher un correspondant",
+    "viewSuggestions": "Voir les suggestions",
+    "noSuggestion": "Aucune suggestion"
 }

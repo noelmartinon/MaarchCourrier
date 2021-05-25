@@ -18,6 +18,7 @@ export class MaarchParaphComponent implements OnInit {
 
     @ViewChild('appExternalVisaWorkflow', { static: true }) appExternalVisaWorkflow: ExternalVisaWorkflowComponent;
 
+    @Input() resIds: number[] = [];
     @Input() resourcesToSign: any[] = [];
     @Input() additionalsInfos: any;
     @Input() externalSignatoryBookDatas: any;

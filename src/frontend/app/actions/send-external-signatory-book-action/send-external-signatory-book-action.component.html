@@ -44,6 +44,7 @@
                             [externalSignatoryBookDatas]="externalSignatoryBookDatas">
                         </app-fast-paraph>
                         <app-maarch-paraph #maarchParapheur *ngIf="signatoryBookEnabled=='maarchParapheur'"
+                            [resIds]="data.resIds"
                             [resourcesToSign]="resourcesToSign"
                             [additionalsInfos]="additionalsInfos"
                             [externalSignatoryBookDatas]="externalSignatoryBookDatas">
