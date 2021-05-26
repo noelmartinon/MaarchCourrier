@@ -88,8 +88,8 @@
                     </mat-option>
                 </mat-select>
             </mat-form-field>
-            <app-maarch-message *ngIf="userOTP.security && userOTP.role !== 'visa'" [mode]="'info'"
-                [content]="'lang.securityModeInfo' | translate : {mode: userOTP.security}"></app-maarch-message>
+            <app-maarch-message *ngIf="userOTP.security" [mode]="'info'"
+                [content]="(userOTP.role === 'visa' ? 'lang.otpVisaUser' : 'lang.securityModeInfo') | translate : {mode: userOTP.security}"></app-maarch-message>
         </div>
     </div>
     <span class="divider-modal"></span>

@@ -2511,5 +2511,6 @@
     "searchCorrespondent": "Rechercher un correspondant",
     "viewSuggestions": "Voir les suggestions",
     "noSuggestion": "Aucune suggestion",
-    "contactsParameters_sector": "Secteur"
+    "contactsParameters_sector": "Secteur",
+    "otpVisaUser": "L'utilisateur sera notifié par <b>courriel</b> au moment de son tour dans le circuit."
 }
