@@ -767,6 +767,7 @@ CREATE TABLE contacts
     enabled boolean NOT NULL DEFAULT TRUE,
     custom_fields jsonb DEFAULT '{}',
     external_id jsonb DEFAULT '{}',
+    sector CHARACTER VARYING(256),
     CONSTRAINT contacts_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);
@@ -1538,3 +1539,17 @@ CREATE TABLE tiles
     CONSTRAINT tiles_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);
+
+CREATE TABLE address_sectors
+(
+    id SERIAL NOT NULL,
+    address_number CHARACTER VARYING(256),
+    address_street CHARACTER VARYING(256),
+    address_postcode CHARACTER VARYING(256),
+    address_town CHARACTER VARYING(256),
+    label CHARACTER VARYING(256),
+    ban_id CHARACTER VARYING(256),
+    CONSTRAINT address_sectors_key UNIQUE (address_number, address_street, address_postcode, address_town),
+    CONSTRAINT address_sectors_pkey PRIMARY KEY (id)
+)
+    WITH (OIDS=FALSE);

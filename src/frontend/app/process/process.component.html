@@ -155,7 +155,7 @@
             </ng-template>
         </div>
         <div class="actions-indexing-form" *ngIf="!detailMode">
-            <ng-container *ngIf="actionsList.length > 0 && selectedAction !== undefined">
+            <ng-container *ngIf="actionsListLoaded && actionsList.length > 0 && selectedAction !== undefined">
                 <button mat-button class="button-form-primary" [disabled]="selectedAction.id === 0"
                     [matMenuTriggerFor]="menu" style="width:350px;margin-right:20px;" [title]="selectedAction.label">
                     <span class="menu-label" [innerHTML]="selectedAction.label">
@@ -190,7 +190,7 @@
                     <mat-icon class="fa fa-check"></mat-icon>
                 </button>
             </ng-container>
-            <div class="emptyAction" *ngIf="actionsList.length === 0"
+            <div class="emptyAction" *ngIf="actionsListLoaded && actionsList.length === 0"
                 [innerHTML]="'lang.noAvailableActionProcess' | translate"></div>
         </div>
     </ng-template>

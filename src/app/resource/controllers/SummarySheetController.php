@@ -778,7 +778,7 @@ class SummarySheetController
                     $pdf->Cell($specialWidth * 3, 20, _USERS, 1, 0, 'L', false);
                     $pdf->Cell($specialWidth, 20, _ACTION_DATE, 1, 1, 'L', false);
                     foreach ($users as $keyUser => $user) {
-                        $pdf->Cell($specialWidth * 3, 20, $keyUser + 1 . ". {$user['user']}", 1, 0, 'L', false);
+                        $pdf->MultiCell($specialWidth * 3, 20, $keyUser + 1 . ". {$user['user']}", 1, 'L', false, 0,'', '', true, 0, false, true, 20, 'M', true);
                         $pdf->Cell($specialWidth, 20, $user['date'], 1, 1, 'L', false);
                     }
                 }

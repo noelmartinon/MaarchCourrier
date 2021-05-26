@@ -2,7 +2,7 @@
     <div class="fieldsetdContainer" style="flex:2">
         <h2>{{'lang.visaWorkflow' | translate}} :</h2>
         <div class="fieldsetdContent">
-            <app-external-visa-workflow #appExternalVisaWorkflow [adminMode]="true" [injectDatas]="injectDatasParam"></app-external-visa-workflow >
+            <app-external-visa-workflow #appExternalVisaWorkflow [adminMode]="true" [resId]="resIds.length === 1 ? resIds[0] : null" [injectDatas]="injectDatasParam"></app-external-visa-workflow >
             <div *ngIf="appExternalVisaWorkflow.checkExternalSignatoryBook().length > 0"
                 class="alert-message alert-message-danger" role="alert">
                 <b>{{appExternalVisaWorkflow.checkExternalSignatoryBook().join(', ')}}</b>

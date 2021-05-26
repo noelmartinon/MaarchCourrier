@@ -256,6 +256,17 @@ export class ContactsFormComponent implements OnInit {
             values: []
         },
         {
+            id: 'sector',
+            unit: 'address',
+            label: this.translate.instant('lang.contactsParameters_sector'),
+            type: 'string',
+            control: new FormControl({value: '', disabled: true}),
+            required: false,
+            display: true,
+            filling: false,
+            values: []
+        },
+        {
             id: 'communicationMeans',
             unit: 'maarch2maarch',
             label: this.translate.instant('lang.communicationMean'),

@@ -578,7 +578,7 @@ export class ActionsService implements OnDestroy {
         const dialogRef = this.dialog.open(SendExternalSignatoryBookActionComponent, {
             panelClass: 'maarch-modal',
             disableClose: true,
-            width: '500px',
+            width: '580px',
             data: this.setDatasActionToSend()
         });
         dialogRef.afterClosed().pipe(

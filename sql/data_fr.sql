@@ -248,6 +248,7 @@ INSERT INTO contacts_parameters (id, identifier, mandatory, filling, searchable,
 INSERT INTO contacts_parameters (id, identifier, mandatory, filling, searchable, displayable) VALUES (14, 'email', false, true, false, false);
 INSERT INTO contacts_parameters (id, identifier, mandatory, filling, searchable, displayable) VALUES (15, 'phone', false, true, false, false);
 INSERT INTO contacts_parameters (id, identifier, mandatory, filling, searchable, displayable) VALUES (16, 'notes', false, false, false, false);
+INSERT INTO contacts_parameters (id, identifier, mandatory, filling, searchable, displayable) VALUES (17, 'sector', false, false, false, false);
 
 INSERT INTO custom_fields (id, label, type, mode, "values") VALUES (1, 'Date de fin de contrat', 'date', 'form', '[]');
 INSERT INTO custom_fields (id, label, type, mode, "values") VALUES (2, 'Adresse d''intervention', 'banAutocomplete', 'form', '[]');

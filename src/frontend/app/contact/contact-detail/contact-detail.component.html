@@ -76,6 +76,11 @@
                     <p mat-line class="contact-content" *ngIf="!functionsService.empty(contact.addressCountry)"
                         [class.newData]="isNewValue('addressCountry')"> {{contact.addressCountry}} </p>
                 </mat-list-item>
+                <mat-list-item class="contact-item" *ngIf="!functionsService.empty(contact.sector)">
+                    <mat-icon mat-list-icon class="contact-group fas fa-map-marked-alt" [title]="'lang.contactsParameters_sector' | translate">
+                    </mat-icon>
+                    <p mat-line class="contact-content"> {{contact.sector}}</p>
+                </mat-list-item>
             </mat-list>
             <mat-expansion-panel *ngIf="!emptyOtherInfo(contact)" [expanded]="selectable">
                 <mat-expansion-panel-header>

@@ -281,7 +281,11 @@ export class SentResourceListComponent implements OnInit {
                 tap(() => {
                     this.refreshEmailList();
                     setTimeout(() => {
-                        this.refreshWaitingElements();
+                        this.refreshWaitingElements(1);
+                        setTimeout(() => {
+                            this.dataSource = new MatTableDataSource(this.sentResources);
+                            this.dataSource.sort = this.sort;
+                        }, 0);
                     }, 5000);
                 }),
                 catchError((err: any) => {
@@ -316,32 +320,34 @@ export class SentResourceListComponent implements OnInit {
         }
     }
 
-    refreshWaitingElements() {
-        this.sentResources.forEach((draftElement: any) => {
-            if (draftElement.status == 'WAITING' && draftElement.type == 'email') {
-                this.http.get(`../rest/emails/${draftElement.id}`).pipe(
-                    tap((data: any) => {
-                        if (data.status == 'SENT' || data.status == 'ERROR') {
-                            if (data.status == 'SENT') {
-                                this.notify.success(this.translate.instant('lang.emailSent'));
-                            } else {
-                                this.notify.error(this.translate.instant('lang.emailCannotSent'));
-                            }
-                            this.sentResources.forEach((element: any, key: number) => {
-                                if (element.id == draftElement.id && element.type == 'email') {
-                                    this.sentResources[key].status = data.status;
-                                    this.sentResources[key].sendDate = data.sendDate;
+    refreshWaitingElements(countTry: number) {
+        if (countTry < 6) {
+            this.sentResources.forEach((draftElement: any) => {
+                if (draftElement.status == 'WAITING' && draftElement.type == 'email') {
+                    this.http.get(`../rest/emails/${draftElement.id}`).pipe(
+                        tap((data: any) => {
+                            if (data.status == 'SENT' || data.status == 'ERROR') {
+                                if (data.status == 'SENT') {
+                                    this.notify.success(this.translate.instant('lang.emailSent'));
+                                } else {
+                                    this.notify.error(this.translate.instant('lang.emailCannotSent'));
                                 }
-                            });
-                        }
-                    })
-                ).subscribe();
-            }
-        });
-        setTimeout(() => {
-            this.dataSource = new MatTableDataSource(this.sentResources);
-            this.dataSource.sort = this.sort;
-        }, 0);
+                                this.sentResources.forEach((element: any, key: number) => {
+                                    if (element.id == draftElement.id && element.type == 'email') {
+                                        this.sentResources[key].status = data.status;
+                                        this.sentResources[key].sendDate = data.sendDate;
+                                    }
+                                });
+                            } else if (data.status == 'WAITING') {
+                                setTimeout(() => {
+                                    this.refreshWaitingElements(countTry + 1);
+                                }, 5000);
+                            }
+                        })
+                    ).subscribe();
+                }
+            });
+        }
     }
 
     refreshEmailList() {

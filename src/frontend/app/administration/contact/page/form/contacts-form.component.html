@@ -275,7 +275,7 @@
                             </button>
                         </mat-list-item>
                         <ng-container
-                            *ngIf="unit.id === 'address' && addressBANMode && ['addressAdditional1', 'addressAdditional2'].indexOf(field.id) > -1">
+                            *ngIf="unit.id === 'address' && addressBANMode && ['addressAdditional1', 'addressAdditional2', 'sector'].indexOf(field.id) > -1">
                             <mat-list-item class="contact-item">
                                 <p mat-line class="contact-content" *ngIf="field.display">
                                     <mat-form-field>
