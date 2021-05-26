@@ -130,10 +130,11 @@ export class CreateExternalUserComponent implements OnInit {
         if (item.type === 'user') {
             this.http.get('../rest/users/' + item.id).pipe(
                 tap((data: any) => {
+                    const phone: string = data.phone;
                     this.userOTP.firstname = data.firstname;
                     this.userOTP.lastname = data.lastname;
                     this.userOTP.email = data.mail;
-                    this.userOTP.phone = data.phone !== undefined ? data.phone.replace(/( |\.|\-)/g, '').replace('0', '+33') : '';
+                    this.userOTP.phone = phone !== undefined ? phone.replace(/( |\.|\-)/g, '').replace('0', '+33') : '';
                 }),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);
@@ -143,10 +144,11 @@ export class CreateExternalUserComponent implements OnInit {
         } else if (item.type === 'contact') {
             this.http.get('../rest/contacts/' + item.id).pipe(
                 tap((data: any) => {
+                    const phone: string = data.phone;
                     this.userOTP.firstname = data.firstname;
                     this.userOTP.lastname = data.lastname;
                     this.userOTP.email = data.email;
-                    this.userOTP.phone = data.phone.replace(/( |\.|\-)/g, '').replace('0', '+33');
+                    this.userOTP.phone = phone !== undefined ? phone.replace(/( |\.|\-)/g, '').replace('0', '+33') : '';
                 }),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);

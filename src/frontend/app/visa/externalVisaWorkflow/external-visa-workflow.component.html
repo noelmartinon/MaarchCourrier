@@ -75,7 +75,7 @@
                             <mat-icon class="fas fa-edit" color="primary"></mat-icon>
                         </button>
                         <button class="currentRoleButton" [class.readonly]="!adminMode" [color]="diffusion.role === 'visa' ? 'default':'primary'" mat-raised-button
-                            title="{{'lang.' + diffusion.role | translate}}"
+                            title="{{'lang.' + diffusion.role + (diffusion.role === 'sign' ? 'User' : '') | translate}}"
                             [matMenuTriggerFor]="rolesMenu" [disabled]="!adminMode">{{'lang.' + diffusion.role + (diffusion.role === 'sign' ? 'User' : '') | translate}}</button>
                         <mat-menu #rolesMenu="matMenu">
                             <ng-container *ngFor="let role of diffusion.availableRoles">
