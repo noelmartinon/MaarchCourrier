@@ -506,3 +506,19 @@ define('_TARGET_RESOURCE_HAS_NO_FILE', 'Target resource has no file');
 
 define('_SIGNED', 'Signed');
 define('_VALIDATED', 'Validated');
+<<<<<<< HEAD
+=======
+
+define('_NO_SENDER_EMAIL', "No email set to send electronic AR");
+
+define('_SIZE', "Size");
+define('_FILENAME', "Filename");
+define('_DOCSERVER_PATH_FILE', "Docserver path file");
+define('_FINGERPRINT', "Fingerprint");
+define('_FULLTEXT', "Fulltext");
+define('_CREATION_DATE', "Creation date");
+define('_SUCCESS', "Success");
+define('_ERROR', "Error");
+
+define('_VIA_ACTION', "via action");
+>>>>>>> 26aba07084... FEAT #17108 TIME 5:10 include action name in process comment when interrupt visa workflow

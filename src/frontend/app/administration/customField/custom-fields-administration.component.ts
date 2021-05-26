@@ -270,7 +270,9 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         this.http.get('../rest/customFieldsWhiteList').pipe(
             tap((data: any) => {
                 data.allowedTables.forEach((table: any) => {
-                    this.availaibleTables[table.name] = table.columns;
+>>>>>>> 13169b14cf... FEAT #16403 TIME 0:03 do not display the name of the table if it is not translated
+                    this.availableTables[table.name] = table.columns;
+>>>>>>> f8f18a189b... FEAT #16403 TIME 0:02 don't show untranslated table name
                 });
             }),
             catchError((err: any) => {
@@ -300,4 +302,13 @@ export class CustomFieldsAdministrationComponent implements OnInit {
             return true;
         }
     }
+
+    checkIfUntranslated(tableName: string) {
+        let value: boolean = false;
+        this.translate.get('lang.' + tableName).subscribe((res: string) => {
+            value = res.includes('lang.') ? true : false;
+        });
+        return value;
+    }
+
 }

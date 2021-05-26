@@ -687,7 +687,7 @@ class ActionMethodController
         if (!empty($listInstances[0])) {
             $listInstances = $listInstances[0];
 
-            $set = ['process_date' => 'CURRENT_TIMESTAMP', 'process_comment' => _HAS_INTERRUPTED_WORKFLOW];
+            $set = ['process_date' => 'CURRENT_TIMESTAMP', 'process_comment' => _HAS_INTERRUPTED_WORKFLOW . ' (' . _VIA_ACTION . ' ' . $args['action']['label_action'] . ')'];
             if ($listInstances['item_id'] != $GLOBALS['id']) {
                 $set['delegate'] = $GLOBALS['id'];
             }
@@ -708,7 +708,7 @@ class ActionMethodController
         ListInstanceModel::update([
             'set'   => [
                 'process_date' => 'CURRENT_TIMESTAMP',
-                'process_comment' => _INTERRUPTED_WORKFLOW
+                'process_comment' => _INTERRUPTED_WORKFLOW . ' (' . _VIA_ACTION . ' ' . $args['action']['label_action'] . ')'
             ],
             'where' => ['res_id = ?', 'difflist_type = ?', 'process_date is null'],
             'data'  => [$args['resId'], 'VISA_CIRCUIT']
