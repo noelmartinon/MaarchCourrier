@@ -674,8 +674,6 @@ export class VisaWorkflowComponent implements OnInit {
             }
         }
     }
-<<<<<<< HEAD
-=======
 
     stringIncludes(source, search) {
         if (source === undefined || source === null) {
@@ -684,32 +682,4 @@ export class VisaWorkflowComponent implements OnInit {
 
         return source.includes(search);
     }
-
-    private _filter(value: string): string[] {
-        if (typeof value === 'string') {
-            const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.signVisaUsers.filter((option: any) => this.latinisePipe.transform(option['title'].toLowerCase()).includes(filterValue));
-        } else {
-            return this.signVisaUsers;
-        }
-    }
-
-    private _filterPrivateModel(value: string): string[] {
-        if (typeof value === 'string') {
-            const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.visaTemplates.private.filter((option: any) => this.latinisePipe.transform(option['title'].toLowerCase()).includes(filterValue));
-        } else {
-            return this.visaTemplates.private;
-        }
-    }
-
-    private _filterPublicModel(value: string): string[] {
-        if (typeof value === 'string') {
-            const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.visaTemplates.public.filter((option: any) => this.latinisePipe.transform(option['title'].toLowerCase()).includes(filterValue));
-        } else {
-            return this.visaTemplates.public;
-        }
-    }
->>>>>>> 26aba07084... FEAT #17108 TIME 5:10 include action name in process comment when interrupt visa workflow
 }

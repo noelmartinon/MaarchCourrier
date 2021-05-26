@@ -73,6 +73,31 @@ export class SummarySheetComponent implements OnInit {
             enabled: true
         },
         {
+            id: 'systemTechnicalFields',
+            unit: 'systemTechnicalFields',
+            label: this.translate.instant('lang.systemTechnicalFields'),
+            css: 'col-md-6 text-left',
+            desc: [
+                this.translate.instant('lang.initiator'),
+                this.translate.instant('lang.creationDate'),
+                this.translate.instant('lang.size'),
+                this.translate.instant('lang.format'),
+                this.translate.instant('lang.filename'),
+                this.translate.instant('lang.docserverPathFile'),
+                this.translate.instant('lang.fingerprint'),
+                this.translate.instant('lang.fulltext')
+            ],
+            enabled: true
+        },
+        {
+            id: 'customTechnicalFields',
+            unit: 'customTechnicalFields',
+            label: this.translate.instant('lang.customTechnicalFields'),
+            css: 'col-md-6 text-left',
+            desc: [],
+            enabled: true
+        },
+        {
             id: 'opinionWorkflow',
             unit: 'opinionWorkflow',
             label: this.translate.instant('lang.avis'),

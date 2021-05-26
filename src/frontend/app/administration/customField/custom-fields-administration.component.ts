@@ -270,9 +270,7 @@ export class CustomFieldsAdministrationComponent implements OnInit {
         this.http.get('../rest/customFieldsWhiteList').pipe(
             tap((data: any) => {
                 data.allowedTables.forEach((table: any) => {
->>>>>>> 13169b14cf... FEAT #16403 TIME 0:03 do not display the name of the table if it is not translated
-                    this.availableTables[table.name] = table.columns;
->>>>>>> f8f18a189b... FEAT #16403 TIME 0:02 don't show untranslated table name
+                    this.availaibleTables[table.name] = table.columns;
                 });
             }),
             catchError((err: any) => {

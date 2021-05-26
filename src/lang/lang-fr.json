@@ -2200,5 +2200,8 @@
     "workflowEndBySignatory": "Le circuit doit se terminer par un Signataire",
     "mandatoryFile": "Fichier obligatoire",
     "signInsteadOf": "Vous agissez en tant que",
-    "infoResId": "Vous pouvez remplir automatiquement ce champ en utilisant le mot-clé <b>@resId</b> pour cibler une ressource du document en cours de traitement"
+    "infoResId": "Vous pouvez remplir automatiquement ce champ en utilisant le mot-clé <b>@resId</b> pour cibler une ressource du document en cours de traitement",
+    "canAddCopies": "Pouvoir ajouter des personnes en copie (CC / CCI)",
+    "systemTechnicalFields": "Champs techniques \"Système\"",
+    "customTechnicalFields": "Champs techniques personnalisés"
 }

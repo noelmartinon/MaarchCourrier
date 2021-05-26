@@ -60,7 +60,6 @@
             [class.interrupt]="diffusion.process_date != null && (stringIncludes(diffusion.process_comment, 'lang.hasInterruptedWorkflow' | translate) || stringIncludes(diffusion.process_comment, 'lang.visaWorkflowInterrupted' | translate))">
             <mat-icon *ngIf="getCurrentVisaUserIndex() === i && (!adminMode || target === 'signatureBook' || target === 'action')"
                 class="fa fa-chevron-right fa-2x" mat-list-icon color="accent">
->>>>>>> 26aba07084... FEAT #17108 TIME 5:10 include action name in process comment when interrupt visa workflow
             </mat-icon>
             <mat-icon
                 class="fa fa-2x"
@@ -83,7 +82,6 @@
                     [class.fa-times]="diffusion.process_date != null && stringIncludes(diffusion.process_comment, 'lang.visaWorkflowInterrupted' | translate)"
                     [class.valid]="diffusion.process_date != null && !stringIncludes(diffusion.process_comment, 'lang.hasInterruptedWorkflow' | translate) && !stringIncludes(diffusion.process_comment, 'lang.visaWorkflowInterrupted' | translate)"
                     [class.invalid]="diffusion.process_date != null && (stringIncludes(diffusion.process_comment, 'lang.hasInterruptedWorkflow' | translate) || stringIncludes(diffusion.process_comment, 'lang.visaWorkflowInterrupted' | translate))"
->>>>>>> 26aba07084... FEAT #17108 TIME 5:10 include action name in process comment when interrupt visa workflow
                     style="opacity:0.5;"></mat-icon>
             </ng-container>
             <div mat-line class="workflowLine">
@@ -111,7 +109,6 @@
                     <div *ngIf="diffusion.process_date != null && stringIncludes(diffusion.process_comment, 'lang.hasInterruptedWorkflow' | translate)"
                         class="workflowLineProcessDate" title='{{diffusion.process_date | fullDate}}' color="warn">
                         {{'lang.interrupted' | translate}} {{diffusion.process_date | timeAgo : 'full'}}</div>
->>>>>>> 26aba07084... FEAT #17108 TIME 5:10 include action name in process comment when interrupt visa workflow
                 </div>
                 <div *ngIf="diffusion.hasPrivilege && diffusion.isValid">
                     <button class="currentRoleButton" [color]="((functions.empty(diffusion.process_date) && diffusion.requested_signature) || diffusion.signatory) ? 'primary': '' "
