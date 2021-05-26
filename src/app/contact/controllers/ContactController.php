@@ -15,6 +15,7 @@ namespace Contact\controllers;
 
 use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
 use Attachment\models\AttachmentModel;
+use Contact\models\ContactAddressSectorModel;
 use Contact\models\ContactCivilityModel;
 use Contact\models\ContactCustomFieldListModel;
 use Contact\models\ContactFillingModel;
@@ -57,7 +58,8 @@ class ContactController
         'addressCountry'        => 'address_country',
         'email'                 => 'email',
         'phone'                 => 'phone',
-        'notes'                 => 'notes'
+        'notes'                 => 'notes',
+        'sector'                => 'sector'
     ];
 
     public function get(Request $request, Response $response)
@@ -91,7 +93,7 @@ class ContactController
             'select'    => [
                 'id', 'firstname', 'lastname', 'company', 'address_number as "addressNumber"', 'address_street as "addressStreet"',
                 'address_additional1 as "addressAdditional1"', 'address_additional2 as "addressAdditional2"', 'address_postcode as "addressPostcode"',
-                'address_town as "addressTown"', 'address_country as "addressCountry"', 'enabled', 'count(1) OVER()'
+                'address_town as "addressTown"', 'address_country as "addressCountry"', 'enabled', 'sector', 'count(1) OVER()'
             ],
             'where'     => $requestData['where'] ?? null,
             'data'      => $requestData['data'] ?? null,
@@ -168,6 +170,8 @@ class ContactController
             $externalId = '{}';
         }
 
+        $sector = ContactController::getAddressSector($body);
+
         $id = ContactModel::create([
             'civility'              => $body['civility'] ?? null,
             'firstname'             => $body['firstname'] ?? null,
@@ -189,7 +193,8 @@ class ContactController
             'creator'               => $GLOBALS['id'],
             'enabled'               => 'true',
             'custom_fields'         => !empty($body['customFields']) ? json_encode($body['customFields']) : '{}',
-            'external_id'           => $externalId
+            'external_id'           => $externalId,
+            'sector'                => $sector['label'] ?? null
         ]);
 
         $historyInfoContact = '';
@@ -252,7 +257,8 @@ class ContactController
             'creationDate'          => $rawContact['creation_date'],
             'modificationDate'      => $rawContact['modification_date'],
             'customFields'          => !empty($rawContact['custom_fields']) ? json_decode($rawContact['custom_fields'], true) : null,
-            'externalId'            => json_decode($rawContact['external_id'], true)
+            'externalId'            => json_decode($rawContact['external_id'], true),
+            'sector'                => $rawContact['sector']
         ];
 
         if (!empty($rawContact['civility'])) {
@@ -340,6 +346,8 @@ class ContactController
             $externalId = '{}';
         }
 
+        $sector = ContactController::getAddressSector($body);
+
         ContactModel::update([
             'set'   => [
                     'civility'              => $body['civility'] ?? null,
@@ -361,7 +369,8 @@ class ContactController
                     'notes'                 => $body['notes'] ?? null,
                     'modification_date'     => 'CURRENT_TIMESTAMP',
                     'custom_fields'         => !empty($body['customFields']) ? json_encode($body['customFields']) : null,
-                    'external_id'           => $externalId
+                    'external_id'           => $externalId,
+                    'sector'                => $sector['label'] ?? null
                 ],
             'where' => ['id = ?'],
             'data'  => [$args['id']]
@@ -1134,6 +1143,7 @@ class ContactController
             'enabled'            => 'enabled',
             'customFields'       => 'custom_fields',
             'externalId'         => 'external_id',
+            'sector'             => 'sector'
         ];
 
         $contactCustoms = ContactCustomFieldListModel::get(['select' => ['id']]);
@@ -1745,7 +1755,10 @@ class ContactController
             $address.= $args['contact']['address_town'] . ' ';
         }
         if (!empty($args['contact']['address_country'])) {
-            $address.= $args['contact']['address_country'];
+            $address.= $args['contact']['address_country'] . ' ';
+        }
+        if (!empty($args['contact']['sector'])) {
+            $address .= $args['contact']['sector'];
         }
 
         $contactName = '';
@@ -1860,6 +1873,9 @@ class ContactController
         if (in_array('notes', $displayableStdParameters)) {
             $contact['notes'] = $rawContact['notes'];
         }
+        if (in_array('sector', $displayableStdParameters)) {
+            $contact['sector'] = $rawContact['sector'];
+        }
 
         if (!empty($displayableCstParameters)) {
             $contact['customFields'] = [];
@@ -1908,5 +1924,53 @@ class ContactController
         }
 
         return $contactsUsed;
+    }
+
+    private static function getAddressSector(array $args)
+    {
+        ValidatorModel::stringType($args, ['addressNumber', 'addressStreet', 'addressPostcode', 'addressTown']);
+
+        $where = [];
+        $data = [];
+
+        if (!empty($args['addressNumber'])) {
+            $where[] = 'address_number = ?';
+            $data[] = strtoupper($args['addressNumber']);
+        } else {
+            $where[] = 'address_number is null';
+        }
+
+        if (!empty($args['addressStreet'])) {
+            $where[] = 'address_street = ?';
+            $data[] = strtoupper($args['addressStreet']);
+        } else {
+            $where[] = 'address_street is null';
+        }
+
+        if (!empty($args['addressPostcode'])) {
+            $where[] = 'address_postcode = ?';
+            $data[] = strtoupper($args['addressPostcode']);
+        } else {
+            $where[] = 'address_postcode is null';
+        }
+
+        if (!empty($args['addressTown'])) {
+            $where[] = 'address_town = ?';
+            $data[] = strtoupper($args['addressTown']);
+        } else {
+            $where[] = 'address_town is null';
+        }
+
+        $sector = ContactAddressSectorModel::get([
+            'select' => ['*'],
+            'where'  => $where,
+            'data'   => $data
+        ]);
+
+        if (empty($sector[0])) {
+            return null;
+        }
+
+        return $sector[0];
     }
 }

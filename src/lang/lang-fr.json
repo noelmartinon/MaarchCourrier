@@ -2510,5 +2510,6 @@
     "suggestedCorrespondents": "Correspondant(s) suggéré(s)",
     "searchCorrespondent": "Rechercher un correspondant",
     "viewSuggestions": "Voir les suggestions",
-    "noSuggestion": "Aucune suggestion"
+    "noSuggestion": "Aucune suggestion",
+    "contactsParameters_sector": "Secteur"
 }

@@ -2514,5 +2514,6 @@
     "youSign": "Yousign",
     "source": "Source",
     "isRequired": "is required",
-    "updateOtp": "Edit external user"
+    "updateOtp": "Edit external user",
+    "contactsParameters_sector": "Sector"
 }
