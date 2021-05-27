@@ -94,7 +94,7 @@
                     </div>
                 </div>
             </ng-container>
-            <ng-container *ngIf="!isModalOpen() && !loading; else elseTemplate">
+            <ng-container *ngIf="!isModalOpen() && !loading">
                 <app-history-list *ngIf="currentTool === 'history' && !loading" #appHistoryList
                     [resId]="currentResourceInformations.resId">
                 </app-history-list>
@@ -147,7 +147,7 @@
                 </div>
 
             </ng-container>
-            <ng-template #elseTemplate>
+            <ng-template *ngIf="isModalOpen() && !loading">
                 <div class="openedModal">
                     <i class="fas fa-external-link-alt"></i>
                     {{'lang.openedInExternalModal' | translate}}
