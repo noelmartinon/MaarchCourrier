@@ -176,7 +176,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
                                 this.getViewTemplateContent();
                             }
                         }
-
+                        this.options = data.template.options;
                         this.headerService.setHeader(this.translate.instant('lang.templateModification'), this.template.template_label);
                         this.loading = false;
                     });
@@ -584,6 +584,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
 
     formatTemplate() {
         const template = { ...this.template };
+        template.options = {...this.options };
         template.entities = this.maarchTree.getSelectedNodes().map(ent => ent.entity_id);
         return template;
     }
@@ -611,6 +612,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
     }
 
     updateTemplateType() {
+        this.options = {};
         this.template.file = {
             name: '',
             type: '',
