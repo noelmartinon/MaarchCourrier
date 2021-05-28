@@ -1,12 +1,8 @@
 <mat-list *ngIf="!loading">
-    <button *ngIf="adminMode && otpConfig > 0" mat-raised-button mat-button color="primary" [title]="'lang.addOtpUser' | translate" 
-        style="margin: 10px; display: flex;" (click)="openCreateUserOtp()">
-        <mat-icon class="fas fa-user-plus" style="width: auto;height: auto;"></mat-icon>
-        {{'lang.addOtp' | translate}}
-    </button>
     <app-plugin-autocomplete *ngIf="adminMode" [labelPlaceholder]="'lang.addPerson' | translate"
         [routeDatas]="['/rest/autocomplete/maarchParapheurUsers']" [targetSearchKey]="'idToDisplay'"
-        [subInfoKey]="'email'" (triggerEvent)="addItemToWorkflow($event)" appearance="outline">
+        [subInfoKey]="'email'" (triggerEvent)="addItemToWorkflow($event)" appearance="outline"
+        [fromExternalWorkflow]="true" [connectorLength]="otpConfig" [resId]="resId" (updateVisaWorkflow)="updateVisaWorkflow($event)">
     </app-plugin-autocomplete>
     <div cdkDropList #dataAvailableList="cdkDropList" [cdkDropListData]="visaWorkflow.items" class="cdk-list"
         (cdkDropListDropped)="drop($event)" [cdkDropListDisabled]="!adminMode">
