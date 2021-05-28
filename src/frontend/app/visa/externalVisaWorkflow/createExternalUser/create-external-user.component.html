@@ -17,7 +17,7 @@
             <div style="display: flex;margin-bottom: 10px;" *ngIf="searchMode">
                 <div style="flex: 1;">
                     <app-contact-autocomplete [exclusion]="'?noEntities=true&noContactsGroups=true'"
-                        [inputMode]="true" style="width:100%;padding-bottom:10px;" (afterSelected)="getContact($event)">
+                        [inputMode]="true" style="width:100%;padding-bottom:10px;" (afterSelected)="getContact($event)" [fromExternalWorkflow]="true">
                     </app-contact-autocomplete>
                 </div>
                 <div>
@@ -33,15 +33,17 @@
                     </div>
                     <div class="formType-content">
                         <div class="correspondent-list">
-                            <div *ngIf="correspondentShorcuts.length === 0" class="empty">
+                            <div *ngIf="correspondentShorcuts.length === 0; else elseBlock" class="empty">
                                 {{'lang.noSuggestion' | translate}}
                             </div>
-                            <mat-chip-list>
-                                <mat-chip *ngFor="let shortcut of correspondentShorcuts" [title]="shortcut.title"
-                                    (click)="setOtpInfoFromShortcut(shortcut)" style="cursor: pointer;font-size: 12px;min-height: 24px;">
-                                    {{shortcut.label}}
-                                </mat-chip>
-                            </mat-chip-list>
+                            <ng-template #elseBlock>
+                                <mat-chip-list>
+                                    <mat-chip *ngFor="let shortcut of correspondentShorcuts" [title]="shortcut.title"
+                                        (click)="setOtpInfoFromShortcut(shortcut)" style="cursor: pointer;font-size: 12px;min-height: 24px;">
+                                        {{shortcut.label}}
+                                    </mat-chip>
+                                </mat-chip-list>
+                            </ng-template>
                         </div>
                         <div>
                             <button mat-icon-button color="primary" [title]="'lang.searchCorrespondent' | translate" (click)="searchMode=!searchMode">
