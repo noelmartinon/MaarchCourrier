@@ -208,6 +208,19 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         return new Promise((resolve) => {
             this.http.get(`../rest/acknowledgementReceipts/${emailId}`).pipe(
                 tap((data: any) => {
+                    this.copies = data.acknowledgementReceipt.cc.map((item: any) => ({
+                        label: item.label,
+                        email: item.email,
+                        badFormat: this.isBadEmailFormat(item.email)
+                    }));
+                    this.showCopies = this.copies.length > 0;
+
+                    this.invisibleCopies = data.acknowledgementReceipt.cci.map((item: any) => ({
+                        label: item.label,
+                        email: item.email,
+                        badFormat: this.isBadEmailFormat(item.email)
+                    }));
+                    this.showInvisibleCopies = this.invisibleCopies.length > 0;
                     this.currentSender = {
                         label: data.acknowledgementReceipt.userLabel,
                         email: data.acknowledgementReceipt.userLabel
