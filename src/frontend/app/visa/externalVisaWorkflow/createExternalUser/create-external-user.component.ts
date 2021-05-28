@@ -148,7 +148,7 @@ export class CreateExternalUserComponent implements OnInit {
                     this.userOTP.firstname = data.firstname;
                     this.userOTP.lastname = data.lastname;
                     this.userOTP.email = data.email;
-                    this.userOTP.phone = phone !== undefined ? phone.replace(/( |\.|\-)/g, '').replace('0', '+33') : '';
+                    this.userOTP.phone = phone !== null ? phone.replace(/( |\.|\-)/g, '').replace('0', '+33') : '';
                 }),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);
@@ -171,7 +171,7 @@ export class CreateExternalUserComponent implements OnInit {
                     data.recipients.forEach((element: any) => {
                         this.setCorrespondentsShorcuts(element, 'recipient');
                     });
-                } else {
+                } else if (data.senders !== undefined) {
                     data.senders.forEach((element: any) => {
                         this.setCorrespondentsShorcuts(element, 'sender');
                     });
