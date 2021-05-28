@@ -85,7 +85,7 @@
                     <mat-icon class="fas fa-plus" style="height: auto"></mat-icon>
                 </button>
                 <mat-menu #actionPosMenu="matMenu">
-                    <button mat-menu-item [disabled]="!emptyDate()"
+                    <button mat-menu-item [disabled]="!emptyDate() || !checkExternalUser()"
                         (click)="initDateBlock()">{{'lang.addDateBlock' | translate}}</button>
                     <button mat-menu-item [disabled]="!emptySign()"
                         (click)="initSign()">{{'lang.addSignaturePosition' | translate}}</button>
