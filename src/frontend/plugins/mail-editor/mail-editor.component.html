@@ -55,7 +55,7 @@
             <input [formControl]="recipientsInput" #copiesField [matChipInputFor]="copiesList"
                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
                 (matChipInputTokenEnd)="add($event, 'copies')" [matAutocomplete]="autoEmails2"
-                (focus)="resetAutocomplete()" (paste)="onPaste($event,'copies')">
+                (focus)="resetAutocomplete()" (paste)="onPaste($event,'copies')" [disabled]="readonly">
         </mat-chip-list>
         <mat-autocomplete #autoEmails2="matAutocomplete" (optionSelected)="addEmail($event.option.value, 'copies')">
             <mat-option *ngFor="let option of filteredEmails | async" [value]="option">
@@ -79,7 +79,7 @@
             <input [formControl]="recipientsInput" #invisibleCopiesField [matChipInputFor]="invCopiesList"
                 [matChipInputSeparatorKeyCodes]="separatorKeysCodes" [matChipInputAddOnBlur]="true"
                 (matChipInputTokenEnd)="add($event, 'invisibleCopies')" [matAutocomplete]="autoEmails3"
-                (focus)="resetAutocomplete()" (paste)="onPaste($event,'invisibleCopies')">
+                (focus)="resetAutocomplete()" (paste)="onPaste($event,'invisibleCopies')" [disabled]="readonly">
         </mat-chip-list>
         <mat-autocomplete #autoEmails3="matAutocomplete"
             (optionSelected)="addEmail($event.option.value, 'invisibleCopies')">
