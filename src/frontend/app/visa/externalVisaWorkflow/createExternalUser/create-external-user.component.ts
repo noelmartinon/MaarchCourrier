@@ -148,7 +148,7 @@ export class CreateExternalUserComponent implements OnInit {
                     this.userOTP.firstname = data.firstname;
                     this.userOTP.lastname = data.lastname;
                     this.userOTP.email = data.email;
-                    this.userOTP.phone = phone !== undefined ? phone.replace(/( |\.|\-)/g, '').replace('0', '+33') : '';
+                    this.userOTP.phone = phone !== null ? phone.replace(/( |\.|\-)/g, '').replace('0', '+33') : '';
                 }),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);
@@ -171,7 +171,7 @@ export class CreateExternalUserComponent implements OnInit {
                     data.recipients.forEach((element: any) => {
                         this.setCorrespondentsShorcuts(element, 'recipient');
                     });
-                } else {
+                } else if (data.senders !== undefined) {
                     data.senders.forEach((element: any) => {
                         this.setCorrespondentsShorcuts(element, 'sender');
                     });
@@ -231,5 +231,25 @@ export class CreateExternalUserComponent implements OnInit {
         this.userOTP.email = item.email;
         this.userOTP.phone = item.phone;
     }
+
+    getRegexPhone() {
+        // map country calling code with national number length
+        const phonesMap = {
+            '32': [8, 10],  // Belgium
+            '33': 9,        // France
+            '1' : 10,       // United States
+            '27': 9         // South Africa
+        };
+        const regex = Object.keys(phonesMap).reduce((phoneFormats: any [], countryCode: any) => {
+            const numberLength = phonesMap[countryCode];
+            if (Array.isArray(numberLength)) {
+                phoneFormats.push('(\\+' + countryCode + `[0-9]\{${numberLength[0]},${numberLength[1]}\})`);
+            } else {
+                phoneFormats.push('(\\+' + countryCode + `[0-9]\{${numberLength}\})`);
+            }
+            return phoneFormats;
+        }, []).join('|');
+        return new RegExp(`^(${regex})$`);
+    };
 
 }

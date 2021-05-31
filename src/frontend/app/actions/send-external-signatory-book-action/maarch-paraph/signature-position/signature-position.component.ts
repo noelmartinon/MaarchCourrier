@@ -262,4 +262,8 @@ export class SignaturePositionComponent implements OnInit {
             })
         ).subscribe();
     }
+
+    checkExternalUser() {
+        return this.data.workflow[this.currentUser].item_id !== null ? true : false;
+    }
 }

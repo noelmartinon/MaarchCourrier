@@ -136,7 +136,7 @@
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element">
                                 <mat-slide-toggle style="margin-left:11px" color="primary"
-                                    [disabled]="element.identifier == 'lastname' || element.identifier == 'company'"
+                                    [disabled]="element.identifier == 'lastname' || element.identifier == 'company' || element.identifier == 'sector'"
                                     title="{{'lang.mandatory' | translate}}"
                                     (change)="addCriteria($event, element, 'mandatory')" [checked]="element.mandatory">
                                 </mat-slide-toggle>

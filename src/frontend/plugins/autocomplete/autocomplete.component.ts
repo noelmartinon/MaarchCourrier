@@ -9,6 +9,8 @@ import { HttpClient } from '@angular/common/http';
 import { ConfirmComponent } from '../modal/confirm.component';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { NotificationService } from '@service/notification/notification.service';
+import { CreateExternalUserComponent } from '@appRoot/visa/externalVisaWorkflow/createExternalUser/create-external-user.component';
+import { ActionsService } from '@appRoot/actions/actions.service';
 
 @Component({
     selector: 'app-plugin-autocomplete',
@@ -85,6 +87,12 @@ export class PluginAutocompleteComponent implements OnInit {
      */
     @Input() styles: any = [];
 
+    @Input() fromExternalWorkflow: boolean = false;
+    @Input() connectorLength: number = 0;
+    @Input() resId: any;
+
+    @Output() updateVisaWorkflow = new EventEmitter<any>();
+
     /**
      * Catch external event after select an element in autocomplete
      */
@@ -112,7 +120,8 @@ export class PluginAutocompleteComponent implements OnInit {
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
-        private latinisePipe: LatinisePipe
+        private latinisePipe: LatinisePipe,
+        public actionService: ActionsService
     ) { }
 
     ngOnInit() {
@@ -292,6 +301,37 @@ export class PluginAutocompleteComponent implements OnInit {
     displayFnWrapper() {
         return (offer: any) => this.displayFn(offer);
     }
+
+    createExternalUser() {
+        const dialogRef = this.dialog.open(CreateExternalUserComponent, {
+            panelClass: 'maarch-modal',
+            disableClose: true,
+            width: '500px',
+            data: { otpInfo : null, resId : this.resId}
+        });
+        dialogRef.afterClosed().pipe(
+            tap(async (data: any) => {
+                if (data) {
+                    const user = {
+                        item_id: null,
+                        item_type: 'userOtp',
+                        labelToDisplay: `${data.otp.firstname} ${data.otp.lastname}`,
+                        picture: await this.actionService.getUserOtpIcon(data.otp.type),
+                        hasPrivilege: true,
+                        isValid: true,
+                        externalId: {
+                            maarchParapheur: null
+                        },
+                        externalInformations: data.otp,
+                        role: data.otp.role,
+                        availableRoles: data.otp.availableRoles
+                    };
+                    this.updateVisaWorkflow.emit(user);
+                }
+            })
+        ).subscribe();
+    }
+
 
     private _filter(value: string): string[] {
         if (typeof value === 'string') {

@@ -812,6 +812,15 @@ export class ContactsFormComponent implements OnInit {
             }
         });
         this.checkFilling();
+        this.http.get('../rest/contacts/sector', {params: {'addressNumber': contact['addressNumber'], 'addressStreet': contact['addressStreet'], 'addressPostcode': contact['addressPostcode'], 'addressTown': contact['addressTown']}}).pipe(
+            tap((data: any) => {
+                if (data.sector !== null) {
+                    const sectorIndex = this.contactForm.findIndex(element => element.id === 'sector');
+                    this.contactForm[sectorIndex].control.setValue(data.sector.label);
+                    this.contactForm[sectorIndex].display = true;
+                }
+            }),
+        ).subscribe();
 
         this.addressBANMode = disableBan ? false : true;
     }

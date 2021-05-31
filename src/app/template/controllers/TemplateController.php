@@ -238,7 +238,8 @@ class TemplateController
             'template_label'            => $body['label'],
             'template_comment'          => $body['description'],
             'template_attachment_type'  => $body['template_attachment_type'],
-            'subject'                   => $subject
+            'subject'                   => $subject,
+            'template_datasource'       => $body['datasource']
         ];
         if (!empty($body['options'])) {
             if (!empty($body['options']['acknowledgementReceiptFrom']) && !in_array($body['options']['acknowledgementReceiptFrom'], ['manual', 'destination', 'mailServer', 'user' ])) {

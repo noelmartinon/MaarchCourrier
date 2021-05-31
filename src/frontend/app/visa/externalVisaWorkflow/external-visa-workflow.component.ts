@@ -409,4 +409,8 @@ export class ExternalVisaWorkflowComponent implements OnInit {
             ).subscribe();
         });
     }
+
+    updateVisaWorkflow(user: any) {
+        this.visaWorkflow.items.push(user);
+    }
 }

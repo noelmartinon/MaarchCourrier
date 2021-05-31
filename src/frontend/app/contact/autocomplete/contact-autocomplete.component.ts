@@ -43,6 +43,7 @@ export class ContactAutocompleteComponent implements OnInit {
 
     @Input() singleMode: boolean = false;
     @Input() inputMode: boolean = false;
+    @Input() fromExternalWorkflow: boolean = false;
 
     @Output() retrieveDocumentEvent = new EventEmitter<string>();
     @Output() afterSelected = new EventEmitter<any>();

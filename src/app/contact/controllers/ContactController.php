@@ -1398,6 +1398,27 @@ class ContactController
         return $response->withJson($return);
     }
 
+    public function getSectorFromAddress(Request $request, Response $response)
+    {
+        $queryParams = $request->getQueryParams();
+
+        if (empty($queryParams)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query is not set or empty']);
+        } elseif (!empty($queryParams['addressNumber']) && !Validator::stringType()->validate($queryParams['addressNumber'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query addressNumber is not a string']);
+        } elseif (!empty($queryParams['addressStreet']) && !Validator::stringType()->notEmpty()->validate($queryParams['addressStreet'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query addressStreet is not a string']);
+        } elseif (!empty($queryParams['addressPostcode']) && !Validator::stringType()->notEmpty()->validate($queryParams['addressPostcode'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query addressPostcode is not a string']);
+        } elseif (!empty($queryParams['addressTown']) && !Validator::stringType()->notEmpty()->validate($queryParams['addressTown'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query addressTown is not a string']);
+        }
+
+        $sector = ContactController::getAddressSector($queryParams);
+
+        return $response->withJson(['sector' => $sector]);
+    }
+
     public static function getParsedContacts(array $args)
     {
         ValidatorModel::notEmpty($args, ['resId', 'mode']);
@@ -1455,7 +1476,8 @@ class ContactController
                     'creationDate'          => $contactRaw['creation_date'],
                     'modificationDate'      => $contactRaw['modification_date'],
                     'customFields'          => !empty($contactRaw['custom_fields']) ? json_decode($contactRaw['custom_fields'], true) : null,
-                    'externalId'            => json_decode($contactRaw['external_id'], true)
+                    'externalId'            => json_decode($contactRaw['external_id'], true),
+                    'sector'                => $contactRaw['sector']
                 ];
 
                 if (!empty($contactRaw['communication_means'])) {
