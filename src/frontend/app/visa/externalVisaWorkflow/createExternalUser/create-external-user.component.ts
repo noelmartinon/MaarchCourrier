@@ -232,4 +232,24 @@ export class CreateExternalUserComponent implements OnInit {
         this.userOTP.phone = item.phone;
     }
 
+    getRegexPhone() {
+        // map country calling code with national number length
+        const phonesMap = {
+            '32': [8, 10],  // Belgium
+            '33': 9,        // France
+            '1' : 10,       // United States
+            '27': 9         // South Africa
+        };
+        const regex = Object.keys(phonesMap).reduce((phoneFormats: any [], countryCode: any) => {
+            const numberLength = phonesMap[countryCode];
+            if (Array.isArray(numberLength)) {
+                phoneFormats.push('(\\+' + countryCode + `[0-9]\{${numberLength[0]},${numberLength[1]}\})`);
+            } else {
+                phoneFormats.push('(\\+' + countryCode + `[0-9]\{${numberLength}\})`);
+            }
+            return phoneFormats;
+        }, []).join('|');
+        return new RegExp(`^(${regex})$`);
+    };
+
 }
