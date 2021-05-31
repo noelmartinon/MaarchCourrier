@@ -152,6 +152,12 @@ class AutoCompleteController
                 }
                 $curlResponse['response'][$key]['idToDisplay'] = $value['firstname'] . ' ' . $value['lastname'];
                 $curlResponse['response'][$key]['externalId']['maarchParapheur'] = $value['id'];
+
+                // Remove external value in signatureModes
+                $array = $curlResponse['response'][$key]['signatureModes'];
+                unset($array[array_search('external', $array)]);
+                $array = array_values($array);
+                $curlResponse['response'][$key]['signatureModes'] = $array;
             }
             return $response->withJson($curlResponse['response']);
         } else {
