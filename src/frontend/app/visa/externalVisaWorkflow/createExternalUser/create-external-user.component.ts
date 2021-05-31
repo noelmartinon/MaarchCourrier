@@ -148,7 +148,7 @@ export class CreateExternalUserComponent implements OnInit {
                     this.userOTP.firstname = data.firstname;
                     this.userOTP.lastname = data.lastname;
                     this.userOTP.email = data.email;
-                    this.userOTP.phone = phone !== null ? phone.replace(/( |\.|\-)/g, '').replace('0', '+33') : '';
+                    this.userOTP.phone = !this.functions.empty(phone) ? phone.replace(/( |\.|\-)/g, '').replace('0', '+33') : '';
                 }),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);
@@ -235,10 +235,15 @@ export class CreateExternalUserComponent implements OnInit {
     getRegexPhone() {
         // map country calling code with national number length
         const phonesMap = {
-            '32': [8, 10],  // Belgium
-            '33': 9,        // France
-            '1' : 10,       // United States
-            '27': 9         // South Africa
+            '32': [8, 10],      // Belgium
+            '41': [4, 12],      // Swiss
+            '44': [7, 10],      // United Kingdom
+            '352': [4, 11],     // Luxembourg
+            '351': [9, 11],     // Portugal
+            '33': 9,            // France
+            '1' : 10,           // USA
+            '39': 11,           // Italy
+            '34': 9             // Spain
         };
         const regex = Object.keys(phonesMap).reduce((phoneFormats: any [], countryCode: any) => {
             const numberLength = phonesMap[countryCode];
