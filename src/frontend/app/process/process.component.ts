@@ -15,7 +15,7 @@ import { ActionsService } from '../actions/actions.service';
 import { tap, catchError, map, finalize, filter, take } from 'rxjs/operators';
 import { DocumentViewerComponent } from '../viewer/document-viewer.component';
 import { IndexingFormComponent } from '../indexation/indexing-form/indexing-form.component';
-import { ConfirmComponent } from '../../plugins/modal/confirm.component';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { ContactResourceModalComponent } from '../contact/contact-resource/modal/contact-resource-modal.component';
 import { DiffusionsListComponent } from '../diffusions/diffusions-list.component';
 
@@ -46,6 +46,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     isMailing: boolean = false;
     isFromSearch: boolean = false;
     actionsList: any[] = [];
+    actionsListLoaded: boolean = false;
     currentUserId: number = null;
     currentBasketId: number = null;
     currentGroupId: number = null;
@@ -280,6 +281,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
             tap((data: any) => {
                 this.selectedAction = data.actions[0];
                 this.actionsList = data.actions;
+                this.actionsListLoaded = true;
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

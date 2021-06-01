@@ -1,4 +1,3 @@
-
 Select setval('notifications_seq', (select max(notification_sid)+1 from notifications), false);
 Select setval('res_id_mlb_seq', (select max(res_id)+1 from res_letterbox), false);
 Select setval('user_signatures_id_seq', (select max(id)+1 from user_signatures), false);
@@ -18,3 +17,9 @@ select setval('listinstance_id_seq', (select max(listinstance_id)+1 from listins
 select setval('listinstance_history_id_seq', (select max(listinstance_history_id)+1 from listinstance_history), false);
 select setval('listinstance_history_details_id_seq', (select max(listinstance_history_details_id)+1 from listinstance_history_details), false);
 select setval('entities_id_seq', (select max(id)+1 from entities), false);
+select setval('resources_tags_id_seq', (select max(id)+1 from resources_tags), false);
+select setval('emails_id_seq', (select max(id)+1 from emails), false);
+select setval('acknowledgement_receipts_id_seq', (select max(id)+1 from acknowledgement_receipts), false);
+select setval('registered_mail_resources_id_seq', (select max(id)+1 from registered_mail_resources), false);
+select setval('resources_folders_id_seq', (select max(id)+1 from resources_folders), false);
+select setval('resource_contacts_id_seq', (select max(id)+1 from resource_contacts), false);

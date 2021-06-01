@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { LatinisePipe } from 'ngx-pipes';
 import { HeaderService } from './header.service';
-import { TimeLimitPipe } from '../plugins/timeLimit.pipe';
+import { DatePipe } from '@angular/common';
 
 @Injectable({
     providedIn: 'root'
@@ -13,6 +13,7 @@ export class FunctionsService {
         public translate: TranslateService,
         private headerService: HeaderService,
         private latinisePipe: LatinisePipe,
+        private datePipe: DatePipe
     ) { }
 
     empty(value: any) {
@@ -74,7 +75,7 @@ export class FunctionsService {
 
     formatDateObjectToDateString(date: Date, limitMode: boolean = false, format: string = 'dd-mm-yyyy') {
         if (date !== null) {
-            let formatDate: any[] = [];
+            const formatDate: any[] = [];
             format.split('-').forEach((element: any) => {
                 if (element === 'dd') {
                     let day: any = date.getDate();
@@ -85,7 +86,7 @@ export class FunctionsService {
                     month = ('00' + month).slice(-2);
                     formatDate.push(month);
                 } else if (element === 'yyyy') {
-                    let year: any = date.getFullYear();
+                    const year: any = date.getFullYear();
                     formatDate.push(year);
                 }
             });
@@ -102,6 +103,13 @@ export class FunctionsService {
 
     formatSerializedDateToDateString(date: string) {
         return this.formatDateObjectToDateString(new Date(date));
+    }
+
+    getFormatedFileName(filename: string = 'maarch', ext: string = '', format: string = 'dd-MM-yyyy') {
+        const today = new Date();
+        const formatedDate = this.datePipe.transform(today, format);
+        const suffix = !this.empty(ext) ? `.${ext}` : '';
+        return `${filename}_${formatedDate}${suffix}`;
     }
 
     listSortingDataAccessor(data: any, sortHeaderId: any) {
@@ -126,7 +134,9 @@ export class FunctionsService {
 
     formatBytes(bytes: number, decimals = 2) {
         if (typeof bytes === 'number') {
-            if (bytes === 0) { return '0 Octet'; }
+            if (bytes === 0) {
+                return '0 Octet';
+            }
 
             const k = 1024;
             const dm = decimals < 0 ? 0 : decimals;

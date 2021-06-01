@@ -182,19 +182,19 @@ class CustomFieldController
 
         $values = json_decode($field['values'], true);
 
-        if (count($body['values']) < count($values)) {
+        if (count($body['values']) < count($values) && $body['SQLMode'] == !empty($values['table'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Not enough values sent']);
         }
 
         $newValues = [];
-        if (empty($body['SQLMode']) && empty($values['table'])) {
+        if (empty($body['SQLMode'])) {
             if (in_array($field['type'], ['select', 'radio', 'checkbox'])) {
                 foreach ($body['values'] as $value) {
                     if ($value['label'] != null) {
                         $newValues[] = $value['label'];
                     }
 
-                    if (!empty($values[$value['key']]) && !empty($value['label']) && $value['label'] != $values[$value['key']]) {
+                    if (empty($values['table']) && !empty($values[$value['key']]) && !empty($value['label']) && $value['label'] != $values[$value['key']]) {
                         ResModel::update([
                             'postSet' => ['custom_fields' => "jsonb_set(custom_fields, '{{$args['id']}}', '\"" . str_replace(["\\", "'", '"'], ["\\\\", "''", '\"'], $value['label']) . "\"')"],
                             'where'   => ["custom_fields->'{$args['id']}' @> ?"],
