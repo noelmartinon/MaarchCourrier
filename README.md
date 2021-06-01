@@ -2,7 +2,6 @@
 [![coverage report](https://labs.maarch.org/maarch/MaarchCourrier/badges/develop/coverage.svg)](https://labs.maarch.org/maarch/MaarchCourrier/commits/develop)
 
 
-
 # Maarch Courrier
 Gestionnaire Électronique de Correspondances – Libre et Open Source –
 
@@ -41,5 +40,3 @@ display_errors = On
 
 ## Le coin des developpeurs
 [Maarch Developer handbook](https://labs.maarch.org/maarch/MaarchCourrier/blob/master/CONTRIBUTING.md)
-
-test
