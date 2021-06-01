@@ -127,7 +127,7 @@ export class AuthService {
 
     async logout(cleanUrl: boolean = true, forcePageLogin: boolean = false) {
         this.clearFilters();
-        if (['cas', 'keycloak', 'azure_saml'].indexOf(this.authMode) > -1 && !forcePageLogin) {
+        if (['cas', 'keycloak'].indexOf(this.authMode) > -1 && !forcePageLogin) {
             this.SsoLogout(cleanUrl);
         } else {
             // HANDLE LOGOUT IN GUARD FOR PROCESS
