@@ -80,10 +80,14 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
         this.checkExternalSignatureBook();
     }
 
-    onSubmit() {
-        this.loading = true;
-        if (this.data.resIds.length > 0) {
-            this.executeAction();
+    async onSubmit() {
+        if (this.hasEmptyOtpSignaturePosition()) {
+            this.notify.error(this.translate.instant('lang.mustSign'));
+        } else {
+            this.loading = true;
+            if (this.data.resIds.length > 0) {
+                this.executeAction();
+            }
         }
     }
 
@@ -174,6 +178,28 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
         } else {
             const index = this.resourcesToSign.map((item: any) => `${item.resId}_${item.mainDocument}`).indexOf(`${document.resId}_${mainDocument}`);
             this.resourcesToSign.splice(index, 1);
+        }
+    }
+
+    hasEmptyOtpSignaturePosition() {
+        const externalUsers: any[] = this.maarchParapheur.appExternalVisaWorkflow.visaWorkflow.items.filter((user: any) => user.item_id === null);
+        if (externalUsers.length > 0) {
+            let resToSign: any[] = this.maarchParapheur.resourcesToSign.filter((res: any) => res.hasOwnProperty('signaturePositions'));
+            let mustSign: boolean = false;
+            if (this.maarchParapheur.resourcesToSign.length - resToSign.length  >= 1) {
+                return true;
+            } else {
+                resToSign = resToSign.map((res: any) => res.signaturePositions);
+                externalUsers.forEach((element: any, index: number) => {
+                    for (let i = 0; i < resToSign.length; i++) {
+                        if (resToSign[i].filter((item: any) => item.sequence === index).length ===  0) {
+                            mustSign = true;
+                            break;
+                        }
+                    }
+                });
+                return mustSign;
+            }
         }
     }
 }
