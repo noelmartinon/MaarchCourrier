@@ -186,13 +186,16 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
         if (externalUsers.length > 0) {
             let resToSign: any[] = this.maarchParapheur.resourcesToSign.filter((res: any) => res.hasOwnProperty('signaturePositions'));
             let mustSign: boolean = false;
-            if (this.maarchParapheur.resourcesToSign.length - resToSign.length  >= 1) {
+            if (this.maarchParapheur.resourcesToSign.length > 1 && this.maarchParapheur.resourcesToSign.length - resToSign.length  >= 1) {
+                return true;
+            }else if (resToSign.length === 0) {
                 return true;
             } else {
                 resToSign = resToSign.map((res: any) => res.signaturePositions);
-                externalUsers.forEach((element: any, index: number) => {
+                externalUsers.forEach((element: any) => {
                     for (let i = 0; i < resToSign.length; i++) {
-                        if (resToSign[i].filter((item: any) => item.sequence === index).length ===  0) {
+                        const userIndex: number = this.maarchParapheur.appExternalVisaWorkflow.visaWorkflow.items.indexOf(element);
+                        if (resToSign[i].filter((item: any) => item.sequence === i).length ===  0) {
                             mustSign = true;
                             break;
                         }
