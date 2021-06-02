@@ -182,7 +182,7 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
     }
 
     hasEmptyOtpSignaturePosition() {
-        const externalUsers: any[] = this.maarchParapheur.appExternalVisaWorkflow.visaWorkflow.items.filter((user: any) => user.item_id === null);
+        const externalUsers: any[] = this.maarchParapheur.appExternalVisaWorkflow.visaWorkflow.items.filter((user: any) => user.item_id === null && user.role === 'sign');
         if (externalUsers.length > 0) {
             let resToSign: any[] = this.maarchParapheur.resourcesToSign.filter((res: any) => res.hasOwnProperty('signaturePositions'));
             let mustSign: boolean = false;
