@@ -195,7 +195,7 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
                 externalUsers.forEach((element: any) => {
                     for (let i = 0; i < resToSign.length; i++) {
                         const userIndex: number = this.maarchParapheur.appExternalVisaWorkflow.visaWorkflow.items.indexOf(element);
-                        if (resToSign[i].filter((item: any) => item.sequence === i).length ===  0) {
+                        if (resToSign[i].filter((item: any) => item.sequence === userIndex).length ===  0) {
                             mustSign = true;
                             break;
                         }
