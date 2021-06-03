@@ -367,7 +367,7 @@ class FastParapheurController
         $config = $aArgs['config'];
         // We need the SIRET field and the user_id of the signatory user's primary entity
         $signatory = DatabaseModel::select([
-            'select'    => ['user_id', 'business_id', 'entities.entity_label'],
+            'select'    => ['user_id', 'external_id', 'entities.entity_label'],
             'table'     => ['listinstance', 'users_entities', 'entities'],
             'left_join' => ['item_id = user_id', 'users_entities.entity_id = entities.entity_id'],
             'where'     => ['res_id = ?', 'item_mode = ?', 'process_date is null'],
@@ -381,6 +381,7 @@ class FastParapheurController
             'data'      => [$aArgs['resIdMaster']]
         ])[0];
 
+        $signatory['business_id'] = json_decode($signatory['external_id'], true)['fastParapheurSubscriberId'];
         if (empty($signatory['business_id']) || substr($signatory['business_id'], 0, 3) == 'org') {
             $signatory['business_id'] = $config['data']['subscriberId'];
         }

@@ -2084,6 +2084,7 @@
     "groupSign": "Groupe du signataire",
     "noAdminSearchConfiguration": "Aucune configuration de recherche trouvée",
     "producerService": "Identifiant de service producteur",
+    "fastParapheurSubscriberId": "Identifiant Fast-Parapheur",
     "sendersDepartment": "Département des expéditeurs",
     "recordManagement": "Archivage électronique",
     "slipLabel": "Libellé du bordereau",

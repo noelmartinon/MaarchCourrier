@@ -102,7 +102,8 @@ class EntityController
             'email'                 => $entity['email'],
             'producerService'       => $entity['producer_service'],
             'business_id'           => $entity['business_id'],
-            'external_id'           => $entity['external_id']
+            'external_id'           => $entity['external_id'],
+            'fastParapheurSubscriberId' => json_decode($entity['external_id'], true)['fastParapheurSubscriberId'],
         ];
 
         $aEntities = EntityModel::getAllowedEntitiesByUserId(['userId' => $GLOBALS['login']]);
@@ -219,6 +220,10 @@ class EntityController
             return $response->withStatus(400)->withJson(['errors' => _ENTITY_ID_ALREADY_EXISTS]);
         }
 
+        $externalId = [];
+        if (!empty($body['fastParapheurSubscriberId'])) {
+            $externalId['fastParapheurSubscriberId'] = $body['fastParapheurSubscriberId'];
+        }
         $id = EntityModel::create([
             'entity_id'             => $body['entity_id'],
             'entity_label'          => $body['entity_label'],
@@ -236,7 +241,8 @@ class EntityController
             'entity_type'           => $body['entity_type'],
             'ldap_id'               => $body['ldap_id'],
             'entity_full_name'      => $body['entity_full_name'],
-            'producer_service'      => $body['producerService']
+            'producer_service'      => $body['producerService'],
+            'external_id'           => json_encode($externalId)
         ]);
         HistoryController::add([
             'tableName' => 'entities',
@@ -274,7 +280,7 @@ class EntityController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $entity = EntityModel::getByEntityId(['entityId' => $aArgs['id'], 'select' => [1]]);
+        $entity = EntityModel::getByEntityId(['entityId' => $aArgs['id'], 'select' => ['id', 'external_id']]);
         if (empty($entity)) {
             return $response->withStatus(400)->withJson(['errors' => 'Entity not found']);
         }
@@ -306,6 +312,12 @@ class EntityController
             $body['producer_service'] = $aArgs['id'];
         }
 
+        $externalId = json_decode($entity['external_id'], true);
+        if (!empty($body['fastParapheurSubscriberId'])) {
+            $externalId['fastParapheurSubscriberId'] = $body['fastParapheurSubscriberId'];
+        } else {
+            unset($externalId['fastParapheurSubscriberId']);
+        }
         EntityModel::update(['set' => [
                 'entity_label'          => $body['entity_label'],
                 'short_label'           => $body['short_label'],
@@ -322,7 +334,8 @@ class EntityController
                 'entity_type'           => $body['entity_type'],
                 'ldap_id'               => $body['ldap_id'],
                 'entity_full_name'      => $body['entity_full_name'],
-                'producer_service'      => $body['producerService']
+                'producer_service'      => $body['producerService'],
+                'external_id'           => json_encode($externalId)
             ],
             'where' => ['entity_id = ?'],
             'data'  => [$aArgs['id']]

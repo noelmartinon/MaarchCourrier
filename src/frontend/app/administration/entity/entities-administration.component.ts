@@ -72,6 +72,7 @@ export class EntitiesAdministrationComponent implements OnInit {
     addressBANFilteredResult: Observable<string[]>;
     addressBANCurrentDepartment: string = '75';
     departmentList: any[] = [];
+    externalSignatoryBook: string;
 
     constructor(
         public translate: TranslateService,
@@ -114,6 +115,21 @@ export class EntitiesAdministrationComponent implements OnInit {
         this.initEntitiesTree();
         this.initBanSearch();
         this.initAutocompleteAddressBan();
+        this.initSignatoryBook();
+    }
+
+    initSignatoryBook() {
+        this.http.get('../rest/externalConnectionsEnabled').pipe(
+            tap((data: any) => {
+                Object.keys(data.connection).filter(connectionId => connectionId !== 'maileva').forEach(connectionId => {
+                    this.externalSignatoryBook = connectionId;
+                });
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     initEntitiesTree() {

@@ -2067,6 +2067,7 @@
     "manualSearchInfo": "You can leave the term in the field without selecting a value for the search.",
     "groupSign": "Signatory's group",
     "producerService": "Producer service",
+    "fastParapheurSubscriberId": "Fast-Parapheur subscriber Id",
     "sendersDepartment": "Senders department",
     "recordManagement": "Record management",
     "slipLabel": "Slip label",

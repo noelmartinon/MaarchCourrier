@@ -109,7 +109,8 @@ abstract class EntityModelAbstract
                 'entity_type'           => $args['entity_type'],
                 'ldap_id'               => $args['ldap_id'],
                 'entity_full_name'      => $args['entity_full_name'],
-                'producer_service'      => $args['producer_service']
+                'producer_service'      => $args['producer_service'],
+                'external_id'           => $args['external_id']
             ]
         ]);
 
