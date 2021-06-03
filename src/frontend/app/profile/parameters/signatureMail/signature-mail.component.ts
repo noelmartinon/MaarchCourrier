@@ -40,6 +40,7 @@ export class MySignatureMailComponent implements OnInit {
         tinymce.suffix = '.min';
         tinymce.init({
             selector: 'textarea#emailSignature',
+            convert_urls: false,
             statusbar: false,
             language: this.translate.instant('lang.langISO').replace('-', '_'),
             language_url: `../node_modules/tinymce-i18n/langs/${this.translate.instant('lang.langISO').replace('-', '_')}.js`,

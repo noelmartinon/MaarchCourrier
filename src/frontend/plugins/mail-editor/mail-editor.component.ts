@@ -544,6 +544,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
             },
             selector: 'textarea#emailSignature',
             base_url: '../node_modules/tinymce/',
+            convert_urls: false,
             readonly: this.readonly,
             height: '400',
             suffix: '.min',
