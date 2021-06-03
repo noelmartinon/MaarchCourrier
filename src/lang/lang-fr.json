@@ -2254,6 +2254,7 @@
     "addTile": "Ajouter une tuile",
     "tileType": "Type de tuile",
     "dashboardEmpty": "Votre tableau de bord est vide",
+    "sendInExternalSignatoryBook": "Ce document est en cours de traitement dans un parapheur externe",
     "refStatus": "Ce document a été refusé dans le parapheur externe",
     "valStatus": "Ce document a été validé dans le parapheur externe",
     "stopStatus": "Ce document a été interrompu dans la parapheur externe",

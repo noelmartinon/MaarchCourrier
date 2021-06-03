@@ -2259,6 +2259,7 @@
     "addTile": "Add a tile",
     "tileType": "Tile type",
     "dashboardEmpty": "Your dashboard is empty",
+    "sendInExternalSignatoryBook": "This document is currently in an external signatory book",
     "navigation": "Navigation",
     "acountNotLinkedTomaarchParapheur": "Your account is not linked to Maarch Parapheur",
     "error": "Eroor",
