@@ -64,7 +64,7 @@ if ($notification['is_enabled'] === 'N') {
 //SECOND STEP
 writeLog(['message' => "Loading events for notification {$notificationId}", 'level' => 'INFO']);
 
-$events = \Notification\models\NotificationsEventsModel::get(['select' => ['*'], 'where' => ['notification_sid = ?', 'exec_date is NULL'], 'data' => [$notification['notification_sid']]]);
+$events = \Notification\models\NotificationsEventsModel::get(['select' => ['*'], 'where' => ['notification_sid = ?', 'exec_date is NULL'], 'data' => [$notification['notification_sid']], 'orderBy' => ['event_date desc']]);
 $totalEventsToProcess = count($events);
 $currentEvent = 0;
 if ($totalEventsToProcess === 0) {

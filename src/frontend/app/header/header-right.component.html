@@ -59,7 +59,7 @@
                 </a>
             </div>
             <div *ngIf="showLogout()" style="text-align:right;flex:2;">
-                <a (click)="authService.logout()" style="cursor:pointer; color: white;padding-right: 10px;">
+                <a (click)="authService.logout(true, false, true)" style="cursor:pointer; color: white;padding-right: 10px;">
                     <span class="badge action-header-profile">{{'lang.logout' | translate}}</span>
                 </a>
             </div>

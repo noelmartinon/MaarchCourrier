@@ -125,11 +125,14 @@ export class AuthService {
             );
     }
 
-    async logout(cleanUrl: boolean = true, forcePageLogin: boolean = false) {
+    async logout(cleanUrl: boolean = true, forcePageLogin: boolean = false, history: boolean = false) {
         this.clearFilters();
         if (['cas', 'keycloak'].indexOf(this.authMode) > -1 && !forcePageLogin) {
             this.SsoLogout(cleanUrl);
         } else {
+            if (history) {
+                this.http.get('../rest/authenticate/logout').subscribe();
+            }
             // HANDLE LOGOUT IN GUARD FOR PROCESS
             if (['process'].indexOf(this.router.url.split('/')[1]) > -1) {
                 this.router.navigate(['/login']);
