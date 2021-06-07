@@ -209,6 +209,7 @@ export class TemplateAdministrationComponent implements OnInit, OnDestroy {
             tinymce.suffix = '.min';
             tinymce.init({
                 selector: selectorId,
+                convert_urls: false,
                 statusbar: false,
                 language: this.translate.instant('lang.langISO').replace('-', '_'),
                 language_url: `../node_modules/tinymce-i18n/langs/${this.translate.instant('lang.langISO').replace('-', '_')}.js`,

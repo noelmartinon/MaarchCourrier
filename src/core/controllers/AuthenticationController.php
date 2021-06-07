@@ -373,7 +373,7 @@ class AuthenticationController
             'eventType' => 'LOGIN',
             'info'      => _LOGIN . ' : ' . $login,
             'moduleId'  => 'authentication',
-            'eventId'   => 'login'
+            'eventId'   => 'userlogin'
         ]);
 
         return $response->withStatus(204);
@@ -394,6 +394,15 @@ class AuthenticationController
             $disconnection = AuthenticationController::azureSamlDisconnection();
             $logoutUrl = $disconnection['logoutUrl'];
         }
+
+        HistoryController::add([
+            'tableName' => 'users',
+            'recordId'  => $GLOBALS['id'],
+            'eventType' => 'LOGOUT',
+            'info'      => _LOGOUT . ' : ' . $GLOBALS['login'],
+            'moduleId'  => 'authentication',
+            'eventId'   => 'userlogout'
+        ]);
 
         return $response->withJson(['logoutUrl' => $logoutUrl]);
     }

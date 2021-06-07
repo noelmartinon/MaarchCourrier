@@ -110,6 +110,7 @@ export class ParametersCustomizationComponent implements OnInit, OnDestroy {
                 });
             },
             base_url: '../node_modules/tinymce/',
+            convert_urls: false,
             height: '200',
             suffix: '.min',
             language: this.translate.instant('lang.langISO').replace('-', '_'),

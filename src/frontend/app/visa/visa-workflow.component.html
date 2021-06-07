@@ -99,7 +99,7 @@
                         <mat-form-field>
                             <input matInput class="comment" maxlength="255"
                                 [disabled]="!adminMode || diffusion.process_date != null || (target === 'signatureBook' && getCurrentVisaUserIndex() === i)"
-                                [placeholder]="'lang.visaNote' | translate" [(ngModel)]="diffusion.process_comment">
+                                [placeholder]="'lang.visaNote' | translate" [(ngModel)]="diffusion.process_comment" title="{{!functions.empty(diffusion.process_comment) ? diffusion.process_comment : null}}">
                         </mat-form-field>
                     </div>
                     <div *ngIf="diffusion.process_date != null && !stringIncludes(diffusion.process_comment, 'lang.visaWorkflowInterrupted' | translate) && !stringIncludes(diffusion.process_comment, 'lang.hasInterruptedWorkflow' | translate)"

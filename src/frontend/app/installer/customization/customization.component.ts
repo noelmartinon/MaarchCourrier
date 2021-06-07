@@ -143,6 +143,7 @@ export class CustomizationComponent implements OnInit {
         tinymce.init({
             selector: 'textarea',
             base_url: '../node_modules/tinymce/',
+            convert_urls: false,
             height: '150',
             suffix: '.min',
             language: this.translate.instant('lang.langISO').replace('-', '_'),

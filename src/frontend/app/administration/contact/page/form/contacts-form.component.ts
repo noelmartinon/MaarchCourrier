@@ -262,7 +262,7 @@ export class ContactsFormComponent implements OnInit {
             type: 'string',
             control: new FormControl({value: '', disabled: true}),
             required: false,
-            display: true,
+            display: false,
             filling: false,
             values: []
         },
@@ -814,12 +814,19 @@ export class ContactsFormComponent implements OnInit {
         this.checkFilling();
         this.http.get('../rest/contacts/sector', {params: {'addressNumber': contact['addressNumber'], 'addressStreet': contact['addressStreet'], 'addressPostcode': contact['addressPostcode'], 'addressTown': contact['addressTown']}}).pipe(
             tap((data: any) => {
+                const sectorIndex = this.contactForm.findIndex(element => element.id === 'sector');
                 if (data.sector !== null) {
-                    const sectorIndex = this.contactForm.findIndex(element => element.id === 'sector');
                     this.contactForm[sectorIndex].control.setValue(data.sector.label);
                     this.contactForm[sectorIndex].display = true;
+                } else {
+                    this.contactForm[sectorIndex].control.setValue('');
+                    this.contactForm[sectorIndex].display = false;
                 }
             }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
         ).subscribe();
 
         this.addressBANMode = disableBan ? false : true;

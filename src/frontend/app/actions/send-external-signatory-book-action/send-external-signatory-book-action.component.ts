@@ -80,10 +80,14 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
         this.checkExternalSignatureBook();
     }
 
-    onSubmit() {
-        this.loading = true;
-        if (this.data.resIds.length > 0) {
-            this.executeAction();
+    async onSubmit() {
+        if (this.hasEmptyOtpSignaturePosition()) {
+            this.notify.error(this.translate.instant('lang.mustSign'));
+        } else {
+            this.loading = true;
+            if (this.data.resIds.length > 0) {
+                this.executeAction();
+            }
         }
     }
 
@@ -174,6 +178,35 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
         } else {
             const index = this.resourcesToSign.map((item: any) => `${item.resId}_${item.mainDocument}`).indexOf(`${document.resId}_${mainDocument}`);
             this.resourcesToSign.splice(index, 1);
+        }
+    }
+
+    hasEmptyOtpSignaturePosition() {
+        if (this.signatoryBookEnabled == 'maarchParapheur') {
+            const externalUsers: any[] = this.maarchParapheur.appExternalVisaWorkflow.visaWorkflow.items.filter((user: any) => user.item_id === null && user.role === 'sign');
+            if (externalUsers.length > 0) {
+                let resToSign: any[] = this.maarchParapheur.resourcesToSign.filter((res: any) => res.hasOwnProperty('signaturePositions'));
+                let mustSign: boolean = false;
+                if (this.maarchParapheur.resourcesToSign.length > 1 && this.maarchParapheur.resourcesToSign.length - resToSign.length  >= 1) {
+                    return true;
+                } else if (resToSign.length === 0) {
+                    return true;
+                } else {
+                    resToSign = resToSign.map((res: any) => res.signaturePositions);
+                    externalUsers.forEach((element: any) => {
+                        for (let i = 0; i < resToSign.length; i++) {
+                            const userIndex: number = this.maarchParapheur.appExternalVisaWorkflow.visaWorkflow.items.indexOf(element);
+                            if (resToSign[i].filter((item: any) => item.sequence === userIndex).length ===  0) {
+                                mustSign = true;
+                                break;
+                            }
+                        }
+                    });
+                    return mustSign;
+                }
+            }
+        } else {
+            return false;
         }
     }
 }
