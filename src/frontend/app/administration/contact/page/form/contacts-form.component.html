@@ -32,7 +32,7 @@
             style="text-align: center;">{{'lang.addAll' | translate}}</button>
         <mat-divider></mat-divider>
         <ng-container *ngFor="let field of contactForm">
-            <button mat-menu-item *ngIf="!field.display && field.unit === 'address'"
+            <button mat-menu-item *ngIf="!field.display && field.unit === 'address' && field.id !== 'sector'"
                 (click)="field.display=!field.display">
                 <mat-icon *ngIf="field.filling" style="height: auto;padding-right: 10px;"
                     [title]="'lang.targetFillingField' | translate" [style.color]="fillingRate.color" class="fas fa-circle rate">
