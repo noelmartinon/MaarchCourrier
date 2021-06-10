@@ -365,7 +365,7 @@ export class IndexingFormComponent implements OnInit {
 
                 this.http.put(`../../rest/resources/${this.resId}`, formatdatas).pipe(
                     tap(() => {
-                        this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas(false)));
+                        this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas()));
                         this.notify.success(this.lang.dataUpdated);
                         resolve(true);
                     }),
@@ -432,7 +432,7 @@ export class IndexingFormComponent implements OnInit {
     }
 
     isResourceModified() {
-        if (this.loading || JSON.stringify(this.currentResourceValues) === JSON.stringify(this.getDatas(false))) {
+        if (this.loading || JSON.stringify(this.currentResourceValues) === JSON.stringify(this.getDatas())) {
             return false;
         } else {
             return true;
@@ -717,7 +717,9 @@ export class IndexingFormComponent implements OnInit {
                     }));
                     this.arrFormControl['mail­tracking'].setValue(data.followed);
                     if (saveResourceState) {
-                        this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas(false)));
+                        setTimeout(() => {
+                            this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas()));
+                        }, 600);
                     }
                     resolve(true);
                 }),
