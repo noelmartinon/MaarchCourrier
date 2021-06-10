@@ -261,6 +261,10 @@ class StoreController
         if (isset($args['confidentiality'])) {
             $preparedData['confidentiality'] = empty($args['confidentiality']) ? 'N' : 'Y';
         }
+        if (!empty($args['destination'])) {
+            $entity = EntityModel::getById(['id' => $args['destination'], 'select' => ['entity_id']]);
+            $preparedData['destination'] = $entity['entity_id'];
+        }
         if (!empty($args['initiator'])) {
             $entity = EntityModel::getById(['id' => $args['initiator'], 'select' => ['entity_id']]);
             $preparedData['initiator'] = $entity['entity_id'];
