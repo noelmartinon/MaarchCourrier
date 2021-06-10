@@ -379,6 +379,21 @@ foreach ($retrievedMails['resLetterbox'] as $resId => $value) {
     Bt_writeLog(['level' => 'INFO', 'message' => 'Update res_letterbox : ' . $resId . '. SignatoryBookId : ' . $value['external_id']]);
     $historyIdentifier = $value['alt_identifier'] ?? $resId . ' (res_letterbox)';
 
+    if (!empty($value['log'])) {
+        Bt_writeLog(['level' => 'INFO', 'message' => 'Create log Main Document']);
+        Bt_createAttachment([
+            'resIdMaster'       => $value['res_id'],
+            'title'             => $value['logTitle'] . ' ' . $value['subject'],
+            'chrono'            => $value['alt_identifier'],
+            'typist'            => $value['typist'],
+            'format'            => $value['logFormat'],
+            'type'              => 'simple_attachment',
+            'inSignatureBook'   => false,
+            'encodedFile'       => $value['log'],
+            'status'            => 'TRA'
+        ]);
+    }
+
     if (!empty($value['encodedFile'])) {
         Bt_writeLog(['level' => 'INFO', 'message' => 'Create document in res_letterbox']);
         if ($value['status'] =='validated') {
