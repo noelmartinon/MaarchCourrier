@@ -42,7 +42,7 @@ $x_delete = 1;
 // Load the template
 // -----------------
 
-$template = 'demo_ms_excel.xlsx';
+$template = '%template%';
 $TBS->LoadTemplate($template, OPENTBS_ALREADY_UTF8); // Also merge some [onload] automatic fields (depends of the type of document).
 
 // ----------------------
@@ -56,29 +56,7 @@ if (isset($_POST['debug']) && ($_POST['debug']=='show'))    $TBS->Plugin(OPENTBS
 // Merging and other operations on the template
 // --------------------------------------------
 
-// Merge data in the first sheet
-$TBS->MergeBlock('a,b', $data);
-
-// Merge cells (extending columns)
-$TBS->MergeBlock('cell1,cell2', $data);
-
-// Change the current sheet
-$TBS->PlugIn(OPENTBS_SELECT_SHEET, 2);
-
-// Merge data in Sheet 2
-$TBS->MergeBlock('cell1,cell2', 'num', 3);
-$TBS->MergeBlock('b2', $data);
-
-// Merge pictures of the current sheet
-$x_picture = 'pic_1523d.gif';
-$TBS->PlugIn(OPENTBS_MERGE_SPECIAL_ITEMS);
-
-// Delete a sheet
-$TBS->PlugIn(OPENTBS_DELETE_SHEETS, 'Delete me');
-
-
-// Display a sheet (make it visible)
-$TBS->PlugIn(OPENTBS_DISPLAY_SHEETS, 'Display me');
+// %code%
 
 // -----------------
 // Output the result

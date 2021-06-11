@@ -20,9 +20,9 @@
                         <mat-divider *ngIf="menu==='delete'"></mat-divider>
                         <button *ngIf="['view', 'color'].indexOf(menu) === -1" mat-menu-item
                             (click)="launchAction(menu, tile)">{{'lang.'+ menu | translate}}</button>
-                        <button *ngIf="menu==='view'" mat-menu-item
+                        <button *ngIf="menu==='view' && !hasError(tile.id)" mat-menu-item
                             [matMenuTriggerFor]="toolMenuView">{{'lang.chartView' | translate}}</button>
-                        <button *ngIf="menu==='color'" mat-menu-item
+                        <button *ngIf="menu==='color' && !hasError(tile.id)" mat-menu-item
                             [matMenuTriggerFor]="toolMenuColors">{{'lang.'+ menu | translate}}</button>
                     </ng-container>
                 </mat-menu>
@@ -66,7 +66,7 @@
                     </div>
                 </mat-menu>
             </div>
-            <app-tile #tileComponent *ngIf="tile.id !== null" [tile]="tile" [view]="tile.view"
+            <app-tile #tileComponent (hasError)="tileErrors.push($event);" *ngIf="tile.id !== null" [tile]="tile" [view]="tile.view"
                 style="display: flex;height: 100%;flex-direction: column;width: 100%;">
             </app-tile>
             <button mat-button color="secondary" mat-icon-button [title]="'lang.addTile' | translate"

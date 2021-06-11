@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, Input } from '@angular/core';
+import { Component, OnInit, AfterViewInit, Input, EventEmitter, Output } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { AppService } from '@service/app.service';
@@ -18,6 +18,8 @@ export class TileDashboardComponent implements OnInit, AfterViewInit {
     @Input() view: string = 'list';
 
     @Input() tile: any = null;
+
+    @Output() hasError = new EventEmitter<any>();
 
     loading: boolean = true;
     onError: boolean = false;
@@ -81,6 +83,7 @@ export class TileDashboardComponent implements OnInit, AfterViewInit {
                     console.log(err);
                     this.notify.error(this.translate.instant('lang.tileLoadError', { 0: (this.tile.position + 1) }));
                     this.onError = true;
+                    this.hasError.emit({id: this.tile.id, error: this.onError});
                     this.errorMessage = err.error.errors;
                     resolve(false);
                     return of(false);
@@ -100,6 +103,7 @@ export class TileDashboardComponent implements OnInit, AfterViewInit {
                     console.log(err);
                     this.notify.error(this.translate.instant('lang.tileLoadError', { 0: (this.tile.position + 1) }));
                     this.onError = true;
+                    this.hasError.emit({id: this.tile.id, error: this.onError});
                     this.errorMessage = err.error.errors;
                     resolve(false);
                     return of(false);
@@ -122,6 +126,7 @@ export class TileDashboardComponent implements OnInit, AfterViewInit {
                     console.log(err);
                     this.notify.error(this.translate.instant('lang.tileLoadError', { 0: (this.tile.position + 1) }));
                     this.onError = true;
+                    this.hasError.emit({id: this.tile.id, error: this.onError});
                     this.errorMessage = err.error.errors;
                     resolve(false);
                     return of(false);
