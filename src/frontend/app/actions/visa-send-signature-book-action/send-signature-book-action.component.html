@@ -16,7 +16,7 @@
                 </div>
                 <div *ngIf="data.resIds.length > 0" style="padding:10px;display: flex;flex-direction: column;">
                     <mat-checkbox color="primary" *ngFor="let inteKey of integrationsInfo | keyvalue"
-                        (click)="toggleIntegration(inteKey.key)" [checked]="data.resource.integrations[inteKey.key]">
+                        (click)="toggleIntegration(inteKey.key)" [checked]="true">
                         {{'lang.' + inteKey.key + '_doc' | translate}}</mat-checkbox>
                 </div>
                 <div *ngIf="!noResourceToProcess && (!visaNumberCorrect || !signNumberCorrect || !atLeastOneSign || (!lastOneIsSign && lastOneMustBeSignatory))" class="alert-message alert-message-danger" role="alert">
