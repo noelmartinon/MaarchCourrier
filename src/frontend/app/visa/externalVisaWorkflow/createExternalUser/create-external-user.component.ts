@@ -158,8 +158,8 @@ export class CreateExternalUserComponent implements OnInit {
         }
     }
 
-    formatPhone(item: any) {
-        if (item.length > 1 && item[0] === '0') {
+    formatPhone() {
+        if (this.userOTP.phone.length > 1 && this.userOTP.phone[0] === '0') {
             this.userOTP.phone = this.userOTP.phone.replace('0', '+33');
         }
     }
@@ -230,6 +230,7 @@ export class CreateExternalUserComponent implements OnInit {
         this.userOTP.lastname = item.lastname;
         this.userOTP.email = item.email;
         this.userOTP.phone = item.phone;
+        this.formatPhone();
     }
 
     getRegexPhone() {
