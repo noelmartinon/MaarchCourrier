@@ -292,17 +292,17 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
 
     
     foreach ($maarchUsers as $user) {
-        // if (empty($ldapUsersLogin[$user['user_id']])) {
-        //     $curlResponse = \SrcCore\models\CurlModel::execSimple([
-        //         'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $user['id'] . '/suspend',
-        //         'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
-        //         'headers'       => ['content-type:application/json'],
-        //         'method'        => 'PUT'
-        //     ]);
-        //     if ($curlResponse['code'] != 204) {
-        //         writeLog(['message' => "[ERROR] Delete user failed  : {$curlResponse['response']['errors']}"]);
-        //     }
-        // }
+        if (empty($ldapUsersLogin[$user['user_id']])) {
+            $curlResponse = \SrcCore\models\CurlModel::execSimple([
+                'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $user['id'] . '/suspend',
+                'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
+                'headers'       => ['content-type:application/json'],
+                'method'        => 'PUT'
+            ]);
+            if ($curlResponse['code'] != 204) {
+                writeLog(['message' => "[ERROR] Delete user failed  : user in use"]);
+            }
+        }
     }
 
     return true;
@@ -355,15 +355,15 @@ function synchronizeEntities(array $ldapEntities, array $maarchEntities)
 
     foreach ($maarchEntities as $entity) {
         if (empty($ldapEntitiesId[$entity['entity_id']])) {
-            // $curlResponse = \SrcCore\models\CurlModel::execSimple([
-            //     'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/entities/' . $entity['entity_id'],
-            //     'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
-            //     'headers'       => ['content-type:application/json'],
-            //     'method'        => 'DELETE'
-            // ]);
-            // if ($curlResponse['code'] != 200) {
-            //     writeLog(['message' => "[ERROR] Delete entity failed : {$curlResponse['response']['errors']}"]);
-            // }
+            $curlResponse = \SrcCore\models\CurlModel::execSimple([
+                'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/entities/' . $entity['entity_id'],
+                'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
+                'headers'       => ['content-type:application/json'],
+                'method'        => 'DELETE'
+            ]);
+            if ($curlResponse['code'] != 200) {
+                writeLog(['message' => "[ERROR] Delete entity failed : entity in use"]);
+            }
         }
     }
 
