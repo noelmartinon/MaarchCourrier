@@ -529,7 +529,10 @@ export class VisaWorkflowComponent implements OnInit {
     }
 
     isValidWorkflow() {
-        if ((this.visaWorkflow.items.filter((item: any) => item.requested_signature).length > 0 && this.visaWorkflow.items.filter((item: any) => !item.hasPrivilege).length === 0) && this.visaWorkflow.items.length > 0) {
+        if (this.visaWorkflow.items.filter((item: any) => item.requested_signature === false).length === this.visaWorkflow.items.length) {
+            this.visaWorkflow.items[this.visaWorkflow.items.length - 1].requested_signature = true;
+            return true;
+        } else if ((this.visaWorkflow.items.filter((item: any) => item.requested_signature).length > 0 && this.visaWorkflow.items.filter((item: any) => !item.hasPrivilege).length === 0) && this.visaWorkflow.items.length > 0) {
             return true;
         } else {
             return false;
@@ -537,9 +540,7 @@ export class VisaWorkflowComponent implements OnInit {
     }
 
     getError() {
-        if (this.visaWorkflow.items.filter((item: any) => item.requested_signature).length === 0) {
-            return this.lang.signUserRequired;
-        } else if (this.visaWorkflow.items.filter((item: any) => !item.hasPrivilege).length > 0) {
+        if (this.visaWorkflow.items.filter((item: any) => !item.hasPrivilege).length > 0) {
             return this.lang.mustDeleteUsersWithNoPrivileges;
         }
     }

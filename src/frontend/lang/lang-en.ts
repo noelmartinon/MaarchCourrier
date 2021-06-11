@@ -1487,7 +1487,6 @@ export const LANG_EN = {
     "signsSynchronized":                           "Signatures have been updated in Maarch Parapheur",
     "signUpdated":                                 "Signature updated",
     "signUser":                                    "Signatory",
-    "signUserRequired":                            "At least one signatory is required",
     "since":                                       "Since",
     "siret":                                       "SIRET number",
     "siretCode":                                   "SIRET code",

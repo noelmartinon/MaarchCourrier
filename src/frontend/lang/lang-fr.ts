@@ -1489,7 +1489,6 @@ export const LANG_FR = {
     "signsSynchronized":                           "Les signatures ont été mises à jour dans Maarch Parapheur",
     "signUpdated":                                 "Signature modifiée",
     "signUser":                                    "Signataire",
-    "signUserRequired":                            "Un signataire mininum est requis",
     "since":                                       "Depuis",
     "siret":                                       "Numéro SIRET",
     "siretCode":                                   "Numéro SIRET",
