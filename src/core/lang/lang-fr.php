@@ -513,3 +513,5 @@ define('_TARGET_RESOURCE_HAS_NO_FILE', 'Le courrier cible n\'a pas de document p
 
 define('_SIGNED', 'Signé');
 define('_VALIDATED', 'Validé');
+
+define('_NO_SENDER_EMAIL', "Aucun courriel défini pour envoyer les AR électronique");

@@ -35,6 +35,7 @@ export class ActionAdministrationComponent implements OnInit {
     selectedFieldsId: Array<any> = [];
     selectedValue: any;
     arMode: any;
+    canAddCopies: boolean;
     successStatus: any;
     errorStatus: any;
 
@@ -128,6 +129,7 @@ export class ActionAdministrationComponent implements OnInit {
                             });
                         } else if (this.action.actionPageId === 'create_acknowledgement_receipt') {
                             this.arMode = this.action.parameters.mode;
+                            this.canAddCopies = this.action.parameters.canAddCopies;
                         } else if (this.action.actionPageId === 'sendToRecordManagement') {
                             this.successStatus = this.action.parameters.successStatus;
                             this.errorStatus = this.action.parameters.errorStatus;
@@ -196,7 +198,7 @@ export class ActionAdministrationComponent implements OnInit {
         if (this.action.actionPageId === 'close_mail') {
             this.action.parameters = { requiredFields: this.selectedFieldsId };
         } else if (this.action.actionPageId === 'create_acknowledgement_receipt') {
-            this.action.parameters = { mode: this.arMode };
+            this.action.parameters = { mode: this.arMode, canAddCopies : this.canAddCopies };
         } else if (this.action.actionPageId === 'sendToRecordManagement') {
             this.action.parameters = { successStatus: this.successStatus, errorStatus: this.errorStatus };
         }

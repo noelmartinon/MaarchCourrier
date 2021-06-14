@@ -263,6 +263,7 @@
                                 </div>
                             </mat-expansion-panel>
                             <mat-expansion-panel>
+                                <app-maarch-message *ngIf="hasError" [mode]="'danger'" [content]="'<b>' + ('lang.saeError' | translate) + '</b> ' + archivalError" style="font-size: 12px; height: 50%;"></app-maarch-message>
                                 <mat-expansion-panel-header>
                                     <mat-panel-title>
                                         {{'lang.archival' | translate}}

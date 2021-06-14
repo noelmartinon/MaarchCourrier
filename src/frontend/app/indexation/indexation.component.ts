@@ -13,9 +13,9 @@ import { AppService } from '@service/app.service';
 import { IndexingFormComponent } from './indexing-form/indexing-form.component';
 import { tap, finalize, catchError, map, filter, take } from 'rxjs/operators';
 import { DocumentViewerComponent } from '../viewer/document-viewer.component';
-import { ConfirmComponent } from '../../plugins/modal/confirm.component';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { ActionsService } from '../actions/actions.service';
-import { SortPipe } from '../../plugins/sorting.pipe';
+import { SortPipe } from '@plugins/sorting.pipe';
 import { FunctionsService } from '@service/functions.service';
 import { of, Subscription } from 'rxjs';
 import { SelectIndexingModelComponent } from './select-indexing-model/select-indexing-model.component';
@@ -43,6 +43,7 @@ export class IndexationComponent implements OnInit {
     currentGroupId: number;
 
     actionsList: any[] = [];
+    actionsListLoaded: boolean = false;
     selectedAction: any = {
         id: 0,
         label: '',
@@ -132,6 +133,7 @@ export class IndexationComponent implements OnInit {
                 tap((data: any) => {
                     this.selectedAction = data.actions[0];
                     this.actionsList = data.actions;
+                    this.actionsListLoaded = true;
                 }),
                 finalize(() => this.loading = false),
                 catchError((err: any) => {
