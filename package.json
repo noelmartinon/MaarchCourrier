@@ -64,11 +64,7 @@
     "jquery": "3.5.1",
     "jstree-bootstrap-theme": "1.0.1",
     "ng2-dnd": "5.0.2",
-<<<<<<< HEAD
     "ng2-pdf-viewer": "5.2.4",
-=======
-    "ng2-pdf-viewer": "6.4.1",
->>>>>>> 20.10.12
     "ngx-cookie-service": "10.0.1",
     "ngx-joyride": "2.3.1",
     "ngx-papaparse": "5.0.0",
