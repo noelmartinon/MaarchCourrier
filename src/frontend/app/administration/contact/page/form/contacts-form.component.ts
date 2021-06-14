@@ -753,7 +753,7 @@ export class ContactsFormComponent implements OnInit {
     }
 
     noField(id: string) {
-        if (this.contactForm.filter(field => !field.display && field.unit === id).length === 0) {
+        if (this.contactForm.filter(field => !field.display && field.unit === id && field.id !== 'sector').length === 0) {
             return true;
         } else {
             return false;
