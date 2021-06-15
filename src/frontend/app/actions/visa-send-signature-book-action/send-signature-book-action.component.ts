@@ -36,7 +36,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
     visaNumberCorrect: any = true;
     signNumberCorrect: any = true;
     atLeastOneSign: any = true;
-    lastOneIsSign: any = false;
+    lastOneIsSign: any = true;
     lastOneMustBeSignatory: any = false;
 
     constructor(
