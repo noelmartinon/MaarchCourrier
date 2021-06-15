@@ -8,3 +8,4 @@ test/unitTests/build/
 modules/visa/xml/remoteSignatoryBooks.xml
 custom
 node_modules
+cs_*
