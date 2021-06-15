@@ -731,7 +731,7 @@ class ActionMethodController
         ListInstanceModel::update([
             'set'   => [
                 'process_date' => 'CURRENT_TIMESTAMP',
-                'process_comment' => _INTERRUPTED_WORKFLOW . ' (' . _VIA_ACTION . ' "' . $args['action']['label_action'] . '")'
+                'process_comment' => _INTERRUPTED_WORKFLOW
             ],
             'where' => ['res_id = ?', 'difflist_type = ?', 'process_date is null'],
             'data'  => [$args['resId'], 'VISA_CIRCUIT']
