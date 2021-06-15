@@ -32,8 +32,8 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
     maximumSignRole: any = 0;
     visaNumberCorrect: any = true;
     signNumberCorrect: any = true;
-    atLeastOneSign: any = false;
-    lastOneIsSign: any = false;
+    atLeastOneSign: any = true;
+    lastOneIsSign: any = true;
     lastOneMustBeSignatory: any = false;
 
     @ViewChild('noteEditor', { static: false }) noteEditor: NoteEditorComponent;
