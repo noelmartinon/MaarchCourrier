@@ -35,7 +35,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
     maximumSignRole: any = 0;
     visaNumberCorrect: any = true;
     signNumberCorrect: any = true;
-    atLeastOneSign: any = false;
+    atLeastOneSign: any = true;
     lastOneIsSign: any = false;
     lastOneMustBeSignatory: any = false;
 
