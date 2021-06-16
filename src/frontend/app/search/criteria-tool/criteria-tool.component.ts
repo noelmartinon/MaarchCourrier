@@ -653,7 +653,7 @@ export class CriteriaToolComponent implements OnInit {
         ).subscribe();
     }
 
-    deleteSearchTemplate(id: number, index: number) {
+    deleteSearchTemplate(id: number, listFilter: any) {
         const dialogRef = this.dialog.open(
             ConfirmComponent,
             {
@@ -671,8 +671,10 @@ export class CriteriaToolComponent implements OnInit {
             filter((data: string) => data === 'ok'),
             exhaustMap(() => this.http.delete(`../rest/searchTemplates/${id}`)),
             tap(() => {
-                this.searchTemplates.splice(index, 1);
+                const element = this.searchTemplates.find((temp: any) => temp.id === id);
+                this.searchTemplates.splice(this.searchTemplates.indexOf(element), 1);
                 this.notify.success(this.translate.instant('lang.searchTemplateDeleted'));
+                listFilter.value = '';
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
