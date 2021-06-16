@@ -635,7 +635,7 @@ class MaarchParapheurController
             $state = MaarchParapheurController::getState(['workflow' => $documentWorkflow]);
             
             if (in_array($state['status'], ['validated', 'refused'])) {
-                $signedDocument = MaarchParapheurController::getDocument(['config' => $aArgs['config'], 'documentId' => $value['external_id']]);
+                $signedDocument = MaarchParapheurController::getDocument(['config' => $aArgs['config'], 'documentId' => $value['external_id'], 'status' => $state['status']]);
                 $aArgs['idsToRetrieve'][$version][$resId]['format'] = 'pdf';
                 $aArgs['idsToRetrieve'][$version][$resId]['encodedFile'] = $signedDocument['encodedDocument'];
                 if ($state['status'] == 'validated' && in_array($state['mode'], ['sign', 'visa'])) {
@@ -712,8 +712,9 @@ class MaarchParapheurController
 
     public static function getDocument(array $args)
     {
+        $type = $args['status'] == 'validated' ? '?type=esign' : '';
         $response = CurlModel::exec([
-            'url'       => rtrim($args['config']['data']['url'], '/') . '/rest/documents/' . $args['documentId'] . '/content',
+            'url'       => rtrim($args['config']['data']['url'], '/') . '/rest/documents/' . $args['documentId'] . '/content' . $type,
             'basicAuth' => ['user' => $args['config']['data']['userId'], 'password' => $args['config']['data']['password']],
             'method'    => 'GET'
         ]);
