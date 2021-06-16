@@ -747,13 +747,13 @@ export class ContactsFormComponent implements OnInit {
     }
 
     toogleAllFieldsUnit(idUnit: string) {
-        this.contactForm.filter(field => field.unit === idUnit).forEach((element: any) => {
+        this.contactForm.filter(field => field.unit === idUnit && field.id !== 'sector').forEach((element: any) => {
             element.display = true;
         });
     }
 
     noField(id: string) {
-        if (this.contactForm.filter(field => !field.display && field.unit === id).length === 0) {
+        if (this.contactForm.filter(field => !field.display && field.unit === id && field.id !== 'sector').length === 0) {
             return true;
         } else {
             return false;
