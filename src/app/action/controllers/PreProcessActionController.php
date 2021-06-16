@@ -496,15 +496,18 @@ class PreProcessActionController
                     $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id'], 'where' => ['signable = ?', 'type_id != ?'], 'data' => ['true', 'signed_response']]);
                     $attachmentTypes = array_column($attachmentTypes, 'type_id');
 
-                    $attachments = AttachmentModel::get([
-                        'select'    => [
-                            'res_id', 'title', 'identifier', 'attachment_type',
-                            'status', 'typist', 'docserver_id', 'path', 'filename', 'creation_date',
-                            'validation_date', 'relation', 'origin_id'
-                        ],
-                        'where'     => ["res_id_master = ?", "attachment_type in (?)", "status not in ('DEL', 'OBS', 'FRZ', 'TMP', 'SIGN')", "in_signature_book = 'true'"],
-                        'data'      => [$resId, $attachmentTypes]
-                    ]);
+                    $attachments = [];
+                    if (!empty($attachmentTypes)) {
+                        $attachments = AttachmentModel::get([
+                            'select'    => [
+                                'res_id', 'title', 'identifier', 'attachment_type',
+                                'status', 'typist', 'docserver_id', 'path', 'filename', 'creation_date',
+                                'validation_date', 'relation', 'origin_id'
+                            ],
+                            'where'     => ["res_id_master = ?", "attachment_type in (?)", "status not in ('DEL', 'OBS', 'FRZ', 'TMP', 'SIGN')", "in_signature_book = 'true'"],
+                            'data'      => [$resId, $attachmentTypes]
+                        ]);
+                    }
 
                     $integratedResource = ResModel::get([
                         'select' => ['subject', 'alt_identifier'],
@@ -1096,11 +1099,14 @@ class PreProcessActionController
                 $resource['alt_identifier'] = _UNDEFINED;
             }
 
-            $attachments = AttachmentModel::get([
-                'select'    => ['status'],
-                'where'     => ['res_id_master = ?', 'attachment_type in (?)', 'in_signature_book = ?', 'status not in (?)'],
-                'data'      => [$resId, $signableAttachmentsTypes, true, ['OBS', 'DEL', 'FRZ']]
-            ]);
+            $attachments = [];
+            if (!empty($signableAttachmentsTypes)) {
+                $attachments = AttachmentModel::get([
+                    'select'    => ['status'],
+                    'where'     => ['res_id_master = ?', 'attachment_type in (?)', 'in_signature_book = ?', 'status not in (?)'],
+                    'data'      => [$resId, $signableAttachmentsTypes, true, ['OBS', 'DEL', 'FRZ']]
+                ]);
+            }
 
             if (empty($attachments)) {
                 $integrations = json_decode($resource['integrations'], true);
@@ -1172,11 +1178,14 @@ class PreProcessActionController
             } elseif ($isSignatory[0]['requested_signature'] && !$isSignatory[0]['signatory']) {
                 $resourcesInformations['warning'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'reason' => 'userHasntSigned'];
             } else {
-                $attachments = AttachmentModel::get([
-                    'select'    => ['status'],
-                    'where'     => ['res_id_master = ?', 'attachment_type in (?)', 'in_signature_book = ?', 'status not in (?)'],
-                    'data'      => [$resId, $signableAttachmentsTypes, true, ['OBS', 'DEL', 'FRZ']]
-                ]);
+                $attachments = [];
+                if (!empty($signableAttachmentsTypes)) {
+                    $attachments = AttachmentModel::get([
+                        'select'    => ['status'],
+                        'where'     => ['res_id_master = ?', 'attachment_type in (?)', 'in_signature_book = ?', 'status not in (?)'],
+                        'data'      => [$resId, $signableAttachmentsTypes, true, ['OBS', 'DEL', 'FRZ']]
+                    ]);
+                }
 
                 $mailing = false;
                 if (!empty($attachments)) {
