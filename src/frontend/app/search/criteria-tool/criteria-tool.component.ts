@@ -50,6 +50,8 @@ export class CriteriaToolComponent implements OnInit {
     @ViewChildren('appContactAutocomplete') appContactAutocomplete: QueryList<ContactAutocompleteComponent>;
     @ViewChildren('pluginSelectAutocompleteSearch') pluginSelectAutocompleteSearch: QueryList<PluginSelectAutocompleteSearchComponent>;
 
+    @ViewChild('listFilter') listFilter: ElementRef;
+
     loading: boolean = true;
     criteria: any = [];
     searchTemplates: any;
@@ -672,6 +674,7 @@ export class CriteriaToolComponent implements OnInit {
             exhaustMap(() => this.http.delete(`../rest/searchTemplates/${id}`)),
             tap(() => {
                 const element = this.searchTemplates.find((temp: any) => temp.id === id);
+                this.listFilter.nativeElement.value = '';
                 this.searchTemplates.splice(this.searchTemplates.indexOf(element), 1);
                 this.notify.success(this.translate.instant('lang.searchTemplateDeleted'));
                 listFilter.value = '';
