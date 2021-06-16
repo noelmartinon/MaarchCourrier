@@ -5,7 +5,7 @@ import { NotificationService } from '../../notification.service';
 import { HeaderService } from '../../../service/header.service';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { AppService } from '../../../service/app.service';
-import { tap, catchError, exhaustMap, filter } from 'rxjs/operators';
+import { tap, catchError, exhaustMap, filter, take } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { SortPipe } from '../../../plugins/sorting.pipe';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -717,9 +717,18 @@ export class IndexingFormComponent implements OnInit {
                     }));
                     this.arrFormControl['mail­tracking'].setValue(data.followed);
                     if (saveResourceState) {
-                        setTimeout(() => {
+                        // WORKAROUND TO WAIT DIFFUSION LIST LOAD
+                        if (this.arrFormControl['diffusionList'] !== undefined) {
+                            this.arrFormControl['diffusionList'].valueChanges.pipe(
+                                filter((value: any) => value.length > 0),
+                                tap(() => {
+                                    this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas()));
+                                }),
+                                take(1)
+                            ).subscribe();
+                        } else {
                             this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas()));
-                        }, 600);
+                        }
                     }
                     resolve(true);
                 }),
