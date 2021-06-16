@@ -45,7 +45,7 @@ include_once('vendor/rafikhaceb/pi-barcode/pi_barcode.php');
 
 class MergeController
 {
-    const OFFICE_EXTENSIONS = ['odt', 'ods', 'odp', 'xlsx', 'pptx', 'docx', 'odf'];
+    public const OFFICE_EXTENSIONS = ['odt', 'ods', 'odp', 'xlsx', 'pptx', 'docx', 'odf'];
 
     public static function mergeDocument(array $args)
     {
@@ -224,8 +224,9 @@ class MergeController
             $currentUserPrimaryEntity['path'] = EntityModel::getEntityPathByEntityId(['entityId' => $currentUserPrimaryEntity['entity_id'], 'path' => '']);
         }
 
-        //Visas
+        //Visas - Visa
         $visas = '';
+        $visa = [];
         if (!empty($args['resId'])) {
             $visaWorkflow = ListInstanceModel::get([
                 'select'    => ['item_id', 'process_date', 'requested_signature', 'delegate', 'signatory'],
@@ -233,22 +234,54 @@ class MergeController
                 'data'      => ['VISA_CIRCUIT', $args['resId']],
                 'orderBy'   => ['listinstance_id']
             ]);
+            $visaCount = 0;
+            $signCount = 0;
             foreach ($visaWorkflow as $value) {
                 $userLabel = UserModel::getLabelledUserById(['id' => $value['item_id']]);
-                $primaryentity = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label']]);
+                $primaryEntity = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label', 'users_entities.user_role as role']]);
 
                 if (!empty($value['process_date'])) {
-                    $mode = ($value['signatory'] ? _SIGNATORY : _VISA_USER_MIN) . ', ' . TextFormatModel::formatDate($value['process_date']);
+                    $modeLabel = ($value['signatory'] ? _SIGNATORY : _VISA_USER_MIN) . ', ' . TextFormatModel::formatDate($value['process_date']);
+                    $mode = ($value['signatory'] ? 'sign' : 'visa');
                 } else {
-                    $mode = ($value['requested_signature'] ? _SIGNATORY : _VISA_USER_MIN);
+                    $modeLabel = ($value['requested_signature'] ? _SIGNATORY : _VISA_USER_MIN);
+                    $mode = ($value['requested_signature'] ? 'sign' : 'visa');
                 }
 
                 $delegate = !empty($value['delegate']) ? UserModel::getLabelledUserById(['id' => $value['delegate']]) : '';
                 if (!empty($delegate)) {
                     $userLabel = $delegate . ', ' . _INSTEAD_OF . ' ' . $userLabel;
                 }
-                $visas .= "{$userLabel} ({$primaryentity['entity_label']}) - {$mode}\n";
+                $visas .= "{$userLabel} (" . (!empty($primaryEntity['role']) ? $primaryEntity['role'].', ' : '') . "{$primaryEntity['entity_label']}) - {$modeLabel}\n";
+
+                if ($mode === 'sign') {
+                    $signCount++;
+                    $visa['nameSign'.$signCount]   = $userLabel;
+                    $visa['roleSign'.$signCount]   = $primaryEntity['role'];
+                    $visa['entitySign'.$signCount] = $primaryEntity['entity_label'];
+                    $visa['dateSign'.$signCount]   = !empty($value['process_date']) ? TextFormatModel::formatDate($value['process_date']) : null;
+                } else {
+                    $visaCount++;
+                    $visa['nameVisa'.$visaCount]   = $userLabel;
+                    $visa['roleVisa'.$visaCount]   = $primaryEntity['role'];
+                    $visa['entityVisa'.$visaCount] = $primaryEntity['entity_label'];
+                    $visa['dateVisa'.$visaCount]   = !empty($value['process_date']) ? TextFormatModel::formatDate($value['process_date']) : null;
+                }
             }
+            if ($visaCount > 0) {
+                $visa['nameVisaLast'] = $visa['nameVisa'.$visaCount];
+                $visa['roleVisaLast'] = $visa['roleVisa'.$visaCount];
+                $visa['entityVisaLast'] = $visa['entityVisa'.$visaCount];
+                $visa['dateVisaLast'] = $visa['dateVisa'.$visaCount];
+            }
+            if ($signCount > 0) {
+                $visa['nameSignLast'] = $visa['nameSign'.$signCount];
+                $visa['roleSignLast'] = $visa['roleSign'.$signCount];
+                $visa['entitySignLast'] = $visa['entitySign'.$signCount];
+                $visa['dateSignLast'] = $visa['dateSign'.$signCount];
+            }
+            unset($visaCount);
+            unset($signCount);
         }
 
         //Opinions
@@ -401,6 +434,7 @@ class MergeController
         $dataToBeMerge['user']                  = $currentUser;
         $dataToBeMerge['userPrimaryEntity']     = $currentUserPrimaryEntity;
         $dataToBeMerge['visas']                 = $visas;
+        $dataToBeMerge['visa']                  = $visa;
         $dataToBeMerge['opinions']              = $opinions;
         $dataToBeMerge['copies']                = $copies;
         $dataToBeMerge['contact']               = [];
@@ -537,7 +571,7 @@ class MergeController
         $datasources['datetime'][0]['time'] = date('H:i:s.u');
         $datasources['datetime'][0]['timestamp'] = time();
 
-        $TBS = new \clsTinyButStrong;
+        $TBS = new \clsTinyButStrong();
         $TBS->NoErr = true;
         $TBS->LoadTemplate($pathToTemplate);
 
@@ -569,7 +603,7 @@ class MergeController
         $datasources['user'] = [UserModel::getById(['select' => ['firstname', 'lastname', 'mail', 'phone', 'initials'], 'id' => $GLOBALS['id']])];
         $datasources['userPrimaryEntity'] = [UserModel::getPrimaryEntityById(['id' => $GLOBALS['id'], 'select' => ['entities.*', 'users_entities.user_role as role']])];
 
-        $TBS = new \clsTinyButStrong;
+        $TBS = new \clsTinyButStrong();
         $TBS->NoErr = true;
         $TBS->LoadTemplate($pathToTemplate);
 
@@ -779,7 +813,7 @@ class MergeController
                 unset($person['custom_fields']);
                 if (!empty($customFields)) {
                     foreach ($customFields as $key => $customField) {
-                        $person["customField_{$key}"] = is_array($customField) ?  implode("\n", $customField) : $customField;
+                        $person["customField_{$key}"] = is_array($customField) ? implode("\n", $customField) : $customField;
                     }
                 }
             } elseif ($args['type'] == 'user') {
