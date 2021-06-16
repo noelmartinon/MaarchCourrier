@@ -588,7 +588,7 @@ class SummarySheetController
                     if ($found && $listInstance['res_id'] != $resource['res_id']) {
                         break;
                     } elseif ($listInstance['res_id'] == $resource['res_id']) {
-                        if (!empty($listInstance['process_date'])) {
+                        if (!empty($listInstance['process_date']) && $listInstance['process_comment'] != _INTERRUPTED_WORKFLOW) {
                             $mode = ($listInstance['signatory'] ? _SIGNATORY : _VISA_USER_MIN);
                         } else {
                             $mode = ($listInstance['requested_signature'] ? _SIGNATORY : _VISA_USER_MIN);
