@@ -327,6 +327,12 @@ UPDATE actions SET component = 'checkReplyRecordManagementAction' where action_p
 UPDATE actions SET component = 'resetRecordManagementAction' where action_page = 'reset_letter';
 UPDATE actions SET component = 'confirmAction' where action_page = 'purge_letter';
 
+--- SGAMI-SO DEBUT
+
+UPDATE actions SET id_status = 'EVIS' WHERE id = 414;
+
+--- SGAMI-SI FIN 
+
 UPDATE res_attachments SET attachment_type = 'acknowledgement_record_management' WHERE attachment_type = 'simple_attachment' AND format = 'xml' AND title = 'Accusé de réception' AND relation = 1 AND status = 'TRA';
 UPDATE res_attachments SET attachment_type = 'reply_record_management' WHERE attachment_type = 'simple_attachment' AND format = 'xml' AND title = 'Réponse au transfert' AND relation = 1 AND status = 'TRA';
 
