@@ -74,13 +74,24 @@ export class SignaturePositionComponent implements OnInit {
     ngOnInit(): void {
         this.currentPage = 1;
         this.getPageAttachment();
+        this.getAllUnits();
+    }
 
-        if (this.data.resource.signaturePositions !== undefined) {
-            this.signList = this.data.resource.signaturePositions;
-        }
-        if (this.data.resource.datePositions !== undefined) {
-            this.dateList = this.data.resource.datePositions;
-        }
+    getAllUnits() {
+        this.data.workflow.forEach((user: any, index: number) => {
+            if (user.signaturePositions?.length > 0) {
+                this.signList = this.signList.concat(user.signaturePositions.filter((pos: any) => pos.resId === this.data.resource.resId && pos.mainDocument === this.data.resource.mainDocument).map((pos: any) => ({
+                    ...pos,
+                    sequence : index
+                })));
+            }
+            if (user.datePositions?.length > 0) {
+                this.dateList = this.dateList.concat(user.datePositions.filter((pos: any) => pos.resId === this.data.resource.resId && pos.mainDocument === this.data.resource.mainDocument).map((pos: any) => ({
+                    ...pos,
+                    sequence : index
+                })));
+            }
+        });
     }
 
     onSubmit() {
