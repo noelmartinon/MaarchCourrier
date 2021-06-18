@@ -157,7 +157,7 @@ export class ContactsFormComponent implements OnInit {
             type: 'string',
             control: new FormControl(),
             required: false,
-            display: true,
+            display: false,
             filling: false,
             values: []
         },
