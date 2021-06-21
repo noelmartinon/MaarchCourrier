@@ -413,4 +413,76 @@ export class ExternalVisaWorkflowComponent implements OnInit {
     updateVisaWorkflow(user: any) {
         this.visaWorkflow.items.push(user);
     }
+
+    setPositionsWorkfow(resource: any, positions: any) {
+        if (this.visaWorkflow.items[0].signaturePositions === undefined) {
+            this.initPositionWorkflow();
+        }
+        this.clearPositionsFromResource(resource);
+        if (positions.signaturePositions !== undefined) {
+            Object.keys(positions.signaturePositions).forEach(key => {
+                const objPos = {
+                    ...positions.signaturePositions[key],
+                    mainDocument : resource.mainDocument,
+                    resId: resource.resId
+                };
+                this.visaWorkflow.items[positions.signaturePositions[key].sequence].signaturePositions = this.visaWorkflow.items[positions.signaturePositions[key].sequence].signaturePositions.filter((pos: any) => pos.resId !== resource.resId && pos.mainDocument !== resource.mainDocument);
+                this.visaWorkflow.items[positions.signaturePositions[key].sequence].signaturePositions.push(objPos);
+            });
+        }
+        if (positions.datePositions !== undefined) {
+            Object.keys(positions.datePositions).forEach(key => {
+                const objPos = {
+                    ...positions.datePositions[key],
+                    mainDocument : resource.mainDocument,
+                    resId: resource.resId
+                };
+                this.visaWorkflow.items[positions.datePositions[key].sequence].datePositions = this.visaWorkflow.items[positions.datePositions[key].sequence].datePositions.filter((pos: any) => pos.resId !== resource.resId && pos.mainDocument !== resource.mainDocument);
+                this.visaWorkflow.items[positions.datePositions[key].sequence].datePositions.push(objPos);
+            });
+        }
+    }
+
+    clearPositionsFromResource(resource: any) {
+        this.visaWorkflow.items.forEach((user: any) => {
+            user.signaturePositions = user.signaturePositions.filter((pos: any) => pos.resId !== resource.resId && pos.mainDocument !== resource.mainDocument);
+            user.datePositions = user.datePositions.filter((pos: any) => pos.resId !== resource.resId && pos.mainDocument !== resource.mainDocument);
+        });
+    }
+
+    initPositionWorkflow() {
+        this.visaWorkflow.items.forEach((user: any) => {
+            user.signaturePositions = [];
+            user.datePositions = [];
+        });
+    }
+
+    getDocumentsFromPositions() {
+        const documents: any[] = [];
+        this.visaWorkflow.items.forEach((user: any) => {
+            user.signaturePositions?.forEach(element => {
+                documents.push({
+                    resId: element.resId,
+                    mainDocument: element.mainDocument
+                });
+            });
+            user.datePositions?.forEach(element => {
+                documents.push({
+                    resId: element.resId,
+                    mainDocument: element.mainDocument
+                });
+            });
+        });
+        return documents;
+    }
+
+    hasOtpNoSignaturePositionFromResource(resource: any) {
+        let state: boolean = true;
+        this.visaWorkflow.items.filter((user: any) => user.item_id === null && user.role === 'sign').forEach((user: any) => {
+            if (user.signaturePositions?.filter((pos: any) => pos.resId === resource.resId && pos.mainDocument === resource.mainDocument).length > 0) {
+                state = false;
+            }
+        });
+        return state;
+    }
 }

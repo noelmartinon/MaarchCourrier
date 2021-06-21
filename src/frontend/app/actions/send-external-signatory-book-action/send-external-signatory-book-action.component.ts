@@ -182,28 +182,16 @@ export class SendExternalSignatoryBookActionComponent implements OnInit {
     }
 
     hasEmptyOtpSignaturePosition() {
-        if (this.signatoryBookEnabled == 'maarchParapheur') {
+        if (this.signatoryBookEnabled === 'maarchParapheur') {
             const externalUsers: any[] = this.maarchParapheur.appExternalVisaWorkflow.visaWorkflow.items.filter((user: any) => user.item_id === null && user.role === 'sign');
             if (externalUsers.length > 0) {
-                let resToSign: any[] = this.maarchParapheur.resourcesToSign.filter((res: any) => res.hasOwnProperty('signaturePositions'));
-                let mustSign: boolean = false;
-                if (this.maarchParapheur.resourcesToSign.length > 1 && this.maarchParapheur.resourcesToSign.length - resToSign.length  >= 1) {
-                    return true;
-                } else if (resToSign.length === 0) {
-                    return true;
-                } else {
-                    resToSign = resToSign.map((res: any) => res.signaturePositions);
-                    externalUsers.forEach((element: any) => {
-                        for (let i = 0; i < resToSign.length; i++) {
-                            const userIndex: number = this.maarchParapheur.appExternalVisaWorkflow.visaWorkflow.items.indexOf(element);
-                            if (resToSign[i].filter((item: any) => item.sequence === userIndex).length ===  0) {
-                                mustSign = true;
-                                break;
-                            }
-                        }
-                    });
-                    return mustSign;
-                }
+                let state: boolean = false;
+                this.resourcesToSign.forEach((resource: any) => {
+                    if (this.maarchParapheur.appExternalVisaWorkflow.hasOtpNoSignaturePositionFromResource(resource)) {
+                        state = true;
+                    }
+                });
+                return state;
             }
         } else {
             return false;
