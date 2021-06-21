@@ -645,6 +645,9 @@ class ListTemplateController
             } elseif ($circuit['type'] == 'opinionCircuit' && !PrivilegeController::hasPrivilege(['privilegeId' => 'avis_documents', 'userId' => $value['item_id']])) {
                 $listTemplateItems[$key]['hasPrivilege'] = false;
             }
+            if ($circuit['type'] == 'visaCircuit') {
+                $listTemplateItems[$key]['currentRole'] = $value['item_mode'];
+            }
         }
         $circuit['items'] = array_values($listTemplateItems);
 
