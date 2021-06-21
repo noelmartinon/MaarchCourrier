@@ -196,9 +196,17 @@ class SummarySheetController
 
         $subject = str_replace("\n", ' ', $resource['subject']);
 
+        $hasQrcode = in_array('qrcode', array_column($units, 'unit'));
+        if ($hasQrcode) {
+            $pdf->SetY($pdf->GetY() + 30);
+        }
         $pdf->SetY($pdf->GetY() + 15);
         $pdf->SetFont('', 'B', 16);
         $pdf->MultiCell(0, 1, $subject, 1, 'C', false);
+
+        if ($hasQrcode) {
+            $pdf->SetY($pdf->GetY() - 20);
+        }
 
         foreach ($units as $key => $unit) {
             $units[$key] = (array)$unit;
