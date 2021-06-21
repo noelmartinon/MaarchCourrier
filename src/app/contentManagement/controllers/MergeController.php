@@ -229,7 +229,7 @@ class MergeController
         $visa = [];
         if (!empty($args['resId'])) {
             $visaWorkflow = ListInstanceModel::get([
-                'select'    => ['item_id', 'process_date', 'requested_signature', 'delegate', 'signatory'],
+                'select'    => ['item_id', 'process_date', 'process_comment', 'requested_signature', 'delegate', 'signatory'],
                 'where'     => ['difflist_type = ?', 'res_id = ?'],
                 'data'      => ['VISA_CIRCUIT', $args['resId']],
                 'orderBy'   => ['listinstance_id']
@@ -240,7 +240,7 @@ class MergeController
                 $userLabel = UserModel::getLabelledUserById(['id' => $value['item_id']]);
                 $primaryEntity = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label', 'users_entities.user_role as role']]);
 
-                if (!empty($value['process_date'])) {
+                if (!empty($value['process_date']) && strpos($value['process_comment'], _INTERRUPTED_WORKFLOW) === false) {
                     $modeLabel = ($value['signatory'] ? _SIGNATORY : _VISA_USER_MIN) . ', ' . TextFormatModel::formatDate($value['process_date']);
                     $mode = ($value['signatory'] ? 'sign' : 'visa');
                 } else {
