@@ -733,7 +733,7 @@ class SummarySheetController
                     if ($found && $listInstance['res_id'] != $resource['res_id']) {
                         break;
                     } elseif ($listInstance['res_id'] == $resource['res_id']) {
-                        if (!empty($listInstance['process_date'])) {
+                        if (!empty($listInstance['process_date']) && $listInstance['process_comment'] != _INTERRUPTED_WORKFLOW) {
                             $mode = ($listInstance['signatory'] ? _SIGNATORY : _VISA_USER_MIN);
                         } else {
                             $mode = ($listInstance['requested_signature'] ? _SIGNATORY : _VISA_USER_MIN);
@@ -778,7 +778,7 @@ class SummarySheetController
                     $pdf->Cell($specialWidth * 3, 20, _USERS, 1, 0, 'L', false);
                     $pdf->Cell($specialWidth, 20, _ACTION_DATE, 1, 1, 'L', false);
                     foreach ($users as $keyUser => $user) {
-                        $pdf->MultiCell($specialWidth * 3, 20, $keyUser + 1 . ". {$user['user']}", 1, 'L', false, 0,'', '', true, 0, false, true, 20, 'M', true);
+                        $pdf->MultiCell($specialWidth * 3, 20, $keyUser + 1 . ". {$user['user']}", 1, 'L', false, 0, '', '', true, 0, false, true, 20, 'M', true);
                         $pdf->Cell($specialWidth, 20, $user['date'], 1, 1, 'L', false);
                     }
                 }
