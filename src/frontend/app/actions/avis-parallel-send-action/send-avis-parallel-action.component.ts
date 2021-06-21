@@ -22,7 +22,7 @@ export class SendAvisParallelComponent implements AfterViewInit {
 
     noResourceToProcess: boolean = null;
 
-    opinionLimitDate: Date = null;
+    opinionLimitDate: Date =  new Date();
 
     today: Date = new Date();
 
@@ -36,7 +36,9 @@ export class SendAvisParallelComponent implements AfterViewInit {
         private notify: NotificationService,
         public dialogRef: MatDialogRef<SendAvisParallelComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
-        public functions: FunctionsService) { }
+        public functions: FunctionsService) {
+            this.opinionLimitDate.setTime(this.today.getTime() + (7 * 24 * 60 * 60 * 1000));
+         }
 
     async ngAfterViewInit(): Promise<void> {
         if (this.data.resIds.length === 1) {
