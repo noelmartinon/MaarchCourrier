@@ -45,7 +45,9 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
         private notify: NotificationService,
         public dialogRef: MatDialogRef<SendSignatureBookActionComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
-        public functions: FunctionsService) { }
+        public functions: FunctionsService) {
+            
+         }
 
     async ngAfterViewInit(): Promise<void> {
         if (this.data.resIds.length === 0) {
@@ -54,6 +56,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
         }
         this.initVisaWorkflow();
         this.loading = false;
+        this.checkSignatureBookInIndexingPage();
     }
 
     async onSubmit() {
