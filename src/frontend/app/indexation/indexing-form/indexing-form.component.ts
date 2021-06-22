@@ -723,6 +723,9 @@ export class IndexingFormComponent implements OnInit {
                                 filter((value: any) => value.length > 0),
                                 tap(() => {
                                     this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas()));
+                                    setTimeout(() => {
+                                        this.loadingFormEndEvent.emit();
+                                    }, 0); 
                                 }),
                                 take(1)
                             ).subscribe();
@@ -756,7 +759,10 @@ export class IndexingFormComponent implements OnInit {
 
     createForm() {
         this.indexingFormGroup = new FormGroup(this.arrFormControl);
-        this.loadingFormEndEvent.emit();
+        // WORKAROUND IF NO DIFFUSION LIST LOAD => LAUNCH END LOAD EVENT
+        if (this.resId === null || this.arrFormControl['diffusionList'] === undefined) {
+            this.loadingFormEndEvent.emit();
+        }
     }
 
     async resetForm() {

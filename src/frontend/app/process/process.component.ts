@@ -561,6 +561,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
         if (this.indexingForm.isValidForm()) {
             this.actionService.loading = true;
             if (this.isToolModified()) {
+                console.log('isToolModified');
+                
                 await this.saveTool();
                 if (this.appDocumentViewer.isEditingTemplate()) {
                     await this.appDocumentViewer.saveMainDocument();
