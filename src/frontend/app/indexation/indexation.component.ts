@@ -276,6 +276,13 @@ export class IndexationComponent implements OnInit, OnDestroy {
         }
     }
 
+    hasActions() {
+        this.actionsListLoaded = false;
+        const actions = this.actionsList.filter(action => action.categoryUse.indexOf(this.indexingForm.getCategory()) > -1);
+        this.actionsListLoaded = true;
+        return actions.length > 0;
+    }
+
     refreshDatas() {
         this.appDocumentViewer.setDatas(this.indexingForm.formatDatas(this.indexingForm.getDatas()));
     }
