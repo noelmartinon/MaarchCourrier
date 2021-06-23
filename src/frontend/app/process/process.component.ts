@@ -651,8 +651,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
         if (this.functions.empty(this.indexingForm) || this.indexingForm.loading) {
             return true;
         } else {
-            const toto = this.actionsList.filter(action => action.categoryUse.indexOf(this.indexingForm.getCategory()) > -1);
-            return toto.length > 0;
+            const categoryActionList = this.actionsList.filter(action => action.categoryUse.indexOf(this.indexingForm.getCategory()) > -1);
+            return categoryActionList.length > 0;
         }
     }
 
