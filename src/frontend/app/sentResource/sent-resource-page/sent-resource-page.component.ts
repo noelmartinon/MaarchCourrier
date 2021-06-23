@@ -505,7 +505,7 @@ export class SentResourcePageComponent implements OnInit {
                             });
                         }
                     });
-
+                    this.getRecipientInfos(this.emailAttachTool.attachments.list);
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -865,5 +865,44 @@ export class SentResourcePageComponent implements OnInit {
                 }
             });
         }
+    }
+    
+    getRecipientInfos(attachments: any[]) {
+        attachments.forEach((attach: any, index: number) => {
+            if (attach.recipientId !== null) {
+                switch (attach.recipientType) {
+                    case 'user':
+                        this.http.get(`../../rest/users/${attach.recipientId}`).pipe(
+                            tap((data: any) => {
+                                this.emailAttachTool.attachments.list[index] = {
+                                    ...this.emailAttachTool.attachments.list[index],
+                                    recipientLabel: `${data.firstname} ${data.lastname}`
+                                };
+                            }),
+                            catchError((err) => {
+                                this.notify.handleSoftErrors(err);
+                                return of(false);
+                            })
+                        ).subscribe();
+                        break;
+
+                    case 'contact':
+                        this.http.get(`../../rest/contacts/${attach.recipientId}`).pipe(
+                            tap((data: any) => {
+                                this.emailAttachTool.attachments.list[index] = {
+                                    ...this.emailAttachTool.attachments.list[index],
+                                    recipientLabel: `${data.firstname} ${data.lastname}`,
+                                    company: !this.functions.empty(data.company) ? `${data.company}` : null
+                                };
+                            }),
+                            catchError((err) => {
+                                this.notify.handleSoftErrors(err);
+                                return of(false);
+                            })
+                        ).subscribe();
+                        break;
+                }
+            }
+        });
     }
 }

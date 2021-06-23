@@ -1742,5 +1742,7 @@ export const LANG_EN = {
     "indexingModelFieldsReset": "The following fields are not in the selected model and will be reset for all mails : ",
     "indexingModelReassign": "Reassign indexing model",
     "youCannotUnsign": "You do not have the right to <b>unsign</b> this document. You must be the person who signed this document.",
-    "arContentIsEmpty": "AR content is empty"
+    "arContentIsEmpty": "AR content is empty",
+    "company": "Company",
+    "noRecipient": "No associated recipient."
 };
