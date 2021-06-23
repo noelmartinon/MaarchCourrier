@@ -485,7 +485,7 @@ class EmailController
         $attachmentTypes = AttachmentTypeModel::get(['select' => ['type_id', 'label', 'email_link']]);
         $attachmentTypes = array_column($attachmentTypes, null, 'type_id');
         $rawAttachments = AttachmentModel::get([
-            'select'    => ['res_id', 'title', 'identifier', 'attachment_type', 'typist', 'format', 'filesize', 'status'],
+            'select'    => ['res_id', 'title', 'identifier', 'attachment_type', 'typist', 'format', 'filesize', 'status', 'recipient_id', 'recipient_type'],
             'where'     => ['res_id_master = ?', 'attachment_type not in (?)', 'status not in (?)'],
             'data'      => [$args['resId'], ['signed_response'], ['DEL', 'OBS']]
         ]);
@@ -526,7 +526,9 @@ class EmailController
                 'creator'           => UserModel::getLabelledUserById(['id' => $attachment['typist']]),
                 'format'            => $attachment['format'],
                 'size'              => StoreController::getFormattedSizeFromBytes(['size' => $attachment['filesize']]),
-                'status'            => $attachment['status']
+                'status'            => $attachment['status'],
+                'recipientId'       => $attachment['recipient_id'],
+                'recipientType'     => $attachment['recipient_type']
             ];
         }
 
