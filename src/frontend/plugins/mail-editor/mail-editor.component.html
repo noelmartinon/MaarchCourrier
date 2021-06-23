@@ -134,6 +134,17 @@
                                             {{attach.typeLabel}}<span *ngIf="attach.status === 'SIGN'"
                                                 style="color:green">&nbsp;({{'lang.signed' | translate | lowercase}})</span>
                                         </div>
+                                        <div *ngIf="attach.recipientId !== null && keyVal.key === 'attachments'" class="recipientPj">
+                                            <div style="margin-top: 5px;">
+                                                {{ 'lang.recipient' | translate }}: <b [title]="attach.recipientLabel">{{ attach.recipientLabel }}</b>
+                                            </div>
+                                            <div *ngIf="attach.recipientType === 'contact' && !functions.empty(attach.company)" style="margin-top: 5px;">
+                                                {{ 'lang.company' | translate }}: <b [title]="attach.company">{{ attach.company }}</b>
+                                            </div>
+                                        </div>
+                                        <div *ngIf="attach.recipientId === null && keyVal.key === 'attachments'" style="font-size: 10px; color: gray; font-style: italic; margin-top: 5px;">
+                                            {{ lang.noRecipient}}
+                                        </div>
                                     </span>
                                 </div>
                             </div>

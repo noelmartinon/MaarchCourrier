@@ -2517,5 +2517,7 @@
     "source": "Source",
     "isRequired": "is required",
     "updateOtp": "Edit external user",
-    "contactsParameters_sector": "Sector"
+    "contactsParameters_sector": "Sector",
+    "company": "Company",
+    "noRecipient": "No associated recipient."
 }
