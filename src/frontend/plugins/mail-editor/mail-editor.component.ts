@@ -1042,7 +1042,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
             if (attach.recipientId !== null) {
                 switch (attach.recipientType) {
                     case 'user':
-                        this.http.get(`../../rest/users/${attach.recipientId}`).pipe(
+                        this.http.get(`../rest/users/${attach.recipientId}`).pipe(
                             tap((data: any) => {
                                 this.emailAttachTool.attachments.list[index] = {
                                     ...this.emailAttachTool.attachments.list[index],
@@ -1057,7 +1057,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                         break;
 
                     case 'contact':
-                        this.http.get(`../../rest/contacts/${attach.recipientId}`).pipe(
+                        this.http.get(`../rest/contacts/${attach.recipientId}`).pipe(
                             tap((data: any) => {
                                 this.emailAttachTool.attachments.list[index] = {
                                     ...this.emailAttachTool.attachments.list[index],
