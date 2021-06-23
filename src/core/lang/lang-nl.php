@@ -20,6 +20,7 @@ define('_ALREADY_EXISTS', 'bestaat reeds');
 define('_AVIS_USER', 'Voor bericht');
 define('_AVIS_USER_COPY', 'In kopie (bericht)');
 define('_AVIS_USER_INFO', 'Ter informatie (bericht)');
+define('_AVIS_NOTE_PREFIX', '[opinion]');
 define('_BASKET_CREATION', 'Aanmaak bakje');
 define('_BASKET_GROUP_CREATION', 'Toegevoegde groep voor bakje');
 define('_BASKET_GROUP_MODIFICATION', 'Gewijzigde groep voor bakje');
