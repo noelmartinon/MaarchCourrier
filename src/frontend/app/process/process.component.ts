@@ -626,10 +626,10 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     showActionInCurrentCategory(action: any) {
 
-        if (this.selectedAction.categoryUse.indexOf(this.currentResourceInformations.categoryId) === -1) {
-            const newAction = this.actionsList.filter(actionItem => actionItem.categoryUse.indexOf(this.currentResourceInformations.categoryId) > -1)[0];
+        if (this.selectedAction.categoryUse.indexOf(this.indexingForm.getCategory()) === -1) {
+            const newAction = this.actionsList.filter(actionItem => actionItem.categoryUse.indexOf(this.indexingForm.getCategory()) > -1)[0];
             if (newAction !== undefined) {
-                this.selectedAction = this.actionsList.filter(actionItem => actionItem.categoryUse.indexOf(this.currentResourceInformations.categoryId) > -1)[0];
+                this.selectedAction = this.actionsList.filter(actionItem => actionItem.categoryUse.indexOf(this.indexingForm.getCategory()) > -1)[0];
             } else {
                 this.selectedAction = {
                     id: 0,
@@ -640,11 +640,20 @@ export class ProcessComponent implements OnInit, OnDestroy {
                 };
             }
         }
-        return action.categoryUse.indexOf(this.currentResourceInformations.categoryId) > -1;
+        return action.categoryUse.indexOf(this.indexingForm.getCategory()) > -1;
     }
 
     selectAction(action: any) {
         this.selectedAction = action;
+    }
+
+    hasActions() {
+        if (this.functions.empty(this.indexingForm) || this.indexingForm.loading) {
+            return true;
+        } else {
+            const toto = this.actionsList.filter(action => action.categoryUse.indexOf(this.indexingForm.getCategory()) > -1);
+            return toto.length > 0;
+        }
     }
 
     createModal() {
