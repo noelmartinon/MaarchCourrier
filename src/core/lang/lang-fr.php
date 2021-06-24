@@ -20,6 +20,7 @@ define('_ALREADY_EXISTS', 'existe déjà');
 define('_AVIS_USER', 'Pour avis');
 define('_AVIS_USER_COPY', 'En copie (avis)');
 define('_AVIS_USER_INFO', 'Pour information (avis)');
+define('_AVIS_NOTE_PREFIX', '[avis]');
 define('_BASKET_CREATION', 'Création bannette');
 define('_BASKET_GROUP_CREATION', 'Groupe ajouté pour bannette');
 define('_BASKET_GROUP_MODIFICATION', 'Groupe modifié pour bannette');
