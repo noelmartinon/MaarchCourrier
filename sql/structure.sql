@@ -231,7 +231,9 @@ CREATE TABLE users
   locked_until TIMESTAMP without time zone,
   authorized_api jsonb NOT NULL DEFAULT '[]',
   external_id jsonb DEFAULT '{}',
-  feature_tour jsonb NOT NULL DEFAULT '[]',
+  -- SGAMI-SO Debut
+  feature_tour jsonb NOT NULL DEFAULT '["welcome","email","notification"]',
+  -- SGAMI-SO Fin
   CONSTRAINT users_pkey PRIMARY KEY (user_id),
   CONSTRAINT users_id_key UNIQUE (id)
 )

@@ -329,7 +329,11 @@ UPDATE actions SET component = 'confirmAction' where action_page = 'purge_letter
 
 --- SGAMI-SO DEBUT
 
+-- add
 UPDATE actions SET id_status = 'EVIS' WHERE id = 414;
+
+-- unable feature_tour
+UPDATE users SET feature_tour = '["welcome","email","notification"]';
 
 --- SGAMI-SI FIN 
 
