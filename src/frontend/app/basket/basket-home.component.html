@@ -53,12 +53,12 @@
                                     <span *ngIf="basket.resourceNumber==0" class="nbResZero">{{basket.resourceNumber}}</span>
                                     <span *ngIf="basket.resourceNumber!=0" class="nbRes">{{basket.resourceNumber}}</span>
                                     <p mat-line title="{{basket.basket_name}}" [ngStyle]="{'color': basket.color}">
-                                        {{basket.basket_name}}s
+                                        {{basket.basket_name}}
                                     </p>
                                 </a>
                         </ng-container>
                     </mat-nav-list>
-                </mat-expansion-panel>      
+                </mat-expansion-panel>
             </mat-accordion>
         </ng-container>
         <ng-container *ngIf="homeData.assignedBaskets.length>0 && !editOrderGroups">
