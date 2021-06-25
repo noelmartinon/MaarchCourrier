@@ -1046,7 +1046,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                             tap((data: any) => {
                                 this.emailAttachTool.attachments.list[index] = {
                                     ...this.emailAttachTool.attachments.list[index],
-                                    recipientLabel: `${data.firstname} ${data.lastname}`
+                                    recipientLabel: this.formatUserName(data)
                                 };
                             }),
                             catchError((err) => {
@@ -1061,8 +1061,8 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                             tap((data: any) => {
                                 this.emailAttachTool.attachments.list[index] = {
                                     ...this.emailAttachTool.attachments.list[index],
-                                    recipientLabel: `${data.firstname} ${data.lastname}`,
-                                    company: !this.functions.empty(data.company) ? `${data.company}` : null
+                                    recipientLabel: this.contactService.formatContact(data),
+                                    onlyCompany: !this.functions.empty(data.company) && this.functions.empty(data.firstname) && this.functions.empty(data.lastname) ? true : false
                                 };
                             }),
                             catchError((err) => {
@@ -1074,6 +1074,17 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                 }
             }
         });
+    }
+
+    formatUserName(data: any) {
+        if (this.functions.empty(data.firstname) && this.functions.empty(data.lastname)) {
+            return null;
+        } else {
+            const dataUser: any[] = [];
+            dataUser.push(data.firstname);
+            dataUser.push(data.lastname);
+            return dataUser.filter((item: any) => !this.functions.empty(item)).join(' ');
+        }
     }
 
 }
