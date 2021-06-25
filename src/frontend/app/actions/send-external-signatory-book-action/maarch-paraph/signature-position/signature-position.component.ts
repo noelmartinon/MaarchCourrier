@@ -132,8 +132,10 @@ export class SignaturePositionComponent implements OnInit {
             this.workingAreaWidth = data.target.naturalWidth;
             this.workingAreaHeight = data.target.naturalHeight;
         };
-        img.src = imgContent;
-        document.getElementsByClassName('signatureContainer')[0].scrollTop = 0;
+        if (document.getElementsByClassName('signatureContainer')[0] !== undefined) {
+            img.src = imgContent;
+            document.getElementsByClassName('signatureContainer')[0].scrollTop = 0;
+        }
     }
 
     moveSign(event: any) {
