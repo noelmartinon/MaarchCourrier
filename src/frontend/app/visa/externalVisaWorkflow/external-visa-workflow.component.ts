@@ -415,10 +415,9 @@ export class ExternalVisaWorkflowComponent implements OnInit {
     }
 
     setPositionsWorkfow(resource: any, positions: any) {
-        if (this.visaWorkflow.items[0].signaturePositions === undefined) {
-            this.initPositionWorkflow();
-        }
+
         this.clearPositionsFromResource(resource);
+
         if (positions.signaturePositions !== undefined) {
             Object.keys(positions.signaturePositions).forEach(key => {
                 const objPos = {
@@ -445,15 +444,17 @@ export class ExternalVisaWorkflowComponent implements OnInit {
 
     clearPositionsFromResource(resource: any) {
         this.visaWorkflow.items.forEach((user: any) => {
-            user.signaturePositions = user.signaturePositions.filter((pos: any) => pos.resId !== resource.resId && pos.mainDocument !== resource.mainDocument);
-            user.datePositions = user.datePositions.filter((pos: any) => pos.resId !== resource.resId && pos.mainDocument !== resource.mainDocument);
-        });
-    }
+            if (user.signaturePositions === undefined) {
+                user.signaturePositions = [];
+            } else {
+                user.signaturePositions = user.signaturePositions.filter((pos: any) => pos.resId !== resource.resId && pos.mainDocument !== resource.mainDocument);
+            }
 
-    initPositionWorkflow() {
-        this.visaWorkflow.items.forEach((user: any) => {
-            user.signaturePositions = [];
-            user.datePositions = [];
+            if (user.datePositions === undefined) {
+                user.datePositions = [];
+            } else {
+                user.datePositions = user.datePositions.filter((pos: any) => pos.resId !== resource.resId && pos.mainDocument !== resource.mainDocument);
+            }
         });
     }
 
