@@ -518,7 +518,7 @@ function sendDiff($xmlfile, $ldapEntities, $ldapUsers)
         return false;
     }
 
-    $finalMaarchUsers = \User\models\UserModel::get(['select' => ['user_id', 'firstname', 'lastname', 'phone', 'mail', 'status']]);
+    $finalMaarchUsers = \User\models\UserModel::get(['select' => ['user_id', 'firstname', 'lastname', 'phone', 'mail', 'status'],'where' => ["status not in ('DEL','SPD')"]]);
     $finalMaarchEntities = \Entity\models\EntityModel::get(['select' => ['entity_id', 'entity_label', 'short_label', 'entity_type', 'parent_entity_id']]);
     
     $bodyUser = "";
