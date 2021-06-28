@@ -251,41 +251,42 @@ class MergeController
             }
         }
 
-        //Opinions - Avis
+        //Opinions - Opinion
         $opinions = '';
-        $avis = [];
+        $opinion = [];
         if (!empty($args['resId'])) {
             $opinionWorkflow = ListInstanceModel::get([
-                'select'    => ['item_id', 'process_date'],
-                'where'     => ['item_mode = ?', 'res_id = ?'],
-                'data'      => ['avis', $args['resId']],
+                'select'    => ['item_id', 'process_date', 'delegate'],
+                'where'     => ['difflist_type = ?', 'res_id = ?'],
+                'data'      => ['AVIS_CIRCUIT', $args['resId']],
                 'orderBy'   => ['listinstance_id']
             ]);
             $visibleNotes = NoteModel::getByUserIdForResource(['select' => ['user_id', 'note_text'], 'resId' => $args['resId'], 'userId' => $GLOBALS['id']]);
             $visibleNotes = array_reverse($visibleNotes);
-            $avisCount = 1;
+            $opinionCount = 1;
             foreach ($opinionWorkflow as $value) {
-                $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['firstname', 'lastname']]);
-                $primaryEntity = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label', 'users_entities.user_role as role']]);
+                $valueUserId = $value['delegate'] ?? $value['item_id'];
+                $user = UserModel::getById(['id' => $valueUserId, 'select' => ['firstname', 'lastname']]);
+                $primaryEntity = UserModel::getPrimaryEntityById(['id' => $valueUserId, 'select' => ['entities.entity_label', 'users_entities.user_role as role']]);
                 $processDate = null;
                 if (!empty($value['process_date'])) {
                     $processDate = ' - ' . TextFormatModel::formatDate($value['process_date']);
                 }
                 $opinions .= "{$user['firstname']} {$user['lastname']} ({$primaryEntity['entity_label']}) {$processDate}\n";
-                $avis['firstname'.$avisCount] = $user['firstname'];
-                $avis['lastname'.$avisCount] = $user['lastname'];
-                $avis['role'.$avisCount] = $primaryEntity['role'];
-                $avis['entity'.$avisCount] = $primaryEntity['entity_label'];
-                $avis['note'.$avisCount] = [];
+                $opinion['firstname'.$opinionCount] = $user['firstname'];
+                $opinion['lastname'.$opinionCount] = $user['lastname'];
+                $opinion['role'.$opinionCount] = $primaryEntity['role'];
+                $opinion['entity'.$opinionCount] = $primaryEntity['entity_label'];
+                $opinion['note'.$opinionCount] = [];
                 foreach ($visibleNotes as $visibleNote) {
-                    if ($visibleNote['user_id'] === $value['item_id'] && strpos($visibleNote['note_text'], _AVIS_NOTE_PREFIX) === 0) {
-                        $avis['note'.$avisCount][] = trim(str_replace(_AVIS_NOTE_PREFIX, '', $visibleNote['note_text']));
+                    if ($visibleNote['user_id'] === $valueUserId && strpos($visibleNote['note_text'], _AVIS_NOTE_PREFIX) === 0) {
+                        $opinion['note'.$opinionCount][] = trim(str_replace(_AVIS_NOTE_PREFIX, '', $visibleNote['note_text']));
                     }
                 }
-                $avis['note'.$avisCount] = implode(' ; ', $avis['note'.$avisCount]);
-                $avisCount++;
+                $opinion['note'.$opinionCount] = implode(' ; ', $opinion['note'.$opinionCount]);
+                $opinionCount++;
             }
-            unset($avisCount);
+            unset($opinionCount);
             unset($visibleNotes);
         }
 
@@ -419,7 +420,7 @@ class MergeController
         $dataToBeMerge['userPrimaryEntity']     = $currentUserPrimaryEntity;
         $dataToBeMerge['visas']                 = $visas;
         $dataToBeMerge['opinions']              = $opinions;
-        $dataToBeMerge['avis']                  = $avis;
+        $dataToBeMerge['opinion']               = $opinion;
         $dataToBeMerge['copies']                = $copies;
         $dataToBeMerge['contact']               = [];
         $dataToBeMerge['notes']                 = $mergedNote;
