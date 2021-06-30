@@ -553,7 +553,7 @@ export class VisaWorkflowComponent implements OnInit {
         if (this.functions.empty(item.process_date)) {
             return item.requested_signature ? 'sign' : 'visa';
         } else {
-            if (this.stringIncludes(item.process_comment, this.translate.instant('lang.hasInterruptedWorkflow')) || this.stringIncludes(item.process_comment, this.translate.instant('lang.visaWorkflowInterrupted'))) {
+            if (this.stringIncludes(item.process_comment, this.translate.instant('lang.visaWorkflowInterrupted'))) {
                 return item.requested_signature ? 'sign' : 'visa';
             } else {
                 return item.signatory ? 'sign' : 'visa';
