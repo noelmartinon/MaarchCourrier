@@ -103,8 +103,8 @@ class Office365SharepointController
 
             if ($body['type'] == 'resourceCreation' || $body['type'] == 'attachmentCreation') {
                 $dataToMerge = ['userId' => $GLOBALS['id']];
-                if (!empty($tokenCheckResult['data']) && is_array($tokenCheckResult['data'])) {
-                    $dataToMerge = array_merge($dataToMerge, $tokenCheckResult['data']);
+                if (!empty($body['data']) && is_array($body['data'])) {
+                    $dataToMerge = array_merge($dataToMerge, $body['data']);
                 }
 
                 $mergedDocument = MergeController::mergeDocument([
