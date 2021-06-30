@@ -57,6 +57,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
         this.initVisaWorkflow();
         this.loading = false;
         this.checkSignatureBookInIndexingPage();
+        this.toggleIntegration("inSignatureBook");
     }
 
     async onSubmit() {
@@ -216,6 +217,7 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
     }
 
     toggleIntegration(integrationId: string) {
+        console.log(integrationId);
         this.http.put(`../rest/resourcesList/integrations`, { resources: this.data.resIds, integrations: { [integrationId]: !this.data.resource.integrations[integrationId] } }).pipe(
             tap(async () => {
                 this.data.resource.integrations[integrationId] = !this.data.resource.integrations[integrationId];
