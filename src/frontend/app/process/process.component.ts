@@ -930,4 +930,9 @@ export class ProcessComponent implements OnInit, OnDestroy {
         // unsubscribe to ensure no memory leaks
         this.subscription.unsubscribe();
     }
+
+    hasActions() {
+        return this.actionsList.filter(action => action.categoryUse.indexOf(this.currentResourceInformations.categoryId) > -1).length > 0;
+    }
+
 }
