@@ -23,15 +23,15 @@
             <mat-option class="autoCompleteInfoResult smallInputInfo" *ngIf="datas.length === 0 && !loading" disabled
                 [innerHTML]="listInfo">
             </mat-option>
+            <mat-option *ngIf="loading" disabled>
+                <mat-spinner diameter="20"></mat-spinner>
+            </mat-option>
             <div *ngIf="fromExternalWorkflow && connectorLength > 0" class="autoCompleteInfoResult create-contact" style="font-size: 11px;">
                 <a style="cursor: pointer;" (click)="$event.stopPropagation(); createExternalUser()" [title]="'lang.addOtp' | translate">
                     <mat-icon matSuffix class="fas fa-user-plus" style="padding-top: 5px"></mat-icon>
                     {{'lang.addOtp' | translate}}
                 </a>
             </div>
-            <mat-option *ngIf="loading" disabled>
-                <mat-spinner diameter="20"></mat-spinner>
-            </mat-option>
         </mat-autocomplete>
     </mat-form-field>
     <ng-container *ngIf="control !== undefined">
