@@ -17,7 +17,7 @@ export class UsersAdministrationRedirectModalComponent implements OnInit {
     isDeletable: boolean = false;
     userDestTemplates: any[] = [];
     userDestDifflists: any[] = [];
-    userDestDifflistsRedirectUserId: any = null;
+    userDestDifflistsRedirectUserSerialId: any = null;
     userVisaWorkflowResources: any[] = [];
     userVisaWorkflowResourcesRedirectUserId: any = null;
 
@@ -90,10 +90,10 @@ export class UsersAdministrationRedirectModalComponent implements OnInit {
     }
 
     setRedirectUserRes(user: any) {
-        if (this.data.user.user_id != user.id) {
-            this.userDestDifflistsRedirectUserId = user.id;
+        if (this.data.user.id !== user.serialId) {
+            this.userDestDifflistsRedirectUserSerialId = user.serialId;
         } else {
-            this.userDestDifflistsRedirectUserId = null;
+            this.userDestDifflistsRedirectUserSerialId = null;
             this.notify.error(this.translate.instant('lang.userUnauthorized'));
         }
     }
@@ -118,7 +118,7 @@ export class UsersAdministrationRedirectModalComponent implements OnInit {
             });
         }
         if (this.userDestDifflists.length > 0) {
-            if (!this.userDestDifflistsRedirectUserId) {
+            if (!this.userDestDifflistsRedirectUserSerialId) {
                 valid = false;
             }
         }
@@ -149,12 +149,9 @@ export class UsersAdministrationRedirectModalComponent implements OnInit {
     }
 
     updateListinstances() {
-        this.userDestDifflists.forEach((res: any, index: number) => {
-            this.userDestDifflists[index].listInstances = this.userDestDifflists[index].listInstances.map((item: any) => ({
-                ...item,
-                item_id: (item.item_mode === 'dest' && item.item_id === this.data.user.id) ? this.userDestDifflistsRedirectUserId : item.item_id
-            }));
-        });
+
+        this.replaceDestWithNewUser();
+
         return new Promise((resolve) => {
             this.http.put('../rest/listinstances', this.userDestDifflists).pipe(
                 tap((data: any) => {
@@ -226,4 +223,12 @@ export class UsersAdministrationRedirectModalComponent implements OnInit {
         });
     }
 
+    replaceDestWithNewUser() {
+        this.userDestDifflists.forEach((res: any, index: number) => {
+            this.userDestDifflists[index].listInstances = this.userDestDifflists[index].listInstances.map((item: any) => ({
+                ...item,
+                item_id: (item.item_mode === 'dest' && item.item_id === this.data.user.id) ? this.userDestDifflistsRedirectUserSerialId : item.item_id
+            }));
+        });
+    }
 }

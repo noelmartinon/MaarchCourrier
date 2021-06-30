@@ -214,6 +214,7 @@ export class RedirectActionComponent implements OnInit {
             item_mode: 'dest',
             item_type: 'user_id',
             item_id: user.user_id,
+            itemSerialId: user.id,
             labelToDisplay: user.labelToDisplay,
             descriptionToDisplay: user.descriptionToDisplay
         };
@@ -231,7 +232,7 @@ export class RedirectActionComponent implements OnInit {
                 let isInCopy = false;
                 let newCopy = null;
                 this.currentDiffusionListDestRedirect.forEach((element: any) => {
-                    if (element.item_mode === 'cc' && element.item_id === this.oldUser.item_id) {
+                    if (element.item_mode === 'cc' && element.itemSerialId === this.oldUser.itemSerialId) {
                         isInCopy = true;
                     }
                 });
@@ -266,7 +267,7 @@ export class RedirectActionComponent implements OnInit {
 
     executeAction() {
         if (this.redirectMode === 'user') {
-            this.http.put(this.data.processActionRoute, { resources: this.data.resIds, data: { onlyRedirectDest: true, listInstances: this.currentDiffusionListDestRedirect }, note: this.noteEditor.getNote() }).pipe(
+            this.http.put(this.data.processActionRoute, { resources: this.data.resIds, data: { onlyRedirectDest: true, listInstances: this.formatDiffusionList() }, note: this.noteEditor.getNote() }).pipe(
                 tap((data: any) => {
                     if (data && data.errors != null) {
                         this.notify.error(data.errors);
@@ -294,6 +295,14 @@ export class RedirectActionComponent implements OnInit {
                 })
             ).subscribe();
         }
+    }
+
+    // WORKAROUND TO SEND SERIAL ID IN ITEM_ID (TO DO : REFACTOR TO ONLY USE SERIAL ID)
+    formatDiffusionList() {
+        return this.currentDiffusionListDestRedirect.map((item: any) => ({
+            ...item,
+            item_id : item.itemSerialId
+        }));
     }
 
     checkValidity() {
