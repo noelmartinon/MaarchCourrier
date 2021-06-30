@@ -932,7 +932,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
     }
 
     hasActions() {
-        return this.actionsList.filter(action => action.categoryUse.indexOf(this.currentResourceInformations.categoryId) > -1).length > 0;
+        return this.loading ? true : this.actionsList.filter(action => action.categoryUse.indexOf(this.currentResourceInformations.categoryId) > -1).length > 0;
     }
 
 }
