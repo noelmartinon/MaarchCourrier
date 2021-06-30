@@ -20,6 +20,7 @@ define('_ALREADY_EXISTS', 'already exists');
 define('_AVIS_USER', 'For opinion');
 define('_AVIS_USER_COPY', 'Copy (opinion)');
 define('_AVIS_USER_INFO', 'For information (opinion)');
+define('_AVIS_NOTE_PREFIX', '[opinion]');
 define('_BASKET_CREATION', 'Basket creation');
 define('_BASKET_GROUP_CREATION', 'Group added to basket');
 define('_BASKET_GROUP_MODIFICATION', 'Group updated for basket');

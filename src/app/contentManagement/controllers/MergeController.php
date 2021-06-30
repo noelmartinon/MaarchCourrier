@@ -284,25 +284,43 @@ class MergeController
             unset($signCount);
         }
 
-        //Opinions
+        //Opinions - Opinion
         $opinions = '';
+        $opinion = [];
         if (!empty($args['resId'])) {
             $opinionWorkflow = ListInstanceModel::get([
-                'select'    => ['item_id', 'process_date'],
+                'select'    => ['item_id', 'process_date', 'delegate'],
                 'where'     => ['difflist_type = ?', 'res_id = ?'],
                 'data'      => ['AVIS_CIRCUIT', $args['resId']],
                 'orderBy'   => ['listinstance_id']
             ]);
+            $visibleNotes = NoteModel::getByUserIdForResource(['select' => ['user_id', 'note_text'], 'resId' => $args['resId'], 'userId' => $GLOBALS['id']]);
+            $visibleNotes = array_reverse($visibleNotes);
+            $opinionCount = 1;
             foreach ($opinionWorkflow as $value) {
-                $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['firstname', 'lastname']]);
-                $primaryentity = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label']]);
-
+                $valueUserId = $value['delegate'] ?? $value['item_id'];
+                $user = UserModel::getById(['id' => $valueUserId, 'select' => ['firstname', 'lastname']]);
+                $primaryEntity = UserModel::getPrimaryEntityById(['id' => $valueUserId, 'select' => ['entities.entity_label', 'users_entities.user_role as role']]);
                 $processDate = null;
                 if (!empty($value['process_date'])) {
                     $processDate = ' - ' . TextFormatModel::formatDate($value['process_date']);
                 }
-                $opinions .= "{$user['firstname']} {$user['lastname']} ({$primaryentity['entity_label']}) {$processDate}\n";
+                $opinions .= "{$user['firstname']} {$user['lastname']} ({$primaryEntity['entity_label']}) {$processDate}\n";
+                $opinion['firstname'.$opinionCount] = $user['firstname'];
+                $opinion['lastname'.$opinionCount] = $user['lastname'];
+                $opinion['role'.$opinionCount] = $primaryEntity['role'];
+                $opinion['entity'.$opinionCount] = $primaryEntity['entity_label'];
+                $opinion['note'.$opinionCount] = [];
+                foreach ($visibleNotes as $visibleNote) {
+                    if ($visibleNote['user_id'] === $valueUserId && strpos($visibleNote['note_text'], _AVIS_NOTE_PREFIX) === 0) {
+                        $opinion['note'.$opinionCount][] = trim(str_replace(_AVIS_NOTE_PREFIX, '', $visibleNote['note_text']));
+                    }
+                }
+                $opinion['note'.$opinionCount] = implode(' ; ', $opinion['note'.$opinionCount]);
+                $opinionCount++;
             }
+            unset($opinionCount);
+            unset($visibleNotes);
         }
 
         //Copies
@@ -436,6 +454,7 @@ class MergeController
         $dataToBeMerge['visas']                 = $visas;
         $dataToBeMerge['visa']                  = $visa;
         $dataToBeMerge['opinions']              = $opinions;
+        $dataToBeMerge['opinion']               = $opinion;
         $dataToBeMerge['copies']                = $copies;
         $dataToBeMerge['contact']               = [];
         $dataToBeMerge['notes']                 = $mergedNote;
