@@ -2515,5 +2515,7 @@
     "noSuggestion": "Aucune suggestion",
     "contactsParameters_sector": "Secteur",
     "otpVisaUser": "L'utilisateur sera notifié par <b>courriel</b> au moment de son tour dans le circuit.",
-    "mustSign": "La position de signature pour les utilisateurs externes est obligatoire."
+    "mustSign": "La position de signature pour les utilisateurs externes est obligatoire.",
+    "company": "Organisation",
+    "noRecipient": "Aucun destinataire associé."
 }
