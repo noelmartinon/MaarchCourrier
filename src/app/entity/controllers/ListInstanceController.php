@@ -266,7 +266,7 @@ class ListInstanceController
                 }
 
                 if (in_array($instance['item_type'], ['user_id', 'user'])) {
-                    if ($instance['item_type'] == 'user_id') {
+                    if (!is_numeric($instance['item_id'])) {
                         $user = UserModel::getByLogin(['login' => $instance['item_id'], 'select' => ['id']]);
                         $instance['item_id'] = $user['id'] ?? null;
                     } else {
@@ -497,10 +497,10 @@ class ListInstanceController
                     return $response->withStatus(400)->withJson(['errors' => "Body resources[{$resourceKey}] listInstances[{$key}] sequence is before already processed users"]);
                 }
 
-                if ($listInstance['item_type'] == 'user_id') {
+                if (!is_numeric($listInstance['item_id'])) {
                     $user = UserModel::getByLogin(['login' => $listInstance['item_id'], 'select' => ['id'], 'noDeleted' => true]);
                     $listInstance['item_id'] = $user['id'] ?? null;
-                } elseif ($listInstance['item_type'] == 'user') {
+                } else {
                     $user = UserModel::getById(['id' => $listInstance['item_id'], 'select' => ['id'], 'noDeleted' => true]);
                 }
                 $listInstance['item_type'] = 'user_id';
