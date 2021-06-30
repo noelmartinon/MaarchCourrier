@@ -91,6 +91,11 @@ class JnlpController
         $newAttribute->value = '1.6+';
         $tagJ2se->appendChild($newAttribute);
 
+        $result = JnlpController::checkJarFile(['path' => 'modules/content_management/dist/maarchCM.jar']);
+        if (!empty($result['errors'])) {
+            return $response->withStatus(500)->withJson(['errors' => $result['errors']]);
+        }
+
         $tagJar1 = $jnlpDocument->createElement('jar');
         $newAttribute = $jnlpDocument->createAttribute('href');
         $newAttribute->value = $coreUrl . '/modules/content_management/dist/maarchCM.jar';
@@ -99,30 +104,60 @@ class JnlpController
         $newAttribute->value = 'true';
         $tagJar1->appendChild($newAttribute);
 
+        $result = JnlpController::checkJarFile(['path' => 'modules/content_management/dist/lib/httpclient-4.5.2.jar']);
+        if (!empty($result['errors'])) {
+            return $response->withStatus(500)->withJson(['errors' => $result['errors']]);
+        }
+
         $tagJar2 = $jnlpDocument->createElement('jar');
         $newAttribute = $jnlpDocument->createAttribute('href');
         $newAttribute->value = $jarPath . '/modules/content_management/dist/lib/httpclient-4.5.2.jar';
         $tagJar2->appendChild($newAttribute);
+
+        $result = JnlpController::checkJarFile(['path' => 'modules/content_management/dist/lib/httpclient-cache-4.5.2.jar']);
+        if (!empty($result['errors'])) {
+            return $response->withStatus(500)->withJson(['errors' => $result['errors']]);
+        }
 
         $tagJar3 = $jnlpDocument->createElement('jar');
         $newAttribute = $jnlpDocument->createAttribute('href');
         $newAttribute->value = $jarPath . '/modules/content_management/dist/lib/httpclient-cache-4.5.2.jar';
         $tagJar3->appendChild($newAttribute);
 
+        $result = JnlpController::checkJarFile(['path' => 'modules/content_management/dist/lib/httpclient-win-4.5.2.jar']);
+        if (!empty($result['errors'])) {
+            return $response->withStatus(500)->withJson(['errors' => $result['errors']]);
+        }
+
         $tagJar4 = $jnlpDocument->createElement('jar');
         $newAttribute = $jnlpDocument->createAttribute('href');
         $newAttribute->value = $jarPath . '/modules/content_management/dist/lib/httpclient-win-4.5.2.jar';
         $tagJar4->appendChild($newAttribute);
+
+        $result = JnlpController::checkJarFile(['path' => 'modules/content_management/dist/lib/httpcore-4.4.4.jar']);
+        if (!empty($result['errors'])) {
+            return $response->withStatus(500)->withJson(['errors' => $result['errors']]);
+        }
 
         $tagJar5 = $jnlpDocument->createElement('jar');
         $newAttribute = $jnlpDocument->createAttribute('href');
         $newAttribute->value = $jarPath . '/modules/content_management/dist/lib/httpcore-4.4.4.jar';
         $tagJar5->appendChild($newAttribute);
 
+        $result = JnlpController::checkJarFile(['path' => 'modules/content_management/dist/lib/plugin.jar']);
+        if (!empty($result['errors'])) {
+            return $response->withStatus(500)->withJson(['errors' => $result['errors']]);
+        }
+
         $tagJar6 = $jnlpDocument->createElement('jar');
         $newAttribute = $jnlpDocument->createAttribute('href');
         $newAttribute->value = $jarPath . '/modules/content_management/dist/lib/plugin.jar';
         $tagJar6->appendChild($newAttribute);
+
+        $result = JnlpController::checkJarFile(['path' => 'modules/content_management/dist/lib/commons-logging-1.2.jar']);
+        if (!empty($result['errors'])) {
+            return $response->withStatus(500)->withJson(['errors' => $result['errors']]);
+        }
 
         $tagJar7 = $jnlpDocument->createElement('jar');
         $newAttribute = $jnlpDocument->createAttribute('href');
@@ -448,5 +483,24 @@ class JnlpController
         }
 
         return $response->saveXML();
+    }
+
+    private static function checkJarFile(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['path']);
+        ValidatorModel::stringType($args, ['path']);
+
+        if (!is_file($args['path'])) {
+            if (!is_file($args['path'] . '.default')) {
+                return ['errors' => 'File ' . $args . '.default not found'];
+            }
+            $content = file_get_contents($args['path'] . '.default');
+            $result = file_put_contents($args['path'], $content);
+            if ($result === false) {
+                return ['errors' => 'Failed to create ' . $args['path'] . ' from default'];
+            }
+        }
+
+        return true;
     }
 }
