@@ -74,6 +74,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     currentResourceInformations: any = {};
 
+    prevCategory: string = '';
+
     processTool: any[] = [
         {
             id: 'dashboard',
@@ -620,6 +622,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                 this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false);
             }
         } else {
+            this.currentResourceInformations.categoryId  = !this.functions.empty(this.prevCategory) ? this.prevCategory : this.currentResourceInformations.categoryId;
             this.notify.error(this.translate.instant('lang.mustFixErrors'));
         }
     }
@@ -706,6 +709,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                 tap((data: string) => {
                     if (data !== 'ok') {
                         this.currentTool = tabId;
+                        this.currentResourceInformations.categoryId  = !this.functions.empty(this.prevCategory) ? this.prevCategory : this.currentResourceInformations.categoryId;
                     }
                 }),
                 filter((data: string) => data === 'ok'),

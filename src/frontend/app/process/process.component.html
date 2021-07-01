@@ -128,7 +128,7 @@
                 </app-attachments-list>
                 <app-select-indexing-model *ngIf="currentTool === 'info' && !loading" #appSelectIndexingModel
                     [defaultIndexingModelId]="currentResourceInformations.modelId" [adminMode]="canChangeModel"
-                    [indexingForm]="indexingForm" (afterSelectedListModel)="currentResourceInformations.categoryId = $event.category; indexingForm.loadForm($event.id, false);">
+                    [indexingForm]="indexingForm" (afterSelectedListModel)="prevCategory=$event.prevCategory; currentResourceInformations.categoryId = $event.indexingModel.category; indexingForm.loadForm($event.indexingModel.id, false);">
                 </app-select-indexing-model>
                 <div *ngIf="currentTool === 'info' && !loading && !functions.empty(currentResourceInformations.registeredMail_deposit_id)"
                     class="alert-message alert-message-info" style="min-width: 100%;"
@@ -374,7 +374,7 @@
                 <app-select-indexing-model *ngIf="modal.id === 'info' && !loading" #appSelectIndexingModel
                     [adminMode]="canChangeModel" [indexingForm]="indexingForm"
                     [defaultIndexingModelId]="currentResourceInformations.modelId"
-                    (afterSelectedListModel)="currentResourceInformations.categoryId = $event.category; indexingForm.loadForm($event.id, false)"></app-select-indexing-model>
+                    (afterSelectedListModel)="prevCategory=$event.prevCategory; currentResourceInformations.categoryId = $event.indexingModel.category; indexingForm.loadForm($event.indexingModel.id, false)"></app-select-indexing-model>
                 <div *ngIf="modal.id === 'info' && !loading && !functions.empty(currentResourceInformations.registeredMail_deposit_id)"
                     class="alert-message alert-message-info" style="min-width: 100%;"
                     [innerHTML]="'lang.dispositListGeneratedMsg' | translate"></div>
