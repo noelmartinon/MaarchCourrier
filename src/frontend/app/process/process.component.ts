@@ -622,7 +622,6 @@ export class ProcessComponent implements OnInit, OnDestroy {
                 this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false);
             }
         } else {
-            this.currentResourceInformations.categoryId  = !this.functions.empty(this.prevCategory) ? this.prevCategory : this.currentResourceInformations.categoryId;
             this.notify.error(this.translate.instant('lang.mustFixErrors'));
         }
     }
@@ -715,10 +714,12 @@ export class ProcessComponent implements OnInit, OnDestroy {
                 filter((data: string) => data === 'ok'),
                 tap(() => {
                     this.saveTool();
-                    setTimeout(() => {
-                        this.loadResource(false);
-                    }, 400);
-                    this.currentTool = tabId;
+                    if (!this.indexingForm.mustFixErrors) {
+                        setTimeout(() => {
+                            this.loadResource(false);
+                        }, 400);
+                        this.currentTool = tabId;
+                    }
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
