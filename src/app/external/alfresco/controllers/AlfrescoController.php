@@ -576,6 +576,56 @@ class AlfrescoController
             return ['errors' => 'Document has no chrono'];
         }
 
+        $alfrescoParameters = CoreConfigModel::getJsonLoaded(['path' => 'config/alfresco.json']);
+        if (empty($alfrescoParameters)) {
+            return ['errors' => 'Alfresco mapping file does not exist'];
+        }
+
+        if (!empty($document['external_id']['alfrescoId']) && empty($document['external_id']['alfrescoFolderId'])) {
+            $message = empty($args['folderName']) ? " (envoyé au dossier {$args['folderId']})" : " (envoyé au dossier {$args['folderName']})";
+            return ['history' => $message];
+        } elseif (!empty($document['external_id']['alfrescoFolderId']) && !empty($alfrescoParameters['mapping']['folderModification'])) {
+            $curlResponse = CurlModel::exec([
+                'url'       => "{$alfrescoUri}/alfresco/versions/1/nodes/{$document['external_id']['alfrescoFolderId']}",
+                'basicAuth' => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
+                'headers'   => ['Accept: application/json'],
+                'method'    => 'GET'
+            ]);
+
+            if ($curlResponse['code'] != 200) {
+                return ['errors' => 'Cannot get alfresco folder ' . $document['external_id']['alfrescoFolderId']];
+            }
+
+            if (empty($curlResponse['response']['entry']['properties'])) {
+                return ['errors' => 'Alfresco folder ' . $document['external_id']['alfrescoFolderId'] . ' does not have any properties'];
+            }
+            $folderProperties = $curlResponse['response']['entry']['properties'];
+            $folderPropertiesKeys = array_keys($folderProperties);
+            $fieldNotFound = false;
+            $fieldNotCorrectValue = false;
+            foreach ($alfrescoParameters['mapping']['folderModification'] as $alfrescoField => $fieldValue) {
+                if (!in_array($alfrescoField, $folderPropertiesKeys)) {
+                    $fieldNotFound = true;
+                    break;
+                }
+                if ($folderProperties[$alfrescoField] != $fieldValue) {
+                    $fieldNotCorrectValue = true;
+                    break;
+                }
+            }
+
+            if (!$fieldNotFound && !$fieldNotCorrectValue) {
+                $message = empty($args['folderName']) ? " (envoyé au dossier {$args['folderId']})" : " (envoyé au dossier {$args['folderName']})";
+                return ['history' => $message];
+            }
+            if ($fieldNotFound) {
+                return ['errors' => 'At least one field is missing in Alfresco folder ' . $document['external_id']['alfrescoFolderId'] . ' properties'];
+            }
+            if ($fieldNotCorrectValue) {
+                return ['errors' => 'At least one field does not have the correct value in Alfresco folder ' . $document['external_id']['alfrescoFolderId'] . ' properties'];
+            }
+        }
+
         $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
         if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
             return ['errors' => 'Docserver does not exist'];
@@ -589,10 +639,6 @@ class AlfrescoController
         $fileContent = file_get_contents($pathToDocument);
         if ($fileContent === false) {
             return ['errors' => 'Document not found on docserver'];
-        }
-        $alfrescoParameters = CoreConfigModel::getJsonLoaded(['path' => 'config/alfresco.json']);
-        if (empty($alfrescoParameters)) {
-            return ['errors' => 'Alfresco mapping file does not exist'];
         }
 
         $body = ['name' => str_replace('/', '_', $document['alt_identifier']), 'nodeType' => 'cm:folder'];
@@ -611,7 +657,8 @@ class AlfrescoController
         }
         $resourceFolderId = $curlResponse['response']['entry']['id'];
 
-        $document['subject'] = str_replace([':', '*', '\'', '"', '>', '<'], ' ', $document['subject']);
+        $alfrescoCharRefused = [':', '*', '\'', '"', '>', '<', '|', '/'];
+        $document['subject'] = ltrim(str_replace($alfrescoCharRefused, ' ', $document['subject']));
         $multipartBody = [
             'filedata' => ['isFile' => true, 'filename' => $document['subject'], 'content' => $fileContent],
         ];
@@ -725,6 +772,7 @@ class AlfrescoController
 
         $externalId = json_decode($document['external_id'], true);
         $externalId['alfrescoId'] = $documentId;
+        $externalId['alfrescoFolderId'] = $resourceFolderId;
         ResModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
 
         $attachments = AttachmentModel::get([
@@ -735,6 +783,7 @@ class AlfrescoController
         $firstAttachment = true;
         $attachmentsTitlesSent = [];
         foreach ($attachments as $attachment) {
+            $attachment['title'] = ltrim(str_replace($alfrescoCharRefused, ' ', $attachment['title']));
             $adrInfo = [
                 'docserver_id'  => $attachment['docserver_id'],
                 'path'          => $attachment['path'],
