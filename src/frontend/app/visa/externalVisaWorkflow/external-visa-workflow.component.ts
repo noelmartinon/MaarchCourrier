@@ -415,8 +415,7 @@ export class ExternalVisaWorkflowComponent implements OnInit {
     }
 
     setPositionsWorkfow(resource: any, positions: any) {
-
-        this.clearPositionsFromResource(resource);
+        this.clearOldPositionsFromResource(resource);
 
         if (positions.signaturePositions !== undefined) {
             Object.keys(positions.signaturePositions).forEach(key => {
@@ -425,7 +424,6 @@ export class ExternalVisaWorkflowComponent implements OnInit {
                     mainDocument : resource.mainDocument,
                     resId: resource.resId
                 };
-                this.visaWorkflow.items[positions.signaturePositions[key].sequence].signaturePositions = this.visaWorkflow.items[positions.signaturePositions[key].sequence].signaturePositions.filter((pos: any) => pos.resId !== resource.resId && pos.mainDocument !== resource.mainDocument);
                 this.visaWorkflow.items[positions.signaturePositions[key].sequence].signaturePositions.push(objPos);
             });
         }
@@ -436,24 +434,40 @@ export class ExternalVisaWorkflowComponent implements OnInit {
                     mainDocument : resource.mainDocument,
                     resId: resource.resId
                 };
-                this.visaWorkflow.items[positions.datePositions[key].sequence].datePositions = this.visaWorkflow.items[positions.datePositions[key].sequence].datePositions.filter((pos: any) => pos.resId !== resource.resId && pos.mainDocument !== resource.mainDocument);
                 this.visaWorkflow.items[positions.datePositions[key].sequence].datePositions.push(objPos);
             });
         }
     }
 
-    clearPositionsFromResource(resource: any) {
+    clearOldPositionsFromResource(resource: any) {
         this.visaWorkflow.items.forEach((user: any) => {
+
             if (user.signaturePositions === undefined) {
                 user.signaturePositions = [];
             } else {
-                user.signaturePositions = user.signaturePositions.filter((pos: any) => pos.resId !== resource.resId && pos.mainDocument !== resource.mainDocument);
+                const signaturePositionsToKeep = [];
+                user.signaturePositions.forEach((pos: any) => {
+                    if (pos.resId !== resource.resId && pos.mainDocument === resource.mainDocument) {
+                        signaturePositionsToKeep.push(pos);
+                    } else if (pos.mainDocument !== resource.mainDocument) {
+                        signaturePositionsToKeep.push(pos);
+                    }
+                });
+                user.signaturePositions = signaturePositionsToKeep;
             }
 
             if (user.datePositions === undefined) {
                 user.datePositions = [];
             } else {
-                user.datePositions = user.datePositions.filter((pos: any) => pos.resId !== resource.resId && pos.mainDocument !== resource.mainDocument);
+                const datePositionsToKeep = [];
+                user.datePositions.forEach((pos: any) => {
+                    if (pos.resId !== resource.resId && pos.mainDocument === resource.mainDocument) {
+                        datePositionsToKeep.push(pos);
+                    } else if (pos.mainDocument !== resource.mainDocument) {
+                        datePositionsToKeep.push(pos);
+                    }
+                });
+                user.datePositions = datePositionsToKeep;
             }
         });
     }
