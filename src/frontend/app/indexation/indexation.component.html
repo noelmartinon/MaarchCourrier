@@ -2,7 +2,7 @@
     <ng-template #adminMenuTemplate>
         <app-select-indexing-model #appSelectIndexingModel [adminMode]="true" [indexingForm]="indexingForm"
             (afterListModelsLoaded)="loadIndexingModel($event)"
-            (afterSelectedListModel)="this.currentIndexingModel = $event;indexingForm.loadForm($event.id)">
+            (afterSelectedListModel)="this.currentIndexingModel = $event.indexingModel; indexingForm.loadForm($event.indexingModel.id)">
         </app-select-indexing-model>
         <ng-container *ngIf="!isEmptyIndexingModels()">
             <div class="indexing-form-container">
