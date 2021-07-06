@@ -715,12 +715,13 @@ export class ProcessComponent implements OnInit, OnDestroy {
                 filter((data: string) => data === 'ok'),
                 tap(() => {
                     this.saveTool();
-                    if (!this.indexingForm.mustFixErrors) {
+                    if (!this.indexingForm?.mustFixErrors) {
                         setTimeout(() => {
                             this.loadResource(false);
                         }, 400);
                         this.currentTool = tabId;
-                        this.currentResourceInformations.categoryId = this.currentCategory;
+                        this.currentResourceInformations.categoryId = !this.functions.empty(this.currentCategory) ? this.currentCategory : this.currentResourceInformations.categoryId;
+                        this.prevCategory = this.currentResourceInformations.categoryId;
                     }
                 }),
                 catchError((err: any) => {
@@ -809,7 +810,8 @@ export class ProcessComponent implements OnInit, OnDestroy {
                         this.notify.error(this.translate.instant('lang.mandatoryFile'));
                     } else {
                         await this.indexingForm.saveData();
-                        this.currentResourceInformations.categoryId = this.currentCategory;
+                        this.currentResourceInformations.categoryId = !this.functions.empty(this.currentCategory) ? this.currentCategory : this.currentResourceInformations.categoryId;
+                        this.prevCategory = this.currentResourceInformations.categoryId;
                         setTimeout(() => {
                             this.loadResource(false);
                         }, 400);
