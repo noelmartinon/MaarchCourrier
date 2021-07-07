@@ -94,7 +94,7 @@ class AttachmentController
             'select'    => [
                 'res_id as "resId"', 'res_id_master as "resIdMaster"', 'status', 'title', 'identifier as chrono', 'typist', 'modified_by as "modifiedBy"', 'relation', 'attachment_type as type',
                 'recipient_id as "recipientId"', 'recipient_type as "recipientType"', 'origin_id as "originId"', 'creation_date as "creationDate"', 'modification_date as "modificationDate"',
-                'validation_date as "validationDate"', 'format', 'fulltext_result as "fulltextResult"', 'in_signature_book as "inSignatureBook"', 'in_send_attach as "inSendAttach"'
+                'validation_date as "validationDate"', 'format', 'fulltext_result as "fulltextResult"', 'in_signature_book as "inSignatureBook"', 'in_send_attach as "inSendAttach"', 'original_filename as "originalFilename"'
             ]
         ]);
         if (empty($attachment) || in_array($attachment['status'], ['DEL', 'OBS'])) {
@@ -519,7 +519,7 @@ class AttachmentController
         }
 
         $attachment = AttachmentModel::get([
-            'select'    => ['res_id', 'docserver_id', 'res_id_master', 'format', 'title', 'signatory_user_serial_id', 'typist', 'attachment_type'],
+            'select'    => ['res_id', 'docserver_id', 'res_id_master', 'format', 'title', 'signatory_user_serial_id', 'typist', 'attachment_type', 'original_filename'],
             'where'     => ['res_id = ?', 'status not in (?)'],
             'data'      => [$args['id'], ['DEL']],
             'limit'     => 1
@@ -585,7 +585,8 @@ class AttachmentController
 
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($fileContent);
-        $filename = TextFormatModel::formatFilename(['filename' => $attachment['title'], 'maxLength' => 250]);
+        $filename = !empty($attachment['original_filename']) ? $attachment['original_filename'] : $attachment['title'];
+        $filename = TextFormatModel::formatFilename(['filename' => $filename, 'maxLength' => 250]);
 
         if ($data['mode'] == 'base64') {
             if ($attachment['attachment_type'] == 'signed_response') {
@@ -619,7 +620,7 @@ class AttachmentController
         }
 
         $attachment = AttachmentModel::get([
-            'select' => ['res_id', 'docserver_id', 'path', 'filename', 'res_id_master', 'title', 'fingerprint', 'relation'],
+            'select' => ['res_id', 'docserver_id', 'path', 'filename', 'res_id_master', 'title', 'fingerprint', 'relation', 'original_filename'],
             'where'  => ['res_id = ?', 'status not in (?)'],
             'data'   => [$args['id'], ['DEL']],
             'limit'  => 1
@@ -673,7 +674,8 @@ class AttachmentController
         $mimeType = $finfo->buffer($fileContent);
         $pathInfo = pathinfo($pathToDocument);
         $data     = $request->getQueryParams();
-        $filename = TextFormatModel::formatFilename(['filename' => $attachmentTodisplay['title'], 'maxLength' => 250]);
+        $filename = !empty($attachmentTodisplay['original_filename']) ? $attachmentTodisplay['original_filename'] : $attachmentTodisplay['title'];
+        $filename = TextFormatModel::formatFilename(['filename' => $filename, 'maxLength' => 250]);
         if ($attachmentTodisplay['relation'] > 1) {
             $filename .= '_V' . $attachmentTodisplay['relation'];
         } else {
@@ -751,7 +753,7 @@ class AttachmentController
         ValidatorModel::intVal($args, ['id']);
         ValidatorModel::boolType($args, ['original']);
 
-        $document = AttachmentModel::getById(['select' => ['docserver_id', 'path', 'filename', 'title', 'status', 'fingerprint'], 'id' => $args['id']]);
+        $document = AttachmentModel::getById(['select' => ['docserver_id', 'path', 'filename', 'title', 'status', 'fingerprint', 'original_filename'], 'id' => $args['id']]);
 
         if (empty($args['original'])) {
             if ($document['status'] == 'SIGN') {
@@ -801,8 +803,9 @@ class AttachmentController
 
         $encodedDocument = base64_encode($fileContent);
 
-        if (!empty($document['title'])) {
-            $document['title'] = TextFormatModel::formatFilename(['filename' => $document['title'], 'maxLength' => 30]);
+        if (!empty($document['title']) || !empty($document['original_filename'])) {
+            $document['title'] = !empty($document['original_filename']) ? $document['original_filename'] : $document['title'];
+            $document['title'] = TextFormatModel::formatFilename(['filename' => $document['title'], 'maxLength' => 250]);
         }
 
         $pathInfo = pathinfo($pathToDocument);
@@ -1001,6 +1004,10 @@ class AttachmentController
             if ($maximumSize > 0 && strlen($file) > $maximumSize) {
                 return ['errors' => "Body encodedFile size is over limit"];
             }
+        }
+
+        if (!empty($body['originalFilename']) && !Validator::stringType()->length(1, 255)->validate($body['format'])) {
+            return ['errors' => 'Body originalName is not a string or is more than 255 characters'];
         }
 
         return true;

@@ -279,6 +279,7 @@ CREATE TABLE res_attachments
   signatory_user_serial_id int,
   fulltext_result character varying(10) DEFAULT NULL::character varying,
   external_id jsonb DEFAULT '{}',
+  original_filename character varying(255) DEFAULT NULL::character varying,
   CONSTRAINT res_attachments_pkey PRIMARY KEY (res_id)
 )
 WITH (OIDS=FALSE);
@@ -924,6 +925,7 @@ CREATE TABLE res_letterbox
   linked_resources jsonb NOT NULL DEFAULT '[]',
   retention_frozen boolean DEFAULT FALSE NOT NULL,
   binding boolean,
+  original_filename character varying(255) DEFAULT NULL::character varying,
   CONSTRAINT res_letterbox_pkey PRIMARY KEY  (res_id)
 )
 WITH (OIDS=FALSE);

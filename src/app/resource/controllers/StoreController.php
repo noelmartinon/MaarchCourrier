@@ -254,7 +254,8 @@ class StoreController
             'integrations'          => json_encode($integrations),
             'linked_resources'      => !empty($args['linkedResources']) ? json_encode($args['linkedResources']) : '[]',
             'external_id'           => $externalId,
-            'creation_date'         => 'CURRENT_TIMESTAMP'
+            'creation_date'         => 'CURRENT_TIMESTAMP',
+            'original_filename'     => $args['originalFilename'] ?? null
         ];
 
         return $preparedData;
@@ -426,7 +427,8 @@ class StoreController
             'in_signature_book'        => $inSignatureBook ? 'true' : 'false',
             'external_id'              => $externalId,
             'creation_date'            => 'CURRENT_TIMESTAMP',
-            'signatory_user_serial_id' => !empty($args['signatory_user_serial_id']) ? $args['signatory_user_serial_id'] : null
+            'signatory_user_serial_id' => !empty($args['signatory_user_serial_id']) ? $args['signatory_user_serial_id'] : null,
+            'original_filename'        => $args['originalFilename'] ?? null
         ];
 
         return $preparedData;

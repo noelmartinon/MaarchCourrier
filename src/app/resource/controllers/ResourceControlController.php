@@ -255,6 +255,10 @@ class ResourceControlController
             }
         }
 
+        if (!empty($body['originalFilename']) && !Validator::stringType()->length(1, 255)->validate($body['format'])) {
+            return ['errors' => 'Body originalName is not a string or is more than 255 characters'];
+        }
+
         return true;
     }
 
