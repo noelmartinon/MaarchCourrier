@@ -167,6 +167,7 @@ export class IndexationComponent implements OnInit {
                 tap((data: any) => {
                     formatdatas['encodedFile'] = data.content;
                     formatdatas['format'] = data.format;
+                    formatdatas['originalFilename'] = data.name.substr(0, data.name.lastIndexOf('.'));
 
                     this.isMailing = !this.functions.empty(formatdatas.recipients) && formatdatas.recipients.length > 0 && this.currentIndexingModel.category === 'outgoing' && formatdatas['encodedFile'] === null;
 

@@ -140,6 +140,15 @@
                                     <i class="fas fa-asterisk noMandatory"></i>
                                 </div>
                             </div>
+                            <div class="attachment-form-item" *ngIf="!functions.empty(attachment['originalFilename'].value)">
+                                <mat-form-field class="input-form">
+                                    <input matInput placeholder="{{'lang.originalFilename' | translate}}"
+                                        [formControl]="attachment['originalFilename']">
+                                </mat-form-field>
+                                <div class="fieldState">
+                                    <i class="fas fa-asterisk noMandatory"></i>
+                                </div>
+                            </div>
                             <div class="attachment-form-item">
                                 <mat-form-field class="input-form" (click)="picker.open()" style="cursor:pointer;">
                                     <input [formControl]="attachment['validationDate']" matInput

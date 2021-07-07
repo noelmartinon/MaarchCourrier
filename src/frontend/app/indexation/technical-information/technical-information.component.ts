@@ -44,6 +44,11 @@ export class TechnicalInformationComponent implements OnInit {
             value: '',
             icon: 'fas fa-quote-right'
         },
+        originalFilename: {
+            label: 'originalFilename',
+            value: '',
+            icon: 'fas fa-quote-right'
+        },
         docserverPathFile: {
             label: 'docserverPathFile',
             value: '',
@@ -89,8 +94,9 @@ export class TechnicalInformationComponent implements OnInit {
                 this.techData.fulltext.value = data.information.fulltext_result,
                 this.techData.docserverPathFile.value = data.information.docserverPathFile,
                 this.techData.filename.value = data.information.filename,
+                this.techData.originalFilename.value = data.information.originalFilename,
                 this.techData.initiator.value = data.information.typistLabel,
-                this.techData.creationDate.value = this.datePipe.transform(data.information.creationDate, 'dd/MM/y HH:mm') ,
+                this.techData.creationDate.value = this.datePipe.transform(data.information.creationDate, 'dd/MM/y HH:mm'),
                 this.loading = false;
             }),
             exhaustMap(() => this.http.get('../rest/customFields')),

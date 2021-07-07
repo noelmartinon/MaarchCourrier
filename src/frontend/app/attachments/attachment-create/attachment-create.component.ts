@@ -133,7 +133,8 @@ export class AttachmentCreateComponent implements OnInit {
                         type: new FormControl({ value: 'response_project', disabled: false }, [Validators.required]),
                         validationDate: new FormControl({ value: '', disabled: false }),
                         format: new FormControl({ value: '', disabled: false }, [Validators.required]),
-                        encodedFile: new FormControl({ value: '', disabled: false }, [Validators.required])
+                        encodedFile: new FormControl({ value: '', disabled: false }, [Validators.required]),
+                        originalFilename: new FormControl({ value: '', disabled: true })
                     });
                     setTimeout(() => {
                         this.getAttachType('response_project', 0);
@@ -254,7 +255,8 @@ export class AttachmentCreateComponent implements OnInit {
                 recipientType: element.recipient.value.length > 0 ? element.recipient.value[0].type : null,
                 validationDate: element.validationDate.value !== '' ? element.validationDate.value : null,
                 encodedFile: element.encodedFile.value,
-                format: element.format.value
+                format: element.format.value,
+                originalFilename: element.originalFilename.value.substr(0, element.originalFilename.value.lastIndexOf('.'))
             });
         });
 
@@ -265,6 +267,7 @@ export class AttachmentCreateComponent implements OnInit {
         this.appDocumentViewer.toArray()[this.indexTab].getFile().pipe(
             distinctUntilChanged(),
             tap((data) => {
+                this.attachments[this.indexTab].originalFilename.setValue(data.name);
                 this.attachments[this.indexTab].encodedFile.setValue(data.content);
                 this.attachments[this.indexTab].format.setValue(data.format);
             }),
@@ -396,6 +399,7 @@ export class AttachmentCreateComponent implements OnInit {
 
         if (ev === 'uploadFile') {
             const filename = this.appDocumentViewer.toArray()[i].file.name;
+            this.attachments[i].originalFilename.setValue(filename);
             this.attachments[i].title.setValue(filename.substr(0, filename.lastIndexOf('.')));
         }
     }
@@ -407,7 +411,8 @@ export class AttachmentCreateComponent implements OnInit {
             type: new FormControl({ value: 'response_project', disabled: false }, [Validators.required]),
             validationDate: new FormControl({ value: null, disabled: false }),
             encodedFile: new FormControl({ value: '', disabled: false }, [Validators.required]),
-            format: new FormControl({ value: '', disabled: false }, [Validators.required])
+            format: new FormControl({ value: '', disabled: false }, [Validators.required]),
+            originalFilename: new FormControl({ value: '', disabled: true })
         });
         this.attachFormGroup.push(new FormGroup(this.attachments[this.attachments.length - 1]));
         this.indexTab = this.attachments.length - 1;

@@ -2203,5 +2203,6 @@
     "infoResId": "Vous pouvez remplir automatiquement ce champ en utilisant le mot-clé <b>@resId</b> pour cibler une ressource du document en cours de traitement",
     "canAddCopies": "Pouvoir ajouter des personnes en copie (CC / CCI)",
     "systemTechnicalFields": "Champs techniques \"Système\"",
-    "customTechnicalFields": "Champs techniques personnalisés"
+    "customTechnicalFields": "Champs techniques personnalisés",
+    "originalFilename": "Nom original"
 }
