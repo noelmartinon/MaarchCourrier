@@ -132,7 +132,7 @@ class ChronoModel
 
         ParameterModel::update(['id' => $chronoId, 'param_value_int' => $chrono + 1]);
 
-        return "/" . $chrono;
+        return $chrono;
     }
 
     public static function getChronoCategoryChar($categoryId)
