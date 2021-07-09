@@ -73,13 +73,13 @@ function main($argv)
     }
     
     if ($synchronizeUsers) {
-        synchronizeUsers($ldapUsers, $maarchUsers);
+        $usersNotDeleted = synchronizeUsers($ldapUsers, $maarchUsers);
     }
     if ($synchronizeEntities) {
         synchronizeEntities($ldapEntities, $maarchEntities);
     }
     
-    sendDiff($xmlfile, $ldapEntities, $ldapUsers);
+    sendDiff($xmlfile, $ldapEntities, $usersNotDeleted);
 }
 
 function initialize($customId)
@@ -222,6 +222,7 @@ function getEntitiesEntries($xmlfile)
 
 function synchronizeUsers(array $ldapUsers, array $maarchUsers)
 {
+    $usersNotDeleted = [];
     $maarchUsersLogin = [];
     foreach ($maarchUsers as $maarchUser) {
         $maarchUsersLogin[$maarchUser['user_id']] = $maarchUser;
@@ -301,11 +302,12 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
             ]);
             if ($curlResponse['code'] != 204) {
                 writeLog(['message' => "[ERROR] Delete user failed  : user in use"]);
+                array_push($usersNotDeleted, $user);
             }
         }
     }
 
-    return true;
+    return $usersNotDeleted;
 }
 
 function synchronizeEntities(array $ldapEntities, array $maarchEntities)
@@ -501,7 +503,7 @@ function sendMail($email)
     return true;
 }
 
-function sendDiff($xmlfile, $ldapEntities, $ldapUsers)
+function sendDiff($xmlfile, $ldapEntities, $usersNotDeleted)
 {
 
     $email['subject'] = (string)$xmlfile->mailing->subject;
@@ -526,18 +528,12 @@ function sendDiff($xmlfile, $ldapEntities, $ldapUsers)
     $compare = false;
     $tabulation = '<tr>';
   
-    foreach ($finalMaarchUsers as $value) {
-        $compare = true;
-        foreach ($ldapUsers as $v) {
-            if($value['user_id'] == $v['user_id'])  $compare = false;
-        }
-        if($compare){
-            $bodyUser .= '<tr>';
-            $bodyUser .= '<td>'.$value['user_id'].'</td>';
-            $bodyUser .= '<td>'.$value['firstname'].'</td>';
-            $bodyUser .= '<td>'.' '.$value['lastname'].'</td>';
-            $bodyUser .= '</tr>';
-        }
+    foreach ($usersNotDeleted as $value) {
+        $bodyUser .= '<tr>';
+        $bodyUser .= '<td>'.$value['user_id'].'</td>';
+        $bodyUser .= '<td>'.$value['firstname'].'</td>';
+        $bodyUser .= '<td>'.' '.$value['lastname'].'</td>';
+        $bodyUser .= '</tr>';
     }
 
     foreach ($finalMaarchEntities as $key => $value) {
