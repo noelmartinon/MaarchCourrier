@@ -15,9 +15,7 @@
 namespace Alfresco\controllers;
 
 use Attachment\models\AttachmentModel;
-use Attachment\models\AttachmentTypeModel;
 use Configuration\models\ConfigurationModel;
-use Contact\controllers\ContactCivilityController;
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
 use Docserver\models\DocserverModel;
@@ -45,7 +43,7 @@ class AlfrescoController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_alfresco']);
+        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
         if (empty($configuration)) {
             return $response->withJson(['configuration' => null]);
         }
@@ -69,11 +67,11 @@ class AlfrescoController
 
         $value = json_encode(['uri' => trim($body['uri'])]);
 
-        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_alfresco']);
+        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
         if (empty($configuration)) {
-            ConfigurationModel::create(['privilege' => 'admin_alfresco', 'value' => $value]);
+            ConfigurationModel::create(['service' => 'admin_alfresco', 'value' => $value]);
         } else {
-            ConfigurationModel::update(['set' => ['value' => $value], 'where' => ['privilege = ?'], 'data' => ['admin_alfresco']]);
+            ConfigurationModel::update(['set' => ['value' => $value], 'where' => ['service = ?'], 'data' => ['admin_alfresco']]);
         }
 
         return $response->withStatus(204);
@@ -315,7 +313,7 @@ class AlfrescoController
             $body['password'] = PasswordModel::decrypt(['cryptedPassword' => $alfresco['alfresco']['password']]);
         }
 
-        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_alfresco']);
+        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
         if (empty($configuration)) {
             return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration is not enabled']);
         }
@@ -336,7 +334,7 @@ class AlfrescoController
                 ],
                 'fields' => ['id', 'name']
             ];
-            $curlResponse = CurlModel::exec([
+            $curlResponse = CurlModel::execSimple([
                 'url'           => "{$alfrescoUri}/search/versions/1/search",
                 'basicAuth'     => ['user' => $body['login'], 'password' => $body['password']],
                 'headers'       => ['content-type:application/json', 'Accept: application/json'],
@@ -345,7 +343,7 @@ class AlfrescoController
             ]);
 
         } else {
-            $curlResponse = CurlModel::exec([
+            $curlResponse = CurlModel::execSimple([
                 'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$body['nodeId']}/children",
                 'basicAuth'     => ['user' => $body['login'], 'password' => $body['password']],
                 'headers'       => ['content-type:application/json'],
@@ -358,7 +356,7 @@ class AlfrescoController
             if (!empty($curlResponse['response']['error']['briefSummary'])) {
                 return $response->withStatus(400)->withJson(['errors' => $curlResponse['response']['error']['briefSummary']]);
             } elseif ($curlResponse['code'] == 404) {
-                return $response->withStatus(400)->withJson(['errors' => 'Page not found', 'lang' => 'pageNotFound']);
+                return $response->withStatus(400)->withJson(['errors' => 'Page not found']);
             } elseif (!empty($curlResponse['response'])) {
                 return $response->withStatus(400)->withJson(['errors' => json_encode($curlResponse['response'])]);
             } else {
@@ -371,7 +369,7 @@ class AlfrescoController
 
     public function getRootFolders(Request $request, Response $response)
     {
-        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_alfresco']);
+        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
         if (empty($configuration)) {
             return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration is not enabled']);
         }
@@ -392,7 +390,7 @@ class AlfrescoController
         }
         $entityInformations['alfresco']['password'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfresco']['password']]);
 
-        $curlResponse = CurlModel::exec([
+        $curlResponse = CurlModel::execSimple([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$entityInformations['alfresco']['nodeId']}/children",
             'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
             'headers'       => ['content-type:application/json'],
@@ -421,7 +419,7 @@ class AlfrescoController
 
     public function getChildrenFoldersById(Request $request, Response $response, array $args)
     {
-        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_alfresco']);
+        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
         if (empty($configuration)) {
             return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration is not enabled']);
         }
@@ -442,7 +440,7 @@ class AlfrescoController
         }
         $entityInformations['alfresco']['password'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfresco']['password']]);
 
-        $curlResponse = CurlModel::exec([
+        $curlResponse = CurlModel::execSimple([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['id']}/children",
             'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
             'headers'       => ['content-type:application/json'],
@@ -478,7 +476,7 @@ class AlfrescoController
             return $response->withStatus(400)->withJson(['errors' => 'Query params search is too short']);
         }
 
-        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_alfresco']);
+        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
         if (empty($configuration)) {
             return $response->withStatus(400)->withJson(['errors' => 'Alfresco configuration is not enabled']);
         }
@@ -507,7 +505,7 @@ class AlfrescoController
             ],
             'fields' => ['id', 'name']
         ];
-        $curlResponse = CurlModel::exec([
+        $curlResponse = CurlModel::execSimple([
             'url'           => "{$alfrescoUri}/search/versions/1/search",
             'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
             'headers'       => ['content-type:application/json', 'Accept: application/json'],
@@ -540,7 +538,7 @@ class AlfrescoController
         ValidatorModel::intVal($args, ['resId', 'userId']);
         ValidatorModel::stringType($args, ['folderId', 'folderName']);
 
-        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_alfresco']);
+        $configuration = ConfigurationModel::getByService(['service' => 'admin_alfresco']);
         if (empty($configuration)) {
             return ['errors' => 'Alfresco configuration is not enabled'];
         }
@@ -576,56 +574,6 @@ class AlfrescoController
             return ['errors' => 'Document has no chrono'];
         }
 
-        $alfrescoParameters = CoreConfigModel::getJsonLoaded(['path' => 'config/alfresco.json']);
-        if (empty($alfrescoParameters)) {
-            return ['errors' => 'Alfresco mapping file does not exist'];
-        }
-
-        if (!empty($document['external_id']['alfrescoId']) && empty($document['external_id']['alfrescoFolderId'])) {
-            $message = empty($args['folderName']) ? " (envoyé au dossier {$args['folderId']})" : " (envoyé au dossier {$args['folderName']})";
-            return ['history' => $message];
-        } elseif (!empty($document['external_id']['alfrescoFolderId']) && !empty($alfrescoParameters['mapping']['folderModification'])) {
-            $curlResponse = CurlModel::exec([
-                'url'       => "{$alfrescoUri}/alfresco/versions/1/nodes/{$document['external_id']['alfrescoFolderId']}",
-                'basicAuth' => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
-                'headers'   => ['Accept: application/json'],
-                'method'    => 'GET'
-            ]);
-
-            if ($curlResponse['code'] != 200) {
-                return ['errors' => 'Cannot get alfresco folder ' . $document['external_id']['alfrescoFolderId']];
-            }
-
-            if (empty($curlResponse['response']['entry']['properties'])) {
-                return ['errors' => 'Alfresco folder ' . $document['external_id']['alfrescoFolderId'] . ' does not have any properties'];
-            }
-            $folderProperties = $curlResponse['response']['entry']['properties'];
-            $folderPropertiesKeys = array_keys($folderProperties);
-            $fieldNotFound = false;
-            $fieldNotCorrectValue = false;
-            foreach ($alfrescoParameters['mapping']['folderModification'] as $alfrescoField => $fieldValue) {
-                if (!in_array($alfrescoField, $folderPropertiesKeys)) {
-                    $fieldNotFound = true;
-                    break;
-                }
-                if ($folderProperties[$alfrescoField] != $fieldValue) {
-                    $fieldNotCorrectValue = true;
-                    break;
-                }
-            }
-
-            if (!$fieldNotFound && !$fieldNotCorrectValue) {
-                $message = empty($args['folderName']) ? " (envoyé au dossier {$args['folderId']})" : " (envoyé au dossier {$args['folderName']})";
-                return ['history' => $message];
-            }
-            if ($fieldNotFound) {
-                return ['errors' => 'At least one field is missing in Alfresco folder ' . $document['external_id']['alfrescoFolderId'] . ' properties'];
-            }
-            if ($fieldNotCorrectValue) {
-                return ['errors' => 'At least one field does not have the correct value in Alfresco folder ' . $document['external_id']['alfrescoFolderId'] . ' properties'];
-            }
-        }
-
         $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
         if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
             return ['errors' => 'Docserver does not exist'];
@@ -640,12 +588,16 @@ class AlfrescoController
         if ($fileContent === false) {
             return ['errors' => 'Document not found on docserver'];
         }
+        $alfrescoParameters = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/alfresco.json']);
+        if (empty($alfrescoParameters)) {
+            return ['errors' => 'Alfresco mapping file does not exist'];
+        }
 
         $body = ['name' => str_replace('/', '_', $document['alt_identifier']), 'nodeType' => 'cm:folder'];
         if (!empty($alfrescoParameters['mapping']['folderCreation'])) {
             $body['properties'] = $alfrescoParameters['mapping']['folderCreation'];
         }
-        $curlResponse = CurlModel::exec([
+        $curlResponse = CurlModel::execSimple([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['folderId']}/children",
             'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
             'headers'       => ['content-type:application/json', 'Accept: application/json'],
@@ -657,12 +609,11 @@ class AlfrescoController
         }
         $resourceFolderId = $curlResponse['response']['entry']['id'];
 
-        $alfrescoCharRefused = [':', '*', '\'', '"', '>', '<', '|', '/'];
-        $document['subject'] = ltrim(str_replace($alfrescoCharRefused, ' ', $document['subject']));
+        $document['subject'] = str_replace([':', '*', '\'', '"', '>', '<'], ' ', $document['subject']);
         $multipartBody = [
             'filedata' => ['isFile' => true, 'filename' => $document['subject'], 'content' => $fileContent],
         ];
-        $curlResponse = CurlModel::exec([
+        $curlResponse = CurlModel::execSimple([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$resourceFolderId}/children",
             'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
             'method'        => 'POST',
@@ -712,18 +663,14 @@ class AlfrescoController
                     }
                 } elseif ($alfrescoParameter == 'destUserLabel') {
                     if (!empty($document['dest_user'])) {
-                        $properties[$key] = UserModel::getLabelledUserById(['id' => $document['dest_user']]);
+                        $properties[$key] = UserModel::getLabelledUserById(['login' => $document['dest_user']]);
                     }
                 } elseif (strpos($alfrescoParameter, 'senderCompany_') !== false) {
                     $contactNb = explode('_', $alfrescoParameter)[1];
                     $properties[$key] = $rawContacts[$contactNb]['company'] ?? '';
                 } elseif (strpos($alfrescoParameter, 'senderCivility_') !== false) {
                     $contactNb = explode('_', $alfrescoParameter)[1];
-                    $civility = null;
-                    if (!empty($rawContacts[$contactNb]['civility'])) {
-                        $civility = ContactCivilityController::getLabelById(['id' => $rawContacts[$contactNb]['civility']]);
-                    }
-                    $properties[$key] = $civility ?? '';
+                    $properties[$key] = ContactModel::getCivilityLabel(['civilityId' => $rawContacts[$contactNb]['civility']]);
                 } elseif (strpos($alfrescoParameter, 'senderFirstname_') !== false) {
                     $contactNb = explode('_', $alfrescoParameter)[1];
                     $properties[$key] = $rawContacts[$contactNb]['firstname'] ?? '';
@@ -759,7 +706,7 @@ class AlfrescoController
         $body = [
             'properties' => $properties,
         ];
-        $curlResponse = CurlModel::exec([
+        $curlResponse = CurlModel::execSimple([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$documentId}",
             'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
             'headers'       => ['content-type:application/json', 'Accept: application/json'],
@@ -772,7 +719,6 @@ class AlfrescoController
 
         $externalId = json_decode($document['external_id'], true);
         $externalId['alfrescoId'] = $documentId;
-        $externalId['alfrescoFolderId'] = $resourceFolderId;
         ResModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
 
         $attachments = AttachmentModel::get([
@@ -783,7 +729,6 @@ class AlfrescoController
         $firstAttachment = true;
         $attachmentsTitlesSent = [];
         foreach ($attachments as $attachment) {
-            $attachment['title'] = ltrim(str_replace($alfrescoCharRefused, ' ', $attachment['title']));
             $adrInfo = [
                 'docserver_id'  => $attachment['docserver_id'],
                 'path'          => $attachment['path'],
@@ -806,7 +751,7 @@ class AlfrescoController
             }
 
             if ($firstAttachment) {
-                $curlResponse = CurlModel::exec([
+                $curlResponse = CurlModel::execSimple([
                     'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$resourceFolderId}/children",
                     'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
                     'headers'       => ['content-type:application/json', 'Accept: application/json'],
@@ -835,7 +780,7 @@ class AlfrescoController
             $multipartBody = [
                 'filedata' => ['isFile' => true, 'filename' => $attachment['title'], 'content' => $fileContent],
             ];
-            $curlResponse = CurlModel::exec([
+            $curlResponse = CurlModel::execSimple([
                 'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$attachmentsFolderId}/children",
                 'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
                 'method'        => 'POST',
@@ -851,8 +796,8 @@ class AlfrescoController
             if (!empty($alfrescoParameters['mapping']['attachment'])) {
                 foreach ($alfrescoParameters['mapping']['attachment'] as $key => $alfrescoParameter) {
                     if ($alfrescoParameter == 'typeLabel') {
-                        $attachmentType = AttachmentTypeModel::getByTypeId(['select' => ['label'], 'typeId' => $attachment['attachment_type']]);
-                        $properties[$key] = $attachmentType['label'] ?? '';
+                        $attachmentsTypes = AttachmentModel::getAttachmentsTypesByXML();
+                        $properties[$key] = $attachmentsTypes[$attachment['attachment_type']]['label'];
                     } else {
                         $properties[$key] = $attachment[$alfrescoParameter];
                     }
@@ -862,7 +807,7 @@ class AlfrescoController
             $body = [
                 'properties' => $properties,
             ];
-            $curlResponse = CurlModel::exec([
+            $curlResponse = CurlModel::execSimple([
                 'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$attachmentId}",
                 'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
                 'headers'       => ['content-type:application/json', 'Accept: application/json'],
@@ -884,7 +829,7 @@ class AlfrescoController
             $body = [
                 'properties' => $alfrescoParameters['mapping']['folderModification'],
             ];
-            $curlResponse = CurlModel::exec([
+            $curlResponse = CurlModel::execSimple([
                 'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$resourceFolderId}",
                 'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
                 'headers'       => ['content-type:application/json', 'Accept: application/json'],
