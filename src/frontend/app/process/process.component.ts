@@ -607,8 +607,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                         if (this.appDocumentViewer.isEditingTemplate()) {
                             await this.appDocumentViewer.saveMainDocument();
                         }
-
-                        this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false);
+                        this.canLaunchAction();
                     }),
                     catchError((err: any) => {
                         this.notify.handleSoftErrors(err);
@@ -620,7 +619,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                 if (this.appDocumentViewer.isEditingTemplate()) {
                     await this.appDocumentViewer.saveMainDocument();
                 }
-                this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false);
+                this.canLaunchAction();
             }
         } else {
             this.notify.error(this.translate.instant('lang.mustFixErrors'));
@@ -809,9 +808,12 @@ export class ProcessComponent implements OnInit, OnDestroy {
                     if (this.functions.empty(data.contentView) && this.indexingForm.mandatoryFile) {
                         this.notify.error(this.translate.instant('lang.mandatoryFile'));
                     } else {
+                        if (this.indexingForm.isValidForm()) {
+                            this.currentResourceInformations.categoryId = !this.functions.empty(this.currentCategory) ? this.currentCategory : this.currentResourceInformations.categoryId;
+                            this.prevCategory = this.currentResourceInformations.categoryId;
+                            this.actionService.loading = false;
+                        }
                         await this.indexingForm.saveData();
-                        this.currentResourceInformations.categoryId = !this.functions.empty(this.currentCategory) ? this.currentCategory : this.currentResourceInformations.categoryId;
-                        this.prevCategory = this.currentResourceInformations.categoryId;
                         setTimeout(() => {
                             this.loadResource(false);
                         }, 400);
@@ -950,4 +952,11 @@ export class ProcessComponent implements OnInit, OnDestroy {
         this.currentCategory = event.indexingModel.category;
     }
 
+    canLaunchAction() {
+        const currentActions: any[] = this.actionsList.filter((action: any) => action.categoryUse.indexOf(this.currentResourceInformations.categoryId) > -1);
+        if (currentActions.length > 0 && currentActions.find((action: any) => action.id === this.selectedAction.id) !== undefined) {
+            this.actionService.loading = true;
+            this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false);
+        }
+    }
 }
