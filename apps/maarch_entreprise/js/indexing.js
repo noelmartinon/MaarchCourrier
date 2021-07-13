@@ -2057,6 +2057,9 @@ function initSenderRecipientAutocomplete(inputId, mode, alternateVersion, cardId
         templateValue: "{{otherInfo}}",
         emptyTemplate: "Aucune donnée pour <b>{{query}}</b>",
         minLength: 3,
+        //-- SGAMI-SO DEBUT 
+        maxItem: 30,
+        //-- SGAMI-SO FIN
         dynamic: true,
         filter: false,
         source: {
@@ -2067,7 +2070,10 @@ function initSenderRecipientAutocomplete(inputId, mode, alternateVersion, cardId
                     data: {
                         search          : query,
                         onlyContacts    : alternateVersion,
-                        color           : !alternateVersion
+                        color           : !alternateVersion,
+                        //-- SGAMI-SO DEBUT 
+                        numItem : 30
+                        //-- SGAMI-SO FIN
                     }
                 }
             }
