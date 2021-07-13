@@ -184,9 +184,11 @@ class MergeController
         ];
 
         if ($args['type'] == 'attachment') {
+            $where = $args['isVersion'] ? ['res_id_version = ?', 'status not in (?)'] : ['res_id = ?', 'status not in (?)'];
+
             $document = AttachmentModel::getOnView([
-                'select' => ['res_id', 'docserver_id', 'path', 'filename', 'res_id_master', 'title', 'fingerprint', 'format', 'identifier', 'attachment_type'],
-                'where'  => ['res_id = ?', 'status not in (?)'],
+                'select' => ['docserver_id', 'path', 'filename', 'res_id_master', 'title', 'fingerprint', 'format', 'identifier', 'attachment_type'],
+                'where'  => $where,
                 'data'   => [$args['resId'], ['DEL']]
             ]);
             $document = $document[0];
@@ -268,8 +270,9 @@ class MergeController
 
             $content = file_get_contents($tmpPath.$fileNameOnTmp.'.pdf');
 
+            $collId = $args['isVersion'] ? 'attachments_version_coll' : 'attachments_coll';
             $storeResult = DocserverController::storeResourceOnDocServer([
-                'collId'          => 'attachments_coll',
+                'collId'          => $collId,
                 'docserverTypeId' => 'CONVERT',
                 'encodedResource' => base64_encode($content),
                 'format'          => 'pdf'
@@ -283,6 +286,7 @@ class MergeController
             unlink($tmpPath.$fileNameOnTmp.'.pdf');
 
             AdrModel::createAttachAdr([
+                'isVersion'   => $args['isVersion'],
                 'resId'       => $args['resId'],
                 'type'        => 'TMP',
                 'docserverId' => $storeResult['docserver_id'],
