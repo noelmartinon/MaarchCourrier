@@ -105,28 +105,31 @@ if (!empty($_REQUEST['id']) && !empty($_REQUEST['collId'])) {
             $attachResId = $line->res_id;
         }
 
-        $attachment = \Attachment\models\AttachmentModel::getById(['id' => $attachResId, 'select' => ['res_id_master', 
-        'title', 'typist', 'identifier','format']]);
+        $attachment = \Attachment\models\AttachmentModel::getById(['id' => $attachResId, 'select' => ['res_id_master', 'title', 'typist', 'identifier','format'], 'isVersion' => $isVersion]);
 
         if (in_array($attachment['format'], \ContentManagement\controllers\MergeController::OFFICE_EXTENSIONS)) {
-            $result = \ContentManagement\controllers\MergeController::mergeAction(['resId' => $attachResId, 'type' => 'attachment']);
+            $result = \ContentManagement\controllers\MergeController::mergeAction(['resId' => $attachResId, 'type' => 'attachment', 'isVersion' => $isVersion]);
             if (!empty($result['errors'])) {
                 echo "{\"status\": 1, \"error\": ".$result['errors']."}";
                 exit;
             }
-            $convertedDocument = \Convert\models\AdrModel::getAttachments([
-                'select' => ['docserver_id', 'path', 'filename', 'type', 'fingerprint'],
-                'where'  => ['res_id = ?', 'type = ?'],
-                'data'   => [$attachResId, 'TMP']
+            $convertedDocument = \Convert\models\AdrModel::getConvertedDocumentById([
+                'select'    => ['docserver_id', 'path', 'filename'],
+                'resId'     => $attachResId,
+                'type'      => 'TMP',
+                'collId'    => 'attachments_coll',
+                'isVersion' => $isVersion
             ]);
         } else {
-            $convertedDocument = \Convert\models\AdrModel::getAttachments([
-                'select' => ['docserver_id', 'path', 'filename', 'type', 'fingerprint'],
-                'where'  => ['res_id = ?', 'type = ?'],
-                'data'   => [$attachResId, 'PDF']
+            $convertedDocument = \Convert\models\AdrModel::getConvertedDocumentById([
+                'select'    => ['docserver_id', 'path', 'filename'],
+                'resId'     => $attachResId,
+                'type'      => 'PDF',
+                'collId'    => 'attachments_coll',
+                'isVersion' => $isVersion
             ]);
         }
-        $convertedAttachment = $convertedDocument[0];
+        $convertedAttachment = $convertedDocument;
 
         if (!empty($convertedAttachment['errors'])) {
             echo "{\"status\":1, \"error\" : \""._ATTACH_PDF_NOT_FOUND . ": {$attachResId}, version : {$isVersion}\"}";
@@ -216,7 +219,7 @@ if (!empty($_REQUEST['id']) && !empty($_REQUEST['collId'])) {
 
         if (in_array($attachment['format'],  \ContentManagement\controllers\MergeController::OFFICE_EXTENSIONS)) {
             unlink($fileOnDs);
-            \Convert\models\AdrModel::deleteAttachmentAdr(['where' => ['res_id = ?', 'type = ?'], 'data' => [$attachResId, 'TMP']]);
+            \Convert\models\AdrModel::deleteAttachAdr(['resId' => $attachResId, 'type' => 'TMP', 'isVersion' => $isVersion]);
         }
 
         include 'modules/visa/save_attach_res_from_cm.php';
