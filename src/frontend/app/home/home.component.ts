@@ -77,7 +77,9 @@ export class HomeComponent extends AutoCompletePlugin implements OnInit {
             .subscribe((data: any) => {
                 this.homeData = data;
                 this.homeMessage = data['homeMessage'];
-        });
+            }, (err) => {
+                location.href = "index.php?display=true&page=logout&logout=true";
+            });
     }
 
     ngAfterViewInit(): void {
