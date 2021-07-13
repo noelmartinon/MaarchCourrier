@@ -487,6 +487,12 @@ abstract class content_management_tools_Abstract
         $j2se_attribute->value = '1.6+';
         $j2se_balise->appendChild($j2se_attribute);
 
+        $result = \ContentManagement\controllers\JnlpController::checkJarFile(['path' => 'modules/content_management/dist/maarchCM.jar']);
+        if (!empty($result['errors'])) {
+            echo $result['errors'];
+            return;
+        }
+
         $jar_balise=$docXML->createElement("jar");
         $jar_attribute = $docXML->createAttribute('href');
         $jar_attribute->value = $jar_path.'/modules/content_management/dist/maarchCM.jar';
@@ -496,30 +502,66 @@ abstract class content_management_tools_Abstract
         $jar_balise->appendChild($jar_attribute);
 
         //begin ext libs
+        $result = \ContentManagement\controllers\JnlpController::checkJarFile(['path' => 'modules/content_management/dist/lib/httpclient-4.5.2.jar']);
+        if (!empty($result['errors'])) {
+            echo $result['errors'];
+            return;
+        }
+        
         $jar_balise_1=$docXML->createElement("jar");
         $jar_attribute = $docXML->createAttribute('href');
         $jar_attribute->value = $jar_path.'/modules/content_management/dist/lib/httpclient-4.5.2.jar';
         $jar_balise_1->appendChild($jar_attribute);
+
+        $result = \ContentManagement\controllers\JnlpController::checkJarFile(['path' => 'modules/content_management/dist/lib/httpclient-cache-4.5.2.jar']);
+        if (!empty($result['errors'])) {
+            echo $result['errors'];
+            return;
+        }
 
         $jar_balise_2=$docXML->createElement("jar");
         $jar_attribute = $docXML->createAttribute('href');
         $jar_attribute->value = $jar_path.'/modules/content_management/dist/lib/httpclient-cache-4.5.2.jar';
         $jar_balise_2->appendChild($jar_attribute);
 
+        $result = \ContentManagement\controllers\JnlpController::checkJarFile(['path' => 'modules/content_management/dist/lib/httpclient-win-4.5.2.jar']);
+        if (!empty($result['errors'])) {
+            echo $result['errors'];
+            return;
+        }
+
         $jar_balise_3=$docXML->createElement("jar");
         $jar_attribute = $docXML->createAttribute('href');
         $jar_attribute->value = $jar_path.'/modules/content_management/dist/lib/httpclient-win-4.5.2.jar';
         $jar_balise_3->appendChild($jar_attribute);
+
+        $result = \ContentManagement\controllers\JnlpController::checkJarFile(['path' => 'modules/content_management/dist/lib/httpcore-4.4.4.jar']);
+        if (!empty($result['errors'])) {
+            echo $result['errors'];
+            return;
+        }
 
         $jar_balise_4=$docXML->createElement("jar");
         $jar_attribute = $docXML->createAttribute('href');
         $jar_attribute->value = $jar_path.'/modules/content_management/dist/lib/httpcore-4.4.4.jar';
         $jar_balise_4->appendChild($jar_attribute);
 
+        $result = \ContentManagement\controllers\JnlpController::checkJarFile(['path' => 'modules/content_management/dist/lib/plugin.jar']);
+        if (!empty($result['errors'])) {
+            echo $result['errors'];
+            return;
+        }
+
         $jar_balise_5=$docXML->createElement("jar");
         $jar_attribute = $docXML->createAttribute('href');
         $jar_attribute->value = $jar_path.'/modules/content_management/dist/lib/plugin.jar';
         $jar_balise_5->appendChild($jar_attribute);
+
+        $result = \ContentManagement\controllers\JnlpController::checkJarFile(['path' => 'modules/content_management/dist/lib/commons-logging-1.2.jar']);
+        if (!empty($result['errors'])) {
+            echo $result['errors'];
+            return;
+        }
 
         $jar_balise_6=$docXML->createElement("jar");
         $jar_attribute = $docXML->createAttribute('href');
