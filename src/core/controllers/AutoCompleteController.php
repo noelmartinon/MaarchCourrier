@@ -226,7 +226,7 @@ class AutoCompleteController
             'where'     => $where,
             'data'      => $requestData,
             'orderBy'   => ["is_corporate_person DESC", "case is_corporate_person when 'Y' then (society, lastname) else (contact_lastname, society) end"],
-            'limit'     => self::TINY_LIMIT
+            'limit'     => (integer)$data['numItem']
         ]);
 
         $color = (!empty($data['color']) && $data['color'] == 'true');
@@ -256,19 +256,46 @@ class AutoCompleteController
             'where'     => $requestData['where'],
             'data'      => $requestData['data'],
             'orderBy'   => ['lastname'],
-            'limit'     => self::TINY_LIMIT
+            'limit'     => (integer)$data['numItem']
         ]);
 
-        foreach ($users as $value) {
-            $autocompleteData[] = [
-                'type'          => 'user',
-                'id'            => $value['id'],
-                'idToDisplay'   => "{$value['firstname']} {$value['lastname']}",
-                'otherInfo'     => "{$value['firstname']} {$value['lastname']}"
-            ];
+        $resultDest = array_merge($contacts, $users);
+
+        $onlyContacts = [];
+        $autocompleteData = [];
+        foreach ($resultDest as $contact) {
+            // if (!empty($data['onlyContacts']) && $data['onlyContacts'] == 'true' && !in_array($contact['contact_id'], $onlyContacts)) {
+            //     $autocompleteData[] = AutoCompleteController::getFormattedOnlyContact(['contact' => $contact])['contact'];
+            //     $onlyContacts[] = $contact['contact_id'];
+            // }
+            if(array_key_exists('contact_id', $contact)) {
+                $autocompleteData[] = AutoCompleteController::getFormattedContact(['contact' => $contact, 'color' => $color])['contact'];
+            }else {
+
+                $autocompleteData[] = [
+                    'type'          => 'user',
+                    'id'            => $contact['user_id'],
+                    'idToDisplay'   => trim("{$contact['firstname']} {$contact['lastname']}"),
+                    'otherInfo'     => "{$contact['firstname']} {$contact['lastname']}"
+                ];
+            }
         }
 
-        return $response->withJson($autocompleteData);
+        foreach ($autocompleteData as $key => $row) {
+            $idToDisplay[$key]  = $row['idToDisplay'];
+        }
+
+        array_multisort(
+            $idToDisplay         , SORT_ASC , SORT_STRING,           
+            $autocompleteData
+        );
+
+        for ($i=0; $i < (integer)$data['numItem'] ; $i++) { 
+            $newArrayData[] = $autocompleteData[$i];
+        }
+        // SGAMI-SO -- END
+
+        return $response->withJson($newArrayData);
     }
 
     public static function getUsersForAdministration(Request $request, Response $response)
