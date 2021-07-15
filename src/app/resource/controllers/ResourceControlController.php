@@ -374,8 +374,10 @@ class ResourceControlController
     {
         $body = $args['body'];
 
-        $indexingModelFields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory'], 'where' => ['model_id = ?'], 'data' => [$body['modelId']]]);
+        $indexingModelFields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'editable', 'default_value', 'allowed_values'], 'where' => ['model_id = ?'], 'data' => [$body['modelId']]]);
         foreach ($indexingModelFields as $indexingModelField) {
+            $indexingModelField['default_value'] = json_decode($indexingModelField['default_value'], true);
+            $indexingModelField['allowed_values'] = json_decode($indexingModelField['allowed_values'], true);
             if (strpos($indexingModelField['identifier'], 'indexingCustomField_') !== false) {
                 $customFieldId = explode('_', $indexingModelField['identifier'])[1];
                 if ($indexingModelField['mandatory'] && empty($body['customFields'][$customFieldId])) {
@@ -418,12 +420,24 @@ class ResourceControlController
                         return ['errors' => "Body customFields[{$customFieldId}] is not a number"];
                     } elseif ($customField['type'] == 'date' && !Validator::date()->notEmpty()->validate($body['customFields'][$customFieldId])) {
                         return ['errors' => "Body customFields[{$customFieldId}] is not a date"];
+                    } elseif (!$indexingModelField['editable'] && $body['customFields'][$customFieldId] != $indexingModelField['default_value']) {
+                        return ['errors' => "Body {$indexingModelField['identifier']} is not editable and defers from default value ({$indexingModelField['default_value']})"];
+                    } elseif (!empty($indexingModelField['allowed_values'])) {
+                        if ($customField['type'] != 'select' && !in_array($body['customFields'][$customFieldId], $indexingModelField['allowed_values'])) {
+                            return ['errors' => "Body {$indexingModelField['identifier']} is not one of the allowed values"];
+                        } elseif ($customField['type'] == 'select' && !empty($array_diff($body['customFields'][$customFieldId], $indexingModelField['default_value']))) {
+                            return ['errors' => "Body {$indexingModelField['identifier']} does not only contain the allowed values"];
+                        }
                     }
                 }
             } elseif ($indexingModelField['identifier'] == 'destination' && !empty($args['isUpdating'])) {
                 continue;
             } elseif ($indexingModelField['mandatory'] && !isset($body[$indexingModelField['identifier']])) {
                 return ['errors' => "Body {$indexingModelField['identifier']} is not set"];
+            } elseif (!$indexingModelField['editable'] && $body[$indexingModelField['identifier']] != $indexingModelField['default_value']) {
+                return ['errors' => "Body {$indexingModelField['identifier']} is not editable and defers from default value ({$indexingModelField['default_value']})"];
+            } elseif (!empty($indexingModelField['allowed_values']) && !in_array($body[$indexingModelField['identifier']], $indexingModelField['allowed_values'])) {
+                return ['errors' => "Body {$indexingModelField['identifier']} is not one of the allowed values"];
             }
         }
 
@@ -491,7 +505,7 @@ class ResourceControlController
             if (!Validator::stringType()->validate($body['priority'])) {
                 return ['errors' => "Body priority is not a string"];
             }
-            
+
             $priority = PriorityModel::getById(['id' => $body['priority'], 'select' => [1]]);
             if (empty($priority)) {
                 return ['errors' => "Body priority does not exist"];
