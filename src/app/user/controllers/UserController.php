@@ -58,7 +58,7 @@ use User\models\UserSignatureModel;
 
 class UserController
 {
-    const ALTERNATIVES_CONNECTIONS_METHODS = ['sso', 'cas', 'ldap', 'keycloak', 'shibboleth'];
+    const ALTERNATIVES_CONNECTIONS_METHODS = ['sso', 'cas', 'ldap', 'keycloak', 'shibboleth', 'azure_saml'];
 
     public function get(Request $request, Response $response)
     {

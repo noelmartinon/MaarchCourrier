@@ -80,7 +80,7 @@ export class HeaderRightComponent implements OnInit {
     }
 
     showLogout() {
-        return ['sso'].indexOf(this.authService.authMode) > -1 && this.functions.empty(this.authService.authUri) ? false : true;
+        return ['sso', 'azure_saml'].indexOf(this.authService.authMode) > -1 && this.functions.empty(this.authService.authUri) ? false : true;
     }
 
     goTo() {

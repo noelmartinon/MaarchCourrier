@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '20.10.14_TMA1' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '20.10.15_TMA1' WHERE id = 'database_version';
 
 DROP VIEW IF EXISTS res_view_letterbox;
 
@@ -335,7 +335,7 @@ UPDATE actions SET id_status = 'EVIS' WHERE id = 414;
 -- unable feature_tour
 UPDATE users SET feature_tour = '["welcome","email","notification"]';
 
---- SGAMI-SI FIN 
+--- SGAMI-SI FIN
 
 UPDATE res_attachments SET attachment_type = 'acknowledgement_record_management' WHERE attachment_type = 'simple_attachment' AND format = 'xml' AND title = 'Accusé de réception' AND relation = 1 AND status = 'TRA';
 UPDATE res_attachments SET attachment_type = 'reply_record_management' WHERE attachment_type = 'simple_attachment' AND format = 'xml' AND title = 'Réponse au transfert' AND relation = 1 AND status = 'TRA';
