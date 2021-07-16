@@ -36,7 +36,7 @@ BEGIN
 	ELSE
 		SELECT entity_tree(parentid) INTO res;
 		RETURN res;
-	END IF;   
+	END IF;
 END;
 $BODY$ LANGUAGE plpgsql;
 
@@ -55,10 +55,10 @@ BEGIN
 		ELSE
 			SELECT ('"' || lastname || ' ' || firstname || '"')::JSONB INTO expe FROM users WHERE id = r.dest_user;
 			SELECT ('"' || entity_by_res_id(r.res_id) || '"')::JSONB INTO dest;
-			UPDATE res_letterbox SET custom_fields = jsonb_set(custom_fields,'{"20"}', expe) WHERE res_id = r.res_id RETURNing custom_fields INTO res;
-			UPDATE res_letterbox SET custom_fields = jsonb_set(custom_fields,'{"18"}', dest) WHERE res_id = r.res_id RETURNing custom_fields INTO res;
+			UPDATE res_letterbox SET custom_fields = jsonb_set(custom_fields,'{"20"}', expe) WHERE res_id = r.res_id RETURNING custom_fields INTO res;
+			UPDATE res_letterbox SET custom_fields = jsonb_set(custom_fields,'{"18"}', dest) WHERE res_id = r.res_id RETURNING custom_fields INTO res;
 			raise notice  '%', res::TEXT;
-		END IF;  
+		END IF;
     END LOOP;
     RETURN 'END';
 END;
@@ -67,3 +67,5 @@ $BODY$ LANGUAGE plpgsql;
 
 SELECT migrate_expeditor_data();
 DROP FUNCTION migrate_expeditor_data;
+
+UPDATE parameters SET param_value_string = '20.10.17' WHERE id = 'database_version';
