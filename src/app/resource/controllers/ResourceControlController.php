@@ -422,12 +422,8 @@ class ResourceControlController
                         return ['errors' => "Body customFields[{$customFieldId}] is not a date"];
                     } elseif (!$indexingModelField['editable'] && $body['customFields'][$customFieldId] != $indexingModelField['default_value']) {
                         return ['errors' => "Body {$indexingModelField['identifier']} is not editable and differs from default value ({$indexingModelField['default_value']})"];
-                    } elseif (!empty($indexingModelField['allowed_values'])) {
-                        if ($customField['type'] != 'select' && !in_array($body['customFields'][$customFieldId], $indexingModelField['allowed_values'])) {
-                            return ['errors' => "Body {$indexingModelField['identifier']} is not one of the allowed values"];
-                        } elseif ($customField['type'] == 'select' && !empty($array_diff($body['customFields'][$customFieldId], $indexingModelField['default_value']))) {
-                            return ['errors' => "Body {$indexingModelField['identifier']} does not only contain the allowed values"];
-                        }
+                    } elseif (!empty($indexingModelField['allowed_values']) && !in_array($body['customFields'][$customFieldId], $indexingModelField['allowed_values'])) {
+                        return ['errors' => "Body {$indexingModelField['identifier']} is not one of the allowed values"];
                     }
                 }
             } elseif ($indexingModelField['identifier'] == 'destination' && !empty($args['isUpdating'])) {

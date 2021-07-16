@@ -390,7 +390,7 @@ class IndexingModelController
                         'enabled'        => $field['enabled'] === false ? 'false' : 'true',
                         'default_value'  => !isset($field['default_value']) ? null : json_encode($field['default_value']),
                         'unit'           => $field['unit'],
-                        'editable'       => $field['editable'] === true ? 'true' : 'false',
+                        'editable'       => $field['editable'] === false ? 'false' : 'true',
                         'allowed_values' => !isset($field['allowedValues']) ? null : json_encode($field['allowedValues']),
                     ]);
                 }
@@ -459,7 +459,7 @@ class IndexingModelController
                 'enabled'        => $field['enabled'] === false ? 'false' : 'true',
                 'default_value'  => !isset($field['default_value']) ? null : json_encode($field['default_value']),
                 'unit'           => $field['unit'],
-                'editable'       => $field['editable'] === true ? 'true' : 'false',
+                'editable'       => $field['editable'] === false ? 'false' : 'true',
                 'allowed_values' => !isset($field['allowedValues']) ? null : json_encode($field['allowedValues']),
             ]);
         }
