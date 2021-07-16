@@ -324,7 +324,7 @@ class AttachmentController
             return $response->withStatus(403)->withJson(['errors' => 'Query limit is not an integer']);
         }
 
-        $excludeAttachmentTypes = ['signed_response'];
+        $excludeAttachmentTypes = ['signed_response', 'summary_sheet'];
 
         $attachments = AttachmentModel::get([
             'select'    => [

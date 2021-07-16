@@ -708,8 +708,8 @@ class FolderController
             if (!empty($resIds)) {
                 $attachments = AttachmentModel::get([
                     'select'    => ['COUNT(res_id)', 'res_id_master'],
-                    'where'     => ['res_id_master in (?)', 'status not in (?)', '((status = ? AND typist = ?) OR status != ?)'],
-                    'data'      => [$resIds, ['DEL', 'OBS'], 'TMP', $GLOBALS['id'], 'TMP'],
+                    'where'     => ['res_id_master in (?)', 'status not in (?)', '((status = ? AND typist = ?) OR status != ?)', 'attachment_type <> ?'],
+                    'data'      => [$resIds, ['DEL', 'OBS'], 'TMP', $GLOBALS['id'], 'TMP', 'summary_sheet'],
                     'groupBy'   => ['res_id_master']
                 ]);
 
