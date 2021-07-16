@@ -73,13 +73,13 @@ function main($argv)
     }
     
     if ($synchronizeUsers) {
-        $usersNotDeleted = synchronizeUsers($ldapUsers, $maarchUsers);
+        synchronizeUsers($ldapUsers, $maarchUsers);
     }
     if ($synchronizeEntities) {
         synchronizeEntities($ldapEntities, $maarchEntities);
     }
     
-    sendDiff($xmlfile, $ldapEntities, $usersNotDeleted);
+    sendDiff($xmlfile, $ldapEntities, $ldapUsers);
 }
 
 function initialize($customId)
@@ -222,7 +222,6 @@ function getEntitiesEntries($xmlfile)
 
 function synchronizeUsers(array $ldapUsers, array $maarchUsers)
 {
-    $usersNotDeleted = [];
     $maarchUsersLogin = [];
     foreach ($maarchUsers as $maarchUser) {
         $maarchUsersLogin[$maarchUser['user_id']] = $maarchUser;
@@ -235,16 +234,14 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
     foreach ($ldapUsers as $user) {
         $user['userId'] = $user['user_id'];
         if (!empty($maarchUsersLogin[$user['userId']])) {
-            if ($maarchUsersLogin[$user['userId']]['status'] == 'SPD') {
-                $curlResponse = \SrcCore\models\CurlModel::execSimple([
-                    'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $maarchUsersLogin[$user['user_id']]['id'] . '/status',
-                    'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
-                    'headers'       => ['content-type:application/json'],
-                    'method'        => 'PUT',
-                    'body'          => json_encode(['status' => 'OK'])
+            if ($maarchUsersLogin[$user['userId']]['status'] == 'DEL' || $maarchUsersLogin[$user['userId']]['status'] == 'SPD') {
+                $update = \User\models\UserModel::update([
+                    'set'   => ['status' => 'OK'],
+                    'where' => ['user_id = ?'],
+                    'data'  => [$user['userId']]
                 ]);
-                if ($curlResponse['code'] != 200) {
-                    writeLog(['message' => "[ERROR] Update user status failed : {$curlResponse['response']['errors']}"]);
+                if (!$update) {
+                    writeLog(['message' => "[ERROR] Update user status failed"]);
                     continue;
                 }
             }
@@ -271,7 +268,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
         } else {
             $control = controlUser($user);
             if (!empty($control['errors'])) {
-                writeLog(['message' => "[ERROR] Control create user [{$maarchUsersLogin[$user['user_id']]['user_id']}] failed : {$control['errors']}"]);
+                writeLog(['message' => "[ERROR] Control create user [{$maarchUsersLogin[$user['userId']]['userId']}] failed : {$control['errors']}"]);
                 continue;
             }
 
@@ -291,23 +288,26 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
         }
     }
 
-    
-    foreach ($maarchUsers as $user) {
-        if (empty($ldapUsersLogin[$user['user_id']])) {
-            $curlResponse = \SrcCore\models\CurlModel::execSimple([
-                'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/users/' . $user['id'] . '/suspend',
-                'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
-                'headers'       => ['content-type:application/json'],
-                'method'        => 'PUT'
-            ]);
-            if ($curlResponse['code'] != 204) {
-                writeLog(['message' => "[ERROR] Delete user failed  : user in use"]);
-                array_push($usersNotDeleted, $user);
+    $finalMaarchUsers = \User\models\UserModel::get(['select' => ['user_id', 'firstname', 'lastname', 'phone', 'mail', 'status'],'where' => ["status not in ('DEL','SPD')"]]);
+    foreach ($finalMaarchUsers as $value) {
+        $compare = true;
+        foreach ($ldapUsers as $v) {
+            if($value['user_id'] == $v['user_id'])  $compare = false;
+        }
+        if($compare){
+            if ($GLOBALS['user'] != $user['user_id'] &&
+            $user['user_id'] != 'superadmin') 
+            {
+                $delete = \User\models\UserModel::update([
+                    'set'   => ['status' => 'DEL'],
+                    'where' => ['id = ?'],
+                    'data'  => [$user['id']]
+                ]);
             }
         }
     }
 
-    return $usersNotDeleted;
+    return true;
 }
 
 function synchronizeEntities(array $ldapEntities, array $maarchEntities)
@@ -354,21 +354,7 @@ function synchronizeEntities(array $ldapEntities, array $maarchEntities)
             }
         }
     }
-
-    // foreach ($maarchEntities as $entity) {
-    //     if (empty($ldapEntitiesId[$entity['entity_id']])) {
-    //         $curlResponse = \SrcCore\models\CurlModel::execSimple([
-    //             'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/entities/' . $entity['entity_id'],
-    //             'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],
-    //             'headers'       => ['content-type:application/json'],
-    //             'method'        => 'DELETE'
-    //         ]);
-    //         if ($curlResponse['code'] != 200) {
-    //             writeLog(['message' => "[ERROR] Delete entity failed : entity in use"]);
-    //         }
-    //     }
-    // }
-
+    
     return true;
 }
 
@@ -503,7 +489,7 @@ function sendMail($email)
     return true;
 }
 
-function sendDiff($xmlfile, $ldapEntities, $usersNotDeleted)
+function sendDiff($xmlfile, $ldapEntities, $ldapUsers)
 {
 
     $email['subject'] = (string)$xmlfile->mailing->subject;
@@ -528,13 +514,6 @@ function sendDiff($xmlfile, $ldapEntities, $usersNotDeleted)
     $compare = false;
     $tabulation = '<tr>';
   
-    foreach ($usersNotDeleted as $value) {
-        $bodyUser .= '<tr>';
-        $bodyUser .= '<td>'.$value['user_id'].'</td>';
-        $bodyUser .= '<td>'.$value['firstname'].'</td>';
-        $bodyUser .= '<td>'.' '.$value['lastname'].'</td>';
-        $bodyUser .= '</tr>';
-    }
 
     foreach ($finalMaarchEntities as $key => $value) {
         $compare = true;
