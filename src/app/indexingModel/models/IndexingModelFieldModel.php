@@ -38,8 +38,8 @@ class IndexingModelFieldModel
 
     public static function create(array $args)
     {
-        ValidatorModel::notEmpty($args, ['model_id', 'enabled', 'mandatory', 'identifier', 'unit', 'editable']);
-        ValidatorModel::stringType($args, ['enabled', 'mandatory', 'identifier', 'unit', 'editable']);
+        ValidatorModel::notEmpty($args, ['model_id', 'enabled', 'mandatory', 'identifier', 'unit']);
+        ValidatorModel::stringType($args, ['enabled', 'mandatory', 'identifier', 'unit']);
         ValidatorModel::intVal($args, ['model_id']);
 
         DatabaseModel::insert([
@@ -51,7 +51,6 @@ class IndexingModelFieldModel
                 'enabled'        => $args['enabled'],
                 'default_value'  => $args['default_value'],
                 'unit'           => $args['unit'],
-                'editable'       => $args['editable'],
                 'allowed_values' => $args['allowed_values'],
             ]
         ]);
