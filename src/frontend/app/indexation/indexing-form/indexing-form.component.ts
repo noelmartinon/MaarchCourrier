@@ -260,6 +260,8 @@ export class IndexingFormComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
+    mustFixErrors: boolean = false;
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -446,6 +448,7 @@ export class IndexingFormComponent implements OnInit {
     saveData() {
         return new Promise((resolve, reject) => {
             if (this.isValidForm()) {
+                this.mustFixErrors = false;
                 const formatdatas = this.formatDatas(this.getDatas());
 
                 this.http.put(`../rest/resources/${this.resId}`, formatdatas).pipe(
@@ -482,6 +485,7 @@ export class IndexingFormComponent implements OnInit {
                 ).subscribe();
                 return true;
             } else {
+                this.mustFixErrors = true;
                 this.notify.error(this.translate.instant('lang.mustFixErrors'));
                 return false;
             }

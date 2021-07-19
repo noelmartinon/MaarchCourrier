@@ -90,8 +90,8 @@ export class SelectIndexingModelComponent implements OnInit {
     }
 
     selectIndexingModel(indexingModel: any) {
+        this.afterSelectedListModel.emit({indexingModel: indexingModel, prevCategory: JSON.parse(JSON.stringify(this.currentIndexingModel.category))});
         this.currentIndexingModel = indexingModel;
-        this.afterSelectedListModel.emit(indexingModel);
     }
 
     getCurrentIndexingModel() {

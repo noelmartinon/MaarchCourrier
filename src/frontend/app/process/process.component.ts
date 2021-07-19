@@ -74,6 +74,9 @@ export class ProcessComponent implements OnInit, OnDestroy {
 
     currentResourceInformations: any = {};
 
+    prevCategory: string = '';
+    currentCategory: string = '';
+
     processTool: any[] = [
         {
             id: 'dashboard',
@@ -604,8 +607,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                         if (this.appDocumentViewer.isEditingTemplate()) {
                             await this.appDocumentViewer.saveMainDocument();
                         }
-
-                        this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false);
+                        this.canLaunchAction();
                     }),
                     catchError((err: any) => {
                         this.notify.handleSoftErrors(err);
@@ -617,7 +619,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                 if (this.appDocumentViewer.isEditingTemplate()) {
                     await this.appDocumentViewer.saveMainDocument();
                 }
-                this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false);
+                this.canLaunchAction();
             }
         } else {
             this.notify.error(this.translate.instant('lang.mustFixErrors'));
@@ -706,15 +708,20 @@ export class ProcessComponent implements OnInit, OnDestroy {
                 tap((data: string) => {
                     if (data !== 'ok') {
                         this.currentTool = tabId;
+                        this.currentResourceInformations.categoryId  = !this.functions.empty(this.prevCategory) ? this.prevCategory : this.currentResourceInformations.categoryId;
                     }
                 }),
                 filter((data: string) => data === 'ok'),
                 tap(() => {
                     this.saveTool();
-                    setTimeout(() => {
-                        this.loadResource(false);
-                    }, 400);
-                    this.currentTool = tabId;
+                    if (!this.indexingForm?.mustFixErrors) {
+                        setTimeout(() => {
+                            this.loadResource(false);
+                        }, 400);
+                        this.currentTool = tabId;
+                        this.currentResourceInformations.categoryId = !this.functions.empty(this.currentCategory) ? this.currentCategory : this.currentResourceInformations.categoryId;
+                        this.prevCategory = this.currentResourceInformations.categoryId;
+                    }
                 }),
                 catchError((err: any) => {
                     this.notify.handleErrors(err);
@@ -801,6 +808,11 @@ export class ProcessComponent implements OnInit, OnDestroy {
                     if (this.functions.empty(data.contentView) && this.indexingForm.mandatoryFile) {
                         this.notify.error(this.translate.instant('lang.mandatoryFile'));
                     } else {
+                        if (this.indexingForm.isValidForm()) {
+                            this.currentResourceInformations.categoryId = !this.functions.empty(this.currentCategory) ? this.currentCategory : this.currentResourceInformations.categoryId;
+                            this.prevCategory = this.currentResourceInformations.categoryId;
+                            this.actionService.loading = false;
+                        }
                         await this.indexingForm.saveData();
                         setTimeout(() => {
                             this.loadResource(false);
@@ -929,5 +941,22 @@ export class ProcessComponent implements OnInit, OnDestroy {
         }
         // unsubscribe to ensure no memory leaks
         this.subscription.unsubscribe();
+    }
+
+    hasActions() {
+        return this.loading ? true : this.actionsList.filter(action => action.categoryUse.indexOf(this.currentResourceInformations.categoryId) > -1).length > 0;
+    }
+
+    setValues(event: any) {
+        this.prevCategory = event.prevCategory;
+        this.currentCategory = event.indexingModel.category;
+    }
+
+    canLaunchAction() {
+        const currentActions: any[] = this.actionsList.filter((action: any) => action.categoryUse.indexOf(this.currentResourceInformations.categoryId) > -1);
+        if (currentActions.length > 0 && currentActions.find((action: any) => action.id === this.selectedAction.id) !== undefined) {
+            this.actionService.loading = true;
+            this.actionService.launchAction(this.selectedAction, this.currentUserId, this.currentGroupId, this.currentBasketId, [this.currentResourceInformations.resId], this.currentResourceInformations, false);
+        }
     }
 }

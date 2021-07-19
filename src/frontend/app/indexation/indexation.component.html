@@ -2,7 +2,7 @@
     <ng-template #adminMenuTemplate>
         <app-select-indexing-model #appSelectIndexingModel [adminMode]="true" [indexingForm]="indexingForm"
             (afterListModelsLoaded)="loadIndexingModel($event)"
-            (afterSelectedListModel)="this.currentIndexingModel = $event;indexingForm.loadForm($event.id)">
+            (afterSelectedListModel)="this.currentIndexingModel = $event.indexingModel; indexingForm.loadForm($event.indexingModel.id)">
         </app-select-indexing-model>
         <ng-container *ngIf="!isEmptyIndexingModels()">
             <div class="indexing-form-container">
@@ -12,7 +12,7 @@
             </div>
             <div class="actions-indexing-form">
                 <ng-container
-                    *ngIf="actionsListLoaded && actionsList.length > 0 && indexingForm !== undefined && selectedAction !== undefined">
+                    *ngIf="actionsListLoaded && hasActions() && indexingForm !== undefined && selectedAction !== undefined">
                     <button mat-button class="button-form-primary" [disabled]="selectedAction.id === 0"
                         [matMenuTriggerFor]="menu" style="width:350px;margin-right:20px;"
                         [title]="selectedAction.label">
@@ -52,7 +52,7 @@
                         <mat-icon class="fa fa-check"></mat-icon>
                     </button>
                 </ng-container>
-                <div class="emptyAction" *ngIf="actionsListLoaded && actionsList.length === 0"
+                <div class="emptyAction" *ngIf="actionsListLoaded && !hasActions()"
                     [innerHTML]="'lang.noAvailableAction' | translate"></div>
             </div>
         </ng-container>
