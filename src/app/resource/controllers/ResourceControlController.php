@@ -374,7 +374,7 @@ class ResourceControlController
     {
         $body = $args['body'];
 
-        $indexingModelFields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'editable', 'default_value', 'allowed_values'], 'where' => ['model_id = ?'], 'data' => [$body['modelId']]]);
+        $indexingModelFields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'default_value', 'allowed_values'], 'where' => ['model_id = ?'], 'data' => [$body['modelId']]]);
         foreach ($indexingModelFields as $indexingModelField) {
             $indexingModelField['default_value'] = json_decode($indexingModelField['default_value'], true);
             $indexingModelField['allowed_values'] = json_decode($indexingModelField['allowed_values'], true);
@@ -420,8 +420,6 @@ class ResourceControlController
                         return ['errors' => "Body customFields[{$customFieldId}] is not a number"];
                     } elseif ($customField['type'] == 'date' && !Validator::date()->notEmpty()->validate($body['customFields'][$customFieldId])) {
                         return ['errors' => "Body customFields[{$customFieldId}] is not a date"];
-                    } elseif (!$indexingModelField['editable'] && $body['customFields'][$customFieldId] != $indexingModelField['default_value']) {
-                        return ['errors' => "Body {$indexingModelField['identifier']} is not editable and differs from default value ({$indexingModelField['default_value']})"];
                     } elseif (!empty($indexingModelField['allowed_values']) && !in_array($body['customFields'][$customFieldId], $indexingModelField['allowed_values'])) {
                         return ['errors' => "Body {$indexingModelField['identifier']} is not one of the allowed values"];
                     }
@@ -430,8 +428,6 @@ class ResourceControlController
                 continue;
             } elseif ($indexingModelField['mandatory'] && !isset($body[$indexingModelField['identifier']])) {
                 return ['errors' => "Body {$indexingModelField['identifier']} is not set"];
-            } elseif (!$indexingModelField['editable'] && $body[$indexingModelField['identifier']] != $indexingModelField['default_value']) {
-                return ['errors' => "Body {$indexingModelField['identifier']} is not editable and defers from default value ({$indexingModelField['default_value']})"];
             } elseif (!empty($indexingModelField['allowed_values']) && !in_array($body[$indexingModelField['identifier']], $indexingModelField['allowed_values'])) {
                 return ['errors' => "Body {$indexingModelField['identifier']} is not one of the allowed values"];
             }

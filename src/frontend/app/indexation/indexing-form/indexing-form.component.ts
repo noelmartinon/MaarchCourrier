@@ -997,7 +997,7 @@ export class IndexingFormComponent implements OnInit {
     }
 
     isAlwaysDisabledField(field: any) {
-        if ((this.adminMode && ((['integer', 'string', 'date'].indexOf(field.type) > -1 && !this.functions.empty(field.values)) || field.today)) || !field.editable) {
+        if (this.adminMode && ((['integer', 'string', 'date'].indexOf(field.type) > -1 && !this.functions.empty(field.values)) || field.today)) {
             return true;
         }
         return false;

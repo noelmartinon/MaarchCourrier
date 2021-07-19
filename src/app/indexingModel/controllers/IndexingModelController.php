@@ -73,7 +73,7 @@ class IndexingModelController
             return $response->withStatus(400)->withJson(['errors' => 'Model out of perimeter']);
         }
 
-        $fields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'default_value', 'unit', 'enabled', 'editable', 'allowed_values'], 'where' => ['model_id = ?'], 'data' => [$args['id']]]);
+        $fields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'default_value', 'unit', 'enabled', 'allowed_values'], 'where' => ['model_id = ?'], 'data' => [$args['id']]]);
         $destination = '';
         foreach ($fields as $key => $value) {
             $fields[$key]['default_value'] = json_decode($value['default_value'], true);
@@ -252,7 +252,6 @@ class IndexingModelController
                 'enabled'        => $field['enabled'] === false ? 'false' : 'true',
                 'default_value'  => !isset($field['default_value']) ? null : json_encode($field['default_value']),
                 'unit'           => $field['unit'],
-                'editable'       => $field['editable'] === true ? 'true' : 'false',
                 'allowed_values' => !isset($field['allowedValues']) ? null : json_encode($field['allowedValues']),
             ]);
         }
@@ -390,7 +389,6 @@ class IndexingModelController
                         'enabled'        => $field['enabled'] === false ? 'false' : 'true',
                         'default_value'  => !isset($field['default_value']) ? null : json_encode($field['default_value']),
                         'unit'           => $field['unit'],
-                        'editable'       => $field['editable'] === false ? 'false' : 'true',
                         'allowed_values' => !isset($field['allowedValues']) ? null : json_encode($field['allowedValues']),
                     ]);
                 }
@@ -459,7 +457,6 @@ class IndexingModelController
                 'enabled'        => $field['enabled'] === false ? 'false' : 'true',
                 'default_value'  => !isset($field['default_value']) ? null : json_encode($field['default_value']),
                 'unit'           => $field['unit'],
-                'editable'       => $field['editable'] === false ? 'false' : 'true',
                 'allowed_values' => !isset($field['allowedValues']) ? null : json_encode($field['allowedValues']),
             ]);
         }
