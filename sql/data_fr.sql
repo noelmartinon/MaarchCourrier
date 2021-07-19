@@ -2055,7 +2055,7 @@ SELECT pg_catalog.setval('public.contacts_filling_id_seq', 1, true);
 SELECT pg_catalog.setval('public.contacts_groups_id_seq', 1, false);
 SELECT pg_catalog.setval('public.contacts_groups_lists_id_seq', 1, false);
 SELECT pg_catalog.setval('public.contacts_id_seq', 12, false);
-SELECT pg_catalog.setval('public.contacts_parameters_id_seq', 17, false);
+SELECT pg_catalog.setval('public.contacts_parameters_id_seq', 18, false);
 SELECT pg_catalog.setval('public.custom_fields_id_seq', 6, false);
 SELECT pg_catalog.setval('public.docservers_id_seq', 12, true);
 SELECT pg_catalog.setval('public.doctypes_first_level_id_seq', 2, false);
