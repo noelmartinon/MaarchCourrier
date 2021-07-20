@@ -231,7 +231,7 @@ class CoreConfigModel
             $configuration = json_decode($configuration['value'], true);
 
             $mailevaConfig['enabled']       = $configuration['enabled'];
-            $mailevaConfig['connectionUri'] = $configuration['authUri'];
+            $mailevaConfig['connectionUri'] = rtrim($configuration['authUri'], '/');
             $mailevaConfig['uri']           = rtrim($configuration['uri'], '/');
 
             if (!empty($mailevaConfig['uri']) && $mailevaConfig['uri'] == 'https://api.maileva.com') {
