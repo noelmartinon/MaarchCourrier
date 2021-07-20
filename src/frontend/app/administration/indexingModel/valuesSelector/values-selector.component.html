@@ -1,0 +1,27 @@
+<div class="mat-dialog-content-container">
+    <h1 mat-dialog-title>{{data.label}}</h1>
+    <div mat-dialog-content>
+        <app-maarch-message>{{'lang.chooseValuesMsg' | translate}} :</app-maarch-message>
+        <mat-checkbox [checked]="allChecked()"
+            color="primary"
+            [indeterminate]="!emptyChecked() && !allChecked()"
+            (change)="toggleAll($event.checked)"><i>{{'lang.selectAll' | translate}}</i></mat-checkbox>
+        <mat-list> 
+            <mat-list-item *ngFor="let val of data.values">
+                <ng-container *ngIf="val.isTitle; else elseTemplate">
+                    {{!functionsServce.empty(val.title) ? val.title : val.label}}
+                </ng-container>
+                <ng-template #elseTemplate>
+                    <mat-checkbox [value]="val.disabled" [checked]="!val.disabled" color="primary" (change)="val.disabled=!val.disabled">{{!functionsServce.empty(val.title) ? val.title : val.label}}</mat-checkbox>
+                </ng-template>
+            </mat-list-item>
+        </mat-list>
+    </div>
+    <span class="divider-modal"></span>
+    <div mat-dialog-actions>
+        <button class="actions" color="primary" mat-raised-button
+            (click)="onSubmit()">{{'lang.validate' | translate}}</button>
+        <button class="actions" color="" mat-raised-button
+            (click)="this.dialogRef.close('');">{{'lang.cancel' | translate}}</button>
+    </div>
+</div>

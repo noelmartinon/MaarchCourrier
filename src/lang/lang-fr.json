@@ -2204,5 +2204,7 @@
     "expAddress": "Adresse expéditrice",
     "manual": "Manuelle",
     "mailServer": "Serveur de messagerie",
-    "canAddCopies": "Pouvoir ajouter des personnes en copie (CC / CCI)"
+    "canAddCopies": "Pouvoir ajouter des personnes en copie (CC / CCI)",
+    "chooseValues": "Choisir les valeurs",
+    "chooseValuesMsg": "Veuillez choisir les valeurs pouvant être utilisé pour ce champ"
 }

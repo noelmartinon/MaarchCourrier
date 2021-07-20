@@ -117,6 +117,11 @@ export class IndexingModelAdministrationComponent implements OnInit {
         const fields = this.indexingForm.getDatas();
         fields.forEach((element, key) => {
             fields[key].default_value = ['string', 'integer', 'date'].indexOf(fields[key].type) > -1 && fields[key].SQLMode ? null : fields[key].default_value;
+            if (fields[key].values?.filter((val: any) => !val.isTitle && val.disabled).length > 0) {
+                fields[key].allowedValues = fields[key].values.filter((val: any) => !val.isTitle && !val.disabled).map((val:any) => val.id);
+            } else {
+               delete fields[key].allowedValues;
+            }
             delete fields[key].event;
             delete fields[key].label;
             delete fields[key].system;
@@ -154,7 +159,6 @@ export class IndexingModelAdministrationComponent implements OnInit {
                 })
             ).subscribe();
         }
-
     }
 
     isModified() {
