@@ -1397,7 +1397,6 @@ CREATE TABLE indexing_models_fields
     enabled BOOLEAN DEFAULT TRUE NOT NULL,
     default_value json,
     unit text NOT NULL,
-    editable BOOLEAN DEFAULT TRUE NOT NULL,
     allowed_values jsonb,
     CONSTRAINT indexing_models_fields_pkey PRIMARY KEY (id)
 )
