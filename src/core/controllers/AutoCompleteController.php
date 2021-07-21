@@ -155,7 +155,10 @@ class AutoCompleteController
 
                 // Remove external value in signatureModes
                 $array = $curlResponse['response'][$key]['signatureModes'];
-                unset($array[array_search('external', $array)]);
+                $externalRoleIndex = array_search('external', $array);
+                if ($externalRoleIndex !== false) {
+                    unset($array[$externalRoleIndex]);
+                }
                 $array = array_values($array);
                 $curlResponse['response'][$key]['signatureModes'] = $array;
             }
