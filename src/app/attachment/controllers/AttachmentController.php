@@ -1029,7 +1029,7 @@ class AttachmentController
         } elseif (!Validator::stringType()->notEmpty()->validate($body['type'])) {
             return ['errors' => 'Body type is empty or not a string'];
         } elseif (isset($body['status']) && !in_array($body['status'], ['A_TRA', 'TRA', 'SEND_MASS'])) {
-            return ['errors' => 'Body type is empty or not a string'];
+            return ['errors' => 'Body status can only be A_TRA, TRA or SEND_MASS'];
         }
 
         if (!ResController::hasRightByResId(['resId' => [$body['resIdMaster']], 'userId' => $GLOBALS['id']])) {
