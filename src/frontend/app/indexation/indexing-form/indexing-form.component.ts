@@ -804,13 +804,13 @@ export class IndexingFormComponent implements OnInit {
                             if (Object.keys(data).indexOf(elem.identifier) > -1 || customId !== undefined) {
                                 let fieldValue: any = '';
                                 if (customId !== undefined) {
-                                    if (!this.functions.empty(elem.allowedValues) && elem.allowedValues.indexOf(elem.default_value) === -1) {
+                                    if (!this.functions.empty(elem.allowedValues) && !this.functions.empty(elem.default_value) && elem.allowedValues.indexOf(elem.default_value) === -1) {
                                         fieldValue = '';
                                     } else {
                                         fieldValue = data.customFields[customId]; 
                                     }
                                 } else {
-                                    if (!this.functions.empty(elem.allowedValues) && elem.allowedValues.indexOf(elem.default_value) === -1) {
+                                    if (!this.functions.empty(elem.allowedValues) && !this.functions.empty(elem.default_value) && elem.allowedValues.indexOf(elem.default_value) === -1) {
                                         fieldValue = '';
                                     } else {
                                         fieldValue = data[elem.identifier]; 
