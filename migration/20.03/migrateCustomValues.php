@@ -10,7 +10,9 @@ foreach ($customs as $custom) {
     if ($custom == 'custom.xml' || $custom == '.' || $custom == '..') {
         continue;
     }
-
+    #SGAMI-DEBUT
+    $idCustomField = 37;
+    #SGAMI-FIN
     \SrcCore\models\DatabasePDO::reset();
     new \SrcCore\models\DatabasePDO(['customId' => $custom]);
 
@@ -40,9 +42,11 @@ foreach ($customs as $custom) {
             'table'  => ['res_letterbox'],
             'where'  => $where
         ]);
-
-        if (!empty($columnValues)) {
-            $fieldId = \CustomField\models\CustomFieldModel::create([
+        #SGAMI-SO DEBUT
+        #if (!empty($columnValues)) {
+            $fieldId =  \CustomField\models\CustomFieldModel::createMod([        
+                'id'        => $idCustomField,
+        #SGAMI-SO FIN
                 'label'     => $migration['label'],
                 'type'      => $migration['customType'],
                 'values'    => '[]'
@@ -84,7 +88,10 @@ foreach ($customs as $custom) {
             }
 
             $migrated[] = $migration['id'];
-        }
+        #SGAMI-SO debut
+        #}
+        $idCustomField++; 
+        #SGAMI-SO fin
     }
 
     if (!empty($migrated)) {
