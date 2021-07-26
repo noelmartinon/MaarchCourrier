@@ -10,10 +10,12 @@ foreach ($customs as $custom) {
     if ($custom == 'custom.xml' || $custom == '.' || $custom == '..') {
         continue;
     }
-
+    #SGAMI-DEBUT
+    $idCustomField = 2;
+    #SGAMI-FIN
     \SrcCore\models\DatabasePDO::reset();
     new \SrcCore\models\DatabasePDO(['customId' => $custom]);
-
+    $listColunm =[];
     $migrated = 0;
     $path = "custom/{$custom}/apps/maarch_entreprise/xml/index_letterbox.xml";
     if (file_exists($path)) {
@@ -36,9 +38,11 @@ foreach ($customs as $custom) {
                         'where'  => ['field_name = ?'],
                         'data'   => [(string)$value->column]
                 ]);
-                if (empty($customExists)) {
-                    continue;
-                }
+                /* SGAMI-SO DEBUT
+                    if (empty($customExists)) {
+                        continue;
+                    }
+                SGAMI-SO FIN */
 
                 $label = (string)$value->label;
                 $type = trim((string)$value->type);
@@ -69,8 +73,10 @@ foreach ($customs as $custom) {
                         $values[] = $valueList[$foreignLabel];
                     }
                 }
-
-                $fieldId = \CustomField\models\CustomFieldModel::create([
+                #SGAMI-SO DEBUT
+                $fieldId =  \CustomField\models\CustomFieldModel::createMod([        
+                    'id'        => $idCustomField,
+                #SGAMI-SO FIN
                     'label'     => $label,
                     'type'      => $type,
                     'values'    => empty($values) ? '[]' : json_encode(array_values($values))
@@ -88,6 +94,7 @@ foreach ($customs as $custom) {
                 }
 
                 $column = (string)$value->column;
+                $listColunm[] = $column;
                 $csColumn = "custom_fields->>''{$fieldId}''";
 
                 if ($type == 'date') {
@@ -98,7 +105,9 @@ foreach ($customs as $custom) {
                 \Basket\models\BasketModel::update(['postSet' => ['basket_clause' => "REPLACE(basket_clause, '{$column}', '{$csColumn}')"], 'where' => ['1 = ?'], 'data' => [1]]);
                 $resources = \Resource\models\ResModel::get([
                     'select'    => ['res_id', $column],
+                    /*SGAMI-SO DEBUT
                     'where'     => [$column . ' is not null'],
+                    SGAMI-SO FIN*/
                 ]);
 
                 foreach ($resources as $resource) {
@@ -114,10 +123,14 @@ foreach ($customs as $custom) {
                         'data'      => [$resId]
                     ]);
                 }
-
+                #SGAMI-SO DEBUT
+                $idCustomField++;
+                #SGAMI-SO FIN
                 $migrated++;
             }
         }
+    }else{
+        printf("verifie le chemin");
     }
 
     printf("Migration Champs Custom (CUSTOM {$custom}) : " . $migrated . " Champs custom utilisé(s) et migré(s).\n");

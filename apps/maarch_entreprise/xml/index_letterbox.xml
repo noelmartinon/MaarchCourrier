@@ -1,107 +1,280 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ROOT>  <!-- If id are numbers, always start with 1, never with 0 -->
-<!--      
-    <INDEX>   
+    <INDEX>
+        <column>custom_t1</column>
+        <label>custom_t1</label>
+        <type>string</type>
+        <img>default_string.gif</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_n1</column>
+        <label>Chiffre</label>
+        <type>float</type>
+        <img>default_string.gif</img>
+    </INDEX>    
+    <INDEX>
+        <column>custom_f1</column>
+        <label>Thématique SVE</label>
+        <type>float</type>
+        <img>plus.png</img>
+        <table>
+            <table_name>procedures</table_name>
+            <foreign_key>procedure_id</foreign_key>
+            <foreign_label>procedure_label</foreign_label>
+            <where_clause></where_clause>
+            <order>order by procedure_label</order>
+        </table>
+        <default_value></default_value>
+    </INDEX>
+    <INDEX>
+        <column>custom_d1</column>
+        <label>Date retour Bureau Courrier</label>
+        <type>date</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_t2</column>
+        <label>Type de diffusion</label>
+        <type>string</type>
+        <img>plus.png</img>
+        <values_list>
+            <value>
+                <id>Reserve</id>
+                <label>Réservé</label>
+            </value>
+            <value>
+                <id>Normal</id>
+                <label>Normal</label>
+            </value>
+        </values_list>
+    </INDEX>
+    <INDEX>
+        <column>custom_n2</column>
+        <label>chiffre 2</label>
+        <type>float</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_f2</column>
+        <label>chiffre f2</label>
+        <type>float</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_d2</column>
+        <label>data d2</label>
+        <type>date</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_t3</column>
+        <label>custom_t3</label>
+        <type>string</type>
+        <img>plus.png</img>
+        <values_list>
+            <value>
+                <id>Reserve</id>
+                <label>Réservé</label>
+            </value>
+            <value>
+                <id>Normal</id>
+                <label>Normal</label>
+            </value>
+        </values_list>
+    </INDEX>
+    <INDEX>
+        <column>custom_n3</column>
+        <label>custom_n3</label>
+        <type>float</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_f3</column>
+        <label>custom_f3</label>
+        <type>float</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_d3</column>
+        <label>custom_d3</label>
+        <type>date</type>
+        <img>plus.png</img>
+    </INDEX>
+    
+    <INDEX>
+        <column>custom_t4</column>
+        <label>custom_t4</label>
+        <type>string</type>
+        <img>plus.png</img>
+        <values_list>
+            <value>
+                <id>Reserve</id>
+                <label>Réservé</label>
+            </value>
+            <value>
+                <id>Normal</id>
+                <label>Normal</label>
+            </value>
+        </values_list>
+    </INDEX>
+    <INDEX>
+        <column>custom_n4</column>
+        <label>custom_n4</label>
+        <type>float</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_f4</column>
+        <label>custom_f4</label>
+        <type>float</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_d4</column>
+        <label>custom_d4</label>
+        <type>date</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_t5</column>
+        <label>custom_t5</label>
+        <type>string</type>
+        <img>plus.png</img>
+        <values_list>
+            <value>
+                <id>Reserve</id>
+                <label>Réservé</label>
+            </value>
+            <value>
+                <id>Normal</id>
+                <label>Normal</label>
+            </value>
+        </values_list>
+    </INDEX>
+    <INDEX>
+        <column>custom_n5</column>
+        <label>custom_n5</label>
+        <type>float</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_f5</column>
+        <label>custom_f5</label>
+        <type>float</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_d5</column>
+        <label>custom_d5</label>
+        <type>date</type>
+        <img>plus.png</img>
+    </INDEX>
+
+    <INDEX>
         <column>custom_t6</column>
         <label>Utilisateur contributeur</label>
         <type>string</type>
-        <img>user</img> 
+        <img>default_string.gif</img>
         <table>
             <table_name>users</table_name>
             <foreign_key>user_id</foreign_key>
             <foreign_label>lastname</foreign_label>
-            <where_clause>enabled = 'Y'</where_clause>
+            <!--where_clause>enabled = 'Y' and status='OK'</where_clause-->
+            <where_clause>status='OK'</where_clause>
             <order>order by lastname</order>
         </table>
-        <only_detail>true</only_detail> if true, field appear only in detail page and research.  Display in all page otherwise.
         <default_value></default_value>
     </INDEX>
--->
     <INDEX>
-        <column>custom_t1</column>
-        <label>PO#</label>
-        <type>string</type>
-        <img>arrow-right</img>
+        <column>custom_d6</column>
+        <label>custom_d6</label>
+        <type>date</type>
+        <img>plus.png</img>
     </INDEX>
     <INDEX>
-        <column>custom_t2</column>
-        <label>Imput</label>
-        <type>string</type>
-        <img>arrow-right</img>
-    </INDEX>
-    <INDEX>
-        <column>custom_f1</column>
-        <label>Mnt</label>
-        <type>float</type>
-        <img>arrow-right</img>
-    </INDEX>
-    <INDEX>
-        <column>custom_t3</column>
-        <label>Id/Matricule</label>
-        <type>string</type>
-        <img>arrow-right</img>
-    </INDEX>
-<!--
-    <INDEX>
-        <column>custom_t2</column>
-        <label>_CUSTOM_T2</label>
+        <column>custom_t7</column>
+        <label>Service contributeur</label>
         <type>string</type>
         <img>default_string.gif</img>
-        <values_list> 
-            <value>
-                <id>1</id>
-                <label>Règlement</label>
-            </value>
-            <value>
-                <id>2</id>
-                <label>Pas de règlement</label>
-            </value>
-        </values_list>
-        <default_value>1</default_value>
-    </INDEX>
-    <INDEX>
-        <column>custom_d1</column>
-        <label>_CUSTOM_D1</label>
-        <type>date</type>
-        <img>default_date.gif</img>
-    </INDEX>
-    
-    <INDEX>
-        <column>custom_f1</column>
-        <label>_CUSTOM_F1</label>
-        <type>float</type>
-        <img>default_number.gif</img>
-    </INDEX>
--->
-<!--<INDEX>   
-        <column>custom_t2</column>   
-        <label>champ 2</label>
-        <type>string</type>
-        <img>default_string.gif</img> 
-        <values_list> 
-            <value>
-                <id>1</id>
-                <label>Contrôle externe</label>
-            </value>
-            <value>
-                <id>2</id>
-                <label>Autocontrôle</label>
-            </value>
-        </values_list>
-        <default_value>1</default_value>
-    </INDEX>
-    <INDEX>   
-        <column>custom_t3</column>
-        <label>champ 3</label>
-        <type>string</type>
-        <img>default_string.gif</img> 
         <table>
-            <table_name>ma_table</table_name>
-            <foreign_key>ma_table_id</foreign_key>
-            <foreign_label>ma_table_label</foreign_label>
+            <table_name>entities</table_name>
+            <foreign_key>entity_id</foreign_key>
+            <foreign_label>entity_label</foreign_label>
             <where_clause>enabled = 'Y'</where_clause>
-            <order>order by ma_table_label</order>
+            <order>order by entity_label</order>
         </table>
-        <default_value>5678</default_value>
-    </INDEX>-->
+        <default_value></default_value>
+    </INDEX>
+    <INDEX>
+        <column>custom_d7</column>
+        <label>custom_d7</label>
+        <type>date</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_t8</column>
+        <label>custom_t8</label>
+        <type>string</type>
+        <img>default_string.gif</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_d8</column>
+        <label>custom_d8</label>
+        <type>date</type>
+        <img>plus.png</img>
+    </INDEX>
+   <INDEX>
+        <column>custom_t9</column>
+        <label>Adresse</label>
+        <type>string</type>
+        <img>default_string.gif</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_d9</column>
+        <label>custom_d9</label>
+        <type>date</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_t10</column>
+        <label>_EMAIL_FROM_ADDRESS</label>
+        <type>string</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_d10</column>
+        <label>custom_d10</label>
+        <type>date</type>
+        <img>plus.png</img>
+    </INDEX>    
+    <INDEX>
+        <column>custom_t11</column>
+        <label>_EMAIL_TO_ADDRESS</label>
+        <type>string</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_t12</column>
+        <label>_EMAIL_CC_ADDRESS</label>
+        <type>string</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_t13</column>
+        <label>_EMAIL_ID</label>
+        <type>string</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_t14</column>
+        <label>_EMAIL_ACCOUNT</label>
+        <type>string</type>
+        <img>plus.png</img>
+    </INDEX>
+    <INDEX>
+        <column>custom_t15</column>
+        <label>Téléphone</label>
+        <type>string</type>
+        <img>plus.png</img>
+    </INDEX>
 </ROOT>

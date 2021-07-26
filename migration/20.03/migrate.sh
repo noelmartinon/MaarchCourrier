@@ -4,6 +4,9 @@ php ./exportCases.php
 php ./exportFileplans.php
 php ./exportFolders.php
 php ./migrateCategories.php
+# SGAMI-SO - DEBUT 
+php ./sgamiChangeNameCustmonFields.php
+# SGAMI-SO - FIN 
 php ./migrateCustomFields.php
 php ./migrateFileplans.php
 php ./migrateFolders.php

@@ -824,6 +824,7 @@ TRUNCATE TABLE custom_fields;
 INSERT INTO custom_fields (id, label, type, values) VALUES (1, 'Nature', 'select', '["Courrier simple", "Courriel", "Courrier suivi", "Courrier avec AR", "Autre"]');
 SELECT setval('custom_fields_id_seq', (select max(id)+1 from custom_fields), false);
 
+
 DO $$ BEGIN
   IF (SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'mlb_coll_ext')) THEN
     UPDATE res_letterbox SET custom_fields = json_build_object('1', 'Courrier simple') FROM mlb_coll_ext WHERE res_letterbox.res_id = mlb_coll_ext.res_id AND mlb_coll_ext.nature_id = 'simple_mail';

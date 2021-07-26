@@ -76,6 +76,32 @@ class CustomFieldModel
         return $nextSequenceId;
     }
 
+    public static function createMod(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['label', 'type']);
+        ValidatorModel::stringType($args, ['label', 'type', 'values']);
+
+        # SGAMI-SO - DEBUT 
+        #$nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'custom_fields_id_seq']);
+        # SGAMI-SO FIN 
+        
+        DatabaseModel::insert([
+            'table'         => 'custom_fields',
+            'columnsValues' => [
+                # SGAMI-SO - DEBUT 
+                'id'        => $args['id'],
+                # SGAMI-SO FIN 
+                'label'     => $args['label'],
+                'type'      => $args['type'],
+                'values'    => $args['values']
+            ]
+        ]);
+
+        # SGAMI-SO - DEBUT 
+        return $args['id'];
+        # SGAMI-SO FIN 
+    }
+
     public static function update(array $args)
     {
         ValidatorModel::notEmpty($args, ['set', 'where', 'data']);
