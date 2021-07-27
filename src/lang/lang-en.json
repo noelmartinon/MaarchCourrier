@@ -2192,5 +2192,7 @@
     "maximumSignUser": "Maximum number of Signatory",
     "workflowEndBySignatory": "Workflow has to end with a Signatory",
     "signInsteadOf": "You act as",
-    "saeError": "Unable to retrieve retention rules"
+    "saeError": "Unable to retrieve retention rules",
+    "chooseValues": "Choose the values",
+    "chooseValuesMsg": "Please choose the values ​​that can be used for this field"
 }

@@ -15,6 +15,7 @@ import { FunctionsService } from '@service/functions.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { IssuingSiteInputComponent } from '../../administration/registered-mail/issuing-site/indexing/issuing-site-input.component';
 import { RegisteredMailRecipientInputComponent } from '../../administration/registered-mail/indexing/recipient-input.component';
+import { IndexingModelValuesSelectorComponent } from '@appRoot/administration/indexingModel/valuesSelector/values-selector.component';
 
 @Component({
     selector: 'app-indexing-form',
@@ -769,6 +770,7 @@ export class IndexingFormComponent implements OnInit {
                     elem.event = 'getIssuingSites';
                     // await this.setDoctypeField(elem);
                 }
+                this.setAllowedValues(elem);
             }));
         }));
 
@@ -778,6 +780,14 @@ export class IndexingFormComponent implements OnInit {
         }
 
         this.loading = false;
+    }
+
+    setAllowedValues(field: any) {
+        if (!this.functions.empty(field.allowedValues)) {
+            field.values.filter((val: any) => !val.isTitle).forEach((item: any) => {
+                item.disabled = field.allowedValues.indexOf(item.id) === -1;
+            });
+        }        
     }
 
     setResource(saveResourceState: boolean = true) {
@@ -794,9 +804,17 @@ export class IndexingFormComponent implements OnInit {
                             if (Object.keys(data).indexOf(elem.identifier) > -1 || customId !== undefined) {
                                 let fieldValue: any = '';
                                 if (customId !== undefined) {
-                                    fieldValue = data.customFields[customId];
+                                    if (!this.functions.empty(elem.allowedValues) && !this.functions.empty(elem.default_value) && elem.allowedValues.indexOf(elem.default_value) === -1) {
+                                        fieldValue = '';
+                                    } else {
+                                        fieldValue = data.customFields[customId]; 
+                                    }
                                 } else {
-                                    fieldValue = data[elem.identifier];
+                                    if (!this.functions.empty(elem.allowedValues) && !this.functions.empty(elem.default_value) && elem.allowedValues.indexOf(elem.default_value) === -1) {
+                                        fieldValue = '';
+                                    } else {
+                                        fieldValue = data[elem.identifier]; 
+                                    }
                                 }
 
                                 if (elem.identifier === 'registeredMail_type') {
@@ -994,6 +1012,24 @@ export class IndexingFormComponent implements OnInit {
             this.arrFormControl[field.identifier].disable();
             field.enabled = false;
         }
+    }
+
+    openValuesSelector(field: any) {
+        const dialogRef = this.dialog.open(IndexingModelValuesSelectorComponent, {
+            panelClass: 'maarch-modal',
+            disableClose: true,
+            data: field
+        });
+        dialogRef.afterClosed().pipe(
+            filter((data: any) => !this.functions.empty(data)),
+            tap((values: any) => {
+                field.values = values;
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     isAlwaysDisabledField(field: any) {

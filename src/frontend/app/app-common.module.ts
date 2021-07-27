@@ -81,6 +81,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { RegisteredMailImportComponent } from '@appRoot/registeredMail/import/registered-mail-import.component';
 import { CriteriaToolComponent } from '@appRoot/search/criteria-tool/criteria-tool.component';
 import { MailEditorComponent } from '@plugins/mail-editor/mail-editor.component';
+import { IndexingModelValuesSelectorComponent } from './administration/indexingModel/valuesSelector/values-selector.component';
 
 @NgModule({
     imports: [
@@ -141,7 +142,7 @@ import { MailEditorComponent } from '@plugins/mail-editor/mail-editor.component'
         NoteEditorComponent,
         CriteriaToolComponent,
         MailEditorComponent,
-
+        IndexingModelValuesSelectorComponent
     ],
     exports: [
         CommonModule,
@@ -193,14 +194,16 @@ import { MailEditorComponent } from '@plugins/mail-editor/mail-editor.component'
         RegisteredMailRecipientInputComponent,
         CriteriaToolComponent,
         MessageBoxComponent,
-        MailEditorComponent
+        MailEditorComponent,
+        IndexingModelValuesSelectorComponent
     ],
     providers: [],
     entryComponents: [
         IndexingGroupModalComponent,
         RegisteredMailImportComponent,
         AlertComponent,
-        ConfirmComponent
+        ConfirmComponent,
+        IndexingModelValuesSelectorComponent
     ],
 })
 export class SharedModule {
