@@ -574,7 +574,7 @@ class AlfrescoController
             return ['errors' => 'Document has no chrono'];
         }
         
-        $alfrescoParameters = CoreConfigModel::getJsonLoaded(['path' => 'config/alfresco.json']);
+        $alfrescoParameters = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/alfresco.json']);
         if (empty($alfrescoParameters)) {
             return ['errors' => 'Alfresco mapping file does not exist'];
         }
