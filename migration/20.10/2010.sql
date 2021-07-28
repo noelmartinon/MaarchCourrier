@@ -49,6 +49,9 @@ END$$;
 /*INDEXING_MODELS_FIELDS*/
 ALTER TABLE indexing_models_fields DROP COLUMN IF EXISTS enabled;
 ALTER TABLE indexing_models_fields ADD COLUMN enabled BOOLEAN NOT NULL DEFAULT TRUE;
+-- SGAMI-SO DEBUT
+ALTER TABLE indexing_models_fields ADD COLUMN allowed_values jsonb;
+-- SGAMI-SO FIN
 ALTER TABLE indexing_models DROP COLUMN IF EXISTS mandatory_file;
 ALTER TABLE indexing_models ADD COLUMN mandatory_file BOOLEAN NOT NULL DEFAULT FALSE;
 
