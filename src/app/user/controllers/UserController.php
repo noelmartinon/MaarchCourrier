@@ -1585,7 +1585,9 @@ class UserController
             return $response->withStatus(400)->withJson(['errors' => 'Body login is empty']);
         }
 
-        $user = UserModel::getByLogin(['select' => ['id', 'mail'], 'login' => strtolower($body['login'])]);
+        #SGAMI-SO DBT 
+        $user = UserModel::getByLogin(['select' => ['id', 'mail'], 'login' => /*strtolower*/($body['login'])]);
+        #SGAMI-SO FIN
         if (empty($user)) {
             return $response->withStatus(204);
         }
