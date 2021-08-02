@@ -1,0 +1,17 @@
+Un fichier de pièce-jointe (PDF ou ERS) est introuvable.
+
+Chemins indiqués :
+
+:docPath:
+:ersPath:
+
+Ce fichier ainsi que l’ensemble du lot :batchName: a été déplacé vers :errorDir:/:errorCode:/:batchPathInRootDir:
+
+Merci de déposer les fichiers aux bons emplacements, ou vérifier les noms de fichiers potentiellement existants.
+
+Une fois l’anomalie corrigée, merci de remettre en place le lot à capturer avec la commande :
+
+mv :errorDir:/:errorCode:/:batchPathInRootDir: :rootDir:/:batchPathInRootDir:
+
+Ils seront ensuite capturés de nouveau automatiquement.
+

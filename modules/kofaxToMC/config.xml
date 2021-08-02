@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+    <config>
+		<docnamefield>11</docnamefield>
+		<maindocconstfield>10</maindocconstfield>
+		<archiveboxidfield>12</archiveboxidfield>
+		<doctype>12154</doctype>
+        <rest>
+            <username>cchaplin</username>
+            <password>maarch</password>
+            <https>true</https>
+			<path>maarch-pprod.yvelines.fr/cs_Maarch_PPROD/rest</path>
+        </rest>
+		<directories>
+			<source>/opt/maarch/kofaxToMC/partage</source>
+			<done>done</done>
+			<errors>errors</errors>
+		</directories>
+    </config>
+</root>

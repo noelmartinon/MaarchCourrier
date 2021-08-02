@@ -1,0 +1,13 @@
+Une entité inexistante a été requise lors de l’import du lot :batchName:. Entité en question :
+
+:destination:
+
+L’ensemble des fichiers de ce lot a été déplacé vers :errorDir:/:errorCode:/:batchPathInRootDir:
+
+Merci de corriger ceci dans le champ DirectorateName du fichier XML présent dans ce dossier.
+
+Une fois l’anomalie corrigée, merci de remettre en place le lot à capturer avec la commande :
+
+mv :errorDir:/:errorCode:/:batchPathInRootDir: :rootDir:/:batchPathInRootDir:
+
+Ils seront ensuite capturés de nouveau automatiquement.

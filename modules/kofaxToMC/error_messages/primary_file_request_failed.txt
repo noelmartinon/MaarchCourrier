@@ -1,0 +1,17 @@
+Une erreur est survenue lors de l’import dans Maarch Courrier du fichier principal du lot :batchName:. Fichier en question :
+
+:docPath:
+
+Ce fichier ainsi que l’ensemble du lot :batchName: a été déplacé vers :errorDir:/:errorCode:/:batchPathInRootDir:
+
+Erreur :
+
+:wserrors:
+
+Merci de vérifier la configuration du module d’entrée dans le fichier :configPath:
+
+Une fois l’anomalie corrigée, merci de remettre en place le lot à capturer avec la commande :
+
+mv :errorDir:/:errorCode:/:batchPathInRootDir: :rootDir:/:batchPathInRootDir:
+
+Ils seront ensuite capturés de nouveau automatiquement.

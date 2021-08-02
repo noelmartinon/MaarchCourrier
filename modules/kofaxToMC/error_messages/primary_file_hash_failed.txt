@@ -1,0 +1,16 @@
+Le hash du fichier principal du lot a échoué. Fichier en question :
+
+:docPath:
+
+Ce fichier ainsi que l’ensemble du lot :batchName: a été déplacé vers :errorDir:/:errorCode:/:batchPathInRootDir:
+
+Merci de vérifier l’intégrité du hash du fichier.
+
+Hash cible : :hash:
+Hash actuel : :fh:
+
+Une fois l’anomalie corrigée, merci de remettre en place le lot à capturer avec la commande :
+
+mv :errorDir:/:errorCode:/:batchPathInRootDir: :rootDir:/:batchPathInRootDir:
+
+Ils seront ensuite capturés de nouveau automatiquement.

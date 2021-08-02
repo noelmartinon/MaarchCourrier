@@ -1,0 +1,15 @@
+Une erreur est survenue lors de l’ajout de note au lot :batchName:.
+
+L’ensemble de ce lot a été déplacé vers :errorDir:/:errorCode:/:batchPathInRootDir:
+
+Erreur :
+
+:wserrors:
+
+Merci de vérifier la configuration du module d’entrée dans le fichier :configPath:
+
+Une fois l’anomalie corrigée, merci de remettre en place le lot à capturer avec la commande :
+
+mv :errorDir:/:errorCode:/:batchPathInRootDir: :rootDir:/:batchPathInRootDir:
+
+Ils seront ensuite capturés de nouveau automatiquement.
