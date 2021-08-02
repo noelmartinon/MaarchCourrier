@@ -37,6 +37,7 @@ use MessageExchange\controllers\AnnuaryController;
 class AutoCompleteController
 {
     const LIMIT = 50;
+    const MEDIUM_LIMIT = 30;
     const TINY_LIMIT = 10;
 
     public static function getUsers(Request $request, Response $response)
@@ -190,7 +191,7 @@ class AutoCompleteController
                 'where'     => $requestData['where'],
                 'data'      => $requestData['data'],
                 'orderBy'   => ['company', 'lastname NULLS FIRST'],
-                'limit'     => self::TINY_LIMIT
+                'limit'     => self::MEDIUM_LIMIT
             ]);
 
             foreach ($contacts as $contact) {
@@ -229,7 +230,7 @@ class AutoCompleteController
                 'where'     => $requestData['where'],
                 'data'      => $requestData['data'],
                 'orderBy'   => ['lastname'],
-                'limit'     => self::TINY_LIMIT
+                'limit'     => self::MEDIUM_LIMIT
             ]);
 
             foreach ($users as $user) {
@@ -273,7 +274,7 @@ class AutoCompleteController
                 'where'     => $requestData['where'],
                 'data'      => $requestData['data'],
                 'orderBy'   => ['entity_label'],
-                'limit'     => self::TINY_LIMIT
+                'limit'     => self::MEDIUM_LIMIT
             ]);
 
             foreach ($entities as $value) {
@@ -310,7 +311,7 @@ class AutoCompleteController
                 'where'     => $requestData['where'],
                 'data'      => $requestData['data'],
                 'orderBy'   => ['label'],
-                'limit'     => self::TINY_LIMIT
+                'limit'     => self::MEDIUM_LIMIT
             ]);
 
             foreach ($contactsGroups as $value) {
@@ -324,8 +325,8 @@ class AutoCompleteController
         }
 
         $total = count($autocompleteContacts) + count($autocompleteUsers) + count($autocompleteEntities) + count($autocompleteContactsGroups);
-        if ($total > self::TINY_LIMIT) {
-            $divider = $total / self::TINY_LIMIT;
+        if ($total > self::MEDIUM_LIMIT) {
+            $divider = $total / self::MEDIUM_LIMIT;
             $autocompleteContacts       = array_slice($autocompleteContacts, 0, round(count($autocompleteContacts) / $divider));
             $autocompleteUsers          = array_slice($autocompleteUsers, 0, round(count($autocompleteUsers) / $divider));
             $autocompleteEntities       = array_slice($autocompleteEntities, 0, round(count($autocompleteEntities) / $divider));
