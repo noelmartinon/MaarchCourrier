@@ -229,8 +229,14 @@ class MaarchParapheurController
             ]);
             foreach ($attachments as $keyAttachment => $attachment) {
                 if (strpos($attachment['identifier'], '-') != false) {
-                    $mailingIdentifier = substr($attachment['identifier'], 0, strpos($attachment['identifier'], '-'));
-                    $mailingAttachment = AttachmentModel::get(['select' => ['res_id'], 'where' => ['identifier = ?'], 'data' =>[$mailingIdentifier]]);
+                    $mailingIdentifier = substr($attachment['identifier'], 0, strripos($attachment['identifier'], '-'));
+                    $mailingAttachment = AttachmentModel::get([
+                        'select'  => ['res_id'],
+                        'where'   => ['identifier = ?'],
+                        'data'    => [$mailingIdentifier],
+                        'orderBy' => ['relation DESC'],
+                        'limit'   => 1
+                    ]);
                     if (!empty($mailingAttachment[0])) {
                         $attachments[$keyAttachment]['mailingResId'] = $mailingAttachment[0]['res_id'];
                     }
