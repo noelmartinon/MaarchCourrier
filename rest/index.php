@@ -130,6 +130,7 @@ $app->put('/sortedBaskets/{id}', \Basket\controllers\BasketController::class . '
 //Configurations
 $app->get('/configurations/{privilege}', \Configuration\controllers\ConfigurationController::class . ':getByPrivilege');
 $app->put('/configurations/{privilege}', \Configuration\controllers\ConfigurationController::class . ':update');
+$app->get('/seda/configuration', \Configuration\controllers\ConfigurationController::class . ':getSedaExportConfiguration');
 
 //Contacts
 $app->get('/contacts', \Contact\controllers\ContactController::class . ':get');
