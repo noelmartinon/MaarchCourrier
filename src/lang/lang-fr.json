@@ -2208,7 +2208,7 @@
     "chooseValues": "Choisir les valeurs",
     "chooseValuesMsg": "Veuillez choisir les valeurs pouvant être utilisé pour ce champ",
     "interconnectionTest": "Tester le paramétrage de <b>l'interconnexion Maarch Courrier / Maarch RM</b> configuré dans le fichier <b>config.json</b>",
-    "interconnectionError": "L'interconnexion avec Maarch RM a été échouée.",
+    "interconnectionFailed": "L'interconnexion avec Maarch RM a été échouée.",
     "interconnectionSuccess": "Interconnexion réussite avec Maarch RM",
     "startTest": "Lancer le test"
 }
