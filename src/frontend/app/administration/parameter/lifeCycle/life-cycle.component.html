@@ -23,3 +23,13 @@
         </mat-select>
     </mat-form-field>
 </form>
+<app-maarch-message *ngIf="isSae" [mode]="'info'">
+    <div [innerHTML]="'lang.interconnectionTest' | translate"></div>
+    <button mat-raised-button [disabled]="loading" (click)="checkInterconnection()"
+        color="primary" [title]="'lang.startTest' | translate">
+        <mat-icon inline="true" color="basic" class="fas fa-plug" style="margin-bottom: 5px; margin-right: 5px;">
+        </mat-icon>
+        {{'lang.startTest' | translate}}
+    </button>
+</app-maarch-message>
+<app-maarch-message *ngIf="!functions.empty(result)" [mode]="hasError ? 'danger' : 'success'" [content]="result"></app-maarch-message>

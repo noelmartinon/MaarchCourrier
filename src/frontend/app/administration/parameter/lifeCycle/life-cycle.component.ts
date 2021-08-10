@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { NotificationService } from '@service/notification/notification.service';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     selector: 'app-life-cyle',
@@ -15,7 +16,19 @@ export class LifeCycleComponent implements OnInit {
     documentFinalAction: FormGroup;
     finalActionValues: any[] = ['restrictAccess', 'transfer', 'copy', 'delete'];
 
-    constructor(public translate: TranslateService, public http: HttpClient, private _formBuilder: FormBuilder, private notify: NotificationService) {
+    hasError: boolean = false;
+    archivalError: string = '';
+    loading: boolean = false;
+    result: string  = '';
+    isSae: boolean = false;
+
+    constructor(
+        public translate: TranslateService,
+        public http: HttpClient,
+        public functions: FunctionsService,
+        private _formBuilder: FormBuilder,
+        private notify: NotificationService
+    ) {
         this.documentFinalAction = this._formBuilder.group({
             bindingDocumentFinalAction: [''],
             nonBindingDocumentFinalAction: ['']
@@ -24,6 +37,7 @@ export class LifeCycleComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         await this.getFinalAction();
+        await this.getSaeConfiguration();
     }
 
     getFinalAction() {
@@ -67,6 +81,44 @@ export class LifeCycleComponent implements OnInit {
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
+    }
+
+    getSaeConfiguration() {
+        return new Promise((resolve) => {
+            this.http.get('../rest/seda/configuration').pipe(
+                tap((data: any) => {
+                    const exportSedaSae: string = data.exportSeda.sae;
+                    this.isSae = exportSedaSae.toLocaleLowerCase() === 'maarchrm' ? true : false;
+                    resolve(this.isSae);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+
+    checkInterconnection() {
+        this.loading = true;
+        this.result = '';
+        this.http.get('../rest/archival/retentionRules').pipe(
+            tap(() => {
+                this.loading = false;
+                this.hasError = false;
+                this.result = '<b>' + this.translate.instant('lang.interconnectionSuccess') + '</b> ';
+            }),
+            catchError((err: any) => {
+                this.hasError = true;
+                this.loading = false;
+                this.archivalError = err.error.errors;
+                const index: number = this.archivalError.indexOf(':');
+                this.archivalError = `(${this.archivalError.slice(index + 1, this.archivalError.length).replace(/^[\s]/, '')})`;
+                this.result = '<b>' + this.translate.instant('lang.interconnectionFailed') + '</b> ' + this.archivalError;
+                return of(false);
+            })
+        ).subscribe();
     }
 
 }

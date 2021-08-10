@@ -2194,5 +2194,9 @@
     "signInsteadOf": "You act as",
     "saeError": "Unable to retrieve retention rules",
     "chooseValues": "Choose the values",
-    "chooseValuesMsg": "Please choose the values ​​that can be used for this field"
+    "chooseValuesMsg": "Please choose the values ​​that can be used for this field",
+    "interconnectionTest": "Test the configuration of the <b> Maarch Courrier / Maarch RM interconnection </b> configured in the <b> config.json </b> file",
+    "interconnectionFailed": "Interconnection with Maarch RM has failed.",
+    "interconnectionSuccess": "Successful interconnection with Maarch RM",
+    "startTest": "Start the test"
 }
