@@ -79,6 +79,38 @@ export class OtherParametersComponent implements OnInit {
         color: new FormControl([20, 192, 30]),
     };
 
+    saeConfig = {
+        maarchRM: {
+            sae: new FormControl('MaarchRM'),
+            urlSAEService: new FormControl('https://demo-ap.maarchrm.cooom'),
+            token: new FormControl('phdF9WkJuTKkDuPXoqDZuCFEQT7En7YqsVROsdD1HoNZV7jD5+XyCtKbhx0Chb4s3skokalo0wEn48DE3M4kGrAceH0/XFbyLZVRoVOO+Y/wxyRdE1QJleI8yijEfGut'),
+            senderOrgRegNumber: new FormControl('org_987654321_DGS_SA'),
+            accessRuleCode: new FormControl('AR039'),
+            certificateSSL: new FormControl(''),
+            userAgent: new FormControl('service'),
+            M2M: new FormControl('maarch_courrier'),
+            statusReplyReceived: new FormControl('REPLY_SEDA'),
+            statusReplyRejected: new FormControl('REPLY_SEDA'),
+            statusMailToPurge: new FormControl('REPLY_SEDA'),
+        },
+        externalSAE: {
+            retentionRules: {
+                id: new FormControl('id1'),
+                label: new FormControl('label1')
+            },
+            archiveEntities: {
+                id: new FormControl('id1'),
+                label: new FormControl('label1')
+            },
+            archivalAgreements: {
+                id: new FormControl('id1'),
+                label: new FormControl('label1')
+            }
+        }
+    };
+
+    saeEnabled: 'maarchRM' | 'externalSAE' = 'maarchRM';
+
     editorsEnabled = [];
 
     fonts = [
@@ -233,10 +265,31 @@ export class OtherParametersComponent implements OnInit {
         blueGrey['100'],
     ];
 
+    retentionRules: any[] = [
+        {
+            'id': 'id1',
+            'label': 'label1'
+        }
+    ];
+    archiveEntities: any[] = [
+        {
+            'id': 'id1',
+            'label': 'label1'
+        }
+    ];
+    archivalAgreements: any[] = [
+        {
+            'id': 'id1',
+            'label': 'label1'
+        }
+    ];
+
     indexingModels: any = [];
     doctypes: any = [];
     statuses: any = [];
     attachmentsTypes: any = [];
+
+    loading: boolean = false;
 
     constructor(
         public translate: TranslateService,
@@ -254,6 +307,7 @@ export class OtherParametersComponent implements OnInit {
         await this.getWatermarkConfiguration();
         await this.getEditorsConfiguration();
         await this.getAddinOutlookConfConfiguration();
+        await this.getSaeConfig();
         Object.keys(this.editorsConf).forEach(editorId => {
             Object.keys(this.editorsConf[editorId]).forEach((elementId: any) => {
                 this.editorsConf[editorId][elementId].valueChanges
@@ -339,7 +393,7 @@ export class OtherParametersComponent implements OnInit {
                     Object.keys(data).forEach(confId => {
                         this.editorsEnabled.push(confId);
                         Object.keys(data[confId]).forEach(itemId => {
-                            console.log(confId, itemId);
+                            // console.log(confId, itemId);
 
                             if (!this.functions.empty(this.editorsConf[confId][itemId])) {
                                 this.editorsConf[confId][itemId].setValue(data[confId][itemId]);
@@ -520,7 +574,8 @@ export class OtherParametersComponent implements OnInit {
                 tap((data: any) => {
                     this.statuses = data.statuses.map((status: any) => ({
                         id: status.identifier,
-                        label: status.label_status
+                        label: status.label_status,
+                        statusId: status.id
                     }));
                     const defaultStatus = data.statuses[0].identifier;
                     resolve(defaultStatus);
@@ -556,5 +611,109 @@ export class OtherParametersComponent implements OnInit {
                 resolve(true);
             });
         });
+    }
+
+    getSaeConfig() {
+        return new Promise((resolve) => {
+            this.http.get('../rest/seda/configuration').pipe(
+                map((data: any) => data.configuration),
+                tap((data: any) => {
+                    this.saeEnabled = data.sae.toLowerCase() === 'maarchrm' ? 'maarchRM' : 'externalSAE';
+                    if (this.saeEnabled === 'maarchRM') {
+                        this.saeConfig[this.saeEnabled] = {
+                            sae: new FormControl(data.sae),
+                            urlSAEService: new FormControl(data.urlSAEService),
+                            token: new FormControl(data.token),
+                            senderOrgRegNumber: new FormControl(data.senderOrgRegNumber),
+                            accessRuleCode: new FormControl(data.accessRuleCode),
+                            certificateSSL: new FormControl(data.certificateSSL),
+                            userAgent: new FormControl(data.userAgent),
+                            M2M: new FormControl(data.M2M.gec),
+                            statusReplyReceived: new FormControl(data.statusReplyReceived),
+                            statusReplyRejected: new FormControl(data.statusReplyRejected),
+                            statusMailToPurge: new FormControl(data.statusMailToPurge),
+                        };
+                    }
+                    if (data.externalSAE !== undefined) {
+                        this.setEXternalSaeData(data.externalSAE);
+                        Object.keys(data.externalSAE).forEach((element: any) => {
+                            this.saeConfig[this.saeEnabled][element] = {
+                                id: new FormControl(data.externalSAE[element][0].id),
+                                label: new FormControl(data.externalSAE[element][0].label)
+                            };
+                        });
+                    }
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    saveSaeConfig() {
+        this.loading = true;
+        this.http.put('../rest/seda/configuration', this.formatSaeConfig()).pipe(
+            tap(() => {
+                this.loading = false;
+                this.notify.success(this.translate.instant('lang.dataUpdated'));
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    formatSaeConfig() {
+        const maarchRM: any = {};
+        const externalSAE: any = {};
+        let objToSend: any = {};
+        Object.keys(this.saeConfig).forEach(elemId => {
+            if (elemId === 'maarchRM') {
+                Object.keys(this.saeConfig[elemId]).forEach((item: any) => {
+                    maarchRM[item] =  item !== 'M2M' ? this.saeConfig[elemId][item].value : { gec: this.saeConfig[elemId][item].value};
+                });
+            } else {
+                Object.keys(this.saeConfig[elemId]).forEach((item: any) => {
+                    externalSAE[item] = {
+                        id: this.saeConfig[elemId][item].id.value,
+                        label: this.getLabel(this.saeConfig[elemId][item].id.value, Object.getOwnPropertyNames(this.saeConfig[elemId]).find((el: any) => el === item))
+                    };
+                });
+            }
+        });
+        return objToSend = {
+            ... maarchRM,
+            externalSAE: externalSAE
+        };
+    }
+
+    setEXternalSaeData(data: any) {
+        Object.keys(data).forEach((element: any) => {
+            if (element === 'retentionRules') {
+                this.retentionRules = data.retentionRules;
+            } else if (element === 'archiveEntities') {
+                this.archiveEntities = data.archiveEntities;
+            } else if (element === 'archivalAgreements') {
+                this.archivalAgreements = data.archivalAgreements;
+            }
+        });
+    }
+
+    getLabel(id: number, item: string) {
+        switch (item) {
+            case 'retentionRules': {
+                return this.retentionRules.find((elem: any) => elem.id === id).label;
+            }
+            case 'archiveEntities': {
+                return this.archiveEntities.find((elem: any) => elem.id === id).label;
+            }
+            case 'archivalAgreements': {
+                return this.archivalAgreements.find((elem: any) => elem.id === id).label;
+            }
+        }
     }
 }

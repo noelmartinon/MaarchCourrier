@@ -2517,5 +2517,22 @@
     "otpVisaUser": "L'utilisateur sera notifié par <b>courriel</b> au moment de son tour dans le circuit.",
     "mustSign": "La position de signature pour les utilisateurs externes est obligatoire.",
     "company": "Organisation",
-    "noRecipient": "Aucun destinataire associé."
+    "noRecipient": "Aucun destinataire associé.",
+    "saeConfig": "Système d'archivage électronique (SAE)",
+    "sae": "Nom du SAE",
+    "urlSAEService": "Adresse de l'API",
+    "tokenSae": "Clé de l'API",
+    "senderOrgRegNumber": "Identifiant du service versant",
+    "accessRuleCode": "Identifiant de la règle de communicabilité",
+    "certificateSSL": "Certificat SSL",
+    "userAgent": "Agent utilisateur",
+    "statusReplyReceived": "Statut de la réponse reçue",
+    "statusReplyRejected": "Statut de la réponse refusée",
+    "statusMailToPurge": "Statut du courrier à purger",
+    "M2M": "Identifiant Maarch2Maarch",
+    "validateConfig": "Valider et tester",
+    "maarchRm": "Maarch RM",
+    "retentionRules": "Les règles de conservations",
+    "archiveEntities": "Les services d'archive destinataire",
+    "archivalAgreements": "Les accords de versements"
 }
