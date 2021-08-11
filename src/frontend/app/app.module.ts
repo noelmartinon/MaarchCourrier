@@ -153,6 +153,7 @@ import { DevToolComponent } from '@service/debug/dev-tool.component';
 import { DevLangComponent } from '@service/debug/dev-lang.component';
 import { AcknowledgementReceptionComponent } from './registeredMail/acknowledgement-reception/acknowledgement-reception.component';
 import { DatePipe } from '@angular/common';
+import { CheckSaeInterconnectionComponent } from './administration/parameter/other/checkSaeInterconnection/check-sae-interconnection.component';
 
 registerLocaleData(localeFr, 'fr-FR');
 @Injectable()
@@ -295,7 +296,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         ProfileHistoryComponent,
         ProfileOtherPluginComponent,
         AddinOutlookConfigurationModalComponent,
-        CreateExternalUserComponent
+        CreateExternalUserComponent,
+        CheckSaeInterconnectionComponent
     ],
     exports : [
         SharedModule

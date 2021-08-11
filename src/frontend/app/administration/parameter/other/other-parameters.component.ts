@@ -3,7 +3,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
 import { FormControl, Validators } from '@angular/forms';
-import { catchError, debounceTime, filter, map, tap } from 'rxjs/operators';
+import { catchError, debounceTime, filter, finalize, map, tap } from 'rxjs/operators';
 import { ColorEvent } from 'ngx-color';
 import { FunctionsService } from '@service/functions.service';
 import {
@@ -30,6 +30,7 @@ import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { of } from 'rxjs';
 import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog } from '@angular/material/dialog';
+import { CheckSaeInterconnectionComponent } from './checkSaeInterconnection/check-sae-interconnection.component';
 
 @Component({
     selector: 'app-other-parameters',
@@ -657,8 +658,15 @@ export class OtherParametersComponent implements OnInit {
         this.loading = true;
         this.http.put('../rest/seda/configuration', this.formatSaeConfig()).pipe(
             tap(() => {
-                this.loading = false;
                 this.notify.success(this.translate.instant('lang.dataUpdated'));
+            }),
+            finalize(() => {
+                this.loading = false;
+                this.dialog.open(CheckSaeInterconnectionComponent, {
+                    panelClass: 'maarch-modal',
+                    disableClose: true,
+                    width: '500px',
+                });
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

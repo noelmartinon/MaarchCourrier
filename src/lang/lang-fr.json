@@ -2534,5 +2534,9 @@
     "maarchRm": "Maarch RM",
     "retentionRules": "Les règles de conservations",
     "archiveEntities": "Les services d'archive destinataire",
-    "archivalAgreements": "Les accords de versements"
+    "archivalAgreements": "Les accords de versements",
+    "loadingTest": "En cours de test d'interconnection avec le SAE configuré",
+    "saeInterconnectionTest": "Interconnexion avec votre SAE",
+    "interconnectionFailed": "L'interconnexion avec Maarch RM a été échouée.",
+    "interconnectionSuccess": "Interconnexion réussite avec Maarch RM"
 }
