@@ -27,7 +27,7 @@ class AdapterEmailController
         $res['content'] = '';
 
         $config = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
-        $gec    = strtolower($config['exportSeda']['M2M']['gec']);
+        $gec    = strtolower($config['exportSeda']['M2M']['gec'] ?? '');
 
         if ($gec == 'maarch_courrier') {
             $document = ['id' => $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->OriginatingSystemId, 'isLinked' => false, 'original' => false];

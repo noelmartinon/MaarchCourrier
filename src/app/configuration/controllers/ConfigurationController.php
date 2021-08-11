@@ -465,4 +465,143 @@ class ConfigurationController
 
         return $response->withStatus(204);
     }
+
+    public function getSedaExportConfiguration(Request $request, Response $response)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_parameters', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_export_seda']);
+        if (empty($configuration)) {
+            return $response->withJson(['configuration' => null]);
+        }
+        $configuration = json_decode($configuration['value'], true);
+
+        return $response->withJson(['configuration' => $configuration]);
+    }
+
+    public function updateSedaExportConfiguration(Request $request, Response $response)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_parameters', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $body = $request->getParsedBody();
+
+        if (empty($body)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body is empty']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['sae'] ?? null)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body sae is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['accessRuleCode'] ?? null)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body accessRuleCode is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['senderOrgRegNumber'] ?? null)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body senderOrgRegNumber is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['statusMailToPurge'] ?? null)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body statusMailToPurge is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['statusReplyReceived'] ?? null)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body statusReplyReceived is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['statusReplyRejected'] ?? null)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body statusReplyRejected is empty or not a string']);
+        }
+
+        $statuses = StatusModel::get(['select' => ['id']]);
+        $statuses = array_column($statuses, 'id');
+
+        if (!in_array($body['statusMailToPurge'], $statuses)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body statusMailToPurge is not an existing status']);
+        } elseif (!in_array($body['statusReplyReceived'], $statuses)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body statusReplyReceived is not an existing status']);
+        } elseif (!in_array($body['statusReplyRejected'], $statuses)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body statusReplyRejected is not an existing status']);
+        }
+
+
+        if (!Validator::arrayType()->notEmpty()->validate($body['M2M'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body M2M is empty or not an array']);
+        } elseif (!empty($body['M2M']['gec']) && !Validator::stringType()->validate($body['M2M']['gec'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body M2M[gec] is not a string']);
+        }
+
+        $configuration = [
+            'sae'                 => $body['sae'],
+            'accessRuleCode'      => $body['accessRuleCode'],
+            'senderOrgRegNumber'  => $body['senderOrgRegNumber'],
+            'statusMailToPurge'   => $body['statusMailToPurge'],
+            'statusReplyReceived' => $body['statusReplyReceived'],
+            'statusReplyRejected' => $body['statusReplyRejected'],
+            'M2M'                 => $body['M2M']
+        ];
+
+        if (strtolower($body['sae']) == 'maarchrm') {
+            if (!Validator::stringType()->notEmpty()->validate($body['token'] ?? null)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body token is empty, not a string']);
+            } elseif (!empty($body['userAgent']) && !Validator::stringType()->validate($body['userAgent'] ?? null)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body userAgent is not a string']);
+            } elseif (!Validator::stringType()->notEmpty()->validate($body['urlSAEService'] ?? null)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body urlSAEService is empty, not a string']);
+            } elseif (!empty($body['certificateSSL']) && !Validator::stringType()->validate($body['certificateSSL'] ?? null)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body certificateSSL is not a string']);
+            }
+
+            $configuration += [
+                'token'          => $body['token'],
+                'userAgent'      => $body['userAgent'],
+                'urlSAEService'  => $body['urlSAEService'],
+                'certificateSSL' => $body['certificateSSL'] ?? null
+            ];
+        } else {
+            if (!Validator::arrayType()->notEmpty()->validate($body['externalSAE'] ?? null)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body externalSAE is empty or not an array']);
+            } elseif (!Validator::arrayType()->notEmpty()->validate($body['externalSAE']['retentionRules'] ?? null)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body externalSAE[retentionRules] is empty or not an array']);
+            } elseif (!Validator::arrayType()->notEmpty()->validate($body['externalSAE']['archiveEntities'] ?? null)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body externalSAE[archiveEntities] is empty or not an array']);
+            } elseif (!Validator::arrayType()->notEmpty()->validate($body['externalSAE']['archivalAgreements'] ?? null)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body externalSAE[archivalAgreements] is empty or not an array']);
+            }
+
+            foreach ($body['externalSAE']['retentionRules'] as $key => $retentionRule) {
+                if (!Validator::stringType()->notEmpty()->validate($retentionRule['id'] ?? null)) {
+                    return $response->withStatus(400)->withJson(['errors' => "Body externalSAE[retentionRules][$key][id] is empty or not a string"]);
+                } elseif (!Validator::stringType()->notEmpty()->validate($retentionRule['label'] ?? null)) {
+                    return $response->withStatus(400)->withJson(['errors' => "Body externalSAE[retentionRules][$key][label] is empty or not a string"]);
+                }
+            }
+
+            foreach ($body['externalSAE']['archiveEntities'] as $key => $archiveEntity) {
+                if (!Validator::stringType()->notEmpty()->validate($archiveEntity['id'] ?? null)) {
+                    return $response->withStatus(400)->withJson(['errors' => "Body externalSAE[archiveEntities][$key][id] is empty or not a string"]);
+                } elseif (!Validator::stringType()->notEmpty()->validate($archiveEntity['label'] ?? null)) {
+                    return $response->withStatus(400)->withJson(['errors' => "Body externalSAE[archiveEntities][$key][label] is empty or not a string"]);
+                }
+            }
+
+            foreach ($body['externalSAE']['archivalAgreements'] as $key => $archivalAgreement) {
+                if (!Validator::stringType()->notEmpty()->validate($archivalAgreement['id'] ?? null)) {
+                    return $response->withStatus(400)->withJson(['errors' => "Body externalSAE[archivalAgreements][$key][id] is empty or not a string"]);
+                } elseif (!Validator::stringType()->notEmpty()->validate($archivalAgreement['label'] ?? null)) {
+                    return $response->withStatus(400)->withJson(['errors' => "Body externalSAE[archivalAgreements][$key][label] is empty or not a string"]);
+                }
+            }
+
+            $configuration += [
+                'externalSAE' => [
+                    'retentionRules'     => $body['externalSAE']['retentionRules'],
+                    'archiveEntities'    => $body['externalSAE']['archiveEntities'],
+                    'archivalAgreements' => $body['externalSAE']['archivalAgreements'],
+                ]
+            ];
+        }
+
+        $configurationExist = ConfigurationModel::getByPrivilege(['privilege' => 'admin_export_seda']);
+        $configuration = json_encode($configuration);
+        if (empty($configurationExist)) {
+            ConfigurationModel::create(['privilege' => 'admin_export_seda', 'value' => $configuration]);
+        } else {
+            ConfigurationModel::update(['set' => ['value' => $configuration], 'where' => ['privilege = ?'], 'data' => ['admin_export_seda']]);
+        }
+
+        return $response->withStatus(204);
+    }
 }
