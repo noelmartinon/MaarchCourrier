@@ -14,13 +14,15 @@
 
 namespace ExportSeda\controllers;
 
+use Configuration\models\ConfigurationModel;
 use SrcCore\models\CoreConfigModel;
 
 class TransferController
 {
     public static function transfer($target, $messageId, $type = null)
     {
-        $config         = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
+        $config = ConfigurationModel::getByPrivilege(['privilege' => 'admin_export_seda']);
+        $config = !empty($config['value']) ? json_decode($config['value'], true) : [];
         $adapter        = '';
         $res['status']  = 0;
         $res['content'] = '';

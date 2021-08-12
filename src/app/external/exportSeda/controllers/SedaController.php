@@ -14,6 +14,7 @@
 
 namespace ExportSeda\controllers;
 
+use Configuration\models\ConfigurationModel;
 use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
@@ -355,7 +356,8 @@ class SedaController
 
         $retentionRules = [];
 
-        $config = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
+        $config = ConfigurationModel::getByPrivilege(['privilege' => 'admin_export_seda']);
+        $config = !empty($config['value']) ? json_decode($config['value'], true) : [];
         if (empty($config['exportSeda']['sae'])) {
             return $response->withJson(['retentionRules' => $retentionRules]);
         }

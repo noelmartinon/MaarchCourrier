@@ -13,6 +13,7 @@
 namespace ExportSeda\controllers;
 
 use Attachment\models\AttachmentModel;
+use Configuration\models\ConfigurationModel;
 use Contact\controllers\ContactController;
 use Convert\controllers\ConvertPdfController;
 use Docserver\models\DocserverModel;
@@ -89,7 +90,9 @@ trait ExportSEDATrait
             $bindingDocument    = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'bindingDocumentFinalAction']);
             $nonBindingDocument = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'nonBindingDocumentFinalAction']);
 
-            $config = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
+            $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_export_seda']);
+            $config = [];
+            $config['exportSeda'] = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
 
             if (count($args['resources']) > 1 && $args['data']['actionMode'] == 'download') {
                 $tmpPath     = CoreConfigModel::getTmpPath();

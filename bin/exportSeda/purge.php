@@ -77,9 +77,6 @@ $GLOBALS['MaarchDirectory'] = $config['maarchDirectory'];
 $GLOBALS['customId']        = $config['customID'];
 $GLOBALS['batchDirectory']  = $GLOBALS['MaarchDirectory'] . 'bin/exportSeda';
 
-$config = $file['exportSeda'];
-$GLOBALS['statusMailToPurge'] = $config['statusMailToPurge'];
-
 chdir($GLOBALS['MaarchDirectory']);
 
 set_include_path(get_include_path() . PATH_SEPARATOR . $GLOBALS['MaarchDirectory']);
@@ -93,6 +90,9 @@ try {
 
 \SrcCore\models\DatabasePDO::reset();
 new \SrcCore\models\DatabasePDO(['customId' => $GLOBALS['customId']]);
+
+$configuration = \Configuration\models\ConfigurationModel::getByPrivilege(['privilege' => 'admin_export_seda']);
+$config = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
 
 $GLOBALS['errorLckFile'] = $GLOBALS['batchDirectory'] . DIRECTORY_SEPARATOR . $GLOBALS['batchName'] .'_error.lck';
 $GLOBALS['lckFile']      = $GLOBALS['batchDirectory'] . DIRECTORY_SEPARATOR . $GLOBALS['batchName'] . '.lck';
