@@ -686,10 +686,12 @@ export class OtherParametersComponent implements OnInit {
                 });
             } else {
                 Object.keys(this.saeConfig[elemId]).forEach((item: any) => {
-                    externalSAE[item] = {
-                        id: this.saeConfig[elemId][item].id.value,
-                        label: this.getLabel(this.saeConfig[elemId][item].id.value, Object.getOwnPropertyNames(this.saeConfig[elemId]).find((el: any) => el === item))
-                    };
+                    externalSAE[item] = [
+                        {
+                            id: this.saeConfig[elemId][item].id.value,
+                            label: this.getLabel(this.saeConfig[elemId][item].id.value, Object.getOwnPropertyNames(this.saeConfig[elemId]).find((el: any) => el === item))
+                        }
+                    ];
                 });
             }
         });
