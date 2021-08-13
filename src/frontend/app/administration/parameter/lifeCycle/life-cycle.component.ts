@@ -21,6 +21,7 @@ export class LifeCycleComponent implements OnInit {
     loading: boolean = false;
     result: string  = '';
     isSae: boolean = false;
+    urlSAEService: string = '';
 
     constructor(
         public translate: TranslateService,
@@ -89,6 +90,7 @@ export class LifeCycleComponent implements OnInit {
                 tap((data: any) => {
                     const exportSedaSae: string = data.exportSeda.sae;
                     this.isSae = exportSedaSae.toLocaleLowerCase() === 'maarchrm' ? true : false;
+                    this.urlSAEService = !this.functions.empty(data.exportSeda.urlSAEService) ? data.exportSeda.urlSAEService : '';
                     resolve(this.isSae);
                 }),
                 catchError((err: any) => {
@@ -114,8 +116,9 @@ export class LifeCycleComponent implements OnInit {
                 this.loading = false;
                 this.archivalError = err.error.errors;
                 const index: number = this.archivalError.indexOf(':');
-                this.archivalError = `(${this.archivalError.slice(index + 1, this.archivalError.length).replace(/^[\s]/, '')})`;
-                this.result = '<b>' + this.translate.instant('lang.interconnectionFailed') + '</b> ' + this.archivalError;
+                const getError: string = this.archivalError.slice(index + 1, this.archivalError.length).replace(/^[\s]/, '');
+                this.archivalError = !this.functions.empty(getError) ? `(${getError})` : '';
+                this.result = this.translate.instant('lang.interconnectionFailed') + ` ${this.urlSAEService} ` + this.archivalError;
                 return of(false);
             })
         ).subscribe();
