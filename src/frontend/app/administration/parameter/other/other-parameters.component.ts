@@ -662,11 +662,13 @@ export class OtherParametersComponent implements OnInit {
             }),
             finalize(() => {
                 this.loading = false;
-                this.dialog.open(CheckSaeInterconnectionComponent, {
-                    panelClass: 'maarch-modal',
-                    disableClose: true,
-                    width: '500px',
-                });
+                if (this.saeEnabled === 'maarchRM') {
+                    this.dialog.open(CheckSaeInterconnectionComponent, {
+                        panelClass: 'maarch-modal',
+                        disableClose: true,
+                        width: '500px',
+                    });
+                }
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

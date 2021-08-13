@@ -28,6 +28,12 @@ export class CheckSaeInterconnectionComponent implements OnInit {
 
     ngOnInit() {
         this.loading = true;
+        setTimeout(() => {
+            this.checkInterconnection();
+        }, 500);
+    }
+
+    checkInterconnection() {
         this.http.get('../rest/archival/retentionRules').pipe(
             tap(() => {
                 this.loading = false;
