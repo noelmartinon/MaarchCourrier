@@ -358,19 +358,19 @@ class SedaController
 
         $config = ConfigurationModel::getByPrivilege(['privilege' => 'admin_export_seda']);
         $config = !empty($config['value']) ? json_decode($config['value'], true) : [];
-        if (empty($config['exportSeda']['sae'])) {
+        if (empty($config['sae'])) {
             return $response->withJson(['retentionRules' => $retentionRules]);
         }
 
-        if (strtolower($config['exportSeda']['sae']) == 'maarchrm') {
+        if (strtolower($config['sae']) == 'maarchrm') {
             $curlResponse = CurlModel::exec([
-                'url'     => rtrim($config['exportSeda']['urlSAEService'], '/') . '/recordsManagement/retentionRule/Index',
+                'url'     => rtrim($config['urlSAEService'], '/') . '/recordsManagement/retentionRule/Index',
                 'method'  => 'GET',
-                'cookie'  => 'LAABS-AUTH=' . urlencode($config['exportSeda']['token']),
+                'cookie'  => 'LAABS-AUTH=' . urlencode($config['token']),
                 'headers' => [
                     'Accept: application/json',
                     'Content-Type: application/json',
-                    'User-Agent: ' . $config['exportSeda']['userAgent']
+                    'User-Agent: ' . $config['userAgent']
                 ]
             ]);
 
@@ -391,8 +391,8 @@ class SedaController
                 ];
             }
         } else {
-            if (is_array($config['exportSeda']['externalSAE']['retentionRules'])) {
-                foreach ($config['exportSeda']['externalSAE']['retentionRules'] as $rule) {
+            if (is_array($config['externalSAE']['retentionRules'])) {
+                foreach ($config['externalSAE']['retentionRules'] as $rule) {
                     $retentionRules[] = [
                         'id'    => $rule['id'],
                         'label' => $rule['label']
