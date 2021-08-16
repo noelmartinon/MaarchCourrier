@@ -2540,5 +2540,6 @@
     "loadingTest": "In the process of testing the interconnection with the configured EAS",
     "saeInterconnectionTest": "Interconnection with your EAS",
     "interconnectionFailed": "Interconnection with Maarch RM has failed",
-    "interconnectionSuccess": "Successful interconnection with Maarch RM"
+    "interconnectionSuccess": "Successful interconnection with Maarch RM",
+    "switchSae": "Switch to Maarch RM"
 }

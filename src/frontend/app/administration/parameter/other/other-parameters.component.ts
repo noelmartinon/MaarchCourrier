@@ -291,6 +291,7 @@ export class OtherParametersComponent implements OnInit {
     attachmentsTypes: any = [];
 
     loading: boolean = false;
+    hasError: boolean = false;
 
     constructor(
         public translate: TranslateService,
@@ -656,25 +657,29 @@ export class OtherParametersComponent implements OnInit {
 
     saveSaeConfig() {
         this.loading = true;
+        this.hasError = false;
         this.http.put('../rest/seda/configuration', this.formatSaeConfig()).pipe(
             tap(() => {
                 this.notify.success(this.translate.instant('lang.dataUpdated'));
             }),
             finalize(() => {
                 this.loading = false;
-                if (this.saeEnabled === 'maarchRM') {
-                    this.dialog.open(CheckSaeInterconnectionComponent, {
-                        panelClass: 'maarch-modal',
-                        disableClose: true,
-                        width: '500px',
-                    });
-                }
+                this.hasError = false;
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
+                this.hasError = true;
                 return of(false);
             })
         ).subscribe();
+
+        if (!this.hasError && this.saeEnabled === 'maarchRM') {
+            this.dialog.open(CheckSaeInterconnectionComponent, {
+                panelClass: 'maarch-modal',
+                disableClose: true,
+                width: '500px',
+            });
+        }
     }
 
     formatSaeConfig() {
@@ -697,6 +702,7 @@ export class OtherParametersComponent implements OnInit {
                 });
             }
         });
+        maarchRM['sae'] = this.saeEnabled !== 'maarchRM' ? 'external' : this.saeConfig['maarchRM']['sae'].value;
         return objToSend = {
             ... maarchRM,
             externalSAE: externalSAE
@@ -727,5 +733,9 @@ export class OtherParametersComponent implements OnInit {
                 return this.archivalAgreements.find((elem: any) => elem.id === id).label;
             }
         }
+    }
+
+    switchSae() {
+        this.saeEnabled = this.saeEnabled === 'maarchRM' ? 'externalSAE' : 'maarchRM';
     }
 }

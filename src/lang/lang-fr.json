@@ -2538,5 +2538,6 @@
     "loadingTest": "En cours de tester l'interconnection avec le SAE configuré",
     "saeInterconnectionTest": "Interconnexion avec votre SAE",
     "interconnectionFailed": "L'interconnexion avec Maarch RM a été échouée",
-    "interconnectionSuccess": "Interconnexion réussite avec Maarch RM"
+    "interconnectionSuccess": "Interconnexion réussie avec Maarch RM",
+    "switchSae": "Passer à Maarch RM"
 }
