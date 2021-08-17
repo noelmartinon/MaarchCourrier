@@ -1,11 +1,13 @@
 -- *************************************************************************--
 --                                                                          --
 --                                                                          --
--- Model migration script - 19.04 to 20.03                                  --
+-- Model migration script - 19.04_TMA1 to 20.03_TMA1                        --
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '20.03.21' WHERE id = 'database_version';
+/*SGAMI-SO DEBUT*/
+UPDATE parameters SET param_value_string = '20.03.22_TMA1' WHERE id = 'database_version';
+/*SGAMI-SO FIN*/
 
 UPDATE parameters SET description = 'Département par défaut sélectionné dans les autocomplétions de la Base Adresse Nationale' WHERE id = 'defaultDepartment';
 
@@ -234,10 +236,20 @@ CREATE TABLE indexing_models_fields
   mandatory BOOLEAN NOT NULL,
   default_value json,
   unit text NOT NULL,
+  /*SGAMI-SO DEBUT*/
+  allowed_values jsonb,
+  /*SGAMI-SO FIN*/
   CONSTRAINT indexing_models_fields_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);
 
+/*SGAMI-SO DEBUT*/
+CREATE TABLE IF NOT EXISTS procedures (
+    procedure_id SERIAL NOT NULL,
+    procedure_label CHARACTER VARYING(256),
+    CONSTRAINT procedures_key PRIMARY KEY (procedure_id)
+);
+/*SGAMI-SO FIN*/
 
 /* TAGS */
 DO $$ BEGIN
@@ -822,6 +834,9 @@ END$$;
 /* DATA */
 TRUNCATE TABLE custom_fields;
 INSERT INTO custom_fields (id, label, type, values) VALUES (1, 'Nature', 'select', '["Courrier simple", "Courriel", "Courrier suivi", "Courrier avec AR", "Autre"]');
+/*SGAMI-SO DEBUT*/
+INSERT INTO custom_fields (id, label, type, values) VALUES (2, 'Référence courrier expéditeur', 'string', '[]');
+/*SGAMI-SO FIN*/
 SELECT setval('custom_fields_id_seq', (select max(id)+1 from custom_fields), false);
 
 
@@ -884,6 +899,9 @@ INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_val
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (1, 'confidentiality', TRUE, null, 'mail');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (1, 'documentDate', TRUE, null, 'mail');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (1, 'arrivalDate', TRUE, null, 'mail');
+/*SGAMI-SO DEBUT*/
+INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (1, 'indexingCustomField_2', FALSE, '"Référence courrier expéditeur"', 'mail');
+/*SGAMI-SO FIN*/
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (1, 'subject', TRUE, null, 'mail');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (1, 'indexingCustomField_1', FALSE, '"Courrier simple"', 'mail');
 INSERT INTO indexing_models_fields (model_id, identifier, mandatory, default_value, unit) VALUES (1, 'senders', TRUE, null, 'contact');

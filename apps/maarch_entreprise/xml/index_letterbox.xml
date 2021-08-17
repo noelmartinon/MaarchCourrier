@@ -8,7 +8,7 @@
     </INDEX>
     <INDEX>
         <column>custom_n1</column>
-        <label>Chiffre</label>
+        <label>custom_n1</label>
         <type>float</type>
         <img>default_string.gif</img>
     </INDEX>    
@@ -50,19 +50,19 @@
     </INDEX>
     <INDEX>
         <column>custom_n2</column>
-        <label>chiffre 2</label>
+        <label>custom_n2</label>
         <type>float</type>
         <img>plus.png</img>
     </INDEX>
     <INDEX>
         <column>custom_f2</column>
-        <label>chiffre f2</label>
+        <label>custom_f2</label>
         <type>float</type>
         <img>plus.png</img>
     </INDEX>
     <INDEX>
         <column>custom_d2</column>
-        <label>data d2</label>
+        <label>custom_d2</label>
         <type>date</type>
         <img>plus.png</img>
     </INDEX>
@@ -237,7 +237,7 @@
     </INDEX>
     <INDEX>
         <column>custom_t10</column>
-        <label>_EMAIL_FROM_ADDRESS</label>
+        <label>custom_t10</label>
         <type>string</type>
         <img>plus.png</img>
     </INDEX>
@@ -249,25 +249,25 @@
     </INDEX>    
     <INDEX>
         <column>custom_t11</column>
-        <label>_EMAIL_TO_ADDRESS</label>
+        <label>custom_t11</label>
         <type>string</type>
         <img>plus.png</img>
     </INDEX>
     <INDEX>
         <column>custom_t12</column>
-        <label>_EMAIL_CC_ADDRESS</label>
+        <label>custom_t12</label>
         <type>string</type>
         <img>plus.png</img>
     </INDEX>
     <INDEX>
         <column>custom_t13</column>
-        <label>_EMAIL_ID</label>
+        <label>custom_t13</label>
         <type>string</type>
         <img>plus.png</img>
     </INDEX>
     <INDEX>
         <column>custom_t14</column>
-        <label>_EMAIL_ACCOUNT</label>
+        <label>custom_t14</label>
         <type>string</type>
         <img>plus.png</img>
     </INDEX>

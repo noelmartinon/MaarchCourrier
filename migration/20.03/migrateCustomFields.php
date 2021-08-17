@@ -11,7 +11,7 @@ foreach ($customs as $custom) {
         continue;
     }
     #SGAMI-DEBUT
-    $idCustomField = 2;
+    $idCustomField = 3;
     #SGAMI-FIN
     \SrcCore\models\DatabasePDO::reset();
     new \SrcCore\models\DatabasePDO(['customId' => $custom]);
@@ -81,7 +81,8 @@ foreach ($customs as $custom) {
                     'type'      => $type,
                     'values'    => empty($values) ? '[]' : json_encode(array_values($values))
                 ]);
-
+                /*SGAMI-SO DEBUT
+                Par défaut les champs custom sont desactivéS
                 if (!empty($indexingModelsId)) {
                     foreach ($indexingModelsId as $indexingModelId) {
                         \IndexingModel\models\IndexingModelFieldModel::create([
@@ -92,7 +93,7 @@ foreach ($customs as $custom) {
                         ]);
                     }
                 }
-
+                SGAMI-SO FIN*/
                 $column = (string)$value->column;
                 $listColunm[] = $column;
                 $csColumn = "custom_fields->>''{$fieldId}''";

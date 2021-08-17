@@ -49,7 +49,10 @@ class IndexingModelFieldModel
                 'identifier'    => $args['identifier'],
                 'mandatory'     => $args['mandatory'],
                 'default_value' => $args['default_value'],
-                'unit'          => $args['unit']
+                'unit'          => $args['unit'],
+                /*SGAMI-SO DEBUT*/
+                'allowed_values'=> $args['allowed_values']
+                /*SGAMI-SO FIN*/
             ]
         ]);
 

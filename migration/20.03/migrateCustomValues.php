@@ -11,7 +11,7 @@ foreach ($customs as $custom) {
         continue;
     }
     #SGAMI-DEBUT
-    $idCustomField = 37;
+    $idCustomField = 38;
     #SGAMI-FIN
     \SrcCore\models\DatabasePDO::reset();
     new \SrcCore\models\DatabasePDO(['customId' => $custom]);
@@ -21,7 +21,9 @@ foreach ($customs as $custom) {
     // Migrate others Field
     $migrateToCustom = [
         ['id' => 'description',         'label' => 'Autres informations',             'customType' => 'string', 'modelId' => [1, 2, 3, 4]],
+         /* SGAMI-SO DEBUT
         ['id' => 'external_reference',  'label' => 'Référence courrier expéditeur',   'customType' => 'string', 'modelId' => [1]],
+           SGAMI-SO FIN */
         ['id' => 'reference_number',    'label' => 'N° recommandé',                   'customType' => 'string', 'modelId' => [1, 2]],
         ['id' => 'scan_date',           'label' => 'Date de scan',                    'customType' => 'date',   'modelId' => [1, 2]],
         ['id' => 'scan_user',           'label' => 'Utilisateur de scan',             'customType' => 'string', 'modelId' => [1, 2]],
@@ -58,6 +60,8 @@ foreach ($customs as $custom) {
             }
             \Basket\models\BasketModel::update(['postSet' => ['basket_clause' => "REPLACE(basket_clause, '{$migration['id']}', '{$csColumn}')"], 'where' => ['1 = ?'], 'data' => [1]]);
 
+            /*SGAMI-SO DEBUT
+            Par défaut les champs custom sont desactivéS
             foreach ($migration['modelId'] as $modelId) {
                 $indexingModels = \IndexingModel\models\IndexingModelModel::get([
                     'select'=> [1],
@@ -86,6 +90,7 @@ foreach ($customs as $custom) {
                     'data'      => [$columnValue['res_id']]
                 ]);
             }
+            SGAMI-SO DEBUT*/
 
             $migrated[] = $migration['id'];
         #SGAMI-SO debut

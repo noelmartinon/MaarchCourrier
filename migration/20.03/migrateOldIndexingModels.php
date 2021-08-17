@@ -4,24 +4,33 @@ $aDataIncoming['incoming'] = [
     'doctype'               => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
     'priority'              => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
     'confidentiality'          => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
-    'docDate'               => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
+    /*SGAMI-SO DEBUT*/
+    'documentDate'          => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
+    /*SGAMI-SO FIN */
     'arrivalDate'           => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
     'subject'               => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
     'indexingCustomField_1' => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'mail'],
+    /*SGAMI-SO DEBUT*/
+    'indexingCustomField_2' => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'mail'],
+    /*SGAMI-SO FIN*/
     'senders'               => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'contact'],
     'recipients'            => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'contact'],
     'initiator'             => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'process'],
     'destination'           => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'process'],
     'processLimitDate'      => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'process'],
-    'folder'                => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'classement'],
-    'tags'                  => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'classement'],
+     /*SGAMI-SO DEBUT*/
+    'folders'                => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'classifying'],
+    'tags'                  => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'classifying'],
+    /*SGAMI-SO FIN*/
 ];
 
 $aDataIncoming['outgoing'] = [
     'doctype'               => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
     'priority'              => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
     'confidentiality'          => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
-    'docDate'               => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
+    /*SGAMI-SO DEBUT*/
+    'documentDate'          => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
+    /*SGAMI-SO FIN */
     'subject'               => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
     'indexingCustomField_1' => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'mail'],
     'senders'               => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'contact'],
@@ -29,15 +38,19 @@ $aDataIncoming['outgoing'] = [
     'initiator'             => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'process'],
     'destination'           => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'process'],
     'processLimitDate'      => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'process'],
-    'folder'                => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'classement'],
-    'tags'                  => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'classement'],
+     /*SGAMI-SO DEBUT*/
+    'folders'                => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'classifying'],
+    'tags'                  => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'classifying'],
+    /*SGAMI-SO FIN*/
 ];
 
 $aDataIncoming['internal'] = [
     'doctype'               => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
     'priority'              => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
     'confidentiality'          => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
-    'docDate'               => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
+    /*SGAMI-SO DEBUT*/
+    'documentDate'          => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
+    /*SGAMI-SO FIN */
     'subject'               => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
     'indexingCustomField_1' => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'mail'],
     'senders'               => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'contact'],
@@ -45,14 +58,18 @@ $aDataIncoming['internal'] = [
     'initiator'             => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'process'],
     'destination'           => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'process'],
     'processLimitDate'      => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'process'],
-    'folder'                => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'classement'],
-    'tags'                  => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'classement'],
+     /*SGAMI-SO DEBUT*/
+    'folders'                => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'classifying'],
+    'tags'                  => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'classifying'],
+    /*SGAMI-SO FIN*/
 ];
 
 $aDataIncoming['ged_doc'] = [
     'doctype'               => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
     'confidentiality'          => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
-    'docDate'               => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
+    /*SGAMI-SO DEBUT*/
+    'documentDate'          => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
+    /*SGAMI-SO FIN */
     'subject'               => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'mail'],
     'senders'               => ['mandatory' => 'true', 'default_value' => '""', 'unit' => 'contact'],
     'recipients'         => ['mandatory' => 'false', 'default_value' => '""', 'unit' => 'contact'],
@@ -108,7 +125,9 @@ foreach ($customs as $custom) {
             if ($key == 'type_id') {
                 $doctype = \Doctype\models\DoctypeModel::get(['select' => [1], 'where' => ['type_id = ?', 'enabled = ?'], 'data' => [$field, 'Y']]);
                 if (!empty($doctype)) {
-                    $datasToImport['doctype']['default_value'] = json_encode($field);
+                   /*SGAMI-SO DEBUT*/
+                   $datasToImport['doctype']['doc'] = json_encode(array($field), JSON_NUMERIC_CHECK);
+                   /*SGAMI-SO FIN*/
                 }
             } elseif ($key == 'priority') {
                 $priority = \Priority\models\PriorityModel::getById(['select' => [1], 'id' => $field]);
@@ -125,12 +144,18 @@ foreach ($customs as $custom) {
             }
         }
         foreach ($datasToImport as $id => $defaultValue) {
+            /*SGAMI-SO DEBUT*/
+            $field  =($defaultValue['default_value'] == '""') ? NULL : ($defaultValue['default_value']);
+            /*SGAMI-SO FIN*/
             \IndexingModel\models\IndexingModelFieldModel::create([
                 'model_id'      => $modelId,
                 'identifier'    => $id,
                 'mandatory'     => $defaultValue['mandatory'],
                 'default_value' => $defaultValue['default_value'],
-                'unit'          => $defaultValue['unit']
+                'unit'          => $defaultValue['unit'],
+                /*SGAMI-SO DEBUT*/
+                'allowed_values'=> empty($defaultValue['doc']) ? NULL : ($defaultValue['doc'])
+                /*SGAMI-SO FIN*/
             ]);
         }
         ++$migrated;
