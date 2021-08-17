@@ -40,32 +40,4 @@ BEGIN
 END;
 $BODY$ LANGUAGE plpgsql;
 
---function to solve issue : 17014
-CREATE OR REPLACE FUNCTION migrate_expeditor_data() RETURNS VARCHAR AS $BODY$
-DECLARE
-	dest JSONB;
-	expe JSONB;
-	res VARCHAR;
-	r RECORD;
-BEGIN
-	FOR r IN SELECT * FROM res_letterbox
-    LOOP
-    	IF r.dest_user IS NULL THEN
-    		raise notice 'resid % do nothing',r.res_id;
-		ELSE
-			SELECT ('"' || lastname || ' ' || firstname || '"')::JSONB INTO expe FROM users WHERE id = r.dest_user;
-			SELECT ('"' || entity_by_res_id(r.res_id) || '"')::JSONB INTO dest;
-			UPDATE res_letterbox SET custom_fields = jsonb_set(custom_fields,'{"20"}', expe) WHERE res_id = r.res_id RETURNING custom_fields INTO res;
-			UPDATE res_letterbox SET custom_fields = jsonb_set(custom_fields,'{"18"}', dest) WHERE res_id = r.res_id RETURNING custom_fields INTO res;
-			raise notice  '%', res::TEXT;
-		END IF;
-    END LOOP;
-    RETURN 'END';
-END;
-$BODY$ LANGUAGE plpgsql;
-
-
-SELECT migrate_expeditor_data();
-DROP FUNCTION migrate_expeditor_data;
-
 UPDATE parameters SET param_value_string = '20.10.17' WHERE id = 'database_version';
