@@ -78,8 +78,6 @@ function main($argv)
     if ($synchronizeEntities) {
         synchronizeEntities($ldapEntities, $maarchEntities);
     }
-    
-    sendDiff($xmlfile, $ldapEntities, $ldapUsers);
 }
 
 function initialize($customId)
@@ -289,7 +287,7 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
     }
 
     $finalMaarchUsers = \User\models\UserModel::get(['select' => ['user_id', 'firstname', 'lastname', 'phone', 'mail', 'status'],'where' => ["status not in ('DEL','SPD')"]]);
-    foreach ($finalMaarchUsers as $value) {
+    foreach ($finalMaarchUsers as $user) {
         $compare = true;
         foreach ($ldapUsers as $v) {
             if($value['user_id'] == $v['user_id'])  $compare = false;
@@ -425,122 +423,4 @@ function userAddEntity($userId, $user)
     else{
         writeLog(['message' => "[ERROR] Add entity to user failed : {Entity not found}"]);
     }
-}
-
-function sendMail($email)
-{
-    $configuration = \Configuration\models\ConfigurationModel::getByPrivilege(['privilege' => 'admin_email_server', 'select' => ['value']]);
-    $configuration = json_decode($configuration['value'], true);
-
-    if (empty($configuration)) {
-        writeLog(['message' => 'Configuration admin_email_server is missing']);
-        return false;
-    }
-    
-    $phpmailer = new \PHPMailer\PHPMailer\PHPMailer();
-    $phpmailer->setFrom($configuration['from'], $configuration['from']);
-    if (in_array($configuration['type'], ['smtp', 'mail'])) {
-        if ($configuration['type'] == 'smtp') {
-            $phpmailer->isSMTP();
-        } elseif ($configuration['type'] == 'mail') {
-            $phpmailer->isMail();
-        }
-
-        $phpmailer->Host = $configuration['host'];
-        $phpmailer->Port = $configuration['port'];
-        $phpmailer->SMTPAutoTLS = false;
-        if (!empty($configuration['secure'])) {
-            $phpmailer->SMTPSecure = $configuration['secure'];
-        }
-        $phpmailer->SMTPAuth = $configuration['auth'];
-        if ($configuration['auth']) {
-            $phpmailer->Username = $configuration['user'];
-            if (!empty($configuration['password'])) {
-                $phpmailer->Password = \SrcCore\models\PasswordModel::decrypt(['cryptedPassword' => $configuration['password']]);
-            }
-        }
-    } elseif ($configuration['type'] == 'sendmail') {
-        $phpmailer->isSendmail();
-    } elseif ($configuration['type'] == 'qmail') {
-        $phpmailer->isQmail();
-    }
-
-    $phpmailer->CharSet = $configuration['charset'];
-    $phpmailer->addAddress($email['recipient']);
-    $phpmailer->isHTML(true);
-    $phpmailer->Timeout = 30;
-
-    $phpmailer->Subject = $email['subject'];
-    $phpmailer->Body = $email['html_body'];
-    if (empty($email['html_body'])) {
-        writeLog(['message' => '0 users et 0 entity to delete']);
-        return false;
-    }
-
-    $isSent = $phpmailer->send();
-    if ($isSent) {
-        $exec_result = 'SENT';
-        writeLog(['message' => 'notification sent']);
-    } else {
-        $err++;
-        writeLog(['message' => 'SENDING EMAIL ERROR ! (' . $phpmailer->ErrorInfo.')']);
-        return false;
-    }
-    return true;
-}
-
-function sendDiff($xmlfile, $ldapEntities, $ldapUsers)
-{
-
-    $email['subject'] = (string)$xmlfile->mailing->subject;
-    if(empty($email['subject']))
-    {
-        writeLog(['message' => 'mailing subject empty, please check the ldap config file.']);
-        return false;
-    }
-
-    $email['recipient'] = (string)$xmlfile->mailing->dest;
-    if(empty($email['subject']))
-    {
-        writeLog(['message' => 'mailing dest empty, please check the ldap config file.']);
-        return false;
-    }
-
-    $finalMaarchUsers = \User\models\UserModel::get(['select' => ['user_id', 'firstname', 'lastname', 'phone', 'mail', 'status'],'where' => ["status not in ('DEL','SPD')"]]);
-    $finalMaarchEntities = \Entity\models\EntityModel::get(['select' => ['entity_id', 'entity_label', 'short_label', 'entity_type', 'parent_entity_id']]);
-    
-    $bodyUser = "";
-    $bodyEntity = "";
-    $compare = false;
-    $tabulation = '<tr>';
-  
-
-    foreach ($finalMaarchEntities as $key => $value) {
-        $compare = true;
-        foreach ($ldapEntities as $v) {
-            if($value['entity_id'] == $v['entity_id']) $compare = false;
-        }
-        if($compare){
-            $bodyEntity .= '<tr>';
-            $bodyEntity .= '<td>'.$value['entity_id'].'</td>';
-            $bodyEntity .= '<td>'.$value['entity_label'].'</td>';
-            $bodyEntity .= '</tr>';
-        }
-    }
-
-    if($bodyUser){
-        $email['html_body'] .= '<h3>Liste utilisateurs non présent dans le fichier ldap</h3> <br>';
-        $email['html_body'] .= '<table>'.$bodyUser.'</table>';
-    }
-    if($bodyEntity){
-        $email['html_body'] .= '<h3>Liste entitées non présentes dans le fichier ldap</h3> <br>';
-        $email['html_body'] .= '<table>'.$bodyEntity.'</table>';
-    }
-
-    if(! $bodyEntity && ! $bodyUser)
-    {
-        $email['html_body'] = "Aucune suppression prévue";
-    }
-
-    return sendMail($email);
 }
