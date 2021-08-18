@@ -123,8 +123,7 @@ class CoreController
         if (in_array($queryParams['image'], ['logo', 'onlyLogo'])) {
             $mimeType = 'image/svg+xml';
         } else {
-            $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->buffer($fileContent);
+            $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $path]);
         }
         $pathInfo = pathinfo($path);
 

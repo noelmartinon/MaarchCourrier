@@ -26,6 +26,7 @@ use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\LogsController;
+use SrcCore\controllers\CoreController;
 use SrcCore\controllers\UrlController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
@@ -323,11 +324,11 @@ class ConvertPdfController
             return $response->withStatus(400)->withJson(['errors' => 'Body base64 is empty']);
         }
 
-        $file     = base64_decode($body['base64']);
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($file);
-        $ext      = substr($body['name'], strrpos($body['name'], '.') + 1);
-        $size     = strlen($file);
+        $ext         = substr($body['name'], strrpos($body['name'], '.') + 1);
+        $file        = base64_decode($body['base64']);
+        $mimeAndSize = CoreController::getMimeTypeAndFileSize(['encodedFile' => $body['base64']]);
+        $mimeType    = $mimeAndSize['mime'];
+        $size        = $mimeAndSize['size'];
 
         if (strtolower($ext) == 'pdf' && strtolower($mimeType) == 'application/pdf') {
             if ($body['context'] == 'scan') {

@@ -37,6 +37,7 @@ use setasign\Fpdi\Tcpdf\Fpdi;
 use SignatureBook\controllers\SignatureBookController;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\controllers\CoreController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
@@ -509,9 +510,7 @@ class AttachmentController
             return $response->withStatus(404)->withJson(['errors' => 'Thumbnail not found on docserver']);
         }
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
-        $pathInfo = pathinfo($pathToThumbnail);
+        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToThumbnail])['mime'];
 
         $response->write($fileContent);
         $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.{$pathInfo['extension']}");
@@ -679,8 +678,7 @@ class AttachmentController
 
         $data = $request->getQueryParams();
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
+        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument])['mime'];
         $filename = TextFormatModel::formatFilename(['filename' => $attachment['title'], 'maxLength' => 250]);
 
         if ($data['mode'] == 'base64') {
@@ -764,8 +762,7 @@ class AttachmentController
             return $response->withStatus(400)->withJson(['errors' => 'Document not found on docserver']);
         }
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
+        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument])['mime'];
         $pathInfo = pathinfo($pathToDocument);
         $data     = $request->getQueryParams();
         $filename = TextFormatModel::formatFilename(['filename' => $attachmentTodisplay['title'], 'maxLength' => 250]);
