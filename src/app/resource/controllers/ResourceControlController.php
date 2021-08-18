@@ -238,15 +238,21 @@ class ResourceControlController
                 return ['errors' => 'Body format is empty or not a string'];
             }
 
-            $file     = base64_decode($body['encodedFile']);
-            $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->buffer($file);
+            $fileTmp = fopen('php://temp', 'r+');
+            $streamFilterBase64 = stream_filter_append($fileTmp, 'convert.base64-decode', STREAM_FILTER_WRITE);
+            stream_set_chunk_size($fileTmp, 1024);
+            $tmpFilesize = fwrite($fileTmp, $body['encodedFile']);
+            rewind($fileTmp);
+            stream_filter_remove($streamFilterBase64);
+            $mimeType = mime_content_type($fileTmp);
+            fclose($fileTmp);
+
             if (!StoreController::isFileAllowed(['extension' => $body['format'], 'type' => $mimeType])) {
                 return ['errors' => "Format with this mimeType is not allowed : {$body['format']} {$mimeType}"];
             }
 
             $maximumSize = CoreController::getMaximumAllowedSizeFromPhpIni();
-            if ($maximumSize > 0 && strlen($file) > $maximumSize) {
+            if ($maximumSize > 0 && $tmpFilesize > $maximumSize) {
                 return ['errors' => "Body encodedFile size is over limit"];
             }
         }
