@@ -43,6 +43,7 @@ use Resource\models\UserFollowedResourceModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\controllers\CoreController;
 use SrcCore\controllers\AuthenticationController;
 use SrcCore\controllers\PasswordController;
 use SrcCore\controllers\UrlController;
@@ -953,8 +954,7 @@ class UserController
             return $response->withStatus(404)->withJson(['errors' => 'Signature not found on docserver']);
         }
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($image);
+        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToSignature])['mime'];
 
         $response->write($image);
 
@@ -982,9 +982,9 @@ class UserController
         $file     = base64_decode($data['base64']);
         $tmpName  = "tmp_file_{$aArgs['id']}_" .rand(). "_{$data['name']}";
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($file);
-        $size     = strlen($file);
+        $mimeAndSize = CoreController::getMimeTypeAndFileSize(['encodedFile' => $data['base64']]);
+        $mimeType    = $mimeAndSize['mime'];
+        $size        = $mimeAndSize['size'];
         $type     = explode('/', $mimeType);
         $ext      = strtoupper(substr($data['name'], strrpos($data['name'], '.') + 1));
 

@@ -26,6 +26,7 @@ use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\UrlController;
+use SrcCore\controllers\CoreController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
 use SrcCore\models\ValidatorModel;
@@ -239,8 +240,7 @@ class OnlyOfficeController
             return $response->withStatus(400)->withJson(['errors' => 'No content found']);
         }
 
-        $finfo     = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType  = $finfo->buffer($fileContent);
+        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $tmpPath . $filename])['mime'];
         $extension = pathinfo($tmpPath . $filename, PATHINFO_EXTENSION);
         unlink($tmpPath . $filename);
 
@@ -493,8 +493,7 @@ class OnlyOfficeController
             return $response->withStatus(404)->withJson(['errors' => 'Document not found']);
         }
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
+        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $jwt->fullFilename])['mime'];
         $pathInfo = pathinfo($jwt->fullFilename);
 
         $response->write($fileContent);

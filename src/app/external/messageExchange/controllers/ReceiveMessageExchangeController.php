@@ -30,6 +30,7 @@ use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\controllers\CoreController;
 use SrcCore\models\CoreConfigModel;
 use User\models\UserModel;
 
@@ -159,8 +160,7 @@ class ReceiveMessageExchangeController
 
         $file     = base64_decode($aArgs['base64']);
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($file);
+        $mimeType = CoreController::getMimeTypeAndFileSize(['encodedFile' => $aArgs['base64']])['mime'];
         $ext      = $aArgs['extension'];
         $tmpName  = 'tmp_file_' .$GLOBALS['login']. '_ArchiveTransfer_' .rand(). '.' . $ext;
 

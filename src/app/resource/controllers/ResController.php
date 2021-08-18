@@ -50,6 +50,7 @@ use Shipping\models\ShippingModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\PreparedClauseController;
+use SrcCore\controllers\CoreController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
@@ -500,8 +501,7 @@ class ResController extends ResourceControlController
 
         $data = $request->getQueryParams();
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
+        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument])['mime'];
         $filename = TextFormatModel::formatFilename(['filename' => $subject, 'maxLength' => 250]);
 
         if ($data['mode'] == 'base64') {
@@ -704,8 +704,7 @@ class ResController extends ResourceControlController
             'eventId'   => 'resview',
         ]);
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
+        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument])['mime'];
         $pathInfo = pathinfo($pathToDocument);
         $data     = $request->getQueryParams();
         $filename = TextFormatModel::formatFilename(['filename' => $subject, 'maxLength' => 250]);
@@ -758,8 +757,7 @@ class ResController extends ResourceControlController
             $fileContent = @file_get_contents($pathToThumbnail);
         }
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
+        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToThumbnail])['mime'];
         $pathInfo = pathinfo($pathToThumbnail);
 
         $response->write($fileContent);
