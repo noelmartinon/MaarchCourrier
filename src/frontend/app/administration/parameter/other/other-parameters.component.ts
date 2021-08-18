@@ -83,7 +83,7 @@ export class OtherParametersComponent implements OnInit {
     saeConfig = {
         maarchRM: {
             sae: new FormControl('MaarchRM'),
-            urlSAEService: new FormControl('https://demo-ap.maarchrm.cooom'),
+            urlSAEService: new FormControl('https://demo-ap.maarchrm.com'),
             token: new FormControl('phdF9WkJuTKkDuPXoqDZuCFEQT7En7YqsVROsdD1HoNZV7jD5+XyCtKbhx0Chb4s3skokalo0wEn48DE3M4kGrAceH0/XFbyLZVRoVOO+Y/wxyRdE1QJleI8yijEfGut'),
             senderOrgRegNumber: new FormControl('org_987654321_DGS_SA'),
             accessRuleCode: new FormControl('AR039'),
@@ -620,30 +620,26 @@ export class OtherParametersComponent implements OnInit {
             this.http.get('../rest/seda/configuration').pipe(
                 map((data: any) => data.configuration),
                 tap((data: any) => {
-                    this.saeEnabled = data.sae.toLowerCase() === 'maarchrm' ? 'maarchRM' : 'externalSAE';
-                    if (this.saeEnabled === 'maarchRM') {
-                        this.saeConfig[this.saeEnabled] = {
-                            sae: new FormControl(data.sae),
-                            urlSAEService: new FormControl(data.urlSAEService),
-                            token: new FormControl(data.token),
-                            senderOrgRegNumber: new FormControl(data.senderOrgRegNumber),
-                            accessRuleCode: new FormControl(data.accessRuleCode),
-                            certificateSSL: new FormControl(data.certificateSSL),
-                            userAgent: new FormControl(data.userAgent),
-                            M2M: new FormControl(data.M2M.gec),
-                            statusReplyReceived: new FormControl(data.statusReplyReceived),
-                            statusReplyRejected: new FormControl(data.statusReplyRejected),
-                            statusMailToPurge: new FormControl(data.statusMailToPurge),
-                        };
-                    }
-                    if (data.externalSAE !== undefined) {
-                        this.setEXternalSaeData(data.externalSAE);
-                        Object.keys(data.externalSAE).forEach((element: any) => {
-                            this.saeConfig[this.saeEnabled][element] = {
-                                id: new FormControl(data.externalSAE[element][0].id),
-                                label: new FormControl(data.externalSAE[element][0].label)
+                    if (data !== undefined) {
+                        this.saeEnabled = data.sae.toLowerCase() === 'maarchrm' ? 'maarchRM' : 'externalSAE';
+                        if (this.saeEnabled === 'maarchRM') {
+                            this.saeConfig[this.saeEnabled] = {
+                                sae: new FormControl(data.sae),
+                                urlSAEService: new FormControl(data.urlSAEService),
+                                token: new FormControl(data.token),
+                                senderOrgRegNumber: new FormControl(data.senderOrgRegNumber),
+                                accessRuleCode: new FormControl(data.accessRuleCode),
+                                certificateSSL: new FormControl(data.certificateSSL),
+                                userAgent: new FormControl(data.userAgent),
+                                M2M: new FormControl(data.M2M.gec),
+                                statusReplyReceived: new FormControl(data.statusReplyReceived),
+                                statusReplyRejected: new FormControl(data.statusReplyRejected),
+                                statusMailToPurge: new FormControl(data.statusMailToPurge),
                             };
-                        });
+                        }
+                        if (data.externalSAE !== undefined) {
+                            this.setEXternalSaeData(data.externalSAE);
+                        }
                     }
                     resolve(true);
                 }),
@@ -678,6 +674,9 @@ export class OtherParametersComponent implements OnInit {
                 panelClass: 'maarch-modal',
                 disableClose: true,
                 width: '500px',
+                data: {
+                    urlSAEService: this.saeConfig['maarchRM']['urlSAEService'].value
+                }
             });
         }
     }
@@ -693,12 +692,17 @@ export class OtherParametersComponent implements OnInit {
                 });
             } else {
                 Object.keys(this.saeConfig[elemId]).forEach((item: any) => {
-                    externalSAE[item] = [
-                        {
-                            id: this.saeConfig[elemId][item].id.value,
-                            label: this.getLabel(this.saeConfig[elemId][item].id.value, Object.getOwnPropertyNames(this.saeConfig[elemId]).find((el: any) => el === item))
-                        }
-                    ];
+                    switch (item) {
+                        case 'retentionRules':
+                            externalSAE[item] = this.retentionRules;
+                            break;
+                        case 'archiveEntities':
+                            externalSAE[item] = this.archiveEntities;
+                            break;
+                        case 'archivalAgreements':
+                            externalSAE[item] = this.archivalAgreements;
+                            break;
+                    }
                 });
             }
         });
@@ -737,5 +741,52 @@ export class OtherParametersComponent implements OnInit {
 
     switchSae() {
         this.saeEnabled = this.saeEnabled === 'maarchRM' ? 'externalSAE' : 'maarchRM';
+    }
+
+    addValue(externalData: string) {
+        switch (externalData) {
+            case 'retentionRules':
+                this.retentionRules.push(
+                    {
+                        id: null,
+                        labe: null
+                    }
+                );
+                break;
+            case 'archiveEntities':
+                this.archiveEntities.push(
+                    {
+                        id: null,
+                        labe: null
+                    }
+                );
+                break;
+            case 'archivalAgreements':
+                this.archivalAgreements.push(
+                    {
+                        id: null,
+                        labe: null
+                    }
+                );
+                break;
+        }
+    }
+
+    removeField(index: number, externalData: string) {
+        if (externalData === 'retentionRules') {
+            this.retentionRules.splice(index, 1);
+        } else if (externalData === 'archiveEntities') {
+            this.archiveEntities.splice(index, 1);
+        } else if (externalData === 'archivalAgreements') {
+            this.archivalAgreements.splice(index, 1);
+        }
+    }
+
+    isValid() {
+        if (this.saeEnabled === 'maarchRM') {
+            return !this.functions.empty(this.saeConfig['maarchRM']['sae'].value) && !this.functions.empty(this.saeConfig['maarchRM']['urlSAEService'].value) && !this.functions.empty(this.saeConfig['maarchRM']['token'].value);
+        } else if (this.saeEnabled === 'externalSAE') {
+            return this.retentionRules.every((item: any) => !this.functions.empty(item.label) && !this.functions.empty(item.id)) && this.archiveEntities.every((item: any) => !this.functions.empty(item.label) && !this.functions.empty(item.id)) && this.archivalAgreements.every((item: any) => !this.functions.empty(item.label) && !this.functions.empty(item.id));
+        }
     }
 }

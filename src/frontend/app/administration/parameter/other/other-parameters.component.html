@@ -146,7 +146,7 @@
                             <div class="col-md-6">
                                 <mat-form-field appearance="outline">
                                     <mat-label>{{'lang.' + sae.key |translate}}</mat-label>
-                                    <input matInput type="text" [title]="'lang.' + sae.key |translate" 
+                                    <input matInput type="text" [title]="'lang.' + sae.key |translate"
                                         [value]="saeConfig[saeEnabled][sae.key]" [formControl]="saeConfig[saeEnabled][sae.key]">
                                 </mat-form-field>
                             </div>
@@ -164,45 +164,117 @@
                             </div>
                         </div>
                     </div>
-                    <div *ngIf="saeEnabled !== 'maarchRM'" class="form-group">
-                        <div *ngIf="sae.key === 'retentionRules'"  class="col-md-12">
-                            <mat-form-field appearance="outline">
-                                <mat-label>{{'lang.' + sae.key |translate}}</mat-label>
-                                <mat-select [formControl]="saeConfig[saeEnabled][sae.key].id">
-                                    <mat-option *ngFor="let rule of retentionRules" [value]="rule.id" [id]="rule.id">
-                                        {{ rule.label }}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-                        <div *ngIf="sae.key === 'archiveEntities'"  class="col-md-12">
-                            <mat-form-field appearance="outline">
-                                <mat-label>{{'lang.' + sae.key |translate}}</mat-label>
-                                <mat-select [formControl]="saeConfig[saeEnabled][sae.key].id">
-                                    <mat-option *ngFor="let entity of archiveEntities" [value]="entity.id" [id]="entity.id">
-                                        {{ entity.label }}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
-                        <div *ngIf="sae.key === 'archivalAgreements'"  class="col-md-12">
-                            <mat-form-field appearance="outline">
-                                <mat-label>{{'lang.' + sae.key |translate}}</mat-label>
-                                <mat-select [formControl]="saeConfig[saeEnabled][sae.key].id">
-                                    <mat-option *ngFor="let agreement of archivalAgreements" [value]="agreement.id" [id]="agreement.id">
-                                        {{ agreement.label }}
-                                    </mat-option>
-                                </mat-select>
-                            </mat-form-field>
-                        </div>
+                    <div *ngIf="saeEnabled !== 'maarchRM'" class="form-group" style="flex:1;">
+                        <mat-expansion-panel *ngIf="sae.key === 'retentionRules'" class="externalSAEvalues" [expanded]="true">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{'lang.' + sae.key |translate}}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                                <div style="display: flex;">
+                                    <div style="flex: 1;">
+                                        <button mat-raised-button color="primary" (click)="addValue(sae.key)">
+                                            {{'lang.addValue' | translate}}</button>
+                                    </div>
+                                </div>
+                                <div *ngIf="retentionRules.length > 0" class="col-md-12">
+                                    <span *ngFor="let rule of retentionRules;let i=index;">
+                                        <div class="form-group">
+                                            <div class="col-md-6">
+                                                <mat-form-field floatLabel="never" *ngIf="rule.label !== null">
+                                                    <input required matInput [(ngModel)]="rule.id" [placeholder]="'lang.id' | translate">
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <mat-form-field floatLabel="never" *ngIf="rule.label !== null">
+                                                    <input required matInput [(ngModel)]="rule.label" [placeholder]="'lang.label' | translate">
+                                                    <button color="warn" mat-icon-button matSuffix (click)="removeField(i, sae.key)"
+                                                        [title]="'lang.delete' | translate" [disabled]="retentionRules.length === 1">
+                                                        <mat-icon class="fa fa-trash"></mat-icon>
+                                                    </button>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                        
+                                    </span>
+                                </div>
+                        </mat-expansion-panel>
+                        <mat-expansion-panel *ngIf="sae.key === 'archiveEntities'" class="externalSAEvalues" [expanded]="false">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{'lang.' + sae.key |translate}}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                                <div style="display: flex;">
+                                    <div style="flex: 1;">
+                                        <button mat-raised-button color="primary" (click)="addValue(sae.key)">
+                                            {{'lang.addValue' | translate}}</button>
+                                    </div>
+                                </div>
+                                <div *ngIf="archiveEntities.length > 0" class="col-md-12">
+                                    <span *ngFor="let rule of archiveEntities;let i=index;">
+                                        <div class="form-group">
+                                            <div class="col-md-6">
+                                                <mat-form-field floatLabel="never" *ngIf="rule.label !== null">
+                                                    <input required matInput [(ngModel)]="rule.id" [placeholder]="'lang.id' | translate">
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <mat-form-field floatLabel="never" *ngIf="rule.label !== null">
+                                                    <input required matInput [(ngModel)]="rule.label" [placeholder]="'lang.label' | translate">
+                                                    <button color="warn" mat-icon-button matSuffix (click)="removeField(i, sae.key)"
+                                                        [title]="'lang.delete' | translate" [disabled]="archiveEntities.length === 1">
+                                                        <mat-icon class="fa fa-trash"></mat-icon>
+                                                    </button>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                        
+                                    </span>
+                                </div>
+                        </mat-expansion-panel>
+                        <mat-expansion-panel *ngIf="sae.key === 'archivalAgreements'" class="externalSAEvalues" [expanded]="false">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{'lang.' + sae.key |translate}}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                                <div style="display: flex;">
+                                    <div style="flex: 1;">
+                                        <button mat-raised-button color="primary" (click)="addValue(sae.key)">
+                                            {{'lang.addValue' | translate}}</button>
+                                    </div>
+                                </div>
+                                <div *ngIf="archivalAgreements.length > 0" class="col-md-12">
+                                    <span *ngFor="let rule of archivalAgreements;let i=index;">
+                                        <div class="form-group">
+                                            <div class="col-md-6">
+                                                <mat-form-field floatLabel="never" *ngIf="rule.label !== null">
+                                                    <input required matInput [(ngModel)]="rule.id" [placeholder]="'lang.id' | translate">
+                                                </mat-form-field>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <mat-form-field floatLabel="never" *ngIf="rule.label !== null">
+                                                    <input required matInput [(ngModel)]="rule.label" [placeholder]="'lang.label' | translate">
+                                                    <button color="warn" mat-icon-button matSuffix (click)="removeField(i, sae.key)"
+                                                        [title]="'lang.delete' | translate" [disabled]="archivalAgreements.length === 1">
+                                                        <mat-icon class="fa fa-trash"></mat-icon>
+                                                    </button>
+                                                </mat-form-field>
+                                            </div>
+                                        </div>
+                                        
+                                    </span>
+                                </div>
+                        </mat-expansion-panel>
                     </div>
                 </ng-container>
                 <div class="form-group">
                     <div class="col-sm-12" style="text-align:center;">
-                        <button mat-raised-button color="primary" [disabled]="loading" (click)="saveSaeConfig()">
+                        <button mat-raised-button color="primary" [disabled]="loading || !isValid()" (click)="saveSaeConfig()">
                             {{(saeEnabled === 'maarchRM' ? 'lang.validateConfig' : 'lang.validate') | translate}}
                         </button>
-                        <mat-slide-toggle style="padding-left: 10px; padding-top: 5px;" [checked]="saeEnabled === 'maarchRM'" color="basic" (change)="switchSae()">
+                        <mat-slide-toggle style="padding-left: 10px; padding-top: 10px;" [checked]="saeEnabled === 'maarchRM'" color="primary" (change)="switchSae()">
                             {{'lang.switchSae' | translate}}</mat-slide-toggle>
                     </div>
                 </div>

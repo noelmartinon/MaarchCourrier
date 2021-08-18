@@ -48,3 +48,9 @@
 .primary {
     color: var(--maarch-color-primary) !important;
 }
+
+.externalSAEvalues {
+    box-shadow: none;
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 12px;
+}

@@ -2539,7 +2539,7 @@
     "archivalAgreements": "Archival agreements",
     "loadingTest": "In the process of testing the interconnection with the configured EAS",
     "saeInterconnectionTest": "Interconnection with your EAS",
-    "interconnectionFailed": "Interconnection with Maarch RM has failed",
+    "interconnectionFailed": "<b>Interconnection with Maarch RM failed.</b> Error when calling Maarch RM server",
     "interconnectionSuccess": "Successful interconnection with Maarch RM",
     "switchSae": "Switch to Maarch RM"
 }
