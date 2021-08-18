@@ -233,7 +233,7 @@ class ResourceControlController
         return true;
     }
 
-    public static function controlFileData(array $args)
+    private static function controlFileData(array $args)
     {
         $body = $args['body'];
 
@@ -242,15 +242,17 @@ class ResourceControlController
                 return ['errors' => 'Body format is empty or not a string'];
             }
 
-            $file     = base64_decode($body['encodedFile']);
-            $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->buffer($file);
-            if (!StoreController::isFileAllowed(['extension' => $body['format'], 'type' => $mimeType])) {
-                return ['errors' => "Format with this mimeType is not allowed : {$body['format']} {$mimeType}"];
+            $mimeAndSize = CoreController::getMimeTypeAndFileSize(['encodedFile' => $body['encodedFile']]);
+            if (isset($mimeAndSize['errors'])) {
+                return $mimeAndSize['errors'];
+            }
+
+            if (!StoreController::isFileAllowed(['extension' => $body['format'], 'type' => $mimeAndSize['mime']])) {
+                return ['errors' => "Format with this mimeType is not allowed : {$body['format']} {$mimeAndSize['mime']}"];
             }
 
             $maximumSize = CoreController::getMaximumAllowedSizeFromPhpIni();
-            if ($maximumSize > 0 && strlen($file) > $maximumSize) {
+            if ($maximumSize > 0 && $mimeAndSize['size'] > $maximumSize) {
                 return ['errors' => "Body encodedFile size is over limit"];
             }
         }

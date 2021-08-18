@@ -147,6 +147,54 @@ class CoreController
         return $maximumSize;
     }
 
+    /**
+     * getMimeTypeAndFileSize
+     * 
+     * @param args array with either an 'encodedFile' (base64 string), a 'resource' (resource), or a 'path' (file path as string)
+     * @return array with 'mime' and 'size' entries
+     */
+    public static function getMimeTypeAndFileSize(array $args) {
+        $resource = null;
+        $size = null;
+        if (!empty($args['encodedFile'])) {
+            if (!is_string($args['encodedFile'])) {
+                return ['errors' => 'args encodedFile is not a string'];
+            }
+            $resource = fopen('php://temp', 'r+');
+            $streamFilterBase64 = stream_filter_append($resource, 'convert.base64-decode', STREAM_FILTER_WRITE);
+            stream_set_chunk_size($resource, 1024*1024);
+            $size = fwrite($resource, $args['encodedFile']);
+            stream_filter_remove($streamFilterBase64);
+        } elseif (!empty($args['resource'])) {
+            if (!is_resource($args['resource'])) {
+                return ['errors' => 'args resource is not a resource'];
+            }
+            $resource = $args['resource'];
+            $devNull = fopen('/dev/null', 'a');
+            $size = stream_copy_to_stream($resource, $devNull);
+        } elseif (!empty($args['path'])) {
+            if (!is_file($args['path']) || !is_readable($args['path'])) {
+                return ['errors' => 'args filename does not refer to a regular file or said file is not readable'];
+            }
+            $resource = fopen($args['path'], 'r');
+            $size = filesize($args['path']);
+        }
+        
+        if (empty($resource)) {
+            return ['errors' => 'missing parameter: getMimeType requires encodedFile, resource, or filename'];
+        }
+
+        rewind($resource);
+        $mimeType = mime_content_type($resource);
+        fclose($resource);
+
+        if (empty($mimeType) || empty($size)) {
+            return ['errors' => "could not compute mime type ($mimeType) or file size ($size)"];
+        }
+
+        return ['mime' => $mimeType, 'size' => $size];
+    }
+
     public static function getErrorReportingFromPhpIni()
     {
         $bits = ini_get('error_reporting');
