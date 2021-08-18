@@ -233,7 +233,7 @@ class ResourceControlController
         return true;
     }
 
-    private static function controlFileData(array $args)
+    public static function controlFileData(array $args)
     {
         $body = $args['body'];
 
