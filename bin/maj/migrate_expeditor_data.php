@@ -39,7 +39,7 @@ function main($argv)
     $dbconn = pg_connect('host='.$file['server'].' dbname='.$file['name'].' port='.$file['port'].' user='.$file['user'].' password='.$file['password']) 
     or die('Connexion impossible : ' . pg_last_error());
 
-    $query = 'SELECT res_id,initiator FROM res_letterbox';
+    $query = 'SELECT res_id,typist FROM res_letterbox';
     $result = pg_fetch_all(pg_query($query));
     $count = count($result);
     $i = 0;
@@ -53,7 +53,7 @@ function main($argv)
 }
 
 function updateExpediteur ($row) {
-    $select = "SELECT  lastname || ' ' || firstname as expediteur FROM users WHERE id = ".$row['initiator'];
+    $select = "SELECT  lastname || ' ' || firstname as expediteur FROM users WHERE id = ".$row['typist'];
     $res = pg_query($select) or die('Échec de la requête : ' . pg_last_error());
     $expe = pg_fetch_all($res)[0]['expediteur'];
     echo " / expediteur : ".$expe;
