@@ -62,10 +62,12 @@ function updateExpediteur ($row) {
 }
 
 function updateDestinataire ($row) {
-    $select = "SELECT entity_by_res_id(".$row['res_id'].") as destinataire;";
-    $res = pg_query($select) or die('Échec de la requête : ' . pg_last_error());
+    $selectDestId = "SELECT entity_by_res_id(".$row['res_id'].") as destinataire;";
+    $res = pg_query($selectDestId) or die('Échec de la requête : ' . pg_last_error());
     $destId = pg_fetch_all($res)[0]['destinataire'];
-    $select = "SELECT  entity_label FROM entities WHERE entitId = '".$destId."'";
+    echo " / societé expéditrice : ".$destId;
+    $select = "SELECT entity_label FROM entities WHERE entity_id = '".$destId."'";
+    $res = pg_query($select) or die('Échec de la requête : ' . pg_last_error());
     $dest = pg_fetch_all($res)[0]['entity_label'];
     echo " / societé expéditrice : ".$dest;
     $update = "UPDATE res_letterbox SET custom_fields = jsonb_set(custom_fields,'{\"18\"}', '".json_encode($dest)."') WHERE res_id = ".$row['res_id']." returning custom_fields;";
