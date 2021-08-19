@@ -188,6 +188,11 @@ class ConfigurationController
             } elseif (!Validator::boolType()->validate($data['enabled'] ?? null)) {
                 return $response->withStatus(400)->withJson(['errors' => "Body enabled is not set or not a boolean"]);
             }
+            $data = [
+                'uri' => rtrim($data['uri'], '/'),
+                'authUri' => rtrim($data['authUri'], '/'),
+                'enabled' => $data['enabled'],
+            ];
         } elseif ($args['privilege'] == 'admin_organization_email_signatures') {
             if (!Validator::notEmpty()->arrayType()->validate($data)) {
                 return $response->withStatus(400)->withJson(['errors' => 'Body is empty or not an array']);
