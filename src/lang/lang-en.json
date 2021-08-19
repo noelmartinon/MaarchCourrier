@@ -2537,7 +2537,7 @@
     "retentionRules": "Retention rules",
     "archiveEntities": "Recipient archive services",
     "archivalAgreements": "Archival agreements",
-    "loadingTest": "In the process of testing the interconnection with the configured EAS",
+    "loadingTest": "Test in progress of the interconnection with the configured EAS",
     "saeInterconnectionTest": "Interconnection with your EAS",
     "interconnectionFailed": "<b>Interconnection with Maarch RM failed.</b> Error when calling Maarch RM server",
     "interconnectionSuccess": "Successful interconnection with Maarch RM",
