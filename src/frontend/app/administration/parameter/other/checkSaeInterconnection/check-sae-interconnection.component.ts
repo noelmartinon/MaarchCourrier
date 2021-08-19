@@ -42,7 +42,7 @@ export class CheckSaeInterconnectionComponent implements OnInit {
             tap(() => {
                 this.loading = false;
                 this.hasError = false;
-                this.result = '<b>' + this.translate.instant('lang.interconnectionSuccess') + '</b> ';
+                this.result = this.translate.instant('lang.interconnectionSuccess');
             }),
             catchError((err: any) => {
                 this.hasError = true;

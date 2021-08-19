@@ -2541,5 +2541,7 @@
     "saeInterconnectionTest": "Interconnection with your EAS",
     "interconnectionFailed": "<b>Interconnection with Maarch RM failed.</b> Error when calling Maarch RM server",
     "interconnectionSuccess": "Successful interconnection with Maarch RM",
-    "switchSae": "Switch to Maarch RM"
+    "switchSae": "Configure Maarch RM",
+    "configSaeInfo": "For more information on setting up an electronic filing system.Consult the documentation : <a href=\"http://docs.maarch.org/MaarchCourrier/guat/guat_exploitation/Seda_send.html\" target=\"_blank\" class=\"link\"> Configure an SAE < / a>",
+    "mustHaveforTest": "In order to test the interconnection with Maarch RM, it is necessary to fill in the fields: <b> API address </b> and <b> API key </b>."
 }

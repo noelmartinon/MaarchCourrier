@@ -84,7 +84,7 @@ export class OtherParametersComponent implements OnInit {
         maarchRM: {
             sae: new FormControl('MaarchRM'),
             urlSAEService: new FormControl('https://demo-ap.maarchrm.com'),
-            token: new FormControl('phdF9WkJuTKkDuPXoqDZuCFEQT7En7YqsVROsdD1HoNZV7jD5+XyCtKbhx0Chb4s3skokalo0wEn48DE3M4kGrAceH0/XFbyLZVRoVOO+Y/wxyRdE1QJleI8yijEfGut'),
+            token: new FormControl(''),
             senderOrgRegNumber: new FormControl('org_987654321_DGS_SA'),
             accessRuleCode: new FormControl('AR039'),
             certificateSSL: new FormControl(''),
@@ -622,6 +622,7 @@ export class OtherParametersComponent implements OnInit {
                 tap((data: any) => {
                     if (data !== undefined) {
                         this.saeEnabled = data.sae.toLowerCase() === 'maarchrm' ? 'maarchRM' : 'externalSAE';
+                        this.saeConfig['maarchRM']['sae'].setValue(this.saeEnabled === 'externalSAE' ? 'externalSAE' : 'maarchRM');
                         if (this.saeEnabled === 'maarchRM') {
                             this.saeConfig[this.saeEnabled] = {
                                 sae: new FormControl(data.sae),
@@ -651,7 +652,7 @@ export class OtherParametersComponent implements OnInit {
         });
     }
 
-    saveSaeConfig() {
+    saveSaeConfig(action: string = 'validate') {
         this.loading = true;
         this.hasError = false;
         this.http.put('../rest/seda/configuration', this.formatSaeConfig()).pipe(
@@ -669,7 +670,7 @@ export class OtherParametersComponent implements OnInit {
             })
         ).subscribe();
 
-        if (!this.hasError && this.saeEnabled === 'maarchRM') {
+        if (!this.hasError && this.saeEnabled === 'maarchRM' && action === 'test') {
             this.dialog.open(CheckSaeInterconnectionComponent, {
                 panelClass: 'maarch-modal',
                 disableClose: true,
@@ -706,7 +707,6 @@ export class OtherParametersComponent implements OnInit {
                 });
             }
         });
-        maarchRM['sae'] = this.saeEnabled !== 'maarchRM' ? 'external' : this.saeConfig['maarchRM']['sae'].value;
         return objToSend = {
             ... maarchRM,
             externalSAE: externalSAE
@@ -741,6 +741,7 @@ export class OtherParametersComponent implements OnInit {
 
     switchSae() {
         this.saeEnabled = this.saeEnabled === 'maarchRM' ? 'externalSAE' : 'maarchRM';
+        this.saeConfig['maarchRM']['sae'].setValue(this.saeEnabled === 'externalSAE' ? 'externalSAE' : 'maarchRM');
     }
 
     addValue(externalData: string) {
@@ -783,10 +784,18 @@ export class OtherParametersComponent implements OnInit {
     }
 
     isValid() {
+        return !this.functions.empty(this.saeConfig['maarchRM']['sae'].value) && !this.functions.empty(this.saeConfig['maarchRM']['urlSAEService'].value) && !this.functions.empty(this.saeConfig['maarchRM']['token'].value);
+    }
+
+    allValid() {
         if (this.saeEnabled === 'maarchRM') {
-            return !this.functions.empty(this.saeConfig['maarchRM']['sae'].value) && !this.functions.empty(this.saeConfig['maarchRM']['urlSAEService'].value) && !this.functions.empty(this.saeConfig['maarchRM']['token'].value);
-        } else if (this.saeEnabled === 'externalSAE') {
-            return this.retentionRules.every((item: any) => !this.functions.empty(item.label) && !this.functions.empty(item.id)) && this.archiveEntities.every((item: any) => !this.functions.empty(item.label) && !this.functions.empty(item.id)) && this.archivalAgreements.every((item: any) => !this.functions.empty(item.label) && !this.functions.empty(item.id));
+            return Object.keys(this.saeConfig['maarchRM']).every((item: any) => !this.functions.empty(this.saeConfig['maarchRM'][item].value));
+        } else {
+            return this.retentionRules.every((item: any) => !this.functions.empty(item.label) && !this.functions.empty(item.id)) &&
+                    this.archiveEntities.every((item: any) => !this.functions.empty(item.label) && !this.functions.empty(item.id)) &&
+                    this.archivalAgreements.every((item: any) => !this.functions.empty(item.label) && !this.functions.empty(item.id)) &&
+                    !this.functions.empty(this.saeConfig['maarchRM']['sae'].value);
+
         }
     }
 }
