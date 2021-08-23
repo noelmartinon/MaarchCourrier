@@ -361,6 +361,13 @@ class ListTemplateController
                     if (!empty($queryParams['maarchParapheur']) && !empty($externalId['maarchParapheur'])) {
                         $userExists = MaarchParapheurController::userExists(['userId' => $externalId['maarchParapheur']]);
                         if (!empty($userExists)) {
+                            // Remove external value in signatureModes
+                            $array = $userExists['signatureModes'];
+                            $externalRoleIndex = array_search('external', $array);
+                            if ($externalRoleIndex !== false) {
+                                unset($array[$externalRoleIndex]);
+                            }
+                            $userExists['signatureModes'] = array_values($array);
                             $listTemplateItems[$itemKey]['externalId']['maarchParapheur'] = $externalId['maarchParapheur'];
                             $listTemplateItems[$itemKey]['descriptionToDisplay']          = $userExists['email'];
                             $listTemplateItems[$itemKey]['labelToDisplay']                = $userExists['firstname'] . ' ' . $userExists['lastname'];
