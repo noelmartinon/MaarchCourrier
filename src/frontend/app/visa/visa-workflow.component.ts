@@ -450,6 +450,7 @@ export class VisaWorkflowComponent implements OnInit {
                         );
                         this.searchVisaSignUser.reset();
                         this.searchVisaSignUserInput.nativeElement.blur();
+                        this.workflowUpdated.emit(this.visaWorkflow.items);
                         resolve(true);
                     })
                 ).subscribe();
