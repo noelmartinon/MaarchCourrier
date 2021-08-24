@@ -955,7 +955,7 @@ img:hover.panelSelectedThumbnail {
 .pjSign:hover {
     display: flex;
     white-space: pre;
-    overflow: hidden !important;
+    overflow-y: auto !important;
     width: 95%;
     -webkit-transition: width 0.5s;
     /* Safari */
