@@ -505,7 +505,7 @@ class ResourceListController
             }
 
             if (!empty($method)) {
-                $methodResponse = ActionMethodController::$method(['resId' => $resId, 'data' => $body['data'], 'note' => $body['note'], 'action' => $action, 'resources' => $resourcesForAction]);
+                $methodResponse = ActionMethodController::$method(['resId' => $resId, 'data' => $body['data'], 'note' => $body['note'], 'action' => $action, 'resources' => $resourcesForAction, 'userId' => $aArgs['userId']]);
 
                 if (!empty($methodResponse['errors'])) {
                     if (empty($methodResponses['errors'])) {

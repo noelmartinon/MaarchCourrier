@@ -944,13 +944,13 @@ class ActionMethodController
 
     public static function giveOpinionParallel(array $args)
     {
-        ValidatorModel::notEmpty($args, ['resId']);
-        ValidatorModel::intVal($args, ['resId']);
+        ValidatorModel::notEmpty($args, ['resId', 'userId']);
+        ValidatorModel::intVal($args, ['resId', 'userId']);
 
         $currentStep = ListInstanceModel::get([
             'select'  => ['listinstance_id', 'item_id'],
             'where'   => ['res_id = ?', 'difflist_type = ?', 'item_id = ?', 'item_mode in (?)'],
-            'data'    => [$args['resId'], 'entity_id', $GLOBALS['id'], ['avis', 'avis_copy', 'avis_info']],
+            'data'    => [$args['resId'], 'entity_id', $args['userId'], ['avis', 'avis_copy', 'avis_info']],
             'limit'   => 1
         ]);
 
