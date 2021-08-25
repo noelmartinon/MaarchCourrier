@@ -1436,7 +1436,11 @@ class PreProcessActionController
                 $resourcesInformation['error'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'reason' => 'userNotInDiffusionList'];
             } else {
                 $userInfo = UserModel::getLabelledUserById(['id' => $opinionNote[0]['user_id']]);
-                $resourcesInformation['success'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'avisUserAsk' => $userInfo, 'note' => $opinionNote[0]['note_text'], 'opinionLimitDate' => $resource['opinion_limit_date']];
+                $delegatingUser = null;
+                if ($args['userId'] != $GLOBALS['id']) {
+                    $delegatingUser = UserModel::getLabelledUserById(['id' => $args['userId']]);
+                }
+                $resourcesInformation['success'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'avisUserAsk' => $userInfo, 'note' => $opinionNote[0]['note_text'], 'opinionLimitDate' => $resource['opinion_limit_date'], 'delegatingUser' => $delegatingUser];
             }
         }
 
