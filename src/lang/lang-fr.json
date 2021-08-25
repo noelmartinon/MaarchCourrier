@@ -212,7 +212,7 @@
     "avisAnswerDesc": "Permet à ce groupe d'apparaître dans la liste des personnes pouvant donner son avis (parallèle et séquentiel)",
     "avisSent": "Avis donné",
     "avisUserAsk": "pour avis",
-    "avisUserState": "avis",
+    "opinionUserState": "avis",
     "avisWorkflowDeleted": "Circuit d'avis supprimé",
     "avisWorkflowUpdated": "Circuit d'avis modifié",
     "back": "Retour",

@@ -1471,7 +1471,7 @@
     "askOpinion": "Several users ask your opinion__TO_TRANSLATE",
     "askOpinionUser": "ask your opinion__TO_TRANSLATE",
     "avisUserAsk": "for opinion__TO_TRANSLATE",
-    "avisUserState": "opinion__TO_TRANSLATE",
+    "opinionUserState": "opinion__TO_TRANSLATE",
     "userNotInDiffusionList": "You are not in opinion diffusion list__TO_TRANSLATE",
     "noOpinionLimitDate": "The opinion limit date is not defined__TO_TRANSLATE",
     "noOpinionNote": "The reason is not defined__TO_TRANSLATE",

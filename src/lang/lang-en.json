@@ -206,7 +206,7 @@
     "avisAnswerDesc": "Allow this group to appear in the counsellor's list (sequential and parallel opinion workflow)",
     "avisSent": "Opinion given",
     "avisUserAsk": "for opinion",
-    "avisUserState": "opinion",
+    "opinionUserState": "opinion",
     "avisWorkflowDeleted": "Opinion workflow deleted",
     "avisWorkflowUpdated": "Opinion workflow updated",
     "back": "Back",
