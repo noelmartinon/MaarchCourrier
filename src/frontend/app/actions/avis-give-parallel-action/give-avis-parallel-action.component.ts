@@ -91,9 +91,8 @@ export class GiveAvisParallelActionComponent implements OnInit {
     }
 
     executeAction(realResSelected: number[]) {
-        const delegateMsg: string = this.translate.instant('lang.insteadOf').replace(/^.{1}/g, this.translate.instant('lang.insteadOf')[0].toLowerCase());
-        const opinionUserState: string = this.delegation.isDelegated ? `${this.translate.instant('lang.opinionUserState').toUpperCase()} ${delegateMsg} ${this.delegation.userDelegated}` : this.translate.instant('lang.opinionUserState');
-        const noteContent: string = `[${opinionUserState}] ${this.noteEditor.getNoteContent()}`;
+        const opinionUserState: string = this.translate.instant('lang.delegatedOpinion').concat(' ', this.delegation.userDelegated);
+        const noteContent: string = this.delegation.isDelegated ? `[${this.translate.instant('lang.opinionUserState')}] ${this.noteEditor.getNoteContent()} ← ${opinionUserState}` : `[${this.translate.instant('lang.opinionUserState')}] ${this.noteEditor.getNoteContent()}`;
         this.noteEditor.setNoteContent(noteContent);
         this.http.put(this.data.processActionRoute, { resources: realResSelected, note: this.noteEditor.getNote()}).pipe(
             tap((data: any) => {

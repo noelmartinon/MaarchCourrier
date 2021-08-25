@@ -2519,5 +2519,6 @@
     "updateOtp": "Edit external user",
     "contactsParameters_sector": "Sector",
     "company": "Company",
-    "noRecipient": "No associated recipient."
+    "noRecipient": "No associated recipient.",
+    "delegatedOpinion": "Opinion given instead of"
 }
