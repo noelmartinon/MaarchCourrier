@@ -2540,6 +2540,5 @@
     "interconnectionFailed": "<b>L'interconnexion avec Maarch RM a échouée.</b> Erreur lors de l'appel au serveur Maarch RM",
     "interconnectionSuccess": "Interconnexion réussie avec Maarch RM",
     "switchSae": "Configurer Maarch RM",
-    "configSaeInfo": "Pour plus d'informations sur la configuration d'un système d'archivage électronique. Consulter la documentation : <a href=\"http://docs.maarch.org/MaarchCourrier/guat/guat_exploitation/Seda_send.html\" target=\"_blank\" class=\"link\">Configurer un SAE</a>",
-    "mustHaveforTest": "Afin de tester l'interconnexion avec Maarch RM, il est nécessaire de remplir les champs: <b>Adresse de l'API</b> et <b>Jeton d'accès</b>."
+    "configSaeInfo": "Pour plus d'informations sur la configuration d'un système d'archivage électronique. Consulter la documentation : <a href=\"{{url}}\" target=\"_blank\" class=\"link\">Configurer un SAE</a>"
 }

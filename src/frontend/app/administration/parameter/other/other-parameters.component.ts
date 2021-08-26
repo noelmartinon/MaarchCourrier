@@ -6,6 +6,7 @@ import { FormControl, Validators } from '@angular/forms';
 import { catchError, debounceTime, filter, finalize, map, tap } from 'rxjs/operators';
 import { ColorEvent } from 'ngx-color';
 import { FunctionsService } from '@service/functions.service';
+import { environment } from '../../../../environments/environment';
 import {
     amber,
     blue,
@@ -292,6 +293,9 @@ export class OtherParametersComponent implements OnInit {
 
     loading: boolean = false;
     hasError: boolean = false;
+
+    exportSedaUrl: string = `https://docs.maarch.org/gitbook/html/MaarchCourrier/${environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1]}/guat/guat_exploitation/Seda_send.html`;
+
 
     constructor(
         public translate: TranslateService,
@@ -620,9 +624,9 @@ export class OtherParametersComponent implements OnInit {
             this.http.get('../rest/seda/configuration').pipe(
                 map((data: any) => data.configuration),
                 tap((data: any) => {
-                    if (data !== undefined) {
+                    if (!this.functions.empty(data)) {
                         this.saeEnabled = data.sae.toLowerCase() === 'maarchrm' ? 'maarchRM' : 'externalSAE';
-                        this.saeConfig['maarchRM']['sae'].setValue(this.saeEnabled === 'externalSAE' ? 'externalSAE' : 'maarchRM');
+                        this.saeConfig['maarchRM']['sae'].setValue(this.saeEnabled === 'externalSAE' ? data.sae : 'maarchRM');
                         if (this.saeEnabled === 'maarchRM') {
                             this.saeConfig[this.saeEnabled] = {
                                 sae: new FormControl(data.sae),
@@ -652,7 +656,7 @@ export class OtherParametersComponent implements OnInit {
         });
     }
 
-    saveSaeConfig(action: string = 'validate') {
+    saveSaeConfig() {
         this.loading = true;
         this.hasError = false;
         this.http.put('../rest/seda/configuration', this.formatSaeConfig()).pipe(
@@ -670,7 +674,7 @@ export class OtherParametersComponent implements OnInit {
             })
         ).subscribe();
 
-        if (!this.hasError && this.saeEnabled === 'maarchRM' && action === 'test') {
+        if (!this.hasError && this.saeEnabled === 'maarchRM') {
             this.dialog.open(CheckSaeInterconnectionComponent, {
                 panelClass: 'maarch-modal',
                 disableClose: true,
@@ -783,13 +787,10 @@ export class OtherParametersComponent implements OnInit {
         }
     }
 
-    isValid() {
-        return !this.functions.empty(this.saeConfig['maarchRM']['sae'].value) && !this.functions.empty(this.saeConfig['maarchRM']['urlSAEService'].value) && !this.functions.empty(this.saeConfig['maarchRM']['token'].value);
-    }
-
     allValid() {
         if (this.saeEnabled === 'maarchRM') {
-            return Object.keys(this.saeConfig['maarchRM']).every((item: any) => !this.functions.empty(this.saeConfig['maarchRM'][item].value));
+            const saeKeys: string[] = Object.keys(this.saeConfig['maarchRM']);
+            return saeKeys.filter((element: any) => ['certificateSSL', 'M2M'].indexOf(element) === -1).every((item: any) => !this.functions.empty(this.saeConfig['maarchRM'][item].value));
         } else {
             return this.retentionRules.every((item: any) => !this.functions.empty(item.label) && !this.functions.empty(item.id)) &&
                     this.archiveEntities.every((item: any) => !this.functions.empty(item.label) && !this.functions.empty(item.id)) &&
