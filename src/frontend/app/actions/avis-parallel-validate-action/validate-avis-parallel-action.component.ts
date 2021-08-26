@@ -35,6 +35,11 @@ export class ValidateAvisParallelComponent implements OnInit, AfterViewInit {
 
     availableRoles: any[] = [];
 
+    delegation: any = {
+        isDelegated: false,
+        userDelegated: null
+    };
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -46,6 +51,15 @@ export class ValidateAvisParallelComponent implements OnInit, AfterViewInit {
 
     ngOnInit() {
         this.checkAvisCircuit();
+        const userId: number = parseInt(this.data.userId, 10);
+        if (userId !== this.headerService.user.id && !this.noResourceToProcess) {
+            this.delegation.isDelegated = true;
+            this.http.get('../rest/users/' + userId).pipe(
+                tap((user: any) => {
+                    this.delegation.userDelegated = `${user.firstname} ${user.lastname}`;
+                })
+            ).subscribe();
+        }
     }
 
     checkAvisCircuit() {
@@ -93,7 +107,9 @@ export class ValidateAvisParallelComponent implements OnInit, AfterViewInit {
     }
 
     executeAction(realResSelected: number[]) {
-        const noteContent: string = `[${this.translate.instant('lang.avisUserAsk').toUpperCase()}] ${this.noteEditor.getNoteContent()} ← ${this.translate.instant('lang.validateBy')} ${this.headerService.user.firstname} ${this.headerService.user.lastname}`;
+        const insteadOfMsg: string = `${this.translate.instant('lang.insteadOf').replace(/^.{1}/g, this.translate.instant('lang.insteadOf')[0].toLowerCase())} ${this.delegation.userDelegated}`;
+        const validatedOpinionMsg: string = `[${this.translate.instant('lang.avisUserAsk').toUpperCase()}] ${this.noteEditor.getNoteContent()} ← ${this.translate.instant('lang.validateBy')} ${this.headerService.user.firstname} ${this.headerService.user.lastname}`;
+        const noteContent: string = !this.delegation.isDelegated ?  validatedOpinionMsg : `${validatedOpinionMsg} ${insteadOfMsg}`;
         this.noteEditor.setNoteContent(noteContent);
         this.http.put(this.data.processActionRoute, { resources: realResSelected, data: { note: this.noteEditor.getNote(), opinionLimitDate: this.functions.formatDateObjectToDateString(this.opinionLimitDate, true), opinionCircuit: this.appAvisWorkflow.getWorkflow() } }).pipe(
             tap((data: any) => {

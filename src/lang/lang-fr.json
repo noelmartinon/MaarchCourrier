@@ -2518,5 +2518,6 @@
     "mustSign": "La position de signature pour les utilisateurs externes est obligatoire.",
     "company": "Organisation",
     "noRecipient": "Aucun destinataire associé.",
-    "delegatedOpinion": "Avis donné à la place de"
+    "delegatedOpinion": "Avis donné à la place de",
+    "requestedOpinion": "Avis demandé à la place de"
 }

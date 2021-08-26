@@ -14,9 +14,9 @@
                     <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{data.resIds.length}}
                         {{'lang.elements' | translate}}</b> ?
                 </div>
-                <div mat-line *ngIf="delegation.isDelegated && !noResourceToProcess" class="delegationMsg">
+                <app-maarch-message style="margin-bottom: -15px;" *ngIf="delegation.isDelegated && !noResourceToProcess" mode="danger">
                     {{'lang.signInsteadOf' | translate}}&nbsp;<b style="overflow: hidden;text-overflow: ellipsis;" [title]="delegation.userDelegated">{{ delegation.userDelegated }}</b>
-                </div>
+                </app-maarch-message>
                 <div class="alert-message alert-message-info" *ngIf="data.resIds.length == 1  && !noResourceToProcess"
                     role="alert" style="margin-top: 30px;"
                     [innerHTML]="'<b>' + ownerOpinion + '</b> '+ ('lang.askOpinionUser' | translate) + ' :<br/><br/>' + opinionContent">
