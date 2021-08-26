@@ -8,7 +8,6 @@
 --DATABASE_BACKUP|res_mark_as_read
 ALTER TABLE res_attachments ADD COLUMN original_filename CHARACTER VARYING(255);
 ALTER TABLE res_letterbox ADD COLUMN original_filename CHARACTER VARYING(255);
-UPDATE baskets SET  basket_id = 'MyBasket' WHERE  basket_id = 'ParafBasket';
 
 --refresh function fOR main entity
 CREATE OR REPLACE FUNCTION entity_by_res_id(id BIGINT) RETURNS VARCHAR AS $BODY$
