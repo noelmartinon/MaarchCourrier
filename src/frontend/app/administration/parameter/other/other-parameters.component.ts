@@ -3,9 +3,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { KeyValue } from '@angular/common';
 import { FormControl, Validators } from '@angular/forms';
-import { catchError, debounceTime, filter, map, tap } from 'rxjs/operators';
+import { catchError, debounceTime, filter, finalize, map, tap } from 'rxjs/operators';
 import { ColorEvent } from 'ngx-color';
 import { FunctionsService } from '@service/functions.service';
+import { environment } from '../../../../environments/environment';
 import {
     amber,
     blue,
@@ -30,6 +31,7 @@ import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { of } from 'rxjs';
 import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog } from '@angular/material/dialog';
+import { CheckSaeInterconnectionComponent } from './checkSaeInterconnection/check-sae-interconnection.component';
 
 @Component({
     selector: 'app-other-parameters',
@@ -78,6 +80,40 @@ export class OtherParametersComponent implements OnInit {
         size: new FormControl(10),
         color: new FormControl([20, 192, 30]),
     };
+
+    saeConfig = {
+        maarchRM: {
+            sae: new FormControl('MaarchRM'),
+            urlSAEService: new FormControl('https://demo-ap.maarchrm.com'),
+            token: new FormControl(''),
+            senderOrgRegNumber: new FormControl('org_987654321_DGS_SA'),
+            accessRuleCode: new FormControl('AR039'),
+            certificateSSL: new FormControl(''),
+            userAgent: new FormControl('service'),
+            M2M: new FormControl('maarch_courrier'),
+            statusReplyReceived: new FormControl('REPLY_SEDA'),
+            statusReplyRejected: new FormControl('REPLY_SEDA'),
+            statusMailToPurge: new FormControl('REPLY_SEDA'),
+        },
+        externalSAE: {
+            retentionRules: {
+                id: new FormControl('id1'),
+                label: new FormControl('label1')
+            },
+            archiveEntities: {
+                id: new FormControl('id1'),
+                label: new FormControl('label1')
+            },
+            archivalAgreements: {
+                id: new FormControl('id1'),
+                label: new FormControl('label1')
+            }
+        }
+    };
+
+    saeEnabled: 'maarchRM' | 'externalSAE' = 'maarchRM';
+
+    externalSaeName: string = '';
 
     editorsEnabled = [];
 
@@ -233,10 +269,35 @@ export class OtherParametersComponent implements OnInit {
         blueGrey['100'],
     ];
 
+    retentionRules: any[] = [
+        {
+            'id': 'id1',
+            'label': 'label1'
+        }
+    ];
+    archiveEntities: any[] = [
+        {
+            'id': 'id1',
+            'label': 'label1'
+        }
+    ];
+    archivalAgreements: any[] = [
+        {
+            'id': 'id1',
+            'label': 'label1'
+        }
+    ];
+
     indexingModels: any = [];
     doctypes: any = [];
     statuses: any = [];
     attachmentsTypes: any = [];
+
+    loading: boolean = false;
+    hasError: boolean = false;
+
+    exportSedaUrl: string = `https://docs.maarch.org/gitbook/html/MaarchCourrier/${environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1]}/guat/guat_exploitation/Seda_send.html`;
+
 
     constructor(
         public translate: TranslateService,
@@ -254,6 +315,7 @@ export class OtherParametersComponent implements OnInit {
         await this.getWatermarkConfiguration();
         await this.getEditorsConfiguration();
         await this.getAddinOutlookConfConfiguration();
+        await this.getSaeConfig();
         Object.keys(this.editorsConf).forEach(editorId => {
             Object.keys(this.editorsConf[editorId]).forEach((elementId: any) => {
                 this.editorsConf[editorId][elementId].valueChanges
@@ -339,7 +401,7 @@ export class OtherParametersComponent implements OnInit {
                     Object.keys(data).forEach(confId => {
                         this.editorsEnabled.push(confId);
                         Object.keys(data[confId]).forEach(itemId => {
-                            console.log(confId, itemId);
+                            // console.log(confId, itemId);
 
                             if (!this.functions.empty(this.editorsConf[confId][itemId])) {
                                 this.editorsConf[confId][itemId].setValue(data[confId][itemId]);
@@ -520,7 +582,8 @@ export class OtherParametersComponent implements OnInit {
                 tap((data: any) => {
                     this.statuses = data.statuses.map((status: any) => ({
                         id: status.identifier,
-                        label: status.label_status
+                        label: status.label_status,
+                        statusId: status.id
                     }));
                     const defaultStatus = data.statuses[0].identifier;
                     resolve(defaultStatus);
@@ -556,5 +619,188 @@ export class OtherParametersComponent implements OnInit {
                 resolve(true);
             });
         });
+    }
+
+    getSaeConfig() {
+        return new Promise((resolve) => {
+            this.http.get('../rest/seda/configuration').pipe(
+                map((data: any) => data.configuration),
+                tap((data: any) => {
+                    if (!this.functions.empty(data)) {
+                        this.saeEnabled = data.sae.toLowerCase() === 'maarchrm' ? 'maarchRM' : 'externalSAE';
+                        this.saeConfig['maarchRM']['sae'].setValue(this.saeEnabled === 'externalSAE' ? data.sae : 'maarchRM');
+                        if (this.saeEnabled === 'maarchRM') {
+                            this.saeConfig[this.saeEnabled] = {
+                                sae: new FormControl(data.sae),
+                                urlSAEService: new FormControl(data.urlSAEService),
+                                token: new FormControl(data.token),
+                                senderOrgRegNumber: new FormControl(data.senderOrgRegNumber),
+                                accessRuleCode: new FormControl(data.accessRuleCode),
+                                certificateSSL: new FormControl(data.certificateSSL),
+                                userAgent: new FormControl(data.userAgent),
+                                M2M: new FormControl(data.M2M.gec),
+                                statusReplyReceived: new FormControl(data.statusReplyReceived),
+                                statusReplyRejected: new FormControl(data.statusReplyRejected),
+                                statusMailToPurge: new FormControl(data.statusMailToPurge),
+                            };
+                        } else {
+                            this.externalSaeName = data.sae;
+                        }
+                        if (data.externalSAE !== undefined) {
+                            this.setEXternalSaeData(data.externalSAE);
+                        }
+                    }
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    saveSaeConfig() {
+        this.loading = true;
+        this.hasError = false;
+        this.http.put('../rest/seda/configuration', this.formatSaeConfig()).pipe(
+            tap(() => {
+                this.notify.success(this.translate.instant('lang.dataUpdated'));
+            }),
+            finalize(() => {
+                this.loading = false;
+                this.hasError = false;
+            }),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                this.hasError = true;
+                return of(false);
+            })
+        ).subscribe();
+
+        if (!this.hasError && this.saeEnabled === 'maarchRM') {
+            this.dialog.open(CheckSaeInterconnectionComponent, {
+                panelClass: 'maarch-modal',
+                disableClose: true,
+                width: '500px',
+                data: {
+                    urlSAEService: this.saeConfig['maarchRM']['urlSAEService'].value
+                }
+            });
+        }
+    }
+
+    formatSaeConfig() {
+        const maarchRM: any = {};
+        const externalSAE: any = {};
+        let objToSend: any = {};
+        Object.keys(this.saeConfig).forEach(elemId => {
+            if (elemId === 'maarchRM') {
+                Object.keys(this.saeConfig[elemId]).forEach((item: any) => {
+                    maarchRM[item] =  item !== 'M2M' ? this.saeConfig[elemId][item].value : { gec: this.saeConfig[elemId][item].value};
+                });
+            } else {
+                Object.keys(this.saeConfig[elemId]).forEach((item: any) => {
+                    switch (item) {
+                        case 'retentionRules':
+                            externalSAE[item] = this.retentionRules;
+                            break;
+                        case 'archiveEntities':
+                            externalSAE[item] = this.archiveEntities;
+                            break;
+                        case 'archivalAgreements':
+                            externalSAE[item] = this.archivalAgreements;
+                            break;
+                    }
+                });
+            }
+        });
+        return objToSend = {
+            ... maarchRM,
+            externalSAE: externalSAE
+        };
+    }
+
+    setEXternalSaeData(data: any) {
+        Object.keys(data).forEach((element: any) => {
+            if (element === 'retentionRules') {
+                this.retentionRules = data.retentionRules;
+            } else if (element === 'archiveEntities') {
+                this.archiveEntities = data.archiveEntities;
+            } else if (element === 'archivalAgreements') {
+                this.archivalAgreements = data.archivalAgreements;
+            }
+        });
+    }
+
+    getLabel(id: number, item: string) {
+        switch (item) {
+            case 'retentionRules': {
+                return this.retentionRules.find((elem: any) => elem.id === id).label;
+            }
+            case 'archiveEntities': {
+                return this.archiveEntities.find((elem: any) => elem.id === id).label;
+            }
+            case 'archivalAgreements': {
+                return this.archivalAgreements.find((elem: any) => elem.id === id).label;
+            }
+        }
+    }
+
+    switchSae() {
+        this.saeEnabled = this.saeEnabled === 'maarchRM' ? 'externalSAE' : 'maarchRM';
+        this.saeConfig['maarchRM']['sae'].setValue(this.saeEnabled === 'externalSAE' ? this.externalSaeName : 'maarchRM');
+    }
+
+    addValue(externalData: string) {
+        switch (externalData) {
+            case 'retentionRules':
+                this.retentionRules.push(
+                    {
+                        id: null,
+                        labe: null
+                    }
+                );
+                break;
+            case 'archiveEntities':
+                this.archiveEntities.push(
+                    {
+                        id: null,
+                        labe: null
+                    }
+                );
+                break;
+            case 'archivalAgreements':
+                this.archivalAgreements.push(
+                    {
+                        id: null,
+                        labe: null
+                    }
+                );
+                break;
+        }
+    }
+
+    removeField(index: number, externalData: string) {
+        if (externalData === 'retentionRules') {
+            this.retentionRules.splice(index, 1);
+        } else if (externalData === 'archiveEntities') {
+            this.archiveEntities.splice(index, 1);
+        } else if (externalData === 'archivalAgreements') {
+            this.archivalAgreements.splice(index, 1);
+        }
+    }
+
+    allValid() {
+        if (this.saeEnabled === 'maarchRM') {
+            const saeKeys: string[] = Object.keys(this.saeConfig['maarchRM']);
+            return saeKeys.filter((element: any) => ['certificateSSL', 'M2M'].indexOf(element) === -1).every((item: any) => !this.functions.empty(this.saeConfig['maarchRM'][item].value));
+        } else {
+            return this.retentionRules.every((item: any) => !this.functions.empty(item.label) && !this.functions.empty(item.id)) &&
+                    this.archiveEntities.every((item: any) => !this.functions.empty(item.label) && !this.functions.empty(item.id)) &&
+                    this.archivalAgreements.every((item: any) => !this.functions.empty(item.label) && !this.functions.empty(item.id)) &&
+                    !this.functions.empty(this.saeConfig['maarchRM']['sae'].value);
+
+        }
     }
 }

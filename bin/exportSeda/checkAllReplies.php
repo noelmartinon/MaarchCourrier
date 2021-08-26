@@ -77,15 +77,6 @@ $GLOBALS['MaarchDirectory'] = $config['maarchDirectory'];
 $GLOBALS['customId']        = $config['customID'];
 $GLOBALS['batchDirectory']  = $GLOBALS['MaarchDirectory'] . 'bin/exportSeda';
 
-$config = $file['exportSeda'];
-$GLOBALS['sae']                 = $config['sae'];
-$GLOBALS['token']               = $config['token'];
-$GLOBALS['userAgent']           = $config['userAgent'];
-$GLOBALS['urlSAEService']       = $config['urlSAEService'];
-$GLOBALS['certificateSSL']      = $config['certificateSSL'];
-$GLOBALS['statusReplyReceived'] = $config['statusReplyReceived'];
-$GLOBALS['statusReplyRejected'] = $config['statusReplyRejected'];
-
 chdir($GLOBALS['MaarchDirectory']);
 
 set_include_path(get_include_path() . PATH_SEPARATOR . $GLOBALS['MaarchDirectory']);
@@ -99,6 +90,16 @@ try {
 
 \SrcCore\models\DatabasePDO::reset();
 new \SrcCore\models\DatabasePDO(['customId' => $GLOBALS['customId']]);
+
+$configuration = \Configuration\models\ConfigurationModel::getByPrivilege(['privilege' => 'admin_export_seda']);
+$config = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
+$GLOBALS['sae']                 = $config['sae'];
+$GLOBALS['token']               = $config['token'];
+$GLOBALS['userAgent']           = $config['userAgent'];
+$GLOBALS['urlSAEService']       = $config['urlSAEService'];
+$GLOBALS['certificateSSL']      = $config['certificateSSL'];
+$GLOBALS['statusReplyReceived'] = $config['statusReplyReceived'];
+$GLOBALS['statusReplyRejected'] = $config['statusReplyRejected'];
 
 $GLOBALS['errorLckFile'] = $GLOBALS['batchDirectory'] . DIRECTORY_SEPARATOR . $GLOBALS['batchName'] .'_error.lck';
 $GLOBALS['lckFile']      = $GLOBALS['batchDirectory'] . DIRECTORY_SEPARATOR . $GLOBALS['batchName'] . '.lck';

@@ -15,6 +15,7 @@ namespace ExportSeda\controllers;
 use Action\controllers\PreProcessActionController;
 use Action\models\ActionModel;
 use Attachment\models\AttachmentModel;
+use Configuration\models\ConfigurationModel;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
 use Doctype\models\DoctypeModel;
@@ -95,12 +96,14 @@ trait PreProcessActionSEDATrait
         $bindingDocument    = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'bindingDocumentFinalAction']);
         $nonBindingDocument = ParameterModel::getById(['select' => ['param_value_string'], 'id' => 'nonBindingDocumentFinalAction']);
 
-        $config = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_export_seda']);
+        $config = [];
+        $config['exportSeda'] = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
         if (empty($config['exportSeda']['senderOrgRegNumber'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'No senderOrgRegNumber found in config.json', 'lang' => 'noSenderOrgRegNumber']);
+            return $response->withStatus(400)->withJson(['errors' => 'No senderOrgRegNumber defined in parameters', 'lang' => 'noSenderOrgRegNumber']);
         }
         if (empty($config['exportSeda']['accessRuleCode'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'No accessRuleCode found in config.json', 'lang' => 'noAccessRuleCode']);
+            return $response->withStatus(400)->withJson(['errors' => 'No accessRuleCode defined in parameters', 'lang' => 'noAccessRuleCode']);
         }
 
         $producerService = '';

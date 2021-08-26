@@ -17,6 +17,7 @@ namespace ExportSeda\controllers;
 require 'vendor/autoload.php';
 
 use Attachment\models\AttachmentModel;
+use Configuration\models\ConfigurationModel;
 use Doctype\models\DoctypeModel;
 use Entity\models\EntityModel;
 use ExportSeda\controllers\ExportSEDATrait;
@@ -54,13 +55,9 @@ class ExportSedaScript
         $GLOBALS['login'] = $currentUser['user_id'];
         $GLOBALS['id']    = $args['data']['userId'];
 
-        $path = 'config/config.json';
-        if (!empty($args['data']['customId']) && file_exists("custom/{$args['data']['customId']}/{$path}")) {
-            $path = "custom/{$args['data']['customId']}/{$path}";
-        }
-
-        $config = file_get_contents($path);
-        $config = json_decode($config, true);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_export_seda']);
+        $config = [];
+        $config['exportSeda'] = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
 
         $resources = ResModel::get([
             'select' => ['res_id', 'destination', 'type_id', 'subject', 'linked_resources', 'alt_identifier', 'admission_date', 'creation_date', 'modification_date', 'doc_date', 'retention_frozen', 'binding', 'docserver_id', 'path', 'filename', 'version', 'fingerprint'],

@@ -14,9 +14,9 @@
 
 namespace ExportSeda\controllers;
 
+use Configuration\models\ConfigurationModel;
 use Email\controllers\EmailController;
 use MessageExchange\models\MessageExchangeModel;
-use SrcCore\models\CoreConfigModel;
 use User\models\UserModel;
 
 class AdapterEmailController
@@ -26,8 +26,9 @@ class AdapterEmailController
         $res['status'] = 0;
         $res['content'] = '';
 
-        $config = CoreConfigModel::getJsonLoaded(['path' => 'config/config.json']);
-        $gec    = strtolower($config['exportSeda']['M2M']['gec']);
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_export_seda']);
+        $configuration = !empty($configuration['value']) ? json_decode($configuration['value'], true) : [];
+        $gec    = strtolower($configuration['M2M']['gec'] ?? '');
 
         if ($gec == 'maarch_courrier') {
             $document = ['id' => $messageObject->DataObjectPackage->DescriptiveMetadata->ArchiveUnit[0]->Content->OriginatingSystemId, 'isLinked' => false, 'original' => false];
