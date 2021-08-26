@@ -113,6 +113,8 @@ export class OtherParametersComponent implements OnInit {
 
     saeEnabled: 'maarchRM' | 'externalSAE' = 'maarchRM';
 
+    externalSaeName: string = '';
+
     editorsEnabled = [];
 
     fonts = [
@@ -641,6 +643,8 @@ export class OtherParametersComponent implements OnInit {
                                 statusReplyRejected: new FormControl(data.statusReplyRejected),
                                 statusMailToPurge: new FormControl(data.statusMailToPurge),
                             };
+                        } else {
+                            this.externalSaeName = data.sae;
                         }
                         if (data.externalSAE !== undefined) {
                             this.setEXternalSaeData(data.externalSAE);
@@ -745,7 +749,7 @@ export class OtherParametersComponent implements OnInit {
 
     switchSae() {
         this.saeEnabled = this.saeEnabled === 'maarchRM' ? 'externalSAE' : 'maarchRM';
-        this.saeConfig['maarchRM']['sae'].setValue(this.saeEnabled === 'externalSAE' ? 'externalSAE' : 'maarchRM');
+        this.saeConfig['maarchRM']['sae'].setValue(this.saeEnabled === 'externalSAE' ? this.externalSaeName : 'maarchRM');
     }
 
     addValue(externalData: string) {
