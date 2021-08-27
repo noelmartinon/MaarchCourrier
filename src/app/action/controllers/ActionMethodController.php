@@ -107,7 +107,7 @@ class ActionMethodController
 
         $set = ['locker_user_id' => null, 'locker_time' => null, 'modification_date' => 'CURRENT_TIMESTAMP'];
 
-        $action = ActionModel::getById(['id' => $args['id'], 'select' => ['label_action', 'id_status', 'history', 'parameters']]);
+        $action = ActionModel::getById(['id' => $args['id'], 'select' => ['label_action', 'id_status', 'history', 'parameters', 'component']]);
         $action['parameters'] = json_decode($action['parameters'], true);
 
         if (empty($args['finishInScript'])) {
@@ -121,6 +121,15 @@ class ActionMethodController
             }
         }
 
+        // Custom for TMA 3
+        if ($action['component'] == 'sendSignatureBookAction') {
+            // workflow is the same for all resources when in mass -> so the next in workflow will be the same for all resources
+            $nextInVisaWorkflow = ListInstanceModel::getCurrentStepByResId([
+                'resId'  => $args['resources'][0],
+                'select' => ['requested_signature']
+            ]);
+            $set['status'] = !empty($nextInVisaWorkflow['requested_signature']) ? 'ESIG' : 'EVIS';
+        }
         ResModel::update([
             'set'   => $set,
             'where' => ['res_id in (?)'],
