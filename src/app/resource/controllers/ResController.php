@@ -31,6 +31,7 @@ use Folder\models\FolderModel;
 use Folder\models\ResourceFolderModel;
 use Group\controllers\GroupController;
 use Group\controllers\PrivilegeController;
+use SrcCore\controllers\CoreController;
 use Group\models\GroupModel;
 use History\controllers\HistoryController;
 use IndexingModel\models\IndexingModelFieldModel;
@@ -503,8 +504,7 @@ class ResController extends ResourceControlController
                 'signatoryId'       => $signatoryId
             ]);
         } else {
-            $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->buffer($fileContent);
+            $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument])['mime'];
             $pathInfo = pathinfo($pathToDocument);
 
             $response->write($fileContent);
@@ -672,8 +672,7 @@ class ResController extends ResourceControlController
             return $response->withStatus(404)->withJson(['errors' => 'Document not found on docserver']);
         }
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
+        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument])['mime'];
         $pathInfo = pathinfo($pathToDocument);
 
         $response->write($fileContent);
@@ -729,8 +728,7 @@ class ResController extends ResourceControlController
             return $response->withStatus(404)->withJson(['errors' => 'Thumbnail not found on docserver']);
         }
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
+        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToThumbnail])['mime'];
         $pathInfo = pathinfo($pathToThumbnail);
 
         $response->write($fileContent);

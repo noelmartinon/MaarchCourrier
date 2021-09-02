@@ -20,6 +20,7 @@ use Resource\controllers\ResController;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\controllers\CoreController;
 use User\models\UserModel;
 
 class MessageExchangeController
@@ -230,8 +231,7 @@ class MessageExchangeController
 
         $fileContent = file_get_contents($pathToDocument);
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
+        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument])['mime'];
 
         $response->write($fileContent);
         $response = $response->withAddedHeader('Content-Disposition', "attachment; filename=maarch.zip");

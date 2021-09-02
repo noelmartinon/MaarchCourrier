@@ -460,9 +460,7 @@ class AttachmentController
             return $response->withStatus(404)->withJson(['errors' => 'Thumbnail not found on docserver']);
         }
 
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
-        $pathInfo = pathinfo($pathToThumbnail);
+        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToThumbnail])['mime'];
 
         $response->write($fileContent);
         $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.{$pathInfo['extension']}");
@@ -557,8 +555,7 @@ class AttachmentController
                 'signatoryId'     => $signatoryId
             ]);
         } else {
-            $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->buffer($fileContent);
+            $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument])['mime'];
             $pathInfo = pathinfo($pathToDocument);
 
             $response->write($fileContent);
@@ -623,9 +620,8 @@ class AttachmentController
         if ($fileContent === false) {
             return $response->withStatus(400)->withJson(['errors' => 'Document not found on docserver']);
         }
-
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
+    
+        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument])['mime'];
         $pathInfo = pathinfo($pathToDocument);
 
         $response->write($fileContent);
@@ -928,20 +924,19 @@ class AttachmentController
             if (!Validator::stringType()->notEmpty()->validate($body['format'])) {
                 return ['errors' => 'Body format is empty or not a string'];
             }
-
-            $file     = base64_decode($body['encodedFile']);
-            $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->buffer($file);
-            if (!StoreController::isFileAllowed(['extension' => $body['format'], 'type' => $mimeType])) {
-                return ['errors' => "Format with this mimeType is not allowed : {$body['format']} {$mimeType}"];
+            $mimeAndSize = CoreController::getMimeTypeAndFileSize(['encodedFile' => $body['encodedFile']]);
+            if (isset($mimeAndSize['errors'])) {
+                return $mimeAndSize['errors'];
             }
 
+            if (!StoreController::isFileAllowed(['extension' => $body['format'], 'type' => $mimeAndSize['mime']])) {
+                return ['errors' => "Format with this mimeType is not allowed : {$body['format']} {$mimeAndSize['mime']}"];
+            }
             $maximumSize = CoreController::getMaximumAllowedSizeFromPhpIni();
-            if ($maximumSize > 0 && strlen($file) > $maximumSize) {
+            if ($maximumSize > 0 && $mimeAndSize['size'] > $maximumSize) {
                 return ['errors' => "Body encodedFile size is over limit"];
             }
         }
-
         return true;
     }
 

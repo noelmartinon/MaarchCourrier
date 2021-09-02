@@ -237,26 +237,19 @@ class ResourceControlController
             if (!Validator::stringType()->notEmpty()->validate($body['format'])) {
                 return ['errors' => 'Body format is empty or not a string'];
             }
-
-            $fileTmp = fopen('php://temp', 'r+');
-            $streamFilterBase64 = stream_filter_append($fileTmp, 'convert.base64-decode', STREAM_FILTER_WRITE);
-            stream_set_chunk_size($fileTmp, 1024);
-            $tmpFilesize = fwrite($fileTmp, $body['encodedFile']);
-            rewind($fileTmp);
-            stream_filter_remove($streamFilterBase64);
-            $mimeType = mime_content_type($fileTmp);
-            fclose($fileTmp);
-
-            if (!StoreController::isFileAllowed(['extension' => $body['format'], 'type' => $mimeType])) {
-                return ['errors' => "Format with this mimeType is not allowed : {$body['format']} {$mimeType}"];
+            $mimeAndSize = CoreController::getMimeTypeAndFileSize(['encodedFile' => $body['encodedFile']]);
+            if (isset($mimeAndSize['errors'])) {
+                return $mimeAndSize['errors'];
             }
 
+            if (!StoreController::isFileAllowed(['extension' => $body['format'], 'type' => $mimeAndSize['mime']])) {
+                return ['errors' => "Format with this mimeType is not allowed : {$body['format']} {$mimeAndSize['mime']}"];
+            }
             $maximumSize = CoreController::getMaximumAllowedSizeFromPhpIni();
-            if ($maximumSize > 0 && $tmpFilesize > $maximumSize) {
+            if ($maximumSize > 0 && $mimeAndSize['size'] > $maximumSize) {
                 return ['errors' => "Body encodedFile size is over limit"];
             }
         }
-
         return true;
     }
 

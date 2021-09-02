@@ -18,6 +18,7 @@ use AcknowledgementReceipt\models\AcknowledgementReceiptModel;
 use Attachment\models\AttachmentModel;
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
+use SrcCore\controllers\CoreController;
 use Convert\controllers\ConvertPdfController;
 use Docserver\models\DocserverModel;
 use Docserver\models\DocserverTypeModel;
@@ -506,12 +507,9 @@ class FolderPrintController
             if (!file_exists($filePathOnTmp)) {
                 return $response->withStatus(500)->withJson(['errors' => 'Merged file not created']);
             } else {
-                $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $filePathOnTmp])['mime'];
 
-                $fileContent = file_get_contents($filePathOnTmp);
-                $mimeType = $finfo->buffer($fileContent);
-
-                $response->write($fileContent);
+                $response->write(file_get_contents($filePathOnTmp));
 
                 $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.pdf");
                 return $response->withHeader('Content-Type', $mimeType);
