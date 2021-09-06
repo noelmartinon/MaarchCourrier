@@ -116,7 +116,8 @@ class CollaboraOnlineController
             $fileContent = base64_decode($content);
         }
 
-        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument])['mime'];
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($fileContent);
         $pathInfo = pathinfo($pathToDocument);
 
         if ($tokenCheckResult['type'] == 'templateEncoded') {
@@ -446,7 +447,8 @@ class CollaboraOnlineController
         }
 
         $fileContent = base64_decode($body['content']);
-        $mimeType = CoreController::getMimeTypeAndFileSize(['encodedFile' => $body['content']])['mime'];
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($fileContent);
         if (!StoreController::isFileAllowed(['extension' => $body['format'], 'type' => $mimeType]) || !in_array($mimeType, TemplateController::AUTHORIZED_MIMETYPES)) {
             return $response->withStatus(400)->withJson(['errors' => _WRONG_FILE_TYPE . ' : '.$mimeType]);
         }

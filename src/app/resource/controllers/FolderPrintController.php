@@ -508,7 +508,11 @@ class FolderPrintController
             if (!file_exists($filePathOnTmp)) {
                 return $response->withStatus(500)->withJson(['errors' => 'Merged file not created']);
             } else {
-                $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $filePathOnTmp])['mime'];
+                $mimeAndSize = CoreController::getMimeTypeAndFileSize(['path' => $filePathOnTmp]);
+                if (!empty($mimeAndSize['errors'])) {
+                    return $response->withStatus(400)->withJson(['errors' => $mimeAndSize['errors']]);
+                }
+                $mimeType = $mimeAndSize['mime'];
 
                 $response->write(file_get_contents($filePathOnTmp));
 

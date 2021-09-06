@@ -149,10 +149,15 @@ class CoreController
     /**
      * getMimeTypeAndFileSize
      * 
-     * @param args array with either an 'encodedFile' (base64 string), a 'resource' (resource), or a 'path' (file path as string)
-     * @return array with 'mime' and 'size' entries
+     * @param args array with either an 'encodedFile' (base64 string), or a 'path' (file path as string)
+     * @return array with 'mime' and 'size' entries or array with 'errors' entry
      */
     public static function getMimeTypeAndFileSize(array $args) {
+        ValidatorModel::stringType($args, ['encodedFile', 'path']);
+        if (empty($args['encodedFile']) && empty($args['path'])) {
+            return ['errors' => 'args needs one of encodedFile or path'];
+        }
+
         $resource = null;
         $size = null;
         if (!empty($args['encodedFile'])) {
@@ -164,13 +169,6 @@ class CoreController
             stream_set_chunk_size($resource, 1024*1024);
             $size = fwrite($resource, $args['encodedFile']);
             stream_filter_remove($streamFilterBase64);
-        } elseif (!empty($args['resource'])) {
-            if (!is_resource($args['resource'])) {
-                return ['errors' => 'args resource is not a resource'];
-            }
-            $resource = $args['resource'];
-            $devNull = fopen('/dev/null', 'a');
-            $size = stream_copy_to_stream($resource, $devNull);
         } elseif (!empty($args['path'])) {
             if (!is_file($args['path']) || !is_readable($args['path'])) {
                 return ['errors' => 'args filename does not refer to a regular file or said file is not readable'];

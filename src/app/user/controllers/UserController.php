@@ -954,7 +954,8 @@ class UserController
             return $response->withStatus(404)->withJson(['errors' => 'Signature not found on docserver']);
         }
 
-        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToSignature])['mime'];
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($image);
 
         $response->write($image);
 
@@ -982,9 +983,9 @@ class UserController
         $file     = base64_decode($data['base64']);
         $tmpName  = "tmp_file_{$aArgs['id']}_" .rand(). "_{$data['name']}";
 
-        $mimeAndSize = CoreController::getMimeTypeAndFileSize(['encodedFile' => $data['base64']]);
-        $mimeType    = $mimeAndSize['mime'];
-        $size        = $mimeAndSize['size'];
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($file);
+        $size     = strlen($file);
         $type     = explode('/', $mimeType);
         $ext      = strtoupper(substr($data['name'], strrpos($data['name'], '.') + 1));
 

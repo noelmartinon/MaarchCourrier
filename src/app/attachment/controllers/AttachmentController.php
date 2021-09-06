@@ -510,7 +510,11 @@ class AttachmentController
             return $response->withStatus(404)->withJson(['errors' => 'Thumbnail not found on docserver']);
         }
 
-        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToThumbnail])['mime'];
+        $mimeAndSize = CoreController::getMimeTypeAndFileSize(['path' => $pathToThumbnail]);
+        if (!empty($mimeAndSize['errors'])) {
+            return $response->withStatus(400)->withJson(['errors' => $mimeAndSize['errors']]);
+        }
+        $mimeType = $mimeAndSize['mime'];
 
         $response->write($fileContent);
         $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.{$pathInfo['extension']}");
@@ -678,7 +682,11 @@ class AttachmentController
 
         $data = $request->getQueryParams();
 
-        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument])['mime'];
+        $mimeAndSize = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument]);
+        if (!empty($mimeAndSize['errors'])) {
+            return $response->withStatus(400)->withJson(['errors' => $mimeAndSize['errors']]);
+        }
+        $mimeType = $mimeAndSize['mime'];
         $filename = TextFormatModel::formatFilename(['filename' => $attachment['title'], 'maxLength' => 250]);
 
         if ($data['mode'] == 'base64') {
@@ -762,7 +770,11 @@ class AttachmentController
             return $response->withStatus(400)->withJson(['errors' => 'Document not found on docserver']);
         }
 
-        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument])['mime'];
+        $mimeAndSize = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument]);
+        if (!empty($mimeAndSize['errors'])) {
+            return $response->withStatus(400)->withJson(['errors' => $mimeAndSize['errors']]);
+        }
+        $mimeType = $mimeAndSize['mime'];
         $pathInfo = pathinfo($pathToDocument);
         $data     = $request->getQueryParams();
         $filename = TextFormatModel::formatFilename(['filename' => $attachmentTodisplay['title'], 'maxLength' => 250]);

@@ -243,8 +243,8 @@ class ResourceControlController
             }
 
             $mimeAndSize = CoreController::getMimeTypeAndFileSize(['encodedFile' => $body['encodedFile']]);
-            if (isset($mimeAndSize['errors'])) {
-                return $mimeAndSize['errors'];
+            if (!empty($mimeAndSize['errors'])) {
+                return ['errors' => $mimeAndSize['errors']];
             }
 
             if (!StoreController::isFileAllowed(['extension' => $body['format'], 'type' => $mimeAndSize['mime']])) {

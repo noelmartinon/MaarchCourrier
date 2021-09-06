@@ -240,7 +240,8 @@ class OnlyOfficeController
             return $response->withStatus(400)->withJson(['errors' => 'No content found']);
         }
 
-        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $tmpPath . $filename])['mime'];
+        $finfo     = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType  = $finfo->buffer($fileContent);
         $extension = pathinfo($tmpPath . $filename, PATHINFO_EXTENSION);
         unlink($tmpPath . $filename);
 
@@ -493,7 +494,8 @@ class OnlyOfficeController
             return $response->withStatus(404)->withJson(['errors' => 'Document not found']);
         }
 
-        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $jwt->fullFilename])['mime'];
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($fileContent);
         $pathInfo = pathinfo($jwt->fullFilename);
 
         $response->write($fileContent);

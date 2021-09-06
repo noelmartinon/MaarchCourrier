@@ -228,10 +228,13 @@ class MessageExchangeController
             return $response->withStatus(400)->withJson(['errors' => 'Document not found on docserver']);
         }
 
+        $mimeAndSize = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument]);
+        if (!empty($mimeAndSize['errors'])) {
+            return $response->withStatus(400)->withJson(['errors' => $mimeAndSize['errors']]);
+        }
+        $mimeType = $mimeAndSize['mime'];
+
         $fileContent = file_get_contents($pathToDocument);
-
-        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument])['mime'];
-
         $response->write($fileContent);
         $response = $response->withAddedHeader('Content-Disposition', "attachment; filename=maarch.zip");
         return $response->withHeader('Content-Type', $mimeType);

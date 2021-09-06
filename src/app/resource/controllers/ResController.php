@@ -501,7 +501,11 @@ class ResController extends ResourceControlController
 
         $data = $request->getQueryParams();
 
-        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument])['mime'];
+        $mimeAndSize = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument]);
+        if (!empty($mimeAndSize['errors'])) {
+            return $response->withStatus(400)->withJson(['errors' => $mimeAndSize['errors']]);
+        }
+        $mimeType = $mimeAndSize['mime'];
         $filename = TextFormatModel::formatFilename(['filename' => $subject, 'maxLength' => 250]);
 
         if ($data['mode'] == 'base64') {
@@ -704,7 +708,11 @@ class ResController extends ResourceControlController
             'eventId'   => 'resview',
         ]);
 
-        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument])['mime'];
+        $mimeAndSize = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument]);
+        if (!empty($mimeAndSize['errors'])) {
+            return $response->withStatus(400)->withJson(['errors' => $mimeAndSize['errors']]);
+        }
+        $mimeType = $mimeAndSize['mime'];
         $pathInfo = pathinfo($pathToDocument);
         $data     = $request->getQueryParams();
         $filename = TextFormatModel::formatFilename(['filename' => $subject, 'maxLength' => 250]);
@@ -757,7 +765,11 @@ class ResController extends ResourceControlController
             $fileContent = @file_get_contents($pathToThumbnail);
         }
 
-        $mimeType = CoreController::getMimeTypeAndFileSize(['path' => $pathToThumbnail])['mime'];
+        $mimeAndSize = CoreController::getMimeTypeAndFileSize(['path' => $pathToThumbnail]);
+        if (!empty($mimeAndSize['errors'])) {
+            return $response->withStatus(400)->withJson(['errors' => $mimeAndSize['errors']]);
+        }
+        $mimeType = $mimeAndSize['mime'];
         $pathInfo = pathinfo($pathToThumbnail);
 
         $response->write($fileContent);

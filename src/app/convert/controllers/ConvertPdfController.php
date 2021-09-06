@@ -327,6 +327,9 @@ class ConvertPdfController
         $ext         = substr($body['name'], strrpos($body['name'], '.') + 1);
         $file        = base64_decode($body['base64']);
         $mimeAndSize = CoreController::getMimeTypeAndFileSize(['encodedFile' => $body['base64']]);
+        if (!empty($mimeAndSize['errors'])) {
+            return $response->withStatus(400)->withJson(['errors' => $mimeAndSize['errors']]);
+        }
         $mimeType    = $mimeAndSize['mime'];
         $size        = $mimeAndSize['size'];
 
