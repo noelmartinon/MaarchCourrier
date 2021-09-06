@@ -43,7 +43,6 @@ use Resource\models\UserFollowedResourceModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\controllers\CoreController;
 use SrcCore\controllers\AuthenticationController;
 use SrcCore\controllers\PasswordController;
 use SrcCore\controllers\UrlController;
@@ -954,7 +953,7 @@ class UserController
             return $response->withStatus(404)->withJson(['errors' => 'Signature not found on docserver']);
         }
 
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($image);
 
         $response->write($image);
