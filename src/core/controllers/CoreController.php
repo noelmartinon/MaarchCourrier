@@ -161,9 +161,6 @@ class CoreController
         $resource = null;
         $size = null;
         if (!empty($args['encodedFile'])) {
-            if (!is_string($args['encodedFile'])) {
-                return ['errors' => 'args encodedFile is not a string'];
-            }
             $resource = fopen('php://temp', 'r+');
             $streamFilterBase64 = stream_filter_append($resource, 'convert.base64-decode', STREAM_FILTER_WRITE);
             stream_set_chunk_size($resource, 1024*1024);
@@ -178,7 +175,7 @@ class CoreController
         }
         
         if (empty($resource)) {
-            return ['errors' => 'missing parameter: getMimeType requires encodedFile, resource, or filename'];
+            return ['errors' => 'could not decode encoded data, or open target file'];
         }
 
         rewind($resource);
