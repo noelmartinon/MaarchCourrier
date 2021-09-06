@@ -58,7 +58,11 @@ class AdministrationController
         }
 
         if (PrivilegeController::hasPrivilege(['privilegeId' => 'manage_entities', 'userId' => $GLOBALS['id']])) {
-            $entities = EntityModel::get(['select' => [1]]);
+            $entities = EntityModel::get([
+                'select' => [1],
+                'where'  => ['enabled = ?'],
+                'data'   => ['Y']
+            ]);
             $count['entities'] = count($entities);
         }
 
