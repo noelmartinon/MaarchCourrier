@@ -206,7 +206,7 @@
     "avisAnswerDesc": "Allow this group to appear in the counsellor's list (sequential and parallel opinion workflow)",
     "avisSent": "Opinion given",
     "avisUserAsk": "for opinion",
-    "avisUserState": "opinion",
+    "opinionUserState": "opinion",
     "avisWorkflowDeleted": "Opinion workflow deleted",
     "avisWorkflowUpdated": "Opinion workflow updated",
     "back": "Back",
@@ -2542,5 +2542,7 @@
     "interconnectionFailed": "<b>Interconnection with Maarch RM failed.</b> Error when calling Maarch RM server",
     "interconnectionSuccess": "Successful interconnection with Maarch RM",
     "switchSae": "Configure Maarch RM",
-    "configSaeInfo": "For more information on setting up an electronic filing system.Consult the documentation : <a href=\"{{url}}\" target=\"_blank\" class=\"link\"> Configure an SAE < / a>"
+    "configSaeInfo": "For more information on setting up an electronic filing system.Consult the documentation : <a href=\"{{url}}\" target=\"_blank\" class=\"link\"> Configure an SAE < / a>",
+    "delegatedOpinion": "Opinion given instead of",
+    "requestedOpinion": "Opinion requested instead of"
 }

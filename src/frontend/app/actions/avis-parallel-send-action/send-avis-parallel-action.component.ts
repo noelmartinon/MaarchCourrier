@@ -8,6 +8,7 @@ import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FunctionsService } from '@service/functions.service';
 import { AvisWorkflowComponent } from '../../avis/avis-workflow.component';
+import { HeaderService } from '@service/header.service';
 
 @Component({
     templateUrl: 'send-avis-parallel-action.component.html',
@@ -30,11 +31,17 @@ export class SendAvisParallelComponent implements AfterViewInit {
 
     availableRoles: any[] = [];
 
+    delegation: any = {
+        isDelegated: false,
+        userDelegated: null
+    };
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialogRef: MatDialogRef<SendAvisParallelComponent>,
+        public headerService: HeaderService,
         @Inject(MAT_DIALOG_DATA) public data: any,
         public functions: FunctionsService) { }
 
@@ -43,6 +50,15 @@ export class SendAvisParallelComponent implements AfterViewInit {
             await this.appAvisWorkflow.loadParallelWorkflow(this.data.resIds[0]);
             if (this.appAvisWorkflow.emptyWorkflow()) {
                 this.appAvisWorkflow.loadDefaultWorkflow(this.data.resIds[0]);
+            }
+            const userId: number = parseInt(this.data.userId, 10);
+            this.delegation.isDelegated = userId !== this.headerService.user.id ? true : false;
+            if (this.delegation.isDelegated && !this.noResourceToProcess) {
+                this.http.get('../rest/users/' + userId).pipe(
+                    tap((user: any) => {
+                        this.delegation.userDelegated = `${user.firstname} ${user.lastname}`;
+                    })
+                ).subscribe();
             }
         }
     }
@@ -80,7 +96,8 @@ export class SendAvisParallelComponent implements AfterViewInit {
     }
 
     executeAction(realResSelected: number[]) {
-        const noteContent: string = `[${this.translate.instant('lang.avisUserAsk').toUpperCase()}] ${this.noteEditor.getNoteContent()}`;
+        const opinionUserState: string = this.translate.instant('lang.requestedOpinion').concat(' ', this.delegation.userDelegated);
+        const noteContent: string = this.delegation.isDelegated ? `[${this.translate.instant('lang.avisUserAsk').toUpperCase()}] ${this.noteEditor.getNoteContent()} ← ${opinionUserState}` : `[${this.translate.instant('lang.avisUserAsk').toUpperCase()}] ${this.noteEditor.getNoteContent()}`;
         this.noteEditor.setNoteContent(noteContent);
         this.http.put(this.data.processActionRoute, { resources: realResSelected, note: this.noteEditor.getNote(), data: { opinionLimitDate: this.functions.formatDateObjectToDateString(this.opinionLimitDate, true, 'yyyy-mm-dd'), opinionCircuit : this.appAvisWorkflow.getWorkflow() } }).pipe(
             tap((data: any) => {

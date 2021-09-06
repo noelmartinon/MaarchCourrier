@@ -7,6 +7,7 @@ import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { tap, finalize, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { FunctionsService } from '@service/functions.service';
+import { HeaderService } from '@service/header.service';
 
 @Component({
     templateUrl: 'give-avis-parallel-action.component.html',
@@ -28,13 +29,20 @@ export class GiveAvisParallelActionComponent implements OnInit {
     ownerOpinion: string = '';
     opinionContent: string = '';
 
+    delegation: any = {
+        isDelegated: false,
+        userDelegated: null
+    };
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialogRef: MatDialogRef<GiveAvisParallelActionComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
-        public functions: FunctionsService) { }
+        public functions: FunctionsService,
+        public headerService: HeaderService
+    ) { }
 
     ngOnInit() {
         this.checkAvisParallel();
@@ -62,6 +70,11 @@ export class GiveAvisParallelActionComponent implements OnInit {
                     this.opinionLimitDate = new Date(data.resourcesInformations.success[0].opinionLimitDate);
                     this.opinionLimitDate = this.functions.formatDateObjectToDateString(this.opinionLimitDate);
                 }
+                const userId: number = parseInt(this.data.userId, 10);
+                this.delegation.isDelegated = userId !== this.headerService.user.id ? true : false;
+                if (this.delegation.isDelegated && !this.noResourceToProcess) {
+                    this.delegation.userDelegated = data.resourcesInformations.success[0].delegatingUser;
+                }
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {
@@ -78,7 +91,8 @@ export class GiveAvisParallelActionComponent implements OnInit {
     }
 
     executeAction(realResSelected: number[]) {
-        const noteContent: string = `[${this.translate.instant('lang.avisUserState')}] ${this.noteEditor.getNoteContent()}`;
+        const opinionUserState: string = this.translate.instant('lang.delegatedOpinion').concat(' ', this.delegation.userDelegated);
+        const noteContent: string = this.delegation.isDelegated ? `[${this.translate.instant('lang.opinionUserState')}] ${this.noteEditor.getNoteContent()} ← ${opinionUserState}` : `[${this.translate.instant('lang.opinionUserState')}] ${this.noteEditor.getNoteContent()}`;
         this.noteEditor.setNoteContent(noteContent);
         this.http.put(this.data.processActionRoute, { resources: realResSelected, note: this.noteEditor.getNote()}).pipe(
             tap((data: any) => {

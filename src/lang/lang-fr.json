@@ -212,7 +212,7 @@
     "avisAnswerDesc": "Permet à ce groupe d'apparaître dans la liste des personnes pouvant donner son avis (parallèle et séquentiel)",
     "avisSent": "Avis donné",
     "avisUserAsk": "pour avis",
-    "avisUserState": "avis",
+    "opinionUserState": "avis",
     "avisWorkflowDeleted": "Circuit d'avis supprimé",
     "avisWorkflowUpdated": "Circuit d'avis modifié",
     "back": "Retour",
@@ -2540,5 +2540,7 @@
     "interconnectionFailed": "<b>L'interconnexion avec Maarch RM a échouée.</b> Erreur lors de l'appel au serveur Maarch RM",
     "interconnectionSuccess": "Interconnexion réussie avec Maarch RM",
     "switchSae": "Configurer Maarch RM",
-    "configSaeInfo": "Pour plus d'informations sur la configuration d'un système d'archivage électronique. Consulter la documentation : <a href=\"{{url}}\" target=\"_blank\" class=\"link\">Configurer un SAE</a>"
+    "configSaeInfo": "Pour plus d'informations sur la configuration d'un système d'archivage électronique. Consulter la documentation : <a href=\"{{url}}\" target=\"_blank\" class=\"link\">Configurer un SAE</a>",
+    "delegatedOpinion": "Avis donné à la place de",
+    "requestedOpinion": "Avis demandé à la place de"
 }

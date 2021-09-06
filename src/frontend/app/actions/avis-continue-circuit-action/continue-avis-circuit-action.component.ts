@@ -79,7 +79,7 @@ export class ContinueAvisCircuitActionComponent implements OnInit {
     }
 
     executeAction(realResSelected: number[]) {
-        const noteContent: string = `[${this.translate.instant('lang.avisUserState')}] ${this.noteEditor.getNoteContent()}`;
+        const noteContent: string = `[${this.translate.instant('lang.opinionUserState')}] ${this.noteEditor.getNoteContent()}`;
         this.noteEditor.setNoteContent(noteContent);
         this.http.put(this.data.processActionRoute, {resources : realResSelected, note: this.noteEditor.getNote()}).pipe(
             tap((data: any) => {

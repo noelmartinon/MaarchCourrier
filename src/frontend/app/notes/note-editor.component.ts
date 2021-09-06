@@ -56,7 +56,7 @@ export class NoteEditorComponent implements OnInit {
 
         if (this.upMode) {
             this.content = this.noteContent;
-            if (this.content.startsWith(`[${this.translate.instant('lang.avisUserState')}]`) || this.content.startsWith(`[${this.translate.instant('lang.avisUserAsk').toUpperCase()}]`)) {
+            if (this.content.startsWith(`[${this.translate.instant('lang.opinionUserState')}]`) || this.content.startsWith(`[${this.translate.instant('lang.avisUserAsk').toUpperCase()}]`)) {
                 this.disableRestriction = true;
             }
             this.entitiesRestriction = this.entitiesNoteRestriction;

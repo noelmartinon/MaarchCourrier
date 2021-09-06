@@ -14,6 +14,9 @@
                     <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{data.resIds.length}}
                         {{'lang.elements' | translate}}</b> ?
                 </div>
+                <app-maarch-message *ngIf="delegation.isDelegated && !noResourceToProcess" mode="danger">
+                    {{'lang.signInsteadOf' | translate}}&nbsp;<b style="overflow: hidden;text-overflow: ellipsis;" [title]="delegation.userDelegated">{{ delegation.userDelegated }}</b>
+                </app-maarch-message>
                 <div *ngIf="resourcesError.length > 0" class="alert-message alert-message-danger mailList" role="alert">
                     <p>
                         {{'lang.canNotMakeAction' | translate}} :
