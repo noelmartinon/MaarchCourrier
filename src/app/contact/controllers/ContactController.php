@@ -1963,7 +1963,7 @@ class ContactController
         }
 
         if (!empty($args['addressStreet'])) {
-            $where[] = 'address_street = ?';
+            $where[] = 'unaccent(address_street) ilike unaccent(?)';
             $data[] = strtoupper($args['addressStreet']);
         } else {
             $where[] = 'address_street is null';
@@ -1977,7 +1977,7 @@ class ContactController
         }
 
         if (!empty($args['addressTown'])) {
-            $where[] = 'address_town = ?';
+            $where[] = 'unaccent(address_town) ilike unaccent(?)';
             $data[] = strtoupper($args['addressTown']);
         } else {
             $where[] = 'address_town is null';
