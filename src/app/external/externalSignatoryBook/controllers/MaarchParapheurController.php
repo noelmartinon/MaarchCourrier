@@ -549,14 +549,19 @@ class MaarchParapheurController
 
         $workflowInfos = [];
         foreach ($workflow as $value) {
-            $curlResponse = CurlModel::exec([
+            if(!empty($value['externalInformations'])) {
+                $userInfos['firstname'] = $value['externalInformations']['firstname'];
+                $userInfos['lastname'] = $value['externalInformations']['lastname'];
+            } else {
+                $curlResponse = CurlModel::exec([
                     'url'           => rtrim($aArgs['config']['data']['url'], '/') . '/rest/users/'.$value['userId'],
                     'basicAuth'     => ['user' => $aArgs['config']['data']['userId'], 'password' => $aArgs['config']['data']['password']],
                     'headers'       => ['content-type:application/json'],
                     'method'        => 'GET'
                 ]);
-            $userInfos['firstname'] = $curlResponse['response']['user']['firstname'];
-            $userInfos['lastname'] = $curlResponse['response']['user']['lastname'];
+                $userInfos['firstname'] = $curlResponse['response']['user']['firstname'];
+                $userInfos['lastname'] = $curlResponse['response']['user']['lastname'];
+            }
             if ($value['mode'] == 'note') {
                 $mode = _NOTE_USER;
             } elseif ($value['mode'] == 'visa') {
