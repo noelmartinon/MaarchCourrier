@@ -59,10 +59,11 @@ class AdministrationController
 
         if (PrivilegeController::hasPrivilege(['privilegeId' => 'manage_entities', 'userId' => $GLOBALS['id']])) {
             $entities = EntityModel::get([
-                'select' => [1],
+                'select' => ['entity_id', 'parent_entity_id'],
                 'where'  => ['enabled = ?'],
                 'data'   => ['Y']
             ]);
+            $entities = EntityModel::removeOrphanedEntities($entities);
             $count['entities'] = count($entities);
         }
 
