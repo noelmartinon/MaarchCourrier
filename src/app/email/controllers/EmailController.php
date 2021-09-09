@@ -758,7 +758,11 @@ class EmailController
 
             // If we cannot override from with the sender email address, we try sending the email with the from in the configuration
             if (strpos($errors, 'Client does not have permissions to send as this sender') !== false && $email['sender']['email'] != $configuration['from']) {
-                EmailModel::update(['set' => ['sender' => json_encode(['email' => $configuration['from']])], 'where' => ['id = ?'], 'data' => [$args['emailId']]]);
+                $sender = [
+                    'email'    => $configuration['from'],
+                    'entityId' => $email['sender']['entityId'] ?? null
+                ];
+                EmailModel::update(['set' => ['sender' => json_encode($sender)], 'where' => ['id = ?'], 'data' => [$args['emailId']]]);
 
                 return EmailController::sendEmail(['emailId' => $args['emailId'], 'userId' => $args['userId']]);
             }
