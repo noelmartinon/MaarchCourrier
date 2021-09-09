@@ -1019,7 +1019,7 @@ class AutoCompleteController
             $searchPostcode = strtoupper(TextFormatModel::normalize(['string' => $queryParams['postcode']]));
         }
         $postcodes = array_values(array_filter($postcodes, function ($code) use ($searchPostcode, $searchTown) {
-            return (!empty($searchTown) && strpos($code['town'], $searchTown) !== false) && (!empty($searchPostcode) && strpos($code['postcode'], $searchPostcode) === 0);
+            return (!empty($searchTown) && strpos($code['town'], $searchTown) !== false) || (!empty($searchPostcode) && strpos($code['postcode'], $searchPostcode) === 0);
         }));
 
         return $response->withJson(['postcodes' => $postcodes]);
