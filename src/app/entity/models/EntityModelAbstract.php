@@ -498,13 +498,12 @@ abstract class EntityModelAbstract
 
     public static function removeOrphanedEntities(array $entities)
     {
-        if (!isset($entities[0]['parent_entity_id']) || !isset($entities[0]['entity_id'])) {
-            return $entities;
-        }
-
         do {
             $entitiesCount = count($entities);
             $entitiesIds = array_column($entities, 'entity_id');
+            if (empty($entitiesIds)) {
+                return $entities;
+            }
             $entities = array_values(array_filter($entities, function($entity) use ($entitiesIds) {
                 return empty($entity['parent_entity_id']) || ($entity['parent_entity_id'] != $entity['entity_id'] && in_array($entity['parent_entity_id'], $entitiesIds));
             }));
