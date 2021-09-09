@@ -348,7 +348,7 @@ class ConfigurationController
 
         $doctype = DoctypeModel::getById(['select' => [1], 'id' => $body['metadata']['typeId']]);
         if (empty($doctype)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Basket not found', 'lang' => 'typeIdDoesNotExist']);
+            return $response->withStatus(400)->withJson(['errors' => 'Doctype not found', 'lang' => 'typeIdDoesNotExist']);
         }
 
         $customId    = CoreConfigModel::getCustomId();

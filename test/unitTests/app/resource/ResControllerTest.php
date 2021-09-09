@@ -178,7 +178,7 @@ class ResControllerTest extends TestCase
         $response     = $resController->create($fullRequest, new \Slim\Http\Response());
         $this->assertSame(400, $response->getStatusCode());
         $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Body doctype is empty or not an integer', $responseBody['errors']);
+        $this->assertSame('Body doctype is not an integer', $responseBody['errors']);
 
         $body = [
             'doctype' => 102,
@@ -787,6 +787,7 @@ class ResControllerTest extends TestCase
 
         $aArgs = [
             'status'           => 'NEW',
+            'doctype'          => 'wrong format',
             'encodedFile'      => $encodedFile,
             'format'           => 'txt',
             'confidentiality'  => false,
@@ -806,7 +807,7 @@ class ResControllerTest extends TestCase
 
         $response     = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => self::$id]);
         $responseBody = json_decode((string)$response->getBody(), true);
-        $this->assertSame('Body doctype is empty or not an integer', $responseBody['errors']);
+        $this->assertSame('Body doctype is not an integer', $responseBody['errors']);
 
         $response     = $resController->update($fullRequest, new \Slim\Http\Response(), ['resId' => 'wrong format']);
         $this->assertSame(400, $response->getStatusCode());
