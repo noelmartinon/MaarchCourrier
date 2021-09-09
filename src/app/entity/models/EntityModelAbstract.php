@@ -496,7 +496,8 @@ abstract class EntityModelAbstract
         return EntityModel::getEntityPathByEntityId(['entityId' => $entity['parent_entity_id'], 'path' => $args['path']]);
     }
 
-    public static function removeOrphanedEntities(array $entities) {
+    public static function removeOrphanedEntities(array $entities)
+    {
         if (!isset($entities[0]['parent_entity_id']) || !isset($entities[0]['entity_id'])) {
             return $entities;
         }
