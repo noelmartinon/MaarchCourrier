@@ -99,3 +99,9 @@
 .subjectPrefix {
     color: #666;
 }
+
+.isSelected {
+    opacity: 0.5 !important;
+    color: rgb(102, 102, 102) !important;
+    pointer-events: none;
+}
