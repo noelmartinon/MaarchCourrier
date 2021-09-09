@@ -986,12 +986,19 @@ class AutoCompleteController
     {
         $queryParams = $request->getQueryParams();
 
-        if (!empty($queryParams['search']) && !Validator::stringType()->validate($queryParams['search'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Query search is not a string']);
+        if (empty($queryParams['postcode']) && empty($queryParams['town'])) {
+            return $response->withJson(['postcodes' => []]);
+        }
+
+        if (!empty($queryParams['postcode']) && !Validator::stringType()->validate($queryParams['postcode'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query postcode is not a string']);
+        }
+        if (!empty($queryParams['town']) && !Validator::stringType()->validate($queryParams['town'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query town is not a string']);
         }
 
         $postcodes = [];
-        if (($handle = fopen("referential/list-postcodes-fr.csv", "r")) !== false) {
+        if (($handle = fopen("referential/code_postaux_v201410.csv", "r")) !== false) {
             fgetcsv($handle, 0, ';');
             while (($data = fgetcsv($handle, 0, ';')) !== false) {
                 $postcodes[] = [
@@ -1002,12 +1009,18 @@ class AutoCompleteController
             fclose($handle);
         }
 
-        if (!empty($queryParams['search'])) {
-            $search = strtoupper($queryParams['search']);
-            $postcodes = array_values(array_filter($postcodes, function ($code) use ($search) {
-                return strpos($code['town'], $search) !== false || strpos($code['postcode'], $search) !== false;
-            }));
+
+        $searchTown = null;
+        if (!empty($queryParams['town'])) {
+            $searchTown = strtoupper(TextFormatModel::normalize(['string' => $queryParams['town']]));
         }
+        $searchPostcode = null;
+        if (!empty($queryParams['postcode'])) {
+            $searchPostcode = strtoupper(TextFormatModel::normalize(['string' => $queryParams['postcode']]));
+        }
+        $postcodes = array_values(array_filter($postcodes, function ($code) use ($searchPostcode, $searchTown) {
+            return (!empty($searchTown) && strpos($code['town'], $searchTown) !== false) && (!empty($searchPostcode) && strpos($code['postcode'], $searchPostcode) === 0);
+        }));
 
         return $response->withJson(['postcodes' => $postcodes]);
     }
