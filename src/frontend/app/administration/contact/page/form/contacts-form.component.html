@@ -280,7 +280,7 @@
                                         <input matInput #autoCompleteInput [formControl]="field.control" [placeholder]="field.label" [matAutocomplete]="matAutocompletePostCodeTown">
                                         <mat-autocomplete #matAutocompletePostCodeTown="matAutocomplete" (optionSelected)="selectPostCode($event)">
                                             <mat-option *ngFor="let postcode of postcodesFilteredResult | async" [value]="postcode">
-                                                {{postcode.postcode}} - {{postcode.town}}
+                                                {{postcode.town}}
                                             </mat-option>
                                         </mat-autocomplete>
                                     </mat-form-field>

@@ -517,8 +517,20 @@ export class ContactsFormComponent implements OnInit {
             if (field.id === 'addressPostcode') {
                 this.postcodesFilteredResult = field.control.valueChanges
                     .pipe(
-                        startWith(''),
-                        exhaustMap((value: string) => this.http.get('../rest/postcode?search=' + value)),
+                        debounceTime(300),
+                        filter((value: string) => value.length > 2),
+                        distinctUntilChanged(),
+                        exhaustMap((value: string) => this.http.get('../rest/autocomplete/postcodes?postcode=' + value)),
+                        map((data: any) => data.postcodes),
+                    );
+            }
+            if (field.id === 'addressTown') {
+                this.postcodesFilteredResult = field.control.valueChanges
+                    .pipe(
+                        debounceTime(300),
+                        filter((value: string) => value.length > 2),
+                        distinctUntilChanged(),
+                        exhaustMap((value: string) => this.http.get('../rest/autocomplete/postcodes?town=' + value)),
                         map((data: any) => data.postcodes),
                     );
             }
