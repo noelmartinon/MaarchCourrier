@@ -1010,17 +1010,27 @@ class AutoCompleteController
         }
 
 
-        $searchTown = null;
+        $searchTowns = [];
         if (!empty($queryParams['town'])) {
-            $searchTown = strtoupper(TextFormatModel::normalize(['string' => $queryParams['town']]));
+            $searchTowns = strtoupper(TextFormatModel::normalize(['string' => $queryParams['town']]));
+            $searchTowns = explode(' ', $searchTowns);
         }
         $searchPostcode = null;
         if (!empty($queryParams['postcode'])) {
             $searchPostcode = strtoupper(TextFormatModel::normalize(['string' => $queryParams['postcode']]));
         }
-        $postcodes = array_values(array_filter($postcodes, function ($code) use ($searchPostcode, $searchTown) {
-            return (!empty($searchTown) && strpos($code['town'], $searchTown) !== false) || (!empty($searchPostcode) && strpos($code['postcode'], $searchPostcode) === 0);
+        $postcodes = array_values(array_filter($postcodes, function ($code) use ($searchPostcode, $searchTowns) {
+            $townFound = true;
+            foreach ($searchTowns as $searchTown) {
+                if (strpos($code['town'], $searchTown) === false) {
+                    $townFound = false;
+                    break;
+                }
+            }
+            return $townFound || (!empty($searchPostcode) && strpos($code['postcode'], $searchPostcode) === 0);
         }));
+
+        $postcodes = array_slice($postcodes, 0, AutoCompleteController::LIMIT);
 
         return $response->withJson(['postcodes' => $postcodes]);
     }
