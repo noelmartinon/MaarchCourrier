@@ -1020,7 +1020,7 @@ class AutoCompleteController
             $searchPostcode = strtoupper(TextFormatModel::normalize(['string' => $queryParams['postcode']]));
         }
         $postcodes = array_values(array_filter($postcodes, function ($code) use ($searchPostcode, $searchTowns) {
-            $townFound = true;
+            $townFound = !empty($searchTowns);
             foreach ($searchTowns as $searchTown) {
                 if (strpos($code['town'], $searchTown) === false) {
                     $townFound = false;
