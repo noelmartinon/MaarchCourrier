@@ -53,6 +53,7 @@ export class ContactsFormComponent implements OnInit {
 
     countries: any = [];
     countriesFilteredResult: Observable<string[]>;
+    postcodesTownFilteredResult: Observable<string[]>;
     postcodesFilteredResult: Observable<string[]>;
     countryControl = new FormControl();
 
@@ -354,7 +355,7 @@ export class ContactsFormComponent implements OnInit {
 
         this.loading = true;
 
-        this.initBanSearch();
+        // this.initBanSearch();
 
         if (this.contactId === null) {
 
@@ -525,7 +526,7 @@ export class ContactsFormComponent implements OnInit {
                     );
             }
             if (field.id === 'addressTown') {
-                this.postcodesFilteredResult = field.control.valueChanges
+                this.postcodesTownFilteredResult = field.control.valueChanges
                     .pipe(
                         debounceTime(300),
                         filter((value: string) => value.length > 2),
@@ -538,12 +539,8 @@ export class ContactsFormComponent implements OnInit {
     }
 
     selectPostcode(ev: any) {
-        this.contactForm.find(contact => contact.id === 'addressPostcode')?.control.setValue(ev.option.value.id);
-        this.contactForm.find(contact => contact.id === 'addressTown')?.control.setValue(ev.option.value.label);
-
-        // for test
-        this.contactForm.find(contact => contact.id === 'addressPostcode')?.control.setValue(92000);
-        this.contactForm.find(contact => contact.id === 'addressTown')?.control.setValue('NANTERRE');
+        this.contactForm.find(contact => contact.id === 'addressPostcode')?.control.setValue(ev.option.value.postcode);
+        this.contactForm.find(contact => contact.id === 'addressTown')?.control.setValue(ev.option.value.town);
     }
 
     selectCountry(ev: any) {

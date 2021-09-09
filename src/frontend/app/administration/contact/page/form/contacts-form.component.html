@@ -268,7 +268,7 @@
                                 <ng-container *ngIf="field.id === 'addressPostcode'">
                                     <mat-form-field>
                                         <input matInput #autoCompleteInput [formControl]="field.control" [placeholder]="field.label" [matAutocomplete]="matAutocompletePostCode">
-                                        <mat-autocomplete #matAutocompletePostCode="matAutocomplete" (optionSelected)="selectPostCode($event)">
+                                        <mat-autocomplete #matAutocompletePostCode="matAutocomplete" (optionSelected)="selectPostcode($event)">
                                             <mat-option *ngFor="let postcode of postcodesFilteredResult | async" [value]="postcode">
                                                 {{postcode.postcode}} - {{postcode.town}}
                                             </mat-option>
@@ -278,9 +278,9 @@
                                 <ng-container *ngIf="field.id === 'addressTown'">
                                     <mat-form-field>
                                         <input matInput #autoCompleteInput [formControl]="field.control" [placeholder]="field.label" [matAutocomplete]="matAutocompletePostCodeTown">
-                                        <mat-autocomplete #matAutocompletePostCodeTown="matAutocomplete" (optionSelected)="selectPostCode($event)">
-                                            <mat-option *ngFor="let postcode of postcodesFilteredResult | async" [value]="postcode">
-                                                {{postcode.town}}
+                                        <mat-autocomplete #matAutocompletePostCodeTown="matAutocomplete" (optionSelected)="selectPostcode($event)">
+                                            <mat-option *ngFor="let postcode of postcodesTownFilteredResult | async" [value]="postcode">
+                                                {{postcode.town}} ({{postcode.postcode}})
                                             </mat-option>
                                         </mat-autocomplete>
                                     </mat-form-field>
