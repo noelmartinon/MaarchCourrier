@@ -982,6 +982,36 @@ class AutoCompleteController
         return $response->withJson($data);
     }
 
+    public function getPostcodes(Request $request, Response $response)
+    {
+        $queryParams = $request->getQueryParams();
+
+        if (!empty($queryParams['search']) && !Validator::stringType()->validate($queryParams['search'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query search is not a string']);
+        }
+
+        $postcodes = [];
+        if (($handle = fopen("referential/list-postcodes-fr.csv", "r")) !== false) {
+            fgetcsv($handle, 0, ';');
+            while (($data = fgetcsv($handle, 0, ';')) !== false) {
+                $postcodes[] = [
+                    'town'     => utf8_encode($data[1]),
+                    'postcode' => utf8_encode($data[2])
+                ];
+            }
+            fclose($handle);
+        }
+
+        if (!empty($queryParams['search'])) {
+            $search = strtoupper($queryParams['search']);
+            $postcodes = array_values(array_filter($postcodes, function ($code) use ($search) {
+                return strpos($code['town'], $search) !== false || strpos($code['postcode'], $search) !== false;
+            }));
+        }
+
+        return $response->withJson(['postcodes' => $postcodes]);
+    }
+
     public static function getDataForRequest(array $args)
     {
         ValidatorModel::notEmpty($args, ['search', 'fields', 'fieldsNumber']);
