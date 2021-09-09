@@ -1956,29 +1956,29 @@ class ContactController
         $data = [];
 
         if (!empty($args['addressNumber'])) {
-            $where[] = 'address_number = ?';
-            $data[] = strtoupper($args['addressNumber']);
+            $where[] = 'unaccent(address_number) ilike unaccent(?)';
+            $data[] = $args['addressNumber'];
         } else {
             $where[] = 'address_number is null';
         }
 
         if (!empty($args['addressStreet'])) {
             $where[] = 'unaccent(address_street) ilike unaccent(?)';
-            $data[] = strtoupper($args['addressStreet']);
+            $data[] = $args['addressStreet'];
         } else {
             $where[] = 'address_street is null';
         }
 
         if (!empty($args['addressPostcode'])) {
-            $where[] = 'address_postcode = ?';
-            $data[] = strtoupper($args['addressPostcode']);
+            $where[] = 'unaccent(address_postcode) ilike unaccent(?)';
+            $data[] = $args['addressPostcode'];
         } else {
             $where[] = 'address_postcode is null';
         }
 
         if (!empty($args['addressTown'])) {
             $where[] = 'unaccent(address_town) ilike unaccent(?)';
-            $data[] = strtoupper($args['addressTown']);
+            $data[] = $args['addressTown'];
         } else {
             $where[] = 'address_town is null';
         }
