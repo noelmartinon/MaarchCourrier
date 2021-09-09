@@ -104,7 +104,7 @@
                             *ngIf="(field.unit === unit.id && unit.id !== 'address') || (field.unit === unit.id && unit.id === 'address' && !addressBANMode)">
                             <p mat-line class="contact-content" *ngIf="field.display">
                                 <ng-container
-                                    *ngIf="field.type === 'string' && field.id !== 'communicationMeans' && field.id !== 'externalId_m2m' && field.id != 'addressCountry'">
+                                    *ngIf="field.type === 'string' && field.id !== 'communicationMeans' && field.id !== 'externalId_m2m' && field.id != 'addressCountry' && field.id != 'addressPostcode' && field.id != 'addressTown'">
                                     <mat-form-field>
                                         <input matInput [formControl]="field.control" [placeholder]="field.label"
                                             (blur)="checkCompany(field);checkFilling();" (ngModelChange)="toUpperCase(field, $event)" [required]="field.required">
@@ -261,6 +261,26 @@
                                         <mat-autocomplete #matAutocompleteCountries="matAutocomplete" isOpen="true" (optionSelected)="selectCountry($event)">
                                             <mat-option *ngFor="let country of countriesFilteredResult | async" [value]="country">
                                                 {{country}}
+                                            </mat-option>
+                                        </mat-autocomplete>
+                                    </mat-form-field>
+                                </ng-container>
+                                <ng-container *ngIf="field.id === 'addressPostcode'">
+                                    <mat-form-field>
+                                        <input matInput #autoCompleteInput [formControl]="field.control" [placeholder]="field.label" [matAutocomplete]="matAutocompletePostCode">
+                                        <mat-autocomplete #matAutocompletePostCode="matAutocomplete" (optionSelected)="selectPostCode($event)">
+                                            <mat-option *ngFor="let postcode of postcodesFilteredResult | async" [value]="postcode">
+                                                {{postcode.postcode}} - {{postcode.town}}
+                                            </mat-option>
+                                        </mat-autocomplete>
+                                    </mat-form-field>
+                                </ng-container>
+                                <ng-container *ngIf="field.id === 'addressTown'">
+                                    <mat-form-field>
+                                        <input matInput #autoCompleteInput [formControl]="field.control" [placeholder]="field.label" [matAutocomplete]="matAutocompletePostCodeTown">
+                                        <mat-autocomplete #matAutocompletePostCodeTown="matAutocomplete" (optionSelected)="selectPostCode($event)">
+                                            <mat-option *ngFor="let postcode of postcodesFilteredResult | async" [value]="postcode">
+                                                {{postcode.postcode}} - {{postcode.town}}
                                             </mat-option>
                                         </mat-autocomplete>
                                     </mat-form-field>
