@@ -24,12 +24,14 @@ foreach ($customs as $custom) {
     $newXml = [];
     $path = "custom/{$custom}/apps/maarch_entreprise/xml/index_letterbox.xml";
 
+    $baseXml = simplexml_load_file($base);
+    
     if ( file_exists($path)) {
         if (!is_readable($path) || !is_writable($path)) {
             continue;
         }
 
-        $baseXml = simplexml_load_file($base);
+        
         $customXml = simplexml_load_file($path);
 
         $nbCustom = 0;
