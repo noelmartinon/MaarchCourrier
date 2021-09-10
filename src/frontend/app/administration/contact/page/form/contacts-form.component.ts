@@ -53,6 +53,8 @@ export class ContactsFormComponent implements OnInit {
 
     countries: any = [];
     countriesFilteredResult: Observable<string[]>;
+    postcodesTownFilteredResult: Observable<string[]>;
+    postcodesFilteredResult: Observable<string[]>;
     countryControl = new FormControl();
 
     loading: boolean = false;
@@ -260,7 +262,7 @@ export class ContactsFormComponent implements OnInit {
             unit: 'address',
             label: this.translate.instant('lang.contactsParameters_sector'),
             type: 'string',
-            control: new FormControl({value: '', disabled: true}),
+            control: new FormControl({ value: '', disabled: true }),
             required: false,
             display: false,
             filling: false,
@@ -353,7 +355,7 @@ export class ContactsFormComponent implements OnInit {
 
         this.loading = true;
 
-        this.initBanSearch();
+        // this.initBanSearch();
 
         if (this.contactId === null) {
 
@@ -379,7 +381,7 @@ export class ContactsFormComponent implements OnInit {
                     this.initAutocompleteCommunicationMeans();
                     this.initAutocompleteExternalIdM2M();
                     this.getCountries();
-                    this.initAutocompleteCountries();
+                    this.initAutocompleteCountriesAndPostcodes();
                 }),
                 finalize(() => this.loading = false),
                 catchError((err: any) => {
@@ -411,7 +413,7 @@ export class ContactsFormComponent implements OnInit {
                     this.initAutocompleteCommunicationMeans();
                     this.initAutocompleteExternalIdM2M();
                     this.getCountries();
-                    this.initAutocompleteCountries();
+                    this.initAutocompleteCountriesAndPostcodes();
                 }),
                 exhaustMap(() => this.http.get('../rest/contacts/' + this.contactId)),
                 map((data: any) => {
@@ -504,7 +506,7 @@ export class ContactsFormComponent implements OnInit {
         ).subscribe();
     }
 
-    initAutocompleteCountries() {
+    initAutocompleteCountriesAndPostcodes() {
         this.contactForm.map((field: any) => {
             if (field.id === 'addressCountry') {
                 this.countriesFilteredResult = field.control.valueChanges
@@ -513,7 +515,32 @@ export class ContactsFormComponent implements OnInit {
                         map((value: any) => this._filter(value))
                     );
             }
+            if (field.id === 'addressPostcode') {
+                this.postcodesFilteredResult = field.control.valueChanges
+                    .pipe(
+                        debounceTime(300),
+                        filter((value: string) => value.length > 2),
+                        distinctUntilChanged(),
+                        exhaustMap((value: string) => this.http.get('../rest/autocomplete/postcodes?postcode=' + value)),
+                        map((data: any) => data.postcodes),
+                    );
+            }
+            if (field.id === 'addressTown') {
+                this.postcodesTownFilteredResult = field.control.valueChanges
+                    .pipe(
+                        debounceTime(300),
+                        filter((value: string) => value.length > 2),
+                        distinctUntilChanged(),
+                        exhaustMap((value: string) => this.http.get('../rest/autocomplete/postcodes?town=' + value)),
+                        map((data: any) => data.postcodes),
+                    );
+            }
         });
+    }
+
+    selectPostcode(ev: any) {
+        this.contactForm.find(contact => contact.id === 'addressPostcode')?.control.setValue(ev.option.value.postcode);
+        this.contactForm.find(contact => contact.id === 'addressTown')?.control.setValue(ev.option.value.town);
     }
 
     selectCountry(ev: any) {
@@ -812,7 +839,7 @@ export class ContactsFormComponent implements OnInit {
             }
         });
         this.checkFilling();
-        this.http.get('../rest/contacts/sector', {params: {'addressNumber': contact['addressNumber'], 'addressStreet': contact['addressStreet'], 'addressPostcode': contact['addressPostcode'], 'addressTown': contact['addressTown']}}).pipe(
+        this.http.get('../rest/contacts/sector', { params: { 'addressNumber': contact['addressNumber'], 'addressStreet': contact['addressStreet'], 'addressPostcode': contact['addressPostcode'], 'addressTown': contact['addressTown'] } }).pipe(
             tap((data: any) => {
                 const sectorIndex = this.contactForm.findIndex(element => element.id === 'sector');
                 if (data.sector !== null) {
@@ -1015,6 +1042,22 @@ export class ContactsFormComponent implements OnInit {
             ).subscribe();
     }
 
+    initAutocompletePostcode() {
+        // this.addressBANInfo = this.translate.instant('lang.autocompleteInfo');
+        // this.addressBANResult = [];
+        this.contactForm.filter(contact => contact.id === 'addressPostcode')[0].control.valueChanges
+            .pipe(
+                debounceTime(300),
+                filter((value: string) => value.length > 2),
+                distinctUntilChanged(),
+                // tap(() => this.addressBANLoading = true),
+                // switchMap((data: any) => this.http.get('../rest/autocomplete/banAddresses', { params: { 'address': data, 'department': this.addressBANCurrentDepartment } })),
+                tap((data: any) => {
+                    console.log('coucou');
+                })
+            ).subscribe();
+    }
+
     resetAutocompleteAddressBan() {
         this.addressBANResult = [];
         this.addressBANInfo = this.translate.instant('lang.autocompleteInfo');
@@ -1024,7 +1067,7 @@ export class ContactsFormComponent implements OnInit {
         const contact = {
             addressNumber: ev.option.value.number,
             addressStreet: ev.option.value.afnorName,
-            addressPostcode: ev.option.value.postalCode,
+            addressPostcode: ev.option.value.postcode,
             addressTown: ev.option.value.city,
             addressCountry: 'FRANCE'
         };
@@ -1130,7 +1173,7 @@ export class ContactsFormComponent implements OnInit {
                 for (let i = 0; i < splitStr.length; i++) {
                     splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
                 }
-                target.control.setValue( splitStr.join('-'));
+                target.control.setValue(splitStr.join('-'));
             }
         }, 100);
     }

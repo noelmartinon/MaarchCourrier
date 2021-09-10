@@ -121,6 +121,7 @@ $app->get('/autocomplete/tags', \SrcCore\controllers\AutoCompleteController::cla
 $app->get('/autocomplete/ouM2MAnnuary', \SrcCore\controllers\AutoCompleteController::class . ':getOuM2MAnnuary');
 $app->get('/autocomplete/businessIdM2MAnnuary', \SrcCore\controllers\AutoCompleteController::class . ':getBusinessIdM2MAnnuary');
 $app->get('/autocomplete/contacts/m2m', \SrcCore\controllers\AutoCompleteController::class . ':getAvailableContactsForM2M');
+$app->get('/autocomplete/postcodes', \SrcCore\controllers\AutoCompleteController::class . ':getPostcodes');
 
 //Baskets
 $app->get('/baskets', \Basket\controllers\BasketController::class . ':get');
