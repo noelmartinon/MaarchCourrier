@@ -9,6 +9,7 @@ import { map, tap, finalize, catchError, startWith } from 'rxjs/operators';
 import { NoteEditorComponent } from '../../notes/note-editor.component';
 import { FunctionsService } from '@service/functions.service';
 import { Observable, of } from 'rxjs';
+import { HeaderService } from '@service/header.service';
 
 declare let $: any;
 
@@ -44,23 +45,29 @@ export class RedirectActionComponent implements OnInit {
     filteredUserRedirect: Observable<any[]>;
     isDestinationChanging: boolean = false;
 
+    actionKeyword: string = '';
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
         public dialogRef: MatDialogRef<RedirectActionComponent>,
+        public headerService: HeaderService,
         @Inject(MAT_DIALOG_DATA) public data: any,
         private functionsService: FunctionsService
     ) { }
 
     async ngOnInit(): Promise<void> {
-
         this.loading = true;
 
         await this.getEntities();
         await this.getDefaultEntity();
 
-        if (this.userListRedirect.length === 0 && this.entities.filter((entity: any) => entity.allowed).length === 0) {
+        if (this.actionKeyword === 'autoRedirectToUser') {
+            this.redirectMode = 'user';
+            this.changeDest({option: { value: this.formatUser()}});
+            this.loading = false;
+        } else if (this.userListRedirect.length === 0 && this.entities.filter((entity: any) => entity.allowed).length === 0) {
             this.redirectMode = 'none';
             this.loading = false;
         } else if (this.userListRedirect.length === 0 && this.entities.filter((entity: any) => entity.allowed).length > 0) {
@@ -76,11 +83,15 @@ export class RedirectActionComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get(`../rest/resourcesList/users/${this.data.userId}/groups/${this.data.groupId}/baskets/${this.data.basketId}/actions/${this.data.action.id}/getRedirect`).pipe(
                 tap((data: any) => {
-                    this.entities = data['entities'];
                     this.userListRedirect = data.users;
+                    if (data.autoRedirectToUser) {
+                        this.actionKeyword = 'autoRedirectToUser';
+                    } else {
+                        this.userListRedirect.push(this.formatUser());
+                    }
+                    this.entities = data['entities'];
                     this.keepDestForRedirection = data.keepDestForRedirection;
                     this.injectDatasParam.keepDestForRedirection = data.keepDestForRedirection;
-
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -313,6 +324,19 @@ export class RedirectActionComponent implements OnInit {
         } else {
             return true;
         }
+    }
+
+    formatUser() {
+        return {
+            difflist_type: 'entity_id',
+            item_mode: 'dest',
+            item_type: 'user_id',
+            id: this.headerService.user.id,
+            item_id: this.headerService.user.id,
+            itemSerialId: this.headerService.user.id,
+            labelToDisplay: `${this.headerService.user.firstname} ${this.headerService.user.lastname}`,
+            descriptionToDisplay: this.headerService.user.entities.find((entity: any) => entity.primary_entity === 'Y').entity_label
+        };
     }
 
     private _filterUserRedirect(value: string): any[] {

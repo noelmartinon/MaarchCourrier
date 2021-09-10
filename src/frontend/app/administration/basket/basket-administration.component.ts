@@ -410,6 +410,13 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
                     icon: 'fa fa-hashtag',
                     allowed: true,
                     text: this.translate.instant('lang.immediatelySuperiorMyPrimaryEntity')
+                }, {
+                    id: 'AUTO_REDIRECT_TO_USER',
+                    keyword: 'AUTO_REDIRECT_TO_USER',
+                    parent: '#',
+                    icon: 'fa fa-hashtag',
+                    allowed: true,
+                    text: this.translate.instant('lang.autoRedirectToUser')
                 }];
 
                 keywordEntities.forEach((keyword: any) => {
@@ -443,7 +450,7 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
                     'name': 'proton',
                     'responsive': true
                 },
-                'data': this.allEntities
+                'data': this.allEntities.filter((entity: any) => entity.id !== 'AUTO_REDIRECT_TO_USER')
             },
             'plugins': ['checkbox', 'search']
         });
