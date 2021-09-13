@@ -2542,5 +2542,10 @@
     "switchSae": "Configurer Maarch RM",
     "configSaeInfo": "Pour plus d'informations sur la configuration d'un système d'archivage électronique. Consulter la documentation : <a href=\"{{url}}\" target=\"_blank\" class=\"link\">Configurer un SAE</a>",
     "delegatedOpinion": "Avis donné à la place de",
-    "requestedOpinion": "Avis demandé à la place de"
+    "requestedOpinion": "Avis demandé à la place de",
+    "multigest": "Multigest",
+    "multigestUrl": "Adresse de l'API Multigest",
+    "multigestCreation": "Création d'un compte Multigest",
+    "multigestModification": "Modification d'un compte Multigest",
+    "multigestAccount": "Compte Multigest"
 }
