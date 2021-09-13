@@ -496,6 +496,9 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
     }
 
     initService2() {
+        if (this.data.action.redirects.find((tag: any) => tag.keyword === 'AUTO_REDIRECT_TO_USER') !== undefined) {
+            this.data.action.redirects = this.data.action.redirects.filter((tag: any) => tag.keyword === 'AUTO_REDIRECT_TO_USER');
+        }
         this.allEntities.forEach((entity: any) => {
             entity.state = { 'opened': false, 'selected': false };
             this.data.action.redirects.forEach((keyword: any) => {
