@@ -622,12 +622,28 @@ class SearchController
             $args['searchData'][] = $sendersMatch;
         }
         if (!empty($body['senders']) && !empty($body['senders']['values']) && is_array($body['senders']['values']) && is_string($body['senders']['values'][0])) {
-            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['company']]);
+            $fieldsToCompleteSendersBy = [
+                'firstname',
+                'lastname',
+                'company',
+                'department',
+                'function',
+                'address_number',
+                'address_street',
+                'address_additional1',
+                'address_additional2',
+                'address_postcode',
+                'address_town',
+                'address_country',
+                'email',
+                'phone'
+            ];
+            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fieldsToCompleteSendersBy]);
 
             $requestData = AutoCompleteController::getDataForRequest([
-                'search'       => $body['senders']['values'][0],
+                'search'       => trim($body['senders']['values'][0]),
                 'fields'       => $fields,
-                'fieldsNumber' => 1
+                'fieldsNumber' => count($fieldsToCompleteSendersBy)
             ]);
 
             $contacts = ContactModel::get([
@@ -639,17 +655,17 @@ class SearchController
             if (empty($contactIds)) {
                 return null;
             } else {
-                $recipientsMatch = ResourceContactModel::get([
+                $sendersMatch = ResourceContactModel::get([
                     'select'    => ['res_id'],
                     'where'     => ['item_id in (?)', 'type = ?', 'mode = ?'],
                     'data'      => [$contactIds, 'contact', 'sender']
                 ]);
-                $resourceByRecipients = array_column($recipientsMatch, 'res_id');
-                if (empty($resourceByRecipients)) {
+                $resourceBySenders = array_column($sendersMatch, 'res_id');
+                if (empty($resourceBySenders)) {
                     return null;
                 } else {
                     $args['searchWhere'][] = 'res_id in (?)';
-                    $args['searchData'][] = $resourceByRecipients;
+                    $args['searchData'][] = $resourceBySenders;
                 }
             }
         }
@@ -678,12 +694,28 @@ class SearchController
             $args['searchData'][] = $recipientsMatch;
         }
         if (!empty($body['recipients']) && !empty($body['recipients']['values']) && is_array($body['recipients']['values']) && is_string($body['recipients']['values'][0])) {
-            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['company']]);
+            $fieldsToCompleteRecipientsBy = [
+                'firstname',
+                'lastname',
+                'company',
+                'department',
+                'function',
+                'address_number',
+                'address_street',
+                'address_additional1',
+                'address_additional2',
+                'address_postcode',
+                'address_town',
+                'address_country',
+                'email',
+                'phone'
+            ];
+            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fieldsToCompleteRecipientsBy]);
 
             $requestData = AutoCompleteController::getDataForRequest([
-                'search'       => $body['recipients']['values'][0],
+                'search'       => trim($body['recipients']['values'][0]),
                 'fields'       => $fields,
-                'fieldsNumber' => 1
+                'fieldsNumber' => count($fieldsToCompleteRecipientsBy)
             ]);
 
             $contacts = ContactModel::get([
