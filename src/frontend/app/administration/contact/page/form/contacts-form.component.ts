@@ -1042,22 +1042,6 @@ export class ContactsFormComponent implements OnInit {
             ).subscribe();
     }
 
-    initAutocompletePostcode() {
-        // this.addressBANInfo = this.translate.instant('lang.autocompleteInfo');
-        // this.addressBANResult = [];
-        this.contactForm.filter(contact => contact.id === 'addressPostcode')[0].control.valueChanges
-            .pipe(
-                debounceTime(300),
-                filter((value: string) => value.length > 2),
-                distinctUntilChanged(),
-                // tap(() => this.addressBANLoading = true),
-                // switchMap((data: any) => this.http.get('../rest/autocomplete/banAddresses', { params: { 'address': data, 'department': this.addressBANCurrentDepartment } })),
-                tap((data: any) => {
-                    console.log('coucou');
-                })
-            ).subscribe();
-    }
-
     resetAutocompleteAddressBan() {
         this.addressBANResult = [];
         this.addressBANInfo = this.translate.instant('lang.autocompleteInfo');
