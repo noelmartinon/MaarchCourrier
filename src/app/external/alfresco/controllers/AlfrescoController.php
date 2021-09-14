@@ -692,8 +692,10 @@ class AlfrescoController
                 if ($alfrescoParameter == 'alfrescoLogin') {
                     $properties[$key] = $entityInformations['alfresco']['login'];
                 } elseif ($alfrescoParameter == 'doctypeLabel') {
-                    $doctype = DoctypeModel::getById(['select' => ['description'], 'id' => $document['type_id']]);
-                    $properties[$key] = $doctype['description'];
+                    if (!empty($document['type_id'])) {
+                        $doctype = DoctypeModel::getById(['select' => ['description'], 'id' => $document['type_id']]);
+                    }
+                    $properties[$key] = $doctype['description'] ?? '';
                 } elseif ($alfrescoParameter == 'priorityLabel') {
                     if (!empty($document['priority'])) {
                         $priority = PriorityModel::getById(['select' => ['label'], 'id' => $document['priority']]);
@@ -735,9 +737,11 @@ class AlfrescoController
                     }
                     $properties[$key] = $contactToDisplay['contact']['address'] ?? '';
                 } elseif ($alfrescoParameter == 'doctypeSecondLevelLabel') {
-                    $doctype = DoctypeModel::getById(['select' => ['doctypes_second_level_id'], 'id' => $document['type_id']]);
-                    $doctypeSecondLevel = SecondLevelModel::getById(['id' => $doctype['doctypes_second_level_id'], 'select' => ['doctypes_second_level_label']]);
-                    $properties[$key] = $doctypeSecondLevel['doctypes_second_level_label'];
+                    if (!empty($document['type_id'])) {
+                        $doctype = DoctypeModel::getById(['select' => ['doctypes_second_level_id'], 'id' => $document['type_id']]);
+                        $doctypeSecondLevel = SecondLevelModel::getById(['id' => $doctype['doctypes_second_level_id'], 'select' => ['doctypes_second_level_label']]);
+                    }
+                    $properties[$key] = $doctypeSecondLevel['doctypes_second_level_label'] ?? '';
                 } elseif (strpos($alfrescoParameter, 'customField_') !== false) {
                     $customId = explode('_', $alfrescoParameter)[1];
                     $customValue = json_decode($document['custom_fields'], true);

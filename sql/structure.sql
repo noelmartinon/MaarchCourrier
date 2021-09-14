@@ -1142,12 +1142,12 @@ SELECT r.res_id,
        r.custom_fields,
        en.entity_label,
        en.entity_type AS entitytype
-FROM doctypes d,
-     doctypes_first_level dfl,
-     doctypes_second_level dsl,
-     res_letterbox r
-    LEFT JOIN entities en ON r.destination::text = en.entity_id::text
-WHERE r.type_id = d.type_id AND d.doctypes_first_level_id = dfl.doctypes_first_level_id AND d.doctypes_second_level_id = dsl.doctypes_second_level_id;
+FROM res_letterbox r
+         LEFT JOIN doctypes d ON r.type_id = d.type_id
+         LEFT JOIN doctypes_first_level dfl ON d.doctypes_first_level_id = dfl.doctypes_first_level_id
+         LEFT JOIN doctypes_second_level dsl ON d.doctypes_second_level_id = dsl.doctypes_second_level_id
+         LEFT JOIN entities en ON r.destination::TEXT = en.entity_id::TEXT
+;
 
 CREATE FUNCTION order_alphanum(text) RETURNS text AS $$
   SELECT regexp_replace(regexp_replace(regexp_replace(regexp_replace($1,

@@ -906,8 +906,10 @@ class FolderPrintController
             'resId'  => $resId
         ]);
 
-        $doctype = DoctypeModel::getById(['select' => ['description'], 'id' => $resource['type_id']]);
-        $resource['type_label'] = $doctype['description'];
+        if (!empty($resource['type_id'])) {
+            $doctype = DoctypeModel::getById(['select' => ['description'], 'id' => $resource['type_id']]);
+        }
+        $resource['type_label'] = $doctype['description'] ?? '';
 
         $data = SummarySheetController::prepareData(['units' => $units, 'resourcesIds' => [$resId]]);
 

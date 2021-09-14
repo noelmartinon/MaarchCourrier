@@ -255,7 +255,10 @@ class PreProcessActionController
                 continue;
             }
 
-            $doctype = DoctypeModel::getById(['id' => $resource['type_id'], 'select' => ['process_mode']]);
+            $doctype['process_mode'] = '';
+            if (!empty($resource['type_id'])) {
+                $doctype = DoctypeModel::getById(['id' => $resource['type_id'], 'select' => ['process_mode']]);
+            }
 
             if (empty($resource['destination']) && $currentMode == 'auto') {
                 $noSendAR['number'] += 1;
