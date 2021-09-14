@@ -91,6 +91,9 @@ DROP SEQUENCE IF EXISTS thesaurus_id_seq;
 
 SELECT setval('tags_id_seq', (SELECT max(id)+1 FROM tags), false);
 SELECT setval('contacts_id_seq', (SELECT max(id)+1 FROM contacts), false);
+--SGAMI-SO DEBUT
+SELECT setval('custom_fields_id_seq', (select max(id)+1 from custom_fields), false);
+--SGAMI-SO FIN
 
 ALTER TABLE res_letterbox DROP COLUMN IF EXISTS custom_t1;
 ALTER TABLE res_letterbox DROP COLUMN IF EXISTS custom_t2;
