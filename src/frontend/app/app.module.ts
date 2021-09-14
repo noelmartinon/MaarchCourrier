@@ -83,6 +83,8 @@ import { SendToRecordManagementComponent } from './actions/send-to-record-manage
 import { CheckReplyRecordManagementComponent } from './actions/check-reply-record-management-action/check-reply-record-management.component';
 import { ResetRecordManagementComponent } from './actions/reset-record-management-action/reset-record-management.component';
 import { CheckAcknowledgmentRecordManagementComponent } from './actions/check-acknowledgment-record-management-action/check-acknowledgment-record-management.component';
+import { SendMultigestActionComponent } from './actions/send-multigest-action/send-multigest-action.component';
+
 
 // PROCESS
 import { ProcessComponent } from './process/process.component';
@@ -275,6 +277,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         GiveAvisParallelActionComponent,
         ValidateAvisParallelComponent,
         SendAlfrescoActionComponent,
+        SendMultigestActionComponent,
         SaveRegisteredMailActionComponent,
         SaveAndPrintRegisteredMailActionComponent,
         SaveAndIndexRegisteredMailActionComponent,
@@ -349,6 +352,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         closeMailWithAttachmentsOrNotesActionComponent,
         SendSignatureBookActionComponent,
         SendAlfrescoActionComponent,
+        SendMultigestActionComponent,
         SaveRegisteredMailActionComponent,
         SaveAndPrintRegisteredMailActionComponent,
         SaveAndIndexRegisteredMailActionComponent,

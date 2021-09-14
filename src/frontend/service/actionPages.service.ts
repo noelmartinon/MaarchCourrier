@@ -6,7 +6,7 @@ interface actionPages {
     'label': string; // title
     'name': string; // name
     'component': string; // action service component
-    'category': 'application' | 'acknowledgementReceipt' | 'externalSignatoryBook' | 'visa' | 'avis' | 'maileva' | 'alfresco' | 'registeredMail' | 'recordManagement'; // category
+    'category': 'application' | 'acknowledgementReceipt' | 'externalSignatoryBook' | 'visa' | 'avis' | 'maileva' | 'alfresco' | 'registeredMail' | 'recordManagement' | 'multigest'; // category
     'description': string; // description
 }
 
@@ -309,7 +309,15 @@ export class ActionPagesService {
             'component': 'resetRecordManagementAction',
             'category': 'recordManagement',
             'description': this.translate.instant('lang.resetRecordManagement')
-        }
+        },
+        {
+            'id': 'send_multigest',
+            'label': this.translate.instant('lang.sendMultigest'),
+            'name': 'send_multigest',
+            'component': 'sendMultigestAction',
+            'category': 'multigest',
+            'description': this.translate.instant('lang.sendMultigest')
+        },
     ];
 
 
