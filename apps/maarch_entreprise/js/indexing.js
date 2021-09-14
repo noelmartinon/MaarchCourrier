@@ -61,6 +61,7 @@ function initSenderRecipientAutocomplete(inputId, mode, alternateVersion, cardId
         templateValue: "{{company}} {{firstname}} {{lastname}}",
         emptyTemplate: "Aucune donnée pour <b>{{query}}</b>",
         minLength: 3,
+        maxItem: 30,
         dynamic: true,
         filter: false,
         source: {
