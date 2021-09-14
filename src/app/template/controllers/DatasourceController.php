@@ -180,9 +180,9 @@ class DatasourceController
             }
 
             if ($event['table_name'] == 'notes') {
-                $datasources['res_letterbox'][0]['linktodoc']     = $note['linktodoc'];
-                $datasources['res_letterbox'][0]['linktodetail']  = $note['linktodetail'];
-                $datasources['res_letterbox'][0]['linktoprocess'] = $note['linktodoc'];
+                $datasources['res_letterbox'][array_key_last($datasources['res_letterbox'])]['linktodoc']     = $note['linktodoc'];
+                $datasources['res_letterbox'][array_key_last($datasources['res_letterbox'])]['linktodetail']  = $note['linktodetail'];
+                $datasources['res_letterbox'][array_key_last($datasources['res_letterbox'])]['linktoprocess'] = $note['linktodoc'];
         
                 $labelledUser = UserModel::getLabelledUserById(['id' => $note['user_id']]);
                 $creationDate = TextFormatModel::formatDate($note['creation_date'], 'd/m/Y');
