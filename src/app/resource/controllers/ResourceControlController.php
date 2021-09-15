@@ -45,17 +45,19 @@ class ResourceControlController
 
         if (empty($body)) {
             return ['errors' => 'Body is not set or empty'];
-        } elseif (!Validator::intVal()->notEmpty()->validate($body['doctype'])) {
-            return ['errors' => 'Body doctype is empty or not an integer'];
+        } elseif (!empty($body['doctype']) && !Validator::intVal()->validate($body['doctype'])) {
+            return ['errors' => 'Body doctype is not an integer'];
         } elseif (!Validator::intVal()->notEmpty()->validate($body['modelId'])) {
             return ['errors' => 'Body modelId is empty or not an integer'];
         } elseif ($isWebServiceUser && !Validator::stringType()->notEmpty()->validate($body['status'])) {
             return ['errors' => 'Body status is empty or not a string'];
         }
 
-        $doctype = DoctypeModel::getById(['id' => $body['doctype'], 'select' => [1]]);
-        if (empty($doctype)) {
-            return ['errors' => 'Body doctype does not exist'];
+        if (!empty($body['doctype'])) {
+            $doctype = DoctypeModel::getById(['id' => $body['doctype'], 'select' => [1]]);
+            if (empty($doctype)) {
+                return ['errors' => 'Body doctype does not exist'];
+            }
         }
 
         $indexingModel = IndexingModelModel::getById(['id' => $body['modelId'], 'select' => ['master', 'enabled']]);
@@ -167,12 +169,14 @@ class ResourceControlController
             }
         }
 
-        if (!Validator::intVal()->notEmpty()->validate($body['doctype'])) {
-            return ['errors' => 'Body doctype is empty or not an integer'];
-        }
-        $doctype = DoctypeModel::getById(['id' => $body['doctype'], 'select' => [1]]);
-        if (empty($doctype)) {
-            return ['errors' => 'Body doctype does not exist'];
+        if (!empty($body['doctype'])) {
+            if (!Validator::intVal()->validate($body['doctype'])) {
+                return ['errors' => 'Body doctype is not an integer'];
+            }
+            $doctype = DoctypeModel::getById(['id' => $body['doctype'], 'select' => [1]]);
+            if (empty($doctype)) {
+                return ['errors' => 'Body doctype does not exist'];
+            }
         }
 
         $control = ResourceControlController::controlAdjacentData(['body' => $body, 'isWebServiceUser' => false]);

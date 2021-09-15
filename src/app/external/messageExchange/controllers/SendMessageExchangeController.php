@@ -152,7 +152,9 @@ class SendMessageExchangeController
         }
 
         $AllInfoMainMail = ResModel::getById(['select' => ['*'], 'resId' => $args['resId']]);
-        $doctype = DoctypeModel::getById(['select' => ['description'], 'id' => $AllInfoMainMail['type_id']]);
+        if (!empty($AllInfoMainMail['type_id'])) {
+            $doctype = DoctypeModel::getById(['select' => ['description'], 'id' => $AllInfoMainMail['type_id']]);
+        }
 
         $tmpMainExchangeDoc = explode("__", $body['mainExchangeDoc']);
         $MainExchangeDoc    = ['tablename' => $tmpMainExchangeDoc[0], 'res_id' => $tmpMainExchangeDoc[1]];
@@ -161,7 +163,7 @@ class SendMessageExchangeController
         if (!empty($body['joinFile']) || $MainExchangeDoc['tablename'] == 'res_letterbox') {
             $AllInfoMainMail['Title']                                  = $AllInfoMainMail['subject'];
             $AllInfoMainMail['OriginatingAgencyArchiveUnitIdentifier'] = $AllInfoMainMail['alt_identifier'];
-            $AllInfoMainMail['DocumentType']                           = $doctype['description'];
+            $AllInfoMainMail['DocumentType']                           = $doctype['description'] ?? null;
             $AllInfoMainMail['tablenameExchangeMessage']               = 'res_letterbox';
             $fileInfo = [$AllInfoMainMail];
         }

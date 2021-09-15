@@ -69,7 +69,10 @@ trait AcknowledgementReceiptTrait
             }
         }
 
-        $doctype = DoctypeModel::getById(['id' => $resource['type_id'], 'select' => ['process_mode']]);
+        $doctype['process_mode'] = '';
+        if (!empty($resource['type_id'])) {
+            $doctype = DoctypeModel::getById(['id' => $resource['type_id'], 'select' => ['process_mode']]);
+        }
 
         if ($doctype['process_mode'] == 'SVA') {
             $templateAttachmentType = 'sva';
