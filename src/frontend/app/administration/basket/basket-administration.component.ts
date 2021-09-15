@@ -523,7 +523,27 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
         });
         $('#jstree2')
             // listen for event
+            .on('loaded.jstree', (e: any, data: any) => {
+                if (this.data.action.redirects.find((tag: any) => tag.keyword === 'AUTO_REDIRECT_TO_USER') !== undefined) {
+                    this.allEntities.forEach((element: any) => {
+                        if (element.id !== 'AUTO_REDIRECT_TO_USER') {
+                            $('#jstree2').jstree('disable_node', element.id);
+                        }
+                    });
+                }
+            })
             .on('select_node.jstree', (e: any, data: any) => {
+                if (data.selected.indexOf('AUTO_REDIRECT_TO_USER') > -1) {
+                    const index: number = data.selected.indexOf('AUTO_REDIRECT_TO_USER');
+                    data.selected.splice(index, 1);
+                    this.allEntities.forEach((element: any) => {
+                        if (element.id !== 'AUTO_REDIRECT_TO_USER') {
+                            $('#jstree2').jstree('disable_node', element.id);
+                        }
+                    });
+                    $('#jstree2').jstree().deselect_node(data.selected);
+                    this.data.action.redirects = [];
+                }
                 if (data.node.original.keyword) {
                     this.data.action.redirects.push({ action_id: this.data.action.id, entity_id: '', keyword: data.node.id, redirect_mode: 'USERS' });
                 } else {
@@ -531,6 +551,12 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
                 }
 
             }).on('deselect_node.jstree', (e: any, data: any) => {
+                if (data.node.id === 'AUTO_REDIRECT_TO_USER') {
+                    this.data.action.redirects = [];
+                    this.allEntities.forEach((element: any) => {
+                        $('#jstree2').jstree('enable_node', element.id);
+                    });
+                }
                 this.data.action.redirects.forEach((redirect: any) => {
                     if (data.node.original.keyword) {
                         if (redirect.keyword === data.node.original.keyword) {
