@@ -497,7 +497,11 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
 
     initService2() {
         if (this.data.action.redirects.find((tag: any) => tag.keyword === 'AUTO_REDIRECT_TO_USER') !== undefined) {
-            this.data.action.redirects = this.data.action.redirects.filter((tag: any) => tag.keyword === 'AUTO_REDIRECT_TO_USER');
+            this.data.action.redirects.forEach((element: any, index: number) => {
+                if (element.redirect_mode === 'USERS' && element.keyword !== 'AUTO_REDIRECT_TO_USER') {
+                    this.data.action.redirects.splice(index, 1);
+                }
+            });
         }
         this.allEntities.forEach((entity: any) => {
             entity.state = { 'opened': false, 'selected': false };
@@ -542,7 +546,6 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
                         }
                     });
                     $('#jstree2').jstree().deselect_node(data.selected);
-                    this.data.action.redirects = [];
                 }
                 if (data.node.original.keyword) {
                     this.data.action.redirects.push({ action_id: this.data.action.id, entity_id: '', keyword: data.node.id, redirect_mode: 'USERS' });
@@ -552,7 +555,6 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
 
             }).on('deselect_node.jstree', (e: any, data: any) => {
                 if (data.node.id === 'AUTO_REDIRECT_TO_USER') {
-                    this.data.action.redirects = [];
                     this.allEntities.forEach((element: any) => {
                         $('#jstree2').jstree('enable_node', element.id);
                     });

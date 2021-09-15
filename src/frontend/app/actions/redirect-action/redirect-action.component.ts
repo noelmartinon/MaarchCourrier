@@ -64,7 +64,7 @@ export class RedirectActionComponent implements OnInit {
         await this.getDefaultEntity();
 
         if (this.actionKeyword === 'autoRedirectToUser') {
-            this.redirectMode = 'user';
+            this.redirectMode = this.entities.length > 0 ? '' : 'user';
             this.changeDest({option: { value: this.formatUser()}});
             this.loading = false;
         } else if (this.userListRedirect.length === 0 && this.entities.filter((entity: any) => entity.allowed).length === 0) {

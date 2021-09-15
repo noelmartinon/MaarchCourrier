@@ -47,7 +47,7 @@
                 </div>
             </div>
         </div>
-        <div *ngIf="redirectMode == 'user'" class="row">
+        <div *ngIf="redirectMode == 'user' && !loading" class="row">
             <mat-form-field *ngIf="actionKeyword !== 'autoRedirectToUser'" appearance="outline" floatLabel="never" [style.fontSize.px]="10">
                 <input class="searchUserRedirect" matInput placeholder="{{'lang.searchNewAssignee' | translate}}"
                     [matAutocomplete]="auto" [formControl]="userRedirectCtrl" (click)="userRedirectCtrl.setValue('')">
