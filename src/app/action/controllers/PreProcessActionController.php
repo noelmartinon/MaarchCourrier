@@ -84,6 +84,7 @@ class PreProcessActionController
 
         $users = [];
         $allEntities = [];
+        $autoRedirectToUser = false;
 
         foreach (['ENTITY', 'USERS'] as $mode) {
             $entityRedirects = GroupBasketRedirectModel::get([
@@ -99,7 +100,7 @@ class PreProcessActionController
                     $allowedEntities[] = $entityRedirect['entity_id'];
                 } elseif (!empty($entityRedirect['keyword'])) {
                     if ($entityRedirect['keyword'] == 'AUTO_REDIRECT_TO_USER') {
-                        return $response->withJson(['entities' => [], 'users' => [], 'keepDestForRedirection' => !empty($parameter['param_value_int']), 'autoRedirectToUser' => true]);
+                        $autoRedirectToUser = true;
                     }
                     if (!empty($keywords[$entityRedirect['keyword']])) {
                         if (!empty($clauseToProcess)) {
@@ -164,7 +165,7 @@ class PreProcessActionController
             }
         }
 
-        return $response->withJson(['entities' => $allEntities, 'users' => $users, 'keepDestForRedirection' => !empty($parameter['param_value_int']), 'autoRedirectToUser' => false]);
+        return $response->withJson(['entities' => $allEntities, 'users' => $users, 'keepDestForRedirection' => !empty($parameter['param_value_int']), 'autoRedirectToUser' => $autoRedirectToUser]);
     }
 
     public function checkAcknowledgementReceipt(Request $request, Response $response, array $args)
