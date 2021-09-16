@@ -1028,7 +1028,15 @@ class AutoCompleteController
         $postcodes = array_values(array_filter($postcodes, function ($code) use ($searchPostcode, $searchTowns) {
             $townFound = !empty($searchTowns);
             foreach ($searchTowns as $searchTown) {
-                if (strpos($code['label'], $searchTown) === false) {
+                if ($searchTown == 'ST' || $searchTown == 'SAINT') {
+                    if (strpos($code['label'], 'ST') === false || strpos($code['label'], 'SAINT')) {
+                        $townFound = false;
+                    }
+                } elseif ($searchTown == 'STE' || $searchTown == 'SAINTE') {
+                    if (strpos($code['label'], 'STE') === false || strpos($code['label'], 'SAINTE')) {
+                        $townFound = false;
+                    }
+                } elseif (strpos($code['label'], $searchTown) === false) {
                     $townFound = false;
                     break;
                 }
