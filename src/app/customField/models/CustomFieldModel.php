@@ -79,7 +79,7 @@ class CustomFieldModel
     public static function createMod(array $args)
     {
         ValidatorModel::notEmpty($args, ['label', 'type']);
-        ValidatorModel::stringType($args, ['label', 'type', 'values']);
+        ValidatorModel::stringType($args, ['label', 'type', 'values', 'actived']);
 
         # SGAMI-SO - DEBUT 
         #$nextSequenceId = DatabaseModel::getNextSequenceValue(['sequenceId' => 'custom_fields_id_seq']);
@@ -93,7 +93,8 @@ class CustomFieldModel
                 # SGAMI-SO FIN 
                 'label'     => $args['label'],
                 'type'      => $args['type'],
-                'values'    => $args['values']
+                'values'    => $args['values'],
+                'actived'    => $args['actived']
             ]
         ]);
 

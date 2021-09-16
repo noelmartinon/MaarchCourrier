@@ -45,6 +45,10 @@ foreach ($customs as $custom) {
                 SGAMI-SO FIN */
 
                 $label = (string)$value->label;
+                //SGAMI-SO DEBUT
+                $enabled = (string)$value->enabled;
+                //SGAMI-SO FIN 
+
                 $type = trim((string)$value->type);
                 if ($type == 'float') {
                     $type = 'integer';
@@ -79,7 +83,8 @@ foreach ($customs as $custom) {
                 #SGAMI-SO FIN
                     'label'     => $label,
                     'type'      => $type,
-                    'values'    => empty($values) ? '[]' : json_encode(array_values($values))
+                    'values'    => empty($values) ? '[]' : json_encode(array_values($values)),
+                    'actived'   =>  (($enabled == 'true') ? 'Y' : 'N' )
                 ]);
                 /*SGAMI-SO DEBUT
                 Par défaut les champs custom sont desactivéS

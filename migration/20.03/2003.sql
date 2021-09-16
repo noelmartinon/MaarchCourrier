@@ -6,7 +6,7 @@
 --                                                                          --
 -- *************************************************************************--
 /*SGAMI-SO DEBUT*/
-UPDATE parameters SET param_value_string = '20.03.23_TMA1' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '20.03.24_TMA1' WHERE id = 'database_version';
 /*SGAMI-SO FIN*/
 
 UPDATE parameters SET description = 'Département par défaut sélectionné dans les autocomplétions de la Base Adresse Nationale' WHERE id = 'defaultDepartment';
@@ -192,6 +192,9 @@ CREATE TABLE custom_fields
   label character varying(256) NOT NULL,
   type character varying(256) NOT NULL,
   values jsonb,
+  --SGAMI-SO FIX49
+  actived character varying(1) DEFAULT 'N',
+  --SGAMI-SO FIX49
   CONSTRAINT custom_fields_pkey PRIMARY KEY (id),
   CONSTRAINT custom_fields_unique_key UNIQUE (label)
 )
