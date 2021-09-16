@@ -208,10 +208,10 @@ class EmailController
 
                 $size = null;
                 if (empty($attachment['original'])) {
-                    $convertedResource = AdrModel::getDocuments([
+                    $convertedResource = AdrModel::getAttachments([
                         'select'  => ['docserver_id', 'path', 'filename'],
-                        'where'   => ['res_id = ?', 'type in (?)'],
-                        'data'    => [$attachment['id'], ['PDF', 'SIGN']],
+                        'where'   => ['res_id = ?', 'type = ?'],
+                        'data'    => [$attachment['id'], 'PDF'],
                         'orderBy' => ["type='SIGN' DESC"],
                         'limit'   => 1
                     ]);
@@ -494,7 +494,7 @@ class EmailController
             $signedAttachment = AttachmentModel::get([
                 'select'    => ['res_id'],
                 'where'     => ['origin = ?', 'status != ?', 'attachment_type = ?'],
-                'data'      => ["{$attachment['resId']},res_attachments", 'DEL', 'signed_response']
+                'data'      => ["{$attachmentId},res_attachments", 'DEL', 'signed_response']
             ]);
             if (!empty($signedAttachment[0])) {
                 $attachmentId = $signedAttachment[0]['res_id'];
@@ -517,7 +517,7 @@ class EmailController
             }
 
             $attachments[] = [
-                'id'                => $attachment['res_id'],
+                'id'                => $attachmentId,
                 'chrono'            => $attachment['identifier'],
                 'label'             => $attachment['title'],
                 'typeLabel'         => $attachmentTypes[$attachment['attachment_type']]['label'],
