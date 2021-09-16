@@ -388,11 +388,11 @@ class SearchController
                 ]);
 
                 if (!empty($requestDataDocument['where'])) {
-                    $whereClause[]      = implode(' OR ', $requestDataDocument['where']);
+                    $whereClause[]      = implode(' AND ', $requestDataDocument['where']);
                     $args['searchData'] = array_merge($args['searchData'], $requestDataDocument['data']);
                 }
                 if (!empty($requestDataDocumentWhiteStripped['where'])) {
-                    $whereClause[]      = implode(' OR ', $requestDataDocumentWhiteStripped['where']);
+                    $whereClause[]      = implode(' AND ', $requestDataDocumentWhiteStripped['where']);
                     $args['searchData'] = array_merge($args['searchData'], $requestDataDocumentWhiteStripped['data']);
                 }
                 if (!empty($requestDataAttachment['where'])) {
