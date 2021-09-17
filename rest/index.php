@@ -712,4 +712,8 @@ $app->post('/office365', \ContentManagement\controllers\Office365SharepointContr
 $app->get('/office365/{id}', \ContentManagement\controllers\Office365SharepointController::class . ':getFileContent');
 $app->delete('/office365/{id}', \ContentManagement\controllers\Office365SharepointController::class . ':delete');
 
+$app->get('/multigest/configuration', \Multigest\controllers\MultigestController::class . ':getConfiguration');
+$app->put('/multigest/configuration', \Multigest\controllers\MultigestController::class . ':updateConfiguration');
+$app->post('/multigest/checkAccounts', \Multigest\controllers\MultigestController::class . ':checkAccount');
+
 $app->run();
