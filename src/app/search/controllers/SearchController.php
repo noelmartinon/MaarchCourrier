@@ -348,35 +348,52 @@ class SearchController
 
                 $args['searchWhere'][] = '(' . $quickWhere . ')';
             } else {
-                $fields = ['subject', 'replace(alt_identifier, \' \', \'\')', 'barcode'];
+                $quick = trim($body['meta']['values']);
+                $quickWhiteStripped = str_replace(' ', '', $quick);
 
-                $quick = $body['meta']['values'];
-                $quick = str_replace(' ', '', $quick);
-
+                $fields = ['subject'];
+                $fieldsNumber = count($fields);
                 $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
                 $requestDataDocument = AutoCompleteController::getDataForRequest([
-                    'search'        => $quick,
-                    'fields'        => $fields,
-                    'where'         => [],
-                    'data'          => [],
-                    'fieldsNumber'  => 3,
-                    'longField'     => true
+                    'search'       => $quick,
+                    'fields'       => $fields,
+                    'where'        => [],
+                    'data'         => [],
+                    'fieldsNumber' => $fieldsNumber,
+                    'longField'    => true
+                ]);
+
+                $fieldsWhiteStripped = ['replace(alt_identifier, \' \', \'\')', 'replace(barcode, \' \', \'\')'];
+                $fieldsWhiteStrippedNumber = count($fieldsWhiteStripped);
+                $fieldsWhiteStripped = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fieldsWhiteStripped]);
+                $requestDataDocumentWhiteStripped = AutoCompleteController::getDataForRequest([
+                    'search'       => $quickWhiteStripped,
+                    'fields'       => $fieldsWhiteStripped,
+                    'where'        => [],
+                    'data'         => [],
+                    'fieldsNumber' => $fieldsWhiteStrippedNumber,
+                    'longField'    => false
                 ]);
 
                 $fields = ['title', 'identifier'];
+                $fieldsNumber = count($fields);
                 $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
                 $requestDataAttachment = AutoCompleteController::getDataForRequest([
-                    'search'        => $quick,
-                    'fields'        => $fields,
-                    'where'         => [],
-                    'data'          => [],
-                    'fieldsNumber'  => 2,
-                    'longField'     => true
+                    'search'       => $quick,
+                    'fields'       => $fields,
+                    'where'        => [],
+                    'data'         => [],
+                    'fieldsNumber' => $fieldsNumber,
+                    'longField'    => true
                 ]);
 
                 if (!empty($requestDataDocument['where'])) {
                     $whereClause[]      = implode(' AND ', $requestDataDocument['where']);
                     $args['searchData'] = array_merge($args['searchData'], $requestDataDocument['data']);
+                }
+                if (!empty($requestDataDocumentWhiteStripped['where'])) {
+                    $whereClause[]      = implode(' AND ', $requestDataDocumentWhiteStripped['where']);
+                    $args['searchData'] = array_merge($args['searchData'], $requestDataDocumentWhiteStripped['data']);
                 }
                 if (!empty($requestDataAttachment['where'])) {
                     $whereClause[]      = 'res_id in (select res_id_master from res_attachments where (' . implode(' AND ', $requestDataAttachment['where']) . ') and status in (\'TRA\', \'A_TRA\', \'FRZ\') and attachment_type <> \'summary_sheet\')';
