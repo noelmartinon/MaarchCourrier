@@ -997,22 +997,28 @@ class AutoCompleteController
             return $response->withStatus(400)->withJson(['errors' => 'Query town is not a string']);
         }
 
-        $postcodes = [];
-        if (($handle = fopen("referential/code_postaux_v201410.csv", "r")) !== false) {
-            fgetcsv($handle, 0, ';');
-            while (($data = fgetcsv($handle, 0, ';')) !== false) {
-                $postcodes[] = [
-                    'town'     => utf8_encode($data[1]),
-                    'postcode' => utf8_encode($data[2])
-                ];
-            }
-            fclose($handle);
+        if (!is_file('referential/codes-postaux.json') || !is_readable('referential/codes-postaux.json')) {
+            return $response->withStatus(400)->withJson(['errors' => 'Cannot read postcodes']);
         }
 
+        $postcodesContent = file_get_contents('referential/codes-postaux.json');
+        if ($postcodesContent === false) {
+            return $response->withStatus(400)->withJson(['errors' => 'Cannot read postcodes']);
+        }
+        $postcodes = json_decode($postcodesContent, true);
+
+        $postcodes = array_map(function ($postcode) {
+            return [
+                'town'     => $postcode['nomCommune'],
+                'label'    => $postcode['libelleAcheminement'],
+                'postcode' => $postcode['codePostal']
+            ];
+        }, $postcodes);
 
         $searchTowns = [];
         if (!empty($queryParams['town'])) {
             $searchTowns = strtoupper(TextFormatModel::normalize(['string' => $queryParams['town']]));
+            $searchTowns = trim(str_replace('-', ' ', $searchTowns));
             $searchTowns = explode(' ', $searchTowns);
         }
         $searchPostcode = null;
@@ -1022,7 +1028,17 @@ class AutoCompleteController
         $postcodes = array_values(array_filter($postcodes, function ($code) use ($searchPostcode, $searchTowns) {
             $townFound = !empty($searchTowns);
             foreach ($searchTowns as $searchTown) {
-                if (strpos($code['town'], $searchTown) === false) {
+                if ($searchTown == 'ST' || $searchTown == 'SAINT') {
+                    if (strpos($code['label'], 'ST') === false && strpos($code['label'], 'SAINT') === false) {
+                        $townFound = false;
+                        break;
+                    }
+                } elseif ($searchTown == 'STE' || $searchTown == 'SAINTE') {
+                    if (strpos($code['label'], 'STE') === false && strpos($code['label'], 'SAINTE') === false) {
+                        $townFound = false;
+                        break;
+                    }
+                } elseif (strpos($code['label'], $searchTown) === false) {
                     $townFound = false;
                     break;
                 }
