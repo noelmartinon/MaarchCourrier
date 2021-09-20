@@ -2545,5 +2545,14 @@
     "configSaeInfo": "For more information on setting up an electronic filing system.Consult the documentation : <a href=\"{{url}}\" target=\"_blank\" class=\"link\"> Configure an SAE < / a>",
     "delegatedOpinion": "Opinion given instead of",
     "requestedOpinion": "Opinion requested instead of",
-    "sharePointWarning": "Close the document editor before validating the edit"
+    "sharePointWarning": "Close the document editor before validating the edit",
+    "otp_visa_yousign": "Visa user (yousign)",
+    "otp_sign_yousign": "Signatory (yousign)",
+    "suggestedCorrespondents": "Suggested correspondent (s)",
+    "searchCorrespondent": "Find a correspondent",
+    "viewSuggestions": "See suggestions",
+    "noSuggestion": "No suggestion",
+    "otpVisaUser": "The user will be notified by <b> email </b> at the time of his turn in the circuit.",
+    "mustSign": "The signature position for external users is mandatory.",
+    "autoRedirectToUser": "To myself"
 }
