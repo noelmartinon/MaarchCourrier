@@ -36,7 +36,7 @@ class CustomFieldController
     {
         $queryParams = $request->getQueryParams();
 
-        $customFields = CustomFieldModel::get(['orderBy' => ['label']]);
+        $customFields = CustomFieldModel::get(['orderBy' => ['label'], 'where' => ['actived = ?'], 'data' => ['Y']]);
 
         foreach ($customFields as $key => $customField) {
             $customFields[$key]['values'] = json_decode($customField['values'], true);
