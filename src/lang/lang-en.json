@@ -2064,7 +2064,7 @@
     "true": "Yes",
     "false": "No",
     "infoImportregisteredMails": "The <b>headless</b> files are organized according to the <b>column positions</b> of the file.<br/>The <b>defaults</b> values defined in the < b>registration template</b> are used.",
-    "manualSearchInfo": "You can leave the term in the field without selecting a value for the search.",
+    "manualSearchInfo": "You can leave the term in the field without selecting a value for the search. At least three characters are required in this case.",
     "groupSign": "Signatory's group",
     "producerService": "Producer service",
     "fastParapheurSubscriberId": "Fast-Parapheur subscriber Id",

@@ -19,6 +19,8 @@ use Basket\models\BasketModel;
 use Basket\models\RedirectBasketModel;
 use Configuration\models\ConfigurationModel;
 use Contact\models\ContactModel;
+use Contact\models\ContactParameterModel;
+use Contact\controllers\ContactController;
 use Convert\controllers\FullTextController;
 use CustomField\models\CustomFieldModel;
 use Docserver\models\DocserverModel;
@@ -639,12 +641,21 @@ class SearchController
             $args['searchData'][] = $sendersMatch;
         }
         if (!empty($body['senders']) && !empty($body['senders']['values']) && is_array($body['senders']['values']) && is_string($body['senders']['values'][0])) {
-            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['company']]);
+            if (mb_strlen($body['senders']['values'][0]) < 3) {
+                return null;
+            }
+
+            $searchableParameters = ContactParameterModel::get(['select' => ['identifier'], 'where' => ['searchable = ?'], 'data' => [true]]);
+            $searchableParameters = array_column($searchableParameters, 'identifier');
+            $searchableParameters = array_map(function ($parameter) {
+                return ContactController::MAPPING_FIELDS[$parameter];
+            }, $searchableParameters);
+            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $searchableParameters]);
 
             $requestData = AutoCompleteController::getDataForRequest([
-                'search'       => $body['senders']['values'][0],
+                'search'       => trim($body['senders']['values'][0]),
                 'fields'       => $fields,
-                'fieldsNumber' => 1
+                'fieldsNumber' => count($searchableParameters)
             ]);
 
             $contacts = ContactModel::get([
@@ -656,17 +667,17 @@ class SearchController
             if (empty($contactIds)) {
                 return null;
             } else {
-                $recipientsMatch = ResourceContactModel::get([
+                $sendersMatch = ResourceContactModel::get([
                     'select'    => ['res_id'],
                     'where'     => ['item_id in (?)', 'type = ?', 'mode = ?'],
                     'data'      => [$contactIds, 'contact', 'sender']
                 ]);
-                $resourceByRecipients = array_column($recipientsMatch, 'res_id');
-                if (empty($resourceByRecipients)) {
+                $resourceBySenders = array_column($sendersMatch, 'res_id');
+                if (empty($resourceBySenders)) {
                     return null;
                 } else {
                     $args['searchWhere'][] = 'res_id in (?)';
-                    $args['searchData'][] = $resourceByRecipients;
+                    $args['searchData'][] = $resourceBySenders;
                 }
             }
         }
@@ -695,12 +706,21 @@ class SearchController
             $args['searchData'][] = $recipientsMatch;
         }
         if (!empty($body['recipients']) && !empty($body['recipients']['values']) && is_array($body['recipients']['values']) && is_string($body['recipients']['values'][0])) {
-            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['company']]);
+            if (mb_strlen($body['recipients']['values'][0]) < 3) {
+                return null;
+            }
+
+            $searchableParameters = ContactParameterModel::get(['select' => ['identifier'], 'where' => ['searchable = ?'], 'data' => [true]]);
+            $searchableParameters = array_column($searchableParameters, 'identifier');
+            $searchableParameters = array_map(function ($parameter) {
+                return ContactController::MAPPING_FIELDS[$parameter];
+            }, $searchableParameters);
+            $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $searchableParameters]);
 
             $requestData = AutoCompleteController::getDataForRequest([
-                'search'       => $body['recipients']['values'][0],
+                'search'       => trim($body['recipients']['values'][0]),
                 'fields'       => $fields,
-                'fieldsNumber' => 1
+                'fieldsNumber' => count($searchableParameters)
             ]);
 
             $contacts = ContactModel::get([
