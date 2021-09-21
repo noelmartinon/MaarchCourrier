@@ -447,7 +447,7 @@ class CollaboraOnlineController
         }
 
         $fileContent = base64_decode($body['content']);
-        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($fileContent);
         if (!StoreController::isFileAllowed(['extension' => $body['format'], 'type' => $mimeType]) || !in_array($mimeType, TemplateController::AUTHORIZED_MIMETYPES)) {
             return $response->withStatus(400)->withJson(['errors' => _WRONG_FILE_TYPE . ' : '.$mimeType]);

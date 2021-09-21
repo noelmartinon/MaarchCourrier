@@ -20,6 +20,7 @@ use Resource\controllers\ResController;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\controllers\CoreController;
 use User\models\UserModel;
 
 class MessageExchangeController
@@ -227,11 +228,13 @@ class MessageExchangeController
             return $response->withStatus(400)->withJson(['errors' => 'Document not found on docserver']);
         }
 
+        $mimeAndSize = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument]);
+        if (!empty($mimeAndSize['errors'])) {
+            return $response->withStatus(400)->withJson(['errors' => $mimeAndSize['errors']]);
+        }
+        $mimeType = $mimeAndSize['mime'];
+
         $fileContent = file_get_contents($pathToDocument);
-
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($fileContent);
-
         $response->write($fileContent);
         $response = $response->withAddedHeader('Content-Disposition', "attachment; filename=maarch.zip");
         return $response->withHeader('Content-Type', $mimeType);
