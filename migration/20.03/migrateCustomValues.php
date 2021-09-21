@@ -32,7 +32,7 @@ foreach ($customs as $custom) {
         ['id' => 'scan_batch',          'label' => 'Batch de scan',                   'customType' => 'string', 'modelId' => [1, 2]],
         ['id' => 'scan_postmark',       'label' => 'Tampon de scan',                  'customType' => 'string', 'modelId' => [1, 2]],
     ];
-
+    
     foreach ($migrateToCustom as $migration) {
         if ($migration['customType'] == 'date') {
             $where = [$migration['id'].' is not null'];
@@ -45,13 +45,17 @@ foreach ($customs as $custom) {
             'where'  => $where
         ]);
         #SGAMI-SO DEBUT
+        $element = $columnValues[0][$migration['id']];
         #if (!empty($columnValues)) {
             $fieldId =  \CustomField\models\CustomFieldModel::createMod([        
                 'id'        => $idCustomField,
         #SGAMI-SO FIN
                 'label'     => $migration['label'],
                 'type'      => $migration['customType'],
-                'values'    => '[]'
+                'values'    => '[]',
+                #SGAMI-SO DEBUT
+                'actived'    => (empty($columnValues[0][$migration['id']]) ? 'N' : 'Y')
+                #SGAMI-SO FIN 
             ]);
 
             $csColumn = "custom_fields->>''{$fieldId}''";
@@ -90,7 +94,7 @@ foreach ($customs as $custom) {
                     'data'      => [$columnValue['res_id']]
                 ]);
             }
-            SGAMI-SO DEBUT*/
+            /*SGAMI-SO DEBUT*/
 
             $migrated[] = $migration['id'];
         #SGAMI-SO debut

@@ -61,7 +61,6 @@ foreach ($customs as $custom) {
                         $result = array_search((string)$customXml->INDEX[$cptCustomXml]->label, $tabEmail);
                         if (false!==$result) {
                             
-
                             $machaine = $tabEmail[$result];
 
                             $chaineDebut = "define('$machaine', '";
@@ -71,9 +70,6 @@ foreach ($customs as $custom) {
                             $machainee = substr($sub,0,strpos($sub,$chaineFin));
 
                             dom_import_simplexml($modifLabel[$cptCustomXml])->nodeValue=$machainee;
-
-                            
-                            
                         }
 
                         $customXml->INDEX[$cptCustomXml]->addChild('enabled', 'true');
