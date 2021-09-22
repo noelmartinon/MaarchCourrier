@@ -107,37 +107,47 @@
             <ng-container *ngFor="let keyVal of emailAttachTool | keyvalue">
                 <ng-container *ngIf="keyVal.key === currentEmailAttachTool">
                     <ng-container *ngFor="let attach of emailAttachTool[keyVal.key].list">
-                        <button mat-menu-item class="attachListButton"
-                            style="line-height: normal;height: auto;padding: 10px;" disableRipple
-                            [disabled]="isSelectedAttachMail(attach,keyVal.key)" (click)="$event.stopPropagation();">
-                            <div class="attachListContainer">
-                                <div>
+                        <div style="display: flex;" [class.isSelected]="isSelectedAttachMail(attach,keyVal.key)">
+                            <div style="vertical-align:middle;">
+                                <div class="attachListButton">
+                                    <br *ngIf="attach.status !== 'SIGN' && functions.empty(attach.convertedDocument)">
                                     <button mat-raised-button class="extensionButton" color="primary"
                                         *ngIf="attach.status !== 'SIGN'"
-                                        (click)="toggleAttachMail(attach,keyVal.key,'original');">.{{attach.format}}</button><br />
+                                        (click)="toggleAttachMail(attach,keyVal.key,'original');">
+                                        .{{attach.format}}
+                                    </button><br />
                                     <button mat-raised-button class="extensionButton" color="primary"
                                         *ngIf="!functions.empty(attach.convertedDocument)"
-                                        (click)="toggleAttachMail(attach,keyVal.key,'pdf');">.pdf</button>
-                                </div>
-                                <div>
-                                    <span [title]="attach.label">
-                                        <div style="font-size: 10px;opacity: 0.5;">
-                                            <ng-container *ngIf="!functions.empty(attach.chrono)">
-                                                {{attach.chrono}} &nbsp;
-                                            </ng-container>
-                                            {{attach.creator}}
-                                        </div>
-                                        <div>
-                                            {{attach.label | shorten: 45: '...'}}
-                                        </div>
-                                        <div class="mailLabel" style="font-size: 10px;">
-                                            {{attach.typeLabel}}<span *ngIf="attach.status === 'SIGN'"
-                                                style="color:green">&nbsp;({{'lang.signed' | translate | lowercase}})</span>
-                                        </div>
-                                    </span>
+                                        (click)="toggleAttachMail(attach,keyVal.key,'pdf');">
+                                        .pdf
+                                    </button>
                                 </div>
                             </div>
-                        </button>
+                            <div style="vertical-align:middle;">
+                                <button mat-menu-item class="attachListButton"
+                                style="line-height: normal;height: auto;padding: 10px;" disableRipple (click)="$event.stopPropagation();">
+                                <div class="attachListContainer">
+                                    <div>
+                                        <span [title]="attach.label">
+                                            <div style="font-size: 10px;opacity: 0.5;">
+                                                <ng-container *ngIf="!functions.empty(attach.chrono)">
+                                                    {{attach.chrono}} &nbsp;
+                                                </ng-container>
+                                                {{attach.creator}}
+                                            </div>
+                                            <div>
+                                                {{attach.label | shorten: 45: '...'}}
+                                            </div>
+                                            <div class="mailLabel" style="font-size: 10px;">
+                                                {{attach.typeLabel}}<span *ngIf="attach.status === 'SIGN'"
+                                                    style="color:green">&nbsp;({{'lang.signed' | translate | lowercase}})</span>
+                                            </div>
+                                        </span>
+                                    </div>
+                                </div>
+                            </button>
+                            </div>
+                        </div>
                         <mat-divider></mat-divider>
                     </ng-container>
                 </ng-container>
