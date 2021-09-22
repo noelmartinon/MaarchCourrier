@@ -20,6 +20,7 @@ use History\controllers\HistoryController;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\models\CoreConfigModel;
 use SrcCore\models\PasswordModel;
 
 class ConfigurationController
@@ -159,4 +160,22 @@ class ConfigurationController
 
         return ['success' => 'success'];
     }
+
+    public function getSedaExportConfiguration(Request $request, Response $response)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_parameters', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $config = CoreConfigModel::getJsonLoaded(['path' => CoreConfigModel::getConfigPath()]);
+
+        if (empty($config['exportSeda'])) {
+            return $response->withJson(['exportSeda' => []]);
+        }
+        $config = $config['exportSeda'];
+        unset($config['token']);
+
+        return $response->withJson(['exportSeda' => $config]);
+    }
+
 }
