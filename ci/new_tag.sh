@@ -159,9 +159,17 @@ if [ -z $IS_TMA ]; then
 
     git add -f package.json
 
-    # sed -i -e "s/$CI_COMMIT_TAG/$next_tag/g" sql/test.sql
+    sed -i -e "s/$CI_COMMIT_TAG/$next_tag/g" sql/data_fr.sql
 
-    # git add -f sql/test.sql
+    git add -f sql/data_fr.sql
+
+    sed -i -e "s/$CI_COMMIT_TAG/$next_tag/g" sql/data_en.sql
+
+    git add -f sql/data_en.sql
+
+    sed -i -e "s/$CI_COMMIT_TAG/$next_tag/g" migration/20.10/2010.sql
+
+    git add -f migration/20.10/2010.sql
 
     git commit -m "Update next tag version files : $next_tag"
 
