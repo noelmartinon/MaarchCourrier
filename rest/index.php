@@ -557,6 +557,7 @@ $app->put('/tilesPositions', \Home\controllers\TileController::class . ':updateP
 //Users
 $app->put('/users/export', \User\controllers\UserController::class . ':getExport');
 $app->put('/users/import', \User\controllers\UserController::class . ':setImport');
+$app->get('/usersParameters', \User\controllers\UserController::class . ':getUsersParameters');
 $app->get('/users', \User\controllers\UserController::class . ':get');
 $app->post('/users', \User\controllers\UserController::class . ':create');
 $app->get('/users/{id}', \User\controllers\UserController::class . ':getById');
