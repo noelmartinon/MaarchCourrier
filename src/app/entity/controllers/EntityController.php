@@ -808,9 +808,9 @@ class EntityController
             $entityValues = [];
             foreach ($fields as $field) {
                 if (in_array($field['value'], ['diffusionList', 'visaCircuit', 'opinionCircuit'])) { // camelCase in the DB already
-                    $entityValues[] = $entity[$field['value']];
+                    $entityValues[] = utf8_decode($entity[$field['value']]);
                 } else {
-                    $entityValues[] = $entity[TextFormatModel::camelToSnake($field['value'])];
+                    $entityValues[] = utf8_decode($entity[TextFormatModel::camelToSnake($field['value'])]);
                 }
             }
             fputcsv($file, $entityValues, $delimiter);
