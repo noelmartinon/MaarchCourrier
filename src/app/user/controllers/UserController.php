@@ -51,6 +51,7 @@ use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
 use SrcCore\models\PasswordModel;
 use SrcCore\models\ValidatorModel;
+use SrcCore\models\TextFormatModel;
 use Template\models\TemplateModel;
 use User\models\UserBasketPreferenceModel;
 use User\models\UserEmailSignatureModel;
@@ -61,18 +62,6 @@ use User\models\UserSignatureModel;
 
 class UserController
 {
-    const MAPPING_FIELDS = [
-        'id'        => 'id',
-        'userId'    => 'user_id',
-        'firstname' => 'firstname',
-        'lastname'  => 'lastname',
-        'phone'     => 'phone',
-        'mail'      => 'mail'
-    ];
-    const PERSONAL_DATA_FIELDS = [
-        'phone'
-    ];
-
     const ALTERNATIVES_CONNECTIONS_METHODS = ['sso', 'cas', 'ldap', 'keycloak', 'shibboleth', 'azure_saml'];
 
     public function get(Request $request, Response $response)
@@ -1646,17 +1635,24 @@ class UserController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $body = $request->getParsedBody();
-        $allowedFields = array_keys(UserController::MAPPING_FIELDS);
-        $fields = [
-            ['label' => 'id',        'value' => 'id'],
-            ['label' => 'user_id',   'value' => 'user_id'],
-            ['label' => 'firstname', 'value' => 'firstname'],
-            ['label' => 'lastname',  'value' => 'lastname'],
-            ['label' => 'phone',     'value' => 'phone'],
-            ['label' => 'mail',      'value' => 'mail']
+        $allowedFields = [
+            'id',
+            'userId',
+            'firstname',
+            'lastname',
+            'phone',
+            'mail'
         ];
+        $personalFields = ['phone'];
 
+        $fields = array_map(function ($field) {
+            return [
+                'label' => TextFormatModel::camelToSnake($field),
+                'value' => $field
+            ];
+        }, $allowedFields);
+
+        $body = $request->getParsedBody();
         if (!empty($body['data'])) {
             $fields = [];
             foreach ($body['data'] as $parameter) {
@@ -1666,12 +1662,14 @@ class UserController
                     }
                     $fields[] = [
                         'label' => $parameter['label'],
-                        'value' => UserController::MAPPING_FIELDS[$parameter['value']]
+                        'value' => $parameter['value']
                     ];
                 }
             }
         }
-        $select = array_column($fields, 'value');
+        $select = array_map(function ($field) {
+            return TextFormatModel::camelToSnake($field['value']);
+        }, $fields);
         foreach ($select as $key => $value) {
             $select[$key] = 'users.'.$value;
         }
@@ -1699,7 +1697,7 @@ class UserController
             $users = [];
             if (!$viewPersonaldata) {
                 foreach ($select as $selectKey => $selectValue) {
-                    foreach (UserController::PERSONAL_DATA_FIELDS as $personalField) {
+                    foreach ($personalFields as $personalField) {
                         $rpos = strrpos($selectValue, 'users.'.$personalField);
                         if (is_int($rpos) && ($rpos + strlen('users.'.$personalField) === strlen($selectValue))) {
                             // selectValue ends with personalField
@@ -1735,7 +1733,7 @@ class UserController
         foreach ($users as $user) {
             $csvContent = [];
             foreach ($fields as $field) {
-                $csvContent[] = $user[$field['value']] ?? '';
+                $csvContent[] = $user[TextFormatModel::camelToSnake($field['value'])] ?? '';
             }
             fputcsv($file, $csvContent, $delimiter);
         }
