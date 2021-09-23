@@ -40,7 +40,7 @@ use MessageExchange\controllers\AnnuaryController;
 class AutoCompleteController
 {
     const LIMIT = 50;
-    const TINY_LIMIT = 10;
+    const TINY_LIMIT = 30;
 
     public static function getUsers(Request $request, Response $response)
     {
@@ -210,7 +210,9 @@ class AutoCompleteController
                 if ($searchOnEmails && empty($autoContact['email'])) {
                     $autoContact['email'] = $contact['email'];
                 }
-
+                //SGAMI-SO DEBUT
+                $autoContact['search'] = trim($autoContact['firstname'].' '.$autoContact['lastname'].' '.$autoContact['company']);
+                //SGAMI-SO FIN 
                 $autocompleteContacts[] = $autoContact;
             }
         }
@@ -254,7 +256,9 @@ class AutoCompleteController
                 if ($searchOnEmails) {
                     $autoUser['email'] = $user['mail'];
                 }
-
+                //SGAMI-SO DEBUT
+                $autoUser['search'] = trim($autoUser['firstname'].' '.$autoUser['lastname']);
+                //SGAMI-SO FIN
                 $autocompleteUsers[] = $autoUser;
             }
         }
@@ -298,7 +302,9 @@ class AutoCompleteController
                 if ($searchOnEmails) {
                     $entity['email'] = $value['email'];
                 }
-
+                //SGAMI-SO DEBUT
+                $entity['search'] = trim($entity['firstname'].' '.$entity['lastname']);
+                //SGAMI-SO FIN
                 $autocompleteEntities[] = $entity;
             }
         }
@@ -331,6 +337,9 @@ class AutoCompleteController
                     'lastname'      => $value['label'],
                     'firstname'     => ''
                 ];
+                //SGAMI-SO DEBUT
+                $autocompleteContactsGroups['search'] = trim($autocompleteContactsGroups['firstname'].' '.$entity['lastname']);
+                //SGAMI-SO FIN
             }
         }
 
@@ -344,8 +353,41 @@ class AutoCompleteController
         }
         $autocompleteData = array_merge($autocompleteContacts, $autocompleteUsers, $autocompleteEntities, $autocompleteContactsGroups);
 
+        // SGAMI-SO -- DEBUT
+        for ($i = 0; $i < count($autocompleteData) ; $i++) {
+            for($j = 0; $j < count($autocompleteData) ; $j++) {
+                $element = AutoCompleteController::compare($autocompleteData[$i]['search'], $autocompleteData[$j]['search'], $queryParams['search']);
+                if($element < 0) {
+                    $temp = $autocompleteData[$i];
+                    $autocompleteData[$i]=$autocompleteData[$j];
+                    $autocompleteData[$j]=$temp;
+                } 
+            }
+        }        
+        // SGAMI-SO -- END    
         return $response->withJson($autocompleteData);
     }
+
+    //SGAMI-SO DEBUT
+    private static function compare($str1, $str2,$word) {
+ 
+        $idx1 = stripos(strtolower($str1), strtolower($word));
+        $idx2 = stripos(strtolower($str2), strtolower($word));
+        
+        if($idx1 == -1 || $idx2 == -1) {
+            if($idx1 == -1) {
+                $idx1 = PHP_INT_MAX ;
+            }
+            if($idx2 == -1) {
+                $idx2 = PHP_INT_MAX ;
+            }
+        } else if($idx1 == $idx2) {
+            return strcasecmp(substr($str1, $idx1), substr($str2, $idx2));
+        }
+         
+        return strcasecmp($idx1, $idx2);
+    }
+    //SGAMI-SO FIN
 
     public static function getUsersForAdministration(Request $request, Response $response)
     {
