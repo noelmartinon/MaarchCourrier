@@ -2555,6 +2555,7 @@
     "otpVisaUser": "The user will be notified by <b> email </b> at the time of his turn in the circuit.",
     "mustSign": "The signature position for external users is mandatory.",
     "autoRedirectToUser": "To myself",
+    "canModifyHeaders": "Customize the data to export",
     "usersParameters_userId": "Identifier",
     "usersParameters_id": "Technical identifier",
     "usersParameters_firstname": "Firstname",
