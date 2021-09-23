@@ -1735,7 +1735,7 @@ class UserController
         foreach ($users as $user) {
             $csvContent = [];
             foreach ($fields as $field) {
-                $csvContent[] = utf8_decode($user[$field['value']]) ?? '';
+                $csvContent[] = $user[$field['value']] ?? '';
             }
             fputcsv($file, $csvContent, $delimiter);
         }
