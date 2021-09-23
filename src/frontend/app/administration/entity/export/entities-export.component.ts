@@ -42,76 +42,76 @@ export class EntitiesExportComponent implements OnInit {
             label: this.translate.instant('lang.entitiesParameters_id')
         },
         {
-            value: 'entity_id',
-            label: this.translate.instant('lang.entitiesParameters_entity_id')
+            value: 'entityId',
+            label: this.translate.instant('lang.entitiesParameters_entityId')
         },
         {
-            value: 'entity_label',
-            label: this.translate.instant('lang.entitiesParameters_entity_label')
+            value: 'entityLabel',
+            label: this.translate.instant('lang.entitiesParameters_entityLabel')
         },
         {
-            value: 'short_label',
-            label: this.translate.instant('lang.entitiesParameters_short_label')
+            value: 'shortLabel',
+            label: this.translate.instant('lang.entitiesParameters_shortLabel')
         },
         {
-            value: 'entity_full_name',
-            label: this.translate.instant('lang.entitiesParameters_entity_full_name')
+            value: 'entityFullName',
+            label: this.translate.instant('lang.entitiesParameters_entityFullName')
         },
         {
             value: 'enabled',
             label: this.translate.instant('lang.entitiesParameters_enabled')
         },
         {
-            value: 'address_number',
-            label: this.translate.instant('lang.entitiesParameters_address_number')
+            value: 'addressNumber',
+            label: this.translate.instant('lang.entitiesParameters_addressNumber')
         },
         {
-            value: 'address_street',
-            label: this.translate.instant('lang.entitiesParameters_address_street')
+            value: 'addressStreet',
+            label: this.translate.instant('lang.entitiesParameters_addressStreet')
         },
         {
-            value: 'address_additional1',
-            label: this.translate.instant('lang.entitiesParameters_address_additional1')
+            value: 'addressAdditional1',
+            label: this.translate.instant('lang.entitiesParameters_addressAdditional1')
         },
         {
-            value: 'address_additional2',
-            label: this.translate.instant('lang.entitiesParameters_address_additional2')
+            value: 'addressAdditional2',
+            label: this.translate.instant('lang.entitiesParameters_addressAdditional2')
         },
         {
-            value: 'address_postcode',
-            label: this.translate.instant('lang.entitiesParameters_address_postcode')
+            value: 'addressPostcode',
+            label: this.translate.instant('lang.entitiesParameters_addressPostcode')
         },
         {
-            value: 'address_town',
-            label: this.translate.instant('lang.entitiesParameters_address_town')
+            value: 'addressTown',
+            label: this.translate.instant('lang.entitiesParameters_addressTown')
         },
         {
-            value: 'address_country',
-            label: this.translate.instant('lang.entitiesParameters_address_country')
+            value: 'addressCountry',
+            label: this.translate.instant('lang.entitiesParameters_addressCountry')
         },
         {
             value: 'email',
             label: this.translate.instant('lang.entitiesParameters_email')
         },
         {
-            value: 'parent_entity_id',
-            label: this.translate.instant('lang.entitiesParameters_parent_entity_id')
+            value: 'parentEntityId',
+            label: this.translate.instant('lang.entitiesParameters_parentEntityId')
         },
         {
-            value: 'entity_type',
-            label: this.translate.instant('lang.entitiesParameters_entity_type')
+            value: 'entityType',
+            label: this.translate.instant('lang.entitiesParameters_entityType')
         },
         {
-            value: 'business_id',
-            label: this.translate.instant('lang.entitiesParameters_business_id')
+            value: 'businessId',
+            label: this.translate.instant('lang.entitiesParameters_businessId')
         },
         {
-            value: 'folder_import',
-            label: this.translate.instant('lang.entitiesParameters_folder_import')
+            value: 'folderImport',
+            label: this.translate.instant('lang.entitiesParameters_folderImport')
         },
         {
-            value: 'producer_service',
-            label: this.translate.instant('lang.entitiesParameters_producer_service')
+            value: 'producerService',
+            label: this.translate.instant('lang.entitiesParameters_producerService')
         },
         {
             value: 'diffusionList',
