@@ -2354,14 +2354,4 @@ class UserController
 
         return true;
     }
-
-    public function getUsersParameters(Request $request, Response $response) {
-        $usersParameters = array_keys(UserController::MAPPING_FIELDS);
-        foreach ($usersParameters as $key => $param) {
-            $usersParameters[$key] = [
-                'identifier' => $param
-            ];
-        }
-        return $response->withJson(['usersParameters' => $usersParameters]);
-    }
 }
