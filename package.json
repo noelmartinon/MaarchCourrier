@@ -21,6 +21,7 @@
   "author": "Maarch",
   "license": "GPL-3.0",
   "dependencies": {
+    "@types/node": "^12.12.6",
     "core-js": "3.6.5",
     "pdfjs-dist": "2.0.943",
     "prod": "^1.0.1",
