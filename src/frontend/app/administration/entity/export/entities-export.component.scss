@@ -123,3 +123,9 @@
   cursor: default;
   pointer-events: none;
 }
+
+.disabledIcon {
+  opacity: 0.8 !important;
+  color: rgb(138, 137, 137);
+  pointer-events: none;
+}

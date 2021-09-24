@@ -18,7 +18,7 @@ import { SortPipe } from '@plugins/sorting.pipe';
 })
 export class UsersExportComponent implements OnInit {
 
-    @ViewChild('listFilter', { static: true }) private listFilter: any;
+    @ViewChild('listFilter', { static: false }) private listFilter: any;
 
     loading: boolean = false;
     loadingExport: boolean = false;
@@ -120,15 +120,18 @@ export class UsersExportComponent implements OnInit {
         });
 
         transferArrayItem(this.dataAvailable, this.exportModel.data, realIndex, this.exportModel.data.length);
-        const curFilter = this.listFilter.nativeElement.value;
-        this.listFilter.nativeElement.value = '';
-        setTimeout(() => {
-            this.listFilter.nativeElement.value = curFilter;
-        }, 10);
+        if (this.listFilter !== undefined) {
+            const curFilter = this.listFilter.nativeElement.value;
+            this.listFilter.nativeElement.value = '';
+            setTimeout(() => {
+                this.listFilter.nativeElement.value = curFilter;
+            }, 10);
+        }
     }
 
     removeData(i: number) {
-        transferArrayItem(this.exportModel.data, this.dataAvailable, i, this.dataAvailable.length);
+        this.dataAvailable = this.dataAvailable.concat(this.exportModel.data[i]);
+        this.exportModel.data.splice(i, 1);
         this.sortPipe.transform(this.dataAvailable, 'label');
     }
 
