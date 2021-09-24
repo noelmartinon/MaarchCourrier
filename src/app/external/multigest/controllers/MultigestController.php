@@ -91,7 +91,6 @@ class MultigestController
         return $response->withStatus(204);
     }
 
-    // TODO
     public function checkAccount(Request $request, Response $response)
     {
         if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_multigest', 'userId' => $GLOBALS['id']])) {
@@ -128,44 +127,34 @@ class MultigestController
         }
         $multigestUri = rtrim($configuration['uri'], '/');
 
-        if (empty($body['nodeId'])) {
-            $requestBody = [
-                'query' => [
-                    'query'     => "select * from cmis:folder",
-                    'language'  => 'cmis',
-                ],
-                "paging" => [
-                    'maxItems' => '1'
-                ],
-                'fields' => ['id', 'name']
-            ];
-            $curlResponse = CurlModel::exec([
-                'url'           => "{$multigestUri}/search/versions/1/search",
-                'basicAuth'     => ['user' => $body['login'], 'password' => $body['password']],
-                'headers'       => ['content-type:application/json', 'Accept: application/json'],
-                'method'        => 'POST',
-                'body'          => json_encode($requestBody)
-            ]);
+        $xmlPostString = '<?xml version="1.0" encoding="UTF-8"?>
+        <soapenv:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:APIMultigest">
+            <soapenv:Header/>
+            <soapenv:Body>
+                <urn:GedSetModeUid soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                    <state xsi:type="xsd:int">auieae</state>
+                </urn:GedSetModeUid>
+            </soapenv:Body>
+        </soapenv:Envelope>';
 
-        } else {
-            $curlResponse = CurlModel::exec([
-                'url'           => "{$multigestUri}/multigest/versions/1/nodes/{$body['nodeId']}/children",
-                'basicAuth'     => ['user' => $body['login'], 'password' => $body['password']],
-                'headers'       => ['content-type:application/json'],
-                'method'        => 'GET',
-                'queryParams'   => ['where' => '(isFolder=true)']
-            ]);
-        }
+        $curlResponse = CurlModel::execSOAP([
+            'url'           => $multigestUri,
+            'soapAction'    => 'urn:GedSetModeUid',
+            'xmlPostString' => $xmlPostString
+        ]);
 
-        if ($curlResponse['code'] != 200) {
-            if (!empty($curlResponse['response']['error']['briefSummary'])) {
-                return $response->withStatus(400)->withJson(['errors' => $curlResponse['response']['error']['briefSummary']]);
-            } elseif ($curlResponse['code'] == 404) {
-                return $response->withStatus(400)->withJson(['errors' => 'Page not found', 'lang' => 'pageNotFound']);
-            } elseif (!empty($curlResponse['response'])) {
-                return $response->withStatus(400)->withJson(['errors' => json_encode($curlResponse['response'])]);
+        $raw = $curlResponse['raw'];
+        $raw = str_ireplace(['SOAP-ENV:', 'ns1:'], '', $raw);
+        $curlResponse['response'] = simplexml_load_string($raw); //->xpath('SOAP-ENV:Body')[0];
+
+        if ($curlResponse['infos']['http_code'] != 200) {
+            if (!empty($curlResponse['response']->xpath('Body/Fault/faultstring'))) {
+                $error = 'MultiGest SOAP returned HTTP Status '.$curlResponse['infos']['http_code'].': ';
+                $error .= (string) $curlResponse['response']->xpath('Body/Fault/faultcode')[0];
+                $error .= (string) $curlResponse['response']->xpath('Body/Fault/faultstring')[0];
+                return $response->withStatus(400)->withJson(['errors' => $error]);
             } else {
-                return $response->withStatus(400)->withJson(['errors' => $curlResponse['errors']]);
+                return $response->withStatus(400)->withJson(['errors' => (string) $curlResponse['response']]);
             }
         }
 
