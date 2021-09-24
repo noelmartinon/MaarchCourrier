@@ -17,7 +17,7 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 })
 export class UsersExportComponent implements OnInit {
 
-    @ViewChild('listFilter', { static: true }) private listFilter: any;
+    @ViewChild('listFilter', { static: false }) private listFilter: any;
 
     loading: boolean = false;
     loadingExport: boolean = false;
@@ -95,16 +95,14 @@ export class UsersExportComponent implements OnInit {
                 }
             }
 
-            transferArrayItem(event.previousContainer.data,
-                event.container.data,
-                realIndex,
-                event.currentIndex);
-            const curFilter = this.listFilter.nativeElement.value;
+            transferArrayItem(event.previousContainer.data, event.container.data, realIndex, event.currentIndex);
+            if (this.listFilter !== undefined) {
+                const curFilter = this.listFilter.nativeElement.value;
             this.listFilter.nativeElement.value = '';
             setTimeout(() => {
                 this.listFilter.nativeElement.value = curFilter;
             }, 10);
-
+            }
         }
     }
 
@@ -146,6 +144,7 @@ export class UsersExportComponent implements OnInit {
     setValues() {
         this.canModifyHeaders = !this.canModifyHeaders;
         if (!this.canModifyHeaders) {
+            this.dataAvailable = this.dataAvailable.concat(this.exportModel.data);
             this.exportModel.data = [];
         }
     }

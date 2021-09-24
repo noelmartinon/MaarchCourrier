@@ -17,7 +17,7 @@ import { SortPipe } from '@plugins/sorting.pipe';
 })
 export class EntitiesExportComponent implements OnInit {
 
-    @ViewChild('listFilter', { static: true }) private listFilter: any;
+    @ViewChild('listFilter', { static: false }) private listFilter: any;
 
     loading: boolean = false;
     loadingExport: boolean = false;
@@ -191,11 +191,13 @@ export class EntitiesExportComponent implements OnInit {
         });
 
         transferArrayItem(this.dataAvailable, this.exportModel.data, realIndex, this.exportModel.data.length);
-        const curFilter = this.listFilter.nativeElement.value;
-        this.listFilter.nativeElement.value = '';
-        setTimeout(() => {
-            this.listFilter.nativeElement.value = curFilter;
-        }, 10);        
+        if (this.listFilter !== undefined) {
+            const curFilter = this.listFilter.nativeElement.value;
+            this.listFilter.nativeElement.value = '';
+            setTimeout(() => {
+                this.listFilter.nativeElement.value = curFilter;
+            }, 10); 
+        }       
     }
 
     removeData(i: number) {
@@ -219,6 +221,7 @@ export class EntitiesExportComponent implements OnInit {
     setValues() {
         this.canModifyHeaders = !this.canModifyHeaders;
         if (!this.canModifyHeaders) {
+            this.dataAvailable = this.dataAvailable.concat(this.exportModel.data);
             this.exportModel.data = [];
         }
     }

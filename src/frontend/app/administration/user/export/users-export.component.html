@@ -36,8 +36,8 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                <mat-accordion>
-                    <mat-expansion-panel [expanded]="canModifyHeaders" [disabled]="!canModifyHeaders">
+                <mat-accordion *ngIf="canModifyHeaders">
+                    <mat-expansion-panel [expanded]="canModifyHeaders">
                         <mat-expansion-panel-header [class.expansionDisabled]="!canModifyHeaders">
                             <mat-panel-title>
                                 {{'lang.datasToExport' | translate}}
@@ -57,9 +57,13 @@
                         </div>
                         <div class="row exportList">
                             <div class="col-md-6 available-data">
-                                <h2><span class="title">{{'lang.availableDatas' | translate}}</span> <i
-                                        class="fa fa-plus-circle removeAllDatas" color="primary" title="{{'lang.addAllData' | translate}}"
-                                        (click)="addAllData()"></i></h2>
+                                <h2>
+                                    <span class="title">{{'lang.availableDatas' | translate}}</span> <i
+                                        class="fa fa-plus-circle removeAllDatas"
+                                        color="primary" [title]="'lang.addAllData' | translate"
+                                        [class.disabledIcon]="dataAvailable.length === 0"
+                                        (click)="addAllData()"></i>
+                                </h2>
                                 <div id="availableElements" cdkDropList #dataAvailableList="cdkDropList"
                                     [cdkDropListData]="dataAvailable" [cdkDropListConnectedTo]="[dataExportList]"
                                     class="cdk-list" (cdkDropListDropped)="drop($event)">
@@ -75,8 +79,12 @@
                             </div>
         
                             <div class="col-md-6 active-data">
-                                <h2><span class="title">{{'lang.chosenDatas' | translate}}</span> <i class="fa fa-minus-circle removeAllDatas"
-                                        color="warn" title="{{'lang.removeAllDatas' | translate}}" (click)="removeAllData()"></i></h2>
+                                <h2>
+                                    <span class="title">{{'lang.chosenDatas' | translate}}</span> <i class="fa fa-minus-circle removeAllDatas"
+                                        color="warn"
+                                        [class.disabledIcon]="exportModel.data.length === 0" 
+                                        [title]="'lang.removeAllDatas' | translate" (click)="removeAllData()"></i>
+                                </h2>
                                 <div id="selectedElements" cdkDropList #dataExportList="cdkDropList"
                                     [cdkDropListData]="exportModel.data" [cdkDropListConnectedTo]="[dataAvailableList]"
                                     class="cdk-list" (cdkDropListDropped)="drop($event)">
