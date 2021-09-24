@@ -132,7 +132,7 @@ class MultigestController
             <soapenv:Header/>
             <soapenv:Body>
                 <urn:GedSetModeUid soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-                    <state xsi:type="xsd:int">auieae</state>
+                    <state xsi:type="xsd:int">1</state>
                 </urn:GedSetModeUid>
             </soapenv:Body>
         </soapenv:Envelope>';
@@ -150,7 +150,7 @@ class MultigestController
         if ($curlResponse['infos']['http_code'] != 200) {
             if (!empty($curlResponse['response']->xpath('Body/Fault/faultstring'))) {
                 $error = 'MultiGest SOAP returned HTTP Status '.$curlResponse['infos']['http_code'].': ';
-                $error .= (string) $curlResponse['response']->xpath('Body/Fault/faultcode')[0];
+                $error .= (string) $curlResponse['response']->xpath('Body/Fault/faultcode')[0].' ';
                 $error .= (string) $curlResponse['response']->xpath('Body/Fault/faultstring')[0];
                 return $response->withStatus(400)->withJson(['errors' => $error]);
             } else {
