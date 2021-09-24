@@ -151,6 +151,7 @@ export class UsersExportComponent implements OnInit {
     setValues() {
         this.canModifyHeaders = !this.canModifyHeaders;
         if (!this.canModifyHeaders) {
+            this.dataAvailable = this.dataAvailable.concat(this.exportModel.data);
             this.exportModel.data = [];
         }
     }
