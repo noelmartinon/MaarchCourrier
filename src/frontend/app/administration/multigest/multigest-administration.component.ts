@@ -109,7 +109,7 @@ export class MultigestAdministrationComponent implements OnInit {
         const multigest: any = {
             label: this.multigest.label,
             login: this.multigest.account.id,
-            nodeId: this.multigest.rootFolder,
+            sasId: this.multigest.rootFolder,
             entities: this.maarchTree.getSelectedNodes().map(ent => ent.id)
         };
 
@@ -182,7 +182,7 @@ export class MultigestAdministrationComponent implements OnInit {
                         this.entities = entities;
 
                         this.entities.forEach(element => {
-                            if (this.availableEntities.indexOf(+element.id) > -1) {
+                            if (this.availableEntities.indexOf(element.id) > -1) {
                                 element.state.disabled = false;
                             } else {
                                 element.state.disabled = true;
@@ -209,7 +209,7 @@ export class MultigestAdministrationComponent implements OnInit {
                             account: {
                                 id: data.login
                             },
-                            rootFolder: data.nodeId,
+                            rootFolder: data.sasId,
                             linkedEntities: data.entities
                         };
 
@@ -258,13 +258,13 @@ export class MultigestAdministrationComponent implements OnInit {
                 accountId : this.multigest.id,
                 login: this.multigest.account.id,
                 password: this.multigest.account.password,
-                nodeId : this.multigest.rootFolder
+                sasId : this.multigest.rootFolder
             };
         } else {
             multigest = {
                 login: this.multigest.account.id,
                 password: this.multigest.account.password,
-                nodeId : this.multigest.rootFolder
+                sasId : this.multigest.rootFolder
             };
         }
 

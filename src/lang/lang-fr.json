@@ -2547,5 +2547,7 @@
     "multigestUrl": "Adresse de l'API Multigest",
     "multigestCreation": "Création d'un compte Multigest",
     "multigestModification": "Modification d'un compte Multigest",
-    "multigestAccount": "Compte Multigest"
+    "multigestAccount": "Compte Multigest",
+    "multigestAPI": "API multigest",
+    "adminMultigestDesc": "Configurer les comptes Multigest"
 }
