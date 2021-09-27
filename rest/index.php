@@ -712,8 +712,15 @@ $app->post('/office365', \ContentManagement\controllers\Office365SharepointContr
 $app->get('/office365/{id}', \ContentManagement\controllers\Office365SharepointController::class . ':getFileContent');
 $app->delete('/office365/{id}', \ContentManagement\controllers\Office365SharepointController::class . ':delete');
 
+// MultiGest
 $app->get('/multigest/configuration', \Multigest\controllers\MultigestController::class . ':getConfiguration');
 $app->put('/multigest/configuration', \Multigest\controllers\MultigestController::class . ':updateConfiguration');
+$app->get('/multigest/accounts', \Multigest\controllers\MultigestController::class . ':getAccounts');
+$app->get('/multigest/availableEntities', \Multigest\controllers\MultigestController::class . ':getAvailableEntities');
+$app->post('/multigest/accounts', \Multigest\controllers\MultigestController::class . ':createAccount');
+$app->get('/multigest/accounts/{id}', \Multigest\controllers\MultigestController::class . ':getAccountById');
+$app->put('/multigest/accounts/{id}', \Multigest\controllers\MultigestController::class . ':updateAccount');
+$app->delete('/multigest/accounts/{id}', \Multigest\controllers\MultigestController::class . ':deleteAccount');
 $app->post('/multigest/checkAccounts', \Multigest\controllers\MultigestController::class . ':checkAccount');
 
 $app->run();
