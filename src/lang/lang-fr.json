@@ -2543,6 +2543,6 @@
     "configSaeInfo": "Pour plus d'informations sur la configuration d'un système d'archivage électronique. Consulter la documentation : <a href=\"{{url}}\" target=\"_blank\" class=\"link\">Configurer un SAE</a>",
     "delegatedOpinion": "Avis donné à la place de",
     "requestedOpinion": "Avis demandé à la place de",
-    "sharePointWarning": "Fermez l'éditeur du document avant de valider l'édition",
+    "sharePointWarning": "Fermez l'éditeur de document avant de valider l'édition",
     "autoRedirectToUser": "A moi-même"
 }
