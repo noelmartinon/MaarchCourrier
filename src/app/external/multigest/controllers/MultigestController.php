@@ -31,10 +31,10 @@ use Resource\models\ResourceContactModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
 use SrcCore\models\PasswordModel;
 use SrcCore\models\ValidatorModel;
+use SrcCore\models\CoreConfigModel;
 use User\models\UserModel;
 
 class MultigestController
@@ -91,6 +91,217 @@ class MultigestController
         return $response->withStatus(204);
     }
 
+    public function getAccounts(Request $request, Response $response)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_multigest', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $entities = EntityModel::get(['select' => ['external_id', 'short_label'], 'where' => ["external_id->>'multigest' is not null"]]);
+
+        $accounts = [];
+        $alreadyAdded = [];
+        foreach ($entities as $entity) {
+            $externalId = json_decode($entity['external_id'], true);
+            if (!in_array($externalId['multigest']['id'], $alreadyAdded)) {
+                $accounts[] = [
+                    'id'            => $externalId['multigest']['id'],
+                    'label'         => $externalId['multigest']['label'],
+                    'login'         => $externalId['multigest']['login'],
+                    'sasId'         => $externalId['multigest']['sasId'],
+                    'entitiesLabel' => [$entity['short_label']]
+                ];
+                $alreadyAdded[] = $externalId['multigest']['id'];
+            } else {
+                foreach ($accounts as $key => $value) {
+                    if ($value['id'] == $externalId['multigest']['id']) {
+                        $accounts[$key]['entitiesLabel'][] = $entity['short_label'];
+                    }
+                }
+            }
+        }
+
+        return $response->withJson(['accounts' => $accounts]);
+    }
+
+    public function getAvailableEntities(Request $request, Response $response)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_multigest', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $entities = EntityModel::get(['select' => ['id'], 'where' => ["external_id->>'multigest' is null"]]);
+
+        $availableEntities = array_column($entities, 'id');
+
+        return $response->withJson(['availableEntities' => $availableEntities]);
+    }
+
+    public function createAccount(Request $request, Response $response)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_multigest', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $body = $request->getParsedBody();
+
+        if (!Validator::stringType()->notEmpty()->validate($body['label'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body label is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['login'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body login is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['password'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body password is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['sasId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body sasId is empty or not a string']);
+        } elseif (!Validator::arrayType()->notEmpty()->validate($body['entities'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body entities is empty or not an array']);
+        }
+
+        foreach ($body['entities'] as $entity) {
+            if (!Validator::intVal()->notEmpty()->validate($entity)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body entities contains non integer values']);
+            }
+        }
+        $entities = EntityModel::get(['select' => ['id'], 'where' => ['id in (?)'], 'data' => [$body['entities']]]);
+        if (count($entities) != count($body['entities'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Some entities do not exist']);
+        }
+
+        $id = CoreConfigModel::uniqueId();
+        $account = [
+            'id'       => $id,
+            'label'    => $body['label'],
+            'login'    => $body['login'],
+            'password' => PasswordModel::encrypt(['password' => $body['password']]),
+            'sasId'    => $body['sasId']
+        ];
+        $account = json_encode($account);
+
+        EntityModel::update([
+            'postSet' => ['external_id' => "jsonb_set(coalesce(external_id, '{}'::jsonb), '{multigest}', '{$account}')"],
+            'where'   => ['id in (?)'],
+            'data'    => [$body['entities']]
+        ]);
+
+        return $response->withStatus(204);
+    }
+
+    public function getAccountById(Request $request, Response $response, array $args)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_multigest', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $entities = EntityModel::get(['select' => ['external_id', 'id'], 'where' => ["external_id->'multigest'->>'id' = ?"], 'data' => [$args['id']]]);
+        if (empty($entities[0])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Account not found']);
+        }
+
+        $externalId = json_decode($entities[0]['external_id'], true);
+        $account = [
+            'id'        => $externalId['multigest']['id'],
+            'label'     => $externalId['multigest']['label'],
+            'login'     => $externalId['multigest']['login'],
+            'sasId'     => $externalId['multigest']['sasId'],
+            'entities'  => []
+        ];
+
+        foreach ($entities as $entity) {
+            $account['entities'][] = $entity['id'];
+        }
+
+        return $response->withJson($account);
+    }
+
+    public function updateAccount(Request $request, Response $response, array $args)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_multigest', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $body = $request->getParsedBody();
+
+        if (!Validator::stringType()->notEmpty()->validate($body['label'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body label is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['login'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body login is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['sasId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body sasId is empty or not a string']);
+        } elseif (!Validator::arrayType()->notEmpty()->validate($body['entities'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body entities is empty or not an array']);
+        }
+
+        $accounts = EntityModel::get(['select' => ['external_id', 'id'], 'where' => ["external_id->'multigest'->>'id' = ?"], 'data' => [$args['id']]]);
+        if (empty($accounts[0])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Account not found']);
+        }
+
+        foreach ($body['entities'] as $entity) {
+            if (!Validator::intVal()->notEmpty()->validate($entity)) {
+                return $response->withStatus(400)->withJson(['errors' => 'Body entities contains non integer values']);
+            }
+        }
+        $entities = EntityModel::get(['select' => ['id'], 'where' => ['id in (?)'], 'data' => [$body['entities']]]);
+        if (count($entities) != count($body['entities'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Some entities do not exist']);
+        }
+
+        $externalId = json_decode($accounts[0]['external_id'], true);
+        $account = [
+            'id'        => $args['id'],
+            'label'     => $body['label'],
+            'login'     => $body['login'],
+            'password'  => empty($body['password']) ? $externalId['multigest']['password'] : PasswordModel::encrypt(['password' => $body['password']]),
+            'sasId'    => $body['sasId']
+        ];
+        $account = json_encode($account);
+
+        EntityModel::update([
+            'set'   => ['external_id' => "{}"],
+            'where' => ['id in (?)', 'external_id = ?'],
+            'data'  => [$body['entities'], 'null']
+        ]);
+
+        EntityModel::update([
+            'postSet'   => ['external_id' => "jsonb_set(external_id, '{multigest}', '{$account}')"],
+            'where'     => ['id in (?)'],
+            'data'      => [$body['entities']]
+        ]);
+
+        $previousEntities = array_column($accounts, 'id');
+        $entitiesToRemove = array_diff($previousEntities, $body['entities']);
+        if (!empty($entitiesToRemove)) {
+            EntityModel::update([
+                'postSet'   => ['external_id' => "external_id - 'multigest'"],
+                'where'     => ['id in (?)'],
+                'data'      => [$entitiesToRemove]
+            ]);
+        }
+
+        return $response->withStatus(204);
+    }
+
+    public function deleteAccount(Request $request, Response $response, array $args)
+    {
+        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_multigest', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }
+
+        $accounts = EntityModel::get(['select' => ['external_id', 'id'], 'where' => ["external_id->'multigest'->>'id' = ?"], 'data' => [$args['id']]]);
+        if (empty($accounts[0])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Account not found']);
+        }
+
+        $entitiesToRemove = array_column($accounts, 'id');
+        EntityModel::update([
+            'postSet'   => ['external_id' => "external_id - 'multigest'"],
+            'where'     => ['id in (?)'],
+            'data'      => [$entitiesToRemove]
+        ]);
+
+        return $response->withStatus(204);
+    }
+
     public function checkAccount(Request $request, Response $response)
     {
         if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_multigest', 'userId' => $GLOBALS['id']])) {
@@ -131,42 +342,35 @@ class MultigestController
         <soapenv:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:APIMultigest">
             <soapenv:Header/>
             <soapenv:Body>
-                <urn:GedSetModeUid soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-                    <state xsi:type="xsd:int">1</state>
-                </urn:GedSetModeUid>
+                <urn:GedTestExistenceUtilisateur soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                    <User xsi:type="xsd:string">'.$body['login'].'</User>
+                </urn:GedTestExistenceUtilisateur>
             </soapenv:Body>
         </soapenv:Envelope>';
 
         $curlResponse = CurlModel::execSOAP([
             'url'           => $multigestUri,
-            'soapAction'    => 'urn:GedSetModeUid',
+            'soapAction'    => 'urn:GedTestExistenceUtilisateur',
             'xmlPostString' => $xmlPostString
         ]);
 
         $raw = $curlResponse['raw'];
         $raw = str_ireplace(['SOAP-ENV:', 'ns1:'], '', $raw);
-        $curlResponse['response'] = simplexml_load_string($raw); //->xpath('SOAP-ENV:Body')[0];
+        $curlResponse['response'] = simplexml_load_string($raw);
 
-        if ($curlResponse['infos']['http_code'] != 200) {
-            if (!empty($curlResponse['response']->xpath('Body/Fault/faultstring'))) {
-                $error = 'MultiGest SOAP returned HTTP Status '.$curlResponse['infos']['http_code'].': ';
-                $error .= (string) $curlResponse['response']->xpath('Body/Fault/faultcode')[0].' ';
-                $error .= (string) $curlResponse['response']->xpath('Body/Fault/faultstring')[0];
-                return $response->withStatus(400)->withJson(['errors' => $error]);
-            } else {
-                return $response->withStatus(400)->withJson(['errors' => (string) $curlResponse['response']]);
-            }
+        $responseCode = (int) (string) $curlResponse['response']->xpath('Body/GedTestExistenceUtilisateurResponse/return')[0];
+        if ($responseCode != 0) {
+            return $response->withStatus(400)->withJson(['errors' => 'MultiGest user '.$body['login'].' does not exist']);
         }
 
         return $response->withStatus(204);
     }
 
-    // TODO
+    // TODO / WIP
     public static function sendResource(array $args)
     {
-        ValidatorModel::notEmpty($args, ['resId', 'folderId', 'userId']);
+        ValidatorModel::notEmpty($args, ['resId', 'userId']);
         ValidatorModel::intVal($args, ['resId', 'userId']);
-        ValidatorModel::stringType($args, ['folderId', 'folderName']);
 
         $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_multigest']);
         if (empty($configuration)) {
@@ -179,6 +383,7 @@ class MultigestController
         }
         $multigestUri = rtrim($configuration['uri'], '/');
 
+        /*
         $entity = UserModel::getPrimaryEntityById(['id' => $args['userId'], 'select' => ['entities.external_id']]);
         if (empty($entity)) {
             return ['errors' => 'User has no primary entity'];
@@ -188,6 +393,7 @@ class MultigestController
             return ['errors' => 'User primary entity has not enough multigest informations'];
         }
         $entityInformations['multigest']['password'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['multigest']['password']]);
+        //*/
 
         $document = ResModel::getById([
             'select' => [
@@ -203,6 +409,7 @@ class MultigestController
         } elseif (empty($document['alt_identifier'])) {
             return ['errors' => 'Document has no chrono'];
         }
+        $document['subject'] = str_replace([':', '*', '\'', '"', '>', '<'], ' ', $document['subject']);
 
         $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
         if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
@@ -218,6 +425,7 @@ class MultigestController
         if ($fileContent === false) {
             return ['errors' => 'Document not found on docserver'];
         }
+        /*
         $multigestParameters = CoreConfigModel::getJsonLoaded(['path' => 'config/multigest.json']);
         if (empty($multigestParameters)) {
             return ['errors' => 'Multigest mapping file does not exist'];
@@ -227,7 +435,6 @@ class MultigestController
         if (!empty($multigestParameters['mapping']['folderCreation'])) {
             $body['properties'] = $multigestParameters['mapping']['folderCreation'];
         }
-
 
         // TODO call soap route
         $curlResponse = CurlModel::exec([
@@ -242,7 +449,6 @@ class MultigestController
         }
         $resourceFolderId = $curlResponse['response']['entry']['id'];
 
-        $document['subject'] = str_replace([':', '*', '\'', '"', '>', '<'], ' ', $document['subject']);
         $multipartBody = [
             'filedata' => ['isFile' => true, 'filename' => $document['subject'], 'content' => $fileContent],
         ];
@@ -256,6 +462,45 @@ class MultigestController
             return ['errors' => "Send resource {$args['resId']} failed : " . json_encode($curlResponse['response'])];
         }
         $documentId = $curlResponse['response']['entry']['id'];
+        //*/
+
+        $fileExtension = explode('.', $document['filename']);
+        $fileExtension = array_pop($fileExtension);
+        $xmlPostString = '<?xml version="1.0" encoding="UTF-8"?>
+        <soapenv:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:APIMultigest">
+            <soapenv:Header/>
+            <soapenv:Body>
+                <urn:GedImporterDocumentStream soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+                    <Armoire xsi:type="xsd:string">'.$configuration['sasId'].'</Armoire>
+                    <User xsi:type="xsd:string">'.$configuration['login'].'</User>
+                    <FileSourceStream xsi:type="xsd:string">'.base64_encode($fileContent).'</FileSourceStream>
+                    <Sd xsi:type="xsd:string"></Sd>
+                    <Ssd xsi:type="xsd:string"></Ssd>
+                    <NomFile xsi:type="xsd:string">'.$document['subject'].'</NomFile>
+                    <Ext xsi:type="xsd:string">'.$fileExtension.'</Ext>
+                    <Convert xsi:type="xsd:int">0</Convert>
+                    <Decoupage xsi:type="xsd:int">0</Decoupage>
+                    <PdfA xsi:type="xsd:int">0</PdfA>
+                    <RefDoc xsi:type="xsd:string">'.$document['alt_identifier'].'</RefDoc>
+                    <TypeDoc xsi:type="xsd:string">'.$document['res_id'].'</TypeDoc>
+                    <IdDT xsi:type="xsd:string">0</IdDT>
+                    <Suffixe xsi:type="xsd:string"></Suffixe>
+                    <ModeDiffere xsi:type="xsd:int">-1</ModeDiffere>
+                </urn:GedImporterDocumentStream>
+            </soapenv:Body>
+        </soapenv:Envelope>';
+
+        $curlResponse = CurlModel::execSOAP([
+            'url'           => $multigestUri,
+            'soapAction'    => 'urn:GedImporterDocumentStream',
+            'xmlPostString' => $xmlPostString
+        ]);
+
+        $raw = $curlResponse['raw'];
+        $raw = str_ireplace(['SOAP-ENV:', 'ns1:'], '', $raw);
+        $curlResponse['response'] = simplexml_load_string($raw);
+        var_dump($curlResponse);
+        return $curlResponse;
 
         $properties = [];
         if (!empty($multigestParameters['mapping']['document'])) {
