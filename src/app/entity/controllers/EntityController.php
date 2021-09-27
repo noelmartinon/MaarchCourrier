@@ -556,8 +556,8 @@ class EntityController
         }
 
         $allowedFields = [
-            'id', 'entityId', 'entityLabel', 'shortLabel', 'entityFullName', 'enabled', 'addressNumber', 'addressStreet', 'addressAdditional1', 'addressAdditional2',
-            'addressPostcode', 'addressTown', 'addressCountry', 'email', 'parentEntityId', 'entityType', 'businessId', 'folderImport', 'producerService',
+            'id', 'entityId', 'entityLabel', 'shortLabel', 'entityFullName', 'enabled', 'adrs_1', 'adrs_2', 'adrs_3', 'zipcode', 'city', 'country',
+            'email', 'parentEntityId', 'entityType', 'businessId', 'folderImport', 'producerService',
             'diffusionList', 'visaCircuit', 'opinionCircuit',
             'users',
             'templates'

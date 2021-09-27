@@ -131,7 +131,7 @@ class TextFormatModel
     public static function camelToSnake($subject) {
         $snakeCaseSubject = '';
         foreach (str_split($subject) as $index => $character) {
-            if ($index > 0 && strtoupper($character) == $character && strpos('0123456789', $character) === false) {
+            if ($index > 0 && strtoupper($character) == $character && strpos('0123456789_', $character) === false) {
                 $character = strtolower($character);
                 $character = '_' . $character;
             }
