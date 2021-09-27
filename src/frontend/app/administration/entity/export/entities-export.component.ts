@@ -61,32 +61,28 @@ export class EntitiesExportComponent implements OnInit {
             label: this.translate.instant('lang.entitiesParameters_enabled')
         },
         {
-            value: 'addressNumber',
-            label: this.translate.instant('lang.entitiesParameters_addressNumber')
+            value: 'adrs_1',
+            label: this.translate.instant('lang.entitiesParameters_adrs_1')
         },
         {
-            value: 'addressStreet',
-            label: this.translate.instant('lang.entitiesParameters_addressStreet')
+            value: 'adrs_2',
+            label: this.translate.instant('lang.entitiesParameters_adrs_2')
         },
         {
-            value: 'addressAdditional1',
-            label: this.translate.instant('lang.entitiesParameters_addressAdditional1')
+            value: 'adrs_3',
+            label: this.translate.instant('lang.entitiesParameters_adrs_3')
         },
         {
-            value: 'addressAdditional2',
-            label: this.translate.instant('lang.entitiesParameters_addressAdditional2')
+            value: 'zipcode',
+            label: this.translate.instant('lang.entitiesParameters_zipcode')
         },
         {
-            value: 'addressPostcode',
-            label: this.translate.instant('lang.entitiesParameters_addressPostcode')
+            value: 'city',
+            label: this.translate.instant('lang.entitiesParameters_city')
         },
         {
-            value: 'addressTown',
-            label: this.translate.instant('lang.entitiesParameters_addressTown')
-        },
-        {
-            value: 'addressCountry',
-            label: this.translate.instant('lang.entitiesParameters_addressCountry')
+            value: 'country',
+            label: this.translate.instant('lang.entitiesParameters_country')
         },
         {
             value: 'email',
