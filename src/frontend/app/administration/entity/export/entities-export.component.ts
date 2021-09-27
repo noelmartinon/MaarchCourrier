@@ -193,7 +193,7 @@ export class EntitiesExportComponent implements OnInit {
             setTimeout(() => {
                 this.listFilter.nativeElement.value = curFilter;
             }, 10); 
-        }       
+        }
     }
 
     removeData(i: number) {
