@@ -2544,5 +2544,6 @@
     "delegatedOpinion": "Avis donné à la place de",
     "requestedOpinion": "Avis demandé à la place de",
     "sharePointWarning": "Fermez l'éditeur du document avant de valider l'édition",
-    "autoRedirectToUser": "A moi-même"
+    "autoRedirectToUser": "A moi-même",
+    "applicationVersion": "Maarch courrier {{version}} Powered by {{author}}"
 }
