@@ -201,7 +201,8 @@ export class EntitiesExportComponent implements OnInit {
     }
 
     removeData(i: number) {
-        transferArrayItem(this.exportModel.data, this.dataAvailable, i, this.dataAvailable.length);
+        this.dataAvailable = this.dataAvailable.concat(this.exportModel.data[i]);
+        this.exportModel.data.splice(i, 1);
         this.sortPipe.transform(this.dataAvailable, 'label');
     }
 
