@@ -117,6 +117,9 @@ export class MultigestListAdministrationComponent implements OnInit {
 
     saveUrl() {
         this.http.put('../rest/multigest/configuration', { uri: this.multigestUrl }).pipe(
+            tap(() => {
+                this.notify.success(this.translate.instant('lang.dataUpdated'));
+            }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
                 return of(false);
