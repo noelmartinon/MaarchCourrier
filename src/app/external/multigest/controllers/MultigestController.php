@@ -303,20 +303,6 @@ class MultigestController
 
         if (!Validator::stringType()->notEmpty()->validate($body['login'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body login is empty or not a string']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['password']) && !Validator::stringType()->notEmpty()->validate($body['accountId'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body password is empty or not a string']);
-        }
-
-        if (empty($body['password'])) {
-            $account = EntityModel::get(['select' => ['external_id'], 'where' => ["external_id->'multigest'->>'id' = ?"], 'data' => [$body['accountId']], 'limit' => 1]);
-            if (empty($account[0])) {
-                return $response->withStatus(400)->withJson(['errors' => 'Account not found']);
-            }
-            $multigest = json_decode($account[0]['external_id'], true);
-            if (empty($multigest['multigest']['password'])) {
-                return $response->withStatus(400)->withJson(['errors' => 'Account has no password']);
-            }
-            $body['password'] = PasswordModel::decrypt(['cryptedPassword' => $multigest['multigest']['password']]);
         }
 
         $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_multigest']);
@@ -329,28 +315,9 @@ class MultigestController
         }
         $multigestUri = rtrim($configuration['uri'], '/');
 
-        $xmlPostString = '<?xml version="1.0" encoding="UTF-8"?>
-        <soapenv:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:APIMultigest">
-            <soapenv:Header/>
-            <soapenv:Body>
-                <urn:GedTestExistenceUtilisateur soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-                    <User xsi:type="xsd:string">'.$body['login'].'</User>
-                </urn:GedTestExistenceUtilisateur>
-            </soapenv:Body>
-        </soapenv:Envelope>';
-
-        $curlResponse = CurlModel::execSOAP([
-            'url'           => $multigestUri,
-            'soapAction'    => 'urn:GedTestExistenceUtilisateur',
-            'xmlPostString' => $xmlPostString
-        ]);
-
-        $raw = $curlResponse['raw'];
-        $raw = str_ireplace(['SOAP-ENV:', 'ns1:'], '', $raw);
-        $curlResponse['response'] = simplexml_load_string($raw);
-
-        $responseCode = (int) (string) $curlResponse['response']->xpath('Body/GedTestExistenceUtilisateurResponse/return')[0];
-        if ($responseCode != 0) {
+        $soapClient = new \SoapClient($multigestUri);
+        $result = (int) $soapClient->GedTestExistenceUtilisateur($body['login']);
+        if ($result !== 0) {
             return $response->withStatus(400)->withJson(['errors' => 'MultiGest user '.$body['login'].' does not exist']);
         }
 
@@ -373,18 +340,6 @@ class MultigestController
             return ['errors' => 'Multigest configuration URI is empty'];
         }
         $multigestUri = rtrim($configuration['uri'], '/');
-
-        /*
-        $entity = UserModel::getPrimaryEntityById(['id' => $args['userId'], 'select' => ['entities.external_id']]);
-        if (empty($entity)) {
-            return ['errors' => 'User has no primary entity'];
-        }
-        $entityInformations = json_decode($entity['external_id'], true);
-        if (empty($entityInformations['multigest'])) {
-            return ['errors' => 'User primary entity has not enough multigest informations'];
-        }
-        $entityInformations['multigest']['password'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['multigest']['password']]);
-        //*/
 
         $document = ResModel::getById([
             'select' => [
@@ -416,82 +371,39 @@ class MultigestController
         if ($fileContent === false) {
             return ['errors' => 'Document not found on docserver'];
         }
-        /*
-        $multigestParameters = CoreConfigModel::getJsonLoaded(['path' => 'config/multigest.json']);
-        if (empty($multigestParameters)) {
-            return ['errors' => 'Multigest mapping file does not exist'];
-        }
-
-        $body = ['name' => str_replace('/', '_', $document['alt_identifier']), 'nodeType' => 'cm:folder'];
-        if (!empty($multigestParameters['mapping']['folderCreation'])) {
-            $body['properties'] = $multigestParameters['mapping']['folderCreation'];
-        }
-
-        // TODO call soap route
-        $curlResponse = CurlModel::exec([
-            'url'           => "{$multigestUri}/multigest/versions/1/nodes/{$args['folderId']}/children",
-            'basicAuth'     => ['user' => $entityInformations['multigest']['login'], 'password' => $entityInformations['multigest']['password']],
-            'headers'       => ['content-type:application/json', 'Accept: application/json'],
-            'method'        => 'POST',
-            'body'          => json_encode($body)
-        ]);
-        if ($curlResponse['code'] != 201) {
-            return ['errors' => "Create folder {$document['alt_identifier']} failed : " . json_encode($curlResponse['response'])];
-        }
-        $resourceFolderId = $curlResponse['response']['entry']['id'];
-
-        $multipartBody = [
-            'filedata' => ['isFile' => true, 'filename' => $document['subject'], 'content' => $fileContent],
-        ];
-        $curlResponse = CurlModel::exec([
-            'url'           => "{$multigestUri}/multigest/versions/1/nodes/{$resourceFolderId}/children",
-            'basicAuth'     => ['user' => $entityInformations['multigest']['login'], 'password' => $entityInformations['multigest']['password']],
-            'method'        => 'POST',
-            'multipartBody' => $multipartBody
-        ]);
-        if ($curlResponse['code'] != 201) {
-            return ['errors' => "Send resource {$args['resId']} failed : " . json_encode($curlResponse['response'])];
-        }
-        $documentId = $curlResponse['response']['entry']['id'];
-        //*/
 
         $fileExtension = explode('.', $document['filename']);
         $fileExtension = array_pop($fileExtension);
-        $xmlPostString = '<?xml version="1.0" encoding="UTF-8"?>
-        <soapenv:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:urn="urn:APIMultigest">
-            <soapenv:Header/>
-            <soapenv:Body>
-                <urn:GedImporterDocumentStream soapenv:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
-                    <Armoire xsi:type="xsd:string">'.$configuration['sasId'].'</Armoire>
-                    <User xsi:type="xsd:string">'.$configuration['login'].'</User>
-                    <FileSourceStream xsi:type="xsd:string">'.base64_encode($fileContent).'</FileSourceStream>
-                    <Sd xsi:type="xsd:string"></Sd>
-                    <Ssd xsi:type="xsd:string"></Ssd>
-                    <NomFile xsi:type="xsd:string">'.$document['subject'].'</NomFile>
-                    <Ext xsi:type="xsd:string">'.$fileExtension.'</Ext>
-                    <Convert xsi:type="xsd:int">0</Convert>
-                    <Decoupage xsi:type="xsd:int">0</Decoupage>
-                    <PdfA xsi:type="xsd:int">0</PdfA>
-                    <RefDoc xsi:type="xsd:string">'.$document['alt_identifier'].'</RefDoc>
-                    <TypeDoc xsi:type="xsd:string">'.$document['res_id'].'</TypeDoc>
-                    <IdDT xsi:type="xsd:string">0</IdDT>
-                    <Suffixe xsi:type="xsd:string"></Suffixe>
-                    <ModeDiffere xsi:type="xsd:int">-1</ModeDiffere>
-                </urn:GedImporterDocumentStream>
-            </soapenv:Body>
-        </soapenv:Envelope>';
 
-        $curlResponse = CurlModel::execSOAP([
-            'url'           => $multigestUri,
-            'soapAction'    => 'urn:GedImporterDocumentStream',
-            'xmlPostString' => $xmlPostString
-        ]);
+        $soapClient = new \SoapClient($multigestUri, ['trace' => true]);
 
-        $raw = $curlResponse['raw'];
-        $raw = str_ireplace(['SOAP-ENV:', 'ns1:'], '', $raw);
-        $curlResponse['response'] = simplexml_load_string($raw);
-        var_dump($curlResponse);
-        return $curlResponse;
+        $result = [];
+        $soapClient->GedSetModeUid(1);
+        $soapClient->GedChampReset();
+        $soapClient->GedAddChampRequete('ALT_IDENTIFIER', $document['alt_identifier']);
+        $result[] = $soapClient->GedDossierCreate('SAS_MAARCH', 'MAARCH', 0);
+        $soapClient->GedChampReset();
+        $soapClient->GedAddChampRecherche('ALT_IDENTIFIER', $document['alt_identifier']);
+        $result[] = $soapClient->GedDossierExist('SAS_MAARCH', 'MAARCH');
+        $result[] = $soapClient->GedImporterDocumentStream(
+            'SAS_MAARCH',
+            'MAARCH',
+            base64_encode($fileContent),
+            '',
+            '',
+            '',
+            $fileExtension,
+            0,
+            0,
+            0,
+            '',
+            '',
+            '',
+            '',
+            -1
+        );
+
+        return $result;
 
         $properties = [];
         if (!empty($multigestParameters['mapping']['document'])) {
