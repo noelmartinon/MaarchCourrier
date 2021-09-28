@@ -203,10 +203,11 @@ export class ContactImportComponent implements OnInit {
             await this.checkMimeType(encodedFile);
             if (fileInput.target.files && fileInput.target.files[0] && this.mimeAllowed) {
                 this.loading = true;
-    
                 let rawCsv = [];
-    
-                reader.readAsText(fileInput.target.files[0], 'ISO-8859-1');
+                const languageEncoding = require("detect-file-encoding-and-language");
+                languageEncoding(file).then((fileInfo: any) => {
+                    reader.readAsText(fileInput.target.files[0], this.functionsService.empty(fileInfo.encoding) ? 'ISO-8859-1' : fileInfo.encoding);
+                });
     
                 reader.onload = (value: any) => {
                     this.papa.parse(value.target.result, {
