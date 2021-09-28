@@ -195,4 +195,53 @@ class CoreController
         }
         return $response->withJson(['langs' => $arrLanguages]);
     }
+
+    public static function getMimeTypeAndFileSize(array $args)
+    {
+        ValidatorModel::stringType($args, ['encodedFile', 'path']);
+        if (empty($args['encodedFile']) && empty($args['path'])) {
+            return ['errors' => 'args needs one of encodedFile or path'];
+        }
+
+        $resource = null;
+        $size = null;
+        if (!empty($args['encodedFile'])) {
+            $resource = fopen('php://temp', 'r+');
+            $streamFilterBase64 = stream_filter_append($resource, 'convert.base64-decode', STREAM_FILTER_WRITE);
+            stream_set_chunk_size($resource, 1024*1024);
+            $size = fwrite($resource, $args['encodedFile']);
+            stream_filter_remove($streamFilterBase64);
+        } elseif (!empty($args['path'])) {
+            if (!is_file($args['path']) || !is_readable($args['path'])) {
+                return ['errors' => 'args filename does not refer to a regular file or said file is not readable'];
+            }
+            $resource = fopen($args['path'], 'r');
+            $size = filesize($args['path']);
+        }
+
+        if (empty($resource)) {
+            return ['errors' => 'could not decode encoded data, or open target file'];
+        }
+
+        rewind($resource);
+        $mimeType = mime_content_type($resource);
+        fclose($resource);
+
+        if (empty($mimeType) || empty($size)) {
+            return ['errors' => "could not compute mime type ($mimeType) or file size ($size)"];
+        }
+
+        return ['mime' => $mimeType, 'size' => $size];
+    }
+
+    public static function getMimeTypeAndFileSizeREST(Request $request, Response $response)
+    {
+        $body = $request->getParsedBody();
+        // only send encodedFile and not path, to prevent clients from reading data about server files
+        $result = CoreController::getMimeTypeAndFileSize(['encodedFile' => $body['encodedFile']]);
+        if (!empty($result['errors'])) {
+            return $response->withStatus(400)->withJson($result);
+        }
+        return $response->withStatus(200)->withJson($result);
+    }
 }
