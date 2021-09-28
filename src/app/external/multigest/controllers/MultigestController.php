@@ -51,7 +51,6 @@ class MultigestController
         }
 
         $configuration = json_decode($configuration['value'], true);
-        unset($configuration['password']);
 
         return $response->withJson(['configuration' => $configuration]);
     }
@@ -67,15 +66,10 @@ class MultigestController
         if (!Validator::stringType()->notEmpty()->validate($body['uri'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body uri is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['login'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body login is empty or not a string']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['password'])) { // TODO login with password or certificate ?
-            return $response->withStatus(400)->withJson(['errors' => 'Body password is empty or not a string']);
         }
 
         $value = json_encode([
-            'uri'      => trim($body['uri']),
-            'login'    => trim($body['login']),
-            'password' => PasswordModel::encrypt(['password' => $body['password']])
+            'uri' => trim($body['uri'])
         ]);
 
         $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_multigest']);
