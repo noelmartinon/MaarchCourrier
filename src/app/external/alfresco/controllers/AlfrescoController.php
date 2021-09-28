@@ -250,7 +250,7 @@ class AlfrescoController
         ]);
 
         EntityModel::update([
-            'postSet'   => ['external_id' => "jsonb_set(external_id, '{alfresco}', '{$account}')"],
+            'postSet'   => ['external_id' => "jsonb_set(coalesce(external_id, '{}'::jsonb), '{alfresco}', '{$account}')"],
             'where'     => ['id in (?)'],
             'data'      => [$body['entities']]
         ]);

@@ -66,8 +66,6 @@ class MultigestController
 
         if (!Validator::stringType()->notEmpty()->validate($body['uri'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body uri is empty or not a string']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['sasId'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body sasId is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['login'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body login is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['password'])) { // TODO login with password or certificate ?
@@ -76,7 +74,6 @@ class MultigestController
 
         $value = json_encode([
             'uri'      => trim($body['uri']),
-            'sasId'    => trim($body['sasId']),
             'login'    => trim($body['login']),
             'password' => PasswordModel::encrypt(['password' => $body['password']])
         ]);
@@ -263,7 +260,7 @@ class MultigestController
         ]);
 
         EntityModel::update([
-            'postSet'   => ['external_id' => "jsonb_set(external_id, '{multigest}', '{$account}')"],
+            'postSet'   => ['external_id' => "jsonb_set(coalesce(external_id, '{}'::jsonb), '{multigest}', '{$account}')"],
             'where'     => ['id in (?)'],
             'data'      => [$body['entities']]
         ]);
