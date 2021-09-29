@@ -23,6 +23,8 @@ export class ContactImportComponent implements OnInit {
     loading: boolean = false;
     mimeAllowed: boolean = false;
 
+    encoding: string = '';
+
     contactColumns: any[] = [
         {
             id: 'id',
@@ -204,11 +206,8 @@ export class ContactImportComponent implements OnInit {
             if (fileInput.target.files && fileInput.target.files[0] && this.mimeAllowed) {
                 this.loading = true;
                 let rawCsv = [];
-                const languageEncoding = require("detect-file-encoding-and-language");
-                languageEncoding(file).then((fileInfo: any) => {
-                    reader.readAsText(fileInput.target.files[0], this.functionsService.empty(fileInfo.encoding) ? 'ISO-8859-1' : fileInfo.encoding);
-                });
-    
+                reader.readAsText(fileInput.target.files[0], this.functionsService.empty(this.encoding) ? 'ISO-8859-1' : this.encoding);
+                
                 reader.onload = (value: any) => {
                     this.papa.parse(value.target.result, {
                         complete: (result) => {
@@ -360,8 +359,9 @@ export class ContactImportComponent implements OnInit {
     checkMimeType(base64: string) {
         return new Promise((resolve) => {
             this.http.post('../rest/mimeAndSize', {encodedFile: base64}).pipe(
-                tap(() => {
+                tap((data: any) => {
                     this.mimeAllowed = true;
+                    this.encoding = data.encoding;
                     resolve(true);
                 }),
                 catchError((err: any) => {

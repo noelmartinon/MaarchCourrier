@@ -22,7 +22,6 @@
   "license": "GPL-3.0",
   "dependencies": {
     "core-js": "3.6.5",
-    "detect-file-encoding-and-language": "^2.1.0",
     "pdfjs-dist": "2.0.943",
     "prod": "^1.0.1",
     "tinymce": "5.5.0",

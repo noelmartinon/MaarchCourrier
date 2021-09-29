@@ -32,6 +32,8 @@ export class UsersImportComponent implements OnInit {
 
     csvColumns: string[] = [];
 
+    encoding: string = '';
+
     associatedColmuns: any = {};
     dataSource = new MatTableDataSource(null);
     hasHeader: boolean = true;
@@ -97,10 +99,7 @@ export class UsersImportComponent implements OnInit {
             if (fileInput.target.files && fileInput.target.files[0] && this.mimeAllowed) {
                 this.loading = true;
                 let rawCsv = [];
-                const languageEncoding = require("detect-file-encoding-and-language");
-                languageEncoding(file).then((fileInfo: any) => {
-                    reader.readAsText(fileInput.target.files[0], this.functionsService.empty(fileInfo.encoding) ? 'ISO-8859-1' : fileInfo.encoding);
-                });
+                reader.readAsText(fileInput.target.files[0], this.functionsService.empty(this.encoding) ? 'ISO-8859-1' : this.encoding);
     
                 reader.onload = (value: any) => {
                     this.papa.parse(value.target.result, {
@@ -258,8 +257,9 @@ export class UsersImportComponent implements OnInit {
     checkMimeType(base64: string) {
         return new Promise((resolve) => {
             this.http.post('../rest/mimeAndSize', {encodedFile: base64}).pipe(
-                tap(() => {
+                tap((data: any) => {
                     this.mimeAllowed = true;
+                    this.encoding = data.encoding;
                     resolve(true);
                 }),
                 catchError((err: any) => {
