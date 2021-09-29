@@ -227,7 +227,7 @@ class CoreController
         $mimeType = mime_content_type($resource);
         $encoding = null;
         if (substr($mimeType, 0, 5) === 'text/') {
-            $encoding = mb_detect_encoding(file_get_contents($resource), ['UTF-8', 'ISO-8859-1', 'ASCII']);
+            $encoding = mb_detect_encoding(stream_get_contents($resource));
         }
         rewind($resource);
         fclose($resource);
