@@ -341,6 +341,23 @@ class MultigestController
         }
         $multigestUri = rtrim($configuration['uri'], '/');
 
+        $userPrimaryEntity = UserModel::getPrimaryEntityById([
+            'id'     => $args['userId'],
+            'select' => ['entities.id', 'entities.external_id']
+        ]);
+
+        if (empty($userPrimaryEntity)) {
+            return ['errors' => 'User has no primary entity'];
+        }
+        $entityConfiguration = json_decode($userPrimaryEntity['external_id'], true);
+        if (empty($entityConfiguration['multigest'])) {
+            return ['errors' => 'Entity has no associated Multigest account'];
+        }
+        $entityConfiguration = [
+            'login' => $entityConfiguration['multigest']['login'] ?? '',
+            'sasId' => $entityConfiguration['multigest']['sasId'] ?? ''
+        ];
+
         $document = ResModel::getById([
             'select' => [
                 'filename', 'subject', 'alt_identifier', 'external_id', 'type_id', 'priority', 'fingerprint', 'custom_fields', 'dest_user',
@@ -375,19 +392,70 @@ class MultigestController
         $fileExtension = explode('.', $document['filename']);
         $fileExtension = array_pop($fileExtension);
 
+        $multigestParameters = CoreConfigModel::getJsonLoaded(['path' => 'config/multigest.json']);
+        if (empty($multigestParameters)) {
+            return ['errors' => 'Multigest mapping file does not exist'];
+        }
+        if (empty($multigestParameters['mapping']['document'])) {
+            return ['errors' => 'Multigest mapping for document is empty'];
+        }
+        $metadataFields = '';
+        $metadataValues = '';
+        $keyMetadataField = '';
+        $keyMetadataValue = '';
+        foreach ($multigestParameters['mapping']['document'] as $multigestField => $maarchField) {
+            if (empty($multigestField) || empty($maarchField)) {
+                continue;
+            }
+            $nextField = '';
+            $nextValue = '';
+
+            if (isset($document[$maarchField])) {
+                $nextField = str_replace('|', '-', $multigestField);
+                if (strpos($maarchField, '_date') !== false) {
+                    $document[$maarchField] = substr($document[$maarchField], 0, 10);
+                }
+                $nextValue = str_replace('|', '-', $document[$maarchField]);
+            }
+
+            if (empty($nextValue)) {
+                continue;
+            }
+
+            if (empty($keyMetadataField)) {
+                $keyMetadataField = $nextField;
+            }
+            if (empty($keyMetadataValue)) {
+                $keyMetadataValue = $nextValue;
+            }
+            if (!empty($metadataFields)) {
+                $metadataFields .= '|';
+            }
+            $metadataFields .= $nextField;
+            if (!empty($metadataValues)) {
+                $metadataValues .= '|';
+            }
+            $metadataValues .= $nextValue;
+        }
+        if (empty($metadataFields) || empty($metadataValues)) {
+            return ['errors' => 'No valid metadata from Multigest mapping'];
+        }
+
+        //return [$metadataFields, $metadataValues];
+
         $soapClient = new \SoapClient($multigestUri, ['trace' => true]);
 
         $result = [];
         $soapClient->GedSetModeUid(1);
         $soapClient->GedChampReset();
-        $soapClient->GedAddChampRequete('ALT_IDENTIFIER', $document['alt_identifier']);
-        $result[] = $soapClient->GedDossierCreate('SAS_MAARCH', 'MAARCH', 0);
+        $soapClient->GedAddMultiChampRequete($metadataFields, $metadataValues);
+        $result[] = $soapClient->GedDossierCreate($entityConfiguration['sasId'], $entityConfiguration['login'], 0);
         $soapClient->GedChampReset();
-        $soapClient->GedAddChampRecherche('ALT_IDENTIFIER', $document['alt_identifier']);
-        $result[] = $soapClient->GedDossierExist('SAS_MAARCH', 'MAARCH');
+        $soapClient->GedAddChampRecherche($keyMetadataField, $keyMetadataValue);
+        $result[] = $soapClient->GedDossierExist($entityConfiguration['sasId'], $entityConfiguration['login']);
         $result[] = $soapClient->GedImporterDocumentStream(
-            'SAS_MAARCH',
-            'MAARCH',
+            $entityConfiguration['sasId'],
+            $entityConfiguration['login'],
             base64_encode($fileContent),
             '',
             '',
