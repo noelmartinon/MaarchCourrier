@@ -3,11 +3,13 @@
         "document": {
             "ALT_IDENTIFIER": "alt_identifier",
             "SUBJECT": "subject",
-            "DOCTYPE": "type_id",
-            "INITIATOR": "initiator",
+            "DOCTYPE": "doctypeLabel",
+            "INITIATOR": "initiatorLabel",
             "DOC_DATE": "doc_date",
-            "DEST": "destination",
-            "PRIORITY": "priority"
+            "DEST": "destinationLabel",
+            "PRIORITY": "priorityLabel",
+            "DEST_USER": "destUserLabel",
+            "SENDER": "senderAddress_0"
         }
     }
 }

@@ -321,6 +321,8 @@ class MultigestController
             return $response->withStatus(400)->withJson(['errors' => 'MultiGest user '.$body['login'].' does not exist']);
         }
 
+        //return $response->withStatus(200)->withJson(MultigestController::sendResource(['resId' => $body['resId'], 'userId' => $body['userId']]));
+
         return $response->withStatus(204);
     }
 
@@ -399,6 +401,21 @@ class MultigestController
         if (empty($multigestParameters['mapping']['document'])) {
             return ['errors' => 'Multigest mapping for document is empty'];
         }
+
+        $resourceContacts = ResourceContactModel::get([
+            'where'     => ['res_id = ?', 'mode = ?'],
+            'data'      => [$args['resId'], 'sender']
+        ]);
+        $rawContacts = [];
+        foreach ($resourceContacts as $resourceContact) {
+            if ($resourceContact['type'] == 'contact') {
+                $rawContacts[] = ContactModel::getById([
+                    'select'    => ['*'],
+                    'id'        => $resourceContact['item_id']
+                ]);
+            }
+        }
+
         $metadataFields = '';
         $metadataValues = '';
         $keyMetadataField = '';
@@ -410,13 +427,22 @@ class MultigestController
             $nextField = '';
             $nextValue = '';
 
-            if (isset($document[$maarchField])) {
-                $nextField = str_replace('|', '-', $multigestField);
+            if ($maarchField == 'CURRENT_DATE') {
+                $nextField = $multigestField;
+                $nextValue = date('Y-m-d');
+            } elseif (isset($document[$maarchField])) {
+                $nextField = $multigestField;
                 if (strpos($maarchField, '_date') !== false) {
                     $document[$maarchField] = substr($document[$maarchField], 0, 10);
                 }
-                $nextValue = str_replace('|', '-', $document[$maarchField]);
+                $nextValue = $document[$maarchField];
+            } else {
+                $nextField = $multigestField;
+                $nextValue = MultigestController::getResourceField($document, $maarchField, $rawContacts);
             }
+
+            $nextField = str_replace('|', '-', trim($nextField));
+            $nextValue = str_replace('|', '-', trim($nextValue));
 
             if (empty($nextValue)) {
                 continue;
@@ -441,19 +467,32 @@ class MultigestController
             return ['errors' => 'No valid metadata from Multigest mapping'];
         }
 
-        //return [$metadataFields, $metadataValues];
-
         $soapClient = new \SoapClient($multigestUri, ['trace' => true]);
-
-        $result = [];
         $soapClient->GedSetModeUid(1);
-        $soapClient->GedChampReset();
-        $soapClient->GedAddMultiChampRequete($metadataFields, $metadataValues);
-        $result[] = $soapClient->GedDossierCreate($entityConfiguration['sasId'], $entityConfiguration['login'], 0);
+
         $soapClient->GedChampReset();
         $soapClient->GedAddChampRecherche($keyMetadataField, $keyMetadataValue);
-        $result[] = $soapClient->GedDossierExist($entityConfiguration['sasId'], $entityConfiguration['login']);
-        $result[] = $soapClient->GedImporterDocumentStream(
+        $result = (int) $soapClient->GedDossierExist($entityConfiguration['sasId'], $entityConfiguration['login']);
+        if ($result > 0) {
+            return ['errors' => 'This resource is already in Multigest'];
+        } elseif ($result !== -7) {
+            return ['errors' => 'Multigest error '.$result.' occured while checking for folder preexistence'];
+        }
+
+        $soapClient->GedChampReset();
+        $soapClient->GedAddMultiChampRequete($metadataFields, $metadataValues);
+        $result = $soapClient->GedDossierCreate($entityConfiguration['sasId'], $entityConfiguration['login'], 0);
+        if ($result != 0) {
+            return ['errors' => 'Could not create Multigest folder'];
+        }
+
+        $soapClient->GedChampReset();
+        $soapClient->GedAddChampRecherche($keyMetadataField, $keyMetadataValue);
+        $result = $soapClient->GedDossierExist($entityConfiguration['sasId'], $entityConfiguration['login']);
+        if ($result <= 0) {
+            return ['errors' => 'Multigest error '.$result.' occured while accessing folder'];
+        }
+        $result = (int) $soapClient->GedImporterDocumentStream(
             $entityConfiguration['sasId'],
             $entityConfiguration['login'],
             base64_encode($fileContent),
@@ -470,114 +509,17 @@ class MultigestController
             '',
             -1
         );
-
-        return $result;
-
-        $properties = [];
-        if (!empty($multigestParameters['mapping']['document'])) {
-            $resourceContacts = ResourceContactModel::get([
-                'where'     => ['res_id = ?', 'mode = ?'],
-                'data'      => [$args['resId'], 'sender']
-            ]);
-            $rawContacts = [];
-            foreach ($resourceContacts as $resourceContact) {
-                if ($resourceContact['type'] == 'contact') {
-                    $rawContacts[] = ContactModel::getById([
-                        'select'    => ['*'],
-                        'id'        => $resourceContact['item_id']
-                    ]);
-                }
-            }
-
-            // TODO export mapping logic to another function ?
-            foreach ($multigestParameters['mapping']['document'] as $key => $multigestParameter) {
-                if ($multigestParameter == 'multigestLogin') {
-                    $properties[$key] = $entityInformations['multigest']['login'];
-                } elseif ($multigestParameter == 'doctypeLabel') {
-                    if (!empty($document['type_id'])) {
-                        $doctype = DoctypeModel::getById(['select' => ['description'], 'id' => $document['type_id']]);
-                    }
-                    $properties[$key] = $doctype['description'] ?? '';
-                } elseif ($multigestParameter == 'priorityLabel') {
-                    if (!empty($document['priority'])) {
-                        $priority = PriorityModel::getById(['select' => ['label'], 'id' => $document['priority']]);
-                        $properties[$key] = $priority['label'];
-                    }
-                } elseif ($multigestParameter == 'destinationLabel') {
-                    if (!empty($document['destination'])) {
-                        $destination = EntityModel::getByEntityId(['entityId' => $document['destination'], 'select' => ['entity_label']]);
-                        $properties[$key] = $destination['entity_label'];
-                    }
-                } elseif ($multigestParameter == 'initiatorLabel') {
-                    if (!empty($document['initiator'])) {
-                        $initiator = EntityModel::getByEntityId(['entityId' => $document['initiator'], 'select' => ['entity_label']]);
-                        $properties[$key] = $initiator['entity_label'];
-                    }
-                } elseif ($multigestParameter == 'destUserLabel') {
-                    if (!empty($document['dest_user'])) {
-                        $properties[$key] = UserModel::getLabelledUserById(['id' => $document['dest_user']]);
-                    }
-                } elseif (strpos($multigestParameter, 'senderCompany_') !== false) {
-                    $contactNb = explode('_', $multigestParameter)[1];
-                    $properties[$key] = $rawContacts[$contactNb]['company'] ?? '';
-                } elseif (strpos($multigestParameter, 'senderCivility_') !== false) {
-                    $contactNb = explode('_', $multigestParameter)[1];
-                    $civility = null;
-                    if (!empty($rawContacts[$contactNb]['civility'])) {
-                        $civility = ContactCivilityController::getLabelById(['id' => $rawContacts[$contactNb]['civility']]);
-                    }
-                    $properties[$key] = $civility ?? '';
-                } elseif (strpos($multigestParameter, 'senderFirstname_') !== false) {
-                    $contactNb = explode('_', $multigestParameter)[1];
-                    $properties[$key] = $rawContacts[$contactNb]['firstname'] ?? '';
-                } elseif (strpos($multigestParameter, 'senderLastname_') !== false) {
-                    $contactNb = explode('_', $multigestParameter)[1];
-                    $properties[$key] = $rawContacts[$contactNb]['lastname'] ?? '';
-                } elseif (strpos($multigestParameter, 'senderFunction_') !== false) {
-                    $contactNb = explode('_', $multigestParameter)[1];
-                    $properties[$key] = $rawContacts[$contactNb]['function'] ?? '';
-                } elseif (strpos($multigestParameter, 'senderAddress_') !== false) {
-                    $contactNb = explode('_', $multigestParameter)[1];
-                    if (!empty($rawContacts[$contactNb])) {
-                        $contactToDisplay = ContactController::getFormattedContactWithAddress(['contact' => $rawContacts[$contactNb]]);
-                    }
-                    $properties[$key] = $contactToDisplay['contact']['address'] ?? '';
-                } elseif ($multigestParameter == 'doctypeSecondLevelLabel') {
-                    if (!empty($document['type_id'])) {
-                        $doctype = DoctypeModel::getById(['select' => ['doctypes_second_level_id'], 'id' => $document['type_id']]);
-                        $doctypeSecondLevel = SecondLevelModel::getById(['id' => $doctype['doctypes_second_level_id'], 'select' => ['doctypes_second_level_label']]);
-                    }
-                    $properties[$key] = $doctypeSecondLevel['doctypes_second_level_label'] ?? '';
-                } elseif (strpos($multigestParameter, 'customField_') !== false) {
-                    $customId = explode('_', $multigestParameter)[1];
-                    $customValue = json_decode($document['custom_fields'], true);
-                    $properties[$key] = (!empty($customValue[$customId]) && is_string($customValue[$customId])) ? $customValue[$customId] : '';
-                } elseif ($multigestParameter == 'currentDate') {
-                    $date = new \DateTime();
-                    $properties[$key] = $date->format('d-m-Y H:i');
-                } else {
-                    $properties[$key] = $document[$multigestParameter];
-                }
-            }
-        }
-
-        $body = [
-            'properties' => $properties,
-        ];
-        $curlResponse = CurlModel::exec([
-            'url'           => "{$multigestUri}/multigest/versions/1/nodes/{$documentId}",
-            'basicAuth'     => ['user' => $entityInformations['multigest']['login'], 'password' => $entityInformations['multigest']['password']],
-            'headers'       => ['content-type:application/json', 'Accept: application/json'],
-            'method'        => 'PUT',
-            'body'          => json_encode($body)
-        ]);
-        if ($curlResponse['code'] != 200) {
-            return ['errors' => "Update resource {$args['resId']} failed : " . json_encode($curlResponse['response'])];
+        if ($result <= 0) {
+            return ['errors' => 'Multigest error '.$result.' occured importing main document'];
         }
 
         $externalId = json_decode($document['external_id'], true);
-        $externalId['multigestId'] = $documentId;
+        $externalId['multigestId'] = $result;
         ResModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
+
+        return ['multigestId' => $result];
+
+        // TODO: attachments
 
         $attachments = AttachmentModel::get([
             'select'    => ['res_id', 'title', 'identifier', 'external_id', 'docserver_id', 'path', 'filename', 'format', 'attachment_type'],
@@ -701,5 +643,69 @@ class MultigestController
 
         $message = empty($args['folderName']) ? " (envoyé au dossier {$args['folderId']})" : " (envoyé au dossier {$args['folderName']})";
         return ['history' => $message];
+    }
+
+    public static function getResourceField(array $document, string $field, array $rawContacts) {
+        if ($field == 'doctypeLabel' && !empty($document['type_id'])) {
+            return DoctypeModel::getById(['select' => ['description'], 'id' => $document['type_id']])['description'];
+        }
+        if ($field == 'priorityLabel' && !empty($document['priority'])) {
+            return PriorityModel::getById(['select' => ['label'], 'id' => $document['priority']])['label'];
+        }
+        if ($field == 'destinationLabel' && !empty($document['destination'])) {
+            return EntityModel::getByEntityId(['entityId' => $document['destination'], 'select' => ['entity_label']])['entity_label'];
+        }
+        if ($field == 'initiatorLabel' && !empty($document['initiator'])) {
+            return EntityModel::getByEntityId(['entityId' => $document['initiator'], 'select' => ['entity_label']])['entity_label'];
+        }
+        if ($field == 'destUserLabel' && !empty($document['dest_user'])) {
+            return UserModel::getLabelledUserById(['id' => $document['dest_user']]);
+        }
+        if (strpos($field, 'senderCompany_') === 0) {
+            $contactIndex = (int) (explode($field, '_')[1]);
+            return $rawContacts[$contactIndex]['company'] ?? '';
+        }
+        if (strpos($field, 'senderCivility_') === 0) {
+            $contactIndex = (int) (explode($field, '_')[1]);
+            if (!empty($rawContacts[$contactIndex]['civility'])) {
+                return ContactCivilityController::getLabelById(['id' => $rawContacts[$contactIndex]['civility']]);
+            } else {
+                return '';
+            }
+        }
+        if (strpos($field, 'senderFirstname_') === 0) {
+            $contactIndex = (int) (explode($field, '_')[1]);
+            return $rawContacts[$contactIndex]['firstname'] ?? '';
+        }
+        if (strpos($field, 'senderLastname_') === 0) {
+            $contactIndex = (int) (explode($field, '_')[1]);
+            return $rawContacts[$contactIndex]['lastname'] ?? '';
+        }
+        if (strpos($field, 'senderFunction_') === 0) {
+            $contactIndex = (int) (explode($field, '_')[1]);
+            return $rawContacts[$contactIndex]['function'] ?? '';
+        }
+        if (strpos($field, 'senderAddress_') === 0) {
+            $contactIndex = (int) (explode($field, '_')[1]);
+            if (!empty($rawContacts[$contactIndex])) {
+                return ContactController::getFormattedContactWithAddress(['contact' => $rawContacts[$contactIndex]])['contact']['otherInfo'];
+            } else {
+                return '';
+            }
+        }
+        if ($field == 'doctypeSecondLevelLabel' && !empty($document['type_id'])) {
+            $doctype = DoctypeModel::getById(['select' => ['doctypes_second_level_id'], 'id' => $document['type_id']]);
+            $doctypeSecondLevel = SecondLevelModel::getById(['id' => $doctype['doctypes_second_level_id'], 'select' => ['doctypes_second_level_label']]);
+            return $doctypeSecondLevel['doctypes_second_level_label'];
+        }
+        if (strpos($field, 'customField_') === 0) {
+            $customFieldId = explode('_', $field)[1];
+            $customFieldsValues = json_decode($document['custom_fields'], true);
+            if (!empty($customFieldsValues[$customFieldId]) && is_string($customFieldsValues[$customFieldId])) {
+                return $customFieldsValues[$customFieldId];
+            } else {
+                return '';
+            }
+        }
     }
 }
