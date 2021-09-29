@@ -225,13 +225,18 @@ class CoreController
 
         rewind($resource);
         $mimeType = mime_content_type($resource);
+        $encoding = null;
+        if (substr($mimeType, 0, 5) === 'text/') {
+            $encoding = mb_detect_encoding(file_get_contents($resource), ['UTF-8', 'ISO-8859-1', 'ASCII']);
+        }
+        rewind($resource);
         fclose($resource);
 
         if (empty($mimeType) || empty($size)) {
             return ['errors' => "could not compute mime type ($mimeType) or file size ($size)"];
         }
 
-        return ['mime' => $mimeType, 'size' => $size];
+        return ['mime' => $mimeType, 'size' => $size, 'encoding' => $encoding];
     }
 
     public static function getMimeTypeAndFileSizeREST(Request $request, Response $response)
