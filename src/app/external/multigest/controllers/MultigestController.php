@@ -510,24 +510,21 @@ class MultigestController
             -1
         );
         if ($result <= 0) {
-            return ['errors' => 'Multigest error '.$result.' occured importing main document'];
+            return ['errors' => 'Multigest error '.$result.' occured while importing main document'];
         }
 
         $externalId = json_decode($document['external_id'], true);
         $externalId['multigestId'] = $result;
         ResModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
 
-        return ['multigestId' => $result];
-
-        // TODO: attachments
+        $multigestUIDs = ['document' => $result, 'attachments' => []];
 
         $attachments = AttachmentModel::get([
             'select'    => ['res_id', 'title', 'identifier', 'external_id', 'docserver_id', 'path', 'filename', 'format', 'attachment_type'],
             'where'     => ['res_id_master = ?', 'attachment_type not in (?)', 'status not in (?)'],
             'data'      => [$args['resId'], ['signed_response'], ['DEL', 'OBS']]
         ]);
-        $firstAttachment = true;
-        $attachmentsTitlesSent = [];
+
         foreach ($attachments as $attachment) {
             $adrInfo = [
                 'docserver_id'  => $attachment['docserver_id'],
@@ -550,98 +547,71 @@ class MultigestController
                 continue;
             }
 
-            if ($firstAttachment) {
-                $curlResponse = CurlModel::exec([
-                    'url'           => "{$multigestUri}/multigest/versions/1/nodes/{$resourceFolderId}/children",
-                    'basicAuth'     => ['user' => $entityInformations['multigest']['login'], 'password' => $entityInformations['multigest']['password']],
-                    'headers'       => ['content-type:application/json', 'Accept: application/json'],
-                    'method'        => 'POST',
-                    'body'          => json_encode(['name' => 'Pièces jointes', 'nodeType' => 'cm:folder'])
-                ]);
-                if ($curlResponse['code'] != 201) {
-                    return ['errors' => "Create folder 'Pièces jointes' failed : " . json_encode($curlResponse['response'])];
+            $metadataFields = '';
+            $metadataValues = '';
+            $keyAttachmentMetadataField = '';
+            $keyAttachmentMetadataValue = '';
+            foreach ($multigestParameters['mapping']['attachments'] as $multigestField => $maarchField) {
+                if (empty($attachment[$maarchField])) {
+                    continue;
                 }
-                $attachmentsFolderId = $curlResponse['response']['entry']['id'];
-            }
-
-            if (empty($attachmentsFolderId)) {
-                continue;
-            }
-            $firstAttachment = false;
-            if (in_array($attachment['title'], $attachmentsTitlesSent)) {
-                $i = 1;
-                $newTitle = "{$attachment['title']}_{$i}";
-                while (in_array($newTitle, $attachmentsTitlesSent)) {
-                    $newTitle = "{$attachment['title']}_{$i}";
-                    ++$i;
+                if ($metadataFields !== '') {
+                    $metadataFields .= '|';
                 }
-                $attachment['title'] = $newTitle;
-            }
-            $multipartBody = [
-                'filedata' => ['isFile' => true, 'filename' => $attachment['title'], 'content' => $fileContent],
-            ];
-            $curlResponse = CurlModel::exec([
-                'url'           => "{$multigestUri}/multigest/versions/1/nodes/{$attachmentsFolderId}/children",
-                'basicAuth'     => ['user' => $entityInformations['multigest']['login'], 'password' => $entityInformations['multigest']['password']],
-                'method'        => 'POST',
-                'multipartBody' => $multipartBody
-            ]);
-            if ($curlResponse['code'] != 201) {
-                return ['errors' => "Send attachment {$attachment['res_id']} failed : " . json_encode($curlResponse['response'])];
-            }
-
-            $attachmentId = $curlResponse['response']['entry']['id'];
-
-            $properties = [];
-            if (!empty($multigestParameters['mapping']['attachment'])) {
-                foreach ($multigestParameters['mapping']['attachment'] as $key => $multigestParameter) {
-                    if ($multigestParameter == 'typeLabel') {
-                        $attachmentType = AttachmentTypeModel::getByTypeId(['select' => ['label'], 'typeId' => $attachment['attachment_type']]);
-                        $properties[$key] = $attachmentType['label'] ?? '';
-                    } else {
-                        $properties[$key] = $attachment[$multigestParameter];
-                    }
+                $metadataFields .= str_replace('|', '-', $multigestField);
+                if ($metadataValues !== '') {
+                    $metadataValues .= '|';
+                }
+                $metadataValues .= str_replace('|', '-', $attachment[$maarchField]);
+                if (empty($keyAttachmentMetadataValue)) {
+                    $keyAttachmentMetadataField = str_replace('|', '-', $multigestField);
+                    $keyAttachmentMetadataValue = str_replace('|', '-', $attachment[$maarchField]);
                 }
             }
+            $metadataFields .= '|'.$keyMetadataField;
+            $metadataValues .= '|'.$keyMetadataValue;
 
-            $body = [
-                'properties' => $properties,
-            ];
-            $curlResponse = CurlModel::exec([
-                'url'           => "{$multigestUri}/multigest/versions/1/nodes/{$attachmentId}",
-                'basicAuth'     => ['user' => $entityInformations['multigest']['login'], 'password' => $entityInformations['multigest']['password']],
-                'headers'       => ['content-type:application/json', 'Accept: application/json'],
-                'method'        => 'PUT',
-                'body'          => json_encode($body)
-            ]);
-            if ($curlResponse['code'] != 200) {
-                return ['errors' => "Update attachment {$attachment['res_id']} failed : " . json_encode($curlResponse['response'])];
+            $soapClient->GedChampReset();
+            $soapClient->GedAddMultiChampRequete($metadataFields, $metadataValues);
+            $result = $soapClient->GedDossierCreate($entityConfiguration['sasId'], $entityConfiguration['login'], 0);
+            if ($result != 0) {
+                return ['errors' => 'Could not create Multigest folder'];
+            }
+            $soapClient->GedChampReset();
+            $soapClient->GedAddChampRecherche($keyAttachmentMetadataField, $keyAttachmentMetadataValue);
+            $result = $soapClient->GedDossierExist($entityConfiguration['sasId'], $entityConfiguration['login']);
+            if ($result <= 0) {
+                return ['errors' => 'Multigest error '.$result.' occured while accessing folder'];
+            }
+            $result = (int) $soapClient->GedImporterDocumentStream(
+                $entityConfiguration['sasId'],
+                $entityConfiguration['login'],
+                base64_encode($fileContent),
+                '',
+                '',
+                '',
+                $fileExtension,
+                0,
+                0,
+                0,
+                '',
+                '',
+                '',
+                '',
+                -1
+            );
+            if ($result <= 0) {
+                return ['errors' => 'Multigest error '.$result.' occured while importing attachment'];
             }
 
-            $attachmentsTitlesSent[] = $attachment['title'];
+            $multigestUIDs['attachments'][] = $result;
 
             $externalId = json_decode($attachment['external_id'], true);
-            $externalId['multigestId'] = $attachmentId;
+            $externalId['multigestId'] = $result;
             AttachmentModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$attachment['res_id']]]);
         }
 
-        if (!empty($multigestParameters['mapping']['folderModification'])) {
-            $body = [
-                'properties' => $multigestParameters['mapping']['folderModification'],
-            ];
-            $curlResponse = CurlModel::exec([
-                'url'           => "{$multigestUri}/multigest/versions/1/nodes/{$resourceFolderId}",
-                'basicAuth'     => ['user' => $entityInformations['multigest']['login'], 'password' => $entityInformations['multigest']['password']],
-                'headers'       => ['content-type:application/json', 'Accept: application/json'],
-                'method'        => 'PUT',
-                'body'          => json_encode($body)
-            ]);
-            if ($curlResponse['code'] != 200) {
-                return ['errors' => "Update multigest folder {$resourceFolderId} failed : " . json_encode($curlResponse['response'])];
-            }
-        }
-
-        $message = empty($args['folderName']) ? " (envoyé au dossier {$args['folderId']})" : " (envoyé au dossier {$args['folderName']})";
+        $message = " (envoyé avec l’UID MultiGest {$multigestUIDs['document']})";
         return ['history' => $message];
     }
 
