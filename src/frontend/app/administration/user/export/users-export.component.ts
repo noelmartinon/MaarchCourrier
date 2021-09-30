@@ -108,6 +108,13 @@ export class UsersExportComponent implements OnInit {
             }, 10);
 
         }
+        if (event.container.id === 'availableElements') {
+            this.dataAvailable = [... new Set(this.dataAvailable.concat(event.container.data))];
+            this.exportModel.data = [... new Set(this.exportModel.data.concat(event.previousContainer.data))];
+        } else {
+            this.dataAvailable = [... new Set(this.dataAvailable.concat(event.previousContainer.data))];
+            this.exportModel.data = [... new Set(this.exportModel.data.concat(event.container.data))];
+        }
     }
 
     addData(item: any) {
