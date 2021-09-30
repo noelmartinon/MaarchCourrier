@@ -321,12 +321,9 @@ class MultigestController
             return $response->withStatus(400)->withJson(['errors' => 'MultiGest user '.$body['login'].' does not exist']);
         }
 
-        //return $response->withStatus(200)->withJson(MultigestController::sendResource(['resId' => $body['resId'], 'userId' => $body['userId']]));
-
         return $response->withStatus(204);
     }
 
-    // TODO / WIP
     public static function sendResource(array $args)
     {
         ValidatorModel::notEmpty($args, ['resId', 'userId']);
