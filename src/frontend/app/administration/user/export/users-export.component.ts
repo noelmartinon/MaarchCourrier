@@ -98,10 +98,14 @@ export class UsersExportComponent implements OnInit {
             transferArrayItem(event.previousContainer.data, event.container.data, realIndex, event.currentIndex);
             if (this.listFilter !== undefined) {
                 const curFilter = this.listFilter.nativeElement.value;
-            this.listFilter.nativeElement.value = '';
-            setTimeout(() => {
-                this.listFilter.nativeElement.value = curFilter;
-            }, 10);
+                this.listFilter.nativeElement.value = '';
+                setTimeout(() => {
+                    this.listFilter.nativeElement.value = curFilter;
+                }, 10);
+            }
+
+            if (event.item.dropContainer.id !== 'availableElements') {
+                this.dataAvailable = [... new Set(this.dataAvailable)];
             }
         }
     }
