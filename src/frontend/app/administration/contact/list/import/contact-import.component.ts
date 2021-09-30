@@ -360,7 +360,7 @@ export class ContactImportComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.post('../rest/mimeAndSize', {encodedFile: base64}).pipe(
                 tap((data: any) => {
-                    this.mimeAllowed = true;
+                    this.mimeAllowed = data.mime === 'text/plain' ? true : false;
                     this.encoding = data.encoding;
                     resolve(true);
                 }),
@@ -370,6 +370,6 @@ export class ContactImportComponent implements OnInit {
                     return of (false);
                 })
             ).subscribe();
-        })
+        });
     }
 }
