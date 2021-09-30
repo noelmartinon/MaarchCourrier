@@ -181,12 +181,8 @@ export class EntitiesExportComponent implements OnInit {
             }, 10);
 
         }
-        if (event.container.id === 'availableElements') {
-            this.dataAvailable = [... new Set(this.dataAvailable.concat(event.container.data))];
-            this.exportModel.data = [... new Set(this.exportModel.data.concat(event.previousContainer.data))];
-        } else {
-            this.dataAvailable = [... new Set(this.dataAvailable.concat(event.previousContainer.data))];
-            this.exportModel.data = [... new Set(this.exportModel.data.concat(event.container.data))];
+        if (event.item.dropContainer.id !== 'availableElements') {
+            this.dataAvailable = [... new Set(this.dataAvailable)];
         }
     }
 
