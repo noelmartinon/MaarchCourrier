@@ -12,5 +12,8 @@ php ./migrateTemplates.php
 php ./migrateSavedQueries.php
 php ./migrateSsoMapping.php
 php ./migrateOpenLdapConfig.php
+#SGAMI-DEBUT
+php ./migrateDelAction18.php
+#SGAMI-FIN
 php ./migrateCustomXml.php # mettre en avant dernier
 php ./migrateSQL.php # mettre en dernier
