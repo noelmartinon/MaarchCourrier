@@ -74,6 +74,7 @@ import { GiveAvisParallelActionComponent } from './actions/avis-give-parallel-ac
 import { ValidateAvisParallelComponent } from './actions/avis-parallel-validate-action/validate-avis-parallel-action.component';
 import { ReconcileActionComponent } from './actions/reconciliation-action/reconcile-action.component';
 import { SendAlfrescoActionComponent } from './actions/send-alfresco-action/send-alfresco-action.component';
+import { SendMultigestActionComponent } from './actions/send-multigest-action/send-multigest-action.component';
 import { SaveRegisteredMailActionComponent } from './actions/save-registered-mail-action/save-registered-mail-action.component';
 import { SaveAndIndexRegisteredMailActionComponent } from './actions/save-and-index-registered-mail-action/save-and-index-registered-mail-action.component';
 import { SaveAndPrintRegisteredMailActionComponent } from './actions/save-and-print-registered-mail-action/save-and-print-registered-mail-action.component';
@@ -275,6 +276,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         GiveAvisParallelActionComponent,
         ValidateAvisParallelComponent,
         SendAlfrescoActionComponent,
+        SendMultigestActionComponent,
         SaveRegisteredMailActionComponent,
         SaveAndPrintRegisteredMailActionComponent,
         SaveAndIndexRegisteredMailActionComponent,
@@ -349,6 +351,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         closeMailWithAttachmentsOrNotesActionComponent,
         SendSignatureBookActionComponent,
         SendAlfrescoActionComponent,
+        SendMultigestActionComponent,
         SaveRegisteredMailActionComponent,
         SaveAndPrintRegisteredMailActionComponent,
         SaveAndIndexRegisteredMailActionComponent,

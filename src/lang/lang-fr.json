@@ -2549,5 +2549,6 @@
     "multigestModification": "Modification d'un compte Multigest",
     "multigestAccount": "Compte Multigest",
     "multigestAPI": "API multigest",
-    "adminMultigestDesc": "Configurer les comptes Multigest"
+    "adminMultigestDesc": "Configurer les comptes Multigest",
+    "sendMultigest": "Envoyer vers Multigest"
 }
