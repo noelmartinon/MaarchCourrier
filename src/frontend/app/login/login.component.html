@@ -27,7 +27,9 @@
             </form>
         </div>
         <footer style="padding: 8px; backdrop-filter: blur(8px)">
-            <a (click)="openAboutModal()" style="color: white;cursor: pointer" [title]="'lang.aboutUs' | translate">Maarch courrier {{environment.VERSION}}</a> Powered by {{environment.AUTHOR}}
+            <p style="color: white;cursor: default" [title]="'lang.applicationVersion' | translate : {version: applicationVersion, author: environment.AUTHOR}"
+                [innerHTML]="'lang.applicationVersion' | translate : {version: applicationVersion, author: environment.AUTHOR}">
+            </p>
         </footer>
     </div>
 </div>

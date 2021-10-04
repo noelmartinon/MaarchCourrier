@@ -8,6 +8,8 @@ import { HttpClient } from '@angular/common/http';
 import { NotificationService } from '@service/notification/notification.service';
 import { of } from 'rxjs';
 import { MatDialogRef } from '@angular/material/dialog';
+import { MatIconRegistry } from '@angular/material/icon';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
     templateUrl: 'about-us.component.html',
@@ -29,7 +31,12 @@ export class AboutUsComponent implements OnInit {
         private notify: NotificationService,
         private headerService: HeaderService,
         public appService: AppService,
-        public dialogRef: MatDialogRef<AboutUsComponent>) { }
+        public dialogRef: MatDialogRef<AboutUsComponent>,
+        iconReg: MatIconRegistry,
+        sanitizer: DomSanitizer,
+    ) {
+        iconReg.addSvgIcon('maarchBox', sanitizer.bypassSecurityTrustResourceUrl('assets/maarch_box.svg'));
+    }
 
     async ngOnInit() {
         this.headerService.setHeader(this.translate.instant('lang.aboutUs'));
