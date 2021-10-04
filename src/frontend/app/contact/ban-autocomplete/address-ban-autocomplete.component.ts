@@ -6,6 +6,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { FormControl } from '@angular/forms';
 import { Observable, of } from 'rxjs';
 import { debounceTime, filter, distinctUntilChanged, tap, switchMap, exhaustMap, catchError } from 'rxjs/operators';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     selector: 'app-address-ban-input',
@@ -46,6 +47,7 @@ export class AddressBanAutocompleteComponent implements OnInit {
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
+        public functions: FunctionsService
     ) {
 
     }
@@ -102,6 +104,7 @@ export class AddressBanAutocompleteComponent implements OnInit {
     }
 
     selectOpt(ev: any) {
+        console.log(ev);
         const objAddress = {
             id: ev.option.value.banId,
             label : `${ev.option.value.number} ${ev.option.value.afnorName}, ${ev.option.value.city} (${ev.option.value.postalCode})`,
@@ -111,6 +114,7 @@ export class AddressBanAutocompleteComponent implements OnInit {
             addressTown: ev.option.value.city,
             longitude: ev.option.value.lon,
             latitude: ev.option.value.lat,
+            sector: ev.option.value.sector
         };
 
         this.setFormValue(objAddress);
