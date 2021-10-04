@@ -1669,11 +1669,10 @@ class UserController
         foreach ($select as $key => $value) {
             $select[$key] = 'users.' . $value;
         }
-        $select[0] = 'DISTINCT ' . $select[0];
-
         if (empty($select)) {
             return $response->withStatus(400)->withJson(['errors' => 'no allowed field selected for users export']);
         }
+        $select[0] = 'DISTINCT ' . $select[0];
 
         if (UserController::isRoot(['id' => $GLOBALS['id']])) {
             $users = UserModel::get([
@@ -1692,7 +1691,7 @@ class UserController
             if (!$viewPersonaldata) {
                 foreach ($select as $selectKey => $selectValue) {
                     foreach ($personalFields as $personalField) {
-                        if (strrpos($selectValue, 'users.'.$personalField) !== false) {
+                        if (strrpos($selectValue, 'users.' . $personalField) !== false) {
                             // TODO: replace this with str_ends_with in PHP8
                             unset($select[$selectKey]);
                         }
