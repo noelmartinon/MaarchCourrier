@@ -1948,7 +1948,7 @@ class ContactController
         return $contactsUsed;
     }
 
-    private static function getAddressSector(array $args)
+    public static function getAddressSector(array $args)
     {
         ValidatorModel::stringType($args, ['addressNumber', 'addressStreet', 'addressPostcode', 'addressTown']);
 
