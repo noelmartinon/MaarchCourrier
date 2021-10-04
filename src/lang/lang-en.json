@@ -2545,5 +2545,6 @@
     "configSaeInfo": "For more information on setting up an electronic filing system.Consult the documentation : <a href=\"{{url}}\" target=\"_blank\" class=\"link\"> Configure an SAE < / a>",
     "delegatedOpinion": "Opinion given instead of",
     "requestedOpinion": "Opinion requested instead of",
-    "sendMultigest": "Send to Multigest"
+    "sendMultigest": "Send to Multigest",
+    "sasMultigestFolder": "Temporary folder"
 }

@@ -2550,5 +2550,6 @@
     "multigestAccount": "Compte Multigest",
     "multigestAPI": "API multigest",
     "adminMultigestDesc": "Configurer les comptes Multigest",
-    "sendMultigest": "Envoyer vers Multigest"
+    "sendMultigest": "Envoyer vers Multigest",
+    "sasMultigestFolder": "Armoire SAS"
 }
