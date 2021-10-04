@@ -188,12 +188,6 @@
                         </ng-container>
                         <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
                         <mat-row *matRowDef="let row; columns: displayedColumns;">
-
-                            <div *ngIf="row.identifier === 'sector'">
-                                sector
-                            </div>
-                        </mat-row>
-                        
                     </mat-table>
                 </mat-card>
             </div>
