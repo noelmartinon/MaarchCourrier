@@ -1677,20 +1677,17 @@ class UserController
         }
 
         $allowedFields = [
-            'id',
-            'userId',
-            'firstname',
-            'lastname',
-            'phone',
-            'mail'
+            'id'        => 'id',
+            'userId'    => 'user_id',
+            'firstname' => 'firstname',
+            'lastname'  => 'lastname',
+            'phone'     => 'phone',
+            'mail'      => 'mail'
         ];
         $personalFields = ['phone'];
 
-        $fields = array_map(function ($field) {
-            return [
-                'label' => TextFormatModel::camelToSnake($field),
-                'value' => $field
-            ];
+        $fields = array_map(function ($field) use ($allowedFields) {
+            return ['label' => $allowedFields[$field], 'value' => $allowedFields[$field]];
         }, $allowedFields);
 
         $body = $request->getParsedBody();
@@ -1698,7 +1695,7 @@ class UserController
             $fields = [];
             foreach ($body['data'] as $parameter) {
                 if (!empty($parameter['label']) && is_string($parameter['label']) && !empty($parameter['value']) && is_string($parameter['value'])) {
-                    if (!in_array($parameter['value'], $allowedFields)) {
+                    if (!in_array($parameter['value'], array_keys($allowedFields))) {
                         continue;
                     }
                     $fields[] = [
@@ -1708,19 +1705,16 @@ class UserController
                 }
             }
         }
-        $select = array_map(function ($field) {
-            return TextFormatModel::camelToSnake($field['value']);
+        $select = array_map(function ($field) use ($allowedFields) {
+            return $allowedFields[$field['value']];
         }, $fields);
         foreach ($select as $key => $value) {
-            $select[$key] = 'users.'.$value;
+            $select[$key] = 'users.' . $value;
         }
-        if (!empty($select)) {
-            $select[0] = 'DISTINCT '.$select[0];
-        }
-
         if (empty($select)) {
             return $response->withStatus(400)->withJson(['errors' => 'no allowed field selected for users export']);
         }
+        $select[0] = 'DISTINCT '.$select[0];
 
         if (UserController::isRoot(['id' => $GLOBALS['id']])) {
             $users = UserModel::get([
@@ -1739,10 +1733,8 @@ class UserController
             if (!$viewPersonaldata) {
                 foreach ($select as $selectKey => $selectValue) {
                     foreach ($personalFields as $personalField) {
-                        $rpos = strrpos($selectValue, 'users.'.$personalField);
-                        if (is_int($rpos) && ($rpos + strlen('users.'.$personalField) === strlen($selectValue))) {
-                            // selectValue ends with personalField
-                            // TODO: replace all of this with str_ends_with in PHP8
+                        if (strrpos($selectValue, 'users.' . $personalField) !== false) {
+                            // TODO: replace this with str_ends_with in PHP8
                             unset($select[$selectKey]);
                         }
                     }
@@ -1775,7 +1767,7 @@ class UserController
         foreach ($users as $user) {
             $csvContent = [];
             foreach ($fields as $field) {
-                $csvContent[] = $user[TextFormatModel::camelToSnake($field['value'])] ?? '';
+                $csvContent[] = $user[$allowedFields[$field['value']]] ?? '';
             }
             fputcsv($file, $csvContent, $delimiter);
         }

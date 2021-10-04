@@ -555,13 +555,22 @@ class EntityController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        $allowedFields = [
+        $allowedFieldsCamelCase = [
             'id', 'entityId', 'entityLabel', 'shortLabel', 'entityFullName', 'enabled', 'adrs_1', 'adrs_2', 'adrs_3', 'zipcode', 'city', 'country',
             'email', 'parentEntityId', 'entityType', 'businessId', 'folderImport', 'producerService',
             'diffusionList', 'visaCircuit', 'opinionCircuit',
             'users',
             'templates'
         ];
+        $allowedFields = [];
+        foreach ($allowedFieldsCamelCase as $camelCaseField) {
+            if (in_array($camelCaseField, ['diffusionList', 'visaCircuit', 'opinionCircuit'])) {
+                $allowedFields[$camelCaseField] = $camelCaseField;
+            } else {
+                $allowedFields[$camelCaseField] = TextFormatModel::camelToSnake($camelCaseField);
+            }
+        }
+        unset($allowedFieldsCamelCase);
 
         $body = $request->getParsedBody();
 
@@ -572,18 +581,14 @@ class EntityController
             }
         }
 
-        $fields = array_map(function ($field) {
-            $label = $field;
-            if (!in_array($field, ['diffusionList', 'visaCircuit', 'opinionCircuit'])) {
-                $label = TextFormatModel::camelToSnake($field);
-            }
-            return ['label' => $label, 'value' => $field];
+        $fields = array_map(function ($field) use ($allowedFields) {
+            return ['label' => $allowedFields[$field], 'value' => $allowedFields[$field]];
         }, $allowedFields);
         if (!empty($body['data'])) {
             $fields = [];
             foreach ($body['data'] as $parameter) {
                 if (!empty($parameter['label']) && is_string($parameter['label']) && !empty($parameter['value']) && is_string($parameter['value'])) {
-                    if (!in_array($parameter['value'], $allowedFields)) {
+                    if (!in_array($parameter['value'], array_keys($allowedFields))) {
                         continue;
                     }
                     $fields[] = [
@@ -608,10 +613,10 @@ class EntityController
         });
         $entitiesIds = array_column($entities, 'serialId');
 
-        $select = array_map(function ($field) {
-            return TextFormatModel::camelToSnake($field['value']);
+        $select = array_map(function ($field) use ($allowedFields) {
+            return $allowedFields[$field['value']];
         }, $fields);
-        $select = array_diff($select, ['diffusion_list', 'visa_circuit', 'opinion_circuit', 'users', 'templates']);
+        $select = array_diff($select, ['diffusionList', 'visaCircuit', 'opinionCircuit', 'users', 'templates']);
         if (!in_array('id', $select)) {
             $select[] = 'id';
         }
@@ -708,11 +713,7 @@ class EntityController
         foreach ($entities as $entity) {
             $entityValues = [];
             foreach ($fields as $field) {
-                if (in_array($field['value'], ['diffusionList', 'visaCircuit', 'opinionCircuit'])) { // camelCase in the DB already
-                    $entityValues[] = $entity[$field['value']];
-                } else {
-                    $entityValues[] = $entity[TextFormatModel::camelToSnake($field['value'])];
-                }
+                $entityValues[] = $entity[$allowedFields[$field['value']]];
             }
             fputcsv($file, $entityValues, $delimiter);
         }
