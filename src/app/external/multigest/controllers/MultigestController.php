@@ -66,6 +66,7 @@ class MultigestController
         if (!Validator::stringType()->notEmpty()->validate($body['uri'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body uri is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['login'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body login is empty or not a string']);
         }
 
         $value = json_encode([
@@ -194,12 +195,8 @@ class MultigestController
             'label'     => $externalId['multigest']['label'],
             'login'     => $externalId['multigest']['login'],
             'sasId'     => $externalId['multigest']['sasId'],
-            'entities'  => []
+            'entities'  => array_column($entities, 'id')
         ];
-
-        foreach ($entities as $entity) {
-            $account['entities'][] = $entity['id'];
-        }
 
         return $response->withJson($account);
     }
@@ -243,7 +240,7 @@ class MultigestController
             'label'     => $body['label'],
             'login'     => $body['login'],
             'password'  => empty($body['password']) ? $externalId['multigest']['password'] : PasswordModel::encrypt(['password' => $body['password']]),
-            'sasId'    => $body['sasId']
+            'sasId'     => $body['sasId']
         ];
         $account = json_encode($account);
 
@@ -421,20 +418,17 @@ class MultigestController
             if (empty($multigestField) || empty($maarchField)) {
                 continue;
             }
-            $nextField = '';
-            $nextValue = '';
 
+            $nextField = $multigestField;
             if ($maarchField == 'CURRENT_DATE') {
-                $nextField = $multigestField;
                 $nextValue = date('Y-m-d');
             } elseif (isset($document[$maarchField])) {
-                $nextField = $multigestField;
                 if (strpos($maarchField, '_date') !== false) {
-                    $document[$maarchField] = substr($document[$maarchField], 0, 10);
+                    $date = new \DateTime($document[$maarchField]);
+                    $document[$maarchField] = $date->format('Y-m-d');
                 }
                 $nextValue = $document[$maarchField];
             } else {
-                $nextField = $multigestField;
                 $nextValue = MultigestController::getResourceField($document, $maarchField, $rawContacts);
             }
 
@@ -464,7 +458,7 @@ class MultigestController
             return ['errors' => 'No valid metadata from Multigest mapping'];
         }
 
-        $soapClient = new \SoapClient($multigestUri, ['trace' => true]);
+        $soapClient = new \SoapClient($multigestUri);
         $soapClient->GedSetModeUid(1);
 
         $soapClient->GedChampReset();
@@ -472,8 +466,8 @@ class MultigestController
         $result = (int) $soapClient->GedDossierExist($entityConfiguration['sasId'], $entityConfiguration['login']);
         if ($result > 0) {
             return ['errors' => 'This resource is already in Multigest'];
-        } elseif ($result !== -7) {
-            return ['errors' => 'Multigest error '.$result.' occured while checking for folder preexistence'];
+        } elseif ($result !== -7) { // -7 -> "Dossier inexistant"
+            return ['errors' => 'Multigest error ' . $result . ' occurred while checking for folder preexistence'];
         }
 
         $soapClient->GedChampReset();
@@ -487,7 +481,7 @@ class MultigestController
         $soapClient->GedAddChampRecherche($keyMetadataField, $keyMetadataValue);
         $result = $soapClient->GedDossierExist($entityConfiguration['sasId'], $entityConfiguration['login']);
         if ($result <= 0) {
-            return ['errors' => 'Multigest error '.$result.' occured while accessing folder'];
+            return ['errors' => 'Multigest error ' . $result . ' occurred while accessing folder'];
         }
         $result = (int) $soapClient->GedImporterDocumentStream(
             $entityConfiguration['sasId'],
@@ -507,7 +501,7 @@ class MultigestController
             -1
         );
         if ($result <= 0) {
-            return ['errors' => 'Multigest error '.$result.' occured while importing main document'];
+            return ['errors' => 'Multigest error ' . $result . ' occurred while importing main document'];
         }
 
         $externalId = json_decode($document['external_id'], true);
@@ -523,6 +517,7 @@ class MultigestController
         ]);
 
         foreach ($attachments as $attachment) {
+            // TODO check for last version
             $adrInfo = [
                 'docserver_id'  => $attachment['docserver_id'],
                 'path'          => $attachment['path'],
@@ -578,7 +573,7 @@ class MultigestController
             $soapClient->GedAddChampRecherche($keyAttachmentMetadataField, $keyAttachmentMetadataValue);
             $result = $soapClient->GedDossierExist($entityConfiguration['sasId'], $entityConfiguration['login']);
             if ($result <= 0) {
-                return ['errors' => 'Multigest error '.$result.' occured while accessing folder'];
+                return ['errors' => 'Multigest error ' . $result . ' occurred while accessing folder'];
             }
             $result = (int) $soapClient->GedImporterDocumentStream(
                 $entityConfiguration['sasId'],
@@ -598,7 +593,7 @@ class MultigestController
                 -1
             );
             if ($result <= 0) {
-                return ['errors' => 'Multigest error '.$result.' occured while importing attachment'];
+                return ['errors' => 'Multigest error ' . $result . ' occurred while importing attachment'];
             }
 
             $multigestUIDs['attachments'][] = $result;
@@ -613,6 +608,7 @@ class MultigestController
     }
 
     public static function getResourceField(array $document, string $field, array $rawContacts) {
+        // TODO test in case type_id is not a real type
         if ($field == 'doctypeLabel' && !empty($document['type_id'])) {
             return DoctypeModel::getById(['select' => ['description'], 'id' => $document['type_id']])['description'];
         }
@@ -674,5 +670,6 @@ class MultigestController
                 return '';
             }
         }
+        return '';
     }
 }
