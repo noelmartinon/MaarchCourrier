@@ -121,7 +121,6 @@
                     color="default" [removable]="!controlAutocomplete.disabled" (removed)="removeItem(i)"
                     (click)="openContact(item)">
                     <div>
-
                         <span style="display: flex;flex: 1;align-items: center;" class="userInfos">
                             <i class="fa" [class.fa-address-card]="this.valuesToDisplay[item.type][item.id].type === 'contact'"
                                 [class.fa-sitemap]="this.valuesToDisplay[item.type][item.id].type ==='entity'"
@@ -139,7 +138,6 @@
                             {{'lang.contactsParameters_sector' | translate}} : {{this.valuesToDisplay[item.type][item.id].sector}}
                         </span>
                     </div>
-                    
                     <i *ngIf="!functions.empty(valuesToDisplay[item.type][item.id].fillingRate.color)" class="fa fa-circle" [style.color]="valuesToDisplay[item.type][item.id].fillingRate.color" style="font-size: 9px;"></i>
                     <mat-icon matChipRemove class="fa fa-times" *ngIf="!controlAutocomplete.disabled"></mat-icon>
                 </mat-chip>
