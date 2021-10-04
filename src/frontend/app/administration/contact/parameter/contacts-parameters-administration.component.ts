@@ -50,6 +50,8 @@ export class ContactsParametersAdministrationComponent implements OnInit {
     dataSource = new MatTableDataSource(this.contactsParameters);
     displayedColumns = ['label', 'mandatory', 'filling', 'searchable', 'displayable'];
 
+    sectorMsg: string = '';
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -79,7 +81,7 @@ export class ContactsParametersAdministrationComponent implements OnInit {
                     ...item,
                     label : this.functionsService.empty(item.label) ? this.translate.instant('lang.contactsParameters_' + item.identifier) : item.label
                 }));
-
+                this.sectorMsg = this.contactsParameters.find((param: any) => param.identifier === 'sector' && param.displayable) ? this.translate.instant('lang.sectorMsg') : '';
                 this.loading = false;
                 setTimeout(() => {
                     this.dataSource = new MatTableDataSource(this.contactsParameters);
@@ -189,8 +191,9 @@ export class ContactsParametersAdministrationComponent implements OnInit {
     }
 
     addCriteria(event: any, criteria: any, type: string) {
+        this.sectorMsg = criteria.identifier === 'sector' && type === 'displayable' && event.checked === true ? this.translate.instant('lang.sectorMsg') : '';
         this.contactsParameters.forEach((col: any, i: number) => {
-            if (col.id == criteria.id) {
+            if (col.id === criteria.id) {
                 this.contactsParameters[i][type] = event.checked;
             }
         });

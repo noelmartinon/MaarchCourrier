@@ -2544,5 +2544,6 @@
     "delegatedOpinion": "Avis donné à la place de",
     "requestedOpinion": "Avis demandé à la place de",
     "sharePointWarning": "Fermez l'éditeur de document avant de valider l'édition",
-    "autoRedirectToUser": "A moi-même"
+    "autoRedirectToUser": "A moi-même",
+    "sectorMsg": "Ce champ s'affichera également sur le formulaire de méta-données pour les champs de contacts et de BAN."
 }

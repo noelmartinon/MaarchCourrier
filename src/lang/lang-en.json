@@ -2554,5 +2554,7 @@
     "noSuggestion": "No suggestion",
     "otpVisaUser": "The user will be notified by <b> email </b> at the time of his turn in the circuit.",
     "mustSign": "The signature position for external users is mandatory.",
-    "autoRedirectToUser": "To myself"
+    "autoRedirectToUser": "To myself",
+    "sectorMsg": "This field will also appear on the metadata form for the contacts and BAN fields."
+
 }
