@@ -120,7 +120,7 @@
                 <mat-chip *ngFor="let item of controlAutocomplete.value;let i=index" class="listAutocomplete"
                     color="default" [removable]="!controlAutocomplete.disabled" (removed)="removeItem(i)"
                     (click)="openContact(item)">
-                    <div>
+                    <div style="margin-right: auto;">
                         <span style="display: flex;flex: 1;align-items: center;" class="userInfos">
                             <i class="fa" [class.fa-address-card]="this.valuesToDisplay[item.type][item.id].type === 'contact'"
                                 [class.fa-sitemap]="this.valuesToDisplay[item.type][item.id].type ==='entity'"

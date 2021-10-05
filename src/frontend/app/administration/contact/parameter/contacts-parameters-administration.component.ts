@@ -191,7 +191,9 @@ export class ContactsParametersAdministrationComponent implements OnInit {
     }
 
     addCriteria(event: any, criteria: any, type: string) {
-        this.sectorMsg = criteria.identifier === 'sector' && type === 'displayable' && event.checked === true ? this.translate.instant('lang.sectorMsg') : '';
+        if (criteria.identifier === 'sector' && type === 'displayable') {
+            this.sectorMsg = event.checked === true ? this.translate.instant('lang.sectorMsg') : '';
+        }
         this.contactsParameters.forEach((col: any, i: number) => {
             if (col.id === criteria.id) {
                 this.contactsParameters[i][type] = event.checked;

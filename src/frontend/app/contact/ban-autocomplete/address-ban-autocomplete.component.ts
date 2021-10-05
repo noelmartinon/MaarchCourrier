@@ -104,7 +104,6 @@ export class AddressBanAutocompleteComponent implements OnInit {
     }
 
     selectOpt(ev: any) {
-        console.log(ev);
         const objAddress = {
             id: ev.option.value.banId,
             label : `${ev.option.value.number} ${ev.option.value.afnorName}, ${ev.option.value.city} (${ev.option.value.postalCode})`,
