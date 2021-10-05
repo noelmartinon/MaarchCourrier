@@ -807,7 +807,7 @@ class EntityController
             }
         }
 
-        $csvHead = array_map(utf8_decode, array_column($fields, 'label'));
+        $csvHead = array_map(function ($field) { return utf8_decode($field); }, array_column($fields, 'label'));
         fputcsv($file, $csvHead, $delimiter);
 
         foreach ($entities as $entity) {
