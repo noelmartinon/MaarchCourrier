@@ -1777,10 +1777,7 @@ class ContactController
             $address.= $args['contact']['address_town'] . ' ';
         }
         if (!empty($args['contact']['address_country'])) {
-            $address.= $args['contact']['address_country'] . ' ';
-        }
-        if (!empty($args['contact']['sector'])) {
-            $address .= $args['contact']['sector'];
+            $address.= $args['contact']['address_country'];
         }
 
         $contactName = '';
@@ -1804,12 +1801,13 @@ class ContactController
 
         $otherInfo = empty($address) ? "{$contactToDisplay}" : "{$contactToDisplay} - {$address}";
         $contact = [
-            'type'          => 'contact',
-            'id'            => $args['contact']['id'],
-            'contact'       => $contactToDisplay,
-            'address'       => $address,
-            'idToDisplay'   => "{$contactToDisplay}<br/>{$address}",
-            'otherInfo'     => $otherInfo,
+            'type'           => 'contact',
+            'id'             => $args['contact']['id'],
+            'contact'        => $contactToDisplay,
+            'address'        => $address,
+            'sector'         => $args['contact']['sector'],
+            'idToDisplay'    => "{$contactToDisplay}<br/>{$address}",
+            'otherInfo'      => $otherInfo,
             'thresholdLevel' => $thresholdLevel
         ];
 
