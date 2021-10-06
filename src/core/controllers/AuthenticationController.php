@@ -256,7 +256,7 @@ class AuthenticationController
         return true;
     }
 
-    public function authenticate(Request $request, Response $response)
+    public static function authenticate(Request $request, Response $response)
     {
         $body = $request->getParsedBody();
 
@@ -340,8 +340,7 @@ class AuthenticationController
         UserController::setAbsences();
         $user = UserModel::getByLowerLogin(['login' => $login, 'select' => ['id', 'refresh_token', 'user_id']]);
 
-        $GLOBALS['id'] = $user['id'];
-        $GLOBALS['login'] = $user['user_id'];
+        \SrcCore\controllers\CoreController::setGlobals(['userId' => $user['id']]);
 
         $user['refresh_token'] = json_decode($user['refresh_token'], true);
         foreach ($user['refresh_token'] as $key => $refreshToken) {
@@ -567,11 +566,8 @@ class AuthenticationController
             return ['errors' => 'Sso configuration missing : no login mapping'];
         }
 
-        if (in_array(strtoupper($mapping['login']), ['REMOTE_USER', 'PHP_AUTH_USER'])) {
-            $login = $_SERVER[strtoupper($mapping['login'])] ?? null;
-        } else {
-            $login = $_SERVER['HTTP_' . strtoupper($mapping['login'])] ?? null;
-        }
+        $headers = apache_request_headers();
+        $login = $headers[$mapping['login']] ?? '';
         if (empty($login)) {
             return ['errors' => 'Authentication Failed : login not present in header'];
         }
