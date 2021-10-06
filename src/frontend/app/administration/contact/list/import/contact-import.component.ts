@@ -21,6 +21,9 @@ import { Papa } from 'ngx-papaparse';
 export class ContactImportComponent implements OnInit {
 
     loading: boolean = false;
+    mimeAllowed: boolean = false;
+
+    encoding: string = '';
 
     contactColumns: any[] = [
         {
@@ -192,45 +195,53 @@ export class ContactImportComponent implements OnInit {
     }
 
     uploadCsv(fileInput: any) {
-        if (fileInput.target.files && fileInput.target.files[0] && (fileInput.target.files[0].type === 'text/csv' || fileInput.target.files[0].type === 'application/vnd.ms-excel')) {
-            this.loading = true;
-
-            let rawCsv = [];
-            const reader = new FileReader();
-
-            reader.readAsText(fileInput.target.files[0]);
-
-            reader.onload = (value: any) => {
-                this.papa.parse(value.target.result, {
-                    complete: (result) => {
-                        rawCsv = result.data;
-                        rawCsv = rawCsv.filter(data => data.length === rawCsv[0].length);
-
-                        let dataCol = [];
-                        let objData = {};
-
-                        this.setCsvColumns(rawCsv[0]);
-                        this.countAll = this.hasHeader ? rawCsv.length - 1 : rawCsv.length;
-
-                        for (let index = 0; index < rawCsv.length; index++) {
-                            objData = {};
-                            dataCol = rawCsv[index];
-                            dataCol.forEach((element: any, index2: number) => {
-                                objData[this.csvColumns[index2]] = element;
-                            });
-                            this.csvData.push(objData);
+        const file: any = fileInput.target.files[0];
+        const reader = new FileReader();
+        let encodedFile: string = '';
+        reader.onload = (async () => {
+            const result: string = reader.result as string;
+            encodedFile = result.substring(result.indexOf('base64'));
+            encodedFile = encodedFile.split(',')[1];
+            await this.checkMimeType(encodedFile);
+            if (fileInput.target.files && fileInput.target.files[0] && this.mimeAllowed) {
+                this.loading = true;
+                let rawCsv = [];
+                reader.readAsText(fileInput.target.files[0], this.functionsService.empty(this.encoding) ? 'ISO-8859-1' : this.encoding);
+                
+                reader.onload = (value: any) => {
+                    this.papa.parse(value.target.result, {
+                        complete: (result) => {
+                            rawCsv = result.data;
+                            rawCsv = rawCsv.filter(data => data.length === rawCsv[0].length);
+    
+                            let dataCol = [];
+                            let objData = {};
+                            this.setCsvColumns(rawCsv[0]);
+    
+                            this.countAll = this.hasHeader ? rawCsv.length - 1 : rawCsv.length;
+    
+                            for (let index = 0; index < rawCsv.length; index++) {
+                                objData = {};
+                                dataCol = rawCsv[index];
+    
+                                dataCol.forEach((element: any, index2: number) => {
+                                    objData[this.csvColumns[index2]] = element;
+                                });
+                                this.csvData.push(objData);
+                            }
+                            this.initData();
+                            this.countAdd = this.csvData.filter((data: any, index: number) => index > 0 && this.functionsService.empty(data[this.associatedColmuns['id']])).length;
+                            this.countUp = this.csvData.filter((data: any, index: number) => index > 0 && !this.functionsService.empty(data[this.associatedColmuns['id']])).length;
+    
+                            this.loading = false;
                         }
-                        this.initData();
-                        this.countAdd = this.csvData.filter((data: any, index: number) => index > 0 && this.functionsService.empty(data[this.associatedColmuns['id']])).length;
-                        this.countUp = this.csvData.filter((data: any, index: number) => index > 0 && !this.functionsService.empty(data[this.associatedColmuns['id']])).length;
-
-                        this.loading = false;
-                    }
-                });
-            };
-        } else {
-            this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.notAllowedExtension') + ' !', msg: this.translate.instant('lang.file') + ' : <b>' + fileInput.target.files[0].name + '</b>, ' + this.translate.instant('lang.type') + ' : <b>' + fileInput.target.files[0].type + '</b><br/><br/><u>' + this.translate.instant('lang.allowedExtensions') + '</u> : <br/>' + 'text/csv' } });
-        }
+                    });
+                };
+            } else {
+                this.dialog.open(AlertComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.notAllowedExtension') + ' !', msg: this.translate.instant('lang.file') + ' : <b>' + fileInput.target.files[0].name + '</b>, ' + this.translate.instant('lang.type') + ' : <b>' + fileInput.target.files[0].type + '</b><br/><br/><u>' + this.translate.instant('lang.allowedExtensions') + '</u> : <br/>' + 'text/csv' } });
+            }
+        });
+        reader.readAsDataURL(file);
     }
 
     setCsvColumns(headerData: string[] = null) {
@@ -343,5 +354,22 @@ export class ContactImportComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    checkMimeType(base64: string) {
+        return new Promise((resolve) => {
+            this.http.post('../rest/mimeAndSize', {encodedFile: base64}).pipe(
+                tap((data: any) => {
+                    this.mimeAllowed = data.mime === 'text/plain' ? true : false;
+                    this.encoding = data.encoding;
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.mimeAllowed = false;
+                    this.notify.handleSoftErrors(err);
+                    return of (false);
+                })
+            ).subscribe();
+        });
     }
 }

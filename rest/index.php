@@ -268,6 +268,9 @@ $app->delete('/folders/{id}/unpin', \Folder\controllers\FolderController::class 
 // CommitInformation
 $app->get('/commitInformation', \SrcCore\controllers\CoreController::class . ':getGitCommitInformation');
 
+// File Utils
+$app->post('/mimeAndSize', \SrcCore\controllers\CoreController::class . ':getMimeTypeAndFileSizeREST');
+
 //Groups
 $app->get('/groups', \Group\controllers\GroupController::class . ':get');
 $app->post('/groups', \Group\controllers\GroupController::class . ':create');
