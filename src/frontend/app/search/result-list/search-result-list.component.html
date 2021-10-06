@@ -1,4 +1,4 @@
-<mat-card id="viewThumbnail" style="display:none;position: fixed;z-index: 2;margin-left: 1px; bottom: 0;">
+<mat-card id="viewThumbnail" style="display:none;position: fixed;z-index: 2;margin-left: -28px; top: 0;">
     <img style="max-height: 100vh;" *ngIf="thumbnailUrl !== ''" [src]="thumbnailUrl | secureUrl | async" />
 </mat-card>
 <ng-template #filterTemplate>
