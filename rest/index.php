@@ -45,10 +45,7 @@ $app->add(function (\Slim\Http\Request $request, \Slim\Http\Response $response, 
                     }
                 }
             } else {
-                $response = \SrcCore\controllers\AuthenticationController::authenticate($request, $response);
-                if ($response->getStatusCode() != 204) {
-                    return $response;
-                }
+                return $response->withStatus(401)->withJson(['errors' => 'Authentication Failed']);
             }
         }
     }
