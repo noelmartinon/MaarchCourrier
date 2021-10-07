@@ -574,8 +574,11 @@ class AuthenticationController
         }
         if (empty($login)) {
             $headers = [];
-            foreach (apache_request_headers() as $key => $value) {
-                $headers[strtoupper($key)] = $value;
+            $apacheHeaders = apache_request_headers();
+            if (!empty($apacheHeaders)) {
+                foreach ($apacheHeaders as $key => $value) {
+                    $headers[strtoupper($key)] = $value;
+                }
             }
             $login = $headers[strtoupper($mapping['login'])] ?? null;
         }
