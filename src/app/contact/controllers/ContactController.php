@@ -1799,13 +1799,14 @@ class ContactController
 
         $contactToDisplay = trim($contactName . $company);
 
-        $otherInfo = empty($address) ? "{$contactToDisplay}" : "{$contactToDisplay} - {$address}";
+        $sector = $args['contact']['sector'];
+        $otherInfo = empty($address) ? "{$contactToDisplay}" : "{$contactToDisplay} - {$address}" . (!empty($sector) ? " - {$sector}" : '');
         $contact = [
             'type'           => 'contact',
             'id'             => $args['contact']['id'],
             'contact'        => $contactToDisplay,
             'address'        => $address,
-            'sector'         => $args['contact']['sector'],
+            'sector'         => $sector,
             'idToDisplay'    => "{$contactToDisplay}<br/>{$address}",
             'otherInfo'      => $otherInfo,
             'thresholdLevel' => $thresholdLevel
