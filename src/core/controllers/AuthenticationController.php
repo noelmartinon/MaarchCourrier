@@ -573,8 +573,11 @@ class AuthenticationController
             $login = $_SERVER['HTTP_' . strtoupper($mapping['login'])] ?? null;
         }
         if (empty($login)) {
-            $headers = apache_request_headers();
-            $login = $headers[$mapping['login']] ?? null;
+            $headers = [];
+            foreach (apache_request_headers() as $key => $value) {
+                $headers[strtoupper($key)] = $value;
+            }
+            $login = $headers[strtoupper($mapping['login'])] ?? null;
         }
         if (empty($login)) {
             return ['errors' => 'Authentication Failed : login not present in header'];
