@@ -1051,7 +1051,7 @@ export class ContactsFormComponent implements OnInit {
         const contact = {
             addressNumber: ev.option.value.number,
             addressStreet: ev.option.value.afnorName,
-            addressPostcode: ev.option.value.postcode,
+            addressPostcode: ev.option.value.postalCode,
             addressTown: ev.option.value.city,
             addressCountry: 'FRANCE'
         };
