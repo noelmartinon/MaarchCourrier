@@ -2,14 +2,18 @@
     <i class="fa fa-spinner fa-spin fa-5x" style="margin-left: 50%;margin-top: 16%;font-size: 8em"></i>
 </div>
 <div *ngIf="!loading" class='visaContent'>
+    <!-- Header circuit visa -->
     <div class="titleSignatureBook">
+        <!-- header tab -->
         <div id="tabSignatureBook">
-            <div *ngIf="signatureBook.documents[0] && !signatureBook.documents[0].inSignatureBook"
+            <!-- SGAMI NGIF -->
+            <div *ngIf="signatureBook.documents[0] && !signatureBook.documents[0].inSignatureBook || letIconDisplay"
                 title="{{'lang.mail' | translate}}" class="item"
                 [ngClass]="{'activeTabSignatureBook': headerTab == 'document'}"
                 (click)="changeSignatureBookLeftContent('document')">
                 <i class="fa fa-file-alt fa-2x"></i>
             </div>
+            <!-- END SGAMI NGIF -->
             <div *ngFor="let module of processTool" title="{{module.label}}" class="item"
                 [ngClass]="{'activeTabSignatureBook': headerTab == module.id}"
                 [class.tool-disabled]="!isToolEnabled(module.id)"
@@ -18,6 +22,7 @@
                 <i *ngIf="module.count > 0" class="fas fa-circle haveContent"></i>
             </div>
         </div>
+        <!-- End header tab -->
         <div id="labelSignatureBook" title="{{signatureBook.documents[0].title}}">
             <div>{{signatureBook.documents[0].alt_id}} : {{signatureBook.documents[0].title}}</div>
         </div>
@@ -40,6 +45,7 @@
             </span>
         </div>
     </div>
+    <!-- end header -->
     <div class="contentSignatureBook">
         <div class="resListContent" [ngStyle]="{'display': showResLeftPanel ? 'inline-block' : 'none'}"
             id="resListContent">
@@ -74,6 +80,7 @@
                 <i class="fa fa-spinner fa-spin fa-4x"></i>
             </div>
         </div>
+        <!-- Leftview -->
         <div *ngIf="showLeftPanel" class="contentLeft" [ngStyle]="{'width': leftContentWidth}" id="contentLeft">
             <div *ngIf="showLeftPanel && showRightPanel" class="hideresListContent" (click)="displayPanel('RESLEFT')">
                 <i class="fa fa-chevron-left" aria-hidden="true" *ngIf="showResLeftPanel"></i>
@@ -103,7 +110,8 @@
                     id="leftPanelShowDocumentIframe" #leftPanelShowDocumentIframe
                     [src]="leftViewerLink | secureUrl | async" [render-text]="true" [fit-to-page]="false"
                     [original-size]="true" [ngStyle]="{'height': showTopLeftPanel ? '84%' : '99%'}" [show-all]="true"
-                    (error)="pdfViewerError(leftViewerLink)"></pdf-viewer>
+                    (error)="pdfViewerError(leftViewerLink)">
+                </pdf-viewer>
                 <div *ngIf="leftSelectedThumbnail > 0 && signatureBook.documents[leftSelectedThumbnail].format != 'pdf' && !signatureBook.documents[leftSelectedThumbnail].isConverted"
                     [ngStyle]="{'height': showTopLeftPanel ? '79%' : '96%'}" class="visaNoPdfWarning">
                     <div style="padding-top: 25%;">
@@ -119,6 +127,17 @@
                     </div>
                 </div>
             </div>
+            <!-- SGAMI -->
+            <!-- <div *ngIf="headerTab == 'document'" class="contentShow" style="width:98%;">
+                <app-document-viewer #appDocumentViewerLeft id="leftPanelShowDocumentIframe"
+                    *ngIf="signatureBook.attachments[leftSelectedThumbnail].isConverted"
+                    style="height:100%;width:100%;" [editMode]="true" [hideTools]="true"
+                    [mode]="'mainDocument'"
+                    [resId]="signatureBook.attachments[leftSelectedThumbnail].signed ? signatureBook.attachments[leftSelectedThumbnail].viewerId : signatureBook.attachments[leftSelectedThumbnail].res_id"
+                    [title]="signatureBook.attachments[leftSelectedThumbnail].identifier">
+                </app-document-viewer>
+            </div> -->
+            <!-- End SGAMI -->
             <div *ngIf="headerTab == 'notes'" class="contentShow" style="width:98%;">
                 <app-notes-list #appNotesList [editMode]="true" [resId]="resId"
                     (reloadBadgeNotes)="refreshBadge($event,'notes')">
@@ -148,6 +167,7 @@
                 <i class="fa fa-chevron-left" aria-hidden="true" *ngIf="!showRightPanel"></i>
             </div>
         </div>
+        <!-- END Leftview -->
         <div *ngIf="showRightPanel" class="contentRight" id="contentRight" [ngStyle]="{'width': rightContentWidth}">
             <div class="hideLeftContent" (click)="displayPanel('LEFT')" id="hideLeftContent"
                 [ngStyle]="{'margin-left': showLeftPanel ? '-13px' : '-2px'}">
@@ -277,7 +297,6 @@
                         </span>
                     </div>
                 </div>
-
                 <app-attachments-list *ngIf="showAttachmentPanel" #appAttachmentsList [resId]="resId"
                     [target]="'process'" [canModify]="canUpdateDocument" (reloadBadgeAttachments)="refreshAttachments()"
                     (afterActionAttachment)="refreshAttachments()">
@@ -291,11 +310,16 @@
             </div>
         </div>
         <div class="panelRight">
+            <!-- RightPanel affiche les docs -->
+            <!-- SGAMI -->
             <div *ngIf="signatureBook.attachments" id="rightPanelContent" class="panelRightContent">
                 <div title="[{{attachment.attachment_type}}] {{attachment.title}}" style="position: relative;"
-                    class="item" *ngFor="let attachment of signatureBook.attachments; let i = index"
-                    (click)="changeRightViewer(i)"
-                    [ngClass]="{'panelSelectedThumbnail': i == rightSelectedThumbnail && !showAttachmentPanel}">
+                    class="item unSelectetableItem" *ngFor="let attachment of signatureBook.attachments; let i = index"
+                    (click)="i == 0 && leftDocumentDisplay ? false : changeRightViewer(i)"
+                    [ngClass]="{'panelSelectedThumbnail': i == rightSelectedThumbnail && !showAttachmentPanel, 'visaDisabledButton': i == 0 && leftDocumentDisplay && !showAttachmentPanel}"
+                    [ngStyle]="{'cursor': i == 0 && leftDocumentDisplay ? 'not-allowed': '', 'backgroundColor': i == 0 && leftDocumentDisplay ? 'inherit': ''} "
+                    >
+            <!-- END -->
                     <span class="fa-stack fa-lg">
                         <i class="far fa-file fa-stack-2x"></i><i
                             style="font-weight:bold;letter-spacing: -1px;">{{attachment.icon}}</i>
@@ -307,9 +331,14 @@
                         class="far fa-circle"></i>
                     <i *ngIf="attachment.sign && attachment.status == 'TMP'"
                         style="color:green;-ms-transform: rotate(-35deg);-webkit-transform: rotate(-35deg);transform: rotate(-35deg);position: absolute;top: 39px;right: 1px;">{{'lang.draft' | translate}}</i>
+                    <!-- SGAMI -->
+                    <i *ngIf="i == 0 && leftDocumentDisplay"
+                        style="color:red;-ms-transform: rotate(-35deg);-webkit-transform: rotate(-35deg);transform: rotate(-35deg);position: absolute;top: 25px;right: 2px;"> Déjà affiché </i>
+                    <!-- END  -->
                     <br /><i style="position: absolute;margin-left: -9px;">.{{attachment.format}}</i>
                 </div>
             </div>
+            <!-- End RightPanel affiche les docs -->
             <div style="bottom: 0px;position: absolute;width:100%;">
                 <div class="panelRightListPj" (click)="displayAttachmentPanel()"
                     title="{{'lang.displayAtt' | translate}}"
@@ -336,7 +365,6 @@
         </div>
     </div>
 </div>
-
 <div class="tooltip_templates" style="display: none">
     <span id="obsVersionTooltip">
         <div

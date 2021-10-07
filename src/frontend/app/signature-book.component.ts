@@ -55,6 +55,10 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     loading: boolean = false;
     loadingSign: boolean = false;
     canUpdateDocument: boolean = false;
+    // SGAMI
+    leftDocumentDisplay : boolean = false;
+    letIconDisplay: boolean = false;
+    // END
 
     subscription: Subscription;
     currentResourceLock: any = null;
@@ -92,6 +96,9 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
     @ViewChild('appVisaWorkflow', { static: false }) appVisaWorkflow: VisaWorkflowComponent;
     @ViewChild('appDocumentViewer', { static: false }) appDocumentViewer: DocumentViewerComponent;
+    // SGAMI
+    @ViewChild('appDocumentViewerLeft', { static: false }) appDocumentViewerLeft: DocumentViewerComponent;
+    // END
     @ViewChild('appNotesList', { static: false }) appNotesList: NotesListComponent;
 
     constructor(
@@ -116,7 +123,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
         });
     }
 
-    ngOnInit(): void {
+    ngOnInit(): void {        
         this.loading = true;
 
         this.route.params.subscribe(params => {
@@ -137,6 +144,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                         return;
                     }
                     this.signatureBook = data;
+                    console.dir("this.signatureBook", this.signatureBook);
                     this.canUpdateDocument = data.canUpdateDocuments;
                     this.headerTab = 'document';
                     this.leftSelectedThumbnail = 0;
@@ -152,15 +160,22 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
                     this.leftContentWidth = '44%';
                     this.rightContentWidth = '44%';
+
+                    // SGAMI             
+                    if (this.signatureBook.attachments[1]) {
+                        this.rightSelectedThumbnail = 1;
+                        this.rightViewerLink = this.signatureBook.attachments[1].viewerLink;
+                        this.leftDocumentDisplay = true;
+                        this.letIconDisplay = true;
+                    }
+
                     if (this.signatureBook.documents[0]) {
-                        this.leftViewerLink = this.signatureBook.documents[0].viewerLink;
-                        if (this.signatureBook.documents[0].inSignatureBook) {
+                        this.leftViewerLink = this.signatureBook.attachments[0].viewerLink;
+                        if (this.signatureBook.documents[0].inSignatureBook && this.leftDocumentDisplay == false) {                            
                             this.headerTab = 'visaCircuit';
                         }
                     }
-                    if (this.signatureBook.attachments[0]) {
-                        this.rightViewerLink = this.signatureBook.attachments[0].viewerLink;
-                    }
+                    // END
 
                     this.signatureBook.resListIndex = this.signatureBook.resList.map((e: any) => e.res_id).indexOf(this.resId);
 
@@ -179,8 +194,9 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                     }, 0);
                     this.loadBadges();
                     this.loadActions();
+                    
                     if (this.appDocumentViewer !== undefined) {
-                        this.appDocumentViewer.loadRessource(this.signatureBook.attachments[this.rightSelectedThumbnail].signed ? this.signatureBook.attachments[this.rightSelectedThumbnail].viewerId : this.signatureBook.attachments[this.rightSelectedThumbnail].res_id, this.signatureBook.attachments[this.rightSelectedThumbnail].isResource ? 'mainDocument' : 'attachment');
+                        this.appDocumentViewer.loadRessource(this.signatureBook.attachments[this.rightSelectedThumbnail].signed ? this.signatureBook.attachments[this.rightSelectedThumbnail].viewerId : this.signatureBook.attachments[this.rightSelectedThumbnail].res_id, this.signatureBook.attachments[this.rightSelectedThumbnail].isResource ?  'mainDocument' : 'attachment');
                     }
                 }, (err) => {
                     this.notify.error(err.error.errors);
@@ -192,7 +208,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
         });
     }
 
-    loadActions() {
+    loadActions() {      
         this.http.get('../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/actions?resId=' + this.resId)
             .subscribe((data: any) => {
                 this.signatureBook.actions = data.actions;
@@ -228,7 +244,20 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     }
 
     changeSignatureBookLeftContent(id: string) {
-        if (this.isToolModified()) {
+        // SGAMI
+        if(id === 'document') {
+            this.leftDocumentDisplay = true;
+            if(this.rightSelectedThumbnail == 0){
+                this.rightSelectedThumbnail = 1;
+                this.appDocumentViewer.loadRessource(this.signatureBook.attachments[this.rightSelectedThumbnail].signed ? this.signatureBook.attachments[this.rightSelectedThumbnail].viewerId : this.signatureBook.attachments[this.rightSelectedThumbnail].res_id, 'attachment');
+            }
+        } 
+        else if(id !== 'document' && this.letIconDisplay == true ) {
+            this.leftDocumentDisplay = false;
+        } 
+        //  END SGAMI
+
+        if (this.isToolModified()) {            
             const dialogRef = this.openConfirmModification();
 
             dialogRef.afterClosed().pipe(
@@ -287,7 +316,9 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
             this.rightViewerLink = '';
         }
         this.rightSelectedThumbnail = index;
+        // SGAMI
         this.appDocumentViewer.loadRessource(this.signatureBook.attachments[this.rightSelectedThumbnail].signed ? this.signatureBook.attachments[this.rightSelectedThumbnail].viewerId : this.signatureBook.attachments[this.rightSelectedThumbnail].res_id, this.signatureBook.attachments[this.rightSelectedThumbnail].isResource ? 'mainDocument' : 'attachment');
+        // END SGAMI
     }
 
     changeLeftViewer(index: number) {
@@ -386,12 +417,25 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                 }
 
                 this.signatureBook.attachments = data;
-
                 if (mode === 'add' || mode === 'edit') {
                     this.changeRightViewer(i);
+                // SGAMI 
+                    this.leftDocumentDisplay = true;
+                    this.letIconDisplay = true;
+                    if(this.signatureBook.attachments.length === 2) {
+                        this.changeSignatureBookLeftContent('document');
+                    }
                 } else if (mode === 'del') {
-                    this.changeRightViewer(0);
+                    if(this.signatureBook.attachments.length >= 2) {
+                        this.changeRightViewer(1);
+                    } else {
+                        this.changeRightViewer(0);
+                        this.changeSignatureBookLeftContent('visaCircuit');
+                        this.leftDocumentDisplay = false;
+                        this.letIconDisplay = false;
+                    }
                 }
+                // END
             });
     }
 
@@ -455,7 +499,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
         }
     }
 
-    unsignFile(attachment: any) {
+    unsignFile(attachment: any) {        
         if (attachment.isResource) {
             this.unSignMainDocument(attachment);
         } else {
@@ -463,7 +507,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
         }
     }
 
-    unSignMainDocument(attachment: any) {
+    unSignMainDocument(attachment: any) {        
         this.http.put(`../rest/resources/${attachment.res_id}/unsign`, {}).pipe(
             tap(() => {
                 this.appDocumentViewer.loadRessource(attachment.res_id, 'maintDocument');
@@ -473,6 +517,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                 if (this.signatureBook.resList.length > 0) {
                     this.signatureBook.resList[this.signatureBook.resListIndex].allSigned = false;
                 }
+
                 if (this.headerTab === 'visaCircuit') {
                     this.changeSignatureBookLeftContent('document');
                     setTimeout(() => {
@@ -491,7 +536,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
         ).subscribe();
     }
 
-    unSignAttachment(attachment: any) {
+    unSignAttachment(attachment: any) {        
         this.http.put('../rest/attachments/' + attachment.res_id + '/unsign', {}).pipe(
             tap(() => {
                 this.appDocumentViewer.loadRessource(attachment.res_id, 'attachment');
