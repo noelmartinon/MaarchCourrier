@@ -681,9 +681,10 @@ class EntityController
             }
         }
 
-        $fields = array_map(function ($field) use ($allowedFields) {
-            return ['label' => $allowedFields[$field], 'value' => $allowedFields[$field]];
-        }, $allowedFields);
+        $fields = [];
+        foreach ($allowedFields as $camel => $snake) {
+            $fields[] = ['label' => $snake, 'value' => $camel];
+        }
         if (!empty($body['data'])) {
             $fields = [];
             foreach ($body['data'] as $parameter) {
