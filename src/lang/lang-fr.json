@@ -2545,5 +2545,9 @@
     "requestedOpinion": "Avis demandé à la place de",
     "sharePointWarning": "Fermez l'éditeur du document avant de valider l'édition",
     "autoRedirectToUser": "A moi-même",
-    "applicationVersion": "Maarch courrier {{version}} Powered by {{author}}"
+    "applicationVersion": "Maarch courrier {{version}} Powered by {{author}}",
+    "getProcessLimitDate": "Date limite de traitement",
+    "getProcessLimitDateSample": "<b color=\"warn\">3 jour(s)</b>",
+    "getCreationDate":             "Date de création",
+    "getCreationDateSample":       "1er janv."
 }

@@ -2555,5 +2555,9 @@
     "otpVisaUser": "The user will be notified by <b> email </b> at the time of his turn in the circuit.",
     "mustSign": "The signature position for external users is mandatory.",
     "autoRedirectToUser": "To myself",
-    "applicationVersion": "Maarch courrier {{version}} Powered by {{author}}"
+    "applicationVersion": "Maarch courrier {{version}} Powered by {{author}}",
+    "getProcessLimitDate": "Processing deadline",
+    "getProcessLimitDateSample": "<b color=\"warn\">3 day(s)</b>",
+    "getCreationDate":             "Creation date",
+    "getCreationDateSample":       "Jan. 1st"
 }
