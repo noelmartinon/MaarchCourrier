@@ -1746,5 +1746,9 @@ export const LANG_FR = {
     "youCannotUnsign" : "Vous n'avez pas le droit de <b>dé-signer</b> ce document. Vous devez ếtre la personne qui a signé ce document.",
     "arContentIsEmpty": "Le contenu de l'accusé de réception est vide",
     "company": "Organisation",
-    "noRecipient": "Aucun destinataire associé."
+    "noRecipient": "Aucun destinataire associé.",
+    "getProcessLimitDate": "Date limite de traitement",
+    "getProcessLimitDateSample": "<b color=\"warn\">3 jour(s)</b>",
+    "getCreationDate":             "Date de création",
+    "getCreationDateSample":       "1er janv.",
 };

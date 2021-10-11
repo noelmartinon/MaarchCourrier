@@ -1744,5 +1744,9 @@ export const LANG_EN = {
     "youCannotUnsign": "You do not have the right to <b>unsign</b> this document. You must be the person who signed this document.",
     "arContentIsEmpty": "AR content is empty",
     "company": "Company",
-    "noRecipient": "No associated recipient."
+    "noRecipient": "No associated recipient.",
+    "getProcessLimitDate": "Processing deadline",
+    "getProcessLimitDateSample": "<b color=\"warn\">3 day(s)</b>",
+    "getCreationDate":             "Creation date",
+    "getCreationDateSample":       "Jan. 1st",
 };

@@ -87,6 +87,20 @@ export class ListAdministrationComponent implements OnInit {
             'icon': 'fa-calendar'
         },
         {
+            'value': 'getCreationDate',
+            'label': this.lang.getCreationDate,
+            'sample': this.lang.getCreationDateSample,
+            'cssClasses': ['align_leftData'],
+            'icon': 'fa-calendar'
+        },
+        {
+            'value': 'getProcessLimitDate',
+            'label': this.lang.getProcessLimitDate,
+            'sample': this.lang.getProcessLimitDateSample,
+            'cssClasses': ['align_leftData'],
+            'icon': 'fa-stopwatch'
+        },
+        {
             'value': 'getVisaWorkflow',
             'label': this.lang.getVisaWorkflow,
             'sample': '<i color="accent" class="fa fa-check"></i> Barbara BAIN -> <i class="fa fa-hourglass-half"></i> <b>Bruno BOULE</b> -> <i class="fa fa-hourglass-half"></i> Patricia PETIT',
@@ -235,9 +249,11 @@ export class ListAdministrationComponent implements OnInit {
         let indexData: number = 0;
         this.basketGroup.list_display.forEach((element: any) => {
             indexData = this.availableData.map((e: any) => e.value).indexOf(element.value);
-            this.availableData[indexData].cssClasses = element.cssClasses;
-            this.displayedSecondaryData.push(this.availableData[indexData]);
-            this.availableData.splice(indexData, 1);
+            if (indexData !== -1) {
+                this.availableData[indexData].cssClasses = element.cssClasses;
+                this.displayedSecondaryData.push(this.availableData[indexData]);
+                this.availableData.splice(indexData, 1);
+            }
         });
         this.selectedListEvent = this.basketGroup.list_event;
         this.selectedListEventClone = this.selectedListEvent;
