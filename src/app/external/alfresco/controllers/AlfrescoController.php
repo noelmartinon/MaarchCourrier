@@ -579,51 +579,13 @@ class AlfrescoController
             return ['errors' => 'Alfresco mapping file does not exist'];
         }
 
-        if (!empty($document['external_id']['alfrescoId']) && empty($document['external_id']['alfrescoFolderId'])) {
+        $document['external_id'] = json_decode($document['external_id'], true);
+        if (!empty($document['external_id']['alfrescoId'])) {
             $message = empty($args['folderName']) ? " (envoyé au dossier {$args['folderId']})" : " (envoyé au dossier {$args['folderName']})";
             return ['history' => $message];
-        } elseif (!empty($document['external_id']['alfrescoFolderId']) && !empty($alfrescoParameters['mapping']['folderModification'])) {
-            $curlResponse = CurlModel::exec([
-                'url'       => "{$alfrescoUri}/alfresco/versions/1/nodes/{$document['external_id']['alfrescoFolderId']}",
-                'basicAuth' => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
-                'headers'   => ['Accept: application/json'],
-                'method'    => 'GET'
-            ]);
-
-            if ($curlResponse['code'] != 200) {
-                return ['errors' => 'Cannot get alfresco folder ' . $document['external_id']['alfrescoFolderId']];
-            }
-
-            if (empty($curlResponse['response']['entry']['properties'])) {
-                return ['errors' => 'Alfresco folder ' . $document['external_id']['alfrescoFolderId'] . ' does not have any properties'];
-            }
-            $folderProperties = $curlResponse['response']['entry']['properties'];
-            $folderPropertiesKeys = array_keys($folderProperties);
-            $fieldNotFound = false;
-            $fieldNotCorrectValue = false;
-            foreach ($alfrescoParameters['mapping']['folderModification'] as $alfrescoField => $fieldValue) {
-                if (!in_array($alfrescoField, $folderPropertiesKeys)) {
-                    $fieldNotFound = true;
-                    break;
-                }
-                if ($folderProperties[$alfrescoField] != $fieldValue) {
-                    $fieldNotCorrectValue = true;
-                    break;
-                }
-            }
-
-            if (!$fieldNotFound && !$fieldNotCorrectValue) {
-                $message = empty($args['folderName']) ? " (envoyé au dossier {$args['folderId']})" : " (envoyé au dossier {$args['folderName']})";
-                return ['history' => $message];
-            }
-            if ($fieldNotFound) {
-                return ['errors' => 'At least one field is missing in Alfresco folder ' . $document['external_id']['alfrescoFolderId'] . ' properties'];
-            }
-            if ($fieldNotCorrectValue) {
-                return ['errors' => 'At least one field does not have the correct value in Alfresco folder ' . $document['external_id']['alfrescoFolderId'] . ' properties'];
-            }
+        } elseif (!empty($document['external_id']['alfrescoLock'])) {
+            return ['errors' => 'Lock found : action already in progress'];
         }
-
 
         $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
         if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
@@ -644,6 +606,14 @@ class AlfrescoController
         if (!empty($alfrescoParameters['mapping']['folderCreation'])) {
             $body['properties'] = $alfrescoParameters['mapping']['folderCreation'];
         }
+
+        $document['external_id']['alfrescoLock'] = true;
+        ResModel::update([
+            'set'   => ['external_id' => json_encode($document['external_id'])],
+            'where' => ['res_id = ?'],
+            'data'  => [$args['resId']]
+        ]);
+
         $curlResponse = CurlModel::execSimple([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['folderId']}/children",
             'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
@@ -652,6 +622,7 @@ class AlfrescoController
             'body'          => json_encode($body)
         ]);
         if ($curlResponse['code'] != 201) {
+            AlfrescoController::resetLock(['resId' => $args['resId']]);
             return ['errors' => "Create folder {$document['alt_identifier']} failed : " . json_encode($curlResponse['response'])];
         }
         $resourceFolderId = $curlResponse['response']['entry']['id'];
@@ -668,6 +639,7 @@ class AlfrescoController
             'multipartBody' => $multipartBody
         ]);
         if ($curlResponse['code'] != 201) {
+            AlfrescoController::resetLock(['resId' => $args['resId']]);
             return ['errors' => "Send resource {$args['resId']} failed : " . json_encode($curlResponse['response'])];
         }
         $documentId = $curlResponse['response']['entry']['id'];
@@ -766,12 +738,12 @@ class AlfrescoController
             'body'          => json_encode($body)
         ]);
         if ($curlResponse['code'] != 200) {
+            AlfrescoController::resetLock(['resId' => $args['resId']]);
             return ['errors' => "Update resource {$args['resId']} failed : " . json_encode($curlResponse['response'])];
         }
 
-        $externalId = json_decode($document['external_id'], true);
+        $externalId = $document['external_id'];
         $externalId['alfrescoId'] = $documentId;
-        $externalId['alfrescoFolderId'] = $resourceFolderId;
         ResModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
 
         $attachments = AttachmentModel::get([
@@ -841,6 +813,7 @@ class AlfrescoController
                 'multipartBody' => $multipartBody
             ]);
             if ($curlResponse['code'] != 201) {
+                AlfrescoController::resetLock(['resId' => $args['resId']]);
                 return ['errors' => "Send attachment {$attachment['res_id']} failed : " . json_encode($curlResponse['response'])];
             }
 
@@ -869,6 +842,7 @@ class AlfrescoController
                 'body'          => json_encode($body)
             ]);
             if ($curlResponse['code'] != 200) {
+                AlfrescoController::resetLock(['resId' => $args['resId']]);
                 return ['errors' => "Update attachment {$attachment['res_id']} failed : " . json_encode($curlResponse['response'])];
             }
 
@@ -891,11 +865,25 @@ class AlfrescoController
                 'body'          => json_encode($body)
             ]);
             if ($curlResponse['code'] != 200) {
+                AlfrescoController::resetLock(['resId' => $args['resId']]);
                 return ['errors' => "Update alfresco folder {$resourceFolderId} failed : " . json_encode($curlResponse['response'])];
             }
         }
 
+        AlfrescoController::resetLock(['resId' => $args['resId']]);
+
         $message = empty($args['folderName']) ? " (envoyé au dossier {$args['folderId']})" : " (envoyé au dossier {$args['folderName']})";
         return ['history' => $message];
+    }
+
+    private static function resetLock(array  $args) {
+        ValidatorModel::notEmpty($args, ['resId']);
+        ValidatorModel::intVal($args, ['resId']);
+
+        ResModel::update([
+            'postSet' => ['external_id' => "external_id - 'alfrescoLock'"],
+            'where'   => ['res_id = ?'],
+            'data'    => [$args['resId']]
+        ]);
     }
 }
