@@ -2192,5 +2192,9 @@
     "maximumSignUser": "Maximum number of Signatory",
     "workflowEndBySignatory": "Workflow has to end with a Signatory",
     "signInsteadOf": "You act as",
-    "saeError": "Unable to retrieve retention rules"
+    "saeError": "Unable to retrieve retention rules",
+    "getProcessLimitDate": "Processing deadline",
+    "getProcessLimitDateSample": "<b color=\"warn\">3 day(s)</b>",
+    "getCreationDate":             "Creation date",
+    "getCreationDateSample":       "Jan. 1st"
 }
