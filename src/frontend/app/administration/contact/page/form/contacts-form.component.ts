@@ -355,7 +355,7 @@ export class ContactsFormComponent implements OnInit {
 
         this.loading = true;
 
-        // this.initBanSearch();
+        this.initBanSearch();
 
         if (this.contactId === null) {
 
