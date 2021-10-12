@@ -1031,6 +1031,7 @@ export class IndexingFormComponent implements OnInit {
                 setTimeout(() => {
                     field.type = 'select';
                 }, 0);
+                this.arrFormControl[field.identifier].reset();
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
