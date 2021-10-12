@@ -36,6 +36,7 @@ use Slim\Http\Response;
 use SrcCore\controllers\AutoCompleteController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
+use SrcCore\models\PasswordModel;
 use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
@@ -152,12 +153,18 @@ class ContactController
         }
 
         if (!empty($body['communicationMeans'])) {
-            if (filter_var($body['communicationMeans'], FILTER_VALIDATE_EMAIL)) {
-                $body['communicationMeans'] = ['email' => $body['communicationMeans']];
-            } elseif (filter_var($body['communicationMeans'], FILTER_VALIDATE_URL)) {
-                $body['communicationMeans'] = ['url' => $body['communicationMeans']];
+            if (filter_var($body['communicationMeans']['email'], FILTER_VALIDATE_EMAIL)) {
+                $contactBody['email'] = $body['communicationMeans']['email'];
+            } elseif (filter_var($body['communicationMeans']['uri'], FILTER_VALIDATE_URL)) {
+                $contactBody['uri'] = $body['communicationMeans']['uri'];
             } else {
                 return $response->withStatus(400)->withJson(['errors' => _COMMUNICATION_MEANS_VALIDATOR]);
+            }
+            if (!empty($body['communicationMeans']['login'])) {
+                $contactBody['login'] = $body['communicationMeans']['login'];
+            }
+            if (!empty($body['communicationMeans']['password'])) {
+                $contactBody['password'] = PasswordModel::encrypt(['password' => $body['communicationMeans']['password']]);                
             }
         }
 
@@ -273,7 +280,13 @@ class ContactController
         }
         if (!empty($rawContact['communication_means'])) {
             $communicationMeans = json_decode($rawContact['communication_means'], true);
-            $contact['communicationMeans'] = $communicationMeans['url'] ?? $communicationMeans['email'];
+            // $communicationMeans[] = ?? 
+            if(!empty($communicationMeans['uri'])) {
+                $contact['communicationMeans']['uri'] = $communicationMeans['uri']; 
+            } elseif (!empty($communicationMeans['email'])) {
+                $contact['communicationMeans']['email'] = $communicationMeans['email']; 
+            }
+            $contact['communicationMeans']['login'] = $communicationMeans['login'];
         }
 
         $filling = ContactController::getFillingRate(['contactId' => $rawContact['id']]);
@@ -328,14 +341,23 @@ class ContactController
         }
 
         if (!empty($body['communicationMeans'])) {
-            if (filter_var($body['communicationMeans'], FILTER_VALIDATE_EMAIL)) {
-                $body['communicationMeans'] = ['email' => $body['communicationMeans']];
-            } elseif (filter_var($body['communicationMeans'], FILTER_VALIDATE_URL)) {
-                $body['communicationMeans'] = ['url' => $body['communicationMeans']];
+            if (filter_var($body['communicationMeans']['email'], FILTER_VALIDATE_EMAIL)) {
+                $contactBody['email'] = $body['communicationMeans']['email'];
+            } elseif (filter_var($body['communicationMeans']['uri'], FILTER_VALIDATE_URL)) {
+                $contactBody['uri'] = $body['communicationMeans']['uri'];
             } else {
-                unset($body['communicationMeans']);
+                unset($contactBody);
+            }
+            if (!empty($body['communicationMeans']['login'])) {
+                $contactBody['login'] = $body['communicationMeans']['login'];
+            }
+            if (!empty($body['communicationMeans']['password'])) {
+                $contactBody['password'] = PasswordModel::encrypt(['password' => $body['communicationMeans']['password']]);                
             }
         }
+        
+
+
 
         $annuaryReturn = ContactController::addContactToM2MAnnuary(['body' => $body]);
         $body = $annuaryReturn['body'];
@@ -365,7 +387,7 @@ class ContactController
                     'address_country'       => $body['addressCountry'] ?? null,
                     'email'                 => $body['email'] ?? null,
                     'phone'                 => $body['phone'] ?? null,
-                    'communication_means'   => !empty($body['communicationMeans']) ? json_encode($body['communicationMeans']) : null,
+                    'communication_means'   => !empty($contactBody) ? json_encode($contactBody) : null,
                     'notes'                 => $body['notes'] ?? null,
                     'modification_date'     => 'CURRENT_TIMESTAMP',
                     'custom_fields'         => !empty($body['customFields']) ? json_encode($body['customFields']) : null,

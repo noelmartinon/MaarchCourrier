@@ -274,7 +274,9 @@ class ConfigurationController
             'basketToRedirect' => $xmlConfig['basketRedirection_afterUpload'][0],
             'communications' => [
                 'email' => $xmlConfig['m2m_communication_type']['email'],
-                'uri'   => $xmlConfig['m2m_communication_type']['url']
+                'uri'   => $xmlConfig['m2m_communication_type']['url'],
+                'login' => $xmlConfig['m2m_login']
+                // 'password' => $xmlConfig['m2m_communication']['password']
             ]
         ];
 
@@ -377,6 +379,8 @@ class ConfigurationController
         $loadedXml->res_attachments->attachment_type = $attachmentType['type_id'];
         $loadedXml->basketRedirection_afterUpload    = $body['basketToRedirect'];
         $loadedXml->m2m_communication                = implode(',', $communication);
+        $loadedXml->m2m_login                        = $body['m2mLogin'];
+        $loadedXml->m2m_password                     = $body['m2mPassword'];
 
         unset($loadedXml->annuaries);
         $loadedXml->annuaries->enabled      = $body['annuary']['enabled'] ? 'true' : 'false';
