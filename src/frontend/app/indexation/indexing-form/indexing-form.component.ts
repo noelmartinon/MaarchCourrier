@@ -284,7 +284,7 @@ export class IndexingFormComponent implements OnInit {
         if (this.indexingFormId <= 0 || this.indexingFormId === undefined) {
 
             await this.initFields();
-            // await this.initCustomFields();
+            await this.initCustomFields();
 
             this.initElemForm();
         } else {
@@ -897,7 +897,7 @@ export class IndexingFormComponent implements OnInit {
         });
 
         if (this.availableCustomFieldsClone === null) {
-            // await this.initCustomFields();
+            await this.initCustomFields();
         } else {
             this.availableCustomFields = JSON.parse(JSON.stringify(this.availableCustomFieldsClone));
         }
