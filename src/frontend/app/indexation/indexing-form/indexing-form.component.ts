@@ -284,7 +284,7 @@ export class IndexingFormComponent implements OnInit {
         if (this.indexingFormId <= 0 || this.indexingFormId === undefined) {
 
             await this.initFields();
-            await this.initCustomFields();
+            // await this.initCustomFields();
 
             this.initElemForm();
         } else {
@@ -697,10 +697,12 @@ export class IndexingFormComponent implements OnInit {
                                     title: secondDoctype.doctypes_second_level_label,
                                     disabled: true,
                                     isTitle: true,
-                                    color: secondDoctype.css_style
+                                    color: secondDoctype.css_style,
+                                    firstLevelId: doctype.doctypes_first_level_id
                                 });
                                 arrValues = arrValues.concat(data.structure.filter((infoDoctype: any) => infoDoctype.doctypes_second_level_id === secondDoctype.doctypes_second_level_id && infoDoctype.description !== undefined).map((infoType: any) => {
                                     return {
+                                        secondLevelId: secondDoctype.doctypes_second_level_id,
                                         id: infoType.type_id,
                                         label: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + infoType.description,
                                         title: infoType.description,
@@ -895,7 +897,7 @@ export class IndexingFormComponent implements OnInit {
         });
 
         if (this.availableCustomFieldsClone === null) {
-            await this.initCustomFields();
+            // await this.initCustomFields();
         } else {
             this.availableCustomFields = JSON.parse(JSON.stringify(this.availableCustomFieldsClone));
         }
@@ -1024,6 +1026,11 @@ export class IndexingFormComponent implements OnInit {
             filter((data: any) => !this.functions.empty(data)),
             tap((values: any) => {
                 field.values = values;
+                // WORK AROUND UPDATING DATA
+                field.type = null;
+                setTimeout(() => {
+                    field.type = 'select';
+                }, 0);
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
