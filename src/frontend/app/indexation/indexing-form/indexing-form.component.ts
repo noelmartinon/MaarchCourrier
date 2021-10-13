@@ -1032,7 +1032,7 @@ export class IndexingFormComponent implements OnInit {
                 setTimeout(() => {
                     field.type = 'select';
                 }, 0);
-                if (field.allowedValues.indexOf(field.default_value) === -1) {
+                if (field.allowedValues.indexOf(this.arrFormControl[field.identifier].value) === -1) {
                     this.arrFormControl[field.identifier].reset();
                 }
             }),
