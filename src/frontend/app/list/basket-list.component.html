@@ -69,7 +69,13 @@
                                                 <ng-container *ngIf="row.closing_date != lang.undefined">
                                                     <i class="fa fa-lock" title="{{lang.closingDate}}"></i>&nbsp;<span
                                                         [innerHTML]="row.closing_date | timeAgo"
-                                                        title='{{row.closing_date | fullDate}}'></span>
+                                                        title='{{row.closing_date | fullDate}}'></span>&nbsp;
+                                                    <ng-container *ngIf="data.value === 'getProcessLimitDate'">
+                                                        <i class="fa {{data.icon}}"
+                                                            title="{{lang.processLimitDate}}"></i>&nbsp;<span
+                                                            [innerHTML]="data.displayValue | timeLimit" style="margin-left: 3px;"
+                                                            title='{{data.displayValue | fullDate}}'></span>
+                                                    </ng-container>
                                                 </ng-container>
                                                 <ng-container *ngIf="row.closing_date == lang.undefined">
                                                     <ng-container *ngIf="data.value === 'getCreationAndProcessLimitDates'">
