@@ -1026,12 +1026,15 @@ export class IndexingFormComponent implements OnInit {
             filter((data: any) => !this.functions.empty(data)),
             tap((values: any) => {
                 field.values = values;
+                field.allowedValues = values.filter((item: any) => !item.isTitle && !item.disabled).map((el: any) => el.id);
                 // WORK AROUND UPDATING DATA
                 field.type = null;
                 setTimeout(() => {
                     field.type = 'select';
                 }, 0);
-                this.arrFormControl[field.identifier].reset();
+                if (field.allowedValues.indexOf(field.default_value) === -1) {
+                    this.arrFormControl[field.identifier].reset();
+                }
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
