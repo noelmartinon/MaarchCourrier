@@ -182,7 +182,7 @@ export class DoctypesAdministrationComponent implements OnInit {
                 .subscribe((dataValue: any) => {
                     this.currentType = dataValue['doctype'];
                     this.secondLevels = dataValue['secondLevel'];
-                    this.processModes = ['NORMAL', 'SVA', 'SVR'];
+                    this.processModes = ['NORMAL', 'SVA', 'SVR', 'SVE'];
                     this.getRules();
 
                     if (move) {
@@ -439,7 +439,7 @@ export class DoctypesAdministrationComponent implements OnInit {
             .subscribe((data: any) => {
                 this.firstLevels = data['firstLevel'];
                 this.secondLevels = data['secondLevel'];
-                this.processModes = ['NORMAL', 'SVA', 'SVR'];
+                this.processModes = ['NORMAL', 'SVA', 'SVR', 'SVE'];
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
