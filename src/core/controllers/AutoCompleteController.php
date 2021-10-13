@@ -819,7 +819,7 @@ class AutoCompleteController
         $requestData = AutoCompleteController::getDataForRequest([
             'search'        => $queryParams['search'],
             'fields'        => $fields,
-            'where'         => ['enabled = ?', "external_id->>'m2m' is not null", "external_id->>'m2m' != ''", "(communication_means->>'url' is not null OR communication_means->>'email' is not null)"],
+            'where'         => ['enabled = ?', "external_id->>'m2m' is not null", "external_id->>'m2m' != ''", "(communication_means->>'uri' is not null OR communication_means->>'email' is not null)"],
             'data'          => [true],
             'fieldsNumber'  => $fieldsNumber
         ]);
@@ -832,13 +832,17 @@ class AutoCompleteController
             'limit'     => self::TINY_LIMIT
         ]);
 
+        // var_dump($contacts);
+        // exit;
         foreach ($contacts as $contact) {
             $autoContact = ContactController::getAutocompleteFormat(['id' => $contact['id']]);
 
             $externalId = json_decode($contact['external_id'], true);
             $communicationMeans = json_decode($contact['communication_means'], true);
             $autoContact['m2m'] = $externalId['m2m'];
-            $autoContact['communicationMeans'] = $communicationMeans['url'] ?? $communicationMeans['email'];
+            $autoContact['communicationMeans'] = $communicationMeans['uri'] ?? $communicationMeans['email'];
+            // var_dump($autoContact);
+            // exit;
             $autocompleteData[] = $autoContact;
         }
 
