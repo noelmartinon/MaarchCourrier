@@ -836,9 +836,9 @@ END$$;
 
 /* DATA */
 TRUNCATE TABLE custom_fields;
-INSERT INTO custom_fields (id, label, type, values) VALUES (1, 'Nature', 'select', '["Courrier simple", "Courriel", "Courrier suivi", "Courrier avec AR", "Autre"]');
+INSERT INTO custom_fields (id, label, type, values, actived) VALUES (1, 'Nature', 'select', '["Courrier simple", "Courriel", "Courrier suivi", "Courrier avec AR", "Autre"]','Y');
 /*SGAMI-SO DEBUT*/
-INSERT INTO custom_fields (id, label, type, values) VALUES (2, 'Référence courrier expéditeur', 'string', '[]');
+INSERT INTO custom_fields (id, label, type, values, actived) VALUES (2, 'Référence courrier expéditeur', 'string', '[]','Y');
 /*SGAMI-SO FIN*/
 SELECT setval('custom_fields_id_seq', (select max(id)+1 from custom_fields), false);
 
