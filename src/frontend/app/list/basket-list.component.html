@@ -76,7 +76,7 @@
                                                         [innerHTML]="row.closing_date | timeAgo"
                                                         title='{{row.closing_date | fullDate}}'></span>
                                                 </ng-container>
-                                                <ng-container *ngIf="row.closing_date == ('lang.undefined' | translate)">
+                                                <ng-container *ngIf="row.closing_date == ('lang.undefined' | translate) || data.value === 'getProcessLimitDate'">
                                                     <ng-container *ngIf="data.value === 'getCreationAndProcessLimitDates'">
                                                         <i class="fa fa-calendar"
                                                         title="{{'lang.creationDate' | translate}}"></i>&nbsp;<span
