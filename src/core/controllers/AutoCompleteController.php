@@ -832,8 +832,7 @@ class AutoCompleteController
             'limit'     => self::TINY_LIMIT
         ]);
 
-        // var_dump($contacts);
-        // exit;
+        
         foreach ($contacts as $contact) {
             $autoContact = ContactController::getAutocompleteFormat(['id' => $contact['id']]);
 
@@ -841,8 +840,6 @@ class AutoCompleteController
             $communicationMeans = json_decode($contact['communication_means'], true);
             $autoContact['m2m'] = $externalId['m2m'];
             $autoContact['communicationMeans'] = $communicationMeans['uri'] ?? $communicationMeans['email'];
-            // var_dump($autoContact);
-            // exit;
             $autocompleteData[] = $autoContact;
         }
 

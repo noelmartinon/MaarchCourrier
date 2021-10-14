@@ -275,8 +275,7 @@ class ConfigurationController
             'communications' => [
                 'email' => $xmlConfig['m2m_communication_type']['email'],
                 'uri'   => $xmlConfig['m2m_communication_type']['url'],
-                'login' => $xmlConfig['m2m_login']
-                // 'password' => $xmlConfig['m2m_communication']['password']
+                'login' => $xmlConfig['m2m_login'][0] ?? null
             ]
         ];
 
@@ -365,6 +364,16 @@ class ConfigurationController
         }
 
         $communication = [];
+        $login = '';
+        $password = '';
+        if(!empty($body['communications']['login'])) {
+            $login = $body['communications']['login'];
+            unset($body['communications']['login']);
+        }
+        if(!empty($body['communications']['password'])) {
+            $password = $body['communications']['password'];
+            unset($body['communications']['password']);
+        }
         foreach ($body['communications'] as $value) {
             if (!empty($value)) {
                 $communication[] = $value;
@@ -379,8 +388,8 @@ class ConfigurationController
         $loadedXml->res_attachments->attachment_type = $attachmentType['type_id'];
         $loadedXml->basketRedirection_afterUpload    = $body['basketToRedirect'];
         $loadedXml->m2m_communication                = implode(',', $communication);
-        $loadedXml->m2m_login                        = $body['m2mLogin'];
-        $loadedXml->m2m_password                     = $body['m2mPassword'];
+        $loadedXml->m2m_login                        = $login;
+        $loadedXml->m2m_password                     = $password;
 
         unset($loadedXml->annuaries);
         $loadedXml->annuaries->enabled      = $body['annuary']['enabled'] ? 'true' : 'false';

@@ -236,7 +236,7 @@ class SendMessageExchangeController
                     $ArchivalAgencyCommunicationType['value'] = $aArchivalAgencyCommunicationType['email'];
                 } else {
                     $ArchivalAgencyCommunicationType['type'] = 'url';
-                    $ArchivalAgencyCommunicationType['value'] = rtrim($aArchivalAgencyCommunicationType['url'], "/");
+                    $ArchivalAgencyCommunicationType['value'] = rtrim($aArchivalAgencyCommunicationType['uri'], "/");
                 }
             }
             $ArchivalAgencyContactInformations = ContactModel::getById(['select' => ['*'], 'id' => $contactId]);
