@@ -28,6 +28,7 @@ use Note\models\NoteModel;
 use Resource\controllers\ResController;
 use Resource\models\ResModel;
 use Respect\Validation\Validator;
+use SrcCore\models\PasswordModel;
 use SrcCore\models\TextFormatModel;
 use Status\models\StatusModel;
 use User\models\UserModel;
@@ -237,6 +238,18 @@ class SendMessageExchangeController
                 } else {
                     $ArchivalAgencyCommunicationType['type'] = 'url';
                     $ArchivalAgencyCommunicationType['value'] = rtrim($aArchivalAgencyCommunicationType['uri'], "/");
+                    if (strrpos($ArchivalAgencyCommunicationType['value'], "http://") !== false) { 
+                        $url = str_replace("http://", "", $ArchivalAgencyCommunicationType['value']);
+                        $prefix = "http://";
+                    } elseif (strrpos($ArchivalAgencyCommunicationType['value'], "https://") !== false) {
+                        $url = str_replace("https://", "", $ArchivalAgencyCommunicationType['value']);
+                        $prefix = "https://";
+                    } else {
+                        return $response->withStatus(403)->withJson(['errors' => 'http or https missing']);
+                    }
+                    $login = $aArchivalAgencyCommunicationType['login'];
+                    $password = PasswordModel::decrypt(['cryptedPassword' => $aArchivalAgencyCommunicationType['password']]);
+                    $ArchivalAgencyCommunicationType['value'] = $prefix . $login . ':' . $password . '@' . $url;
                 }
             }
             $ArchivalAgencyContactInformations = ContactModel::getById(['select' => ['*'], 'id' => $contactId]);
