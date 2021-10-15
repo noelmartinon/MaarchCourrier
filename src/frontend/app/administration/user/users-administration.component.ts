@@ -194,7 +194,7 @@ export class UsersAdministrationComponent implements OnInit {
     }
 
     openUsersExportModal() {
-        this.dialog.open(UsersExportComponent, { panelClass: 'maarch-modal', width: '400px', autoFocus: false });
+        this.dialog.open(UsersExportComponent, { panelClass: 'maarch-modal', width: '800px', autoFocus: false });
 
     }
 }

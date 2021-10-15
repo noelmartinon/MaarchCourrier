@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit, Inject, ViewChild } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
@@ -7,12 +7,17 @@ import { catchError, tap, finalize } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { LocalStorageService } from '@service/local-storage.service';
 import { HeaderService } from '@service/header.service';
+import { SortPipe } from '@plugins/sorting.pipe';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
 @Component({
     templateUrl: 'users-export.component.html',
     styleUrls: ['users-export.component.scss'],
+    providers: [SortPipe],
 })
 export class UsersExportComponent implements OnInit {
+
+    @ViewChild('listFilter', { static: false }) private listFilter: any;
 
     loading: boolean = false;
     loadingExport: boolean = false;
@@ -23,9 +28,39 @@ export class UsersExportComponent implements OnInit {
     exportModel: any = {
         delimiter: ';',
         format: 'csv',
+        data: []
     };
 
     exportModelList: any;
+
+    canModifyHeaders: boolean = false;
+
+    dataAvailable: any[] = [
+        {
+            value: 'id',
+            label: this.translate.instant('lang.usersParameters_id')
+        },
+        {
+            value: 'userId',
+            label: this.translate.instant('lang.usersParameters_userId')
+        },
+        {
+            value: 'firstname',
+            label: this.translate.instant('lang.usersParameters_firstname')
+        },
+        {
+            value: 'lastname',
+            label: this.translate.instant('lang.usersParameters_lastname')
+        },
+        {
+            value: 'mail',
+            label: this.translate.instant('lang.usersParameters_mail')
+        },
+        {
+            value: 'phone',
+            label: this.translate.instant('lang.usersParameters_phone')
+        }
+    ];
 
     constructor(
         public translate: TranslateService,
@@ -34,11 +69,91 @@ export class UsersExportComponent implements OnInit {
         public dialogRef: MatDialogRef<UsersExportComponent>,
         @Inject(MAT_DIALOG_DATA) public data: any,
         private localStorage: LocalStorageService,
-        private headerService: HeaderService
+        private headerService: HeaderService,
+        private sortPipe: SortPipe,
     ) { }
 
-    async ngOnInit(): Promise<void> {
+    ngOnInit(): void {
+        if (this.localStorage.get(`exportUsersFields_${this.headerService.user.id}`) !== null) {
+            this.canModifyHeaders = JSON.parse(this.localStorage.get(`exportUsersFields_${this.headerService.user.id}`)).data.length > 0 ? true : false;
+        } else {
+            this.canModifyHeaders = false;
+        }
         this.setConfiguration();
+    }
+
+    drop(event: CdkDragDrop<string[]>) {
+        if (event.previousContainer === event.container) {
+            moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+        } else {
+            let realIndex = event.previousIndex;
+            if (event.container.id === 'selectedElements') {
+                realIndex = 0;
+                if ($('.available-data .columns')[event.previousIndex] !== undefined) {
+                    const fakeIndex = $('.available-data .columns')[event.previousIndex].id;
+                    realIndex = this.dataAvailable.map((dataAv: any) => (dataAv.value)).indexOf(fakeIndex);
+                }
+            }
+
+            transferArrayItem(event.previousContainer.data, event.container.data, realIndex, event.currentIndex);
+            if (this.listFilter !== undefined) {
+                const curFilter = this.listFilter.nativeElement.value;
+                this.listFilter.nativeElement.value = '';
+                setTimeout(() => {
+                    this.listFilter.nativeElement.value = curFilter;
+                }, 10);
+            }
+
+            if (event.item.dropContainer.id !== 'availableElements') {
+                this.dataAvailable = [... new Set(this.dataAvailable)];
+            }
+        }
+    }
+
+    addData(item: any) {
+        let realIndex = 0;
+
+        this.dataAvailable.forEach((value: any, index: number) => {
+            if (value.value === item.value) {
+                realIndex = index;
+            }
+        });
+
+        transferArrayItem(this.dataAvailable, this.exportModel.data, realIndex, this.exportModel.data.length);
+        if (this.listFilter != undefined) {
+            const curFilter = this.listFilter.nativeElement.value;
+            this.listFilter.nativeElement.value = '';
+            setTimeout(() => {
+                this.listFilter.nativeElement.value = curFilter;
+            }, 10);
+        }
+    }
+
+    removeData(i: number) {
+        this.dataAvailable = this.dataAvailable.concat(this.exportModel.data[i]);
+        this.exportModel.data.splice(i, 1);
+        this.sortPipe.transform(this.dataAvailable, 'label');
+    }
+
+    removeAllData() {
+        this.dataAvailable = this.dataAvailable.concat(this.exportModel.data);
+        this.exportModel.data = [];
+    }
+
+    addAllData() {
+        this.exportModel.data = this.exportModel.data.concat(this.dataAvailable);
+        while (this.dataAvailable.length > 0) {
+            this.dataAvailable.pop();
+        }
+        this.listFilter.nativeElement.value = '';
+    }
+
+    setValues() {
+        this.canModifyHeaders = !this.canModifyHeaders;
+        if (!this.canModifyHeaders) {
+            this.dataAvailable = this.dataAvailable.concat(this.exportModel.data);
+            this.exportModel.data = [];
+        }
     }
 
     exportData() {
@@ -84,7 +199,11 @@ export class UsersExportComponent implements OnInit {
 
     setConfiguration() {
         if (this.localStorage.get(`exportUsersFields_${this.headerService.user.id}`) !== null) {
+            JSON.parse(this.localStorage.get(`exportUsersFields_${this.headerService.user.id}`)).data.forEach((element: any) => {
+                this.addData(element);
+            });
             this.exportModel.delimiter = JSON.parse(this.localStorage.get(`exportUsersFields_${this.headerService.user.id}`)).delimiter;
         }
     }
 }
+
