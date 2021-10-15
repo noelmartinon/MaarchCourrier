@@ -2210,5 +2210,10 @@
     "interconnectionTest": "Tester le paramétrage de <b>l'interconnexion Maarch Courrier / Maarch RM</b> configuré dans le fichier <b>config.json</b>",
     "interconnectionFailed": "<b>L'interconnexion avec Maarch RM a échouée.</b> Erreur lors de l'appel au serveur Maarch RM",
     "interconnectionSuccess": "<b>Interconnexion réussie avec Maarch RM.</b>",
-    "startTest": "Lancer le test"
+    "startTest": "Lancer le test",
+    "userIdMaarch2Maarch": "Identifiant de l'utilisateur",
+    "userPasswordMaarch2Maarch": "Mot de passe de l'utilisateur",
+    "userIdMaarch2MaarchDesc": "Identifiant de l'utilisateur avec un compte webservice",
+    "userPasswordMaarch2MaarchDesc": "Mot de passe de l'utilisateur avec un compte webservice",
+    "m2mEmailDesc": "Utilisé dans le cadre d'une connexion indirecte entre les applications (utilisation des envois de mail pour le pli numérique)"
 }
