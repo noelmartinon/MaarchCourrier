@@ -2545,5 +2545,9 @@
     "requestedOpinion": "Avis demandé à la place de",
     "sharePointWarning": "Fermez l'éditeur du document avant de valider l'édition",
     "autoRedirectToUser": "A moi-même",
-    "applicationVersion": "Maarch courrier {{version}} Powered by {{author}}"
+    "applicationVersion": "Maarch courrier {{version}} Powered by {{author}}",
+    "copyInfos": "Copier les informations du contact",
+    "emptyAddress": "Adresse non renseignée",
+    "toCopyInfos": "pour copier ses informations.",
+    "find": "trouvé."
 }

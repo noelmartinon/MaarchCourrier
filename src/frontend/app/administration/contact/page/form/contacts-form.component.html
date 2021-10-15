@@ -76,16 +76,32 @@
         </mat-progress-bar>
 
     </div>
-    <div *ngIf="companyFound !== null" class="alert-message alert-message-info" role="alert" [@hideShow]>
-        <div style="padding:10px;">
-            {{'lang.contactsParameters_company' | translate}} <b>{{companyFound.company}}</b>
-            {{'lang.found' | translate}}
-            !
-            <a (click)="setAddress(companyFound)"
-                style="cursor: pointer;font-weight:bold;font-style: italic;">{{'lang.click' | translate}} {{'lang.here' | translate}}</a>
-            {{'lang.toCopyAddress' | translate}} :<br/>
-            <q style="font-weight: bold;width: 100%;display: block;text-align: center;">{{companyFound.addressNumber}} {{companyFound.addressStreet}}, {{companyFound.addressPostcode}}
-                {{companyFound.addressTown}}, {{companyFound.addressCountry}}</q>
+    <div style="display: flex; flex: 1; align-items:flex-start;">
+        <div *ngIf="autocompleteContactName.length > 0 && !contactChanged" class="alert-message alert-message-info" role="alert">
+            <div [ngStyle]="{'padding': autocompleteContactName.length === 1 ? '10px' : '0px'}" style="margin: 13px; width: 100% !important;">
+                <div style="margin-top: -7px; margin-bottom: 2px;">
+                    {{'lang.contact' | translate}}
+                    <ng-container *ngIf="!functions.empty(autocompleteContactName[0].firstname)">{{autocompleteContactName[0].firstname}} </ng-container>
+                    <ng-container *ngIf="!functions.empty(autocompleteContactName[0].lastname)"> <b>{{autocompleteContactName[0].lastname}}</b></ng-container> {{'lang.find' | translate}}
+                    <a style="cursor: pointer;font-weight:bold;font-style: italic;" (click)="setContact(0)">{{'lang.click' | translate}} {{'lang.here' | translate}}</a> {{'lang.toCopyInfos' | translate}}
+                </div>
+                <div *ngIf="autocompleteContactName.length > 1" style="margin-bottom: -8px;">
+                    <mat-icon color="primary" class="fas fa-angle-right" style="font-size:16px;width:14px;"></mat-icon>
+                <a class="showAllContacts" (click)="showAllContact()">Voir les autres contacts</a>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="companyFound !== null" class="alert-message alert-message-info" role="alert" [@hideShow]>
+            <div style="padding:10px;">
+                {{'lang.contactsParameters_company' | translate}} <b>{{companyFound.company}}</b>
+                {{'lang.found' | translate}}
+                !
+                <a (click)="setAddress(companyFound)"
+                    style="cursor: pointer;font-weight:bold;font-style: italic;">{{'lang.click' | translate}} {{'lang.here' | translate}}</a>
+                {{'lang.toCopyAddress' | translate}} :<br/>
+                <q style="font-weight: bold;width: 100%;display: block;text-align: center;">{{companyFound.addressNumber}} {{companyFound.addressStreet}}, {{companyFound.addressPostcode}}
+                    {{companyFound.addressTown}}, {{companyFound.addressCountry}}</q>
+            </div>
         </div>
     </div>
     <div class="row" style="margin: 0px;">
@@ -107,7 +123,7 @@
                                     *ngIf="field.type === 'string' && field.id !== 'communicationMeans' && field.id !== 'externalId_m2m' && field.id != 'addressCountry' && field.id != 'addressPostcode' && field.id != 'addressTown'">
                                     <mat-form-field>
                                         <input matInput [formControl]="field.control" [placeholder]="field.label"
-                                            (blur)="checkCompany(field);checkFilling();" (ngModelChange)="toUpperCase(field, $event)" [required]="field.required">
+                                            (blur)="checkCompany(field); checkContactName(field); checkFilling();" (ngModelChange)="toUpperCase(field, $event)" [required]="field.required">
                                         <mat-hint *ngIf="!isEmptyValue(field.desc)" align="end"
                                             [innerHTML]="field.desc">
                                         </mat-hint>

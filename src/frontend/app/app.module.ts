@@ -154,6 +154,7 @@ import { DevLangComponent } from '@service/debug/dev-lang.component';
 import { AcknowledgementReceptionComponent } from './registeredMail/acknowledgement-reception/acknowledgement-reception.component';
 import { DatePipe } from '@angular/common';
 import { CheckSaeInterconnectionComponent } from './administration/parameter/other/checkSaeInterconnection/check-sae-interconnection.component';
+import { ContactSearchModal } from './administration/contact/page/contactSearchModal/contact-search-modal.component';
 
 registerLocaleData(localeFr, 'fr-FR');
 @Injectable()
@@ -297,7 +298,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         ProfileOtherPluginComponent,
         AddinOutlookConfigurationModalComponent,
         CreateExternalUserComponent,
-        CheckSaeInterconnectionComponent
+        CheckSaeInterconnectionComponent,
+        ContactSearchModal
     ],
     exports : [
         SharedModule
@@ -359,7 +361,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         TechnicalInformationComponent,
         AbsModalComponent,
         TileCreateComponent,
-        AddinOutlookConfigurationModalComponent
+        AddinOutlookConfigurationModalComponent,
+        ContactSearchModal
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
