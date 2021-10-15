@@ -15,6 +15,7 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { Observable, of } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { LatinisePipe } from 'ngx-pipes';
+import { ContactSearchModal } from '../contactSearchModal/contact-search-modal.component';
 
 @Component({
     selector: 'app-contact-form',
@@ -307,6 +308,9 @@ export class ContactsFormComponent implements OnInit {
     annuaryM2MId: any = null;
 
     annuaryEnabled: boolean = false;
+
+    autocompleteContactName: any[] = [];
+    contactChanged: boolean = false;
 
     constructor(
         public translate: TranslateService,
@@ -843,6 +847,7 @@ export class ContactsFormComponent implements OnInit {
             }
         }
         this.checkFilling();
+        this.checkContactName(field);
     }
 
     initAutocompleteCommunicationMeans() {
@@ -1091,5 +1096,66 @@ export class ContactsFormComponent implements OnInit {
                 target.control.setValue( splitStr.join('-'));
             }
         }, 100);
+    }
+
+    checkContactName(field: any) {
+        if (this.creationMode && ['firstname', 'lastname'].indexOf(field.id) > -1 && this.canSearchContact()) {
+            this.autocompleteContactName = [];
+            this.http.get(`../../rest/autocomplete/contacts/name?search=${field.control.value}`).pipe(
+                tap((data: any) => {
+                    this.autocompleteContactName = JSON.parse(JSON.stringify(data));
+                    this.contactChanged = false;
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        } else if(!this.canSearchContact()) {
+            this.contactChanged = true;
+        }
+    }
+
+    canSearchContact() {
+        const firstname: any = this.contactForm.find((item: any) => item.id === 'firstname');
+        const lastname: any = this.contactForm.find((item: any) => item.id === 'lastname');
+        // const alreadyExist: boolean = this.autocompleteContactName.find((contact: any) => contact.firstname === firstname.control.value && contact.lastname === lastname.control.value) !== undefined ? true : false;
+        if (!this.functions.empty(firstname.control.value) && !this.functions.empty(lastname.control.value) && firstname.display && lastname.display) {
+            return firstname.control.value.toLowerCase() === lastname.control.value.toLowerCase();
+        } else {
+            this.contactChanged = true;
+            return false;
+        }
+    }
+
+    setContact(index: number) {
+        let indexField = -1;
+        Object.keys(this.autocompleteContactName[index]).forEach(element => {
+            indexField = this.contactForm.map(field => field.id).indexOf(element);
+            if (!this.isEmptyValue(this.autocompleteContactName[index][element]) && indexField > -1 && element !== 'id') {
+                this.contactForm[indexField].control.setValue(this.autocompleteContactName[index][element]);
+                this.contactForm[indexField].display = true;
+            }
+        });
+        this.checkFilling();
+        this.contactChanged = true;
+    }
+
+    showAllContact() {
+        const dialogRef = this.dialog.open(ContactSearchModal, {
+            disableClose: true,
+            width: '800px',
+            panelClass: 'maarch-modal',
+            data: this.autocompleteContactName
+        });
+
+        dialogRef.afterClosed().pipe(
+            tap((index: number) => {
+                if (!this.functions.empty(index)) {
+                    this.setContact(index);
+                    this.contactChanged = true;
+                }
+            })
+        ).subscribe();
     }
 }
