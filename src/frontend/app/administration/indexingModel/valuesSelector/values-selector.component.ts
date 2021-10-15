@@ -11,6 +11,7 @@ import { FunctionsService } from '@service/functions.service';
 export class IndexingModelValuesSelectorComponent implements OnInit {
 
     loading: boolean = true;
+    values: any[] = [];
 
     constructor(
         public translate: TranslateService,
@@ -21,24 +22,48 @@ export class IndexingModelValuesSelectorComponent implements OnInit {
     ) { }
 
     ngOnInit() {
+        this.values = JSON.parse(JSON.stringify(this.data.values));
         this.loading = false;
     }
 
     onSubmit() {
-        this.dialogRef.close(this.data.values);
+        this.dialogRef.close(this.values);
     }
 
     allChecked() {
-        return this.data.values.filter((val: any) => !val.isTitle && !val.disabled).length === this.data.values.filter((val: any) => !val.isTitle).length;
+        return this.values.filter((val: any) => !val.isTitle).every((el:any) => !el.disabled);
     }
 
     emptyChecked() {
-        return this.data.values.filter((val: any) => !val.isTitle && !val.disabled).length === 0;
+        return this.values.filter((val: any) => !val.isTitle && !val.disabled).length === 0;
     }
 
     toggleAll(state: boolean) {
-        this.data.values.filter((item: any) => !item.isTitle).forEach((item: any) => {
+        this.values.filter((item: any) => !item.isTitle).forEach((item: any) => {
             item.disabled = !state;
+        });
+    }
+
+    getSecondLevel(firstLevelId: number) {
+        return this.values.filter((item: any) => item.isTitle && item.firstLevelId === firstLevelId);
+    }
+
+    getTypes(secondLevelId: number) {
+        return this.values.filter((item: any) => !item.isTitle && item.secondLevelId === secondLevelId);
+    }
+
+    allSecondLevel(secondLevelId: number) {
+        const secondLevel: any[] = this.values.filter((item: any) => !item.isTitle && item.secondLevelId === secondLevelId);
+        return this.values.filter((item: any) => !item.isTitle && item.secondLevelId === secondLevelId && !item.disabled).length === secondLevel.length;
+    }
+
+    emptyCheckedSecondLevel(secondLevelId: number) {
+        return this.values.filter((item: any) => !item.isTitle && item.secondLevelId === secondLevelId && !item.disabled).length === 0;
+    }
+
+    toggleSecondLevel(secondLevelId: number, state: boolean) {
+        this.values.filter((item: any) => !item.isTitle && item.secondLevelId === secondLevelId).forEach((element: any) => {
+            element.disabled = !state;
         });
     }
 }
