@@ -1744,5 +1744,10 @@ export const LANG_EN = {
     "youCannotUnsign": "You do not have the right to <b>unsign</b> this document. You must be the person who signed this document.",
     "arContentIsEmpty": "AR content is empty",
     "company": "Company",
-    "noRecipient": "No associated recipient."
+    "noRecipient": "No associated recipient.",
+    "emptyAddress": "Address not filled in",
+    "copyInfos": "to copy its information.",
+    "find": "find.",
+    "showAll": "See other contacts",
+    "setContactInfos": "Copy contact information"
 };
