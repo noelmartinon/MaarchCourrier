@@ -38,7 +38,9 @@ export class MaarchToMaarchParametersComponent implements OnInit {
         attachmentTypeId: new FormControl(),
     };
     communications = {
-        uri: new FormControl('https://cchaplin:maarch@demo.maarchcourrier.com'),
+        uri: new FormControl('https://demo.maarchcourrier.com'),
+        login: new FormControl('cchaplin'),
+        password: new FormControl('maarch'),
         email: new FormControl(null),
     };
     annuary = {
@@ -194,7 +196,9 @@ export class MaarchToMaarchParametersComponent implements OnInit {
                 map((data: any) => data.configuration),
                 tap((data: any) => {
                     Object.keys(this.communications).forEach(elemId => {
-                        this.communications[elemId].setValue(data.communications[elemId]);
+                        if (!this.functionsService.empty(data.communications[elemId])) {
+                            this.communications[elemId].setValue(data.communications[elemId]);
+                        }
                         this.communications[elemId].valueChanges
                             .pipe(
                                 debounceTime(1000),
@@ -375,6 +379,8 @@ export class MaarchToMaarchParametersComponent implements OnInit {
             },
             communications: {
                 uri: this.communications.uri.value,
+                login: this.communications.login.value,
+                password: this.communications.password.value,
                 email: this.communications.email.value
             },
         };

@@ -2545,5 +2545,9 @@
     "requestedOpinion": "Avis demandé à la place de",
     "sharePointWarning": "Fermez l'éditeur du document avant de valider l'édition",
     "autoRedirectToUser": "A moi-même",
-    "applicationVersion": "Maarch courrier {{version}} Powered by {{author}}"
+    "applicationVersion": "Maarch courrier {{version}} Powered by {{author}}",
+    "userIdMaarch2Maarch": "Identifiant de l'utilisateur",
+    "userPasswordMaarch2Maarch": "Mot de passe de l'utilisateur",
+    "userIdMaarch2MaarchDesc": "Identifiant de l'utilisateur avec un compte webservice",
+    "userPasswordMaarch2MaarchDesc": "Mot de passe de l'utilisateur avec un compte webservice"
 }
