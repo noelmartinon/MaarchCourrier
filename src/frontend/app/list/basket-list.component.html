@@ -66,18 +66,16 @@
                                     padding-left: 5px;
                                     padding-right: 5px;" [class.hasEvent]="data.event" (click)="launchEventSubData(data, row)">
                                             <ng-container *ngIf="['getCreationDate', 'getProcessLimitDate', 'getCreationAndProcessLimitDates'].indexOf(data.value) > -1">
-                                                <ng-container *ngIf="row.closing_date != lang.undefined">
-                                                    <i class="fa fa-lock" title="{{lang.closingDate}}"></i>&nbsp;<span
+                                                <ng-container *ngIf="data.value === 'getCreationAndProcessLimitDates' && row.closing_date != lang.undefined">
+                                                    <i class="fa fa-calendar"
+                                                        title="{{lang.creationDate}}"></i>&nbsp;<span
+                                                        [innerHTML]="data.displayValue.creationDate | timeAgo"
+                                                        title='{{data.displayValue.creationDate | fullDate}}'></span>
+                                                    - <i class="fa fa-lock" title="{{lang.closingDate}}"></i>&nbsp;<span
                                                         [innerHTML]="row.closing_date | timeAgo"
                                                         title='{{row.closing_date | fullDate}}'></span>&nbsp;
-                                                    <ng-container *ngIf="data.value === 'getProcessLimitDate'">
-                                                        <i class="fa {{data.icon}}"
-                                                            title="{{lang.processLimitDate}}"></i>&nbsp;<span
-                                                            [innerHTML]="data.displayValue | timeLimit" style="margin-left: 3px;"
-                                                            title='{{data.displayValue | fullDate}}'></span>
-                                                    </ng-container>
                                                 </ng-container>
-                                                <ng-container *ngIf="row.closing_date == lang.undefined">
+                                                <ng-container *ngIf="(row.closing_date == lang.undefined) || (data.value === 'getProcessLimitDate')">
                                                     <ng-container *ngIf="data.value === 'getCreationAndProcessLimitDates'">
                                                         <i class="fa fa-calendar"
                                                         title="{{lang.creationDate}}"></i>&nbsp;<span
