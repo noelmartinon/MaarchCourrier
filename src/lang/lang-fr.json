@@ -2577,5 +2577,9 @@
     "entitiesParameters_opinionCircuit": "Circuit d'avis",
     "entitiesParameters_users": "Utilisateurs",
     "entitiesParameters_templates": "Modèles de documents",
-    "sectorMsg": "Ce champ s'affichera également sur le formulaire de méta-données pour les champs de contacts et de BAN."
+    "sectorMsg": "Ce champ s'affichera également sur le formulaire de méta-données pour les champs de contacts et de BAN.",
+    "getProcessLimitDate": "Date limite de traitement",
+    "getProcessLimitDateSample": "<b color=\"warn\">3 jour(s)</b>",
+    "getCreationDate":             "Date de création",
+    "getCreationDateSample":       "1er janv."
 }

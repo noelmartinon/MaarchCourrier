@@ -2587,5 +2587,9 @@
     "entitiesParameters_opinionCircuit": "Opinion workflow",
     "entitiesParameters_users": "Users",
     "entitiesParameters_templates": "Templates",
-    "sectorMsg": "This field will also appear on the metadata form for the contacts and BAN fields."
+    "sectorMsg": "This field will also appear on the metadata form for the contacts and BAN fields.",
+    "getProcessLimitDate": "Processing deadline",
+    "getProcessLimitDateSample": "<b color=\"warn\">3 day(s)</b>",
+    "getCreationDate":             "Creation date",
+    "getCreationDateSample":       "Jan. 1st"
 }

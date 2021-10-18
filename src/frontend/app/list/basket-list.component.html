@@ -66,8 +66,8 @@
                                     text-overflow: ellipsis;
                                     padding-left: 5px;
                                     padding-right: 5px;" [class.hasEvent]="data.event && data.displayValue !== ('lang.undefined' | translate)" (click)="launchEventSubData(data, row)">
-                                            <ng-container *ngIf="data.value == 'getCreationAndProcessLimitDates'">
-                                                <ng-container *ngIf="row.closing_date != ('lang.undefined' | translate)">
+                                            <ng-container *ngIf="['getCreationDate', 'getProcessLimitDate', 'getCreationAndProcessLimitDates'].indexOf(data.value) > -1">
+                                                <ng-container *ngIf="data.value === 'getCreationAndProcessLimitDates' && row.closing_date != ('lang.undefined' | translate)">
                                                     <i class="fa fa-calendar"
                                                         title="{{'lang.creationDate' | translate}}"></i>&nbsp;<span
                                                         [innerHTML]="data.displayValue.creationDate | timeAgo"
@@ -76,8 +76,9 @@
                                                         [innerHTML]="row.closing_date | timeAgo"
                                                         title='{{row.closing_date | fullDate}}'></span>
                                                 </ng-container>
-                                                <ng-container *ngIf="row.closing_date == ('lang.undefined' | translate)">
-                                                    <i class="fa fa-calendar"
+                                                <ng-container *ngIf="row.closing_date == ('lang.undefined' | translate) || data.value === 'getProcessLimitDate'">
+                                                    <ng-container *ngIf="data.value === 'getCreationAndProcessLimitDates'">
+                                                        <i class="fa fa-calendar"
                                                         title="{{'lang.creationDate' | translate}}"></i>&nbsp;<span
                                                         [innerHTML]="data.displayValue.creationDate | timeAgo"
                                                         title='{{data.displayValue.creationDate | fullDate}}'></span>
@@ -85,9 +86,16 @@
                                                         title="{{'lang.processLimitDate' | translate}}"></i>&nbsp;<span
                                                         [innerHTML]="data.displayValue.processLimitDate | timeLimit"
                                                         title='{{data.displayValue.processLimitDate | fullDate}}'></span>
+                                                    </ng-container>
+                                                    <ng-container *ngIf="data.value === 'getProcessLimitDate'">
+                                                        <i class="fa {{data.icon}}"
+                                                            title="{{'lang.getProcessLimitDate' | translate}}"></i>&nbsp;<span
+                                                            [innerHTML]="data.displayValue | timeLimit" style="margin-left: 3px;"
+                                                            title='{{data.displayValue | fullDate}}'></span>
+                                                    </ng-container>
                                                 </ng-container>
                                             </ng-container>
-                                            <ng-container *ngIf="data.icon != ''">
+                                            <ng-container *ngIf="data.icon != '' && data.value !== 'getProcessLimitDate'">
                                                 <i class="fa {{data.icon}}" title="{{data.label}}"></i>
                                                 &nbsp;
                                             </ng-container>
@@ -98,7 +106,7 @@
                                                     title="{{'lang.' + data.displayValue | translate}}">{{'lang.' + data.displayValue | translate}}</span>
                                             </ng-container>
                                             <ng-container
-                                                *ngIf="data.value != 'getCategory' && data.value != 'getCreationAndProcessLimitDates'">
+                                                *ngIf="data.value != 'getCategory' && data.value !== 'getProcessLimitDate' && data.value != 'getCreationAndProcessLimitDates'">
                                                 <span *ngIf="!data.value.includes('Date')" title="{{data.displayTitle}}"
                                                     [innerHTML]="data.displayValue"></span>
                                                 <span *ngIf="data.value.includes('Date')"
