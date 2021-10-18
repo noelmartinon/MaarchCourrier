@@ -2556,8 +2556,10 @@
     "mustSign": "The signature position for external users is mandatory.",
     "autoRedirectToUser": "To myself",
     "applicationVersion": "Maarch courrier {{version}} Powered by {{author}}",
-    "copyInfos": "Copy contact information",
-    "emptyAddress": "Adresse non renseignée",
-    "toCopyInfos": "to copy its information.",
-    "find": "find."
+    "emptyAddress": "Address not filled in",
+    "copyInfos": "to copy its information.",
+    "find": "find.",
+    "showAll": "See other contacts",
+    "setContactInfos": "Access the contact details sheet",
+    "goToContact": "You will lose your current changes, are you sure you want to continue?"
 }

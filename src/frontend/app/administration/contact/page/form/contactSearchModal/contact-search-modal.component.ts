@@ -1,9 +1,9 @@
+
 import { Component, Inject, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { FunctionsService } from '../../../../../service/functions.service';
-import { ContactService } from '../../../../../service/contact.service';
+import { ContactService } from '@service/contact.service';
 import { MatDialog, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { TranslateService } from '@ngx-translate/core';
+import { FunctionsService } from '@service/functions.service';
 
 @Component({
     templateUrl: 'contact-search-modal.component.html',
@@ -11,7 +11,7 @@ import { TranslateService } from '@ngx-translate/core';
     providers: [ContactService]
 })
 
-export class ContactSearchModal implements OnInit {
+export class ContactSearchModalComponentComponent implements OnInit {
 
     loading: boolean = true;
     contactResult: any[] = [];
@@ -20,9 +20,8 @@ export class ContactSearchModal implements OnInit {
         public http: HttpClient,
         public dialog: MatDialog,
         public functions: FunctionsService,
-        public dialogRef: MatDialogRef<ContactSearchModal>,
+        public dialogRef: MatDialogRef<ContactSearchModalComponentComponent>,
         public contactService: ContactService,
-        public translate: TranslateService,
         @Inject(MAT_DIALOG_DATA) public data: any
     ) { }
 
@@ -32,7 +31,7 @@ export class ContactSearchModal implements OnInit {
     }
 
     formatContactAdress(contact: any) {
-        if (this.functions.empty(contact.addressNumber) && this.functions.empty( contact.addressStreet) && this.functions.empty(contact.addressPostcode) && this.functions.empty(contact.addressTown) && this.functions.empty(contact.addressCountry)) {
+        if (this.functions.empty(contact.addressNumber) && this.functions.empty(contact.addressStreet) && this.functions.empty(contact.addressPostcode) && this.functions.empty(contact.addressTown) && this.functions.empty(contact.addressCountry)) {
             return null;
         } else {
             const addressArray = [];

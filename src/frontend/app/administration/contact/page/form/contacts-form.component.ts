@@ -16,7 +16,8 @@ import { Observable, of } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { LatinisePipe } from 'ngx-pipes';
 import { InputCorrespondentGroupComponent } from '../../group/inputCorrespondent/input-correspondent-group.component';
-import { ContactSearchModal } from '../contactSearchModal/contact-search-modal.component';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { ContactSearchModalComponentComponent } from './contactSearchModal/contact-search-modal.component';
 
 @Component({
     selector: 'app-contact-form',
@@ -340,6 +341,8 @@ export class ContactsFormComponent implements OnInit {
 
     autocompleteContactName: any[] = [];
     contactChanged: boolean = false;
+
+    contactNameClone: any = null;
 
     constructor(
         public translate: TranslateService,
@@ -1167,51 +1170,70 @@ export class ContactsFormComponent implements OnInit {
         }, 100);
     }
 
+
     checkContactName(field: any) {
-        if (this.creationMode && ['firstname', 'lastname'].indexOf(field.id) > -1 && this.canSearchContact()) {
-            this.autocompleteContactName = [];
-            this.http.get(`../rest/autocomplete/contacts/name?search=${field.control.value}`).pipe(
-                tap((data: any) => {
-                    this.contactChanged = false;
-                    this.autocompleteContactName = JSON.parse(JSON.stringify(data));
-                }),
-                catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
+        const contactName: any = {
+            firstname: this.contactForm.find((item: any) => item.id === 'firstname').control.value,
+            lastname: this.contactForm.find((item: any) => item.id === 'lastname').control.value
+        };
+        const alreadyExist: boolean = this.autocompleteContactName.find((contact: any) => contact.firstname === contactName.firstname && contact.lastname === contactName.lastname) !== undefined ? true : false;
+        if (this.creationMode && ['firstname', 'lastname'].indexOf(field.id) > -1 && this.canSearchContact() && !alreadyExist) {
+            if (JSON.stringify(contactName) !== JSON.stringify(this.contactNameClone)) {
+                this.http.get(`../rest/autocomplete/contacts/name?firstname=${contactName.firstname}&lastname=${contactName.lastname}`).pipe(
+                    tap((data: any) => {
+                        this.autocompleteContactName = [];
+                        this.autocompleteContactName = JSON.parse(JSON.stringify(data));
+                        this.contactChanged = false;
+                        this.contactNameClone = JSON.parse(JSON.stringify(
+                            {
+                                firstname: this.contactForm.find((item: any) => item.id === 'firstname').control.value,
+                                lastname: this.contactForm.find((item: any) => item.id === 'lastname').control.value
+                            }
+                        ));
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            }
         } else if (!this.canSearchContact()) {
-            this.autocompleteContactName = [];
+            this.contactChanged = true;
         }
     }
 
     canSearchContact() {
         const firstname: any = this.contactForm.find((item: any) => item.id === 'firstname');
         const lastname: any = this.contactForm.find((item: any) => item.id === 'lastname');
-        // const alreadyExist: boolean = this.autocompleteContactName.find((contact: any) => contact.firstname === firstname.control.value && contact.lastname === lastname.control.value) !== undefined ? true : false;
         if (!this.functions.empty(firstname.control.value) && !this.functions.empty(lastname.control.value) && firstname.display && lastname.display) {
-            return firstname.control.value.toLowerCase() === lastname.control.value.toLowerCase();
+            return true;
         } else {
             this.contactChanged = true;
             return false;
         }
     }
 
-    setContact(index: number) {
-        let indexField = -1;
-        Object.keys(this.autocompleteContactName[index]).forEach(element => {
-            indexField = this.contactForm.map(field => field.id).indexOf(element);
-            if (!this.isEmptyValue(this.autocompleteContactName[index][element]) && indexField > -1 && element !== 'id') {
-                this.contactForm[indexField].control.setValue(this.autocompleteContactName[index][element]);
-                this.contactForm[indexField].display = true;
-            }
-        });
-        this.checkFilling();
-        this.contactChanged = true;
+    setContact(id: number) {
+        const dialogRef = this.dialog.open(ConfirmComponent,
+            { panelClass: 'maarch-modal',
+                autoFocus: false, disableClose: true,
+                data: {
+                    title: this.translate.instant('lang.setContactInfos'),
+                    msg: this.translate.instant('lang.goToContact')
+                }
+            });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(() => this.router.navigate([`/administration/contacts/list/${id}`])),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     showAllContact() {
-        const dialogRef = this.dialog.open(ContactSearchModal, {
+        const dialogRef = this.dialog.open(ContactSearchModalComponentComponent, {
             disableClose: true,
             width: '800px',
             panelClass: 'maarch-modal',
@@ -1219,9 +1241,9 @@ export class ContactsFormComponent implements OnInit {
         });
 
         dialogRef.afterClosed().pipe(
-            tap((index: number) => {
-                if (!this.functions.empty(index)) {
-                    this.setContact(index);
+            tap((id: number) => {
+                if (!this.functions.empty(id)) {
+                    this.setContact(id);
                     this.contactChanged = true;
                 }
             })
