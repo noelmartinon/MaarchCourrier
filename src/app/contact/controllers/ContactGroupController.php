@@ -377,7 +377,7 @@ class ContactGroupController
         if (!empty($queryParams['search'])) {
             $fields = [
                 'contacts.firstname', 'contacts.lastname', 'contacts.company', 'users.firstname', 'users.lastname', 'entities.entity_label',
-                'contacts.address_number', 'contacts.address_street', 'contacts.address_town', 'contacts.address_postcode',
+                'contacts.address_number', 'contacts.address_street', 'contacts.address_town', 'contacts.address_postcode', 'contacts.sector',
                 'entities.address_number', 'entities.address_street', 'entities.address_town', 'entities.address_postcode'
             ];
 
@@ -413,7 +413,7 @@ class ContactGroupController
         foreach ($rawCorrespondents as $correspondent) {
             if ($correspondent['correspondent_type'] == 'contact') {
                 $contact = ContactModel::getById([
-                    'select'    => ['id', 'firstname', 'lastname', 'email', 'company', 'address_number', 'address_street', 'address_town', 'address_postcode', 'enabled'],
+                    'select'    => ['id', 'firstname', 'lastname', 'email', 'company', 'address_number', 'address_street', 'address_town', 'address_postcode', 'sector', 'enabled'],
                     'id'        => $correspondent['correspondent_id']
                 ]);
                 if (!empty($contact)) {
@@ -423,6 +423,7 @@ class ContactGroupController
                         'type'              => $correspondent['correspondent_type'],
                         'name'              => $contactToDisplay['contact']['contact'],
                         'address'           => $contactToDisplay['contact']['address'],
+                        'sector'            => $contactToDisplay['contact']['sector'],
                         'thresholdLevel'    => $contactToDisplay['contact']['thresholdLevel']
                     ];
                 }

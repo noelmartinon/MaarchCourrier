@@ -120,19 +120,24 @@
                 <mat-chip *ngFor="let item of controlAutocomplete.value;let i=index" class="listAutocomplete"
                     color="default" [removable]="!controlAutocomplete.disabled" (removed)="removeItem(i)"
                     (click)="openContact(item)">
-                    <span style="display: flex;flex: 1;align-items: center;">
-                        <i class="fa" [class.fa-address-card]="this.valuesToDisplay[item.type][item.id].type === 'contact'"
-                            [class.fa-sitemap]="this.valuesToDisplay[item.type][item.id].type ==='entity'"
-                            [class.fa-user]="this.valuesToDisplay[item.type][item.id].type ==='user'"
-                            [title]="'lang.' + this.valuesToDisplay[item.type][item.id].type | translate" style="padding-right:5px;"></i>
-                        <ng-container *ngIf="!empty(this.valuesToDisplay[item.type][item.id].firstname)">
-                            {{this.valuesToDisplay[item.type][item.id].firstname}}
-                        </ng-container>
-
-                        {{this.valuesToDisplay[item.type][item.id].lastname}} <ng-container
-                            *ngIf="!empty(this.valuesToDisplay[item.type][item.id].company)">
-                            ({{this.valuesToDisplay[item.type][item.id].company}})</ng-container>
-                    </span>
+                    <div style="margin-right: auto;">
+                        <span style="display: flex;flex: 1;align-items: center;" class="userInfos">
+                            <i class="fa" [class.fa-address-card]="this.valuesToDisplay[item.type][item.id].type === 'contact'"
+                                [class.fa-sitemap]="this.valuesToDisplay[item.type][item.id].type ==='entity'"
+                                [class.fa-user]="this.valuesToDisplay[item.type][item.id].type ==='user'"
+                                [title]="'lang.' + this.valuesToDisplay[item.type][item.id].type | translate" style="padding-right:5px;"></i>
+                            <ng-container *ngIf="!empty(this.valuesToDisplay[item.type][item.id].firstname)">
+                                {{this.valuesToDisplay[item.type][item.id].firstname}}
+                            </ng-container>
+    
+                            {{this.valuesToDisplay[item.type][item.id].lastname}} <ng-container
+                                *ngIf="!empty(this.valuesToDisplay[item.type][item.id].company)">
+                                ({{this.valuesToDisplay[item.type][item.id].company}})</ng-container>
+                        </span>
+                        <span *ngIf="!empty(this.valuesToDisplay[item.type][item.id].sector)" class="sector">
+                            {{'lang.contactsParameters_sector' | translate}} : {{this.valuesToDisplay[item.type][item.id].sector}}
+                        </span>
+                    </div>
                     <i *ngIf="!functions.empty(valuesToDisplay[item.type][item.id].fillingRate.color)" class="fa fa-circle" [style.color]="valuesToDisplay[item.type][item.id].fillingRate.color" style="font-size: 9px;"></i>
                     <mat-icon matChipRemove class="fa fa-times" *ngIf="!controlAutocomplete.disabled"></mat-icon>
                 </mat-chip>

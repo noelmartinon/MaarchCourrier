@@ -2586,5 +2586,6 @@
     "entitiesParameters_visaCircuit": "Visa workflow",
     "entitiesParameters_opinionCircuit": "Opinion workflow",
     "entitiesParameters_users": "Users",
-    "entitiesParameters_templates": "Templates"
+    "entitiesParameters_templates": "Templates",
+    "sectorMsg": "This field will also appear on the metadata form for the contacts and BAN fields."
 }

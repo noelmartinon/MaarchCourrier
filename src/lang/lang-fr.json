@@ -2576,5 +2576,6 @@
     "entitiesParameters_visaCircuit": "Circuit de visa",
     "entitiesParameters_opinionCircuit": "Circuit d'avis",
     "entitiesParameters_users": "Utilisateurs",
-    "entitiesParameters_templates": "Modèles de documents"
+    "entitiesParameters_templates": "Modèles de documents",
+    "sectorMsg": "Ce champ s'affichera également sur le formulaire de méta-données pour les champs de contacts et de BAN."
 }

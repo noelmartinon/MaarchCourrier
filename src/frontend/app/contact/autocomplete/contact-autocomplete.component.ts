@@ -194,7 +194,8 @@ export class ContactAutocompleteComponent implements OnInit {
                             company: data.company,
                             fillingRate: !this.functions.empty(data.fillingRate) ? {
                                 color: this.contactService.getFillingColor(data.fillingRate.thresholdLevel)
-                            } : ''
+                            } : '',
+                            sector: data.sector
                         };
                     }),
                     finalize(() => this.loadingValues = false),
@@ -250,6 +251,7 @@ export class ContactAutocompleteComponent implements OnInit {
                         id: correspondent.id,
                         type: correspondent.type,
                         lastname: correspondent.name,
+                        sector: correspondent.sector,
                         fillingRate: !this.functions.empty(correspondent.thresholdLevel) ? {
                             color: this.contactService.getFillingColor(correspondent.thresholdLevel)
                         } : ''
@@ -284,7 +286,8 @@ export class ContactAutocompleteComponent implements OnInit {
                 {
                     type: contact['type'],
                     id: contact['id'],
-                    label: this.getFormatedContact(contact['type'], contact['id'])
+                    label: this.getFormatedContact(contact['type'], contact['id']),
+                    sector: contact['sector']
                 });
             this.controlAutocomplete.setValue(arrvalue);
             this.loadingValues = false;
