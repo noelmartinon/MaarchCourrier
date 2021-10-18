@@ -1056,7 +1056,9 @@ export class ContactsFormComponent implements OnInit {
     checkContactName(field: any) {
         if (this.creationMode && ['firstname', 'lastname'].indexOf(field.id) > -1 && this.canSearchContact()) {
             this.autocompleteContactName = [];
-            this.http.get(`../../rest/autocomplete/contacts/name?search=${field.control.value}`).pipe(
+            const firstname: string = this.contactForm.find((item: any) => item.id === 'firstname').control.value;
+            const lastname: string = this.contactForm.find((item: any) => item.id === 'lastname').control.value;
+            this.http.get(`../../rest/autocomplete/contacts/name?firstname=${firstname}&lastname=${lastname}`).pipe(
                 tap((data: any) => {
                     this.autocompleteContactName = JSON.parse(JSON.stringify(data));
                     this.contactChanged = false;
@@ -1076,7 +1078,7 @@ export class ContactsFormComponent implements OnInit {
         const lastname: any = this.contactForm.find((item: any) => item.id === 'lastname');
         // const alreadyExist: boolean = this.autocompleteContactName.find((contact: any) => contact.firstname === firstname.control.value && contact.lastname === lastname.control.value) !== undefined ? true : false;
         if (!this.functions.empty(firstname.control.value) && !this.functions.empty(lastname.control.value) && firstname.display && lastname.display) {
-            return firstname.control.value.toLowerCase() === lastname.control.value.toLowerCase();
+            return true;
         } else {
             this.contactChanged = true;
             return false;
