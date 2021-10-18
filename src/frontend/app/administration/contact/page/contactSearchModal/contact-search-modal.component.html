@@ -5,7 +5,7 @@
             <mat-spinner style="margin:auto;"></mat-spinner>
         </div>
         <ng-container *ngIf="!loading">
-            <ng-container *ngFor="let contact of contactResult; let i = index;">
+            <ng-container *ngFor="let contact of contactResult">
                 <div *ngIf="!loading" class="row rowData">
                     <div class="col-md-4">
                         <b>{{contactService.formatContact(contact)}}</b>
@@ -19,7 +19,7 @@
                         </span>
                     </div>
                     <div class="col-md-2" style="margin-left: auto;">
-                        <mat-icon class="fas fa-copy" color="primary" (click)="selectContact(i)"
+                        <mat-icon class="fas fa-id-card" color="primary" (click)="selectContact(contact.id)"
                         style="font-size: 20px; cursor: pointer;" [title]="lang.setContactInfos">
                     </mat-icon>
                     </div>

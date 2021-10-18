@@ -14,6 +14,7 @@ import { FunctionsService } from '../../../../../service/functions.service';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { Observable, of} from 'rxjs';
 import { ContactSearchModal } from '../contactSearchModal/contact-search-modal.compoent';
+import { ConfirmComponent } from '../../../../../plugins/modal/confirm.component';
 
 declare var angularGlobals: any;
 
@@ -308,6 +309,8 @@ export class ContactsFormComponent implements OnInit {
 
     autocompleteContactName: any[] = [];
     contactChanged: boolean = false;
+
+    contactNameClone: any = null;
 
     constructor(
         public http: HttpClient,
@@ -1054,21 +1057,31 @@ export class ContactsFormComponent implements OnInit {
     }
 
     checkContactName(field: any) {
-        const firstname: string = this.contactForm.find((item: any) => item.id === 'firstname').control.value;
-        const lastname: string = this.contactForm.find((item: any) => item.id === 'lastname').control.value;
-        const alreadyExist: boolean = this.autocompleteContactName.find((contact: any) => contact.firstname === firstname && contact.lastname === lastname) !== undefined ? true : false;
+        const contactName: any = {
+            firstname: this.contactForm.find((item: any) => item.id === 'firstname').control.value,
+            lastname: this.contactForm.find((item: any) => item.id === 'lastname').control.value
+        }
+        const alreadyExist: boolean = this.autocompleteContactName.find((contact: any) => contact.firstname === contactName.firstname && contact.lastname === contactName.lastname) !== undefined ? true : false;
         if (this.creationMode && ['firstname', 'lastname'].indexOf(field.id) > -1 && this.canSearchContact() && !alreadyExist) {
-            this.autocompleteContactName = [];
-            this.http.get(`../../rest/autocomplete/contacts/name?firstname=${firstname}&lastname=${lastname}`).pipe(
-                tap((data: any) => {
-                    this.autocompleteContactName = JSON.parse(JSON.stringify(data));
-                    this.contactChanged = false;
-                }),
-                catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
+            if (JSON.stringify(contactName) !== JSON.stringify(this.contactNameClone)) {
+                this.autocompleteContactName = [];
+                this.http.get(`../../rest/autocomplete/contacts/name?firstname=${contactName.firstname}&lastname=${contactName.lastname}`).pipe(
+                    tap((data: any) => {
+                        this.autocompleteContactName = JSON.parse(JSON.stringify(data));
+                        this.contactChanged = false;
+                        this.contactNameClone = JSON.parse(JSON.stringify(
+                            {
+                                firstname: this.contactForm.find((item: any) => item.id === 'firstname').control.value,
+                                lastname: this.contactForm.find((item: any) => item.id === 'lastname').control.value
+                            }
+                        ));
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            }
         } else if(!this.canSearchContact()) {
             this.contactChanged = true;
         }
@@ -1085,17 +1098,23 @@ export class ContactsFormComponent implements OnInit {
         }
     }
 
-    setContact(index: number) {
-        let indexField = -1;
-        Object.keys(this.autocompleteContactName[index]).forEach(element => {
-            indexField = this.contactForm.map(field => field.id).indexOf(element);
-            if (!this.isEmptyValue(this.autocompleteContactName[index][element]) && indexField > -1 && element !== 'id') {
-                this.contactForm[indexField].control.setValue(this.autocompleteContactName[index][element]);
-                this.contactForm[indexField].display = true;
-            }
-        });
-        this.checkFilling();
-        this.contactChanged = true;
+    setContact(id: number) {
+        const dialogRef = this.dialog.open(ConfirmComponent,
+            { panelClass: 'maarch-modal',
+                autoFocus: false, disableClose: true,
+                data: {
+                    title: this.lang.setContactInfos,
+                    msg: this.lang.goToContact
+                }
+            });
+            dialogRef.afterClosed().pipe(
+                filter((data: string) => data === 'ok'),
+                exhaustMap(() => this.router.navigate([`/administration/contacts/list/${id}`])),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
     }
 
     showAllContact() {
@@ -1107,9 +1126,9 @@ export class ContactsFormComponent implements OnInit {
         });
 
         dialogRef.afterClosed().pipe(
-            tap((index: number) => {
-                if (!this.functions.empty(index)) {
-                    this.setContact(index);
+            tap((id: number) => {
+                if (!this.functions.empty(id)) {
+                    this.setContact(id);
                     this.contactChanged = true;
                 }
             })

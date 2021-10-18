@@ -1749,5 +1749,6 @@ export const LANG_EN = {
     "copyInfos": "to copy its information.",
     "find": "find.",
     "showAll": "See other contacts",
-    "setContactInfos": "Copy contact information"
+    "setContactInfos": "Access the contact details sheet",
+    "goToContact": "You will lose your current changes, are you sure you want to continue?"
 };

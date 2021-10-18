@@ -1748,8 +1748,9 @@ export const LANG_FR = {
     "company": "Organisation",
     "noRecipient": "Aucun destinataire associé.",
     "emptyAddress": "Adresse non renseignée",
-    "copyInfos": "pour copier ses informations.",
+    "accessContact": "pour accéder à la fiche de détails.",
     "find": "trouvé.",
     "showAll": "Voir les autres contacts",
-    "setContactInfos": "Copier les informations du contact"
+    "setContactInfos": "Accéder à la fiche de détails du contact",
+    "goToContact": "Vous allez perdre vos modifications actuelles, voulez-vous vraiment continuer ?"
 };
