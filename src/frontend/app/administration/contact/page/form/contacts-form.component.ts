@@ -1064,9 +1064,9 @@ export class ContactsFormComponent implements OnInit {
         const alreadyExist: boolean = this.autocompleteContactName.find((contact: any) => contact.firstname === contactName.firstname && contact.lastname === contactName.lastname) !== undefined ? true : false;
         if (this.creationMode && ['firstname', 'lastname'].indexOf(field.id) > -1 && this.canSearchContact() && !alreadyExist) {
             if (JSON.stringify(contactName) !== JSON.stringify(this.contactNameClone)) {
-                this.autocompleteContactName = [];
                 this.http.get(`../../rest/autocomplete/contacts/name?firstname=${contactName.firstname}&lastname=${contactName.lastname}`).pipe(
                     tap((data: any) => {
+                        this.autocompleteContactName = [];
                         this.autocompleteContactName = JSON.parse(JSON.stringify(data));
                         this.contactChanged = false;
                         this.contactNameClone = JSON.parse(JSON.stringify(
