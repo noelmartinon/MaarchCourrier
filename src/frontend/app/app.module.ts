@@ -124,8 +124,7 @@ import { DevToolComponent } from '@service/debug/dev-tool.component';
 import { DevLangComponent } from '@service/debug/dev-lang.component';
 import { AcknowledgementReceptionComponent } from './registeredMail/acknowledgement-reception/acknowledgement-reception.component';
 import { DatePipe } from '@angular/common';
-
-import { ContactSearchModal } from './administration/contact/page/contactSearchModal/contact-search-modal.component';
+import { ContactSearchModalComponentComponent } from './administration/contact/page/contactSearchModal/contact-search-modal.component';
 
 @Injectable()
 export class MyHammerConfig extends HammerGestureConfig {
@@ -244,7 +243,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         ResetRecordManagementComponent,
         CheckAcknowledgmentRecordManagementComponent,
         TechnicalInformationComponent,
-        ContactSearchModal
+        ContactSearchModalComponentComponent
     ],
     exports : [
         SharedModule
@@ -302,7 +301,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         ViewDocActionComponent,
         ReconcileActionComponent,
         TechnicalInformationComponent,
-        ContactSearchModal
+        ContactSearchModalComponentComponent
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

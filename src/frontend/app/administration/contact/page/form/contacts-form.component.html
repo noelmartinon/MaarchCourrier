@@ -81,9 +81,8 @@
             <div [ngStyle]="{'padding': autocompleteContactName.length === 1 ? '10px' : '0px'}" style="margin: 13px; width: 100% !important;">
                 <div style="margin-top: -7px; margin-bottom: 2px;">
                     {{'lang.contact' | translate}}
-                    <ng-container *ngIf="!functions.empty(autocompleteContactName[0].firstname)">{{autocompleteContactName[0].firstname}} </ng-container>
-                    <ng-container *ngIf="!functions.empty(autocompleteContactName[0].lastname)"> <b>{{autocompleteContactName[0].lastname}}</b></ng-container> {{'lang.find' | translate}}
-                    <a style="cursor: pointer;font-weight:bold;font-style: italic;" (click)="setContact(0)">{{'lang.click' | translate}} {{'lang.here' | translate}}</a> {{'lang.toCopyInfos' | translate}}
+                    <ng-container> <b>{{contactService.formatContact(autocompleteContactName[0])}}</b></ng-container> {{'lang.find' | translate}}
+                    <a style="cursor: pointer;font-weight:bold;font-style: italic;" (click)="setContact(autocompleteContactName[0].id)">{{'lang.click' | translate}} {{'lang.here' | translate}}</a> {{'lang.accessContact' | translate}}
                 </div>
                 <div *ngIf="autocompleteContactName.length > 1" style="margin-bottom: -8px;">
                     <mat-icon color="primary" class="fas fa-angle-right" style="font-size:16px;width:14px;"></mat-icon>
