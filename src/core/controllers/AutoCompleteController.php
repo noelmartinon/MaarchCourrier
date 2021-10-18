@@ -626,14 +626,15 @@ class AutoCompleteController
             return $response->withStatus(400)->withJson(['errors' => 'Query params lastname is empty or not a string']);
         }
 
-        $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['firstname', 'lastname']]);
+        $firstnameField = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['firstname']]);
+        $lastnameField = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['lastname']]);
         $contacts = ContactModel::get([
             'select'    => [
                 'id', 'company', 'firstname', 'lastname', 'address_number as "addressNumber"', 'address_street as "addressStreet"',
                 'address_additional1 as "addressAdditional1"', 'address_additional2 as "addressAdditional2"', 'address_postcode as "addressPostcode"',
                 'address_town as "addressTown"', 'address_country as "addressCountry"'
             ],
-            'where'     => ['enabled = ?', $fields],
+            'where'     => ['enabled = ?', $firstnameField, $lastnameField],
             'data'      => [true, $queryParams['firstname'] . '%', $queryParams['lastname'] . '%'],
             'orderBy'   => ['company', 'lastname'],
             'limit'     => AutoCompleteController::TINY_LIMIT
