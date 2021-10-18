@@ -353,7 +353,7 @@ export class ContactsFormComponent implements OnInit {
         private headerService: HeaderService,
         public appService: AppService,
         public dialog: MatDialog,
-        private contactService: ContactService,
+        public contactService: ContactService,
         public functions: FunctionsService,
         private latinisePipe: LatinisePipe
     ) { }
