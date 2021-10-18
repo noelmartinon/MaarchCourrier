@@ -620,8 +620,10 @@ class AutoCompleteController
     {
         $queryParams = $request->getQueryParams();
 
-        if (!Validator::stringType()->notEmpty()->validate($queryParams['search'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Query params search is empty']);
+        if (!Validator::stringType()->notEmpty()->validate($queryParams['firstname'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query params firstname is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($queryParams['lastname'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query params lastname is empty or not a string']);
         }
 
         $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => ['firstname', 'lastname']]);
@@ -632,7 +634,7 @@ class AutoCompleteController
                 'address_town as "addressTown"', 'address_country as "addressCountry"'
             ],
             'where'     => ['enabled = ?', $fields],
-            'data'      => [true, $queryParams['search'] . '%', $queryParams['search'] . '%'],
+            'data'      => [true, $queryParams['firstname'] . '%', $queryParams['lastname'] . '%'],
             'orderBy'   => ['company', 'lastname'],
             'limit'     => AutoCompleteController::TINY_LIMIT
         ]);
