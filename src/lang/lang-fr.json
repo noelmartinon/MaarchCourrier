@@ -2204,5 +2204,9 @@
     "expAddress": "Adresse expéditrice",
     "manual": "Manuelle",
     "mailServer": "Serveur de messagerie",
-    "canAddCopies": "Pouvoir ajouter des personnes en copie (CC / CCI)"
+    "canAddCopies": "Pouvoir ajouter des personnes en copie (CC / CCI)",
+    "getProcessLimitDate": "Date limite de traitement",
+    "getProcessLimitDateSample": "<b color=\"warn\">3 jour(s)</b>",
+    "getCreationDate":             "Date de création",
+    "getCreationDateSample":       "1er janv."
 }
