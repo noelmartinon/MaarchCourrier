@@ -1054,10 +1054,11 @@ export class ContactsFormComponent implements OnInit {
     }
 
     checkContactName(field: any) {
-        if (this.creationMode && ['firstname', 'lastname'].indexOf(field.id) > -1 && this.canSearchContact()) {
+        const firstname: string = this.contactForm.find((item: any) => item.id === 'firstname').control.value;
+        const lastname: string = this.contactForm.find((item: any) => item.id === 'lastname').control.value;
+        const alreadyExist: boolean = this.autocompleteContactName.find((contact: any) => contact.firstname === firstname && contact.lastname === lastname) !== undefined ? true : false;
+        if (this.creationMode && ['firstname', 'lastname'].indexOf(field.id) > -1 && this.canSearchContact() && !alreadyExist) {
             this.autocompleteContactName = [];
-            const firstname: string = this.contactForm.find((item: any) => item.id === 'firstname').control.value;
-            const lastname: string = this.contactForm.find((item: any) => item.id === 'lastname').control.value;
             this.http.get(`../../rest/autocomplete/contacts/name?firstname=${firstname}&lastname=${lastname}`).pipe(
                 tap((data: any) => {
                     this.autocompleteContactName = JSON.parse(JSON.stringify(data));
@@ -1076,7 +1077,6 @@ export class ContactsFormComponent implements OnInit {
     canSearchContact() {
         const firstname: any = this.contactForm.find((item: any) => item.id === 'firstname');
         const lastname: any = this.contactForm.find((item: any) => item.id === 'lastname');
-        // const alreadyExist: boolean = this.autocompleteContactName.find((contact: any) => contact.firstname === firstname.control.value && contact.lastname === lastname.control.value) !== undefined ? true : false;
         if (!this.functions.empty(firstname.control.value) && !this.functions.empty(lastname.control.value) && firstname.display && lastname.display) {
             return true;
         } else {
