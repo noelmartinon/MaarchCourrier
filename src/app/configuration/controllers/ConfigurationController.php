@@ -275,7 +275,8 @@ class ConfigurationController
             'communications' => [
                 'email' => $xmlConfig['m2m_communication_type']['email'],
                 'uri'   => $xmlConfig['m2m_communication_type']['url'],
-                'login' => $xmlConfig['m2m_login'][0] ?? null
+                'login' => $xmlConfig['m2m_login'][0] ?? null,
+                'passwordAlreadyExists' => !empty($xmlConfig['m2m_password']) ? true : false
             ]
         ];
 

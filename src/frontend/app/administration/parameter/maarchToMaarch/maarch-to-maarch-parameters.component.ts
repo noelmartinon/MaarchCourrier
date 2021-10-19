@@ -40,7 +40,7 @@ export class MaarchToMaarchParametersComponent implements OnInit {
     communications = {
         uri: new FormControl('https://demo.maarchcourrier.com'),
         login: new FormControl('cchaplin'),
-        password: new FormControl('maarch'),
+        password: new FormControl(null),
         email: new FormControl(null),
     };
     annuary = {
@@ -57,6 +57,8 @@ export class MaarchToMaarchParametersComponent implements OnInit {
         ]
     };
     maarch2maarchUrl: string = `https://docs.maarch.org/gitbook/html/MaarchCourrier/${environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1]}/guat/guat_exploitation/maarch2maarch.html`;
+
+    passwordAlreadyExists: boolean = false;
 
     constructor(
         public translate: TranslateService,
@@ -195,8 +197,9 @@ export class MaarchToMaarchParametersComponent implements OnInit {
             this.http.get('../rest/m2m/configuration').pipe(
                 map((data: any) => data.configuration),
                 tap((data: any) => {
-                    Object.keys(this.communications).forEach(elemId => {
-                        if (!this.functionsService.empty(data.communications[elemId])) {
+                    this.passwordAlreadyExists = data.communications.passwordAlreadyExists ? true : false;
+                    Object.keys(this.communications).forEach((elemId: any) => {
+                        if (['uri', 'login', 'email'].indexOf(elemId) > -1) {
                             this.communications[elemId].setValue(data.communications[elemId]);
                         }
                         this.communications[elemId].valueChanges
@@ -362,6 +365,7 @@ export class MaarchToMaarchParametersComponent implements OnInit {
         this.http.put('../rest/m2m/configuration', { configuration: this.formatConfiguration() }).pipe(
             tap(() => {
                 this.notify.success(this.translate.instant('lang.dataUpdated'));
+                this.passwordAlreadyExists = this.functionsService.empty(this.communications['password'].value) ? false : true;
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);

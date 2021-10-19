@@ -1,6 +1,7 @@
 <ng-container *ngIf="!loading; else elseTemplate">
     <app-maarch-message [content]="'lang.maarch2maarchDesc' | translate : {url : maarch2maarchUrl}">
     </app-maarch-message>
+    <app-maarch-message *ngIf="!passwordAlreadyExists" [mode]="'danger'" [content]="'lang.m2mPasswordMsg' | translate"></app-maarch-message>
     <div class="formType" style="margin-top: 20px;">
         <div class="formType-title">
             {{('lang.communicationMeans' | translate)}}

@@ -2559,5 +2559,7 @@
     "userIdMaarch2Maarch": "User identifier",
     "userPasswordMaarch2Maarch": "User password",
     "userIdMaarch2MaarchDesc": "User ID with a web service account",
-    "userPasswordMaarch2MaarchDesc": "User password with a web service account"
+    "userPasswordMaarch2MaarchDesc": "User password with a web service account",
+    "m2mPasswordMsg": "The password for your <b>web service user</b> is not defined"
+
 }

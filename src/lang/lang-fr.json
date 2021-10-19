@@ -2549,5 +2549,6 @@
     "userIdMaarch2Maarch": "Identifiant de l'utilisateur",
     "userPasswordMaarch2Maarch": "Mot de passe de l'utilisateur",
     "userIdMaarch2MaarchDesc": "Identifiant de l'utilisateur avec un compte webservice",
-    "userPasswordMaarch2MaarchDesc": "Mot de passe de l'utilisateur avec un compte webservice"
+    "userPasswordMaarch2MaarchDesc": "Mot de passe de l'utilisateur avec un compte webservice",
+    "m2mPasswordMsg": "Le mot de passe de votre <b>utilisateur webservice</b> n'est pas défini"
 }
