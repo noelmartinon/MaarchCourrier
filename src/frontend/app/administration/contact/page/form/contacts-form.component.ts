@@ -1129,7 +1129,6 @@ export class ContactsFormComponent implements OnInit {
             tap((id: number) => {
                 if (!this.functions.empty(id)) {
                     this.setContact(id);
-                    this.contactChanged = true;
                 }
             })
         ).subscribe();
