@@ -559,6 +559,12 @@ class AlfrescoController
         }
         $entityInformations['alfresco']['password'] = PasswordModel::decrypt(['cryptedPassword' => $entityInformations['alfresco']['password']]);
 
+        $sha = hash('sha256', rand());
+        ResModel::update([
+            'postSet'   => ['external_id' => "jsonb_set(external_id, '{alfrescoSha}', '\"$sha\"')"],
+            'where'     => ['res_id = ?'],
+            'data'      => [$args['resId']]
+        ]);
         $document = ResModel::getById([
             'select'    => [
                 'filename', 'subject', 'alt_identifier', 'external_id', 'type_id', 'priority', 'fingerprint', 'custom_fields', 'dest_user',
@@ -579,71 +585,34 @@ class AlfrescoController
             return ['errors' => 'Alfresco mapping file does not exist'];
         }
 
-        if (!empty($document['external_id']['alfrescoId']) && empty($document['external_id']['alfrescoFolderId'])) {
+        $document['external_id'] = json_decode($document['external_id'], true);
+        if (!empty($document['external_id']['alfrescoId'])) {
             $message = empty($args['folderName']) ? " (envoyé au dossier {$args['folderId']})" : " (envoyé au dossier {$args['folderName']})";
             return ['history' => $message];
-        } elseif (!empty($document['external_id']['alfrescoFolderId']) && !empty($alfrescoParameters['mapping']['folderModification'])) {
-            $curlResponse = CurlModel::exec([
-                'url'       => "{$alfrescoUri}/alfresco/versions/1/nodes/{$document['external_id']['alfrescoFolderId']}",
-                'basicAuth' => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
-                'headers'   => ['Accept: application/json'],
-                'method'    => 'GET'
-            ]);
-
-            if ($curlResponse['code'] != 200) {
-                return ['errors' => 'Cannot get alfresco folder ' . $document['external_id']['alfrescoFolderId']];
-            }
-
-            if (empty($curlResponse['response']['entry']['properties'])) {
-                return ['errors' => 'Alfresco folder ' . $document['external_id']['alfrescoFolderId'] . ' does not have any properties'];
-            }
-            $folderProperties = $curlResponse['response']['entry']['properties'];
-            $folderPropertiesKeys = array_keys($folderProperties);
-            $fieldNotFound = false;
-            $fieldNotCorrectValue = false;
-            foreach ($alfrescoParameters['mapping']['folderModification'] as $alfrescoField => $fieldValue) {
-                if (!in_array($alfrescoField, $folderPropertiesKeys)) {
-                    $fieldNotFound = true;
-                    break;
-                }
-                if ($folderProperties[$alfrescoField] != $fieldValue) {
-                    $fieldNotCorrectValue = true;
-                    break;
-                }
-            }
-
-            if (!$fieldNotFound && !$fieldNotCorrectValue) {
-                $message = empty($args['folderName']) ? " (envoyé au dossier {$args['folderId']})" : " (envoyé au dossier {$args['folderName']})";
-                return ['history' => $message];
-            }
-            if ($fieldNotFound) {
-                return ['errors' => 'At least one field is missing in Alfresco folder ' . $document['external_id']['alfrescoFolderId'] . ' properties'];
-            }
-            if ($fieldNotCorrectValue) {
-                return ['errors' => 'At least one field does not have the correct value in Alfresco folder ' . $document['external_id']['alfrescoFolderId'] . ' properties'];
-            }
+        } elseif (!empty($document['external_id']['alfrescoSha']) && $document['external_id']['alfrescoSha'] != $sha) {
+            return ['errors' => 'Wrong alfrescoSha : document sha ' . $document['external_id']['alfrescoSha'] . ' does not match with generated ' . $sha];
         }
-
 
         $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
         if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
-            return ['errors' => 'Docserver does not exist'];
+            return ['errors' => '(SHA '.$sha.') Docserver does not exist'];
         }
 
         $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $document['path']) . $document['filename'];
         if (!is_file($pathToDocument)) {
-            return ['errors' => 'Document not found on docserver'];
+            return ['errors' => '(SHA '.$sha.') Document not found on docserver'];
         }
 
         $fileContent = file_get_contents($pathToDocument);
         if ($fileContent === false) {
-            return ['errors' => 'Document not found on docserver'];
+            return ['errors' => '(SHA '.$sha.') Document not found on docserver'];
         }
 
         $body = ['name' => str_replace('/', '_', $document['alt_identifier']), 'nodeType' => 'cm:folder'];
         if (!empty($alfrescoParameters['mapping']['folderCreation'])) {
             $body['properties'] = $alfrescoParameters['mapping']['folderCreation'];
         }
+
         $curlResponse = CurlModel::execSimple([
             'url'           => "{$alfrescoUri}/alfresco/versions/1/nodes/{$args['folderId']}/children",
             'basicAuth'     => ['user' => $entityInformations['alfresco']['login'], 'password' => $entityInformations['alfresco']['password']],
@@ -652,7 +621,7 @@ class AlfrescoController
             'body'          => json_encode($body)
         ]);
         if ($curlResponse['code'] != 201) {
-            return ['errors' => "Create folder {$document['alt_identifier']} failed : " . json_encode($curlResponse['response'])];
+            return ['errors' => "(SHA $sha) Create folder {$document['alt_identifier']} failed : " . json_encode($curlResponse['response'])];
         }
         $resourceFolderId = $curlResponse['response']['entry']['id'];
 
@@ -668,7 +637,7 @@ class AlfrescoController
             'multipartBody' => $multipartBody
         ]);
         if ($curlResponse['code'] != 201) {
-            return ['errors' => "Send resource {$args['resId']} failed : " . json_encode($curlResponse['response'])];
+            return ['errors' => "(SHA $sha) Send resource {$args['resId']} failed : " . json_encode($curlResponse['response'])];
         }
         $documentId = $curlResponse['response']['entry']['id'];
 
@@ -766,13 +735,16 @@ class AlfrescoController
             'body'          => json_encode($body)
         ]);
         if ($curlResponse['code'] != 200) {
-            return ['errors' => "Update resource {$args['resId']} failed : " . json_encode($curlResponse['response'])];
+            return ['errors' => "(SHA $sha) Update resource {$args['resId']} failed : " . json_encode($curlResponse['response'])];
         }
 
-        $externalId = json_decode($document['external_id'], true);
+        $externalId = $document['external_id'];
         $externalId['alfrescoId'] = $documentId;
-        $externalId['alfrescoFolderId'] = $resourceFolderId;
-        ResModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$args['resId']]]);
+        ResModel::update([
+            'set'   => ['external_id' => json_encode($externalId)],
+            'where' => ['res_id = ?', "external_id->>'alfrescoSha' = ?"],
+            'data'  => [$args['resId'], $sha]
+        ]);
 
         $attachments = AttachmentModel::get([
             'select'    => ['res_id', 'title', 'identifier', 'external_id', 'docserver_id', 'path', 'filename', 'format', 'attachment_type'],
@@ -813,7 +785,7 @@ class AlfrescoController
                     'body'          => json_encode(['name' => 'Pièces jointes', 'nodeType' => 'cm:folder'])
                 ]);
                 if ($curlResponse['code'] != 201) {
-                    return ['errors' => "Create folder 'Pièces jointes' failed : " . json_encode($curlResponse['response'])];
+                    return ['errors' => "(SHA '.$sha.') Create folder 'Pièces jointes' failed : " . json_encode($curlResponse['response'])];
                 }
                 $attachmentsFolderId = $curlResponse['response']['entry']['id'];
             }
@@ -841,7 +813,7 @@ class AlfrescoController
                 'multipartBody' => $multipartBody
             ]);
             if ($curlResponse['code'] != 201) {
-                return ['errors' => "Send attachment {$attachment['res_id']} failed : " . json_encode($curlResponse['response'])];
+                return ['errors' => "(SHA '.$sha.') Send attachment {$attachment['res_id']} failed : " . json_encode($curlResponse['response'])];
             }
 
             $attachmentId = $curlResponse['response']['entry']['id'];
@@ -869,7 +841,7 @@ class AlfrescoController
                 'body'          => json_encode($body)
             ]);
             if ($curlResponse['code'] != 200) {
-                return ['errors' => "Update attachment {$attachment['res_id']} failed : " . json_encode($curlResponse['response'])];
+                return ['errors' => "(SHA '.$sha.') Update attachment {$attachment['res_id']} failed : " . json_encode($curlResponse['response'])];
             }
 
             $attachmentsTitlesSent[] = $attachment['title'];
@@ -891,7 +863,7 @@ class AlfrescoController
                 'body'          => json_encode($body)
             ]);
             if ($curlResponse['code'] != 200) {
-                return ['errors' => "Update alfresco folder {$resourceFolderId} failed : " . json_encode($curlResponse['response'])];
+                return ['errors' => "(SHA '.$sha.') Update alfresco folder {$resourceFolderId} failed : " . json_encode($curlResponse['response'])];
             }
         }
 
