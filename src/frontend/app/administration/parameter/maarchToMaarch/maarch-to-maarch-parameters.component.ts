@@ -38,7 +38,7 @@ export class MaarchToMaarchParametersComponent implements OnInit {
         attachmentTypeId: new FormControl(),
     };
     communications = {
-        uri: new FormControl('https://demo.maarchcourrier.com'),
+        url: new FormControl('https://demo.maarchcourrier.com'),
         login: new FormControl('cchaplin'),
         password: new FormControl(null),
         email: new FormControl(null),
@@ -197,68 +197,70 @@ export class MaarchToMaarchParametersComponent implements OnInit {
             this.http.get('../rest/m2m/configuration').pipe(
                 map((data: any) => data.configuration),
                 tap((data: any) => {
-                    this.passwordAlreadyExists = data.communications.passwordAlreadyExists ? true : false;
-                    Object.keys(this.communications).forEach((elemId: any) => {
-                        if (['uri', 'login', 'email'].indexOf(elemId) > -1) {
-                            this.communications[elemId].setValue(data.communications[elemId]);
-                        }
-                        this.communications[elemId].valueChanges
-                            .pipe(
-                                debounceTime(1000),
-                                tap((value: any) => {
-                                    this.saveConfiguration();
-                                }),
-                            ).subscribe();
-                    });
-                    Object.keys(this.metadata).forEach(elemId => {
-                        this.setDefaultValue(elemId, data.metadata[elemId]);
-                        this.metadata[elemId].valueChanges
+                    if (!this.functionsService.empty(data)) {
+                        this.passwordAlreadyExists = data.communications.passwordAlreadyExists ? true : false;
+                        Object.keys(this.communications).forEach((elemId: any) => {
+                            if (['url', 'login', 'email'].indexOf(elemId) > -1) {
+                                this.communications[elemId].setValue(data.communications[elemId]);
+                            }
+                            this.communications[elemId].valueChanges
+                                .pipe(
+                                    debounceTime(1000),
+                                    tap((value: any) => {
+                                        this.saveConfiguration();
+                                    }),
+                                ).subscribe();
+                        });
+                        Object.keys(this.metadata).forEach(elemId => {
+                            this.setDefaultValue(elemId, data.metadata[elemId]);
+                            this.metadata[elemId].valueChanges
+                                .pipe(
+                                    debounceTime(300),
+                                    tap((value: any) => {
+                                        this.saveConfiguration();
+                                    }),
+                                ).subscribe();
+                        });
+                        Object.keys(this.annuary).forEach(elemId => {
+                            if (['annuaries'].indexOf(elemId) === -1) {
+                                this.annuary[elemId].setValue(data.annuary[elemId]);
+                                this.annuary[elemId].valueChanges
+                                    .pipe(
+                                        debounceTime(1000),
+                                        tap((value: any) => {
+                                            if (elemId === 'enabled' && value === true && this.annuary.annuaries.length === 0) {
+                                                this.addAnnuary();
+                                            } else {
+                                                this.saveConfiguration();
+                                            }
+                                        }),
+                                    ).subscribe();
+                            } else {
+                                this.annuary[elemId] = [];
+                                data.annuary[elemId].forEach((annuaryConf: any, index: number) => {
+                                    this.annuary[elemId].push({});
+                                    Object.keys(annuaryConf).forEach(annuaryItem => {
+                                        this.annuary[elemId][index][annuaryItem] = new FormControl(data.annuary[elemId][index][annuaryItem]);
+                                        this.annuary[elemId][index][annuaryItem].valueChanges
+                                            .pipe(
+                                                debounceTime(1000),
+                                                tap((value: any) => {
+                                                    this.saveConfiguration();
+                                                }),
+                                            ).subscribe();
+                                    });
+                                });
+                            }
+                        });
+                        this.setDefaultValue('basketToRedirect', data.basketToRedirect);
+                        this.basketToRedirect.valueChanges
                             .pipe(
                                 debounceTime(300),
                                 tap((value: any) => {
                                     this.saveConfiguration();
                                 }),
                             ).subscribe();
-                    });
-                    Object.keys(this.annuary).forEach(elemId => {
-                        if (['annuaries'].indexOf(elemId) === -1) {
-                            this.annuary[elemId].setValue(data.annuary[elemId]);
-                            this.annuary[elemId].valueChanges
-                                .pipe(
-                                    debounceTime(1000),
-                                    tap((value: any) => {
-                                        if (elemId === 'enabled' && value === true && this.annuary.annuaries.length === 0) {
-                                            this.addAnnuary();
-                                        } else {
-                                            this.saveConfiguration();
-                                        }
-                                    }),
-                                ).subscribe();
-                        } else {
-                            this.annuary[elemId] = [];
-                            data.annuary[elemId].forEach((annuaryConf: any, index: number) => {
-                                this.annuary[elemId].push({});
-                                Object.keys(annuaryConf).forEach(annuaryItem => {
-                                    this.annuary[elemId][index][annuaryItem] = new FormControl(data.annuary[elemId][index][annuaryItem]);
-                                    this.annuary[elemId][index][annuaryItem].valueChanges
-                                        .pipe(
-                                            debounceTime(1000),
-                                            tap((value: any) => {
-                                                this.saveConfiguration();
-                                            }),
-                                        ).subscribe();
-                                });
-                            });
-                        }
-                    });
-                    this.setDefaultValue('basketToRedirect', data.basketToRedirect);
-                    this.basketToRedirect.valueChanges
-                        .pipe(
-                            debounceTime(300),
-                            tap((value: any) => {
-                                this.saveConfiguration();
-                            }),
-                        ).subscribe();
+                    }
                 }),
                 finalize(() => {
                     resolve(true);
@@ -365,7 +367,7 @@ export class MaarchToMaarchParametersComponent implements OnInit {
         this.http.put('../rest/m2m/configuration', { configuration: this.formatConfiguration() }).pipe(
             tap(() => {
                 this.notify.success(this.translate.instant('lang.dataUpdated'));
-                this.passwordAlreadyExists = this.functionsService.empty(this.communications['password'].value) ? false : true;
+                // this.passwordAlreadyExists = this.functionsService.empty(this.communications['password'].value) ? false : true;
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
@@ -382,7 +384,7 @@ export class MaarchToMaarchParametersComponent implements OnInit {
                 annuaries: []
             },
             communications: {
-                uri: this.communications.uri.value,
+                url: this.communications.url.value,
                 login: this.communications.login.value,
                 password: this.communications.password.value,
                 email: this.communications.email.value
