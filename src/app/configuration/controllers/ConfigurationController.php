@@ -259,6 +259,9 @@ class ConfigurationController
         }
 
         $xmlConfig = ReceiveMessageExchangeController::readXmlConfig();
+        if (empty($xmlConfig)) {
+            return $response->withStatus(200)->withJson(['configuration' => null]);
+        }
 
         $attachmentType = AttachmentTypeModel::getByTypeId(['select' => ['id'], 'typeId' => $xmlConfig['res_attachments']['attachment_type']]);
         $status         = StatusModel::getById(['select' => ['identifier'], 'id' => $xmlConfig['res_letterbox']['status']]);
@@ -369,17 +372,17 @@ class ConfigurationController
         $password = '';
         if(!empty($body['communications']['login'])) {
             $login = $body['communications']['login'];
-            unset($body['communications']['login']);
         }
+        unset($body['communications']['login']);
         if(!empty($body['communications']['password'])) {
             $password = $body['communications']['password'];
-            unset($body['communications']['password']);
         }
+        unset($body['communications']['password']);
         foreach ($body['communications'] as $key => $value) {
             if (!empty($value)) {
-                if ($key == 'url' && !filter_var($body['communicationMeans']['url'], FILTER_VALIDATE_URL)) {
+                if ($key == 'url' && !filter_var($body['communications']['url'], FILTER_VALIDATE_URL)) {
                     return $response->withStatus(400)->withJson(['errors' => 'Communications url is not a valid URL', 'lang' => 'urlUndefinedFormat']);
-                } elseif ($key == 'email' && !filter_var($body['communicationMeans']['email'], FILTER_VALIDATE_EMAIL)) {
+                } elseif ($key == 'email' && !filter_var($body['communications']['email'], FILTER_VALIDATE_EMAIL)) {
                     return $response->withStatus(400)->withJson(['errors' => 'Communications email is not a valid email address', 'lang' => 'urlUndefinedFormat']);
                 }
                 $communication[] = $value;
