@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '20.10.18_TMA1' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '20.10.19_TMA1' WHERE id = 'database_version';
 
 DROP VIEW IF EXISTS res_view_letterbox;
 
@@ -334,6 +334,10 @@ UPDATE actions SET id_status = 'EVIS' WHERE id = 414;
 
 -- unable feature_tour
 UPDATE users SET feature_tour = '["welcome","email","notification"]';
+
+UPDATE contacts_parameters set searchable = true;
+UPDATE contacts_parameters set searchable = false
+where  identifier NOT IN ('lastname', 'firstname', 'company');
 
 --- SGAMI-SI FIN
 
