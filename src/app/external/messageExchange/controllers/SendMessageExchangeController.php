@@ -237,16 +237,15 @@ class SendMessageExchangeController
                     $ArchivalAgencyCommunicationType['value'] = $aArchivalAgencyCommunicationType['email'];
                 } else {
                     $ArchivalAgencyCommunicationType['type'] = 'url';
-                    $ArchivalAgencyCommunicationType['value'] = rtrim($aArchivalAgencyCommunicationType['uri'], "/");
-                    if (strrpos($ArchivalAgencyCommunicationType['value'], "http://") !== false) { 
-                        $url = str_replace("http://", "", $ArchivalAgencyCommunicationType['value']);
+                    $ArchivalAgencyCommunicationType['value'] = rtrim($aArchivalAgencyCommunicationType['url'], "/");
+                    if (strrpos($ArchivalAgencyCommunicationType['value'], "http://") !== false) {
                         $prefix = "http://";
                     } elseif (strrpos($ArchivalAgencyCommunicationType['value'], "https://") !== false) {
-                        $url = str_replace("https://", "", $ArchivalAgencyCommunicationType['value']);
                         $prefix = "https://";
                     } else {
                         return $response->withStatus(403)->withJson(['errors' => 'http or https missing']);
                     }
+                    $url = str_replace($prefix, '', $ArchivalAgencyCommunicationType['value']);
                     $login = $aArchivalAgencyCommunicationType['login'];
                     $password = PasswordModel::decrypt(['cryptedPassword' => $aArchivalAgencyCommunicationType['password']]);
                     $ArchivalAgencyCommunicationType['value'] = $prefix . $login . ':' . $password . '@' . $url;

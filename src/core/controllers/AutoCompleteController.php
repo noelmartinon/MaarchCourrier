@@ -819,7 +819,7 @@ class AutoCompleteController
         $requestData = AutoCompleteController::getDataForRequest([
             'search'        => $queryParams['search'],
             'fields'        => $fields,
-            'where'         => ['enabled = ?', "external_id->>'m2m' is not null", "external_id->>'m2m' != ''", "(communication_means->>'uri' is not null OR communication_means->>'email' is not null)"],
+            'where'         => ['enabled = ?', "external_id->>'m2m' is not null", "external_id->>'m2m' != ''", "(communication_means->>'url' is not null OR communication_means->>'email' is not null)"],
             'data'          => [true],
             'fieldsNumber'  => $fieldsNumber
         ]);

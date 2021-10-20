@@ -264,7 +264,7 @@ class ConfigurationController
         $status         = StatusModel::getById(['select' => ['identifier'], 'id' => $xmlConfig['res_letterbox']['status']]);
 
         $config = [
-            "metadata" => [
+            "metadata"         => [
                 'typeId'           => (int)$xmlConfig['res_letterbox']['type_id'],
                 'statusId'         => (int)$status['identifier'],
                 'priorityId'       => $xmlConfig['res_letterbox']['priority'],
@@ -272,11 +272,11 @@ class ConfigurationController
                 'attachmentTypeId' => (int)$attachmentType['id']
             ],
             'basketToRedirect' => $xmlConfig['basketRedirection_afterUpload'][0],
-            'communications' => [
-                'email' => $xmlConfig['m2m_communication_type']['email'],
-                'uri'   => $xmlConfig['m2m_communication_type']['url'],
-                'login' => $xmlConfig['m2m_login'][0] ?? null,
-                'passwordAlreadyExists' => !empty($xmlConfig['m2m_password']) ? true : false
+            'communications'   => [
+                'email'                 => $xmlConfig['m2m_communication_type']['email'],
+                'url'                   => $xmlConfig['m2m_communication_type']['url'],
+                'login'                 => $xmlConfig['m2m_login'][0] ?? null,
+                'passwordAlreadyExists' => !empty($xmlConfig['m2m_password'])
             ]
         ];
 
@@ -375,8 +375,13 @@ class ConfigurationController
             $password = $body['communications']['password'];
             unset($body['communications']['password']);
         }
-        foreach ($body['communications'] as $value) {
+        foreach ($body['communications'] as $key => $value) {
             if (!empty($value)) {
+                if ($key == 'url' && !filter_var($body['communicationMeans']['url'], FILTER_VALIDATE_URL)) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Communications url is not a valid URL', 'lang' => 'urlUndefinedFormat']);
+                } elseif ($key == 'email' && !filter_var($body['communicationMeans']['email'], FILTER_VALIDATE_EMAIL)) {
+                    return $response->withStatus(400)->withJson(['errors' => 'Communications email is not a valid email address', 'lang' => 'urlUndefinedFormat']);
+                }
                 $communication[] = $value;
             }
         }

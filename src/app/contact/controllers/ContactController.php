@@ -155,8 +155,8 @@ class ContactController
         if (!empty($body['communicationMeans'])) {
             if (filter_var($body['communicationMeans']['email'], FILTER_VALIDATE_EMAIL)) {
                 $contactBody['email'] = $body['communicationMeans']['email'];
-            } elseif (filter_var($body['communicationMeans']['uri'], FILTER_VALIDATE_URL)) {
-                $contactBody['uri'] = $body['communicationMeans']['uri'];
+            } elseif (filter_var($body['communicationMeans']['url'], FILTER_VALIDATE_URL)) {
+                $contactBody['url'] = $body['communicationMeans']['url'];
             } else {
                 return $response->withStatus(400)->withJson(['errors' => _COMMUNICATION_MEANS_VALIDATOR]);
             }
@@ -195,7 +195,7 @@ class ContactController
             'address_country'       => $body['addressCountry'] ?? null,
             'email'                 => $body['email'] ?? null,
             'phone'                 => $body['phone'] ?? null,
-            'communication_means'   => !empty($body['communicationMeans']) ? json_encode($body['communicationMeans']) : null,
+            'communication_means'   => !empty($contactBody) ? json_encode($contactBody) : null,
             'notes'                 => $body['notes'] ?? null,
             'creator'               => $GLOBALS['id'],
             'enabled'               => 'true',
@@ -280,9 +280,8 @@ class ContactController
         }
         if (!empty($rawContact['communication_means'])) {
             $communicationMeans = json_decode($rawContact['communication_means'], true);
-            // $communicationMeans[] = ?? 
-            if(!empty($communicationMeans['uri'])) {
-                $contact['communicationMeans']['uri'] = $communicationMeans['uri']; 
+            if(!empty($communicationMeans['url'])) {
+                $contact['communicationMeans']['url'] = $communicationMeans['url'];
             } elseif (!empty($communicationMeans['email'])) {
                 $contact['communicationMeans']['email'] = $communicationMeans['email']; 
             }
@@ -343,8 +342,8 @@ class ContactController
         if (!empty($body['communicationMeans'])) {
             if (filter_var($body['communicationMeans']['email'], FILTER_VALIDATE_EMAIL)) {
                 $contactBody['email'] = $body['communicationMeans']['email'];
-            } elseif (filter_var($body['communicationMeans']['uri'], FILTER_VALIDATE_URL)) {
-                $contactBody['uri'] = $body['communicationMeans']['uri'];
+            } elseif (filter_var($body['communicationMeans']['url'], FILTER_VALIDATE_URL)) {
+                $contactBody['url'] = $body['communicationMeans']['url'];
             } else {
                 unset($contactBody);
             }
@@ -355,9 +354,6 @@ class ContactController
                 $contactBody['password'] = PasswordModel::encrypt(['password' => $body['communicationMeans']['password']]);                
             }
         }
-        
-
-
 
         $annuaryReturn = ContactController::addContactToM2MAnnuary(['body' => $body]);
         $body = $annuaryReturn['body'];
