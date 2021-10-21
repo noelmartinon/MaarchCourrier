@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild, EventEmitter, Input, Output } from '@angu
 import { HttpClient } from '@angular/common/http';
 import { LANG } from '../../../../translate.component';
 import { NotificationService } from '../../../../notification.service';
-import { HeaderService } from '../../../../../service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../../../service/app.service';
 import { MatDialog } from '@angular/material';
@@ -316,13 +315,10 @@ export class ContactsFormComponent implements OnInit {
     fromAdministration: boolean = false;
     currentRoute: string = '';
     
-    
     constructor(
         public http: HttpClient,
-        private route: ActivatedRoute,
         private router: Router,
         private notify: NotificationService,
-        private headerService: HeaderService,
         public appService: AppService,
         public dialog: MatDialog,
         private contactService: ContactService,

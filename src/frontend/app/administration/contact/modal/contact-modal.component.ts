@@ -8,6 +8,7 @@ import { MatSidenav } from '@angular/material';
 import { ConfirmComponent } from '../../../../plugins/modal/confirm.component';
 import { catchError, exhaustMap, filter } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { NotificationService } from '../../../notification.service';
 
 declare function $j(selector: any): any;
 
@@ -25,7 +26,6 @@ export class ContactModalComponent implements OnInit{
 
     @ViewChild('drawer', { static: true }) drawer: MatSidenav;
     @ViewChild('contactForm', {static: true}) contactForm: ElementRef;
-    notify: any;
 
     constructor(
         public http: HttpClient,
@@ -34,6 +34,7 @@ export class ContactModalComponent implements OnInit{
         public dialogRef: MatDialogRef<ContactModalComponent>,
         public headerService: HeaderService,
         public dialog: MatDialog,
+        public notify: NotificationService,
         private renderer: Renderer2) {
     }
 
