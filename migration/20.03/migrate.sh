@@ -5,6 +5,7 @@ php ./exportFileplans.php
 php ./exportFolders.php
 php ./migrateCategories.php
 php ./migrateCustomFields.php
+php ./migrateCustomNatures.php
 php ./migrateFileplans.php
 php ./migrateFolders.php
 php ./migrateFullText.php
