@@ -112,15 +112,7 @@
                                     {{contact.communicationMeans.login}}
                                 </p>
                             </mat-list-item>
-                        <mat-list-item class="contact-item"
-                            *ngIf="!functionsService.empty(contact.externalId) && !functionsService.empty(contact.externalId['m2m'])"
-                            [title]="'lang.IdMaarch2Maarch' | translate">
-                            <mat-icon mat-list-icon class="contact-group fas fa-hashtag"></mat-icon>
-                            <p mat-line class="contact-content" [title]="contact.externalId['m2m']">
-                                {{contact.externalId['m2m']}} </p>
-                        </mat-list-item>
-                        </ng-container>
-
+                    </ng-container>
                     <mat-list-item class="contact-item"
                         *ngIf="!functionsService.empty(contact.externalId) && !functionsService.empty(contact.externalId['m2m'])"
                         [title]="'lang.IdMaarch2Maarch' | translate">
