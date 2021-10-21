@@ -334,11 +334,16 @@ class ContactController
             return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
         }
 
-        $contact = ContactModel::getById(['id' => $args['id'], 'select' => [1]]);
+        $contact = ContactModel::getById(['id' => $args['id'], 'select' => ['communication_means']]);
         if (empty($contact)) {
             return $response->withStatus(400)->withJson(['errors' => 'Contact does not exist']);
         }
 
+        $contact['communication_means'] = json_decode($contact['communication_means'], true);
+        $contactBody = [];
+        if (!empty($contact['communication_means']['password'])) {
+            $contactBody['password'] = $contact['communication_means']['password'];
+        }
         if (!empty($body['communicationMeans'])) {
             if (filter_var($body['communicationMeans']['email'], FILTER_VALIDATE_EMAIL)) {
                 $contactBody['email'] = $body['communicationMeans']['email'];

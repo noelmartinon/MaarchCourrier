@@ -246,9 +246,13 @@ class SendMessageExchangeController
                         return $response->withStatus(403)->withJson(['errors' => 'http or https missing']);
                     }
                     $url = str_replace($prefix, '', $ArchivalAgencyCommunicationType['value']);
-                    $login = $aArchivalAgencyCommunicationType['login'];
-                    $password = PasswordModel::decrypt(['cryptedPassword' => $aArchivalAgencyCommunicationType['password']]);
-                    $ArchivalAgencyCommunicationType['value'] = $prefix . $login . ':' . $password . '@' . $url;
+                    $login = $aArchivalAgencyCommunicationType['login'] ?? '';
+                    $password = !empty($aArchivalAgencyCommunicationType['password']) ? PasswordModel::decrypt(['cryptedPassword' => $aArchivalAgencyCommunicationType['password']]) : '';
+                    $ArchivalAgencyCommunicationType['value'] = $prefix;
+                    if (!empty($login) && !empty($password)) {
+                        $ArchivalAgencyCommunicationType['value'] .= $login . ':' . $password . '@';
+                    }
+                    $ArchivalAgencyCommunicationType['value'] .= $url;
                 }
             }
             $ArchivalAgencyContactInformations = ContactModel::getById(['select' => ['*'], 'id' => $contactId]);

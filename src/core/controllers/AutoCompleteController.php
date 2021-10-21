@@ -839,7 +839,7 @@ class AutoCompleteController
             $externalId = json_decode($contact['external_id'], true);
             $communicationMeans = json_decode($contact['communication_means'], true);
             $autoContact['m2m'] = $externalId['m2m'];
-            $autoContact['communicationMeans'] = $communicationMeans['uri'] ?? $communicationMeans['email'];
+            $autoContact['communicationMeans'] = $communicationMeans['url'] ?? $communicationMeans['email'];
             $autocompleteData[] = $autoContact;
         }
 
@@ -905,8 +905,8 @@ class AutoCompleteController
                 }
             }
 
-            return $response->withJson($unitOrganizations);
         }
+        return $response->withJson($unitOrganizations);
     }
 
     public static function getFolders(Request $request, Response $response)
