@@ -69,7 +69,7 @@ function concate($elements) {
     $numItems = count($elements);
     $i = 0;
     foreach($elements as $element) {
-        $string = '"'.$element.'"';
+        $string .= '"'.$element.'"';
         if(++$i < $numItems) {
             $string .= ", ";
         }
