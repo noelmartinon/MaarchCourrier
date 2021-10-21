@@ -32,8 +32,8 @@
                         <div>
                             {{recipient.label}} - <b>{{recipient.m2m}}</b>
                         </div>
-                        <div class="attachLabel">
-                            ({{'lang.communicationMean' | translate}} : {{recipient.communicationMeans}})
+                        <div *ngIf="!functions.empty(recipient.communicationMeans.url) || !functions.empty(recipient.communicationMeans.email)" class="attachLabel">
+                            ({{'lang.communicationMean' | translate}} : {{getCommunicationMean(recipient.communicationMeans)}})
                         </div>
                     </span>
                     <mat-icon matChipRemove class="fa fa-times" *ngIf="canManageMail()"></mat-icon>
