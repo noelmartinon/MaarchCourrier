@@ -82,7 +82,7 @@
                 <div style="margin-top: -7px; margin-bottom: 2px;">
                     {{lang.contact}}
                     <ng-container ><b>{{contactService.formatContact(autocompleteContactName[0])}}</b></ng-container> {{lang.find}}
-                    <a style="cursor: pointer;font-weight:bold;font-style: italic;" (click)="setContact(autocompleteContactName[0].id)">{{lang.click}} {{lang.here}}</a> {{lang.accessContact}}
+                    <a style="cursor: pointer;font-weight:bold;font-style: italic;" (click)="setContact(autocompleteContactName[0].id)">{{lang.click}} {{lang.here}}</a> {{!fromAdministration ? lang.associateContact : lang.accessContact}}
                 </div>
                 <div *ngIf="autocompleteContactName.length > 1" style="margin-bottom: -8px;">
                     <mat-icon color="primary" class="fas fa-angle-right" style="font-size:16px;width:14px;"></mat-icon>

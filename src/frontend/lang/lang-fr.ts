@@ -1752,5 +1752,7 @@ export const LANG_FR = {
     "find": "trouvé.",
     "showAll": "Voir les autres contacts",
     "setContactInfos": "Accéder à la fiche de détails du contact",
-    "goToContact": "Vous allez perdre vos modifications actuelles, voulez-vous vraiment continuer ?"
+    "goToContact": "Vous allez perdre vos modifications actuelles, voulez-vous vraiment continuer ?",
+    "associateContact": "pour associer ce contact au courrier/pièce jointe.",
+    "associateContactToDoc": "Associer ce contact au courrier/pièce jointe"
 };

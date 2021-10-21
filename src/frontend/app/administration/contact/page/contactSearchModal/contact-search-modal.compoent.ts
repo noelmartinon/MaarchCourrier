@@ -27,7 +27,7 @@ export class ContactSearchModal implements OnInit {
     ) { }
 
     ngOnInit(): void {
-        this.contactResult = JSON.parse(JSON.stringify(this.data));
+        this.contactResult = JSON.parse(JSON.stringify(this.data.contacts));
         this.loading = false;
     }
 

@@ -6,7 +6,7 @@ import { HeaderService } from '../../../../../service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '../../../../../service/app.service';
 import { MatDialog } from '@angular/material';
-import { switchMap, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize, map, last } from 'rxjs/operators';
+import { switchMap, catchError, filter, exhaustMap, tap, debounceTime, distinctUntilChanged, finalize, map } from 'rxjs/operators';
 import { FormControl, Validators, ValidatorFn } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ContactService } from '../../../../../service/contact.service';
@@ -44,6 +44,7 @@ export class ContactsFormComponent implements OnInit {
 
     @ViewChild('snav2', { static: true }) public sidenavRight: MatSidenav;
 
+    @Output('linkContact') linkContact = new EventEmitter<number>();
 
     lang: any = LANG;
     loading: boolean = false;
@@ -312,6 +313,10 @@ export class ContactsFormComponent implements OnInit {
 
     contactNameClone: any = null;
 
+    fromAdministration: boolean = false;
+    currentRoute: string = '';
+    
+    
     constructor(
         public http: HttpClient,
         private route: ActivatedRoute,
@@ -321,13 +326,15 @@ export class ContactsFormComponent implements OnInit {
         public appService: AppService,
         public dialog: MatDialog,
         private contactService: ContactService,
-        public functions: FunctionsService
+        public functions: FunctionsService,
+        private activatedRoute: ActivatedRoute,
     ) { }
 
     ngOnInit(): void {
-
         this.loading = true;
 
+        this.currentRoute = this.activatedRoute.snapshot['_routerState'].url;
+        this.fromAdministration = this.currentRoute.includes('administration') ? true : false;
         this.initBanSearch();
 
         if (this.contactId === null) {
@@ -1099,22 +1106,26 @@ export class ContactsFormComponent implements OnInit {
     }
 
     setContact(id: number) {
-        const dialogRef = this.dialog.open(ConfirmComponent,
-            { panelClass: 'maarch-modal',
-                autoFocus: false, disableClose: true,
-                data: {
-                    title: this.lang.setContactInfos,
-                    msg: this.lang.goToContact
-                }
-            });
-            dialogRef.afterClosed().pipe(
-                filter((data: string) => data === 'ok'),
-                exhaustMap(() => this.router.navigate([`/administration/contacts/list/${id}`])),
-                catchError((err: any) => {
-                    this.notify.handleErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
+        if (!this.fromAdministration) {
+            this.linkContact.emit(id);
+        } else {
+            const dialogRef = this.dialog.open(ConfirmComponent,
+                { panelClass: 'maarch-modal',
+                    autoFocus: false, disableClose: true,
+                    data: {
+                        title: this.lang.setContactInfos,
+                        msg: this.lang.goToContact
+                    }
+                });
+                dialogRef.afterClosed().pipe(
+                    filter((data: string) => data === 'ok'),
+                    exhaustMap(() => this.router.navigate([`/administration/contacts/list/${id}`])),
+                    catchError((err: any) => {
+                        this.notify.handleErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+        }
     }
 
     showAllContact() {
@@ -1122,7 +1133,10 @@ export class ContactsFormComponent implements OnInit {
             disableClose: true,
             width: '800px',
             panelClass: 'maarch-modal',
-            data: this.autocompleteContactName
+            data: {
+                contacts: this.autocompleteContactName,
+                fromAdministration: this.fromAdministration
+            }
         });
 
         dialogRef.afterClosed().pipe(

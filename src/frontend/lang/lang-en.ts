@@ -1750,5 +1750,7 @@ export const LANG_EN = {
     "find": "find.",
     "showAll": "See other contacts",
     "setContactInfos": "Access the contact details sheet",
-    "goToContact": "You will lose your current changes, are you sure you want to continue?"
+    "goToContact": "You will lose your current changes, are you sure you want to continue?",
+    "associateContact": "to associate the contact with the mail / attachment.",
+    "associateContactToDoc": "Associate the contact with the mail / attachment"
 };
