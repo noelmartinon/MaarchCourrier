@@ -46,7 +46,7 @@
                     <div>
                         {{option.label}} - <b>{{option.m2m}}</b>
                     </div>
-                    <div *ngIf="!functions.empty(option.communicationMeans.url) || functions.empty(option.communicationMeans.login)" class="attachLabel">
+                    <div *ngIf="!functions.empty(option.communicationMeans.url) || !functions.empty(option.communicationMeans.email)" class="attachLabel">
                         ({{'lang.communicationMean' | translate}} : {{getCommunicationMean(option.communicationMeans)}})
                     </div>
                 </mat-option>
