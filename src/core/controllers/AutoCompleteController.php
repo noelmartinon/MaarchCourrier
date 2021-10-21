@@ -838,8 +838,9 @@ class AutoCompleteController
 
             $externalId = json_decode($contact['external_id'], true);
             $communicationMeans = json_decode($contact['communication_means'], true);
+            unset($communicationMeans['password']);
             $autoContact['m2m'] = $externalId['m2m'];
-            $autoContact['communicationMeans'] = $communicationMeans['url'] ?? $communicationMeans['email'];
+            $autoContact['communicationMeans'] = $communicationMeans ?? null;
             $autocompleteData[] = $autoContact;
         }
 

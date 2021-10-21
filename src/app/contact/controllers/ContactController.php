@@ -1505,6 +1505,7 @@ class ContactController
 
                 if (!empty($contactRaw['communication_means'])) {
                     $communicationMeans = json_decode($contactRaw['communication_means'], true);
+                    unset($communicationMeans['password']);
                     $contact['communicationMeans'] = !empty($communicationMeans) ? $communicationMeans : null;
                 }
 
