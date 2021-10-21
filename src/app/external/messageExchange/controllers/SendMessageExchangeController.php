@@ -600,6 +600,22 @@ class SendMessageExchangeController
 
         $aDefaultConfig = ReceiveMessageExchangeController::readXmlConfig();
 
+        // If communication_type is an url, and there is a separate field for login and password, we recreate the url with the login and password
+        if (filter_var($aDefaultConfig['m2m_communication_type'][$aArgs['ChannelType']], FILTER_VALIDATE_URL)) {
+            if (!empty($aDefaultConfig['m2m_login']) && !empty($aDefaultConfig['m2m_password'])) {
+                $prefix = '';
+                if (strrpos($aDefaultConfig['m2m_communication_type'][$aArgs['ChannelType']], "http://") !== false) {
+                    $prefix = "http://";
+                } elseif (strrpos($aDefaultConfig['m2m_communication_type'][$aArgs['ChannelType']], "https://") !== false) {
+                    $prefix = "https://";
+                }
+                $url = str_replace($prefix, '', $aDefaultConfig['m2m_communication_type'][$aArgs['ChannelType']]);
+                $login = $aDefaultConfig['m2m_login'][0] ?? '';
+                $password = $aDefaultConfig['m2m_password'][0] ?? '';
+                $aDefaultConfig['m2m_communication_type'][$aArgs['ChannelType']] = $prefix . $login . ':' . $password . '@' . $url;
+            }
+        }
+
         $traCommunicationObject->Channel = $aArgs['ChannelType'];
         $traCommunicationObject->value   = rtrim($aDefaultConfig['m2m_communication_type'][$aArgs['ChannelType']], "/");
 
