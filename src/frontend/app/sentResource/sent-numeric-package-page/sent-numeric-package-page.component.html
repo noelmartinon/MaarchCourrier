@@ -46,8 +46,8 @@
                     <div>
                         {{option.label}} - <b>{{option.m2m}}</b>
                     </div>
-                    <div class="attachLabel">
-                        ({{'lang.communicationMean' | translate}} : {{option.communicationMeans}})
+                    <div *ngIf="!functions.empty(option.communicationMeans.url) || functions.empty(option.communicationMeans.login)" class="attachLabel">
+                        ({{'lang.communicationMean' | translate}} : {{getCommunicationMean(option.communicationMeans)}})
                     </div>
                 </mat-option>
             </mat-autocomplete>

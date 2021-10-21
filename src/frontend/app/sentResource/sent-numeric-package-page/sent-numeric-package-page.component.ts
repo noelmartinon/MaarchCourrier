@@ -565,4 +565,12 @@ export class SentNumericPackagePageComponent implements OnInit {
     canSendNumericPackage() {
         return this.privilegeService.getCurrentUserMenus().filter((item: any) => item.id === 'manage_numeric_package').length > 0;
     }
+
+    getCommunicationMean(value: any) {
+        if (!this.functions.empty(value.url)) {
+            return value.url;
+        } else if (!this.functions.empty(value.email)) {
+            return value.email;
+        }
+    }
 }
