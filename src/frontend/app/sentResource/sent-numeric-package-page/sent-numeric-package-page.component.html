@@ -32,7 +32,7 @@
                         <div>
                             {{recipient.label}} - <b>{{recipient.m2m}}</b>
                         </div>
-                        <div *ngIf="!functions.empty(recipient.communicationMeans.url) || functions.empty(recipient.communicationMeans.login)" class="attachLabel">
+                        <div *ngIf="!functions.empty(recipient.communicationMeans.url) || !functions.empty(recipient.communicationMeans.email)" class="attachLabel">
                             ({{'lang.communicationMean' | translate}} : {{getCommunicationMean(recipient.communicationMeans)}})
                         </div>
                     </span>
