@@ -1505,7 +1505,7 @@ class ContactController
 
                 if (!empty($contactRaw['communication_means'])) {
                     $communicationMeans = json_decode($contactRaw['communication_means'], true);
-                    $contact['communicationMeans'] = $communicationMeans['url'] ?? $communicationMeans['email'];
+                    $contact['communicationMeans'] = !empty($communicationMeans) ? $communicationMeans : null;
                 }
 
                 $filling = ContactController::getFillingRate(['contactId' => $resourceContact['item_id']]);
