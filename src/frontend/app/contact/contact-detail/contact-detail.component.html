@@ -94,7 +94,7 @@
                         <mat-list-item class="contact-item" *ngIf="!functionsService.empty(contact.communicationMeans.url)"
                             [title]="'lang.communicationMean' | translate">
                             <mat-icon mat-list-icon class="contact-group fas fa-hashtag"></mat-icon>
-                            <p mat-line class="contact-content" [class.newData]="isNewValue('communicationMeans.url')" [title]="contact.communicationMeans.url">
+                            <p mat-line class="contact-content" [class.newData]="isNewValue('communicationMeans.url')" [title]="contact.communicationMeans.url | splitLoginPwd">
                                 {{contact.communicationMeans.url | splitLoginPwd}}
                             </p>
                         </mat-list-item>
