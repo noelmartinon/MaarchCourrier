@@ -54,9 +54,6 @@ foreach ($customs as $custom) {
             ]);
         }
         
-        \Action\models\ActionModel::delete([
-           'id' => $element
-        ]);
         $bool = true;
     }
 

@@ -339,6 +339,11 @@ UPDATE contacts_parameters set searchable = true;
 UPDATE contacts_parameters set searchable = false
 where  identifier NOT IN ('lastname', 'firstname', 'company');
 
+--  indexing un document par defaut
+
+update usergroups set indexation_parameters = ('{"actions": ["21","324","506"], "entities": [], "keywords": ["ALL_ENTITIES"]}')::jsonb	WHERE group_id='COURRIER';
+
+
 --- SGAMI-SI FIN
 
 UPDATE res_attachments SET attachment_type = 'acknowledgement_record_management' WHERE attachment_type = 'simple_attachment' AND format = 'xml' AND title = 'Accusé de réception' AND relation = 1 AND status = 'TRA';
