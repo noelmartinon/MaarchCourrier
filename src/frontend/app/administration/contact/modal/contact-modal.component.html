@@ -10,7 +10,7 @@
         <mat-sidenav-container>
             <mat-sidenav-content>
                 <app-contact-form *ngIf="mode === 'update'" [creationMode]="creationMode" [contactId]="data.contactId"
-                    (onSubmitEvent)="dialogRef.close($event)"></app-contact-form>
+                    (onSubmitEvent)="dialogRef.close($event)" (linkContact)="linkContact($event)"></app-contact-form>
                 <app-contact-detail *ngIf="mode === 'read'" [contact]="contact"></app-contact-detail>
             </mat-sidenav-content>
             <mat-sidenav #drawer position='end' mode="side" style="overflow-x:hidden;width: 50%;" autoFocus="false">

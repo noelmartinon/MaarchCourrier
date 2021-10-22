@@ -20,7 +20,7 @@
                     </div>
                     <div class="col-md-2" style="margin-left: auto;">
                         <mat-icon class="fas fa-id-card" color="primary" (click)="selectContact(contact.id)"
-                        style="font-size: 20px; cursor: pointer;" [title]="'lang.setContactInfos' | translate">
+                        style="font-size: 20px; cursor: pointer;" [title]="!data.fromAdministration ? ('lang.associateContactToDoc' | translate) : ('lang.setContactInfos' | translate)">
                     </mat-icon>
                     </div>
                 </div>
