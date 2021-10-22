@@ -13,12 +13,13 @@ import { HeaderService } from '@service/header.service';
 import { StripTagsPipe, ReversePipe } from 'ngx-pipes';
 import { Observable, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { SplitLoginPwdPipe } from '@plugins/splitLoginPwd.pipe';
 
 @Component({
     selector: 'app-sent-numeric-package-page',
     templateUrl: './sent-numeric-package-page.component.html',
     styleUrls: ['./sent-numeric-package-page.component.scss'],
-    providers: [ContactService, StripTagsPipe, ReversePipe],
+    providers: [ContactService, StripTagsPipe, ReversePipe, SplitLoginPwdPipe],
 })
 export class SentNumericPackagePageComponent implements OnInit {
 
@@ -93,6 +94,7 @@ export class SentNumericPackagePageComponent implements OnInit {
         public headerService: HeaderService,
         private stringPipe: StripTagsPipe,
         private reversePipe: ReversePipe,
+        private splitLoginPwd: SplitLoginPwdPipe
     ) { }
 
     async ngOnInit(): Promise<void> {
@@ -549,7 +551,7 @@ export class SentNumericPackagePageComponent implements OnInit {
 
     getCommunicationMean(value: any) {
         if (!this.functions.empty(value.url)) {
-            return value.url;
+            return this.splitLoginPwd.transform(value.url);
         } else if (!this.functions.empty(value.email)) {
             return value.email;
         }

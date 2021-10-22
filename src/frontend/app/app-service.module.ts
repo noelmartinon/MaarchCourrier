@@ -10,6 +10,7 @@ import { NgStringPipesModule } from 'ngx-pipes';
 import { LatinisePipe } from 'ngx-pipes';
 import { SortPipe } from '@plugins/sorting.pipe';
 import { HighlightPipe } from '@plugins/highlight.pipe';
+import { SplitLoginPwdPipe } from '@plugins/splitLoginPwd.pipe';
 
 @NgModule({
     imports: [
@@ -23,7 +24,8 @@ import { HighlightPipe } from '@plugins/highlight.pipe';
         SortPipe,
         TimeAgoPipe,
         TimeLimitPipe,
-        HighlightPipe
+        HighlightPipe,
+        SplitLoginPwdPipe
     ],
     exports: [
         NgStringPipesModule,
@@ -34,7 +36,8 @@ import { HighlightPipe } from '@plugins/highlight.pipe';
         SortPipe,
         TimeAgoPipe,
         TimeLimitPipe,
-        HighlightPipe
+        HighlightPipe,
+        SplitLoginPwdPipe
     ],
     entryComponents: [
     ],
