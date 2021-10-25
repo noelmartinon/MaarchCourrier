@@ -1745,8 +1745,12 @@ export const LANG_EN = {
     "arContentIsEmpty": "AR content is empty",
     "company": "Company",
     "noRecipient": "No associated recipient.",
-    "getProcessLimitDate": "Processing deadline",
-    "getProcessLimitDateSample": "<b color=\"warn\">3 day(s)</b>",
-    "getCreationDate":             "Creation date",
-    "getCreationDateSample":       "Jan. 1st",
+    "emptyAddress": "Address not filled in",
+    "copyInfos": "to copy its information.",
+    "find": "find.",
+    "showAll": "See other contacts",
+    "setContactInfos": "Access the contact details sheet",
+    "goToContact": "You will lose your current changes, are you sure you want to continue?",
+    "associateContact": "to associate the contact with the mail / attachment.",
+    "associateContactToDoc": "Associate the contact with the mail / attachment"
 };

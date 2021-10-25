@@ -1747,8 +1747,12 @@ export const LANG_FR = {
     "arContentIsEmpty": "Le contenu de l'accusé de réception est vide",
     "company": "Organisation",
     "noRecipient": "Aucun destinataire associé.",
-    "getProcessLimitDate": "Date limite de traitement",
-    "getProcessLimitDateSample": "<b color=\"warn\">3 jour(s)</b>",
-    "getCreationDate":             "Date de création",
-    "getCreationDateSample":       "1er janv.",
+    "emptyAddress": "Adresse non renseignée",
+    "accessContact": "pour accéder à la fiche de détails.",
+    "find": "trouvé.",
+    "showAll": "Voir les autres contacts",
+    "setContactInfos": "Accéder à la fiche de détails du contact",
+    "goToContact": "Vous allez perdre vos modifications actuelles, voulez-vous vraiment continuer ?",
+    "associateContact": "pour associer ce contact au courrier/pièce jointe.",
+    "associateContactToDoc": "Associer ce contact au courrier/pièce jointe"
 };
