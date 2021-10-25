@@ -7,9 +7,9 @@ stages:
   - logs
   - new_branch
   - new_tag
+  - mr_end
   - test
   - deploy
-  - mr_end
 
 before_script:
   - apt-get update -yqq > /dev/null
