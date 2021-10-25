@@ -284,7 +284,7 @@ class AttachmentController
             return $response->withStatus(403)->withJson(['errors' => 'Query limit is not an integer']);
         }
 
-        $excludeAttachmentTypes = [''];//['signed_response'];
+        $excludeAttachmentTypes = [''];
 
         $attachments = AttachmentModel::get([
             'select'    => [
@@ -438,7 +438,7 @@ class AttachmentController
 
         if (empty($tnlAdr)) {
             ConvertThumbnailController::convert(['type' => 'attachment', 'resId' => $args['id']]);
-            
+
             $tnlAdr = AdrModel::getTypedAttachAdrByResId([
                 'select'    => ['docserver_id', 'path', 'filename'],
                 'resId'     => $args['id'],
@@ -469,7 +469,7 @@ class AttachmentController
 
         return $response->withHeader('Content-Type', $mimeType);
     }
-    
+
     public function getFileContent(Request $request, Response $response, array $args)
     {
         if (!Validator::intVal()->validate($args['id'])) {
@@ -833,7 +833,7 @@ class AttachmentController
                     'path'  => $pathToAttachment,
                     'data'  => ['userId' => $args['userId'], 'recipientId' => $recipient['item_id'], 'recipientType' => 'contact']
                 ]);
-    
+
                 $data = [
                     'title'             => $attachment['title'],
                     'encodedFile'       => $mergedDocument['encodedDocument'],

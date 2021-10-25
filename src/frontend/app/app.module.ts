@@ -116,6 +116,8 @@ import { SelectIndexingModelComponent } from './indexation/select-indexing-model
 import { ThesaurusModalComponent } from './tag/indexing/thesaurus/thesaurus-modal.component';
 import { RedirectIndexingModelComponent } from './administration/indexingModel/redirectIndexingModel/redirect-indexing-model.component';
 
+import { ContactSearchModal } from './administration/contact/page/contactSearchModal/contact-search-modal.compoent';
+
 
 
 @NgModule({
@@ -218,7 +220,8 @@ import { RedirectIndexingModelComponent } from './administration/indexingModel/r
         ReconcileActionComponent,
         SelectIndexingModelComponent,
         ThesaurusModalComponent,
-        RedirectIndexingModelComponent
+        RedirectIndexingModelComponent,
+        ContactSearchModal
     ],
     entryComponents: [
         InfoChangePasswordModalComponent,
@@ -268,7 +271,8 @@ import { RedirectIndexingModelComponent } from './administration/indexingModel/r
         FolderCreateModalComponent,
         ReconcileActionComponent,
         ThesaurusModalComponent,
-        RedirectIndexingModelComponent
+        RedirectIndexingModelComponent,
+        ContactSearchModal
     ],
     providers: [FiltersListService, FoldersService, ActionsService, PrivilegeService],
     bootstrap: [AppComponent]
