@@ -284,7 +284,7 @@ class AttachmentController
             return $response->withStatus(403)->withJson(['errors' => 'Query limit is not an integer']);
         }
 
-        $excludeAttachmentTypes = ['signed_response'];
+        $excludeAttachmentTypes = [''];//['signed_response'];
 
         $attachments = AttachmentModel::get([
             'select'    => [
@@ -884,7 +884,7 @@ class AttachmentController
             return ['errors' => 'Body resIdMaster is empty or not an integer'];
         } elseif (!Validator::stringType()->notEmpty()->validate($body['type'])) {
             return ['errors' => 'Body type is empty or not a string'];
-        } elseif (isset($body['status']) && !in_array($body['status'], ['A_TRA', 'TRA', 'SEND_MASS'])) {
+        } elseif (isset($body['status']) && !in_array($body['status'], ['A_TRA', 'TRA', 'SIGN', 'SEND_MASS'])) {
             return ['errors' => 'Body type is empty or not a string'];
         }
 
