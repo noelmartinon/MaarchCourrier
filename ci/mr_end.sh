@@ -7,7 +7,8 @@ ISSUE_ID=`echo $BRANCH | grep -oP "/[0-9]*/" | head -1 | tr -d "/"`
 if [[ ! -z $ISSUE_ID ]]
 then
     IT=0
-    for row in $(curl --header "PRIVATE-TOKEN: $TOKEN_GITLAB" "https://labs.maarch.org/api/v4/projects/projects/$PROJECTID/merge_requests?state=merged&in=source_branch&search=$ISSUE_ID" | jq -r '.[] | @base64'); do
+
+    for row in $(curl --header "PRIVATE-TOKEN: $TOKEN_GITLAB" "https://labs.maarch.org/api/v4/projects/projects/$CI_PROJECT_ID/merge_requests?state=merged&in=source_branch&search=$ISSUE_ID" | jq -r '.[] | @base64'); do
         _jq() {
         echo ${row} | base64 --decode | jq -r ${1}
         }
@@ -21,7 +22,7 @@ then
     
     echo $BODY
     
-    curl -v -H 'Content-Type:application/json' -H "X-Redmine-API-Key:$REDMINE_API_KEY" -d "$BODY" -X PUT https://forge.maarch.org/issues/$ISSUE_ID.json
+    curl -H 'Content-Type:application/json' -H "X-Redmine-API-Key:$REDMINE_API_KEY" -d "$BODY" -X PUT https://forge.maarch.org/issues/$ISSUE_ID.json
 else
     echo "NO US FOUND !"
 fi
