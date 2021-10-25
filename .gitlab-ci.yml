@@ -9,6 +9,7 @@ stages:
   - new_tag
   - test
   - deploy
+  - mr_end
 
 before_script:
   - apt-get update -yqq > /dev/null
@@ -183,6 +184,22 @@ new_tag:
    - chmod +x ./ci/new_tag.sh
    - ./ci/new_tag.sh
 
+mr_end:
+ image: debian:10-slim
+ stage: mr_end
+ # only: 
+ #  - merge_requests
+ rules:
+   - if: '$CI_COMMIT_MESSAGE =~ /^Merge branch/'
+ before_script:
+   # Install git and curl command
+   - apt-get update -yqq > /dev/null
+   - apt install -y git
+   - apt install -y curl
+   - apt install -y jq
+ script:
+   - chmod +x ./ci/mr_end.sh
+   - ./ci/mr_end.sh
 
 #pages:
 #  stage: deploy
