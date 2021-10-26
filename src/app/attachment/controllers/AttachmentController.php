@@ -515,6 +515,7 @@ class AttachmentController
             return $response->withStatus(400)->withJson(['errors' => $mimeAndSize['errors']]);
         }
         $mimeType = $mimeAndSize['mime'];
+        $pathInfo = pathinfo($pathToThumbnail);
 
         $response->write($fileContent);
         $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.{$pathInfo['extension']}");
