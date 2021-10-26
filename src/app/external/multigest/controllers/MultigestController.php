@@ -15,7 +15,6 @@
 namespace Multigest\controllers;
 
 use Attachment\models\AttachmentModel;
-use Attachment\models\AttachmentTypeModel;
 use Configuration\models\ConfigurationModel;
 use Contact\controllers\ContactCivilityController;
 use Contact\controllers\ContactController;
@@ -31,7 +30,6 @@ use Resource\models\ResourceContactModel;
 use Respect\Validation\Validator;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use SrcCore\models\CurlModel;
 use SrcCore\models\PasswordModel;
 use SrcCore\models\ValidatorModel;
 use SrcCore\models\CoreConfigModel;
@@ -312,7 +310,10 @@ class MultigestController
         }
         $multigestUri = rtrim($configuration['uri'], '/');
 
-        $soapClient = new \SoapClient($multigestUri);
+        $soapClient = new \SoapClient($multigestUri, [
+            'login'    => $configuration['login'],
+            'password' => $configuration['password']
+        ]);
         $result = (int) $soapClient->GedTestExistenceUtilisateur($body['login']);
         if ($result !== 0) {
             return $response->withStatus(400)->withJson(['errors' => 'MultiGest user '.$body['login'].' does not exist']);
@@ -361,6 +362,21 @@ class MultigestController
             ],
             'resId'  => $args['resId']
         ]);
+
+        $convertedDocument = AdrModel::getDocuments([
+            'select'    => ['docserver_id', 'path', 'filename', 'fingerprint'],
+            'where'     => ['res_id = ?', 'type = ?', 'version = ?'],
+            'data'      => [$args['resId'], 'SIGN', $document['version']],
+            'orderBy'   => ['version DESC'],
+            'limit'     => 1
+        ]);
+        if (!empty($convertedDocument[0])) {
+            $document['docserver_id'] = $convertedDocument['docserver_id'];
+            $document['path']         = $convertedDocument['path'];
+            $document['filename']     = $convertedDocument['filename'];
+            $document['fingerprint']  = $convertedDocument['fingerprint'];
+        }
+
         if (empty($document)) {
             return ['errors' => 'Document does not exist'];
         } elseif (empty($document['filename'])) {
@@ -457,8 +473,13 @@ class MultigestController
         if (empty($metadataFields) || empty($metadataValues)) {
             return ['errors' => 'No valid metadata from Multigest mapping'];
         }
+        $metadataFields = utf8_decode($metadataFields);
+        $metadataValues = utf8_decode($metadataValues);
 
-        $soapClient = new \SoapClient($multigestUri);
+        $soapClient = new \SoapClient($multigestUri, [
+            'login'    => $configuration['login'],
+            'password' => $configuration['password']
+        ]);
         $soapClient->GedSetModeUid(1);
 
         $soapClient->GedChampReset();
@@ -511,13 +532,23 @@ class MultigestController
         $multigestUIDs = ['document' => $result, 'attachments' => []];
 
         $attachments = AttachmentModel::get([
-            'select'    => ['res_id', 'title', 'identifier', 'external_id', 'docserver_id', 'path', 'filename', 'format', 'attachment_type'],
+            'select'    => ['res_id', 'title', 'identifier', 'external_id', 'docserver_id', 'path', 'filename', 'format', 'attachment_type', 'relation'],
             'where'     => ['res_id_master = ?', 'attachment_type not in (?)', 'status not in (?)'],
-            'data'      => [$args['resId'], ['signed_response'], ['DEL', 'OBS']]
+            'data'      => [$args['resId'], ['signed_response'], ['DEL', 'OBS']],
+            'orderBy'   => ['relation DESC']
         ]);
 
+        // keep only last version
+        $attachmentIdentifiers = [];
+        foreach ($attachments as $key => $attachment) {
+            if (in_array($attachment['identifier'], $attachmentIdentifiers)) {
+                unset($attachments[$key]);
+            } else {
+                $attachmentIdentifiers[] = $attachment['identifier'];
+            }
+        }
+
         foreach ($attachments as $attachment) {
-            // TODO check for last version
             $adrInfo = [
                 'docserver_id'  => $attachment['docserver_id'],
                 'path'          => $attachment['path'],
@@ -562,6 +593,9 @@ class MultigestController
             }
             $metadataFields .= '|'.$keyMetadataField;
             $metadataValues .= '|'.$keyMetadataValue;
+
+            $metadataFields = utf8_decode($metadataFields);
+            $metadataValues = utf8_decode($metadataValues);
 
             $soapClient->GedChampReset();
             $soapClient->GedAddMultiChampRequete($metadataFields, $metadataValues);
@@ -608,48 +642,58 @@ class MultigestController
     }
 
     public static function getResourceField(array $document, string $field, array $rawContacts) {
-        // TODO test in case type_id is not a real type
         if ($field == 'doctypeLabel' && !empty($document['type_id'])) {
-            return DoctypeModel::getById(['select' => ['description'], 'id' => $document['type_id']])['description'];
+            $doctype = DoctypeModel::getById(['select' => ['description'], 'id' => $document['type_id']]);
+            if (!empty($doctype)) {
+                return $doctype['description'];
+            }
+            return '';
         }
         if ($field == 'priorityLabel' && !empty($document['priority'])) {
-            return PriorityModel::getById(['select' => ['label'], 'id' => $document['priority']])['label'];
+            $priority = PriorityModel::getById(['select' => ['label'], 'id' => $document['priority']]);
+            if (!empty($priority)) {
+                return $priority['label'];
+            }
+            return '';
         }
         if ($field == 'destinationLabel' && !empty($document['destination'])) {
-            return EntityModel::getByEntityId(['entityId' => $document['destination'], 'select' => ['entity_label']])['entity_label'];
+            $destination = EntityModel::getByEntityId(['entityId' => $document['destination'], 'select' => ['entity_label']]);
+            if (!empty($destination)) {
+                return $destination['entity_label'];
+            }
+            return '';
         }
         if ($field == 'initiatorLabel' && !empty($document['initiator'])) {
-            return EntityModel::getByEntityId(['entityId' => $document['initiator'], 'select' => ['entity_label']])['entity_label'];
+            $initiator = EntityModel::getByEntityId(['entityId' => $document['initiator'], 'select' => ['entity_label']]);
+            if (!empty($initiator)) {
+                return $initiator['entity_label'];
+            }
+            return '';
         }
         if ($field == 'destUserLabel' && !empty($document['dest_user'])) {
             return UserModel::getLabelledUserById(['id' => $document['dest_user']]);
         }
         if (strpos($field, 'senderCompany_') === 0) {
-            $contactIndex = (int) (explode($field, '_')[1]);
-            return $rawContacts[$contactIndex]['company'] ?? '';
+            return $rawContacts[MultigestController::fieldNameToIndex($field)]['company'] ?? '';
         }
         if (strpos($field, 'senderCivility_') === 0) {
-            $contactIndex = (int) (explode($field, '_')[1]);
-            if (!empty($rawContacts[$contactIndex]['civility'])) {
-                return ContactCivilityController::getLabelById(['id' => $rawContacts[$contactIndex]['civility']]);
+            if (!empty($rawContacts[MultigestController::fieldNameToIndex($field)]['civility'])) {
+                return ContactCivilityController::getLabelById(['id' => $rawContacts[MultigestController::fieldNameToIndex($field)]['civility']]);
             } else {
                 return '';
             }
         }
         if (strpos($field, 'senderFirstname_') === 0) {
-            $contactIndex = (int) (explode($field, '_')[1]);
-            return $rawContacts[$contactIndex]['firstname'] ?? '';
+            return $rawContacts[MultigestController::fieldNameToIndex($field)]['firstname'] ?? '';
         }
         if (strpos($field, 'senderLastname_') === 0) {
-            $contactIndex = (int) (explode($field, '_')[1]);
-            return $rawContacts[$contactIndex]['lastname'] ?? '';
+            return $rawContacts[MultigestController::fieldNameToIndex($field)]['lastname'] ?? '';
         }
         if (strpos($field, 'senderFunction_') === 0) {
-            $contactIndex = (int) (explode($field, '_')[1]);
-            return $rawContacts[$contactIndex]['function'] ?? '';
+            return $rawContacts[MultigestController::fieldNameToIndex($field)]['function'] ?? '';
         }
         if (strpos($field, 'senderAddress_') === 0) {
-            $contactIndex = (int) (explode($field, '_')[1]);
+            $contactIndex = MultigestController::fieldNameToIndex($field);
             if (!empty($rawContacts[$contactIndex])) {
                 return ContactController::getFormattedContactWithAddress(['contact' => $rawContacts[$contactIndex]])['contact']['otherInfo'];
             } else {
@@ -658,11 +702,17 @@ class MultigestController
         }
         if ($field == 'doctypeSecondLevelLabel' && !empty($document['type_id'])) {
             $doctype = DoctypeModel::getById(['select' => ['doctypes_second_level_id'], 'id' => $document['type_id']]);
+            if (empty($doctype)) {
+                return '';
+            }
             $doctypeSecondLevel = SecondLevelModel::getById(['id' => $doctype['doctypes_second_level_id'], 'select' => ['doctypes_second_level_label']]);
+            if (empty($doctypeSecondLevel)) {
+                return '';
+            }
             return $doctypeSecondLevel['doctypes_second_level_label'];
         }
         if (strpos($field, 'customField_') === 0) {
-            $customFieldId = explode('_', $field)[1];
+            $customFieldId = MultigestController::fieldNameToIndex($field);
             $customFieldsValues = json_decode($document['custom_fields'], true);
             if (!empty($customFieldsValues[$customFieldId]) && is_string($customFieldsValues[$customFieldId])) {
                 return $customFieldsValues[$customFieldId];
@@ -671,5 +721,14 @@ class MultigestController
             }
         }
         return '';
+    }
+
+    private static function fieldNameToIndex($field)
+    {
+        $fieldParts = explode($field, '_');
+        if (count($fieldParts) > 1) {
+            return (int) $fieldParts[1];
+        }
+        return 0;
     }
 }
