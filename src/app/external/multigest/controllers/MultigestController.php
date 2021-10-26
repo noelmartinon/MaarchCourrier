@@ -19,6 +19,7 @@ use Configuration\models\ConfigurationModel;
 use Contact\controllers\ContactCivilityController;
 use Contact\controllers\ContactController;
 use Contact\models\ContactModel;
+use Convert\models\AdrModel;
 use Docserver\models\DocserverModel;
 use Doctype\models\DoctypeModel;
 use Doctype\models\SecondLevelModel;
