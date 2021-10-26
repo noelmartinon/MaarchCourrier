@@ -34,45 +34,29 @@ foreach ($customs as $custom) {
         $cpt = 0;
 
         foreach($groupsmodel as $model) {
-            $indexation_paramters = json_decode($model['indexation_parameters'], true);
-            $result = array_search($element, $indexation_paramters['actions'] );
+            $indexation_parameters = json_decode($model['indexation_parameters'], true);
+            $result = array_search($element, $indexation_parameters['actions'] );
             if( $result !== false ) {
-                unset($indexation_paramters['actions'][array_search($element, $indexation_paramters['actions'])]);
+                unset($indexation_parameters['actions'][array_search($element, $indexation_parameters['actions'])]);
                 $cpt += 1;
-            }
 
-            $actions  = concate($indexation_paramters['actions']);
-            $entities = concate($indexation_paramters['entities']);
-            $keywords = concate($indexation_paramters['keywords']);
+                $indexation_parameters['actions'] = array_values($indexation_parameters['actions']);
 
-            $str = '{"actions":['.$actions.'], "entities":['.$entities.'],"keywords":['.$keywords.']}';
+                $str['indexation_parameters'] = json_encode($indexation_parameters);
 
-            \Group\models\GroupModel::update([
-                'set'   => ['indexation_parameters' => $str ],
-                'where' => ['id = ?'],
-                'data'  => [$model['id']]
-            ]);
+                \Group\models\GroupModel::update([
+                    'set'   => $str,
+                    'where' => ['id = ?'],
+                    'data'  => [$model['id']]
+                ]);
+            }            
         }
         
         $bool = true;
     }
-
-    $texte = ($bool == true)? $cpt . " action(s) trouvé(s) \n" : "Pas d'action trouvé \n";
+    $texte = ($bool == true)? $cpt . " action(s) trouvé(s) et retiré(s)  \n" : "Pas d'action trouvé \n";
     printf($texte);
 
-}
-
-function concate($elements) {
-    $numItems = count($elements);
-    $i = 0;
-    foreach($elements as $element) {
-        $string .= '"'.$element.'"';
-        if(++$i < $numItems) {
-            $string .= ", ";
-        }
-    }
-
-    return $string;
 }
 
 
