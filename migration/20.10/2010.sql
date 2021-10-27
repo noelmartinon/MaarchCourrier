@@ -335,6 +335,10 @@ UPDATE actions SET id_status = '_NOSTATUS_' WHERE id = 416;
 -- unable feature_tour
 UPDATE users SET feature_tour = '["welcome","email","notification"]';
 
+-- Apparition bannette e-signe
+UPDATE basket SET clause_where = 'status=''EVIS'' and (res_id, @user_id) IN (SELECT res_id, item_id FROM listinstance WHERE item_mode =''sign'' process_date ISNULL and res_view_letterbox.res_id = res_id order by listinstance_id asc limit 1)'
+WHERE basket_id = 'EsigBasket';
+
 UPDATE contacts_parameters set searchable = true;
 UPDATE contacts_parameters set searchable = false
 where  identifier NOT IN ('lastname', 'firstname', 'company');
