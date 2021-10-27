@@ -86,6 +86,8 @@
     "notEnoughAlfrescoInformations": "User primary entity has not enough alfresco informations",
     "missingAlfrescoConfig": "Alfresco configuration is not enabled or incomplete",
     "alreadySentToAlfresco": "Document already sent to Alfresco",
+    "alreadySentToMultigest": "Document already sent to Multigest",
+    "noMultigestAccount": "No Multigest account associated with this entity",
     "addNewAccount": "Add a new account",
     "addNote": "Add a note",
     "addNoteToNumericPackage": "Add a note to mail to transmit",

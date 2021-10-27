@@ -1728,6 +1728,8 @@
     "missingAlfrescoConfig": "La configuration Alfresco est désactivée ou incomplète__TO_TRANSLATE",
     "alreadySentToAlfresco": "Courrier déjà envoyé à Alfresco__TO_TRANSLATE",
     "notEnoughAlfrescoInformations": "Des informations Alfresco sont manquantes pour l'entité primaire de l'utilisateur__TO_TRANSLATE",
+    "alreadySentToMultigest": "Courrier déjà envoyé à Multigest__TO_TRANSLATE",
+    "noMultigestAccount": "Aucun compte Multigest associé à l’entité__TO_TRANSLATE",
     "attachmentShort": "PJ__TO_TRANSLATE",
     "canNotSendAr": "accusé(s) de réception impossible à envoyer__TO_TRANSLATE",
     "createUserInMaarchParapheur": "Créer dans Maarch Parapheur__TO_TRANSLATE",

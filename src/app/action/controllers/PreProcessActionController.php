@@ -1714,6 +1714,62 @@ class PreProcessActionController
         return $response->withJson(['resourcesInformations' => $resourcesInformations]);
     }
 
+    public function checkSendMultigest(Request $request, Response $response, array $args)
+    {
+        $body = $request->getParsedBody();
+        
+        if (!Validator::arrayType()->notEmpty()->validate($body['resources'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body resources is empty or not an array']);
+        }
+
+        $errors = ResourceListController::listControl(['groupId' => $args['groupId'], 'userId' => $args['userId'], 'basketId' => $args['basketId'], 'currentUserId' => $GLOBALS['id']]);
+        if (!empty($errors['errors'])) {
+            return $response->withStatus($errors['code'])->withJson(['errors' => $errors['errors']]);
+        }
+
+        $body['resources'] = array_slice($body['resources'], 0, 500);
+        if (!ResController::hasRightByResId(['resId' => $body['resources'], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+        $body['resources'] = PreProcessActionController::getNonLockedResources(['resources' => $body['resources'], 'userId' => $GLOBALS['id']]);
+
+        $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_multigest']);
+        if (empty($configuration)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Multigest configuration is not enabled']);
+        }
+        $configuration = json_decode($configuration['value'], true);
+        if (empty($configuration['uri'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Multigest configuration URI is empty']);
+        }
+
+        $entity = UserModel::getPrimaryEntityById(['id' => $args['userId'], 'select' => ['entities.external_id']]);
+        if (empty($entity)) {
+            return $response->withStatus(400)->withJson(['errors' => 'User has no primary entity', 'lang' => 'userHasNoPrimaryEntity']);
+        }
+        $entityInformations = json_decode($entity['external_id'], true);
+        if (empty($entityInformations['multigest'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'User primary entity has no Multigest account', 'lang' => 'noMultigestAccount']);
+        }
+
+        $resourcesInformations = [];
+        foreach ($body['resources'] as $resId) {
+            $resource = ResModel::getById(['select' => ['filename', 'alt_identifier', 'external_id'], 'resId' => $resId]);
+            if (empty($resource['filename'])) {
+                $resourcesInformations['error'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'reason' => 'noFile'];
+                continue;
+            }
+            $externalId = json_decode($resource['external_id'], true);
+            if (!empty($externalId['multigestId'])) {
+                $resourcesInformations['error'][] = ['alt_identifier' => $resource['alt_identifier'], 'res_id' => $resId, 'reason' => 'alreadySentToMultigest'];
+                continue;
+            }
+
+            $resourcesInformations['success'][] = ['res_id' => $resId, 'alt_identifier' => $resource['alt_identifier']];
+        }
+
+        return $response->withJson(['resourcesInformations' => $resourcesInformations]);
+    }
+
     public function checkPrintDepositList(Request $request, Response $response, array $args)
     {
         $body = $request->getParsedBody();

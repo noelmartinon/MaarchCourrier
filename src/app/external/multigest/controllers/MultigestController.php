@@ -299,6 +299,8 @@ class MultigestController
 
         if (!Validator::stringType()->notEmpty()->validate($body['login'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body login is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['sasId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body sasId is empty or not a string']);
         }
 
         $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_multigest']);
@@ -312,16 +314,36 @@ class MultigestController
         $multigestUri = rtrim($configuration['uri'], '/');
 
         $soapClient = new \SoapClient($multigestUri, [
-            'login'          => $configuration['login'],
-            'password'       => $configuration['password'],
+            'login'          => $body['login'],
+            'password'       => $body['password'] ?? '',
             'authentication' => SOAP_AUTHENTICATION_BASIC
         ]);
-        $result = $soapClient->GedTestExistenceUtilisateur($body['login']);
+
+        $multigestParameters = CoreConfigModel::getJsonLoaded(['path' => 'config/multigest.json']);
+        if (empty($multigestParameters)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Multigest mapping file does not exist']);
+        }
+        if (empty($multigestParameters['mapping']['document'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Multigest mapping for document is empty']);
+        }
+
+        $keyMetadataField = key($multigestParameters['mapping']['document']);
+        $result = $soapClient->GedChampReset();
         if (is_soap_fault($result)) {
             return $response->withStatus(400)->withJson(['errors' => 'MultiGest SoapFault: ' . $result]);
         }
-        if ($result !== 0) {
-            return $response->withStatus(400)->withJson(['errors' => 'MultiGest user ' . $body['login'] . ' does not exist']);
+        $result = $soapClient->GedAddChampRecherche($keyMetadataField, 'FAKEDATA');
+        if (is_soap_fault($result)) {
+            return $response->withStatus(400)->withJson(['errors' => 'MultiGest SoapFault: ' . $result]);
+        }
+        $result = $soapClient->GedDossierExist($body['sasId'], $body['login']);
+        if (is_soap_fault($result)) {
+            return $response->withStatus(400)->withJson(['errors' => 'MultiGest SoapFault: ' . $result]);
+        }
+        $result = (int) $result;
+
+        if ($result < 0 && $result != -7) { // -7 -> "Dossier inexistant"
+            return $response->withStatus(400)->withJson(['errors' => 'MultiGest connection failed for user ' . $body['login'] . ' in sas ' . $body['sasId']]);
         }
 
         return $response->withStatus(204);
@@ -403,7 +425,7 @@ class MultigestController
 
         $fileContent = file_get_contents($pathToDocument);
         if ($fileContent === false) {
-            return ['errors' => 'Document not found on docserver'];
+            return ['errors' => 'Could not read file from docserver'];
         }
 
         $fileExtension = explode('.', $document['filename']);

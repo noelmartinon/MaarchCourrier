@@ -124,6 +124,8 @@
     "missingAlfrescoConfig": "La configuration Alfresco est désactivée ou incomplète",
     "alreadySentToAlfresco": "Courrier déjà envoyé à Alfresco",
     "notEnoughAlfrescoInformations": "Des informations Alfresco sont manquantes pour l'entité primaire de l'utilisateur",
+    "alreadySentToMultigest": "Courrier déjà envoyé à Multigest",
+    "noMultigestAccount": "Aucun compte Multigest associé à l’entité",
     "afterClickingSendLinkChangePassword": "Après avoir cliqué sur <b>Envoyer</b>, vous recevrez un courriel contenant un lien pour modifier votre mot de passe. Ce lien sera actif <b>1 heure</b>.",
     "alignCenter": "Centre",
     "alignLeft": "Gauche",
