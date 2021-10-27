@@ -312,12 +312,16 @@ class MultigestController
         $multigestUri = rtrim($configuration['uri'], '/');
 
         $soapClient = new \SoapClient($multigestUri, [
-            'login'    => $configuration['login'],
-            'password' => $configuration['password']
+            'login'          => $configuration['login'],
+            'password'       => $configuration['password'],
+            'authentication' => SOAP_AUTHENTICATION_BASIC
         ]);
-        $result = (int) $soapClient->GedTestExistenceUtilisateur($body['login']);
+        $result = $soapClient->GedTestExistenceUtilisateur($body['login']);
+        if (is_soap_fault($result)) {
+            return $response->withStatus(400)->withJson(['errors' => 'MultiGest SoapFault: ' . $result]);
+        }
         if ($result !== 0) {
-            return $response->withStatus(400)->withJson(['errors' => 'MultiGest user '.$body['login'].' does not exist']);
+            return $response->withStatus(400)->withJson(['errors' => 'MultiGest user ' . $body['login'] . ' does not exist']);
         }
 
         return $response->withStatus(204);
@@ -479,33 +483,78 @@ class MultigestController
 
         $soapClient = new \SoapClient($multigestUri, [
             'login'    => $configuration['login'],
-            'password' => $configuration['password']
+            'password' => $configuration['password'],
+            'authentication' => SOAP_AUTHENTICATION_BASIC
         ]);
-        $soapClient->GedSetModeUid(1);
 
-        $soapClient->GedChampReset();
-        $soapClient->GedAddChampRecherche($keyMetadataField, $keyMetadataValue);
-        $result = (int) $soapClient->GedDossierExist($entityConfiguration['sasId'], $entityConfiguration['login']);
+        $result = $soapClient->GedSetModeUid(1);
+        if (is_soap_fault($result)) {
+            return ['errors' => 'MultiGest SoapFault: ' . $result];
+        }
+
+        $result = $soapClient->GedChampReset();
+        if (is_soap_fault($result)) {
+            return ['errors' => 'MultiGest SoapFault: ' . $result];
+        }
+
+        $result = $soapClient->GedAddChampRecherche($keyMetadataField, $keyMetadataValue);
+        if (is_soap_fault($result)) {
+            return ['errors' => 'MultiGest SoapFault: ' . $result];
+        }
+
+        $result = $soapClient->GedDossierExist($entityConfiguration['sasId'], $entityConfiguration['login']);
+        if (is_soap_fault($result)) {
+            return ['errors' => 'MultiGest SoapFault: ' . $result];
+        }
+
+        $result = (int) $result;
         if ($result > 0) {
             return ['errors' => 'This resource is already in Multigest'];
         } elseif ($result !== -7) { // -7 -> "Dossier inexistant"
             return ['errors' => 'Multigest error ' . $result . ' occurred while checking for folder preexistence'];
         }
 
-        $soapClient->GedChampReset();
-        $soapClient->GedAddMultiChampRequete($metadataFields, $metadataValues);
+        $result = $soapClient->GedChampReset();
+        if (is_soap_fault($result)) {
+            return ['errors' => 'MultiGest SoapFault: ' . $result];
+        }
+
+        $result = $soapClient->GedAddMultiChampRequete($metadataFields, $metadataValues);
+        if (is_soap_fault($result)) {
+            return ['errors' => 'MultiGest SoapFault: ' . $result];
+        }
+
         $result = $soapClient->GedDossierCreate($entityConfiguration['sasId'], $entityConfiguration['login'], 0);
+        if (is_soap_fault($result)) {
+            return ['errors' => 'MultiGest SoapFault: ' . $result];
+        }
+
+        $result = (int) $result;
         if ($result != 0) {
             return ['errors' => 'Could not create Multigest folder'];
         }
 
-        $soapClient->GedChampReset();
-        $soapClient->GedAddChampRecherche($keyMetadataField, $keyMetadataValue);
+        $result = $soapClient->GedChampReset();
+        if (is_soap_fault($result)) {
+            return ['errors' => 'MultiGest SoapFault: ' . $result];
+        }
+
+        $result = $soapClient->GedAddChampRecherche($keyMetadataField, $keyMetadataValue);
+        if (is_soap_fault($result)) {
+            return ['errors' => 'MultiGest SoapFault: ' . $result];
+        }
+
         $result = $soapClient->GedDossierExist($entityConfiguration['sasId'], $entityConfiguration['login']);
+        if (is_soap_fault($result)) {
+            return ['errors' => 'MultiGest SoapFault: ' . $result];
+        }
+
+        $result = (int) $result;
         if ($result <= 0) {
             return ['errors' => 'Multigest error ' . $result . ' occurred while accessing folder'];
         }
-        $result = (int) $soapClient->GedImporterDocumentStream(
+
+        $result = $soapClient->GedImporterDocumentStream(
             $entityConfiguration['sasId'],
             $entityConfiguration['login'],
             base64_encode($fileContent),
@@ -522,6 +571,11 @@ class MultigestController
             '',
             -1
         );
+        if (is_soap_fault($result)) {
+            return ['errors' => 'MultiGest SoapFault: ' . $result];
+        }
+
+        $result = (int) $result;
         if ($result <= 0) {
             return ['errors' => 'Multigest error ' . $result . ' occurred while importing main document'];
         }
@@ -598,19 +652,47 @@ class MultigestController
             $metadataFields = utf8_decode($metadataFields);
             $metadataValues = utf8_decode($metadataValues);
 
-            $soapClient->GedChampReset();
-            $soapClient->GedAddMultiChampRequete($metadataFields, $metadataValues);
+            $result = $soapClient->GedChampReset();
+            if (is_soap_fault($result)) {
+                return ['errors' => 'MultiGest SoapFault: ' . $result];
+            }
+
+            $result = $soapClient->GedAddMultiChampRequete($metadataFields, $metadataValues);
+            if (is_soap_fault($result)) {
+                return ['errors' => 'MultiGest SoapFault: ' . $result];
+            }
+
             $result = $soapClient->GedDossierCreate($entityConfiguration['sasId'], $entityConfiguration['login'], 0);
+            if (is_soap_fault($result)) {
+                return ['errors' => 'MultiGest SoapFault: ' . $result];
+            }
+
+            $result = (int) $result;
             if ($result != 0) {
                 return ['errors' => 'Could not create Multigest folder'];
             }
-            $soapClient->GedChampReset();
-            $soapClient->GedAddChampRecherche($keyAttachmentMetadataField, $keyAttachmentMetadataValue);
+
+            $result = $soapClient->GedChampReset();
+            if (is_soap_fault($result)) {
+                return ['errors' => 'MultiGest SoapFault: ' . $result];
+            }
+
+            $result = $soapClient->GedAddChampRecherche($keyAttachmentMetadataField, $keyAttachmentMetadataValue);
+            if (is_soap_fault($result)) {
+                return ['errors' => 'MultiGest SoapFault: ' . $result];
+            }
+
             $result = $soapClient->GedDossierExist($entityConfiguration['sasId'], $entityConfiguration['login']);
+            if (is_soap_fault($result)) {
+                return ['errors' => 'MultiGest SoapFault: ' . $result];
+            }
+
+            $result = (int) $result;
             if ($result <= 0) {
                 return ['errors' => 'Multigest error ' . $result . ' occurred while accessing folder'];
             }
-            $result = (int) $soapClient->GedImporterDocumentStream(
+
+            $result = $soapClient->GedImporterDocumentStream(
                 $entityConfiguration['sasId'],
                 $entityConfiguration['login'],
                 base64_encode($fileContent),
@@ -627,6 +709,11 @@ class MultigestController
                 '',
                 -1
             );
+            if (is_soap_fault($result)) {
+                return ['errors' => 'MultiGest SoapFault: ' . $result];
+            }
+
+            $result = (int) $result;
             if ($result <= 0) {
                 return ['errors' => 'Multigest error ' . $result . ' occurred while importing attachment'];
             }
