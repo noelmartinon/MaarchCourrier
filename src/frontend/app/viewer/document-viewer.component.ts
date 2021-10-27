@@ -89,6 +89,10 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     @Input() attachType: string = null;
 
     /**
+     * Original file version
+     */
+    @Input() version: number;
+    /**
      * Event emitter
      */
     @Output() triggerEvent = new EventEmitter<string>();
@@ -160,6 +164,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     isDocModified: boolean = false;
 
     docToUploadValue: any;
+
+    status: string = '';
 
     constructor(
         public translate: TranslateService,
@@ -582,17 +588,12 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         }
     }
 
-    downloadOriginalFile() {
+    downloadOriginalFile(type: string = '') {
         const downloadLink = document.createElement('a');
-        if (this.file.contentMode === 'base64') {
-            downloadLink.href = `data:${this.file.type};base64,${this.file.content}`;
-            downloadLink.setAttribute('download', this.file.name);
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-        } else {
-            this.http.get(this.file.content).pipe(
+        if (type === 'docx' && this.file.content.includes('base64')) {
+            this.http.get(`../rest/resources/${this.resId}/content/${this.version}?type=SIGN`).pipe(
                 tap((data: any) => {
-                    downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
+                    downloadLink.href = `data:application/docx;base64,${data.encodedDocument}`;
                     downloadLink.setAttribute('download', data.filename);
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
@@ -602,6 +603,26 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                     return of(false);
                 })
             ).subscribe();
+        } else {
+            if (this.file.contentMode === 'base64') {
+                downloadLink.href = `data:${this.file.type};base64,${this.file.content}`;
+                downloadLink.setAttribute('download', this.file.name);
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+            } else {
+                this.http.get(this.file.content).pipe(
+                    tap((data: any) => {
+                        downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
+                        downloadLink.setAttribute('download', data.filename);
+                        document.body.appendChild(downloadLink);
+                        downloadLink.click();
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            }
         }
     }
 
@@ -729,6 +750,10 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                         commentedDocVersions: commentedDocVersions,
                         mainDocPDFVersions: mainDocPDFVersions
                     };
+
+                    if (!this.functions.empty(this.version)) {
+                        this.status = data.SIGN.find((id: any) => id === this.version) !== undefined && data.DOC.find((id: any) => id === this.version) !== undefined ? 'SIGN' : '';
+                    }
                 }),
                 exhaustMap(() => this.http.get(`../rest/resources/${this.resId}/fileInformation`)),
                 tap((data: any) => {
@@ -1205,15 +1230,23 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     openResourceVersion(version: number, type: string) {
-
         const title = type !== 'PDF' ? this.translate.instant('lang.' + type + '_version') : `${this.translate.instant('lang.version')} ${version}`;
-
         // TO SHOW ORIGINAL DOC (because autoload signed doc)
         type = type === 'SIGN' ? 'PDF' : type;
 
         this.http.get(`../rest/resources/${this.resId}/content/${version}?type=${type}`).pipe(
             tap((data: any) => {
-                this.dialog.open(DocumentViewerModalComponent, { autoFocus: false, panelClass: 'maarch-full-height-modal', data: { title: `${title}`, base64: data.encodedDocument, filename: data.filename } });
+                this.dialog.open(DocumentViewerModalComponent, {
+                    autoFocus: false,
+                    panelClass: 'maarch-full-height-modal',
+                    data: {
+                        title: `${title}`,
+                        base64: data.encodedDocument,
+                        filename: data.filename,
+                        version: version,
+                        resId: this.resId
+                    }
+                });
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
