@@ -35,6 +35,8 @@ export class MultigestListAdministrationComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
+    multigestUrlClone: string = '';
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -116,14 +118,17 @@ export class MultigestListAdministrationComponent implements OnInit {
     }
 
     saveUrl() {
-        this.http.put('../rest/multigest/configuration', { uri: this.multigestUrl }).pipe(
-            tap(() => {
-                this.notify.success(this.translate.instant('lang.dataUpdated'));
-            }),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+        if (JSON.stringify(this.multigestUrl) !== JSON.stringify(this.multigestUrlClone) || this.functions.empty(this.multigestUrl)) {
+            this.http.put('../rest/multigest/configuration', { uri: this.multigestUrl }).pipe(
+                tap(() => {
+                    this.multigestUrlClone = JSON.parse(JSON.stringify(this.multigestUrl));
+                    this.notify.success(this.translate.instant('lang.dataUpdated'));
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(this.translate.instant('lang.multigestUriIsEmpty'));
+                    return of(false);
+                })
+            ).subscribe();
+        }
     }
 }
