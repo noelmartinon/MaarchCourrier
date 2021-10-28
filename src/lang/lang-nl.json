@@ -2202,12 +2202,12 @@
     "multigestMappingForDocumentIsEmpty": "Mapping Multigest vide pour la section document__TO_TRANSLATE",
     "multigestInvalidMapping": "Mapping Multigest invalide__TO_TRANSLATE",
     "multigestAccountTestFailed": "Échec du test de connexion Multigest__TO_TRANSLATE",
-    "entityHasNoMultigestAccount": "Cette entité n’a aucun compte Multigest associé__TO_TRANSLATE",
     "documentAlreadyInMultigest": "Ce document est déjà dans Multigest__TO_TRANSLATE",
     "multigestFolderCreationError": "Échec de la création du dossier Multigest__TO_TRANSLATE",
     "documentNotExist": "Ce courrier n’existe pas__TO_TRANSLATE",
     "documentHasNoFile": "Ce courrier n’a pas de fichier__TO_TRANSLATE",
     "documentHasNoChrono": "Ce courrier n’a pas de numéro chrono__TO_TRANSLATE",
     "documentNotFoundOnDocserver": "Fichier introuvable dans l’espace de stockage__TO_TRANSLATE",
-    "docserverDocumentNotReadable": "Fichier illisible sur l’espace de stockage__TO_TRANSLATE"
+    "docserverDocumentNotReadable": "Fichier illisible sur l’espace de stockage__TO_TRANSLATE",
+    "soapClientCreationError": "Erreur de lancement de la communication SOAP__TO_TRANSLATE"
 }

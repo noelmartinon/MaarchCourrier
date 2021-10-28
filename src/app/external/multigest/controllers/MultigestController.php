@@ -294,57 +294,78 @@ class MultigestController
         }
 
         $body = $request->getParsedBody();
+        if (!empty($body['password'])) {
+            $body['password'] = PasswordModel::decrypt(['cryptedPassword' => $body['password']]);
+        }
+        $result = MultigestController::checkAccountWithCredentials($body);
 
-        if (!Validator::stringType()->notEmpty()->validate($body['login'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body login is empty or not a string']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['sasId'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body sasId is empty or not a string']);
+        if (!empty($result['errors'])) {
+            $return = ['errors' => $result['errors']];
+            if (!empty($result['lang'])) {
+                $return['lang'] = $result['lang'];
+            }
+            return $response->withStatus(400)->withJson($return);
+        }
+
+        return $response->withStatus(204);
+    }
+
+    public static function checkAccountWithCredentials(array $args)
+    {
+        if (!Validator::stringType()->notEmpty()->validate($args['login'])) {
+            return ['errors' => 'Body login is empty or not a string'];
+        } elseif (!Validator::stringType()->notEmpty()->validate($args['sasId'])) {
+            return ['errors' => 'Body sasId is empty or not a string'];
         }
 
         $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_multigest']);
         if (empty($configuration)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Multigest configuration is not enabled', 'lang' => 'multigestIsNotEnabled']);
+            return ['errors' => 'Multigest configuration is not enabled', 'lang' => 'multigestIsNotEnabled'];
         }
         $configuration = json_decode($configuration['value'], true);
         if (empty($configuration['uri'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Multigest configuration URI is empty', 'lang' => 'multigestUriIsEmpty']);
+            return ['errors' => 'Multigest configuration URI is empty', 'lang' => 'multigestUriIsEmpty'];
         }
         $multigestUri = rtrim($configuration['uri'], '/');
 
-        $soapClient = new \SoapClient($multigestUri, [
-            'login'          => $body['login'],
-            'password'       => $body['password'] ?? '',
-            'authentication' => SOAP_AUTHENTICATION_BASIC
-        ]);
+        try {
+            $soapClient = new \SoapClient($multigestUri, [
+                'login'          => $args['login'],
+                'password'       => $args['password'] ?? '',
+                'authentication' => SOAP_AUTHENTICATION_BASIC
+            ]);
+        } catch (\SoapFault $e) {
+            return ['errors' => (string) $e, 'lang' => 'soapClientCreationError'];
+        }
 
         $multigestParameters = CoreConfigModel::getJsonLoaded(['path' => 'config/multigest.json']);
         if (empty($multigestParameters)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Multigest mapping file does not exist', 'lang' => 'multigestMappingDoesNotExist']);
+            return ['errors' => 'Multigest mapping file does not exist', 'lang' => 'multigestMappingDoesNotExist'];
         }
         if (empty($multigestParameters['mapping']['document'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Multigest mapping for document is empty', 'lang' => 'multigestMappingForDocumentIsEmpty']);
+            return ['errors' => 'Multigest mapping for document is empty', 'lang' => 'multigestMappingForDocumentIsEmpty'];
         }
 
         $keyMetadataField = key($multigestParameters['mapping']['document']);
         $result = $soapClient->GedChampReset();
         if (is_soap_fault($result)) {
-            return $response->withStatus(400)->withJson(['errors' => 'MultiGest SoapFault: ' . $result]);
+            return ['errors' => 'MultiGest SoapFault: ' . $result];
         }
         $result = $soapClient->GedAddChampRecherche($keyMetadataField, 'FAKEDATA');
         if (is_soap_fault($result)) {
-            return $response->withStatus(400)->withJson(['errors' => 'MultiGest SoapFault: ' . $result]);
+            return ['errors' => 'MultiGest SoapFault: ' . $result];
         }
-        $result = $soapClient->GedDossierExist($body['sasId'], $body['login']);
+        $result = $soapClient->GedDossierExist($args['sasId'], $args['login']);
         if (is_soap_fault($result)) {
-            return $response->withStatus(400)->withJson(['errors' => 'MultiGest SoapFault: ' . $result]);
+            return ['errors' => 'MultiGest SoapFault: ' . $result];
         }
         $result = (int) $result;
 
         if ($result < 0 && $result != -7) { // -7 -> "Dossier inexistant"
-            return $response->withStatus(400)->withJson(['errors' => 'MultiGest connection failed for user ' . $body['login'] . ' in sas ' . $body['sasId'], 'lang' => 'multigestAccountTestFailed']);
+            return ['errors' => 'MultiGest connection failed for user ' . $args['login'] . ' in sas ' . $args['sasId'], 'lang' => 'multigestAccountTestFailed'];
         }
 
-        return $response->withStatus(204);
+        return true;
     }
 
     public static function sendResource(array $args)
@@ -373,7 +394,7 @@ class MultigestController
         }
         $entityConfiguration = json_decode($userPrimaryEntity['external_id'], true);
         if (empty($entityConfiguration['multigest'])) {
-            return ['errors' => 'Entity has no associated Multigest account', 'lang' => 'entityHasNoMultigestAccount'];
+            return ['errors' => 'Entity has no associated Multigest account', 'lang' => 'noMultigestAccount'];
         }
         $entityConfiguration = [
             'login' => $entityConfiguration['multigest']['login'] ?? '',
@@ -498,14 +519,16 @@ class MultigestController
         if (empty($metadataFields) || empty($metadataValues)) {
             return ['errors' => 'No valid metadata from Multigest mapping', 'lang' => 'multigestInvalidMapping'];
         }
-        $metadataFields = utf8_decode($metadataFields);
-        $metadataValues = utf8_decode($metadataValues);
 
-        $soapClient = new \SoapClient($multigestUri, [
-            'login'    => $configuration['login'],
-            'password' => $configuration['password'],
-            'authentication' => SOAP_AUTHENTICATION_BASIC
-        ]);
+        try {
+            $soapClient = new \SoapClient($multigestUri, [
+                'login'          => $configuration['login'],
+                'password'       => empty($configuration['password']) ? '' : PasswordModel::decrypt(['cryptedPassword' => $configuration['password']]),
+                'authentication' => SOAP_AUTHENTICATION_BASIC
+            ]);
+        } catch (\SoapFault $e) {
+            return ['errors' => (string) $e, 'lang' => 'soapClientCreationError'];
+        }
 
         $result = $soapClient->GedSetModeUid(1);
         if (is_soap_fault($result)) {

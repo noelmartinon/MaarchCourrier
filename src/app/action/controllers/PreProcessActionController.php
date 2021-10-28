@@ -55,6 +55,8 @@ use Template\models\TemplateModel;
 use User\models\UserEntityModel;
 use User\models\UserModel;
 use ExportSeda\controllers\PreProcessActionSEDATrait;
+use Multigest\controllers\MultigestController;
+use SrcCore\models\PasswordModel;
 
 class PreProcessActionController
 {
@@ -1729,17 +1731,17 @@ class PreProcessActionController
 
         $body['resources'] = array_slice($body['resources'], 0, 500);
         if (!ResController::hasRightByResId(['resId' => $body['resources'], 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter', 'lang' => 'documentOutOfPerimeter']);
         }
         $body['resources'] = PreProcessActionController::getNonLockedResources(['resources' => $body['resources'], 'userId' => $GLOBALS['id']]);
 
         $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_multigest']);
         if (empty($configuration)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Multigest configuration is not enabled']);
+            return $response->withStatus(400)->withJson(['errors' => 'Multigest configuration is not enabled', 'lang' => 'multigestIsNotEnabled']);
         }
         $configuration = json_decode($configuration['value'], true);
         if (empty($configuration['uri'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Multigest configuration URI is empty']);
+            return $response->withStatus(400)->withJson(['errors' => 'Multigest configuration URI is empty', 'lang' => 'multigestUriIsEmpty']);
         }
 
         $entity = UserModel::getPrimaryEntityById(['id' => $args['userId'], 'select' => ['entities.external_id']]);
@@ -1749,6 +1751,15 @@ class PreProcessActionController
         $entityInformations = json_decode($entity['external_id'], true);
         if (empty($entityInformations['multigest'])) {
             return $response->withStatus(400)->withJson(['errors' => 'User primary entity has no Multigest account', 'lang' => 'noMultigestAccount']);
+        }
+
+        $accountCheck = MultigestController::checkAccountWithCredentials([
+            'sasId' => $entityInformations['multigest']['sasId'],
+            'login' => $entityInformations['multigest']['login'],
+            'password' => PasswordModel::decrypt(['cryptedPassword' => $entityInformations['multigest']['password']])
+        ]);
+        if (!empty($accountCheck['errors'])) {
+            return $response->withStatus(400)->withJson(['errors' => $accountCheck['errors'], 'lang' => ($accountCheck['lang'] ?? null)]);
         }
 
         $resourcesInformations = [];

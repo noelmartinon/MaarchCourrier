@@ -2555,12 +2555,12 @@
     "multigestMappingForDocumentIsEmpty": "Multigest mapping for document is empty",
     "multigestInvalidMapping": "Multigest mapping for document is invalid",
     "multigestAccountTestFailed": "Multigest account test failed",
-    "entityHasNoMultigestAccount": "This entity has no associated Multigest account",
     "documentAlreadyInMultigest": "This document is already in Multigest",
     "multigestFolderCreationError": "An error occured while creating Multigest folder",
     "documentNotExist": "This document does not exist",
     "documentHasNoFile": "This document has no file",
     "documentHasNoChrono": "This document has no chrono identifier",
     "documentNotFoundOnDocserver": "Document not found on document server",
-    "docserverDocumentNotReadable": "Document could not be read from document server"
+    "docserverDocumentNotReadable": "Document could not be read from document server",
+    "soapClientCreationError": "Error while initiating SOAP client"
 }
