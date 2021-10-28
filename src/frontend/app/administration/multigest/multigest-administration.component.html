@@ -14,10 +14,10 @@
         </div>
         <div class="container" [class.fullContainer]="appService.getViewMode()">
             <div class="container-content">
-                <div *ngIf="loading" style="display:flex;height:100%;">
+                <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
                     <mat-spinner style="margin:auto;"></mat-spinner>
                 </div>
-                <mat-card *ngIf="!loading" class="card-app-content">
+                <mat-card class="card-app-content" style="margin: 0;">
                     <form (ngSubmit)="onSubmit()" #multigestForm="ngForm">
                         <mat-form-field>
                             <input matInput [(ngModel)]="multigest.label" required name="label" id="label"

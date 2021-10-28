@@ -9,7 +9,7 @@ import { FunctionsService } from '@service/functions.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { MaarchFlatTreeComponent } from '@plugins/tree/maarch-flat-tree.component';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, finalize, map, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-multigest',
@@ -252,6 +252,7 @@ export class MultigestAdministrationComponent implements OnInit {
     }
 
     checkAccount() {
+        this.loading = true;
         let multigest  = {};
         if (!this.creationMode) {
             multigest = {
@@ -272,6 +273,7 @@ export class MultigestAdministrationComponent implements OnInit {
             tap(() => {
                 this.notify.success(this.translate.instant('lang.testSucceeded'));
             }),
+            finalize(() => this.loading = false),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
                 return of(false);
