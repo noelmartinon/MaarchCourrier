@@ -2,7 +2,6 @@ import { Component, OnInit, ViewChild, EventEmitter, Input, Output } from '@angu
 import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
-import { HeaderService } from '@service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
 import { AppService } from '@service/app.service';
 import { MatDialog } from '@angular/material/dialog';
@@ -16,6 +15,8 @@ import { Observable, of } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { LatinisePipe } from 'ngx-pipes';
 import { InputCorrespondentGroupComponent } from '../../group/inputCorrespondent/input-correspondent-group.component';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { ContactSearchModalComponentComponent } from './contactSearchModal/contact-search-modal.component';
 
 @Component({
     selector: 'app-contact-form',
@@ -50,6 +51,7 @@ export class ContactsFormComponent implements OnInit {
     @Input() defaultName: string = '';
 
     @Output() onSubmitEvent = new EventEmitter<number>();
+    @Output() linkContact = new EventEmitter<number>();
 
     countries: any = [];
     countriesFilteredResult: Observable<string[]>;
@@ -337,23 +339,33 @@ export class ContactsFormComponent implements OnInit {
 
     annuaryEnabled: boolean = false;
 
+    autocompleteContactName: any[] = [];
+    contactChanged: boolean = false;
+
+    contactNameClone: any = null;
+
+    fromAdministration: boolean = false;
+    currentRoute: string = '';
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
-        private route: ActivatedRoute,
         private router: Router,
         private notify: NotificationService,
-        private headerService: HeaderService,
         public appService: AppService,
         public dialog: MatDialog,
-        private contactService: ContactService,
+        public contactService: ContactService,
         public functions: FunctionsService,
-        private latinisePipe: LatinisePipe
+        private latinisePipe: LatinisePipe,
+        private activatedRoute: ActivatedRoute,
     ) { }
 
     ngOnInit(): void {
 
         this.loading = true;
+
+        this.currentRoute = this.activatedRoute.snapshot['_routerState'].url;
+        this.fromAdministration = this.currentRoute.includes('administration') ? true : false;
 
         this.initBanSearch();
 
@@ -905,6 +917,7 @@ export class ContactsFormComponent implements OnInit {
             }
         }
         this.checkFilling();
+        this.checkContactName(field);
     }
 
     handleCorrespondentsGroupsField(correspondentsGroups: any, field: any) {
@@ -1145,9 +1158,9 @@ export class ContactsFormComponent implements OnInit {
     toUpperCase(target: any, ev: any) {
         setTimeout(() => {
             const test = target.control.value;
-            if (['lastname'].indexOf(target.id) > -1) {
+            if (['lastname'].indexOf(target.id) > -1 && target.display) {
                 target.control.setValue(test.toUpperCase());
-            } else if (['firstname'].indexOf(target.id) > -1) {
+            } else if (['firstname'].indexOf(target.id) > -1 && target.display) {
                 let splitStr = test.toLowerCase().split(' ');
                 for (let i = 0; i < splitStr.length; i++) {
                     splitStr[i] = splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1);
@@ -1160,6 +1173,92 @@ export class ContactsFormComponent implements OnInit {
                 target.control.setValue(splitStr.join('-'));
             }
         }, 100);
+    }
+
+
+    checkContactName(field: any) {
+        const contactName: any = {
+            firstname: this.contactForm.find((item: any) => item.id === 'firstname').control.value,
+            lastname: this.contactForm.find((item: any) => item.id === 'lastname').control.value
+        };
+        const alreadyExist: boolean = this.autocompleteContactName.find((contact: any) => contact.firstname === contactName.firstname && contact.lastname === contactName.lastname) !== undefined ? true : false;
+        if (this.creationMode && ['firstname', 'lastname'].indexOf(field.id) > -1 && this.canSearchContact() && !alreadyExist) {
+            if (JSON.stringify(contactName) !== JSON.stringify(this.contactNameClone)) {
+                this.http.get(`../rest/autocomplete/contacts/name?firstname=${contactName.firstname}&lastname=${contactName.lastname}`).pipe(
+                    tap((data: any) => {
+                        this.autocompleteContactName = [];
+                        this.autocompleteContactName = JSON.parse(JSON.stringify(data));
+                        this.contactChanged = false;
+                        this.contactNameClone = JSON.parse(JSON.stringify(
+                            {
+                                firstname: this.contactForm.find((item: any) => item.id === 'firstname').control.value,
+                                lastname: this.contactForm.find((item: any) => item.id === 'lastname').control.value
+                            }
+                        ));
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            }
+        } else if (!this.canSearchContact()) {
+            this.contactChanged = true;
+        }
+    }
+
+    canSearchContact() {
+        const firstname: any = this.contactForm.find((item: any) => item.id === 'firstname');
+        const lastname: any = this.contactForm.find((item: any) => item.id === 'lastname');
+        if (!this.functions.empty(firstname.control.value) && !this.functions.empty(lastname.control.value) && firstname.display && lastname.display) {
+            return true;
+        } else {
+            this.contactChanged = true;
+            return false;
+        }
+    }
+
+    setContact(id: number) {
+        if (!this.fromAdministration) {
+            this.linkContact.emit(id);
+        } else {
+            const dialogRef = this.dialog.open(ConfirmComponent,
+                { panelClass: 'maarch-modal',
+                    autoFocus: false, disableClose: true,
+                    data: {
+                        title: this.translate.instant('lang.setContactInfos'),
+                        msg: this.translate.instant('lang.goToContact')
+                    }
+                });
+            dialogRef.afterClosed().pipe(
+                filter((data: string) => data === 'ok'),
+                exhaustMap(() => this.router.navigate([`/administration/contacts/list/${id}`])),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        }
+    }
+
+    showAllContact() {
+        const dialogRef = this.dialog.open(ContactSearchModalComponentComponent, {
+            disableClose: true,
+            width: '800px',
+            panelClass: 'maarch-modal',
+            data: {
+                contacts: this.autocompleteContactName,
+                fromAdministration: this.fromAdministration
+            }
+        });
+
+        dialogRef.afterClosed().pipe(
+            tap((id: number) => {
+                if (!this.functions.empty(id)) {
+                    this.setContact(id);
+                }
+            })
+        ).subscribe();
     }
 
     private _filter(value: string): string[] {

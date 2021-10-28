@@ -111,6 +111,7 @@ $app->get('/autocomplete/maarchParapheurUsers', \SrcCore\controllers\AutoComplet
 $app->get('/autocomplete/correspondents', \SrcCore\controllers\AutoCompleteController::class . ':getCorrespondents');
 $app->get('/autocomplete/contacts', \SrcCore\controllers\AutoCompleteController::class . ':getContacts');
 $app->get('/autocomplete/contacts/company', \SrcCore\controllers\AutoCompleteController::class . ':getContactsCompany');
+$app->get('/autocomplete/contacts/name', \SrcCore\controllers\AutoCompleteController::class . ':getContactsByName');
 $app->get('/autocomplete/users/administration', \SrcCore\controllers\AutoCompleteController::class . ':getUsersForAdministration');
 $app->get('/autocomplete/users/circuit', \SrcCore\controllers\AutoCompleteController::class . ':getUsersForCircuit');
 $app->get('/autocomplete/entities', \SrcCore\controllers\AutoCompleteController::class . ':getEntities');
