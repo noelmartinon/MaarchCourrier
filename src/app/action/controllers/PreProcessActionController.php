@@ -38,6 +38,7 @@ use IndexingModel\models\IndexingModelFieldModel;
 use Note\models\NoteModel;
 use Parameter\models\ParameterModel;
 use RegisteredMail\models\RegisteredMailModel;
+use RegisteredMail\models\RegisteredNumberRangeModel;
 use Resource\controllers\ResController;
 use Resource\controllers\ResourceListController;
 use Resource\controllers\StoreController;
@@ -1769,6 +1770,15 @@ class PreProcessActionController
 
             if (!$registeredMail['generated']) {
                 $cannotGenerate[] = $registeredMail['alt_identifier'] . ' - ' . _NOT_GENERATED;
+                continue;
+            }
+
+            $range = RegisteredNumberRangeModel::get([
+                'where' => ['type = ?', 'range_start <= ?', 'range_end >= ?'],
+                'data'  => [$registeredMail['type'], $registeredMail['number'], $registeredMail['number']]
+            ]);
+            if (empty($range[0])) {
+                $cannotGenerate[] = $registeredMail['alt_identifier'] . ' - ' . _NO_RANGE_FOUND;
                 continue;
             }
 
