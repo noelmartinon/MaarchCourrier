@@ -64,8 +64,6 @@ class MultigestController
 
         if (!Validator::stringType()->notEmpty()->validate($body['uri'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body uri is empty or not a string']);
-        } elseif (!Validator::stringType()->notEmpty()->validate($body['login'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body login is empty or not a string']);
         }
 
         $value = json_encode([
