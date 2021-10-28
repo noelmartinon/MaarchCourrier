@@ -35,7 +35,7 @@ export class SendMultigestActionComponent implements OnInit {
 
     async ngOnInit(): Promise<void> {
         this.loading = true;
-        // await this.checkMultigest();
+        await this.checkMultigest();
         this.loading = false;
     }
 
@@ -43,7 +43,7 @@ export class SendMultigestActionComponent implements OnInit {
         this.resourcesErrors = [];
 
         return new Promise((resolve, reject) => {
-            this.http.post('../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkMultigest', { resources: this.data.resIds })
+            this.http.post('../rest/resourcesList/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/actions/' + this.data.action.id + '/checkSendMultigest', { resources: this.data.resIds })
                 .subscribe((data: any) => {
                     if (!this.functions.empty(data.fatalError)) {
                         this.notify.error(this.translate.instant('lang.' + data.reason));
@@ -72,7 +72,7 @@ export class SendMultigestActionComponent implements OnInit {
 
         const realResSelected: number[] = this.data.resIds.filter((resId: any) => this.resourcesErrors.map(resErr => resErr.res_id).indexOf(resId) === -1);
 
-        this.http.put(this.data.processActionRoute, { resources: realResSelected, note: this.noteEditor.getNoteContent() }).pipe(
+        this.http.put(this.data.processActionRoute, { resources: realResSelected, note: this.noteEditor.getNote()}).pipe(
             tap((data: any) => {
                 if (!data) {
                     this.dialogRef.close('success');
