@@ -1,6 +1,6 @@
 {
   "name": "maarchcourrier",
-  "version": "21.03.11",
+  "version": "21.03.12",
   "description": "MaarchCourrier",
   "scripts": {
     "build-prod": "ng build --prod",
