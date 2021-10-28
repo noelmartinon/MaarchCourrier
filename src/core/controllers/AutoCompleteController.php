@@ -626,6 +626,33 @@ class AutoCompleteController
         return $response->withJson($contacts);
     }
 
+    public static function getContactsByName(Request $request, Response $response)
+    {
+        $queryParams = $request->getQueryParams();
+
+        if (!Validator::stringType()->notEmpty()->validate($queryParams['firstname'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query params firstname is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($queryParams['lastname'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query params lastname is empty or not a string']);
+        }
+
+        $firstnameField = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['firstname']]);
+        $lastnameField = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['lastname']]);
+        $contacts = ContactModel::get([
+            'select'    => [
+                'id', 'company', 'firstname', 'lastname', 'address_number as "addressNumber"', 'address_street as "addressStreet"',
+                'address_additional1 as "addressAdditional1"', 'address_additional2 as "addressAdditional2"', 'address_postcode as "addressPostcode"',
+                'address_town as "addressTown"', 'address_country as "addressCountry"'
+            ],
+            'where'     => ['enabled = ?', $firstnameField, $lastnameField],
+            'data'      => [true, $queryParams['firstname'] . '%', $queryParams['lastname'] . '%'],
+            'orderBy'   => ['company', 'lastname'],
+            'limit'     => AutoCompleteController::TINY_LIMIT
+        ]);
+
+        return $response->withJson($contacts);
+    }
+
     public static function getBanAddresses(Request $request, Response $response)
     {
         $data = $request->getQueryParams();
