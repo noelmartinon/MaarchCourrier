@@ -303,11 +303,11 @@ class MultigestController
 
         $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_multigest']);
         if (empty($configuration)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Multigest configuration is not enabled']);
+            return $response->withStatus(400)->withJson(['errors' => 'Multigest configuration is not enabled', 'lang' => 'multigestIsNotEnabled']);
         }
         $configuration = json_decode($configuration['value'], true);
         if (empty($configuration['uri'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Multigest configuration URI is empty']);
+            return $response->withStatus(400)->withJson(['errors' => 'Multigest configuration URI is empty', 'lang' => 'multigestUriIsEmpty']);
         }
         $multigestUri = rtrim($configuration['uri'], '/');
 
@@ -319,10 +319,10 @@ class MultigestController
 
         $multigestParameters = CoreConfigModel::getJsonLoaded(['path' => 'config/multigest.json']);
         if (empty($multigestParameters)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Multigest mapping file does not exist']);
+            return $response->withStatus(400)->withJson(['errors' => 'Multigest mapping file does not exist', 'lang' => 'multigestMappingDoesNotExist']);
         }
         if (empty($multigestParameters['mapping']['document'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Multigest mapping for document is empty']);
+            return $response->withStatus(400)->withJson(['errors' => 'Multigest mapping for document is empty', 'lang' => 'multigestMappingForDocumentIsEmpty']);
         }
 
         $keyMetadataField = key($multigestParameters['mapping']['document']);
@@ -341,7 +341,7 @@ class MultigestController
         $result = (int) $result;
 
         if ($result < 0 && $result != -7) { // -7 -> "Dossier inexistant"
-            return $response->withStatus(400)->withJson(['errors' => 'MultiGest connection failed for user ' . $body['login'] . ' in sas ' . $body['sasId']]);
+            return $response->withStatus(400)->withJson(['errors' => 'MultiGest connection failed for user ' . $body['login'] . ' in sas ' . $body['sasId'], 'lang' => 'multigestAccountTestFailed']);
         }
 
         return $response->withStatus(204);
@@ -354,12 +354,12 @@ class MultigestController
 
         $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_multigest']);
         if (empty($configuration)) {
-            return ['errors' => 'Multigest configuration is not enabled'];
+            return ['errors' => 'Multigest configuration is not enabled', 'lang' => 'multigestIsNotEnabled'];
         }
 
         $configuration = json_decode($configuration['value'], true);
         if (empty($configuration['uri'])) {
-            return ['errors' => 'Multigest configuration URI is empty'];
+            return ['errors' => 'Multigest configuration URI is empty', 'lang' => 'multigestUriIsEmpty'];
         }
         $multigestUri = rtrim($configuration['uri'], '/');
 
@@ -373,7 +373,7 @@ class MultigestController
         }
         $entityConfiguration = json_decode($userPrimaryEntity['external_id'], true);
         if (empty($entityConfiguration['multigest'])) {
-            return ['errors' => 'Entity has no associated Multigest account'];
+            return ['errors' => 'Entity has no associated Multigest account', 'lang' => 'entityHasNoMultigestAccount'];
         }
         $entityConfiguration = [
             'login' => $entityConfiguration['multigest']['login'] ?? '',
@@ -403,27 +403,27 @@ class MultigestController
         }
 
         if (empty($document)) {
-            return ['errors' => 'Document does not exist'];
+            return ['errors' => 'Document does not exist', 'lang' => 'documentNotExist'];
         } elseif (empty($document['filename'])) {
-            return ['errors' => 'Document has no file'];
+            return ['errors' => 'Document has no file', 'lang' => 'documentHasNoFile'];
         } elseif (empty($document['alt_identifier'])) {
-            return ['errors' => 'Document has no chrono'];
+            return ['errors' => 'Document has no chrono', 'lang' => 'documentHasNoChrono'];
         }
         $document['subject'] = str_replace([':', '*', '\'', '"', '>', '<'], ' ', $document['subject']);
 
         $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
         if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
-            return ['errors' => 'Docserver does not exist'];
+            return ['errors' => 'Docserver does not exist', 'lang' => 'docserverDoesNotExists'];
         }
 
         $pathToDocument = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $document['path']) . $document['filename'];
         if (!is_file($pathToDocument)) {
-            return ['errors' => 'Document not found on docserver'];
+            return ['errors' => 'Document not found on docserver', 'lang' => 'documentNotFoundOnDocserver'];
         }
 
         $fileContent = file_get_contents($pathToDocument);
         if ($fileContent === false) {
-            return ['errors' => 'Could not read file from docserver'];
+            return ['errors' => 'Could not read file from docserver', 'lang' => 'docserverDocumentNotReadable'];
         }
 
         $fileExtension = explode('.', $document['filename']);
@@ -431,10 +431,10 @@ class MultigestController
 
         $multigestParameters = CoreConfigModel::getJsonLoaded(['path' => 'config/multigest.json']);
         if (empty($multigestParameters)) {
-            return ['errors' => 'Multigest mapping file does not exist'];
+            return ['errors' => 'Multigest mapping file does not exist', 'lang' => 'multigestMappingDoesNotExist'];
         }
         if (empty($multigestParameters['mapping']['document'])) {
-            return ['errors' => 'Multigest mapping for document is empty'];
+            return ['errors' => 'Multigest mapping for document is empty', 'lang' => 'multigestMappingForDocumentIsEmpty'];
         }
 
         $resourceContacts = ResourceContactModel::get([
@@ -496,7 +496,7 @@ class MultigestController
             $metadataValues .= $nextValue;
         }
         if (empty($metadataFields) || empty($metadataValues)) {
-            return ['errors' => 'No valid metadata from Multigest mapping'];
+            return ['errors' => 'No valid metadata from Multigest mapping', 'lang' => 'multigestInvalidMapping'];
         }
         $metadataFields = utf8_decode($metadataFields);
         $metadataValues = utf8_decode($metadataValues);
@@ -529,7 +529,7 @@ class MultigestController
 
         $result = (int) $result;
         if ($result > 0) {
-            return ['errors' => 'This resource is already in Multigest'];
+            return ['errors' => 'This resource is already in Multigest', 'lang' => 'documentAlreadyInMultigest'];
         } elseif ($result !== -7) { // -7 -> "Dossier inexistant"
             return ['errors' => 'Multigest error ' . $result . ' occurred while checking for folder preexistence'];
         }
@@ -551,7 +551,7 @@ class MultigestController
 
         $result = (int) $result;
         if ($result != 0) {
-            return ['errors' => 'Could not create Multigest folder'];
+            return ['errors' => 'Could not create Multigest folder', 'lang' => 'multigestFolderCreationError'];
         }
 
         $result = $soapClient->GedChampReset();
@@ -689,7 +689,7 @@ class MultigestController
 
             $result = (int) $result;
             if ($result != 0) {
-                return ['errors' => 'Could not create Multigest folder'];
+                return ['errors' => 'Could not create Multigest folder', 'lang' => 'multigestFolderCreationError'];
             }
 
             $result = $soapClient->GedChampReset();

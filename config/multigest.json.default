@@ -10,6 +10,10 @@
             "PRIORITY": "priorityLabel",
             "DEST_USER": "destUserLabel",
             "SENDER": "senderAddress_0"
+        },
+        "attachments": {
+            "IDENTIFIER": "identifier",
+            "TITLE": "title"
         }
     }
 }

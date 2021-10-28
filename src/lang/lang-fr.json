@@ -2553,5 +2553,19 @@
     "multigestAPI": "API multigest",
     "adminMultigestDesc": "Configurer les comptes Multigest",
     "sendMultigest": "Envoyer vers Multigest",
-    "sasMultigestFolder": "Armoire SAS"
+    "sasMultigestFolder": "Armoire SAS",
+    "multigestIsNotEnabled": "Configuration Multigest manquante",
+    "multigestUriIsEmpty": "URI Multigest manquante",
+    "multigestMappingDoesNotExist": "Fichier de mapping Multigest inexistant ou illisible",
+    "multigestMappingForDocumentIsEmpty": "Mapping Multigest vide pour la section document",
+    "multigestInvalidMapping": "Mapping Multigest invalide",
+    "multigestAccountTestFailed": "Échec du test de connexion Multigest",
+    "entityHasNoMultigestAccount": "Cette entité n’a aucun compte Multigest associé",
+    "documentAlreadyInMultigest": "Ce document est déjà dans Multigest",
+    "multigestFolderCreationError": "Échec de la création du dossier Multigest",
+    "documentNotExist": "Ce courrier n’existe pas",
+    "documentHasNoFile": "Ce courrier n’a pas de fichier",
+    "documentHasNoChrono": "Ce courrier n’a pas de numéro chrono",
+    "documentNotFoundOnDocserver": "Fichier introuvable dans l’espace de stockage",
+    "docserverDocumentNotReadable": "Fichier illisible sur l’espace de stockage"
 }
