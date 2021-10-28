@@ -57,10 +57,10 @@
                         </div>
                         <div class="col-sm-12 text-center" style="padding:10px;">
                             <button mat-raised-button type="button" color="primary" (click)="checkAccount()"
-                                [disabled]="functionsService.empty(multigest.account.id) || (functionsService.empty(multigest.account.password) && creationMode)">{{'lang.test' | translate}}</button>
+                                [disabled]="loading || functionsService.empty(multigest.account.id) || (functionsService.empty(multigest.account.password) && creationMode)">{{'lang.test' | translate}}</button>
 
                             <button mat-raised-button type="submit" color="primary"
-                                [disabled]="!multigestForm.valid || !validAccount()">{{'lang.validate' | translate}}</button>
+                                [disabled]="loading || !multigestForm.valid || !validAccount()">{{'lang.validate' | translate}}</button>
                         </div>
                     </form>
                 </mat-card>
