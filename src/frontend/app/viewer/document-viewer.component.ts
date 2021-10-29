@@ -88,6 +88,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
      */
     @Input() attachType: string = null;
 
+    @Input() isModal: boolean = false;
     /**
      * Original file version
      */
