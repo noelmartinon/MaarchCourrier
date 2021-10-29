@@ -73,7 +73,7 @@ export class PrintDepositListActionComponent implements OnInit {
                     this.notify.error(data.errors);
                 }
 
-                if (!this.functions.empty(data.data.encodedFile)) {
+                if (!this.functions.empty(data.data) && this.functions.empty(data.data.encodedFile)) {
                     downloadLink.href = `data:application/pdf;base64,${data.data.encodedFile}`;
                     downloadLink.setAttribute('download', this.functions.getFormatedFileName(this.translate.instant('lang.depositList'), 'pdf'));
                     document.body.appendChild(downloadLink);
