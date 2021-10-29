@@ -367,9 +367,10 @@ class ConfigurationController
             $path = $defaultPath;
         }
 
+        $xmlConfig = ReceiveMessageExchangeController::readXmlConfig();
         $communication = [];
         $login = '';
-        $password = '';
+        $password = $xmlConfig['m2m_password'] ?? '';
         if(!empty($body['communications']['login'])) {
             $login = $body['communications']['login'];
         }

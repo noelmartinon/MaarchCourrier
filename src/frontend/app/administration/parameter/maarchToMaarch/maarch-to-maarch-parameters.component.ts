@@ -367,7 +367,7 @@ export class MaarchToMaarchParametersComponent implements OnInit {
         this.http.put('../rest/m2m/configuration', { configuration: this.formatConfiguration() }).pipe(
             tap(() => {
                 this.notify.success(this.translate.instant('lang.dataUpdated'));
-                // this.passwordAlreadyExists = this.functionsService.empty(this.communications['password'].value) ? false : true;
+                this.passwordAlreadyExists = (this.functionsService.empty(this.communications['password'].value) && this.passwordAlreadyExists) || (!this.functionsService.empty(this.communications['password'].value));
             }),
             catchError((err: any) => {
                 this.notify.handleErrors(err);
