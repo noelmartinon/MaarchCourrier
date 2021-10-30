@@ -4,6 +4,9 @@
         <div>
             {{'lang.editInProgress' | translate}}
         </div>
+        <div *ngIf="documentWebUrl !== null" style="font-weight: bold;">
+            <i class="fas fa-exclamation-circle" style="font-size: 20px;"></i> {{'lang.sharePointWarning' | translate}}
+        </div> 
     </div>
     <div style="display: flex; justify-content: center">
         <button mat-button (click)="openDocument()" class="button-form-primary-alt" [disabled]="documentWebUrl === null">

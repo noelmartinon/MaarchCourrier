@@ -76,16 +76,31 @@
         </mat-progress-bar>
 
     </div>
-    <div *ngIf="companyFound !== null" class="alert-message alert-message-info" role="alert" [@hideShow]>
-        <div style="padding:10px;">
-            {{'lang.contactsParameters_company' | translate}} <b>{{companyFound.company}}</b>
-            {{'lang.found' | translate}}
-            !
-            <a (click)="setAddress(companyFound)"
-                style="cursor: pointer;font-weight:bold;font-style: italic;">{{'lang.click' | translate}} {{'lang.here' | translate}}</a>
-            {{'lang.toCopyAddress' | translate}} :<br/>
-            <q style="font-weight: bold;width: 100%;display: block;text-align: center;">{{companyFound.addressNumber}} {{companyFound.addressStreet}}, {{companyFound.addressPostcode}}
-                {{companyFound.addressTown}}, {{companyFound.addressCountry}}</q>
+    <div style="display: flex; flex: 1; align-items:flex-start;">
+        <div *ngIf="autocompleteContactName.length > 0 && !contactChanged" class="alert-message alert-message-info" role="alert">
+            <div [ngStyle]="{'padding': autocompleteContactName.length === 1 ? '10px' : '0px'}" style="margin: 13px; width: auto;">
+                <div style="margin-top: -7px; margin-bottom: 2px;">
+                    {{'lang.contact' | translate}}
+                    <ng-container> <b>{{contactService.formatContact(autocompleteContactName[0])}}</b></ng-container>  {{'lang.find' | translate}}
+                    <a style="cursor: pointer;font-weight:bold;font-style: italic;" (click)="setContact(autocompleteContactName[0].id)">{{'lang.click' | translate}} {{'lang.here' | translate}}</a> {{!fromAdministration ? ('lang.associateContact' | translate) : ('lang.accessContact' | translate)}}
+                </div>
+                <div *ngIf="autocompleteContactName.length > 1" style="margin-bottom: -8px;">
+                    <mat-icon color="primary" class="fas fa-angle-right" style="font-size:16px;width:14px;"></mat-icon>
+                <a class="showAllContacts" (click)="showAllContact()">Voir les autres contacts</a>
+                </div>
+            </div>
+        </div>
+        <div *ngIf="companyFound !== null" class="alert-message alert-message-info" role="alert" [@hideShow]>
+            <div style="padding:10px;">
+                {{'lang.contactsParameters_company' | translate}} <b>{{companyFound.company}}</b>
+                {{'lang.found' | translate}}
+                !
+                <a (click)="setAddress(companyFound)"
+                    style="cursor: pointer;font-weight:bold;font-style: italic;">{{'lang.click' | translate}} {{'lang.here' | translate}}</a>
+                {{'lang.toCopyAddress' | translate}} :<br/>
+                <q style="font-weight: bold;width: 100%;display: block;text-align: center;">{{companyFound.addressNumber}} {{companyFound.addressStreet}}, {{companyFound.addressPostcode}}
+                    {{companyFound.addressTown}}, {{companyFound.addressCountry}}</q>
+            </div>
         </div>
     </div>
     <div class="row" style="margin: 0px;">
@@ -104,10 +119,10 @@
                             *ngIf="(field.unit === unit.id && unit.id !== 'address') || (field.unit === unit.id && unit.id === 'address' && !addressBANMode)">
                             <p mat-line class="contact-content" *ngIf="field.display">
                                 <ng-container
-                                    *ngIf="field.type === 'string' && field.id !== 'communicationMeans' && field.id !== 'externalId_m2m' && field.id != 'addressCountry'">
+                                    *ngIf="field.type === 'string' && field.id !== 'communicationMeans' && field.id !== 'externalId_m2m' && field.id != 'addressCountry' && field.id != 'addressPostcode' && field.id != 'addressTown'">
                                     <mat-form-field>
                                         <input matInput [formControl]="field.control" [placeholder]="field.label"
-                                            (blur)="checkCompany(field);checkFilling();" (ngModelChange)="toUpperCase(field, $event)" [required]="field.required">
+                                            (blur)="checkCompany(field); checkContactName(field); checkFilling();" (ngModelChange)="toUpperCase(field, $event)" [required]="field.required">
                                         <mat-hint *ngIf="!isEmptyValue(field.desc)" align="end"
                                             [innerHTML]="field.desc">
                                         </mat-hint>
@@ -261,6 +276,26 @@
                                         <mat-autocomplete #matAutocompleteCountries="matAutocomplete" isOpen="true" (optionSelected)="selectCountry($event)">
                                             <mat-option *ngFor="let country of countriesFilteredResult | async" [value]="country">
                                                 {{country}}
+                                            </mat-option>
+                                        </mat-autocomplete>
+                                    </mat-form-field>
+                                </ng-container>
+                                <ng-container *ngIf="field.id === 'addressPostcode'">
+                                    <mat-form-field>
+                                        <input matInput #autoCompleteInput [formControl]="field.control" [placeholder]="field.label" [matAutocomplete]="matAutocompletePostCode">
+                                        <mat-autocomplete #matAutocompletePostCode="matAutocomplete" (optionSelected)="selectPostcode($event)">
+                                            <mat-option *ngFor="let postcode of postcodesFilteredResult | async" [value]="postcode">
+                                                {{postcode.postcode}} - {{postcode.town}}
+                                            </mat-option>
+                                        </mat-autocomplete>
+                                    </mat-form-field>
+                                </ng-container>
+                                <ng-container *ngIf="field.id === 'addressTown'">
+                                    <mat-form-field>
+                                        <input matInput #autoCompleteInput [formControl]="field.control" [placeholder]="field.label" [matAutocomplete]="matAutocompletePostCodeTown">
+                                        <mat-autocomplete #matAutocompletePostCodeTown="matAutocomplete" (optionSelected)="selectPostcode($event)">
+                                            <mat-option *ngFor="let postcode of postcodesTownFilteredResult | async" [value]="postcode">
+                                                {{postcode.town}} ({{postcode.postcode}})
                                             </mat-option>
                                         </mat-autocomplete>
                                     </mat-form-field>

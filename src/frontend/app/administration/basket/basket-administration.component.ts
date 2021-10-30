@@ -405,6 +405,13 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
                     icon: 'fa fa-hashtag',
                     allowed: true,
                     text: this.translate.instant('lang.immediatelySuperiorMyPrimaryEntity')
+                }, {
+                    id: 'AUTO_REDIRECT_TO_USER',
+                    keyword: 'AUTO_REDIRECT_TO_USER',
+                    parent: '#',
+                    icon: 'fa fa-hashtag',
+                    allowed: true,
+                    text: this.translate.instant('lang.autoRedirectToUser')
                 }];
 
                 keywordEntities.forEach((keyword: any) => {
@@ -438,7 +445,7 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
                     'name': 'proton',
                     'responsive': true
                 },
-                'data': this.allEntities
+                'data': this.allEntities.filter((entity: any) => entity.id !== 'AUTO_REDIRECT_TO_USER')
             },
             'plugins': ['checkbox', 'search']
         });
@@ -484,6 +491,13 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
     }
 
     initService2() {
+        if (this.data.action.redirects.find((tag: any) => tag.keyword === 'AUTO_REDIRECT_TO_USER') !== undefined) {
+            this.data.action.redirects.forEach((element: any, index: number) => {
+                if (element.redirect_mode === 'USERS' && element.keyword !== 'AUTO_REDIRECT_TO_USER') {
+                    this.data.action.redirects.splice(index, 1);
+                }
+            });
+        }
         this.allEntities.forEach((entity: any) => {
             entity.state = { 'opened': false, 'selected': false };
             this.data.action.redirects.forEach((keyword: any) => {
@@ -508,7 +522,25 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
         });
         $('#jstree2')
             // listen for event
-            .on('select_node.jstree', (e: any, data: any) => {
+            .on('loaded.jstree', (e: any, data: any) => {
+                if (this.data.action.redirects.find((tag: any) => tag.keyword === 'AUTO_REDIRECT_TO_USER') !== undefined) {
+                    this.allEntities.forEach((element: any) => {
+                        if (element.id !== 'AUTO_REDIRECT_TO_USER') {
+                            $('#jstree2').jstree('disable_node', element.id);
+                        }
+                    });
+                }
+            }).on('select_node.jstree', (e: any, data: any) => {
+                if (data.selected.indexOf('AUTO_REDIRECT_TO_USER') > -1) {
+                    const index: number = data.selected.indexOf('AUTO_REDIRECT_TO_USER');
+                    data.selected.splice(index, 1);
+                    this.allEntities.forEach((element: any) => {
+                        if (element.id !== 'AUTO_REDIRECT_TO_USER') {
+                            $('#jstree2').jstree('disable_node', element.id);
+                        }
+                    });
+                    $('#jstree2').jstree().deselect_node(data.selected);
+                }
                 if (data.node.original.keyword) {
                     this.data.action.redirects.push({ action_id: this.data.action.id, entity_id: '', keyword: data.node.id, redirect_mode: 'USERS' });
                 } else {
@@ -516,6 +548,11 @@ export class BasketAdministrationSettingsModalComponent implements OnInit {
                 }
 
             }).on('deselect_node.jstree', (e: any, data: any) => {
+                if (data.node.id === 'AUTO_REDIRECT_TO_USER') {
+                    this.allEntities.forEach((element: any) => {
+                        $('#jstree2').jstree('enable_node', element.id);
+                    });
+                }
                 this.data.action.redirects.forEach((redirect: any) => {
                     if (data.node.original.keyword) {
                         if (redirect.keyword === data.node.original.keyword) {

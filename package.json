@@ -1,6 +1,6 @@
 {
   "name": "maarchcourrier",
-  "version": "21.03.8",
+  "version": "21.03.12",
   "description": "MaarchCourrier",
   "scripts": {
     "build-prod": "ng build --prod",
@@ -57,6 +57,7 @@
     "@types/jquery": "3.5.5",
     "@types/jquery.nicescroll": "3.7.1",
     "@types/jstree": "3.3.40",
+    "@types/node": "12.12.6",
     "@types/tooltipster": "0.0.30",
     "@typescript-eslint/eslint-plugin": "4.19.0",
     "@typescript-eslint/eslint-plugin-tslint": "4.19.0",

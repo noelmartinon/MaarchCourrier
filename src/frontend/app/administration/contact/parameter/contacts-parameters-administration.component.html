@@ -128,7 +128,15 @@
                             <mat-header-cell *matHeaderCellDef mat-sort-header>{{'lang.label' | translate}}
                             </mat-header-cell>
                             <mat-cell *matCellDef="let element">
-                                <div>{{element.label}}</div>
+                                <div>
+                                    <div style="margin-top: 5px; margin-bottom: 5px;">
+                                        {{element.label}}
+                                        <mat-icon *ngIf="element.identifier === 'sector' && !functionsService.empty(sectorMsg)"
+                                            color="primary" class="fas fa-question-circle"
+                                            [title]="sectorMsg" style="cursor:help;">
+                                        </mat-icon>
+                                    </div>
+                                </div>
                             </mat-cell>
                         </ng-container>
                         <ng-container matColumnDef="mandatory">

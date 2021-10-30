@@ -329,12 +329,19 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         }
         if (!this.functions.empty(this.resourceData.senders)) {
             this.resourceData.senders.forEach((sender: any) => {
-                this.formatSender(sender);
+                this.formatData(sender);
             });
         }
+
+        if (!this.functions.empty(this.resourceData.recipients)) {
+            this.resourceData.recipients.forEach((recipient: any) => {
+                this.formatData(recipient);
+            });
+        }
+
     }
 
-    formatSender(sender: any) {
+    formatData(sender: any) {
         switch (sender.type) {
             case 'contact':
                 this.http.get(`../rest/contacts/${sender.id}`).pipe(

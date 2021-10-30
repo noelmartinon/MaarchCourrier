@@ -121,4 +121,22 @@ class TextFormatModel
             return $string;
         }
     }
+
+    public static function snakeToCamel($subject) {
+        $subject = lcfirst(ucwords($subject, '_'));
+        $subject = str_replace('_', '', $subject);
+        return $subject;
+    }
+
+    public static function camelToSnake($subject) {
+        $snakeCaseSubject = '';
+        foreach (str_split($subject) as $index => $character) {
+            if ($index > 0 && strtoupper($character) == $character && strpos('0123456789_', $character) === false) {
+                $character = strtolower($character);
+                $character = '_' . $character;
+            }
+            $snakeCaseSubject .= $character;
+        }
+        return $snakeCaseSubject;
+    }
 }

@@ -88,6 +88,20 @@ export class ListAdministrationComponent implements OnInit {
             'icon': 'fa-calendar'
         },
         {
+            'value': 'getCreationDate',
+            'label': this.translate.instant('lang.getCreationDate'),
+            'sample': this.translate.instant('lang.getCreationDateSample'),
+            'cssClasses': ['align_leftData'],
+            'icon': 'fa-calendar'
+        },
+        {
+            'value': 'getProcessLimitDate',
+            'label': this.translate.instant('lang.getProcessLimitDate'),
+            'sample': this.translate.instant('lang.getProcessLimitDateSample'),
+            'cssClasses': ['align_leftData'],
+            'icon': 'fa-stopwatch'
+        },
+        {
             'value': 'getVisaWorkflow',
             'label': this.translate.instant('lang.getVisaWorkflow'),
             'sample': '<i color="accent" class="fa fa-check"></i> Barbara BAIN -> <i class="fa fa-hourglass-half"></i> <b>Bruno BOULE</b> -> <i class="fa fa-hourglass-half"></i> Patricia PETIT',
@@ -274,8 +288,10 @@ export class ListAdministrationComponent implements OnInit {
         this.selectedTemplateDisplayedSecondaryDataClone = this.selectedTemplateDisplayedSecondaryData;
 
         this.basketGroup.list_display.subInfos.forEach((element: any) => {
-            this.addData(element.value);
-            this.displayedSecondaryData[this.displayedSecondaryData.length - 1].cssClasses = element.cssClasses;
+            if (element !== undefined) {
+                this.addData(element.value);
+                this.displayedSecondaryData[this.displayedSecondaryData.length - 1].cssClasses = element.cssClasses;
+            }
         });
 
         this.selectedListEvent = this.basketGroup.list_event;

@@ -188,6 +188,11 @@ class ConfigurationController
             } elseif (!Validator::boolType()->validate($data['enabled'] ?? null)) {
                 return $response->withStatus(400)->withJson(['errors' => "Body enabled is not set or not a boolean"]);
             }
+            $data = [
+                'uri'     => rtrim($data['uri'], '/'),
+                'authUri' => rtrim($data['authUri'], '/'),
+                'enabled' => $data['enabled']
+            ];
         }
 
         $data = json_encode($data, JSON_UNESCAPED_SLASHES);
@@ -315,22 +320,22 @@ class ConfigurationController
 
         $attachmentType = AttachmentTypeModel::getById(['select' => ['type_id'], 'id' => $body['metadata']['attachmentTypeId']]);
         if (empty($attachmentType)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Basket not found', 'lang' => 'attachmentTypeDoesNotExist']);
+            return $response->withStatus(400)->withJson(['errors' => 'Attachment type not found', 'lang' => 'attachmentTypeDoesNotExist']);
         }
 
         $indexingModel = IndexingModelModel::getById(['select' => [1], 'id' => $body['metadata']['indexingModelId']]);
         if (empty($indexingModel)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Basket not found', 'lang' => 'indexingModelDoesNotExist']);
+            return $response->withStatus(400)->withJson(['errors' => 'Indexing model not found', 'lang' => 'indexingModelDoesNotExist']);
         }
 
         $status = StatusModel::getByIdentifier(['select' => ['id'], 'identifier' => $body['metadata']['statusId']]);
         if (empty($status)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Basket not found', 'lang' => 'statusDoesNotExist']);
+            return $response->withStatus(400)->withJson(['errors' => 'Status not found', 'lang' => 'statusDoesNotExist']);
         }
 
         $doctype = DoctypeModel::getById(['select' => [1], 'id' => $body['metadata']['typeId']]);
         if (empty($doctype)) {
-            return $response->withStatus(400)->withJson(['errors' => 'Basket not found', 'lang' => 'typeIdDoesNotExist']);
+            return $response->withStatus(400)->withJson(['errors' => 'Doctype not found', 'lang' => 'typeIdDoesNotExist']);
         }
 
         $customId    = CoreConfigModel::getCustomId();

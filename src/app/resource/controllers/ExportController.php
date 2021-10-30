@@ -761,6 +761,9 @@ class ExportController
             $customValues = implode("\n", $customValues);
         } elseif ($field['type'] == 'banAutocomplete') {
             $line = "{$customValues[0]['addressNumber']} {$customValues[0]['addressStreet']} {$customValues[0]['addressTown']} ({$customValues[0]['addressPostcode']})";
+            if (!empty($customValues[0]['sector'])) {
+                $line .= " - {$customValues[0]['sector']}";
+            }
             $line .= "\n";
             $line .= "{$customValues[0]['latitude']},{$customValues[0]['longitude']}";
             $customValues = $line;

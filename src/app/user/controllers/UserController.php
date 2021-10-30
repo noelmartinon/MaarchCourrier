@@ -1694,9 +1694,50 @@ class UserController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
+        $allowedFields = [
+            'id'        => 'id',
+            'userId'    => 'user_id',
+            'firstname' => 'firstname',
+            'lastname'  => 'lastname',
+            'phone'     => 'phone',
+            'mail'      => 'mail'
+        ];
+        $personalFields = ['phone'];
+
+        $fields = [];
+        foreach ($allowedFields as $camel => $snake) {
+            $fields[] = ['label' => $snake, 'value' => $camel];
+        }
+
+        $body = $request->getParsedBody();
+        if (!empty($body['data'])) {
+            $fields = [];
+            foreach ($body['data'] as $parameter) {
+                if (!empty($parameter['label']) && is_string($parameter['label']) && !empty($parameter['value']) && is_string($parameter['value'])) {
+                    if (!in_array($parameter['value'], array_keys($allowedFields))) {
+                        continue;
+                    }
+                    $fields[] = [
+                        'label' => $parameter['label'],
+                        'value' => $parameter['value']
+                    ];
+                }
+            }
+        }
+        $select = array_map(function ($field) use ($allowedFields) {
+            return $allowedFields[$field['value']];
+        }, $fields);
+        foreach ($select as $key => $value) {
+            $select[$key] = 'users.'.$value;
+        }
+        if (empty($select)) {
+            return $response->withStatus(400)->withJson(['errors' => 'no allowed field selected for users export']);
+        }
+        $select[0] = 'DISTINCT '.$select[0];
+
         if (UserController::isRoot(['id' => $GLOBALS['id']])) {
             $users = UserModel::get([
-                'select'    => ['id', 'user_id', 'firstname', 'lastname', 'mail', 'phone'],
+                'select'    => $select,
                 'where'     => ['status != ?'],
                 'data'      => ['DEL']
             ]);
@@ -1708,9 +1749,15 @@ class UserController
 
             $entities = EntityModel::getAllEntitiesByUserId(['userId' => $GLOBALS['id']]);
             $users = [];
-            $select = ['DISTINCT users.id', 'users.user_id', 'firstname', 'lastname', 'mail'];
-            if ($viewPersonaldata) {
-                $select[] = 'phone';
+            if (!$viewPersonaldata) {
+                foreach ($select as $selectKey => $selectValue) {
+                    foreach ($personalFields as $personalField) {
+                        if (strrpos($selectValue, 'users.'.$personalField) !== false) {
+                            // TODO: replace this with str_ends_with in PHP8
+                            unset($select[$selectKey]);
+                        }
+                    }
+                }
             }
             if (!empty($entities)) {
                 $users = UserEntityModel::getWithUsers([
@@ -1719,16 +1766,11 @@ class UserController
                     'data'      => [$entities, 'DEL']
                 ]);
             }
-            $select = ['DISTINCT users.id', 'users.user_id', 'firstname', 'lastname', 'mail'];
-            if ($viewPersonaldata) {
-                $select[] = 'phone';
-            }
             $usersNoEntities = UserEntityModel::getUsersWithoutEntities(['select' => $select]);
             $users = array_merge($users, $usersNoEntities);
         }
 
         $delimiter = ',';
-        $body = $request->getParsedBody();
         if (!empty($body['delimiter'])) {
             if (in_array($body['delimiter'], [',', ';', 'TAB'])) {
                 $delimiter = ($body['delimiter'] == 'TAB' ? "\t" : $body['delimiter']);
@@ -1737,11 +1779,14 @@ class UserController
 
         $file = fopen('php://temp', 'w');
 
-        $csvHead = ['id', 'user_id', 'firstname', 'lastname', 'mail', 'phone'];
+        $csvHead = array_map(function ($field) { return utf8_decode($field); }, array_column($fields, 'label'));
         fputcsv($file, $csvHead, $delimiter);
 
         foreach ($users as $user) {
-            $csvContent = [$user['id'], $user['user_id'], utf8_decode($user['firstname']), utf8_decode($user['lastname']), utf8_decode($user['mail']), $user['phone']];
+            $csvContent = [];
+            foreach ($fields as $field) {
+                $csvContent[] = utf8_decode($user[$allowedFields[$field['value']]] ?? '');
+            }
             fputcsv($file, $csvContent, $delimiter);
         }
 

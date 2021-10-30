@@ -810,7 +810,7 @@ export class EntitiesAdministrationComponent implements OnInit {
     }
 
     openExportModal() {
-        this.dialog.open(EntitiesExportComponent, { panelClass: 'maarch-modal', width: '400px', autoFocus: false });
+        this.dialog.open(EntitiesExportComponent, { panelClass: 'maarch-modal', width: '800px', autoFocus: false });
 
     }
 

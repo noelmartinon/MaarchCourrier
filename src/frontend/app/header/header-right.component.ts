@@ -11,6 +11,7 @@ import { PrivilegeService } from '@service/privileges.service';
 import { FunctionsService } from '@service/functions.service';
 import { AuthService } from '@service/auth.service';
 import { RegisteredMailImportComponent } from '@appRoot/registeredMail/import/registered-mail-import.component';
+import { AboutUsComponent } from '@appRoot/about-us.component';
 
 
 @Component({
@@ -85,5 +86,9 @@ export class HeaderRightComponent implements OnInit {
 
     goTo() {
         this.router.navigate(['/search'], { queryParams: { value: this.searchTarget } });
+    }
+
+    openAboutModal() {
+        this.dialog.open(AboutUsComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: false });
     }
 }

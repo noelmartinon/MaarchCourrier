@@ -395,6 +395,7 @@ abstract class EntityModelAbstract
             'data'      => ['Y'],
             'orderBy'   => ['e1.parent_entity_id']
         ]);
+        $allEntities = EntityModel::removeOrphanedEntities($allEntities);
 
         foreach ($allEntities as $key => $value) {
             $allEntities[$key]['serialId'] = $value['id'];
@@ -493,5 +494,21 @@ abstract class EntityModelAbstract
         }
 
         return EntityModel::getEntityPathByEntityId(['entityId' => $entity['parent_entity_id'], 'path' => $args['path']]);
+    }
+
+    public static function removeOrphanedEntities(array $entities)
+    {
+        do {
+            $entitiesCount = count($entities);
+            $entitiesIds = array_column($entities, 'entity_id');
+            if (empty($entitiesIds)) {
+                return $entities;
+            }
+            $entities = array_values(array_filter($entities, function($entity) use ($entitiesIds) {
+                return empty($entity['parent_entity_id']) || ($entity['parent_entity_id'] != $entity['entity_id'] && in_array($entity['parent_entity_id'], $entitiesIds));
+            }));
+        } while (count($entities) != $entitiesCount);
+
+        return $entities;
     }
 }

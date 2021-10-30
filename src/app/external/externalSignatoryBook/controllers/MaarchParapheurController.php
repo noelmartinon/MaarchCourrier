@@ -666,7 +666,7 @@ class MaarchParapheurController
                         'externalName' => 'maarchParapheur'
                     ]);
                     if (!empty($signatoryUser['user_id'])) {
-                        $aArgs['idsToRetrieve'][$version][$resId]['typist'] = $signatoryUser['user_id'];
+                        $aArgs['idsToRetrieve'][$version][$resId]['typist'] = $signatoryUser['id'];
                         $aArgs['idsToRetrieve'][$version][$resId]['signatory_user_serial_id'] = $signatoryUser['id'];
                     }
                 }

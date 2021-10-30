@@ -32,10 +32,16 @@
             <mat-chip *ngFor="let item of controlAutocomplete.value;let i=index" class="activeListAutocomplete"
                 style="height:auto;" color="default" [removable]="!controlAutocomplete.disabled"
                 (removed)="removeItem(i)">
-                <span style="display: flex;flex: 1;align-items: center;cursor: pointer;"
-                    [title]="this.valuesToDisplay[item.id]" (click)="goTo(item)">
-                    {{this.valuesToDisplay[item.id]}}
-                </span>
+                <div>
+                    <span style="display: flex;flex: 1;align-items: center;cursor: pointer;"
+                        [title]="this.valuesToDisplay[item.id]" (click)="goTo(item)">
+                        {{this.valuesToDisplay[item.id]}}
+                    </span>
+                    <span *ngIf="!functions.empty(controlAutocomplete.value[0].sector)" class="sector"
+                        [title]="this.valuesToDisplay[item.id]">
+                        {{'lang.contactsParameters_sector' | translate}} : {{controlAutocomplete.value[0].sector}}
+                    </span>
+                </div>
                 <mat-icon matChipRemove class="fa fa-times" *ngIf="!controlAutocomplete.disabled"></mat-icon>
             </mat-chip>
         </mat-chip-list>

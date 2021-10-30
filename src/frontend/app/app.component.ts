@@ -53,7 +53,6 @@ export class AppComponent implements OnInit, AfterViewInit {
         iconReg.addSvgIcon('maarchLogoFull', sanitizer.bypassSecurityTrustResourceUrl('../rest/images?image=logo'));
         iconReg.addSvgIcon('maarchLogoWhite', sanitizer.bypassSecurityTrustResourceUrl('assets/logo_only_white.svg'));
         iconReg.addSvgIcon('maarchLogoWhiteFull', sanitizer.bypassSecurityTrustResourceUrl('assets/logo_white.svg'));
-        iconReg.addSvgIcon('maarchBox', sanitizer.bypassSecurityTrustResourceUrl('assets/maarch_box.svg'));
         iconReg.addSvgIcon('alfresco', sanitizer.bypassSecurityTrustResourceUrl('assets/alfresco.svg'));
         if (!environment.production) {
             this.debugMode = true;

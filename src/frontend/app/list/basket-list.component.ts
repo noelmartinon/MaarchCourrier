@@ -306,7 +306,7 @@ export class BasketListComponent implements OnInit, OnDestroy {
             element.display.forEach((key: any) => {
                 key.event = false;
                 key.displayTitle = key.displayValue;
-                if ((key.displayValue == null || key.displayValue === '') && ['getCreationAndProcessLimitDates', 'getParallelOpinionsNumber'].indexOf(key.value) === -1) {
+                if ((key.displayValue == null || key.displayValue === '') && ['getCreationDate', 'getProcessLimitDate', 'getCreationAndProcessLimitDates', 'getParallelOpinionsNumber'].indexOf(key.value) === -1) {
                     key.displayValue = this.translate.instant('lang.undefined');
                     key.displayTitle = '';
                 } else if (['getSenders', 'getRecipients'].indexOf(key.value) > -1) {

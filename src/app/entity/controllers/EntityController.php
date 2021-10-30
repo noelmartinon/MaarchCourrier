@@ -32,7 +32,8 @@ use Slim\Http\Response;
 use Template\models\TemplateAssociationModel;
 use User\models\UserEntityModel;
 use User\models\UserModel;
-use \Template\models\TemplateModel;
+use Template\models\TemplateModel;
+use SrcCore\models\TextFormatModel;
 
 class EntityController
 {
@@ -654,6 +655,23 @@ class EntityController
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
+        $allowedFieldsCamelCase = [
+            'id', 'entityId', 'entityLabel', 'shortLabel', 'entityFullName', 'enabled', 'addressNumber', 'addressStreet', 'addressAdditional1', 'addressAdditional2',
+            'addressPostcode', 'addressTown', 'addressCountry', 'email', 'parentEntityId', 'entityType', 'businessId', 'folderImport', 'producerService',
+            'diffusionList', 'visaCircuit', 'opinionCircuit',
+            'users',
+            'templates'
+        ];
+        $allowedFields = [];
+        foreach ($allowedFieldsCamelCase as $camelCaseField) {
+            if (in_array($camelCaseField, ['diffusionList', 'visaCircuit', 'opinionCircuit'])) {
+                $allowedFields[$camelCaseField] = $camelCaseField;
+            } else {
+                $allowedFields[$camelCaseField] = TextFormatModel::camelToSnake($camelCaseField);
+            }
+        }
+        unset($allowedFieldsCamelCase);
+
         $body = $request->getParsedBody();
 
         $delimiter = ';';
@@ -663,12 +681,27 @@ class EntityController
             }
         }
 
-        $fields = [
-            'id', 'entity_id', 'entity_label', 'short_label', 'entity_full_name', 'enabled', 'address_number', 'address_street', 'address_additional1', 'address_additional2',
-            'address_postcode', 'address_town', 'address_country', 'email', 'parent_entity_id', 'entity_type', 'business_id', 'folder_import', 'producer_service'
-        ];
-
-        $csvHead = array_merge($fields, [ 'diffusionList', 'visaCircuit', 'opinionCircuit', 'users', 'templates']);
+        $fields = [];
+        foreach ($allowedFields as $camel => $snake) {
+            $fields[] = ['label' => $snake, 'value' => $camel];
+        }
+        if (!empty($body['data'])) {
+            $fields = [];
+            foreach ($body['data'] as $parameter) {
+                if (!empty($parameter['label']) && is_string($parameter['label']) && !empty($parameter['value']) && is_string($parameter['value'])) {
+                    if (!in_array($parameter['value'], array_keys($allowedFields))) {
+                        continue;
+                    }
+                    $fields[] = [
+                        'label' => $parameter['label'],
+                        'value' => $parameter['value']
+                    ];
+                }
+            }
+        }
+        if (empty($fields)) {
+            return $response->withStatus(400)->withJson(['errors' => 'no allowed fields selected for entities export']);
+        }
 
         ini_set('memory_limit', -1);
 
@@ -680,21 +713,40 @@ class EntityController
             return $entity['allowed'] == true;
         });
         $entitiesIds = array_column($entities, 'serialId');
+
+        $select = array_map(function ($field) use ($allowedFields) {
+            return $allowedFields[$field['value']];
+        }, $fields);
+        $select = array_diff($select, ['diffusionList', 'visaCircuit', 'opinionCircuit', 'users', 'templates']);
+        if (!in_array('id', $select)) {
+            $select[] = 'id';
+        }
+        if (!in_array('entity_id', $select)) {
+            $select[] = 'entity_id';
+        }
+
         $entities = EntityModel::get([
-            'select'  => $fields,
+            'select'  => $select,
             'where'   => ['id in (?)'],
             'data'    => [$entitiesIds],
             'orderBy' => ['parent_entity_id', 'entity_label']
         ]);
 
-        $templateType = ['diffusionList', 'visaCircuit', 'opinionCircuit'];
+        $templateTypes = [];
+        foreach ($fields as $key => $field) {
+            if (in_array($field['value'], ['diffusionList', 'visaCircuit', 'opinionCircuit'])) {
+                $templateTypes[] = $field['value'];
+            }
+        }
+        $includeUsers     = in_array('users', array_column($fields, 'value'));
+        $includeTemplates = in_array('templates', array_column($fields, 'value'));
 
         $roles = EntityModel::getRoles();
         $roles = array_column($roles, 'label', 'id');
 
         foreach ($entities as $key => $entity) {
             // list templates
-            foreach ($templateType as $type) {
+            foreach ($templateTypes as $type) {
                 $template = ListTemplateModel::get([
                     'select' => ['*'],
                     'where'  => ['entity_id = ?', 'type = ?'],
@@ -727,36 +779,44 @@ class EntityController
                         $list[] = implode(' ', $item);
                     }
                 }
-                $entities[$key][] = implode("\n", $list);
+                $entities[$key][$type] = implode("\n", $list);
             }
 
             // Users in entity
-            $users = UserEntityModel::getWithUsers([
-                'select'    => ['DISTINCT users.id', 'firstname', 'lastname'],
-                'where'     => ['users_entities.entity_id = ?'],
-                'data'      => [$entity['entity_id']]
-            ]);
-            $users = array_map(function ($user) {
-                return $user['firstname'] . ' ' . $user['lastname'];
-            }, $users);
-            $entities[$key][] = implode("\n", $users);
-
+            if ($includeUsers) {
+                $users = UserEntityModel::getWithUsers([
+                    'select'    => ['DISTINCT users.id', 'firstname', 'lastname'],
+                    'where'     => ['users_entities.entity_id = ?'],
+                    'data'      => [$entity['entity_id']]
+                ]);
+                $users = array_map(function ($user) {
+                    return $user['firstname'] . ' ' . $user['lastname'];
+                }, $users);
+                $entities[$key]['users'] = implode("\n", $users);
+            }
 
             // Document templates
-            $templates = TemplateModel::getByEntity([
-                'select'    => ['t.template_label', 't.template_target'],
-                'entities'  => [$entity['entity_id']]
-            ]);
-            $templates = array_map(function ($template) {
-                return $template['template_label'] . ' ' . $template['template_target'];
-            }, $templates);
-            $entities[$key][] = implode("\n", $templates);
+            if ($includeTemplates) {
+                $templates = TemplateModel::getByEntity([
+                    'select'    => ['t.template_label', 't.template_target'],
+                    'entities'  => [$entity['entity_id']]
+                ]);
+                $templates = array_map(function ($template) {
+                    return $template['template_label'] . ' ' . $template['template_target'];
+                }, $templates);
+                $entities[$key]['templates'] = implode("\n", $templates);
+            }
         }
 
+        $csvHead = array_map(function ($field) { return utf8_decode($field); }, array_column($fields, 'label'));
         fputcsv($file, $csvHead, $delimiter);
 
         foreach ($entities as $entity) {
-            fputcsv($file, $entity, $delimiter);
+            $entityValues = [];
+            foreach ($fields as $field) {
+                $entityValues[] = utf8_decode($entity[$allowedFields[$field['value']]] ?? '');
+            }
+            fputcsv($file, $entityValues, $delimiter);
         }
 
         rewind($file);

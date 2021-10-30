@@ -392,6 +392,9 @@ class SummarySheetController
                             if (!empty($customFieldsValues[$customFieldsId])) {
                                 if ($fieldsType[$customFieldsId] == 'banAutocomplete') {
                                     $customValue = "{$customFieldsValues[$customFieldsId][0]['addressNumber']} {$customFieldsValues[$customFieldsId][0]['addressStreet']} {$customFieldsValues[$customFieldsId][0]['addressTown']} ({$customFieldsValues[$customFieldsId][0]['addressPostcode']})";
+                                    if (!empty($customFieldsValues[$customFieldsId][0]['sector'])) {
+                                        $customValue .= " - {$customFieldsValues[$customFieldsId][0]['sector']}";
+                                    }
                                 } elseif ($fieldsType[$customFieldsId] == 'contact') {
                                     $customValues = ContactController::getContactCustomField(['contacts' => $customFieldsValues[$customFieldsId]]);
                                     $customValue = count($customValues) > 2 ? count($customValues) . ' ' . _CONTACTS : implode(", ", $customValues);
@@ -526,6 +529,9 @@ class SummarySheetController
                                 if (!empty($customFieldsValues[$customFieldsId])) {
                                     if ($fieldsType[$customFieldsId] == 'banAutocomplete') {
                                         $customValue = "{$customFieldsValues[$customFieldsId][0]['addressNumber']} {$customFieldsValues[$customFieldsId][0]['addressStreet']} {$customFieldsValues[$customFieldsId][0]['addressTown']} ({$customFieldsValues[$customFieldsId][0]['addressPostcode']})";
+                                        if (!empty($customFieldsValues[$customFieldsId][0]['sector'])) {
+                                            $customValue .= " - {$customFieldsValues[$customFieldsId][0]['sector']}";
+                                        }
                                     } elseif ($fieldsType[$customFieldsId] == 'contact') {
                                         $customValues = ContactController::getContactCustomField(['contacts' => $customFieldsValues[$customFieldsId]]);
                                         $customValue = count($customValues) > 2 ? count($customValues) . ' ' . _CONTACTS : implode(", ", $customValues);

@@ -56,3 +56,13 @@
     background:white;
     color: var(--maarch-color-primary);
 }
+
+.aboutUsIcon {
+    z-index: 2;
+    right: 7%;
+    bottom: 84%;
+    height: 45px;
+    font-size: 25px;
+    position: absolute;
+    cursor: pointer;
+}

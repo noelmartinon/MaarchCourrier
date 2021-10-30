@@ -143,12 +143,17 @@ class ContactCivilityController
         ValidatorModel::notEmpty($args, ['label']);
         ValidatorModel::stringType($args, ['label']);
 
-        $civility = ContactCivilityModel::get(['select' => ['id'], 'where' => ['label = ?'], 'data' => [$args['label']], 'limit' => 1]);
+        $civility = ContactCivilityModel::get([
+            'select' => ['id'],
+            'where' => ['label ilike ?'],
+            'data' => [$args['label']],
+            'limit' => 1
+        ]);
 
         if (empty($civility)) {
             return '';
         }
 
-        return $civility['id'];
+        return $civility[0]['id'];
     }
 }

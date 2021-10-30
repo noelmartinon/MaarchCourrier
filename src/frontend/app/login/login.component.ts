@@ -13,7 +13,6 @@ import { FunctionsService } from '@service/functions.service';
 import { TimeLimitPipe } from '../../plugins/timeLimit.pipe';
 import { TranslateService } from '@ngx-translate/core';
 import { LocalStorageService } from '@service/local-storage.service';
-import { AboutUsComponent } from '@appRoot/about-us.component';
 
 @Component({
     templateUrl: 'login.component.html',
@@ -28,6 +27,7 @@ export class LoginComponent implements OnInit {
     environment: any;
     applicationName: string = '';
     loginMessage: string = '';
+    applicationVersion: string = '';
 
     constructor(
         public translate: TranslateService,
@@ -51,6 +51,14 @@ export class LoginComponent implements OnInit {
         });
 
         this.environment = environment;
+        const appVersion: string = environment.VERSION.split('.')[0] + '.' + environment.VERSION.split('.')[1];
+        if (!this.functionsService.empty(environment.VERSION.split(' ')[1])) {
+            const mode: string = (environment.VERSION.split(' ')[1]).concat(' ', environment.VERSION.split(' ')[2]);
+            this.applicationVersion = appVersion.concat(' ', mode);
+        } else {
+            this.applicationVersion = appVersion;
+        }
+
         if (this.authService.getToken() !== null) {
             if (!this.functionsService.empty(this.authService.getUrl(JSON.parse(atob(this.authService.getToken().split('.')[1])).user.id))) {
                 this.router.navigate([this.authService.getUrl(JSON.parse(atob(this.authService.getToken().split('.')[1])).user.id)]);
@@ -147,10 +155,6 @@ export class LoginComponent implements OnInit {
                 window.location.href = this.authService.authUri;
             }
         }
-    }
-
-    openAboutModal() {
-        this.dialog.open(AboutUsComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: false });
     }
 
     goTo(route: string) {

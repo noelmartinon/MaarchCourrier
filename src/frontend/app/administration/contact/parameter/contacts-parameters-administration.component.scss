@@ -16,5 +16,11 @@
     ::ng-deep.mat-form-field-wrapper{
         padding-bottom: 0 !important;
     }
-} 
+}
+
+.fa-question-circle::before {
+    position: absolute;
+    font-size: 13px;
+    margin-top: 5px;
+}
   

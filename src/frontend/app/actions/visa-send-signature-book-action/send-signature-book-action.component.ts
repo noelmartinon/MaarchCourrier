@@ -218,7 +218,9 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
                 this.data.resource.integrations[integrationId] = !this.data.resource.integrations[integrationId];
                 await this.checkSignatureBook();
                 setTimeout(async () => {
-                    await this.appVisaWorkflow.loadWorkflow(this.data.resIds[0]);
+                    if (this.appVisaWorkflow.emptyWorkflow()) {
+                        await this.appVisaWorkflow.loadWorkflow(this.data.resIds[0]);
+                    }
                     this.loadWorkflowEntity();
                     if (!this.noResourceToProcess) {
                         this.checkWorkflowParameters(this.appVisaWorkflow.visaWorkflow.items);

@@ -194,7 +194,8 @@ export class ContactAutocompleteComponent implements OnInit {
                             company: data.company,
                             fillingRate: !this.functions.empty(data.fillingRate) ? {
                                 color: this.contactService.getFillingColor(data.fillingRate.thresholdLevel)
-                            } : ''
+                            } : '',
+                            sector: data.sector
                         };
                     }),
                     finalize(() => this.loadingValues = false),
@@ -250,6 +251,7 @@ export class ContactAutocompleteComponent implements OnInit {
                         id: correspondent.id,
                         type: correspondent.type,
                         lastname: correspondent.name,
+                        sector: correspondent.sector,
                         fillingRate: !this.functions.empty(correspondent.thresholdLevel) ? {
                             color: this.contactService.getFillingColor(correspondent.thresholdLevel)
                         } : ''
@@ -284,7 +286,8 @@ export class ContactAutocompleteComponent implements OnInit {
                 {
                     type: contact['type'],
                     id: contact['id'],
-                    label: this.getFormatedContact(contact['type'], contact['id'])
+                    label: this.getFormatedContact(contact['type'], contact['id']),
+                    sector: contact['sector']
                 });
             this.controlAutocomplete.setValue(arrvalue);
             this.loadingValues = false;
@@ -297,14 +300,6 @@ export class ContactAutocompleteComponent implements OnInit {
         this.myControl.setValue('');
     }
 
-    private _filter(value: string): string[] {
-        if (typeof value === 'string') {
-            const filterValue = this.latinisePipe.transform(value.toLowerCase());
-            return this.options.filter((option: any) => this.latinisePipe.transform(option[this.key].toLowerCase()).includes(filterValue));
-        } else {
-            return this.options;
-        }
-    }
 
     unsetValue() {
         this.controlAutocomplete.setValue('');
@@ -397,5 +392,14 @@ export class ContactAutocompleteComponent implements OnInit {
 
     resetInputValue() {
         this.myControl.setValue('');
+    }
+
+    private _filter(value: string): string[] {
+        if (typeof value === 'string') {
+            const filterValue = this.latinisePipe.transform(value.toLowerCase());
+            return this.options.filter((option: any) => this.latinisePipe.transform(option[this.key].toLowerCase()).includes(filterValue));
+        } else {
+            return this.options;
+        }
     }
 }
