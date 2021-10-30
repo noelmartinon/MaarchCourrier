@@ -1,10 +1,15 @@
-import { Component, Inject, ViewChild, Renderer2, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { Component, Inject, ViewChild, Renderer2, OnInit, ElementRef } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { TranslateService } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
 import { PrivilegeService } from '@service/privileges.service';
 import { HeaderService } from '@service/header.service';
 import { MatSidenav } from '@angular/material/sidenav';
+import { ConfirmComponent } from '@plugins/modal/confirm.component';
+import { catchError, exhaustMap, filter } from 'rxjs/operators';
+import { of } from 'rxjs';
+import { NotificationSpec } from 'tinymce';
+import { NotificationService } from '@service/notification/notification.service';
 
 declare var $: any;
 
@@ -21,6 +26,7 @@ export class ContactModalComponent implements OnInit{
     loadedDocument: boolean = false;
 
     @ViewChild('drawer', { static: true }) drawer: MatSidenav;
+    @ViewChild('contactForm', {static: true}) contactForm: ElementRef;
 
     constructor(
         public translate: TranslateService,
@@ -29,6 +35,8 @@ export class ContactModalComponent implements OnInit{
         @Inject(MAT_DIALOG_DATA) public data: any,
         public dialogRef: MatDialogRef<ContactModalComponent>,
         public headerService: HeaderService,
+        public dialog: MatDialog,
+        public notify: NotificationService,
         private renderer: Renderer2) {
     }
 
@@ -69,5 +77,24 @@ export class ContactModalComponent implements OnInit{
                 this.loadedDocument = true;
             }, 200);
         }
+    }
+
+    linkContact(contactId: any) {
+        const dialogRef = this.dialog.open(ConfirmComponent,
+            { panelClass: 'maarch-modal',
+                autoFocus: false, disableClose: true,
+                data: {
+                    title: this.translate.instant('lang.linkContact'),
+                    msg: this.translate.instant('lang.goToContact')
+                }
+            });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'ok'),
+            exhaustMap(async () => this.dialogRef.close(contactId)),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 }
