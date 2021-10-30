@@ -177,6 +177,10 @@ class ResourceListController
             } elseif ($value['value'] == 'getCreationAndProcessLimitDates') {
                 $select[] = 'res_letterbox.creation_date';
                 $select[] = 'res_letterbox.process_limit_date';
+            } elseif ($value['value'] == 'getCreationDate') {
+                $select[] = 'res_letterbox.creation_date';
+            } elseif ($value['value'] == 'getProcessLimitDate') {
+                $select[] = 'res_letterbox.process_limit_date';
             } elseif ($value['value'] == 'getModificationDate') {
                 $select[] = 'res_letterbox.modification_date';
             } elseif ($value['value'] == 'getOpinionLimitDate') {
@@ -967,6 +971,12 @@ class ResourceListController
                         $display[] = $value;
                     } elseif ($value['value'] == 'getCreationAndProcessLimitDates') {
                         $value['displayValue'] = ['creationDate' => $resource['creation_date'], 'processLimitDate' => $resource['process_limit_date']];
+                        $display[] = $value;
+                    } elseif ($value['value'] == 'getCreationDate') {
+                        $value['displayValue'] = $resource['creation_date'];
+                        $display[] = $value;
+                    } elseif ($value['value'] == 'getProcessLimitDate') {
+                        $value['displayValue'] = $resource['process_limit_date'];
                         $display[] = $value;
                     } elseif ($value['value'] == 'getModificationDate') {
                         $value['displayValue'] = $resource['modification_date'];

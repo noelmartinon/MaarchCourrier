@@ -30,6 +30,7 @@ use Resource\models\ResModel;
 use Resource\models\ResourceContactModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\controllers\CoreController;
 use SrcCore\models\CoreConfigModel;
 use User\models\UserModel;
 
@@ -157,10 +158,11 @@ class ReceiveMessageExchangeController
             return ['errors' => 'Bad Request'];
         }
 
-        $file     = base64_decode($aArgs['base64']);
-
-        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-        $mimeType = $finfo->buffer($file);
+        $mimeAndSize = CoreController::getMimeTypeAndFileSize(['encodedFile' => $aArgs['base64']]);
+        if (!empty($mimeAndSize['errors'])) {
+            return ['errors' => $mimeAndSize['errors']];
+        }
+        $mimeType = $mimeAndSize['mime'];
         $ext      = $aArgs['extension'];
         $tmpName  = 'tmp_file_' .$GLOBALS['login']. '_ArchiveTransfer_' .rand(). '.' . $ext;
 
@@ -171,6 +173,8 @@ class ReceiveMessageExchangeController
         if ($mimeType != "application/x-tar" && $mimeType != "application/zip" && $mimeType != "application/tar" && $mimeType != "application/x-gzip") {
             return ['errors' => 'Filetype is not allowed'];
         }
+
+        $file = base64_decode($aArgs['base64']);
 
         $tmpPath = CoreConfigModel::getTmpPath();
         file_put_contents($tmpPath . $tmpName, $file);

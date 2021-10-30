@@ -1777,10 +1777,7 @@ class ContactController
             $address.= $args['contact']['address_town'] . ' ';
         }
         if (!empty($args['contact']['address_country'])) {
-            $address.= $args['contact']['address_country'] . ' ';
-        }
-        if (!empty($args['contact']['sector'])) {
-            $address .= $args['contact']['sector'];
+            $address.= $args['contact']['address_country'];
         }
 
         $contactName = '';
@@ -1802,14 +1799,16 @@ class ContactController
 
         $contactToDisplay = trim($contactName . $company);
 
-        $otherInfo = empty($address) ? "{$contactToDisplay}" : "{$contactToDisplay} - {$address}";
+        $sector = $args['contact']['sector'];
+        $otherInfo = empty($address) ? "{$contactToDisplay}" : "{$contactToDisplay} - {$address}" . (!empty($sector) ? " - {$sector}" : '');
         $contact = [
-            'type'          => 'contact',
-            'id'            => $args['contact']['id'],
-            'contact'       => $contactToDisplay,
-            'address'       => $address,
-            'idToDisplay'   => "{$contactToDisplay}<br/>{$address}",
-            'otherInfo'     => $otherInfo,
+            'type'           => 'contact',
+            'id'             => $args['contact']['id'],
+            'contact'        => $contactToDisplay,
+            'address'        => $address,
+            'sector'         => $sector,
+            'idToDisplay'    => "{$contactToDisplay}<br/>{$address}",
+            'otherInfo'      => $otherInfo,
             'thresholdLevel' => $thresholdLevel
         ];
 
@@ -1948,7 +1947,7 @@ class ContactController
         return $contactsUsed;
     }
 
-    private static function getAddressSector(array $args)
+    public static function getAddressSector(array $args)
     {
         ValidatorModel::stringType($args, ['addressNumber', 'addressStreet', 'addressPostcode', 'addressTown']);
 
@@ -1956,29 +1955,29 @@ class ContactController
         $data = [];
 
         if (!empty($args['addressNumber'])) {
-            $where[] = 'address_number = ?';
-            $data[] = strtoupper($args['addressNumber']);
+            $where[] = 'unaccent(address_number) ilike unaccent(?)';
+            $data[] = $args['addressNumber'];
         } else {
             $where[] = 'address_number is null';
         }
 
         if (!empty($args['addressStreet'])) {
-            $where[] = 'address_street = ?';
-            $data[] = strtoupper($args['addressStreet']);
+            $where[] = 'unaccent(address_street) ilike unaccent(?)';
+            $data[] = $args['addressStreet'];
         } else {
             $where[] = 'address_street is null';
         }
 
         if (!empty($args['addressPostcode'])) {
-            $where[] = 'address_postcode = ?';
-            $data[] = strtoupper($args['addressPostcode']);
+            $where[] = 'unaccent(address_postcode) ilike unaccent(?)';
+            $data[] = $args['addressPostcode'];
         } else {
             $where[] = 'address_postcode is null';
         }
 
         if (!empty($args['addressTown'])) {
-            $where[] = 'address_town = ?';
-            $data[] = strtoupper($args['addressTown']);
+            $where[] = 'unaccent(address_town) ilike unaccent(?)';
+            $data[] = $args['addressTown'];
         } else {
             $where[] = 'address_town is null';
         }

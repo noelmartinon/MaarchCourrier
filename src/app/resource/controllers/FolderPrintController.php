@@ -33,6 +33,7 @@ use Respect\Validation\Validator;
 use setasign\Fpdi\Tcpdf\Fpdi;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use SrcCore\controllers\CoreController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
 use Status\models\StatusModel;
@@ -507,12 +508,13 @@ class FolderPrintController
             if (!file_exists($filePathOnTmp)) {
                 return $response->withStatus(500)->withJson(['errors' => 'Merged file not created']);
             } else {
-                $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                $mimeAndSize = CoreController::getMimeTypeAndFileSize(['path' => $filePathOnTmp]);
+                if (!empty($mimeAndSize['errors'])) {
+                    return $response->withStatus(400)->withJson(['errors' => $mimeAndSize['errors']]);
+                }
+                $mimeType = $mimeAndSize['mime'];
 
-                $fileContent = file_get_contents($filePathOnTmp);
-                $mimeType = $finfo->buffer($fileContent);
-
-                $response->write($fileContent);
+                $response->write(file_get_contents($filePathOnTmp));
 
                 $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.pdf");
                 return $response->withHeader('Content-Type', $mimeType);
@@ -910,8 +912,10 @@ class FolderPrintController
             'resId'  => $resId
         ]);
 
-        $doctype = DoctypeModel::getById(['select' => ['description'], 'id' => $resource['type_id']]);
-        $resource['type_label'] = $doctype['description'];
+        if (!empty($resource['type_id'])) {
+            $doctype = DoctypeModel::getById(['select' => ['description'], 'id' => $resource['type_id']]);
+        }
+        $resource['type_label'] = $doctype['description'] ?? '';
 
         $data = SummarySheetController::prepareData(['units' => $units, 'resourcesIds' => [$resId]]);
 

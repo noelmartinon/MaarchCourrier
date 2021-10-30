@@ -670,6 +670,33 @@ class AutoCompleteController
         return $response->withJson($contacts);
     }
 
+    public static function getContactsByName(Request $request, Response $response)
+    {
+        $queryParams = $request->getQueryParams();
+
+        if (!Validator::stringType()->notEmpty()->validate($queryParams['firstname'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query params firstname is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($queryParams['lastname'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query params lastname is empty or not a string']);
+        }
+
+        $firstnameField = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['firstname']]);
+        $lastnameField = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['lastname']]);
+        $contacts = ContactModel::get([
+            'select'    => [
+                'id', 'company', 'firstname', 'lastname', 'address_number as "addressNumber"', 'address_street as "addressStreet"',
+                'address_additional1 as "addressAdditional1"', 'address_additional2 as "addressAdditional2"', 'address_postcode as "addressPostcode"',
+                'address_town as "addressTown"', 'address_country as "addressCountry"'
+            ],
+            'where'     => ['enabled = ?', $firstnameField, $lastnameField],
+            'data'      => [true, $queryParams['firstname'] . '%', $queryParams['lastname'] . '%'],
+            'orderBy'   => ['company', 'lastname'],
+            'limit'     => AutoCompleteController::TINY_LIMIT
+        ]);
+
+        return $response->withJson($contacts);
+    }
+
     public static function getBanAddresses(Request $request, Response $response)
     {
         $data = $request->getQueryParams();
@@ -716,6 +743,12 @@ class AutoCompleteController
 
         $addresses = [];
         foreach ($hits as $key => $hit) {
+            $sector = ContactController::getAddressSector([
+                'addressNumber'   => $hit->streetNumber,
+                'addressStreet'   => $hit->afnorName,
+                'addressPostcode' => $hit->postalCode,
+                'addressTown'     => $hit->city
+            ]);
             $addresses[] = [
                 'banId'         => $hit->banId,
                 'lon'           => $hit->lon,
@@ -724,7 +757,8 @@ class AutoCompleteController
                 'afnorName'     => $hit->afnorName,
                 'postalCode'    => $hit->postalCode,
                 'city'          => $hit->city,
-                'address'       => "{$hit->streetNumber} {$hit->afnorName}, {$hit->city} ({$hit->postalCode})"
+                'address'       => "{$hit->streetNumber} {$hit->afnorName}, {$hit->city} ({$hit->postalCode})",
+                'sector'        => $sector['label'] ?? null
             ];
         }
 
@@ -980,6 +1014,75 @@ class AutoCompleteController
         }
 
         return $response->withJson($data);
+    }
+
+    public function getPostcodes(Request $request, Response $response)
+    {
+        $queryParams = $request->getQueryParams();
+
+        if (empty($queryParams['postcode']) && empty($queryParams['town'])) {
+            return $response->withJson(['postcodes' => []]);
+        }
+
+        if (!empty($queryParams['postcode']) && !Validator::stringType()->validate($queryParams['postcode'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query postcode is not a string']);
+        }
+        if (!empty($queryParams['town']) && !Validator::stringType()->validate($queryParams['town'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Query town is not a string']);
+        }
+
+        if (!is_file('referential/codes-postaux.json') || !is_readable('referential/codes-postaux.json')) {
+            return $response->withStatus(400)->withJson(['errors' => 'Cannot read postcodes']);
+        }
+
+        $postcodesContent = file_get_contents('referential/codes-postaux.json');
+        if ($postcodesContent === false) {
+            return $response->withStatus(400)->withJson(['errors' => 'Cannot read postcodes']);
+        }
+        $postcodes = json_decode($postcodesContent, true);
+
+        $postcodes = array_map(function ($postcode) {
+            return [
+                'town'     => $postcode['nomCommune'],
+                'label'    => $postcode['libelleAcheminement'],
+                'postcode' => $postcode['codePostal']
+            ];
+        }, $postcodes);
+
+        $searchTowns = [];
+        if (!empty($queryParams['town'])) {
+            $searchTowns = strtoupper(TextFormatModel::normalize(['string' => $queryParams['town']]));
+            $searchTowns = trim(str_replace('-', ' ', $searchTowns));
+            $searchTowns = explode(' ', $searchTowns);
+        }
+        $searchPostcode = null;
+        if (!empty($queryParams['postcode'])) {
+            $searchPostcode = strtoupper(TextFormatModel::normalize(['string' => $queryParams['postcode']]));
+        }
+        $postcodes = array_values(array_filter($postcodes, function ($code) use ($searchPostcode, $searchTowns) {
+            $townFound = !empty($searchTowns);
+            foreach ($searchTowns as $searchTown) {
+                if ($searchTown == 'ST' || $searchTown == 'SAINT') {
+                    if (strpos($code['label'], 'ST') === false && strpos($code['label'], 'SAINT') === false) {
+                        $townFound = false;
+                        break;
+                    }
+                } elseif ($searchTown == 'STE' || $searchTown == 'SAINTE') {
+                    if (strpos($code['label'], 'STE') === false && strpos($code['label'], 'SAINTE') === false) {
+                        $townFound = false;
+                        break;
+                    }
+                } elseif (strpos($code['label'], $searchTown) === false) {
+                    $townFound = false;
+                    break;
+                }
+            }
+            return $townFound || (!empty($searchPostcode) && strpos($code['postcode'], $searchPostcode) === 0);
+        }));
+
+        $postcodes = array_slice($postcodes, 0, AutoCompleteController::LIMIT);
+
+        return $response->withJson(['postcodes' => $postcodes]);
     }
 
     public static function getDataForRequest(array $args)

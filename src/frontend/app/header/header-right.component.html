@@ -33,9 +33,10 @@
     </button>
     <mat-menu #menu="matMenu" class="headerMaarch">
         <canvas class="header-bg" width="250" height="70"
-            style="margin-top:-8px;background-size:cover;border-bottom: solid 1px white;" [style.background-image]="'url(../rest/images?image=loginPage)'"></canvas>
+            style="margin-top:-8px;background-size:cover;border-bottom: solid 1px white; width: 100%;" [style.background-image]="'url(../rest/images?image=loginPage)'"></canvas>
+        <mat-icon color="primary" class="fas fa-info-circle aboutUsIcon" [title]="'lang.aboutUs' | translate" (click)="openAboutModal()"></mat-icon>
         <i title="{{'lang.myProfileAccess' | translate}}" routerLink="/profile"
-            style="cursor:pointer;z-index:1;color:white;position: absolute;left: 85px;top: 17px;width: 70px;height: 70px;background-size: cover;background-position: top center;border-radius: 50%;border: solid white;background-color:white;" [style.background-image]="'url(../rest/images?image=onlyLogo)'"></i>
+            style="cursor:pointer;z-index:1;color:white;position: absolute;left: 34%;top: 17px;width: 70px;height: 70px;background-size: cover;background-position: top center;border-radius: 50%;border: solid white;background-color:white;" [style.background-image]="'url(../rest/images?image=onlyLogo)'"></i>
         <div class="content" style="padding-top:20px;color:white;max-height:250px;overflow-y:auto;overflow-x:hidden;">
             <p routerLink="/profile" class="text-center" style="cursor:pointer;">{{headerService.user.firstname}}
                 {{headerService.user.lastname | uppercase}}</p>
@@ -43,12 +44,12 @@
                 <h3 mat-subheader style="color:white;">{{'lang.groups' | translate}}</h3>
                 <mat-divider></mat-divider>
                 <mat-list-item *ngFor="let group of headerService.user.groups">
-                    <p mat-line style="color:white;opacity:0.5;"> {{group.group_desc}} </p>
+                    <p mat-line style="color:white;opacity:0.5; white-space: normal;"> {{group.group_desc}} </p>
                 </mat-list-item>
                 <h3 mat-subheader style="color:white;">{{'lang.entities' | translate}}</h3>
                 <mat-divider></mat-divider>
                 <mat-list-item *ngFor="let entity of headerService.user.entities">
-                    <p mat-line style="color:white;opacity:0.5;"> {{entity.entity_label}} </p>
+                    <p mat-line style="color:white;opacity:0.5; white-space: normal;"> {{entity.entity_label}} </p>
                 </mat-list-item>
             </mat-list>
         </div>

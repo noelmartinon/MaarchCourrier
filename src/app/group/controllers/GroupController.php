@@ -249,12 +249,13 @@ class GroupController
         $allActions = ActionModel::get(['select' => ['id', 'label_action'], 'where' => ['component in (?)'], 'data' => [GroupController::INDEXING_ACTIONS]]);
 
         $allEntities = EntityModel::get([
-            'select'    => ['e1.id', 'e1.entity_id', 'e1.entity_label', 'e2.id as parent_id'],
+            'select'    => ['e1.id', 'e1.entity_id', 'e1.entity_label', 'e1.parent_entity_id', 'e2.id as parent_id'],
             'table'     => ['entities e1', 'entities e2'],
             'left_join' => ['e1.parent_entity_id = e2.entity_id'],
             'where'     => ['e1.enabled = ?'],
             'data'      => ['Y']
         ]);
+        $allEntities = EntityModel::removeOrphanedEntities($allEntities);
 
         foreach ($allEntities as $key => $value) {
             $allEntities[$key]['id'] = $value['id'];

@@ -45,17 +45,19 @@ class ResourceControlController
 
         if (empty($body)) {
             return ['errors' => 'Body is not set or empty'];
-        } elseif (!Validator::intVal()->notEmpty()->validate($body['doctype'])) {
-            return ['errors' => 'Body doctype is empty or not an integer'];
+        } elseif (!empty($body['doctype']) && !Validator::intVal()->validate($body['doctype'])) {
+            return ['errors' => 'Body doctype is not an integer'];
         } elseif (!Validator::intVal()->notEmpty()->validate($body['modelId'])) {
             return ['errors' => 'Body modelId is empty or not an integer'];
         } elseif ($isWebServiceUser && !Validator::stringType()->notEmpty()->validate($body['status'])) {
             return ['errors' => 'Body status is empty or not a string'];
         }
 
-        $doctype = DoctypeModel::getById(['id' => $body['doctype'], 'select' => [1]]);
-        if (empty($doctype)) {
-            return ['errors' => 'Body doctype does not exist'];
+        if (!empty($body['doctype'])) {
+            $doctype = DoctypeModel::getById(['id' => $body['doctype'], 'select' => [1]]);
+            if (empty($doctype)) {
+                return ['errors' => 'Body doctype does not exist'];
+            }
         }
 
         $indexingModel = IndexingModelModel::getById(['id' => $body['modelId'], 'select' => ['master', 'enabled', 'mandatory_file']]);
@@ -171,12 +173,14 @@ class ResourceControlController
             }
         }
 
-        if (!Validator::intVal()->notEmpty()->validate($body['doctype'])) {
-            return ['errors' => 'Body doctype is empty or not an integer'];
+        if (!Validator::intVal()->validate($body['doctype'])) {
+            return ['errors' => 'Body doctype is not an integer'];
         }
-        $doctype = DoctypeModel::getById(['id' => $body['doctype'], 'select' => [1]]);
-        if (empty($doctype)) {
-            return ['errors' => 'Body doctype does not exist'];
+        if (!empty($body['doctype'])) {
+            $doctype = DoctypeModel::getById(['id' => $body['doctype'], 'select' => [1]]);
+            if (empty($doctype)) {
+                return ['errors' => 'Body doctype does not exist'];
+            }
         }
 
         $control = ResourceControlController::controlAdjacentData(['body' => $body]);
@@ -242,15 +246,17 @@ class ResourceControlController
                 return ['errors' => 'Body format is empty or not a string'];
             }
 
-            $file     = base64_decode($body['encodedFile']);
-            $finfo    = new \finfo(FILEINFO_MIME_TYPE);
-            $mimeType = $finfo->buffer($file);
-            if (!StoreController::isFileAllowed(['extension' => $body['format'], 'type' => $mimeType])) {
-                return ['errors' => "Format with this mimeType is not allowed : {$body['format']} {$mimeType}"];
+            $mimeAndSize = CoreController::getMimeTypeAndFileSize(['encodedFile' => $body['encodedFile']]);
+            if (!empty($mimeAndSize['errors'])) {
+                return ['errors' => $mimeAndSize['errors']];
+            }
+
+            if (!StoreController::isFileAllowed(['extension' => $body['format'], 'type' => $mimeAndSize['mime']])) {
+                return ['errors' => "Format with this mimeType is not allowed : {$body['format']} {$mimeAndSize['mime']}"];
             }
 
             $maximumSize = CoreController::getMaximumAllowedSizeFromPhpIni();
-            if ($maximumSize > 0 && strlen($file) > $maximumSize) {
+            if ($maximumSize > 0 && $mimeAndSize['size'] > $maximumSize) {
                 return ['errors' => "Body encodedFile size is over limit"];
             }
         }

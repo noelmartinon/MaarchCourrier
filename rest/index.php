@@ -111,6 +111,7 @@ $app->get('/autocomplete/maarchParapheurUsers', \SrcCore\controllers\AutoComplet
 $app->get('/autocomplete/correspondents', \SrcCore\controllers\AutoCompleteController::class . ':getCorrespondents');
 $app->get('/autocomplete/contacts', \SrcCore\controllers\AutoCompleteController::class . ':getContacts');
 $app->get('/autocomplete/contacts/company', \SrcCore\controllers\AutoCompleteController::class . ':getContactsCompany');
+$app->get('/autocomplete/contacts/name', \SrcCore\controllers\AutoCompleteController::class . ':getContactsByName');
 $app->get('/autocomplete/users/administration', \SrcCore\controllers\AutoCompleteController::class . ':getUsersForAdministration');
 $app->get('/autocomplete/users/circuit', \SrcCore\controllers\AutoCompleteController::class . ':getUsersForCircuit');
 $app->get('/autocomplete/entities', \SrcCore\controllers\AutoCompleteController::class . ':getEntities');
@@ -121,6 +122,7 @@ $app->get('/autocomplete/tags', \SrcCore\controllers\AutoCompleteController::cla
 $app->get('/autocomplete/ouM2MAnnuary', \SrcCore\controllers\AutoCompleteController::class . ':getOuM2MAnnuary');
 $app->get('/autocomplete/businessIdM2MAnnuary', \SrcCore\controllers\AutoCompleteController::class . ':getBusinessIdM2MAnnuary');
 $app->get('/autocomplete/contacts/m2m', \SrcCore\controllers\AutoCompleteController::class . ':getAvailableContactsForM2M');
+$app->get('/autocomplete/postcodes', \SrcCore\controllers\AutoCompleteController::class . ':getPostcodes');
 
 //Baskets
 $app->get('/baskets', \Basket\controllers\BasketController::class . ':get');
