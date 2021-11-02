@@ -21,6 +21,8 @@ import { SearchComponent } from './search/search.component';
 import { ProcessComponent } from './process/process.component';
 import { IndexationComponent } from './indexation/indexation.component';
 import { AppLightGuard } from '@service/app-light.guard';
+import { MultigestAdministrationComponent } from './administration/multigest/multigest-administration.component';
+import { MultigestListAdministrationComponent } from './administration/multigest/multigest-list-administration.component';
 
 
 const routes: Routes = [
@@ -45,6 +47,9 @@ const routes: Routes = [
     { path: 'login', canActivate: [AppLightGuard], component: LoginComponent },
     { path: 'registeredMail/acknowledgement', canActivate: [AppGuard], component: AcknowledgementReceptionComponent },
     { path: 'search', canActivate: [AppGuard], component: SearchComponent },
+    { path: 'administration/multigest/new', canActivate: [AppGuard], component: MultigestAdministrationComponent },
+    { path: 'administration/multigest/:id', canActivate: [AppGuard], component: MultigestAdministrationComponent },
+    { path: 'administration/multigest', canActivate: [AppGuard], component: MultigestListAdministrationComponent },
     {
         path: 'process/users/:userSerialId/groups/:groupSerialId/baskets/:basketId/resId/:resId',
         canActivate: [AppGuard],

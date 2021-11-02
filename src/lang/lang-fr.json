@@ -2533,5 +2533,10 @@
     "goToContact": "Vous allez perdre vos modifications actuelles, voulez-vous vraiment continuer ?",
     "associateContact": "pour associer ce contact au courrier/pièce jointe.",
     "associateContactToDoc": "Associer ce contact au courrier/pièce jointe",
-    "toCopyInfos": "pour copier ses informations."
+    "toCopyInfos": "pour copier ses informations.",
+    "multigest": "Multigest",
+    "multigestUrl": "Adresse de l'API Multigest",
+    "multigestCreation": "Création d'un compte Multigest",
+    "multigestModification": "Modification d'un compte Multigest",
+    "multigestAccount": "Compte Multigest"
 }

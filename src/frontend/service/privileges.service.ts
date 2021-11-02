@@ -326,6 +326,16 @@ export class PrivilegeService {
             'angular': true,
             'hasParams': false
         },
+        {
+            'id': 'admin_multigest',
+            'label': 'lang.multigest',
+            'comment': 'lang.adminMultigestDesc',
+            'route': '/administration/multigest',
+            'unit': 'supervision',
+            'style': 'multigest',
+            'angular': true,
+            'hasParams': false
+        },
     ];
 
     private privileges: privilege[] = [
