@@ -1063,6 +1063,7 @@ class RegisteredMailController
             } elseif (!empty($recipient[1])) {
                 $recipientLabel .= ' (' . $recipient[1] . ')';
             }
+            $recipientLabel = trim($recipientLabel);
             if (strlen($recipientLabel . " " . $recipient[4] . " " . $recipient[6] . " " . $recipient[7]) > 60) {
                 $pdf->Cell(95, 10, $recipientLabel, 1);
                 $pdf->SetXY($pdf->GetX() - 95, $pdf->GetY() + 3);
