@@ -2542,5 +2542,20 @@
     "multigestUrl": "Multigest API address",
     "multigestCreation": "Creation of a Multigest account",
     "multigestModification": "Modification of a Multigest account",
-    "multigestAccount": "Multigest Account"
+    "multigestAccount": "Multigest Account",
+    "sendMultigest": "Send to Multigest",
+    "multigestIsNotEnabled": "Multigest configuration missing",
+    "multigestUriIsEmpty": "Missing Multigest URI",
+    "multigestMappingDoesNotExist": "Non-existent or unreadable Multigest mapping file",
+    "multigestMappingForDocumentIsEmpty": "Mapping Multigest empty for document section",
+    "multigestInvalidMapping": "Invalid Mapping Multigest",
+    "multigestAccountTestFailed": "Multigest connection test failed",
+    "documentAlreadyInMultigest": "This document is already in Multigest",
+    "multigestFolderCreationError": "Failed to create Multigest folder",
+    "documentNotExist": "This document does not exist",
+    "documentHasNoFile": "This document has no file",
+    "documentHasNoChrono": "This document has no chrono number",
+    "documentNotFoundOnDocserver": "File not found in storage",
+    "docserverDocumentNotReadable": "Unreadable file on storage space",
+    "soapClientCreationError": "SOAP communication initiation error"
 }

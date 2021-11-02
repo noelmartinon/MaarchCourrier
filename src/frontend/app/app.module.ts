@@ -151,8 +151,7 @@ import { DevLangComponent } from '@service/debug/dev-lang.component';
 import { AcknowledgementReceptionComponent } from './registeredMail/acknowledgement-reception/acknowledgement-reception.component';
 import { DatePipe } from '@angular/common';
 import { ContactSearchModalComponentComponent } from './administration/contact/page/form/contactSearchModal/contact-search-modal.component';
-import { MultigestAdministrationComponent } from './administration/multigest/multigest-administration.component';
-import { MultigestListAdministrationComponent } from './administration/multigest/multigest-list-administration.component';
+import { SendMultigestActionComponent } from './actions/send-multigest-action/send-multigest-action.component';
 
 registerLocaleData(localeFr, 'fr-FR');
 @Injectable()
@@ -294,8 +293,7 @@ export class MyHammerConfig extends HammerGestureConfig {
         ProfileOtherPluginComponent,
         AddinOutlookConfigurationModalComponent,
         ContactSearchModalComponentComponent,
-        MultigestAdministrationComponent,
-        MultigestListAdministrationComponent
+        SendMultigestActionComponent
     ],
     exports : [
         SharedModule
@@ -358,7 +356,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         AbsModalComponent,
         TileCreateComponent,
         AddinOutlookConfigurationModalComponent,
-        ContactSearchModalComponentComponent
+        ContactSearchModalComponentComponent,
+        SendMultigestActionComponent
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
