@@ -3,10 +3,10 @@
         <div class="bg-head">
             <div class="bg-head-title" [class.customContainerRight]="appService.getViewMode()">
                 <div class="bg-head-title-label">
-                    <app-header-left></app-header-left>
+                    <header-left></header-left>
                 </div>
                 <div class="bg-head-title-tool">
-                    <app-header-right></app-header-right>
+                    <header-right></header-right>
                 </div>
             </div>
             <div class="bg-head-content" [class.fullContainer]="appService.getViewMode()">
@@ -14,10 +14,10 @@
         </div>
         <div class="container" [class.fullContainer]="appService.getViewMode()">
             <div class="container-content">
-                <div *ngIf="loading" style="display:flex;height:100%;">
+                <div *ngIf="loading" class="loading" style="display:flex;height:100%;">
                     <mat-spinner style="margin:auto;"></mat-spinner>
                 </div>
-                <mat-card *ngIf="!loading" class="card-app-content">
+                <mat-card class="card-app-content" style="margin: 0;">
                     <form (ngSubmit)="onSubmit()" #multigestForm="ngForm">
                         <mat-form-field>
                             <input matInput [(ngModel)]="multigest.label" required name="label" id="label"
@@ -39,7 +39,7 @@
                                             [title]="creationMode ? ('lang.password' | translate) : ('lang.changePassword' | translate)"
                                             [type]="hidePassword ? 'password' : 'text'"
                                             [placeholder]="creationMode ? ('lang.password' | translate) : ('lang.changePassword' | translate)">
-                                        <mat-icon color="primary" style="cursor: pointer;" matSuffix
+                                        <mat-icon color="primary" style="cursor: pointer; font-size: 18px;" matSuffix
                                             (click)="hidePassword = !hidePassword" class="fa fa-2x"
                                             [ngClass]="[hidePassword ? 'fa-eye-slash' : 'fa-eye']"></mat-icon>
                                     </mat-form-field>
@@ -47,20 +47,20 @@
                             </div>
                             <div class="formType ratio-1 col-sm-12">
                                 <div class="formType-title">
-                                    {{'lang.rootFolder' | translate}}
+                                    {{'lang.sasMultigestFolder' | translate}}
                                 </div>
                                 <mat-form-field>
                                     <input matInput [(ngModel)]="multigest.rootFolder" required name="rootFolder"
-                                        id="rootFolder" [title]="'lang.id' | translate" type="text" placeholder="Dépôt racine">
+                                        id="rootFolder" [title]="'lang.id' | translate" type="text" [placeholder]="'lang.sasMultigestFolder' | translate">
                                 </mat-form-field>
                             </div>
                         </div>
                         <div class="col-sm-12 text-center" style="padding:10px;">
                             <button mat-raised-button type="button" color="primary" (click)="checkAccount()"
-                                [disabled]="functionsService.empty(multigest.account.id) || (functionsService.empty(multigest.account.password) && creationMode)">{{'lang.test' | translate}}</button>
+                                [disabled]="loading || functionsService.empty(multigest.account.id) || (functionsService.empty(multigest.account.password) && creationMode)">{{'lang.test' | translate}}</button>
 
                             <button mat-raised-button type="submit" color="primary"
-                                [disabled]="!multigestForm.valid || !validAccount()">{{'lang.validate' | translate}}</button>
+                                [disabled]="loading || !multigestForm.valid || !validAccount()">{{'lang.validate' | translate}}</button>
                         </div>
                     </form>
                 </mat-card>

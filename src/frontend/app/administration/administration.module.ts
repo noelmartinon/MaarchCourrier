@@ -84,6 +84,8 @@ import { AttachmentTypeAdministrationComponent } from './attachment/attachment-t
 import { VisaParametersComponent } from '@appRoot/administration/parameter/visa/visa-parameters.component';
 import { OtherParametersComponent } from '@appRoot/administration/parameter/other/other-parameters.component';
 import { MaarchToMaarchParametersComponent } from '@appRoot/administration/parameter/maarchToMaarch/maarch-to-maarch-parameters.component';
+import { MultigestAdministrationComponent } from './multigest/multigest-administration.component';
+import { MultigestListAdministrationComponent } from './multigest/multigest-list-administration.component';
 
 @NgModule({
     imports: [
@@ -174,7 +176,9 @@ import { MaarchToMaarchParametersComponent } from '@appRoot/administration/param
         AttachmentTypesAdministrationComponent,
         VisaParametersComponent,
         OtherParametersComponent,
-        MaarchToMaarchParametersComponent
+        MaarchToMaarchParametersComponent,
+        MultigestAdministrationComponent,
+        MultigestListAdministrationComponent,
     ],
     entryComponents: [
         AccountLinkComponent,
