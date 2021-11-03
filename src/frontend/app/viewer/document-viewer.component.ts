@@ -198,8 +198,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
                 this.maxFileSize = data.informations.maximumSize;
                 this.maxFileSizeLabel = data.informations.maximumSizeLabel;
-
-                if (this.resId !== null) {
+                if (!this.functions.empty(this.resId) && !this.isModal) {
                     this.loadRessource(this.resId, this.mode);
                     if (this.editMode) {
                         if (this.attachType !== null && this.mode === 'attachment') {
@@ -210,6 +209,26 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                     }
                 } else {
                     this.loadTemplates();
+                    if (!this.functions.empty(this.version)) {
+                        this.http.get(`../rest/resources/${this.resId}/versionsInformations`).pipe(
+                            tap((result: any) => {
+                                this.status = result.SIGN.find((id: any) => id === this.version) !== undefined && result.DOC.find((id: any) => id === this.version) !== undefined ? 'SIGN' : '';
+                            }),
+                            catchError((err: any) => {
+                                this.notify.handleSoftErrors(err);
+                                return of(false);
+                            })
+                        ).subscribe();
+                        this.http.get(`../rest/resources/${this.resId}/fileInformation`).pipe(
+                            tap((infos: any) => {
+                                this.format = ['doc', 'docx', 'dotx', 'odt', 'ott', 'html', 'xlsl', 'xlsx', 'xltx', 'ods', 'ots', 'csv'].indexOf(infos.information.format) > -1 ? infos.information.format : '';
+                            }),
+                            catchError((err: any) => {
+                                this.notify.handleSoftErrors(err);
+                                return of(false);
+                            })
+                        ).subscribe();
+                    }
                     this.loading = false;
                 }
             }),
@@ -591,10 +610,10 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     downloadOriginalFile(type: string = '') {
         const downloadLink = document.createElement('a');
-        if (type === 'docx' && this.file.content.includes('base64')) {
-            this.http.get(`../rest/resources/${this.resId}/content/${this.version}?type=SIGN`).pipe(
+        if (type !== 'pdf' && !this.functions.empty(this.format) && this.file.contentMode.includes('base64') && this.status === 'SIGN') {
+            this.http.get(`../rest/resources/${this.resId}/content?mode=base64`).pipe(
                 tap((data: any) => {
-                    downloadLink.href = `data:application/docx;base64,${data.encodedDocument}`;
+                    downloadLink.href = `data:application/${this.format};base64,${this.base64}`;
                     downloadLink.setAttribute('download', data.filename);
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
@@ -751,10 +770,6 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                         commentedDocVersions: commentedDocVersions,
                         mainDocPDFVersions: mainDocPDFVersions
                     };
-
-                    if (!this.functions.empty(this.version)) {
-                        this.status = data.SIGN.find((id: any) => id === this.version) !== undefined && data.DOC.find((id: any) => id === this.version) !== undefined ? 'SIGN' : '';
-                    }
                 }),
                 exhaustMap(() => this.http.get(`../rest/resources/${this.resId}/fileInformation`)),
                 tap((data: any) => {

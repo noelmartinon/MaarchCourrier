@@ -44,14 +44,14 @@
             [disabled]="!editMode">
             <div *ngIf="!loading && file.content !== null && !hideTools" class="viewer-tools">
                 <!-- Download original file with pdf or docx format -->
-                <ng-container *ngIf="status === 'SIGN'">
+                <ng-container *ngIf="status === 'SIGN' && !functions.empty(format)">
                     <button mat-icon-button [matMenuTriggerFor]="menuOptions">
                         <mat-icon class="fa fa-download"></mat-icon>
                     </button>
                     <mat-menu #menuOptions="matMenu" [class]="'optionsListMenu'">
-                        <button mat-menu-item (click)="downloadOriginalFile('docx')">
+                        <button mat-menu-item (click)="downloadOriginalFile(format)">
                             <mat-icon color="primary" class="fas fa-file-word"></mat-icon>
-                            <span>{{'lang.docxFormat' | translate}}</span>
+                            <span>{{'lang.format' | translate}} {{format}}</span>
                         </button>
                         <button mat-menu-item (click)="downloadOriginalFile('pdf')">
                             <mat-icon color="primary" class="fas fa-file-pdf"></mat-icon>
@@ -60,7 +60,7 @@
                     </mat-menu>
                 </ng-container>
                 <!--  -->
-                <button *ngIf="status !== 'SIGN'" mat-icon-button (click)="downloadOriginalFile()" [matTooltip]="'lang.downloadOriginalFile' | translate">
+                <button *ngIf="status !== 'SIGN' || functions.empty(format)" mat-icon-button (click)="downloadOriginalFile()" [matTooltip]="'lang.downloadOriginalFile' | translate">
                     <mat-icon class="fa fa-download"></mat-icon>
                 </button>
                 <ng-container *ngIf="editMode && resId !== null && !noConvertedFound">
