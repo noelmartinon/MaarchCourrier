@@ -294,8 +294,13 @@ class MultigestController
         }
 
         $body = $request->getParsedBody();
-        ValidatorModel::stringType($body, ['sasId', 'login', 'password']);
-        ValidatorModel::notEmpty($body, ['sasId', 'login']);
+        if (!Validator::stringType()->notEmpty()->validate($body['sasId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body sasId is empty or not a string']);
+        } elseif (!Validator::stringType()->notEmpty()->validate($body['login'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body login is empty or not a string']);
+        } elseif (!Validator::stringType()->validate($body['password'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body password is not a string']);
+        }
 
         $result = MultigestController::checkAccountWithCredentials([
             'sasId' => $body['sasId'],
