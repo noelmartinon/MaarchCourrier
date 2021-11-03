@@ -1753,10 +1753,14 @@ class PreProcessActionController
             return $response->withStatus(400)->withJson(['errors' => 'User primary entity has no Multigest account', 'lang' => 'noMultigestAccount']);
         }
 
+        if (empty($entityInformations['multigest']['sasId']) || empty($entityInformations['multigest']['login'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Multigest configuration is lacking sasId or login']);
+        }
+
         $accountCheck = MultigestController::checkAccountWithCredentials([
             'sasId' => $entityInformations['multigest']['sasId'],
             'login' => $entityInformations['multigest']['login'],
-            'password' => PasswordModel::decrypt(['cryptedPassword' => $entityInformations['multigest']['password']])
+            'password' => empty($entityInformations['multigest']['password']) ? '' : PasswordModel::decrypt(['cryptedPassword' => $entityInformations['multigest']['password']])
         ]);
         if (!empty($accountCheck['errors'])) {
             return $response->withStatus(400)->withJson(['errors' => $accountCheck['errors'], 'lang' => ($accountCheck['lang'] ?? null)]);

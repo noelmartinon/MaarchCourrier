@@ -294,10 +294,14 @@ class MultigestController
         }
 
         $body = $request->getParsedBody();
-        if (!empty($body['password'])) {
-            $body['password'] = PasswordModel::decrypt(['cryptedPassword' => $body['password']]);
-        }
-        $result = MultigestController::checkAccountWithCredentials($body);
+        ValidatorModel::stringType($body, ['sasId', 'login', 'password']);
+        ValidatorModel::notEmpty($body, ['sasId', 'login']);
+
+        $result = MultigestController::checkAccountWithCredentials([
+            'sasId' => $body['sasId'],
+            'login' => $body['login'],
+            'password' => empty($body['password']) ? '' : PasswordModel::decrypt(['cryptedPassword' => $body['password']])
+        ]);
 
         if (!empty($result['errors'])) {
             $return = ['errors' => $result['errors']];
@@ -312,11 +316,8 @@ class MultigestController
 
     public static function checkAccountWithCredentials(array $args)
     {
-        if (!Validator::stringType()->notEmpty()->validate($args['login'])) {
-            return ['errors' => 'Body login is empty or not a string'];
-        } elseif (!Validator::stringType()->notEmpty()->validate($args['sasId'])) {
-            return ['errors' => 'Body sasId is empty or not a string'];
-        }
+        ValidatorModel::stringType($args, ['sasId', 'login', 'password']);
+        ValidatorModel::notEmpty($args, ['sasId', 'login']);
 
         $configuration = ConfigurationModel::getByPrivilege(['privilege' => 'admin_multigest']);
         if (empty($configuration)) {
