@@ -668,6 +668,8 @@ class MultigestController
             if ($fileContent === false) {
                 continue;
             }
+            $fileExtension = explode('.', $attachment['filename']);
+            $fileExtension = array_pop($fileExtension);
 
             $metadataFields = '';
             $metadataValues = '';
