@@ -866,13 +866,15 @@ class AutoCompleteController
             'limit'     => self::TINY_LIMIT
         ]);
 
+        
         foreach ($contacts as $contact) {
             $autoContact = ContactController::getAutocompleteFormat(['id' => $contact['id']]);
 
             $externalId = json_decode($contact['external_id'], true);
             $communicationMeans = json_decode($contact['communication_means'], true);
+            unset($communicationMeans['password']);
             $autoContact['m2m'] = $externalId['m2m'];
-            $autoContact['communicationMeans'] = $communicationMeans['url'] ?? $communicationMeans['email'];
+            $autoContact['communicationMeans'] = $communicationMeans ?? null;
             $autocompleteData[] = $autoContact;
         }
 
@@ -938,8 +940,8 @@ class AutoCompleteController
                 }
             }
 
-            return $response->withJson($unitOrganizations);
         }
+        return $response->withJson($unitOrganizations);
     }
 
     public static function getFolders(Request $request, Response $response)

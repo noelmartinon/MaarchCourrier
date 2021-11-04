@@ -2589,5 +2589,13 @@
     "setContactInfos": "Accéder à la fiche de détails du contact",
     "goToContact": "Vous allez perdre vos modifications actuelles, voulez-vous vraiment continuer ?",
     "associateContact": "pour associer ce contact au courrier/pièce jointe.",
-    "associateContactToDoc": "Associer ce contact au courrier/pièce jointe"
+    "associateContactToDoc": "Associer ce contact au courrier/pièce jointe",
+    "userIdMaarch2Maarch": "Identifiant de l'utilisateur",
+    "userPasswordMaarch2Maarch": "Mot de passe de l'utilisateur",
+    "userIdMaarch2MaarchDesc": "Identifiant de l'utilisateur avec un compte webservice",
+    "userPasswordMaarch2MaarchDesc": "Mot de passe de l'utilisateur avec un compte webservice",
+    "m2mPasswordMsg": "Le mot de passe de votre <b>utilisateur webservice</b> n'est pas défini",
+    "urlUndefinedFormat": "L'URL de communication n'est pas une URL valide",
+    "uriServerExample": "Exemple: https://demo.maarchcourrier.com",
+    "emailM2M": "Courriel pour une connexion indirecte entre les applications (envoi de mail pour le pli numérique)"
 }

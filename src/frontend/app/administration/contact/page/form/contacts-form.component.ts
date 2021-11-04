@@ -271,7 +271,7 @@ export class ContactsFormComponent implements OnInit {
             values: []
         },
         {
-            id: 'communicationMeans',
+            id: 'url',
             unit: 'maarch2maarch',
             label: this.translate.instant('lang.communicationMean'),
             desc: `${this.translate.instant('lang.communicationMeanDesc')} (${this.translate.instant('lang.see')} <a href="${this.maarch2maarchUrl}" target="_blank">MAARCH2MAARCH</a>)`,
@@ -287,6 +287,42 @@ export class ContactsFormComponent implements OnInit {
             unit: 'maarch2maarch',
             label: this.translate.instant('lang.IdMaarch2Maarch'),
             desc: `${this.translate.instant('lang.m2mContactInfo')} (${this.translate.instant('lang.see')} <a href="${this.maarch2maarchUrl}" target="_blank">MAARCH2MAARCH</a>)`,
+            type: 'string',
+            control: new FormControl(),
+            required: false,
+            display: false,
+            filling: false,
+            values: []
+        },
+        {
+            id: 'login',
+            unit: 'maarch2maarch',
+            label: this.translate.instant('lang.userIdMaarch2Maarch'),
+            desc: `${this.translate.instant('lang.userIdMaarch2MaarchDesc')}`,
+            type: 'string',
+            control: new FormControl(),
+            required: false,
+            display: false,
+            filling: false,
+            values: []
+        },
+        {
+            id: 'password',
+            unit: 'maarch2maarch',
+            label: this.translate.instant('lang.userPasswordMaarch2Maarch'),
+            desc: `${this.translate.instant('lang.userPasswordMaarch2MaarchDesc')}`,
+            type: 'string',
+            control: new FormControl(),
+            required: false,
+            display: false,
+            filling: false,
+            values: []
+        },
+        {
+            id: 'email_m2m',
+            unit: 'maarch2maarch',
+            label: this.translate.instant('lang.email'),
+            desc: `${this.translate.instant('lang.m2mEmailDesc')}`,
             type: 'string',
             control: new FormControl(),
             required: false,
@@ -430,6 +466,9 @@ export class ContactsFormComponent implements OnInit {
                 exhaustMap(() => this.http.get('../rest/contacts/' + this.contactId)),
                 map((data: any) => {
                     // data.civility = this.contactService.formatCivilityObject(data.civility);
+                    if (data.communicationMeans !== null) {
+                        this.setCommunicationMeans(data.communicationMeans);
+                    }
                     data.fillingRate = this.contactService.formatFillingObject(data.fillingRate);
                     return data;
                 }),
@@ -612,7 +651,6 @@ export class ContactsFormComponent implements OnInit {
     }
 
     setContactDataExternal(data: any) {
-
         if (data.externalId !== undefined) {
             Object.keys(data.externalId).forEach(id => {
 
@@ -764,11 +802,22 @@ export class ContactsFormComponent implements OnInit {
                 contact['customFields'][element.id.split(/_(.+)/)[1]] = element.control.value;
             } else if (element.id.match(regex2) !== null) {
                 contact['externalId'][element.id.split(/_(.+)/)[1]] = element.control.value;
-            } else {
+            } else if (element.utit !== 'maarch2maarch') {
                 contact[element.id] = element.control.value;
             }
         });
-        return contact;
+        const m2mData: any[] = this.contactForm.filter((element: any) => element.unit === 'maarch2maarch').map((item: any) => ({
+            id: item.id,
+            value: item.control.value
+        }));
+        const communicationMeans = {
+            url: m2mData.find((item: any) => item.id === 'url').value,
+            externalId_m2m: m2mData.find((item: any) => item.id === 'externalId_m2m').value,
+            login: m2mData.find((item: any) => item.id === 'login').value,
+            password: m2mData.find((item: any) => item.id === 'password').value,
+            email: m2mData.find((item: any) => item.id === 'email_m2m').value,
+        };
+        return { ... contact, communicationMeans};
     }
 
     isEmptyUnit(id: string) {
@@ -871,6 +920,22 @@ export class ContactsFormComponent implements OnInit {
         this.addressBANMode = disableBan ? false : true;
     }
 
+    setCommunicationMeans(communicationMeans: any) {
+        let indexField = -1;
+        Object.keys(communicationMeans).forEach(element => {
+            element = element === 'email' ? 'email_m2m' : element;
+            indexField = this.contactForm.map(field => field.id).indexOf(element);
+            if (!this.isEmptyValue(communicationMeans[element === 'email_m2m' ? 'email' : element]) && indexField > -1 && ['url', 'login', 'email_m2m'].indexOf(element) > -1) {
+                if (element === 'email_m2m') {
+                    this.contactForm[indexField].control.setValue(communicationMeans['email']);
+                } else {
+                    this.contactForm[indexField].control.setValue(communicationMeans[element]);
+                }
+                this.contactForm[indexField].display = true;
+            }
+        });
+    }
+
     canDelete(field: any) {
         if (field.id === 'company') {
             const lastname = this.contactForm.filter(contact => contact.id === 'lastname')[0];
@@ -910,7 +975,7 @@ export class ContactsFormComponent implements OnInit {
     removeField(field: any) {
         field.display = !field.display;
         field.control.reset();
-        if ((field.id === 'externalId_m2m' || field.id === 'communicationMeans') && !field.display) {
+        if ((field.id === 'externalId_m2m' || field.id === 'url') && !field.display) {
             const indexFieldAnnuaryId = this.contactForm.map(item => item.id).indexOf('externalId_m2m_annuary_id');
             if (indexFieldAnnuaryId > -1) {
                 this.contactForm.splice(indexFieldAnnuaryId, 1);
@@ -930,7 +995,7 @@ export class ContactsFormComponent implements OnInit {
     initAutocompleteCommunicationMeans() {
         this.communicationMeanInfo = this.translate.instant('lang.autocompleteInfo');
         this.communicationMeanResult = [];
-        const indexFieldCommunicationMeans = this.contactForm.map(field => field.id).indexOf('communicationMeans');
+        const indexFieldCommunicationMeans = this.contactForm.map(field => field.id).indexOf('url');
         this.contactForm[indexFieldCommunicationMeans].control.valueChanges
             .pipe(
                 debounceTime(300),
@@ -957,7 +1022,7 @@ export class ContactsFormComponent implements OnInit {
     }
 
     selectCommunicationMean(ev: any) {
-        const indexFieldCommunicationMeans = this.contactForm.map(field => field.id).indexOf('communicationMeans');
+        const indexFieldCommunicationMeans = this.contactForm.map(field => field.id).indexOf('url');
         this.contactForm[indexFieldCommunicationMeans].control.setValue(ev.option.value.communicationValue);
 
         const indexFieldExternalId = this.contactForm.map(field => field.id).indexOf('externalId_m2m');
@@ -971,7 +1036,7 @@ export class ContactsFormComponent implements OnInit {
     initAutocompleteExternalIdM2M() {
         this.externalId_m2mInfo = this.translate.instant('lang.autocompleteInfo');
         this.externalId_m2mResult = [];
-        const indexFieldCommunicationMeans = this.contactForm.map(field => field.id).indexOf('communicationMeans');
+        const indexFieldCommunicationMeans = this.contactForm.map(field => field.id).indexOf('url');
         const indexFieldExternalId = this.contactForm.map(field => field.id).indexOf('externalId_m2m');
         this.contactForm[indexFieldExternalId].control.valueChanges
             .pipe(

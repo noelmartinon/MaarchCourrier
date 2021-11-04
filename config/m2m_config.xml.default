@@ -10,7 +10,9 @@
         <attachment_type>simple_attachment</attachment_type>
     </res_attachments>
     <basketRedirection_afterUpload>NumericBasket</basketRedirection_afterUpload><!--basketId-->
-    <m2m_communication>https://cchaplin:maarch@demo.maarchcourrier.com</m2m_communication><!--moyen de communication de l'instance : email ou uri -->
+    <m2m_communication>https://demo.maarchcourrier.com</m2m_communication><!-- moyen de communication de l'instance : email ou uri -->
+    <m2m_login>cchaplin</m2m_login>
+    <m2m_password>maarch</m2m_password>
     <annuaries>
         <enabled>false</enabled>
         <organization>organization</organization>

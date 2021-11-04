@@ -1,6 +1,7 @@
 <ng-container *ngIf="!loading; else elseTemplate">
     <app-maarch-message [content]="'lang.maarch2maarchDesc' | translate : {url : maarch2maarchUrl}">
     </app-maarch-message>
+    <app-maarch-message *ngIf="!passwordAlreadyExists" [mode]="'danger'" [content]="'lang.m2mPasswordMsg' | translate"></app-maarch-message>
     <div class="formType" style="margin-top: 20px;">
         <div class="formType-title">
             {{('lang.communicationMeans' | translate)}}
@@ -8,8 +9,18 @@
         <div style="width: 100%;">
             <mat-form-field>
                 <mat-label>{{'lang.uri' | translate}}</mat-label>
-                <input matInput [formControl]="communications.uri">
+                <input matInput [formControl]="communications.url" [placeholder]="'lang.uriServerExample' | translate">
                 <mat-hint align="end" [innerHTML]="'lang.m2mUriDesc' | translate"></mat-hint>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>{{'lang.userIdMaarch2Maarch' | translate}}</mat-label>
+                <input matInput [formControl]="communications.login">
+                <mat-hint align="end" [innerHTML]="'lang.userIdMaarch2MaarchDesc' | translate"></mat-hint>
+            </mat-form-field>
+            <mat-form-field>
+                <mat-label>{{'lang.userPasswordMaarch2Maarch' | translate}}</mat-label>
+                <input matInput [formControl]="communications.password">
+                <mat-hint align="end" [innerHTML]="'lang.userPasswordMaarch2MaarchDesc' | translate"></mat-hint>
             </mat-form-field>
             <mat-form-field>
                 <mat-label>{{'lang.email' | translate}}</mat-label>
