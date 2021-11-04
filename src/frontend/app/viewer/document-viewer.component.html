@@ -93,7 +93,7 @@
                     </button>
                 </mat-menu>
                 <ng-container *ngIf="mode === 'mainDocument' && !functions.empty(file.subinfos)">
-                    <button *ngIf="file.subinfos.mainDocVersions.length > 1 && !file.subinfos.signedDocVersions && !isModal" mat-button
+                    <button *ngIf="file.subinfos.mainDocVersions.length > 1 && !file.subinfos.signedDocVersions" mat-button
                         [matBadge]="file.subinfos.mainDocVersions.length" [matMenuTriggerFor]="menuVersionsDoc">
                         {{'lang.versions' | translate}}
                     </button>
@@ -102,11 +102,11 @@
                             <span>{{'lang.version' | translate}} {{version}}</span>
                         </button>
                     </mat-menu>
-                    <button *ngIf="file.subinfos.signedDocVersions && !isModal" mat-button
+                    <button *ngIf="file.subinfos.signedDocVersions" mat-button
                         (click)="openResourceVersion(file.subinfos.mainDocVersions[file.subinfos.mainDocVersions.length -1],'SIGN')">
                         {{'lang.SIGN_version' | translate}}
                     </button>
-                    <button *ngIf="file.subinfos.commentedDocVersions > 0 && !isModal" mat-button
+                    <button *ngIf="file.subinfos.commentedDocVersions > 0" mat-button
                         (click)="openResourceVersion(file.subinfos.mainDocVersions[file.subinfos.mainDocVersions.length -1],'NOTE')">
                         {{'lang.NOTE_version' | translate}}
                     </button>
