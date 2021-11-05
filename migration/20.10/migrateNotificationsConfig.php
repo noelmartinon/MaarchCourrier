@@ -50,7 +50,7 @@ foreach ($customs as $custom) {
             $file['config']['maarchDirectory'] = (string)$loadedNotificationXml->CONFIG->MaarchDirectory;
             $file['config']['customID'] = (string)$loadedNotificationXml->CONFIG->customID;
             if (empty($file['config']['maarchUrl'])) {
-                $file['config']['maarchUrl'] = (string)$loadedNotificationXml->CONFIG->applicationUrl;
+                $file['config']['maarchUrl'] = (string)$loadedNotificationXml->CONFIG->MaarchUrl;
             }
 
             $fp = fopen($configPath, 'w+');
