@@ -1057,13 +1057,20 @@ class RegisteredMailController
             $pdf->Cell(30, 10, mb_strimwidth($registeredMail['reference'], 0, 22, "...", "UTF-8"), 1, 0, 'C');
 
             $pdf->setFont('times', '', 6);
-            if (strlen($recipient[1] . " " . $recipient[4] . " " . $recipient[6] . " " . $recipient[7]) > 60) {
-                $pdf->Cell(95, 10, $recipient[1], 1);
+            $recipientLabel = $recipient[2] ?? '';
+            if (empty($recipientLabel)) {
+                $recipientLabel = $recipient[1];
+            } elseif (!empty($recipient[1])) {
+                $recipientLabel .= ' (' . $recipient[1] . ')';
+            }
+            $recipientLabel = trim($recipientLabel);
+            if (strlen($recipientLabel . " " . $recipient[4] . " " . $recipient[6] . " " . $recipient[7]) > 60) {
+                $pdf->Cell(95, 10, $recipientLabel, 1);
                 $pdf->SetXY($pdf->GetX() - 95, $pdf->GetY() + 3);
                 $pdf->Cell(95, 10, $recipient[4] . " " . $recipient[6] . " " . $recipient[7], 0);
                 $pdf->SetXY($pdf->GetX() + 95, $pdf->GetY() - 3);
             } else {
-                $pdf->Cell(95, 10, $recipient[1] . " " . $recipient[4] . " " . $recipient[6] . " " . $recipient[7], 1);
+                $pdf->Cell(95, 10, $recipientLabel . " " . $recipient[4] . " " . $recipient[6] . " " . $recipient[7], 1);
             }
 
 
