@@ -15,6 +15,7 @@
 namespace Multigest\controllers;
 
 use Attachment\models\AttachmentModel;
+use Attachment\models\AttachmentTypeModel;
 use Configuration\models\ConfigurationModel;
 use Contact\controllers\ContactCivilityController;
 use Contact\controllers\ContactController;
@@ -298,7 +299,7 @@ class MultigestController
             return $response->withStatus(400)->withJson(['errors' => 'Body sasId is empty or not a string']);
         } elseif (!Validator::stringType()->notEmpty()->validate($body['login'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body login is empty or not a string']);
-        } elseif (!Validator::stringType()->validate($body['password'])) {
+        } elseif (!empty($body['password']) && !Validator::stringType()->validate($body['password'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Body password is not a string']);
         }
 
@@ -410,7 +411,8 @@ class MultigestController
         $document = ResModel::getById([
             'select' => [
                 'filename', 'subject', 'alt_identifier', 'external_id', 'type_id', 'priority', 'fingerprint', 'custom_fields', 'dest_user',
-                'creation_date', 'modification_date', 'doc_date', 'destination', 'initiator', 'process_limit_date', 'closing_date', 'docserver_id', 'path', 'filename'
+                'creation_date', 'modification_date', 'doc_date', 'admission_date',
+                'destination', 'initiator', 'process_limit_date', 'closing_date', 'docserver_id', 'path', 'filename'
             ],
             'resId'  => $args['resId']
         ]);
@@ -488,7 +490,7 @@ class MultigestController
             }
 
             $nextField = $multigestField;
-            if ($maarchField == 'CURRENT_DATE') {
+            if ($maarchField == 'currentDate') {
                 $nextValue = date('Y-m-d');
             } elseif (isset($document[$maarchField])) {
                 if (strpos($maarchField, '_date') !== false) {
@@ -681,7 +683,17 @@ class MultigestController
             $keyAttachmentMetadataField = '';
             $keyAttachmentMetadataValue = '';
             foreach ($multigestParameters['mapping']['attachments'] as $multigestField => $maarchField) {
-                if (empty($attachment[$maarchField])) {
+                $metadataValue = '';
+                if ($maarchField == 'typeLabel' && !empty($attachment['attachment_type'])) {
+                    $attachmentType = AttachmentTypeModel::getByTypeId([
+                        'typeId' => $attachment['attachment_type'],
+                        'select' => ['label']
+                    ]);
+                    $metadataValue = $attachmentType['label'] ?? '';
+                } elseif (!empty($attachment[$maarchField])) {
+                    $metadataValue = $attachment[$maarchField];
+                }
+                if (empty($metadataValue)) {
                     continue;
                 }
                 if ($metadataFields !== '') {
@@ -691,17 +703,17 @@ class MultigestController
                 if ($metadataValues !== '') {
                     $metadataValues .= '|';
                 }
-                $metadataValues .= str_replace('|', '-', $attachment[$maarchField]);
+                $metadataValues .= str_replace('|', '-', $metadataValue);
                 if (empty($keyAttachmentMetadataValue)) {
                     $keyAttachmentMetadataField = str_replace('|', '-', $multigestField);
-                    $keyAttachmentMetadataValue = str_replace('|', '-', $attachment[$maarchField]);
+                    $keyAttachmentMetadataValue = str_replace('|', '-', $metadataValue);
                 }
             }
             $metadataFields .= '|'.$keyMetadataField;
             $metadataValues .= '|'.$keyMetadataValue;
 
-            $metadataFields = utf8_decode($metadataFields);
-            $metadataValues = utf8_decode($metadataValues);
+            $metadataFields = $metadataFields;
+            $metadataValues = $metadataValues;
 
             $result = $soapClient->GedChampReset();
             if (is_soap_fault($result)) {
