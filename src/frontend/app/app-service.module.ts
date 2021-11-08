@@ -11,6 +11,7 @@ import { LatinisePipe } from 'ngx-pipes';
 import { CookieService } from 'ngx-cookie-service';
 import { SortPipe } from '@plugins/sorting.pipe';
 import { HighlightPipe } from '@plugins/highlight.pipe';
+import { SplitLoginPwd } from '@plugins/splitLoginPwd.pipe';
 
 @NgModule({
     imports: [
@@ -24,7 +25,8 @@ import { HighlightPipe } from '@plugins/highlight.pipe';
         SortPipe,
         TimeAgoPipe,
         TimeLimitPipe,
-        HighlightPipe
+        HighlightPipe,
+        SplitLoginPwd
     ],
     exports: [
         NgStringPipesModule,
@@ -35,7 +37,8 @@ import { HighlightPipe } from '@plugins/highlight.pipe';
         SortPipe,
         TimeAgoPipe,
         TimeLimitPipe,
-        HighlightPipe
+        HighlightPipe,
+        SplitLoginPwd
     ],
     entryComponents: [
     ],

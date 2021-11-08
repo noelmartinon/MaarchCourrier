@@ -189,6 +189,10 @@ class ReceiveMessageExchangeController
         }
         $loadedXml = CoreConfigModel::getXmlLoaded(['path' => 'apps/maarch_entreprise/xml/m2m_config.xml']);
 
+        if (empty($loadedXml)) {
+            return null;
+        }
+
         $aDefaultConfig = [];
         if (!empty($loadedXml)) {
             foreach ($loadedXml as $key => $value) {

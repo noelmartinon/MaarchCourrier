@@ -104,7 +104,7 @@
                             *ngIf="(field.unit === unit.id && unit.id !== 'address') || (field.unit === unit.id && unit.id === 'address' && !addressBANMode)">
                             <p mat-line class="contact-content" *ngIf="field.display">
                                 <ng-container
-                                    *ngIf="field.type === 'string' && field.id !== 'communicationMeans' && field.id !== 'externalId_m2m' && field.id != 'addressCountry'">
+                                    *ngIf="field.type === 'string' && field.id !== 'url' && field.id !== 'externalId_m2m' && field.id != 'addressCountry'">
                                     <mat-form-field>
                                         <input matInput [formControl]="field.control" [placeholder]="field.label"
                                             (blur)="checkCompany(field);checkFilling();" (ngModelChange)="toUpperCase(field, $event)" [required]="field.required">
@@ -184,7 +184,7 @@
                                     <mat-error *ngIf="field.control.status!=='VALID'  && field.control.touched">
                                         {{getErrorMsg(field.control.errors)}}</mat-error>
                                 </ng-container>
-                                <ng-container *ngIf="field.id === 'communicationMeans'">
+                                <ng-container *ngIf="field.id === 'url'">
                                     <mat-form-field *ngIf="annuaryEnabled">
                                         <input type="text" #autoCompleteInputCommunicationMean
                                             [placeholder]="'lang.searchCommunicationMean' | translate" matInput

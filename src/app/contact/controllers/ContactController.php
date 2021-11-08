@@ -34,6 +34,7 @@ use Slim\Http\Response;
 use SrcCore\controllers\AutoCompleteController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\DatabaseModel;
+use SrcCore\models\PasswordModel;
 use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
 use User\models\UserModel;
@@ -149,12 +150,18 @@ class ContactController
         }
 
         if (!empty($body['communicationMeans'])) {
-            if (filter_var($body['communicationMeans'], FILTER_VALIDATE_EMAIL)) {
-                $body['communicationMeans'] = ['email' => $body['communicationMeans']];
-            } elseif (filter_var($body['communicationMeans'], FILTER_VALIDATE_URL)) {
-                $body['communicationMeans'] = ['url' => $body['communicationMeans']];
+            if (filter_var($body['communicationMeans']['email'], FILTER_VALIDATE_EMAIL)) {
+                $contactBody['email'] = $body['communicationMeans']['email'];
+            } elseif (filter_var($body['communicationMeans']['url'], FILTER_VALIDATE_URL)) {
+                $contactBody['url'] = $body['communicationMeans']['url'];
             } else {
                 return $response->withStatus(400)->withJson(['errors' => _COMMUNICATION_MEANS_VALIDATOR]);
+            }
+            if (!empty($body['communicationMeans']['login'])) {
+                $contactBody['login'] = $body['communicationMeans']['login'];
+            }
+            if (!empty($body['communicationMeans']['password'])) {
+                $contactBody['password'] = PasswordModel::encrypt(['password' => $body['communicationMeans']['password']]);
             }
         }
 
@@ -183,7 +190,7 @@ class ContactController
             'address_country'       => $body['addressCountry'] ?? null,
             'email'                 => $body['email'] ?? null,
             'phone'                 => $body['phone'] ?? null,
-            'communication_means'   => !empty($body['communicationMeans']) ? json_encode($body['communicationMeans']) : null,
+            'communication_means'   => !empty($contactBody) ? json_encode($contactBody) : null,
             'notes'                 => $body['notes'] ?? null,
             'creator'               => $GLOBALS['id'],
             'enabled'               => 'true',
@@ -262,7 +269,12 @@ class ContactController
         }
         if (!empty($rawContact['communication_means'])) {
             $communicationMeans = json_decode($rawContact['communication_means'], true);
-            $contact['communicationMeans'] = $communicationMeans['url'] ?? $communicationMeans['email'];
+            if(!empty($communicationMeans['url'])) {
+                $contact['communicationMeans']['url'] = $communicationMeans['url'];
+            } elseif (!empty($communicationMeans['email'])) {
+                $contact['communicationMeans']['email'] = $communicationMeans['email'];
+            }
+            $contact['communicationMeans']['login'] = $communicationMeans['login'];
         }
 
         $filling = ContactController::getFillingRate(['contactId' => $rawContact['id']]);
@@ -312,18 +324,29 @@ class ContactController
             return $response->withStatus(400)->withJson(['errors' => $control['errors']]);
         }
 
-        $contact = ContactModel::getById(['id' => $args['id'], 'select' => [1]]);
+        $contact = ContactModel::getById(['id' => $args['id'], 'select' => ['communication_means']]);
         if (empty($contact)) {
             return $response->withStatus(400)->withJson(['errors' => 'Contact does not exist']);
         }
 
+        $contact['communication_means'] = json_decode($contact['communication_means'], true);
+        $contactBody = [];
+        if (!empty($contact['communication_means']['password'])) {
+            $contactBody['password'] = $contact['communication_means']['password'];
+        }
         if (!empty($body['communicationMeans'])) {
-            if (filter_var($body['communicationMeans'], FILTER_VALIDATE_EMAIL)) {
-                $body['communicationMeans'] = ['email' => $body['communicationMeans']];
-            } elseif (filter_var($body['communicationMeans'], FILTER_VALIDATE_URL)) {
-                $body['communicationMeans'] = ['url' => $body['communicationMeans']];
+            if (filter_var($body['communicationMeans']['email'], FILTER_VALIDATE_EMAIL)) {
+                $contactBody['email'] = $body['communicationMeans']['email'];
+            } elseif (filter_var($body['communicationMeans']['url'], FILTER_VALIDATE_URL)) {
+                $contactBody['url'] = $body['communicationMeans']['url'];
             } else {
-                unset($body['communicationMeans']);
+                unset($contactBody);
+            }
+            if (!empty($body['communicationMeans']['login'])) {
+                $contactBody['login'] = $body['communicationMeans']['login'];
+            }
+            if (!empty($body['communicationMeans']['password'])) {
+                $contactBody['password'] = PasswordModel::encrypt(['password' => $body['communicationMeans']['password']]);
             }
         }
 
@@ -353,7 +376,7 @@ class ContactController
                     'address_country'       => $body['addressCountry'] ?? null,
                     'email'                 => $body['email'] ?? null,
                     'phone'                 => $body['phone'] ?? null,
-                    'communication_means'   => !empty($body['communicationMeans']) ? json_encode($body['communicationMeans']) : null,
+                    'communication_means'   => !empty($contactBody) ? json_encode($contactBody) : null,
                     'notes'                 => $body['notes'] ?? null,
                     'modification_date'     => 'CURRENT_TIMESTAMP',
                     'custom_fields'         => !empty($body['customFields']) ? json_encode($body['customFields']) : null,
@@ -1432,7 +1455,8 @@ class ContactController
 
                 if (!empty($contactRaw['communication_means'])) {
                     $communicationMeans = json_decode($contactRaw['communication_means'], true);
-                    $contact['communicationMeans'] = $communicationMeans['url'] ?? $communicationMeans['email'];
+                    unset($communicationMeans['password']);
+                    $contact['communicationMeans'] = !empty($communicationMeans) ? $communicationMeans : null;
                 }
 
                 $filling = ContactController::getFillingRate(['contactId' => $resourceContact['item_id']]);
