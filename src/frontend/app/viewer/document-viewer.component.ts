@@ -87,12 +87,11 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
      * To load specific attachment type in template list (to create document)
      */
     @Input() attachType: string = null;
-
-    @Input() isModal: boolean = false;
     /**
-     * Original file version
+     * Download actions
      */
-    @Input() version: number;
+    @Input() downloadActions: any[] = [];
+
     /**
      * Event emitter
      */
@@ -198,7 +197,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
                 this.maxFileSize = data.informations.maximumSize;
                 this.maxFileSizeLabel = data.informations.maximumSizeLabel;
-                if (!this.functions.empty(this.resId) && !this.isModal) {
+                if (!this.functions.empty(this.resId)) {
                     this.loadRessource(this.resId, this.mode);
                     if (this.editMode) {
                         if (this.attachType !== null && this.mode === 'attachment') {
@@ -209,26 +208,6 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                     }
                 } else {
                     this.loadTemplates();
-                    if (!this.functions.empty(this.version)) {
-                        this.http.get(`../rest/resources/${this.resId}/versionsInformations`).pipe(
-                            tap((result: any) => {
-                                this.status = result.SIGN.find((id: any) => id === this.version) !== undefined && result.DOC.find((id: any) => id === this.version) !== undefined ? 'SIGN' : '';
-                            }),
-                            catchError((err: any) => {
-                                this.notify.handleSoftErrors(err);
-                                return of(false);
-                            })
-                        ).subscribe();
-                        this.http.get(`../rest/resources/${this.resId}/fileInformation`).pipe(
-                            tap((infos: any) => {
-                                this.format = ['doc', 'docx', 'dotx', 'odt', 'ott', 'html', 'xlsl', 'xlsx', 'xltx', 'ods', 'ots', 'csv'].indexOf(infos.information.format) > -1 ? infos.information.format : '';
-                            }),
-                            catchError((err: any) => {
-                                this.notify.handleSoftErrors(err);
-                                return of(false);
-                            })
-                        ).subscribe();
-                    }
                     this.loading = false;
                 }
             }),
@@ -608,12 +587,25 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         }
     }
 
-    downloadOriginalFile(type: string = '') {
+    downloadOriginalFile(data: any) {
         const downloadLink = document.createElement('a');
-        if (type !== 'pdf' && !this.functions.empty(this.format) && this.file.contentMode.includes('base64') && this.status === 'SIGN') {
-            this.http.get(`../rest/resources/${this.resId}/content?mode=base64`).pipe(
+        downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
+        downloadLink.setAttribute('download', data.filename);
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+    }
+
+    downloadConvertedFile() {
+        const downloadLink = document.createElement('a');
+        if (this.file.contentMode === 'base64') {
+            downloadLink.href = `data:${this.file.type};base64,${this.file.content}`;
+            downloadLink.setAttribute('download', this.file.name);
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+        } else {
+            this.http.get(this.file.content).pipe(
                 tap((data: any) => {
-                    downloadLink.href = `data:application/${this.format};base64,${this.base64}`;
+                    downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
                     downloadLink.setAttribute('download', data.filename);
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
@@ -623,26 +615,6 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                     return of(false);
                 })
             ).subscribe();
-        } else {
-            if (this.file.contentMode === 'base64') {
-                downloadLink.href = `data:${this.file.type};base64,${this.file.content}`;
-                downloadLink.setAttribute('download', this.file.name);
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-            } else {
-                this.http.get(this.file.content).pipe(
-                    tap((data: any) => {
-                        downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
-                        downloadLink.setAttribute('download', data.filename);
-                        document.body.appendChild(downloadLink);
-                        downloadLink.click();
-                    }),
-                    catchError((err: any) => {
-                        this.notify.handleSoftErrors(err);
-                        return of(false);
-                    })
-                ).subscribe();
-            }
         }
     }
 
@@ -1245,24 +1217,36 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         });
     }
 
-    openResourceVersion(version: number, type: string) {
+    async openResourceVersion(version: number, type: string) {
+        this.downloadActions.push(
+            {
+                id: 'converted',
+                icon: 'fas fa-file-pdf',
+                label: this.translate.instant('lang.pdfFormat')
+            }
+        );
+        await this.getOriginalFileInfos(version);
         const title = type !== 'PDF' ? this.translate.instant('lang.' + type + '_version') : `${this.translate.instant('lang.version')} ${version}`;
         // TO SHOW ORIGINAL DOC (because autoload signed doc)
         type = type === 'SIGN' ? 'PDF' : type;
-
         this.http.get(`../rest/resources/${this.resId}/content/${version}?type=${type}`).pipe(
             tap((data: any) => {
-                this.dialog.open(DocumentViewerModalComponent, {
+                const dialogRef = this.dialog.open(DocumentViewerModalComponent, {
                     autoFocus: false,
                     panelClass: 'maarch-full-height-modal',
                     data: {
                         title: `${title}`,
                         base64: data.encodedDocument,
                         filename: data.filename,
-                        version: version,
-                        resId: this.resId
+                        downloadActions: this.downloadActions,
                     }
                 });
+
+                dialogRef.afterClosed().pipe(
+                    tap(() => {
+                        this.downloadActions = [];
+                    })
+                ).subscribe();
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
@@ -1298,5 +1282,64 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     openMaarchParapheurWorkflow() {
         this.dialog.open(VisaWorkflowModalComponent, { panelClass: 'maarch-modal', data: { id: this.resId, type: 'resource', linkedToMaarchParapheur: true } });
+    }
+
+    getOriginalFileInfos(version: number) {
+        return new Promise((resolve) => {
+            Promise.all([this.versionsInformations(version), this.fileInformation()]).then((result: any) => {
+                if (result[0] === 'SIGN' && !this.functions.empty(result[1])) {
+                    this.http.get(`../rest/resources/${this.resId}/originalContent?mode=base64`).pipe(
+                        tap((data: any) => {
+                            this.downloadActions.push(
+                                {
+                                    id: 'original',
+                                    icon: 'fas fa-file-word',
+                                    label: `${this.translate.instant('lang.format')} ${this.format}`,
+                                    fileData: data
+                                }
+                            );
+                            resolve(true);
+                        }),
+                        catchError((err: any) => {
+                            this.notify.handleSoftErrors(err);
+                            return of(false);
+                        })
+                    ).subscribe();
+                } else {
+                    this.downloadActions = [];
+                }
+                resolve(true);
+            });
+        });
+    }
+
+    versionsInformations(version: number) {
+        return new Promise((resolve) => {
+            this.http.get(`../rest/resources/${this.resId}/versionsInformations`).pipe(
+                tap((result: any) => {
+                    this.status = result.SIGN.find((id: any) => id === version) !== undefined && result.DOC.find((id: any) => id === version) !== undefined ? 'SIGN' : '';
+                    resolve(this.status);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    fileInformation() {
+        return new Promise((resolve) => {
+            this.http.get(`../rest/resources/${this.resId}/fileInformation`).pipe(
+                tap((infos: any) => {
+                    this.format = this.allowedExtensionsMailing.indexOf(infos.information.format) > -1 ? infos.information.format : '';
+                    resolve(this.format);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 }
