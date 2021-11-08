@@ -44,10 +44,10 @@
             [disabled]="!editMode">
             <div *ngIf="!loading && file.content !== null && !hideTools" class="viewer-tools">
                 <!-- Download original file with pdf/original format -->
-                <button *ngIf="downloadActions.length > 0" mat-icon-button [matMenuTriggerFor]="menuOptions" [matTooltip]="'lang.downloadOriginalFile' | translate">
+                <button *ngIf="downloadActions.length > 0" mat-icon-button [matMenuTriggerFor]="formatListMenu" [matTooltip]="'lang.downloadOriginalFile' | translate">
                     <mat-icon class="fa fa-download"></mat-icon>
                 </button>
-                <mat-menu #menuOptions="matMenu" [class]="'optionsListMenu'">
+                <mat-menu #formatListMenu="matMenu" [class]="'optionsListMenu'">
                     <ng-container *ngFor="let action of downloadActions">
                         <button mat-menu-item (click)="action.id === 'original' ? downloadOriginalFile(action.fileData) : downloadConvertedFile()">
                             <mat-icon color="primary" [class]="action.icon"></mat-icon>
