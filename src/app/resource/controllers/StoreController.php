@@ -204,7 +204,10 @@ class StoreController
             $externalId = json_encode($args['externalId']);
         }
 
-        $integrations = ['inSignatureBook' => false, 'inShipping' => false];
+        //SGAMI-DEBUT TICKET #73
+        //$integrations = ['inSignatureBook' => false, 'inShipping' => false];
+        $integrations = ['inSignatureBook' => true, 'inShipping' => false];
+        //SGAMI-FIN
         if (!empty($args['integrations']) && !empty($args['encodedFile'])) {
             $integrations['inSignatureBook'] = !empty($args['integrations']['inSignatureBook']);
             $integrations['inShipping'] = !empty($args['integrations']['inShipping']);
