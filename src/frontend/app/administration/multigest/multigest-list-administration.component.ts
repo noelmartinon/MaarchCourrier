@@ -55,8 +55,8 @@ export class MultigestListAdministrationComponent implements OnInit {
 
         this.loading = true;
 
-        // this.getApiUri();
-        // await this.getAccounts();
+        this.getApiUri();
+        await this.getAccounts();
 
         this.loading = false;
 
