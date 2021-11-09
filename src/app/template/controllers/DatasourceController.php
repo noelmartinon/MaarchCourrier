@@ -124,6 +124,7 @@ class DatasourceController
                 $contact = ContactModel::getById(['id' => $resourceContacts['item_id'], 'select' => ['*']]);
         
                 $postalAddress = ContactController::getContactAfnor($contact);
+                
                 unset($postalAddress[0]);
                 $contact['postal_address'] = implode("\n", $postalAddress);
             }
