@@ -17,7 +17,7 @@ use Action\models\ActionModel;
 use Action\models\BasketPersistenceModel;
 use Action\models\ResMarkAsReadModel;
 use Alfresco\controllers\AlfrescoController;
-use Multigest\controllers\MultigestConttroller;
+use Multigest\controllers\MultigestController;
 use Attachment\models\AttachmentModel;
 use Attachment\models\AttachmentTypeModel;
 use Basket\models\BasketModel;
