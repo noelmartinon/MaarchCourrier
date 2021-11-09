@@ -491,6 +491,7 @@ $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/ac
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkCloseWithFieldsAction', \Action\controllers\PreProcessActionController::class . ':checkCloseWithFieldsAction');
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkReconcile', \Action\controllers\PreProcessActionController::class . ':checkReconcile');
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkSendAlfresco', \Action\controllers\PreProcessActionController::class . ':checkSendAlfresco');
+$app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkSendMultigest', \Action\controllers\PreProcessActionController::class . ':checkSendMultigest');
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/actions/{actionId}/checkPrintDepositList', \Action\controllers\PreProcessActionController::class . ':checkPrintDepositList');
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/checkAcknowledgementRecordManagement', \Action\controllers\PreProcessActionController::class . ':checkAcknowledgementRecordManagement');
 $app->post('/resourcesList/users/{userId}/groups/{groupId}/baskets/{basketId}/checkReplyRecordManagement', \Action\controllers\PreProcessActionController::class . ':checkReplyRecordManagement');
@@ -661,6 +662,17 @@ $app->post('/alfresco/checkAccounts', \Alfresco\controllers\AlfrescoController::
 $app->get('/alfresco/rootFolders', \Alfresco\controllers\AlfrescoController::class . ':getRootFolders');
 $app->get('/alfresco/folders/{id}/children', \Alfresco\controllers\AlfrescoController::class . ':getChildrenFoldersById');
 $app->get('/alfresco/autocomplete/folders', \Alfresco\controllers\AlfrescoController::class . ':getFolders');
+
+//Multigest
+$app->get('/multigest/configuration', \Multigest\controllers\MultigestController::class . ':getConfiguration');
+$app->put('/multigest/configuration', \Multigest\controllers\MultigestController::class . ':updateConfiguration');
+$app->get('/multigest/accounts', \Multigest\controllers\MultigestController::class . ':getAccounts');
+$app->get('/multigest/availableEntities', \Multigest\controllers\MultigestController::class . ':getAvailableEntities');
+$app->post('/multigest/accounts', \Multigest\controllers\MultigestController::class . ':createAccount');
+$app->get('/multigest/accounts/{id}', \Multigest\controllers\MultigestController::class . ':getAccountById');
+$app->put('/multigest/accounts/{id}', \Multigest\controllers\MultigestController::class . ':updateAccount');
+$app->delete('/multigest/accounts/{id}', \Multigest\controllers\MultigestController::class . ':deleteAccount');
+$app->post('/multigest/checkAccounts', \Multigest\controllers\MultigestController::class . ':checkAccount');
 
 // Collabora Online
 $app->get('/wopi/files/{id}/contents', \ContentManagement\controllers\CollaboraOnlineController::class . ':getFileContent');
