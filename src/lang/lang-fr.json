@@ -2554,5 +2554,7 @@
     "documentHasNoChrono": "Ce courrier n’a pas de numéro chrono",
     "documentNotFoundOnDocserver": "Fichier introuvable dans l’espace de stockage",
     "docserverDocumentNotReadable": "Fichier illisible sur l’espace de stockage",
-    "soapClientCreationError": "Erreur de lancement de la communication SOAP"
+    "soapClientCreationError": "Erreur de lancement de la communication SOAP",
+    "alreadySentToMultigest": "Courrier déjà envoyé à Multigest",
+    "noMultigestAccount": "Aucun compte Multigest associé à l’entité"
 }
