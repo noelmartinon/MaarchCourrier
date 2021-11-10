@@ -23,7 +23,6 @@ class TextFormatModel
 
         $a = 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿŔŕ';
         $b = 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybyRr';
-        $test = 'ok';
         $string = utf8_decode($aArgs['string']);
         $string = strtr($string, utf8_decode($a), $b);
         $string = strtolower($string);
