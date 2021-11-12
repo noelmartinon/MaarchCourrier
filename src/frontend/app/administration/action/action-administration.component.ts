@@ -192,6 +192,8 @@ export class ActionAdministrationComponent implements OnInit {
                         } else if (this.action.actionPageId === 'send_shipping') {
                             if (!this.functions.empty(this.action.parameters.intermediateStatus)) {
                                 this.selectIntermidiateStatusId.setValue(this.action.parameters.intermediateStatus.actionStatus);
+                                this.selectSuccessStatusId.setValue(this.action.parameters.finalStatus.actionStatus);
+                                this.selectErrorStatusId.setValue(this.action.parameters.errorStatus.actionStatus);
                                 this.getSelectedStatus(this.action.parameters.intermediateStatus.mailevaStatus, 'intermediateStatus');
                                 this.getSelectedStatus(this.action.parameters.finalStatus.mailevaStatus, 'finalStatus');
                                 this.getSelectedStatus(this.action.parameters.errorStatus.mailevaStatus, 'errorStatus');
