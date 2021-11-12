@@ -52,37 +52,37 @@ export class ActionAdministrationComponent implements OnInit {
     mailevaStatus: any[] = [
         {
             id: 'ON_STATUS_ACCEPTED',
-            label: 'Accepté',
+            label: this.translate.instant('lang.ON_STATUS_ACCEPTED'),
             actionStatus: null,
             disabled: false
         },
         {
             id: 'ON_STATUS_REJECTED',
-            label: 'Refusé',
+            label: this.translate.instant('lang.ON_STATUS_REJECTED'),
             actionStatus: null,
             disabled: false
         },
         {
             id: 'ON_STATUS_PROCESSED',
-            label: 'Traité',
+            label: this.translate.instant('lang.ON_STATUS_PROCESSED'),
             actionStatus: null,
             disabled: false
         },
         {
             id: 'ON_DEPOSIT_PROOF_RECEIVED',
-            label: 'Preuve de dépot obtenue',
+            label: this.translate.instant('lang.ON_DEPOSIT_PROOF_RECEIVED'),
             actionStatus: null,
             disabled: false
         },
         {
             id: 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED',
-            label: 'Avis de réception reçu',
+            label: this.translate.instant('lang.ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED'),
             actionStatus: null,
             disabled: false
         },
         {
             id: 'ON_STATUS_ARCHIVED',
-            label: 'Archivé',
+            label: this.translate.instant('lang.ON_STATUS_ARCHIVED'),
             actionStatus: null,
             disabled: false
         },
@@ -114,8 +114,6 @@ export class ActionAdministrationComponent implements OnInit {
         this.setIntermediateStatus();
         this.setFinalStatus();
         this.setErrorStatus();
-
-        console.log(this.intermediateStatusParams);
 
         this.route.params.subscribe(params => {
 
@@ -307,7 +305,7 @@ export class ActionAdministrationComponent implements OnInit {
 
     getSelectedStatus(mailevaStatus: any[], actionStatus: string) {
         if (actionStatus === 'intermediateStatus') {
-            Object.freeze(this.intermediateStatusParams);
+            this.checkSelection(mailevaStatus, 'intermediateStatus');
             this.setIntermediateStatus(mailevaStatus);
             this.finalStatusParams.data.forEach((element: any) => {
                 element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled ? true : false;
@@ -315,21 +313,24 @@ export class ActionAdministrationComponent implements OnInit {
             this.errorStatusParams.data.forEach((element: any) => {
                 element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled ? true : false;
             });
+
         } else if (actionStatus === 'finalStatus') {
+            this.checkSelection(mailevaStatus, 'finalStatus');
             this.setFinalStatus(mailevaStatus);
             this.intermediateStatusParams.data.forEach((element: any) => {
-                element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled ? true : false;
+                element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled  ? true : false;
             });
             this.errorStatusParams.data.forEach((element: any) => {
-                element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled ? true : false;
+                element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled  ? true : false;
             });
         } else if (actionStatus === 'errorStatus') {
+            this.checkSelection(mailevaStatus, 'errorStatus');
             this.setErrorStatus(mailevaStatus);
             this.intermediateStatusParams.data.forEach((element: any) => {
-                element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled ? true : false;
+                element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled  ? true : false;
             });
             this.finalStatusParams.data.forEach((element: any) => {
-                element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled ? true : false;
+                element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled  ? true : false;
             });
         }
     }
@@ -342,9 +343,10 @@ export class ActionAdministrationComponent implements OnInit {
             });
             this.intermediateSelectedStatus = this.mailevaStatus.filter((item: any) => item.actionStatus === 'intermediateStatus').map((el: any) => el.id);
         } else {
+            const data: any = JSON.parse(JSON.stringify(this.mailevaStatus));
             this.intermediateStatusParams = {
                 id: 'intermediateStatus',
-                data: this.mailevaStatus
+                data: data
             };
         }
     }
@@ -356,11 +358,13 @@ export class ActionAdministrationComponent implements OnInit {
                 element.actionStatus = mailevaStatus.indexOf(element.id) > -1 ? 'finalStatus' : null;
             });
             this.finalSelectedStatus = this.mailevaStatus.filter((item: any) => item.actionStatus === 'finalStatus').map((el: any) => el.id);
+        } else {
+            const data: any = JSON.parse(JSON.stringify(this.mailevaStatus));
+            this.finalStatusParams = {
+                id: 'finalStatus',
+                data: data
+            };
         }
-        this.finalStatusParams = {
-            id: 'finalStatus',
-            data: this.mailevaStatus
-        };
     }
 
     setErrorStatus(mailevaStatus: any[] = null) {
@@ -370,10 +374,37 @@ export class ActionAdministrationComponent implements OnInit {
                 element.actionStatus = mailevaStatus.indexOf(element.id) > -1 ? 'errorStatus' : null;
             });
             this.errorSelectedStatus = this.mailevaStatus.filter((item: any) => item.actionStatus === 'errorStatus').map((el: any) => el.id);
+        } else {
+            const data: any = JSON.parse(JSON.stringify(this.mailevaStatus));
+            this.errorStatusParams = {
+                id: 'errorStatus',
+                data: data
+            };
         }
-        this.errorStatusParams = {
-            id: 'errorStatus',
-            data: this.mailevaStatus
-        };
+    }
+
+    checkSelection(mailevaStatus: any[], actionStatus: string) {
+        if (actionStatus === 'intermediateStatus') {
+            const array: any[] = this.intermediateStatusParams.data.filter((item: any) => item.actionStatus === 'intermediateStatus').map((el: any) => el.id);
+            const deselectedItem: string = array.filter((element: any) => !mailevaStatus.includes(element)).toString();
+            if (!this.functions.empty(deselectedItem)) {
+                this.finalStatusParams.data.find((el: any) => el.id === deselectedItem).disabled = false;
+                this.errorStatusParams.data.find((el: any) => el.id === deselectedItem).disabled = false;
+            }
+        } else if (actionStatus === 'finalStatus') {
+            const array: any[] = this.finalStatusParams.data.filter((item: any) => item.actionStatus === 'finalStatus').map((el: any) => el.id);
+            const deselectedItem: string = array.filter((element: any) => !mailevaStatus.includes(element)).toString();
+            if (!this.functions.empty(deselectedItem)) {
+                this.intermediateStatusParams.data.find((el: any) => el.id === deselectedItem).disabled = false;
+                this.errorStatusParams.data.find((el: any) => el.id === deselectedItem).disabled = false;
+            }
+        } else if (actionStatus === 'errorStatus') {
+            const array: any[] = this.errorStatusParams.data.filter((item: any) => item.actionStatus === 'errorStatus').map((el: any) => el.id);
+            const deselectedItem: string = array.filter((element: any) => !mailevaStatus.includes(element)).toString();
+            if (!this.functions.empty(deselectedItem)) {
+                this.intermediateStatusParams.data.find((el: any) => el.id === deselectedItem).disabled = false;
+                this.finalStatusParams.data.find((el: any) => el.id === deselectedItem).disabled = false;
+            }
+        }
     }
 }

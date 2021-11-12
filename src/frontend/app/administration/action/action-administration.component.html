@@ -70,7 +70,7 @@
                             </div>
                             <!-- Maileva status -->
                             <div *ngIf="action.actionPageId === 'send_shipping'"  class="col-sm-6">
-                                <app-select-with-filter #intermediateStatus
+                                <app-select-with-filter #intermediateStatus [required]="true"
                                     name="linkedIntermediateStatus" [label]="'lang.mailevaStatus' | translate"
                                     [(ngModel)]="intermediateSelectedStatus" [array]="intermediateStatusParams.data" [multiple]="true" (selectionChange)="getSelectedStatus($event, 'intermediateStatus')">
                                 </app-select-with-filter>
@@ -86,7 +86,7 @@
                             </div>
                             <!-- Maileva status -->
                             <div *ngIf="action.actionPageId === 'send_shipping'"  class="col-sm-6">
-                                <app-select-with-filter #finalStatus
+                                <app-select-with-filter #finalStatus [required]="true"
                                     name="linkedFinalStatus" [label]="'lang.mailevaStatus' | translate"
                                     [(ngModel)]="finalSelectedStatus" [array]="finalStatusParams.data" [multiple]="true" (selectionChange)="getSelectedStatus($event, 'finalStatus')">
                                 </app-select-with-filter>
@@ -102,7 +102,7 @@
                             </div>
                             <!-- Maileva status -->
                             <div *ngIf="action.actionPageId === 'send_shipping'"  class="col-sm-6">
-                                <app-select-with-filter #errorStatus
+                                <app-select-with-filter #errorStatus [required]="true"
                                     name="linkedErrorStatus" [label]="'lang.mailevaStatus' | translate"
                                     [(ngModel)]="errorSelectedStatus" [array]="errorStatusParams.data" [multiple]="true" (selectionChange)="getSelectedStatus($event, 'errorStatus')">
                                 </app-select-with-filter>
