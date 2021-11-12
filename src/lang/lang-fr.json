@@ -2533,5 +2533,6 @@
     "goToContact": "Vous allez perdre vos modifications actuelles, voulez-vous vraiment continuer ?",
     "associateContact": "pour associer ce contact au courrier/pièce jointe.",
     "associateContactToDoc": "Associer ce contact au courrier/pièce jointe",
-    "toCopyInfos": "pour copier ses informations."
+    "toCopyInfos": "pour copier ses informations.",
+    "mailevaStatus": "Statut Maileva associé"
 }
