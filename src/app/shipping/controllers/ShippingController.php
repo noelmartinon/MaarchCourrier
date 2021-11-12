@@ -24,6 +24,8 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\LogsController;
 use User\models\UserModel;
+use Action\models\ActionModel;
+use Status\models\StatusModel;
 use SrcCore\models\CoreConfigModel;
 
 class ShippingController
@@ -115,6 +117,50 @@ class ShippingController
         $shippingApiDomainName = str_replace(['http://', 'https://'], '', $shippingApiDomainName);
         $shippingApiDomainName = rtrim($shippingApiDomainName, '/');
 
+        // get and validate action parameters
+        $actions = ActionModel::get([
+            'select' => ['parameters'],
+            'where'  => ['component = ?'],
+            'data'   => ['sendShippingAction'],
+            'limit'  => 1
+        ]);
+        if (empty($actions)) {
+            return ShippingController::logAndReturnError($response, 400, 'No Maileva action available');
+        }
+        $actionParameters = json_decode($actions[0]['parameters'], true);
+        $actionParameters = [
+            'intermediateStatus' => $actionParameters['intermediateStatus'] ?? null,
+            'errorStatus'        => $actionParameters['errorStatus'] ?? null,
+            'finalStatus'        => $actionParameters['finalStatus'] ?? null
+        ];
+        if (!Validator::each(Validator::arrayType())->validate($actionParameters)) {
+            return ShippingController::logAndReturnError($response, 400, 'Maileva action parameters are not arrays');
+        } elseif (
+                !Validator::stringType()->length(1, 10)->validate($actionParameters['intermediateStatus']['actionStatus'])
+                || ($actionParameters['intermediateStatus']['actionStatus'] !== '_NOSTATUS_'
+                && empty(StatusModel::getById(['id' => $actionParameters['intermediateStatus']['actionStatus'], 'select' => ['id']])))
+                ) {
+            return ShippingController::logAndReturnError($response, 400, 'Maileva action actionStatus is invalid for intermediateStatus');
+        } elseif (
+                !Validator::stringType()->length(1, 10)->validate($actionParameters['errorStatus']['actionStatus'])
+                || ($actionParameters['errorStatus']['actionStatus'] !== '_NOSTATUS_'
+                && empty(StatusModel::getById(['id' => $actionParameters['errorStatus']['actionStatus'], 'select' => ['id']])))
+                ) {
+            return ShippingController::logAndReturnError($response, 400, 'Maileva action actionStatus is invalid for errorStatus');
+        } elseif (
+                !Validator::stringType()->length(1, 10)->validate($actionParameters['finalStatus']['actionStatus'])
+                || ($actionParameters['finalStatus']['actionStatus'] !== '_NOSTATUS_'
+                && empty(StatusModel::getById(['id' => $actionParameters['finalStatus']['actionStatus'], 'select' => ['id']])))
+                ) {
+            return ShippingController::logAndReturnError($response, 400, 'Maileva action actionStatus is invalid for finalStatus');
+        } elseif (!Validator::each(Validator::in(ShippingController::MAILEVA_EVENT_TYPES))->validate($actionParameters['intermediateStatus']['mailevaStatus'])) {
+            return ShippingController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for intermediateStatus');
+        } elseif (!Validator::each(Validator::in(ShippingController::MAILEVA_EVENT_TYPES))->validate($actionParameters['errorStatus']['mailevaStatus'])) {
+            return ShippingController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for errorStatus');
+        } elseif (!Validator::each(Validator::in(ShippingController::MAILEVA_EVENT_TYPES))->validate($actionParameters['finalStatus']['mailevaStatus'])) {
+            return ShippingController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for finalStatus');
+        }
+
         // get and validate body
         $body = $request->getParsedBody();
         $error = null;
@@ -185,7 +231,15 @@ class ShippingController
             return ShippingController::logAndReturnError($response, 403, 'Document out of perimeter');
         }
 
-        return $response->withStatus(418);
+        // react to event
+        // TODO:
+        // write to shipping log
+        // set resource status in maarch
+        // if deposit proof, fetch it
+        // if acknowledgment of receipt, fetch it
+
+        // return
+        return $response->withStatus(204);
     }
 
     private static function logAndReturnError(Response $response, int $httpStatusCode, string $error)
