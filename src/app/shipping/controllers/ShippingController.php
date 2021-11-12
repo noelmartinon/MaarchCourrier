@@ -22,7 +22,7 @@ use Shipping\models\ShippingModel;
 use Shipping\models\ShippingTemplateModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
-use Resource\models\ResModel;
+use SrcCore\controllers\LogsController;
 use User\models\UserModel;
 use SrcCore\models\CoreConfigModel;
 
@@ -105,10 +105,11 @@ class ShippingController
     {
         // get maileva config
         $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
+        $error = null;
         if (empty($mailevaConfig)) {
-            return $response->withStatus(412)->withJson(['errors' => 'Maileva configuration does not exist']);
+            return ShippingController::logAndReturnError($response, 400, 'Maileva configuration does not exist');
         } elseif (!$mailevaConfig['enabled']) {
-            return $response->withStatus(412)->withJson(['errors' => 'Maileva configuration is disabled']);
+            return ShippingController::logAndReturnError($response, 400, 'Maileva configuration is disabled');
         }
         $shippingApiDomainName = $mailevaConfig['uri'];
         $shippingApiDomainName = str_replace(['http://', 'https://'], '', $shippingApiDomainName);
@@ -116,27 +117,32 @@ class ShippingController
 
         // get and validate body
         $body = $request->getParsedBody();
+        $error = null;
         if (!Validator::equals($shippingApiDomainName)->validate($body['source'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body source is different from the saved one']);
+            $error = 'Body source is different from the saved one';
         } elseif (!Validator::stringType()->length(1, 256)->validate($body['user_id'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body user_id is empty, too long, or not a string']);
+            $error = 'Body user_id is empty, too long, or not a string';
         } elseif (!Validator::stringType()->length(1, 256)->validate($body['client_id'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body client_id is empty, too long, or not a string']);
+            $error = 'Body client_id is empty, too long, or not a string';
         } elseif (!Validator::stringType()->in(ShippingController::MAILEVA_EVENT_TYPES)->validate($body['event_type'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body event_type is not an allowed value']);
+            $error = 'Body event_type is not an allowed value';
         } elseif (!Validator::stringType()->in(ShippingController::MAILEVA_RESOURCE_TYPES)->validate($body['resource_type'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body resource_type is not an allowed value']);
+            $error = 'Body resource_type is not an allowed value';
         } elseif (!Validator::date()->validate($body['event_date'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body event_date is not a valid date']);
+            $error = 'Body event_date is not a valid date';
         } elseif (!Validator::equals('FR')->validate($body['event_location'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body event_location is not FR']);
+            $error = 'Body event_location is not FR';
         } elseif (!Validator::stringType()->length(1, 256)->validate($body['resource_id'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body resource_id is empty, too long, or not a string']);
+            $error = 'Body resource_id is empty, too long, or not a string';
         } elseif (!Validator::url()->validate($body['resource_location'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body resource_location is not a valid url']);
+            $error = 'Body resource_location is not a valid url';
         } elseif (!Validator::intVal()->notEmpty()->validate($body['resource_custom_id'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body resource_custom_id is empty or not an integer']);
+            $error = 'Body resource_custom_id is empty or not an integer';
         }
+        if (!empty($error)) {
+            return ShippingController::logAndReturnError($response, 400, $error);
+        }
+
         $body = [
             'source'           => $body['source'],
             'userId'           => $body['user_id'],
@@ -156,7 +162,7 @@ class ShippingController
             'select' => ['entities.id']
         ]);
         if (empty($primaryEntity) || !Validator::intType()->validate($primaryEntity['id'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'User has no primary entity']);
+            return ShippingController::logAndReturnError($response, 400, 'User has no primary entity');
         }
         $shippingTemplates = ShippingTemplateModel::getByEntities([
             'entities' => [(string) $primaryEntity['id']],
@@ -170,15 +176,29 @@ class ShippingController
             }
         }
         if ($noMatchingTemplate) {
-            return $response->withStatus(400)->withJson(['errors' => 'Body clientId does not match any shipping template for this user']);
+            return ShippingController::logAndReturnError($response, 400, 'Body clientId does not match any shipping template for this user');
         }
 
         // identify resource and check permissions
         $resId = $body['resourceCustomId'];
         if (!ResController::hasRightByResId(['resId' => [$resId], 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+            return ShippingController::logAndReturnError($response, 403, 'Document out of perimeter');
         }
 
         return $response->withStatus(418);
+    }
+
+    private static function logAndReturnError(Response $response, int $httpStatusCode, string $error)
+    {
+        LogsController::add([
+            'isTech'    => true,
+            'moduleId'  => 'shipping',
+            'level'     => 'ERROR',
+            'tableName' => '',
+            'recordId'  => '',
+            'eventType' => 'Shipping webhook error: ' . $error,
+            'eventId'   => 'Shipping webhook error'
+        ]);
+        return $response->withStatus($httpStatusCode)->withJson(['errors' => $error]);
     }
 }
