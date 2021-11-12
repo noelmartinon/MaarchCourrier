@@ -27,7 +27,7 @@ class ValidatorModel
             if (Validator::stringType()->validate($args[$key]) && trim($args[$key]) == '' && $args[$key] != '') {
                 $args[$key] .= 'NOT_EMPTY';
             }
-            if (Validator::stringType()->validate($args[$key]) && trim($args[$key]) == '0') {
+            if (Validator::stringType()->validate($args[$key]) && trim($args[$key]) == '0' && $args[$key] != '0') {
                 $args[$key] .= 'NOT_EMPTY';
             }
             if (!Validator::notEmpty()->validate($args[$key])) {
