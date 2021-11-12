@@ -263,17 +263,17 @@ export class ActionAdministrationComponent implements OnInit {
                 {
                     id: 'intermediatetatus',
                     actionStatus: this.selectIntermidiateStatusId.value,
-                    mailevStatus: this.intermediateSelectedStatus
+                    mailevaStatus: this.intermediateSelectedStatus
                 },
                 {
                     id: 'finalStatus',
                     actionStatus: this.selectSuccessStatusId.value,
-                    mailevStatus: this.finalSelectedStatus
+                    mailevaStatus: this.finalSelectedStatus
                 },
                 {
                     id: 'errorStatus',
                     actionStatus: this.selectErrorStatusId.value,
-                    mailevStatus: this.errorSelectedStatus
+                    mailevaStatus: this.errorSelectedStatus
                 }
             ];
         } else if (this.intermediateStatusActions.indexOf(this.action.actionPageId) !== -1) {
