@@ -189,6 +189,13 @@ export class ActionAdministrationComponent implements OnInit {
                         } else if (this.action.actionPageId === 'create_acknowledgement_receipt') {
                             this.arMode = this.action.parameters.mode;
                             this.canAddCopies = this.action.parameters.canAddCopies;
+                        } else if (this.action.actionPageId === 'send_shipping') {
+                            if (this.action.parameters.length > 0) {
+                                const array: any[] = this.action.parameters;
+                                array.forEach((element: any) => {
+                                    this.getSelectedStatus(element.mailevStatus, element.actionStatus);
+                                });
+                            }
                         } else if (this.intermediateStatusActions.indexOf(this.action.actionPageId) !== -1) {
                             this.selectSuccessStatusId.setValue(this.action.parameters.successStatus);
                             this.selectErrorStatusId.setValue(this.action.parameters.errorStatus);
@@ -259,23 +266,23 @@ export class ActionAdministrationComponent implements OnInit {
         } else if (this.action.actionPageId === 'create_acknowledgement_receipt') {
             this.action.parameters = { mode: this.arMode, canAddCopies : this.canAddCopies };
         } else if (this.action.actionPageId === 'send_shipping') {
-            this.action.parameters = [
-                {
-                    id: 'intermediatetatus',
-                    actionStatus: this.selectIntermidiateStatusId.value,
-                    mailevaStatus: this.intermediateSelectedStatus
-                },
-                {
-                    id: 'finalStatus',
-                    actionStatus: this.selectSuccessStatusId.value,
-                    mailevaStatus: this.finalSelectedStatus
-                },
-                {
-                    id: 'errorStatus',
-                    actionStatus: this.selectErrorStatusId.value,
-                    mailevaStatus: this.errorSelectedStatus
-                }
-            ];
+            const intermediatetatus = {
+                actionStatus: this.selectIntermidiateStatusId.value,
+                mailevaStatus: this.intermediateSelectedStatus
+            };
+            const finalStatus = {
+                actionStatus: this.selectSuccessStatusId.value,
+                mailevaStatus: this.finalSelectedStatus
+            };
+            const errorStatus = {
+                actionStatus: this.selectErrorStatusId.value,
+                mailevaStatus: this.errorSelectedStatus
+            };
+            this.action.parameters = {
+                intermediatetatus: intermediatetatus,
+                finalStatus: finalStatus,
+                errorStatus: errorStatus
+            };
         } else if (this.intermediateStatusActions.indexOf(this.action.actionPageId) !== -1) {
             this.action.parameters = { successStatus: this.successStatus, errorStatus: this.errorStatus };
         }
