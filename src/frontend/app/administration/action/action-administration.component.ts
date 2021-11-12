@@ -190,11 +190,11 @@ export class ActionAdministrationComponent implements OnInit {
                             this.arMode = this.action.parameters.mode;
                             this.canAddCopies = this.action.parameters.canAddCopies;
                         } else if (this.action.actionPageId === 'send_shipping') {
-                            if (this.action.parameters.length > 0) {
-                                const array: any[] = this.action.parameters;
-                                array.forEach((element: any) => {
-                                    this.getSelectedStatus(element.mailevStatus, element.actionStatus);
-                                });
+                            if (!this.functions.empty(this.action.parameters.intermediateStatus)) {
+                                this.selectIntermidiateStatusId.setValue(this.action.parameters.intermediateStatus.actionStatus);
+                                this.getSelectedStatus(this.action.parameters.intermediateStatus.mailevaStatus, 'intermediateStatus');
+                                this.getSelectedStatus(this.action.parameters.finalStatus.mailevaStatus, 'finalStatus');
+                                this.getSelectedStatus(this.action.parameters.errorStatus.mailevaStatus, 'errorStatus');
                             }
                         } else if (this.intermediateStatusActions.indexOf(this.action.actionPageId) !== -1) {
                             this.selectSuccessStatusId.setValue(this.action.parameters.successStatus);
@@ -218,6 +218,7 @@ export class ActionAdministrationComponent implements OnInit {
         if (this.intermediateStatusActions.indexOf(this.action.actionPageId) !== -1) {
             this.selectSuccessStatusId.setValue('_NOSTATUS_');
             this.selectErrorStatusId.setValue('_NOSTATUS_');
+            this.selectIntermidiateStatusId.setValue('_NOSTATUS_');
         }
 
         return new Promise((resolve) => {
@@ -266,7 +267,7 @@ export class ActionAdministrationComponent implements OnInit {
         } else if (this.action.actionPageId === 'create_acknowledgement_receipt') {
             this.action.parameters = { mode: this.arMode, canAddCopies : this.canAddCopies };
         } else if (this.action.actionPageId === 'send_shipping') {
-            const intermediatetatus = {
+            const intermediateStatus = {
                 actionStatus: this.selectIntermidiateStatusId.value,
                 mailevaStatus: this.intermediateSelectedStatus
             };
@@ -279,7 +280,7 @@ export class ActionAdministrationComponent implements OnInit {
                 mailevaStatus: this.errorSelectedStatus
             };
             this.action.parameters = {
-                intermediatetatus: intermediatetatus,
+                intermediateStatus: intermediateStatus,
                 finalStatus: finalStatus,
                 errorStatus: errorStatus
             };
@@ -348,7 +349,7 @@ export class ActionAdministrationComponent implements OnInit {
             data.forEach((element: any, index: number) => {
                 element.actionStatus = mailevaStatus.indexOf(element.id) > -1 ? 'intermediateStatus' : null;
             });
-            this.intermediateSelectedStatus = this.mailevaStatus.filter((item: any) => item.actionStatus === 'intermediateStatus').map((el: any) => el.id);
+            this.intermediateSelectedStatus = mailevaStatus;
         } else {
             const data: any = JSON.parse(JSON.stringify(this.mailevaStatus));
             this.intermediateStatusParams = {
@@ -364,7 +365,7 @@ export class ActionAdministrationComponent implements OnInit {
             data.forEach((element: any, index: number) => {
                 element.actionStatus = mailevaStatus.indexOf(element.id) > -1 ? 'finalStatus' : null;
             });
-            this.finalSelectedStatus = this.mailevaStatus.filter((item: any) => item.actionStatus === 'finalStatus').map((el: any) => el.id);
+            this.finalSelectedStatus = mailevaStatus;
         } else {
             const data: any = JSON.parse(JSON.stringify(this.mailevaStatus));
             this.finalStatusParams = {
@@ -380,7 +381,7 @@ export class ActionAdministrationComponent implements OnInit {
             data.forEach((element: any, index: number) => {
                 element.actionStatus = mailevaStatus.indexOf(element.id) > -1 ? 'errorStatus' : null;
             });
-            this.errorSelectedStatus = this.mailevaStatus.filter((item: any) => item.actionStatus === 'errorStatus').map((el: any) => el.id);
+            this.errorSelectedStatus = mailevaStatus;
         } else {
             const data: any = JSON.parse(JSON.stringify(this.mailevaStatus));
             this.errorStatusParams = {
