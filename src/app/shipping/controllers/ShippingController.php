@@ -19,13 +19,33 @@ use Entity\models\EntityModel;
 use Resource\controllers\ResController;
 use Respect\Validation\Validator;
 use Shipping\models\ShippingModel;
+use Shipping\models\ShippingTemplateModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
+use Resource\models\ResModel;
 use User\models\UserModel;
+use SrcCore\models\CoreConfigModel;
 
 class ShippingController
 {
-    public static function getByResId(Request $request, Response $response, array $args)
+    public const MAILEVA_EVENT_TYPES = [
+        'ON_STATUS_ACCEPTED',
+        'ON_STATUS_REJECTED',
+        'ON_STATUS_PROCESSED',
+        'ON_DEPOSIT_PROOF_RECEIVED',
+        'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED',
+        'ON_STATUS_ARCHIVED'
+    ];
+
+    public const MAILEVA_RESOURCE_TYPES = [
+        'mail/v2/sendings',
+        'registered_mail/v2/sendings',
+        'simple_registered_mail/v1/sendings',
+        'lel/v2/sendings',
+        'lrc/v1/sendings'
+    ];
+
+    public function getByResId(Request $request, Response $response, array $args)
     {
         if (!Validator::intVal()->validate($args['resId']) || !ResController::hasRightByResId(['resId' => [$args['resId']], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
@@ -79,5 +99,86 @@ class ShippingController
         }
 
         return $response->withJson($shippings);
+    }
+
+    public function receiveNotification(Request $request, Response $response, array $args)
+    {
+        // get maileva config
+        $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
+        if (empty($mailevaConfig)) {
+            return $response->withStatus(412)->withJson(['errors' => 'Maileva configuration does not exist']);
+        } elseif (!$mailevaConfig['enabled']) {
+            return $response->withStatus(412)->withJson(['errors' => 'Maileva configuration is disabled']);
+        }
+        $shippingApiDomainName = $mailevaConfig['uri'];
+        $shippingApiDomainName = str_replace(['http://', 'https://'], '', $shippingApiDomainName);
+        $shippingApiDomainName = rtrim($shippingApiDomainName, '/');
+
+        // get and validate body
+        $body = $request->getParsedBody();
+        if (!Validator::equals($shippingApiDomainName)->validate($body['source'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body source is different from the saved one']);
+        } elseif (!Validator::stringType()->length(1, 256)->validate($body['user_id'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body user_id is empty, too long, or not a string']);
+        } elseif (!Validator::stringType()->length(1, 256)->validate($body['client_id'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body client_id is empty, too long, or not a string']);
+        } elseif (!Validator::stringType()->in(ShippingController::MAILEVA_EVENT_TYPES)->validate($body['event_type'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body event_type is not an allowed value']);
+        } elseif (!Validator::stringType()->in(ShippingController::MAILEVA_RESOURCE_TYPES)->validate($body['resource_type'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body resource_type is not an allowed value']);
+        } elseif (!Validator::date()->validate($body['event_date'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body event_date is not a valid date']);
+        } elseif (!Validator::equals('FR')->validate($body['event_location'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body event_location is not FR']);
+        } elseif (!Validator::stringType()->length(1, 256)->validate($body['resource_id'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body resource_id is empty, too long, or not a string']);
+        } elseif (!Validator::url()->validate($body['resource_location'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body resource_location is not a valid url']);
+        } elseif (!Validator::intVal()->notEmpty()->validate($body['resource_custom_id'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body resource_custom_id is empty or not an integer']);
+        }
+        $body = [
+            'source'           => $body['source'],
+            'userId'           => $body['user_id'],
+            'clientId'         => $body['client_id'],
+            'eventType'        => $body['event_type'],
+            'resourceType'     => $body['resource_type'],
+            'eventDate'        => $body['event_date'],
+            'eventLocation'    => $body['event_location'],
+            'resourceId'       => $body['resource_id'],
+            'resourceLocation' => $body['resource_location'],
+            'resourceCustomId' => $body['resource_custom_id']
+        ];
+
+        // check clientId
+        $primaryEntity = UserModel::getPrimaryEntityById([
+            'id'     => $GLOBALS['id'],
+            'select' => ['entities.id']
+        ]);
+        if (empty($primaryEntity) || !Validator::intType()->validate($primaryEntity['id'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'User has no primary entity']);
+        }
+        $shippingTemplates = ShippingTemplateModel::getByEntities([
+            'entities' => [(string) $primaryEntity['id']],
+            'select'   => ["account->>'id' as account_id"]
+        ]);
+        $noMatchingTemplate = true;
+        foreach ($shippingTemplates as $shippingTemplate) {
+            if (Validator::equals($shippingTemplate['account_id'])->validate($body['clientId'])) {
+                $noMatchingTemplate = false;
+                break;
+            }
+        }
+        if ($noMatchingTemplate) {
+            return $response->withStatus(400)->withJson(['errors' => 'Body clientId does not match any shipping template for this user']);
+        }
+
+        // identify resource and check permissions
+        $resId = $body['resourceCustomId'];
+        if (!ResController::hasRightByResId(['resId' => [$resId], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
+        return $response->withStatus(418);
     }
 }
