@@ -605,6 +605,10 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         } else {
             this.http.get(this.file.content).pipe(
                 tap((data: any) => {
+                    const formatFileName: any = data.filename.substring(0, data.filename.lastIndexOf('.'));
+                    if (formatFileName !== undefined) {
+                        data.filename = this.file.subinfos.signedDocVersions || this.file.subinfos.commentedDocVersions ? formatFileName : data.filename;
+                    }
                     downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
                     downloadLink.setAttribute('download', data.filename);
                     document.body.appendChild(downloadLink);
@@ -691,7 +695,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 this.requestWithLoader(`../rest/resources/${resId}/content?mode=base64`).subscribe(
                     (data: any) => {
                         if (data.encodedDocument) {
-                            const fileToDownload: string = !this.file.subinfos.signedDocVersions ? 'originalContent' : 'content';
+
+                            const fileToDownload: string = this.file.subinfos.signedDocVersions || this.file.subinfos.commentedDocVersions ? 'content' : 'originalContent';
                             this.file.contentMode = 'route';
                             this.file.name = `${data.filename}`;
                             this.file.format = data.originalFormat;

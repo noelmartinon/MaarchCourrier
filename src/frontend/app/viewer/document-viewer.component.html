@@ -56,7 +56,7 @@
                     </ng-container>
                 </mat-menu>
                 <!--  -->
-                <button *ngIf="downloadActions.length === 0" mat-icon-button (click)="downloadConvertedFile()" [matTooltip]="'lang.downloadOriginalFile' | translate">
+                <button *ngIf="downloadActions.length === 0" mat-icon-button (click)="downloadConvertedFile()" [matTooltip]="(resId !== null ? 'lang.downloadFile' : 'lang.downloadOriginalFile') | translate">
                     <mat-icon class="fa fa-download"></mat-icon>
                 </button>
                 <ng-container *ngIf="editMode && resId !== null && !noConvertedFound">

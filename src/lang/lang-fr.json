@@ -2525,5 +2525,6 @@
     "getProcessLimitDateSample": "<b color=\"warn\">3 jour(s)</b>",
     "getCreationDate":             "Date de création",
     "getCreationDateSample":       "1er janv.",
-    "pdfFormat": "Format pdf"
+    "pdfFormat": "Format pdf",
+    "downloadFile": "Télécharger le fichier"
 }
