@@ -43,6 +43,7 @@
             "ExternalSummary\\"         : "src/app/external/summary/",
             "Outlook\\"                 : "src/app/external/outlook/",
             "Sendmail\\"                : "modules/sendmail/",
+            "Multigest\\"               : "src/app/external/multigest/",
             "Noxxie\\PdfParser\\"       : "vendor/noxxie/pdfparser/src/Smalot/PdfParser/"
     	}
     },

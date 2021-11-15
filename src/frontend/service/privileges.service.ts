@@ -316,6 +316,15 @@ export class PrivilegeService {
             'style': 'fas fa-paperclip',
             'hasParams': false
         },
+        {
+            'id': 'admin_multigest',
+            'label': 'lang.multigest',
+            'comment': 'lang.adminMultigestDesc',
+            'route': '/administration/multigest',
+            'unit': 'supervision',
+            'style': 'multigest',
+            'hasParams': false
+        },
     ];
 
     private privileges: Privilege[] = [

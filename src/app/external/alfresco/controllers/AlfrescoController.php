@@ -173,7 +173,7 @@ class AlfrescoController
 
         foreach ($body['entities'] as $entity) {
             if (!Validator::intVal()->notEmpty()->validate($entity)) {
-                return $response->withStatus(400)->withJson(['errors' => 'Body entities contains no integer values']);
+                return $response->withStatus(400)->withJson(['errors' => 'Body entities contains non integer values']);
             }
         }
         $entities = EntityModel::get(['select' => ['id'], 'where' => ['id in (?)'], 'data' => [$body['entities']]]);
@@ -192,7 +192,7 @@ class AlfrescoController
         $account = json_encode($account);
 
         EntityModel::update([
-            'postSet'   => ['external_id' => "jsonb_set(external_id, '{alfresco}', '{$account}')"],
+            'postSet'   => ['external_id' => "jsonb_set(coalesce(external_id, '{}'::jsonb), '{alfresco}', '{$account}')"],
             'where'     => ['id in (?)'],
             'data'      => [$body['entities']]
         ]);
@@ -225,7 +225,7 @@ class AlfrescoController
 
         foreach ($body['entities'] as $entity) {
             if (!Validator::intVal()->notEmpty()->validate($entity)) {
-                return $response->withStatus(400)->withJson(['errors' => 'Body entities contains no integer values']);
+                return $response->withStatus(400)->withJson(['errors' => 'Body entities contains non integer values']);
             }
         }
         $entities = EntityModel::get(['select' => ['id'], 'where' => ['id in (?)'], 'data' => [$body['entities']]]);
@@ -250,7 +250,7 @@ class AlfrescoController
         ]);
 
         EntityModel::update([
-            'postSet'   => ['external_id' => "jsonb_set(external_id, '{alfresco}', '{$account}')"],
+            'postSet'   => ['external_id' => "jsonb_set(coalesce(external_id, '{}'::jsonb), '{alfresco}', '{$account}')"],
             'where'     => ['id in (?)'],
             'data'      => [$body['entities']]
         ]);

@@ -6,7 +6,7 @@ interface actionPages {
     'label': string; // title
     'name': string; // name
     'component': string; // action service component
-    'category': 'application' | 'acknowledgementReceipt' | 'externalSignatoryBook' | 'visa' | 'avis' | 'maileva' | 'alfresco' | 'registeredMail' | 'recordManagement'; // category
+    'category': 'application' | 'acknowledgementReceipt' | 'externalSignatoryBook' | 'visa' | 'avis' | 'maileva' | 'alfresco' | 'multigest' | 'registeredMail' | 'recordManagement'; // category
     'description': string; // description
 }
 
@@ -237,6 +237,14 @@ export class ActionPagesService {
             'component': 'sendAlfrescoAction',
             'category': 'alfresco',
             'description': this.translate.instant('lang.sendAlfresco')
+        },
+        {
+            'id': 'send_multigest',
+            'label': this.translate.instant('lang.sendMultigest'),
+            'name': 'send_multigest',
+            'component': 'sendMultigestAction',
+            'category': 'multigest',
+            'description': this.translate.instant('lang.sendMultigest')
         },
         {
             'id': 'saveRegisteredMail',

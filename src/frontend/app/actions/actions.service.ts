@@ -36,6 +36,7 @@ import { HeaderService } from '@service/header.service';
 import { FunctionsService } from '@service/functions.service';
 import { ReconcileActionComponent } from './reconciliation-action/reconcile-action.component';
 import { SendAlfrescoActionComponent } from './send-alfresco-action/send-alfresco-action.component';
+import { SendMultigestActionComponent } from './send-multigest-action/send-multigest-action.component';
 import { SaveRegisteredMailActionComponent } from './save-registered-mail-action/save-registered-mail-action.component';
 import { SaveAndPrintRegisteredMailActionComponent } from './save-and-print-registered-mail-action/save-and-print-registered-mail-action.component';
 import { SaveAndIndexRegisteredMailActionComponent } from './save-and-index-registered-mail-action/save-and-index-registered-mail-action.component';
@@ -966,6 +967,29 @@ export class ActionsService implements OnDestroy {
 
     sendAlfrescoAction(options: any = null) {
         const dialogRef = this.dialog.open(SendAlfrescoActionComponent, {
+            panelClass: 'maarch-modal',
+            autoFocus: false,
+            disableClose: true,
+            data: this.setDatasActionToSend()
+        });
+        dialogRef.afterClosed().pipe(
+            tap((data: any) => {
+                this.unlockResourceAfterActionModal(data);
+            }),
+            filter((data: string) => data === 'success'),
+            tap((result: any) => {
+                this.endAction(result);
+            }),
+            finalize(() => this.loading = false),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    sendMultigestAction(options: any = null) {
+        const dialogRef = this.dialog.open(SendMultigestActionComponent, {
             panelClass: 'maarch-modal',
             autoFocus: false,
             disableClose: true,

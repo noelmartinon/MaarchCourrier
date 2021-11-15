@@ -58,6 +58,8 @@ import { SsoAdministrationComponent } from './connection/sso/sso-administration.
 import { AttachmentTypeAdministrationComponent } from './attachment/attachment-type-administration.component';
 import { AttachmentTypesAdministrationComponent } from './attachment/attachment-types-administration.component';
 import { OrganizationEmailSignaturesAdministrationComponent } from './organizationEmailSignatures/organization-email-signatures-administration.component';
+import { MultigestListAdministrationComponent } from './multigest/multigest-list-administration.component';
+import { MultigestAdministrationComponent } from './multigest/multigest-administration.component';
 
 
 @NgModule({
@@ -128,6 +130,9 @@ import { OrganizationEmailSignaturesAdministrationComponent } from './organizati
             { path: 'administration/alfresco', canActivate: [AppGuard], component: AlfrescoListAdministrationComponent },
             { path: 'administration/alfresco/new', canActivate: [AppGuard], component: AlfrescoAdministrationComponent },
             { path: 'administration/alfresco/:id', canActivate: [AppGuard], component: AlfrescoAdministrationComponent },
+            { path: 'administration/multigest', canActivate: [AppGuard], component: MultigestListAdministrationComponent },
+            { path: 'administration/multigest/new', canActivate: [AppGuard], component: MultigestAdministrationComponent },
+            { path: 'administration/multigest/:id', canActivate: [AppGuard], component: MultigestAdministrationComponent },
             { path: 'administration/registeredMails', canActivate: [AppGuard], component: RegisteredMailListComponent },
             { path: 'administration/registeredMails/new', canActivate: [AppGuard], component: RegisteredMailComponent },
             { path: 'administration/registeredMails/:id', canActivate: [AppGuard], component: RegisteredMailComponent },
