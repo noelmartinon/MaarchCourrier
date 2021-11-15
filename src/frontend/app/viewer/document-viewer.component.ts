@@ -691,11 +691,12 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 this.requestWithLoader(`../rest/resources/${resId}/content?mode=base64`).subscribe(
                     (data: any) => {
                         if (data.encodedDocument) {
+                            const fileToDownload: string = !this.file.subinfos.signedDocVersions ? 'originalContent' : 'content';
                             this.file.contentMode = 'route';
                             this.file.name = `${data.filename}`;
                             this.file.format = data.originalFormat;
                             this.file.signatoryId = data.signatoryId;
-                            this.file.content = `../rest/resources/${resId}/originalContent?mode=base64`;
+                            this.file.content = `../rest/resources/${resId}/${fileToDownload}?mode=base64`;
                             this.file.contentView = `../rest/resources/${resId}/content?mode=base64`;
                             this.file.src = this.base64ToArrayBuffer(data.encodedDocument);
                             this.loading = false;
