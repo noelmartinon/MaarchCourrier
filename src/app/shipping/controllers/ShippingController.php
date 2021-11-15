@@ -17,6 +17,7 @@ namespace Shipping\controllers;
 use Attachment\models\AttachmentModel;
 use Entity\models\EntityModel;
 use Resource\controllers\ResController;
+use Resource\models\ResModel;
 use Respect\Validation\Validator;
 use Shipping\models\ShippingModel;
 use Shipping\models\ShippingTemplateModel;
@@ -105,7 +106,6 @@ class ShippingController
 
     public function receiveNotification(Request $request, Response $response, array $args)
     {
-        // get maileva config
         $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
         $error = null;
         if (empty($mailevaConfig)) {
@@ -117,7 +117,6 @@ class ShippingController
         $shippingApiDomainName = str_replace(['http://', 'https://'], '', $shippingApiDomainName);
         $shippingApiDomainName = rtrim($shippingApiDomainName, '/');
 
-        // get and validate action parameters
         $actions = ActionModel::get([
             'select' => ['parameters'],
             'where'  => ['component = ?'],
@@ -161,7 +160,6 @@ class ShippingController
             return ShippingController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for finalStatus');
         }
 
-        // get and validate body
         $body = $request->getParsedBody();
         $error = null;
         if (!Validator::equals($shippingApiDomainName)->validate($body['source'])) {
@@ -188,7 +186,6 @@ class ShippingController
         if (!empty($error)) {
             return ShippingController::logAndReturnError($response, 400, $error);
         }
-
         $body = [
             'source'           => $body['source'],
             'userId'           => $body['user_id'],
@@ -202,7 +199,6 @@ class ShippingController
             'resourceCustomId' => $body['resource_custom_id']
         ];
 
-        // check clientId
         $primaryEntity = UserModel::getPrimaryEntityById([
             'id'     => $GLOBALS['id'],
             'select' => ['entities.id']
@@ -225,16 +221,43 @@ class ShippingController
             return ShippingController::logAndReturnError($response, 400, 'Body clientId does not match any shipping template for this user');
         }
 
-        // identify resource and check permissions
-        $resId = $body['resourceCustomId'];
+        $shippingId = $body['resourceCustomId'];
+        $shipping = ShippingModel::get([
+            'select' => ['document_id', 'history'],
+            'where'  => ['id = ?'],
+            'data'   => [$shippingId]
+        ]);
+        if (empty($shipping)) {
+            return ShippingController::logAndReturnError($response, 400, 'Body resource_custom_id does not match any shipping');
+        }
+        $shipping = $shipping[0];
+        $resId = $shipping['document_id'];
         if (!ResController::hasRightByResId(['resId' => [$resId], 'userId' => $GLOBALS['id']])) {
             return ShippingController::logAndReturnError($response, 403, 'Document out of perimeter');
         }
 
-        // react to event
-        // TODO:
-        // write to shipping log
-        // set resource status in maarch
+        $shippingHistory = json_decode($shipping['history'], true);
+        $shippingHistory[] = $body;
+        ShippingModel::update([
+            'set'   => ['history' => json_encode($shippingHistory)],
+            'where' => ['id = ?'],
+            'data'  => [$shippingId]
+        ]);
+
+        foreach ($actionParameters as $statuses) {
+            if (in_array($body['eventType'], $statuses['mailevaStatus'])) {
+                if ($statuses['actionStatus'] == '_NOSTATUS_') {
+                    break;
+                }
+                ResModel::update([
+                    'set'   => ['status' => $statuses['actionStatus']],
+                    'where' => ['res_id = ?'],
+                    'data'  => [$resId]
+                ]);
+                break;
+            }
+        }
+
         // if deposit proof, fetch it
         // if acknowledgment of receipt, fetch it
 

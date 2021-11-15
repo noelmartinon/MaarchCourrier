@@ -61,4 +61,20 @@ class ShippingModel
 
         return $shippings;
     }
+
+    public static function update(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['where', 'data']);
+        ValidatorModel::arrayType($args, ['set', 'postSet', 'where', 'data']);
+
+        DatabaseModel::update([
+            'table'     => 'shippings',
+            'set'       => $args['set'] ?? null,
+            'postSet'   => $args['postSet'] ?? null,
+            'where'     => $args['where'],
+            'data'      => $args['data']
+        ]);
+
+        return true;
+    }
 }
