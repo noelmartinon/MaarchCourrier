@@ -26,8 +26,11 @@ use Slim\Http\Response;
 use SrcCore\controllers\LogsController;
 use User\models\UserModel;
 use Action\models\ActionModel;
+use Shipping\controllers\ShippingController as ControllersShippingController;
 use Status\models\StatusModel;
 use SrcCore\models\CoreConfigModel;
+use SrcCore\models\CurlModel;
+use SrcCore\models\PasswordModel;
 
 class ShippingController
 {
@@ -192,9 +195,9 @@ class ShippingController
             'clientId'         => $body['client_id'],
             'eventType'        => $body['event_type'],
             'resourceType'     => $body['resource_type'],
+            'resourceId'       => $body['resource_id'],
             'eventDate'        => $body['event_date'],
             'eventLocation'    => $body['event_location'],
-            'resourceId'       => $body['resource_id'],
             'resourceLocation' => $body['resource_location'],
             'resourceCustomId' => $body['resource_custom_id']
         ];
@@ -208,11 +211,12 @@ class ShippingController
         }
         $shippingTemplates = ShippingTemplateModel::getByEntities([
             'entities' => [(string) $primaryEntity['id']],
-            'select'   => ["account->>'id' as account_id"]
+            'select'   => ['account']
         ]);
         $noMatchingTemplate = true;
         foreach ($shippingTemplates as $shippingTemplate) {
-            if (Validator::equals($shippingTemplate['account_id'])->validate($body['clientId'])) {
+            $shippingTemplateAccount = json_decode($shippingTemplate['account'], true);
+            if (Validator::equals($shippingTemplateAccount['id'])->validate($body['clientId'])) {
                 $noMatchingTemplate = false;
                 break;
             }
@@ -221,36 +225,54 @@ class ShippingController
             return ShippingController::logAndReturnError($response, 400, 'Body clientId does not match any shipping template for this user');
         }
 
-        $shippingId = $body['resourceCustomId'];
-        $shipping = ShippingModel::get([
-            'select' => ['document_id', 'history'],
-            'where'  => ['id = ?'],
-            'data'   => [$shippingId]
-        ]);
-        if (empty($shipping)) {
-            return ShippingController::logAndReturnError($response, 400, 'Body resource_custom_id does not match any shipping');
+        if ($body['eventType'] == 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED') {
+            $shipping = ShippingModel::getByRecipientId([
+                'select'      => ['id', 'sending_id', 'document_id', 'history', 'recipients'],
+                'recipientId' => $body['resourceId']
+            ]);
+            if (empty($shipping[0])) {
+                return ShippingController::logAndReturnError($response, 400, 'Body resource_id does not match any shipping recipient');
+            }
+            $shipping = $shipping[0];
+            $shipping['recipients'] = json_decode($shipping['recipients'], true);
+            foreach ($shipping['recipients'] as $recipientValue) {
+                if ($recipientValue['recipientId'] == $body['resourceId']) {
+                    $recipient = $recipientValue;
+                    break;
+                }
+            }
+        } else {
+            $shipping = ShippingModel::get([
+                'select' => ['id', 'sending_id', 'document_id', 'history', 'recipients'],
+                'where'  => ['sending_id = ?'],
+                'data'   => [$body['resourceId']]
+            ]);
+            if (empty($shipping[0])) {
+                return ShippingController::logAndReturnError($response, 400, 'Body resource_id does not match any shipping');
+            }
+            $shipping = $shipping[0];
+            $shipping['recipients'] = json_decode($shipping['recipients'], true);
         }
-        $shipping = $shipping[0];
         $resId = $shipping['document_id'];
         if (!ResController::hasRightByResId(['resId' => [$resId], 'userId' => $GLOBALS['id']])) {
             return ShippingController::logAndReturnError($response, 403, 'Document out of perimeter');
         }
 
-        $shippingHistory = json_decode($shipping['history'], true);
-        $shippingHistory[] = $body;
+        $shipping['history'] = json_decode($shipping['history'], true);
+        $shipping['history'][] = $body;
         ShippingModel::update([
-            'set'   => ['history' => json_encode($shippingHistory)],
+            'set'   => ['history' => json_encode($shipping['history'])],
             'where' => ['id = ?'],
-            'data'  => [$shippingId]
+            'data'  => [$shipping['id']]
         ]);
 
-        foreach ($actionParameters as $statuses) {
-            if (in_array($body['eventType'], $statuses['mailevaStatus'])) {
-                if ($statuses['actionStatus'] == '_NOSTATUS_') {
+        foreach ($actionParameters as $phaseStatuses) {
+            if (in_array($body['eventType'], $phaseStatuses['mailevaStatus'])) {
+                if ($phaseStatuses['actionStatus'] == '_NOSTATUS_') {
                     break;
                 }
                 ResModel::update([
-                    'set'   => ['status' => $statuses['actionStatus']],
+                    'set'   => ['status' => $phaseStatuses['actionStatus']],
                     'where' => ['res_id = ?'],
                     'data'  => [$resId]
                 ]);
@@ -258,10 +280,36 @@ class ShippingController
             }
         }
 
-        // if deposit proof, fetch it
-        // if acknowledgment of receipt, fetch it
+        if ($body['eventType'] == 'ON_DEPOSIT_PROOF_RECEIVED') {
+            $authToken = ShippingController::getMailevaAuthToken($mailevaConfig, $shippingTemplateAccount);
+            $curlResponse = CurlModel::exec([
+                'method'     => 'GET',
+                'url'        => $body['resourceLocation'] . '/download_deposit_proof',
+                'bearerAuth' => ['token' => $authToken],
+                'headers'    => ['Accept: application/zip']
+            ]);
+            if ($curlResponse['code'] < 200 || $curlResponse['code'] >= 300) {
+                return ShippingController::logAndReturnError($response, 400, 'deposit proof failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId']]));
+            }
+            // TODO save $curlResponse['response'] to docservers
+        }
 
-        // return
+        if ($body['eventType'] == 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED') {
+            if (empty($authToken)) {
+                $authToken = ShippingController::getMailevaAuthToken($mailevaConfig, $shippingTemplateAccount);
+            }
+            $curlResponse = CurlModel::exec([
+                'method'     => 'GET',
+                'url'        => $mailevaConfig['uri'] . $recipient['acknowledgement_of_receipt_url'],
+                'bearerAuth' => ['token' => $authToken],
+                'headers'    => ['Accept: application/zip']
+            ]);
+            if ($curlResponse['code'] < 200 || $curlResponse['code'] >= 300) {
+                return ShippingController::logAndReturnError($response, 400, 'acknowledgement of receipt failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId'], 'recipientId' => $recipient['id']]));
+            }
+            // TODO save $curlResponse['response'] to docservers
+        }
+
         return $response->withStatus(204);
     }
 
@@ -277,5 +325,24 @@ class ShippingController
             'eventId'   => 'Shipping webhook error'
         ]);
         return $response->withStatus($httpStatusCode)->withJson(['errors' => $error]);
+    }
+
+    private static function getMailevaAuthToken(array $mailevaConfig, array $shippingTemplateAccount) {
+        $curlAuth = CurlModel::exec([
+            'url'           => $mailevaConfig['connectionUri'] . '/authentication/oauth2/token',
+            'basicAuth'     => ['user' => $mailevaConfig['clientId'], 'password' => $mailevaConfig['clientSecret']],
+            'headers'       => ['Content-Type: application/x-www-form-urlencoded'],
+            'method'        => 'POST',
+            'queryParams'   => [
+                'grant_type'    => 'password',
+                'username'      => $shippingTemplateAccount['id'],
+                'password'      => PasswordModel::decrypt(['cryptedPassword' => $shippingTemplateAccount['password']])
+            ]
+        ]);
+        if ($curlAuth['code'] != 200) {
+            return ['errors' => ['Maileva authentication failed']];
+        }
+        $token = $curlAuth['response']['access_token'];
+        return $token;
     }
 }

@@ -21,14 +21,15 @@ class ShippingModel
 {
     public static function create(array $args)
     {
-        ValidatorModel::notEmpty($args, ['userId', 'documentId', 'documentType', 'accountId', 'recipients']);
+        ValidatorModel::notEmpty($args, ['userId', 'sendingId', 'documentId', 'documentType', 'accountId', 'recipients']);
         ValidatorModel::intVal($args, ['userId', 'documentId', 'recipientEntityId']);
-        ValidatorModel::stringType($args, ['accountId', 'documentType', 'recipients']);
+        ValidatorModel::stringType($args, ['sendingId', 'accountId', 'documentType', 'recipients']);
 
         DatabaseModel::insert([
             'table'         => 'shippings',
             'columnsValues' => [
                 'user_id'               => $args['userId'],
+                'sending_id'            => $args['sendingId'],
                 'document_id'           => $args['documentId'],
                 'document_type'         => $args['documentType'],
                 'options'               => $args['options'],
@@ -60,6 +61,25 @@ class ShippingModel
         ]);
 
         return $shippings;
+    }
+
+    public static function getByRecipientId(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['select', 'recipientId']);
+        ValidatorModel::arrayType($args, ['select', 'orderBy']);
+        ValidatorModel::intType($args, ['limit']);
+        ValidatorModel::stringType($args, ['recipientId']);
+
+        $args['where'] = [
+            'recipients @@ \'$[*].recipientId == "' . $args['recipientId'] . '"\''
+        ];
+
+        return ShippingModel::get([
+            'select'  => $args['select'],
+            'where'   => $args['where'],
+            'orderBy' => $args['orderBy'],
+            'limit'   => $args['limit']
+        ]);
     }
 
     public static function update(array $args)

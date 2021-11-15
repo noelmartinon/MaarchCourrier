@@ -307,6 +307,8 @@ trait ShippingTrait
                     $errors[] = "Maileva recipient creation failed for resource {$resId}";
                     continue;
                 }
+                $contact[$key]['recipientId'] = $createRecipient['response']['id'];
+                $contact[$key]['acknowledgement_of_receipt_url'] = $createRecipient['response']['acknowledgement_of_receipt_url'];
                 $recipients[] = $contacts[$key];
             } else {
                 foreach ($contacts[$key] as $contact) {
@@ -329,6 +331,8 @@ trait ShippingTrait
                         $errors[] = "Maileva recipient creation failed for resource {$resId}";
                         continue 2;
                     }
+                    $contact['recipientId'] = $createRecipient['response']['id'];
+                    $contact['acknowledgement_of_receipt_url'] = $createRecipient['response']['acknowledgement_of_receipt_url'];
                     $recipients[] = $contact;
                 }
             }
@@ -379,6 +383,7 @@ trait ShippingTrait
 
             ShippingModel::create([
                 'userId'            => $GLOBALS['id'],
+                'sendingId'         => $sendingId,
                 'documentId'        => $resId,
                 'documentType'      => $resource['type'],
                 'options'           => json_encode($shippingTemplate['options']),
