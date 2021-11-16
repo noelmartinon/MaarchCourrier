@@ -26,6 +26,7 @@ use Slim\Http\Response;
 use SrcCore\controllers\LogsController;
 use User\models\UserModel;
 use Action\models\ActionModel;
+use Docserver\controllers\DocserverController;
 use Shipping\controllers\ShippingController as ControllersShippingController;
 use Status\models\StatusModel;
 use SrcCore\models\CoreConfigModel;
@@ -279,6 +280,9 @@ class ShippingController
 
         if ($body['eventType'] == 'ON_DEPOSIT_PROOF_RECEIVED') {
             $authToken = ShippingController::getMailevaAuthToken($mailevaConfig, $shippingTemplateAccount);
+            if (!empty($authToken['errors'])) {
+                return ShippingController::logAndReturnError($response, 400, $authToken['errors']);
+            }
             $curlResponse = CurlModel::exec([
                 'method'     => 'GET',
                 'url'        => $body['resourceLocation'] . '/download_deposit_proof',
@@ -288,12 +292,23 @@ class ShippingController
             if ($curlResponse['code'] < 200 || $curlResponse['code'] >= 300) {
                 return ShippingController::logAndReturnError($response, 400, 'deposit proof failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId']]));
             }
-            // TODO save $curlResponse['response'] to docservers
+            $storage = DocserverController::storeResourceOnDocServer([
+                'collId'          => 'attachments_coll',
+                'docserverTypeId' => 'DOC',
+                'encodedResource' => base64_encode($curlResponse['response']),
+                'format'          => 'zip'
+            ]);
+            if (!empty($storage['errors'])) {
+                return ShippingController::logAndReturnError($response, 500, 'could not save deposit proof to docserver');
+            }
         }
 
         if ($body['eventType'] == 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED') {
             if (empty($authToken)) {
                 $authToken = ShippingController::getMailevaAuthToken($mailevaConfig, $shippingTemplateAccount);
+                if (!empty($authToken['errors'])) {
+                    return ShippingController::logAndReturnError($response, 400, $authToken['errors']);
+                }
             }
             $curlResponse = CurlModel::exec([
                 'method'     => 'GET',
@@ -304,7 +319,15 @@ class ShippingController
             if ($curlResponse['code'] < 200 || $curlResponse['code'] >= 300) {
                 return ShippingController::logAndReturnError($response, 400, 'acknowledgement of receipt failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId'], 'recipientId' => $recipient['id']]));
             }
-            // TODO save $curlResponse['response'] to docservers
+            $storage = DocserverController::storeResourceOnDocServer([
+                'collId'          => 'attachments_coll',
+                'docserverTypeId' => 'DOC',
+                'encodedResource' => base64_encode($curlResponse['response']),
+                'format'          => 'zip'
+            ]);
+            if (!empty($storage['errors'])) {
+                return ShippingController::logAndReturnError($response, 500, 'could not save acknowledgement of receipt to docserver');
+            }
         }
 
         return $response->withStatus(204);
@@ -337,7 +360,7 @@ class ShippingController
             ]
         ]);
         if ($curlAuth['code'] != 200) {
-            return ['errors' => ['Maileva authentication failed']];
+            return ['errors' => 'Maileva authentication failed'];
         }
         $token = $curlAuth['response']['access_token'];
         return $token;
