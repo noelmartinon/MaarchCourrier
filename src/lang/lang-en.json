@@ -25,7 +25,7 @@
     "PRE": "Back from absence",
     "RESETPSW": "Password reset",
     "SIGN": "Sign document",
-    "SIGN_version": "Original version",
+    "SIGN_version": "Unsigned version",
     "SPH": "Superior",
     "UNSIGN": "Un-sign document",
     "UP": "Update",
@@ -2624,5 +2624,7 @@
     "documentHasNoChrono": "This document has no chrono identifier",
     "documentNotFoundOnDocserver": "Document not found on document server",
     "docserverDocumentNotReadable": "Document could not be read from document server",
-    "soapClientCreationError": "Error while initiating SOAP client"
+    "soapClientCreationError": "Error while initiating SOAP client",
+    "downloadFile": "Download file",
+    "pdfFormat": "pdf format"
 }
