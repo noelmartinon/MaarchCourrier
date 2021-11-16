@@ -183,8 +183,6 @@ class ShippingController
             $error = 'Body resource_id is empty, too long, or not a string';
         } elseif (!Validator::url()->validate($body['resource_location'])) {
             $error = 'Body resource_location is not a valid url';
-        } elseif (!Validator::intVal()->notEmpty()->validate($body['resource_custom_id'])) {
-            $error = 'Body resource_custom_id is empty or not an integer';
         }
         if (!empty($error)) {
             return ShippingController::logAndReturnError($response, 400, $error);
@@ -198,8 +196,7 @@ class ShippingController
             'resourceId'       => $body['resource_id'],
             'eventDate'        => $body['event_date'],
             'eventLocation'    => $body['event_location'],
-            'resourceLocation' => $body['resource_location'],
-            'resourceCustomId' => $body['resource_custom_id']
+            'resourceLocation' => $body['resource_location']
         ];
 
         $primaryEntity = UserModel::getPrimaryEntityById([
