@@ -788,8 +788,7 @@ class MultigestController
             AttachmentModel::update(['set' => ['external_id' => json_encode($externalId)], 'where' => ['res_id = ?'], 'data' => [$attachment['res_id']]]);
         }
 
-        $message = " (envoyé avec l’UID MultiGest {$multigestUIDs['document']})";
-        return ['history' => $message];
+        return true;
     }
 
     public static function getResourceField(array $document, string $field, array $rawContacts) {
