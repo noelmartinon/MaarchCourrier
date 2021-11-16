@@ -25,7 +25,7 @@
     "PRE": "Back from absence",
     "RESETPSW": "Password reset",
     "SIGN": "Sign document",
-    "SIGN_version": "Original version",
+    "SIGN_version": "Unsigned version",
     "SPH": "Superior",
     "UNSIGN": "Un-sign document",
     "UP": "Update",
@@ -2204,5 +2204,7 @@
     "setContactInfos": "Access the contact details sheet",
     "goToContact": "You will lose your current changes, are you sure you want to continue?",
     "associateContact": "to associate the contact with the mail / attachment.",
-    "associateContactToDoc": "Associate the contact with the mail / attachment"
+    "associateContactToDoc": "Associate the contact with the mail / attachment",
+    "downloadFile": "Download file",
+    "pdfFormat": "pdf format"
 }

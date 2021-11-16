@@ -83,6 +83,11 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     @Input() attachType: string = null;
 
     /**
+     * Download actions
+     */
+     @Input() downloadActions: any[] = [];
+
+    /**
      * Event emitter
      */
     @Output() triggerEvent = new EventEmitter<string>();
@@ -123,6 +128,21 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         message: '',
     };
 
+    allowedExtensionsMailing: string[] = [
+        'doc',
+        'docx',
+        'dotx',
+        'odt',
+        'ott',
+        'html',
+        'xlsl',
+        'xlsx',
+        'xltx',
+        'ods',
+        'ots',
+        'csv',
+    ];
+
     dialogRef: MatDialogRef<any>;
     editor: any = {
         mode: '',
@@ -134,6 +154,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     };
 
     isDocModified: boolean = false;
+
+    status: string = '';
 
     @ViewChild('templateList', { static: true }) templateList: PluginSelectSearchComponent;
     @ViewChild('onlyofficeViewer', { static: false }) onlyofficeViewer: EcplOnlyofficeViewerComponent;
@@ -555,7 +577,15 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         }
     }
 
-    downloadOriginalFile() {
+    downloadOriginalFile(data: any) {
+        const downloadLink = document.createElement('a');
+        downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
+        downloadLink.setAttribute('download', data.filename);
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+    }
+
+    downloadConvertedFile() {
         const downloadLink = document.createElement('a');
         if (this.file.contentMode === 'base64') {
             downloadLink.href = `data:${this.file.type};base64,${this.file.content}`;
@@ -565,6 +595,10 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         } else {
             this.http.get(this.file.content).pipe(
                 tap((data: any) => {
+                    const formatFileName: any = data.filename.substring(0, data.filename.lastIndexOf('.'));
+                    if (formatFileName !== undefined) {
+                        data.filename = this.file.subinfos.signedDocVersions || this.file.subinfos.commentedDocVersions ? formatFileName : data.filename;
+                    }
                     downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
                     downloadLink.setAttribute('download', data.filename);
                     document.body.appendChild(downloadLink);
@@ -651,11 +685,12 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 this.requestWithLoader(`../rest/resources/${resId}/content?mode=base64`).subscribe(
                     (data: any) => {
                         if (data.encodedDocument) {
+                            const fileToDownload: string = this.file.subinfos.signedDocVersions || this.file.subinfos.commentedDocVersions ? 'content' : 'originalContent';
                             this.file.contentMode = 'route';
                             this.file.name = `${data.filename}`;
                             this.file.format = data.originalFormat;
                             this.file.signatoryId = data.signatoryId;
-                            this.file.content = `../rest/resources/${resId}/originalContent?mode=base64`;
+                            this.file.content = `../rest/resources/${resId}/${fileToDownload}?mode=base64`;
                             this.file.contentView = `../rest/resources/${resId}/content?mode=base64`;
                             this.file.src = this.base64ToArrayBuffer(data.encodedDocument);
                             this.loading = false;
@@ -1150,8 +1185,15 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         });
     }
 
-    openResourceVersion(version: number, type: string) {
-
+    async openResourceVersion(version: number, type: string) {
+        this.downloadActions.push(
+            {
+                id: 'converted',
+                icon: 'fas fa-file-pdf',
+                label: this.translate.instant('lang.pdfFormat')
+            }
+        );
+        await this.getOriginalFileInfos(version);
         const title = type !== 'PDF' ? this.translate.instant('lang.' + type + '_version') : `${this.translate.instant('lang.version')} ${version}`;
 
         // TO SHOW ORIGINAL DOC (because autoload signed doc)
@@ -1159,7 +1201,22 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
         this.http.get(`../rest/resources/${this.resId}/content/${version}?type=${type}`).pipe(
             tap((data: any) => {
-                this.dialog.open(DocumentViewerModalComponent, { autoFocus: false, panelClass: 'maarch-full-height-modal', data: { title: `${title}`, base64: data.encodedDocument, filename: data.filename } });
+                const dialogRef = this.dialog.open(DocumentViewerModalComponent, {
+                    autoFocus: false,
+                    panelClass: 'maarch-full-height-modal',
+                    data: {
+                        title: `${title}`,
+                        base64: data.encodedDocument,
+                        filename: data.filename,
+                        downloadActions: this.downloadActions,
+                    }
+                });
+
+                dialogRef.afterClosed().pipe(
+                    tap(() => {
+                        this.downloadActions = [];
+                    })
+                ).subscribe();
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
@@ -1195,5 +1252,64 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     openMaarchParapheurWorkflow() {
         this.dialog.open(VisaWorkflowModalComponent, { panelClass: 'maarch-modal', data: { id: this.resId, type: 'resource' } });
+    }
+
+    getOriginalFileInfos(version: number) {
+        return new Promise((resolve) => {
+            Promise.all([this.versionsInformations(version), this.fileInformation()]).then((result: any) => {
+                if (result[0] === 'SIGN' && !this.functions.empty(result[1])) {
+                    this.http.get(`../rest/resources/${this.resId}/originalContent?mode=base64`).pipe(
+                        tap((data: any) => {
+                            this.downloadActions.push(
+                                {
+                                    id: 'original',
+                                    icon: 'fas fa-file-word',
+                                    label: `${this.translate.instant('lang.format')} ${this.format}`,
+                                    fileData: data
+                                }
+                            );
+                            resolve(true);
+                        }),
+                        catchError((err: any) => {
+                            this.notify.handleSoftErrors(err);
+                            return of(false);
+                        })
+                    ).subscribe();
+                } else {
+                    this.downloadActions = [];
+                }
+                resolve(true);
+            });
+        });
+    }
+
+    versionsInformations(version: number) {
+        return new Promise((resolve) => {
+            this.http.get(`../rest/resources/${this.resId}/versionsInformations`).pipe(
+                tap((result: any) => {
+                    this.status = result.SIGN.find((id: any) => id === version) !== undefined && result.DOC.find((id: any) => id === version) !== undefined ? 'SIGN' : '';
+                    resolve(this.status);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    fileInformation() {
+        return new Promise((resolve) => {
+            this.http.get(`../rest/resources/${this.resId}/fileInformation`).pipe(
+                tap((infos: any) => {
+                    this.format = this.allowedExtensionsMailing.indexOf(infos.information.format) > -1 ? infos.information.format : '';
+                    resolve(this.format);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 }

@@ -443,9 +443,19 @@ class ResController extends ResourceControlController
         $creatorId      = $document['typist'];
         $subject        = $document['subject'];
 
-        $convertedDocument = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['resId'], 'collId' => 'letterbox_coll']);
-        if (!empty($convertedDocument['errors'])) {
-            return $response->withStatus(400)->withJson(['errors' => 'Conversion error : ' . $convertedDocument['errors']]);
+        $signedDocument = AdrModel::getDocuments([
+            'select'    => ['id', 'docserver_id', 'path', 'filename', 'fingerprint'],
+            'where'     => ['res_id = ?', 'type = ?', 'version = ?'],
+            'data'      => [$args['resId'], 'SIGN', $document['version']],
+            'limit'     => 1
+        ]);
+        if (!empty($signedDocument[0]) && !empty($signedDocuments[0]['id'])) {
+            $convertedDocument = $signedDocument[0];
+        } else {
+            $convertedDocument = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['resId'], 'collId' => 'letterbox_coll']);
+            if (!empty($convertedDocument['errors'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Conversion error : ' . $convertedDocument['errors']]);
+            }
         }
 
         $document = $convertedDocument;
@@ -646,14 +656,6 @@ class ResController extends ResourceControlController
             return $response->withStatus(400)->withJson(['errors' => 'Document has no file']);
         }
         $subject = $document['subject'];
-
-        $convertedDocument = AdrModel::getDocuments([
-            'select'    => ['docserver_id', 'path', 'filename', 'fingerprint'],
-            'where'     => ['res_id = ?', 'type = ?', 'version = ?'],
-            'data'      => [$args['resId'], 'SIGN', $document['version']],
-            'limit'     => 1
-        ]);
-        $document = $convertedDocument[0] ?? $document;
 
         $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
         if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
