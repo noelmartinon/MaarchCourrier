@@ -814,15 +814,19 @@ export class IndexingFormComponent implements OnInit {
                                     await this.getCurrentInitiator(elem, fieldValue);
                                 }
 
-                                if (elem.type === 'date' && !this.functions.empty(fieldValue)) {
-                                    fieldValue = new Date(fieldValue);
-                                } else{
-                                    elem.default_value = null;
-                                    this.arrFormControl[elem.identifier].value = null;
+                                if (elem.type === 'date') {
+                                    if (!this.functions.empty(fieldValue)) {
+                                        fieldValue = new Date(fieldValue);
+                                    } else {
+                                        elem.default_value = null;
+                                        this.arrFormControl[elem.identifier].value = null;
+                                    }
                                 }
+
                                 if (!this.functions.empty(fieldValue)) {
                                     this.arrFormControl[elem.identifier].setValue(fieldValue);
                                 }
+
                             } else if (!saveResourceState && elem.identifier === 'destination') {
                                 this.arrFormControl[elem.identifier].disable();
                                 this.arrFormControl[elem.identifier].setValidators([]);
