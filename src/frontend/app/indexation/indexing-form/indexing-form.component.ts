@@ -815,7 +815,8 @@ export class IndexingFormComponent implements OnInit {
                                 }
 
                                 if (elem.type === 'date') {
-                                    if (!this.functions.empty(fieldValue)) {
+                                    if (!this.functions.empty(fieldValue) || elem.default_value !== null) {
+                                        fieldValue = elem.default_value !== null ? elem.default_value : fieldValue;
                                         fieldValue = new Date(fieldValue);
                                     } else {
                                         elem.default_value = null;
