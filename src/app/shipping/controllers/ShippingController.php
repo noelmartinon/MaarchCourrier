@@ -27,7 +27,6 @@ use SrcCore\controllers\LogsController;
 use User\models\UserModel;
 use Action\models\ActionModel;
 use Docserver\controllers\DocserverController;
-use Shipping\controllers\ShippingController as ControllersShippingController;
 use Status\models\StatusModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
@@ -49,7 +48,9 @@ class ShippingController
         'registered_mail/v2/sendings',
         'simple_registered_mail/v1/sendings',
         'lel/v2/sendings',
-        'lrc/v1/sendings'
+        'lrc/v1/sendings',
+        'registered_mail/v2/recipients',
+        'simple_registered_mail/v1/recipients'
     ];
 
     public function getByResId(Request $request, Response $response, array $args)
@@ -225,7 +226,7 @@ class ShippingController
 
         if ($body['eventType'] == 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED') {
             $shipping = ShippingModel::getByRecipientId([
-                'select'      => ['id', 'sending_id', 'document_id', 'history', 'recipients'],
+                'select'      => ['id', 'sending_id', 'document_id', 'history', 'recipients', 'attachments'],
                 'recipientId' => $body['resourceId']
             ]);
             if (empty($shipping[0])) {
@@ -241,7 +242,7 @@ class ShippingController
             }
         } else {
             $shipping = ShippingModel::get([
-                'select' => ['id', 'sending_id', 'document_id', 'history', 'recipients'],
+                'select' => ['id', 'sending_id', 'document_id', 'history', 'recipients', 'attachments'],
                 'where'  => ['sending_id = ?'],
                 'data'   => [$body['resourceId']]
             ]);
@@ -256,6 +257,7 @@ class ShippingController
             return ShippingController::logAndReturnError($response, 403, 'Document out of perimeter');
         }
 
+        $shipping['attachments'] = json_decode($shipping['attachments'], true);
         $shipping['history'] = json_decode($shipping['history'], true);
         $shipping['history'][] = $body;
         ShippingModel::update([
@@ -301,6 +303,13 @@ class ShippingController
             if (!empty($storage['errors'])) {
                 return ShippingController::logAndReturnError($response, 500, 'could not save deposit proof to docserver');
             }
+            $storage['shipping_attachment_type'] = 'DEPOSIT_PROOF';
+            $shipping['attachments'][] = $storage;
+            ShippingModel::update([
+                'set'   => ['attachments' => json_encode($shipping['attachments'])],
+                'where' => ['id = ?'],
+                'data'  => [$shipping['id']]
+            ]);
         }
 
         if ($body['eventType'] == 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED') {
@@ -328,6 +337,13 @@ class ShippingController
             if (!empty($storage['errors'])) {
                 return ShippingController::logAndReturnError($response, 500, 'could not save acknowledgement of receipt to docserver');
             }
+            $storage['shipping_attachment_type'] = 'ACKNOWLEDGEMENT_OF_RECEIPT';
+            $shipping['attachments'][] = $storage;
+            ShippingModel::update([
+                'set'   => ['attachments' => json_encode($shipping['attachments'])],
+                'where' => ['id = ?'],
+                'data'  => [$shipping['id']]
+            ]);
         }
 
         return $response->withStatus(204);
