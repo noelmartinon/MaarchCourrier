@@ -512,6 +512,8 @@ $app->post('/administration/shippings', \Shipping\controllers\ShippingTemplateCo
 $app->put('/administration/shippings/{id}', \Shipping\controllers\ShippingTemplateController::class . ':update');
 $app->delete('/administration/shippings/{id}', \Shipping\controllers\ShippingTemplateController::class . ':delete');
 $app->post('/shippings/notifications', \Shipping\controllers\ShippingController::class . ':receiveNotification');
+$app->get('/shippings/{shippingId}/attachments', \Shipping\controllers\ShippingController::class . ':getShippingAttachmentsList');
+$app->get('/shippings/{shippingId}/attachments/{attachmentId}', \Shipping\controllers\ShippingController::class . ':getShippingAttachment');
 
 //SignatureBook
 $app->get('/signatureBook/users/{userId}/groups/{groupId}/baskets/{basketId}/resources', \SignatureBook\controllers\SignatureBookController::class . ':getResources');

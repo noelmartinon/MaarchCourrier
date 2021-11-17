@@ -28,6 +28,7 @@ use User\models\UserModel;
 use Action\models\ActionModel;
 use Docserver\controllers\DocserverController;
 use Status\models\StatusModel;
+use Docserver\models\DocserverModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
 use SrcCore\models\PasswordModel;
@@ -347,6 +348,81 @@ class ShippingController
         }
 
         return $response->withStatus(204);
+    }
+
+    public function getShippingAttachmentsList(Request $request, Response $response, array $args)
+    {
+        $shipping = ShippingModel::get([
+            'select' => ['id', 'document_id', 'attachments'],
+            'where'  => ['id = ?'],
+            'data'   => [$args['shippingId']]
+        ]);
+        if (empty($shipping[0])) {
+            return $response->withStatus(400)->withJson(['errors' => 'no shipping with this id']);
+        }
+        $shipping = $shipping[0];
+        $shipping['attachments'] = json_decode($shipping['attachments'], true);
+
+        if (!ResController::hasRightByResId(['resId' => [$shipping['document_id']], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
+        $attachments = [];
+        foreach ($shipping['attachments'] as $key => $attachment) {
+            if (empty($attachments[$attachment['shipping_attachment_type']])) {
+                $attachments[$attachment['shipping_attachment_type']] = [];
+            }
+            $attachments[$attachment['shipping_attachment_type']][] = [
+                'id' => $key
+            ];
+        }
+        return $response->withStatus(200)->withJson(['attachments' => $attachments]);
+    }
+
+    public function getShippingAttachment(Request $request, Response $response, array $args)
+    {
+        $shipping = ShippingModel::get([
+            'select' => ['id', 'document_id', 'attachments'],
+            'where'  => ['id = ?'],
+            'data'   => [$args['shippingId']]
+        ]);
+        if (empty($shipping[0])) {
+            return $response->withStatus(400)->withJson(['errors' => 'no shipping with this id']);
+        }
+        $shipping = $shipping[0];
+        $shipping['attachments'] = json_decode($shipping['attachments'], true);
+
+        if (!ResController::hasRightByResId(['resId' => [$shipping['document_id']], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
+        if (empty($shipping['attachments'][$args['attachmentId']])) {
+            return $response->withStatus(400)->withJson(['errors' => 'no shipping attachment with this id']);
+        }
+
+        $attachment = $shipping['attachments'][$args['attachmentId']];
+
+        $docserver = DocserverModel::get([
+            'select' => ['path_template'],
+            'where'  => ['docserver_id = ?'],
+            'data'   => [$attachment['docserver_id']]
+        ]);
+        if (empty($docserver[0])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Docserver not found']);
+        }
+        $docserver = $docserver[0];
+        $filepath = $docserver['path_template'] . $attachment['directory'] . $attachment['file_destination_name'];
+        $extension = explode('.', $filepath);
+        $extension = array_pop($extension);
+        $filename = $attachment['shipping_attachment_type'] . '_' . $shipping['id'] . '_' . $args['attachmentId'] . '.' . $extension;
+
+        $fileContent = file_get_contents($filepath);
+        if (empty($fileContent)) {
+            return $response->withStatus(400)->withJson(['errors' => 'file does not exist or is unreadable']);
+        }
+        $response->write($fileContent);
+
+        return $response->withStatus(200)->withHeader('Content-Disposition', 'attachment; filename=' . $filename);
     }
 
     private static function logAndReturnError(Response $response, int $httpStatusCode, string $error)
