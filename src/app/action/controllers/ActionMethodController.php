@@ -603,9 +603,9 @@ class ActionMethodController
 
         $opinionLimitDate = new \DateTime($args['data']['opinionLimitDate']);
         $today = new \DateTime('today');
-        if ($opinionLimitDate < $today) {
-            return ['errors' => ["Opinion limit date is not a valid date"]];
-        }
+        // if ($opinionLimitDate < $today) {
+        //     return ['errors' => ["Opinion limit date is not a valid date"]];
+        // }
 
         ResModel::update([
             'set'   => ['opinion_limit_date' => $args['data']['opinionLimitDate']],
@@ -632,9 +632,9 @@ class ActionMethodController
 
         $opinionLimitDate = new \DateTime($args['data']['opinionLimitDate']);
         $today = new \DateTime('today');
-        if ($opinionLimitDate < $today) {
-            return ['errors' => ["Opinion limit date is not a valid date"]];
-        }
+        // if ($opinionLimitDate < $today) {
+        //     return ['errors' => ["Opinion limit date is not a valid date"]];
+        // }
 
         if (empty($args['data']['opinionCircuit'])) {
             return ['errors' => "opinionCircuit is empty"];
@@ -789,9 +789,9 @@ class ActionMethodController
 
         $opinionLimitDate = new \DateTime($args['data']['opinionLimitDate']);
         $today = new \DateTime('today');
-        if ($opinionLimitDate < $today) {
-            return ['errors' => ["Opinion limit date is not a valid date"]];
-        }
+        // if ($opinionLimitDate < $today) {
+        //     return ['errors' => ["Opinion limit date is not a valid date"]];
+        // }
 
         $latestNote = NoteModel::get([
             'where'  => ['identifier = ?', "note_text like '[" . _TO_AVIS . "]%'"],
