@@ -390,7 +390,8 @@ trait ShippingTrait
                 'fee'               => $fee,
                 'recipientEntityId' => $recipientEntity['id'],
                 'accountId'         => $shippingTemplate['account']['id'],
-                'recipients'        => json_encode($recipients)
+                'recipients'        => json_encode($recipients),
+                'actionId'          => $actionId ?? $action['id'] ?? null
             ]);
         }
 

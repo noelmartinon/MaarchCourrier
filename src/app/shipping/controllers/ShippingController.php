@@ -32,10 +32,11 @@ use Docserver\models\DocserverModel;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\CurlModel;
 use SrcCore\models\PasswordModel;
+use SrcCore\models\TextFormatModel;
 
 class ShippingController
 {
-    public const MAILEVA_EVENT_TYPES = [
+    private const MAILEVA_EVENT_TYPES = [
         'ON_STATUS_ACCEPTED',
         'ON_STATUS_REJECTED',
         'ON_STATUS_PROCESSED',
@@ -44,7 +45,7 @@ class ShippingController
         'ON_STATUS_ARCHIVED'
     ];
 
-    public const MAILEVA_RESOURCE_TYPES = [
+    private const MAILEVA_RESOURCE_TYPES = [
         'mail/v2/sendings',
         'registered_mail/v2/sendings',
         'simple_registered_mail/v1/sendings',
@@ -110,7 +111,7 @@ class ShippingController
         return $response->withJson($shippings);
     }
 
-    public function receiveNotification(Request $request, Response $response, array $args)
+    public function receiveNotification(Request $request, Response $response)
     {
         $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
         $error = null;
@@ -122,49 +123,6 @@ class ShippingController
         $shippingApiDomainName = $mailevaConfig['uri'];
         $shippingApiDomainName = str_replace(['http://', 'https://'], '', $shippingApiDomainName);
         $shippingApiDomainName = rtrim($shippingApiDomainName, '/');
-
-        $actions = ActionModel::get([
-            'select' => ['parameters'],
-            'where'  => ['component = ?'],
-            'data'   => ['sendShippingAction'],
-            'limit'  => 1
-        ]);
-        if (empty($actions)) {
-            return ShippingController::logAndReturnError($response, 400, 'No Maileva action available');
-        }
-        $actionParameters = json_decode($actions[0]['parameters'], true);
-        $actionParameters = [
-            'intermediateStatus' => $actionParameters['intermediateStatus'] ?? null,
-            'errorStatus'        => $actionParameters['errorStatus'] ?? null,
-            'finalStatus'        => $actionParameters['finalStatus'] ?? null
-        ];
-        if (!Validator::each(Validator::arrayType())->validate($actionParameters)) {
-            return ShippingController::logAndReturnError($response, 400, 'Maileva action parameters are not arrays');
-        } elseif (
-                !Validator::stringType()->length(1, 10)->validate($actionParameters['intermediateStatus']['actionStatus'])
-                || ($actionParameters['intermediateStatus']['actionStatus'] !== '_NOSTATUS_'
-                && empty(StatusModel::getById(['id' => $actionParameters['intermediateStatus']['actionStatus'], 'select' => ['id']])))
-                ) {
-            return ShippingController::logAndReturnError($response, 400, 'Maileva action actionStatus is invalid for intermediateStatus');
-        } elseif (
-                !Validator::stringType()->length(1, 10)->validate($actionParameters['errorStatus']['actionStatus'])
-                || ($actionParameters['errorStatus']['actionStatus'] !== '_NOSTATUS_'
-                && empty(StatusModel::getById(['id' => $actionParameters['errorStatus']['actionStatus'], 'select' => ['id']])))
-                ) {
-            return ShippingController::logAndReturnError($response, 400, 'Maileva action actionStatus is invalid for errorStatus');
-        } elseif (
-                !Validator::stringType()->length(1, 10)->validate($actionParameters['finalStatus']['actionStatus'])
-                || ($actionParameters['finalStatus']['actionStatus'] !== '_NOSTATUS_'
-                && empty(StatusModel::getById(['id' => $actionParameters['finalStatus']['actionStatus'], 'select' => ['id']])))
-                ) {
-            return ShippingController::logAndReturnError($response, 400, 'Maileva action actionStatus is invalid for finalStatus');
-        } elseif (!Validator::each(Validator::in(ShippingController::MAILEVA_EVENT_TYPES))->validate($actionParameters['intermediateStatus']['mailevaStatus'])) {
-            return ShippingController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for intermediateStatus');
-        } elseif (!Validator::each(Validator::in(ShippingController::MAILEVA_EVENT_TYPES))->validate($actionParameters['errorStatus']['mailevaStatus'])) {
-            return ShippingController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for errorStatus');
-        } elseif (!Validator::each(Validator::in(ShippingController::MAILEVA_EVENT_TYPES))->validate($actionParameters['finalStatus']['mailevaStatus'])) {
-            return ShippingController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for finalStatus');
-        }
 
         $body = $request->getParsedBody();
         $error = null;
@@ -227,7 +185,7 @@ class ShippingController
 
         if ($body['eventType'] == 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED') {
             $shipping = ShippingModel::getByRecipientId([
-                'select'      => ['id', 'sending_id', 'document_id', 'history', 'recipients', 'attachments'],
+                'select'      => ['id', 'sending_id', 'document_id', 'document_type', 'history', 'recipients', 'attachments', 'action_id'],
                 'recipientId' => $body['resourceId']
             ]);
             if (empty($shipping[0])) {
@@ -243,7 +201,7 @@ class ShippingController
             }
         } else {
             $shipping = ShippingModel::get([
-                'select' => ['id', 'sending_id', 'document_id', 'history', 'recipients', 'attachments'],
+                'select' => ['id', 'sending_id', 'document_id', 'document_type', 'history', 'recipients', 'attachments', 'action_id'],
                 'where'  => ['sending_id = ?'],
                 'data'   => [$body['resourceId']]
             ]);
@@ -253,12 +211,66 @@ class ShippingController
             $shipping = $shipping[0];
             $shipping['recipients'] = json_decode($shipping['recipients'], true);
         }
-        $resId = $shipping['document_id'];
-        if (!ResController::hasRightByResId(['resId' => [$resId], 'userId' => $GLOBALS['id']])) {
-            return ShippingController::logAndReturnError($response, 403, 'Document out of perimeter');
-        }
         $shipping['attachments'] = json_decode($shipping['attachments'], true);
         $shipping['history'] = json_decode($shipping['history'], true);
+
+        $resId = $shipping['document_id'];
+        if ($shipping['document_type'] == 'attachment') {
+            $referencedAttachment = AttachmentModel::getById([
+                'id'     => $shipping['document_id'],
+                'select' => ['res_id', 'res_id_master']
+            ]);
+            if (empty($referencedAttachment)) {
+                return ShippingController::logAndReturnError($response, 400, 'Body document_id does not match any attachment');
+            }
+            $resId = $referencedAttachment['res_id_master'];
+        }
+        if (!ResController::hasRightByResId(['resId' => [$resId], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
+        $actions = ActionModel::get([
+            'select' => ['parameters'],
+            'where'  => ['component = ?', 'id = ?'],
+            'data'   => ['sendShippingAction', $shipping['action_id']],
+            'limit'  => 1
+        ]);
+        if (empty($actions)) {
+            return ShippingController::logAndReturnError($response, 400, 'No Maileva action available');
+        }
+        $actionParameters = json_decode($actions[0]['parameters'], true);
+        $actionParameters = [
+            'intermediateStatus' => $actionParameters['intermediateStatus'] ?? null,
+            'errorStatus'        => $actionParameters['errorStatus'] ?? null,
+            'finalStatus'        => $actionParameters['finalStatus'] ?? null
+        ];
+        if (!Validator::each(Validator::arrayType())->validate($actionParameters)) {
+            return ShippingController::logAndReturnError($response, 400, 'Maileva action parameters are not arrays');
+        } elseif (
+                !Validator::stringType()->length(1, 10)->validate($actionParameters['intermediateStatus']['actionStatus'])
+                || ($actionParameters['intermediateStatus']['actionStatus'] !== '_NOSTATUS_'
+                && empty(StatusModel::getById(['id' => $actionParameters['intermediateStatus']['actionStatus'], 'select' => ['id']])))
+                ) {
+            return ShippingController::logAndReturnError($response, 400, 'Maileva action actionStatus is invalid for intermediateStatus');
+        } elseif (
+                !Validator::stringType()->length(1, 10)->validate($actionParameters['errorStatus']['actionStatus'])
+                || ($actionParameters['errorStatus']['actionStatus'] !== '_NOSTATUS_'
+                && empty(StatusModel::getById(['id' => $actionParameters['errorStatus']['actionStatus'], 'select' => ['id']])))
+                ) {
+            return ShippingController::logAndReturnError($response, 400, 'Maileva action actionStatus is invalid for errorStatus');
+        } elseif (
+                !Validator::stringType()->length(1, 10)->validate($actionParameters['finalStatus']['actionStatus'])
+                || ($actionParameters['finalStatus']['actionStatus'] !== '_NOSTATUS_'
+                && empty(StatusModel::getById(['id' => $actionParameters['finalStatus']['actionStatus'], 'select' => ['id']])))
+                ) {
+            return ShippingController::logAndReturnError($response, 400, 'Maileva action actionStatus is invalid for finalStatus');
+        } elseif (!Validator::each(Validator::in(ShippingController::MAILEVA_EVENT_TYPES))->validate($actionParameters['intermediateStatus']['mailevaStatus'])) {
+            return ShippingController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for intermediateStatus');
+        } elseif (!Validator::each(Validator::in(ShippingController::MAILEVA_EVENT_TYPES))->validate($actionParameters['errorStatus']['mailevaStatus'])) {
+            return ShippingController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for errorStatus');
+        } elseif (!Validator::each(Validator::in(ShippingController::MAILEVA_EVENT_TYPES))->validate($actionParameters['finalStatus']['mailevaStatus'])) {
+            return ShippingController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for finalStatus');
+        }
 
         $actionStatus = null;
         foreach ($actionParameters as $phaseStatuses) {
@@ -267,11 +279,6 @@ class ShippingController
                     break;
                 }
                 $actionStatus = $phaseStatuses['actionStatus'];
-                ResModel::update([
-                    'set'   => ['status' => $actionStatus],
-                    'where' => ['res_id = ?'],
-                    'data'  => [$resId]
-                ]);
                 break;
             }
         }
@@ -303,6 +310,7 @@ class ShippingController
             if ($curlResponse['code'] < 200 || $curlResponse['code'] >= 300) {
                 return ShippingController::logAndReturnError($response, 400, 'deposit proof failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId']]));
             }
+            // TODO add system attachment type as in summary sheet
             $storage = DocserverController::storeResourceOnDocServer([
                 'collId'          => 'attachments_coll',
                 'docserverTypeId' => 'DOC',
@@ -312,7 +320,7 @@ class ShippingController
             if (!empty($storage['errors'])) {
                 return ShippingController::logAndReturnError($response, 500, 'could not save deposit proof to docserver');
             }
-            $storage['shipping_attachment_type'] = 'DEPOSIT_PROOF';
+            $storage['shipping_attachment_type'] = 'depositProof';
             $storage['resource_type']            = $body['resourceType'];
             $storage['resource_id']              = $body['resourceId'];
             $storage['date']                     = $body['eventDate'];
@@ -349,7 +357,7 @@ class ShippingController
             if (!empty($storage['errors'])) {
                 return ShippingController::logAndReturnError($response, 500, 'could not save acknowledgement of receipt to docserver');
             }
-            $storage['shipping_attachment_type'] = 'ACKNOWLEDGEMENT_OF_RECEIPT';
+            $storage['shipping_attachment_type'] = 'acknowledgementOfReceipt';
             $storage['resource_type']            = $body['resourceType'];
             $storage['resource_id']              = $body['resourceId'];
             $storage['date']                     = $body['eventDate'];
@@ -368,13 +376,19 @@ class ShippingController
             ]);
         }
 
+        ResModel::update([
+            'set'   => ['status' => $actionStatus],
+            'where' => ['res_id = ?'],
+            'data'  => [$resId]
+        ]);
+
         return $response->withStatus(204);
     }
 
     public function getShippingAttachmentsList(Request $request, Response $response, array $args)
     {
         $shipping = ShippingModel::get([
-            'select' => ['id', 'document_id', 'attachments'],
+            'select' => ['id', 'document_id', 'document_type', 'attachments'],
             'where'  => ['id = ?'],
             'data'   => [$args['shippingId']]
         ]);
@@ -384,21 +398,30 @@ class ShippingController
         $shipping = $shipping[0];
         $shipping['attachments'] = json_decode($shipping['attachments'], true);
 
-        if (!ResController::hasRightByResId(['resId' => [$shipping['document_id']], 'userId' => $GLOBALS['id']])) {
+        $resId = $shipping['document_id'];
+        if ($shipping['document_type'] == 'attachment') {
+            $referencedAttachment = AttachmentModel::getById([
+                'id'     => $shipping['document_id'],
+                'select' => ['res_id', 'res_id_master']
+            ]);
+            if (empty($referencedAttachment)) {
+                return ShippingController::logAndReturnError($response, 400, 'Body document_id does not match any attachment');
+            }
+            $resId = $referencedAttachment['res_id_master'];
+        }
+        if (!ResController::hasRightByResId(['resId' => [$resId], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
         $attachments = [];
         foreach ($shipping['attachments'] as $key => $attachment) {
-            if (empty($attachments[$attachment['shipping_attachment_type']])) {
-                $attachments[$attachment['shipping_attachment_type']] = [];
-            }
-            $attachments[$attachment['shipping_attachment_type']][] = [
-                'id'           => $key,
-                'resourceType' => $attachment['resource_type'] ?? null,
-                'resourceId'   => $attachment['resource_id'] ?? null,
-                'label'        => $attachment['label'] ?? null,
-                'date'         => $attachment['date'] ?? null
+            $attachments[] = [
+                'id'             => $key,
+                'attachmentType' => $attachment['shipping_attachment_type'] ?? null,
+                'resourceType'   => $attachment['resource_type'] ?? null,
+                'resourceId'     => $attachment['resource_id'] ?? null,
+                'label'          => $attachment['label'] ?? null,
+                'date'           => $attachment['date'] ?? null
             ];
         }
         return $response->withStatus(200)->withJson(['attachments' => $attachments]);
@@ -407,7 +430,7 @@ class ShippingController
     public function getShippingAttachment(Request $request, Response $response, array $args)
     {
         $shipping = ShippingModel::get([
-            'select' => ['id', 'document_id', 'attachments'],
+            'select' => ['id', 'document_id', 'document_type', 'attachments'],
             'where'  => ['id = ?'],
             'data'   => [$args['shippingId']]
         ]);
@@ -417,7 +440,18 @@ class ShippingController
         $shipping = $shipping[0];
         $shipping['attachments'] = json_decode($shipping['attachments'], true);
 
-        if (!ResController::hasRightByResId(['resId' => [$shipping['document_id']], 'userId' => $GLOBALS['id']])) {
+        $resId = $shipping['document_id'];
+        if ($shipping['document_type'] == 'attachment') {
+            $referencedAttachment = AttachmentModel::getById([
+                'id'     => $shipping['document_id'],
+                'select' => ['res_id', 'res_id_master']
+            ]);
+            if (empty($referencedAttachment)) {
+                return ShippingController::logAndReturnError($response, 400, 'Body document_id does not match any attachment');
+            }
+            $resId = $referencedAttachment['res_id_master'];
+        }
+        if (!ResController::hasRightByResId(['resId' => [$resId], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
@@ -455,7 +489,7 @@ class ShippingController
 
     public function getHistory(Request $request, Response $response, array $args) {
         $shipping = ShippingModel::get([
-            'select' => ['id', 'document_id', 'history'],
+            'select' => ['id', 'document_id', 'document_type', 'history'],
             'where'  => ['id = ?'],
             'data'   => [$args['shippingId']]
         ]);
@@ -465,11 +499,22 @@ class ShippingController
         $shipping = $shipping[0];
         $shipping['history'] = json_decode($shipping['history'], true);
 
-        if (!ResController::hasRightByResId(['resId' => [$shipping['document_id']], 'userId' => $GLOBALS['id']])) {
+        $resId = $shipping['document_id'];
+        if ($shipping['document_type'] == 'attachment') {
+            $referencedAttachment = AttachmentModel::getById([
+                'id'     => $shipping['document_id'],
+                'select' => ['res_id', 'res_id_master']
+            ]);
+            if (empty($referencedAttachment)) {
+                return ShippingController::logAndReturnError($response, 400, 'Body document_id does not match any attachment');
+            }
+            $resId = $referencedAttachment['res_id_master'];
+        }
+        if (!ResController::hasRightByResId(['resId' => [$resId], 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        return $response->withStatus(200)->withJson($shipping['history']);
+        return $response->withStatus(200)->withJson(['history' => $shipping['history']]);
     }
 
     private static function logAndReturnError(Response $response, int $httpStatusCode, string $error)
