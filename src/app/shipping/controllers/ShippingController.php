@@ -257,29 +257,37 @@ class ShippingController
         if (!ResController::hasRightByResId(['resId' => [$resId], 'userId' => $GLOBALS['id']])) {
             return ShippingController::logAndReturnError($response, 403, 'Document out of perimeter');
         }
-
         $shipping['attachments'] = json_decode($shipping['attachments'], true);
         $shipping['history'] = json_decode($shipping['history'], true);
-        $shipping['history'][] = $body;
-        ShippingModel::update([
-            'set'   => ['history' => json_encode($shipping['history'])],
-            'where' => ['id = ?'],
-            'data'  => [$shipping['id']]
-        ]);
 
+        $actionStatus = null;
         foreach ($actionParameters as $phaseStatuses) {
             if (in_array($body['eventType'], $phaseStatuses['mailevaStatus'])) {
                 if ($phaseStatuses['actionStatus'] == '_NOSTATUS_') {
                     break;
                 }
+                $actionStatus = $phaseStatuses['actionStatus'];
                 ResModel::update([
-                    'set'   => ['status' => $phaseStatuses['actionStatus']],
+                    'set'   => ['status' => $actionStatus],
                     'where' => ['res_id = ?'],
                     'data'  => [$resId]
                 ]);
                 break;
             }
         }
+
+        $shipping['history'][] = [
+            'eventType'    => $body['eventType'],
+            'eventDate'    => $body['eventDate'],
+            'resourceId'   => $body['resourceId'],
+            'resourceType' => $body['resourceType'],
+            'status'       => $actionStatus
+        ];
+        ShippingModel::update([
+            'set'   => ['history' => json_encode($shipping['history'])],
+            'where' => ['id = ?'],
+            'data'  => [$shipping['id']]
+        ]);
 
         if ($body['eventType'] == 'ON_DEPOSIT_PROOF_RECEIVED') {
             $authToken = ShippingController::getMailevaAuthToken($mailevaConfig, $shippingTemplateAccount);
@@ -305,6 +313,9 @@ class ShippingController
                 return ShippingController::logAndReturnError($response, 500, 'could not save deposit proof to docserver');
             }
             $storage['shipping_attachment_type'] = 'DEPOSIT_PROOF';
+            $storage['resource_type']            = $body['resourceType'];
+            $storage['resource_id']              = $body['resourceId'];
+            $storage['date']                     = $body['eventDate'];
             $shipping['attachments'][] = $storage;
             ShippingModel::update([
                 'set'   => ['attachments' => json_encode($shipping['attachments'])],
@@ -339,6 +350,16 @@ class ShippingController
                 return ShippingController::logAndReturnError($response, 500, 'could not save acknowledgement of receipt to docserver');
             }
             $storage['shipping_attachment_type'] = 'ACKNOWLEDGEMENT_OF_RECEIPT';
+            $storage['resource_type']            = $body['resourceType'];
+            $storage['resource_id']              = $body['resourceId'];
+            $storage['date']                     = $body['eventDate'];
+            $storage['label']                    = trim($recipient['firstname'] . ' ' . $recipient['lastname']);
+            if (empty($storage['label'])) {
+                $storage['label'] = $recipient['company'];
+            } elseif (!empty($recipient['company'])) {
+                $storage['label'] .= ' (' . $recipient['company'] . ')';
+            }
+            $storage['label'] = trim($storage['label']) ?? null;
             $shipping['attachments'][] = $storage;
             ShippingModel::update([
                 'set'   => ['attachments' => json_encode($shipping['attachments'])],
@@ -373,7 +394,11 @@ class ShippingController
                 $attachments[$attachment['shipping_attachment_type']] = [];
             }
             $attachments[$attachment['shipping_attachment_type']][] = [
-                'id' => $key
+                'id'           => $key,
+                'resourceType' => $attachment['resource_type'] ?? null,
+                'resourceId'   => $attachment['resource_id'] ?? null,
+                'label'        => $attachment['label'] ?? null,
+                'date'         => $attachment['date'] ?? null
             ];
         }
         return $response->withStatus(200)->withJson(['attachments' => $attachments]);
@@ -420,9 +445,31 @@ class ShippingController
         if (empty($fileContent)) {
             return $response->withStatus(400)->withJson(['errors' => 'file does not exist or is unreadable']);
         }
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($fileContent);
         $response->write($fileContent);
+        $response = $response->withAddedheader('Content-Type', $mimeType);
 
         return $response->withStatus(200)->withHeader('Content-Disposition', 'attachment; filename=' . $filename);
+    }
+
+    public function getHistory(Request $request, Response $response, array $args) {
+        $shipping = ShippingModel::get([
+            'select' => ['id', 'document_id', 'history'],
+            'where'  => ['id = ?'],
+            'data'   => [$args['shippingId']]
+        ]);
+        if (empty($shipping[0])) {
+            return $response->withStatus(400)->withJson(['errors' => 'no shipping with this id']);
+        }
+        $shipping = $shipping[0];
+        $shipping['history'] = json_decode($shipping['history'], true);
+
+        if (!ResController::hasRightByResId(['resId' => [$shipping['document_id']], 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
+        }
+
+        return $response->withStatus(200)->withJson($shipping['history']);
     }
 
     private static function logAndReturnError(Response $response, int $httpStatusCode, string $error)

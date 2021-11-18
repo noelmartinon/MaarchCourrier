@@ -514,6 +514,7 @@ $app->delete('/administration/shippings/{id}', \Shipping\controllers\ShippingTem
 $app->post('/shippings/notifications', \Shipping\controllers\ShippingController::class . ':receiveNotification');
 $app->get('/shippings/{shippingId}/attachments', \Shipping\controllers\ShippingController::class . ':getShippingAttachmentsList');
 $app->get('/shippings/{shippingId}/attachments/{attachmentId}', \Shipping\controllers\ShippingController::class . ':getShippingAttachment');
+$app->get('/shippings/{shippingId}/history', \Shipping\controllers\ShippingController::class . ':getHistory');
 
 //SignatureBook
 $app->get('/signatureBook/users/{userId}/groups/{groupId}/baskets/{basketId}/resources', \SignatureBook\controllers\SignatureBookController::class . ':getResources');
