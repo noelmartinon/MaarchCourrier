@@ -770,7 +770,6 @@ export class IndexingFormComponent implements OnInit {
         }));
 
         if (this.resId !== null) {
-
             await this.setResource(saveResourceState);
         }
 
@@ -813,11 +812,14 @@ export class IndexingFormComponent implements OnInit {
                                     await this.getCurrentInitiator(elem, fieldValue);
                                 }
 
-                                if (elem.type === 'date' && !this.functions.empty(fieldValue)) {
-                                    fieldValue = new Date(fieldValue);
-                                } else{
-                                    elem.default_value = null;
-                                    this.arrFormControl[elem.identifier].value = null;
+                                if (elem.type === 'date') {
+                                    if (!this.functions.empty(fieldValue) || elem.default_value !== null) {
+                                        fieldValue = elem.default_value !== null ? elem.default_value : fieldValue;
+                                        fieldValue = new Date(fieldValue);
+                                    } else {
+                                        elem.default_value = null;
+                                        this.arrFormControl[elem.identifier].value = null;
+                                    }
                                 }
                                 if (!this.functions.empty(fieldValue)) {
                                     this.arrFormControl[elem.identifier].setValue(fieldValue);
