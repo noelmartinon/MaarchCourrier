@@ -4,9 +4,11 @@
     </div>
 </ng-container>
 <ng-template #elseLoading>
+    <!-- SGAMI modif: transform -->
     <mat-card id="viewThumbnail"
-        style="display:none;position: fixed;z-index: 2;margin-left: 1px;left: 50%;transform: translate(-50%,-50%);top: 50%;">
+        style="display:none;position: fixed;z-index: 2;margin-left: 1px;left: 50%;transform: translate(-30%,-50%);top: 50%;">
         <img style="max-height: 100vh;" *ngIf="thumbnailUrl !== ''" [src]="thumbnailUrl | secureUrl | async" /></mat-card>
+    <!-- END -->
     <div class="row" style="margin: 0px;">
         <div class="col-md-12">
             <mat-paginator #paginator [length]="100" [hidePageSize]="true" [pageSize]="10">
