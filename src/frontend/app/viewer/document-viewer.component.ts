@@ -600,11 +600,12 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     downloadConvertedFile() {
         const downloadLink = document.createElement('a');
         if (this.file.contentMode === 'base64') {
+            let fileName: string = '';
             if (this.isSigned) {
-                this.file.name = this.file.name.substring(0, this.file.name.indexOf('_V'));
+                fileName = this.file.name.substring(0, this.file.name.indexOf('_V'));
             }
             downloadLink.href = `data:${this.file.type};base64,${this.file.content}`;
-            downloadLink.setAttribute('download', this.file.name);
+            downloadLink.setAttribute('download', fileName !== '' ? fileName : this.file.name);
             document.body.appendChild(downloadLink);
             downloadLink.click();
         } else {
