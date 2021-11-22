@@ -23,8 +23,11 @@ class ValidatorModel
         if (!Validator::arrayType()->notEmpty()->validate($args)) {
             throw new \Exception('First argument must be a non empty array');
         }
-        foreach ($keys as $key) {
+        foreach ($keys as $key) {        
             if (Validator::stringType()->validate($args[$key]) && trim($args[$key]) == '' && $args[$key] != '') {
+                $args[$key] .= 'NOT_EMPTY';
+            }
+            if (Validator::stringType()->validate($args[$key]) && trim($args[$key]) == '0' && $args[$key] != '0') {
                 $args[$key] .= 'NOT_EMPTY';
             }
             if (!Validator::notEmpty()->validate($args[$key])) {
