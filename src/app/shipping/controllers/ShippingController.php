@@ -24,6 +24,7 @@ use Shipping\models\ShippingTemplateModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\LogsController;
+use Configuration\models\ConfigurationModel;
 use User\models\UserModel;
 use Action\models\ActionModel;
 use Docserver\controllers\DocserverController;
@@ -111,10 +112,88 @@ class ShippingController
         return $response->withJson($shippings);
     }
 
+    public function subscribeToNotifications(Request $request, Response $response, array $args)
+    {
+        if (!Validator::intVal()->validate($args['templateId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route templateId is empty, too long, or not a string']);
+        }
+        $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
+        if (empty($mailevaConfig)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Maileva configuration does not exist']);
+        } elseif (!$mailevaConfig['enabled']) {
+            return $response->withStatus(400)->withJson(['errors' => 'Maileva configuration is disabled']);
+        }
+        $shippingTemplate = ShippingTemplateModel::getById([
+            'select' => ['account', 'subscription_id as "subscriptionId"'],
+            'id'     => $args['templateId']
+        ]);
+        if (empty($shippingTemplate)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route templateId does not match any shipping template for this user']);
+        }
+        $shippingTemplate['account'] = json_decode($shippingTemplate['account'], true);
+        $authToken = ShippingController::getMailevaAuthToken($mailevaConfig, $shippingTemplate['account']);
+        if (!empty($authToken['errors'])) {
+            return $response->withStatus(400)->withJson(['errors' => $authToken['errors']]);
+        }
+        foreach (ShippingController::MAILEVA_EVENT_TYPES as $eventType) {
+            foreach (ShippingController::MAILEVA_RESOURCE_TYPES as $resourceType) {
+                $curlResponse = CurlModel::exec([
+                    'method'     => 'POST',
+                    'url'        => $mailevaConfig['uri'] . '/subscriptions',
+                    'bearerAuth' => ['token' => $authToken],
+                    'body'       => json_encode([
+                        'event_type'    => $eventType,
+                        'resource_type' => $resourceType,
+                        'callback_url'  => $maarchUrl . '/rest/shippingTemplates/' . $shippingTemplate['id'] . '/notifications'
+                    ])
+                ]);
+                if ($curlResponse['code'] != 204) {
+                    return $response->withStatus(400)->withJson(['errors' => $curlResponse['response']['errors']]);
+                }
+            }
+        }
+
+        return $response->withStatus(204);
+    }
+
+    public function unsubscribeFromNotifications(Request $request, Response $response, array $args)
+    {
+        if (!Validator::intVal()->validate($args['templateId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route templateId is empty, too long, or not a string']);
+        }
+        $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
+        if (empty($mailevaConfig)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Maileva configuration does not exist']);
+        } elseif (!$mailevaConfig['enabled']) {
+            return $response->withStatus(400)->withJson(['errors' => 'Maileva configuration is disabled']);
+        }
+        $shippingTemplate = ShippingTemplateModel::getById([
+            'select' => ['account', 'subscription_id as "subscriptionId"'],
+            'id'     => $args['templateId']
+        ]);
+        if (empty($shippingTemplate)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route templateId does not match any shipping template for this user']);
+        }
+        $shippingTemplate['account'] = json_decode($shippingTemplate['account'], true);
+        $authToken = ShippingController::getMailevaAuthToken($mailevaConfig, $shippingTemplate['account']);
+        if (!empty($authToken['errors'])) {
+            return $response->withStatus(400)->withJson(['errors' => $authToken['errors']]);
+        }
+        $curlResponse = CurlModel::exec([
+            'method'     => 'DELETE',
+            'url'        => $mailevaConfig['uri'] . '/subscriptions/' . $shippingTemplate['subscriptionId'],
+            'bearerAuth' => ['token' => $authToken]
+        ]);
+        if ($curlResponse['code'] != 204) {
+            return $response->withStatus(400)->withJson(['errors' => $curlResponse['response']['errors']]);
+        }
+
+        return $response->withStatus(204);
+    }
+
     public function receiveNotification(Request $request, Response $response)
     {
         $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
-        $error = null;
         if (empty($mailevaConfig)) {
             return ShippingController::logAndReturnError($response, 400, 'Maileva configuration does not exist');
         } elseif (!$mailevaConfig['enabled']) {
@@ -171,15 +250,13 @@ class ShippingController
             'entities' => [(string) $primaryEntity['id']],
             'select'   => ['account']
         ]);
-        $noMatchingTemplate = true;
         foreach ($shippingTemplates as $shippingTemplate) {
             $shippingTemplateAccount = json_decode($shippingTemplate['account'], true);
             if (Validator::equals($shippingTemplateAccount['id'])->validate($body['clientId'])) {
-                $noMatchingTemplate = false;
                 break;
             }
         }
-        if ($noMatchingTemplate) {
+        if (empty($shippingTemplateAccount)) {
             return ShippingController::logAndReturnError($response, 400, 'Body clientId does not match any shipping template for this user');
         }
 
@@ -307,7 +384,7 @@ class ShippingController
                 'bearerAuth' => ['token' => $authToken],
                 'headers'    => ['Accept: application/zip']
             ]);
-            if ($curlResponse['code'] < 200 || $curlResponse['code'] >= 300) {
+            if ($curlResponse['code'] != 200) {
                 return ShippingController::logAndReturnError($response, 400, 'deposit proof failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId']]));
             }
             // TODO add system attachment type as in summary sheet
@@ -345,7 +422,7 @@ class ShippingController
                 'bearerAuth' => ['token' => $authToken],
                 'headers'    => ['Accept: application/zip']
             ]);
-            if ($curlResponse['code'] < 200 || $curlResponse['code'] >= 300) {
+            if ($curlResponse['code'] != 200) {
                 return ShippingController::logAndReturnError($response, 400, 'acknowledgement of receipt failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId'], 'recipientId' => $recipient['id']]));
             }
             $storage = DocserverController::storeResourceOnDocServer([
