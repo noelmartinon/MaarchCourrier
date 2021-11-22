@@ -306,20 +306,24 @@ class IParapheurController
                 $curlReturn = IParapheurController::returnCurl($xmlPostString, $aArgs['config']);
 
                 if (!empty($curlReturn['error'])) {
-                    return ['error' => $curlReturn['error']];
+                    $aArgs['idsToRetrieve'][$version][$resId]['error'] = $curlReturn['error'];
+                    continue;
                 }
 
                 try {
                     if (is_bool($curlReturn['response']) === true) {
-                        return ['error' => 'Curl response is a boolean'];
+                        $aArgs['idsToRetrieve'][$version][$resId]['error'] = 'Curl response is a boolean';
+                        continue;
                     }
                     $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
                 } catch (Exception $e) {
-                    return ['error' => 'Exception : ' . $e->getMessage()];
+                    $aArgs['idsToRetrieve'][$version][$resId]['error'] = 'Exception : ' . $e->getMessage();
+                    continue;
                 }
 
                 if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']) {
-                    return ['error' => 'Error : [' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message];
+                    $aArgs['idsToRetrieve'][$version][$resId]['error'] = 'Error : [' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message;
+                    continue;
                 } else {
                     $noteContent = '';
                     foreach ($response->LogDossier as $res) {    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
@@ -332,7 +336,8 @@ class IParapheurController
                                 'documentId' => $value['external_id']
                             ]);
                             if (!empty($response['error'])) {
-                                return ['error' => $response['error']];
+                                $aArgs['idsToRetrieve'][$version][$resId]['error'] = $response['error'];
+                                continue;
                             }
                             $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'validated';
                             $aArgs['idsToRetrieve'][$version][$resId]['format'] = 'pdf';
