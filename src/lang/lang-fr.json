@@ -2540,5 +2540,7 @@
     "ON_STATUS_PROCESSED": "Traité",
     "ON_DEPOSIT_PROOF_RECEIVED": "Preuve de dépot obtenue",
     "ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED": "Avis de réception reçu",
-    "ON_STATUS_ARCHIVED": "Archivé"
+    "ON_STATUS_ARCHIVED": "Archivé",
+    "showShippingHistory": "Afficher l'historique de l'envoi Maileva",
+    "sendDate": "Date d'envoi"
 }
