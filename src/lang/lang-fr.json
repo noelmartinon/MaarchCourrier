@@ -25,7 +25,7 @@
     "PRE": "Retour d'absence",
     "RESETPSW": "Réinitialisation de mot de passe",
     "SIGN": "Signer un document",
-    "SIGN_version": "Version non signée",
+    "SIGN_version": "Version originale",
     "SPH": "Supérieur hiérarchique",
     "UNSIGN": "Dé-signer un document",
     "UP": "Modification",
@@ -2622,7 +2622,5 @@
     "documentHasNoChrono": "Ce courrier n’a pas de numéro chrono",
     "documentNotFoundOnDocserver": "Fichier introuvable dans l’espace de stockage",
     "docserverDocumentNotReadable": "Fichier illisible sur l’espace de stockage",
-    "soapClientCreationError": "Erreur de lancement de la communication SOAP",
-    "downloadFile": "Télécharger le fichier",
-    "pdfFormat": "Format pdf"
+    "soapClientCreationError": "Erreur de lancement de la communication SOAP"
 }
