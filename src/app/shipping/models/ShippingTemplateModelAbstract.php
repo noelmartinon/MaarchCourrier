@@ -87,7 +87,8 @@ abstract class ShippingTemplateModelAbstract
                 'options'        => $aArgs['options'],
                 'fee'            => $aArgs['fee'],
                 'entities'       => $aArgs['entities'],
-                'account'        => $aArgs['account']
+                'account'        => $aArgs['account'],
+                'subscriptions'  => []
             ]
         ]);
 
@@ -98,7 +99,7 @@ abstract class ShippingTemplateModelAbstract
     {
         ValidatorModel::notEmpty($aArgs, ['id', 'label', 'description']);
         ValidatorModel::intVal($aArgs, ['id']);
-        ValidatorModel::stringType($aArgs, ['label', 'description', 'options', 'fee', 'entities', 'account']);
+        ValidatorModel::stringType($aArgs, ['label', 'description', 'options', 'fee', 'entities', 'account', 'subscriptions']);
         
         DatabaseModel::update([
             'table'     => 'shipping_templates',
@@ -109,6 +110,7 @@ abstract class ShippingTemplateModelAbstract
                 'fee'           => $aArgs['fee'],
                 'entities'      => $aArgs['entities'],
                 'account'       => $aArgs['account'],
+                'subscriptions' => $aArgs['subscriptions']
             ],
             'where'     => ['id = ?'],
             'data'      => [$aArgs['id']]

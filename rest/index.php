@@ -511,10 +511,9 @@ $app->get('/administration/shippings/{id}', \Shipping\controllers\ShippingTempla
 $app->post('/administration/shippings', \Shipping\controllers\ShippingTemplateController::class . ':create');
 $app->put('/administration/shippings/{id}', \Shipping\controllers\ShippingTemplateController::class . ':update');
 $app->delete('/administration/shippings/{id}', \Shipping\controllers\ShippingTemplateController::class . ':delete');
-$app->get('/shippingTemplates/{templateId}/subscriptions', \Shipping\controllers\ShippingController::class . ':getSubscriptions');
-$app->post('/shippingTemplates/{templateId}/subscriptions', \Shipping\controllers\ShippingController::class . ':subscribeToNotifications');
-$app->delete('/shippingTemplates/{templateId}/subscriptions', \Shipping\controllers\ShippingController::class . ':unsubscribeFromNotifications');
-$app->post('/shippingTemplates/{templateId}/notifications', \Shipping\controllers\ShippingController::class . ':receiveNotification');
+$app->post('/administration/shippings/{id}/subscriptions', \Shipping\controllers\ShippingTemplateController::class . ':subscribeToNotifications');
+$app->delete('/administration/shippings/{id}/subscriptions', \Shipping\controllers\ShippingTemplateController::class . ':unsubscribeFromNotifications');
+$app->post('/administration/shippings/{id}/notifications', \Shipping\controllers\ShippingTemplateController::class . ':receiveNotification');
 $app->get('/shippings/{shippingId}/attachments', \Shipping\controllers\ShippingController::class . ':getShippingAttachmentsList');
 $app->get('/shippings/{shippingId}/attachments/{attachmentId}', \Shipping\controllers\ShippingController::class . ':getShippingAttachment');
 $app->get('/shippings/{shippingId}/history', \Shipping\controllers\ShippingController::class . ':getHistory');
