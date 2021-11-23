@@ -92,6 +92,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
      */
     @Input() downloadActions: any[] = [];
 
+    @Input() isSigned: boolean = false;
+
     /**
       * Event emitter
       */
@@ -602,8 +604,12 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     downloadConvertedFile() {
         const downloadLink = document.createElement('a');
         if (this.file.contentMode === 'base64') {
+            let fileName: string = '';
+            if (this.isSigned) {
+                fileName = this.file.name.substring(0, this.file.name.indexOf('_V'));
+            }
             downloadLink.href = `data:${this.file.type};base64,${this.file.content}`;
-            downloadLink.setAttribute('download', this.file.name);
+            downloadLink.setAttribute('download', fileName !== '' ? fileName : this.file.name);
             document.body.appendChild(downloadLink);
             downloadLink.click();
         } else {
@@ -700,6 +706,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 this.requestWithLoader(`../rest/resources/${resId}/content?mode=base64`).subscribe(
                     (data: any) => {
                         if (data.encodedDocument) {
+                            this.isSigned = this.file.subinfos.signedDocVersions;
                             const fileToDownload: string = this.file.subinfos.signedDocVersions || this.file.subinfos.commentedDocVersions ? 'content' : 'originalContent';
                             this.file.contentMode = 'route';
                             this.file.name = `${data.filename}`;
@@ -1262,6 +1269,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                         base64: data.encodedDocument,
                         filename: data.filename,
                         downloadActions: this.downloadActions,
+                        isSigned: this.isSigned
                     }
                 });
 
