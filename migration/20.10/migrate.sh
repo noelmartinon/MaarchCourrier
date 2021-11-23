@@ -15,6 +15,7 @@ php ./migrateOpenLdapConfig.php
 #SGAMI-DEBUT
 php ./migrateDelAction18.php
 php ./migrateIndexingDefault.php
+php ./migrateM2MConfiguration.php
 #SGAMI-FIN
 php ./migrateCustomXml.php # mettre en avant dernier
 php ./migrateSQL.php # mettre en dernier
