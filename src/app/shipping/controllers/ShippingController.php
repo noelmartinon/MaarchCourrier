@@ -92,7 +92,7 @@ class ShippingController
             $recipients = json_decode($shipping['recipients'], true);
             $contacts = [];
             foreach ($recipients as $recipient) {
-                $contacts[] = ['company' => $recipient[1], 'contactLabel' => $recipient[2]];
+                $contacts[] = ['company' => $recipient['company'], 'contactLabel' => $recipient['firstname'].' '.$recipient['lastname']];
             }
 
             $shippings[] = [
