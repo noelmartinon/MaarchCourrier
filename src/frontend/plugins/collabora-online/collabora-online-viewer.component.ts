@@ -18,11 +18,10 @@ declare let $: any;
 })
 export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
-    loading: boolean = true;
-
     @Input() editMode: boolean = false;
     @Input() file: any = {};
     @Input() params: any = {};
+    @Input() loading: boolean = false;
 
     @Output() triggerAfterUpdatedDoc = new EventEmitter<string>();
     @Output() triggerCloseEditor = new EventEmitter<string>();
