@@ -120,7 +120,7 @@ class ResController extends ResourceControlController
 
         $queryParams = $request->getQueryParams();
 
-        $select = ['model_id', 'category_id', 'priority', 'status', 'subject', 'alt_identifier', 'process_limit_date', 'closing_date', 'creation_date', 'modification_date', 'integrations', 'retention_frozen', 'binding'];
+        $select = ['model_id', 'category_id', 'priority', 'status', 'subject', 'alt_identifier', 'process_limit_date', 'closing_date', 'creation_date', 'modification_date', 'integrations', 'retention_frozen', 'binding', 'external_id'];
         if (empty($queryParams['light'])) {
             $select = array_merge($select, ['type_id', 'typist', 'destination', 'initiator', 'confidentiality', 'doc_date', 'admission_date', 'departure_date', 'barcode', 'custom_fields']);
         }
@@ -256,6 +256,10 @@ class ResController extends ResourceControlController
             $formattedData['registeredMail_returnDate']   = $registeredMail['received_date'];
             $formattedData['registeredMail_returnReason'] = $registeredMail['return_reason'];
             $formattedData['registeredMail_deposit_id']   = $registeredMail['deposit_id'];
+        }
+
+        if (PrivilegeController::hasPrivilege(['privilegeId' => 'view_technical_infos', 'userId' => $GLOBALS['id']])) {
+            $formattedData['externalId'] = json_decode($document['external_id'], true);
         }
 
         return $response->withJson($formattedData);

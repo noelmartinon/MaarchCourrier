@@ -113,6 +113,15 @@ export class TechnicalInformationComponent implements OnInit {
                         };
                     }
                 });
+                Object.keys(data.externalId).forEach(key => {
+                    if (this.functions.empty(this.techData[key])) {
+                        this.techData[key] = {
+                            label: key,
+                            value: data.externalId[key],
+                            icon: 'fa fa-key'
+                        };
+                    }
+                });
             }),
             catchError((err: any) => {
                 this.notify.handleSoftErrors(err);
