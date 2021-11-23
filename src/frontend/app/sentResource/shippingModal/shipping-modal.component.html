@@ -20,27 +20,27 @@
                         <div class="col-md-4">
                             <mat-form-field>
                                 <mat-label [title]="'lang.sender' | translate">{{ 'lang.sender' | translate }}</mat-label>
-                                <input matInput disabled [title]="data.row.sender" [(ngModel)]="data.row.sender" [placeholder]="'lang.sender' | translate">
+                                <input matInput disabled [title]="data.shippingData.sender" [(ngModel)]="data.shippingData.sender" [placeholder]="'lang.sender' | translate">
                             </mat-form-field>
                         </div>
                         <div class="col-md-4">
                             <mat-form-field>
                                 <mat-label [title]="'lang.creationDate' | translate">{{ 'lang.creationDate' | translate }}</mat-label>
-                                <input matInput disabled [title]="data.row.creationDate" [(ngModel)]="data.row.creationDate" [placeholder]="'lang.creationDate' | translate">
+                                <input matInput disabled [title]="data.shippingData.creationDate" [(ngModel)]="data.shippingData.creationDate" [placeholder]="'lang.creationDate' | translate">
                             </mat-form-field>
                         </div>
                         <div class="col-md-4">
                             <mat-form-field>
                                 <mat-label [title]="'lang.sendDate' | translate">{{ 'lang.sendDate' | translate }}</mat-label>
-                                <input matInput disabled [title]="data.row.sendDate" [(ngModel)]="data.row.sendDate" [placeholder]="'lang.sendDate' | translate">
+                                <input matInput disabled [title]="data.shippingData.sendDate" [(ngModel)]="data.shippingData.sendDate" [placeholder]="'lang.sendDate' | translate">
                             </mat-form-field>
                         </div>
                     </div>
                 </div>
-                <div class="row" style="margin: 4px;">
+                <div class="row recipients">
                     <mat-label>{{ 'lang.recipients' | translate }}</mat-label><br>
                     <mat-chip-list style="margin: 5px; padding: 5px;">
-                        <mat-chip *ngFor="let recipient of data.row.recipients; let i = index" class="matChip" [title]="recipient">
+                        <mat-chip *ngFor="let recipient of data.shippingData.recipients; let i = index" class="matChip" [title]="recipient">
                             {{recipient}}
                         </mat-chip>
                     </mat-chip-list>
@@ -56,21 +56,21 @@
                             <span style="display: flex;flex: 1;align-items: center;">
                                 <i class="fa fa-box" style="padding-right:5px;"></i>&nbsp;Fichier envoyé par Maileva (MAA-16/21)
                             </span>
-                            <mat-icon class="fas fa-download" style="margin-top: 8px; cursor: pointer;" color="danger" [title]="'Telecharger le fichier'"></mat-icon>
-                            <mat-icon class="fas fa-eye" color="primary" style="margin-top: 8px; cursor: pointer;" [title]="'Visualiser le fichier'"></mat-icon>
+                            <mat-icon class="fas fa-download" style="margin-top: 8px; cursor: pointer;" color="primary" [title]="'lang.downloadFile' | translate"></mat-icon>
+                            <mat-icon class="fas fa-eye" color="primary" style="margin-top: 8px; cursor: pointer;" [title]="'lang.viewResource' | translate"></mat-icon>
                     </mat-chip>
                     </mat-chip-list>
                 </div>
                 <div class="col-md-6">
                     <mat-label class="typeFileTitle">{{ 'lang.attachments' | translate }}</mat-label><br>
                     <mat-chip-list class="mat-chip-list-stacked itemChip" style="margin-top: 2px; padding: 5px;">
-                        <mat-chip *ngFor="let attachment of shippingAttachments[0]['attachments']; let i = index" 
-                            class="listAutocomplete" [title]="'lang.' + attachment.attachmentType | translate">
-                            <span style="display: flex;flex: 1;align-items: center;" [title]="'lang.' + attachment.attachmentType | translate">
-                                <i class="fa fa-paperclip" style="padding-right:5px;"></i>&nbsp;{{'lang.' + attachment.attachmentType | translate}}
+                        <mat-chip *ngFor="let attachment of shippingAttachments; let i = index" 
+                            class="listAutocomplete" [title]="attachment.label">
+                            <span style="display: flex;flex: 1;align-items: center;" [title]="attachment.label">
+                                <i class="fa fa-paperclip" style="padding-right:5px;"></i>&nbsp;{{attachment.label}}
                             </span>
-                            <mat-icon class="fas fa-download" style="margin-top: 8px; cursor: pointer;" color="danger" [title]="'Telecharger le fichier'"></mat-icon>
-                            <mat-icon class="fas fa-eye" color="primary" style="margin-top: 8px; cursor: pointer;" [title]="'Visualiser le fichier'"></mat-icon>
+                            <mat-icon class="fas fa-download" style="margin-top: 8px; cursor: pointer;" color="primary" [title]="'lang.downloadFile' | translate" (click)="$event.stopPropagation(); downloadFile(attachment.id)"></mat-icon>
+                            <mat-icon class="fas fa-eye" color="primary" style="margin-top: 8px; cursor: pointer;" [title]="'lang.viewResource' | translate"></mat-icon>
                         </mat-chip>
                     </mat-chip-list>
                 </div>
@@ -99,8 +99,8 @@
                                         </mat-icon>
                                         <div mat-line class="historyLine">
                                             <div class="historyLineContainer">
-                                                <div class="historyLineLabel">
-                                                    <b>{{history.eventType}}</b>
+                                                <div class="historyLineLabel" [title]="'lang.' + history.eventType | translate">
+                                                    <b>{{'lang.' + history.eventType | translate}}</b>
                                                 </div>
                                                 <div class="historyLineSubLabel" [title]="history.eventDate | fullDate">
                                                     <b>{{history.eventDate | fullDate}}</b>
@@ -117,5 +117,3 @@
         </ng-container>
     </mat-dialog-content>
 </div>
-
-<!-- spent 4:50 -->

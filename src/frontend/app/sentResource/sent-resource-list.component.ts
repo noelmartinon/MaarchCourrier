@@ -199,22 +199,21 @@ export class SentResourceListComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/resources/${this.resId}/shippings`).pipe(
                 map((data: any) => {
-                    const obj: any = {
-                        id: '1',
-                        sender: 'barbara.bain@maarch.org',
-                        recipients: ['alian.dupont@maarch.org', 'brigitte.berger@xelians.fr'],
-                        creationDate: '2021-11-18 11:33:28.57102',
-                        sendDate: '2021-11-22 16:33:28.57102',
+                    data = data.map((item: any) => ({
+                        id: item.id,
+                        sender: item.userLabel,
+                        recipients: item.recipients.map((recip: any) => recip.contactLabel),
+                        creationDate: item.creationDate,
+                        sendDate: item.creationDate,
                         type: 'shipping',
                         typeColor: '#9440D5',
-                        desc: 'Envoyer un pli via Maileva',
+                        desc: this.functions.empty(item.chrono) ? this.translate.instant('lang.shipping') : `[${item.chrono}] ` + this.translate.instant('lang.shipping'),
                         status: 'SENT',
-                        hasAttach: false,
+                        hasAttach: item.creationDate === 'attachment',
                         hasNote: false,
-                        hasMainDoc: false,
-                        canManage: true
-                    };
-                    data = obj;
+                        hasMainDoc: item.creationDate === 'resource',
+                        canManage: false
+                    }));
                     return data;
                 }),
                 tap((data: any) => {
@@ -295,22 +294,12 @@ export class SentResourceListComponent implements OnInit {
             }
         } else if (row.type === 'shipping') {
             const dialogRef = this.dialog.open(ShippingModalComponent, {
-                panelClass: 'maarch-modal', width: '60vw', disableClose: true, data: {
+                panelClass: 'maarch-modal', width: '60vw', disableClose: true,
+                data: {
                     title: title,
-                    row: row
+                    shippingData: row
                 }
             });
-
-            dialogRef.afterClosed().pipe(
-                tap((data: any) => {
-                    console.log(data);
-                }),
-                catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
-
         }
     }
 

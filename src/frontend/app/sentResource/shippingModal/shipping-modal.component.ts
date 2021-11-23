@@ -23,54 +23,8 @@ export class ShippingModalComponent implements OnInit {
 
     loading: boolean = true;
 
-    shippingAttachments: any [] = [
-        {
-            'attachments': [
-                {
-                    attachmentType: 'summarySheet',
-                    date: '2021-11-10T16:00:00Z',
-                    id: 0,
-                    label: null,
-                    resourceId: 'foo-bar',
-                    resourceType: 'registered_mail/v2/sendings'
-                },
-                {
-                    attachmentType: 'acknowledgementReceipt',
-                    date: '2021-11-10T16:00:00Z',
-                    id: 1,
-                    label: 'Bernard PASCONTENT (Monstres & Cie.)',
-                    resourceId: 'batman',
-                    resourceType: 'registered_mail/v2/recipients'
-                }
-            ]
-        }
-
-    ];
-
-    shippingHistory: any[] = [
-        {
-            eventDate: '2021-09-10T16:00:00Z',
-            eventType: this.translate.instant('lang.ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED'),
-            resourceId: 'batman',
-            resourceType: 'registered_mail/v2/recipients',
-            status: 'END'
-        },
-        {
-            eventDate: '2021-10-10T16:00:00Z',
-            eventType: this.translate.instant('lang.ON_DEPOSIT_PROOF_RECEIVED'),
-            resourceId: 'foo-bar',
-            resourceType: 'registered_mail/v2/sendings',
-            status: 'ATT'
-        },
-        {
-            eventDate: '2021-11-10T16:00:00Z',
-            eventType: this.translate.instant('lang.ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED'),
-            resourceId: 'batman',
-            resourceType: 'registered_mail/v2/recipients',
-            status: 'END'
-        }
-    ];
-
+    shippingAttachments: any [] = [];
+    shippingHistory: any[] = [];
     status: any[] = [];
 
     constructor(
@@ -88,18 +42,19 @@ export class ShippingModalComponent implements OnInit {
 
     async ngOnInit() {
         await this.getStatus();
-        this.data.row.creationDate = this.fullDate.transform(new Date(this.data.row.creationDate).toString());
-        this.data.row.sendDate = this.fullDate.transform(new Date(this.data.row.sendDate).toString());
+        await this.getAttachments();
+        await this.getShippingHistory();
+        this.data.shippingData.creationDate = this.fullDate.transform(new Date(this.data.shippingData.creationDate).toString());
+        this.data.shippingData.sendDate = this.fullDate.transform(new Date(this.data.shippingData.sendDate).toString());
         this.loading = false;
-        // await this.getShippingHistory(this.data.shippingId);
     }
 
-    getShippingHistory(shippingId: number) {
+    getAttachments() {
         return new Promise((resolve) => {
-            this.http.get(`../rest/shippings/${shippingId}/history`).pipe(
+            this.http.get(`../rest/shippings/${this.data.shippingData.id}/attachments`).pipe(
                 tap((data: any) => {
-                    console.log('data', data);
-                    this.shippingHistory = data;
+                    console.log('attachments', data.attachments);
+                    this.shippingAttachments = data.attachments;
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -110,8 +65,36 @@ export class ShippingModalComponent implements OnInit {
         });
     }
 
-    setStatus(status: string) {
-        return this.status.find((element: any) => element.id === status).label_status;
+    getShippingHistory() {
+        return new Promise((resolve) => {
+            this.http.get(`../rest/shippings/${this.data.shippingData.id}/history`).pipe(
+                tap((data: any) => {
+                    console.log('history', data.history);
+                    this.shippingHistory = data.history;
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
+    }
+
+    downloadFile(fileId: number) {
+        this.http.get(`../rest/shippings/${this.data.shippingData.id}/attachments/${fileId}`).pipe(
+            tap((data: any) => {
+                const downloadLink = document.createElement('a');
+                downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
+                downloadLink.setAttribute('download', data.filename);
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     getStatus() {
@@ -128,5 +111,9 @@ export class ShippingModalComponent implements OnInit {
                 })
             ).subscribe();
         });
+    }
+
+    setStatus(status: string) {
+        return this.status.find((element: any) => element.id === status).label_status;
     }
 }
