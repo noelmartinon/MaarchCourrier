@@ -445,19 +445,9 @@ class ResController extends ResourceControlController
         $creatorId      = $document['typist'];
         $subject        = $document['subject'];
 
-        $signedDocument = AdrModel::getDocuments([
-            'select'    => ['id', 'docserver_id', 'path', 'filename', 'fingerprint'],
-            'where'     => ['res_id = ?', 'type = ?', 'version = ?'],
-            'data'      => [$args['resId'], 'SIGN', $document['version']],
-            'limit'     => 1
-        ]);
-        if (!empty($signedDocument[0]) && !empty($signedDocuments[0]['id'])) {
-            $convertedDocument = $signedDocument[0];
-        } else {
-            $convertedDocument = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['resId'], 'collId' => 'letterbox_coll']);
-            if (!empty($convertedDocument['errors'])) {
-                return $response->withStatus(400)->withJson(['errors' => 'Conversion error : ' . $convertedDocument['errors']]);
-            }
+        $convertedDocument = ConvertPdfController::getConvertedPdfById(['resId' => $aArgs['resId'], 'collId' => 'letterbox_coll']);
+        if (!empty($convertedDocument['errors'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Conversion error : ' . $convertedDocument['errors']]);
         }
 
         $document = $convertedDocument;
