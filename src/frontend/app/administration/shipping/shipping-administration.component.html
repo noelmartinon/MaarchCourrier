@@ -121,6 +121,12 @@
                                                   class="fa fa-2x" [ngClass]="[hidePassword ? 'fa-eye-slash' : 'fa-eye']"></mat-icon>
                                     </mat-form-field>
                                 </div>
+                                <div class="form-group col-sm-12" style="text-align:center;">
+                                    <mat-slide-toggle name="subscribed"
+                                        id="subscribed" color="primary" [(ngModel)]="shipping.subscribed"
+                                        [checked]="shipping.subscribed">
+                                        {{(shipping.subscribed ? 'lang.shippingSubscribe' : 'lang.shippingUnsubscribe') | translate}}</mat-slide-toggle>
+                                </div>
                             </div>
                         </div>
 
