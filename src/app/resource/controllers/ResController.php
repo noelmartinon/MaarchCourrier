@@ -379,7 +379,6 @@ class ResController extends ResourceControlController
         if (empty($data['historyMessage'])) {
             $data['historyMessage'] = _UPDATE_STATUS;
         }
-
         $check = Validator::arrayType()->notEmpty()->validate($data['chrono']) || Validator::arrayType()->notEmpty()->validate($data['resId']);
         $check = $check && Validator::stringType()->notEmpty()->validate($data['status']);
         $check = $check && Validator::stringType()->notEmpty()->validate($data['historyMessage']);
@@ -397,6 +396,7 @@ class ResController extends ResourceControlController
 
         $identifiers = !empty($data['chrono']) ? $data['chrono'] : $data['resId'];
         foreach ($identifiers as $id) {
+            $id = trim($id);
             if (!empty($data['chrono'])) {
                 $document = ResModel::getByAltIdentifier(['altIdentifier' => $id, 'select' => ['res_id']]);
             } else {
