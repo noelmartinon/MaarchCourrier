@@ -261,6 +261,8 @@ export class IndexingFormComponent implements OnInit {
 
     mustFixErrors: boolean = false;
 
+    isPrivate: boolean = false;
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -814,15 +816,19 @@ export class IndexingFormComponent implements OnInit {
                                     await this.getCurrentInitiator(elem, fieldValue);
                                 }
 
-                                if (elem.type === 'date' && !this.functions.empty(fieldValue)) {
-                                    fieldValue = new Date(fieldValue);
-                                } else{
-                                    elem.default_value = null;
-                                    this.arrFormControl[elem.identifier].value = null;
+                                if (elem.type === 'date') {
+                                    if (!this.isPrivate && this.functions.empty(fieldValue)) {
+                                        elem.default_value = null;
+                                        this.arrFormControl[elem.identifier].value = null;
+                                    } else if (!this.functions.empty(fieldValue)) {
+                                        fieldValue = new Date(fieldValue);
+                                    }
                                 }
+
                                 if (!this.functions.empty(fieldValue)) {
                                     this.arrFormControl[elem.identifier].setValue(fieldValue);
                                 }
+
                             } else if (!saveResourceState && elem.identifier === 'destination') {
                                 this.arrFormControl[elem.identifier].disable();
                                 this.arrFormControl[elem.identifier].setValidators([]);
@@ -898,6 +904,7 @@ export class IndexingFormComponent implements OnInit {
 
         this.http.get(`../rest/indexingModels/${indexModelId}`).pipe(
             tap(async (data: any) => {
+                this.isPrivate = data.indexingModel.private || data.indexingModel.master !== null;
                 this.indexingFormId = data.indexingModel.master !== null ? data.indexingModel.master : data.indexingModel.id;
                 this.currentCategory = data.indexingModel.category;
                 this.mandatoryFile = data.indexingModel.mandatoryFile;
