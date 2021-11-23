@@ -1132,7 +1132,7 @@ class ActionMethodController
             return ['errors' => [$sent['errors']]];
         }
 
-        return ['history' => $sent['history']];
+        return true;
     }
 
     public static function reconcile(array $args)
