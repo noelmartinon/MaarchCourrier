@@ -102,7 +102,7 @@ class ShippingController
                 'select' => ['res_id', 'res_id_master']
             ]);
             if (empty($referencedAttachment)) {
-                return ShippingController::logAndReturnError($response, 400, 'Body document_id does not match any attachment');
+                return $response->withStatus(400)->withJson(['Body document_id does not match any attachment']);
             }
             $resId = $referencedAttachment['res_id_master'];
         }
@@ -144,7 +144,7 @@ class ShippingController
                 'select' => ['res_id', 'res_id_master']
             ]);
             if (empty($referencedAttachment)) {
-                return ShippingController::logAndReturnError($response, 400, 'Body document_id does not match any attachment');
+                return $response->withStatus(400)->withJson(['Body document_id does not match any attachment']);
             }
             $resId = $referencedAttachment['res_id_master'];
         }
@@ -203,7 +203,7 @@ class ShippingController
                 'select' => ['res_id', 'res_id_master']
             ]);
             if (empty($referencedAttachment)) {
-                return ShippingController::logAndReturnError($response, 400, 'Body document_id does not match any attachment');
+                return $response->withStatus(400)->withJson(['Body document_id does not match any attachment']);
             }
             $resId = $referencedAttachment['res_id_master'];
         }
