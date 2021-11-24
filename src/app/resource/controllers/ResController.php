@@ -50,7 +50,6 @@ use Shipping\models\ShippingModel;
 use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\controllers\PreparedClauseController;
-use SrcCore\controllers\CoreController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\TextFormatModel;
 use SrcCore\models\ValidatorModel;
@@ -95,10 +94,11 @@ class ResController extends ResourceControlController
                 'collId'    => 'letterbox_coll',
                 'version'   => 1
             ]);
+
+            $customId = CoreConfigModel::getCustomId();
+            $customId = empty($customId) ? 'null' : $customId;
+            exec("php src/app/convert/scripts/FullTextScript.php --customId {$customId} --resId {$resId} --collId letterbox_coll --userId {$GLOBALS['id']} > /dev/null &");
         }
-        $customId = CoreConfigModel::getCustomId();
-        $customId = empty($customId) ? 'null' : $customId;
-        exec("php src/app/convert/scripts/FullTextScript.php --customId {$customId} --resId {$resId} --collId letterbox_coll --userId {$GLOBALS['id']} > /dev/null &");
 
         HistoryController::add([
             'tableName' => 'res_letterbox',
@@ -120,7 +120,7 @@ class ResController extends ResourceControlController
 
         $queryParams = $request->getQueryParams();
 
-        $select = ['model_id', 'category_id', 'priority', 'status', 'subject', 'alt_identifier', 'process_limit_date', 'closing_date', 'creation_date', 'modification_date', 'integrations', 'retention_frozen', 'binding', 'external_id'];
+        $select = ['model_id', 'category_id', 'priority', 'status', 'subject', 'alt_identifier', 'process_limit_date', 'closing_date', 'creation_date', 'modification_date', 'integrations', 'retention_frozen', 'binding'];
         if (empty($queryParams['light'])) {
             $select = array_merge($select, ['type_id', 'typist', 'destination', 'initiator', 'confidentiality', 'doc_date', 'admission_date', 'departure_date', 'barcode', 'custom_fields']);
         }
@@ -258,10 +258,6 @@ class ResController extends ResourceControlController
             $formattedData['registeredMail_deposit_id']   = $registeredMail['deposit_id'];
         }
 
-        if (PrivilegeController::hasPrivilege(['privilegeId' => 'view_technical_infos', 'userId' => $GLOBALS['id']])) {
-            $formattedData['externalId'] = json_decode($document['external_id'], true);
-        }
-
         return $response->withJson($formattedData);
     }
 
@@ -275,7 +271,7 @@ class ResController extends ResourceControlController
 
         $body = $request->getParsedBody();
         $body = StoreController::setDisabledAndEmptyMandatoryFields($body);
-
+        
         $queryParams = $request->getQueryParams();
 
         $onlyDocument = !empty($queryParams['onlyDocument']);
@@ -372,29 +368,17 @@ class ResController extends ResourceControlController
 
     public function updateStatus(Request $request, Response $response)
     {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'update_status_mail', 'userId' =>  $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
-        }
-
         $data = $request->getParams();
 
         if (empty($data['status'])) {
             $data['status'] = 'COU';
         }
-
-        $statusInfo = StatusModel::getById(['id' => $data['status'], 'select' => ['label_status']]);
-        if (empty($statusInfo)) {
+        if (empty(StatusModel::getById(['id' => $data['status']]))) {
             return $response->withStatus(400)->withJson(['errors' => _STATUS_NOT_FOUND]);
         }
         if (empty($data['historyMessage'])) {
             $data['historyMessage'] = _UPDATE_STATUS;
-            $data['historyMessage'] = str_replace("{2}", $statusInfo['label_status'], $data['historyMessage']);
-
-            if ($data['admin'] == 'true') {
-                $data['historyMessage'] = '[' . _ADMINISTRATION . '] ' . $data['historyMessage'];
-            }
         }
-
         $check = Validator::arrayType()->notEmpty()->validate($data['chrono']) || Validator::arrayType()->notEmpty()->validate($data['resId']);
         $check = $check && Validator::stringType()->notEmpty()->validate($data['status']);
         $check = $check && Validator::stringType()->notEmpty()->validate($data['historyMessage']);
@@ -413,9 +397,10 @@ class ResController extends ResourceControlController
         $identifiers = !empty($data['chrono']) ? $data['chrono'] : $data['resId'];
         foreach ($identifiers as $id) {
             if (!empty($data['chrono'])) {
-                $document = ResModel::getByAltIdentifier(['altIdentifier' => trim($id), 'select' => ['res_id', 'status']]);
+                $id = trim($id);
+                $document = ResModel::getByAltIdentifier(['altIdentifier' => $id, 'select' => ['res_id']]);
             } else {
-                $document = ResModel::getById(['resId' => $id, 'select' => ['res_id', 'status']]);
+                $document = ResModel::getById(['resId' => $id, 'select' => ['res_id']]);
             }
             if (empty($document)) {
                 return $response->withStatus(400)->withJson(['errors' => _DOCUMENT_NOT_FOUND]);
@@ -429,9 +414,6 @@ class ResController extends ResourceControlController
             } else {
                 ResModel::update(['set' => ['status' => $data['status'], 'closing_date' => $closingDate], 'where' => ['res_id = ?', 'closing_date is null'], 'data' => [$document['res_id']]]);
             }
-
-            $statusInfo = StatusModel::getById(['id' => $document['status'], 'select' => ['label_status']]);
-            $data['historyMessage'] = str_replace("{1}", $statusInfo['label_status'], $data['historyMessage']);
 
             HistoryController::add([
                 'tableName' => 'res_letterbox',
@@ -505,11 +487,8 @@ class ResController extends ResourceControlController
 
         $data = $request->getQueryParams();
 
-        $mimeAndSize = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument]);
-        if (!empty($mimeAndSize['errors'])) {
-            return $response->withStatus(400)->withJson(['errors' => $mimeAndSize['errors']]);
-        }
-        $mimeType = $mimeAndSize['mime'];
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($fileContent);
         $filename = TextFormatModel::formatFilename(['filename' => $subject, 'maxLength' => 250]);
 
         if ($data['mode'] == 'base64') {
@@ -522,7 +501,7 @@ class ResController extends ResourceControlController
             ]);
 
             $signatoryId = $listInstance[0]['item_id'] ?? $creatorId;
-
+    
             return $response->withJson([
                 'encodedDocument'   => base64_encode($fileContent),
                 'originalFormat'    => $originalFormat,
@@ -557,7 +536,7 @@ class ResController extends ResourceControlController
         }
 
         $canConvert = ConvertPdfController::canConvert(['extension' => $resource['format']]);
-
+        
         $convertedDocuments = AdrModel::getDocuments([
             'select'    => ['type', 'version'],
             'where'     => ['res_id = ?', 'type in (?)'],
@@ -712,11 +691,8 @@ class ResController extends ResourceControlController
             'eventId'   => 'resview',
         ]);
 
-        $mimeAndSize = CoreController::getMimeTypeAndFileSize(['path' => $pathToDocument]);
-        if (!empty($mimeAndSize['errors'])) {
-            return $response->withStatus(400)->withJson(['errors' => $mimeAndSize['errors']]);
-        }
-        $mimeType = $mimeAndSize['mime'];
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($fileContent);
         $pathInfo = pathinfo($pathToDocument);
         $data     = $request->getQueryParams();
         $filename = TextFormatModel::formatFilename(['filename' => $subject, 'maxLength' => 250]);
@@ -769,11 +745,8 @@ class ResController extends ResourceControlController
             $fileContent = @file_get_contents($pathToThumbnail);
         }
 
-        $mimeAndSize = CoreController::getMimeTypeAndFileSize(['path' => $pathToThumbnail]);
-        if (!empty($mimeAndSize['errors'])) {
-            return $response->withStatus(400)->withJson(['errors' => $mimeAndSize['errors']]);
-        }
-        $mimeType = $mimeAndSize['mime'];
+        $finfo    = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($fileContent);
         $pathInfo = pathinfo($pathToThumbnail);
 
         $response->write($fileContent);
@@ -846,7 +819,7 @@ class ResController extends ResourceControlController
             $pdf = new Fpdi('P', 'pt');
             $pageCount = $pdf->setSourceFile($pathToPdf);
         }
-
+        
         return $response->withJson(['fileContent' => $base64Content, 'pageCount' => $pageCount]);
     }
 
