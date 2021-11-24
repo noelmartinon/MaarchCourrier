@@ -396,8 +396,8 @@ class ResController extends ResourceControlController
 
         $identifiers = !empty($data['chrono']) ? $data['chrono'] : $data['resId'];
         foreach ($identifiers as $id) {
-            $id = trim($id);
             if (!empty($data['chrono'])) {
+                $id = trim($id);
                 $document = ResModel::getByAltIdentifier(['altIdentifier' => $id, 'select' => ['res_id']]);
             } else {
                 $document = ResModel::getById(['resId' => $id, 'select' => ['res_id']]);
