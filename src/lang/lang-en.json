@@ -2624,5 +2624,9 @@
     "documentHasNoChrono": "This document has no chrono identifier",
     "documentNotFoundOnDocserver": "Document not found on document server",
     "docserverDocumentNotReadable": "Document could not be read from document server",
-    "soapClientCreationError": "Error while initiating SOAP client"
+    "soapClientCreationError": "Error while initiating SOAP client",
+    "mailevaSendingId": "Maileva sending identifier",
+    "signatureBookId": "ID in external signature book",
+    "m2m": "M2M identifier",
+    "multigestId": "Multigest Unique Identifier (UID)"
 }
