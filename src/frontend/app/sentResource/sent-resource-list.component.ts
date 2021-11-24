@@ -202,10 +202,7 @@ export class SentResourceListComponent implements OnInit {
                     data = data.map((item: any) => ({
                         id: item.id,
                         sender: item.userLabel,
-                        recipients: item.recipients.map((recip: any) => ({
-                            name: recip.contactLabel,
-                            company: recip.company
-                        })),
+                        recipients: item.recipients.map((recip: any) => recip.contactLabel),
                         creationDate: item.creationDate,
                         sendDate: item.creationDate,
                         type: 'shipping',

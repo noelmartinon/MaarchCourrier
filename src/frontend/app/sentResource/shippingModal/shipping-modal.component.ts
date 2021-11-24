@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
 import { MatDialog, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -9,9 +9,9 @@ import { ContactService } from '@service/contact.service';
 import { AppService } from '@service/app.service';
 import { PrivilegeService } from '@service/privileges.service';
 import { HeaderService } from '@service/header.service';
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { FullDatePipe } from '@plugins/fullDate.pipe';
-import { resolve } from 'dns';
+import { AuthService } from '@service/auth.service';
 
 @Component({
     templateUrl: 'shipping-modal.component.html',
@@ -37,7 +37,8 @@ export class ShippingModalComponent implements OnInit {
         public headerService: HeaderService,
         public translate: TranslateService,
         @Inject(MAT_DIALOG_DATA) public data: any,
-        private fullDate: FullDatePipe
+        private fullDate: FullDatePipe,
+        private authService: AuthService
     ) {}
 
     async ngOnInit() {
@@ -53,7 +54,6 @@ export class ShippingModalComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/shippings/${this.data.shippingData.id}/attachments`).pipe(
                 tap((data: any) => {
-                    console.log('attachments', data.attachments);
                     this.shippingAttachments = data.attachments;
                     resolve(true);
                 }),
@@ -69,7 +69,6 @@ export class ShippingModalComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/shippings/${this.data.shippingData.id}/history`).pipe(
                 tap((data: any) => {
-                    console.log('history', data.history);
                     this.shippingHistory = data.history;
                     resolve(true);
                 }),
@@ -82,19 +81,26 @@ export class ShippingModalComponent implements OnInit {
     }
 
     downloadFile(fileId: number) {
-        this.http.get(`../rest/shippings/${this.data.shippingData.id}/attachments/${fileId}`).pipe(
-            tap((data: any) => {
-                const downloadLink = document.createElement('a');
-                downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
-                downloadLink.setAttribute('download', data.filename);
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-            }),
-            catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+        const headers = new HttpHeaders({
+            'Authorization': 'Bearer ' + this.authService.getToken()
+        });
+        return new Observable<string>((observer) => {
+            const { next, error } = observer;
+            this.http.get(`../rest/shippings/${this.data.shippingData.id}/attachments/${fileId}`, { headers: headers, responseType: 'blob' }).subscribe(response => {
+                const reader = new FileReader();
+                reader.readAsDataURL(response);
+                reader.onloadend = () => {
+                    observer.next(reader.result as any);
+                    const href: string = reader.result as string;
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = href;
+                    downloadLink.setAttribute('download', this.shippingAttachments.find((el: any) => el.id === fileId).attachmentType);
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                };
+            });
+        }).subscribe();
+
     }
 
     getStatus() {
