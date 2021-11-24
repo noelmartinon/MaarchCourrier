@@ -28,12 +28,11 @@ declare let DocsAPI: any;
 })
 export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnDestroy {
 
-    loading: boolean = true;
-
     @Input() editMode: boolean = false;
     @Input() file: any = {};
     @Input() params: any = {};
     @Input() hideCloseEditor: any = false;
+    @Input() loading: boolean = false;
 
     @Output() triggerAfterUpdatedDoc = new EventEmitter<string>();
     @Output() triggerCloseEditor = new EventEmitter<string>();

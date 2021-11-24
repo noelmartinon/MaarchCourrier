@@ -1202,6 +1202,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     saveTmpDocument() {
+        this.loading = true;
         return new Promise((resolve, reject) => {
             this.getFile().pipe(
                 tap((data: any) => {
@@ -1220,6 +1221,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                     this.closeEditor();
                     resolve(true);
                 }),
+                finalize(() => this.loading = false),
                 catchError((err: any) => {
                     this.notify.handleSoftErrors(err);
                     resolve(false);
