@@ -27,6 +27,8 @@ export class ShippingModalComponent implements OnInit {
     shippingHistory: any[] = [];
     status: any[] = [];
 
+    depositProof: any = null;
+
     constructor(
         public http: HttpClient,
         private notify: NotificationService,
@@ -54,7 +56,8 @@ export class ShippingModalComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/shippings/${this.data.shippingData.id}/attachments`).pipe(
                 tap((data: any) => {
-                    this.shippingAttachments = data.attachments;
+                    this.depositProof = data.attachments.find((item: any) => item.attachmentType === 'depositProof');
+                    this.shippingAttachments = data.attachments.filter((item: any) => item.attachmentType !== 'depositProof');
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -93,8 +96,9 @@ export class ShippingModalComponent implements OnInit {
                     observer.next(reader.result as any);
                     const href: string = reader.result as string;
                     const downloadLink = document.createElement('a');
+                    const fileName: string = this.shippingAttachments.find((el: any) => el.id === fileId) === undefined ? this.translate.instant('lang.depositProof') : this.shippingAttachments.find((el: any) => el.id === fileId).label;
                     downloadLink.href = href;
-                    downloadLink.setAttribute('download', this.shippingAttachments.find((el: any) => el.id === fileId).attachmentType);
+                    downloadLink.setAttribute('download', fileName);
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
                 };

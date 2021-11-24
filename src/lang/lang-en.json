@@ -2545,5 +2545,10 @@
     "ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED": "Receipt notice received",
     "ON_STATUS_ARCHIVED": "Archived",
     "showShippingHistory": "View Maileva sending history",
-    "sendDate": "Sending date"
+    "sendDate": "Sending date",
+    "shippingSubscribe": "Subscribe to notifications enabled",
+    "shippingUnsubscribe": "Subscribe to notifications disabled",
+    "depositProof": "Deposit proof",
+    "downloadFile": "Download file"
+
 }

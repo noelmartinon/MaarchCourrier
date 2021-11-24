@@ -2544,5 +2544,7 @@
     "showShippingHistory": "Afficher l'historique de l'envoi Maileva",
     "sendDate": "Date d'envoi",
     "shippingSubscribe": "Abonnement aux notifications activé",
-    "shippingUnsubscribe": "Abonnement aux notifications désactivé"
+    "shippingUnsubscribe": "Abonnement aux notifications désactivé",
+    "depositProof": "Preuve de dépôt",
+    "downloadFile": "Télécharger le fichier"
 }

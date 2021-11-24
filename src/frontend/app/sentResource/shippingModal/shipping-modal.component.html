@@ -48,20 +48,19 @@
             </div>
             <br>
             <div class="row">
-                <div class="col-md-6">
-                    <mat-label class="typeFileTitle">Preuve de dépôt</mat-label><br>
+                <div *ngIf="depositProof !== null" class="col-md-6">
+                    <mat-label class="typeFileTitle">{{'lang.depositProof' | translate}}</mat-label><br>
                     <mat-chip-list class="mat-chip-list-stacked itemChip" style="margin-top: 2px; padding: 5px;">
                         <mat-chip [title]="'Fichier envoyé par Maileva (MAA-16/21)'"
                             class="listAutocomplete">
                             <span style="display: flex;flex: 1;align-items: center;">
-                                <i class="fa fa-box" style="padding-right:5px;"></i>&nbsp;Fichier envoyé par Maileva (MAA-16/21)
+                                <i class="fa fa-box" style="padding-right:5px;"></i>&nbsp;{{'lang.depositProof' | translate}}
                             </span>
-                            <mat-icon class="fas fa-download" style="margin-top: 8px; cursor: pointer;" color="primary" [title]="'lang.downloadFile' | translate"></mat-icon>
-                            <mat-icon class="fas fa-eye" color="primary" style="margin-top: 8px; cursor: pointer;" [title]="'lang.viewResource' | translate"></mat-icon>
+                            <mat-icon class="fas fa-download" style="margin-top: 8px; cursor: pointer;" color="primary" [title]="'lang.downloadFile' | translate" (click)="downloadFile(this.depositProof.id)"></mat-icon>
                     </mat-chip>
                     </mat-chip-list>
                 </div>
-                <div class="col-md-6">
+                <div *ngIf="shippingAttachments.length > 0" class="col-md-6">
                     <mat-label class="typeFileTitle">{{ 'lang.attachments' | translate }}</mat-label><br>
                     <mat-chip-list class="mat-chip-list-stacked itemChip" style="margin-top: 2px; padding: 5px;">
                         <mat-chip *ngFor="let attachment of shippingAttachments; let i = index" 
@@ -70,7 +69,6 @@
                                 <i class="fa fa-paperclip" style="padding-right:5px;"></i>&nbsp;{{attachment.label}}
                             </span>
                             <mat-icon class="fas fa-download" style="margin-top: 8px; cursor: pointer;" color="primary" [title]="'lang.downloadFile' | translate" (click)="$event.stopPropagation(); downloadFile(attachment.id)"></mat-icon>
-                            <mat-icon class="fas fa-eye" color="primary" style="margin-top: 8px; cursor: pointer;" [title]="'lang.viewResource' | translate"></mat-icon>
                         </mat-chip>
                     </mat-chip-list>
                 </div>
