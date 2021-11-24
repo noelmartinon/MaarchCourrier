@@ -398,7 +398,7 @@ class ShippingTemplateController
                         'callback_url'  => $maarchUrl . '/rest/administration/shippings/' . $shippingTemplate['id'] . '/notifications'
                     ])
                 ]);
-                if ($curlResponse['code'] != 200) {
+                if ($curlResponse['code'] != 201) {
                     return ['errors' => $curlResponse['response']['errors']];
                 }
 
@@ -430,11 +430,11 @@ class ShippingTemplateController
         }
         foreach ($shippingTemplate['subscriptions'] as $subscriptionId) {
             $curlResponse = CurlModel::exec([
-                'method'     => 'GET',
+                'method'     => 'DELETE',
                 'url'        => $mailevaConfig['uri'] . '/subscriptions/' . $subscriptionId,
                 'bearerAuth' => ['token' => $authToken]
             ]);
-            if ($curlResponse['code'] != 200) {
+            if ($curlResponse['code'] != 204) {
                 return ['errors' => $curlResponse['response']['errors']];
             }
         }
