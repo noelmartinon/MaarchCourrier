@@ -630,10 +630,11 @@ class ShippingTemplateController
                 return ShippingTemplateController::logAndReturnError($response, 400, $authToken['errors']);
             }
             $curlResponse = CurlModel::exec([
-                'method'     => 'GET',
-                'url'        => $body['resourceLocation'] . '/download_deposit_proof',
-                'bearerAuth' => ['token' => $authToken],
-                'headers'    => ['Accept: application/zip']
+                'method'       => 'GET',
+                'url'          => $body['resourceLocation'] . '/download_deposit_proof',
+                'bearerAuth'   => ['token' => $authToken],
+                'headers'      => ['Accept: */*'],
+                'fileResponse' => true
             ]);
             if ($curlResponse['code'] != 200) {
                 return ShippingTemplateController::logAndReturnError($response, 400, 'deposit proof failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId']]));
@@ -668,10 +669,11 @@ class ShippingTemplateController
                 }
             }
             $curlResponse = CurlModel::exec([
-                'method'     => 'GET',
-                'url'        => $mailevaConfig['uri'] . $recipient['acknowledgement_of_receipt_url'],
-                'bearerAuth' => ['token' => $authToken],
-                'headers'    => ['Accept: application/zip']
+                'method'       => 'GET',
+                'url'          => $mailevaConfig['uri'] . $recipient['acknowledgement_of_receipt_url'],
+                'bearerAuth'   => ['token' => $authToken],
+                'headers'      => ['Accept: */*'],
+                'fileResponse' => true,
             ]);
             if ($curlResponse['code'] != 200) {
                 return ShippingTemplateController::logAndReturnError($response, 400, 'acknowledgement of receipt failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId'], 'recipientId' => $recipient['id']]));
