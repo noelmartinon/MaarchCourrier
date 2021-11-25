@@ -193,7 +193,9 @@ export class AdministrationService {
 
         // WORKAROUND TO SHOW ARROW DEFAULT FILTER
         const element: HTMLElement = document.getElementsByClassName('mat-column-' + this.getFilter('sort'))[0] as HTMLElement;
-        element.click();
+        if (document.getElementsByClassName('mat-column-' + this.getFilter('sort')).length > 0) {
+            element.click();
+        }
         if (this.getFilter('sortDirection') === 'desc') {
             element.click();
         }

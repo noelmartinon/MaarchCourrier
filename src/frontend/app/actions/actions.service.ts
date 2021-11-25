@@ -45,6 +45,7 @@ import { SendToRecordManagementComponent } from './send-to-record-management-act
 import { CheckReplyRecordManagementComponent } from './check-reply-record-management-action/check-reply-record-management.component';
 import { ResetRecordManagementComponent } from './reset-record-management-action/reset-record-management.component';
 import { CheckAcknowledgmentRecordManagementComponent } from './check-acknowledgment-record-management-action/check-acknowledgment-record-management.component';
+import { SendMultigestActionComponent } from './send-multigest-action/send-multigest-action.component';
 
 @Injectable()
 export class ActionsService implements OnDestroy {
@@ -1189,6 +1190,29 @@ export class ActionsService implements OnDestroy {
             filter((resIds: any) => !this.functions.empty(resIds)),
             tap((resIds: any) => {
                 this.endAction(resIds);
+            }),
+            finalize(() => this.loading = false),
+            catchError((err: any) => {
+                this.notify.handleErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+
+    sendMultigestAction(options: any = null) {
+        const dialogRef = this.dialog.open(SendMultigestActionComponent, {
+            panelClass: 'maarch-modal',
+            autoFocus: false,
+            disableClose: true,
+            data: this.setDatasActionToSend()
+        });
+        dialogRef.afterClosed().pipe(
+            tap((data: any) => {
+                this.unlockResourceAfterActionModal(data);
+            }),
+            filter((data: string) => data === 'success'),
+            tap((result: any) => {
+                this.endAction(result);
             }),
             finalize(() => this.loading = false),
             catchError((err: any) => {

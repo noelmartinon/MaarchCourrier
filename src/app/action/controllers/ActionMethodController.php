@@ -17,6 +17,7 @@ use Action\models\ActionModel;
 use Action\models\BasketPersistenceModel;
 use Action\models\ResMarkAsReadModel;
 use Alfresco\controllers\AlfrescoController;
+use Multigest\controllers\MultigestController;
 use Attachment\models\AttachmentModel;
 use Attachment\models\AttachmentTypeModel;
 use Basket\models\BasketModel;
@@ -86,6 +87,7 @@ class ActionMethodController
         'validateParallelOpinionDiffusionAction'    => 'validateParallelOpinionDiffusion',
         'reconcileAction'                           => 'reconcile',
         'sendAlfrescoAction'                        => 'sendResourceAlfresco',
+        'sendMultigestAction'                       => 'sendResourceMultigest',
         'saveRegisteredMailAction'                  => 'saveAndPrintRegisteredMail',
         'saveAndPrintRegisteredMailAction'          => 'saveAndPrintRegisteredMail',
         'saveAndIndexRegisteredMailAction'          => 'saveAndPrintRegisteredMail',
@@ -1108,6 +1110,29 @@ class ActionMethodController
         }
 
         return ['history' => $sent['history']];
+    }
+
+    public static function sendResourceMultigest(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['resId']);
+        ValidatorModel::intVal($args, ['resId']);
+
+        $sent = MultigestController::sendResource(['resId' => $args['resId'], 'userId' => $GLOBALS['id']]);
+        if (!empty($sent['errors'])) {
+            LogsController::add([
+                'isTech'    => true,
+                'moduleId'  => 'multigest',
+                'level'     => 'ERROR',
+                'tableName' => '',
+                'recordId'  => '',
+                'eventType' => 'Error sending to Multigest : ' . $sent['errors'],
+                'eventId'   => 'Multigest Error'
+            ]);
+
+            return ['errors' => [$sent['errors']]];
+        }
+
+        return true;
     }
 
     public static function reconcile(array $args)
