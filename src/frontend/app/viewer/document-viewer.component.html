@@ -114,12 +114,15 @@
 </ng-container>
 <ng-container *ngIf="editInProgress && editor.mode === 'onlyoffice'">
     <app-onlyoffice-viewer #onlyofficeViewer style="height:100%;width:100%;" [params]="editor.options" [file]="file"
-        [editMode]="true" (triggerAfterUpdatedDoc)="triggerEvent.emit()"
+        [editMode]="true" [loading]="loading"  (triggerAfterUpdatedDoc)="triggerEvent.emit()"
         (triggerCloseEditor)="closeEditor()" (triggerModifiedDocument)="isDocModified = true"></app-onlyoffice-viewer>
+        <div *ngIf="loading" class="example-loading-shade">
+            <mat-spinner style="margin:auto;"></mat-spinner>
+        </div>    
 </ng-container>
 <ng-container *ngIf="editInProgress && editor.mode === 'collaboraOnline'">
     <app-collabora-online-viewer #collaboraOnlineViewer style="height:100%;width:100%;" [params]="editor.options" [file]="file"
-        [editMode]="true" (triggerAfterUpdatedDoc)="triggerEvent.emit()"
+        [editMode]="true" [loading]="loading"  (triggerAfterUpdatedDoc)="triggerEvent.emit()"
         (triggerCloseEditor)="closeEditor()" (triggerModifiedDocument)="isDocModified = true"></app-collabora-online-viewer>
     <div *ngIf="collaboraOnlineViewer.isSaving" class="example-loading-shade">
         <mat-spinner style="margin:auto;"></mat-spinner>
@@ -134,12 +137,12 @@
         <mat-spinner style="margin:auto;"></mat-spinner>
     </div>
 </ng-container>
-<button mat-fab *ngIf="isDocModified && mode === 'mainDocument' && resId !== null && editor.mode !== 'office365sharepoint'" color="accent"
+<button mat-fab *ngIf="isDocModified && mode === 'mainDocument' && resId !== null && editor.mode !== 'office365sharepoint' && !loading" color="accent"
     [title]="'lang.saveModifications' | translate" style="position: absolute;z-index: 3;bottom: 40px;right: 60px;"
     (click)="saveMainDocument()">
     <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>
 </button>
-<button mat-fab *ngIf="isDocModified && mode === 'attachment' && editor.mode !== 'office365sharepoint'" color="accent"
+<button mat-fab *ngIf="isDocModified && mode === 'attachment' && editor.mode !== 'office365sharepoint' && !loading" color="accent"
     [title]="'lang.saveModifications' | translate" style="position: absolute;z-index: 3;bottom: 40px;right: 60px;"
     (click)="saveTmpDocument()">
     <mat-icon style="height:auto;font-size:20px;" class="fas fa-check"></mat-icon>

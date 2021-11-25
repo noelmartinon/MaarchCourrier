@@ -32,12 +32,11 @@ export class EcplOnlyofficeViewerComponent implements OnInit, AfterViewInit, OnD
     @Input() file: any = {};
     @Input() params: any = {};
     @Input() hideCloseEditor: any = false;
+    @Input() loading: boolean = false;
 
     @Output() triggerAfterUpdatedDoc = new EventEmitter<string>();
     @Output() triggerCloseEditor = new EventEmitter<string>();
     @Output() triggerModifiedDocument = new EventEmitter<string>();
-
-    loading: boolean = true;
 
     editorConfig: any;
     docEditor: any;
