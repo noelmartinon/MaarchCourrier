@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { HeaderService } from '@service/header.service';
 import { AppService } from '@service/app.service';
 import { environment } from '../environments/environment';
 import { catchError, tap } from 'rxjs/operators';
@@ -29,7 +28,6 @@ export class AboutUsComponent implements OnInit {
         public translate: TranslateService,
         public http: HttpClient,
         private notify: NotificationService,
-        private headerService: HeaderService,
         public appService: AppService,
         public dialogRef: MatDialogRef<AboutUsComponent>,
         iconReg: MatIconRegistry,
@@ -39,8 +37,6 @@ export class AboutUsComponent implements OnInit {
     }
 
     async ngOnInit() {
-        this.headerService.setHeader(this.translate.instant('lang.aboutUs'));
-
         this.applicationVersion = environment.VERSION;
         this.currentYear = new Date().getFullYear();
         this.loading = false;
