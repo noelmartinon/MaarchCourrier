@@ -399,7 +399,7 @@ class ShippingTemplateController
                     ])
                 ]);
                 if ($curlResponse['code'] != 201) {
-                    return ['errors' => $curlResponse['response']['errors']];
+                    return ['errors' => $curlResponse['response']['errors'] ?? ('Maileva POST/subscriptions returned HTTP ' . $curlResponse['code'])];
                 }
 
                 $subscriptionId = $curlResponse['response']['subscription_id'] ?? null;
@@ -435,7 +435,7 @@ class ShippingTemplateController
                 'bearerAuth' => ['token' => $authToken]
             ]);
             if ($curlResponse['code'] != 204) {
-                return ['errors' => $curlResponse['response']['errors']];
+                return ['errors' => $curlResponse['response']['errors'] ?? ('Maileva DELETE/subscriptions/' . $subscriptionId . ' returned HTTP ' . $curlResponse['code'])];
             }
         }
 
