@@ -806,7 +806,7 @@ export class IndexingFormComponent implements OnInit {
                                 }
 
                                 if (elem.identifier === 'priority') {
-                                    this.setPriorityColor(null, fieldValue);
+                                    this.setPriorityColor(null, elem.default_value !== null ? elem.default_value : fieldValue);
                                 } else if (elem.identifier === 'processLimitDate' && !this.functions.empty(fieldValue)) {
                                     elem.startDate = '';
                                 } else if (elem.identifier === 'destination') {
