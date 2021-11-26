@@ -21,14 +21,13 @@ export class CollaboraOnlineViewerComponent implements OnInit, AfterViewInit, On
     @Input() editMode: boolean = false;
     @Input() file: any = {};
     @Input() params: any = {};
+    @Input() loading: boolean = false;
 
     @Output() triggerAfterUpdatedDoc = new EventEmitter<string>();
     @Output() triggerCloseEditor = new EventEmitter<string>();
     @Output() triggerModifiedDocument = new EventEmitter<string>();
 
     @ViewChild('collaboraFrame', { static: false }) collaboraFrame: any;
-
-    loading: boolean = true;
 
     editorConfig: any;
     key: number = 0;
