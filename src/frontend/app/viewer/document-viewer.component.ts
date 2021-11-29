@@ -613,7 +613,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 tap((data: any) => {
                     const formatFileName: any = data.filename.substring(0, data.filename.lastIndexOf('.'));
                     if (formatFileName !== undefined) {
-                        data.filename = this.file.subinfos.signedDocVersions || this.file.subinfos.commentedDocVersions ? formatFileName : data.filename;
+                        data.filename = this.file.subinfos?.signedDocVersions || this.file.subinfos?.commentedDocVersions ? formatFileName : data.filename;
                     }
                     downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
                     downloadLink.setAttribute('download', data.filename);
