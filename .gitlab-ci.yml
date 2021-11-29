@@ -4,10 +4,7 @@ variables:
   POSTGRES_PASSWORD: ""
 
 stages:
-  - logs
-  - new_branch
-  - new_tag
-  - mr_end
+  - sync
   - test
   - deploy
 
@@ -72,8 +69,10 @@ job_e2e:
      - test/e2e/output/
    expire_in: 2 days
    when: always
- only:
-   - schedules
+ rules:
+   - if: '$CI_PIPELINE_SOURCE == "schedule"'
+# only:
+#   - schedules
 
 job_php-7.4:
  image: php:7.4-apache
@@ -85,37 +84,23 @@ job_php-7.4:
    - curl --location -s --output /usr/local/bin/phpunit https://phar.phpunit.de/phpunit-9.phar
    - chmod +x /usr/local/bin/phpunit
    - phpunit --coverage-text --colors=never
- only:
-   - develop
- except:
-   - schedules
+# only:
+#   - develop
+# except:
+#   - schedules
+ rules:
+   - if: '$CI_COMMIT_BRANCH =~ /(feat|fix)\/[0-9]{4,5}\/develop/'
+
  artifacts:
    paths:
      - test/unitTests/build/
    expire_in: 2h
 
-job_php-7.3:
- image: php:7.3-apache
- stage: test
- services:
-   - name: postgres:10.1
-     command: [ "-c", "datestyle=iso,dmy" ]
- script:
-   - curl --location -s --output /usr/local/bin/phpunit https://phar.phpunit.de/phpunit-9.phar
-   - chmod +x /usr/local/bin/phpunit
-   - phpunit --coverage-text --colors=never
- only:
-   - develop
- except:
-   - schedules
-
 logs:
   image: debian:10-slim
-  stage: logs
-  except:
-    - schedules
-    - tags
-    - master
+  stage: sync
+  rules:
+    - if: '$CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "schedule" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_TAG =~ "/^$/"'
   before_script:
     - apt-get update -y
     - apt install -y curl
@@ -134,7 +119,7 @@ logs:
         fi; \
       fi
     - echo $ISSUE_ID
-    - NOTE_MESSAGE="Commit ajouté sur la branche **$CI_COMMIT_REF_NAME** de **$CI_PROJECT_NAME**"
+    - NOTE_MESSAGE="Commit ajouté sur la branche **$CI_COMMIT_REF_NAME** de **$CI_PROJECT_NAME** par $CI_COMMIT_AUTHOR"
     - COMMIT_URL="$CI_PROJECT_URL/commit/$CI_COMMIT_SHA"
     - echo $NOTE_MESSAGE
     - echo "$CI_COMMIT_MESSAGE"
@@ -149,9 +134,11 @@ logs:
 
 new_branch:
  image: debian:10-slim
- stage: new_branch
- only:
-   - branches
+ stage: sync
+# only:
+#   - branches
+ rules:
+   - if: '$CI_COMMIT_BRANCH =~ /(feat|fix)\/[0-9]{4,5}\//'
  before_script:
    # Install git and curl command
    - apt-get update -yqq > /dev/null
@@ -163,9 +150,11 @@ new_branch:
 
 new_tag:
  image: debian:10-slim
- stage: new_tag
- only:
-   - tags
+ stage: deploy
+# only:
+#   - tags
+ rules:
+   - if: $CI_COMMIT_TAG
  before_script:
    # Install git and curl command
    - apt-get update -yqq > /dev/null
@@ -186,7 +175,7 @@ new_tag:
 
 mr_end:
  image: debian:10-slim
- stage: mr_end
+ stage: deploy
  # only: 
  #  - merge_requests
  rules:
