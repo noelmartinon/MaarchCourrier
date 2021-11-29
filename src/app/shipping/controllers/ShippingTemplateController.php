@@ -33,27 +33,44 @@ use User\models\UserModel;
 use SrcCore\controllers\LogsController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\PasswordModel;
-use SrcCore\models\ValidatorModel;
 
 class ShippingTemplateController
 {
-    public const MAILEVA_EVENT_TYPES = [
-        'ON_STATUS_ACCEPTED',
-        'ON_STATUS_REJECTED',
-        'ON_STATUS_PROCESSED',
-        'ON_DEPOSIT_PROOF_RECEIVED',
-        'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED',
-        'ON_STATUS_ARCHIVED'
-    ];
-
-    public const MAILEVA_RESOURCE_TYPES = [
-        'mail/v2/sendings',
-        'registered_mail/v2/sendings',
-        'simple_registered_mail/v1/sendings',
-        'lel/v2/sendings',
-        'lrc/v1/sendings',
-        'registered_mail/v2/recipients',
-        'simple_registered_mail/v1/recipients'
+    private const MAILEVA_EVENT_RESOURCES = [
+        'ON_STATUS_ACCEPTED' => [
+            'mail/v2/sendings',
+            'registered_mail/v2/sendings',
+            'simple_registered_mail/v1/sendings',
+            'lel/v2/sendings',
+            'lrc/v1/sendings'
+        ],
+        'ON_STATUS_REJECTED' => [
+            'mail/v2/sendings',
+            'registered_mail/v2/sendings',
+            'simple_registered_mail/v1/sendings',
+            'lel/v2/sendings',
+            'lrc/v1/sending'
+        ],
+        'ON_STATUS_PROCESSED' => [
+            'mail/v2/sendings',
+            'registered_mail/v2/sendings',
+            'simple_registered_mail/v1/sendings',
+            'lel/v2/sendings',
+            'lrc/v1/sending'
+        ],
+        'ON_DEPOSIT_PROOF_RECEIVED' => [
+            'registered_mail/v2/sendings'
+        ],
+        'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED' => [
+            'registered_mail/v2/recipients',
+            'simple_registered_mail/v1/recipients'
+        ],
+        'ON_STATUS_ARCHIVED' => [
+            'mail/v2/sendings',
+            'registered_mail/v2/sendings',
+            'simple_registered_mail/v1/sendings',
+            'lel/v2/sending'
+        ]
     ];
 
     public function get(Request $request, Response $response)
@@ -381,17 +398,21 @@ class ShippingTemplateController
             return ['errors' => $authToken['errors']];
         }
         $configFile = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
-        $maarchUrl = $configFile['config']['maarchUrl'] ?? null;
+        $maarchUrl = rtrim($configFile['config']['maarchUrl'], '/') ?? null;
         if (empty($maarchUrl)) {
             return ['errors' => 'maarchUrl is not configured'];
         }
         $subscriptions = [];
-        foreach (ShippingTemplateController::MAILEVA_EVENT_TYPES as $eventType) {
-            foreach (ShippingTemplateController::MAILEVA_RESOURCE_TYPES as $resourceType) {
+        foreach (ShippingTemplateController::MAILEVA_EVENT_RESOURCES as $eventType => $resourceTypes) {
+            foreach ($resourceTypes as $resourceType) {
                 $curlResponse = CurlModel::exec([
                     'method'     => 'POST',
-                    'url'        => $mailevaConfig['uri'] . '/subscriptions',
+                    'url'        => $mailevaConfig['uri'] . '/notification_center/v2/subscriptions',
                     'bearerAuth' => ['token' => $authToken],
+                    'headers'   => [
+                        'Accept: application/json',
+                        'Content-Type: application/json'
+                    ],
                     'body'       => json_encode([
                         'event_type'    => $eventType,
                         'resource_type' => $resourceType,
@@ -402,7 +423,7 @@ class ShippingTemplateController
                     return ['errors' => $curlResponse['response']['errors'] ?? ('Maileva POST/subscriptions returned HTTP ' . $curlResponse['code'])];
                 }
 
-                $subscriptionId = $curlResponse['response']['subscription_id'] ?? null;
+                $subscriptionId = $curlResponse['response']['subcription_id'] ?? null;
                 if (!empty($subscriptionId)) {
                     $subscriptions[] = $subscriptionId;
                 }
@@ -431,11 +452,12 @@ class ShippingTemplateController
         foreach ($shippingTemplate['subscriptions'] as $subscriptionId) {
             $curlResponse = CurlModel::exec([
                 'method'     => 'DELETE',
-                'url'        => $mailevaConfig['uri'] . '/subscriptions/' . $subscriptionId,
-                'bearerAuth' => ['token' => $authToken]
+                'url'        => $mailevaConfig['uri'] . '/notification_center/v2/subscriptions/' . $subscriptionId,
+                'bearerAuth' => ['token' => $authToken],
+                'headers'    => ['Accept: application/json']
             ]);
             if ($curlResponse['code'] != 204) {
-                return ['errors' => $curlResponse['response']['errors'] ?? ('Maileva DELETE/subscriptions/' . $subscriptionId . ' returned HTTP ' . $curlResponse['code'])];
+                return ['errors' => $curlResponse['response'] ?? ('Maileva DELETE/subscriptions/' . $subscriptionId . ' returned HTTP ' . $curlResponse['code'])];
             }
         }
 
@@ -462,9 +484,9 @@ class ShippingTemplateController
             $error = 'Body user_id is empty, too long, or not a string';
         } elseif (!Validator::stringType()->length(1, 256)->validate($body['client_id'])) {
             $error = 'Body client_id is empty, too long, or not a string';
-        } elseif (!Validator::stringType()->in(ShippingTemplateController::MAILEVA_EVENT_TYPES)->validate($body['event_type'])) {
+        } elseif (!Validator::stringType()->in(array_keys(ShippingTemplateController::MAILEVA_EVENT_RESOURCES))->validate($body['event_type'])) {
             $error = 'Body event_type is not an allowed value';
-        } elseif (!Validator::stringType()->in(ShippingTemplateController::MAILEVA_RESOURCE_TYPES)->validate($body['resource_type'])) {
+        } elseif (!Validator::stringType()->in(ShippingTemplateController::MAILEVA_EVENT_RESOURCES[$body['event_type']])->validate($body['resource_type'])) {
             $error = 'Body resource_type is not an allowed value';
         } elseif (!Validator::date()->validate($body['event_date'])) {
             $error = 'Body event_date is not a valid date';
@@ -592,11 +614,11 @@ class ShippingTemplateController
                 && empty(StatusModel::getById(['id' => $actionParameters['finalStatus']['actionStatus'], 'select' => ['id']])))
                 ) {
             return ShippingTemplateController::logAndReturnError($response, 400, 'Maileva action actionStatus is invalid for finalStatus');
-        } elseif (!Validator::each(Validator::in(ShippingTemplateController::MAILEVA_EVENT_TYPES))->validate($actionParameters['intermediateStatus']['mailevaStatus'])) {
+        } elseif (!Validator::each(Validator::in(array_keys(ShippingTemplateController::MAILEVA_EVENT_RESOURCES)))->validate($actionParameters['intermediateStatus']['mailevaStatus'])) {
             return ShippingTemplateController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for intermediateStatus');
-        } elseif (!Validator::each(Validator::in(ShippingTemplateController::MAILEVA_EVENT_TYPES))->validate($actionParameters['errorStatus']['mailevaStatus'])) {
+        } elseif (!Validator::each(Validator::in(array_keys(ShippingTemplateController::MAILEVA_EVENT_RESOURCES)))->validate($actionParameters['errorStatus']['mailevaStatus'])) {
             return ShippingTemplateController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for errorStatus');
-        } elseif (!Validator::each(Validator::in(ShippingTemplateController::MAILEVA_EVENT_TYPES))->validate($actionParameters['finalStatus']['mailevaStatus'])) {
+        } elseif (!Validator::each(Validator::in(array_keys(ShippingTemplateController::MAILEVA_EVENT_RESOURCES)))->validate($actionParameters['finalStatus']['mailevaStatus'])) {
             return ShippingTemplateController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for finalStatus');
         }
 
@@ -712,7 +734,7 @@ class ShippingTemplateController
             'data'  => [$resId]
         ]);
 
-        return $response->withStatus(204);
+        return $response->withStatus(201);
     }
 
     private static function logAndReturnError(Response $response, int $httpStatusCode, string $error)
