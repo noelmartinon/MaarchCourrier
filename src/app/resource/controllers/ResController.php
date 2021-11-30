@@ -278,7 +278,7 @@ class ResController extends ResourceControlController
 
         $body = $request->getParsedBody();
         $body = StoreController::setDisabledAndEmptyMandatoryFields($body);
-        
+
         $queryParams = $request->getQueryParams();
 
         $onlyDocument = !empty($queryParams['onlyDocument']);
@@ -385,7 +385,7 @@ class ResController extends ResourceControlController
         if (empty($data['status'])) {
             $data['status'] = 'COU';
         }
-        
+
         $statusInfo = StatusModel::getById(['id' => $data['status'], 'select' => ['label_status']]);
         if (empty($statusInfo)) {
             return $response->withStatus(400)->withJson(['errors' => _STATUS_NOT_FOUND]);
@@ -561,7 +561,7 @@ class ResController extends ResourceControlController
         }
 
         $canConvert = ConvertPdfController::canConvert(['extension' => $resource['format']]);
-        
+
         $convertedDocuments = AdrModel::getDocuments([
             'select'    => ['type', 'version'],
             'where'     => ['res_id = ?', 'type in (?)'],
@@ -672,14 +672,6 @@ class ResController extends ResourceControlController
             return $response->withStatus(400)->withJson(['errors' => 'Document has no file']);
         }
         $subject = $document['subject'];
-
-        $convertedDocument = AdrModel::getDocuments([
-            'select'    => ['docserver_id', 'path', 'filename', 'fingerprint'],
-            'where'     => ['res_id = ?', 'type = ?', 'version = ?'],
-            'data'      => [$args['resId'], 'SIGN', $document['version']],
-            'limit'     => 1
-        ]);
-        $document = $convertedDocument[0] ?? $document;
 
         $docserver = DocserverModel::getByDocserverId(['docserverId' => $document['docserver_id'], 'select' => ['path_template', 'docserver_type_id']]);
         if (empty($docserver['path_template']) || !file_exists($docserver['path_template'])) {
@@ -850,7 +842,7 @@ class ResController extends ResourceControlController
             $pdf = new Fpdi('P', 'pt');
             $pageCount = $pdf->setSourceFile($pathToPdf);
         }
-        
+
         return $response->withJson(['fileContent' => $base64Content, 'pageCount' => $pageCount]);
     }
 
