@@ -25,7 +25,7 @@
     "PRE": "Back from absence",
     "RESETPSW": "Password reset",
     "SIGN": "Sign document",
-    "SIGN_version": "Original version",
+    "SIGN_version": "Unsigned version",
     "SPH": "Superior",
     "UNSIGN": "Un-sign document",
     "UP": "Update",
@@ -2628,5 +2628,7 @@
     "mailevaSendingId": "Maileva sending identifier",
     "signatureBookId": "ID in external signature book",
     "m2m": "M2M identifier",
-    "multigestId": "Multigest Unique Identifier (UID)"
+    "multigestId": "Multigest Unique Identifier (UID)",
+    "downloadFile": "Download file",
+    "pdfFormat": "pdf format"
 }

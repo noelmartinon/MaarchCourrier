@@ -43,7 +43,20 @@
         <div style="display: block;width:100%;" appUploadFileDragDrop (fileDropped)="dndUploadFile($event)"
             [disabled]="!editMode">
             <div *ngIf="!loading && file.content !== null && !hideTools" class="viewer-tools">
-                <button mat-icon-button (click)="downloadOriginalFile()" [matTooltip]="'lang.downloadOriginalFile' | translate">
+                <!-- Download original file with pdf/original format -->
+                <button *ngIf="downloadActions.length > 0" mat-icon-button [matMenuTriggerFor]="formatListMenu" [matTooltip]="'lang.downloadOriginalFile' | translate">
+                    <mat-icon class="fa fa-download"></mat-icon>
+                </button>
+                <mat-menu #formatListMenu="matMenu" [class]="'optionsListMenu'">
+                    <ng-container *ngFor="let action of downloadActions">
+                        <button mat-menu-item (click)="action.id === 'original' ? downloadOriginalFile(action.fileData) : downloadConvertedFile()">
+                            <mat-icon color="primary" [class]="action.icon"></mat-icon>
+                            <span>{{action.label}}</span>
+                        </button>
+                    </ng-container>
+                </mat-menu>
+                <!--  -->
+                <button *ngIf="downloadActions.length === 0" mat-icon-button (click)="downloadConvertedFile()" [matTooltip]="(resId !== null ? 'lang.downloadFile' : 'lang.downloadOriginalFile') | translate">
                     <mat-icon class="fa fa-download"></mat-icon>
                 </button>
                 <ng-container *ngIf="editMode && resId !== null && !noConvertedFound">
@@ -105,7 +118,7 @@
         <div *ngIf="file.content !== null && noConvertedFound" class="no-doc-container" appUploadFileDragDrop
             (fileDropped)="dndUploadFile($event)" [disabled]="!editMode">
             <div class="loaded-file"><i class="fa fa-file"></i>&nbsp;<a
-                    (click)="downloadOriginalFile()">{{file.name}}</a>&nbsp;<b>{{'lang.loaded' | translate}}</b></div>
+                    (click)="downloadConvertedFile()">{{file.name}}</a>&nbsp;<b>{{'lang.loaded' | translate}}</b></div>
 
             <div class="no-view"><i class="far fa-eye-slash no-view-icon"></i><br />{{'lang.noAvailablePreview' | translate}}</div>
 

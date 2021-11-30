@@ -6,7 +6,10 @@
         </button>
     </h1>
     <mat-dialog-content>
-        <app-document-viewer #appDocumentViewer style="height:100%;width:100%;" [editMode]="false" [base64]="data.base64" [title]="data.title" [filename]="data.filename">
+        <app-document-viewer #appDocumentViewer style="height:100%;width:100%;"
+            [editMode]="false" [base64]="data.base64"
+            [title]="data.title" [filename]="data.filename"
+            [downloadActions]="data.downloadActions" [isSigned]="data.isSigned">
         </app-document-viewer>
     </mat-dialog-content>
 </div>
