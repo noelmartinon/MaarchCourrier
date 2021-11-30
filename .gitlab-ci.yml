@@ -4,9 +4,7 @@ variables:
   POSTGRES_PASSWORD: ""
 
 stages:
-  - logs
-  - new_branch
-  - new_tag
+  - sync
   - test
   - deploy
 
@@ -110,11 +108,9 @@ job_php-7.3:
 
 logs:
   image: debian:10-slim
-  stage: logs
-  except:
-    - schedules
-    - tags
-    - master
+  stage: sync
+  rules:
+    - if: '$CI_COMMIT_BRANCH != "master" && $CI_PIPELINE_SOURCE != "schedule" && $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_TAG =~ "/^$/"'
   before_script:
     - apt-get update -y
     - apt install -y curl
@@ -133,7 +129,7 @@ logs:
         fi; \
       fi
     - echo $ISSUE_ID
-    - NOTE_MESSAGE="Commit ajouté sur la branche **$CI_COMMIT_REF_NAME** de **$CI_PROJECT_NAME**"
+    - NOTE_MESSAGE="Commit ajouté sur la branche **$CI_COMMIT_REF_NAME** de **$CI_PROJECT_NAME** par $CI_COMMIT_AUTHOR"
     - COMMIT_URL="$CI_PROJECT_URL/commit/$CI_COMMIT_SHA"
     - echo $NOTE_MESSAGE
     - echo "$CI_COMMIT_MESSAGE"
@@ -147,41 +143,59 @@ logs:
     - curl -v -H 'Content-Type:application/json' -H "X-Redmine-API-Key:$REDMINE_API_KEY" -d "$BODY" -X PUT https://forge.maarch.org/issues/$ISSUE_ID.json
 
 new_branch:
- image: debian:10-slim
- stage: new_branch
- only:
-   - branches
- before_script:
-   # Install git and curl command
-   - apt-get update -yqq > /dev/null
-   - apt install -y curl
-   - apt install -y jq
- script:
-   - chmod +x ./ci/create_mr.sh
-   - ./ci/create_mr.sh
+  image: debian:10-slim
+  stage: sync
+  rules:
+    - if: '$CI_COMMIT_BRANCH =~ /(feat|fix)\/[0-9]{4,5}\//'
+  before_script:
+    # Install git and curl command
+    - apt-get update -yqq > /dev/null
+    - apt install -y curl
+    - apt install -y jq
+  script:
+    - chmod +x ./ci/create_mr.sh
+    - ./ci/create_mr.sh
 
 new_tag:
- image: debian:10-slim
- stage: new_tag
- only:
-   - tags
- before_script:
-   # Install git and curl command
-   - apt-get update -yqq > /dev/null
-   - 'which ssh-agent || ( apt-get install openssh-client -y )'
-   - eval $(ssh-agent -s)
-   - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
-   - mkdir -p ~/.ssh
-   - chmod 700 ~/.ssh
-   - ssh-keyscan "$GITLAB_URL" >> ~/.ssh/known_hosts
-   - chmod 644 ~/.ssh/known_hosts
-   - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config'
-   - apt install -y git
-   - apt install -y curl
-   - apt install -y jq
- script:
-   - chmod +x ./ci/new_tag.sh
-   - ./ci/new_tag.sh
+  image: debian:10-slim
+  stage: deploy
+  rules:
+    - if: $CI_COMMIT_TAG
+  before_script:
+    # Install git and curl command
+    - apt-get update -yqq > /dev/null
+    - 'which ssh-agent || ( apt-get install openssh-client -y )'
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan "$GITLAB_URL" >> ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" >> ~/.ssh/config'
+    - apt install -y git
+    - apt install -y curl
+    - apt install -y jq
+  script:
+    - chmod +x ./ci/new_tag.sh
+    - ./ci/new_tag.sh
+
+
+mr_end:
+  image: debian:10-slim
+  stage: sync
+  # only:
+  #  - merge_requests
+  rules:
+    - if: '$CI_COMMIT_MESSAGE =~ /^Merge branch/'
+  before_script:
+    # Install git and curl command
+    - apt-get update -yqq > /dev/null
+    - apt install -y git
+    - apt install -y curl
+    - apt install -y jq
+  script:
+    - chmod +x ./ci/mr_end.sh
+    - ./ci/mr_end.sh
 
 
 #pages:
