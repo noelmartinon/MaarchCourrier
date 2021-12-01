@@ -121,8 +121,8 @@ class ActionMethodController
             }
         }
 
-        // Custom for TMA 1
-        if ($action['component'] == 'sendSignatureBookAction' || $action['component'] == 'continueVisaCircuitAction' ) {
+        // Custom for TMA 1  #75: Réaffectation du dernier viseur à viseur
+        if ($action['component'] == 'sendSignatureBookAction' || $action['component'] == 'continueVisaCircuitAction' || $action['component'] == 'rejectVisaBackToPreviousAction' ) {
             // workflow is the same for all resources when in mass -> so the next in workflow will be the same for all resources
             $nextInVisaWorkflow = ListInstanceModel::getCurrentStepByResId([
                 'resId'  => $args['resources'][0],

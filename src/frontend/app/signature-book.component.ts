@@ -211,16 +211,15 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     loadActions(hideAction: boolean = true) {      
         this.http.get('../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/actions?resId=' + this.resId)
             .subscribe((data: any) => {
-               
-                   let resultat;
+               //SGAMI-SO DEBUT #75: Réaffectation du dernier viseur à viseur
+                let resultat;
                 if(hideAction) {
-                    resultat =  data.actions.filter((action) => action.id != 535);
+                    resultat =  data.actions.filter((action:any) => action.id != 405);
                 }else {
                     resultat = data.actions;
-                }
-                
-                console.log('resultat',resultat)
+                }              
                 this.signatureBook.actions = resultat;
+                //SAGAMI-SO FIN
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -601,7 +600,6 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     async changeLocation(resId: number, origin: string) {
         if (resId !== this.resId) {
             const data: any = await this.actionService.canExecuteAction([resId], this.userId, this.groupId, this.basketId);
-         console.log("oaeza eja ")
             if (data === true) {
                 this.actionService.stopRefreshResourceLock();
                 if (!this.actionService.actionEnded) { 
@@ -626,7 +624,6 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     processAction() {
         this.http.get(`../rest/resources/${this.resId}?light=true`).pipe(
             tap((data: any) => {
-                console.dir("chargement action data", data);
                 const actionId = $('#signatureBookActions option:selected').val();
                 const selectedAction = this.signatureBook.actions.filter((action: any) => action.id == actionId)[0];
                 this.actionService.launchAction(selectedAction, this.userId, this.groupId, this.basketId, [this.resId], data, false);
