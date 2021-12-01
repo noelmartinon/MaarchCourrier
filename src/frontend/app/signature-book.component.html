@@ -33,7 +33,7 @@
             <i style="cursor: pointer;vertical-align: middle;" title="{{'lang.linkDetails' | translate}}"
                 class="fa fa-info-circle fa-2x" (click)="backToDetails()"></i>&nbsp;
             <select id="signatureBookActions">
-                <option *ngFor="let option of signatureBook.actions" value="{{option.id}}">{{option.id}} {{option.label}}</option>
+                <option *ngFor="let option of signatureBook.actions" value="{{option.id}}">{{option.label}}</option>
             </select>
             <input name="send" id="send" value="{{'lang.validate' | translate}}"
                 class="button button-form-primary-filled" type="button" (click)="validForm()">
