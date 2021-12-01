@@ -208,10 +208,19 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
         });
     }
 
-    loadActions() {      
+    loadActions(hideAction: boolean = true) {      
         this.http.get('../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/actions?resId=' + this.resId)
             .subscribe((data: any) => {
-                this.signatureBook.actions = data.actions;
+               
+                   let resultat;
+                if(hideAction) {
+                    resultat =  data.actions.filter((action) => action.id != 535);
+                }else {
+                    resultat = data.actions;
+                }
+                
+                console.log('resultat',resultat)
+                this.signatureBook.actions = resultat;
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -305,7 +314,17 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     }
 
     openConfirmModification() {
-        return this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirm'), msg: this.translate.instant('lang.saveModifiedData'), buttonValidate: this.translate.instant('lang.yes'), buttonCancel: this.translate.instant('lang.no') } });
+        return this.dialog.open(ConfirmComponent, { 
+            panelClass: 'maarch-modal', 
+            autoFocus: false, 
+            disableClose: true, 
+            data: { 
+                title: this.translate.instant('lang.confirm'), 
+                msg: this.translate.instant('lang.saveModifiedData'), 
+                buttonValidate: this.translate.instant('lang.yes'), 
+                buttonCancel: this.translate.instant('lang.no') 
+            } 
+        });
     }
 
     changeRightViewer(index: number) {
@@ -582,7 +601,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     async changeLocation(resId: number, origin: string) {
         if (resId !== this.resId) {
             const data: any = await this.actionService.canExecuteAction([resId], this.userId, this.groupId, this.basketId);
-
+         console.log("oaeza eja ")
             if (data === true) {
                 this.actionService.stopRefreshResourceLock();
                 if (!this.actionService.actionEnded) { 
@@ -607,6 +626,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     processAction() {
         this.http.get(`../rest/resources/${this.resId}?light=true`).pipe(
             tap((data: any) => {
+                console.dir("chargement action data", data);
                 const actionId = $('#signatureBookActions option:selected').val();
                 const selectedAction = this.signatureBook.actions.filter((action: any) => action.id == actionId)[0];
                 this.actionService.launchAction(selectedAction, this.userId, this.groupId, this.basketId, [this.resId], data, false);
