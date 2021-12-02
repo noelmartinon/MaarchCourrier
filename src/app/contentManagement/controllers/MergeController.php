@@ -256,8 +256,8 @@ class MergeController
             $visibleNotes = array_reverse($visibleNotes);
             $avisCount = 1;
             foreach ($opinionWorkflow as $value) {
-                $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['firstname', 'lastname']]);
-                $primaryEntity = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label', 'users_entities.user_role as role']]);
+                $user = UserModel::getByLogin(['login' => $value['item_id'], 'select' => ['id','firstname', 'lastname']]);
+                $primaryEntity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label', 'users_entities.user_role as role']]);
                 $processDate = null;
                 if (!empty($value['process_date'])) {
                     $processDate = ' - ' . TextFormatModel::formatDate($value['process_date']);
