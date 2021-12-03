@@ -269,7 +269,7 @@ class MergeController
                 $avis['entity'.$avisCount] = $primaryEntity['entity_label'];
                 $avis['note'.$avisCount] = [];
                 foreach ($visibleNotes as $visibleNote) {
-                    if ($visibleNote['user_id'] === $value['item_id'] && strpos($visibleNote['note_text'], _AVIS_NOTE_PREFIX) === 0) {
+                    if ($visibleNote['user_id'] === $user['id'] && strpos($visibleNote['note_text'], _AVIS_NOTE_PREFIX) === 0) {
                         $avis['note'.$avisCount][] = trim(str_replace(_AVIS_NOTE_PREFIX, '', $visibleNote['note_text']));
                     }
                 }
