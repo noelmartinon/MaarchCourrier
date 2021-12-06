@@ -104,6 +104,8 @@ export class MailEditorComponent implements OnInit, OnDestroy {
 
     summarySheetUnits: any = [];
 
+    signedAttachId: number = null;
+
     constructor(
         public http: HttpClient,
         public translate: TranslateService,
@@ -981,9 +983,13 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         };
     }
 
-    openEmailAttach(type: string, attach: any): void {
+    async openEmailAttach(type: string, attach: any): Promise<void> {
         if (type === 'attachments') {
-            this.http.get(`../rest/attachments/${attach.id}/content?mode=base64`).pipe(
+            if (attach.status === 'SIGN') {
+                this.signedAttachId = attach.id;
+                await this.getSignedAttachment(this.signedAttachId);
+            }
+            this.http.get(`../rest/attachments/${this.signedAttachId !== null ? this.signedAttachId : attach.id}/content?mode=base64`).pipe(
                 tap((data: any) => {
                     this.dialog.open(DocumentViewerModalComponent, { autoFocus: false, panelClass: 'maarch-full-height-modal', data: { title: `${attach.label}`, base64: data.encodedDocument, filename: data.filename } });
                 }),
@@ -1022,5 +1028,21 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         return decodeURIComponent(atob(str).split('').map(function (c) {
             return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join(''));
+    }
+
+    getSignedAttachment(id: number) {
+        this.signedAttachId = null;
+        return new Promise((resolve) => {
+            this.http.get(`../rest/attachments/${id}`).pipe(
+                tap((data: any) => {
+                    this.signedAttachId = id + data.relation;
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        })
     }
 }
