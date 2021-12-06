@@ -256,8 +256,8 @@ class MergeController
             $visibleNotes = array_reverse($visibleNotes);
             $avisCount = 1;
             foreach ($opinionWorkflow as $value) {
-                $user = UserModel::getById(['id' => $value['item_id'], 'select' => ['firstname', 'lastname']]);
-                $primaryEntity = UserModel::getPrimaryEntityById(['id' => $value['item_id'], 'select' => ['entities.entity_label', 'users_entities.user_role as role']]);
+                $user = UserModel::getByLogin(['login' => $value['item_id'], 'select' => ['id','firstname', 'lastname']]);
+                $primaryEntity = UserModel::getPrimaryEntityById(['id' => $user['id'], 'select' => ['entities.entity_label', 'users_entities.user_role as role']]);
                 $processDate = null;
                 if (!empty($value['process_date'])) {
                     $processDate = ' - ' . TextFormatModel::formatDate($value['process_date']);
@@ -269,7 +269,7 @@ class MergeController
                 $avis['entity'.$avisCount] = $primaryEntity['entity_label'];
                 $avis['note'.$avisCount] = [];
                 foreach ($visibleNotes as $visibleNote) {
-                    if ($visibleNote['user_id'] === $value['item_id'] && strpos($visibleNote['note_text'], _AVIS_NOTE_PREFIX) === 0) {
+                    if ($visibleNote['user_id'] === $user['id'] && strpos($visibleNote['note_text'], _AVIS_NOTE_PREFIX) === 0) {
                         $avis['note'.$avisCount][] = trim(str_replace(_AVIS_NOTE_PREFIX, '', $visibleNote['note_text']));
                     }
                 }

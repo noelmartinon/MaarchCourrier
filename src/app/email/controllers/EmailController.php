@@ -398,8 +398,8 @@ class EmailController
         $attachmentTypes = AttachmentModel::getAttachmentsTypesByXML();
         $rawAttachments = AttachmentModel::get([
             'select'    => ['res_id', 'title', 'identifier', 'attachment_type', 'typist', 'format', 'filesize', 'status', 'recipient_id', 'recipient_type'],
-            'where'     => ['res_id_master = ?', 'attachment_type not in (?)', 'status not in (?)'],
-            'data'      => [$args['resId'], ['signed_response'], ['DEL', 'OBS']]
+            'where'     => ['res_id_master = ?', 'status not in (?)'],
+            'data'      => [$args['resId'], ['DEL', 'OBS']]
         ]);
         foreach ($rawAttachments as $attachment) {
             $attachmentId = $attachment['res_id'];
