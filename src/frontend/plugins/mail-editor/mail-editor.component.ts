@@ -984,6 +984,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
     }
 
     async openEmailAttach(type: string, attach: any): Promise<void> {
+        this.signedAttachId = null;
         if (type === 'attachments') {
             if (attach.status === 'SIGN') {
                 this.signedAttachId = attach.id;
