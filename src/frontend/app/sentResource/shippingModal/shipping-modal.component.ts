@@ -28,6 +28,8 @@ export class ShippingModalComponent implements OnInit {
     status: any[] = [];
 
     depositProof: any = null;
+    creationDate: any;
+    sendDate: any;
 
     constructor(
         public http: HttpClient,
@@ -47,8 +49,8 @@ export class ShippingModalComponent implements OnInit {
         await this.getStatus();
         await this.getAttachments();
         await this.getShippingHistory();
-        this.data.shippingData.creationDate = this.fullDate.transform(new Date(this.data.shippingData.creationDate).toString());
-        this.data.shippingData.sendDate = this.fullDate.transform(new Date(this.data.shippingData.sendDate).toString());
+        this.creationDate = this.fullDate.transform(new Date(this.data.shippingData.creationDate).toString());
+        this.sendDate = this.fullDate.transform(new Date(this.data.shippingData.sendDate).toString());
         this.loading = false;
     }
 

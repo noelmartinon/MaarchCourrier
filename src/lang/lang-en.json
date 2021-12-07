@@ -2549,6 +2549,8 @@
     "shippingSubscribe": "Subscribe to notifications enabled",
     "shippingUnsubscribe": "Subscribe to notifications disabled",
     "depositProof": "Deposit proof",
-    "downloadFile": "Download file"
+    "downloadFile": "Download file",
+    "emptyShippingHistory": "The Maileva sending history is empty."
+
 
 }

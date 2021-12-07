@@ -209,9 +209,9 @@ export class SentResourceListComponent implements OnInit {
                         typeColor: '#9440D5',
                         desc: this.functions.empty(item.chrono) ? this.translate.instant('lang.shipping') : `[${item.chrono}] ` + this.translate.instant('lang.shipping'),
                         status: 'SENT',
-                        hasAttach: item.creationDate === 'attachment',
-                        hasNote: false,
-                        hasMainDoc: item.creationDate === 'resource',
+                        hasAttach: !this.functions.empty(item.attachments),
+                        hasNote: !this.functions.empty(item.notes),
+                        hasMainDoc: item.isLinked,
                         canManage: true
                     }));
                     return data;
@@ -255,7 +255,7 @@ export class SentResourceListComponent implements OnInit {
         }
     }
 
-    openPromptMail(row: any = {id: null, type: null}) {
+    async openPromptMail(row: any = {id: null, type: null}) {
         let title = this.translate.instant('lang.sendElement');
 
         if (row.id !== null) {

@@ -26,13 +26,13 @@
                         <div class="col-md-4">
                             <mat-form-field>
                                 <mat-label [title]="'lang.creationDate' | translate">{{ 'lang.creationDate' | translate }}</mat-label>
-                                <input matInput disabled [title]="data.shippingData.creationDate" [(ngModel)]="data.shippingData.creationDate" [placeholder]="'lang.creationDate' | translate">
+                                <input matInput disabled [title]="creationDate" [(ngModel)]="creationDate" [placeholder]="'lang.creationDate' | translate">
                             </mat-form-field>
                         </div>
                         <div class="col-md-4">
                             <mat-form-field>
                                 <mat-label [title]="'lang.sendDate' | translate">{{ 'lang.sendDate' | translate }}</mat-label>
-                                <input matInput disabled [title]="data.shippingData.sendDate" [(ngModel)]="data.shippingData.sendDate" [placeholder]="'lang.sendDate' | translate">
+                                <input matInput disabled [title]="sendDate" [(ngModel)]="sendDate" [placeholder]="'lang.sendDate' | translate">
                             </mat-form-field>
                         </div>
                     </div>
@@ -48,7 +48,7 @@
             </div>
             <br>
             <div class="row">
-                <div *ngIf="depositProof !== null" class="col-md-6">
+                <div *ngIf="!functions.empty(depositProof)" class="col-md-6">
                     <mat-label class="typeFileTitle">{{'lang.depositProof' | translate}}</mat-label><br>
                     <mat-chip-list class="mat-chip-list-stacked itemChip" style="margin-top: 2px; padding: 5px;">
                         <mat-chip [title]="'Fichier envoyé par Maileva (MAA-16/21)'"
@@ -107,6 +107,11 @@
                                         </div>
                                     </mat-list-item>
                                 </mat-list>
+                            </ng-container>
+                            <ng-container *ngIf="shippingHistory.length === 0">
+                                <div mat-line class="historyLine" style="font-style: italic; color: gray;">
+                                    {{'lang.emptyShippingHistory' | translate}}
+                                </div>
                             </ng-container>
                         </ng-container>
                     </ng-template>
