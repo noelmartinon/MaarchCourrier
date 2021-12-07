@@ -1043,7 +1043,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         return new Promise((resolve) => {
             this.http.get(`../rest/attachments/${id}`).pipe(
                 tap((data: any) => {
-                    this.signedAttachId = id + data.relation;
+                    this.signedAttachId = data.signedResponse;
                     resolve(true);
                 }),
                 catchError((err: any) => {
