@@ -208,18 +208,10 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
         });
     }
 
-    loadActions(hideAction: boolean = true) {      
+    loadActions() {      
         this.http.get('../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/actions?resId=' + this.resId)
             .subscribe((data: any) => {
-               //SGAMI-SO DEBUT #75: Réaffectation du dernier viseur à viseur
-                let resultat;
-                if(hideAction) {
-                    resultat =  data.actions.filter((action:any) => action.id != 405);
-                }else {
-                    resultat = data.actions;
-                }              
-                this.signatureBook.actions = resultat;
-                //SAGAMI-SO FIN
+                this.signatureBook.actions = data.actions;
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
@@ -313,17 +305,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     }
 
     openConfirmModification() {
-        return this.dialog.open(ConfirmComponent, { 
-            panelClass: 'maarch-modal', 
-            autoFocus: false, 
-            disableClose: true, 
-            data: { 
-                title: this.translate.instant('lang.confirm'), 
-                msg: this.translate.instant('lang.saveModifiedData'), 
-                buttonValidate: this.translate.instant('lang.yes'), 
-                buttonCancel: this.translate.instant('lang.no') 
-            } 
-        });
+        return this.dialog.open(ConfirmComponent, { panelClass: 'maarch-modal', autoFocus: false, disableClose: true, data: { title: this.translate.instant('lang.confirm'), msg: this.translate.instant('lang.saveModifiedData'), buttonValidate: this.translate.instant('lang.yes'), buttonCancel: this.translate.instant('lang.no') } });
     }
 
     changeRightViewer(index: number) {
