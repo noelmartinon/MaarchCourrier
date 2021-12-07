@@ -993,10 +993,8 @@ export class MailEditorComponent implements OnInit, OnDestroy {
     async openEmailAttach(type: string, attach: any): Promise<void> {
         this.signedAttachId = null;
         if (type === 'attachments') {
-            if (attach.status === 'SIGN') {
-                this.signedAttachId = attach.id;
-                await this.getSignedAttachment(this.signedAttachId);
-            }
+            this.signedAttachId = attach.id;
+            await this.getSignedAttachment(this.signedAttachId);
             this.http.get(`../rest/attachments/${this.signedAttachId !== null ? this.signedAttachId : attach.id}/content?mode=base64`).pipe(
                 tap((data: any) => {
                     this.dialog.open(DocumentViewerModalComponent, { autoFocus: false, panelClass: 'maarch-full-height-modal', data: { title: `${attach.label}`, base64: data.encodedDocument, filename: data.filename } });
@@ -1043,7 +1041,11 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         return new Promise((resolve) => {
             this.http.get(`../rest/attachments/${id}`).pipe(
                 tap((data: any) => {
-                    this.signedAttachId = data.signedResponse;
+                    if (!this.functions.empty(data.signedResponse)) {
+                        this.signedAttachId = data.signedResponse;
+                    } else {
+                        this.signedAttachId = null;
+                    }
                     resolve(true);
                 }),
                 catchError((err: any) => {
