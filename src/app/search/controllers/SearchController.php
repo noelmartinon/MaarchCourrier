@@ -1228,6 +1228,7 @@ class SearchController
 
         $matchingResources = [];
         if (!empty($args['body']['fulltext']['values'])) {
+            $args['body']['fulltext']['values'] = TextFormatModel::normalize(['string' => $args['body']['fulltext']['values']]);
             // regex /\b[^"*~\s]{1,2}\b/
             // \b: word boundary
             // [^...]: reverse character class (captures only what is not ...)
@@ -1259,7 +1260,7 @@ class SearchController
 
                 if (is_dir($pathToLuceneIndex) && !FullTextController::isDirEmpty($pathToLuceneIndex)) {
                     $index     = \Zend_Search_Lucene::open($pathToLuceneIndex);
-                    $hits      = $index->find(TextFormatModel::normalize(['string' => $args['body']['fulltext']['values']]));
+                    $hits      = $index->find($args['body']['fulltext']['values']);
                     $listIds   = [];
                     $cptIds    = 0;
                     foreach ($hits as $hit) {
