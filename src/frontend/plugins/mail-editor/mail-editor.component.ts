@@ -957,15 +957,15 @@ export class MailEditorComponent implements OnInit, OnDestroy {
             if (!this.functions.empty(this.emailAttach[element])) {
                 if (element === 'document') {
                     objAttach = {
-                        id: this.signedAttachId !== null ? this.signedAttachId : this.emailAttach[element].id,
+                        id: this.emailAttach[element].id,
                         isLinked: this.emailAttach[element].isLinked,
                         original: this.emailAttach[element].original
                     };
                 } else if (element === 'notes') {
                     objAttach[element] = this.emailAttach[element].map((item: any) => item.id);
-                } else {
+                } else {                    
                     objAttach[element] = this.emailAttach[element].map((item: any) => ({
-                        id: item.id,
+                        id: element === 'attachments' && this.signedAttachId !== null ? this.signedAttachId : item.id,
                         original: item.original
                     }));
                 }
