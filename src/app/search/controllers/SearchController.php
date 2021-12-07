@@ -1194,6 +1194,15 @@ class SearchController
 
         $matchingResources = [];
         if (!empty($args['body']['fulltext']['values'])) {
+            // regex /\b[^"*~\s]{1,2}\b/
+            // \b: word boundary
+            // [^...]: reverse character class (captures only what is not ...)
+            // "*~: Zend Lucene Search meta characters
+            // \s: blank space
+            // {1,2}: 1 or 2 characters of this character class
+            // result: captures words of 1 or 2 characters that are not space, not counting Zend Lucene Search meta characters
+            $args['body']['fulltext']['values'] = preg_replace('/\b[^"*~\s]{1,2}\b/', '', $args['body']['fulltext']['values']);
+            $args['body']['fulltext']['values'] = preg_replace('/\s+/', ' ', $args['body']['fulltext']['values']); // squeezing spaces
             if (strpos($args['body']['fulltext']['values'], "'") === false && ($args['body']['fulltext']['values'][0] != '"' || $args['body']['fulltext']['values'][strlen($args['body']['fulltext']['values']) - 1] != '"')) {
                 $query_fulltext = explode(" ", trim($args['body']['fulltext']['values']));
                 foreach ($query_fulltext as $key => $value) {
