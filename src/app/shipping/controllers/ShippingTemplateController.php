@@ -490,7 +490,7 @@ class ShippingTemplateController
             $error = 'Body resource_type is not an allowed value';
         } elseif (!Validator::date()->validate($body['event_date'])) {
             $error = 'Body event_date is not a valid date';
-        } elseif (!Validator::equals('FR')->validate($body['event_location'])) {
+        } elseif (!empty($body['event_location']) && !Validator::equals('FR')->validate($body['event_location'])) {
             $error = 'Body event_location is not FR';
         } elseif (!Validator::stringType()->length(1, 256)->validate($body['resource_id'])) {
             $error = 'Body resource_id is empty, too long, or not a string';
@@ -498,7 +498,7 @@ class ShippingTemplateController
             $error = 'Body resource_location is not a valid url';
         }
         if (!empty($error)) {
-            return ShippingTemplateController::logAndReturnError($response, 400, $error);
+            return ShippingTemplateController::logAndReturnError($response, 400, $error . ' => ' . json_encode($body));
         }
         $body = [
             'source'           => $body['source'],
@@ -511,6 +511,16 @@ class ShippingTemplateController
             'eventLocation'    => $body['event_location'],
             'resourceLocation' => $body['resource_location']
         ];
+
+        LogsController::add([
+            'isTech'    => true,
+            'moduleId'  => 'shipping',
+            'level'     => 'DEBUG',
+            'tableName' => '',
+            'recordId'  => '',
+            'eventType' => 'Shipping webhook body: ' . json_encode($body),
+            'eventId'   => 'Shipping webhook error'
+        ]);
 
         $primaryEntity = UserModel::getPrimaryEntityById([
             'id'     => $GLOBALS['id'],
@@ -653,7 +663,7 @@ class ShippingTemplateController
             }
             $curlResponse = CurlModel::exec([
                 'method'       => 'GET',
-                'url'          => $body['resourceLocation'] . '/download_deposit_proof',
+                'url'          => str_replace('\\', '', $body['resourceLocation']) . '/download_deposit_proof',
                 'bearerAuth'   => ['token' => $authToken],
                 'headers'      => ['Accept: */*'],
                 'fileResponse' => true
@@ -661,6 +671,17 @@ class ShippingTemplateController
             if ($curlResponse['code'] != 200) {
                 return ShippingTemplateController::logAndReturnError($response, 400, 'deposit proof failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId']]));
             }
+
+            LogsController::add([
+                'isTech'    => true,
+                'moduleId'  => 'shipping',
+                'level'     => 'DEBUG',
+                'tableName' => '',
+                'recordId'  => '',
+                'eventType' => 'Shipping deposit proof body: ' . json_encode($curlResponse['response']),
+                'eventId'   => 'Shipping webhook error'
+            ]);
+
             // TODO add system attachment type as in summary sheet
             $storage = DocserverController::storeResourceOnDocServer([
                 'collId'          => 'attachments_coll',
@@ -700,6 +721,17 @@ class ShippingTemplateController
             if ($curlResponse['code'] != 200) {
                 return ShippingTemplateController::logAndReturnError($response, 400, 'acknowledgement of receipt failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId'], 'recipientId' => $recipient['id']]));
             }
+
+            LogsController::add([
+                'isTech'    => true,
+                'moduleId'  => 'shipping',
+                'level'     => 'DEBUG',
+                'tableName' => '',
+                'recordId'  => '',
+                'eventType' => 'Shipping acknowledgement of receipt body: ' . json_encode($curlResponse['response']),
+                'eventId'   => 'Shipping webhook error'
+            ]);
+
             $storage = DocserverController::storeResourceOnDocServer([
                 'collId'          => 'attachments_coll',
                 'docserverTypeId' => 'DOC',

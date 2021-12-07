@@ -40,6 +40,7 @@ trait ShippingTrait
         ValidatorModel::notEmpty($args, ['resId']);
         ValidatorModel::intVal($args, ['resId']);
         ValidatorModel::arrayType($args, ['data']);
+        ValidatorModel::intVal($args, ['actionId']);
 
         $resource = ResModel::getById(['select' => ['destination', 'integrations', 'subject as title', 'external_id', 'res_id', 'version'], 'resId' => $args['resId']]);
         $integrations = json_decode($resource['integrations'], true);
@@ -391,7 +392,7 @@ trait ShippingTrait
                 'recipientEntityId' => $recipientEntity['id'],
                 'accountId'         => $shippingTemplate['account']['id'],
                 'recipients'        => json_encode($recipients),
-                'actionId'          => $actionId ?? $action['id'] ?? null
+                'actionId'          => $args['actionId'] ?? null
             ]);
         }
 
