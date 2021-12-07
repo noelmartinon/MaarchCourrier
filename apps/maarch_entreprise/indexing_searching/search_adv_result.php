@@ -313,6 +313,16 @@ where lower(translate(folders.label , 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓ�
                 } else {
                     // FULLTEXT
                     $fulltext_request = $func->normalize($_REQUEST['fulltext']);
+                    // regex /\b[^"*~\s]{1,2}\b/
+                    // \b: word boundary
+                    // [^...]: reverse character class (captures only what is not ...)
+                    // "*~: Zend Lucene Search meta characters
+                    // \s: blank space
+                    // {1,2}: 1 or 2 characters of this character class
+                    // result: captures words of 1 or 2 characters that are not space, not counting Zend Lucene Search meta characters
+                    $fulltext_request = preg_replace('/\b[^"*~\s]{1,2}\b/', '', $fulltext_request);
+                    $fulltext_request = preg_replace('/\s+/', ' ', $fulltext_request); // squeezing spaces
+
                     $json_txt .= " 'fulltext' : ['"
                         . addslashes(trim($_REQUEST['fulltext'])) . "'],";
                     set_include_path(
