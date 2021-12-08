@@ -293,7 +293,7 @@ class IParapheurController
     public static function retrieveSignedMails($aArgs)
     {
         $version = $aArgs['version'];
-        $aArgs['idsToRetrieve']['errors'] = [$version => []];
+        $aArgs['idsToRetrieve']['error'] = [$version => []];
         foreach ($aArgs['idsToRetrieve'][$version] as $resId => $value) {
             if (!empty($value['external_id'])) {
                 $xmlPostString = '<?xml version="1.0" encoding="utf-8"?>
@@ -307,23 +307,27 @@ class IParapheurController
                 $curlReturn = IParapheurController::returnCurl($xmlPostString, $aArgs['config']);
 
                 if (!empty($curlReturn['error'])) {
-                    $aArgs['idsToRetrieve']['errors'][$version][$resId] = $curlReturn['error'];
+                    $aArgs['idsToRetrieve']['error'][$version][$resId] = $curlReturn['error'];
+                    unset($aArgs['idsToRetrieve'][$version][$resId]);
                     continue;
                 }
 
                 try {
                     if (is_bool($curlReturn['response']) === true) {
-                        $aArgs['idsToRetrieve']['errors'][$version][$resId] = 'Curl response is a boolean';
+                        $aArgs['idsToRetrieve']['error'][$version][$resId] = 'Curl response is a boolean';
+                        unset($aArgs['idsToRetrieve'][$version][$resId]);
                         continue;
                     }
                     $response = $curlReturn['response']->children('http://schemas.xmlsoap.org/soap/envelope/')->Body->children('http://www.adullact.org/spring-ws/iparapheur/1.0')->GetHistoDossierResponse[0];
                 } catch (Exception $e) {
-                    $aArgs['idsToRetrieve']['errors'][$version][$resId] = 'Exception : ' . $e->getMessage();
+                    $aArgs['idsToRetrieve']['error'][$version][$resId] = 'Exception : ' . $e->getMessage();
+                    unset($aArgs['idsToRetrieve'][$version][$resId]);
                     continue;
                 }
 
                 if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']) {
-                    $aArgs['idsToRetrieve']['errors'][$version][$resId] = 'Error : [' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message;
+                    $aArgs['idsToRetrieve']['error'][$version][$resId] = 'Error : [' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message;
+                    unset($aArgs['idsToRetrieve'][$version][$resId]);
                     continue;
                 } else {
                     $noteContent = '';
@@ -337,8 +341,9 @@ class IParapheurController
                                 'documentId' => $value['external_id']
                             ]);
                             if (!empty($response['error'])) {
-                                $aArgs['idsToRetrieve']['errors'][$version][$resId] = $response['error'];
-                                continue;
+                                $aArgs['idsToRetrieve']['error'][$version][$resId] = $response['error'];
+                                unset($aArgs['idsToRetrieve'][$version][$resId]);
+                                continue 2;
                             }
                             $aArgs['idsToRetrieve'][$version][$resId]['status'] = 'validated';
                             $aArgs['idsToRetrieve'][$version][$resId]['format'] = 'pdf';
