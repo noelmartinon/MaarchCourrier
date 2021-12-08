@@ -163,7 +163,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
 
             this.emailAttach.attachments.forEach((element: any, index: number) => {
                 const attach: any = this.emailAttachTool.attachments.list.find((item: any) => item.id === element.id || item.signedResponse === element.id);
-                this.emailAttach.attachments[index].format = attach.format;
+                this.emailAttach.attachments[index].format = attach.status === 'SIGN' ? 'pdf' : attach.format;
                 this.emailAttach.attachments[index].size = attach.size;
 
             });
