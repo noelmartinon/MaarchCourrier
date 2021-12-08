@@ -921,7 +921,12 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         });
     }
 
-    saveDraft() {
+    async saveDraft() {
+        for (let i = 0; i < this.emailAttach.attachments.length; i++) {
+            await this.getSignedAttachment(this.emailAttach.attachments[i].id);
+            this.emailAttach.attachments[i].id = this.signedAttachId !== null ? this.signedAttachId : this.emailAttach.attachments[i].id;
+            this.emailAttach.attachments[i].original = false;
+        }
         return new Promise(async (resolve) => {
             if (!this.readonly && !this.functions.empty(tinymce.get('emailSignature').getContent())) {
                 this.emailStatus = 'DRAFT';
@@ -987,11 +992,6 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                     }));
                 }
             }
-        });
-        objAttach.attachments.forEach(async (element: any, index: number) => {
-            await this.getSignedAttachment(element.id);
-            objAttach.attachments[index].id = this.signedAttachId !== null ? this.signedAttachId : element.id;
-            objAttach.attachments[index].original = false;
         });
         const formatSender = {
             email: this.currentSender.email,
