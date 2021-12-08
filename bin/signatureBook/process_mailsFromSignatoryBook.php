@@ -205,12 +205,24 @@ if (!empty($idsToRetrieve['resLetterbox'])) {
         $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\IxbusController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve, 'version' => 'resLetterbox']);
     }
     $retrievedMails['resLetterbox'] = $retrievedLetterboxMails['resLetterbox'] ?? [];
-    $retrievedMails['error']        = $retrievedLetterboxMails['error'] ?? $retrieveMails['error'] ?? null;
+
+    if (empty($retrievedMails['error'])) {
+        $retrievedMails['error'] = [];
+    } elseif (!is_array($retrievedMails['error'])) {
+        $retrievedMails['error'] = [$retrievedMails['error']];
+    }
+    if (!empty($retrievedLetterboxMails['error'])) {
+        if (is_array($retrievedLetterboxMails['error'])) {
+            $retrievedMails['error'] = array_merge($retrievedMails['error'], $retrievedLetterboxMails['error']);
+        } else {
+            $retrievedMails['error'][] = $retrievedLetterboxMails['error'];
+        }
+    }
+    $retrievedMails['error'] = !empty($retrievedMails['error']) ? json_encode($retrievedMails['error'], JSON_PRETTY_PRINT) : null;
 }
 
 if (!empty($retrievedMails['error'])) {
     Bt_writeLog(['level' => 'ERROR', 'message' => $retrievedMails['error']]);
-    exit;
 }
 
 // On dégele les pj et on créé une nouvelle ligne si le document a été signé
