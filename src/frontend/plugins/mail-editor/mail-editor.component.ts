@@ -312,7 +312,8 @@ export class MailEditorComponent implements OnInit, OnDestroy {
 
                     await this.getAttachElements(false);
                     const attachIds: number[] = this.emailAttachTool.attachments.list.map((item: any) => item.id);
-                    this.emailAttach.attachments.forEach((element: any, index: number) => {
+                    this.emailAttach.attachments.forEach(async (element: any, index: number) => {
+                        await this.getSignedAttachment(element.id);
                         if (attachIds.indexOf(element.id) > -1) {
                             const attachment: any = this.emailAttachTool.attachments.list.find((item: any) => item.id === element.id);
                             this.emailAttach.attachments[index] = {
@@ -320,7 +321,8 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                                 format: attachment.format,
                                 label: attachment.label,
                                 original: attachment.original,
-                                size: attachment.size
+                                size: attachment.size,
+                                signedResponse: this.signedAttachId
                             }
                         }
                     });
@@ -978,15 +980,19 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                     };
                 } else if (element === 'notes') {
                     objAttach[element] = this.emailAttach[element].map((item: any) => item.id);
-                } else {                    
+                } else {       
                     objAttach[element] = this.emailAttach[element].map((item: any) => ({
-                        id: element === 'attachments' && this.signedAttachId !== null ? this.signedAttachId : item.id,
+                        id: item.id,
                         original: item.original
                     }));
                 }
             }
         });
-
+        objAttach.attachments.forEach(async (element: any, index: number) => {
+            await this.getSignedAttachment(element.id);
+            objAttach.attachments[index].id = this.signedAttachId !== null ? this.signedAttachId : element.id;
+            objAttach.attachments[index].original = false;
+        });
         const formatSender = {
             email: this.currentSender.email,
             entityId: !this.functions.empty(this.currentSender.entityId) ? this.currentSender.entityId : null
