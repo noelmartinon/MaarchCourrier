@@ -206,6 +206,9 @@ if (!empty($idsToRetrieve['resLetterbox'])) {
     }
     $retrievedMails['resLetterbox'] = $retrievedLetterboxMails['resLetterbox'] ?? [];
     $retrievedMails['error']        = $retrievedLetterboxMails['error'] ?? $retrieveMails['error'] ?? null;
+    if (is_array($retrievedMails['error'])) {
+        $retrievedMails['error'] = json_encode($retrievedMails['error'], JSON_PRETTY_PRINT);
+    }
 }
 
 if (!empty($retrievedMails['error'])) {
