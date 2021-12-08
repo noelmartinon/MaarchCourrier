@@ -328,7 +328,6 @@ class IParapheurController
                 if ($response->MessageRetour->codeRetour == $aArgs['config']['data']['errorCode']) {
                     $aArgs['idsToRetrieve']['error'][$version][$resId] = 'Error : [' . $response->MessageRetour->severite . ']' . $response->MessageRetour->message;
                     unset($aArgs['idsToRetrieve'][$version][$resId]);
-                    continue;
                 } else {
                     $noteContent = '';
                     foreach ($response->LogDossier as $res) {    // Loop on all steps of the documents (prepared, send to signature, signed etc...)
