@@ -104,6 +104,8 @@ export class MailEditorComponent implements OnInit, OnDestroy {
 
     summarySheetUnits: any = [];
 
+    signedAttachId: number = null;
+
     constructor(
         public http: HttpClient,
         public translate: TranslateService,
@@ -154,6 +156,17 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                 await this.getResourceData();
                 this.setDefaultInfoFromResource();
             }
+
+            for (let i = 0; i < this.emailAttachTool.attachments.list.length; i ++) {
+                await this.getSignedAttachment(this.emailAttachTool.attachments.list[i].id)
+            }
+
+            this.emailAttach.attachments.forEach((element: any, index: number) => {
+                const attach: any = this.emailAttachTool.attachments.list.find((item: any) => item.id === element.id || item.signedResponse === element.id);
+                this.emailAttach.attachments[index].format = attach.status === 'SIGN' ? 'pdf' : attach.format;
+                this.emailAttach.attachments[index].size = attach.size;
+
+            });
 
             this.initEmailModelsList();
         }
@@ -308,6 +321,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                         }
                     });
 
+                    await this.getAttachElements(false);
                     resolve(true);
                 }),
                 catchError((err) => {
@@ -450,7 +464,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         if (type === 'document') {
             return this.emailAttach.document.isLinked;
         } else {
-            return this.emailAttach[type].filter((attach: any) => attach.id === item.id).length > 0;
+            return this.emailAttach[type].filter((attach: any) => attach.id === item.id || item.signedResponse === attach.id).length > 0;
         }
     }
 
@@ -902,7 +916,12 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         });
     }
 
-    saveDraft() {
+    async saveDraft() {
+        for (let i = 0; i < this.emailAttach.attachments.length; i++) {
+            await this.getSignedAttachment(this.emailAttach.attachments[i].id);
+            this.emailAttach.attachments[i].id = this.signedAttachId !== null ? this.signedAttachId : this.emailAttach.attachments[i].id;
+            this.emailAttach.attachments[i].original = false;
+        }
         return new Promise(async (resolve) => {
             if (!this.readonly && !this.functions.empty(tinymce.get('emailSignature').getContent())) {
                 this.emailStatus = 'DRAFT';
@@ -961,7 +980,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                     };
                 } else if (element === 'notes') {
                     objAttach[element] = this.emailAttach[element].map((item: any) => item.id);
-                } else {
+                } else {       
                     objAttach[element] = this.emailAttach[element].map((item: any) => ({
                         id: item.id,
                         original: item.original
@@ -969,7 +988,6 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                 }
             }
         });
-
         const formatSender = {
             email: this.currentSender.email,
             entityId: !this.functions.empty(this.currentSender.entityId) ? this.currentSender.entityId : null
@@ -988,9 +1006,12 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         };
     }
 
-    openEmailAttach(type: string, attach: any): void {
+    async openEmailAttach(type: string, attach: any): Promise<void> {
+        this.signedAttachId = null;
         if (type === 'attachments') {
-            this.http.get(`../rest/attachments/${attach.id}/content?mode=base64`).pipe(
+            this.signedAttachId = attach.id;
+            await this.getSignedAttachment(this.signedAttachId);
+            this.http.get(`../rest/attachments/${this.signedAttachId !== null ? this.signedAttachId : attach.id}/content?mode=base64`).pipe(
                 tap((data: any) => {
                     this.dialog.open(DocumentViewerModalComponent, { autoFocus: false, panelClass: 'maarch-full-height-modal', data: { title: `${attach.label}`, base64: data.encodedDocument, filename: data.filename } });
                 }),
@@ -1029,5 +1050,30 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         return decodeURIComponent(atob(str).split('').map(function (c) {
             return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
         }).join(''));
+    }
+
+    getSignedAttachment(id: number) {
+        this.signedAttachId = null;
+        return new Promise((resolve) => {
+            this.http.get(`../rest/attachments/${id}`).pipe(
+                tap((data: any) => {
+                    if (!this.functions.empty(data.signedResponse)) {
+                        this.signedAttachId = data.signedResponse;
+                        this.emailAttachTool.attachments.list.find((item: any) => item.id === id).signedResponse = data.signedResponse;
+                        const attach: any = this.emailAttach.attachments.find((item: any) => item.id === id)
+                        if (attach !== undefined) {
+                            this.emailAttach.attachments.find((item: any) => item.id === id).signedResponse = data.signedResponse;
+                        }
+                    } else {
+                        this.signedAttachId = null;
+                    }
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        })
     }
 }
