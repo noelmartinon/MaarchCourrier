@@ -211,10 +211,12 @@ if (!empty($idsToRetrieve['resLetterbox'])) {
     } elseif (!is_array($retrievedMails['error'])) {
         $retrievedMails['error'] = [$retrievedMails['error']];
     }
-    if (is_array($retrievedLetterboxMails['error'])) {
-        $retrievedMails['error'] = array_merge($retrievedMails['error'], $retrievedLetterboxMails['error']);
-    } else {
-        $retrievedMails['error'][] = $retrievedLetterboxMails['error'];
+    if (!empty($retrievedLetterboxMails['error'])) {
+        if (is_array($retrievedLetterboxMails['error'])) {
+            $retrievedMails['error'] = array_merge($retrievedMails['error'], $retrievedLetterboxMails['error']);
+        } else {
+            $retrievedMails['error'][] = $retrievedLetterboxMails['error'];
+        }
     }
     $retrievedMails['error'] = json_encode($retrievedMails['error'], JSON_PRETTY_PRINT);
 }
