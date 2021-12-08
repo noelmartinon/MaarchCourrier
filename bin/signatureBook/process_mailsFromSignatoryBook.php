@@ -205,10 +205,18 @@ if (!empty($idsToRetrieve['resLetterbox'])) {
         $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\IxbusController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve, 'version' => 'resLetterbox']);
     }
     $retrievedMails['resLetterbox'] = $retrievedLetterboxMails['resLetterbox'] ?? [];
-    $retrievedMails['error']        = $retrievedLetterboxMails['error'] ?? $retrieveMails['error'] ?? null;
-    if (is_array($retrievedMails['error'])) {
-        $retrievedMails['error'] = json_encode($retrievedMails['error'], JSON_PRETTY_PRINT);
+
+    if (empty($retrievedMails['error'])) {
+        $retrievedMails['error'] = [];
+    } elseif (!is_array($retrievedMails['error'])) {
+        $retrievedMails['error'] = [$retrievedMails['error']];
     }
+    if (is_array($retrievedLetterboxMails['error'])) {
+        $retrievedMails['error'] = array_merge($retrievedMails['error'], $retrievedLetterboxMails['error']);
+    } else {
+        $retrievedMails['error'][] = $retrievedLetterboxMails['error'];
+    }
+    $retrievedMails['error'] = json_encode($retrievedMails['error'], JSON_PRETTY_PRINT);
 }
 
 if (!empty($retrievedMails['error'])) {
