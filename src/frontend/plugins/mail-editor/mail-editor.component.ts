@@ -310,22 +310,20 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                         }
                     });
 
-                    if (this.emailStatus !== 'SENT') {
-                        await this.getAttachElements(false);
-                        const attachIds: number[] = this.emailAttachTool.attachments.list.map((item: any) => item.id);
-                        this.emailAttach.attachments.forEach((element: any, index: number) => {
-                            if (attachIds.indexOf(element.id) > -1) {
-                                const attachment: any = this.emailAttachTool.attachments.list.find((item: any) => item.id === element.id);
-                                this.emailAttach.attachments[index] = {
-                                    id: attachment.id,
-                                    format: attachment.format,
-                                    label: attachment.label,
-                                    original: attachment.original,
-                                    size: attachment.size
-                                }
+                    await this.getAttachElements(false);
+                    const attachIds: number[] = this.emailAttachTool.attachments.list.map((item: any) => item.id);
+                    this.emailAttach.attachments.forEach((element: any, index: number) => {
+                        if (attachIds.indexOf(element.id) > -1) {
+                            const attachment: any = this.emailAttachTool.attachments.list.find((item: any) => item.id === element.id);
+                            this.emailAttach.attachments[index] = {
+                                id: attachment.id,
+                                format: attachment.format,
+                                label: attachment.label,
+                                original: attachment.original,
+                                size: attachment.size
                             }
-                        });
-                    }
+                        }
+                    });
 
                     resolve(true);
                 }),
