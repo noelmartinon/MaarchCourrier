@@ -982,7 +982,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                     objAttach[element] = this.emailAttach[element].map((item: any) => item.id);
                 } else {                    
                     objAttach[element] = this.emailAttach[element].map((item: any) => ({
-                        id: element === 'attachments' && this.emailStatus === 'SENT' && this.signedAttachId !== null ? this.signedAttachId : item.id,
+                        id: element === 'attachments' && this.signedAttachId !== null ? this.signedAttachId : item.id,
                         original: item.original
                     }));
                 }
