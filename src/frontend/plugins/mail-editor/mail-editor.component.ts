@@ -157,6 +157,16 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                 this.setDefaultInfoFromResource();
             }
 
+            for (let i = 0; i < this.emailAttachTool.attachments.list.length; i ++) {
+                await this.getSignedAttachment(this.emailAttachTool.attachments.list[i].id)
+            }
+
+            this.emailAttach.attachments.forEach((element: any, index: number) => {
+                const attach: any = this.emailAttachTool.attachments.list.find((item: any) => item.id === element.id || item.signedResponse === element.id);
+                this.emailAttach.attachments[index].format = attach.status === 'SIGN' ? 'pdf' : attach.format;
+                this.emailAttach.attachments[index].size = attach.size;
+            });
+
             this.initEmailModelsList();
         }
 
@@ -310,6 +320,21 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                         }
                     });
 
+                    await this.getAttachElements(false);
+                    const attachIds: number[] = this.emailAttachTool.attachments.list.map((item: any) => item.id);
+                    this.emailAttach.attachments.forEach((element: any, index: number) => {
+                        if (attachIds.indexOf(element.id) > -1) {
+                            const attachment: any = this.emailAttachTool.attachments.list.find((item: any) => item.id === element.id);
+                            this.emailAttach.attachments[index] = {
+                                id: attachment.id,
+                                format: attachment.format,
+                                label: attachment.label,
+                                original: attachment.original,
+                                size: attachment.size
+                            }
+                        }
+                    });
+                    await this.getAttachElements(false);
                     resolve(true);
                 }),
                 catchError((err) => {
@@ -445,7 +470,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         if (type === 'document') {
             return this.emailAttach.document.isLinked;
         } else {
-            return this.emailAttach[type].filter((attach: any) => attach.id === item.id).length > 0;
+            return this.emailAttach[type].filter((attach: any) => attach.id === item.id || item.signedResponse === attach.id).length > 0;
         }
     }
 
@@ -897,7 +922,12 @@ export class MailEditorComponent implements OnInit, OnDestroy {
         });
     }
 
-    saveDraft() {
+    async saveDraft() {
+        for (let i = 0; i < this.emailAttach.attachments.length; i++) {
+            await this.getSignedAttachment(this.emailAttach.attachments[i].id);
+            this.emailAttach.attachments[i].id = this.signedAttachId !== null ? this.signedAttachId : this.emailAttach.attachments[i].id;
+            this.emailAttach.attachments[i].original = this.signedAttachId !== null;
+        }
         return new Promise(async (resolve) => {
             if (!this.readonly && !this.functions.empty(tinymce.get('emailSignature').getContent())) {
                 this.emailStatus = 'DRAFT';
@@ -958,7 +988,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                     objAttach[element] = this.emailAttach[element].map((item: any) => item.id);
                 } else {
                     objAttach[element] = this.emailAttach[element].map((item: any) => ({
-                        id: element === 'attachments' && this.signedAttachId !== null ? this.signedAttachId : item.id,
+                        id: item.id,
                         original: item.original
                     }));
                 }
@@ -1036,6 +1066,11 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                 tap((data: any) => {
                     if (!this.functions.empty(data.signedResponse)) {
                         this.signedAttachId = data.signedResponse;
+                        this.emailAttachTool.attachments.list.find((item: any) => item.id === id).signedResponse = data.signedResponse;
+                        const attach: any = this.emailAttach.attachments.find((item: any) => item.id === id)
+                        if (attach !== undefined) {
+                            this.emailAttach.attachments.find((item: any) => item.id === id).signedResponse = data.signedResponse;
+                        }
                     } else {
                         this.signedAttachId = null;
                     }
