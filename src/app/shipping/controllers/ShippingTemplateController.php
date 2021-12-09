@@ -33,6 +33,7 @@ use User\models\UserModel;
 use SrcCore\controllers\LogsController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\PasswordModel;
+use SrcCore\models\ValidatorModel;
 
 class ShippingTemplateController
 {
@@ -102,9 +103,10 @@ class ShippingTemplateController
         $shippingInfo['options']  = json_decode($shippingInfo['options'], true);
         $shippingInfo['fee']      = json_decode($shippingInfo['fee'], true);
         $shippingInfo['entities'] = json_decode($shippingInfo['entities'], true);
-        $subscriptions = json_decode($shippingInfo['subscriptions'], true);
+
+        $shippingInfo['subscriptions'] = json_decode($shippingInfo['subscriptions'], true);
+        $shippingInfo['subscribed'] = !empty($shippingInfo['subscriptions']) || ShippingTemplateController::subscribed(['accountId' => $shippingInfo['account']['id']]);
         unset($shippingInfo['subscriptions']);
-        $shippingInfo['subscribed'] = !empty($subscriptions);
 
         $allEntities = EntityModel::get([
             'select'    => ['e1.id', 'e1.entity_id', 'e1.entity_label', 'e2.id as parent_id'],
@@ -188,7 +190,6 @@ class ShippingTemplateController
         }
 
         $body = $request->getParsedBody();
-        $body['id'] = $aArgs['id'];
 
         $errors = ShippingTemplateController::checkData($body, 'update');
         if (!empty($errors)) {
@@ -202,8 +203,7 @@ class ShippingTemplateController
             $shippingInfo['account'] = json_decode($shippingInfo['account'], true);
             $body['account']['password'] = $shippingInfo['account']['password'];
         }
-        $shippingInfo = ShippingTemplateModel::getById(['id' => $aArgs['id'], 'select' => ['subscriptions']]);
-        $body['subscriptions'] = json_decode($shippingInfo['subscriptions']) ?? [];
+        $alreadySubscribed = ShippingTemplateController::subscribed(['accountId' => $shippingInfo['account']['id']]);
         unset($shippingInfo);
 
         $body['options']  = json_encode($body['options']);
@@ -211,15 +211,13 @@ class ShippingTemplateController
         foreach ($body['entities'] as $key => $entity) {
             $body['entities'][$key] = (string)$entity;
         }
-        $body['entities'] = json_encode($body['entities']);
-        $body['account']  = json_encode($body['account']);
-        if (!!$body['subscribed'] && empty($body['subscriptions'])) {
+        if (!!$body['subscribed'] && !$alreadySubscribed) {
             $subscriptions = ShippingTemplateController::subscribeToNotifications($body);
             if (!empty($subscriptions['errors'])) {
                 return $response->withStatus(400)->withJson(['errors' => $subscriptions['errors']]);
             }
             $body['subscriptions'] = $subscriptions['subscriptions'];
-        } elseif (!$body['subscribed']) {
+        } elseif (!$body['subscribed'] && $alreadySubscribed) {
             $subscriptions = ShippingTemplateController::unsubscribeFromNotifications($body);
             if (!empty($subscriptions['errors'])) {
                 return $response->withStatus(400)->withJson(['errors' => $subscriptions['errors']]);
@@ -227,9 +225,15 @@ class ShippingTemplateController
             $body['subscriptions'] = $subscriptions['subscriptions'];
         }
         unset($body['subscribed']);
-        $body['subscriptions'] = json_encode($body['subscriptions']);
+        $body['subscriptions'] = !empty($body['subscriptions']) ? json_encode($body['subscriptions']) : '[]';
+        $body['entities'] = json_encode($body['entities']);
+        $body['account']  = json_encode($body['account']);
 
-        ShippingTemplateModel::update($body);
+        ShippingTemplateModel::update([
+            'where' => ['id = ?'],
+            'data'  => [$aArgs['id']],
+            'set'   => $body
+        ]);
 
         HistoryController::add([
             'tableName' => 'shipping_templates',
@@ -382,6 +386,21 @@ class ShippingTemplateController
         return $fee;
     }
 
+    private static function subscribed(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['accountId']);
+        ValidatorModel::stringType($args, ['accountId']);
+
+        $result = ShippingTemplateModel::get([
+            'select' => [1],
+            'where'  => ['account->>\'id\' = ?', 'jsonb_array_length(subscriptions) > 0'],
+            'data'   => [$args['accountId']],
+            'limit'  => 1
+        ]);
+
+        return !empty($result);
+    }
+
     private static function subscribeToNotifications(array $shippingTemplate)
     {
         if (empty($shippingTemplate)) {
@@ -439,13 +458,29 @@ class ShippingTemplateController
         if (empty($shippingTemplate)) {
             return ['errors' => 'shipping template is empty'];
         }
+        $subscribedElsewhere = false;
+        if (empty($shippingTemplate['subscriptions'])) {
+            $shippingTemplate = ShippingTemplateModel::get([
+                'select' => ['id', 'account', 'subscriptions'],
+                'where'  => ['account->>\'id\' = ?', 'jsonb_array_length(subscriptions) > 0'],
+                'data'   => [$shippingTemplate['account']['id']],
+                'limit'  => 1
+            ]);
+            if (empty($shippingTemplate)) {
+                return ['errors' => 'no subscribed shipping template with matching account id'];
+            }
+            $shippingTemplate = $shippingTemplate[0];
+            $shippingTemplate['account'] = json_decode($shippingTemplate['account'], true);
+            $shippingTemplate['subscriptions'] = json_decode($shippingTemplate['subscriptions'], true);
+            $subscribedElsewhere = true;
+        }
         $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
         if (empty($mailevaConfig)) {
             return ['errors' => 'Maileva configuration does not exist'];
         } elseif (!$mailevaConfig['enabled']) {
             return ['errors' => 'Maileva configuration is disabled'];
         }
-        $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, json_decode($shippingTemplate['account'], true));
+        $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, $shippingTemplate['account']);
         if (!empty($authToken['errors'])) {
             return ['errors' => $authToken['errors']];
         }
@@ -459,6 +494,15 @@ class ShippingTemplateController
             if ($curlResponse['code'] != 204) {
                 return ['errors' => $curlResponse['response'] ?? ('Maileva DELETE/subscriptions/' . $subscriptionId . ' returned HTTP ' . $curlResponse['code'])];
             }
+        }
+        if ($subscribedElsewhere) {
+            ShippingTemplateModel::update([
+                'where'   => ['id = ?'],
+                'data'    => [$shippingTemplate['id']],
+                'set' => [
+                    'subscriptions' => '[]'
+                ]
+            ]);
         }
 
         return ['subscriptions' => []];
