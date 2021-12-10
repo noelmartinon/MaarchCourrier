@@ -34,6 +34,7 @@ use SrcCore\controllers\LogsController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\PasswordModel;
 use SrcCore\models\ValidatorModel;
+use Firebase\JWT\JWT;
 
 class ShippingTemplateController
 {
@@ -217,12 +218,16 @@ class ShippingTemplateController
                 return $response->withStatus(400)->withJson(['errors' => $subscriptions['errors']]);
             }
             $body['subscriptions'] = $subscriptions['subscriptions'];
+            $body['token_min_iat'] = new \DateTime();
+            $body['token_min_iat'] = $body['token_min_iat']->format('c');
         } elseif (!$body['subscribed'] && $alreadySubscribed) {
             $subscriptions = ShippingTemplateController::unsubscribeFromNotifications($body);
             if (!empty($subscriptions['errors'])) {
                 return $response->withStatus(400)->withJson(['errors' => $subscriptions['errors']]);
             }
             $body['subscriptions'] = $subscriptions['subscriptions'];
+            $body['token_min_iat'] = new \DateTime();
+            $body['token_min_iat'] = $body['token_min_iat']->format('c');
         }
         unset($body['subscribed']);
         $body['subscriptions'] = !empty($body['subscriptions']) ? json_encode($body['subscriptions']) : '[]';
@@ -386,6 +391,68 @@ class ShippingTemplateController
         return $fee;
     }
 
+    private static function generateToken($args)
+    {
+        ValidatorModel::notEmpty($args, ['mailevaUri', 'shippingTemplateId']);
+        ValidatorModel::stringType($args, ['mailevaUri']);
+        ValidatorModel::intType($args, ['shippingTemplateId']);
+
+        $shippingApiDomainName = $args['mailevaUri'];
+        $shippingApiDomainName = str_replace(['http://', 'https://'], '', $shippingApiDomainName);
+        $shippingApiDomainName = rtrim($shippingApiDomainName, '/');
+
+        $now = time();
+
+        $payload = [
+            'iss' => 'MaarchCourrier',
+            'sub' => 'maileva_notifications',
+            'aud' => $shippingApiDomainName,
+            'iat' => $now,
+            'shippingTemplateId' => $args['shippingTemplateId'],
+        ];
+
+        $jwt = JWT::encode($payload, CoreConfigModel::getEncryptKey());
+
+        return $jwt;
+    }
+
+    private static function checkToken($args)
+    {
+        ValidatorModel::notEmpty($args, ['token', 'shippingTemplateId', 'shippingApiDomainName', 'minIAT']);
+        ValidatorModel::stringType($args, ['token', 'mailevaUri']);
+        ValidatorModel::intType($args, ['shippingTemplateId', 'minIAT']);
+
+        $now = time();
+
+        try {
+            $payload = JWT::decode($args['token'], CoreConfigModel::getEncryptKey(), ['HS256']);
+        } catch (\Exception $e) {
+            return ['errors' => 'Maileva webhook JWT is invalid'];
+        }
+
+        if (empty($payload['iss']) || !Validator::stringVal()->equals('MaarchCourrier')->validate($payload['iss'])) {
+            return ['errors' => 'Maileva webhook token issuer is invalid'];
+        } elseif (empty($payload['sub']) || !Validator::stringVal()->equals('maileva_notifications')->validate($payload['sub'])) {
+            return ['errors' => 'Maileva webhook token subject is invalid'];
+        } elseif (empty($payload['aud']) || !Validator::stringVal()->equals($args['shippingApiDomainName'])->validate($payload['aud'])) {
+            return ['errors' => 'Maileva webhook token audience is invalid'];
+        } elseif (empty($payload['iat']) || !Validator::intVal()->min($args['minIAT'])->max($now)->validate($payload['iat'])) {
+            return ['errors' => 'Maileva webhook token issuing date is invalid'];
+        } elseif (empty($payload['shippingTemplateId']) || !Validator::intVal()->equals($args['shippingTemplateId'])->validate($payload['shippingTemplateId'])) {
+            return ['errors' => 'Maileva webhook token shippingTemplateId is invalid'];
+        }
+
+        $payload = [
+            'iss' => $payload['iss'],
+            'sub' => $payload['sub'],
+            'aud' => $payload['aud'],
+            'iat' => $payload['iat'],
+            'shippingTemplateId' => $payload['shippingTemplateId']
+        ];
+
+        return $payload;
+    }
+
     private static function subscribed(array $args)
     {
         ValidatorModel::notEmpty($args, ['accountId']);
@@ -412,6 +479,7 @@ class ShippingTemplateController
         } elseif (!$mailevaConfig['enabled']) {
             return ['errors' => 'Maileva configuration is disabled'];
         }
+        $jwt = ShippingTemplateController::generateToken(['mailevaUri' => $mailevaConfig['uri'], 'shippingTemplateId' => $shippingTemplate['id']]);
         $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, json_decode($shippingTemplate['account'], true));
         if (!empty($authToken['errors'])) {
             return ['errors' => $authToken['errors']];
@@ -435,7 +503,7 @@ class ShippingTemplateController
                     'body'       => json_encode([
                         'event_type'    => $eventType,
                         'resource_type' => $resourceType,
-                        'callback_url'  => $maarchUrl . '/rest/administration/shippings/' . $shippingTemplate['id'] . '/notifications'
+                        'callback_url'  => $maarchUrl . '/rest/administration/shippings/' . $shippingTemplate['id'] . '/notifications?auth_token=' . $jwt
                     ])
                 ]);
                 if ($curlResponse['code'] != 201) {
@@ -450,7 +518,7 @@ class ShippingTemplateController
         }
         $subscriptions = array_values(array_unique(array_merge($shippingTemplate['subscriptions'], $subscriptions))) ?? [];
 
-        return ['subscriptions' => $subscriptions];
+        return ['subscriptions' => $subscriptions, 'jwt' => $jwt];
     }
 
     private static function unsubscribeFromNotifications(array $shippingTemplate)
@@ -496,11 +564,13 @@ class ShippingTemplateController
             }
         }
         if ($subscribedElsewhere) {
+            $now = new \DateTime();
             ShippingTemplateModel::update([
                 'where'   => ['id = ?'],
                 'data'    => [$shippingTemplate['id']],
                 'set' => [
-                    'subscriptions' => '[]'
+                    'subscriptions' => '[]',
+                    'token_min_iat' => $now->format('c')
                 ]
             ]);
         }
@@ -508,7 +578,7 @@ class ShippingTemplateController
         return ['subscriptions' => []];
     }
 
-    public function receiveNotification(Request $request, Response $response)
+    public function receiveNotification(Request $request, Response $response, array $args)
     {
         $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
         if (empty($mailevaConfig)) {
@@ -520,14 +590,36 @@ class ShippingTemplateController
         $shippingApiDomainName = str_replace(['http://', 'https://'], '', $shippingApiDomainName);
         $shippingApiDomainName = rtrim($shippingApiDomainName, '/');
 
+        if (empty($args['id'])) {
+            return ShippingTemplateController::logAndReturnError($response, 400, 'No shipping template id provided');
+        }
+        $shippingTemplate = ShippingTemplateModel::getById(['id' => $args['id']]);
+        if (empty($shippingTemplate)) {
+            return ShippingTemplateController::logAndReturnError($response, 400, 'No shipping template found with this id');
+        }
+        $shippingTemplateAccount = json_decode($shippingTemplate['account'], true);
+        $minIAT = new \DateTime($shippingTemplate['token_min_iat']);
+        $minIAT = $minIAT->format('U');
+
+        $authToken = $request->getQueryParam('auth_token');
+        $payload = ShippingTemplateController::checkToken([
+            'token'                 => $authToken,
+            'shippingApiDomainName' => $shippingApiDomainName,
+            'shippingTemplateId'    => $shippingTemplate['id'],
+            'minIAT'                => $minIAT
+        ]);
+        if (!empty($payload['errors'])) {
+            return ShippingTemplateController::logAndReturnError($response, 403, $payload['errors']);
+        }
+
         $body = $request->getParsedBody();
         $error = null;
         if (!Validator::equals($shippingApiDomainName)->validate($body['source'])) {
             $error = 'Body source is different from the saved one';
         } elseif (!Validator::stringType()->length(1, 256)->validate($body['user_id'])) {
             $error = 'Body user_id is empty, too long, or not a string';
-        } elseif (!Validator::stringType()->length(1, 256)->validate($body['client_id'])) {
-            $error = 'Body client_id is empty, too long, or not a string';
+        } elseif (!Validator::stringType()->equals($shippingTemplateAccount['id'])->validate($body['client_id'])) {
+            $error = 'Body client_id does not match shipping template id';
         } elseif (!Validator::stringType()->in(array_keys(ShippingTemplateController::MAILEVA_EVENT_RESOURCES))->validate($body['event_type'])) {
             $error = 'Body event_type is not an allowed value';
         } elseif (!Validator::stringType()->in(ShippingTemplateController::MAILEVA_EVENT_RESOURCES[$body['event_type']])->validate($body['resource_type'])) {
@@ -565,27 +657,6 @@ class ShippingTemplateController
             'eventType' => 'Shipping webhook body: ' . json_encode($body),
             'eventId'   => 'Shipping webhook error'
         ]);
-
-        $primaryEntity = UserModel::getPrimaryEntityById([
-            'id'     => $GLOBALS['id'],
-            'select' => ['entities.id']
-        ]);
-        if (empty($primaryEntity) || !Validator::intType()->validate($primaryEntity['id'])) {
-            return ShippingTemplateController::logAndReturnError($response, 400, 'User has no primary entity');
-        }
-        $shippingTemplates = ShippingTemplateModel::getByEntities([
-            'entities' => [(string) $primaryEntity['id']],
-            'select'   => ['account']
-        ]);
-        foreach ($shippingTemplates as $shippingTemplate) {
-            $shippingTemplateAccount = json_decode($shippingTemplate['account'], true);
-            if (Validator::equals($shippingTemplateAccount['id'])->validate($body['clientId'])) {
-                break;
-            }
-        }
-        if (empty($shippingTemplateAccount)) {
-            return ShippingTemplateController::logAndReturnError($response, 400, 'Body clientId does not match any shipping template for this user');
-        }
 
         if ($body['eventType'] == 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED') {
             $shipping = ShippingModel::getByRecipientId([
@@ -628,9 +699,6 @@ class ShippingTemplateController
                 return ShippingTemplateController::logAndReturnError($response, 400, 'Body document_id does not match any attachment');
             }
             $resId = $referencedAttachment['res_id_master'];
-        }
-        if (!ResController::hasRightByResId(['resId' => [$resId], 'userId' => $GLOBALS['id']])) {
-            return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
         $actions = ActionModel::get([

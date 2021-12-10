@@ -1058,6 +1058,7 @@ fee json DEFAULT '{}',
 entities jsonb DEFAULT '{}',
 account json DEFAULT '{}',
 subscriptions jsonb DEFAULT '[]'::jsonb,
+token_min_iat TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
 CONSTRAINT shipping_templates_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);
