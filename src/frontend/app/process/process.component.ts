@@ -268,26 +268,33 @@ export class ProcessComponent implements OnInit, OnDestroy {
             }, 800);
         }
 
-        this.http.get(`../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/actions?resId=${this.currentResourceInformations.resId}`).pipe(
-            map((data: any) => {
-                data.actions = data.actions.map((action: any, index: number) => ({
-                    id: action.id,
-                    label: action.label,
-                    component: action.component,
-                    categoryUse: action.categories
-                }));
-                return data;
-            }),
-            tap((data: any) => {
-                this.selectedAction = data.actions[0];
-                this.actionsList = data.actions;
-                this.actionsListLoaded = true;
-            }),
-            catchError((err: any) => {
-                this.notify.handleErrors(err);
-                return of(false);
-            })
-        ).subscribe();
+        await this.getActions();
+    }
+
+    getActions() {
+        return new Promise((resolve) => {
+            this.http.get(`../rest/resourcesList/users/${this.currentUserId}/groups/${this.currentGroupId}/baskets/${this.currentBasketId}/actions?resId=${this.currentResourceInformations.resId}`).pipe(
+                map((data: any) => {
+                    data.actions = data.actions.map((action: any, index: number) => ({
+                        id: action.id,
+                        label: action.label,
+                        component: action.component,
+                        categoryUse: action.categories
+                    }));
+                    return data;
+                }),
+                tap((data: any) => {
+                    this.selectedAction = data.actions[0];
+                    this.actionsList = data.actions;
+                    this.actionsListLoaded = true;
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        });
     }
 
     async initDetailPage(params: any) {
@@ -810,6 +817,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                             this.actionService.loading = false;
                         }
                         await this.indexingForm.saveData();
+                        await this.getActions();
                         setTimeout(() => {
                             this.loadResource(false);
                         }, 400);
