@@ -515,7 +515,6 @@ $app->post('/administration/shippings/{id}/subscriptions', \Shipping\controllers
 $app->delete('/administration/shippings/{id}/subscriptions', \Shipping\controllers\ShippingTemplateController::class . ':unsubscribeFromNotifications');
 $app->post('/administration/shippings/{id}/notifications', \Shipping\controllers\ShippingTemplateController::class . ':receiveNotification');
 $app->get('/shippings/{shippingId}/attachments', \Shipping\controllers\ShippingController::class . ':getShippingAttachmentsList');
-$app->get('/shippings/{shippingId}/attachments/{attachmentId}', \Shipping\controllers\ShippingController::class . ':getShippingAttachment');
 $app->get('/shippings/{shippingId}/history', \Shipping\controllers\ShippingController::class . ':getHistory');
 
 //SignatureBook
