@@ -225,7 +225,7 @@ if (!empty($idsToRetrieve['resLetterbox'])) {
         $retrievedLetterboxMails = \ExternalSignatoryBook\controllers\IxbusController::retrieveSignedMails(['config' => $configRemoteSignatoryBook, 'idsToRetrieve' => $idsToRetrieve, 'version' => 'resLetterbox']);
     }
     $retrievedMails['resLetterbox'] = $retrievedLetterboxMails['resLetterbox'] ?? [];
-        if (empty($retrievedMails['error'])) {
+    if (empty($retrievedMails['error'])) {
         $retrievedMails['error'] = [];
     } elseif (!is_array($retrievedMails['error'])) {
         $retrievedMails['error'] = [$retrievedMails['error']];
