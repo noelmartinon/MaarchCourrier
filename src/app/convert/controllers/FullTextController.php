@@ -103,7 +103,7 @@ class FullTextController
             $doc = new \Zend_Search_Lucene_Document();
 
             $doc->addField(\Zend_Search_Lucene_Field::UnIndexed('Id', (integer)$args['resId']));
-            $doc->addField(\Zend_Search_Lucene_Field::UnStored('contents', $fileContent));
+            $doc->addField(\Zend_Search_Lucene_Field::UnStored('contents', $fileContent, 'utf-8'));
 
             $index->addDocument($doc);
             $index->commit();
