@@ -304,7 +304,7 @@ trait ShippingTrait
                         "country_code"      => 'FR'
                     ]),
                 ]);
-                if ($createRecipient['code'] != 201) {
+                if ($createRecipient['code'] != 201 || empty($createRecipient['response']) || !is_array($createRecipient['response'])) {
                     $errors[] = "Maileva recipient creation failed for resource {$resId}";
                     continue;
                 }
@@ -387,11 +387,11 @@ trait ShippingTrait
                 'sendingId'         => $sendingId,
                 'documentId'        => $resId,
                 'documentType'      => $resource['type'],
-                'options'           => json_encode($shippingTemplate['options']),
+                'options'           => !empty($shippingTemplate['options']) ? json_encode($shippingTemplate['options']) : '{}',
                 'fee'               => $fee,
                 'recipientEntityId' => $recipientEntity['id'],
                 'accountId'         => $shippingTemplate['account']['id'],
-                'recipients'        => json_encode($recipients),
+                'recipients'        => !empty($recipients) ? json_encode($recipients) : '[]',
                 'actionId'          => $args['actionId'] ?? null
             ]);
         }

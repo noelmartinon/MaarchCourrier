@@ -414,6 +414,8 @@ define("_ATTACH_REMOVE_FROM_SIGNATORY_BOOK", "Attachment removed from signatory 
 define("_ATTACH_ADD_TO_SIGNATORY_BOOK", "Attachment added to signatory book"); //TO TRANSLATE
 define("_ATTACH_REMOVE_FROM_SHIPPING", "Attachment removed from Maileva shippings"); //TO TRANSLATE
 define("_ATTACH_ADD_TO_SHIPPING", "Attachment added to Maileva shippings"); //TO TRANSLATE
+define('_SHIPPING_ATTACH_DEPOSIT_PROOF', 'Maileva deposit proof'); // TO TRANSLATE
+define('_SHIPPING_ATTACH_ACKNOWLEDGEMENT_OF_RECEIPT', 'Maileva acknowledgement of receipt'); // TO TRANSLATE
 
 define("_DOC_ADD_TO_SIGNATORY_BOOK", "Mail added to signatory book"); //TO TRANSLATE
 define("_DOC_REMOVE_FROM_SIGNATORY_BOOK", "Mail removed from signatory book"); //TO TRANSLATE

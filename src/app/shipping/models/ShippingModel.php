@@ -71,6 +71,10 @@ class ShippingModel
         ValidatorModel::intType($args, ['limit']);
         ValidatorModel::stringType($args, ['recipientId']);
 
+        // jsonb @@ jsonpath -> boolean
+        // @@ executes a check on a json value
+        // check on recipients that AT LEAST ONE of them has a recipientId equal to $args['recipientId']
+        // see PostgreSQL doc on json functions and operators
         $args['where'] = [
             'recipients @@ \'$[*].recipientId == "' . $args['recipientId'] . '"\''
         ];

@@ -62,7 +62,7 @@ class ShippingController
             $recipients = json_decode($shipping['recipients'], true);
             $contacts = [];
             foreach ($recipients as $recipient) {
-                $contacts[] = ['company' => $recipient['company'], 'contactLabel' => $recipient['firstname'].' '.$recipient['lastname']];
+                $contacts[] = ['company' => $recipient[1], 'contactLabel' => $recipient[2]];
             }
 
             $shippings[] = [
@@ -84,13 +84,16 @@ class ShippingController
 
     public function getShippingAttachmentsList(Request $request, Response $response, array $args)
     {
+        if (!Validator::intVal()->validate($args['shippingId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route shippingId is not an integer']);
+        }
         $shipping = ShippingModel::get([
             'select' => ['id', 'document_id', 'document_type', 'attachments'],
             'where'  => ['id = ?'],
             'data'   => [$args['shippingId']]
         ]);
         if (empty($shipping[0])) {
-            return $response->withStatus(400)->withJson(['errors' => 'no shipping with this id']);
+            return $response->withStatus(400)->withJson(['errors' => 'No shipping with this id']);
         }
         $shipping = $shipping[0];
         $shipping['attachments'] = json_decode($shipping['attachments'], true);
@@ -102,7 +105,7 @@ class ShippingController
                 'select' => ['res_id', 'res_id_master']
             ]);
             if (empty($referencedAttachment)) {
-                return $response->withStatus(400)->withJson(['Body document_id does not match any attachment']);
+                return $response->withStatus(400)->withJson(['No attachment with this id']);
             }
             $resId = $referencedAttachment['res_id_master'];
         }
@@ -121,18 +124,22 @@ class ShippingController
                 'date'           => $attachment['date'] ?? null
             ];
         }
-        return $response->withStatus(200)->withJson(['attachments' => $attachments]);
+        return $response->withJson(['attachments' => $attachments]);
     }
 
+    // voir si possible de supprimer cette route au profit de GET/attachments/{id}
     public function getShippingAttachment(Request $request, Response $response, array $args)
     {
+        if (!Validator::intVal()->validate($args['shippingId'])) {
+            return $response->withStatus(400)->withJson(['errors' => 'Route shippingId is not an integer']);
+        }
         $shipping = ShippingModel::get([
             'select' => ['id', 'document_id', 'document_type', 'attachments'],
             'where'  => ['id = ?'],
             'data'   => [$args['shippingId']]
         ]);
         if (empty($shipping[0])) {
-            return $response->withStatus(400)->withJson(['errors' => 'no shipping with this id']);
+            return $response->withStatus(400)->withJson(['errors' => 'No shipping with this id']);
         }
         $shipping = $shipping[0];
         $shipping['attachments'] = json_decode($shipping['attachments'], true);
@@ -144,7 +151,7 @@ class ShippingController
                 'select' => ['res_id', 'res_id_master']
             ]);
             if (empty($referencedAttachment)) {
-                return $response->withStatus(400)->withJson(['Body document_id does not match any attachment']);
+                return $response->withStatus(400)->withJson(['No attachment with this id']);
             }
             $resId = $referencedAttachment['res_id_master'];
         }
@@ -153,7 +160,7 @@ class ShippingController
         }
 
         if (empty($shipping['attachments'][$args['attachmentId']])) {
-            return $response->withStatus(400)->withJson(['errors' => 'no shipping attachment with this id']);
+            return $response->withStatus(400)->withJson(['errors' => 'No shipping attachment with this id']);
         }
 
         $attachment = $shipping['attachments'][$args['attachmentId']];
@@ -174,14 +181,14 @@ class ShippingController
 
         $fileContent = file_get_contents($filepath);
         if (empty($fileContent)) {
-            return $response->withStatus(400)->withJson(['errors' => 'file does not exist or is unreadable']);
+            return $response->withStatus(400)->withJson(['errors' => 'File does not exist or is unreadable']);
         }
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($fileContent);
         $response->write($fileContent);
         $response = $response->withAddedheader('Content-Type', $mimeType);
 
-        return $response->withStatus(200)->withHeader('Content-Disposition', 'attachment; filename=' . $filename);
+        return $response->withHeader('Content-Disposition', 'attachment; filename=' . $filename);
     }
 
     public function getHistory(Request $request, Response $response, array $args) {
@@ -191,7 +198,7 @@ class ShippingController
             'data'   => [$args['shippingId']]
         ]);
         if (empty($shipping[0])) {
-            return $response->withStatus(400)->withJson(['errors' => 'no shipping with this id']);
+            return $response->withStatus(400)->withJson(['errors' => 'No shipping with this id']);
         }
         $shipping = $shipping[0];
         $shipping['history'] = json_decode($shipping['history'], true);
@@ -203,7 +210,7 @@ class ShippingController
                 'select' => ['res_id', 'res_id_master']
             ]);
             if (empty($referencedAttachment)) {
-                return $response->withStatus(400)->withJson(['Body document_id does not match any attachment']);
+                return $response->withStatus(400)->withJson(['No attachment with this id']);
             }
             $resId = $referencedAttachment['res_id_master'];
         }
@@ -211,6 +218,6 @@ class ShippingController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
-        return $response->withStatus(200)->withJson(['history' => $shipping['history']]);
+        return $response->withJson(['history' => $shipping['history']]);
     }
 }

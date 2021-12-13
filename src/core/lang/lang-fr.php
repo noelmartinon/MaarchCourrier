@@ -414,6 +414,8 @@ define("_ATTACH_REMOVE_FROM_SIGNATORY_BOOK", "Pièce jointe retirée du parapheu
 define("_ATTACH_ADD_TO_SIGNATORY_BOOK", "Pièce jointe intégrée au parapheur électronique");
 define("_ATTACH_REMOVE_FROM_SHIPPING", "Pièce jointe retirée des envois Maileva");
 define("_ATTACH_ADD_TO_SHIPPING", "Pièce jointe intégrée aux envois Maileva");
+define('_SHIPPING_ATTACH_DEPOSIT_PROOF', 'Preuve de dépôt Maileva');
+define('_SHIPPING_ATTACH_ACKNOWLEDGEMENT_OF_RECEIPT', 'Accusé de réception Maileva');
 
 define("_DOC_ADD_TO_SIGNATORY_BOOK", "Courrier intégré au parapheur électronique");
 define("_DOC_REMOVE_FROM_SIGNATORY_BOOK", "Courrier retiré du parapheur électronique");

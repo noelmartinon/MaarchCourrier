@@ -23,9 +23,24 @@ use Slim\Http\Response;
 
 class AttachmentTypeController
 {
+    // never displayed as attachments
+    public const HIDDEN_ATTACHMENT_TYPES = [
+        'summary_sheet',
+        'shipping_deposit_proof',
+        'shipping_acknowledgement_of_receipt'
+    ];
+
+    // neither in attachment counts nor possible to get by id
+    public const UNLISTED_ATTACHMENT_TYPES = [
+        'signed_response',
+        'summary_sheet',
+        'shipping_deposit_proof',
+        'shipping_acknowledgement_of_receipt'
+    ];
+
     public function get(Request $request, Response $response)
     {
-        $rawAttachmentsTypes = AttachmentTypeModel::get(['select' => ['*'], 'where' => ['type_id <> ?'], 'data' => ['summary_sheet']]);
+        $rawAttachmentsTypes = AttachmentTypeModel::get(['select' => ['*'], 'where' => ['type_id <> ?'], 'data' => AttachmentTypeController::HIDDEN_ATTACHMENT_TYPES]);
 
         $attachmentsTypes = [];
         foreach ($rawAttachmentsTypes as $rawAttachmentsType) {

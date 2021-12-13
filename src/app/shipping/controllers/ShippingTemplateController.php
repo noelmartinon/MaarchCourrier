@@ -22,14 +22,12 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\models\CurlModel;
 use Resource\models\ResModel;
-use Resource\controllers\ResController;
+use Resource\controllers\StoreController;
 use Attachment\models\AttachmentModel;
 use Shipping\models\ShippingTemplateModel;
 use Shipping\models\ShippingModel;
 use Action\models\ActionModel;
-use Docserver\controllers\DocserverController;
 use Status\models\StatusModel;
-use User\models\UserModel;
 use SrcCore\controllers\LogsController;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\PasswordModel;
@@ -84,17 +82,17 @@ class ShippingTemplateController
         return $response->withJson(['shippings' => ShippingTemplateModel::get(['select' => ['id', 'label', 'description', 'options', 'fee', 'entities', "account->>'id' as accountid"]])]);
     }
 
-    public function getById(Request $request, Response $response, array $aArgs)
+    public function getById(Request $request, Response $response, array $args)
     {
         if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_shippings', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        if (!Validator::intVal()->validate($aArgs['id'])) {
+        if (!Validator::intVal()->validate($args['id'])) {
             return $response->withStatus(400)->withJson(['errors' => 'id is not an integer']);
         }
 
-        $shippingInfo = ShippingTemplateModel::getById(['id' => $aArgs['id']]);
+        $shippingInfo = ShippingTemplateModel::getById(['id' => $args['id']]);
         if (empty($shippingInfo)) {
             return $response->withStatus(400)->withJson(['errors' => 'Shipping does not exist']);
         }
@@ -106,7 +104,7 @@ class ShippingTemplateController
         $shippingInfo['entities'] = json_decode($shippingInfo['entities'], true);
 
         $shippingInfo['subscriptions'] = json_decode($shippingInfo['subscriptions'], true);
-        $shippingInfo['subscribed'] = !empty($shippingInfo['subscriptions']) || ShippingTemplateController::subscribed(['accountId' => $shippingInfo['account']['id']]);
+        $shippingInfo['subscribed'] = !empty($shippingInfo['subscriptions']) || ShippingTemplateController::isSubscribed(['accountId' => $shippingInfo['account']['id']]);
         unset($shippingInfo['subscriptions']);
 
         $allEntities = EntityModel::get([
@@ -184,7 +182,7 @@ class ShippingTemplateController
         return $response->withJson(['shippingId' => $id]);
     }
 
-    public function update(Request $request, Response $response, array $aArgs)
+    public function update(Request $request, Response $response, array $args)
     {
         if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_shippings', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
@@ -200,11 +198,11 @@ class ShippingTemplateController
         if (!empty($body['account']['password'])) {
             $body['account']['password'] = PasswordModel::encrypt(['password' => $body['account']['password']]);
         } else {
-            $shippingInfo = ShippingTemplateModel::getById(['id' => $aArgs['id'], 'select' => ['account']]);
+            $shippingInfo = ShippingTemplateModel::getById(['id' => $args['id'], 'select' => ['account']]);
             $shippingInfo['account'] = json_decode($shippingInfo['account'], true);
             $body['account']['password'] = $shippingInfo['account']['password'];
         }
-        $alreadySubscribed = ShippingTemplateController::subscribed(['accountId' => $shippingInfo['account']['id']]);
+        $alreadySubscribed = ShippingTemplateController::isSubscribed(['accountId' => $shippingInfo['account']['id']]);
         unset($shippingInfo);
 
         $body['options']  = json_encode($body['options']);
@@ -236,13 +234,13 @@ class ShippingTemplateController
 
         ShippingTemplateModel::update([
             'where' => ['id = ?'],
-            'data'  => [$aArgs['id']],
+            'data'  => [$args['id']],
             'set'   => $body
         ]);
 
         HistoryController::add([
             'tableName' => 'shipping_templates',
-            'recordId'  => $aArgs['id'],
+            'recordId'  => $args['id'],
             'eventType' => 'UP',
             'eventId'   => 'shippingup',
             'info'      => _MAILEVA_UPDATED. ' : ' . $body['label']
@@ -251,26 +249,26 @@ class ShippingTemplateController
         return $response->withJson(['success' => 'success']);
     }
 
-    public function delete(Request $request, Response $response, array $aArgs)
+    public function delete(Request $request, Response $response, array $args)
     {
         if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_shippings', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
-        if (!Validator::intVal()->validate($aArgs['id'])) {
+        if (!Validator::intVal()->validate($args['id'])) {
             return $response->withStatus(400)->withJson(['errors' => 'id is not an integer']);
         }
 
-        $shippingInfo = ShippingTemplateModel::getById(['id' => $aArgs['id'], 'select' => ['label']]);
+        $shippingInfo = ShippingTemplateModel::getById(['id' => $args['id'], 'select' => ['label']]);
         if (empty($shippingInfo)) {
             return $response->withStatus(400)->withJson(['errors' => 'Shipping does not exist']);
         }
 
-        ShippingTemplateModel::delete(['id' => $aArgs['id']]);
+        ShippingTemplateModel::delete(['id' => $args['id']]);
 
         HistoryController::add([
             'tableName' => 'shipping_templates',
-            'recordId'  => $aArgs['id'],
+            'recordId'  => $args['id'],
             'eventType' => 'DEL',
             'eventId'   => 'shippingdel',
             'info'      => _MAILEVA_DELETED. ' : ' . $shippingInfo['label']
@@ -278,59 +276,6 @@ class ShippingTemplateController
 
         $shippings = ShippingTemplateModel::get(['select' => ['id', 'label', 'description', 'options', 'fee', 'entities']]);
         return $response->withJson(['shippings' => $shippings]);
-    }
-
-    protected static function checkData($aArgs, $mode)
-    {
-        $errors = [];
-
-        if ($mode == 'update') {
-            if (!Validator::intVal()->validate($aArgs['id'])) {
-                $errors[] = 'Id is not a numeric';
-            } else {
-                $shippingInfo = ShippingTemplateModel::getById(['id' => $aArgs['id']]);
-            }
-            if (empty($shippingInfo)) {
-                $errors[] = 'Shipping does not exist';
-            }
-        } else {
-            if (!empty($aArgs['account'])) {
-                if (!Validator::notEmpty()->validate($aArgs['account']['id']) || !Validator::notEmpty()->validate($aArgs['account']['password'])) {
-                    $errors[] = 'account id or password is empty';
-                }
-            }
-        }
-           
-        if (!Validator::notEmpty()->validate($aArgs['label']) ||
-            !Validator::length(1, 64)->validate($aArgs['label'])) {
-            $errors[] = 'label is empty or too long';
-        }
-        if (!Validator::notEmpty()->validate($aArgs['description']) ||
-            !Validator::length(1, 255)->validate($aArgs['description'])) {
-            $errors[] = 'description is empty or too long';
-        }
-
-        if (!empty($aArgs['entities'])) {
-            if (!Validator::arrayType()->validate($aArgs['entities'])) {
-                $errors[] = 'entities must be an array';
-            }
-            foreach ($aArgs['entities'] as $entity) {
-                $info = EntityModel::getById(['id' => $entity, 'select' => ['id']]);
-                if (empty($info)) {
-                    $errors[] = $entity . ' does not exists';
-                }
-            }
-        }
-
-        if (!empty($aArgs['fee'])) {
-            foreach ($aArgs['fee'] as $value) {
-                if (!empty($value) && !Validator::floatVal()->positive()->validate($value)) {
-                    $errors[] = 'fee must be an array with positive values';
-                }
-            }
-        }
-
-        return $errors;
     }
 
     public function initShipping(Request $request, Response $response)
@@ -368,216 +313,6 @@ class ShippingTemplateController
         ]);
     }
 
-    public static function calculShippingFee(array $aArgs)
-    {
-        $fee = 0;
-        foreach ($aArgs['resources'] as $value) {
-            $resourceId = $value['res_id'];
-
-            $collId = $value['type'] == 'attachment' ? 'attachments_coll' : 'letterbox_coll';
-
-            $convertedResource = ConvertPdfController::getConvertedPdfById(['resId' => $resourceId, 'collId' => $collId]);
-            $docserver         = DocserverModel::getByDocserverId(['docserverId' => $convertedResource['docserver_id'], 'select' => ['path_template']]);
-            $pathToDocument    = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedResource['path']) . $convertedResource['filename'];
-
-            $img = new \Imagick();
-            $img->pingImage($pathToDocument);
-            $pageCount = $img->getNumberImages();
-
-            $attachmentFee = ($pageCount > 1) ? ($pageCount - 1) * $aArgs['fee']['nextPagePrice'] : 0 ;
-            $fee = $fee + $attachmentFee + $aArgs['fee']['firstPagePrice'] + $aArgs['fee']['postagePrice'];
-        }
-
-        return $fee;
-    }
-
-    private static function generateToken($args)
-    {
-        ValidatorModel::notEmpty($args, ['mailevaUri', 'shippingTemplateId']);
-        ValidatorModel::stringType($args, ['mailevaUri']);
-        ValidatorModel::intType($args, ['shippingTemplateId']);
-
-        $shippingApiDomainName = $args['mailevaUri'];
-        $shippingApiDomainName = str_replace(['http://', 'https://'], '', $shippingApiDomainName);
-        $shippingApiDomainName = rtrim($shippingApiDomainName, '/');
-
-        $now = time();
-
-        $payload = [
-            'iss' => 'MaarchCourrier',
-            'sub' => 'maileva_notifications',
-            'aud' => $shippingApiDomainName,
-            'iat' => $now,
-            'shippingTemplateId' => $args['shippingTemplateId'],
-        ];
-
-        $jwt = JWT::encode($payload, CoreConfigModel::getEncryptKey());
-
-        return $jwt;
-    }
-
-    private static function checkToken($args)
-    {
-        ValidatorModel::notEmpty($args, ['token', 'shippingTemplateId', 'shippingApiDomainName', 'minIAT']);
-        ValidatorModel::stringType($args, ['token', 'mailevaUri']);
-        ValidatorModel::intType($args, ['shippingTemplateId', 'minIAT']);
-
-        $now = time();
-
-        try {
-            $payload = JWT::decode($args['token'], CoreConfigModel::getEncryptKey(), ['HS256']);
-        } catch (\Exception $e) {
-            return ['errors' => 'Maileva webhook JWT is invalid'];
-        }
-
-        if (empty($payload['iss']) || !Validator::stringVal()->equals('MaarchCourrier')->validate($payload['iss'])) {
-            return ['errors' => 'Maileva webhook token issuer is invalid'];
-        } elseif (empty($payload['sub']) || !Validator::stringVal()->equals('maileva_notifications')->validate($payload['sub'])) {
-            return ['errors' => 'Maileva webhook token subject is invalid'];
-        } elseif (empty($payload['aud']) || !Validator::stringVal()->equals($args['shippingApiDomainName'])->validate($payload['aud'])) {
-            return ['errors' => 'Maileva webhook token audience is invalid'];
-        } elseif (empty($payload['iat']) || !Validator::intVal()->min($args['minIAT'])->max($now)->validate($payload['iat'])) {
-            return ['errors' => 'Maileva webhook token issuing date is invalid'];
-        } elseif (empty($payload['shippingTemplateId']) || !Validator::intVal()->equals($args['shippingTemplateId'])->validate($payload['shippingTemplateId'])) {
-            return ['errors' => 'Maileva webhook token shippingTemplateId is invalid'];
-        }
-
-        $payload = [
-            'iss' => $payload['iss'],
-            'sub' => $payload['sub'],
-            'aud' => $payload['aud'],
-            'iat' => $payload['iat'],
-            'shippingTemplateId' => $payload['shippingTemplateId']
-        ];
-
-        return $payload;
-    }
-
-    private static function subscribed(array $args)
-    {
-        ValidatorModel::notEmpty($args, ['accountId']);
-        ValidatorModel::stringType($args, ['accountId']);
-
-        $result = ShippingTemplateModel::get([
-            'select' => [1],
-            'where'  => ['account->>\'id\' = ?', 'jsonb_array_length(subscriptions) > 0'],
-            'data'   => [$args['accountId']],
-            'limit'  => 1
-        ]);
-
-        return !empty($result);
-    }
-
-    private static function subscribeToNotifications(array $shippingTemplate)
-    {
-        if (empty($shippingTemplate)) {
-            return ['errors' => 'shipping template is empty'];
-        }
-        $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
-        if (empty($mailevaConfig)) {
-            return ['errors' => 'Maileva configuration does not exist'];
-        } elseif (!$mailevaConfig['enabled']) {
-            return ['errors' => 'Maileva configuration is disabled'];
-        }
-        $jwt = ShippingTemplateController::generateToken(['mailevaUri' => $mailevaConfig['uri'], 'shippingTemplateId' => $shippingTemplate['id']]);
-        $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, json_decode($shippingTemplate['account'], true));
-        if (!empty($authToken['errors'])) {
-            return ['errors' => $authToken['errors']];
-        }
-        $configFile = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
-        $maarchUrl = rtrim($configFile['config']['maarchUrl'], '/') ?? null;
-        if (empty($maarchUrl)) {
-            return ['errors' => 'maarchUrl is not configured'];
-        }
-        $subscriptions = [];
-        foreach (ShippingTemplateController::MAILEVA_EVENT_RESOURCES as $eventType => $resourceTypes) {
-            foreach ($resourceTypes as $resourceType) {
-                $curlResponse = CurlModel::exec([
-                    'method'     => 'POST',
-                    'url'        => $mailevaConfig['uri'] . '/notification_center/v2/subscriptions',
-                    'bearerAuth' => ['token' => $authToken],
-                    'headers'   => [
-                        'Accept: application/json',
-                        'Content-Type: application/json'
-                    ],
-                    'body'       => json_encode([
-                        'event_type'    => $eventType,
-                        'resource_type' => $resourceType,
-                        'callback_url'  => $maarchUrl . '/rest/administration/shippings/' . $shippingTemplate['id'] . '/notifications?auth_token=' . $jwt
-                    ])
-                ]);
-                if ($curlResponse['code'] != 201) {
-                    return ['errors' => $curlResponse['response']['errors'] ?? ('Maileva POST/subscriptions returned HTTP ' . $curlResponse['code'])];
-                }
-
-                $subscriptionId = $curlResponse['response']['subcription_id'] ?? null;
-                if (!empty($subscriptionId)) {
-                    $subscriptions[] = $subscriptionId;
-                }
-            }
-        }
-        $subscriptions = array_values(array_unique(array_merge($shippingTemplate['subscriptions'], $subscriptions))) ?? [];
-
-        return ['subscriptions' => $subscriptions, 'jwt' => $jwt];
-    }
-
-    private static function unsubscribeFromNotifications(array $shippingTemplate)
-    {
-        if (empty($shippingTemplate)) {
-            return ['errors' => 'shipping template is empty'];
-        }
-        $subscribedElsewhere = false;
-        if (empty($shippingTemplate['subscriptions'])) {
-            $shippingTemplate = ShippingTemplateModel::get([
-                'select' => ['id', 'account', 'subscriptions'],
-                'where'  => ['account->>\'id\' = ?', 'jsonb_array_length(subscriptions) > 0'],
-                'data'   => [$shippingTemplate['account']['id']],
-                'limit'  => 1
-            ]);
-            if (empty($shippingTemplate)) {
-                return ['errors' => 'no subscribed shipping template with matching account id'];
-            }
-            $shippingTemplate = $shippingTemplate[0];
-            $shippingTemplate['account'] = json_decode($shippingTemplate['account'], true);
-            $shippingTemplate['subscriptions'] = json_decode($shippingTemplate['subscriptions'], true);
-            $subscribedElsewhere = true;
-        }
-        $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
-        if (empty($mailevaConfig)) {
-            return ['errors' => 'Maileva configuration does not exist'];
-        } elseif (!$mailevaConfig['enabled']) {
-            return ['errors' => 'Maileva configuration is disabled'];
-        }
-        $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, $shippingTemplate['account']);
-        if (!empty($authToken['errors'])) {
-            return ['errors' => $authToken['errors']];
-        }
-        foreach ($shippingTemplate['subscriptions'] as $subscriptionId) {
-            $curlResponse = CurlModel::exec([
-                'method'     => 'DELETE',
-                'url'        => $mailevaConfig['uri'] . '/notification_center/v2/subscriptions/' . $subscriptionId,
-                'bearerAuth' => ['token' => $authToken],
-                'headers'    => ['Accept: application/json']
-            ]);
-            if ($curlResponse['code'] != 204) {
-                return ['errors' => $curlResponse['response'] ?? ('Maileva DELETE/subscriptions/' . $subscriptionId . ' returned HTTP ' . $curlResponse['code'])];
-            }
-        }
-        if ($subscribedElsewhere) {
-            $now = new \DateTime();
-            ShippingTemplateModel::update([
-                'where'   => ['id = ?'],
-                'data'    => [$shippingTemplate['id']],
-                'set' => [
-                    'subscriptions' => '[]',
-                    'token_min_iat' => $now->format('c')
-                ]
-            ]);
-        }
-
-        return ['subscriptions' => []];
-    }
-
     public function receiveNotification(Request $request, Response $response, array $args)
     {
         $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
@@ -590,7 +325,7 @@ class ShippingTemplateController
         $shippingApiDomainName = str_replace(['http://', 'https://'], '', $shippingApiDomainName);
         $shippingApiDomainName = rtrim($shippingApiDomainName, '/');
 
-        if (empty($args['id'])) {
+        if (empty($args['id']) || !Validator::intVal()->validate($args['id'])) {
             return ShippingTemplateController::logAndReturnError($response, 400, 'No shipping template id provided');
         }
         $shippingTemplate = ShippingTemplateModel::getById(['id' => $args['id']]);
@@ -794,21 +529,23 @@ class ShippingTemplateController
                 'eventId'   => 'Shipping webhook error'
             ]);
 
-            // TODO add system attachment type as in summary sheet
-            $storage = DocserverController::storeResourceOnDocServer([
-                'collId'          => 'attachments_coll',
-                'docserverTypeId' => 'DOC',
-                'encodedResource' => base64_encode($curlResponse['response']),
-                'format'          => 'zip'
+            $attachmentId = StoreController::storeAttachment([
+                'title'       => _SHIPPING_ATTACH_DEPOSIT_PROOF,
+                'resIdMaster' => $resId,
+                'type'        => 'shipping_deposit_proof',
+                'status'      => 'TRA',
+                'encodedFile' => base64_encode($curlResponse['response']),
+                'format'      => 'zip',
+                'externalId'  => [
+                    'shippingResourceType' => $body['resourceType'],
+                    'shippingResourceId'   => $body['resourceId'],
+                    'shippingEventDate'    => $body['eventDate']
+                ]
             ]);
-            if (!empty($storage['errors'])) {
+            if (!empty($attachmentId['errors'])) {
                 return ShippingTemplateController::logAndReturnError($response, 500, 'could not save deposit proof to docserver');
             }
-            $storage['shipping_attachment_type'] = 'depositProof';
-            $storage['resource_type']            = $body['resourceType'];
-            $storage['resource_id']              = $body['resourceId'];
-            $storage['date']                     = $body['eventDate'];
-            $shipping['attachments'][] = $storage;
+            $shipping['attachments'][] = $attachmentId;
             ShippingModel::update([
                 'set'   => ['attachments' => json_encode($shipping['attachments'])],
                 'where' => ['id = ?'],
@@ -844,27 +581,23 @@ class ShippingTemplateController
                 'eventId'   => 'Shipping webhook error'
             ]);
 
-            $storage = DocserverController::storeResourceOnDocServer([
-                'collId'          => 'attachments_coll',
-                'docserverTypeId' => 'DOC',
-                'encodedResource' => base64_encode($curlResponse['response']),
-                'format'          => 'zip'
+            $attachmentId = StoreController::storeAttachment([
+                'title'       => _SHIPPING_ATTACH_ACKNOWLEDGEMENT_OF_RECEIPT . ' (' . trim($recipient[2]),
+                'resIdMaster' => $resId,
+                'type'        => 'shipping_acknowledgement_of_receipt',
+                'status'      => 'TRA',
+                'encodedFile' => base64_encode($curlResponse['response']),
+                'format'      => 'zip',
+                'externalId'  => [
+                    'shippingResourceType' => $body['resourceType'],
+                    'shippingResourceId'   => $body['resourceId'],
+                    'shippingEventDate'    => $body['eventDate']
+                ]
             ]);
-            if (!empty($storage['errors'])) {
+            if (!empty($attachmentId['errors'])) {
                 return ShippingTemplateController::logAndReturnError($response, 500, 'could not save acknowledgement of receipt to docserver');
             }
-            $storage['shipping_attachment_type'] = 'acknowledgementOfReceipt';
-            $storage['resource_type']            = $body['resourceType'];
-            $storage['resource_id']              = $body['resourceId'];
-            $storage['date']                     = $body['eventDate'];
-            $storage['label']                    = trim($recipient['firstname'] . ' ' . $recipient['lastname']);
-            if (empty($storage['label'])) {
-                $storage['label'] = $recipient['company'];
-            } elseif (!empty($recipient['company'])) {
-                $storage['label'] .= ' (' . $recipient['company'] . ')';
-            }
-            $storage['label'] = trim($storage['label']) ?? null;
-            $shipping['attachments'][] = $storage;
+            $shipping['attachments'][] = $attachmentId;
             ShippingModel::update([
                 'set'   => ['attachments' => json_encode($shipping['attachments'])],
                 'where' => ['id = ?'],
@@ -879,6 +612,272 @@ class ShippingTemplateController
         ]);
 
         return $response->withStatus(201);
+    }
+
+    private static function checkData($args, $mode)
+    {
+        $errors = [];
+
+        if ($mode == 'update') {
+            if (!Validator::boolType()->validate($args['subscribed'])) {
+                $errors[] = '"subscribed" field is not a boolean';
+            }
+            if (!Validator::intVal()->validate($args['id'])) {
+                $errors[] = 'Id is not a numeric';
+            } else {
+                $shippingInfo = ShippingTemplateModel::getById(['id' => $args['id']]);
+            }
+            if (empty($shippingInfo)) {
+                $errors[] = 'Shipping does not exist';
+            }
+        } else {
+            if (!empty($args['account'])) {
+                if (!Validator::notEmpty()->validate($args['account']['id']) || !Validator::notEmpty()->validate($args['account']['password'])) {
+                    $errors[] = 'account id or password is empty';
+                }
+            }
+        }
+           
+        if (!Validator::notEmpty()->validate($args['label']) ||
+            !Validator::length(1, 64)->validate($args['label'])) {
+            $errors[] = 'label is empty or too long';
+        }
+        if (!Validator::notEmpty()->validate($args['description']) ||
+            !Validator::length(1, 255)->validate($args['description'])) {
+            $errors[] = 'description is empty or too long';
+        }
+
+        if (!empty($args['entities'])) {
+            if (!Validator::arrayType()->validate($args['entities'])) {
+                $errors[] = 'entities must be an array';
+            }
+            foreach ($args['entities'] as $entity) {
+                $info = EntityModel::getById(['id' => $entity, 'select' => ['id']]);
+                if (empty($info)) {
+                    $errors[] = $entity . ' does not exists';
+                }
+            }
+        }
+
+        if (!empty($args['fee'])) {
+            foreach ($args['fee'] as $value) {
+                if (!empty($value) && !Validator::floatVal()->positive()->validate($value)) {
+                    $errors[] = 'fee must be an array with positive values';
+                }
+            }
+        }
+
+        return $errors;
+    }
+
+    public static function calculShippingFee(array $args)
+    {
+        $fee = 0;
+        foreach ($args['resources'] as $value) {
+            $resourceId = $value['res_id'];
+
+            $collId = $value['type'] == 'attachment' ? 'attachments_coll' : 'letterbox_coll';
+
+            $convertedResource = ConvertPdfController::getConvertedPdfById(['resId' => $resourceId, 'collId' => $collId]);
+            $docserver         = DocserverModel::getByDocserverId(['docserverId' => $convertedResource['docserver_id'], 'select' => ['path_template']]);
+            $pathToDocument    = $docserver['path_template'] . str_replace('#', DIRECTORY_SEPARATOR, $convertedResource['path']) . $convertedResource['filename'];
+
+            $img = new \Imagick();
+            $img->pingImage($pathToDocument);
+            $pageCount = $img->getNumberImages();
+
+            $attachmentFee = ($pageCount > 1) ? ($pageCount - 1) * $args['fee']['nextPagePrice'] : 0 ;
+            $fee = $fee + $attachmentFee + $args['fee']['firstPagePrice'] + $args['fee']['postagePrice'];
+        }
+
+        return $fee;
+    }
+
+    private static function generateToken($args)
+    {
+        ValidatorModel::notEmpty($args, ['mailevaUri', 'shippingTemplateId']);
+        ValidatorModel::stringType($args, ['mailevaUri']);
+        ValidatorModel::intType($args, ['shippingTemplateId']);
+
+        $shippingApiDomainName = $args['mailevaUri'];
+        $shippingApiDomainName = str_replace(['http://', 'https://'], '', $shippingApiDomainName);
+        $shippingApiDomainName = rtrim($shippingApiDomainName, '/');
+
+        $now = time();
+
+        $payload = [
+            'iss' => 'MaarchCourrier',
+            'sub' => 'maileva_notifications',
+            'aud' => $shippingApiDomainName,
+            'iat' => $now,
+            'shippingTemplateId' => $args['shippingTemplateId'],
+        ];
+
+        $jwt = JWT::encode($payload, CoreConfigModel::getEncryptKey());
+
+        return $jwt;
+    }
+
+    private static function checkToken($args)
+    {
+        ValidatorModel::notEmpty($args, ['token', 'shippingTemplateId', 'shippingApiDomainName', 'minIAT']);
+        ValidatorModel::stringType($args, ['token', 'mailevaUri']);
+        ValidatorModel::intType($args, ['shippingTemplateId', 'minIAT']);
+
+        $now = time();
+
+        try {
+            $payload = JWT::decode($args['token'], CoreConfigModel::getEncryptKey(), ['HS256']);
+        } catch (\Exception $e) {
+            return ['errors' => 'Maileva webhook JWT is invalid'];
+        }
+
+        if (empty($payload['iss']) || !Validator::stringVal()->equals('MaarchCourrier')->validate($payload['iss'])) {
+            return ['errors' => 'Maileva webhook token issuer is invalid'];
+        } elseif (empty($payload['sub']) || !Validator::stringVal()->equals('maileva_notifications')->validate($payload['sub'])) {
+            return ['errors' => 'Maileva webhook token subject is invalid'];
+        } elseif (empty($payload['aud']) || !Validator::stringVal()->equals($args['shippingApiDomainName'])->validate($payload['aud'])) {
+            return ['errors' => 'Maileva webhook token audience is invalid'];
+        } elseif (empty($payload['iat']) || !Validator::intVal()->min($args['minIAT'])->max($now)->validate($payload['iat'])) {
+            return ['errors' => 'Maileva webhook token issuing date is invalid'];
+        } elseif (empty($payload['shippingTemplateId']) || !Validator::intVal()->equals($args['shippingTemplateId'])->validate($payload['shippingTemplateId'])) {
+            return ['errors' => 'Maileva webhook token shippingTemplateId is invalid'];
+        }
+
+        $payload = [
+            'iss' => $payload['iss'],
+            'sub' => $payload['sub'],
+            'aud' => $payload['aud'],
+            'iat' => $payload['iat'],
+            'shippingTemplateId' => $payload['shippingTemplateId']
+        ];
+
+        return $payload;
+    }
+
+    private static function isSubscribed(array $args)
+    {
+        ValidatorModel::notEmpty($args, ['accountId']);
+        ValidatorModel::stringType($args, ['accountId']);
+
+        $result = ShippingTemplateModel::get([
+            'select' => [1],
+            'where'  => ['account->>\'id\' = ?', 'jsonb_array_length(subscriptions) > 0'],
+            'data'   => [$args['accountId']],
+            'limit'  => 1
+        ]);
+
+        return !empty($result);
+    }
+
+    private static function subscribeToNotifications(array $shippingTemplate)
+    {
+        if (empty($shippingTemplate)) {
+            return ['errors' => 'shipping template is empty'];
+        }
+        $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
+        if (empty($mailevaConfig)) {
+            return ['errors' => 'Maileva configuration does not exist'];
+        } elseif (!$mailevaConfig['enabled']) {
+            return ['errors' => 'Maileva configuration is disabled'];
+        }
+        $configFile = CoreConfigModel::getJsonLoaded(['path' => 'apps/maarch_entreprise/xml/config.json']);
+        $maarchUrl = rtrim($configFile['config']['maarchUrl'], '/') ?? null;
+        if (empty($maarchUrl)) {
+            return ['errors' => 'maarchUrl is not configured'];
+        }
+        $jwt = ShippingTemplateController::generateToken(['mailevaUri' => $mailevaConfig['uri'], 'shippingTemplateId' => $shippingTemplate['id']]);
+        $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, json_decode($shippingTemplate['account'], true));
+        if (!empty($authToken['errors'])) {
+            return ['errors' => $authToken['errors']];
+        }
+        $subscriptions = [];
+        foreach (ShippingTemplateController::MAILEVA_EVENT_RESOURCES as $eventType => $resourceTypes) {
+            foreach ($resourceTypes as $resourceType) {
+                $curlResponse = CurlModel::exec([
+                    'method'     => 'POST',
+                    'url'        => $mailevaConfig['uri'] . '/notification_center/v2/subscriptions',
+                    'bearerAuth' => ['token' => $authToken],
+                    'headers'   => [
+                        'Accept: application/json',
+                        'Content-Type: application/json'
+                    ],
+                    'body'       => json_encode([
+                        'event_type'    => $eventType,
+                        'resource_type' => $resourceType,
+                        'callback_url'  => $maarchUrl . '/rest/administration/shippings/' . $shippingTemplate['id'] . '/notifications?auth_token=' . $jwt
+                    ])
+                ]);
+                if ($curlResponse['code'] != 201) {
+                    return ['errors' => 'Maileva POST/subscriptions returned HTTP ' . $curlResponse['code'] . '; ' . (string)$curlResponse['response']];
+                }
+
+                $subscriptionId = $curlResponse['response']['subcription_id'] ?? null;
+                if (!empty($subscriptionId)) {
+                    $subscriptions[] = $subscriptionId;
+                }
+            }
+        }
+        $subscriptions = array_values(array_unique(array_merge($shippingTemplate['subscriptions'], $subscriptions))) ?? [];
+
+        return ['subscriptions' => $subscriptions, 'jwt' => $jwt];
+    }
+
+    private static function unsubscribeFromNotifications(array $shippingTemplate)
+    {
+        if (empty($shippingTemplate)) {
+            return ['errors' => 'shipping template is empty'];
+        }
+        $subscribedElsewhere = false;
+        if (empty($shippingTemplate['subscriptions'])) {
+            $shippingTemplate = ShippingTemplateModel::get([
+                'select' => ['id', 'account', 'subscriptions'],
+                'where'  => ['account->>\'id\' = ?', 'jsonb_array_length(subscriptions) > 0'],
+                'data'   => [$shippingTemplate['account']['id']],
+                'limit'  => 1
+            ]);
+            if (empty($shippingTemplate[0])) {
+                return ['errors' => 'no subscribed shipping template with matching account id'];
+            }
+            $shippingTemplate = $shippingTemplate[0];
+            $shippingTemplate['account'] = json_decode($shippingTemplate['account'], true);
+            $shippingTemplate['subscriptions'] = json_decode($shippingTemplate['subscriptions'], true);
+            $subscribedElsewhere = true;
+        }
+        $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
+        if (empty($mailevaConfig)) {
+            return ['errors' => 'Maileva configuration does not exist'];
+        } elseif (!$mailevaConfig['enabled']) {
+            return ['errors' => 'Maileva configuration is disabled'];
+        }
+        $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, $shippingTemplate['account']);
+        if (!empty($authToken['errors'])) {
+            return ['errors' => $authToken['errors']];
+        }
+        foreach ($shippingTemplate['subscriptions'] as $subscriptionId) {
+            $curlResponse = CurlModel::exec([
+                'method'     => 'DELETE',
+                'url'        => $mailevaConfig['uri'] . '/notification_center/v2/subscriptions/' . $subscriptionId,
+                'bearerAuth' => ['token' => $authToken],
+                'headers'    => ['Accept: application/json']
+            ]);
+            if ($curlResponse['code'] != 204) {
+                return ['errors' => $curlResponse['response'] ?? ('Maileva DELETE/subscriptions/' . $subscriptionId . ' returned HTTP ' . $curlResponse['code'])];
+            }
+        }
+        if ($subscribedElsewhere) {
+            $now = new \DateTime();
+            ShippingTemplateModel::update([
+                'where'   => ['id = ?'],
+                'data'    => [$shippingTemplate['id']],
+                'set' => [
+                    'subscriptions' => '[]',
+                    'token_min_iat' => $now->format('c')
+                ]
+            ]);
+        }
+
+        return ['subscriptions' => []];
     }
 
     private static function logAndReturnError(Response $response, int $httpStatusCode, string $error)

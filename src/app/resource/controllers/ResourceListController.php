@@ -18,6 +18,7 @@ use Action\controllers\ActionController;
 use Action\controllers\ActionMethodController;
 use Action\models\ActionModel;
 use Attachment\models\AttachmentModel;
+use Attachment\controllers\AttachmentTypeController;
 use Basket\models\ActionGroupBasketModel;
 use Basket\models\BasketModel;
 use Basket\models\GroupBasketModel;
@@ -95,11 +96,10 @@ class ResourceListController
         $displayFolderTags  = false;
         $templateColumns    = 0;
         if (!empty($resIds)) {
-            $excludeAttachmentTypes = ['signed_response', 'summary_sheet'];
             $attachments = AttachmentModel::get([
                 'select'    => ['COUNT(res_id)', 'res_id_master'],
                 'where'     => ['res_id_master in (?)', 'status not in (?)', 'attachment_type not in (?)', '((status = ? AND typist = ?) OR status != ?)'],
-                'data'      => [$resIds, ['DEL', 'OBS'], $excludeAttachmentTypes, 'TMP', $GLOBALS['id'], 'TMP'],
+                'data'      => [$resIds, ['DEL', 'OBS'], AttachmentTypeController::UNLISTED_ATTACHMENT_TYPES, 'TMP', $GLOBALS['id'], 'TMP'],
                 'groupBy'   => ['res_id_master']
             ]);
 

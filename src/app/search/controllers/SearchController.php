@@ -15,6 +15,7 @@
 namespace Search\controllers;
 
 use Attachment\models\AttachmentModel;
+use Attachment\controllers\AttachmentTypeController;
 use Basket\models\BasketModel;
 use Basket\models\RedirectBasketModel;
 use Configuration\models\ConfigurationModel;
@@ -193,11 +194,10 @@ class SearchController
             return $response->withJson(['resources' => [], 'count' => 0, 'allResources' => []]);
         }
 
-        $excludeAttachmentTypes = ['signed_response', 'summary_sheet'];
         $attachments = AttachmentModel::get([
             'select'    => ['COUNT(res_id)', 'res_id_master'],
             'where'     => ['res_id_master in (?)', 'status not in (?)', 'attachment_type not in (?)', '((status = ? AND typist = ?) OR status != ?)'],
-            'data'      => [$resIds, ['DEL', 'OBS'], $excludeAttachmentTypes, 'TMP', $GLOBALS['id'], 'TMP'],
+            'data'      => [$resIds, ['DEL', 'OBS'], AttachmentTypeController::UNLISTED_ATTACHMENT_TYPES, 'TMP', $GLOBALS['id'], 'TMP'],
             'groupBy'   => ['res_id_master']
         ]);
 
@@ -338,10 +338,10 @@ class SearchController
             if ($body['meta']['values'][0] == '"' && $body['meta']['values'][strlen($body['meta']['values']) - 1] == '"') {
                 $quick = trim($body['meta']['values'], '"');
                 $quickWhere = "subject = ? OR replace(alt_identifier, ' ', '') = ? OR barcode = ?";
-                $quickWhere .= " OR res_id in (select res_id_master from res_attachments where (title = ? OR identifier = ?) and status in ('TRA', 'A_TRA', 'FRZ') and attachment_type <> 'summary_sheet')";
+                $quickWhere .= " OR res_id in (select res_id_master from res_attachments where (title = ? OR identifier = ?) and status in ('TRA', 'A_TRA', 'FRZ') and attachment_type not in (?))";
 
                 $whiteStrippedChrono = str_replace(' ', '', $quick);
-                $args['searchData'] = array_merge($args['searchData'], [$quick, $whiteStrippedChrono, $quick, $quick, $quick]);
+                $args['searchData'] = array_merge($args['searchData'], [$quick, $whiteStrippedChrono, $quick, $quick, $quick, AttachmentTypeController::HIDDEN_ATTACHMENT_TYPES]);
 
                 if (ctype_digit($quick)) {
                     $quickWhere .= ' OR res_id = ?';
@@ -425,10 +425,11 @@ class SearchController
 
         if (!empty($body['subject']) && !empty($body['subject']['values']) && is_string($body['subject']['values'])) {
             if ($body['subject']['values'][0] == '"' && $body['subject']['values'][strlen($body['subject']['values']) - 1] == '"') {
-                $args['searchWhere'][] = "(subject = ? OR res_id in (select res_id_master from res_attachments where title = ? and status in ('TRA', 'A_TRA', 'FRZ') and attachment_type <> 'summary_sheet'))";
+                $args['searchWhere'][] = "(subject = ? OR res_id in (select res_id_master from res_attachments where title = ? and status in ('TRA', 'A_TRA', 'FRZ') and attachment_type not in (?)))";
                 $subject = trim($body['subject']['values'], '"');
                 $args['searchData'][] = $subject;
                 $args['searchData'][] = $subject;
+                $args['searchData'][] = AttachmentTypeController::HIDDEN_ATTACHMENT_TYPES;
             } else {
                 $fields = ['subject'];
                 $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);
@@ -442,11 +443,12 @@ class SearchController
                 ]);
                 $subjectGlue = implode(' AND ', $requestData['where']);
                 $attachmentField = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['title']]);
-                $subjectGlue = "(($subjectGlue) OR res_id in (select res_id_master from res_attachments where {$attachmentField} and status in ('TRA', 'A_TRA', 'FRZ') and attachment_type <> 'summary_sheet'))";
+                $subjectGlue = "(($subjectGlue) OR res_id in (select res_id_master from res_attachments where {$attachmentField} and status in ('TRA', 'A_TRA', 'FRZ') and attachment_type not in (?)))";
                 $args['searchWhere'][] = $subjectGlue;
                 $args['searchData'] = array_merge($args['searchData'], $requestData['data']);
 
                 $args['searchData'][] = "%{$body['subject']['values']}%";
+                $args['searchData'][] = AttachmentTypeController::HIDDEN_ATTACHMENT_TYPES;
             }
         }
         if (!empty($body['chrono']) && !empty($body['chrono']['values']) && is_string($body['chrono']['values'])) {
@@ -1914,8 +1916,9 @@ class SearchController
                 $data[]    = $subject;
             } else {
                 $attachmentField = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => ['title']]);
-                $wherePlus = "res_id in (select res_id_master from res_attachments where {$attachmentField} and status in ('TRA', 'A_TRA', 'FRZ') and attachment_type <> 'summary_sheet')";
+                $wherePlus = "res_id in (select res_id_master from res_attachments where {$attachmentField} and status in ('TRA', 'A_TRA', 'FRZ') and attachment_type not in (?))";
                 $data[]    = "%{$body['subject']['values']}%";
+                $data[]    = AttachmentTypeController::HIDDEN_ATTACHMENT_TYPES;
             }
         }
         if (!empty($body['chrono']) && !empty($body['chrono']['values']) && is_string($body['chrono']['values'])) {
@@ -1931,9 +1934,10 @@ class SearchController
                     $wherePlus .= ' OR ';
                 }
                 $quick = trim($body['meta']['values'], '"');
-                $wherePlus .= "res_id in (select res_id_master from res_attachments where (title = ? OR identifier = ?) and status in ('TRA', 'A_TRA', 'FRZ') and attachment_type <> 'summary_sheet')";
+                $wherePlus .= "res_id in (select res_id_master from res_attachments where (title = ? OR identifier = ?) and status in ('TRA', 'A_TRA', 'FRZ') and attachment_type not in (?))";
                 $data[] = $quick;
                 $data[] = $quick;
+                $data[] = AttachmentTypeController::HIDDEN_ATTACHMENT_TYPES;
             } else {
                 $fields = ['title', 'identifier'];
                 $fields = AutoCompleteController::getInsensitiveFieldsForRequest(['fields' => $fields]);

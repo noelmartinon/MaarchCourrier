@@ -89,6 +89,7 @@ class StoreController
         }
     }
 
+    // see POST/rest/attachments field documentation
     public static function storeAttachment(array $args)
     {
         try {
