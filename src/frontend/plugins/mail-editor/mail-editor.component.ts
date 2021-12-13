@@ -319,7 +319,7 @@ export class MailEditorComponent implements OnInit, OnDestroy {
                             this.emailAttach.document.chrono = data.document.resource.chrono;
                         }
                     });
-
+                    await this.getAttachElements(false);
                     resolve(true);
                 }),
                 catchError((err) => {
