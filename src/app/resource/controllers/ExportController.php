@@ -643,7 +643,6 @@ class ExportController
             ]);
 
             foreach ($attachments as $attachment) {
-                $date  = new \DateTime($attachment['creation_date']);
                 if (!empty($aSignatureDates[$attachment['res_id']])) {
                     $aSignatureDates[$attachment['res_id_master']] .= "\n";
                 } else {
