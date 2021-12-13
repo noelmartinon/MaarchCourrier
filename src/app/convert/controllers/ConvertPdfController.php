@@ -48,7 +48,7 @@ class ConvertPdfController
             $xvfb = !empty($outputWhereIs[1]);
 
             if ($xvfb) {
-                $command = 'xvfb-run ' . $command;
+                $command = 'xvfb-run -a -e /dev/stderr ' . $command;
             } else {
                 $command = 'export DISPLAY=:0 && ' . $command;
             }
