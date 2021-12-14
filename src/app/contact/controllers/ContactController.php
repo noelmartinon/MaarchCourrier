@@ -148,8 +148,10 @@ class ContactController
                 return $response->withJson(['id' => $contact[0]['id']]);
             }
         }
-
-        if (!empty($body['communicationMeans'])) {
+        
+        //FIX_81 - création d'un expéditeur 
+        if (!empty($body['communicationMeans']['email'] || $body['communicationMeans']['url'] ) ) {
+        //
             if (filter_var($body['communicationMeans']['email'], FILTER_VALIDATE_EMAIL)) {
                 $contactBody['email'] = $body['communicationMeans']['email'];
             } elseif (filter_var($body['communicationMeans']['url'], FILTER_VALIDATE_URL)) {
