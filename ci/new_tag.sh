@@ -73,7 +73,7 @@ echo "Set user git : $GITLAB_USER_NAME <$GITLAB_USER_EMAIL>"
 
 git config --global user.email "$GITLAB_USER_EMAIL" && git config --global user.name "$GITLAB_USER_NAME"
 
-git remote set-url origin "https://gitlab-ci-token:${TOKEN_GITLAB}@${GILAB_URL}/${CI_PROJECT_PATH}"
+git remote set-url origin "https://gitlab-ci-token:${TOKEN_GITLAB}@${GITLAB_URL}/${CI_PROJECT_PATH}"
 
 git branch -D $major_version
 git pull origin $major_version
