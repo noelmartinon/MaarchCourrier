@@ -40,7 +40,7 @@ class AttachmentTypeController
 
     public function get(Request $request, Response $response)
     {
-        $rawAttachmentsTypes = AttachmentTypeModel::get(['select' => ['*'], 'where' => ['type_id <> ?'], 'data' => AttachmentTypeController::HIDDEN_ATTACHMENT_TYPES]);
+        $rawAttachmentsTypes = AttachmentTypeModel::get(['select' => ['*'], 'where' => ['type_id not in (?)'], 'data' => [AttachmentTypeController::HIDDEN_ATTACHMENT_TYPES]]);
 
         $attachmentsTypes = [];
         foreach ($rawAttachmentsTypes as $rawAttachmentsType) {

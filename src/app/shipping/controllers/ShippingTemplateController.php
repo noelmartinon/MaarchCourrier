@@ -371,6 +371,17 @@ class ShippingTemplateController
         if (!empty($error)) {
             return ShippingTemplateController::logAndReturnError($response, 400, $error . ' => ' . json_encode($body));
         }
+
+        LogsController::add([
+            'isTech'    => true,
+            'moduleId'  => 'shipping',
+            'level'     => 'DEBUG',
+            'tableName' => '',
+            'recordId'  => '',
+            'eventType' => 'Shipping webhook body: ' . json_encode($body),
+            'eventId'   => 'Shipping webhook error'
+        ]);
+
         $body = [
             'source'           => $body['source'],
             'userId'           => $body['user_id'],
@@ -382,16 +393,6 @@ class ShippingTemplateController
             'eventLocation'    => $body['event_location'],
             'resourceLocation' => $body['resource_location']
         ];
-
-        LogsController::add([
-            'isTech'    => true,
-            'moduleId'  => 'shipping',
-            'level'     => 'DEBUG',
-            'tableName' => '',
-            'recordId'  => '',
-            'eventType' => 'Shipping webhook body: ' . json_encode($body),
-            'eventId'   => 'Shipping webhook error'
-        ]);
 
         if ($body['eventType'] == 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED') {
             $shipping = ShippingModel::getByRecipientId([
@@ -451,6 +452,7 @@ class ShippingTemplateController
             'errorStatus'        => $actionParameters['errorStatus'] ?? null,
             'finalStatus'        => $actionParameters['finalStatus'] ?? null
         ];
+        // TODO simplifier / ordonner les validator + commenter avec exemple
         if (!Validator::each(Validator::arrayType())->validate($actionParameters)) {
             return ShippingTemplateController::logAndReturnError($response, 400, 'Maileva action parameters are not arrays');
         } elseif (
@@ -530,7 +532,7 @@ class ShippingTemplateController
             ]);
 
             $attachmentId = StoreController::storeAttachment([
-                'title'       => _SHIPPING_ATTACH_DEPOSIT_PROOF,
+                'title'       => _SHIPPING_ATTACH_DEPOSIT_PROOF . '_' . date_format($body['eventDate'], 'd-m-Y'),
                 'resIdMaster' => $resId,
                 'type'        => 'shipping_deposit_proof',
                 'status'      => 'TRA',
@@ -582,7 +584,7 @@ class ShippingTemplateController
             ]);
 
             $attachmentId = StoreController::storeAttachment([
-                'title'       => _SHIPPING_ATTACH_ACKNOWLEDGEMENT_OF_RECEIPT . ' (' . trim($recipient[2]),
+                'title'       => _SHIPPING_ATTACH_ACKNOWLEDGEMENT_OF_RECEIPT . '_' . trim($recipient[2]) . '_' . date_format($body['eventDate'], 'd-m-Y'),
                 'resIdMaster' => $resId,
                 'type'        => 'shipping_acknowledgement_of_receipt',
                 'status'      => 'TRA',
@@ -729,19 +731,19 @@ class ShippingTemplateController
         try {
             $payload = JWT::decode($args['token'], CoreConfigModel::getEncryptKey(), ['HS256']);
         } catch (\Exception $e) {
-            return ['errors' => 'Maileva webhook JWT is invalid'];
+            return ['errors' => 'Authentication failed'];
         }
 
-        if (empty($payload['iss']) || !Validator::stringVal()->equals('MaarchCourrier')->validate($payload['iss'])) {
-            return ['errors' => 'Maileva webhook token issuer is invalid'];
-        } elseif (empty($payload['sub']) || !Validator::stringVal()->equals('maileva_notifications')->validate($payload['sub'])) {
-            return ['errors' => 'Maileva webhook token subject is invalid'];
-        } elseif (empty($payload['aud']) || !Validator::stringVal()->equals($args['shippingApiDomainName'])->validate($payload['aud'])) {
-            return ['errors' => 'Maileva webhook token audience is invalid'];
-        } elseif (empty($payload['iat']) || !Validator::intVal()->min($args['minIAT'])->max($now)->validate($payload['iat'])) {
-            return ['errors' => 'Maileva webhook token issuing date is invalid'];
-        } elseif (empty($payload['shippingTemplateId']) || !Validator::intVal()->equals($args['shippingTemplateId'])->validate($payload['shippingTemplateId'])) {
-            return ['errors' => 'Maileva webhook token shippingTemplateId is invalid'];
+        if (!Validator::notEmpty()->stringVal()->equals('MaarchCourrier')->validate($payload['iss'])) {
+            return ['errors' => 'Authentication failed'];
+        } elseif (!Validator::notEmpty()->stringVal()->equals('maileva_notifications')->validate($payload['sub'])) {
+            return ['errors' => 'Authentication failed'];
+        } elseif (!Validator::notEmpty()->stringVal()->equals($args['shippingApiDomainName'])->validate($payload['aud'])) {
+            return ['errors' => 'Authentication failed'];
+        } elseif (!Validator::notEmpty()->intVal()->min($args['minIAT'])->max($now)->validate($payload['iat'])) {
+            return ['errors' => 'Authentication failed'];
+        } elseif (!Validator::notEmpty()->intVal()->equals($args['shippingTemplateId'])->validate($payload['shippingTemplateId'])) {
+            return ['errors' => 'Authentication failed'];
         }
 
         $payload = [

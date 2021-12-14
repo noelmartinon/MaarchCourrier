@@ -75,6 +75,7 @@ class ShippingModel
         // @@ executes a check on a json value
         // check on recipients that AT LEAST ONE of them has a recipientId equal to $args['recipientId']
         // see PostgreSQL doc on json functions and operators
+        // https://www.postgresql.org/docs/14/functions-json.html
         $args['where'] = [
             'recipients @@ \'$[*].recipientId == "' . $args['recipientId'] . '"\''
         ];
