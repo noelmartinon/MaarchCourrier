@@ -116,7 +116,21 @@ class ShippingController
         if (!Validator::notEmpty()->arrayType()->each(Validator::intType())->validate($shipping['attachments'])) {
             return $response->withJson(['errors' => 'Shipping attachments are improperly saved']);
         }
-        return $response->withJson(['attachments' => $shiping['attachments']]);
+        $attachments = [];
+        foreach ($shipping['attachments'] as $attachmentId) {
+            $attachment = AttachmentModel::getById(['id' => $attachmentId, 'select' => ['res_id', 'title', 'creation_date', 'attachment_type', 'filesize']]);
+            if (empty($attachment)) {
+                continue;
+            }
+            $attachments[] = [
+                'resId'          => $attachment['res_id'],
+                'title'          => $attachment['title'],
+                'creationDate'   => $attachment['creation_date'],
+                'attachmentType' => $attachment['attachment_type'],
+                'filesize'       => $attachment['filesize']
+            ];
+        }
+        return $response->withJson(['attachments' => $attachments]);
     }
 
     public function getHistory(Request $request, Response $response, array $args) {
