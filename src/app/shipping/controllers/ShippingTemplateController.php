@@ -452,33 +452,35 @@ class ShippingTemplateController
             'errorStatus'        => $actionParameters['errorStatus'] ?? null,
             'finalStatus'        => $actionParameters['finalStatus'] ?? null
         ];
-        // TODO simplifier / ordonner les validator + commenter avec exemple
         if (!Validator::each(Validator::arrayType())->validate($actionParameters)) {
             return ShippingTemplateController::logAndReturnError($response, 400, 'Maileva action parameters are not arrays');
-        } elseif (
-                !Validator::stringType()->length(1, 10)->validate($actionParameters['intermediateStatus']['actionStatus'])
-                || ($actionParameters['intermediateStatus']['actionStatus'] !== '_NOSTATUS_'
-                && empty(StatusModel::getById(['id' => $actionParameters['intermediateStatus']['actionStatus'], 'select' => ['id']])))
-                ) {
-            return ShippingTemplateController::logAndReturnError($response, 400, 'Maileva action actionStatus is invalid for intermediateStatus');
-        } elseif (
-                !Validator::stringType()->length(1, 10)->validate($actionParameters['errorStatus']['actionStatus'])
-                || ($actionParameters['errorStatus']['actionStatus'] !== '_NOSTATUS_'
-                && empty(StatusModel::getById(['id' => $actionParameters['errorStatus']['actionStatus'], 'select' => ['id']])))
-                ) {
-            return ShippingTemplateController::logAndReturnError($response, 400, 'Maileva action actionStatus is invalid for errorStatus');
-        } elseif (
-                !Validator::stringType()->length(1, 10)->validate($actionParameters['finalStatus']['actionStatus'])
-                || ($actionParameters['finalStatus']['actionStatus'] !== '_NOSTATUS_'
-                && empty(StatusModel::getById(['id' => $actionParameters['finalStatus']['actionStatus'], 'select' => ['id']])))
-                ) {
-            return ShippingTemplateController::logAndReturnError($response, 400, 'Maileva action actionStatus is invalid for finalStatus');
-        } elseif (!Validator::each(Validator::in(array_keys(ShippingTemplateController::MAILEVA_EVENT_RESOURCES)))->validate($actionParameters['intermediateStatus']['mailevaStatus'])) {
-            return ShippingTemplateController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for intermediateStatus');
-        } elseif (!Validator::each(Validator::in(array_keys(ShippingTemplateController::MAILEVA_EVENT_RESOURCES)))->validate($actionParameters['errorStatus']['mailevaStatus'])) {
-            return ShippingTemplateController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for errorStatus');
-        } elseif (!Validator::each(Validator::in(array_keys(ShippingTemplateController::MAILEVA_EVENT_RESOURCES)))->validate($actionParameters['finalStatus']['mailevaStatus'])) {
-            return ShippingTemplateController::logAndReturnError($response, 400, 'Maileva action mailevaStatus is invalid for finalStatus');
+        }
+        /**
+         * expected format
+         * $actionParameters = [
+         *   'intermediateStatus' => [
+         *     'actionStatus' => 'COU', // a MaarchCourrier status
+         *     'mailevaStatus' => ['ON_STATUS_ACCEPTED', 'ON_STATUS_PROCESSED'] // an array of Maileva statuses
+         *   ],
+         *   'errorStatus' => [
+         *     ... same format as intermediateStatus ...
+         *   ],
+         *   'finalStatus' => [
+         *     ... same format as intermediateStatus ...
+         *   ]
+         * ]
+         */
+        foreach ($actionParameters as $phaseParameters) {
+            if (
+                !Validator::each(Validator::in(array_keys(ShippingTemplateController::MAILEVA_EVENT_RESOURCES)))->validate($phaseParameters['mailevaStatus'])
+                || !Validator::stringType()->length(1, 10)->validate($phaseParameters['actionStatus'])
+                || (
+                    $phaseParameters['actionStatus'] != '_NOSTATUS_'
+                    && empty(StatusModel::getById(['id' => $phaseParameters['actionStatus'], 'select' => [1]]))
+                )
+            ) {
+                return ShippingTemplateController::logAndReturnError($response, 400, 'Maileva action parameters are invalid');
+            }
         }
 
         $actionStatus = null;
