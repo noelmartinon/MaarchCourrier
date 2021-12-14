@@ -58,8 +58,8 @@ export class ShippingModalComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/shippings/${this.data.shippingData.id}/attachments`).pipe(
                 tap((data: any) => {
-                    this.depositProof = data.attachments.find((item: any) => item.attachmentType === 'depositProof');
-                    this.shippingAttachments = data.attachments.filter((item: any) => item.attachmentType !== 'depositProof');
+                    this.depositProof = data.attachments.find((item: any) => item.attachmentType === 'shipping_deposit_proof');
+                    this.shippingAttachments = data.attachments.filter((item: any) => item.attachmentType === 'shipping_acknowledgement_of_receipt');
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -85,27 +85,20 @@ export class ShippingModalComponent implements OnInit {
         });
     }
 
-    downloadFile(fileId: number) {
-        const headers = new HttpHeaders({
-            'Authorization': 'Bearer ' + this.authService.getToken()
-        });
-        return new Observable<string>((observer) => {
-            const { next, error } = observer;
-            this.http.get(`../rest/shippings/${this.data.shippingData.id}/attachments/${fileId}`, { headers: headers, responseType: 'blob' }).subscribe(response => {
-                const reader = new FileReader();
-                reader.readAsDataURL(response);
-                reader.onloadend = () => {
-                    observer.next(reader.result as any);
-                    const href: string = reader.result as string;
-                    const downloadLink = document.createElement('a');
-                    const fileName: string = this.shippingAttachments.find((el: any) => el.id === fileId) === undefined ? this.translate.instant('lang.depositProof') : this.shippingAttachments.find((el: any) => el.id === fileId).label;
-                    downloadLink.href = href;
-                    downloadLink.setAttribute('download', fileName);
-                    document.body.appendChild(downloadLink);
-                    downloadLink.click();
-                };
-            });
-        }).subscribe();
+    downloadFile(resId: number) {
+        const downloadLink = document.createElement('a');
+        this.http.get(`../rest/attachments/${resId}/originalContent?mode=base64`).pipe(
+            tap((data: any) => {
+                downloadLink.href = `data:${data.mimeType};base64,${data.encodedDocument}`;
+                downloadLink.setAttribute('download', data.filename);
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
 
     }
 
