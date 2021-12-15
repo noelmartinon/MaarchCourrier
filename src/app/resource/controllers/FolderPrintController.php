@@ -40,7 +40,12 @@ use User\models\UserModel;
 
 class FolderPrintController
 {
-    public static function generateFile(Request $request, Response $response)
+    /**
+     * generateFile returns one PDF per resource
+     * if 1 resource, sends a single PDF
+     * if several resources, sends one PDF per resource combined into a ZIP archive
+     */
+    public function generateFile(Request $request, Response $response)
     {
         $body = $request->getParsedBody();
 
@@ -79,8 +84,9 @@ class FolderPrintController
             ]
         ];
 
-        // Array containing all path to the pdf files to merge
-        $documentPaths = [];
+        // Array containing all paths to the pdf files to return
+        $folderPrintPaths = [];
+        $tmpDir = CoreConfigModel::getTmpPath();
 
         $withSeparators = !empty($body['withSeparator']);
 
@@ -97,6 +103,9 @@ class FolderPrintController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
         foreach ($body['resources'] as $resource) {
+            // Array containing all paths to the pdf files to merge for this resource
+            $documentPaths = [];
+
             $withSummarySheet = !empty($unitsSummarySheet) || !empty($resource['summarySheet']);
 
             if ($withSummarySheet) {
@@ -495,28 +504,60 @@ class FolderPrintController
             foreach ($linkedAttachmentsPath as $linkedAttachmentPath) {
                 $documentPaths = array_merge($documentPaths, $linkedAttachmentPath);
             }
+
+            if (!empty($documentPaths)) {
+                $filePathOnTmp = $tmpDir . 'maarch_res' . $resource['resId'] . '.pdf';
+                if (file_exists($filePathOnTmp)) {
+                    unlink($filePathOnTmp);
+                }
+                $command = "pdfunite " . implode(" ", $documentPaths) . ' ' . $filePathOnTmp;
+
+                exec($command . ' 2>&1', $output, $return);
+
+                if (!file_exists($filePathOnTmp)) {
+                    return $response->withStatus(500)->withJson(['errors' => 'Merged PDF file not created']);
+                }
+                $folderPrintPaths[] = str_replace('//', '/', $filePathOnTmp);
+            }
         }
 
-        if (!empty($documentPaths)) {
-            $tmpDir = CoreConfigModel::getTmpPath();
-            $filePathOnTmp = $tmpDir . 'mergedFile.pdf';
-            $command = "pdfunite " . implode(" ", $documentPaths) . ' ' . $filePathOnTmp;
+        if (count($folderPrintPaths) == 1) {
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+
+            $fileContent = file_get_contents($folderPrintPaths[0]);
+            $mimeType = $finfo->buffer($fileContent);
+
+            $response->write($fileContent);
+
+            $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.pdf");
+            return $response->withHeader('Content-Type', $mimeType);
+        } else {
+            $filePathOnTmp = str_replace('//', '/', $tmpDir . 'folderPrint.zip');
+            if (file_exists($filePathOnTmp)) {
+                unlink($filePathOnTmp);
+            }
+            // zip -j: store files as their basename ignoring tmpDir (see man zip)
+            $command = 'zip -j ' . $filePathOnTmp . ' ' . implode(' ', $folderPrintPaths);
 
             exec($command . ' 2>&1', $output, $return);
 
             if (!file_exists($filePathOnTmp)) {
-                return $response->withStatus(500)->withJson(['errors' => 'Merged file not created']);
-            } else {
-                $finfo = new \finfo(FILEINFO_MIME_TYPE);
-
-                $fileContent = file_get_contents($filePathOnTmp);
-                $mimeType = $finfo->buffer($fileContent);
-
-                $response->write($fileContent);
-
-                $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.pdf");
-                return $response->withHeader('Content-Type', $mimeType);
+                return $response->withStatus(500)->withJson(['errors' => 'Merged ZIP file not created']);
             }
+
+            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+            $fileContent = file_get_contents($filePathOnTmp);
+            $mimeType = $finfo->buffer($fileContent);
+
+            $response->write($fileContent);
+
+            unlink($filePathOnTmp);
+            foreach ($folderPrintPaths as $folderPrintPath) {
+                unlink($folderPrintPath);
+            }
+
+            $response = $response->withAddedHeader('Content-Disposition', 'inline; filename=maarch.zip');
+            return $response->withHeader('Content-Type', $mimeType);
         }
 
         return $response->withStatus(400)->withJson(['errors' => 'No document to merge']);
