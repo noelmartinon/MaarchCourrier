@@ -35,6 +35,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
+use SrcCore\controllers\LogsController;
 use Status\models\StatusModel;
 use User\models\UserModel;
 
@@ -133,10 +134,18 @@ class FolderPrintController
 
                 $path = FolderPrintController::getDocumentFilePath(['document' => $document, 'collId' => 'letterbox_coll']);
                 if (!empty($path['errors'])) {
-                    return $response->withStatus($path['code'])->withJson(['errors' => $path['errors']]);
+                    LogsController::add([
+                        'isTech'    => true,
+                        'moduleId'  => 'folderPrint',
+                        'level'     => 'DEBUG',
+                        'tableName' => '',
+                        'recordId'  => '',
+                        'eventType' => 'Error: ' . $path['errors'],
+                        'eventId'   => 'FolderPrint Error'
+                    ]);
+                } else {
+                    $documentPaths[] = $path;
                 }
-
-                $documentPaths[] = $path;
             }
 
             if (!empty($resource['attachments'])) {
@@ -207,10 +216,18 @@ class FolderPrintController
                         $path = FolderPrintController::getDocumentFilePath(['document' => $attachment, 'collId' => 'attachments_coll']);
 
                         if (!empty($path['errors'])) {
-                            return $response->withStatus($path['code'])->withJson(['errors' => $path['errors']]);
+                            LogsController::add([
+                                'isTech'    => true,
+                                'moduleId'  => 'folderPrint',
+                                'level'     => 'DEBUG',
+                                'tableName' => '',
+                                'recordId'  => '',
+                                'eventType' => 'Error: ' . $path['errors'],
+                                'eventId'   => 'FolderPrint Error'
+                            ]);
+                        } else {
+                            $documentPaths[] = $path;
                         }
-
-                        $documentPaths[] = $path;
                     }
                 }
             }
@@ -447,10 +464,18 @@ class FolderPrintController
 
                     $path = FolderPrintController::getDocumentFilePath(['document' => $attachment, 'collId' => 'attachments_coll']);
                     if (!empty($path['errors'])) {
-                        return $response->withStatus($path['code'])->withJson(['errors' => $path['errors']]);
+                        LogsController::add([
+                            'isTech'    => true,
+                            'moduleId'  => 'folderPrint',
+                            'level'     => 'DEBUG',
+                            'tableName' => '',
+                            'recordId'  => '',
+                            'eventType' => 'Error: ' . $path['errors'],
+                            'eventId'   => 'FolderPrint Error'
+                        ]);
+                    } else {
+                        $linkedAttachmentsPath[$attachment['res_id_master']][] = $path;
                     }
-
-                    $linkedAttachmentsPath[$attachment['res_id_master']][] = $path;
                 }
             }
 
@@ -485,14 +510,21 @@ class FolderPrintController
 
                     $path = FolderPrintController::getDocumentFilePath(['document' => $document, 'collId' => 'letterbox_coll']);
                     if (!empty($path['errors'])) {
-                        return $response->withStatus($path['code'])->withJson(['errors' => $path['errors']]);
+                        LogsController::add([
+                            'isTech'    => true,
+                            'moduleId'  => 'folderPrint',
+                            'level'     => 'DEBUG',
+                            'tableName' => '',
+                            'recordId'  => '',
+                            'eventType' => 'Error: ' . $path['errors'],
+                            'eventId'   => 'FolderPrint Error'
+                        ]);
+                    } else {
+                        if ($withSummarySheet) {
+                            $documentPaths[] = FolderPrintController::getSummarySheet(['units' => $units, 'resId' => $linkedResource]);
+                        }
+                        $documentPaths[] = $path;
                     }
-
-                    if ($withSummarySheet) {
-                        $documentPaths[] = FolderPrintController::getSummarySheet(['units' => $units, 'resId' => $linkedResource]);
-                    }
-
-                    $documentPaths[] = $path;
 
                     if (!empty($linkedAttachmentsPath[$linkedResource])) {
                         $documentPaths = array_merge($documentPaths, $linkedAttachmentsPath[$linkedResource]);
@@ -536,7 +568,7 @@ class FolderPrintController
             if (file_exists($filePathOnTmp)) {
                 unlink($filePathOnTmp);
             }
-            // zip -j: store files as their basename ignoring tmpDir (see man zip)
+            // zip -j: store files as their basenames ignoring tmpDir (see man zip)
             $command = 'zip -j ' . $filePathOnTmp . ' ' . implode(' ', $folderPrintPaths);
 
             exec($command . ' 2>&1', $output, $return);
@@ -551,6 +583,7 @@ class FolderPrintController
 
             $response->write($fileContent);
 
+            // delete tmp files, partly to avoid filling an existing ZIP and sending more than was requested
             unlink($filePathOnTmp);
             foreach ($folderPrintPaths as $folderPrintPath) {
                 unlink($folderPrintPath);
@@ -578,7 +611,7 @@ class FolderPrintController
             }
 
             if (strtolower(pathinfo($document['filename'], PATHINFO_EXTENSION)) != 'pdf') {
-                return ['errors' => 'Document can not be converted', 'code' => 400];
+                return ['errors' => 'Document can not be converted: ' . json_encode(['resId' => $resourceDocument['res_id'], 'collId' => $args['collId']]), 'code' => 400];
             }
         } else {
             $document = $resourceDocument;
