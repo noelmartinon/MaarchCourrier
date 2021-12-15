@@ -6,6 +6,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { ExportComponent } from '../export/export.component';
 import { SummarySheetComponent } from '../summarySheet/summary-sheet.component';
+import { PrintedFolderModalComponent } from '@appRoot/printedFolder/printed-folder-modal.component';
 
 
 export interface StateGroup {
@@ -65,5 +66,17 @@ export class ToolsListComponent implements OnInit {
                 selectedRes: this.selectedRes
             }
         });
+    }
+
+    openPrintedFolderPrompt() {
+        this.dialog.open(
+            PrintedFolderModalComponent, {
+                panelClass: 'maarch-modal',
+                width: '800px',
+                data: {
+                    resId: this.selectedRes,
+                    multiple: this.selectedRes.length > 1
+                }
+            });
     }
 }
