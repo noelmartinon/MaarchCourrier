@@ -129,22 +129,30 @@ class FolderPrintController
                 }
 
                 if (empty($document['filename'])) {
-                    return $response->withStatus(400)->withJson(['errors' => 'Document has no file']);
-                }
-
-                $path = FolderPrintController::getDocumentFilePath(['document' => $document, 'collId' => 'letterbox_coll']);
-                if (!empty($path['errors'])) {
                     LogsController::add([
                         'isTech'    => true,
                         'moduleId'  => 'folderPrint',
                         'level'     => 'DEBUG',
                         'tableName' => '',
                         'recordId'  => '',
-                        'eventType' => 'Error: ' . $path['errors'],
+                        'eventType' => 'Error: Document has no file, resId: ' . $document['res_id'],
                         'eventId'   => 'FolderPrint Error'
                     ]);
                 } else {
-                    $documentPaths[] = $path;
+                    $path = FolderPrintController::getDocumentFilePath(['document' => $document, 'collId' => 'letterbox_coll']);
+                    if (!empty($path['errors'])) {
+                        LogsController::add([
+                            'isTech'    => true,
+                            'moduleId'  => 'folderPrint',
+                            'level'     => 'DEBUG',
+                            'tableName' => '',
+                            'recordId'  => '',
+                            'eventType' => 'Error: ' . $path['errors'],
+                            'eventId'   => 'FolderPrint Error'
+                        ]);
+                    } else {
+                        $documentPaths[] = $path;
+                    }
                 }
             }
 
@@ -505,7 +513,16 @@ class FolderPrintController
                     }
 
                     if (empty($document['filename'])) {
-                        return $response->withStatus(400)->withJson(['errors' => 'LinkedResources document has no file']);
+                        LogsController::add([
+                            'isTech'    => true,
+                            'moduleId'  => 'folderPrint',
+                            'level'     => 'DEBUG',
+                            'tableName' => '',
+                            'recordId'  => '',
+                            'eventType' => 'Error: LinkedResources document has no file, resId: ' . $document['res_id'],
+                            'eventId'   => 'FolderPrint Error'
+                        ]);
+                        continue;
                     }
 
                     $path = FolderPrintController::getDocumentFilePath(['document' => $document, 'collId' => 'letterbox_coll']);
@@ -519,12 +536,13 @@ class FolderPrintController
                             'eventType' => 'Error: ' . $path['errors'],
                             'eventId'   => 'FolderPrint Error'
                         ]);
-                    } else {
-                        if ($withSummarySheet) {
-                            $documentPaths[] = FolderPrintController::getSummarySheet(['units' => $units, 'resId' => $linkedResource]);
-                        }
-                        $documentPaths[] = $path;
+                        continue;
                     }
+
+                    if ($withSummarySheet) {
+                        $documentPaths[] = FolderPrintController::getSummarySheet(['units' => $units, 'resId' => $linkedResource]);
+                    }
+                    $documentPaths[] = $path;
 
                     if (!empty($linkedAttachmentsPath[$linkedResource])) {
                         $documentPaths = array_merge($documentPaths, $linkedAttachmentsPath[$linkedResource]);
