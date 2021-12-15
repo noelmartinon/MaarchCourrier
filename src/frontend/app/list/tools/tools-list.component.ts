@@ -74,7 +74,8 @@ export class ToolsListComponent implements OnInit {
                 panelClass: 'maarch-modal',
                 width: '800px',
                 data: {
-                    resId: this.selectedRes
+                    resId: this.selectedRes,
+                    multiple: this.selectedRes.length > 1
                 }
             });
     }

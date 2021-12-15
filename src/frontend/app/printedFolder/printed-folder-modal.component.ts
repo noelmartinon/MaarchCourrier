@@ -55,12 +55,14 @@ export class PrintedFolderModalComponent implements OnInit {
             this.selectedPrintedFolderElement[element] = new FormControl({ value: [], disabled: false });
         });
 
-        this.getMainDocInfo();
-        this.getAttachments();
-        this.getEmails();
-        this.getAcknowledgementReceips();
-        this.getNotes();
-        await this.getLinkedResources();
+        if (!this.data.multiple) {
+            this.getMainDocInfo();
+            this.getAttachments();
+            this.getEmails();
+            this.getAcknowledgementReceips();
+            this.getNotes();
+            await this.getLinkedResources();
+        }
 
         this.loading = false;
     }
@@ -272,7 +274,7 @@ export class PrintedFolderModalComponent implements OnInit {
     toggleAllElements(state: boolean, type: any) {
 
         if (state) {
-            this.selectedPrintedFolderElement[type].setValue(this.printedFolderElement[type].filter((item: any) => item.canConvert).map((item: any) => item.id));
+            this.selectedPrintedFolderElement[type].setValue(this.data.multiple ? 'ALL' : this.printedFolderElement[type].filter((item: any) => item.canConvert).map((item: any) => item.id));
         } else {
             this.selectedPrintedFolderElement[type].setValue([]);
         }
@@ -285,7 +287,7 @@ export class PrintedFolderModalComponent implements OnInit {
             tap((data: any) => {
                 const downloadLink = document.createElement('a');
                 downloadLink.href = window.URL.createObjectURL(data);
-                downloadLink.setAttribute('download', this.functions.getFormatedFileName(this.translate.instant('lang.printedFolder'), 'pdf'));
+                downloadLink.setAttribute('download', this.functions.getFormatedFileName(this.translate.instant('lang.printedFolder'), this.data.multiple ? 'zip' : 'pdf'));
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
             }),
@@ -303,19 +305,31 @@ export class PrintedFolderModalComponent implements OnInit {
             summarySheet: this.summarySheet,
             resources: []
         };
-        const resource = {
-            resId: this.data.resId,
-            document: this.mainDocument,
-        };
-        Object.keys(this.printedFolderElement).forEach(element => {
-            if (this.selectedPrintedFolderElement[element].value.length !== this.printedFolderElement[element].length) {
-                resource[element] = this.selectedPrintedFolderElement[element].value;
+        let resource: any = null;
+
+        this.data.resId.forEach((id: any, index: number) => {
+            resource = {
+                resId: id,
+                document: this.mainDocument
+            };
+            if (!this.data.multiple) {
+                Object.keys(this.printedFolderElement).forEach(element => {
+                    if (this.selectedPrintedFolderElement[element].value.length !== this.printedFolderElement[element].length) {
+                        resource[element] = this.selectedPrintedFolderElement[element].value;
+                    } else {
+                        resource[element] = this.selectedPrintedFolderElement[element].value.length > 0 ? 'ALL' : [];
+                    }
+                });
             } else {
-                resource[element] = this.selectedPrintedFolderElement[element].value.length > 0 ? 'ALL' : [];
+                Object.keys(this.printedFolderElement).forEach(element => {
+                    resource[element] = this.selectedPrintedFolderElement[element].value.length > 0 ? 'ALL' : [];
+                });
             }
+            printedFolder.resources.push(resource);
         });
 
-        printedFolder.resources.push(resource);
+
+
 
         return printedFolder;
     }
