@@ -35,6 +35,7 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use SrcCore\models\CoreConfigModel;
 use SrcCore\models\ValidatorModel;
+use SrcCore\models\TextFormatModel;
 use SrcCore\controllers\LogsController;
 use Status\models\StatusModel;
 use User\models\UserModel;
@@ -121,12 +122,15 @@ class FolderPrintController
 
             if (!empty($resource['document'])) {
                 $document = ResModel::getById([
-                    'select' => ['res_id', 'docserver_id', 'path', 'filename', 'fingerprint', 'category_id', 'alt_identifier'],
+                    'select' => ['res_id', 'docserver_id', 'path', 'filename', 'fingerprint', 'category_id', 'alt_identifier', 'subject'],
                     'resId'  => $resource['resId']
                 ]);
                 if (empty($document)) {
                     return $response->withStatus(400)->withJson(['errors' => 'Document does not exist']);
                 }
+
+                $resource['altIdentifier'] = $document['alt_identifier'];
+                $resource['subject']       = $document['subject'];
 
                 if (empty($document['filename'])) {
                     LogsController::add([
@@ -556,11 +560,15 @@ class FolderPrintController
             }
 
             if (!empty($documentPaths)) {
-                $filePathOnTmp = $tmpDir . 'maarch_res' . $resource['resId'] . '.pdf';
+                $filePathOnTmp = trim($tmpDir . TextFormatModel::formatFilename([
+                    'filename'  => $resource['altIdentifier'] . '_' . $resource['subject'],
+                    'maxLength' => 100
+                ])) . '.pdf';
+                $filePathOnTmp = str_replace('//', '/', $filePathOnTmp);
                 if (file_exists($filePathOnTmp)) {
                     unlink($filePathOnTmp);
                 }
-                $command = "pdfunite " . implode(" ", $documentPaths) . ' ' . $filePathOnTmp;
+                $command = "pdfunite '" . implode("' '", $documentPaths) . "' '" . $filePathOnTmp . "'";
 
                 exec($command . ' 2>&1', $output, $return);
 
@@ -582,14 +590,19 @@ class FolderPrintController
             $response = $response->withAddedHeader('Content-Disposition', "inline; filename=maarch.pdf");
             return $response->withHeader('Content-Type', $mimeType);
         } else {
-            $filePathOnTmp = str_replace('//', '/', $tmpDir . 'folderPrint.zip');
+            $filePathOnTmp = str_replace('//', '/', $tmpDir) . 'folderPrint.zip';
             if (file_exists($filePathOnTmp)) {
                 unlink($filePathOnTmp);
             }
-            // zip -j: store files as their basenames ignoring tmpDir (see man zip)
-            $command = 'zip -j ' . $filePathOnTmp . ' ' . implode(' ', $folderPrintPaths);
 
-            exec($command . ' 2>&1', $output, $return);
+            $zip = new \ZipArchive;
+            if ($zip->open($filePathOnTmp, \ZipArchive::CREATE) !== TRUE) {
+                return $response->withStatus(500)->withJson(['errors' => 'Merged ZIP file not created']);
+            }
+            foreach ($folderPrintPaths as $folderPrintPath) {
+                $zip->addFile($folderPrintPath, basename($folderPrintPath));
+            }
+            $zip->close();
 
             if (!file_exists($filePathOnTmp)) {
                 return $response->withStatus(500)->withJson(['errors' => 'Merged ZIP file not created']);
