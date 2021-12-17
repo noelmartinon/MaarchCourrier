@@ -364,7 +364,9 @@ ALTER TABLE custom_fields DROP COLUMN IF EXISTS mode;
 DROP TYPE IF EXISTS custom_fields_modes;
 CREATE TYPE custom_fields_modes AS ENUM ('form', 'technical');
 ALTER TABLE custom_fields ADD COLUMN mode custom_fields_modes NOT NULL DEFAULT 'form';
-
+-- SGAMI fix 88
+ALTER TABLE custom_fields ALTER COLUMN actived SET DEFAULT 'Y';
+-- END SGAMI
 ALTER TABLE listinstance DROP COLUMN IF EXISTS delegate;
 ALTER TABLE listinstance ADD COLUMN delegate INTEGER;
 
