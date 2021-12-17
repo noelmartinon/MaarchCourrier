@@ -218,15 +218,7 @@ class FolderPrintController
                             $attachment = $originAttachment;
                         }
 
-                        if ($withSeparators) {
-                            $documentPaths[] = FolderPrintController::getAttachmentSeparator([
-                                'attachment'     => $attachment,
-                                'chronoResource' => $chronoResource
-                            ]);
-                        }
-
                         $path = FolderPrintController::getDocumentFilePath(['document' => $attachment, 'collId' => 'attachments_coll']);
-
                         if (!empty($path['errors'])) {
                             LogsController::add([
                                 'isTech'    => true,
@@ -237,9 +229,16 @@ class FolderPrintController
                                 'eventType' => 'Error: ' . $path['errors'],
                                 'eventId'   => 'FolderPrint Error'
                             ]);
-                        } else {
-                            $documentPaths[] = $path;
+                            continue;
                         }
+
+                        if ($withSeparators) {
+                            $documentPaths[] = FolderPrintController::getAttachmentSeparator([
+                                'attachment'     => $attachment,
+                                'chronoResource' => $chronoResource
+                            ]);
+                        }
+                        $documentPaths[] = $path;
                     }
                 }
             }
@@ -560,6 +559,14 @@ class FolderPrintController
             }
 
             if (!empty($documentPaths)) {
+                if (empty($resource['altIdentifier'] . $resource['subject'])) {
+                    $document = ResModel::getById([
+                        'select' => ['alt_identifier', 'subject'],
+                        'resId'  => $resource['resId']
+                    ]);
+                    $resource['altIdentifier'] = $document['alt_identifier'];
+                    $resource['subject']       = $document['subject'];
+                }
                 $filePathOnTmp = trim($tmpDir . TextFormatModel::formatFilename([
                     'filename'  => $resource['altIdentifier'] . '_' . $resource['subject'],
                     'maxLength' => 100
