@@ -166,7 +166,6 @@ export class ProcessComponent implements OnInit, OnDestroy {
     resourceFollowed: boolean = false;
     resourceFreezed: boolean = false;
     resourceBinded: boolean = false;
-    isInProcess: boolean = false;
 
     constructor(
         public translate: TranslateService,
@@ -201,7 +200,6 @@ export class ProcessComponent implements OnInit, OnDestroy {
             if (typeof params['detailResId'] !== 'undefined') {
                 this.initDetailPage(params);
             } else {
-                this.isInProcess = true;
                 this.initProcessPage(params);
             }
         }, (err: any) => {
@@ -823,7 +821,7 @@ export class ProcessComponent implements OnInit, OnDestroy {
                             this.actionService.loading = false;
                         }
                         await this.indexingForm.saveData();
-                        if (this.isInProcess) {
+                        if (!this.detailMode) {
                             await this.getActions();
                         }
                         setTimeout(() => {
