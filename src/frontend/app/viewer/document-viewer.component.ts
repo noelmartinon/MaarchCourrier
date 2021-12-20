@@ -189,6 +189,10 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        if (this.downloadActions === undefined) {
+            this.downloadActions = [];
+        }
+
         this.setEditor();
 
         this.http.get('../rest/indexing/fileInformations').pipe(
