@@ -36,15 +36,6 @@ function main($argv)
         $synchronizeEntities = true;
     }
     
-    if ($synchronizeUsers) {
-        $maarchUsers = \User\models\UserModel::get(['select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'status']]);
-        $ldapUsers = getUsersEntries($xmlfile);
-        if (!empty($ldapUsers['errors'])) {
-            writeLog(['message' => "[ERROR] {$ldapUsers['errors']}"]);
-            $synchronizeUsers = false;
-            $ldapUsers = null;
-        }
-    }
     if ($synchronizeEntities) {
         $maarchEntities = \Entity\models\EntityModel::get(['select' => ['id', 'entity_id', 'entity_label', 'short_label', 'entity_type', 'parent_entity_id']]);
         $ldapEntities = getEntitiesEntries($xmlfile);
@@ -52,6 +43,16 @@ function main($argv)
             writeLog(['message' => "[ERROR] {$ldapEntities['errors']}"]);
             $synchronizeEntities = false;
             $ldapEntities = null;
+        }
+    }
+
+    if ($synchronizeUsers) {
+        $maarchUsers = \User\models\UserModel::get(['select' => ['id', 'user_id', 'firstname', 'lastname', 'phone', 'mail', 'status']]);
+        $ldapUsers = getUsersEntries($xmlfile);
+        if (!empty($ldapUsers['errors'])) {
+            writeLog(['message' => "[ERROR] {$ldapUsers['errors']}"]);
+            $synchronizeUsers = false;
+            $ldapUsers = null;
         }
     }
     
@@ -72,12 +73,13 @@ function main($argv)
         }
     }
     
-    if ($synchronizeUsers) {
-        synchronizeUsers($ldapUsers, $maarchUsers);
-    }
     if ($synchronizeEntities) {
         synchronizeEntities($ldapEntities, $maarchEntities);
     }
+    if ($synchronizeUsers) {
+        synchronizeUsers($ldapUsers, $maarchUsers);
+    }
+
 }
 
 function initialize($customId)
@@ -160,9 +162,9 @@ function getUsersEntries($xmlfile)
             if (empty($ldapField)) {
                 continue;
             }
-            if (count($entry[$ldapField]) === 0) {
+            if (!array_key_exists($ldapField,$entry)) {
                 $user[$mcField] = '';
-            }else if (isset($entry[$ldapField])) {
+            }else if (isset($entry[$ldapField]) && !empty($entry[$ldapField])) {
                 $user[$mcField] = $entry[$ldapField];
             } else {
                 $user[$mcField] = '';
@@ -204,9 +206,9 @@ function getEntitiesEntries($xmlfile)
                 continue;
             }
 
-            if (count($entry[$ldapField]) === 0) {
+            if (!array_key_exists($ldapField,$entry)) {
                 $entity[$mcField] = '';
-            }else if (isset($entry[$ldapField])) {
+            }else if (isset($entry[$ldapField]) && !empty($entry[$ldapField])) {
                 $entity[$mcField] = $entry[$ldapField];
             } else {
                 $entity[$mcField] = '';
@@ -232,11 +234,12 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
     foreach ($ldapUsers as $user) {
         $user['userId'] = $user['user_id'];
         if (!empty($maarchUsersLogin[$user['userId']])) {
+            $user = array_merge($maarchUsersLogin[$user['userId']], $user);
             if ($maarchUsersLogin[$user['userId']]['status'] == 'DEL' || $maarchUsersLogin[$user['userId']]['status'] == 'SPD') {
                 $update = \User\models\UserModel::update([
                     'set'   => ['status' => 'OK'],
-                    'where' => ['user_id = ?'],
-                    'data'  => [$user['userId']]
+                    'where' => ['id = ?'],
+                    'data'  => [$user['id']]
                 ]);
                 if (!$update) {
                     writeLog(['message' => "[ERROR] Update user status failed"]);
@@ -286,18 +289,21 @@ function synchronizeUsers(array $ldapUsers, array $maarchUsers)
         }
     }
 
-    $finalMaarchUsers = \User\models\UserModel::get(['select' => ['user_id', 'firstname', 'lastname', 'phone', 'mail', 'status'],'where' => ["status not in ('DEL','SPD')"]]);
+    $finalMaarchUsers = \User\models\UserModel::get(['select' => ['id','user_id', 'firstname', 'lastname', 'phone', 'mail', 'status'],'where' => ["status not in ('DEL','SPD')"]]);
     foreach ($finalMaarchUsers as $user) {
         $compare = true;
         foreach ($ldapUsers as $v) {
-            if($value['user_id'] == $v['user_id'])  $compare = false;
+            if($user['user_id'] == $v['user_id']) 
+            {
+                $compare = false;
+            }
         }
         if($compare){
             if ($GLOBALS['user'] != $user['user_id'] &&
             $user['user_id'] != 'superadmin') 
             {
                 $delete = \User\models\UserModel::update([
-                    'set'   => ['status' => 'DEL'],
+                    'set'   => ['status' => 'SPD'],
                     'where' => ['id = ?'],
                     'data'  => [$user['id']]
                 ]);
@@ -324,7 +330,7 @@ function synchronizeEntities(array $ldapEntities, array $maarchEntities)
             if ($entity['entity_label'] != $maarchEntitiesId[$entity['entity_id']]['entity_label']
                 || $entity['parent_entity_id'] != $maarchEntitiesId[$entity['entity_id']]['parent_entity_id']
             ) {
-                $entity['short_label'] = $maarchEntitiesId[$entity['entity_id']]['short_label'];
+                $entity['short_label'] = $maarchEntitiesId[$entity['entity_id']]['entity_id'];
                 $entity['entity_type'] = $maarchEntitiesId[$entity['entity_id']]['entity_type'];
                 $curlResponse = \SrcCore\models\CurlModel::execSimple([
                     'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/entities/' . $entity['entity_id'],
@@ -338,8 +344,17 @@ function synchronizeEntities(array $ldapEntities, array $maarchEntities)
                 }
             }
         } else {
-            $entity['short_label'] = $entity['entity_label'];
+            $entity['short_label'] = $entity['entity_id'];
             $entity['entity_type'] = 'Service';
+
+            $maarchEntityParent = \Entity\models\EntityModel::get(['select' => ['id'], 'where' => ['entity_id = ?'], 'data' => [$entity['parent_entity_id']]]);
+
+            if(empty($maarchEntityParent)) 
+            {
+                writeLog(['message' => "[ERROR] Create entity failed : Entity parent ".$entity['parent_entity_id']." not already present in maarch "]);
+                continue ; 
+            }
+
             $curlResponse = \SrcCore\models\CurlModel::execSimple([
                 'url'           => rtrim($GLOBALS['maarchUrl'], '/') . '/rest/entities',
                 'basicAuth'     => ['user' => $GLOBALS['user'], 'password' => $GLOBALS['password']],

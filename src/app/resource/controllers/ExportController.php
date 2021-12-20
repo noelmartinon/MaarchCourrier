@@ -601,8 +601,8 @@ class ExportController
         foreach ($args['chunkedResIds'] as $resIds) {
             $listInstances = ListInstanceModel::get([
                 'select'    => ['item_id', 'res_id'],
-                'where'     => ['res_id in (?)', 'item_type = ?', 'signatory = ?'],
-                'data'      => [$resIds, 'user_id', true],
+                'where'     => ['res_id in (?)', 'item_type = ?', 'requested_signature = ?', 'process_date is not null', 'process_comment != ?'],
+                'data'      => [$resIds, 'user_id', true, 'Circuit interrompu'],
                 'order_by'  => ['res_id']
             ]);
 
