@@ -701,7 +701,7 @@ class ShippingTemplateController
     {
         ValidatorModel::notEmpty($args, ['mailevaUri', 'shippingTemplateId']);
         ValidatorModel::stringType($args, ['mailevaUri']);
-        ValidatorModel::intType($args, ['shippingTemplateId']);
+        ValidatorModel::intVal($args, ['shippingTemplateId']);
 
         $shippingApiDomainName = $args['mailevaUri'];
         $shippingApiDomainName = str_replace(['http://', 'https://'], '', $shippingApiDomainName);
@@ -726,7 +726,7 @@ class ShippingTemplateController
     {
         ValidatorModel::notEmpty($args, ['token', 'shippingTemplateId', 'shippingApiDomainName', 'minIAT']);
         ValidatorModel::stringType($args, ['token', 'mailevaUri']);
-        ValidatorModel::intType($args, ['shippingTemplateId', 'minIAT']);
+        ValidatorModel::intVal($args, ['shippingTemplateId', 'minIAT']);
 
         $now = time();
 
@@ -736,11 +736,11 @@ class ShippingTemplateController
             return ['errors' => 'Authentication failed'];
         }
 
-        if (!Validator::notEmpty()->stringVal()->equals('MaarchCourrier')->validate($payload['iss'])) {
+        if (!Validator::notEmpty()->stringType()->equals('MaarchCourrier')->validate($payload['iss'])) {
             return ['errors' => 'Authentication failed'];
-        } elseif (!Validator::notEmpty()->stringVal()->equals('maileva_notifications')->validate($payload['sub'])) {
+        } elseif (!Validator::notEmpty()->stringType()->equals('maileva_notifications')->validate($payload['sub'])) {
             return ['errors' => 'Authentication failed'];
-        } elseif (!Validator::notEmpty()->stringVal()->equals($args['shippingApiDomainName'])->validate($payload['aud'])) {
+        } elseif (!Validator::notEmpty()->stringType()->equals($args['shippingApiDomainName'])->validate($payload['aud'])) {
             return ['errors' => 'Authentication failed'];
         } elseif (!Validator::notEmpty()->intVal()->min($args['minIAT'])->max($now)->validate($payload['iat'])) {
             return ['errors' => 'Authentication failed'];
