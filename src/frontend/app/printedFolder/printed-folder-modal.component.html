@@ -103,7 +103,7 @@
     </mat-dialog-content>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
-        <button mat-raised-button color="primary" [disabled]="isLoadingResults || isEmptySelection() || !summarySheet"
+        <button mat-raised-button color="primary" [disabled]="isLoadingResults || isEmptySelection() || (!summarySheet && data.multiple)"
             (click)="onSubmit()">{{'lang.validate' | translate}}</button>
     </div>
 </div>
