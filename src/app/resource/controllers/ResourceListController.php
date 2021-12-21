@@ -441,7 +441,7 @@ class ResourceListController
             return $response->withStatus(400)->withJson(['errors' => 'Action is not linked to this group basket']);
         }
 
-        $action = ActionModel::getById(['id' => $aArgs['actionId'], 'select' => ['component', 'parameters', 'label_action']]);
+        $action = ActionModel::getById(['id' => $aArgs['actionId'], 'select' => ['id', 'component', 'parameters', 'label_action']]);
         if (empty($action['component'])) {
             return $response->withStatus(400)->withJson(['errors' => 'Action component does not exist']);
         }

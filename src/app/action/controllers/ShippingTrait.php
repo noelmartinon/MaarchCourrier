@@ -37,10 +37,11 @@ trait ShippingTrait
 {
     public static function createMailevaShippings(array $args)
     {
-        ValidatorModel::notEmpty($args, ['resId']);
+        ValidatorModel::notEmpty($args, ['resId', 'action']);
         ValidatorModel::intVal($args, ['resId']);
-        ValidatorModel::arrayType($args, ['data']);
-        ValidatorModel::intVal($args, ['actionId']);
+        ValidatorModel::arrayType($args, ['data', 'action']);
+        ValidatorModel::notEmpty($args['action'], ['id']);
+        ValidatorModel::intVal($args['action'], ['id']);
 
         $resource = ResModel::getById(['select' => ['destination', 'integrations', 'subject as title', 'external_id', 'res_id', 'version'], 'resId' => $args['resId']]);
         $integrations = json_decode($resource['integrations'], true);
@@ -392,7 +393,7 @@ trait ShippingTrait
                 'recipientEntityId' => $recipientEntity['id'],
                 'accountId'         => $shippingTemplate['account']['id'],
                 'recipients'        => !empty($recipients) ? json_encode($recipients) : '[]',
-                'actionId'          => $args['actionId'] ?? null
+                'actionId'          => $args['action']['id']
             ]);
         }
 
