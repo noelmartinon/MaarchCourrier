@@ -202,7 +202,7 @@ class ShippingTemplateController
             $shippingInfo['account'] = json_decode($shippingInfo['account'], true);
             $body['account']['password'] = $shippingInfo['account']['password'];
         }
-        $alreadySubscribed = ShippingTemplateController::isSubscribed(['accountId' => $shippingInfo['account']['id']]);
+        $alreadySubscribed = ShippingTemplateController::isSubscribed(['accountId' => $body['account']['id']]);
         unset($shippingInfo);
 
         $body['options']  = json_encode($body['options']);
@@ -776,7 +776,7 @@ class ShippingTemplateController
 
     private static function subscribeToNotifications(array $shippingTemplate)
     {
-        if (empty($shippingTemplate)) {
+        if (empty($shippingTemplate)) { // todo validator model
             return ['errors' => 'shipping template is empty'];
         }
         $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
@@ -791,7 +791,7 @@ class ShippingTemplateController
             return ['errors' => 'maarchUrl is not configured'];
         }
         $jwt = ShippingTemplateController::generateToken(['mailevaUri' => $mailevaConfig['uri'], 'shippingTemplateId' => $shippingTemplate['id']]);
-        $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, json_decode($shippingTemplate['account'], true));
+        $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, $shippingTemplate['account']);
         if (!empty($authToken['errors'])) {
             return ['errors' => $authToken['errors']];
         }
@@ -813,16 +813,16 @@ class ShippingTemplateController
                     ])
                 ]);
                 if ($curlResponse['code'] != 201) {
-                    return ['errors' => 'Maileva POST/subscriptions returned HTTP ' . $curlResponse['code'] . '; ' . (string)$curlResponse['response']];
+                    return ['errors' => 'Maileva POST/subscriptions returned HTTP ' . $curlResponse['code'] . '; ' . json_encode($curlResponse['response'], true)];
                 }
 
-                $subscriptionId = $curlResponse['response']['subcription_id'] ?? null;
+                $subscriptionId = $curlResponse['response']['subscription_id'] ?? null;
                 if (!empty($subscriptionId)) {
                     $subscriptions[] = $subscriptionId;
                 }
             }
         }
-        $subscriptions = array_values(array_unique(array_merge($shippingTemplate['subscriptions'], $subscriptions))) ?? [];
+        $subscriptions = array_values(array_unique(array_merge(($shippingTemplate['subscriptions'] ?? []), $subscriptions))) ?? [];
 
         return ['subscriptions' => $subscriptions, 'jwt' => $jwt];
     }
