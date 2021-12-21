@@ -216,8 +216,7 @@ class ShippingTemplateController
                 return $response->withStatus(400)->withJson(['errors' => $subscriptions['errors']]);
             }
             $body['subscriptions'] = $subscriptions['subscriptions'];
-            $body['token_min_iat'] = new \DateTime();
-            $body['token_min_iat'] = $body['token_min_iat']->format('c');
+            $body['token_min_iat'] = $subscriptions['iat'] - 1;
         } elseif (!$body['subscribed'] && $alreadySubscribed) {
             $subscriptions = ShippingTemplateController::unsubscribeFromNotifications($body);
             if (!empty($subscriptions['errors'])) {
@@ -719,7 +718,7 @@ class ShippingTemplateController
 
         $jwt = JWT::encode($payload, CoreConfigModel::getEncryptKey());
 
-        return $jwt;
+        return ['jwt' => $jwt, 'iat' => $now];
     }
 
     private static function checkToken($args)
@@ -728,14 +727,14 @@ class ShippingTemplateController
         ValidatorModel::stringType($args, ['token', 'mailevaUri']);
         ValidatorModel::intVal($args, ['shippingTemplateId', 'minIAT']);
 
-        $now = time();
-
         try {
             $payload = JWT::decode($args['token'], CoreConfigModel::getEncryptKey(), ['HS256']);
             $payload = (array)$payload;
         } catch (\Exception $e) {
             return ['errors' => 'Authentication failed'];
         }
+
+        $now = time();
 
         if (!Validator::notEmpty()->stringType()->equals('MaarchCourrier')->validate($payload['iss'])) {
             return ['errors' => 'Authentication failed'];
@@ -791,7 +790,9 @@ class ShippingTemplateController
         if (empty($maarchUrl)) {
             return ['errors' => 'maarchUrl is not configured'];
         }
-        $jwt = ShippingTemplateController::generateToken(['mailevaUri' => $mailevaConfig['uri'], 'shippingTemplateId' => $shippingTemplate['id']]);
+        $jwtAndIAT = ShippingTemplateController::generateToken(['mailevaUri' => $mailevaConfig['uri'], 'shippingTemplateId' => $shippingTemplate['id']]);
+        $jwt = $jwtAndIAT['jwt'];
+        $iat = $jwtAndIAT['iat'];
         $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, $shippingTemplate['account']);
         if (!empty($authToken['errors'])) {
             return ['errors' => $authToken['errors']];
@@ -825,7 +826,7 @@ class ShippingTemplateController
         }
         $subscriptions = array_values(array_unique(array_merge(($shippingTemplate['subscriptions'] ?? []), $subscriptions))) ?? [];
 
-        return ['subscriptions' => $subscriptions, 'jwt' => $jwt];
+        return ['subscriptions' => $subscriptions, 'jwt' => $jwt, 'iat' => $iat];
     }
 
     private static function unsubscribeFromNotifications(array $shippingTemplate)
