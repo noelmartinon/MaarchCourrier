@@ -724,7 +724,7 @@ class ShippingTemplateController
 
     private static function checkToken($args)
     {
-        ValidatorModel::notEmpty($args, ['token', 'shippingTemplateId', 'shippingApiDomainName', 'minIAT']);
+        ValidatorModel::notEmpty($args, ['shippingTemplateId', 'shippingApiDomainName', 'minIAT']);
         ValidatorModel::stringType($args, ['token', 'mailevaUri']);
         ValidatorModel::intVal($args, ['shippingTemplateId', 'minIAT']);
 
@@ -732,6 +732,7 @@ class ShippingTemplateController
 
         try {
             $payload = JWT::decode($args['token'], CoreConfigModel::getEncryptKey(), ['HS256']);
+            $payload = (array)$payload;
         } catch (\Exception $e) {
             return ['errors' => 'Authentication failed'];
         }
