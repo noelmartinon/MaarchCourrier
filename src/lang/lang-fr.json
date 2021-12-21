@@ -2562,5 +2562,6 @@
     "docserverDocumentNotReadable": "Fichier illisible sur l’espace de stockage",
     "soapClientCreationError": "Erreur de lancement de la communication SOAP",
     "alreadySentToMultigest": "Courrier déjà envoyé à Multigest",
-    "noMultigestAccount": "Aucun compte Multigest associé à l’entité"
+    "noMultigestAccount": "Aucun compte Multigest associé à l’entité",
+    "summarySheetMandatory": "<b>Vous devez attacher une fiche de liaison en cas d'impression de messe.</b>"
 }

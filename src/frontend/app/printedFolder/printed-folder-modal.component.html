@@ -14,6 +14,8 @@
             <div class="example-loading-shade" *ngIf="isLoadingResults">
                 <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
             </div>
+            <app-maarch-message *ngIf="data.multiple" mode="info" [content]="'lang.summarySheetMandatory' | translate">
+            </app-maarch-message>
             <div style="padding: 10px;">
                 <mat-slide-toggle color="primary" [(ngModel)]="summarySheet"
                     (change)="$event.checked ? openSummarySheet() : false">{{'lang.attachSummarySheet' | translate}}
@@ -101,7 +103,7 @@
     </mat-dialog-content>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
-        <button mat-raised-button color="primary" [disabled]="isLoadingResults || isEmptySelection()"
+        <button mat-raised-button color="primary" [disabled]="isLoadingResults || isEmptySelection() || !summarySheet"
             (click)="onSubmit()">{{'lang.validate' | translate}}</button>
     </div>
 </div>
