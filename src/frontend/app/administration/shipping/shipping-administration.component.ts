@@ -137,6 +137,7 @@ export class ShippingAdministrationComponent implements OnInit {
     }
 
     onSubmit() {
+        this.loading = true;
         if (this.creationMode) {
             this.http.post('../rest/administration/shippings', this.shipping)
                 .subscribe((data: any) => {
@@ -156,6 +157,7 @@ export class ShippingAdministrationComponent implements OnInit {
                     this.notify.handleErrors(err);
                 });
         }
+        this.loading = false;
     }
 
     checkModif() {
