@@ -217,6 +217,7 @@ class ShippingTemplateController
             }
             $body['subscriptions'] = $subscriptions['subscriptions'];
             $body['token_min_iat'] = $subscriptions['iat'] - 1;
+            $body['token_min_iat'] = $body['token_min_iat']->format('c');
         } elseif (!$body['subscribed'] && $alreadySubscribed) {
             $subscriptions = ShippingTemplateController::unsubscribeFromNotifications($body);
             if (!empty($subscriptions['errors'])) {
