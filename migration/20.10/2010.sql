@@ -5,7 +5,7 @@
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
-UPDATE parameters SET param_value_string = '20.10.22_TMA1' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '20.10.24_TMA1' WHERE id = 'database_version';
 
 DROP VIEW IF EXISTS res_view_letterbox;
 
@@ -335,7 +335,6 @@ UPDATE actions SET component = 'confirmAction' where action_page = 'purge_letter
 -- add
 UPDATE actions SET id_status = 'EVIS' WHERE id = 414;
 UPDATE actions SET id_status = '_NOSTATUS_' WHERE id = 416;
-UPDATE actions SET component = 'rejectVisaBackToPreviousAction' WHERE id = 405;
 
 -- unable feature_tour
 UPDATE users SET feature_tour = '["welcome","email","notification"]';
