@@ -41,7 +41,7 @@
                     <mat-label>{{ 'lang.recipients' | translate }}</mat-label><br>
                     <mat-chip-list style="margin: 5px; padding: 5px;">
                         <mat-chip *ngFor="let recipient of data.shippingData.recipients; let i = index" class="matChip" [title]="recipient">
-                            {{recipient}} <ng-container *ngIf="!functions.empty(recipient.company)">({{recipient.company}})</ng-container>
+                            <div [innerHTML]="recipient" style="white-space: pre-wrap;"></div>
                         </mat-chip>
                     </mat-chip-list>
                 </div>
