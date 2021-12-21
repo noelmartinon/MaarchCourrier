@@ -816,7 +816,7 @@ class ShippingTemplateController
                     return ['errors' => 'Maileva POST/subscriptions returned HTTP ' . $curlResponse['code'] . '; ' . json_encode($curlResponse['response'], true)];
                 }
 
-                $subscriptionId = $curlResponse['response']['subscription_id'] ?? null;
+                $subscriptionId = $curlResponse['response']['id'] ?? null;
                 if (!empty($subscriptionId)) {
                     $subscriptions[] = $subscriptionId;
                 }
