@@ -2563,5 +2563,5 @@
     "soapClientCreationError": "Erreur de lancement de la communication SOAP",
     "alreadySentToMultigest": "Courrier déjà envoyé à Multigest",
     "noMultigestAccount": "Aucun compte Multigest associé à l’entité",
-    "summarySheetMandatory": "<b>Vous devez attacher une fiche de liaison en cas d'impression de messe.</b>"
+    "summarySheetMandatory": "<b>Vous devez attacher une fiche de liaison en cas d'impression de masse</b>"
 }
