@@ -62,7 +62,7 @@ class ShippingController
             $recipients = json_decode($shipping['recipients'], true);
             $contacts = [];
             foreach ($recipients as $recipient) {
-                $contacts[] = ['company' => $recipient[1], 'contactLabel' => $recipient[2]];
+                $contacts[] = implode("\n", $recipient);
             }
 
             $shippings[] = [
@@ -113,8 +113,8 @@ class ShippingController
         }
 
         $shipping['attachments'] = json_decode($shipping['attachments'], true);
-        if (!Validator::notEmpty()->arrayType()->each(Validator::intType())->validate($shipping['attachments'])) {
-            return $response->withJson(['errors' => 'Shipping attachments are improperly saved']);
+        if (!Validator::arrayType()->each(Validator::intType())->validate($shipping['attachments'])) {
+            return $response->withStatus(500)->withJson(['errors' => 'Shipping attachments are improperly saved']);
         }
         $attachments = [];
         foreach ($shipping['attachments'] as $attachmentId) {
