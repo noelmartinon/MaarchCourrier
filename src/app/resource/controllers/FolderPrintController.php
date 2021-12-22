@@ -570,6 +570,10 @@ class FolderPrintController
                     $resource['altIdentifier'] = $document['alt_identifier'];
                     $resource['subject']       = $document['subject'];
                 }
+                if (empty($resource['altIdentifier'] . $resource['subject'])) {
+                    $resource['altIdentifier'] = 'MAARCH';
+                    $resource['subject']       = $resource['resId'];
+                }
                 $filePathOnTmp = trim($tmpDir . TextFormatModel::formatFilename([
                     'filename'  => $resource['altIdentifier'] . '_' . $resource['subject'],
                     'maxLength' => 100
