@@ -2563,5 +2563,6 @@
     "documentHasNoChrono": "This document has no chrono number",
     "documentNotFoundOnDocserver": "File not found in storage",
     "docserverDocumentNotReadable": "Unreadable file on storage space",
-    "soapClientCreationError": "SOAP communication initiation error"
+    "soapClientCreationError": "SOAP communication initiation error",
+    "summarySheetMandatory": "<b>You must attach a summary sheet in case of mass printing</b>"
 }
