@@ -73,7 +73,7 @@ echo "Set user git : $GITLAB_USER_NAME <$GITLAB_USER_EMAIL>"
 
 git config --global user.email "$GITLAB_USER_EMAIL" && git config --global user.name "$GITLAB_USER_NAME"
 
-git remote set-url origin "https://gitlab-ci-token:${TOKEN_GITLAB}@${GILAB_URL}/${CI_PROJECT_PATH}"
+git remote set-url origin "https://gitlab-ci-token:${TOKEN_GITLAB}@${GITLAB_URL}/${CI_PROJECT_PATH}"
 
 git branch -D $major_version
 git pull origin $major_version
@@ -137,9 +137,9 @@ done <"changelog.txt"
 echo $CONTENT
 
 # Update tag release
-BODY="{\"description\":\"$CONTENT\"}"
+BODY="{\"tag_name\":\"$CI_COMMIT_TAG\",\"description\":\"$CONTENT\"}"
 
-curl -v -H 'Content-Type:application/json' -H "PRIVATE-TOKEN:$TOKEN_GITLAB" -d "$BODY" -X POST https://labs.maarch.org/api/v4/projects/$CI_PROJECT_ID/repository/tags/$CI_COMMIT_TAG/release
+curl -v -H 'Content-Type:application/json' -H "PRIVATE-TOKEN:$TOKEN_GITLAB" -d "$BODY" -X POST https://labs.maarch.org/api/v4/projects/$CI_PROJECT_ID/releases
 
 # NOTIFY TAG IN SLACK
 curl -X POST --data-urlencode "payload={\"channel\": \"$CHANNEL_SLACK_NOTIFICATION\", \"username\": \"$USERNAME_SLACK_NOTIFICATION\", \"text\": \"Jalon mis à jour à la version $tag!\nVeuillez rédiger le <$CI_PROJECT_URL/tags/$tag/release/edit|changelog> et définir une date de sortie.\", \"icon_emoji\": \":cop:\"}" $URL_SLACK_NOTIFICATION
