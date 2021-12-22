@@ -353,8 +353,8 @@ class ShippingTemplateController
             $error = 'Body source is different from the saved one';
         } elseif (!Validator::stringType()->length(1, 256)->validate($body['user_id'])) {
             $error = 'Body user_id is empty, too long, or not a string';
-        } elseif (!Validator::stringType()->equals($shippingTemplateAccount['id'])->validate($body['client_id'])) {
-            $error = 'Body client_id does not match shipping template id';
+        } elseif (!Validator::stringType()->equals($mailevaConfig['clientId'])->validate($body['client_id'])) {
+            $error = 'Body client_id does not match ours';
         } elseif (!Validator::stringType()->in(array_keys(ShippingTemplateController::MAILEVA_EVENT_RESOURCES))->validate($body['event_type'])) {
             $error = 'Body event_type is not an allowed value';
         } elseif (!Validator::stringType()->in(ShippingTemplateController::MAILEVA_EVENT_RESOURCES[$body['event_type']])->validate($body['resource_type'])) {
