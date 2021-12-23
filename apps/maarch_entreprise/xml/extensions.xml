@@ -365,4 +365,9 @@
         <mime>video/x-msvideo</mime>
         <canConvert>false</canConvert>
     </FORMAT>
+    <FORMAT>
+        <name>ZIP</name>
+        <mime>application/x-zip-compressed</mime>
+        <canConvert>false</canConvert>
+    </FORMAT>
 </ROOT>
