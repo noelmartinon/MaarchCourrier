@@ -1,11 +1,11 @@
 -- *************************************************************************--
 --                                                                          --
 --                                                                          --
--- Model migration script - 21.03.5 to 21.03.13                             --
+-- Model migration script - 21.03.5 to 21.03.14                             --
 --                                                                          --
 --                                                                          --
 -- *************************************************************************--
---DATABASE_BACKUP|shippings|shipping_templates
+--DATABASE_BACKUP|shippings|shipping_templates|attachment_types
 
 ALTER TABLE shippings DROP COLUMN IF EXISTS history;
 ALTER TABLE shippings ADD COLUMN history jsonb DEFAULT '[]'::jsonb;
@@ -24,4 +24,4 @@ ALTER TABLE shipping_templates ADD COLUMN token_min_iat TIMESTAMP WITHOUT TIME Z
 INSERT INTO attachment_types (type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES ('shipping_deposit_proof', 'Preuve de dépôt Maileva', false, false, false, 'M', false, false, false);
 INSERT INTO attachment_types (type_id, label, visible, email_link, signable, icon, chrono, version_enabled, new_version_default) VALUES ('shipping_acknowledgement_of_receipt', 'Accusé de réception Maileva', false, false, false, 'M', false, false, false);
 
-UPDATE parameters SET param_value_string = '21.03.13' WHERE id = 'database_version';
+UPDATE parameters SET param_value_string = '21.03.14' WHERE id = 'database_version';
