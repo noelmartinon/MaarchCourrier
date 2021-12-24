@@ -243,7 +243,7 @@ class EntityController
             'ldap_id'               => $body['ldap_id'],
             'entity_full_name'      => $body['entity_full_name'],
             'producer_service'      => $body['producerService'],
-            'external_id'           => json_encode($externalId)
+            'external_id'           => !empty($externalId) ? json_encode($externalId) : '{}',
         ]);
         HistoryController::add([
             'tableName' => 'entities',
@@ -336,7 +336,7 @@ class EntityController
                 'ldap_id'               => $body['ldap_id'],
                 'entity_full_name'      => $body['entity_full_name'],
                 'producer_service'      => $body['producerService'],
-                'external_id'           => json_encode($externalId)
+                'external_id'           => !empty($externalId) ? json_encode($externalId) : '{}',
             ],
             'where' => ['entity_id = ?'],
             'data'  => [$aArgs['id']]
