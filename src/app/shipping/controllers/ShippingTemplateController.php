@@ -547,7 +547,7 @@ class ShippingTemplateController
                 ]
             ]);
             if (!empty($attachmentId['errors'])) {
-                return ShippingTemplateController::logAndReturnError($response, 500, 'could not save deposit proof to docserver');
+                return ShippingTemplateController::logAndReturnError($response, 500, 'could not save deposit proof to docserver: ' . json_encode($attachmentId['errors']));
             }
             $shipping['attachments'][] = $attachmentId;
             ShippingModel::update([
@@ -599,7 +599,7 @@ class ShippingTemplateController
                 ]
             ]);
             if (!empty($attachmentId['errors'])) {
-                return ShippingTemplateController::logAndReturnError($response, 500, 'could not save acknowledgement of receipt to docserver');
+                return ShippingTemplateController::logAndReturnError($response, 500, 'could not save acknowledgement of receipt to docserver: ' . json_encode($attachmentId['errors']));
             }
             $shipping['attachments'][] = $attachmentId;
             ShippingModel::update([
