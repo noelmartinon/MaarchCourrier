@@ -1719,13 +1719,13 @@ class UserController
 
         $file = fopen('php://temp', 'w');
 
-        $csvHead = array_map(function ($field) { return utf8_decode($field); }, array_column($fields, 'label'));
+        $csvHead = array_map(function ($field) { return $field; }, array_column($fields, 'label'));
         fputcsv($file, $csvHead, $delimiter);
 
         foreach ($users as $user) {
             $csvContent = [];
             foreach ($fields as $field) {
-                $csvContent[] = utf8_decode($user[$allowedFields[$field['value']]] ?? '');
+                $csvContent[] = $user[$allowedFields[$field['value']]] ?? '';
             }
             fputcsv($file, $csvContent, $delimiter);
         }
