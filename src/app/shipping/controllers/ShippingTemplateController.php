@@ -533,6 +533,17 @@ class ShippingTemplateController
                 'eventId'   => 'Shipping webhook error'
             ]);
 
+            $typist = UserModel::get([
+                'select' => ['id'],
+                'where'  => ['mode = ?'],
+                'data'   => ['rest'],
+                'limit'  => 1
+            ]);
+            if (empty($typist[0]['id'])) {
+                return ShippingTemplateController::logAndReturnError($response, 500, 'no rest user available');
+            }
+            $typist = $typist[0]['id'];
+
             $attachmentId = StoreController::storeAttachment([
                 'title'       => _SHIPPING_ATTACH_DEPOSIT_PROOF . '_' . date_format($body['eventDate'], 'd-m-Y'),
                 'resIdMaster' => $resId,
@@ -540,6 +551,7 @@ class ShippingTemplateController
                 'status'      => 'TRA',
                 'encodedFile' => base64_encode($curlResponse['response']),
                 'format'      => 'zip',
+                'typist'      => $typist,
                 'externalId'  => [
                     'shippingResourceType' => $body['resourceType'],
                     'shippingResourceId'   => $body['resourceId'],
@@ -585,6 +597,17 @@ class ShippingTemplateController
                 'eventId'   => 'Shipping webhook error'
             ]);
 
+            $typist = UserModel::get([
+                'select' => ['id'],
+                'where'  => ['mode = ?'],
+                'data'   => ['rest'],
+                'limit'  => 1
+            ]);
+            if (empty($typist[0]['id'])) {
+                return ShippingTemplateController::logAndReturnError($response, 500, 'no rest user available');
+            }
+            $typist = $typist[0]['id'];
+
             $attachmentId = StoreController::storeAttachment([
                 'title'       => _SHIPPING_ATTACH_ACKNOWLEDGEMENT_OF_RECEIPT . '_' . trim($recipient[2]) . '_' . date_format($body['eventDate'], 'd-m-Y'),
                 'resIdMaster' => $resId,
@@ -592,6 +615,7 @@ class ShippingTemplateController
                 'status'      => 'TRA',
                 'encodedFile' => base64_encode($curlResponse['response']),
                 'format'      => 'zip',
+                'typist'      => $typist,
                 'externalId'  => [
                     'shippingResourceType' => $body['resourceType'],
                     'shippingResourceId'   => $body['resourceId'],
