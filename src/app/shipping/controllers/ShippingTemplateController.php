@@ -26,6 +26,7 @@ use Resource\controllers\StoreController;
 use Attachment\models\AttachmentModel;
 use Shipping\models\ShippingTemplateModel;
 use Shipping\models\ShippingModel;
+use User\models\UserModel;
 use Action\models\ActionModel;
 use Status\models\StatusModel;
 use SrcCore\controllers\LogsController;
