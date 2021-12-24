@@ -2628,5 +2628,6 @@
     "signatureBookId": "Identifiant dans le parapheur externe",
     "multigestId": "Identifiant unique (UID) Multigest",
     "downloadFile": "Télécharger le fichier",
-    "pdfFormat": "Format pdf"
+    "pdfFormat": "Format pdf",
+    "summarySheetMandatory": "<b>Vous devez attacher une fiche de liaison en cas d'impression de masse</b>"
 }

@@ -2630,5 +2630,6 @@
     "m2m": "M2M identifier",
     "multigestId": "Multigest Unique Identifier (UID)",
     "downloadFile": "Download file",
-    "pdfFormat": "pdf format"
+    "pdfFormat": "pdf format",
+    "summarySheetMandatory": "<b>You must attach a summary sheet in case of mass printing</b>"
 }
