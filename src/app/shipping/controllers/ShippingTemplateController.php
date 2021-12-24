@@ -546,7 +546,7 @@ class ShippingTemplateController
             $typist = $typist[0]['id'];
 
             $attachmentId = StoreController::storeAttachment([
-                'title'       => _SHIPPING_ATTACH_DEPOSIT_PROOF . '_' . date_format($body['eventDate'], 'd-m-Y'),
+                'title'       => _SHIPPING_ATTACH_DEPOSIT_PROOF . '_' . (new \DateTime($body['eventDate']))->format('d-m-Y'),
                 'resIdMaster' => $resId,
                 'type'        => 'shipping_deposit_proof',
                 'status'      => 'TRA',
@@ -610,7 +610,7 @@ class ShippingTemplateController
             $typist = $typist[0]['id'];
 
             $attachmentId = StoreController::storeAttachment([
-                'title'       => _SHIPPING_ATTACH_ACKNOWLEDGEMENT_OF_RECEIPT . '_' . trim($recipient[2]) . '_' . date_format($body['eventDate'], 'd-m-Y'),
+                'title'       => _SHIPPING_ATTACH_ACKNOWLEDGEMENT_OF_RECEIPT . '_' . trim($recipient[2]) . '_' . (new \DateTime($body['eventDate']))->format('d-m-Y'),
                 'resIdMaster' => $resId,
                 'type'        => 'shipping_acknowledgement_of_receipt',
                 'status'      => 'TRA',
