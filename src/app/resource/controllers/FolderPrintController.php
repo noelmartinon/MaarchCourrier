@@ -579,6 +579,13 @@ class FolderPrintController
                     'maxLength' => 100
                 ])) . '.pdf';
                 $filePathOnTmp = str_replace('//', '/', $filePathOnTmp);
+                foreach ($documentPaths as $key => $documentPath) {
+                    $documentPaths[$key] = TextFormatModel::formatFilename([
+                        'filename'  => $documentPath,
+                        'maxLength' => 100
+                    ]);
+                    $documentPaths[$key] = str_replace('//', '/', $documentPath);
+                }
                 if (file_exists($filePathOnTmp)) {
                     unlink($filePathOnTmp);
                 }
