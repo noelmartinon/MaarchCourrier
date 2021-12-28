@@ -208,10 +208,21 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
         });
     }
 
-    loadActions() {      
+    loadActions(hideAction: boolean = true) {      
         this.http.get('../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/actions?resId=' + this.resId)
             .subscribe((data: any) => {
-                this.signatureBook.actions = data.actions;
+
+                /** SGAMI */
+                //this.signatureBook.actions = data.actions;
+                let resultat= null
+                if(hideAction) {
+                    resultat = data.actions.filter((action:any) => action.id != 405)
+                }else {
+                    resultat = data.actions
+                }
+                this.signatureBook.actions = resultat
+                /** SGAMI FIN  */
+                
             }, (err) => {
                 this.notify.error(err.error.errors);
             });

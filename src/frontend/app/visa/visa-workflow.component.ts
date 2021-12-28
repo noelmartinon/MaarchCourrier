@@ -14,11 +14,13 @@ import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { ActivatedRoute } from '@angular/router';
 import { PrivilegeService } from '@service/privileges.service';
 import { HeaderService } from '@service/header.service';
+/*** */
+import { SignatureBookComponent } from '../signature-book.component';
 @Component({
     selector: 'app-visa-workflow',
     templateUrl: 'visa-workflow.component.html',
     styleUrls: ['visa-workflow.component.scss'],
-    providers: [ScanPipe]
+    providers: [ScanPipe, SignatureBookComponent]
 })
 export class VisaWorkflowComponent implements OnInit {
 
@@ -70,13 +72,16 @@ export class VisaWorkflowComponent implements OnInit {
         private route: ActivatedRoute,
         private privilegeService: PrivilegeService,
         public headerService: HeaderService,
+        //SGAAMI-SO debut 
+        private signatureBook: SignatureBookComponent
+        /**SgAMI-SO FIN  */
     ) {
         // ngOnInit is not called if navigating in the same component : must be in constructor for this case
         this.route.params.subscribe(params => {
             this.loading = true;
 
             this.resId = params['resId'];
-
+            //this.signatureBook.loadActions(false)
             if (!this.functions.empty(this.resId)) {
                 this.loadedInConstructor = true;
                 this.loadWorkflow(this.resId);
@@ -467,9 +472,17 @@ export class VisaWorkflowComponent implements OnInit {
                     };
                 });
                 this.http.put(`../rest/circuits/visaCircuit`, { resources: arrVisa }).pipe(                   
-                    tap((data: any) => {                        
+                    tap((data: any) => {         
+                        console.log('data', data)               
                         this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
+                        console.log(this.visaWorkflowClone)
                         this.notify.success(this.translate.instant('lang.visaWorkflowUpdated'));
+                        //SGAMI-SO DEBUT 
+
+                        //alert(this.signatureBook)
+                            this.signatureBook.loadActions(false)
+                    
+                        //SGAMI-SO FIN
                         resolve(true);
                     }),
                     catchError((err: any) => {
