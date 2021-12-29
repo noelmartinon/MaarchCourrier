@@ -1758,5 +1758,7 @@ export const LANG_FR = {
     "setContactInfos": "Accéder à la fiche de détails du contact",
     "goToContact": "Vous allez perdre vos modifications actuelles, voulez-vous vraiment continuer ?",
     "associateContact": "pour associer ce contact au courrier/pièce jointe.",
-    "associateContactToDoc": "Associer ce contact au courrier/pièce jointe"
+    "associateContactToDoc": "Associer ce contact au courrier/pièce jointe",
+    "hasLinkedRes": "Au moins un courrier enregistré dans les {0} derniers jours est affecté au même contact.",
+    "seeMore": "Voir!"
 };
