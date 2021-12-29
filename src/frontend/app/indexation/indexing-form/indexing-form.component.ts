@@ -77,6 +77,8 @@ export class IndexingFormComponent implements OnInit {
     indexingModels_classementClone: any[] = [];
 
     indexingModelsCustomFields: any[] = [];
+    indexingModelsClone: any = null;
+    resFieldsClone: any[] = [];
 
     availableFields: any[] = [
         {
@@ -670,6 +672,7 @@ export class IndexingFormComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get(`../../rest/resources/${this.resId}`).pipe(
                 tap(async (data: any) => {
+                    this.resFieldsClone = JSON.parse(JSON.stringify(data));
                     await Promise.all(this.fieldCategories.map(async (element: any) => {
 
                         // this.fieldCategories.forEach(async element => {
@@ -733,6 +736,24 @@ export class IndexingFormComponent implements OnInit {
                             this.currentResourceValues = JSON.parse(JSON.stringify(this.getDatas()));
                         }
                     }
+                    
+                    if (this.indexingModelsClone.master !== null) {
+                        Object.keys(this.indexingModelsClone.fields).forEach((element: any) => {
+                            const item: any = this.indexingModelsClone.fields[element];
+                            if (!this.functions.empty(item.default_value)) {
+                                if (!item.identifier.includes('Date')) {
+                                    this.arrFormControl[item.identifier].value = item.default_value;
+                                    if (item.identifier === 'priority') {
+                                        this.setPriorityColor(null, item.default_value);
+                                    }
+                                } else {
+                                    this.arrFormControl[item.identifier].value = new Date(this.functions.formatFrenchDateToObjectDate(this.functions.formatFrenchDateToTechnicalDate(item.default_value)));
+                                }
+                            }
+                        });
+                        
+                    }
+                    
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -796,6 +817,7 @@ export class IndexingFormComponent implements OnInit {
 
         this.http.get(`../../rest/indexingModels/${indexModelId}`).pipe(
             tap(async (data: any) => {
+                this.indexingModelsClone = JSON.parse(JSON.stringify({fields: data.indexingModel.fields, master: data.indexingModel.master}));
                 this.indexingFormId = data.indexingModel.master !== null ? data.indexingModel.master : data.indexingModel.id;
                 this.currentCategory = data.indexingModel.category;
                 let fieldExist: boolean;
