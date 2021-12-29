@@ -395,36 +395,22 @@ class ShippingTemplateController
             'resourceLocation' => $body['resource_location']
         ];
 
-        if ($body['eventType'] == 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED') {
-            $shipping = ShippingModel::getByRecipientId([
-                'select'      => ['id', 'sending_id', 'document_id', 'document_type', 'history', 'recipients', 'attachments', 'action_id'],
-                'recipientId' => $body['resourceId']
-            ]);
-            if (empty($shipping[0])) {
-                return ShippingTemplateController::logAndReturnError($response, 400, 'Body resource_id does not match any shipping recipient');
-            }
-            $shipping = $shipping[0];
-            $shipping['recipients'] = json_decode($shipping['recipients'], true);
-            foreach ($shipping['recipients'] as $recipientValue) {
-                if ($recipientValue['recipientId'] == $body['resourceId']) {
-                    $recipient = $recipientValue;
-                    break;
-                }
-            }
-        } else {
-            $shipping = ShippingModel::get([
-                'select' => ['id', 'sending_id', 'document_id', 'document_type', 'history', 'recipients', 'attachments', 'action_id'],
-                'where'  => ['sending_id = ?'],
-                'data'   => [$body['resourceId']]
-            ]);
-            if (empty($shipping[0])) {
-                return ShippingTemplateController::logAndReturnError($response, 400, 'Body resource_id does not match any shipping');
-            }
-            $shipping = $shipping[0];
-            $shipping['recipients'] = json_decode($shipping['recipients'], true);
+        if (in_array($body['eventType'], ['ON_DEPOSIT_PROOF_RECEIVED', 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED'])) {
+            return ShippingTemplateController::logAndReturnError($response, 400, 'body event_type is ignored');
         }
+
+        $shipping = ShippingModel::get([
+            'select' => ['id', 'sending_id', 'document_id', 'document_type', 'history', 'recipients', 'attachments', 'action_id'],
+            'where'  => ['sending_id = ?'],
+            'data'   => [$body['resourceId']]
+        ]);
+        if (empty($shipping[0])) {
+            return ShippingTemplateController::logAndReturnError($response, 400, 'Body resource_id does not match any shipping');
+        }
+        $shipping = $shipping[0];
+        $shipping['recipients']  = json_decode($shipping['recipients'], true);
         $shipping['attachments'] = json_decode($shipping['attachments'], true);
-        $shipping['history'] = json_decode($shipping['history'], true);
+        $shipping['history']     = json_decode($shipping['history'], true);
 
         $resId = $shipping['document_id'];
         if ($shipping['document_type'] == 'attachment') {
@@ -508,11 +494,26 @@ class ShippingTemplateController
             'data'  => [$shipping['id']]
         ]);
 
-        if ($body['eventType'] == 'ON_DEPOSIT_PROOF_RECEIVED') {
+        if ($body['eventType'] == 'ON_STATUS_ARCHIVED') {
             $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, $shippingTemplateAccount);
             if (!empty($authToken['errors'])) {
                 return ShippingTemplateController::logAndReturnError($response, 400, $authToken['errors']);
             }
+
+            $typist = UserModel::get([
+                'select' => ['id'],
+                'where'  => ['mode = ?'],
+                'data'   => ['rest'],
+                'limit'  => 1
+            ]);
+            if (empty($typist[0]['id'])) {
+                return ShippingTemplateController::logAndReturnError($response, 500, 'no rest user available');
+            }
+            $typist = $typist[0]['id'];
+
+            // TODO defer all returns beneath this
+
+            // download deposit proof
             $curlResponse = CurlModel::exec([
                 'method'       => 'GET',
                 'url'          => str_replace('\\', '', $body['resourceLocation']) . '/download_deposit_proof',
@@ -533,17 +534,6 @@ class ShippingTemplateController
                 'eventType' => 'Shipping deposit proof body: ' . json_encode($curlResponse['response']),
                 'eventId'   => 'Shipping webhook error'
             ]);
-
-            $typist = UserModel::get([
-                'select' => ['id'],
-                'where'  => ['mode = ?'],
-                'data'   => ['rest'],
-                'limit'  => 1
-            ]);
-            if (empty($typist[0]['id'])) {
-                return ShippingTemplateController::logAndReturnError($response, 500, 'no rest user available');
-            }
-            $typist = $typist[0]['id'];
 
             $attachmentId = StoreController::storeAttachment([
                 'title'       => _SHIPPING_ATTACH_DEPOSIT_PROOF . '_' . (new \DateTime($body['eventDate']))->format('d-m-Y'),
@@ -568,70 +558,54 @@ class ShippingTemplateController
                 'where' => ['id = ?'],
                 'data'  => [$shipping['id']]
             ]);
-        }
 
-        if ($body['eventType'] == 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED') {
-            if (empty($authToken)) {
-                $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, $shippingTemplateAccount);
-                if (!empty($authToken['errors'])) {
-                    return ShippingTemplateController::logAndReturnError($response, 400, $authToken['errors']);
+            // download acknowledgement of receipt (AR) for each recipient
+            foreach ($shipping['recipients'] as $recipient) {
+                $curlResponse = CurlModel::exec([
+                    'method'       => 'GET',
+                    'url'          => $body['resourceLocation'] . '/recipients/' . $recipient['id'] . '/download_acknowledgement_of_receipt', // TODO build this URL ourselves if possible or fetch it online
+                    'bearerAuth'   => ['token' => $authToken],
+                    'headers'      => ['Accept: */*'],
+                    'fileResponse' => true,
+                ]);
+                if ($curlResponse['code'] != 200) {
+                    return ShippingTemplateController::logAndReturnError($response, 400, 'acknowledgement of receipt failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId'], 'recipientId' => $recipient['id']]));
                 }
-            }
-            $curlResponse = CurlModel::exec([
-                'method'       => 'GET',
-                'url'          => $mailevaConfig['uri'] . $recipient['acknowledgement_of_receipt_url'],
-                'bearerAuth'   => ['token' => $authToken],
-                'headers'      => ['Accept: */*'],
-                'fileResponse' => true,
-            ]);
-            if ($curlResponse['code'] != 200) {
-                return ShippingTemplateController::logAndReturnError($response, 400, 'acknowledgement of receipt failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId'], 'recipientId' => $recipient['id']]));
-            }
 
-            LogsController::add([
-                'isTech'    => true,
-                'moduleId'  => 'shipping',
-                'level'     => 'DEBUG',
-                'tableName' => '',
-                'recordId'  => '',
-                'eventType' => 'Shipping acknowledgement of receipt body: ' . json_encode($curlResponse['response']),
-                'eventId'   => 'Shipping webhook error'
-            ]);
+                LogsController::add([
+                    'isTech'    => true,
+                    'moduleId'  => 'shipping',
+                    'level'     => 'DEBUG',
+                    'tableName' => '',
+                    'recordId'  => '',
+                    'eventType' => 'Shipping acknowledgement of receipt body: ' . json_encode($curlResponse['response']),
+                    'eventId'   => 'Shipping webhook error'
+                ]);
 
-            $typist = UserModel::get([
-                'select' => ['id'],
-                'where'  => ['mode = ?'],
-                'data'   => ['rest'],
-                'limit'  => 1
-            ]);
-            if (empty($typist[0]['id'])) {
-                return ShippingTemplateController::logAndReturnError($response, 500, 'no rest user available');
+                $attachmentId = StoreController::storeAttachment([
+                    'title'       => _SHIPPING_ATTACH_ACKNOWLEDGEMENT_OF_RECEIPT . '_' . trim($recipient[2]) . '_' . (new \DateTime($body['eventDate']))->format('d-m-Y'),
+                    'resIdMaster' => $resId,
+                    'type'        => 'shipping_acknowledgement_of_receipt',
+                    'status'      => 'TRA',
+                    'encodedFile' => base64_encode($curlResponse['response']),
+                    'format'      => 'zip',
+                    'typist'      => $typist,
+                    'externalId'  => [
+                        'shippingResourceType' => $body['resourceType'],
+                        'shippingResourceId'   => $body['resourceId'],
+                        'shippingEventDate'    => $body['eventDate']
+                    ]
+                ]);
+                if (!empty($attachmentId['errors'])) {
+                    return ShippingTemplateController::logAndReturnError($response, 500, 'could not save acknowledgement of receipt to docserver: ' . json_encode($attachmentId['errors']));
+                }
+                $shipping['attachments'][] = $attachmentId;
+                ShippingModel::update([
+                    'set'   => ['attachments' => json_encode($shipping['attachments'])],
+                    'where' => ['id = ?'],
+                    'data'  => [$shipping['id']]
+                ]);
             }
-            $typist = $typist[0]['id'];
-
-            $attachmentId = StoreController::storeAttachment([
-                'title'       => _SHIPPING_ATTACH_ACKNOWLEDGEMENT_OF_RECEIPT . '_' . trim($recipient[2]) . '_' . (new \DateTime($body['eventDate']))->format('d-m-Y'),
-                'resIdMaster' => $resId,
-                'type'        => 'shipping_acknowledgement_of_receipt',
-                'status'      => 'TRA',
-                'encodedFile' => base64_encode($curlResponse['response']),
-                'format'      => 'zip',
-                'typist'      => $typist,
-                'externalId'  => [
-                    'shippingResourceType' => $body['resourceType'],
-                    'shippingResourceId'   => $body['resourceId'],
-                    'shippingEventDate'    => $body['eventDate']
-                ]
-            ]);
-            if (!empty($attachmentId['errors'])) {
-                return ShippingTemplateController::logAndReturnError($response, 500, 'could not save acknowledgement of receipt to docserver: ' . json_encode($attachmentId['errors']));
-            }
-            $shipping['attachments'][] = $attachmentId;
-            ShippingModel::update([
-                'set'   => ['attachments' => json_encode($shipping['attachments'])],
-                'where' => ['id = ?'],
-                'data'  => [$shipping['id']]
-            ]);
         }
 
         ResModel::update([
