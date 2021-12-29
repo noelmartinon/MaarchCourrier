@@ -494,6 +494,12 @@ class ShippingTemplateController
             'data'  => [$shipping['id']]
         ]);
 
+        ResModel::update([
+            'set'   => ['status' => $actionStatus],
+            'where' => ['res_id = ?'],
+            'data'  => [$resId]
+        ]);
+
         if ($body['eventType'] == 'ON_STATUS_ARCHIVED') {
             $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, $shippingTemplateAccount);
             if (!empty($authToken['errors'])) {
@@ -511,9 +517,9 @@ class ShippingTemplateController
             }
             $typist = $typist[0]['id'];
 
-            // TODO defer all returns beneath this
+            $attachmentErrors = [];
 
-            // download deposit proof
+            // deposit proof
             $curlResponse = CurlModel::exec([
                 'method'       => 'GET',
                 'url'          => str_replace('\\', '', $body['resourceLocation']) . '/download_deposit_proof',
@@ -522,65 +528,47 @@ class ShippingTemplateController
                 'fileResponse' => true
             ]);
             if ($curlResponse['code'] != 200) {
-                return ShippingTemplateController::logAndReturnError($response, 400, 'deposit proof failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId']]));
+                $attachmentErrors[] = 'shipping_deposit_proof:download: deposit proof failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId'], 'curlResponse' => $curlResponse['response']]);
+            } else {
+                $attachmentId = StoreController::storeAttachment([
+                    'title'       => _SHIPPING_ATTACH_DEPOSIT_PROOF . '_' . (new \DateTime($body['eventDate']))->format('d-m-Y'),
+                    'resIdMaster' => $resId,
+                    'type'        => 'shipping_deposit_proof',
+                    'status'      => 'TRA',
+                    'encodedFile' => base64_encode($curlResponse['response']),
+                    'format'      => 'zip',
+                    'typist'      => $typist,
+                    'externalId'  => [
+                        'shippingResourceType' => $body['resourceType'],
+                        'shippingResourceId'   => $body['resourceId'],
+                        'shippingEventDate'    => $body['eventDate']
+                    ]
+                ]);
+                if (!empty($attachmentId['errors'])) {
+                    $attachmentErrors[] = 'shipping_deposit_proof:save: could not save deposit proof to docserver: ' . json_encode($attachmentId['errors']);
+                } else {
+                    $shipping['attachments'][] = $attachmentId;
+                    ShippingModel::update([
+                        'set'   => ['attachments' => json_encode($shipping['attachments'])],
+                        'where' => ['id = ?'],
+                        'data'  => [$shipping['id']]
+                    ]);
+                }
             }
 
-            LogsController::add([
-                'isTech'    => true,
-                'moduleId'  => 'shipping',
-                'level'     => 'DEBUG',
-                'tableName' => '',
-                'recordId'  => '',
-                'eventType' => 'Shipping deposit proof body: ' . json_encode($curlResponse['response']),
-                'eventId'   => 'Shipping webhook error'
-            ]);
-
-            $attachmentId = StoreController::storeAttachment([
-                'title'       => _SHIPPING_ATTACH_DEPOSIT_PROOF . '_' . (new \DateTime($body['eventDate']))->format('d-m-Y'),
-                'resIdMaster' => $resId,
-                'type'        => 'shipping_deposit_proof',
-                'status'      => 'TRA',
-                'encodedFile' => base64_encode($curlResponse['response']),
-                'format'      => 'zip',
-                'typist'      => $typist,
-                'externalId'  => [
-                    'shippingResourceType' => $body['resourceType'],
-                    'shippingResourceId'   => $body['resourceId'],
-                    'shippingEventDate'    => $body['eventDate']
-                ]
-            ]);
-            if (!empty($attachmentId['errors'])) {
-                return ShippingTemplateController::logAndReturnError($response, 500, 'could not save deposit proof to docserver: ' . json_encode($attachmentId['errors']));
-            }
-            $shipping['attachments'][] = $attachmentId;
-            ShippingModel::update([
-                'set'   => ['attachments' => json_encode($shipping['attachments'])],
-                'where' => ['id = ?'],
-                'data'  => [$shipping['id']]
-            ]);
-
-            // download acknowledgement of receipt (AR) for each recipient
+            // acknowledgement of receipt (AR) for each recipient
             foreach ($shipping['recipients'] as $recipient) {
                 $curlResponse = CurlModel::exec([
                     'method'       => 'GET',
-                    'url'          => $body['resourceLocation'] . '/recipients/' . $recipient['id'] . '/download_acknowledgement_of_receipt', // TODO build this URL ourselves if possible or fetch it online
+                    'url'          => str_replace('\\', '', $body['resourceLocation']) . '/recipients/' . $recipient['id'] . '/download_acknowledgement_of_receipt', // TODO build this URL ourselves if possible or fetch it online
                     'bearerAuth'   => ['token' => $authToken],
                     'headers'      => ['Accept: */*'],
                     'fileResponse' => true,
                 ]);
                 if ($curlResponse['code'] != 200) {
-                    return ShippingTemplateController::logAndReturnError($response, 400, 'acknowledgement of receipt failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId'], 'recipientId' => $recipient['id']]));
+                    $attachmentErrors[] = 'shipping_acknowledgement_of_receipt:download: acknowledgement of receipt failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId'], 'recipientId' => $recipient['id'], 'curlResponse' => $curlResponse['response']]);
+                    continue;
                 }
-
-                LogsController::add([
-                    'isTech'    => true,
-                    'moduleId'  => 'shipping',
-                    'level'     => 'DEBUG',
-                    'tableName' => '',
-                    'recordId'  => '',
-                    'eventType' => 'Shipping acknowledgement of receipt body: ' . json_encode($curlResponse['response']),
-                    'eventId'   => 'Shipping webhook error'
-                ]);
 
                 $attachmentId = StoreController::storeAttachment([
                     'title'       => _SHIPPING_ATTACH_ACKNOWLEDGEMENT_OF_RECEIPT . '_' . trim($recipient[2]) . '_' . (new \DateTime($body['eventDate']))->format('d-m-Y'),
@@ -597,22 +585,21 @@ class ShippingTemplateController
                     ]
                 ]);
                 if (!empty($attachmentId['errors'])) {
-                    return ShippingTemplateController::logAndReturnError($response, 500, 'could not save acknowledgement of receipt to docserver: ' . json_encode($attachmentId['errors']));
+                    $attachmentErrors[] = 'shipping_acknowledgement_of_receipt:save: could not save acknowledgement of receipt to docserver: ' . json_encode($attachmentId['errors']);
+                } else {
+                    $shipping['attachments'][] = $attachmentId;
+                    ShippingModel::update([
+                        'set'   => ['attachments' => json_encode($shipping['attachments'])],
+                        'where' => ['id = ?'],
+                        'data'  => [$shipping['id']]
+                    ]);
                 }
-                $shipping['attachments'][] = $attachmentId;
-                ShippingModel::update([
-                    'set'   => ['attachments' => json_encode($shipping['attachments'])],
-                    'where' => ['id = ?'],
-                    'data'  => [$shipping['id']]
-                ]);
+            }
+
+            if (!empty($attachmentErrors)) {
+                return ShippingTemplateController::logAndReturnError($response, 500, "attachment errors:\n" . json_encode($attachmentErrors, JSON_PRETTY_PRINT));
             }
         }
-
-        ResModel::update([
-            'set'   => ['status' => $actionStatus],
-            'where' => ['res_id = ?'],
-            'data'  => [$resId]
-        ]);
 
         return $response->withStatus(201);
     }
