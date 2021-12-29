@@ -106,7 +106,7 @@
                     [resId]="currentResourceInformations.resId" [indexingFormId]="currentResourceInformations.modelId"
                     [mode]="detailMode ? 'details' : 'process'" [canEdit]="canEditData"
                     (loadingFormEndEvent)="triggerProcessAction()"
-                    (retrieveDocumentEvent)="appDocumentViewer.saveDocService()" (reloadBadge)="refreshBadge(1,'linkedResources')"></app-indexing-form>
+                    (retrieveDocumentEvent)="appDocumentViewer.saveDocService()"></app-indexing-form>
                 <div style="position: sticky;bottom: 0px;text-align:right;">
                     <button mat-fab [title]="lang.saveModifications" *ngIf="isToolModified()" (click)="saveTool()"
                         color="accent">
@@ -291,7 +291,7 @@
                 <app-indexing-form *ngIf="modal.id === 'info' && !loading" #indexingForm [groupId]="currentGroupId"
                     [indexingFormId]="currentResourceInformations.modelId" [resId]="currentResourceInformations.resId"
                     [mode]="detailMode ? 'details' : 'process'" [canEdit]="canEditData"
-                    (loadingFormEndEvent)="triggerProcessAction()" (retrieveDocumentEvent)="appDocumentViewer.saveDocService()" (reloadBadge)="refreshBadge(1,'linkedResources')">
+                    (loadingFormEndEvent)="triggerProcessAction()" (retrieveDocumentEvent)="appDocumentViewer.saveDocService()">
                 </app-indexing-form>
                 <div style="position: sticky;bottom: 0px;text-align:right;padding:15px;">
                     <button mat-fab

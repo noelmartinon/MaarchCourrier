@@ -59,7 +59,6 @@ export class ContactAutocompleteComponent implements OnInit {
 
 
     @Output('retrieveDocumentEvent') retrieveDocumentEvent = new EventEmitter<string>();
-    @Output('afterContactSelected') afterContactSelected = new EventEmitter<any>();
 
     @ViewChild('autoCompleteInput', { static: true }) autoCompleteInput: ElementRef;
 
@@ -162,7 +161,6 @@ export class ContactAutocompleteComponent implements OnInit {
     selectOpt(ev: any) {
         this.setFormValue(ev.option.value);
         this.myControl.setValue('');
-        this.afterContactSelected.emit(ev.option.value);
 
     }
 

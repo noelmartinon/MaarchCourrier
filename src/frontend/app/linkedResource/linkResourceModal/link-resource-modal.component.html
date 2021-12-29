@@ -7,13 +7,9 @@
             <mat-icon class="fa fa-times"></mat-icon>
         </button></h1>
     <mat-dialog-content>
-        <app-criteria-tool *ngIf="data.fromContact === undefined" (searchUrlGenerated)="launchSearch($event)"
+        <app-criteria-tool (searchUrlGenerated)="launchSearch($event)"
             [defaultCriteria]="['resourceField','contactField']"></app-criteria-tool>
-        <search-adv-list #appSearchAdvList
-            [excludeRes]="[data.resId]" 
-            [fromContact]="data.fromContact"
-            [linkedRes]="data.linkedRes">
-        </search-adv-list>
+        <search-adv-list #appSearchAdvList [excludeRes]="[data.resId]"></search-adv-list>
     </mat-dialog-content>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">

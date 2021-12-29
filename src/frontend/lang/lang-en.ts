@@ -1752,6 +1752,5 @@ export const LANG_EN = {
     "setContactInfos": "Access the contact details sheet",
     "goToContact": "You will lose your current changes, are you sure you want to continue?",
     "associateContact": "to associate the contact with the mail / attachment.",
-    "associateContactToDoc": "Associate the contact with the mail / attachment",
-    "hasLinkedRes": "At least one mail registered in the last {0} days is assigned to the same contact.",
+    "associateContactToDoc": "Associate the contact with the mail / attachment"
 };
