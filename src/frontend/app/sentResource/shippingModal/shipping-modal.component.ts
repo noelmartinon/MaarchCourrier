@@ -58,8 +58,10 @@ export class ShippingModalComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/shippings/${this.data.shippingData.id}/attachments`).pipe(
                 tap((data: any) => {
-                    this.depositProof = data.attachments.find((item: any) => item.attachmentType === 'shipping_deposit_proof');
-                    this.shippingAttachments = data.attachments.filter((item: any) => item.attachmentType === 'shipping_acknowledgement_of_receipt');
+                    if (data.attachments.length > 0) {
+                        this.depositProof = data.attachments.find((item: any) => item.attachmentType === 'shipping_deposit_proof');
+                        this.shippingAttachments = data.attachments.filter((item: any) => item.attachmentType === 'shipping_acknowledgement_of_receipt');
+                    }
                     resolve(true);
                 }),
                 catchError((err: any) => {
@@ -74,7 +76,9 @@ export class ShippingModalComponent implements OnInit {
         return new Promise((resolve) => {
             this.http.get(`../rest/shippings/${this.data.shippingData.id}/history`).pipe(
                 tap((data: any) => {
-                    this.shippingHistory = data.history;
+                    if (data.history.length > 0) {
+                        this.shippingHistory = data.history.filter((history: any) => ['ON_DEPOSIT_PROOF_RECEIVED', 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED'].indexOf(history.eventType) === -1);
+                    }
                     resolve(true);
                 }),
                 catchError((err: any) => {

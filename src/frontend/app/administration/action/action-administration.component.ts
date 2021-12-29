@@ -69,18 +69,6 @@ export class ActionAdministrationComponent implements OnInit {
             disabled: false
         },
         {
-            id: 'ON_DEPOSIT_PROOF_RECEIVED',
-            label: this.translate.instant('lang.ON_DEPOSIT_PROOF_RECEIVED'),
-            actionStatus: null,
-            disabled: false
-        },
-        {
-            id: 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED',
-            label: this.translate.instant('lang.ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED'),
-            actionStatus: null,
-            disabled: false
-        },
-        {
             id: 'ON_STATUS_ARCHIVED',
             label: this.translate.instant('lang.ON_STATUS_ARCHIVED'),
             actionStatus: null,

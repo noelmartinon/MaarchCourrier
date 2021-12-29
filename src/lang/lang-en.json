@@ -2541,8 +2541,6 @@
     "ON_STATUS_ACCEPTED": "Accepted",
     "ON_STATUS_REJECTED": "Rejected",
     "ON_STATUS_PROCESSED": "Processed",
-    "ON_DEPOSIT_PROOF_RECEIVED": "Proof of deposit obtained",
-    "ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED": "Receipt notice received",
     "ON_STATUS_ARCHIVED": "Archived",
     "showShippingHistory": "View Maileva sending history",
     "sendDate": "Sending date",
