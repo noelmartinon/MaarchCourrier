@@ -40,6 +40,8 @@ export class SearchAdvListComponent implements OnInit {
     @Input('search') search: string = '';
     @Input('singleMode') singleMode: boolean = false;
     @Input('excludeRes') excludeRes: number[] = [];
+    @Input('fromContact') fromContact: boolean = false;
+    @Input('linkedRes') linkedRes: any[] = [];
 
     
 
@@ -58,7 +60,13 @@ export class SearchAdvListComponent implements OnInit {
 
     ngOnInit(): void {
         this.loading = true;
-        this.initResourceList();
+        if (!this.fromContact || this.fromContact === undefined) {
+            this.initResourceList();
+        } else {
+            this.data = this.linkedRes;
+            this.loading = false;
+            this.isLoadingResults = false;
+        }
         this.selectedRes = [];
     }
 
