@@ -663,3 +663,12 @@
         left: 0px;
     }
 }
+
+.linkRes {
+    display: inline-flex;
+    font-size: 15px;
+    text-align: center;
+    color: $primary;
+    padding-top: 10px;
+    overflow-x: hidden;
+}

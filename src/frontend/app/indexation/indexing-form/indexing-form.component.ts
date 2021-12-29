@@ -13,6 +13,8 @@ import { FormControl, Validators, FormGroup, ValidationErrors, ValidatorFn, Abst
 import { DiffusionsListComponent } from '../../diffusions/diffusions-list.component';
 import { FunctionsService } from '../../../service/functions.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
+import { Router } from '@angular/router';
+import { LinkResourceModalComponent } from '../../linkedResource/linkResourceModal/link-resource-modal.component';
 
 @Component({
     selector: 'app-indexing-form',
@@ -38,6 +40,7 @@ export class IndexingFormComponent implements OnInit {
 
     @Output() retrieveDocumentEvent = new EventEmitter<string>();
     @Output() loadingFormEndEvent = new EventEmitter<string>();
+    @Output() reloadBadge = new EventEmitter<any>();
 
     @ViewChild('appDiffusionsList', { static: false }) appDiffusionsList: DiffusionsListComponent;
 
@@ -185,13 +188,17 @@ export class IndexingFormComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
+    hasLinkedRes: boolean = false;
+    linkedResources: any[] = [];
+
     constructor(
         public http: HttpClient,
         private notify: NotificationService,
         public dialog: MatDialog,
         private headerService: HeaderService,
         public appService: AppService,
-        public functions: FunctionsService
+        public functions: FunctionsService,
+        private route: Router
     ) {
 
     }
@@ -1127,4 +1134,46 @@ export class IndexingFormComponent implements OnInit {
     getCheckboxListLabel(selectedItemId: any, items: any) {
         return items.filter((item: any) => item.id === selectedItemId)[0].label;
     }
+
+    selectedContact(contact: any, identifier: string) {
+        if (this.getCategory() === 'incoming' && identifier === 'senders' && !this.route.url.includes('indexing')) {
+            console.log('contact', contact);
+            this.hasLinkedRes = true;
+            // this.http.post('../../rest/linkedResource', {contactId: contact.id}).pipe(
+            //     tap((data: any) => {
+            //         if (data.linkedResource.length > 0) {
+            //             this.linkedResources = data.linkedResource
+            //         }
+            //     }),
+            //     catchError((err: any) => {
+            //         this.notify.error(err);
+            //         return of(false);
+            //     })
+            // ).subscribe();
+        }
+    }
+
+    openSearchResourceModal() {
+        const dialogRef = this.dialog.open(LinkResourceModalComponent,
+            {
+                panelClass: 'maarch-full-height-modal', minWidth: '80%',
+                data: {
+                    resId: this.resId,
+                    currentLinkedRes: this.linkedResources.map(res => res.resId),
+                    fromContact: true
+                }
+            });
+        dialogRef.afterClosed().pipe(
+            filter((data: string) => data === 'success'),
+            tap(() => {
+                this.reloadBadge.emit();
+                this.notify.success(this.lang.resourcesLinked);
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
+    }
+    
 }

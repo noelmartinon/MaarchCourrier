@@ -146,7 +146,7 @@
                                 </ng-container>-->
                                 <ng-container *ngIf="['senders','recipients'].indexOf(field.identifier) > -1">
                                     <app-contact-autocomplete [control]="arrFormControl[field.identifier]"
-                                        style="width:100%;" (retrieveDocumentEvent)="retrieveDocumentEvent.emit()">
+                                        style="width:100%;" (retrieveDocumentEvent)="retrieveDocumentEvent.emit()" (afterContactSelected)="selectedContact($event, field.identifier)">
                                     </app-contact-autocomplete>
                                 </ng-container>
                                 <ng-container *ngIf="field.identifier === 'folders'">
@@ -171,13 +171,16 @@
                             </div>
                             <div class="fieldState">
                                 <i class="fas fa-asterisk fieldRequired"
-                                    *ngIf="adminMode || (arrFormControl[field.identifier].hasError('required') && arrFormControl[field.identifier].untouched)"
-                                    [class.noMandatory]="!field.mandatory"></i>
+                                *ngIf="adminMode || (arrFormControl[field.identifier].hasError('required') && arrFormControl[field.identifier].untouched)"
+                                [class.noMandatory]="!field.mandatory"></i>
                                 <i class="fas fa-exclamation-triangle fieldError"
-                                    *ngIf="!adminMode && arrFormControl[field.identifier].touched && arrFormControl[field.identifier].hasError('required')"></i>
+                                *ngIf="!adminMode && arrFormControl[field.identifier].touched && arrFormControl[field.identifier].hasError('required')"></i>
                                 <i class="fas fa-check fieldFull"
-                                    *ngIf="!adminMode && arrFormControl[field.identifier].valid && !isEmptyField(field)"></i>
+                                *ngIf="!adminMode && arrFormControl[field.identifier].valid && !isEmptyField(field)"></i>
                             </div>
+                        </div>
+                        <div class="linkRes" *ngIf="hasLinkedRes && field.identifier === 'senders'">
+                            {{lang.hasLinkedRes | scan: [10]}} <ng-container><a style="cursor: pointer; display: contents; font-weight: bold; font-size: 14px;" (click)="openSearchResourceModal()">{{lang.seeMore}}</a></ng-container>
                         </div>
                         <div
                             *ngIf="field.identifier === 'destination' && !adminMode && arrFormControl['destination'].value > 0 && !hideDiffusionList">
