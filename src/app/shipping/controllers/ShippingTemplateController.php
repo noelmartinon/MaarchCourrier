@@ -396,7 +396,7 @@ class ShippingTemplateController
         ];
 
         if (in_array($body['eventType'], ['ON_DEPOSIT_PROOF_RECEIVED', 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED'])) {
-            return ShippingTemplateController::logAndReturnError($response, 400, 'body event_type is ignored');
+            return ShippingTemplateController::logAndReturnError($response, 201, 'body event_type is ignored');
         }
 
         $shipping = ShippingModel::get([
@@ -517,47 +517,65 @@ class ShippingTemplateController
             }
             $typist = $typist[0]['id'];
 
+            $previousAttachments = AttachmentModel::get([
+                'select' => ['id', 'attachment_type', 'external_id as "externalId"'],
+                'where'  => ['res_id in (?)'],
+                'data'   => [$shipping['attachments']]
+            ]);
+            foreach ($previousAttachments as $key => $previousAttachment) {
+                $previousAttachments[$key]['externalId'] = json_decode($previousAttachment['externalId'], true);
+            }
+
             $attachmentErrors = [];
 
             // deposit proof
-            $curlResponse = CurlModel::exec([
-                'method'       => 'GET',
-                'url'          => str_replace('\\', '', $body['resourceLocation']) . '/download_deposit_proof',
-                'bearerAuth'   => ['token' => $authToken],
-                'headers'      => ['Accept: */*'],
-                'fileResponse' => true
-            ]);
-            if ($curlResponse['code'] != 200) {
-                $attachmentErrors[] = 'shipping_deposit_proof:download: deposit proof failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId'], 'curlResponse' => $curlResponse['response']]);
-            } else {
-                $attachmentId = StoreController::storeAttachment([
-                    'title'       => _SHIPPING_ATTACH_DEPOSIT_PROOF . '_' . (new \DateTime($body['eventDate']))->format('d-m-Y'),
-                    'resIdMaster' => $resId,
-                    'type'        => 'shipping_deposit_proof',
-                    'status'      => 'TRA',
-                    'encodedFile' => base64_encode($curlResponse['response']),
-                    'format'      => 'zip',
-                    'typist'      => $typist,
-                    'externalId'  => [
-                        'shippingResourceType' => $body['resourceType'],
-                        'shippingResourceId'   => $body['resourceId'],
-                        'shippingEventDate'    => $body['eventDate']
-                    ]
+            if (!in_array('shipping_deposit_proof', array_column($previousAttachments, 'attachment_type'))) {
+                $curlResponse = CurlModel::exec([
+                    'method'       => 'GET',
+                    'url'          => str_replace('\\', '', $body['resourceLocation']) . '/download_deposit_proof',
+                    'bearerAuth'   => ['token' => $authToken],
+                    'headers'      => ['Accept: */*'],
+                    'fileResponse' => true
                 ]);
-                if (!empty($attachmentId['errors'])) {
-                    $attachmentErrors[] = 'shipping_deposit_proof:save: could not save deposit proof to docserver: ' . json_encode($attachmentId['errors']);
+                if ($curlResponse['code'] != 200) {
+                    $attachmentErrors[] = 'shipping_deposit_proof:download: deposit proof failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId'], 'curlResponse' => $curlResponse['response']]);
                 } else {
-                    $shipping['attachments'][] = $attachmentId;
-                    ShippingModel::update([
-                        'set'   => ['attachments' => json_encode($shipping['attachments'])],
-                        'where' => ['id = ?'],
-                        'data'  => [$shipping['id']]
+                    $attachmentId = StoreController::storeAttachment([
+                        'title'       => _SHIPPING_ATTACH_DEPOSIT_PROOF . '_' . (new \DateTime($body['eventDate']))->format('d-m-Y'),
+                        'resIdMaster' => $resId,
+                        'type'        => 'shipping_deposit_proof',
+                        'status'      => 'TRA',
+                        'encodedFile' => base64_encode($curlResponse['response']),
+                        'format'      => 'zip',
+                        'typist'      => $typist,
+                        'externalId'  => [
+                            'shippingResourceType' => $body['resourceType'],
+                            'shippingResourceId'   => $body['resourceId'],
+                            'shippingEventDate'    => $body['eventDate']
+                        ]
                     ]);
+                    if (!empty($attachmentId['errors'])) {
+                        $attachmentErrors[] = 'shipping_deposit_proof:save: could not save deposit proof to docserver: ' . json_encode($attachmentId['errors']);
+                    } else {
+                        $shipping['attachments'][] = $attachmentId;
+                        ShippingModel::update([
+                            'set'   => ['attachments' => json_encode($shipping['attachments'])],
+                            'where' => ['id = ?'],
+                            'data'  => [$shipping['id']]
+                        ]);
+                    }
                 }
             }
 
             // acknowledgement of receipt (AR) for each recipient
             foreach ($shipping['recipients'] as $recipient) {
+                foreach ($previousAttachments as $previousAttachment) {
+                    if ($previousAttachment['attachment_type'] == 'shipping_acknowledgement_of_receipt'
+                    && !empty($previousAttachment['externalId']['shippingRecipientId'])
+                    && $previousAttachment['externalId']['shippingRecipientId'] == $recipient['id']) {
+                        continue 2;
+                    }
+                }
                 $curlResponse = CurlModel::exec([
                     'method'       => 'GET',
                     'url'          => str_replace('\\', '', $body['resourceLocation']) . '/recipients/' . $recipient['id'] . '/download_acknowledgement_of_receipt', // TODO build this URL ourselves if possible or fetch it online
@@ -581,7 +599,8 @@ class ShippingTemplateController
                     'externalId'  => [
                         'shippingResourceType' => $body['resourceType'],
                         'shippingResourceId'   => $body['resourceId'],
-                        'shippingEventDate'    => $body['eventDate']
+                        'shippingEventDate'    => $body['eventDate'],
+                        'shippingRecipientId'  => $recipient['id']
                     ]
                 ]);
                 if (!empty($attachmentId['errors'])) {
