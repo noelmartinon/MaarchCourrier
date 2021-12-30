@@ -321,7 +321,7 @@ where lower(translate(folders.label , 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓ�
                     // {1,2}: 1 or 2 characters of this character class
                     // result: captures words of 1 or 2 characters that are not space, not counting Zend Lucene Search meta characters
                     $fulltext_request = preg_replace('/\b[^"*~\s]{1,2}\b/u', '', $fulltext_request);
-                    $fulltext_request = preg_replace('/\s+/', ' ', $fulltext_request); // squeezing spaces
+                    $fulltext_request = preg_replace('/\s+/u', ' ', $fulltext_request); // squeezing spaces
 
                     $json_txt .= " 'fulltext' : ['"
                         . addslashes(trim($_REQUEST['fulltext'])) . "'],";
