@@ -111,6 +111,11 @@ class SearchController
             $searchWhere = array_merge($searchWhere, $requestData['where']);
             $searchData = array_merge($searchData, $requestData['data']);
         }
+        if (!empty($queryParams['resourceNotBefore'])) {
+            $searchWhere[] = '(creation_date >= ?)';
+            $queryCreationDate = new \DateTime($queryParams['resourceNotBefore']);
+            $searchData[] = $queryCreationDate->format('c');
+        }
         if (!empty($queryParams['contactField'])) {
             $fields = ['company', 'firstname', 'lastname'];
             $fields = AutoCompleteController::getUnsensitiveFieldsForRequest(['fields' => $fields]);
