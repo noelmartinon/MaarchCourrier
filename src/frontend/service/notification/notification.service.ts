@@ -4,13 +4,16 @@ import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 
+
 @Component({
     selector: 'custom-snackbar',
     templateUrl: 'notification.service.html',
     styleUrls: ['notification.service.scss'],
 })
 export class CustomSnackbarComponent {
-    constructor(@Inject(MAT_SNACK_BAR_DATA) public data: any) { }
+    constructor(@Inject(MAT_SNACK_BAR_DATA) public data: any,
+        private notify: NotificationService,
+    ) { }
 
     dismiss() {
         this.data.close();
@@ -56,6 +59,8 @@ export class NotificationService {
                     if (err.error.lang !== undefined) {
                         this.error(this.translate.instant('lang.' + err.error.lang));
                     } else if (err.error.errors === 'Document out of perimeter' || err.error.errors === 'Resource out of perimeter') {
+                        //element a changer ??? 
+                        console.debug('je suis bien ici', err)
                         this.error(this.translate.instant('lang.documentOutOfPerimeter'));
                     } else if (err.error.errors === 'Resources out of perimeter') {
                         this.error(this.translate.instant('lang.documentsOutOfPerimeter'));
@@ -63,7 +68,15 @@ export class NotificationService {
                         this.error(err.error.errors, err.url);
                     }
                     if (err.status === 403 || err.status === 404) {
-                        this.router.navigate(['/home']);
+                        /*SGAMI-SO #75
+                        if(err.sgami === 1 ){
+                            console.debug('err.sgami', err.url)
+                            this.router.navigate([err.url])                            
+                        }else{*/
+                            this.router.navigate(['/home']);
+                        /*}
+                        //SGAMI-SO #75 FIN*/
+                       
                     }
                 } else if (err.error.exception !== undefined) {
                     this.error(err.error.exception[0].message, err.url);

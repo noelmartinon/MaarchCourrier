@@ -59,6 +59,9 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     leftDocumentDisplay : boolean = false;
     letIconDisplay: boolean = false;
     // END
+    //SGAMI-SO #75
+    basket: any = null
+    //SGAMI-SO #75
 
     subscription: Subscription;
     currentResourceLock: any = null;
@@ -622,6 +625,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     }
 
     loadBadges() {
+        
         this.http.get(`../rest/resources/${this.resId}/items`).pipe(
             tap((data: any) => {
                 this.processTool.forEach(element => {
@@ -629,7 +633,25 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                 });
             }),
             catchError((err: any) => {
-                this.notify.handleSoftErrors(err);
+                /**
+                * SGAMI-SO #75
+                */
+                 console.debug("sgami load badges")
+                 /**SGAMO-SO #75 */
+                 this.actionService.nameBasket(this.basketId,this.userId)
+                 this.basket = this.actionService.basket
+                 console.debug('this.basket',this.basket)
+                 //SGAMI-SO FIN 
+                if( String(this.basket) == 'EvisBasket' || String(this.basket) == 'EsigBasket') {                    
+                    
+                    this.notify.success(this.translate.instant('lang.avisWorkflowUpdated'));
+                }else {
+                    this.notify.handleSoftErrors(err);
+                }
+                /**
+                 * SGAMI-SO FIN
+                 */
+               
                 return of(false);
             })
         ).subscribe();
