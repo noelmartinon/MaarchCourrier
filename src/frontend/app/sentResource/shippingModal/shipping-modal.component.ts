@@ -51,6 +51,9 @@ export class ShippingModalComponent implements OnInit {
         await this.getShippingHistory();
         this.creationDate = this.fullDate.transform(new Date(this.data.shippingData.creationDate).toString());
         this.sendDate = this.fullDate.transform(new Date(this.data.shippingData.sendDate).toString());
+        this.data.shippingData.recipients.forEach((element: any, index: number) => {
+            this.data.shippingData.recipients[index] = element.filter((item: any) => item !== '');
+        });
         this.loading = false;
     }
 
