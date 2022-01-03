@@ -2545,5 +2545,6 @@
     "shippingUnsubscribe": "Abonnement aux notifications désactivé",
     "depositProof": "Preuve de dépôt",
     "downloadFile": "Télécharger le fichier",
-    "emptyShippingHistory": "L'historique de l'envoi Maileva est vide."
+    "emptyShippingHistory": "L'historique de l'envoi Maileva est vide.",
+    "depositProofShipping": "Preuve de dépôt envoyée par Maileva"
 }
