@@ -59,8 +59,6 @@ export class NotificationService {
                     if (err.error.lang !== undefined) {
                         this.error(this.translate.instant('lang.' + err.error.lang));
                     } else if (err.error.errors === 'Document out of perimeter' || err.error.errors === 'Resource out of perimeter') {
-                        //element a changer ??? 
-                        console.debug('je suis bien ici', err)
                         this.error(this.translate.instant('lang.documentOutOfPerimeter'));
                     } else if (err.error.errors === 'Resources out of perimeter') {
                         this.error(this.translate.instant('lang.documentsOutOfPerimeter'));

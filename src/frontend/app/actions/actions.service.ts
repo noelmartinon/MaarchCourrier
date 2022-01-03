@@ -296,7 +296,7 @@ export class ActionsService implements OnDestroy {
 
                     /**
                      * SGAMI-SO #75
-                     */
+                     *
                     if( String(this.basket) == 'EvisBasket' || String(this.basket) == 'EsigBasket') {
                     
                         if(this.sgami75.length > 0) {
@@ -306,9 +306,9 @@ export class ActionsService implements OnDestroy {
                         }else{
                             this.router.navigate(['/home']);
                         }
-                    }else{
+                    }else{*/
                         this.notify.handleErrors(err);
-                    }
+                    /*}
                     /**
                      * SGAMI-SO FIN
                      */

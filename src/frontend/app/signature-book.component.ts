@@ -628,6 +628,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
         
         this.http.get(`../rest/resources/${this.resId}/items`).pipe(
             tap((data: any) => {
+                console.debug(data)
                 this.processTool.forEach(element => {
                     element.count = data[element.id] !== undefined ? data[element.id] : 0;
                 });
@@ -643,8 +644,26 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                  console.debug('this.basket',this.basket)
                  //SGAMI-SO FIN 
                 if( String(this.basket) == 'EvisBasket' || String(this.basket) == 'EsigBasket') {                    
-                    
+                  
+                    this.actionService.stopRefreshResourceLock();
+                    /*if (!this.actionService.actionEnded) { 
+                        this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+                    }*/
+                    let path
+                    if(this.actionService.sgami75.length > 0) {
+                        path  = '/signatureBook/users/'+this.userId+'/groups/'+this.groupId+'/baskets/'+this.basketId+'/resources/' + this.actionService.sgami75[0]
+                        
+                    }else{
+                        path = '/home'
+                    }
                     this.notify.success(this.translate.instant('lang.avisWorkflowUpdated'));
+                    setTimeout(() => {
+                        this.router.navigate([path]);
+                    }, 2000);
+                   
+                    
+                    return of(true);
+                    
                 }else {
                     this.notify.handleSoftErrors(err);
                 }
