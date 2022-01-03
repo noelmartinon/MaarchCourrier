@@ -190,6 +190,7 @@ export class IndexingFormComponent implements OnInit {
 
     hasLinkedRes: boolean = false;
     linkedResources: any[] = [];
+    selectedContactClone: any = null;
 
     constructor(
         public http: HttpClient,
@@ -1138,11 +1139,12 @@ export class IndexingFormComponent implements OnInit {
     selectedContact(contact: any, identifier: string) {
         if (this.getCategory() === 'incoming' && identifier === 'senders' && !this.route.url.includes('indexing')) {
             console.log('contact', contact);
+            this.selectedContactClone = JSON.parse(JSON.stringify(contact));
             this.hasLinkedRes = true;
             // this.http.post('../../rest/linkedResource', {contactId: contact.id}).pipe(
             //     tap((data: any) => {
             //         if (data.linkedResource.length > 0) {
-            //             this.linkedResources = data.linkedResource
+            //             this.linkedResources = data.linkedResource;
             //         }
             //     }),
             //     catchError((err: any) => {
@@ -1150,6 +1152,8 @@ export class IndexingFormComponent implements OnInit {
             //         return of(false);
             //     })
             // ).subscribe();
+        } else {
+            this.hasLinkedRes = false;
         }
     }
 
@@ -1160,7 +1164,8 @@ export class IndexingFormComponent implements OnInit {
                 data: {
                     resId: this.resId,
                     currentLinkedRes: this.linkedResources.map(res => res.resId),
-                    fromContact: true
+                    fromContact: true,
+                    selectedContact: this.selectedContactClone
                 }
             });
         dialogRef.afterClosed().pipe(
@@ -1174,6 +1179,12 @@ export class IndexingFormComponent implements OnInit {
                 return of(false);
             })
         ).subscribe();
+    }
+
+    checkRemovedItem(value: any) {
+        if (typeof value === 'boolean' || this.selectedContactClone.id === value) {
+            this.hasLinkedRes = false;
+        }
     }
     
 }

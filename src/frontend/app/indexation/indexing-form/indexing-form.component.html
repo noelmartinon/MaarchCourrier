@@ -146,7 +146,8 @@
                                 </ng-container>-->
                                 <ng-container *ngIf="['senders','recipients'].indexOf(field.identifier) > -1">
                                     <app-contact-autocomplete [control]="arrFormControl[field.identifier]"
-                                        style="width:100%;" (retrieveDocumentEvent)="retrieveDocumentEvent.emit()" (afterContactSelected)="selectedContact($event, field.identifier)">
+                                        style="width:100%;" (retrieveDocumentEvent)="retrieveDocumentEvent.emit()"
+                                        (afterContactSelected)="selectedContact($event, field.identifier)" (removeContactEvent)="checkRemovedItem($event)">
                                     </app-contact-autocomplete>
                                 </ng-container>
                                 <ng-container *ngIf="field.identifier === 'folders'">
