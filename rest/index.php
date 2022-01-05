@@ -117,6 +117,9 @@ $app->get('/autocomplete/contacts/m2m', \SrcCore\controllers\AutoCompleteControl
 $app->get('/baskets', \Basket\controllers\BasketController::class . ':get');
 $app->post('/baskets', \Basket\controllers\BasketController::class . ':create');
 $app->get('/baskets/{id}', \Basket\controllers\BasketController::class . ':getById');
+/** SGAMI SO - #75*/
+$app->get('/basket/{id}/users/{userId}', \Basket\controllers\BasketController::class . ':getId');
+/** */
 $app->put('/baskets/{id}', \Basket\controllers\BasketController::class . ':update');
 $app->delete('/baskets/{id}', \Basket\controllers\BasketController::class . ':delete');
 $app->get('/baskets/{id}/groups', \Basket\controllers\BasketController::class . ':getGroups');
