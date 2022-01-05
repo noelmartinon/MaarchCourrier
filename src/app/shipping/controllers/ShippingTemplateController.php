@@ -395,7 +395,7 @@ class ShippingTemplateController
             'resourceLocation' => $body['resource_location']
         ];
 
-        if (in_array($body['eventType'], ['ON_DEPOSIT_PROOF_RECEIVED', 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED'])) {
+        if ($body['eventType'] == 'ON_DEPOSIT_PROOF_RECEIVED') {
             return ShippingTemplateController::logAndReturnError($response, 201, 'Body event_type is ignored');
         }
 
@@ -489,7 +489,7 @@ class ShippingTemplateController
             'status'       => $actionStatus
         ];
 
-        if ($body['eventType'] == 'ON_STATUS_ARCHIVED') {
+        if (in_array($body['eventType'], ['ON_STATUS_ARCHIVED', 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED'])) {
             $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, $shippingTemplateAccount);
             if (!empty($authToken['errors'])) {
                 return ShippingTemplateController::logAndReturnError($response, 400, $authToken['errors']);
@@ -521,7 +521,7 @@ class ShippingTemplateController
             $attachmentErrors = [];
 
             // deposit proof
-            if (!in_array('shipping_deposit_proof', array_column($previousAttachments, 'attachment_type'))) {
+            if ($body['eventType'] == 'ON_STATUS_ARCHIVED' && !in_array('shipping_deposit_proof', array_column($previousAttachments, 'attachment_type'))) {
                 $curlResponse = CurlModel::exec([
                     'method'       => 'GET',
                     'url'          => str_replace('\\', '', $body['resourceLocation']) . '/download_deposit_proof',
@@ -559,51 +559,53 @@ class ShippingTemplateController
                 }
             }
 
-            // acknowledgement of receipt (AR) for each recipient
-            foreach ($shipping['recipients'] as $recipient) {
-                foreach ($previousAttachments as $previousAttachment) {
-                    if ($previousAttachment['attachment_type'] == 'shipping_acknowledgement_of_receipt'
-                    && !empty($previousAttachment['externalId']['shippingRecipientId'])
-                    && $previousAttachment['externalId']['shippingRecipientId'] == $recipient['id']) {
-                        continue 2;
+            if ($body['eventType'] == 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED') {
+                // acknowledgement of receipt (AR) for each recipient
+                foreach ($shipping['recipients'] as $recipient) {
+                    foreach ($previousAttachments as $previousAttachment) {
+                        if ($previousAttachment['attachment_type'] == 'shipping_acknowledgement_of_receipt'
+                            && !empty($previousAttachment['externalId']['shippingRecipientId'])
+                            && $previousAttachment['externalId']['shippingRecipientId'] == $recipient['id']) {
+                            continue 2;
+                        }
                     }
-                }
-                $curlResponse = CurlModel::exec([
-                    'method'       => 'GET',
-                    'url'          => str_replace('\\', '', $body['resourceLocation']) . '/recipients/' . $recipient['recipientId'] . '/download_acknowledgement_of_receipt', // TODO build this URL ourselves if possible or fetch it online
-                    'bearerAuth'   => ['token' => $authToken],
-                    'headers'      => ['Accept: */*'],
-                    'fileResponse' => true,
-                ]);
-                if ($curlResponse['code'] != 200) {
-                    $attachmentErrors[] = 'shipping_acknowledgement_of_receipt:download: acknowledgement of receipt failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId'], 'recipientId' => $recipient['id'], 'curlResponse' => $curlResponse['response']]);
-                    continue;
-                }
-
-                $attachmentId = StoreController::storeAttachment([
-                    'title'       => _SHIPPING_ATTACH_ACKNOWLEDGEMENT_OF_RECEIPT . '_' . trim($recipient[2]) . '_' . (new \DateTime($body['eventDate']))->format('d-m-Y'),
-                    'resIdMaster' => $resId,
-                    'type'        => 'shipping_acknowledgement_of_receipt',
-                    'status'      => 'TRA',
-                    'encodedFile' => base64_encode($curlResponse['response']),
-                    'format'      => 'zip',
-                    'typist'      => $typist,
-                    'externalId'  => [
-                        'shippingResourceType' => $body['resourceType'],
-                        'shippingResourceId'   => $body['resourceId'],
-                        'shippingEventDate'    => $body['eventDate'],
-                        'shippingRecipientId'  => $recipient['id']
-                    ]
-                ]);
-                if (!empty($attachmentId['errors'])) {
-                    $attachmentErrors[] = 'shipping_acknowledgement_of_receipt:save: could not save acknowledgement of receipt to docserver: ' . json_encode($attachmentId['errors']);
-                } else {
-                    $shipping['attachments'][] = $attachmentId;
-                    ShippingModel::update([
-                        'set'   => ['attachments' => json_encode($shipping['attachments'])],
-                        'where' => ['id = ?'],
-                        'data'  => [$shipping['id']]
+                    $curlResponse = CurlModel::exec([
+                        'method'       => 'GET',
+                        'url'          => str_replace('\\', '', $body['resourceLocation']) . '/recipients/' . $recipient['recipientId'] . '/download_acknowledgement_of_receipt', // TODO build this URL ourselves if possible or fetch it online
+                        'bearerAuth'   => ['token' => $authToken],
+                        'headers'      => ['Accept: */*'],
+                        'fileResponse' => true,
                     ]);
+                    if ($curlResponse['code'] != 200) {
+                        $attachmentErrors[] = 'shipping_acknowledgement_of_receipt:download: acknowledgement of receipt failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId'], 'recipientId' => $recipient['id'], 'curlResponse' => $curlResponse['response']]);
+                        continue;
+                    }
+
+                    $attachmentId = StoreController::storeAttachment([
+                        'title'       => _SHIPPING_ATTACH_ACKNOWLEDGEMENT_OF_RECEIPT . '_' . trim($recipient[2]) . '_' . (new \DateTime($body['eventDate']))->format('d-m-Y'),
+                        'resIdMaster' => $resId,
+                        'type'        => 'shipping_acknowledgement_of_receipt',
+                        'status'      => 'TRA',
+                        'encodedFile' => base64_encode($curlResponse['response']),
+                        'format'      => 'zip',
+                        'typist'      => $typist,
+                        'externalId'  => [
+                            'shippingResourceType' => $body['resourceType'],
+                            'shippingResourceId'   => $body['resourceId'],
+                            'shippingEventDate'    => $body['eventDate'],
+                            'shippingRecipientId'  => $recipient['id']
+                        ]
+                    ]);
+                    if (!empty($attachmentId['errors'])) {
+                        $attachmentErrors[] = 'shipping_acknowledgement_of_receipt:save: could not save acknowledgement of receipt to docserver: ' . json_encode($attachmentId['errors']);
+                    } else {
+                        $shipping['attachments'][] = $attachmentId;
+                        ShippingModel::update([
+                            'set'   => ['attachments' => json_encode($shipping['attachments'])],
+                            'where' => ['id = ?'],
+                            'data'  => [$shipping['id']]
+                        ]);
+                    }
                 }
             }
 
