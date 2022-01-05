@@ -657,9 +657,9 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                         path = '/home'
                     }
                     this.notify.success(this.translate.instant('lang.avisWorkflowUpdated'));
-                    setTimeout(() => {
+                    //setTimeout(() => {
                         this.router.navigate([path]);
-                    }, 2000);
+                    //}, 2000);
                    
                     
                     return of(true);

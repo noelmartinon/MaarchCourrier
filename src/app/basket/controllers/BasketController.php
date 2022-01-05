@@ -40,7 +40,7 @@ class BasketController
         return $response->withJson(['baskets' => BasketModel::get()]);
     }
 
-    //
+    //SGAMI-SO #75
     public function getId(Request $request, Response $response, array $aArgs)
     {
         /*if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_baskets', 'userId' => $GLOBALS['id']])) {
