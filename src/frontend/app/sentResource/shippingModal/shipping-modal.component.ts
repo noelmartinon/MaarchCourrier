@@ -9,14 +9,14 @@ import { ContactService } from '@service/contact.service';
 import { AppService } from '@service/app.service';
 import { PrivilegeService } from '@service/privileges.service';
 import { HeaderService } from '@service/header.service';
-import { Observable, of } from 'rxjs';
+import { of } from 'rxjs';
 import { FullDatePipe } from '@plugins/fullDate.pipe';
-import { AuthService } from '@service/auth.service';
+import { SortPipe } from '@plugins/sorting.pipe';
 
 @Component({
     templateUrl: 'shipping-modal.component.html',
     styleUrls: ['shipping-modal.component.scss'],
-    providers: [ContactService, AppService, FullDatePipe],
+    providers: [ContactService, AppService, FullDatePipe, SortPipe],
 })
 
 export class ShippingModalComponent implements OnInit {
@@ -42,7 +42,7 @@ export class ShippingModalComponent implements OnInit {
         public translate: TranslateService,
         @Inject(MAT_DIALOG_DATA) public data: any,
         private fullDate: FullDatePipe,
-        private authService: AuthService
+        private sortPipe: SortPipe
     ) {}
 
     async ngOnInit() {
@@ -81,6 +81,7 @@ export class ShippingModalComponent implements OnInit {
                 tap((data: any) => {
                     if (data.history.length > 0) {
                         this.shippingHistory = data.history.filter((history: any) => ['ON_DEPOSIT_PROOF_RECEIVED', 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED'].indexOf(history.eventType) === -1);
+                        this.shippingHistory = this.sortPipe.transform(this.shippingHistory, 'eventDate').reverse();
                     }
                     resolve(true);
                 }),
