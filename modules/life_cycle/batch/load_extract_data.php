@@ -185,6 +185,9 @@ if ($xmlconfig == FALSE) {
 // Load the config vars
 $CONFIG = $xmlconfig->CONFIG;
 $lang = (string) $CONFIG->Lang;
+$GLOBALS['MaarchUrl'] = (string) $CONFIG->MaarchUrl;
+$GLOBALS['WsUser'] = (string) $CONFIG->WsUser;
+$GLOBALS['WsPasswd'] = (string) $CONFIG->WsPasswd;
 $GLOBALS['MaarchDirectory'] = (string) $CONFIG->MaarchDirectory;
 $GLOBALS['batchDirectory'] = $GLOBALS['MaarchDirectory'] . 'modules' 
                            . DIRECTORY_SEPARATOR . 'life_cycle' 
@@ -247,6 +250,8 @@ unset($xmlconfig);
 
 // Include library
 try {
+    Bt_myInclude($GLOBALS['MaarchDirectory'] .'vendor/autoload.php');
+
     Bt_myInclude($GLOBALS['MaarchDirectory'] . 'core' . DIRECTORY_SEPARATOR 
                  . 'class' . DIRECTORY_SEPARATOR . 'class_functions.php');
     Bt_myInclude($GLOBALS['MaarchDirectory'] . 'core' . DIRECTORY_SEPARATOR 
