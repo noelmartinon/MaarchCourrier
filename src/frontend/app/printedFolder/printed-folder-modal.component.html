@@ -14,6 +14,8 @@
             <div class="example-loading-shade" *ngIf="isLoadingResults">
                 <mat-spinner *ngIf="isLoadingResults"></mat-spinner>
             </div>
+            <app-maarch-message *ngIf="data.multiple" mode="info" [content]="'lang.summarySheetMandatory' | translate">
+            </app-maarch-message>
             <div style="padding: 10px;">
                 <mat-slide-toggle color="primary" [(ngModel)]="summarySheet"
                     (change)="$event.checked ? openSummarySheet() : false">{{'lang.attachSummarySheet' | translate}}
@@ -29,25 +31,25 @@
                     <mat-expansion-panel-header>
                         <mat-panel-title style="color: #135f7f;font-weight: bold;">
                             <mat-checkbox color="primary" [(ngModel)]="mainDocument"
-                                [disabled]="!mainDocumentInformation.canConvert" disableRipple>{{'lang.mainDocument' | translate}}
+                                [disabled]="!mainDocumentInformation.canConvert && !data.multiple" disableRipple>{{'lang.mainDocument' | translate}}
                             </mat-checkbox>
                         </mat-panel-title>
                     </mat-expansion-panel-header>
                 </mat-expansion-panel>
                 <ng-container *ngFor="let keyVal of printedFolderElement | keyvalue">
-                    <div class="printedFolderElement" *ngIf="printedFolderElement[keyVal.key].length > 0">
-                        <mat-expansion-panel>
+                    <div class="printedFolderElement" *ngIf="printedFolderElement[keyVal.key].length > 0 || data.multiple">
+                        <mat-expansion-panel [hideToggle]="data.multiple" [disabled]="data.multiple">
                             <mat-expansion-panel-header>
                                 <mat-panel-title style="color: #135f7f;font-weight: bold;">
                                     <mat-checkbox color="primary"
                                         (change)="$event ? toggleAllElements($event.checked, keyVal.key) : null"
                                         [checked]="selectedPrintedFolderElement[keyVal.key].value.length > 0 && selectedPrintedFolderElement[keyVal.key].value.length === printedFolderElement[keyVal.key].length"
-                                        [indeterminate]="selectedPrintedFolderElement[keyVal.key].value.length > 0 && selectedPrintedFolderElement[keyVal.key].value.length !== printedFolderElement[keyVal.key].length"
+                                        [indeterminate]="!data.multiple && selectedPrintedFolderElement[keyVal.key].value.length > 0 && selectedPrintedFolderElement[keyVal.key].value.length !== printedFolderElement[keyVal.key].length"
                                         (click)="$event.stopPropagation()" disableRipple>{{'lang.' + keyVal.key | translate}}
                                     </mat-checkbox>
                                 </mat-panel-title>
                             </mat-expansion-panel-header>
-                            <mat-selection-list [formControl]="selectedPrintedFolderElement[keyVal.key]" color="primary"
+                            <mat-selection-list *ngIf="!data.multiple" [formControl]="selectedPrintedFolderElement[keyVal.key]" color="primary"
                                 class="printedFolderElement-content">
                                 <mat-list-option class="printedFolderElement-option"
                                     [title]="!element.canConvert ? 'Aucune version pdf trouvé!' : ''"
@@ -101,7 +103,7 @@
     </mat-dialog-content>
     <span class="divider-modal"></span>
     <div mat-dialog-actions class="actions">
-        <button mat-raised-button color="primary" [disabled]="isLoadingResults || isEmptySelection()"
+        <button mat-raised-button color="primary" [disabled]="isLoadingResults || isEmptySelection() || (!summarySheet && data.multiple)"
             (click)="onSubmit()">{{'lang.validate' | translate}}</button>
     </div>
 </div>
