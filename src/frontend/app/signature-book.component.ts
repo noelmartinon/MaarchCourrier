@@ -664,8 +664,23 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                     
                     return of(true);
                     
-                }else {
-                    this.notify.handleSoftErrors(err);
+                } else {
+                    const path: string = `resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}?limit=10&offset=0`;
+                    this.http.get(`../rest/${path}`).pipe(
+                        tap((data: any) => {
+                            if (!this.router.url.includes('signatureBook')) {
+                                this.dialogRef?.close(data.allResources[0]);
+                            } else {
+                                if (data.count > 0) {
+                                    this.dialogRef?.close();
+                                    this.router.navigate(['/signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + data.allResources[0]])
+                                } else {
+                                    this.router.navigate(['/home']);
+                                    this.notify.handleSoftErrors(err);
+                                }
+                            }
+                        })
+                    ).subscribe();
                 }
                 /**
                  * SGAMI-SO FIN
