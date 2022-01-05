@@ -488,17 +488,6 @@ class ShippingTemplateController
             'resourceType' => $body['resourceType'],
             'status'       => $actionStatus
         ];
-        ShippingModel::update([
-            'set'   => ['history' => json_encode($shipping['history'])],
-            'where' => ['id = ?'],
-            'data'  => [$shipping['id']]
-        ]);
-
-        ResModel::update([
-            'set'   => ['status' => $actionStatus],
-            'where' => ['res_id = ?'],
-            'data'  => [$resId]
-        ]);
 
         if ($body['eventType'] == 'ON_STATUS_ARCHIVED') {
             $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, $shippingTemplateAccount);
@@ -520,7 +509,7 @@ class ShippingTemplateController
             $previousAttachments = [];
             if (!empty($shipping['attachments'])) {
                 $previousAttachments = AttachmentModel::get([
-                    'select' => ['id', 'attachment_type', 'external_id as "externalId"'],
+                    'select' => ['res_id', 'attachment_type', 'external_id as "externalId"'],
                     'where'  => ['res_id in (?)'],
                     'data'   => [$shipping['attachments']]
                 ]);
@@ -581,7 +570,7 @@ class ShippingTemplateController
                 }
                 $curlResponse = CurlModel::exec([
                     'method'       => 'GET',
-                    'url'          => str_replace('\\', '', $body['resourceLocation']) . '/recipients/' . $recipient['id'] . '/download_acknowledgement_of_receipt', // TODO build this URL ourselves if possible or fetch it online
+                    'url'          => str_replace('\\', '', $body['resourceLocation']) . '/recipients/' . $recipient['recipientId'] . '/download_acknowledgement_of_receipt', // TODO build this URL ourselves if possible or fetch it online
                     'bearerAuth'   => ['token' => $authToken],
                     'headers'      => ['Accept: */*'],
                     'fileResponse' => true,
@@ -622,6 +611,19 @@ class ShippingTemplateController
                 return ShippingTemplateController::logAndReturnError($response, 500, "attachment errors:\n" . json_encode($attachmentErrors, JSON_PRETTY_PRINT));
             }
         }
+
+        // Update history and status only if no error occurred
+        ShippingModel::update([
+            'set'   => ['history' => json_encode($shipping['history'])],
+            'where' => ['id = ?'],
+            'data'  => [$shipping['id']]
+        ]);
+
+        ResModel::update([
+            'set'   => ['status' => $actionStatus],
+            'where' => ['res_id = ?'],
+            'data'  => [$resId]
+        ]);
 
         return $response->withStatus(201);
     }
