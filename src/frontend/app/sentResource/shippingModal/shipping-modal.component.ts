@@ -49,8 +49,8 @@ export class ShippingModalComponent implements OnInit {
         await this.getStatus();
         await this.getAttachments();
         await this.getShippingHistory();
-        this.creationDate = this.fullDate.transform(new Date(this.data.shippingData.creationDate).toString());
-        this.sendDate = this.fullDate.transform(new Date(this.data.shippingData.sendDate).toString());
+        this.creationDate = this.formatDate(this.data.shippingData.creationDate);
+        this.sendDate = this.formatDate(this.data.shippingData.sendDate);
         this.data.shippingData.recipients.forEach((element: any, index: number) => {
             this.data.shippingData.recipients[index] = element.filter((item: any) => item !== '');
         });
@@ -127,5 +127,9 @@ export class ShippingModalComponent implements OnInit {
 
     setStatus(status: string) {
         return this.status.find((element: any) => element.id === status).label_status;
+    }
+
+    formatDate(date: string) {
+        return this.fullDate.transform(new Date(date).toString());
     }
 }

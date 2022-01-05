@@ -100,8 +100,8 @@
                                                 <div class="historyLineLabel" [title]="'lang.' + history.eventType | translate">
                                                     <b>{{'lang.' + history.eventType | translate}}</b>
                                                 </div>
-                                                <div class="historyLineSubLabel" [title]="history.eventDate | fullDate">
-                                                    <b>{{history.eventDate | fullDate}}</b>
+                                                <div class="historyLineSubLabel" [title]="formatDate(history.eventDate)">
+                                                    <b>{{formatDate(history.eventDate)}}</b>
                                                 </div>
                                             </div>
                                         </div>
