@@ -161,7 +161,7 @@ class ShippingTemplateController
             $body['entities'][$key] = (string)$entity;
         }
         $body['entities'] = json_encode($body['entities']);
-        $body['account']  = json_encode($body['account']);
+        $account  = json_encode($body['account']);
 
         $id = ShippingTemplateModel::create([
             'label'       => $body['label'],
@@ -169,8 +169,30 @@ class ShippingTemplateController
             'options'     => $body['options'],
             'fee'         => $body['fee'],
             'entities'    => $body['entities'],
-            'account'     => $body['account']
+            'account'     => $account
         ]);
+
+        if (!empty($body['subscribed'])) {
+            if (empty($body['account']['id']) || !Validator::stringType()->validate($body['account']['id'])) {
+                return $response->withStatus(400)->withJson(['errors' => 'Cannot subscribed to notification : body[account][id] is empty or not a string']);
+            }
+            $body['id'] = $id;
+            $subscriptions = ShippingTemplateController::subscribeToNotifications($body);
+            if (!empty($subscriptions['errors'])) {
+                return $response->withStatus(400)->withJson(['errors' => $subscriptions['errors']]);
+            }
+            $body['subscriptions'] = $subscriptions['subscriptions'];
+            $tokenMinIat = date_create_from_format('U', $subscriptions['iat']-1);
+            $tokenMinIat = date_format($tokenMinIat, 'c');
+            ShippingTemplateModel::update([
+                'set'   => [
+                    'subscriptions' => $subscriptions['subscriptions'],
+                    'token_min_iat' => $tokenMinIat
+                ],
+                'where' => ['id = ?'],
+                'data'  => [$id]
+            ]);
+        }
 
         HistoryController::add([
             'tableName' => 'shipping_templates',
@@ -190,6 +212,7 @@ class ShippingTemplateController
         }
 
         $body = $request->getParsedBody();
+        $body['id'] = $args['id'];
 
         $errors = ShippingTemplateController::checkData($body, 'update');
         if (!empty($errors)) {
@@ -203,7 +226,10 @@ class ShippingTemplateController
             $shippingInfo['account'] = json_decode($shippingInfo['account'], true);
             $body['account']['password'] = $shippingInfo['account']['password'];
         }
-        $alreadySubscribed = ShippingTemplateController::isSubscribed(['accountId' => $body['account']['id']]);
+        $alreadySubscribed = false;
+        if (!empty($body['account']['id']) && Validator::stringType()->validate($body['account']['id'])) {
+            $alreadySubscribed = ShippingTemplateController::isSubscribed(['accountId' => $body['account']['id']]);
+        }
         unset($shippingInfo);
 
         $body['options']  = json_encode($body['options']);
@@ -395,7 +421,7 @@ class ShippingTemplateController
             'resourceLocation' => $body['resource_location']
         ];
 
-        if ($body['eventType'] == 'ON_DEPOSIT_PROOF_RECEIVED') {
+        if (in_array($body['eventType'], ['ON_DEPOSIT_PROOF_RECEIVED', 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED'])) {
             return ShippingTemplateController::logAndReturnError($response, 201, 'Body event_type is ignored');
         }
 
@@ -489,7 +515,7 @@ class ShippingTemplateController
             'status'       => $actionStatus
         ];
 
-        if (in_array($body['eventType'], ['ON_STATUS_ARCHIVED', 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED'])) {
+        if ($body['eventType'] == 'ON_STATUS_ARCHIVED') {
             $authToken = ShippingTemplateController::getMailevaAuthToken($mailevaConfig, $shippingTemplateAccount);
             if (!empty($authToken['errors'])) {
                 return ShippingTemplateController::logAndReturnError($response, 400, $authToken['errors']);
@@ -521,7 +547,7 @@ class ShippingTemplateController
             $attachmentErrors = [];
 
             // deposit proof
-            if ($body['eventType'] == 'ON_STATUS_ARCHIVED' && !in_array('shipping_deposit_proof', array_column($previousAttachments, 'attachment_type'))) {
+            if (!in_array('shipping_deposit_proof', array_column($previousAttachments, 'attachment_type'))) {
                 $curlResponse = CurlModel::exec([
                     'method'       => 'GET',
                     'url'          => str_replace('\\', '', $body['resourceLocation']) . '/download_deposit_proof',
@@ -548,56 +574,6 @@ class ShippingTemplateController
                     ]);
                     if (!empty($attachmentId['errors'])) {
                         $attachmentErrors[] = 'shipping_deposit_proof:save: could not save deposit proof to docserver: ' . json_encode($attachmentId['errors']);
-                    } else {
-                        $shipping['attachments'][] = $attachmentId;
-                        ShippingModel::update([
-                            'set'   => ['attachments' => json_encode($shipping['attachments'])],
-                            'where' => ['id = ?'],
-                            'data'  => [$shipping['id']]
-                        ]);
-                    }
-                }
-            }
-
-            if ($body['eventType'] == 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED') {
-                // acknowledgement of receipt (AR) for each recipient
-                foreach ($shipping['recipients'] as $recipient) {
-                    foreach ($previousAttachments as $previousAttachment) {
-                        if ($previousAttachment['attachment_type'] == 'shipping_acknowledgement_of_receipt'
-                            && !empty($previousAttachment['externalId']['shippingRecipientId'])
-                            && $previousAttachment['externalId']['shippingRecipientId'] == $recipient['id']) {
-                            continue 2;
-                        }
-                    }
-                    $curlResponse = CurlModel::exec([
-                        'method'       => 'GET',
-                        'url'          => str_replace('\\', '', $body['resourceLocation']) . '/recipients/' . $recipient['recipientId'] . '/download_acknowledgement_of_receipt', // TODO build this URL ourselves if possible or fetch it online
-                        'bearerAuth'   => ['token' => $authToken],
-                        'headers'      => ['Accept: */*'],
-                        'fileResponse' => true,
-                    ]);
-                    if ($curlResponse['code'] != 200) {
-                        $attachmentErrors[] = 'shipping_acknowledgement_of_receipt:download: acknowledgement of receipt failed to download for sending ' . json_encode(['maarchShippingId' => $shipping['id'], 'mailevaSendingId' => $body['resourceId'], 'recipientId' => $recipient['id'], 'curlResponse' => $curlResponse['response']]);
-                        continue;
-                    }
-
-                    $attachmentId = StoreController::storeAttachment([
-                        'title'       => _SHIPPING_ATTACH_ACKNOWLEDGEMENT_OF_RECEIPT . '_' . trim($recipient[2]) . '_' . (new \DateTime($body['eventDate']))->format('d-m-Y'),
-                        'resIdMaster' => $resId,
-                        'type'        => 'shipping_acknowledgement_of_receipt',
-                        'status'      => 'TRA',
-                        'encodedFile' => base64_encode($curlResponse['response']),
-                        'format'      => 'zip',
-                        'typist'      => $typist,
-                        'externalId'  => [
-                            'shippingResourceType' => $body['resourceType'],
-                            'shippingResourceId'   => $body['resourceId'],
-                            'shippingEventDate'    => $body['eventDate'],
-                            'shippingRecipientId'  => $recipient['id']
-                        ]
-                    ]);
-                    if (!empty($attachmentId['errors'])) {
-                        $attachmentErrors[] = 'shipping_acknowledgement_of_receipt:save: could not save acknowledgement of receipt to docserver: ' . json_encode($attachmentId['errors']);
                     } else {
                         $shipping['attachments'][] = $attachmentId;
                         ShippingModel::update([
@@ -639,7 +615,7 @@ class ShippingTemplateController
                 $errors[] = '"subscribed" field is not a boolean';
             }
             if (!Validator::intVal()->validate($args['id'])) {
-                $errors[] = 'Id is not a numeric';
+                $errors[] = 'id is not an integer';
             } else {
                 $shippingInfo = ShippingTemplateModel::getById(['id' => $args['id']]);
             }
@@ -789,9 +765,10 @@ class ShippingTemplateController
 
     private static function subscribeToNotifications(array $shippingTemplate)
     {
-        if (empty($shippingTemplate)) { // todo validator model
-            return ['errors' => 'shipping template is empty'];
-        }
+        ValidatorModel::notEmpty($shippingTemplate, ['id', 'account']);
+        ValidatorModel::intVal($shippingTemplate, ['id']);
+        ValidatorModel::arrayType($shippingTemplate, ['account', 'subscriptions']);
+
         $mailevaConfig = CoreConfigModel::getMailevaConfiguration();
         if (empty($mailevaConfig)) {
             return ['errors' => 'Maileva configuration does not exist'];
@@ -844,6 +821,10 @@ class ShippingTemplateController
 
     private static function unsubscribeFromNotifications(array $shippingTemplate)
     {
+        ValidatorModel::notEmpty($shippingTemplate, ['id', 'account']);
+        ValidatorModel::intVal($shippingTemplate, ['id']);
+        ValidatorModel::arrayType($shippingTemplate, ['account', 'subscriptions']);
+
         if (empty($shippingTemplate)) {
             return ['errors' => 'shipping template is empty'];
         }
