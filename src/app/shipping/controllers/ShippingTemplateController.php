@@ -176,22 +176,25 @@ class ShippingTemplateController
             if (empty($body['account']['id']) || !Validator::stringType()->validate($body['account']['id'])) {
                 return $response->withStatus(400)->withJson(['errors' => 'Cannot subscribed to notification : body[account][id] is empty or not a string']);
             }
-            $body['id'] = $id;
-            $subscriptions = ShippingTemplateController::subscribeToNotifications($body);
-            if (!empty($subscriptions['errors'])) {
-                return $response->withStatus(400)->withJson(['errors' => $subscriptions['errors']]);
+            $alreadySubscribed = ShippingTemplateController::isSubscribed(['accountId' => $body['account']['id']]);
+            if (!$alreadySubscribed) {
+                $body['id'] = $id;
+                $subscriptions = ShippingTemplateController::subscribeToNotifications($body);
+                if (!empty($subscriptions['errors'])) {
+                    return $response->withStatus(400)->withJson(['errors' => $subscriptions['errors']]);
+                }
+                $body['subscriptions'] = $subscriptions['subscriptions'];
+                $tokenMinIat = date_create_from_format('U', $subscriptions['iat'] - 1);
+                $tokenMinIat = date_format($tokenMinIat, 'c');
+                ShippingTemplateModel::update([
+                    'set'   => [
+                        'subscriptions' => $subscriptions['subscriptions'],
+                        'token_min_iat' => $tokenMinIat
+                    ],
+                    'where' => ['id = ?'],
+                    'data'  => [$id]
+                ]);
             }
-            $body['subscriptions'] = $subscriptions['subscriptions'];
-            $tokenMinIat = date_create_from_format('U', $subscriptions['iat']-1);
-            $tokenMinIat = date_format($tokenMinIat, 'c');
-            ShippingTemplateModel::update([
-                'set'   => [
-                    'subscriptions' => $subscriptions['subscriptions'],
-                    'token_min_iat' => $tokenMinIat
-                ],
-                'where' => ['id = ?'],
-                'data'  => [$id]
-            ]);
         }
 
         HistoryController::add([
