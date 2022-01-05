@@ -160,6 +160,10 @@ class ShippingController
             return $response->withStatus(403)->withJson(['errors' => 'Document out of perimeter']);
         }
 
+        foreach ($shipping['history'] as $key => $history) {
+            $shipping['history'][$key]['eventDate'] = (new \DateTime($history['eventDate']))->format('Y-m-d H:i:s');
+        }
+
         return $response->withJson(['history' => $shipping['history']]);
     }
 }
