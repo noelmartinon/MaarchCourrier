@@ -380,7 +380,7 @@ class ShippingTemplateController
             'tableName' => '',
             'recordId'  => '',
             'eventType' => 'Shipping webhook body: ' . json_encode($body),
-            'eventId'   => 'Shipping webhook error'
+            'eventId'   => 'Shipping webhook'
         ]);
 
         $body = [
@@ -396,7 +396,7 @@ class ShippingTemplateController
         ];
 
         if (in_array($body['eventType'], ['ON_DEPOSIT_PROOF_RECEIVED', 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED'])) {
-            return ShippingTemplateController::logAndReturnError($response, 201, 'body event_type is ignored');
+            return ShippingTemplateController::logAndReturnError($response, 201, 'Body event_type is ignored');
         }
 
         $shipping = ShippingModel::get([
@@ -517,11 +517,14 @@ class ShippingTemplateController
             }
             $typist = $typist[0]['id'];
 
-            $previousAttachments = AttachmentModel::get([
-                'select' => ['id', 'attachment_type', 'external_id as "externalId"'],
-                'where'  => ['res_id in (?)'],
-                'data'   => [$shipping['attachments']]
-            ]);
+            $previousAttachments = [];
+            if (!empty($shipping['attachments'])) {
+                $previousAttachments = AttachmentModel::get([
+                    'select' => ['id', 'attachment_type', 'external_id as "externalId"'],
+                    'where'  => ['res_id in (?)'],
+                    'data'   => [$shipping['attachments']]
+                ]);
+            }
             foreach ($previousAttachments as $key => $previousAttachment) {
                 $previousAttachments[$key]['externalId'] = json_decode($previousAttachment['externalId'], true);
             }
