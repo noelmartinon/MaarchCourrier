@@ -218,7 +218,9 @@ export class SentResourceListComponent implements OnInit {
                 }),
                 tap((data: any) => {
                     data.forEach((element: any) => {
-                        element.recipients = element.recipients.filter((item: any) => !this.functions.empty(item));
+                        element.recipients.forEach((el: any, index: number) => {
+                            element.recipients[index] = el.filter((item: any) => item !== '');
+                        });
                     });
                     this.sentResources = this.sentResources.concat(data);
 
