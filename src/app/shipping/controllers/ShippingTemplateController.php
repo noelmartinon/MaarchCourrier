@@ -436,7 +436,16 @@ class ShippingTemplateController
         ];
 
         if (in_array($body['eventType'], ['ON_DEPOSIT_PROOF_RECEIVED', 'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED'])) {
-            return ShippingTemplateController::logAndReturnError($response, 201, 'Body event_type is ignored');
+            LogsController::add([
+                'isTech'    => true,
+                'moduleId'  => 'shipping',
+                'level'     => 'DEBUG',
+                'tableName' => '',
+                'recordId'  => '',
+                'eventType' => 'Shipping webhook debug: Body event_type is ignored',
+                'eventId'   => 'Shipping webhook debug'
+            ]);
+            return $response->withStatus(201)->withJson(['errors' => 'Body event_type is ignored']);
         }
 
         $shipping = ShippingModel::get([
