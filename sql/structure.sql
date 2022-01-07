@@ -1057,6 +1057,8 @@ options json DEFAULT '{}',
 fee json DEFAULT '{}',
 entities jsonb DEFAULT '{}',
 account json DEFAULT '{}',
+subscriptions jsonb DEFAULT '[]'::jsonb,
+token_min_iat TIMESTAMP WITHOUT TIME ZONE DEFAULT now(),
 CONSTRAINT shipping_templates_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);
@@ -1073,6 +1075,10 @@ recipient_entity_id INTEGER NOT NULL,
 recipients jsonb DEFAULT '[]',
 account_id character varying(64) NOT NULL,
 creation_date timestamp without time zone NOT NULL,
+history jsonb DEFAULT '[]'::jsonb,
+sending_id character varying(40),
+attachments jsonb DEFAULT '[]'::jsonb,
+action_id INTEGER,
 CONSTRAINT shippings_pkey PRIMARY KEY (id)
 )
 WITH (OIDS=FALSE);

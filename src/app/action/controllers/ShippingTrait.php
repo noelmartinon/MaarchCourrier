@@ -37,9 +37,11 @@ trait ShippingTrait
 {
     public static function createMailevaShippings(array $args)
     {
-        ValidatorModel::notEmpty($args, ['resId']);
+        ValidatorModel::notEmpty($args, ['resId', 'action']);
         ValidatorModel::intVal($args, ['resId']);
-        ValidatorModel::arrayType($args, ['data']);
+        ValidatorModel::arrayType($args, ['data', 'action']);
+        ValidatorModel::notEmpty($args['action'], ['id']);
+        ValidatorModel::intVal($args['action'], ['id']);
 
         $resource = ResModel::getById(['select' => ['destination', 'integrations', 'subject as title', 'external_id', 'res_id', 'version'], 'resId' => $args['resId']]);
         $integrations = json_decode($resource['integrations'], true);
@@ -303,10 +305,12 @@ trait ShippingTrait
                         "country_code"      => 'FR'
                     ]),
                 ]);
-                if ($createRecipient['code'] != 201) {
+                if ($createRecipient['code'] != 201 || empty($createRecipient['response']) || !is_array($createRecipient['response'])) {
                     $errors[] = "Maileva recipient creation failed for resource {$resId}";
                     continue;
                 }
+                $contact[$key]['recipientId'] = $createRecipient['response']['id'] ?? null;
+                $contact[$key]['acknowledgement_of_receipt_url'] = $createRecipient['response']['acknowledgement_of_receipt_url'] ?? null;
                 $recipients[] = $contacts[$key];
             } else {
                 foreach ($contacts[$key] as $contact) {
@@ -329,6 +333,8 @@ trait ShippingTrait
                         $errors[] = "Maileva recipient creation failed for resource {$resId}";
                         continue 2;
                     }
+                    $contact['recipientId'] = $createRecipient['response']['id'];
+                    $contact['acknowledgement_of_receipt_url'] = $createRecipient['response']['acknowledgement_of_receipt_url'];
                     $recipients[] = $contact;
                 }
             }
@@ -379,13 +385,15 @@ trait ShippingTrait
 
             ShippingModel::create([
                 'userId'            => $GLOBALS['id'],
+                'sendingId'         => $sendingId,
                 'documentId'        => $resId,
                 'documentType'      => $resource['type'],
-                'options'           => json_encode($shippingTemplate['options']),
+                'options'           => !empty($shippingTemplate['options']) ? json_encode($shippingTemplate['options']) : '{}',
                 'fee'               => $fee,
                 'recipientEntityId' => $recipientEntity['id'],
                 'accountId'         => $shippingTemplate['account']['id'],
-                'recipients'        => json_encode($recipients)
+                'recipients'        => !empty($recipients) ? json_encode($recipients) : '[]',
+                'actionId'          => $args['action']['id']
             ]);
         }
 

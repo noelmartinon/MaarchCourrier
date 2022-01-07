@@ -11,6 +11,7 @@ import { FunctionsService } from '@service/functions.service';
 import { PrivilegeService } from '@service/privileges.service';
 import { SentResourcePageComponent } from './sent-resource-page/sent-resource-page.component';
 import { SentNumericPackagePageComponent } from './sent-numeric-package-page/sent-numeric-package-page.component';
+import { ShippingModalComponent } from './shippingModal/shipping-modal.component';
 
 @Component({
     selector: 'app-sent-resource-list',
@@ -201,21 +202,26 @@ export class SentResourceListComponent implements OnInit {
                     data = data.map((item: any) => ({
                         id: item.id,
                         sender: item.userLabel,
-                        recipients: item.recipients.map((recip: any) => recip.contactLabel),
+                        recipients: item.recipients,
                         creationDate: item.creationDate,
                         sendDate: item.creationDate,
                         type: 'shipping',
                         typeColor: '#9440D5',
                         desc: this.functions.empty(item.chrono) ? this.translate.instant('lang.shipping') : `[${item.chrono}] ` + this.translate.instant('lang.shipping'),
                         status: 'SENT',
-                        hasAttach: item.creationDate === 'attachment',
-                        hasNote: false,
-                        hasMainDoc: item.creationDate === 'resource',
-                        canManage: false
+                        hasAttach: !this.functions.empty(item.attachments),
+                        hasNote: !this.functions.empty(item.notes),
+                        hasMainDoc: item.isLinked,
+                        canManage: true
                     }));
                     return data;
                 }),
                 tap((data: any) => {
+                    data.forEach((element: any) => {
+                        element.recipients.forEach((el: any, index: number) => {
+                            element.recipients[index] = el.filter((item: any) => item !== '');
+                        });
+                    });
                     this.sentResources = this.sentResources.concat(data);
 
                     resolve(true);
@@ -254,43 +260,51 @@ export class SentResourceListComponent implements OnInit {
         }
     }
 
-    openPromptMail(row: any = {id: null, type: null}) {
-
+    async openPromptMail(row: any = {id: null, type: null}) {
         let title = this.translate.instant('lang.sendElement');
 
         if (row.id !== null) {
             title = this.translate.instant('lang.' + row.type);
         }
+        if (row.type !== 'shipping') {
+            if (row.canManage || row.id === null) {
+                const dialogRef = this.dialog.open(SentResourcePageComponent, {
+                    panelClass: 'maarch-modal', width: '60vw', disableClose: true, data: {
+                        title: title,
+                        resId: this.resId,
+                        emailId: row.id, emailType: row.type,
+                        currentUserId: this.currentUserId,
+                        currentGroupId: this.currentGroupId,
+                        currentBasketId: this.currentBasketId,
+                    }
+                });
 
-        if (row.canManage || row.id === null) {
-            const dialogRef = this.dialog.open(SentResourcePageComponent, {
-                panelClass: 'maarch-modal', width: '60vw', disableClose: true, data: {
+                dialogRef.afterClosed().pipe(
+                    filter((data: any) => data.state === 'success' || data === 'success'),
+                    tap(() => {
+                        this.refreshEmailList();
+                        setTimeout(() => {
+                            this.refreshWaitingElements(1);
+                            setTimeout(() => {
+                                this.dataSource = new MatTableDataSource(this.sentResources);
+                                this.dataSource.sort = this.sort;
+                            }, 0);
+                        }, 5000);
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();
+            }
+        } else if (row.type === 'shipping') {
+            const dialogRef = this.dialog.open(ShippingModalComponent, {
+                panelClass: 'maarch-modal', width: '60vw', disableClose: true,
+                data: {
                     title: title,
-                    resId: this.resId,
-                    emailId: row.id, emailType: row.type,
-                    currentUserId: this.currentUserId,
-                    currentGroupId: this.currentGroupId,
-                    currentBasketId: this.currentBasketId,
+                    shippingData: row
                 }
             });
-
-            dialogRef.afterClosed().pipe(
-                filter((data: any) => data.state === 'success' || data === 'success'),
-                tap(() => {
-                    this.refreshEmailList();
-                    setTimeout(() => {
-                        this.refreshWaitingElements(1);
-                        setTimeout(() => {
-                            this.dataSource = new MatTableDataSource(this.sentResources);
-                            this.dataSource.sort = this.sort;
-                        }, 0);
-                    }, 5000);
-                }),
-                catchError((err: any) => {
-                    this.notify.handleSoftErrors(err);
-                    return of(false);
-                })
-            ).subscribe();
         }
     }
 

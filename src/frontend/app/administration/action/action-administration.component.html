@@ -60,7 +60,23 @@
                             </div>
                         </div>
                         <div class="form-group" *ngIf="intermediateStatusActions.indexOf(action.actionPageId) !== -1">
-                            <div class="col-sm-12">
+                            <div *ngIf="action.actionPageId === 'send_shipping'" class="col-sm-6">
+                                <plugin-select-search [showLabel]="true" [class]="''" [title]="'lang.intermediateStatus' | translate"
+                                                      [label]="'lang.intermediateStatus' | translate"
+                                                      [placeholderLabel]="'lang.intermediateStatus' | translate"
+                                                      [formControlSelect]="selectIntermidiateStatusId" [datas]="statuses"
+                                                      (afterSelected)="intermediateStatus = selectIntermidiateStatusId.value" style="width:100%;" [required]="true">
+                                </plugin-select-search>
+                            </div>
+                            <!-- Maileva status -->
+                            <div *ngIf="action.actionPageId === 'send_shipping'"  class="col-sm-6">
+                                <app-select-with-filter #intermediateStatus [required]="true"
+                                    name="linkedIntermediateStatus" [label]="'lang.mailevaStatus' | translate"
+                                    [(ngModel)]="intermediateSelectedStatus" [array]="intermediateStatusParams.data" [multiple]="true" (selectionChange)="getSelectedStatus($event, 'intermediateStatus')">
+                                </app-select-with-filter>
+                            </div>
+                            <!--  -->
+                            <div [class]="action.actionPageId === 'send_shipping' ? 'col-sm-6' : 'col-sm-12'">
                                 <plugin-select-search [showLabel]="true" [class]="''" [title]="'lang.finalStatusAlt' | translate"
                                                       [label]="'lang.finalStatus' | translate"
                                                       [placeholderLabel]="'lang.finalStatusAlt' | translate"
@@ -68,7 +84,15 @@
                                                       (afterSelected)="successStatus = selectSuccessStatusId.value" style="width:100%;" [required]="true">
                                 </plugin-select-search>
                             </div>
-                            <div class="col-sm-12">
+                            <!-- Maileva status -->
+                            <div *ngIf="action.actionPageId === 'send_shipping'"  class="col-sm-6">
+                                <app-select-with-filter #finalStatus [required]="true"
+                                    name="linkedFinalStatus" [label]="'lang.mailevaStatus' | translate"
+                                    [(ngModel)]="finalSelectedStatus" [array]="finalStatusParams.data" [multiple]="true" (selectionChange)="getSelectedStatus($event, 'finalStatus')">
+                                </app-select-with-filter>
+                            </div>
+                            <!--  -->
+                            <div [class]="action.actionPageId === 'send_shipping' ? 'col-sm-6' : 'col-sm-12'">
                                 <plugin-select-search [showLabel]="true" [class]="''" [title]="'lang.errorStatusAlt' | translate"
                                                       [label]="'lang.errorStatus' | translate"
                                                       [placeholderLabel]="'lang.errorStatusAlt' | translate"
@@ -76,6 +100,14 @@
                                                       (afterSelected)="errorStatus = selectErrorStatusId.value" style="width:100%;" [required]="true">
                                 </plugin-select-search>
                             </div>
+                            <!-- Maileva status -->
+                            <div *ngIf="action.actionPageId === 'send_shipping'"  class="col-sm-6">
+                                <app-select-with-filter #errorStatus [required]="true"
+                                    name="linkedErrorStatus" [label]="'lang.mailevaStatus' | translate"
+                                    [(ngModel)]="errorSelectedStatus" [array]="errorStatusParams.data" [multiple]="true" (selectionChange)="getSelectedStatus($event, 'errorStatus')">
+                                </app-select-with-filter>
+                            </div>
+                            <!--  -->
                             <em class="col-sm-12" *ngIf="action.actionPageId !== 'sendToRecordManagement'">{{'lang.intermediateStatusMailing' | translate}}</em>
                         </div>
                         <div class="form-group" *ngIf="action.actionPageId=='create_acknowledgement_receipt'">
@@ -98,7 +130,7 @@
                                     {{'lang.canAddCopies' | translate}}</mat-slide-toggle>
                             </div>
                         </div>
-                        <div class="form-group" *ngIf="action.actionPageId!='reconcile'">
+                        <div class="form-group" *ngIf="action.actionPageId!='reconcile' && action.actionPageId !== 'send_shipping'">
                             <div class="col-sm-12">
                                 <plugin-select-search [showLabel]="true" [class]="''"
                                     [label]="intermediateStatusActions.indexOf(action.actionPageId) !== -1 ? ('lang.intermediateStatus' | translate) : ('lang.associatedStatus' | translate)"

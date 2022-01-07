@@ -152,6 +152,7 @@ import { AcknowledgementReceptionComponent } from './registeredMail/acknowledgem
 import { DatePipe } from '@angular/common';
 import { ContactSearchModalComponentComponent } from './administration/contact/page/form/contactSearchModal/contact-search-modal.component';
 import { SendMultigestActionComponent } from './actions/send-multigest-action/send-multigest-action.component';
+import { ShippingModalComponent } from './sentResource/shippingModal/shipping-modal.component';
 
 registerLocaleData(localeFr, 'fr-FR');
 @Injectable()
@@ -293,7 +294,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         ProfileOtherPluginComponent,
         AddinOutlookConfigurationModalComponent,
         ContactSearchModalComponentComponent,
-        SendMultigestActionComponent
+        SendMultigestActionComponent,
+        ShippingModalComponent
     ],
     exports : [
         SharedModule
@@ -357,7 +359,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         TileCreateComponent,
         AddinOutlookConfigurationModalComponent,
         ContactSearchModalComponentComponent,
-        SendMultigestActionComponent
+        SendMultigestActionComponent,
+        ShippingModalComponent
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

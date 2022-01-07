@@ -15,6 +15,7 @@
 namespace Folder\controllers;
 
 use Attachment\models\AttachmentModel;
+use Attachment\controllers\AttachmentTypeController;
 use Entity\models\EntityModel;
 use Folder\models\EntityFolderModel;
 use Folder\models\FolderModel;
@@ -708,8 +709,8 @@ class FolderController
             if (!empty($resIds)) {
                 $attachments = AttachmentModel::get([
                     'select'    => ['COUNT(res_id)', 'res_id_master'],
-                    'where'     => ['res_id_master in (?)', 'status not in (?)', '((status = ? AND typist = ?) OR status != ?)', 'attachment_type <> ?'],
-                    'data'      => [$resIds, ['DEL', 'OBS'], 'TMP', $GLOBALS['id'], 'TMP', 'summary_sheet'],
+                    'where'     => ['res_id_master in (?)', 'status not in (?)', '((status = ? AND typist = ?) OR status != ?)', 'attachment_type not in (?)'],
+                    'data'      => [$resIds, ['DEL', 'OBS'], 'TMP', $GLOBALS['id'], 'TMP', AttachmentTypeController::HIDDEN_ATTACHMENT_TYPES],
                     'groupBy'   => ['res_id_master']
                 ]);
 
