@@ -434,6 +434,14 @@ export class VisaWorkflowComponent implements OnInit {
         return !this.functions.empty(arrOnlyProcess[arrOnlyProcess.length - 1]) ? arrOnlyProcess[arrOnlyProcess.length - 1] : '';
     }
 
+    //SGAMI 75
+    getLastVisaUserSgami() {       
+        const element = this.visaWorkflow.items.filter((item: any) => this.functions.empty(item.process_date) && item.isValid); 
+        const arrOnlyProcess = [element[0]]
+        return !this.functions.empty(arrOnlyProcess[arrOnlyProcess.length - 1]) ? arrOnlyProcess[arrOnlyProcess.length - 1] : '';
+    }
+    //SGAMI 75
+
     getRealIndex(index: number) {
         while (index < this.visaWorkflow.items.length && !this.visaWorkflow.items[index].isValid) {
             index++;

@@ -122,12 +122,52 @@ class ActionMethodController
         }
 
         // Custom for TMA 1
-        if ($action['component'] == 'sendSignatureBookAction' || $action['component'] == 'continueVisaCircuitAction' ) {
+        if ($action['component'] == 'sendSignatureBookAction' || $action['component'] == 'continueVisaCircuitAction' || $action['component'] == 'rejectVisaBackToPreviousAction') {
             // workflow is the same for all resources when in mass -> so the next in workflow will be the same for all resources
             $nextInVisaWorkflow = ListInstanceModel::getCurrentStepByResId([
                 'resId'  => $args['resources'][0],
                 'select' => ['requested_signature']
             ]);
+
+            //SGAMI-SO #75
+            $resId = $args['resources'][0];
+
+            $user = ListInstanceModel::get([
+                'select'  => ['*'],
+                'where'   => ['item_id = ?', 'difflist_type = ?','res_id = ?'],
+                'data'    => [$GLOBALS['id'], 'VISA_CIRCUIT', $resId],
+                'orderBy' => ['sequence']
+            ]);
+
+            if ($action['component'] == 'rejectVisaBackToPreviousAction' && $user[0]['item_mode'] == 'sign' ) {
+              
+                $courrier = \Resource\models\ResModel::get([
+                    'select'  => ['*'],
+                    'where'   => ['res_id = ?' ],
+                    'data'    => [$resId]
+                ]);
+                if($courrier[0]['status'] == 'ESIG') {
+                    //if($args['type'] == 'visaCircuit') {
+                        $retour = ListInstanceModel::get([
+                            'select'  => ['*'],
+                            'where'   => ['res_id = ?', 'difflist_type = ?', 'process_date isnull' ],
+                            'data'    => [$resId, 'VISA_CIRCUIT'],
+                            'orderBy' => ['sequence']
+                        ]);
+                        if($retour[0]['item_mode'] == 'visa') {
+                            $set['status'] = 'EVIS';
+                            ResModel::update([
+                                'set'   => $set,
+                                'where' => ['res_id in (?)'],
+                                'data'  => [$resId]
+                            ]);
+                        }
+                    //}
+                }
+
+            }
+            //SGAMI-SO FIN
+
             $set['status'] = !empty($nextInVisaWorkflow['requested_signature']) ? 'ESIG' : 'EVIS';
         }
         ResModel::update([
