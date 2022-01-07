@@ -62,10 +62,6 @@ class ShippingTemplateController
         'ON_DEPOSIT_PROOF_RECEIVED' => [
             'registered_mail/v2/sendings'
         ],
-        'ON_ACKNOWLEDGEMENT_OF_RECEIPT_RECEIVED' => [
-            'registered_mail/v2/recipients',
-            'simple_registered_mail/v1/recipients'
-        ],
         'ON_STATUS_ARCHIVED' => [
             'mail/v2/sendings',
             'registered_mail/v2/sendings',
@@ -102,10 +98,10 @@ class ShippingTemplateController
         $shippingInfo['account']['password'] = '';
         $shippingInfo['options']  = json_decode($shippingInfo['options'], true);
         $shippingInfo['fee']      = json_decode($shippingInfo['fee'], true);
-        $shippingInfo['entities'] = json_decode($shippingInfo['entities'], true);
+        $shippingInfo['entities'] = !empty($shippingInfo['entities']) ? json_decode($shippingInfo['entities'], true) : [];
 
-        $shippingInfo['subscriptions'] = json_decode($shippingInfo['subscriptions'], true);
-        $shippingInfo['subscribed'] = !empty($shippingInfo['subscriptions']) || ShippingTemplateController::isSubscribed(['accountId' => $shippingInfo['account']['id']]);
+        $shippingInfo['subscriptions'] = !empty($shippingInfo['subscriptions']) ? json_decode($shippingInfo['subscriptions'], true) : [];
+        $shippingInfo['subscribed'] = !empty($shippingInfo['subscriptions']) || (!empty($shippingInfo['account']['id']) && ShippingTemplateController::isSubscribed(['accountId' => $shippingInfo['account']['id']]));
         unset($shippingInfo['subscriptions']);
 
         $allEntities = EntityModel::get([
@@ -155,13 +151,13 @@ class ShippingTemplateController
             $body['account']['password'] = PasswordModel::encrypt(['password' => $body['account']['password']]);
         }
 
-        $body['options']  = json_encode($body['options']);
-        $body['fee']      = json_encode($body['fee']);
+        $body['options']  = !empty($body['options']) ? json_encode($body['options']) : '{}';
+        $body['fee']      = !empty($body['fee']) ? json_encode($body['fee']) : '{}';
         foreach ($body['entities'] as $key => $entity) {
             $body['entities'][$key] = (string)$entity;
         }
-        $body['entities'] = json_encode($body['entities']);
-        $account  = json_encode($body['account']);
+        $body['entities'] = !empty($body['entities']) ? json_encode($body['entities']) : '[]';
+        $account  = !empty($body['account']) ? json_encode($body['account']) : '[]';
 
         $id = ShippingTemplateModel::create([
             'label'       => $body['label'],
@@ -235,8 +231,8 @@ class ShippingTemplateController
         }
         unset($shippingInfo);
 
-        $body['options']  = json_encode($body['options']);
-        $body['fee']      = json_encode($body['fee']);
+        $body['options']  = !empty($body['options']) ? json_encode($body['options']) : '{}';
+        $body['fee']      = !empty($body['fee']) ? json_encode($body['fee']) : '{}';
         foreach ($body['entities'] as $key => $entity) {
             $body['entities'][$key] = (string)$entity;
         }
@@ -259,8 +255,8 @@ class ShippingTemplateController
         }
         unset($body['subscribed']);
         $body['subscriptions'] = !empty($body['subscriptions']) ? json_encode($body['subscriptions']) : '[]';
-        $body['entities'] = json_encode($body['entities']);
-        $body['account']  = json_encode($body['account']);
+        $body['entities'] = !empty($body['entities']) ? json_encode($body['entities']) : '[]';
+        $body['account']  = !empty($body['account']) ? json_encode($body['account']) : '[]';
 
         ShippingTemplateModel::update([
             'where' => ['id = ?'],
@@ -289,9 +285,24 @@ class ShippingTemplateController
             return $response->withStatus(400)->withJson(['errors' => 'id is not an integer']);
         }
 
-        $shippingInfo = ShippingTemplateModel::getById(['id' => $args['id'], 'select' => ['label']]);
+        $shippingInfo = ShippingTemplateModel::getById(['id' => $args['id'], 'select' => ['label', 'subscriptions', 'account']]);
         if (empty($shippingInfo)) {
             return $response->withStatus(400)->withJson(['errors' => 'Shipping does not exist']);
+        }
+
+        $subscriptions = json_decode($shippingInfo['subscriptions'], true);
+        $account = json_decode($shippingInfo['account'], true);
+        if (!empty($account['id']) && Validator::stringType()->validate($account['id'])) {
+            if (!empty($subscriptions)) {
+                $result = ShippingTemplateController::unsubscribeFromNotifications([
+                    'id'            => $args['id'],
+                    'account'       => $account,
+                    'subscriptions' => $subscriptions
+                ]);
+                if (!empty($result['errors'])) {
+                    return $response->withStatus(400)->withJson(['errors' => $result['errors']]);
+                }
+            }
         }
 
         ShippingTemplateModel::delete(['id' => $args['id']]);
