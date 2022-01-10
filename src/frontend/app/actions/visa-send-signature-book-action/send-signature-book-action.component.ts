@@ -123,10 +123,17 @@ export class SendSignatureBookActionComponent implements AfterViewInit {
                         if (!this.route.url.includes('signatureBook')) {
                             this.dialogRef.close(data.allResources[0]);
                         } else {
-                            if (data.count > 0) {
-                                this.dialogRef.close(data.allResources[0]);
-                                this.route.navigate(['/signatureBook/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/resources/' + data.allResources[0]])
+                            if (data.defaultAction?.component === 'signatureBookAction' && data.defaultAction?.data.goToNextDocument) {
+                                if (data.count > 0) {
+                                    this.dialogRef.close();
+                                    this.route.navigate(['/signatureBook/users/' + this.data.userId + '/groups/' + this.data.groupId + '/baskets/' + this.data.basketId + '/resources/' + data.allResources[0]])
+                                } else {
+                                    this.dialogRef.close();
+                                    this.route.navigate(['/home']);
+                                    this.notify.handleSoftErrors(err);
+                                }
                             } else {
+                                this.dialogRef.close();
                                 this.route.navigate(['/home']);
                                 this.notify.handleSoftErrors(err);
                             }

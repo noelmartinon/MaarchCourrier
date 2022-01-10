@@ -299,12 +299,34 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
     async saveTool() {
         if (this.headerTab === 'visaCircuit' && this.appVisaWorkflow !== undefined) {
-            await this.appVisaWorkflow.saveVisaWorkflow();
+            await this.appVisaWorkflow.saveVisaWorkflow().finally(() => {
+                if (this.appVisaWorkflow.visaWorkflow.items[0].item_id !== this.headerService.user.id) {
+                    this.goToNextDocument()
+                }
+            });
             this.loadBadges();
         } else if (this.headerTab === 'notes' && this.appNotesList !== undefined) {
             this.appNotesList.addNote();
             this.loadBadges();
         }
+    }
+
+    goToNextDocument() {
+        this.actionService.stopRefreshResourceLock();
+        const path: string = `resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}?limit=10&offset=0`;
+        this.http.get(`../rest/${path}`).pipe(
+            tap((data: any) => {
+                if (data.defaultAction?.component === 'signatureBookAction' && data.defaultAction?.data.goToNextDocument) {
+                    if (data.count > 0) {                        
+                        this.router.navigate(['/signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + data.allResources[0]])
+                    } else {
+                        this.router.navigate(['/home']);
+                    }
+                } else {
+                    this.router.navigate(['/home']);
+                }
+            })
+        ).subscribe();
     }
 
     openConfirmModification() {
@@ -665,22 +687,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                     return of(true);
                     
                 } else {
-                    const path: string = `resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}?limit=10&offset=0`;
-                    this.http.get(`../rest/${path}`).pipe(
-                        tap((data: any) => {
-                            if (!this.router.url.includes('signatureBook')) {
-                                this.dialogRef?.close(data.allResources[0]);
-                            } else {
-                                if (data.count > 0) {
-                                    this.dialogRef?.close();
-                                    this.router.navigate(['/signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + data.allResources[0]])
-                                } else {
-                                    this.router.navigate(['/home']);
-                                    this.notify.handleSoftErrors(err);
-                                }
-                            }
-                        })
-                    ).subscribe();
+                    this.notify.handleSoftErrors(err);
                 }
                 /**
                  * SGAMI-SO FIN

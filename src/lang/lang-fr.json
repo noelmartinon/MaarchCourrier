@@ -2245,5 +2245,6 @@
     "userPasswordMaarch2Maarch": "Mot de passe de l'utilisateur",
     "userIdMaarch2MaarchDesc": "Identifiant de l'utilisateur avec un compte webservice",
     "userPasswordMaarch2MaarchDesc": "Mot de passe de l'utilisateur avec un compte webservice",
-    "m2mEmailDesc": "Utilisé dans le cadre d'une connexion indirecte entre les applications (utilisation des envois de mail pour le pli numérique)"
+    "m2mEmailDesc": "Utilisé dans le cadre d'une connexion indirecte entre les applications (utilisation des envois de mail pour le pli numérique)",
+    "goToNextDocument": "Forcer le passage au document suivant"
 }
