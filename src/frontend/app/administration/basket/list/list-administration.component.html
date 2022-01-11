@@ -94,7 +94,7 @@
         [sortableData]="displayedSecondaryData" style="border: solid 1px #F9983066;border-radius: 4px;">
         <mat-toolbar class="secondaryInformations example-list column-{{selectedTemplateDisplayedSecondaryData}}-list">
             <ng-container *ngFor="let item of displayedSecondaryData;let i=index">
-                <span class="example-box" *ngIf="item.value != 'getFolders'" dnd-sortable [sortableIndex]="i">
+                <span class="example-box" *ngIf="item?.value != 'getFolders'" dnd-sortable [sortableIndex]="i">
                     <button *ngIf="displayMode=='label'" color="primary" mat-icon-button [matMenuTriggerFor]="menu">
                         <mat-icon fontSet="fas" fontIcon="fa-ellipsis-v fa-2x"></mat-icon>
                     </button>
