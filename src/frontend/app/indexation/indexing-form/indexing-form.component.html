@@ -49,6 +49,9 @@
                                     <button mat-menu-item *ngIf="field.enabled" (click)="enableField(field, false)">
                                         <span>{{'lang.disableField' | translate}}</span>
                                     </button>
+                                    <button mat-menu-item *ngIf="['select','checkbox','radio'].indexOf(field.type) > -1 && !field.SQLMode" (click)="openValuesSelector(field)">
+                                        <span>{{'lang.chooseValues' | translate}}</span>
+                                    </button>
                                     <mat-divider *ngIf="!field.system"></mat-divider>
                                     <button mat-menu-item (click)="removeItem('indexingModels_'+category,field,i)"
                                         *ngIf="!field.system && field.identifier.indexOf('registeredMail_') === -1 && ((currentCategory == 'registeredMail' && field.identifier != 'departureDate') || 

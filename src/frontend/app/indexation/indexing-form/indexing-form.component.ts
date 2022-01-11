@@ -15,6 +15,8 @@ import { FunctionsService } from '@service/functions.service';
 import { ConfirmComponent } from '../../../plugins/modal/confirm.component';
 import { IssuingSiteInputComponent } from '../../administration/registered-mail/issuing-site/indexing/issuing-site-input.component';
 import { RegisteredMailRecipientInputComponent } from '../../administration/registered-mail/indexing/recipient-input.component';
+import { IndexingModelValuesSelectorComponent } from '@appRoot/administration/indexingModel/valuesSelector/values-selector.component';
+
 
 @Component({
     selector: 'app-indexing-form',
@@ -697,10 +699,12 @@ export class IndexingFormComponent implements OnInit {
                                     title: secondDoctype.doctypes_second_level_label,
                                     disabled: true,
                                     isTitle: true,
-                                    color: secondDoctype.css_style
+                                    color: secondDoctype.css_style,
+                                    firstLevelId: doctype.doctypes_first_level_id
                                 });
                                 arrValues = arrValues.concat(data.structure.filter((infoDoctype: any) => infoDoctype.doctypes_second_level_id === secondDoctype.doctypes_second_level_id && infoDoctype.description !== undefined).map((infoType: any) => ({
                                     id: infoType.type_id,
+                                    secondLevelId: secondDoctype.doctypes_second_level_id,
                                     label: '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + infoType.description,
                                     title: infoType.description,
                                     disabled: false,
@@ -768,6 +772,7 @@ export class IndexingFormComponent implements OnInit {
                     elem.event = 'getIssuingSites';
                     // await this.setDoctypeField(elem);
                 }
+                this.setAllowedValues(elem);
             }));
         }));
 
@@ -1242,6 +1247,60 @@ export class IndexingFormComponent implements OnInit {
 
     getCheckboxListLabel(selectedItemId: any, items: any) {
         return items.filter((item: any) => item.id === selectedItemId)[0].label;
+    }
+
+    setAllowedValues(field: any) {
+        if (!this.functions.empty(field.allowedValues)) {
+            field.values.filter((val: any) => !val.isTitle).forEach((item: any) => {
+                item.disabled = field.allowedValues.indexOf(item.id) === -1;
+            });
+        }
+        if (!this.adminMode && field.identifier === 'doctype') {
+            this.checkDisabledValues(field);
+        }
+    }
+
+    checkDisabledValues(field: any) {
+        let disabledItems: number[] = [];
+        // CHECK SECOND LEVEL
+        disabledItems = field.values.filter((element: any) => element.disabled && !element.isTitle).map((item: any) => item.id);
+        field.values = field.values.filter((element: any) => disabledItems.indexOf(element.id) === -1 || (element.firstLevelId === undefined && element.secondLevelId === undefined));
+
+
+        // CHECK FIRST LEVEL
+        field.values.filter((element: any) => element.firstLevelId !== undefined).forEach((item: any) => {
+            if (field.values.filter((element: any) => element.secondLevelId !== undefined && element.secondLevelId === item.id).length === 0) {
+                disabledItems.push(item.id);
+            }
+        });
+        field.values = field.values.filter((element: any) => disabledItems.indexOf(element.id) === -1 || (element.firstLevelId === undefined && element.secondLevelId === undefined));
+    }
+
+    openValuesSelector(field: any) {
+        const dialogRef = this.dialog.open(IndexingModelValuesSelectorComponent, {
+            panelClass: 'maarch-modal',
+            disableClose: true,
+            data: field
+        });
+        dialogRef.afterClosed().pipe(
+            filter((data: any) => !this.functions.empty(data)),
+            tap((values: any) => {
+                field.values = values;
+                field.allowedValues = values.filter((item: any) => !item.isTitle && !item.disabled).map((el: any) => el.id);
+                // WORK AROUND UPDATING DATA
+                field.type = null;
+                setTimeout(() => {
+                    field.type = 'select';
+                }, 0);
+                if (field.allowedValues.indexOf(this.arrFormControl[field.identifier].value) === -1) {
+                    this.arrFormControl[field.identifier].reset();
+                }
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     /**

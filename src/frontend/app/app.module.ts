@@ -102,6 +102,7 @@ import { ThesaurusModalComponent } from './tag/indexing/thesaurus/thesaurus-moda
 import { SelectIndexingModelComponent } from './indexation/select-indexing-model/select-indexing-model.component';
 import { FilterToolComponent } from './search/filter-tool/filter-tool.component';
 import { TechnicalInformationComponent } from './indexation/technical-information/technical-information.component';
+import { IndexingModelValuesSelectorComponent } from './administration/indexingModel/valuesSelector/values-selector.component';
 
 import { SearchComponent } from './search/search.component';
 import { SearchResultListComponent } from './search/result-list/search-result-list.component';
@@ -301,7 +302,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         AddinOutlookConfigurationModalComponent,
         CreateExternalUserComponent,
         CheckSaeInterconnectionComponent,
-        ContactSearchModalComponentComponent
+        ContactSearchModalComponentComponent,
+        IndexingModelValuesSelectorComponent
     ],
     exports : [
         SharedModule
@@ -365,7 +367,8 @@ export class MyHammerConfig extends HammerGestureConfig {
         AbsModalComponent,
         TileCreateComponent,
         AddinOutlookConfigurationModalComponent,
-        ContactSearchModalComponentComponent
+        ContactSearchModalComponentComponent,
+        IndexingModelValuesSelectorComponent
     ],
     providers: [
         { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
