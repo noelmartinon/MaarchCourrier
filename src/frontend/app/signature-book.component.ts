@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '@service/notification/notification.service';
-import { tap, catchError, filter } from 'rxjs/operators';
+import { tap, catchError, filter, finalize } from 'rxjs/operators';
 import { PrivilegeService } from '@service/privileges.service';
 import { MatDialogRef, MatDialog } from '@angular/material/dialog';
 import { AttachmentCreateComponent } from './attachments/attachment-create/attachment-create.component';
@@ -300,14 +300,34 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     async saveTool() {
         if (this.headerTab === 'visaCircuit' && this.appVisaWorkflow !== undefined) {
             await this.appVisaWorkflow.saveVisaWorkflow().finally(() => {
-                if (this.appVisaWorkflow.visaWorkflow.items[0].item_id !== this.headerService.user.id) {
-                    this.goToNextDocument()
-                }
+                let assignedBasket: any;
+                this.http.get('../rest/home').pipe(
+                    tap((data: any) => {
+                        assignedBasket = data.assignedBaskets.find((basket: any) => basket.id.toString() === this.basketId && basket.owner_user_id.toString() === this.userId && basket.group_id.toString() === this.groupId);                        
+                    }),
+                    finalize(() => {                        
+                        if (this.canChange(assignedBasket)) {
+                            this.goToNextDocument()
+                        }
+                    }),
+                    catchError((err: any) => {
+                        this.notify.handleSoftErrors(err);
+                        return of(false);
+                    })
+                ).subscribe();             
             });
             this.loadBadges();
         } else if (this.headerTab === 'notes' && this.appNotesList !== undefined) {
             this.appNotesList.addNote();
             this.loadBadges();
+        }
+    }
+
+    canChange(assignedBasket: any) {
+        if (assignedBasket === undefined) {
+            return this.appVisaWorkflow.visaWorkflow.items[0].item_id !== this.headerService.user.id;
+        } else {
+            return (this.userId === this.headerService.user.id && this.appVisaWorkflow.visaWorkflow.items[0].item_id !== this.headerService.user.id) || (this.userId !== this.headerService.user.id && assignedBasket.owner_user_id !== this.appVisaWorkflow.visaWorkflow.items[0].item_id);
         }
     }
 
@@ -318,7 +338,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
             tap((data: any) => {
                 if (data.defaultAction?.component === 'signatureBookAction' && data.defaultAction?.data.goToNextDocument) {
                     if (data.count > 0) {                        
-                        this.router.navigate(['/signatureBook/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/resources/' + data.allResources[0]])
+                        this.router.navigate([`/signatureBook/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/resources/${data.allResources[0]}`])
                     } else {
                         this.router.navigate(['/home']);
                     }
