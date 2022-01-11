@@ -547,6 +547,7 @@ class BasketController
         } elseif ($data['list_event'] == 'signatureBookAction') {
             $listEventData = [
                 'canUpdateDocuments' => !empty($data['list_event_data']['canUpdateDocuments']),
+                'goToNextDocument' => !empty($data['list_event_data']['goToNextDocument']),
             ];
         }
 
