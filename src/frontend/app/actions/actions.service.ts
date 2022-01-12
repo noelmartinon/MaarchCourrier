@@ -235,7 +235,7 @@ export class ActionsService implements OnDestroy {
     nameBasket(basketId: number = this.currentBasketId,userId: number = this.currentUserId,) {      
         this.http.get('../rest/basket/' + basketId + '/users/' + userId)
         .subscribe((data: any) => {    
-            this.basket = data.basket.basket_id
+            this.basket = data.basket.basket_id;
             
         });
     }
@@ -245,7 +245,7 @@ export class ActionsService implements OnDestroy {
                       
         this.http.get('../rest/resourcesList/users/'+userId+'/groups/'+groupId+'/baskets/'+basketId).subscribe((data: any) => {    
             
-            this.sgami75 = data.allResources.filter((action:any) => action != resId)            
+            this.sgami75 = data.allResources.filter((action:any) => action != resId);           
         });
     }
 
@@ -254,7 +254,7 @@ export class ActionsService implements OnDestroy {
                            
         this.http.get('../rest/signatureBook/users/'+userId+'/groups/'+groupId+'/baskets/'+basketId+'/resources/' + resId).subscribe((data: any) => {    
                            
-            this.sgami75_2 = data
+            this.sgami75_2 = data;
         });
     }
     /** 
