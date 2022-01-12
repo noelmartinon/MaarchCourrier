@@ -50,7 +50,8 @@ class IndexingModelFieldModel
                 'mandatory'     => $args['mandatory'],
                 'enabled'       => $args['enabled'],
                 'default_value' => $args['default_value'],
-                'unit'          => $args['unit']
+                'unit'          => $args['unit'],
+                'allowed_values' => $args['allowed_values'],
             ]
         ]);
 

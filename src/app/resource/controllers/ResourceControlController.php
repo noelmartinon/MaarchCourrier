@@ -380,8 +380,9 @@ class ResourceControlController
     {
         $body = $args['body'];
 
-        $indexingModelFields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory'], 'where' => ['model_id = ?'], 'data' => [$body['modelId']]]);
+        $indexingModelFields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'allowed_values'], 'where' => ['model_id = ?'], 'data' => [$body['modelId']]]);
         foreach ($indexingModelFields as $indexingModelField) {
+            $indexingModelField['allowed_values'] = json_decode($indexingModelField['allowed_values'], true);
             if (strpos($indexingModelField['identifier'], 'indexingCustomField_') !== false) {
                 $customFieldId = explode('_', $indexingModelField['identifier'])[1];
                 if ($indexingModelField['mandatory'] && empty($body['customFields'][$customFieldId])) {
@@ -427,12 +428,16 @@ class ResourceControlController
                         return ['errors' => "Body customFields[{$customFieldId}] is not a number"];
                     } elseif ($customField['type'] == 'date' && !Validator::date()->notEmpty()->validate($body['customFields'][$customFieldId])) {
                         return ['errors' => "Body customFields[{$customFieldId}] is not a date"];
+                    } elseif (!empty($indexingModelField['allowed_values']) && !in_array($body['customFields'][$customFieldId], $indexingModelField['allowed_values'])) {
+                        return ['errors' => "Body {$indexingModelField['identifier']} is not one of the allowed values"];
                     }
                 }
             } elseif ($indexingModelField['identifier'] == 'destination' && !empty($args['isUpdating'])) {
                 continue;
             } elseif ($indexingModelField['mandatory'] && !isset($body[$indexingModelField['identifier']])) {
                 return ['errors' => "Body {$indexingModelField['identifier']} is not set"];
+            } elseif (!empty($indexingModelField['allowed_values']) && !in_array($body[$indexingModelField['identifier']], $indexingModelField['allowed_values'])) {
+                return ['errors' => "Body {$indexingModelField['identifier']} is not one of the allowed values"];
             }
         }
 

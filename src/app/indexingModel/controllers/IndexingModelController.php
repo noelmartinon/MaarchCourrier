@@ -73,10 +73,12 @@ class IndexingModelController
             return $response->withStatus(400)->withJson(['errors' => 'Model out of perimeter']);
         }
 
-        $fields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'default_value', 'unit', 'enabled'], 'where' => ['model_id = ?'], 'data' => [$args['id']]]);
+        $fields = IndexingModelFieldModel::get(['select' => ['identifier', 'mandatory', 'default_value', 'unit', 'enabled', 'allowed_values'], 'where' => ['model_id = ?'], 'data' => [$args['id']]]);
         $destination = '';
         foreach ($fields as $key => $value) {
             $fields[$key]['default_value'] = json_decode($value['default_value'], true);
+            $fields[$key]['allowedValues'] = json_decode($value['allowed_values'], true);
+            unset($fields[$key]['allowed_values']);
             if ($value['identifier'] == 'destination') {
                 $destination = $value['default_value'];
             } elseif ($value['identifier'] == 'diffusionList') {
@@ -254,7 +256,8 @@ class IndexingModelController
                 'mandatory'     => empty($field['mandatory']) ? 'false' : 'true',
                 'enabled'       => $field['enabled'] === false ? 'false' : 'true',
                 'default_value' => !isset($field['default_value']) ? null : json_encode($field['default_value']),
-                'unit'          => $field['unit']
+                'unit'          => $field['unit'],
+                'allowed_values' => !isset($field['allowedValues']) ? null : json_encode($field['allowedValues']),
             ]);
         }
 
@@ -390,7 +393,8 @@ class IndexingModelController
                         'mandatory'     => empty($field['mandatory']) ? 'false' : 'true',
                         'enabled'       => $field['enabled'] === false ? 'false' : 'true',
                         'default_value' => !isset($field['default_value']) ? null : json_encode($field['default_value']),
-                        'unit'          => $field['unit']
+                        'unit'          => $field['unit'],
+                        'allowed_values' => !isset($field['allowedValues']) ? null : json_encode($field['allowedValues']),
                     ]);
                 }
 
@@ -457,7 +461,8 @@ class IndexingModelController
                 'mandatory'     => empty($field['mandatory']) ? 'false' : 'true',
                 'enabled'       => $field['enabled'] === false ? 'false' : 'true',
                 'default_value' => !isset($field['default_value']) ? null : json_encode($field['default_value']),
-                'unit'          => $field['unit']
+                'unit'          => $field['unit'],
+                'allowed_values' => !isset($field['allowedValues']) ? null : json_encode($field['allowedValues']),
             ]);
         }
 
