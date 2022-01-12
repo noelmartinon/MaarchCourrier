@@ -70,6 +70,8 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     rightContentWidth: string = '44%';
     dialogRef: MatDialogRef<any>;
 
+    pathToRedirect: string = '';
+
     processTool: any[] = [
         {
             id: 'notes',
@@ -305,7 +307,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                     tap((data: any) => {
                         assignedBasket = data.assignedBaskets.find((basket: any) => basket.id.toString() === this.basketId && basket.owner_user_id.toString() === this.userId && basket.group_id.toString() === this.groupId);                        
                     }),
-                    finalize(() => {                        
+                    finalize(() => {   
                         if (this.canChange(assignedBasket)) {
                             this.goToNextDocument()
                         }
@@ -333,6 +335,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     }
 
     goToNextDocument() {
+        this.pathToRedirect = '';                     
         this.actionService.stopRefreshResourceLock();
         const path: string = `resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}?limit=10&offset=0`;
         this.http.get(`../rest/${path}`).pipe(
@@ -341,10 +344,12 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                     if (data.count > 0) {                        
                         this.router.navigate([`/signatureBook/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/resources/${data.allResources[0]}`])
                     } else {
-                        this.router.navigate(['/home']);
+                        this.pathToRedirect = `/basketList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}`;
+                        this.router.navigate([this.pathToRedirect]);
                     }
                 } else {
-                    this.router.navigate(['/home']);
+                    this.pathToRedirect = `/basketList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}`;
+                    this.router.navigate([this.pathToRedirect]);
                 }
             })
         ).subscribe();
@@ -778,7 +783,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.actionService.stopRefreshResourceLock();
 
-        if (!this.actionService.actionEnded) {
+        if (!this.actionService.actionEnded && this.pathToRedirect === '') {
             this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
         }
 
