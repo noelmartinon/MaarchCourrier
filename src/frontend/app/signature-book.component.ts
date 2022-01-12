@@ -324,10 +324,11 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     }
 
     canChange(assignedBasket: any) {
+        const usersHasNotSigned: any[] = this.appVisaWorkflow.visaWorkflow.items.filter((user: any) => user.process_date === null);
         if (assignedBasket === undefined) {
-            return this.appVisaWorkflow.visaWorkflow.items[0].item_id !== this.headerService.user.id;
+            return usersHasNotSigned[0].item_id !== this.headerService.user.id;
         } else {
-            return (this.userId === this.headerService.user.id && this.appVisaWorkflow.visaWorkflow.items[0].item_id !== this.headerService.user.id) || (this.userId !== this.headerService.user.id && assignedBasket.owner_user_id !== this.appVisaWorkflow.visaWorkflow.items[0].item_id);
+            return (this.userId === this.headerService.user.id && usersHasNotSigned[0].item_id !== this.headerService.user.id) || (this.userId !== this.headerService.user.id && assignedBasket.owner_user_id !== usersHasNotSigned[0].item_id);
         }
     }
 
