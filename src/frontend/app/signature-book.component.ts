@@ -229,7 +229,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     loadActions() {      
         this.http.get('../rest/resourcesList/users/' + this.userId + '/groups/' + this.groupId + '/baskets/' + this.basketId + '/actions?resId=' + this.resId)
             .subscribe((data: any) => {
-                this.signatureBook.actions = data.actions                
+                this.signatureBook.actions = data.actions;               
             }, (err) => {
                 this.notify.error(err.error.errors);
             });
