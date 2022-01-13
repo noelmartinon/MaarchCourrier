@@ -314,6 +314,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
     async saveTool() {
         if (this.headerTab === 'visaCircuit' && this.appVisaWorkflow !== undefined) {
+            this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId], this.pathToRedirect);
             await this.appVisaWorkflow.saveVisaWorkflow().finally(() => {
                 let assignedBasket: any;
                 this.http.get('../rest/home').pipe(
@@ -365,7 +366,8 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                                 index = 0;
                             }
                         }
-                        this.router.navigate([`/signatureBook/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/resources/${data.allResources[index]}`])
+                        this.pathToRedirect = `/signatureBook/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/resources/${data.allResources[index]}`;
+                        this.router.navigate([this.pathToRedirect]);
                     } else {
                         this.pathToRedirect = `/basketList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}`;
                         this.router.navigate([this.pathToRedirect]);
@@ -813,8 +815,8 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     ngOnDestroy() {
         this.actionService.stopRefreshResourceLock();
 
-        if (!this.actionService.actionEnded && this.pathToRedirect === '') {
-            this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
+        if (!this.actionService.actionEnded) {
+            this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId], this.pathToRedirect);
         }
 
         // unsubscribe to ensure no memory leaks

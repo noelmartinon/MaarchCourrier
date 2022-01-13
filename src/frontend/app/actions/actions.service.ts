@@ -321,12 +321,16 @@ export class ActionsService implements OnDestroy {
         //50000
     }
 
-    unlockResource(userId: number = this.currentUserId, groupId: number = this.currentGroupId, basketId: number = this.currentBasketId, resIds: number[] = this.currentResIds) {
+    unlockResource(userId: number = this.currentUserId, groupId: number = this.currentGroupId, basketId: number = this.currentBasketId, resIds: number[] = this.currentResIds, path: string = null) {
         if (resIds.length > 0) {
             console.debug(`Unlock resources : ${resIds}`);
             this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/unlock`, { resources: resIds }).pipe(
                 catchError((err: any) => {
-                    this.notify.handleErrors(err);
+                    if (path !== null) {
+                        this.router.navigate([path]);
+                    } else {
+                        this.notify.handleErrors(err);
+                    }
                     return of(false);
                 })
             ).subscribe();
