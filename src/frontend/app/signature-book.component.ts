@@ -151,7 +151,6 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                         return;
                     }
                     this.signatureBook = data;
-                    console.dir("this.signatureBook", this.signatureBook);
                     this.canUpdateDocument = data.canUpdateDocuments;
                     this.headerTab = 'document';
                     this.leftSelectedThumbnail = 0;
