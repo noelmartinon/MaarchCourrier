@@ -72,6 +72,8 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
     pathToRedirect: string = '';
 
+    allResources: number[] = [];
+
     processTool: any[] = [
         {
             id: 'notes',
@@ -199,7 +201,18 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
                     }, 0);
                     this.loadBadges();
                     this.loadActions();
-                    
+
+                    const path: string = `resourcesList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}?limit=10&offset=0`;
+                    this.http.get(`../rest/${path}`).pipe(
+                        tap((data: any) => {
+                            this.allResources = data.allResources;
+                        }),
+                        catchError((err: any) => {
+                            this.notify.handleSoftErrors(err);
+                            return of(false);
+                        })
+                    ).subscribe();
+
                     if (this.appDocumentViewer !== undefined) {
                         this.appDocumentViewer.loadRessource(this.signatureBook.attachments[this.rightSelectedThumbnail].signed ? this.signatureBook.attachments[this.rightSelectedThumbnail].viewerId : this.signatureBook.attachments[this.rightSelectedThumbnail].res_id, this.signatureBook.attachments[this.rightSelectedThumbnail].isResource ?  'mainDocument' : 'attachment');
                     }
@@ -341,16 +354,33 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
         this.http.get(`../rest/${path}`).pipe(
             tap((data: any) => {
                 if (data.defaultAction?.component === 'signatureBookAction' && data.defaultAction?.data.goToNextDocument) {
-                    if (data.count > 0) {                        
-                        this.router.navigate([`/signatureBook/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/resources/${data.allResources[0]}`])
+                    if (data.count > 0) {
+                        let index: number;
+                        if (data.allResources.indexOf(this.resId) > -1) {
+                            index = data.allResources.indexOf(this.resId);
+                        } else {
+                            if (this.allResources.length > 2 && this.allResources.indexOf(this.resId) !== this.allResources.length - 1) {
+                                index = this.allResources.indexOf(this.resId) + 1;
+                            } else {
+                                index = 0;
+                            }
+                        }
+                        this.router.navigate([`/signatureBook/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}/resources/${data.allResources[index]}`])
                     } else {
                         this.pathToRedirect = `/basketList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}`;
                         this.router.navigate([this.pathToRedirect]);
                     }
+                    // this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId]);
                 } else {
-                    this.pathToRedirect = `/basketList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}`;
-                    this.router.navigate([this.pathToRedirect]);
+                    if (data.allResources.indexOf(this.resId) === -1) {
+                        this.pathToRedirect = `/basketList/users/${this.userId}/groups/${this.groupId}/baskets/${this.basketId}`;
+                        this.router.navigate([this.pathToRedirect]);
+                    }
                 }
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
             })
         ).subscribe();
     }
