@@ -11,9 +11,8 @@
                 <b *ngIf="data.resIds.length > 1" color="primary" class="highlight">{{data.resIds.length}}
                     {{'lang.elements' | translate}}</b> ?
                     <div *ngIf="data.resIds.length > 1" class="alert-message alert-message-info" role="alert" style="margin-top: 30px;" [innerHTML]="'lang.rejectVisaBack' | translate"></div>
-                    <!-- SGAMI-SO #75 -->
-                    <div *ngIf="data.resIds.length == 1 && appVisaWorkflow !== undefined && appVisaWorkflow.getLastVisaUser() !== ''" class="alert-message alert-message-info" role="alert" style="margin-top: 30px;" [innerHTML]="('lang.rejectVisaBackUser' | translate) + ' <b>' + appVisaWorkflow.getLastVisaUserSgami().labelToDisplay + '</b>'"></div>
-                    <!-- SGAMI-SO FIN -->
+                    <div *ngIf="data.resIds.length == 1 && appVisaWorkflow !== undefined && appVisaWorkflow.getLastVisaUser() !== ''" class="alert-message alert-message-info" role="alert" style="margin-top: 30px;" [innerHTML]="('lang.rejectVisaBackUser' | translate) + ' <b>' + appVisaWorkflow.getLastVisaUser().labelToDisplay + '</b>'"></div>
+    
                 <div *ngIf="resourcesErrors.length > 0" class="alert-message alert-message-danger mailList" role="alert">
                     <p>
                         {{'lang.canNotMakeAction' | translate}} :
@@ -31,10 +30,8 @@
                         </li>
                     </ul>
                 </div>
-                
-                <!-- SGAMI-SO #75 -->
-                <app-visa-workflow *ngIf="data.resIds.length == 1" [adminMode]="false" [resId]="data.resIds[0]" [target]="'action!'" #appVisaWorkflow>
-                <!-- SGAMI-SO #75 -->
+    
+                <app-visa-workflow *ngIf="data.resIds.length == 1" [adminMode]="false" [resId]="data.resIds[0]" [target]="'action'" #appVisaWorkflow>
                 </app-visa-workflow>
             </div>
             <div class="col-md-12">

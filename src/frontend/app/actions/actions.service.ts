@@ -321,11 +321,8 @@ export class ActionsService implements OnDestroy {
         //50000
     }
 
-    unlockResource(userId: number = this.currentUserId, groupId: number = this.currentGroupId, basketId: number = this.currentBasketId, resIds: number[] = this.currentResIds) {
-        //SGAMI-SO #75
-        // La condition resIds.length > 0 est fausse car le tableau est sert vide mais il existe dans il une longueur de 1 
-        // il faut test si le tableau est vide aussi 
-        if (resIds.length > 0 && resIds[0] != null ) {
+    unlockResource(userId: number = this.currentUserId, groupId: number = this.currentGroupId, basketId: number = this.currentBasketId, resIds: number[] = this.currentResIds, path: string = null) {
+        if (resIds.length > 0) {
             console.debug(`Unlock resources : ${resIds}`);
             this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/unlock`, { resources: resIds }).pipe(
                 catchError((err: any) => {

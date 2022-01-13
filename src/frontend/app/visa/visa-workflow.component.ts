@@ -14,7 +14,6 @@ import { ConfirmComponent } from '@plugins/modal/confirm.component';
 import { ActivatedRoute } from '@angular/router';
 import { PrivilegeService } from '@service/privileges.service';
 import { HeaderService } from '@service/header.service';
-
 @Component({
     selector: 'app-visa-workflow',
     templateUrl: 'visa-workflow.component.html',
@@ -70,7 +69,7 @@ export class VisaWorkflowComponent implements OnInit {
         private scanPipe: ScanPipe,
         private route: ActivatedRoute,
         private privilegeService: PrivilegeService,
-        public headerService: HeaderService
+        public headerService: HeaderService,
     ) {
         // ngOnInit is not called if navigating in the same component : must be in constructor for this case
         this.route.params.subscribe(params => {
@@ -434,14 +433,6 @@ export class VisaWorkflowComponent implements OnInit {
         return !this.functions.empty(arrOnlyProcess[arrOnlyProcess.length - 1]) ? arrOnlyProcess[arrOnlyProcess.length - 1] : '';
     }
 
-    //SGAMI 75
-    getLastVisaUserSgami() {       
-        const element = this.visaWorkflow.items.filter((item: any) => this.functions.empty(item.process_date) && item.isValid); 
-        const arrOnlyProcess = [element[0]]
-        return !this.functions.empty(arrOnlyProcess[arrOnlyProcess.length - 1]) ? arrOnlyProcess[arrOnlyProcess.length - 1] : '';
-    }
-    //SGAMI 75
-
     getRealIndex(index: number) {
         while (index < this.visaWorkflow.items.length && !this.visaWorkflow.items[index].isValid) {
             index++;
@@ -475,8 +466,8 @@ export class VisaWorkflowComponent implements OnInit {
                         listInstances: this.visaWorkflow.items
                     };
                 });
-                this.http.put(`../rest/circuits/visaCircuit`, { resources: arrVisa }).pipe(
-                    tap((data: any) => {
+                this.http.put(`../rest/circuits/visaCircuit`, { resources: arrVisa }).pipe(                   
+                    tap((data: any) => {                        
                         this.visaWorkflowClone = JSON.parse(JSON.stringify(this.visaWorkflow.items));
                         this.notify.success(this.translate.instant('lang.visaWorkflowUpdated'));
                         resolve(true);
