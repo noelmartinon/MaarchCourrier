@@ -62,6 +62,12 @@ export class ActionsService implements OnDestroy {
     currentResIds: number[] = [];
     currentResourceInformations: any = null;
 
+    //SGAMI-SO #75
+    basket: any = null
+    sgami75: any = null
+    sgami75_2: any = null
+    //SGAMI-SO #75
+
     loading: boolean = false;
 
     indexActionRoute: string;
@@ -223,9 +229,45 @@ export class ActionsService implements OnDestroy {
         return !this.functions.empty(this.currentResourceLock);
     }
 
+    /** 
+     * SGAMI-SO DEBUT #75
+     * */
+    nameBasket(basketId: number = this.currentBasketId,userId: number = this.currentUserId,) {      
+        this.http.get('../rest/basket/' + basketId + '/users/' + userId)
+        .subscribe((data: any) => {    
+            this.basket = data.basket.basket_id;
+            
+        });
+    }
+
+
+    listBasketCurrent(userId , groupId,basketId, resId) { 
+                      
+        this.http.get('../rest/resourcesList/users/'+userId+'/groups/'+groupId+'/baskets/'+basketId).subscribe((data: any) => {    
+            
+            this.sgami75 = data.allResources.filter((action:any) => action != resId);           
+        });
+    }
+
+
+    signatureCurrent(basketId, groupId, userId, resId) {      
+                           
+        this.http.get('../rest/signatureBook/users/'+userId+'/groups/'+groupId+'/baskets/'+basketId+'/resources/' + resId).subscribe((data: any) => {    
+                           
+            this.sgami75_2 = data;
+        });
+    }
+    /** 
+     * SGAMI FIN  
+     **/
+
+
+
     lockResource(userId: number = this.currentUserId, groupId: number = this.currentGroupId, basketId: number = this.currentBasketId, resIds: number[] = this.currentResIds) {
         console.debug(`Lock resources : ${resIds}`);
 
+
+       
         this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/lock`, { resources: resIds }).pipe(
             tap(() => console.debug(`Cycle lock : `, this.currentResourceLock)),
             catchError((err: any) => {
@@ -233,6 +275,12 @@ export class ActionsService implements OnDestroy {
                 return of(false);
             })
         ).subscribe();
+
+
+        //SGAMI-SO #75
+        this.nameBasket(basketId)
+        this.listBasketCurrent(userId,groupId,basketId, resIds)
+        //SGAMI-SO  FIN 
 
         if (!this.functions.empty(this.currentResourceLock)) {
             clearInterval(this.currentResourceLock);
@@ -245,11 +293,32 @@ export class ActionsService implements OnDestroy {
                     if (err.status === 403) {
                         clearInterval(this.currentResourceLock);
                     }
-                    this.notify.handleErrors(err);
+
+                    /**
+                     * SGAMI-SO #75
+                     *
+                    if( String(this.basket) == 'EvisBasket' || String(this.basket) == 'EsigBasket') {
+                    
+                        if(this.sgami75.length > 0) {
+                            err.sgami = 1
+                            err.url = '/signatureBook/users/'+userId+'/groups/'+groupId+'/baskets/'+basketId+'/resources/' + this.sgami75[0]
+                            this.router.navigate([err.url]);
+                        }else{
+                            this.router.navigate(['/home']);
+                        }
+                    }else{*/
+                        this.notify.handleErrors(err);
+                    /*}
+                    /**
+                     * SGAMI-SO FIN
+                     */
+
+                    
                     return of(false);
                 })
             ).subscribe();
         }, 50000);
+        //50000
     }
 
     unlockResource(userId: number = this.currentUserId, groupId: number = this.currentGroupId, basketId: number = this.currentBasketId, resIds: number[] = this.currentResIds) {
@@ -260,7 +329,11 @@ export class ActionsService implements OnDestroy {
             console.debug(`Unlock resources : ${resIds}`);
             this.http.put(`../rest/resourcesList/users/${userId}/groups/${groupId}/baskets/${basketId}/unlock`, { resources: resIds }).pipe(
                 catchError((err: any) => {
-                    this.notify.handleErrors(err);
+                    if (path !== null) {
+                        this.router.navigate([path]);
+                    } else {
+                        this.notify.handleErrors(err);
+                    }
                     return of(false);
                 })
             ).subscribe();

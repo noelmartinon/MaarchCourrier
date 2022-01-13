@@ -27,7 +27,6 @@ export class AppGuard implements CanActivate {
 
         console.debug('== ROUTE GUARD ==');
         console.debug(state.url);
-
         this.headerService.resetSideNavSelection();
 
         return this.authService.getLoginInformations(state.url)

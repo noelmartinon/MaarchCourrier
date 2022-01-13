@@ -252,6 +252,7 @@ export class ListAdministrationComponent implements OnInit {
         canUpdateData: false,
         canUpdateModel: false,
         canUpdateDocuments: false,
+        goToNextDocument: false
     };
     selectedProcessToolClone: string = null;
 
@@ -287,6 +288,8 @@ export class ListAdministrationComponent implements OnInit {
             this.selectedProcessTool.canUpdateModel = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdateModel;
         } else if (this.basketGroup.list_event === 'signatureBookAction') {
             this.selectedProcessTool.canUpdateDocuments = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.canUpdateDocuments;
+            this.selectedProcessTool.goToNextDocument = this.basketGroup.list_event_data === null ? false : this.basketGroup.list_event_data.goToNextDocument;
+
         }
 
         this.selectedProcessToolClone = JSON.parse(JSON.stringify(this.selectedProcessTool));

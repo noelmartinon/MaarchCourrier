@@ -36,6 +36,11 @@
         <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.canUpdateDocuments">
             {{'lang.canUpdateResourcesInSignatureBook' | translate}}</mat-slide-toggle>
     </div>
+    <div style="padding: 10px;">
+        <mat-slide-toggle color="primary" [(ngModel)]="selectedProcessTool.goToNextDocument">
+            {{'lang.goToNextDocument' | translate}}
+        </mat-slide-toggle>
+    </div>
 </div>
 <hr />
 <mat-toolbar class="editorTool">
@@ -89,7 +94,7 @@
         [sortableData]="displayedSecondaryData" style="border: solid 1px #F9983066;border-radius: 4px;">
         <mat-toolbar class="secondaryInformations example-list column-{{selectedTemplateDisplayedSecondaryData}}-list">
             <ng-container *ngFor="let item of displayedSecondaryData;let i=index">
-                <span class="example-box" *ngIf="item.value != 'getFolders'" dnd-sortable [sortableIndex]="i">
+                <span class="example-box" *ngIf="item?.value != 'getFolders'" dnd-sortable [sortableIndex]="i">
                     <button *ngIf="displayMode=='label'" color="primary" mat-icon-button [matMenuTriggerFor]="menu">
                         <mat-icon fontSet="fas" fontIcon="fa-ellipsis-v fa-2x"></mat-icon>
                     </button>
@@ -100,38 +105,38 @@
                             <span>{{'lang.delete' | translate}}</span>
                         </button>
                         <mat-divider></mat-divider>
-                        <button [class.isSelectedMenu]="item.cssClasses.indexOf('boldFontData') > -1" mat-menu-item
+                        <button [class.isSelectedMenu]="item?.cssClasses.indexOf('boldFontData') > -1" mat-menu-item
                             (click)="setStyle(item,'boldFontData')">
                             <mat-icon class="secondaryInformations_icon" fontSet="fas" fontIcon="fa-bold fa-2x">
                             </mat-icon>
                             <span>{{'lang.fontBold' | translate}}</span>
                         </button>
-                        <button [class.isSelectedMenu]="item.cssClasses.indexOf('align_leftData') > -1" mat-menu-item
+                        <button [class.isSelectedMenu]="item?.cssClasses.indexOf('align_leftData') > -1" mat-menu-item
                             (click)="setStyle(item,'align_leftData')">
                             <mat-icon class="secondaryInformations_icon" fontSet="fas" fontIcon="fa-align-left fa-2x">
                             </mat-icon>
                             <span>{{'lang.alignLeft' | translate}}</span>
                         </button>
-                        <button [class.isSelectedMenu]="item.cssClasses.indexOf('align_centerData') > -1" mat-menu-item
+                        <button [class.isSelectedMenu]="item?.cssClasses.indexOf('align_centerData') > -1" mat-menu-item
                             (click)="setStyle(item,'align_centerData')">
                             <mat-icon class="secondaryInformations_icon" fontSet="fas" fontIcon="fa-align-center fa-2x">
                             </mat-icon>
                             <span>{{'lang.alignCenter' | translate}}</span>
                         </button>
-                        <button [class.isSelectedMenu]="item.cssClasses.indexOf('align_rightData') > -1" mat-menu-item
+                        <button [class.isSelectedMenu]="item?.cssClasses.indexOf('align_rightData') > -1" mat-menu-item
                             (click)="setStyle(item,'align_rightData')">
                             <mat-icon class="secondaryInformations_icon" fontSet="fas" fontIcon="fa-align-right fa-2x">
                             </mat-icon>
                             <span>{{'lang.alignRight' | translate}}</span>
                         </button>
-                        <button [class.isSelectedMenu]="item.cssClasses.indexOf('bigFontData') > -1" mat-menu-item
+                        <button [class.isSelectedMenu]="item?.cssClasses.indexOf('bigFontData') > -1" mat-menu-item
                             (click)="setStyle(item,'bigFontData')">
                             <mat-icon class="secondaryInformations_icon" fontSet="fas" fontIcon="fa-text-height fa-2x">
                             </mat-icon>
                             <span>{{'lang.fontBig' | translate}}</span>
                         </button>
                     </mat-menu>
-                    <span style="width:100%;" [class]="item.cssClasses.join(' ')">
+                    <span style="width:100%;" [class]="item?.cssClasses.join(' ')">
                         <i class="fa {{item.icon}}"></i>&nbsp;
                         <span class="secondaryInformations_label" [innerHTML]="item[displayMode]"></span>
                     </span>

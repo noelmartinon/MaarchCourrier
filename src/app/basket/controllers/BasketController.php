@@ -40,6 +40,22 @@ class BasketController
         return $response->withJson(['baskets' => BasketModel::get()]);
     }
 
+    //
+    public function getId(Request $request, Response $response, array $aArgs)
+    {
+        /*if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_baskets', 'userId' => $GLOBALS['id']])) {
+            return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
+        }*/
+
+        $basket = BasketModel::getById(['id' => $aArgs['id']]);
+        if (empty($basket)) {
+            return $response->withStatus(400)->withJson(['errors' => 'Basket not found']);
+        }
+
+        return $response->withJson(['basket' => $basket]);
+    }
+    //
+
     public function getById(Request $request, Response $response, array $aArgs)
     {
         if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_baskets', 'userId' => $GLOBALS['id']])) {
@@ -531,6 +547,7 @@ class BasketController
         } elseif ($data['list_event'] == 'signatureBookAction') {
             $listEventData = [
                 'canUpdateDocuments' => !empty($data['list_event_data']['canUpdateDocuments']),
+                'goToNextDocument' => !empty($data['list_event_data']['goToNextDocument']),
             ];
         }
 
