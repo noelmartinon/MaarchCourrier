@@ -639,6 +639,32 @@ class ListInstanceController
 
         DatabaseModel::commitTransaction();
 
+        //SGAMI-SO #75 reaffectation de viseurs à viseurs
+        $courrier = \Resource\models\ResModel::get([
+            'select'  => ['*'],
+            'where'   => ['res_id = ?' ],
+            'data'    => [$resId]
+        ]);
+        if($courrier[0]['status'] == 'EVIS' || $courrier[0]['status'] == 'ESIG') {
+            if($args['type'] == 'visaCircuit') {
+                $retour = ListInstanceModel::get([
+                    'select'  => ['*'],
+                    'where'   => ['res_id = ?', 'difflist_type = ?', 'process_date isnull' ],
+                    'data'    => [$resId, 'VISA_CIRCUIT'],
+                    'orderBy' => ['sequence']
+                ]);
+                if($retour[0]['item_mode'] == 'visa') {
+                    $set['status'] = 'EVIS';
+                    ResModel::update([
+                        'set'   => $set,
+                        'where' => ['res_id in (?)'],
+                        'data'  => [$resId]
+                    ]);
+                }
+            }
+        }
+        //SGAMI-SO -FIN
+
         return $response->withStatus(204);
     }
 
