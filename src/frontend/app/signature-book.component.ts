@@ -340,7 +340,7 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
     }
 
     canChange(assignedBasket: any) {
-        const usersHasNotSigned: any[] = this.appVisaWorkflow.visaWorkflow.items.filter((user: any) => user.process_date === null);
+        const usersHasNotSigned: any[] = this.appVisaWorkflow.getWorkflow().filter((user: any) => this.functions.empty(user.process_date));
         if (assignedBasket === undefined) {
             return usersHasNotSigned[0].item_id !== this.headerService.user.id;
         } else {
