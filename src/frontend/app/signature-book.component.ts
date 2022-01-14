@@ -313,7 +313,6 @@ export class SignatureBookComponent implements OnInit, OnDestroy {
 
     async saveTool() {
         if (this.headerTab === 'visaCircuit' && this.appVisaWorkflow !== undefined) {
-            this.actionService.unlockResource(this.userId, this.groupId, this.basketId, [this.resId], this.pathToRedirect);
             await this.appVisaWorkflow.saveVisaWorkflow().finally(() => {
                 let assignedBasket: any;
                 this.http.get('../rest/home').pipe(
