@@ -821,7 +821,7 @@ END$$;
 
 /* DATA */
 TRUNCATE TABLE custom_fields;
-INSERT INTO custom_fields (id, label, type, values) VALUES (1, 'Nature', 'select', '["Courrier simple", "Courriel", "Courrier suivi", "Courrier avec AR", "Autre"]');
+INSERT INTO custom_fields (id, label, type, values) VALUES (1, 'Nature', 'select', '["Lettre", "Courriel", "Ouvrage / Brochure / Rapport", "Courrier postal recommandé", "Courrier PM", "Retour de transmission", "Plis numérique"]');
 SELECT setval('custom_fields_id_seq', (select max(id)+1 from custom_fields), false);
 
 DO $$ BEGIN
