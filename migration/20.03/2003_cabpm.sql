@@ -823,14 +823,15 @@ END$$;
 TRUNCATE TABLE custom_fields;
 INSERT INTO custom_fields (id, label, type, values) VALUES (1, 'Nature', 'select', '["Lettre", "Courriel", "Ouvrage / Brochure / Rapport", "Courrier postal recommandé", "Courrier PM", "Retour de transmission", "Plis numérique"]');
 SELECT setval('custom_fields_id_seq', (select max(id)+1 from custom_fields), false);
-
 DO $$ BEGIN
   IF (SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'mlb_coll_ext')) THEN
-    UPDATE res_letterbox SET custom_fields = json_build_object('1', 'Courrier simple') FROM mlb_coll_ext WHERE res_letterbox.res_id = mlb_coll_ext.res_id AND mlb_coll_ext.nature_id = 'simple_mail';
+    UPDATE res_letterbox SET custom_fields = json_build_object('1', 'Lettre') FROM mlb_coll_ext WHERE res_letterbox.res_id = mlb_coll_ext.res_id AND mlb_coll_ext.nature_id = 'mail';
     UPDATE res_letterbox SET custom_fields = json_build_object('1', 'Courriel') FROM mlb_coll_ext WHERE res_letterbox.res_id = mlb_coll_ext.res_id AND mlb_coll_ext.nature_id = 'email';
-    UPDATE res_letterbox SET custom_fields = json_build_object('1', 'Autre') FROM mlb_coll_ext WHERE res_letterbox.res_id = mlb_coll_ext.res_id AND mlb_coll_ext.nature_id in ('fax', 'other', 'courier');
-    UPDATE res_letterbox SET custom_fields = json_build_object('1', 'Courrier suivi') FROM mlb_coll_ext WHERE res_letterbox.res_id = mlb_coll_ext.res_id AND mlb_coll_ext.nature_id in ('chronopost', 'fedex');
-    UPDATE res_letterbox SET custom_fields = json_build_object('1', 'Courrier avec AR') FROM mlb_coll_ext WHERE res_letterbox.res_id = mlb_coll_ext.res_id AND mlb_coll_ext.nature_id = 'registered_mail';
+    UPDATE res_letterbox SET custom_fields = json_build_object('1', 'Ouvrage / Brochure / Rapport') FROM mlb_coll_ext WHERE res_letterbox.res_id = mlb_coll_ext.res_id AND mlb_coll_ext.nature_id = 'report_brochure';
+    UPDATE res_letterbox SET custom_fields = json_build_object('1', 'Courrier postal recommandé') FROM mlb_coll_ext WHERE res_letterbox.res_id = mlb_coll_ext.res_id AND mlb_coll_ext.nature_id = '_mail_ar';
+    UPDATE res_letterbox SET custom_fields = json_build_object('1', 'Courrier PM') FROM mlb_coll_ext WHERE res_letterbox.res_id = mlb_coll_ext.res_id AND mlb_coll_ext.nature_id = 'courrier_pm';
+    UPDATE res_letterbox SET custom_fields = json_build_object('1', 'Retour de transmission') FROM mlb_coll_ext WHERE res_letterbox.res_id = mlb_coll_ext.res_id AND mlb_coll_ext.nature_id = 'transmission_return';
+    UPDATE res_letterbox SET custom_fields = json_build_object('1', 'Plis numérique') FROM mlb_coll_ext WHERE res_letterbox.res_id = mlb_coll_ext.res_id AND mlb_coll_ext.nature_id = 'message_exchange';
   END IF;
 END$$;
 UPDATE baskets set basket_clause = replace(basket_clause, 'nature_id' , 'custom_fields->>''1''');
