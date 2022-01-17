@@ -40,7 +40,7 @@
                         </div>
                         <div class="attachment-form-item">
                             <mat-form-field class="input-form">
-                                <input matInput placeholder="{{'lang.subject' | translate}}" [formControl]="attachment['title']">
+                                <input matInput placeholder="{{'lang.subject' | translate}}" maxlength="255" [formControl]="attachment['title']">
                             </mat-form-field>
                             <div class="fieldState">
                                 <i class="fas fa-asterisk fieldRequired"
