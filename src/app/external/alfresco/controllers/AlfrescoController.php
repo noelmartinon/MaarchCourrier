@@ -625,8 +625,13 @@ class AlfrescoController
         }
         $resourceFolderId = $curlResponse['response']['entry']['id'];
 
-        $alfrescoCharRefused = [':', '*', '\'', '"', '>', '<', '|', '/'];
-        $document['subject'] = ltrim(str_replace($alfrescoCharRefused, ' ', $document['subject']));
+        // regex matching INVALID folder or document name, used in Alfresco:
+        // (.*[\"\*\\\>\<\?\/\:\|]+.*)|(.*[\.]?.*[\.]+$)|(.*[ ]+$)
+        $alfrescoCharRefused = str_split('"*\\><?/:|');
+        $alfrescoCharToRtrim = '. ';
+        $document['subject'] = str_replace($alfrescoCharRefused, '', $document['subject']); // replace refused character with a blank space
+        $document['subject'] = preg_replace('/\s+/u', ' ', $document['subject']); // squeeze spaces including unicode
+        $document['subject'] = trim($document['subject'], $alfrescoCharToRtrim); // trim beginning and end
         $multipartBody = [
             'filedata' => ['isFile' => true, 'filename' => $document['subject'], 'content' => $fileContent],
         ];
@@ -754,7 +759,9 @@ class AlfrescoController
         $firstAttachment = true;
         $attachmentsTitlesSent = [];
         foreach ($attachments as $attachment) {
-            $attachment['title'] = ltrim(str_replace($alfrescoCharRefused, ' ', $attachment['title']));
+            $attachment['title'] = str_replace($alfrescoCharRefused, '', $attachment['title']);
+            $attachment['title'] = preg_replace('/\s+/u', ' ', $attachment['title']);
+            $attachment['title'] = trim($attachment['title'], $alfrescoCharToRtrim);
             $adrInfo = [
                 'docserver_id'  => $attachment['docserver_id'],
                 'path'          => $attachment['path'],
