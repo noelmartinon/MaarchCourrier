@@ -2629,5 +2629,18 @@
     "multigestId": "Identifiant unique (UID) Multigest",
     "downloadFile": "Télécharger le fichier",
     "pdfFormat": "Format pdf",
-    "summarySheetMandatory": "<b>Vous devez attacher une fiche de liaison en cas d'impression de masse</b>"
+    "summarySheetMandatory": "<b>Vous devez attacher une fiche de liaison en cas d'impression de masse</b>",
+    "mailevaStatus": "Statut Maileva associé",
+    "ON_STATUS_ACCEPTED": "Accepté",
+    "ON_STATUS_REJECTED": "Refusé",
+    "ON_STATUS_PROCESSED": "Traité",
+    "ON_STATUS_ARCHIVED": "Archivé",
+    "showShippingHistory": "Afficher l'historique de l'envoi Maileva",
+    "sendDate": "Date d'envoi",
+    "shippingSubscribe": "Abonnement aux notifications activé",
+    "shippingUnsubscribe": "Abonnement aux notifications désactivé",
+    "depositProof": "Preuve de dépôt",
+    "emptyShippingHistory": "L'historique de l'envoi Maileva est vide.",
+    "depositProofShipping": "Preuve de dépôt envoyée par Maileva",
+    "shippingSubscriptionDesc": "Permet de s'abonner aux notifications de suivi d'un courrier"
 }

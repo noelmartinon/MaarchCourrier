@@ -2631,5 +2631,17 @@
     "multigestId": "Multigest Unique Identifier (UID)",
     "downloadFile": "Download file",
     "pdfFormat": "pdf format",
-    "summarySheetMandatory": "<b>You must attach a summary sheet in case of mass printing</b>"
+    "summarySheetMandatory": "<b>You must attach a summary sheet in case of mass printing</b>",
+    "ON_STATUS_ACCEPTED": "Accepted",
+    "ON_STATUS_REJECTED": "Rejected",
+    "ON_STATUS_PROCESSED": "Processed",
+    "ON_STATUS_ARCHIVED": "Archived",
+    "showShippingHistory": "View Maileva sending history",
+    "sendDate": "Sending date",
+    "shippingSubscribe": "Subscribe to notifications enabled",
+    "shippingUnsubscribe": "Subscribe to notifications disabled",
+    "depositProof": "Deposit proof",
+    "emptyShippingHistory": "The Maileva sending history is empty.",
+    "depositProofShipping": "Proof of deposit sent by Maileva",
+    "shippingSubscriptionDesc": "Allows you to subscribe to mail follow-up notifications"
 }

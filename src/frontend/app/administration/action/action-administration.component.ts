@@ -39,13 +39,51 @@ export class ActionAdministrationComponent implements OnInit {
     canAddCopies: boolean;
     successStatus: any;
     errorStatus: any;
+    intermediateStatus: any;
+
 
     selectActionPageId = new FormControl();
     selectStatusId = new FormControl();
     selectSuccessStatusId = new FormControl();
     selectErrorStatusId = new FormControl();
+    selectIntermidiateStatusId = new FormControl();
 
-    intermediateStatusActions = ['sendToRecordManagement', 'sendToExternalSignatureBook', 'send_to_visa', 'visa_workflow'];
+    intermediateStatusActions = ['sendToRecordManagement', 'sendToExternalSignatureBook', 'send_to_visa', 'visa_workflow', 'send_shipping'];
+
+    mailevaStatus: any[] = [
+        {
+            id: 'ON_STATUS_ACCEPTED',
+            label: this.translate.instant('lang.ON_STATUS_ACCEPTED'),
+            actionStatus: null,
+            disabled: false
+        },
+        {
+            id: 'ON_STATUS_REJECTED',
+            label: this.translate.instant('lang.ON_STATUS_REJECTED'),
+            actionStatus: null,
+            disabled: false
+        },
+        {
+            id: 'ON_STATUS_PROCESSED',
+            label: this.translate.instant('lang.ON_STATUS_PROCESSED'),
+            actionStatus: null,
+            disabled: false
+        },
+        {
+            id: 'ON_STATUS_ARCHIVED',
+            label: this.translate.instant('lang.ON_STATUS_ARCHIVED'),
+            actionStatus: null,
+            disabled: false
+        },
+    ];
+
+    intermediateSelectedStatus: any[] = [];
+    finalSelectedStatus: any[] = [];
+    errorSelectedStatus: any[] = [];
+
+    intermediateStatusParams: any = {};
+    finalStatusParams: any = {};
+    errorStatusParams: any = {};
 
     constructor(
         public translate: TranslateService,
@@ -60,6 +98,10 @@ export class ActionAdministrationComponent implements OnInit {
 
     ngOnInit(): void {
         this.loading = true;
+
+        this.setIntermediateStatus();
+        this.setFinalStatus();
+        this.setErrorStatus();
 
         this.route.params.subscribe(params => {
 
@@ -93,6 +135,10 @@ export class ActionAdministrationComponent implements OnInit {
                     });
             } else {
                 this.creationMode = false;
+
+                this.intermediateSelectedStatus = this.mailevaStatus.filter((item: any) => item.actionStatus === 'intermediateStatus').map((el: any) => el.id);
+                this.finalSelectedStatus = this.mailevaStatus.filter((item: any) => item.actionStatus === 'finalStatus').map((el: any) => el.id);
+                this.errorSelectedStatus = this.mailevaStatus.filter((item: any) => item.actionStatus === 'errorStatus').map((el: any) => el.id);
 
                 this.http.get('../rest/actions/' + params['id'])
                     .subscribe(async (data: any) => {
@@ -133,6 +179,15 @@ export class ActionAdministrationComponent implements OnInit {
                         } else if (this.action.actionPageId === 'create_acknowledgement_receipt') {
                             this.arMode = this.action.parameters.mode;
                             this.canAddCopies = this.action.parameters.canAddCopies;
+                        }  else if (this.action.actionPageId === 'send_shipping') {
+                            if (!this.functions.empty(this.action.parameters.intermediateStatus)) {
+                                this.selectIntermidiateStatusId.setValue(this.action.parameters.intermediateStatus.actionStatus);
+                                this.selectSuccessStatusId.setValue(this.action.parameters.finalStatus.actionStatus);
+                                this.selectErrorStatusId.setValue(this.action.parameters.errorStatus.actionStatus);
+                                this.getSelectedStatus(this.action.parameters.intermediateStatus.mailevaStatus, 'intermediateStatus');
+                                this.getSelectedStatus(this.action.parameters.finalStatus.mailevaStatus, 'finalStatus');
+                                this.getSelectedStatus(this.action.parameters.errorStatus.mailevaStatus, 'errorStatus');
+                            }
                         } else if (this.intermediateStatusActions.indexOf(this.action.actionPageId) !== -1) {
                             this.selectSuccessStatusId.setValue(this.action.parameters.successStatus);
                             this.selectErrorStatusId.setValue(this.action.parameters.errorStatus);
@@ -155,6 +210,7 @@ export class ActionAdministrationComponent implements OnInit {
         if (this.intermediateStatusActions.indexOf(this.action.actionPageId) !== -1) {
             this.selectSuccessStatusId.setValue('_NOSTATUS_');
             this.selectErrorStatusId.setValue('_NOSTATUS_');
+            this.selectIntermidiateStatusId.setValue('_NOSTATUS_');
         }
 
         return new Promise((resolve) => {
@@ -202,6 +258,24 @@ export class ActionAdministrationComponent implements OnInit {
             this.action.parameters = { requiredFields: this.selectedFieldsId };
         } else if (this.action.actionPageId === 'create_acknowledgement_receipt') {
             this.action.parameters = { mode: this.arMode, canAddCopies : this.canAddCopies };
+        } else if (this.action.actionPageId === 'send_shipping') {
+            const intermediateStatus = {
+                actionStatus: this.selectIntermidiateStatusId.value,
+                mailevaStatus: this.intermediateSelectedStatus
+            };
+            const finalStatus = {
+                actionStatus: this.selectSuccessStatusId.value,
+                mailevaStatus: this.finalSelectedStatus
+            };
+            const errorStatus = {
+                actionStatus: this.selectErrorStatusId.value,
+                mailevaStatus: this.errorSelectedStatus
+            };
+            this.action.parameters = {
+                intermediateStatus: intermediateStatus,
+                finalStatus: finalStatus,
+                errorStatus: errorStatus
+            };
         } else if (this.intermediateStatusActions.indexOf(this.action.actionPageId) !== -1) {
             this.action.parameters = { successStatus: this.successStatus, errorStatus: this.errorStatus };
         }
@@ -226,6 +300,111 @@ export class ActionAdministrationComponent implements OnInit {
                 }, (err) => {
                     this.notify.error(err.error.errors);
                 });
+        }
+    }
+
+    getSelectedStatus(mailevaStatus: any[], actionStatus: string) {
+        if (actionStatus === 'intermediateStatus') {
+            this.checkSelection(mailevaStatus, 'intermediateStatus');
+            this.setIntermediateStatus(mailevaStatus);
+            this.finalStatusParams.data.forEach((element: any) => {
+                element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled ? true : false;
+            });
+            this.errorStatusParams.data.forEach((element: any) => {
+                element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled ? true : false;
+            });
+
+        } else if (actionStatus === 'finalStatus') {
+            this.checkSelection(mailevaStatus, 'finalStatus');
+            this.setFinalStatus(mailevaStatus);
+            this.intermediateStatusParams.data.forEach((element: any) => {
+                element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled  ? true : false;
+            });
+            this.errorStatusParams.data.forEach((element: any) => {
+                element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled  ? true : false;
+            });
+        } else if (actionStatus === 'errorStatus') {
+            this.checkSelection(mailevaStatus, 'errorStatus');
+            this.setErrorStatus(mailevaStatus);
+            this.intermediateStatusParams.data.forEach((element: any) => {
+                element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled  ? true : false;
+            });
+            this.finalStatusParams.data.forEach((element: any) => {
+                element.disabled = mailevaStatus.indexOf(element.id) > - 1 || element.disabled  ? true : false;
+            });
+        }
+    }
+
+    setIntermediateStatus(mailevaStatus: any[] = null) {
+        if (mailevaStatus !== null) {
+            const data: any[] = this.intermediateStatusParams.data;
+            data.forEach((element: any, index: number) => {
+                element.actionStatus = mailevaStatus.indexOf(element.id) > -1 ? 'intermediateStatus' : null;
+            });
+            this.intermediateSelectedStatus = mailevaStatus;
+        } else {
+            const data: any = JSON.parse(JSON.stringify(this.mailevaStatus));
+            this.intermediateStatusParams = {
+                id: 'intermediateStatus',
+                data: data
+            };
+        }
+    }
+
+    setFinalStatus(mailevaStatus: any[] = null) {
+        if (mailevaStatus !== null) {
+            const data: any[] = this.finalStatusParams.data;
+            data.forEach((element: any, index: number) => {
+                element.actionStatus = mailevaStatus.indexOf(element.id) > -1 ? 'finalStatus' : null;
+            });
+            this.finalSelectedStatus = mailevaStatus;
+        } else {
+            const data: any = JSON.parse(JSON.stringify(this.mailevaStatus));
+            this.finalStatusParams = {
+                id: 'finalStatus',
+                data: data
+            };
+        }
+    }
+
+    setErrorStatus(mailevaStatus: any[] = null) {
+        if (mailevaStatus !== null) {
+            const data: any[] = this.errorStatusParams.data;
+            data.forEach((element: any, index: number) => {
+                element.actionStatus = mailevaStatus.indexOf(element.id) > -1 ? 'errorStatus' : null;
+            });
+            this.errorSelectedStatus = mailevaStatus;
+        } else {
+            const data: any = JSON.parse(JSON.stringify(this.mailevaStatus));
+            this.errorStatusParams = {
+                id: 'errorStatus',
+                data: data
+            };
+        }
+    }
+
+    checkSelection(mailevaStatus: any[], actionStatus: string) {
+        if (actionStatus === 'intermediateStatus') {
+            const array: any[] = this.intermediateStatusParams.data.filter((item: any) => item.actionStatus === 'intermediateStatus').map((el: any) => el.id);
+            const deselectedItem: string = array.filter((element: any) => !mailevaStatus.includes(element)).toString();
+            if (!this.functions.empty(deselectedItem)) {
+                this.finalStatusParams.data.find((el: any) => el.id === deselectedItem).disabled = false;
+                this.errorStatusParams.data.find((el: any) => el.id === deselectedItem).disabled = false;
+            }
+        } else if (actionStatus === 'finalStatus') {
+            const array: any[] = this.finalStatusParams.data.filter((item: any) => item.actionStatus === 'finalStatus').map((el: any) => el.id);
+            const deselectedItem: string = array.filter((element: any) => !mailevaStatus.includes(element)).toString();
+            if (!this.functions.empty(deselectedItem)) {
+                this.intermediateStatusParams.data.find((el: any) => el.id === deselectedItem).disabled = false;
+                this.errorStatusParams.data.find((el: any) => el.id === deselectedItem).disabled = false;
+            }
+        } else if (actionStatus === 'errorStatus') {
+            const array: any[] = this.errorStatusParams.data.filter((item: any) => item.actionStatus === 'errorStatus').map((el: any) => el.id);
+            const deselectedItem: string = array.filter((element: any) => !mailevaStatus.includes(element)).toString();
+            if (!this.functions.empty(deselectedItem)) {
+                this.intermediateStatusParams.data.find((el: any) => el.id === deselectedItem).disabled = false;
+                this.finalStatusParams.data.find((el: any) => el.id === deselectedItem).disabled = false;
+            }
         }
     }
 }
