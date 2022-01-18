@@ -1,6 +1,6 @@
 {
   "name": "MaarchCourrier",
-  "version": "20.10.11",
+  "version": "20.10.20",
   "description": "MaarchCourrier",
   "scripts": {
     "build-css": "node-sass --include-path scss src/frontend/css/maarch-material.scss   src/frontend/css/maarch-material.css --output-style compressed",
