@@ -2206,7 +2206,7 @@
     "mailServer": "Serveur de messagerie",
     "canAddCopies": "Pouvoir ajouter des personnes en copie (CC / CCI)",
     "chooseValues": "Choisir les valeurs",
-    "chooseValuesMsg": "Veuillez choisir les valeurs pouvant être utilisé pour ce champ",
+    "chooseValuesMsg": "Veuillez choisir les valeurs pouvant être utilisées pour ce champ",
     "interconnectionTest": "Tester le paramétrage de <b>l'interconnexion Maarch Courrier / Maarch RM</b> configuré dans le fichier <b>config.json</b>",
     "interconnectionFailed": "<b>L'interconnexion avec Maarch RM a échouée.</b> Erreur lors de l'appel au serveur Maarch RM",
     "interconnectionSuccess": "<b>Interconnexion réussie avec Maarch RM.</b>",
