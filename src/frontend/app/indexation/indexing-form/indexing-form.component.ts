@@ -86,6 +86,8 @@ export class IndexingFormComponent implements OnInit {
 
     indexingModelsCustomFields: any[] = [];
 
+    allowedValues: number[] = [];
+
     availableFields: any[] = [
         {
             identifier: 'recipients',
@@ -909,6 +911,9 @@ export class IndexingFormComponent implements OnInit {
                 this.indexingFormId = data.indexingModel.master !== null ? data.indexingModel.master : data.indexingModel.id;
                 this.currentCategory = data.indexingModel.category;
                 this.mandatoryFile = data.indexingModel.mandatoryFile;
+                if (data.indexingModel.fields.find((item: any) => item.identifier === 'doctype').allowedValues !== null) {
+                    this.allowedValues = data.indexingModel.fields.find((item: any) => item.identifier === 'doctype').allowedValues;
+                }
                 let fieldExist: boolean;
                 if (data.indexingModel.fields.length === 0) {
                     this.initFields();
@@ -1094,8 +1099,19 @@ export class IndexingFormComponent implements OnInit {
     }
 
     isEmptyField(field: any) {
-
-        if (this.arrFormControl[field.identifier].value === null) {
+        if (field.identifier === 'doctype') {
+            if (this.functions.empty(field.allowedValues)) {
+                field.allowedValues = this.allowedValues;
+                this.setAllowedValues(field);
+            }
+            if (field.allowedValues.indexOf(this.arrFormControl[field.identifier].value) === -1) {
+                this.arrFormControl[field.identifier].value = '';
+                if (this.mode !== 'indexation') {
+                    this.arrFormControl[field.identifier].touched = true;
+                }
+                return false;
+            }
+        } else if (this.arrFormControl[field.identifier].value === null) {
             return true;
 
         } else if (Array.isArray(this.arrFormControl[field.identifier].value)) {
