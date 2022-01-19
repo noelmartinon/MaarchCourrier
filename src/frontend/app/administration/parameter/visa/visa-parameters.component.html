@@ -2,11 +2,11 @@
 </div>
 <form [formGroup]="visaParameters" style="display: contents;">
     <div>
-        <mat-slide-toggle style="display: inline-block; width: 20%" color="primary" name="minimumVisaRole" (toggleChange)="toggle('minimumVisaRole')"
+        <mat-slide-toggle [ngStyle]="{'display': visaParameters.controls['minimumVisaRole'].value !== 0 ? 'inline-block' : 'flex'}" style="width: 20%; margin-bottom: 20px;" color="primary" name="minimumVisaRole" (toggleChange)="toggle('minimumVisaRole')"
                           [checked]="visaParameters.controls['minimumVisaRole'].value !== 0">
             {{'lang.minimumVisaUser' | translate}}
         </mat-slide-toggle>
-        <mat-form-field style="margin-left: 10px; display: inline-block; width: 70% !important;">
+        <mat-form-field *ngIf="visaParameters.controls['minimumVisaRole'].value !== 0" style="margin-left: 10px; display: inline-block; width: 70% !important;">
             <input type="number" matInput required max="50" formControlName="minimumVisaRole" [value]="visaParameters.controls['minimumVisaRole'].value">
             <mat-hint *ngIf="visaParameters.get('minimumVisaRole').errors && visaParameters.get('minimumVisaRole').hasError('max')" 
             align="start" style="color: red;" [innerHTML]="('lang.maxValueVisaWorklow' | translate) + ' ' + visaParameters.get('minimumVisaRole').errors.max.max"></mat-hint>
@@ -16,11 +16,11 @@
     </div>
 
     <div>
-        <mat-slide-toggle style="display: inline-block; width: 20%" color="primary" name="maximumSignRole" (toggleChange)="toggle('maximumSignRole')"
+        <mat-slide-toggle [ngStyle]="{'display': visaParameters.controls['maximumSignRole'].value !== 0 ? 'inline-block' : 'flex'}" style="width: 20%; margin-bottom: 20px;" color="primary" name="maximumSignRole" (toggleChange)="toggle('maximumSignRole')"
                           [checked]="visaParameters.controls['maximumSignRole'].value !== 0">
             {{'lang.maximumSignUser' | translate}}
         </mat-slide-toggle>
-        <mat-form-field style="margin-left: 10px; display: inline-block; width: 70% !important;">
+        <mat-form-field *ngIf="visaParameters.controls['maximumSignRole'].value !== 0" style="margin-left: 10px; display: inline-block; width: 70% !important;">
             <input type="number" matInput required max="50" formControlName="maximumSignRole" [value]="visaParameters.controls['maximumSignRole'].value">
             <mat-hint *ngIf="visaParameters.get('maximumSignRole').errors && visaParameters.get('maximumSignRole').hasError('max')" 
             align="start" style="color: red;" [innerHTML]="('lang.maxValueVisaWorklow' | translate) + ' ' + visaParameters.get('maximumSignRole').errors.max.max"></mat-hint>
