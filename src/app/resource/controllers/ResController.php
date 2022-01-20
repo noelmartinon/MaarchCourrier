@@ -654,7 +654,8 @@ class ResController extends ResourceControlController
         }
         $subject = $document['subject'];
 
-        if (!empty($args['signedVersion'])) {
+        $data = $request->getQueryParams();
+        if (!empty($data['signedVersion'])) {
             $convertedDocument = AdrModel::getDocuments([
                 'select' => ['docserver_id', 'path', 'filename', 'fingerprint'],
                 'where'  => ['res_id = ?', 'type = ?', 'version = ?'],
@@ -702,7 +703,6 @@ class ResController extends ResourceControlController
         $finfo    = new \finfo(FILEINFO_MIME_TYPE);
         $mimeType = $finfo->buffer($fileContent);
         $pathInfo = pathinfo($pathToDocument);
-        $data     = $request->getQueryParams();
         $filename = TextFormatModel::formatFilename(['filename' => $subject, 'maxLength' => 250]);
 
         if ($data['mode'] == 'base64') {
