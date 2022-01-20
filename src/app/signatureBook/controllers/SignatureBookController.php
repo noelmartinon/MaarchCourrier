@@ -618,6 +618,7 @@ class SignatureBookController
         $data = [
             'title'                    => $attachment['title'],
             'encodedFile'              => base64_encode($signedDocument),
+            'status'                   => 'TRA',
             'format'                   => 'pdf',
             'typist'                   => $attachment['typist'],
             'resIdMaster'              => $attachment['res_id_master'],
