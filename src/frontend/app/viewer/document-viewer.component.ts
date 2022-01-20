@@ -169,6 +169,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     status: string = '';
 
+    isNewVersion: boolean = false;
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -309,7 +311,17 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     uploadTrigger(fileInput: any) {
-        if (fileInput.target.files && fileInput.target.files[0] && this.isExtensionAllowed(fileInput.target.files[0])) {
+        // CHECK IF WE UPLOADING NEW VERSION FOR DOCUMENT
+        if (this.isNewVersion) {
+            const fileData: any = {
+                name : fileInput.target.files[0].name,
+                type : fileInput.target.files[0].type,
+                format : this.file.name.split('.').pop(),
+                content: null
+            };
+            this.setNewVersion(fileInput, fileData);
+
+        } else if (fileInput.target.files && fileInput.target.files[0] && this.isExtensionAllowed(fileInput.target.files[0])) {
             this.initUpload();
 
             const reader = new FileReader();
@@ -332,6 +344,33 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         } else {
             this.loading = false;
         }
+    }
+
+    setNewVersion(fileInput: any, file: any) {
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(fileInput.target.files[0]);
+        reader.onload = (value: any) => {
+            this.triggerEvent.emit('uploadFile');
+            file.content = this.getBase64Document(value.target.result);
+            if (file.type !== 'application/pdf') {
+                const base64Data: any = this.convertDocument(file);
+                console.log(base64Data);
+
+                file.base64 = base64Data.base64src;
+            } else {
+                file.base64 = this.getBase64Document(value.target.result);
+            }
+            const dialogRef = this.dialog.open(DocumentViewerModalComponent, {
+                autoFocus: false,
+                panelClass: 'maarch-full-height-modal',
+                data: {
+                    title: file.name,
+                    filename: file.name,
+                    base64: file.base64,
+                    isNewVersion: true
+                }
+            });
+        };
     }
 
     initUpload() {
@@ -391,9 +430,14 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             this.upload(data).subscribe(
                 (res: any) => {
                     if (res.encodedResource) {
-                        this.file.base64src = res.encodedResource;
-                        this.file.src = this.base64ToArrayBuffer(res.encodedResource);
-                        this.loading = false;
+                        if (this.isNewVersion) {
+                            file.base64src = res.encodedResource;
+                            file.src = this.base64ToArrayBuffer(res.encodedResource);
+                        } else {
+                            this.file.base64src = res.encodedResource;
+                            this.file.src = this.base64ToArrayBuffer(res.encodedResource);
+                            this.loading = false;
+                        }
                     }
                 },
                 (err: any) => {
@@ -408,6 +452,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             this.loading = false;
         }
 
+        return file;
     }
 
     upload(data: any) {

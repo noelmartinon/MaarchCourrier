@@ -2576,5 +2576,6 @@
     "downloadFile": "Télécharger le fichier",
     "emptyShippingHistory": "L'historique de l'envoi Maileva est vide.",
     "depositProofShipping": "Preuve de dépôt envoyée par Maileva",
-    "shippingSubscriptionDesc": "Permet de s'abonner aux notifications de suivi d'un courrier"
+    "shippingSubscriptionDesc": "Permet de s'abonner aux notifications de suivi d'un courrier",
+    "uploadNewVersion": "Téléverser une nouvelle version du document"
 }
