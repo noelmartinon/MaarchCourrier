@@ -14,4 +14,8 @@ export class DocumentViewerModalComponent implements OnInit {
     constructor(public translate: TranslateService, public dialogRef: MatDialogRef<DocumentViewerModalComponent>, @Inject(MAT_DIALOG_DATA) public data: any) { }
 
     ngOnInit(): void { }
+
+    createNewVersion() {
+        this.dialogRef.close('createNewVersion');
+    }
 }

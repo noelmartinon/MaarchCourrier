@@ -15,7 +15,7 @@
     <ng-container *ngIf="data.isNewVersion !== undefined">
         <span class="divider-modal"></span>
         <div mat-dialog-actions class="actions">
-            <button mat-raised-button color="primary">{{'lang.createNewVersion' | translate}}</button>
+            <button mat-raised-button color="primary" (click)="createNewVersion()">{{'lang.createNewVersion' | translate}}</button>
         </div>
     </ng-container>
 </div>

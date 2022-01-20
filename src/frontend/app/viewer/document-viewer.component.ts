@@ -311,36 +311,38 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     uploadTrigger(fileInput: any) {
-        // CHECK IF WE UPLOADING NEW VERSION FOR DOCUMENT
-        if (this.isNewVersion) {
+        if (fileInput.target.files && fileInput.target.files[0] && this.isExtensionAllowed(fileInput.target.files[0])) {
             const fileData: any = {
                 name : fileInput.target.files[0].name,
                 type : fileInput.target.files[0].type,
                 format : this.file.name.split('.').pop(),
                 content: null
             };
-            this.setNewVersion(fileInput, fileData);
+            // CHECK IF WE ARE UPLOADING NEW VERSION FOR DOCUMENT
+            if (this.isNewVersion) {
+                this.setNewVersion(fileInput, fileData);
 
-        } else if (fileInput.target.files && fileInput.target.files[0] && this.isExtensionAllowed(fileInput.target.files[0])) {
-            this.initUpload();
+            } else {
+                this.initUpload();
 
-            const reader = new FileReader();
-            this.file.name = fileInput.target.files[0].name;
-            this.file.type = fileInput.target.files[0].type;
-            this.file.format = this.file.name.split('.').pop();
+                const reader = new FileReader();
+                this.file.name = fileData.name;
+                this.file.type = fileData.type;
+                this.file.format = fileData.format;
 
-            reader.readAsArrayBuffer(fileInput.target.files[0]);
+                reader.readAsArrayBuffer(fileInput.target.files[0]);
 
-            reader.onload = (value: any) => {
-                this.file.content = this.getBase64Document(value.target.result);
-                this.triggerEvent.emit('uploadFile');
-                if (this.file.type !== 'application/pdf') {
-                    this.convertDocument(this.file);
-                } else {
-                    this.file.src = value.target.result;
-                    this.loading = false;
-                }
-            };
+                reader.onload = (value: any) => {
+                    this.file.content = this.getBase64Document(value.target.result);
+                    this.triggerEvent.emit('uploadFile');
+                    if (this.file.type !== 'application/pdf') {
+                        this.convertDocument(this.file);
+                    } else {
+                        this.file.src = value.target.result;
+                        this.loading = false;
+                    }
+                };
+            }
         } else {
             this.loading = false;
         }
@@ -350,13 +352,11 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         const reader = new FileReader();
         reader.readAsArrayBuffer(fileInput.target.files[0]);
         reader.onload = (value: any) => {
-            this.triggerEvent.emit('uploadFile');
             file.content = this.getBase64Document(value.target.result);
+            this.triggerEvent.emit('uploadFile');
             if (file.type !== 'application/pdf') {
                 const base64Data: any = this.convertDocument(file);
-                console.log(base64Data);
-
-                file.base64 = base64Data.base64src;
+                file.base64 = base64Data.base64;
             } else {
                 file.base64 = this.getBase64Document(value.target.result);
             }
@@ -370,6 +370,28 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                     isNewVersion: true
                 }
             });
+
+            dialogRef.afterClosed().pipe(
+                tap((data: any) => {
+                    if (data === 'createNewVersion') {
+                        const objToSend: any = {
+                            encodedFile: file.base64,
+                            format: 'pdf',
+                            resId: this.resId
+                        };
+                        this.http.put(`../rest/resources/${this.resId}?onlyDocument=true`, objToSend).pipe(
+                            tap(() => {
+                                this.loadRessource(this.resId);
+                            }),
+                            catchError((err: any) => {
+                                this.notify.handleSoftErrors(err);
+                                return of(false);
+                            })
+                        ).subscribe();
+                    }
+
+                })
+            ).subscribe();
         };
     }
 
