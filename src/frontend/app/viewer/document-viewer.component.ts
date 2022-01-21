@@ -319,9 +319,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
                 content: null
             };
             // CHECK IF WE ARE UPLOADING NEW VERSION FOR DOCUMENT
-            if (this.isNewVersion) {
+            if (this.isNewVersion && this.mode !== 'attachment') {
                 this.setNewVersion(fileInput, fileData);
-
             } else {
                 this.initUpload();
 
@@ -351,48 +350,59 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     setNewVersion(fileInput: any, file: any) {
         const reader = new FileReader();
         reader.readAsArrayBuffer(fileInput.target.files[0]);
-        reader.onload = (value: any) => {
+        reader.onload = async (value: any) => {
             file.content = this.getBase64Document(value.target.result);
             this.triggerEvent.emit('uploadFile');
             if (file.type !== 'application/pdf') {
-                const base64Data: any = this.convertDocument(file);
-                file.base64 = base64Data.base64;
+                await this.convertDocument(file);
             } else {
                 file.base64 = this.getBase64Document(value.target.result);
+                this.openDocumentViewerModal(file);
             }
-            const dialogRef = this.dialog.open(DocumentViewerModalComponent, {
-                autoFocus: false,
-                panelClass: 'maarch-full-height-modal',
-                data: {
-                    title: file.name,
-                    filename: file.name,
-                    base64: file.base64,
-                    isNewVersion: true
-                }
-            });
-
-            dialogRef.afterClosed().pipe(
-                tap((data: any) => {
-                    if (data === 'createNewVersion') {
-                        const objToSend: any = {
-                            encodedFile: file.base64,
-                            format: 'pdf',
-                            resId: this.resId
-                        };
-                        this.http.put(`../rest/resources/${this.resId}?onlyDocument=true`, objToSend).pipe(
-                            tap(() => {
-                                this.loadRessource(this.resId);
-                            }),
-                            catchError((err: any) => {
-                                this.notify.handleSoftErrors(err);
-                                return of(false);
-                            })
-                        ).subscribe();
-                    }
-
-                })
-            ).subscribe();
         };
+    }
+
+    openDocumentViewerModal(file: any) {
+        const dialogRef = this.dialog.open(DocumentViewerModalComponent, {
+            autoFocus: false,
+            disableClose: true,
+            panelClass: 'maarch-full-height-modal',
+            data: {
+                title: file.name,
+                filename: file.name,
+                base64: file.base64,
+                isNewVersion: true
+            }
+        });
+
+        dialogRef.afterClosed().pipe(
+            tap((data: any) => {
+                if (data === 'createNewVersion' && this.mode === 'mainDocument') {
+                    const objToSend: any = {
+                        resId: this.resId,
+                        encodedFile: file.base64,
+                        format: 'pdf',
+                    };
+                    this.http.put(`../rest/resources/${this.resId}?onlyDocument=true`, objToSend).pipe(
+                        tap(() => {
+                            this.loadRessource(this.resId);
+                            this.isNewVersion = false;
+                        }),
+                        catchError((err: any) => {
+                            this.notify.handleSoftErrors(err);
+                            return of(false);
+                        })
+                    ).subscribe();
+                } else {
+                    this.isNewVersion = false;
+                }
+            })
+        ).subscribe();
+
+    }
+
+    canUploadNewVersion() {
+        return ((this.file.contentView !== undefined || this.base64 !== null) || (this.file.content !== null && this.noConvertedFound)) && this.resId !== null;
     }
 
     initUpload() {
@@ -448,33 +458,35 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     convertDocument(file: any) {
         if (this.canBeConverted(file)) {
-            const data = { name: file.name, base64: file.content };
-            this.upload(data).subscribe(
-                (res: any) => {
-                    if (res.encodedResource) {
-                        if (this.isNewVersion) {
-                            file.base64src = res.encodedResource;
-                            file.src = this.base64ToArrayBuffer(res.encodedResource);
-                        } else {
-                            this.file.base64src = res.encodedResource;
-                            this.file.src = this.base64ToArrayBuffer(res.encodedResource);
-                            this.loading = false;
+            return new Promise((resolve) => {
+                const data = { name: file.name, base64: file.content };
+                this.upload(data).pipe(
+                    tap((res: any) => {
+                        if (res.encodedResource) {
+                            if (this.isNewVersion && this.mode !== 'attachment') {
+                                file.base64 = res.encodedResource;
+                                file.src = this.base64ToArrayBuffer(res.encodedResource);
+                                this.openDocumentViewerModal(file);
+                            } else {
+                                this.file.base64src = res.encodedResource;
+                                this.file.src = this.base64ToArrayBuffer(res.encodedResource);
+                                this.loading = false;
+                            }
                         }
-                    }
-                },
-                (err: any) => {
-                    this.noConvertedFound = true;
-                    this.notify.handleErrors(err);
-                    this.loading = false;
-                    return of(false);
-                }
-            );
+                        resolve(file);
+                    }),
+                    catchError((err: any) => {
+                        this.noConvertedFound = true;
+                        this.notify.handleErrors(err);
+                        this.loading = false;
+                        return of(false);
+                    })
+                ).subscribe();
+            });
         } else {
             this.noConvertedFound = true;
             this.loading = false;
         }
-
-        return file;
     }
 
     upload(data: any) {
@@ -1428,3 +1440,5 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         });
     }
 }
+
+// spent 0:58
