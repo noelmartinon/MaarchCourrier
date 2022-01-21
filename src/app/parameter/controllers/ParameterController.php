@@ -49,7 +49,7 @@ class ParameterController
 
     public function getById(Request $request, Response $response, array $aArgs)
     {
-        if (!PrivilegeController::hasPrivilege(['privilegeId' => 'admin_parameters', 'userId' => $GLOBALS['id']])) {
+        if ($aArgs['id'] != 'suggest_links_n_days_ago' && !PrivilegeController::hasPrivilege(['privilegeId' => 'admin_parameters', 'userId' => $GLOBALS['id']])) {
             return $response->withStatus(403)->withJson(['errors' => 'Service forbidden']);
         }
 
