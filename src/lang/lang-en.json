@@ -2577,5 +2577,6 @@
     "emptyShippingHistory": "The Maileva sending history is empty.",
     "depositProofShipping": "Proof of deposit sent by Maileva",
     "shippingSubscriptionDesc": "Allows you to subscribe to mail follow-up notifications",
-    "uploadNewVersion": "Upload a new version of the document"
+    "uploadNewVersion": "Upload a new version of the document",
+    "fileNotConvertible": "Only convertible files are allowed"
 }

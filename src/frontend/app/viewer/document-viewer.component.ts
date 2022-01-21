@@ -94,6 +94,8 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
 
     @Input() isSigned: boolean = false;
 
+    @Input() newPjVersion: boolean = false;
+
     /**
      * Event emitter
      */
@@ -348,21 +350,27 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     setNewVersion(fileInput: any, file: any) {
-        const reader = new FileReader();
-        reader.readAsArrayBuffer(fileInput.target.files[0]);
-        reader.onload = async (value: any) => {
-            file.content = this.getBase64Document(value.target.result);
-            this.triggerEvent.emit('uploadFile');
-            if (file.type !== 'application/pdf') {
-                await this.convertDocument(file);
-            } else {
-                file.base64 = this.getBase64Document(value.target.result);
-                this.openDocumentViewerModal(file);
-            }
-        };
+        if (this.canBeConverted(file)) {
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(fileInput.target.files[0]);
+            reader.onload = async (value: any) => {
+                file.content = this.getBase64Document(value.target.result);
+                this.triggerEvent.emit('uploadFile');
+                if (file.type !== 'application/pdf') {
+                    this.loading = true;
+                    this.convertDocument(file);
+                } else {
+                    file.base64 = this.getBase64Document(value.target.result);
+                    this.openDocumentViewerModal(file);
+                }
+            };
+        } else {
+            this.notify.error(this.translate.instant('lang.fileNotConvertible'));
+        }
     }
 
     openDocumentViewerModal(file: any) {
+        this.loading = false;
         const dialogRef = this.dialog.open(DocumentViewerModalComponent, {
             autoFocus: false,
             disableClose: true,
@@ -402,7 +410,11 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     canUploadNewVersion() {
-        return ((this.file.contentView !== undefined || this.base64 !== null) || (this.file.content !== null && this.noConvertedFound)) && this.resId !== null;
+        if (this.resId != null && ((this.mode === 'mainDocument' && (this.noConvertedFound || this.isSigned)) || (this.mode === 'attachment' && (!this.newPjVersion || this.noConvertedFound)))) {
+            return false;
+        } else {
+            return ((this.file.contentView !== undefined || this.base64 !== null) || (this.file.content !== null && this.noConvertedFound)) && this.resId !== null;
+        }
     }
 
     initUpload() {

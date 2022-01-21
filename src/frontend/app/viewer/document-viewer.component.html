@@ -75,7 +75,7 @@
                         <mat-icon color="primary" class="fas fa-external-link-alt"></mat-icon>
                         <span>{{'lang.openInExternalModal' | translate}}</span>
                     </button>
-                    <button mat-menu-item *ngIf="canUploadNewVersion()"
+                    <button mat-menu-item *ngIf="canUploadNewVersion() && !loading"
                         [title]="'lang.uploadNewVersion' | translate" (click)="isNewVersion = true; docToUpload.click()" >
                         <mat-icon color="primary" class="fas fa-file-upload"></mat-icon>
                         <span style="white-space: pre-wrap;">{{'lang.uploadNewVersion' | translate}}</span>
