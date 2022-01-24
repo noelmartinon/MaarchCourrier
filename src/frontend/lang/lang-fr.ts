@@ -1758,5 +1758,7 @@ export const LANG_FR = {
     "setContactInfos": "Accéder à la fiche de détails du contact",
     "goToContact": "Vous allez perdre vos modifications actuelles, voulez-vous vraiment continuer ?",
     "associateContact": "pour associer ce contact au courrier/pièce jointe.",
-    "associateContactToDoc": "Associer ce contact au courrier/pièce jointe"
+    "associateContactToDoc": "Associer ce contact au courrier/pièce jointe",
+    "m2mEmailDesc": "Utilisé dans le cadre d'une connexion indirecte entre les applications (utilisation des envois de mail pour le pli numérique)",
+    "waitingReception": "En attente de réception"
 };

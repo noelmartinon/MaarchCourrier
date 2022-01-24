@@ -1752,5 +1752,7 @@ export const LANG_EN = {
     "setContactInfos": "Access the contact details sheet",
     "goToContact": "You will lose your current changes, are you sure you want to continue?",
     "associateContact": "to associate the contact with the mail / attachment.",
-    "associateContactToDoc": "Associate the contact with the mail / attachment"
+    "associateContactToDoc": "Associate the contact with the mail / attachment",
+    "m2mEmailDesc": "Used as part of an <b> indirect connection </b> between applications (use of mailings for digital fold)",
+    "waitingReception": "Waiting for reception"
 };
