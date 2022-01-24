@@ -1146,14 +1146,17 @@ export class IndexingFormComponent implements OnInit {
 
     selectedContact(contact: any, identifier: string) {
         if (this.getCategory() === 'incoming' && identifier === 'senders' && !this.route.url.includes('indexing') && this.suggestLinksNdaysAgo > 0) {
-            console.log('contact', contact);
             const resourceNotBefore = new Date(new Date(this.creationDateClone).setDate(new Date(this.creationDateClone).getDate() - this.suggestLinksNdaysAgo)).toISOString().split('T')[0];            
-            this.selectedContactClone = JSON.parse(JSON.stringify(contact));
             this.http.get(`../../rest/search?limit=10&offset=0&order=asc&orderBy=creationDate&&resourceNotBefore=${resourceNotBefore}&contactId=${contact.id}`).pipe(
                 tap((data: any) => {
                     if (!this.functions.empty(data.resources)) {
-                        this.linkedResources = data;
-                        this.hasLinkedRes = true;
+                        if (data.allResources.length === 1 && data.allResources.indexOf(this.resId) > -1) {
+                            this.hasLinkedRes = false;
+                        } else {
+                            this.linkedResources = data;
+                            this.selectedContactClone = JSON.parse(JSON.stringify(contact));
+                            this.hasLinkedRes = true;
+                        }
                     } else {
                         this.hasLinkedRes = false;
                     }
