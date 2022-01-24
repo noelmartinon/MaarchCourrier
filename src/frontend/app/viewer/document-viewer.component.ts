@@ -317,7 +317,7 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
             const fileData: any = {
                 name : fileInput.target.files[0].name,
                 type : fileInput.target.files[0].type,
-                format : this.file.name.split('.').pop(),
+                format : fileInput.target.files[0].name.split('.').pop(),
                 content: null
             };
             // CHECK IF WE ARE UPLOADING NEW VERSION FOR DOCUMENT
@@ -410,10 +410,14 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
     }
 
     canUploadNewVersion() {
-        if (this.resId != null && ((this.mode === 'mainDocument' && (this.noConvertedFound || this.isSigned)) || (this.mode === 'attachment' && (!this.newPjVersion || this.noConvertedFound)))) {
-            return false;
+        if (this.editMode) {
+            if (this.resId != null && ((this.mode === 'mainDocument' && (this.noConvertedFound || this.isSigned)) || (this.mode === 'attachment' && (!this.newPjVersion || this.noConvertedFound)))) {
+                return false;
+            } else {
+                return ((this.file.contentView !== undefined || this.base64 !== null) || (this.file.content !== null && this.noConvertedFound)) && this.resId !== null;
+            }
         } else {
-            return ((this.file.contentView !== undefined || this.base64 !== null) || (this.file.content !== null && this.noConvertedFound)) && this.resId !== null;
+            return false;
         }
     }
 
@@ -1452,5 +1456,3 @@ export class DocumentViewerComponent implements OnInit, OnDestroy {
         });
     }
 }
-
-// spent 0:58
