@@ -10,8 +10,7 @@
         <app-criteria-tool *ngIf="data.fromContact === undefined" (searchUrlGenerated)="launchSearch($event)"
             [defaultCriteria]="['resourceField','contactField']"></app-criteria-tool>
         <search-adv-list #appSearchAdvList
-            [excludeRes]="[data.resId]" 
-            [fromContact]="data.fromContact"
+            [excludeRes]="[data.resId]"
             [linkedRes]="data.linkedRes">
         </search-adv-list>
     </mat-dialog-content>

@@ -192,6 +192,9 @@ export class IndexingFormComponent implements OnInit {
     linkedResources: any[] = [];
     selectedContactClone: any = null;
 
+    suggestLinksNdaysAgo: number;
+    creationDateClone: Date;
+
     constructor(
         public http: HttpClient,
         private notify: NotificationService,
@@ -212,6 +215,10 @@ export class IndexingFormComponent implements OnInit {
         this.fieldCategories.forEach(category => {
             this['indexingModels_' + category] = [];
         });
+
+        if (!this.adminMode) {
+            await this.getParameter();
+        }
 
         if (this.indexingFormId <= 0 || this.indexingFormId === undefined) {
 
@@ -678,6 +685,7 @@ export class IndexingFormComponent implements OnInit {
         return new Promise((resolve, reject) => {
             this.http.get(`../../rest/resources/${this.resId}`).pipe(
                 tap(async (data: any) => {
+                    this.creationDateClone = JSON.parse(JSON.stringify(data['creationDate']));
                     await Promise.all(this.fieldCategories.map(async (element: any) => {
 
                         // this.fieldCategories.forEach(async element => {
@@ -1137,24 +1145,42 @@ export class IndexingFormComponent implements OnInit {
     }
 
     selectedContact(contact: any, identifier: string) {
-        if (this.getCategory() === 'incoming' && identifier === 'senders' && !this.route.url.includes('indexing')) {
+        if (this.getCategory() === 'incoming' && identifier === 'senders' && !this.route.url.includes('indexing') && this.suggestLinksNdaysAgo > 0) {
             console.log('contact', contact);
+            const resourceNotBefore = new Date(new Date(this.creationDateClone).setDate(new Date(this.creationDateClone).getDate() - this.suggestLinksNdaysAgo)).toISOString().split('T')[0];            
             this.selectedContactClone = JSON.parse(JSON.stringify(contact));
-            this.hasLinkedRes = true;
-            // this.http.post('../../rest/linkedResource', {contactId: contact.id}).pipe(
-            //     tap((data: any) => {
-            //         if (data.linkedResource.length > 0) {
-            //             this.linkedResources = data.linkedResource;
-            //         }
-            //     }),
-            //     catchError((err: any) => {
-            //         this.notify.error(err);
-            //         return of(false);
-            //     })
-            // ).subscribe();
+            this.http.get(`../../rest/search?limit=10&offset=0&order=asc&orderBy=creationDate&&resourceNotBefore=${resourceNotBefore}&contactId=${contact.id}`).pipe(
+                tap((data: any) => {
+                    if (!this.functions.empty(data.resources)) {
+                        this.linkedResources = data;
+                        this.hasLinkedRes = true;
+                    } else {
+                        this.hasLinkedRes = false;
+                    }
+                }),
+                catchError((err: any) => {
+                    this.notify.error(err);
+                    return of(false);
+                })
+            ).subscribe();
         } else {
             this.hasLinkedRes = false;
         }
+    }
+
+    getParameter() {
+        return new Promise((resolve) => {
+            this.http.get('../../rest/parameters/suggest_links_n_days_ago').pipe(
+                tap((data: any) => {
+                    this.suggestLinksNdaysAgo = data.parameter.param_value_int;
+                    resolve(true);
+                }),
+                catchError((err: any) => {
+                    this.notify.handleSoftErrors(err);
+                    return of(false);
+                })
+            ).subscribe();
+        })
     }
 
     openSearchResourceModal() {
@@ -1163,7 +1189,7 @@ export class IndexingFormComponent implements OnInit {
                 panelClass: 'maarch-full-height-modal', minWidth: '80%',
                 data: {
                     resId: this.resId,
-                    currentLinkedRes: this.linkedResources.map(res => res.resId),
+                    linkedRes: this.linkedResources,
                     fromContact: true,
                     selectedContact: this.selectedContactClone
                 }

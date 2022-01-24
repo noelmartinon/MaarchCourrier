@@ -181,7 +181,7 @@
                             </div>
                         </div>
                         <div class="linkRes" *ngIf="hasLinkedRes && field.identifier === 'senders'">
-                            {{lang.hasLinkedRes | scan: [10]}} <ng-container><a style="cursor: pointer; display: contents; font-weight: bold; font-size: 14px;" (click)="openSearchResourceModal()">{{lang.seeMore}}</a></ng-container>
+                            {{lang.hasLinkedRes | scan: [suggestLinksNdaysAgo]}} <ng-container><a style="cursor: pointer; display: contents; font-weight: bold; font-size: 14px;" (click)="openSearchResourceModal()">{{lang.seeMore}}</a></ng-container>
                         </div>
                         <div
                             *ngIf="field.identifier === 'destination' && !adminMode && arrFormControl['destination'].value > 0 && !hideDiffusionList">
