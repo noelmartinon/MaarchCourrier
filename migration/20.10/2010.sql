@@ -208,8 +208,10 @@ DO $$ BEGIN
 END$$;
 
 /* GROUPBASKET */
-UPDATE groupbasket SET list_event_data = jsonb_set(list_event_data, '{canUpdateData}', 'true') WHERE list_event_data->>'canUpdate' = 'true';
-UPDATE groupbasket SET list_event_data = jsonb_set(list_event_data, '{canUpdateData}', 'false') WHERE list_event_data->>'canUpdate' = 'false';
+/* SGAMI SO FIX 75 */
+UPDATE groupbasket SET list_event_data = jsonb_set(list_event_data, '{canUpdateData, goToNextDocument}', 'true') WHERE list_event_data->>'canUpdate' = 'true';
+UPDATE groupbasket SET list_event_data = jsonb_set(list_event_data, '{canUpdateData, goToNextDocument}', 'false') WHERE list_event_data->>'canUpdate' = 'false';
+/* END SGAMI SO FIX 75 */
 UPDATE groupbasket SET list_event_data = list_event_data - 'canUpdate';
 
 /* TEMPLATES */
@@ -217,6 +219,7 @@ ALTER TABLE templates DROP COLUMN IF EXISTS subject;
 ALTER TABLE templates ADD COLUMN subject character varying(255);
 
 UPDATE groupbasket SET list_event_data = '{"canUpdateDocuments":true}' WHERE list_event_data->'canUpdateDocument' = 'true';
+
 
 /* REGISTERED MAIL */
 DROP TABLE IF EXISTS registered_mail_issuing_sites;
