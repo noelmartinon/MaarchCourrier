@@ -123,8 +123,10 @@ class SearchController
                 'data'   => [$queryParams['contactId'], 'contact']
             ]);
             $contactsResId = array_column($contactsResId, 'res_id');
-            $searchWhere[] = 'res_id in (?)';
-            $searchData[] = $contactsResId;
+            if (!empty($contactsResId)) {
+                $searchWhere[] = 'res_id in (?)';
+                $searchData[] = $contactsResId;
+            }
         }
         if (!empty($queryParams['contactField'])) {
             $fields = ['company', 'firstname', 'lastname'];
