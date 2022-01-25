@@ -260,6 +260,8 @@ export class IndexingFormComponent implements OnInit {
 
     dialogRef: MatDialogRef<any>;
 
+    allowedValues: number[] = [];
+
     constructor(
         public translate: TranslateService,
         public http: HttpClient,
@@ -938,6 +940,9 @@ export class IndexingFormComponent implements OnInit {
                 this.indexingFormId = data.indexingModel.master !== null ? data.indexingModel.master : data.indexingModel.id;
                 this.currentCategory = data.indexingModel.category;
                 this.mandatoryFile = data.indexingModel.mandatoryFile;
+                if (data.indexingModel.master !== null) {
+                    this.getAllowedValues(data.indexingModel.master);
+                }
                 let fieldExist: boolean;
                 if (data.indexingModel.fields.length === 0) {
                     this.initFields();
@@ -1032,6 +1037,18 @@ export class IndexingFormComponent implements OnInit {
             this.arrFormControl[field.identifier].disable();
             field.enabled = false;
         }
+    }
+
+    getAllowedValues(id: number) {
+        this.http.get(`../rest/indexingModels/${id}`).pipe(
+            tap((data: any) => {
+                this.allowedValues = data.indexingModel.fields.find((item: any) => item.identifier === 'doctype').allowedValues;
+            }),
+            catchError((err: any) => {
+                this.notify.handleSoftErrors(err);
+                return of(false);
+            })
+        ).subscribe();
     }
 
     openValuesSelector(field: any) {
@@ -1150,8 +1167,16 @@ export class IndexingFormComponent implements OnInit {
     }
 
     isEmptyField(field: any) {
-
-        if (this.arrFormControl[field.identifier].value === null) {
+        if (field.identifier === 'doctype') {
+            if (this.functions.empty(field.allowedValues)) {
+                field.allowedValues = this.allowedValues;
+                this.setAllowedValues(field);
+            }
+            if (field.allowedValues.indexOf(this.arrFormControl[field.identifier].value) === -1) {
+                this.arrFormControl[field.identifier].value = '';
+                return false;
+            }
+        } else if (this.arrFormControl[field.identifier].value === null) {
             return true;
 
         } else if (Array.isArray(this.arrFormControl[field.identifier].value)) {
